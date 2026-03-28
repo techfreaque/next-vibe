@@ -10,3 +10,5 @@ export const scopedTranslation = createScopedTranslation({
 
 export type StoryComponentsTranslationKey =
   (typeof scopedTranslation)["ScopedTranslationKey"];
+
+export type ScopedKey = StoryComponentsTranslationKey;

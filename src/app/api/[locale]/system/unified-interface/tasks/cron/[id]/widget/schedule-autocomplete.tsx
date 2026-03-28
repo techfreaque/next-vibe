@@ -36,7 +36,8 @@ import { CRON_SCHEDULES } from "@/app/api/[locale]/system/unified-interface/task
 import { formatCronScheduleShort } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation as cronIdScopedTranslation } from "../i18n";
 
 export interface ScheduleAutocompleteProps {
   value?: string;
@@ -63,7 +64,7 @@ export function ScheduleAutocomplete({
   name,
   locale,
 }: ScheduleAutocompleteProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = cronIdScopedTranslation.scopedT(locale);
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isCustomValue, setIsCustomValue] = useState(false);
@@ -141,7 +142,7 @@ export function ScheduleAutocomplete({
             <Div className="flex items-center gap-2 flex-1 min-w-0">
               {isCustomValue && (
                 <Badge variant="secondary" className="text-xs">
-                  {t("app.admin.cron.taskDetails.customBadge")}
+                  {t("widget.scheduleAutocomplete.customBadge")}
                 </Badge>
               )}
               <Span className="truncate">
@@ -185,7 +186,7 @@ export function ScheduleAutocomplete({
               <CommandEmpty>
                 <Div className="py-6 text-center text-sm">
                   <P className="text-muted-foreground">
-                    {t("app.admin.cron.taskDetails.noSchedulesFound")}
+                    {t("widget.scheduleAutocomplete.noSchedulesFound")}
                   </P>
                   {allowCustom && searchValue && (
                     <Button
@@ -194,7 +195,7 @@ export function ScheduleAutocomplete({
                       className="mt-2"
                       onClick={() => handleCustomValue(searchValue)}
                     >
-                      {t("app.admin.cron.taskDetails.useCustomSchedule", {
+                      {t("widget.scheduleAutocomplete.useCustomSchedule", {
                         searchValue,
                       })}
                     </Button>
@@ -204,7 +205,7 @@ export function ScheduleAutocomplete({
 
               {filteredOptions.length > 0 && (
                 <CommandGroup
-                  heading={t("app.admin.cron.taskDetails.commonSchedules")}
+                  heading={t("widget.scheduleAutocomplete.commonSchedules")}
                 >
                   {filteredOptions.map((option) => (
                     <CommandItem
@@ -227,7 +228,7 @@ export function ScheduleAutocomplete({
                     className="flex items-center justify-between"
                   >
                     <Span>
-                      {t("app.admin.cron.taskDetails.useCustomSchedule", {
+                      {t("widget.scheduleAutocomplete.useCustomSchedule", {
                         searchValue,
                       })}
                     </Span>

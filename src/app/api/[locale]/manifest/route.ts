@@ -6,9 +6,9 @@
 
 import { NextResponse } from "next/server";
 
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
-import { simpleT } from "@/i18n/core/shared";
 
 // Constants for manifest values (non-translatable)
 const MANIFEST_CONSTANTS = {
@@ -35,7 +35,7 @@ export async function GET(
   const { locale } = await params;
 
   // Create translation function for the current locale
-  const { t } = simpleT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
 
   // Extract language from locale (e.g., "en" from "en-GLOBAL")
   const language = getLanguageFromLocale(locale);
@@ -45,9 +45,9 @@ export async function GET(
 
   // Create localized manifest
   const manifest = {
-    name: t("config.appName"),
-    short_name: t("config.appName"),
-    description: t("config.appDescription"),
+    name: configT("appName"),
+    short_name: configT("appName"),
+    description: configT("appDescription"),
     start_url: `/${locale}/`,
     display: MANIFEST_CONSTANTS.DISPLAY,
     background_color: MANIFEST_CONSTANTS.BACKGROUND_COLOR,

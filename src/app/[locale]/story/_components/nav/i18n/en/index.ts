@@ -22,6 +22,10 @@ export const translations = {
     title: "Invest",
     description: "Back the open AI platform",
   },
+  blog: {
+    title: "Blog",
+    description: "Deep dives into the architecture and ideas behind next-vibe",
+  },
   user: {
     dashboard: "Dashboard",
     completeOnboarding: "Complete Onboarding",

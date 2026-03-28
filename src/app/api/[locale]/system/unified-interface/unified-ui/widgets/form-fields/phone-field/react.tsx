@@ -32,7 +32,6 @@ import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/ap
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
@@ -68,7 +67,6 @@ export function PhoneFieldWidget<
   const isDisabled = useWidgetDisabled();
 
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
-  const { t: globalT } = simpleT(locale);
 
   if (!form || !fieldName) {
     return <Div>{widgetT("react.widgets.formField.requiresContext")}</Div>;
@@ -80,7 +78,7 @@ export function PhoneFieldWidget<
   const phonePlaceholder =
     field.placeholder !== undefined
       ? tField(field.placeholder)
-      : globalT("packages.nextVibeUi.web.common.enterPhoneNumber");
+      : widgetT("widgets.formFields.common.enterPhoneNumber");
 
   return (
     <FormField
@@ -139,7 +137,7 @@ export function PhoneFieldWidget<
                     variant="secondary"
                     className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
                   >
-                    {globalT("packages.nextVibeUi.web.common.required")}
+                    {widgetT("widgets.formFields.common.required")}
                   </Badge>
                 )}
               </Div>

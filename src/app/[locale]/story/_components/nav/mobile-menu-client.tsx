@@ -14,8 +14,8 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation } from "../i18n";
 import { ThemeToggleMobile } from "../../../_components/theme-toggle";
 import type { NavItemType } from "./nav-constants";
 
@@ -63,7 +63,7 @@ export function MobileMenuClient({
   locale,
   navigationItems,
 }: MobileMenuClientProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
     {},
@@ -87,7 +87,7 @@ export function MobileMenuClient({
         size="icon"
         className="md:hidden"
         onClick={toggleMenu}
-        aria-label={t("app.common.accessibility.srOnly.toggleMenu")}
+        aria-label={t("common.accessibility.srOnly.toggleMenu")}
       >
         {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
       </Button>

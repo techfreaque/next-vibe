@@ -14,10 +14,12 @@ import type { JSX, ReactNode } from "react";
 
 import { getCookie } from "@tanstack/react-start/server";
 
+import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "./layout-i18n";
 
 import { RootProviders } from "./layout-shared";
 
@@ -38,14 +40,15 @@ export async function generateMetadata({
   params,
 }: RootLayoutMetaProps): Promise<Metadata> {
   const { locale } = await params;
+  const { t } = scopedTranslation.scopedT(locale);
   return metadataGenerator(locale, {
     path: "",
-    title: "app.layout.metadata.defaultTitle",
-    category: "app.layout.metadata.category",
-    description: "app.layout.metadata.description",
+    title: t("meta.defaultTitle"),
+    category: t("meta.category"),
+    description: t("meta.description"),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/og-image.jpg`,
-    imageAlt: "app.layout.openGraph.imageAlt",
-    keywords: ["app.meta.home.keywords"],
+    imageAlt: t("meta.imageAlt"),
+    keywords: [t("meta.keywords")],
   });
 }
 
@@ -82,31 +85,28 @@ export async function tanstackLoader({
   params: Promise<{ locale: CountryLanguage }>;
 }): Promise<Omit<RootLayoutData, "children">> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": t("app.layout.structuredData.organization.types.organization"),
-    name: t("config.group.name"),
+    "@type": t("structuredData.organization.types.organization"),
+    name: configT("group.name"),
     url: envClient.NEXT_PUBLIC_APP_URL,
     logo: `${envClient.NEXT_PUBLIC_APP_URL}/logo.png`,
     sameAs: [
-      t("config.social.facebookUrl"),
-      t("config.social.twitterUrl"),
-      t("config.social.instagramUrl"),
-      t("config.social.linkedinUrl"),
+      configT("social.facebookUrl"),
+      configT("social.twitterUrl"),
+      configT("social.instagramUrl"),
+      configT("social.linkedinUrl"),
     ],
     contactPoint: {
-      "@type": t("app.layout.structuredData.organization.types.contactPoint"),
-      telephone: t(
-        "app.layout.structuredData.organization.contactPoint.telephone",
-      ),
-      contactType: t(
-        "app.layout.structuredData.organization.contactPoint.contactType",
-      ),
+      "@type": t("structuredData.organization.types.contactPoint"),
+      telephone: configT("group.contact.telephone"),
+      contactType: t("structuredData.organization.contactPoint.contactType"),
       availableLanguage: [
-        t("app.constants.languages.en"),
-        t("app.constants.languages.de"),
-        t("app.constants.languages.pl"),
+        t("constants.languages.en"),
+        t("constants.languages.de"),
+        t("constants.languages.pl"),
       ],
     },
   };

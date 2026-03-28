@@ -7,10 +7,12 @@ import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "./i18n";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -18,27 +20,28 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
+  const { t } = scopedTranslation.scopedT(locale);
   return metadataGenerator(locale, {
-    title: "app.meta.careers.title",
-    description: "app.meta.careers.description",
+    title: t("meta.title"),
+    description: t("meta.description"),
     additionalMetadata: {
       openGraph: {
-        title: "app.meta.careers.ogTitle",
-        description: "app.meta.careers.ogDescription",
+        title: t("meta.ogTitle"),
+        description: t("meta.ogDescription"),
         url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/careers`,
         type: "website",
       },
       twitter: {
         card: "summary_large_image",
-        title: "app.meta.careers.twitterTitle",
-        description: "app.meta.careers.twitterDescription",
+        title: t("meta.twitterTitle"),
+        description: t("meta.twitterDescription"),
       },
     },
     path: "careers",
-    category: "app.meta.careers.category",
+    category: t("meta.category"),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/careers-hero.jpg`,
-    imageAlt: "app.meta.careers.imageAlt",
-    keywords: ["app.meta.careers.keywords"],
+    imageAlt: t("meta.imageAlt"),
+    keywords: [t("meta.keywords")],
   });
 }
 
@@ -62,23 +65,15 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<CareersPageData> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const openPositions: readonly JobPosition[] = [
     {
       id: "socialMediaManager",
-      title: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.title",
-      ),
-      description: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.shortDescription",
-      ),
+      title: t("jobs.socialMediaManager.title"),
+      description: t("jobs.socialMediaManager.shortDescription"),
       type: "Full-time",
-      location: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.location",
-      ),
-      department: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.department",
-      ),
+      location: t("jobs.socialMediaManager.location"),
+      department: t("jobs.socialMediaManager.department"),
 
       // current date - 2.5 weeks
       postedDate: new Date(
@@ -91,17 +86,11 @@ export async function tanstackLoader({
     },
     {
       id: "contentCreator",
-      title: t("app.story._components.home.careers.jobs.contentCreator.title"),
-      description: t(
-        "app.story._components.home.careers.jobs.contentCreator.shortDescription",
-      ),
+      title: t("jobs.contentCreator.title"),
+      description: t("jobs.contentCreator.shortDescription"),
       type: "Full-time",
-      location: t(
-        "app.story._components.home.careers.jobs.contentCreator.location",
-      ),
-      department: t(
-        "app.story._components.home.careers.jobs.contentCreator.department",
-      ),
+      location: t("jobs.contentCreator.location"),
+      department: t("jobs.contentCreator.department"),
       // current date - 2.5 weeks
       postedDate: new Date(
         Date.now() - 2.5 * 7 * 24 * 60 * 60 * 1000,
@@ -120,19 +109,20 @@ export function TanstackPage({
   locale,
   openPositions,
 }: CareersPageData): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
 
   return (
     <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
       <Div className="container max-w-6xl mx-auto py-8 px-4">
         <Div className="max-w-4xl mx-auto">
           <H1 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600">
-            {t("app.story._components.home.careers.title")}
+            {t("title")}
           </H1>
 
           <P className="text-xl text-gray-700 dark:text-gray-300 mb-8">
-            {t("app.story._components.home.careers.description", {
-              appName: t("config.appName"),
+            {t("description", {
+              appName: configT("appName"),
             })}
           </P>
 
@@ -141,83 +131,65 @@ export function TanstackPage({
             <Div className="absolute inset-0 bg-blue-600/20 bg-linear-to-br from-blue-600/20 to-cyan-500/20 z-10" />
             <Div className="absolute inset-0 bg-black/60 bg-linear-to-t from-black/60 to-transparent z-10" />
             <Div className="absolute bottom-0 left-0 p-8 z-20 text-white">
-              <H2 className="text-3xl font-bold mb-2">
-                {t("app.story._components.home.careers.joinTeam")}
-              </H2>
-              <P className="text-lg max-w-lg">
-                {t("app.story._components.home.careers.subtitle")}
-              </P>
+              <H2 className="text-3xl font-bold mb-2">{t("joinTeam")}</H2>
+              <P className="text-lg max-w-lg">{t("subtitle")}</P>
             </Div>
           </Div>
 
           <Div className="mb-12">
             <H2 className="text-2xl font-semibold mb-4">
-              {t("app.story._components.home.careers.whyWorkWithUs")}
+              {t("whyWorkWithUs")}
             </H2>
             <P className="text-gray-700 dark:text-gray-300 mb-6">
-              {t("app.story._components.home.careers.workplaceDescription")}
+              {t("workplaceDescription")}
             </P>
             <Div className="grid md:grid-cols-2 gap-6">
               <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("app.story._components.home.careers.benefits.growthTitle")}
+                  {t("benefits.growthTitle")}
                 </H3>
                 <P className="text-gray-700 dark:text-gray-300">
-                  {t("app.story._components.home.careers.benefits.growthDesc")}
+                  {t("benefits.growthDesc")}
                 </P>
               </Div>
               <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t(
-                    "app.story._components.home.careers.benefits.meaningfulTitle",
-                  )}
+                  {t("benefits.meaningfulTitle")}
                 </H3>
                 <P className="text-gray-700 dark:text-gray-300">
-                  {t(
-                    "app.story._components.home.careers.benefits.meaningfulDesc",
-                  )}
+                  {t("benefits.meaningfulDesc")}
                 </P>
               </Div>
               <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t(
-                    "app.story._components.home.careers.benefits.balanceTitle",
-                  )}
+                  {t("benefits.balanceTitle")}
                 </H3>
                 <P className="text-gray-700 dark:text-gray-300">
-                  {t("app.story._components.home.careers.benefits.balanceDesc")}
+                  {t("benefits.balanceDesc")}
                 </P>
               </Div>
               <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t(
-                    "app.story._components.home.careers.benefits.compensationTitle",
-                  )}
+                  {t("benefits.compensationTitle")}
                 </H3>
                 <P className="text-gray-700 dark:text-gray-300">
-                  {t(
-                    "app.story._components.home.careers.benefits.compensationDesc",
-                  )}
+                  {t("benefits.compensationDesc")}
                 </P>
               </Div>
               <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t(
-                    "app.story._components.home.careers.benefits.innovationTitle",
-                  )}
+                  {t("benefits.innovationTitle")}
                 </H3>
                 <P className="text-gray-700 dark:text-gray-300">
-                  {t(
-                    "app.story._components.home.careers.benefits.innovationDesc",
-                  )}
+                  {t("benefits.innovationDesc")}
                 </P>
               </Div>
               <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("app.story._components.home.careers.benefits.teamTitle")}
+                  {t("benefits.teamTitle")}
                 </H3>
                 <P className="text-gray-700 dark:text-gray-300">
-                  {t("app.story._components.home.careers.benefits.teamDesc")}
+                  {t("benefits.teamDesc")}
                 </P>
               </Div>
             </Div>
@@ -225,7 +197,7 @@ export function TanstackPage({
 
           <Div className="mb-12">
             <H2 className="text-2xl font-semibold mb-6">
-              {t("app.story._components.home.careers.openPositions")}
+              {t("openPositions")}
             </H2>
             <Div className="grid md:grid-cols-2 gap-8">
               {openPositions.map((position) => (
@@ -240,10 +212,7 @@ export function TanstackPage({
                   <Div className="flex flex-col gap-2 mb-4">
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t(
-                          "app.story._components.home.careers.jobDetail.department",
-                        )}
-                        :
+                        {t("jobDetail.department")}:
                       </Span>
                       <Span className="text-sm font-medium">
                         {position.department}
@@ -251,10 +220,7 @@ export function TanstackPage({
                     </Div>
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t(
-                          "app.story._components.home.careers.jobDetail.employmentType",
-                        )}
-                        :
+                        {t("jobDetail.employmentType")}:
                       </Span>
                       <Span className="text-sm font-medium">
                         {position.type}
@@ -262,10 +228,7 @@ export function TanstackPage({
                     </Div>
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t(
-                          "app.story._components.home.careers.jobDetail.location",
-                        )}
-                        :
+                        {t("jobDetail.location")}:
                       </Span>
                       <Span className="text-sm font-medium">
                         {position.location}
@@ -273,10 +236,7 @@ export function TanstackPage({
                     </Div>
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t(
-                          "app.story._components.home.careers.jobDetail.applicationDeadline",
-                        )}
-                        :
+                        {t("jobDetail.applicationDeadline")}:
                       </Span>
                       <Span className="text-sm font-medium">
                         {position.applicationDeadline}
@@ -286,16 +246,14 @@ export function TanstackPage({
                   <Div className="flex flex-row gap-3">
                     <Button className="flex-1" asChild>
                       <Link href={`/${locale}/story/careers/${position.id}`}>
-                        {t(
-                          "app.story._components.home.careers.jobDetail.moreDetails",
-                        )}
+                        {t("jobDetail.moreDetails")}
                       </Link>
                     </Button>
                     <Button variant="outline" className="flex-1" asChild>
                       <Link
                         href={`mailto:${contactClientRepository.getSupportEmail(locale)}?subject=Application for ${position.title}`}
                       >
-                        {t("app.story._components.home.careers.applyNow")}
+                        {t("applyNow")}
                       </Link>
                     </Button>
                   </Div>
@@ -305,16 +263,12 @@ export function TanstackPage({
           </Div>
 
           <Div className="text-center bg-blue-50 bg-linear-to-br from-blue-50 to-cyan-50 dark:bg-gray-800 dark:from-gray-800 dark:to-gray-700 p-8 rounded-xl">
-            <H2 className="text-2xl font-semibold mb-4">
-              {t("app.story._components.home.careers.readyToJoin")}
-            </H2>
+            <H2 className="text-2xl font-semibold mb-4">{t("readyToJoin")}</H2>
             <P className="text-gray-700 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
-              {t("app.story._components.home.careers.explorePositions")}
+              {t("explorePositions")}
             </P>
             <Button size="lg" asChild>
-              <Link href={`/${locale}/help`}>
-                {t("app.story._components.home.careers.getInTouch")}
-              </Link>
+              <Link href={`/${locale}/help`}>{t("getInTouch")}</Link>
             </Button>
           </Div>
         </Div>

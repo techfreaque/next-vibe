@@ -10,6 +10,7 @@ import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
+import { scopedTranslation } from "./i18n";
 import { FrameworkContent } from "../framework/_components/framework-content";
 
 // Revalidate every hour (ISR)
@@ -21,14 +22,15 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
+  const { t } = scopedTranslation.scopedT(locale);
   return metadataGenerator(locale, {
     path: "story/invest",
-    title: "app.story.invest.meta.title",
-    category: "app.story.invest.meta.category",
-    description: "app.story.invest.meta.description",
+    title: t("meta.title"),
+    category: t("meta.category"),
+    description: t("meta.description"),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`,
-    imageAlt: "app.story.invest.meta.imageAlt",
-    keywords: ["app.story.invest.meta.keywords"],
+    imageAlt: t("meta.imageAlt"),
+    keywords: [t("meta.keywords")],
   });
 }
 

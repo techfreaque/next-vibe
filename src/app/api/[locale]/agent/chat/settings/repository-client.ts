@@ -84,6 +84,7 @@ export class ChatSettingsRepositoryClient {
       pinnedTools: null,
       compactTrigger: COMPACT_TRIGGER,
       memoryLimit: null,
+      codingAgent: null,
     };
   }
 
@@ -129,6 +130,10 @@ export class ChatSettingsRepositoryClient {
           "memoryLimit" in overrides
             ? overrides.memoryLimit
             : defaults.memoryLimit,
+        codingAgent:
+          "codingAgent" in overrides
+            ? overrides.codingAgent
+            : defaults.codingAgent,
       };
     } catch {
       return this.getDefaults();
@@ -183,6 +188,9 @@ export class ChatSettingsRepositoryClient {
     if (settings.memoryLimit !== defaults.memoryLimit) {
       overrides.memoryLimit = settings.memoryLimit;
     }
+    if (settings.codingAgent !== defaults.codingAgent) {
+      overrides.codingAgent = settings.codingAgent;
+    }
 
     if (Object.keys(overrides).length === 0) {
       localStorage.removeItem(STORAGE_KEY);
@@ -227,6 +235,10 @@ export class ChatSettingsRepositoryClient {
         updates.memoryLimit !== undefined
           ? updates.memoryLimit
           : current.memoryLimit,
+      codingAgent:
+        updates.codingAgent !== undefined
+          ? updates.codingAgent
+          : current.codingAgent,
     };
 
     this.saveLocalSettings(updated);

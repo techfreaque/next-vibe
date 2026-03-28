@@ -39,7 +39,7 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 import { useChatSettings } from "../../../chat/settings/hooks";
 import { Selector } from "./selector";
@@ -117,7 +117,7 @@ export function WidgetChatInput({
 }: WidgetChatInputProps): JSX.Element {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const { t } = simpleT(locale);
+  const { t } = aiStreamScopedTranslation.scopedT(locale);
   const isInactive = disabled || isSubmitting;
 
   // Bridge: react to favorite selection → sync model/skill to form
@@ -194,21 +194,21 @@ export function WidgetChatInput({
           {!content && !isInactive && (
             <Div className="absolute inset-0 pl-3 pr-3 pointer-events-none hidden @sm:flex flex-col justify-between pb-1">
               <Div className="text-sm text-muted-foreground/70 pt-2">
-                {t("app.chat.input.placeholder")}
+                {t("input.placeholder")}
               </Div>
               <Div className="flex items-center gap-2 text-[11px] text-muted-foreground/40">
                 <Span>
                   <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
-                    {t("app.chat.input.keyboardShortcuts.enter")}
+                    {t("input.keyboardShortcuts.enter")}
                   </Kbd>{" "}
-                  {t("app.chat.input.keyboardShortcuts.toSend")}
+                  {t("input.keyboardShortcuts.toSend")}
                 </Span>
                 <Span className="opacity-30">{"/"}</Span>
                 <Span>
                   <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
-                    {t("app.chat.input.keyboardShortcuts.shiftEnter")}
+                    {t("input.keyboardShortcuts.shiftEnter")}
                   </Kbd>{" "}
-                  {t("app.chat.input.keyboardShortcuts.forNewLine")}
+                  {t("input.keyboardShortcuts.forNewLine")}
                 </Span>
               </Div>
             </Div>
@@ -306,9 +306,7 @@ export function WidgetChatInput({
                     <Square className="h-3.5 w-3.5 fill-current" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>
-                  {t("app.chat.actions.stopGeneration")}
-                </TooltipContent>
+                <TooltipContent>{t("actions.stopGeneration")}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           ) : (
@@ -326,9 +324,7 @@ export function WidgetChatInput({
                     <Send className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>
-                  {t("app.chat.actions.sendMessage")}
-                </TooltipContent>
+                <TooltipContent>{t("actions.sendMessage")}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           ))}

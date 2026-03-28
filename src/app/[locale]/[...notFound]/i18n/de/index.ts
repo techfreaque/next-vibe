@@ -1,6 +1,30 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  pages: {
+    error: {
+      title: "Etwas ist schiefgelaufen!",
+      message: "Es tut uns leid, aber etwas Unerwartetes ist passiert.",
+      errorId: "Fehler-ID: {{id}}",
+      error_message: "Fehler: {{message}}",
+      stackTrace: "Stack-Trace: {{stack}}",
+      tryAgain: "Erneut versuchen",
+      backToHome: "Zurück zur Startseite",
+    },
+    notFound: {
+      title: "Seite nicht gefunden",
+      description: "Die gesuchte Seite existiert nicht oder wurde verschoben.",
+      goBack: "Zurück",
+      goHome: "Zur Startseite",
+    },
+  },
+  meta: {
+    title: "404 - Seite nicht gefunden",
+    category: "Fehler",
+    description: "Die gesuchte Seite existiert nicht",
+    imageAlt: "404 Nicht gefunden",
+    keywords: "404, nicht gefunden, Fehler",
+  },
   post: {
     title: "Titel",
     description: "Endpunkt-Beschreibung",

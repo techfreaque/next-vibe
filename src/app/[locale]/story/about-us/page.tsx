@@ -15,9 +15,11 @@ import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "./i18n";
 
 // Revalidate every hour (ISR)
 export const revalidate = 3600;
@@ -33,23 +35,24 @@ export const generateMetadata = async ({
   params,
 }: Props): Promise<Metadata> => {
   const { locale } = await params;
+  const { t } = scopedTranslation.scopedT(locale);
   return metadataGenerator(locale, {
     path: "about-us",
-    title: "app.meta.aboutUs.title",
-    category: "app.meta.aboutUs.category",
-    description: "app.meta.aboutUs.description",
+    title: t("meta.title"),
+    category: t("meta.category"),
+    description: t("meta.description"),
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Building_perspective.jpg/1920px-Building_perspective.jpg",
-    imageAlt: "app.meta.aboutUs.imageAlt",
-    keywords: ["app.meta.aboutUs.keywords"],
+    imageAlt: t("meta.imageAlt"),
+    keywords: [t("meta.keywords")],
     additionalMetadata: {
       openGraph: {
-        title: "app.meta.aboutUs.ogTitle",
-        description: "app.meta.aboutUs.ogDescription",
+        title: t("meta.ogTitle"),
+        description: t("meta.ogDescription"),
       },
       twitter: {
-        title: "app.meta.aboutUs.twitterTitle",
-        description: "app.meta.aboutUs.twitterDescription",
+        title: t("meta.twitterTitle"),
+        description: t("meta.twitterDescription"),
       },
     },
   });
@@ -94,36 +97,30 @@ export async function tanstackLoader({
 }
 
 export function TanstackPage({ locale }: AboutUsPageData): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
   // Get values from translations
   const values = [
     {
-      title: t("app.story._components.home.aboutUs.values.excellence.title"),
-      description: t(
-        "app.story._components.home.aboutUs.values.excellence.description",
-      ),
+      title: t("values.excellence.title"),
+      description: t("values.excellence.description"),
       icon: <Award className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
     {
-      title: t("app.story._components.home.aboutUs.values.innovation.title"),
-      description: t(
-        "app.story._components.home.aboutUs.values.innovation.description",
-      ),
+      title: t("values.innovation.title"),
+      description: t("values.innovation.description"),
       icon: <Lightbulb className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
     {
-      title: t("app.story._components.home.aboutUs.values.integrity.title"),
-      description: t(
-        "app.story._components.home.aboutUs.values.integrity.description",
-      ),
+      title: t("values.integrity.title"),
+      description: t("values.integrity.description"),
       icon: <Heart className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
     {
-      title: t("app.story._components.home.aboutUs.values.collaboration.title"),
-      description: t(
-        "app.story._components.home.aboutUs.values.collaboration.description",
-      ),
+      title: t("values.collaboration.title"),
+      description: t("values.collaboration.description"),
       icon: <Handshake className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
   ];
@@ -139,21 +136,21 @@ export function TanstackPage({ locale }: AboutUsPageData): JSX.Element {
             className="inline-flex items-center text-sm text-white/80 hover:text-white mb-8 transition-colors"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("app.story._components.home.aboutUs.backToHome")}
+            {t("backToHome")}
           </Link>
 
           <Div className="max-w-3xl">
             <H1 className="text-4xl md:text-5xl font-bold mb-6">
-              {t("app.story._components.home.aboutUs.title", {
-                appName: t("config.appName"),
+              {t("title", {
+                appName: appName,
               })}
             </H1>
             <P className="text-xl md:text-2xl opacity-90 mb-8">
-              {t("app.story._components.home.aboutUs.subtitle")}
+              {t("subtitle")}
             </P>
             <P className="text-lg opacity-80">
-              {t("app.story._components.home.aboutUs.description", {
-                appName: t("config.appName"),
+              {t("description", {
+                appName: appName,
                 foundedYear: 2024,
               })}
             </P>
@@ -165,15 +162,13 @@ export function TanstackPage({ locale }: AboutUsPageData): JSX.Element {
         {/* Mission Section */}
         <Div className="mb-24">
           <Div className="max-w-4xl mx-auto text-center mb-16">
-            <H2 className="text-4xl font-bold mb-6">
-              {t("app.story._components.home.aboutUs.mission.title")}
-            </H2>
+            <H2 className="text-4xl font-bold mb-6">{t("mission.title")}</H2>
             <P className="text-xl text-blue-600 dark:text-blue-400 font-semibold mb-8">
-              {t("app.story._components.home.aboutUs.mission.subtitle")}
+              {t("mission.subtitle")}
             </P>
             <P className="text-lg text-muted-foreground leading-relaxed">
-              {t("app.story._components.home.aboutUs.mission.description", {
-                appName: t("config.appName"),
+              {t("mission.description", {
+                appName: appName,
               })}
             </P>
           </Div>
@@ -186,17 +181,14 @@ export function TanstackPage({ locale }: AboutUsPageData): JSX.Element {
                   <Lightbulb className="h-7 w-7 text-blue-600 dark:text-blue-400" />
                 </Div>
                 <CardTitle className="text-xl">
-                  {t("app.story._components.home.aboutUs.mission.vision.title")}
+                  {t("mission.vision.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <P className="text-muted-foreground leading-relaxed">
-                  {t(
-                    "app.story._components.home.aboutUs.mission.vision.description",
-                    {
-                      appName: t("config.appName"),
-                    },
-                  )}
+                  {t("mission.vision.description", {
+                    appName: appName,
+                  })}
                 </P>
               </CardContent>
             </Card>
@@ -207,16 +199,12 @@ export function TanstackPage({ locale }: AboutUsPageData): JSX.Element {
                   <Globe className="h-7 w-7 text-green-600 dark:text-green-400" />
                 </Div>
                 <CardTitle className="text-xl">
-                  {t(
-                    "app.story._components.home.aboutUs.mission.approach.title",
-                  )}
+                  {t("mission.approach.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <P className="text-muted-foreground leading-relaxed">
-                  {t(
-                    "app.story._components.home.aboutUs.mission.approach.description",
-                  )}
+                  {t("mission.approach.description")}
                 </P>
               </CardContent>
             </Card>
@@ -227,16 +215,12 @@ export function TanstackPage({ locale }: AboutUsPageData): JSX.Element {
                   <Handshake className="h-7 w-7 text-purple-600 dark:text-purple-400" />
                 </Div>
                 <CardTitle className="text-xl">
-                  {t(
-                    "app.story._components.home.aboutUs.mission.commitment.title",
-                  )}
+                  {t("mission.commitment.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <P className="text-muted-foreground leading-relaxed">
-                  {t(
-                    "app.story._components.home.aboutUs.mission.commitment.description",
-                  )}
+                  {t("mission.commitment.description")}
                 </P>
               </CardContent>
             </Card>
@@ -246,15 +230,15 @@ export function TanstackPage({ locale }: AboutUsPageData): JSX.Element {
           <Div className="relative rounded-2xl overflow-hidden h-[400px] shadow-2xl">
             <Image
               src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070"
-              alt={t("app.story._components.home.aboutUs.mission.title")}
+              alt={t("mission.title")}
               fill
               className="object-cover"
             />
             <Div className="absolute inset-0 bg-black/60 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
             <Div className="absolute bottom-8 left-8 right-8 text-white">
-              <H3 className="text-2xl font-bold mb-2">{t("config.appName")}</H3>
+              <H3 className="text-2xl font-bold mb-2">{appName}</H3>
               <P className="text-lg opacity-90">
-                {t("app.story._components.home.hero.subtitle", {
+                {t("hero.subtitle", {
                   modelCount: TOTAL_MODEL_COUNT,
                 })}
               </P>
@@ -265,12 +249,10 @@ export function TanstackPage({ locale }: AboutUsPageData): JSX.Element {
         {/* Values Section */}
         <Div className="mb-24">
           <Div className="max-w-3xl mx-auto text-center mb-12">
-            <H2 className="text-3xl font-bold mb-4">
-              {t("app.story._components.home.aboutUs.values.title")}
-            </H2>
+            <H2 className="text-3xl font-bold mb-4">{t("values.title")}</H2>
             <P className="text-lg text-muted-foreground">
-              {t("app.story._components.home.aboutUs.values.description", {
-                appName: t("config.appName"),
+              {t("values.description", {
+                appName: appName,
               })}
             </P>
           </Div>
@@ -291,19 +273,15 @@ export function TanstackPage({ locale }: AboutUsPageData): JSX.Element {
         <Separator className="my-16" />
 
         <Div className="max-w-3xl mx-auto text-center mb-12">
-          <H2 className="text-3xl font-bold mb-4">
-            {t("app.story._components.home.aboutUs.contact.title")}
-          </H2>
+          <H2 className="text-3xl font-bold mb-4">{t("contact.title")}</H2>
           <P className="text-lg text-muted-foreground">
-            {t("app.story._components.home.aboutUs.contact.description")}
+            {t("contact.description")}
           </P>
         </Div>
 
         <Div className="mt-12 text-center">
           <Button asChild size="lg">
-            <Link href={`/${locale}/help`}>
-              {t("app.story._components.home.aboutUs.contact.cta")}
-            </Link>
+            <Link href={`/${locale}/help`}>{t("contact.cta")}</Link>
           </Button>
         </Div>
       </Div>

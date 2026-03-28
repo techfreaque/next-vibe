@@ -17,7 +17,8 @@ import type { FC } from "react";
 import { useInView } from "react-intersection-observer";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "./i18n";
 
 interface ProcessProps {
   locale: CountryLanguage;
@@ -32,7 +33,7 @@ interface ProcessStep {
 }
 
 const Process: FC<ProcessProps> = ({ locale }) => {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -41,45 +42,29 @@ const Process: FC<ProcessProps> = ({ locale }) => {
   const steps: ProcessStep[] = [
     {
       number: "01",
-      title: t(
-        "app.story._components.home.process.steps.strategyDevelopment.title",
-      ),
-      description: t(
-        "app.story._components.home.process.steps.strategyDevelopment.description",
-      ),
+      title: t("home.process.steps.strategyDevelopment.title"),
+      description: t("home.process.steps.strategyDevelopment.description"),
       icon: <Lightbulb className="h-8 w-8 text-amber-500" />,
       image: "/images/process/strategy.png",
     },
     {
       number: "02",
-      title: t(
-        "app.story._components.home.process.steps.contentCreation.title",
-      ),
-      description: t(
-        "app.story._components.home.process.steps.contentCreation.description",
-      ),
+      title: t("home.process.steps.contentCreation.title"),
+      description: t("home.process.steps.contentCreation.description"),
       icon: <PenTool className="h-8 w-8 text-blue-500" />,
       image: "/images/process/content.png",
     },
     {
       number: "03",
-      title: t(
-        "app.story._components.home.process.steps.publishingManagement.title",
-      ),
-      description: t(
-        "app.story._components.home.process.steps.publishingManagement.description",
-      ),
+      title: t("home.process.steps.publishingManagement.title"),
+      description: t("home.process.steps.publishingManagement.description"),
       icon: <MessageSquare className="h-8 w-8 text-green-500" />,
       image: "/images/process/publishing.png",
     },
     {
       number: "04",
-      title: t(
-        "app.story._components.home.process.steps.analysisOptimization.title",
-      ),
-      description: t(
-        "app.story._components.home.process.steps.analysisOptimization.description",
-      ),
+      title: t("home.process.steps.analysisOptimization.title"),
+      description: t("home.process.steps.analysisOptimization.description"),
       icon: <BarChart3 className="h-8 w-8 text-purple-500" />,
       image: "/images/process/analysis.png",
     },
@@ -98,9 +83,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
             animate={inView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Span className="font-medium">
-              {t("app.story._components.home.process.badge")}
-            </Span>
+            <Span className="font-medium">{t("home.process.badge")}</Span>
           </MotionDiv>
 
           <MotionDiv
@@ -109,7 +92,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            {t("app.story._components.home.process.title")}{" "}
+            {t("home.process.title")}{" "}
           </MotionDiv>
 
           <MotionDiv
@@ -118,7 +101,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            {t("app.story._components.home.process.subtitle")}
+            {t("home.process.subtitle")}
           </MotionDiv>
         </Div>
 
@@ -158,12 +141,12 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                       <>
                         <Span className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
                           {t(
-                            "app.story._components.home.process.steps.strategyDevelopment.tags.audienceAnalysis",
+                            "home.process.steps.strategyDevelopment.tags.audienceAnalysis",
                           )}
                         </Span>
                         <Span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                           {t(
-                            "app.story._components.home.process.steps.strategyDevelopment.tags.competitorResearch",
+                            "home.process.steps.strategyDevelopment.tags.competitorResearch",
                           )}
                         </Span>
                       </>
@@ -172,12 +155,12 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                       <>
                         <Span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
                           {t(
-                            "app.story._components.home.process.steps.contentCreation.tags.brandAlignedContent",
+                            "home.process.steps.contentCreation.tags.brandAlignedContent",
                           )}
                         </Span>
                         <Span className="inline-flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm font-medium text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
                           {t(
-                            "app.story._components.home.process.steps.contentCreation.tags.engagingVisuals",
+                            "home.process.steps.contentCreation.tags.engagingVisuals",
                           )}
                         </Span>
                       </>
@@ -186,12 +169,12 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                       <>
                         <Span className="inline-flex items-center rounded-full bg-cyan-100 px-3 py-1 text-sm font-medium text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400">
                           {t(
-                            "app.story._components.home.process.steps.publishingManagement.tags.optimalTiming",
+                            "home.process.steps.publishingManagement.tags.optimalTiming",
                           )}
                         </Span>
                         <Span className="inline-flex items-center rounded-full bg-pink-100 px-3 py-1 text-sm font-medium text-pink-800 dark:bg-pink-900/30 dark:text-pink-400">
                           {t(
-                            "app.story._components.home.process.steps.publishingManagement.tags.communityBuilding",
+                            "home.process.steps.publishingManagement.tags.communityBuilding",
                           )}
                         </Span>
                       </>
@@ -200,12 +183,12 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                       <>
                         <Span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400">
                           {t(
-                            "app.story._components.home.process.steps.analysisOptimization.tags.performanceMetrics",
+                            "home.process.steps.analysisOptimization.tags.performanceMetrics",
                           )}
                         </Span>
                         <Span className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
                           {t(
-                            "app.story._components.home.process.steps.analysisOptimization.tags.strategyRefinement",
+                            "home.process.steps.analysisOptimization.tags.strategyRefinement",
                           )}
                         </Span>
                       </>
@@ -231,13 +214,13 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                         <Div className="h-2 w-2 rounded-full bg-green-500" />
                         <Span className="text-sm font-medium">
                           {t(
-                            "app.story._components.home.process.steps.strategyDevelopment.insights.title",
+                            "home.process.steps.strategyDevelopment.insights.title",
                           )}
                         </Span>
                       </Div>
                       <P className="text-xs text-gray-600 dark:text-gray-300">
                         {t(
-                          "app.story._components.home.process.steps.strategyDevelopment.insights.description",
+                          "home.process.steps.strategyDevelopment.insights.description",
                         )}
                       </P>
                     </Div>
@@ -249,13 +232,13 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                         <Div className="h-2 w-2 rounded-full bg-blue-500" />
                         <Span className="text-sm font-medium">
                           {t(
-                            "app.story._components.home.process.steps.contentCreation.insights.title",
+                            "home.process.steps.contentCreation.insights.title",
                           )}
                         </Span>
                       </Div>
                       <P className="text-xs text-gray-600 dark:text-gray-300">
                         {t(
-                          "app.story._components.home.process.steps.contentCreation.insights.description",
+                          "home.process.steps.contentCreation.insights.description",
                         )}
                       </P>
                     </Div>
@@ -279,16 +262,16 @@ const Process: FC<ProcessProps> = ({ locale }) => {
               </Div>
             </Div>
             <H3 className="text-xl font-bold mb-2">
-              {t("app.story._components.home.process.readyTransform")}
+              {t("home.process.readyTransform")}
             </H3>
             <P className="text-gray-600 dark:text-gray-300 mb-4">
-              {t("app.story._components.home.process.handleSocial")}
+              {t("home.process.handleSocial")}
             </P>
             <Link
               href={`/${locale}/subscription/overview`}
               className="inline-flex items-center justify-center rounded-md bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 shadow-md hover:shadow-lg transition-all"
             >
-              {t("app.story._components.home.process.getStarted")}
+              {t("home.process.getStarted")}
             </Link>
           </Div>
         </MotionDiv>

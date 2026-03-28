@@ -3,6 +3,30 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   nav: navTranslations,
+  newsletter: {
+    title: "Bądź na bieżąco",
+    description:
+      "Subskrybuj nasz newsletter, aby otrzymywać najnowsze aktualizacje i spostrzeżenia.",
+    emailPlaceholder: "Wpisz e-mail",
+    subscribe: "Subskrybuj",
+    subscription: {
+      unsubscribe: {
+        title: "Wypisz się",
+        confirmButton: "Potwierdź wypisanie",
+      },
+    },
+  },
+  common: {
+    selector: {
+      country: "Kraj",
+      language: "Język",
+    },
+    accessibility: {
+      srOnly: {
+        toggleMenu: "Przełącz menu",
+      },
+    },
+  },
   home: {
     hero: {
       badge: "Open source - MIT + GPL v3",
@@ -94,6 +118,41 @@ export const translations: typeof enTranslations = {
           messageResult:
             'Wysłano: "email-sync naprawiono. Przyczyna: 5s timeout IMAP nadpisywał konfigurację. Załatano, przebudowano, 47 oczekujących e-maili jest teraz synchronizowanych."',
         },
+      },
+    },
+    splitHero: {
+      or: "LUB",
+      clickToExplore: "Kliknij, aby odkryć",
+      unbottled: {
+        badge: "AI bez cenzury",
+        titleLine1: "Twoje AI.",
+        titleLine2: "Twoje zasady.",
+        subtitle:
+          "{{modelCount}} modeli, zero cenzury. Każda rozmowa pozostaje twoja.",
+        pill1: "{{modelCount}}+ modeli",
+        pill2: "Filtrowanie kontrolowane przez użytkownika",
+        pill3: "{{skillCount}}+ umiejętności",
+        cta: "Zacznij za darmo",
+      },
+      nextvibe: {
+        badge: "Framework open source",
+        titleLine1: "Twoja platforma.",
+        titleLine2: "Twój stack.",
+        subtitle:
+          "Jedna definicja → {{toolCount}}+ narzędzi, CLI, MCP, web, mobile, cron. Sforkuj. Posiadaj wszystko.",
+        pill1: "10 platform, 1 definicja",
+        pill2: "Ultra-ścisły TypeScript",
+        pill3: "MIT + GPL v3",
+        ctaGithub: "Star na GitHub",
+        ctaDocs: "Dokumentacja",
+      },
+      tab: {
+        unbottled: "unbottled.ai",
+        unbottledSub: "AI dla użytkowników",
+        unbottledDesc: "Platforma AI dla każdego",
+        nextvibe: "next-vibe",
+        nextvibeSub: "Framework SaaS",
+        nextvibeDesc: "Framework open source napędzający unbottled.ai",
       },
     },
     forumHero: {
@@ -1180,6 +1239,7 @@ export const translations: typeof enTranslations = {
       title: "Firma",
       aboutUs: "O nas",
       careers: "Kariera",
+      blog: "Blog",
       imprint: "Informacje prawne",
       privacyPolicy: "Polityka prywatności",
       termsOfService: "Warunki korzystania",

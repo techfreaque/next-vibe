@@ -489,4 +489,17 @@ export const translations = {
       title: "Confirm batch tool calls",
     },
   },
+  flatView: {
+    timestamp: {
+      sun: "Sun",
+      mon: "Mon",
+      tue: "Tue",
+      wed: "Wed",
+      thu: "Thu",
+      fri: "Fri",
+      sat: "Sat",
+      format:
+        "{{month}}/{{day}}/{{year}}({{dayName}}){{hours}}:{{mins}}:{{secs}}",
+    },
+  },
 };

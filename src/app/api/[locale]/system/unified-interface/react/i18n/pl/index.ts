@@ -93,6 +93,8 @@ export const translations: typeof enTranslations = {
         cancel: "Anuluj",
         deny: "Odmów",
       },
+      creditsUsed_one: "{{cost}} kredyt",
+      creditsUsed_other: "{{cost}} kredytów",
     },
     codeQualityList: {
       noData: "Nie znaleziono problemów z jakością kodu",

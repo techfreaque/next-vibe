@@ -19,7 +19,6 @@ import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";
 import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 interface LeadsEmailsPageProps {
   params: Promise<{
@@ -72,14 +71,13 @@ export function TanstackPage({
   availableJourneys,
   journeyData,
 }: LeadsEmailsPageData): React.JSX.Element {
-  const { t } = simpleT(locale);
-  const { t: scopedT } = leadsScopedTranslation.scopedT(locale);
+  const { t } = leadsScopedTranslation.scopedT(locale);
 
   return (
     <Div className="flex flex-col gap-6">
       {/* Page Description */}
       <P className="text-muted-foreground">
-        {t("app.admin.leads.leads.admin.emails.description")}
+        {t("admin.tabs.emails_description")}
       </P>
 
       {/* Email Templates Overview */}
@@ -113,8 +111,7 @@ export function TanstackPage({
                 {journey.info.description}
               </P>
               <Span className="text-xs text-blue-600 dark:text-blue-300 mt-1">
-                {journey.stages.length}{" "}
-                {t("app.admin.leads.leads.admin.emails.templates")}
+                {journey.stages.length} {t("admin.emails.stages")}
               </Span>
             </Div>
 
@@ -129,7 +126,7 @@ export function TanstackPage({
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base flex items-center gap-2">
                         <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        {scopedT(stage)}
+                        {stage}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -138,7 +135,7 @@ export function TanstackPage({
                         size="sm"
                         className="w-full text-sm"
                       >
-                        {t("app.admin.leads.leads.admin.emails.view_preview")}
+                        {t("admin.emails.email_preview")}
                       </Button>
                     </CardContent>
                   </Card>

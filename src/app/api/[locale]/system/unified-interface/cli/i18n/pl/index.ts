@@ -93,6 +93,8 @@ export const translations: typeof enTranslations = {
       },
       renderers: {
         cliUi: {
+          noEndpoint:
+            "Ta funkcja nie jest jeszcze dostępna. Proszę spróbować ponownie później",
           helpHandler: {
             noDescription: "Brak dostępnego opisu",
             flagDataDesc: "Podaj dane żądania jako JSON",

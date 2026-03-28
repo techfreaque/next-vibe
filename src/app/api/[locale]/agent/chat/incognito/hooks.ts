@@ -10,10 +10,9 @@ import { useCallback, useEffect, useState } from "react";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation as chatScopedTranslation } from "../i18n";
 
 import type { DefaultFolderId } from "../config";
-import { CHAT_CONSTANTS } from "../constants";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { ChatMessageRole, ThreadStatus } from "../enum";
 import {
@@ -80,7 +79,7 @@ export function useIncognitoChat(
   currentRootFolderId: DefaultFolderId,
   currentSubFolderId: string | null,
 ): UseIncognitoChatReturn {
-  const { t } = simpleT(locale);
+  const { t } = chatScopedTranslation.scopedT(locale);
 
   // Load initial state from storage
   const [state, setState] = useState<IncognitoState>({
@@ -132,7 +131,7 @@ export function useIncognitoChat(
 
       void (async (): Promise<void> => {
         const thread = await createIncognitoThread(
-          title || t(CHAT_CONSTANTS.DEFAULT_THREAD_TITLE),
+          title || t("common.newChat"),
           currentRootFolderId,
           currentSubFolderId,
           threadId,
@@ -148,7 +147,7 @@ export function useIncognitoChat(
         id: threadId,
         userId: "incognito",
         leadId: null,
-        title: title || t(CHAT_CONSTANTS.DEFAULT_THREAD_TITLE),
+        title: title || t("common.newChat"),
         rootFolderId: currentRootFolderId,
         folderId: currentSubFolderId,
         status: ThreadStatus.ACTIVE,

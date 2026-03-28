@@ -10,7 +10,8 @@ import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation as pageT } from "./i18n";
 
 interface AdminDashboardPageProps {
   params: Promise<{
@@ -32,12 +33,12 @@ export async function tanstackLoader({
 export function TanstackPage({
   locale,
 }: AdminDashboardPageData): React.JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
 
   return (
     <Div className="p-6 flex flex-col gap-8">
       <P className="text-gray-600 dark:text-gray-400">
-        {t("app.admin.dashboard.subtitle")}
+        {t("dashboard.subtitle")}
       </P>
     </Div>
   );

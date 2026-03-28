@@ -17,7 +17,7 @@ import { contactClientRepository } from "@/app/api/[locale]/contact/repository-c
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { configScopedTranslation } from "@/config/i18n";
 
 import { EmailTemplate } from "../../messenger/providers/email/smtp-client/components/template.email";
 import {
@@ -59,8 +59,8 @@ function NewsletterWelcomeEmail({
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
-  const { t: globalT } = simpleT(locale);
-  const appName = globalT("config.appName");
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
+  const appName = globalT("appName");
 
   return (
     <EmailTemplate
@@ -434,11 +434,11 @@ export const adminNewsletterSubscribeEmailTemplate: EmailTemplateDefinition<
     subscriberName: "Max Mustermann",
   },
   render: ({ requestData, locale, t, user }) => {
-    const { t: globalT } = simpleT(locale);
+    const { t: globalT } = configScopedTranslation.scopedT(locale);
     try {
       return success({
         toEmail: contactClientRepository.getSupportEmail(locale),
-        toName: globalT("config.appName"),
+        toName: globalT("appName"),
         subject: t("emailTemplate.admin_notification.subject"),
         leadId: user.leadId,
         jsx: AdminNotificationEmailContent({

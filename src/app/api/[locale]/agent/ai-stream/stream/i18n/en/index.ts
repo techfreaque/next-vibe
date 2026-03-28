@@ -746,4 +746,67 @@ export const translations = {
       },
     },
   },
+  input: {
+    placeholder: "Send a message...",
+    imagePlaceholder: "Describe an image to generate...",
+    audioPlaceholder: "Describe audio or music to generate...",
+    noPermission: "You don't have permission to post here",
+    keyboardShortcuts: {
+      enter: "Enter",
+      toSend: "to send",
+      shiftEnter: "Shift+Enter",
+      forNewLine: "for new line",
+      ctrlV: "Ctrl+V",
+      orPasteFiles: "or paste files",
+    },
+    speechInput: {
+      transcribing: "Transcribing...",
+    },
+    attachments: {
+      uploadFile: "Attach files",
+      attachedFiles: "Attached Files",
+      addMore: "Add More",
+    },
+  },
+  imageGen: {
+    sizeSquare: "Square (1024×1024)",
+    sizeLandscape: "Landscape (1792×1024)",
+    sizePortrait: "Portrait (1024×1792)",
+    qualityStandard: "Standard",
+    qualityHD: "HD",
+  },
+  audioGen: {
+    durationShort: "Short (~8s)",
+    durationMedium: "Medium (~15s)",
+    durationLong: "Long (~30s)",
+  },
+  voiceMode: {
+    unconfiguredTitle: "Voice Not Configured",
+    unconfiguredDescription: "Text-to-speech is not available for this skill.",
+    callMode: "Call mode",
+    callModeDescription: "AI will respond with voice",
+    tapToRecord: "Tap to record",
+    recording: {
+      paused: "Paused",
+      resume: "Resume",
+      pause: "Pause",
+    },
+    callOverlay: {
+      listening: "Listening...",
+    },
+    actions: {
+      cancel: "Cancel",
+      toInput: "To Input",
+      sendVoice: "Send Voice",
+    },
+  },
+  actions: {
+    cancellingGeneration: "Cancelling...",
+    stopGeneration: "Stop",
+    sendMessage: "Send",
+  },
+  toolsButton: {
+    title: "AI Tools",
+    tools: "Tools",
+  },
 };

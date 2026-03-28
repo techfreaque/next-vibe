@@ -53,6 +53,9 @@ export const chatSettings = pgTable("chat_settings", {
   // Memory budget in tokens (null = use DEFAULT_MEMORY_BUDGET_TOKENS; cascades to skill → favorite → subagent)
   memoryLimit: integer("memory_limit"),
 
+  // Coding agent provider preference (admin-only). null = "claude-code" (default)
+  codingAgent: jsonb("coding_agent").$type<"claude-code" | "open-code">(),
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

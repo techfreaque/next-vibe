@@ -65,9 +65,12 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTouchDevice } from "@/hooks/use-touch-device";
-import { simpleT } from "@/i18n/core/shared";
+import {
+  scopedTranslation as chatScopedTranslation,
+  type ChatT,
+} from "@/app/api/[locale]/agent/chat/i18n";
 
-import { DEFAULT_FOLDER_CONFIGS, DefaultFolderId } from "../../config";
+import { DefaultFolderId } from "../../config";
 import type { ChatThread } from "../../db";
 import { useChatStore } from "../../hooks/store";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
@@ -77,6 +80,17 @@ import { scopedTranslation } from "../i18n";
 
 type ThreadFromResponse = ThreadListResponseOutput["threads"][number];
 type FolderFromResponse = FolderListResponseOutput["folders"][number];
+
+function getFolderName(folderId: DefaultFolderId, tChat: ChatT): string {
+  const folderNames: Record<DefaultFolderId, string> = {
+    [DefaultFolderId.PRIVATE]: tChat("config.folders.private"),
+    [DefaultFolderId.INCOGNITO]: tChat("config.folders.incognito"),
+    [DefaultFolderId.SHARED]: tChat("config.folders.shared"),
+    [DefaultFolderId.PUBLIC]: tChat("config.folders.public"),
+    [DefaultFolderId.CRON]: tChat("config.folders.cron"),
+  };
+  return folderNames[folderId];
+}
 
 /**
  * Props for custom widget - matches the customWidgetObject pattern
@@ -104,6 +118,7 @@ function ThreadRow({
   const isTouch = useTouchDevice();
   const { locale, logger, user } = useWidgetContext();
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: tChat } = chatScopedTranslation.scopedT(locale);
   const navIsStreaming = useChatNavigationStore((s) => s.isStreaming);
   // Optimistic: show streaming indicator immediately when the active thread starts
   // streaming (before the WS STREAMING_STATE_CHANGED event arrives from the server)
@@ -495,10 +510,7 @@ function ThreadRow({
                             className="cursor-pointer"
                           >
                             <Icon icon="folder" className="h-4 w-4 mr-2" />
-                            {simpleT(locale).t(
-                              DEFAULT_FOLDER_CONFIGS[thread.rootFolderId]
-                                .translationKey,
-                            )}
+                            {getFolderName(thread.rootFolderId, tChat)}
                           </DropdownMenuItem>
                         )}
                         {allFolders.map((folder) => (

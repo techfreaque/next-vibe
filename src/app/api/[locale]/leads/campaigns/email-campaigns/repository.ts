@@ -32,8 +32,8 @@ import {
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { env } from "@/config/env";
+import { configScopedTranslation } from "@/config/i18n";
 import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { emailJourneyVariants, leads } from "../../db";
@@ -444,7 +444,8 @@ export class EmailCampaignsRepository {
             fullLead.language,
             fullLead.country,
           );
-          const { t: simpleLocalT } = simpleT(leadLocale);
+          const { t: configLocalT } =
+            configScopedTranslation.scopedT(leadLocale);
 
           if (!fullLead.email) {
             result.emailsFailed++;
@@ -485,9 +486,9 @@ export class EmailCampaignsRepository {
             .limit(1);
 
           const variantSenderName =
-            variantRow?.senderName ?? simpleLocalT("config.appName");
+            variantRow?.senderName ?? configLocalT("appName");
           const variantCompanyName =
-            variantRow?.companyName ?? simpleLocalT("config.appName");
+            variantRow?.companyName ?? configLocalT("appName");
           const variantCompanyEmail =
             variantRow?.companyEmail ??
             contactClientRepository.getSupportEmail(leadLocale);

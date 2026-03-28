@@ -12,40 +12,40 @@
 
 Import from `next-vibe-ui/ui/*` — never from `next/image`, `next/link`, or framework-specific component libraries.
 
-| Import | Web | Native | TanStack |
-|--------|-----|--------|----------|
-| `next-vibe-ui/ui/link` | `next/link` | `expo-router` Link | `@tanstack/react-router` Link |
-| `next-vibe-ui/ui/image` | `next/image` (optimized) | React Native `Image` | plain `<img>` |
-| `next-vibe-ui/ui/button` | shadcn/ui Button | rn-primitives Button | shadcn/ui Button |
-| `next-vibe-ui/ui/head` | Next.js `<Head>` | N/A | TanStack head() |
-| `next-vibe-ui/ui/body` | `<body>` | N/A | `<body>` |
-| `next-vibe-ui/ui/outlet` | renders children | N/A | TanStack `<Outlet>` |
-| `next-vibe-ui/ui/theme-provider` | next-themes | `Appearance` API | N/A |
-| `next-vibe-ui/ui/div` | `<div>` | `<View>` | `<div>` |
-| `next-vibe-ui/ui/span` | `<span>` | `<Text>` | `<span>` |
-| All other `ui/*` | shadcn/ui | rn-primitives | shadcn/ui |
+| Import                           | Web                      | Native               | TanStack                      |
+| -------------------------------- | ------------------------ | -------------------- | ----------------------------- |
+| `next-vibe-ui/ui/link`           | `next/link`              | `expo-router` Link   | `@tanstack/react-router` Link |
+| `next-vibe-ui/ui/image`          | `next/image` (optimized) | React Native `Image` | plain `<img>`                 |
+| `next-vibe-ui/ui/button`         | shadcn/ui Button         | rn-primitives Button | shadcn/ui Button              |
+| `next-vibe-ui/ui/head`           | Next.js `<Head>`         | N/A                  | TanStack head()               |
+| `next-vibe-ui/ui/body`           | `<body>`                 | N/A                  | `<body>`                      |
+| `next-vibe-ui/ui/outlet`         | renders children         | N/A                  | TanStack `<Outlet>`           |
+| `next-vibe-ui/ui/theme-provider` | next-themes              | `Appearance` API     | N/A                           |
+| `next-vibe-ui/ui/div`            | `<div>`                  | `<View>`             | `<div>`                       |
+| `next-vibe-ui/ui/span`           | `<span>`                 | `<Text>`             | `<span>`                      |
+| All other `ui/*`                 | shadcn/ui                | rn-primitives        | shadcn/ui                     |
 
 ### Navigation & Routing
 
 Import from `next-vibe-ui/hooks/*` — never from `next/navigation` directly.
 
-| Import | Web | Native | TanStack |
-|--------|-----|--------|----------|
-| `next-vibe-ui/hooks/use-navigation` | `useRouter` (next/navigation) | `useExpoRouter` | `useNavigate` |
-| `next-vibe-ui/hooks/use-pathname` | `usePathname` (next/navigation) | `useExpoPathname` | `useLocation().pathname` |
+| Import                              | Web                             | Native            | TanStack                 |
+| ----------------------------------- | ------------------------------- | ----------------- | ------------------------ |
+| `next-vibe-ui/hooks/use-navigation` | `useRouter` (next/navigation)   | `useExpoRouter`   | `useNavigate`            |
+| `next-vibe-ui/hooks/use-pathname`   | `usePathname` (next/navigation) | `useExpoPathname` | `useLocation().pathname` |
 
 ### Server Utilities
 
 Import from `next-vibe-ui/lib/*` — never from `next/headers`, `next/navigation` (server), or `next/server` directly.
 
-| Import | Web | TanStack | Native |
-|--------|-----|----------|--------|
-| `next-vibe-ui/lib/headers` | `next/headers` cookies/headers | TanStack SSR shim | N/A |
-| `next-vibe-ui/lib/redirect` | `next/navigation` redirect | `@tanstack/react-router` redirect | expo-router replace |
-| `next-vibe-ui/lib/not-found` | `next/navigation` notFound | TanStack notFound | throws Error |
-| `next-vibe-ui/lib/request` | `NextRequest`/`NextResponse` from `next/server` | Custom compatible classes | N/A |
-| `next-vibe-ui/lib/storage` | `localStorage` (async wrapper) | `AsyncStorage` | N/A |
-| `next-vibe-ui/lib/cookies` (client) | `document.cookie` wrapper | `AsyncStorage` | N/A |
+| Import                              | Web                                             | TanStack                          | Native              |
+| ----------------------------------- | ----------------------------------------------- | --------------------------------- | ------------------- |
+| `next-vibe-ui/lib/headers`          | `next/headers` cookies/headers                  | TanStack SSR shim                 | N/A                 |
+| `next-vibe-ui/lib/redirect`         | `next/navigation` redirect                      | `@tanstack/react-router` redirect | expo-router replace |
+| `next-vibe-ui/lib/not-found`        | `next/navigation` notFound                      | TanStack notFound                 | throws Error        |
+| `next-vibe-ui/lib/request`          | `NextRequest`/`NextResponse` from `next/server` | Custom compatible classes         | N/A                 |
+| `next-vibe-ui/lib/storage`          | `localStorage` (async wrapper)                  | `AsyncStorage`                    | N/A                 |
+| `next-vibe-ui/lib/cookies` (client) | `document.cookie` wrapper                       | `AsyncStorage`                    | N/A                 |
 
 ---
 
@@ -80,6 +80,7 @@ import "server-only"; // ✅ — works on Next.js and TanStack
 ```
 
 Never use:
+
 ```typescript
 if (typeof window === "undefined") { ... } // ❌ — fragile, not tree-shakeable
 ```
@@ -109,7 +110,10 @@ When writing `widget.tsx` components that render on native:
 - For native-only platform detection use `platform-helpers`:
 
 ```typescript
-import { isNative, platformSelect } from "@/app/api/[locale]/system/unified-interface/react-native/platform-helpers";
+import {
+  isNative,
+  platformSelect,
+} from "@/app/api/[locale]/system/unified-interface/react-native/platform-helpers";
 
 const fontSize = platformSelect({ native: 16, web: 14 });
 ```

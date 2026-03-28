@@ -4,11 +4,11 @@
 
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import type { DivRefObject } from "next-vibe-ui/ui/div";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useCallback, useLayoutEffect, useState } from "react";
 
@@ -19,7 +19,6 @@ import {
 } from "@/app/[locale]/chat/lib/utils/formatting";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { scopedTranslation } from "../../i18n";
 import { getPostsByUserId } from "./helpers";
@@ -43,8 +42,6 @@ export function UserIdHoverCard({
   locale,
 }: UserIdHoverCardProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  // simpleT needed for format4chanTimestamp which uses global app.chat.flatView.timestamp.* keys
-  const { t: tGlobal } = simpleT(locale);
   const userPosts = getPostsByUserId(messages, userId);
   const postCount = userPosts.length;
   const idColor = getIdColor(userId);
@@ -122,7 +119,7 @@ export function UserIdHoverCard({
                   suppressHydrationWarning
                 >
                   {/* eslint-disable-next-line i18next/no-literal-string -- Technical post number and separator */}
-                  {`Post #${idx + 1} • ${format4chanTimestamp(post.createdAt.getTime(), tGlobal)}`}
+                  {`Post #${idx + 1} • ${format4chanTimestamp(post.createdAt.getTime(), t)}`}
                 </Div>
                 <Div className="text-sm text-foreground/90 line-clamp-2">
                   {(post.content ?? "").slice(0, 100)}

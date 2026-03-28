@@ -21,7 +21,7 @@ import {
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { configScopedTranslation } from "@/config/i18n";
 
 import {
   ErrorResponseTypes,
@@ -82,8 +82,8 @@ function SubscriptionSuccessEmail({
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
-  const { t: globalT } = simpleT(locale);
-  const appName = globalT("config.appName");
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
   const modelCategories = [
     {
@@ -459,7 +459,7 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
   },
   render: ({ user, requestData, locale }) => {
     const { t } = subscriptionScopedTranslation.scopedT(locale);
-    const { t: globalT } = simpleT(locale);
+    const { t: configT } = configScopedTranslation.scopedT(locale);
     try {
       const templateProps: SubscriptionSuccessProps = {
         privateName: requestData.user?.privateName ?? "",
@@ -476,7 +476,7 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
         toEmail: requestData.user?.email ?? "",
         toName: templateProps.privateName,
         subject: t("email.success.subject", {
-          appName: globalT("config.appName"),
+          appName: configT("appName"),
         }),
         leadId: templateProps.leadId,
         jsx: subscriptionSuccessEmailTemplate.component({
@@ -526,13 +526,13 @@ function AdminSubscriptionNotificationEmailContent({
   recipientEmail: string;
 }): ReactElement {
   const tracking = createTrackingContext(locale);
-  const { t: globalT } = simpleT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
   return (
     <EmailTemplate
       locale={locale}
       title={t("email.admin_notification.title")}
       previewText={t("email.admin_notification.preview", {
-        appName: globalT("config.appName"),
+        appName: configT("appName"),
       })}
       recipientEmail={recipientEmail}
       tracking={tracking}
@@ -559,7 +559,7 @@ function AdminSubscriptionNotificationEmailContent({
         }}
       >
         {t("email.admin_notification.message", {
-          appName: globalT("config.appName"),
+          appName: configT("appName"),
         })}
       </Span>
 
@@ -705,7 +705,7 @@ function AdminSubscriptionNotificationEmailContent({
         }}
       >
         {t("email.admin_notification.footer", {
-          appName: globalT("config.appName"),
+          appName: configT("appName"),
         })}
       </Span>
     </EmailTemplate>

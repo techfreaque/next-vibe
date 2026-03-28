@@ -124,7 +124,9 @@ export function MyWidget({ field }: CliWidgetProps): React.JSX.Element {
   // CLI: colored, formatted, human-readable
   return (
     <Box flexDirection="column">
-      <Text bold color="cyan">{value.summary}</Text>
+      <Text bold color="cyan">
+        {value.summary}
+      </Text>
     </Box>
   );
 }
@@ -160,18 +162,25 @@ const DETAIL_THRESHOLD = 5;
 // >5 items → compact one-line-per-item list with pagination hint
 
 const count = value.items.length;
-const output = count <= DETAIL_THRESHOLD
-  ? (isMcp ? renderDetailMcp(value.items) : renderDetailCli(value.items))
-  : (isMcp ? renderListMcp(value) : renderListCli(value));
+const output =
+  count <= DETAIL_THRESHOLD
+    ? isMcp
+      ? renderDetailMcp(value.items)
+      : renderDetailCli(value.items)
+    : isMcp
+      ? renderListMcp(value)
+      : renderListCli(value);
 ```
 
 **MCP list format** — one line per item, pipe-separated fields:
+
 ```
 SkillName — tagline • modelInfo • provider
 Page 1/3 - use page=2 for next
 ```
 
 **CLI list format** — aligned columns, chalk colors, grouped by section:
+
 ```
   Skills
     name           tagline truncated to 50 chars   model

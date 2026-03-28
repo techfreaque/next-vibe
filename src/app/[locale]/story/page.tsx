@@ -18,16 +18,9 @@ import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { simpleT } from "@/i18n/core/shared";
 
-import { Architecture } from "./_components/architecture";
-import CallToAction from "./_components/call-to-action";
-import { CapabilityShowcase } from "./_components/capability-showcase";
-import { CloudVsSelfHost } from "./_components/cloud-vs-selfhost";
-import Hero from "./_components/hero";
-import { OpenClawComparison } from "./_components/openclaw-comparison";
-import { ProblemStatement } from "./_components/problem-statement";
-import { StatsStrip } from "./_components/stats-strip";
+import { HomeClient } from "./_components/home-client";
+import { scopedTranslation } from "./i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -42,44 +35,16 @@ export async function generateMetadata({
   params,
 }: HomePageProps): Promise<Metadata> {
   const { locale } = await params;
+  const { t } = scopedTranslation.scopedT(locale);
   return metadataGenerator(locale, {
     path: "",
-    title: "app.meta.home.title",
-    category: "app.meta.home.category",
-    description: "app.meta.home.description",
+    title: t("meta.title"),
+    category: t("meta.category"),
+    description: t("meta.description"),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`,
-    imageAlt: "app.meta.home.imageAlt",
-    keywords: ["app.meta.home.keywords"],
-    additionalMetadata: {
-      openGraph: {
-        title: "app.meta.home.ogTitle",
-        description: "app.meta.home.ogDescription",
-        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}`,
-        type: "website",
-        images: [
-          {
-            url: `${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`,
-            width: 1200,
-            height: 630,
-            alt: "app.meta.home.imageAlt",
-          },
-        ],
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: "app.meta.home.twitterTitle",
-        description: "app.meta.home.twitterDescription",
-        images: [`${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`],
-      },
-    },
+    imageAlt: t("meta.imageAlt"),
+    keywords: [t("meta.keywords")],
   });
-}
-
-export default async function StoryPage({
-  params,
-}: HomePageProps): Promise<JSX.Element | never> {
-  const data = await tanstackLoader({ params });
-  return <TanstackPage {...data} />;
 }
 
 interface StoryPageData {
@@ -131,16 +96,16 @@ export function TanstackPage({
   hasUser,
 }: StoryPageData): JSX.Element {
   if (!hasUser) {
-    const { t } = simpleT(locale);
+    const { t } = scopedTranslation.scopedT(locale);
     return (
       <Div>
         <Div className="flex items-center justify-center min-h-screen p-4">
           <Div className="max-w-md text-center">
             <P className="text-lg font-semibold mb-2">
-              {t("app.common.error.title")}
+              {t("common.error.title")}
             </P>
             <P className="text-sm text-muted-foreground">
-              {t("app.common.error.message")}
+              {t("common.error.message")}
             </P>
           </Div>
         </Div>
@@ -149,19 +114,19 @@ export function TanstackPage({
   }
 
   return (
-    <Div role="main" className="flex min-h-screen flex-col w-full">
-      <Hero locale={locale} totalToolCount={totalToolCount} />
-      <ProblemStatement locale={locale} />
-      <CapabilityShowcase locale={locale} totalToolCount={totalToolCount} />
-      <Architecture locale={locale} />
-      <OpenClawComparison locale={locale} totalToolCount={totalToolCount} />
-      <CloudVsSelfHost
-        locale={locale}
-        subPrice={subPrice}
-        subCurrency={subCurrency}
-      />
-      <StatsStrip locale={locale} totalEndpointCount={totalEndpointCount} />
-      <CallToAction locale={locale} />
-    </Div>
+    <HomeClient
+      locale={locale}
+      totalToolCount={totalToolCount}
+      totalEndpointCount={totalEndpointCount}
+      subPrice={subPrice}
+      subCurrency={subCurrency}
+    />
   );
+}
+
+export default async function StoryPage({
+  params,
+}: HomePageProps): Promise<JSX.Element | never> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

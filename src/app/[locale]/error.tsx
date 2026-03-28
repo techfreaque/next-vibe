@@ -13,7 +13,8 @@ import type { ReactElement } from "react";
 import { envClient } from "@/config/env-client";
 import useErrorHandler from "@/hooks/use-error-handler";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation as pageT } from "./[...notFound]/i18n";
 
 export default function ErrorPage({
   error,
@@ -32,38 +33,36 @@ export default function ErrorPage({
   }
 
   const { locale }: { locale: CountryLanguage } = useParams();
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
   const digest = useErrorHandler(error, locale);
 
   return (
     <Div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">
-      <H2 className="text-3xl font-bold mb-4">{t("app.pages.error.title")}</H2>
+      <H2 className="text-3xl font-bold mb-4">{t("pages.error.title")}</H2>
       <P className="text-gray-600 dark:text-gray-400 mb-8 max-w-md">
-        {t("app.pages.error.message")}
+        {t("pages.error.message")}
         {digest && (
           <Span className="block mt-2 text-xs text-gray-500">
-            {t("app.pages.error.errorId", { id: digest })}
+            {t("pages.error.errorId", { id: digest })}
           </Span>
         )}
         {error.message && (
           <Span className="block mt-2 text-xs text-gray-500">
-            {t("app.pages.error.error_message", { message: error.message })}
+            {t("pages.error.error_message", { message: error.message })}
           </Span>
         )}
         {error.stack && (
           <Span className="block mt-2 text-xs text-gray-500">
-            {t("app.pages.error.stackTrace", { stack: error.stack })}
+            {t("pages.error.stackTrace", { stack: error.stack })}
           </Span>
         )}
       </P>
       <Div className="flex flex-col sm:flex-row gap-4">
         <Button onClick={() => reset()} variant="outline">
-          {t("app.pages.error.tryAgain")}
+          {t("pages.error.tryAgain")}
         </Button>
         <Button asChild>
-          <Link href={`/${locale}/threads`}>
-            {t("app.pages.error.backToHome")}
-          </Link>
+          <Link href={`/${locale}/threads`}>{t("pages.error.backToHome")}</Link>
         </Button>
       </Div>
     </Div>

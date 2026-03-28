@@ -376,5 +376,11 @@ export const translations = {
       editTitle: "Task Input Parameters",
       editDescription: "Configure the input parameters for this task endpoint",
     },
+    scheduleAutocomplete: {
+      customBadge: "Custom",
+      noSchedulesFound: "No schedules found",
+      useCustomSchedule: "Use custom schedule",
+      commonSchedules: "Common Schedules",
+    },
   },
 };

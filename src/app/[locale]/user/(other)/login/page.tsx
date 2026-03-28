@@ -47,19 +47,20 @@ export interface LoginPageData {
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
+  const { t } = pageT.scopedT(locale);
   return metadataGenerator(locale, {
     path: "login",
-    title: "app.user.other.login.meta.title",
-    description: "app.user.other.login.meta.description",
-    category: "app.user.other.login.meta.category",
+    title: t("meta.title"),
+    description: t("meta.description"),
+    category: t("meta.category"),
     image:
       "https://images.unsplash.com/photo-1611926653458-09294b3142bf?q=80&w=1200&h=630&auto=format&fit=crop",
-    imageAlt: "app.user.other.login.meta.imageAlt",
-    keywords: ["app.user.other.login.meta.keywords"],
+    imageAlt: t("meta.imageAlt"),
+    keywords: [t("meta.keywords")],
     additionalMetadata: {
       openGraph: {
-        title: "app.user.other.login.meta.ogTitle",
-        description: "app.user.other.login.meta.ogDescription",
+        title: t("meta.ogTitle"),
+        description: t("meta.ogDescription"),
         url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/user/login`,
         type: "website",
         images: [
@@ -67,14 +68,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             url: "https://images.unsplash.com/photo-1611926653458-09294b3142bf?q=80&w=1200&h=630&auto=format&fit=crop",
             width: 1200,
             height: 630,
-            alt: "app.user.other.login.meta.imageAlt",
+            alt: t("meta.imageAlt"),
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: "app.user.other.login.meta.twitterTitle",
-        description: "app.user.other.login.meta.twitterDescription",
+        title: t("meta.twitterTitle"),
+        description: t("meta.twitterDescription"),
         images: [
           "https://images.unsplash.com/photo-1611926653458-09294b3142bf?q=80&w=1200&h=630&auto=format&fit=crop",
         ],

@@ -32,20 +32,20 @@ export interface ResetPasswordPageData {
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
+  const { t } = pageT.scopedT(locale);
   return metadataGenerator(locale, {
     path: "reset-password",
-    title: "app.user.other.resetPassword.meta.passwordReset.title",
-    description: "app.user.other.resetPassword.meta.passwordReset.description",
-    category: "app.user.other.resetPassword.meta.passwordReset.category",
+    title: t("meta.passwordReset.title"),
+    description: t("meta.passwordReset.description"),
+    category: t("meta.passwordReset.category"),
     image:
       "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
-    imageAlt: "app.user.other.resetPassword.meta.passwordReset.imageAlt",
-    keywords: ["app.user.other.resetPassword.meta.passwordReset.keywords"],
+    imageAlt: t("meta.passwordReset.imageAlt"),
+    keywords: [t("meta.passwordReset.keywords")],
     additionalMetadata: {
       openGraph: {
-        title: "app.user.other.resetPassword.meta.passwordReset.title",
-        description:
-          "app.user.other.resetPassword.meta.passwordReset.description",
+        title: t("meta.passwordReset.title"),
+        description: t("meta.passwordReset.description"),
         url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/reset-password`,
         type: "website",
         images: [
@@ -53,15 +53,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             url: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
             width: 1200,
             height: 630,
-            alt: "app.user.other.resetPassword.meta.passwordReset.imageAlt",
+            alt: t("meta.passwordReset.imageAlt"),
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: "app.user.other.resetPassword.meta.passwordReset.title",
-        description:
-          "app.user.other.resetPassword.meta.passwordReset.description",
+        title: t("meta.passwordReset.title"),
+        description: t("meta.passwordReset.description"),
         images: [
           "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
         ],

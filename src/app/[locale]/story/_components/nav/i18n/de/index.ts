@@ -24,6 +24,10 @@ export const translations: typeof enTranslations = {
     title: "Investieren",
     description: "Unterstütze die offene KI-Plattform",
   },
+  blog: {
+    title: "Blog",
+    description: "Technische Einblicke in die Architektur von next-vibe",
+  },
   user: {
     dashboard: "Dashboard",
     completeOnboarding: "Onboarding abschließen",

@@ -19,7 +19,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 interface ToolsButtonProps {
   disabled?: boolean;
@@ -80,7 +80,7 @@ export function ToolsButton({
   const activeToolCount = enabledTools
     ? enabledTools.filter((tool) => tool.pinned).length
     : getDefaultToolIds(isAdmin, isCustomer).length;
-  const { t } = simpleT(locale);
+  const { t } = aiStreamScopedTranslation.scopedT(locale);
 
   return (
     <Button
@@ -93,11 +93,11 @@ export function ToolsButton({
         "relative inline-flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 h-8 sm:h-9 px-1.5 sm:px-2 md:px-3",
         activeToolCount > 0 && "border-primary/50 bg-primary/5",
       )}
-      title={t("app.chat.toolsButton.title")}
+      title={t("toolsButton.title")}
     >
       <Wrench className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
       <Span className="hidden @2xl:inline text-xs">
-        {t("app.chat.toolsButton.tools")}
+        {t("toolsButton.tools")}
       </Span>
       {activeToolCount > 0 && (
         <Badge

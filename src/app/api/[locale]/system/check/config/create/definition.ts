@@ -7,20 +7,27 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import React from "react";
+
 import { UserRole } from "../../../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
+
+// Lazy import to avoid TDZ circular dependency in MCP context
+// (widget.tsx type-imports definition → circular module resolution → "Cannot access 'default' before initialization")
+const ConfigCreateWidget = React.lazy(() =>
+  import("./widget").then((m) => ({ default: m.ConfigCreateWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -40,13 +47,9 @@ const { POST } = createEndpoint({
   ],
   aliases: ["config-create", "create-config", "cc"],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "title",
-    description: "description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: ConfigCreateWidget,
+    usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
       createMcpConfig: requestField(scopedTranslation, {

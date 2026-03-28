@@ -24,8 +24,8 @@ import {
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as pageT } from "../i18n";
 import { EmailPreviewClient } from "../_components/email-preview-client";
 
 interface EmailTemplatePreviewPageProps {
@@ -71,7 +71,7 @@ export async function tanstackLoader({
   params,
 }: EmailTemplatePreviewPageProps): Promise<EmailTemplatePreviewPageData> {
   const { locale, templateId } = await params;
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
   const user = await requireAdminUser(locale);
 
   // Load full template and metadata in parallel (server-side only)
@@ -114,13 +114,13 @@ export async function tanstackLoader({
     exampleProps: exampleProps as Record<string, string | number | boolean>,
     previousTemplateId,
     nextTemplateId,
-    backLabel: t("app.admin.emails.templates.preview.back_to_templates"),
-    previousLabel: t("app.admin.emails.templates.preview.previous"),
-    nextLabel: t("app.admin.emails.templates.preview.next"),
-    idLabel: t("app.admin.emails.templates.preview.id"),
-    versionLabel: t("app.admin.emails.templates.preview.version"),
-    categoryLabel: t("app.admin.emails.templates.preview.category"),
-    pathLabel: t("app.admin.emails.templates.preview.path"),
+    backLabel: t("preview.back_to_templates"),
+    previousLabel: t("preview.previous"),
+    nextLabel: t("preview.next"),
+    idLabel: t("preview.id"),
+    versionLabel: t("preview.version"),
+    categoryLabel: t("preview.category"),
+    pathLabel: t("preview.path"),
   };
 }
 

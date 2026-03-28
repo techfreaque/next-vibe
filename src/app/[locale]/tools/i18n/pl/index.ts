@@ -6,4 +6,9 @@ export const translations: typeof enTranslations = {
   description:
     "Zarządzaj dostępnymi narzędziami AI. Przypnij narzędzia, aby zawsze były w kontekście.",
   openFullPage: "Otwórz pełną stronę",
+  modal: {
+    title: "Narzędzia AI",
+    description:
+      "Zarządzaj dostępnymi narzędziami AI. Przypnij narzędzia, aby zawsze były w kontekście.",
+  },
 };

@@ -60,5 +60,13 @@ export const translations: typeof enTranslations = {
     codeQualityFiles: {
       affectedFiles: "Betroffene Dateien",
     },
+    formFields: {
+      common: {
+        required: "Erforderlich",
+        enterPhoneNumber: "Telefonnummer eingeben",
+        selectDate: "Datum auswählen",
+        unknownFieldType: "Unbekannter Feldtyp",
+      },
+    },
   },
 };

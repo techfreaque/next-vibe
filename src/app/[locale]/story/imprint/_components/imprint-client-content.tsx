@@ -7,7 +7,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { ReactElement } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation } from "../i18n";
 
 interface ImprintClientInteractionProps {
   locale: CountryLanguage;
@@ -24,7 +24,7 @@ const handlePrint = (): void => {
 export function ImprintClientInteraction({
   locale,
 }: ImprintClientInteractionProps): ReactElement {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <Div className="flex justify-end mb-8">
@@ -33,10 +33,10 @@ export function ImprintClientInteraction({
         size="unset"
         onClick={handlePrint}
         className="flex items-center gap-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 rounded-md text-blue-700 dark:text-blue-300 transition-colors"
-        aria-label={t("app.story.imprint.printAriaLabel")}
+        aria-label={t("printAriaLabel")}
       >
         <Printer className="h-4 w-4" />
-        <Span>{t("app.story.imprint.printButton")}</Span>
+        <Span>{t("printButton")}</Span>
       </Button>
     </Div>
   );

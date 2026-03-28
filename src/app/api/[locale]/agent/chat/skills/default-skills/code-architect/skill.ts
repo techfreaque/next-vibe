@@ -1,4 +1,4 @@
-import { CLAUDE_CODE_ALIAS } from "@/app/api/[locale]/agent/claude-code/constants";
+import { CODING_AGENT_ALIAS } from "@/app/api/[locale]/agent/coding-agent/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
@@ -32,7 +32,7 @@ export const codeArchitectSkill: Skill = {
   voice: TtsVoice.MALE,
   userRole: envClient.NEXT_PUBLIC_LOCAL_MODE ? [UserPermissionRole.ADMIN] : [],
   availableTools: [
-    tool(CLAUDE_CODE_ALIAS),
+    tool(CODING_AGENT_ALIAS),
     tool(TOOL_HELP_ALIAS),
     tool(MEMORY_LIST_ALIAS),
     tool(MEMORY_ADD_ALIAS),

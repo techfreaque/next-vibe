@@ -92,6 +92,8 @@ export const translations = {
         cancel: "Cancel",
         deny: "Deny",
       },
+      creditsUsed_one: "{{cost}} credit",
+      creditsUsed_other: "{{cost}} credits",
     },
     codeQualityList: {
       noData: "No code quality issues found",

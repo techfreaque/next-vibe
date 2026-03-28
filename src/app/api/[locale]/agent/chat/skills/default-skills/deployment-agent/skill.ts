@@ -1,6 +1,6 @@
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
-import { CLAUDE_CODE_ALIAS } from "@/app/api/[locale]/agent/claude-code/constants";
+import { CODING_AGENT_ALIAS } from "@/app/api/[locale]/agent/coding-agent/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -32,7 +32,7 @@ export const deploymentAgentSkill: Skill = {
   voice: TtsVoice.MALE,
   userRole: envClient.NEXT_PUBLIC_LOCAL_MODE ? [UserPermissionRole.ADMIN] : [],
   availableTools: [
-    tool(CLAUDE_CODE_ALIAS),
+    tool(CODING_AGENT_ALIAS),
     tool(HEALTH_ALIAS),
     tool(TOOL_HELP_ALIAS),
     tool(MEMORY_LIST_ALIAS),

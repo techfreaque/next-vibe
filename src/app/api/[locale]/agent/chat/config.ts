@@ -10,7 +10,7 @@ import {
   type UserPermissionRoleValue,
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
 
 /**
  * Default folder IDs
@@ -206,13 +206,13 @@ export interface DefaultFolderConfig {
   id: DefaultFolderId;
 
   /** Translation key for folder name */
-  translationKey: TranslationKey;
+  translationKey: ChatTranslationKey;
 
   /** Icon identifier (lucide icon name or si icon name) */
   icon: IconKey;
 
   /** Translation key for folder description */
-  descriptionKey: TranslationKey;
+  descriptionKey: ChatTranslationKey;
 
   /** Display order (0-based) */
   order: number;
@@ -243,9 +243,9 @@ export interface DefaultFolderConfig {
 export const DEFAULT_FOLDER_CONFIGS = {
   [DefaultFolderId.PRIVATE]: {
     id: DefaultFolderId.PRIVATE,
-    translationKey: "app.chat.common.privateChats",
+    translationKey: "common.privateChats",
     icon: "lock",
-    descriptionKey: "app.chat.folders.privateDescription",
+    descriptionKey: "folders.privateDescription",
     order: 0,
     color: "sky", // Softer blue for private/secure
     rolesView: [], // Owner only
@@ -257,9 +257,9 @@ export const DEFAULT_FOLDER_CONFIGS = {
   },
   [DefaultFolderId.INCOGNITO]: {
     id: DefaultFolderId.INCOGNITO,
-    translationKey: "app.chat.common.incognitoChats",
+    translationKey: "common.incognitoChats",
     icon: "shield-plus",
-    descriptionKey: "app.chat.folders.incognitoDescription",
+    descriptionKey: "folders.incognitoDescription",
     order: 1,
     color: "purple", // Purple for incognito/private
     rolesView: [], // Local only
@@ -271,9 +271,9 @@ export const DEFAULT_FOLDER_CONFIGS = {
   },
   [DefaultFolderId.SHARED]: {
     id: DefaultFolderId.SHARED,
-    translationKey: "app.chat.common.sharedChats",
+    translationKey: "common.sharedChats",
     icon: "users",
-    descriptionKey: "app.chat.folders.sharedDescription",
+    descriptionKey: "folders.sharedDescription",
     order: 2,
     color: "teal", // Collaborative teal for shared
     rolesView: [], // Will be set via share links
@@ -285,9 +285,9 @@ export const DEFAULT_FOLDER_CONFIGS = {
   },
   [DefaultFolderId.PUBLIC]: {
     id: DefaultFolderId.PUBLIC,
-    translationKey: "app.chat.common.publicChats",
+    translationKey: "common.publicChats",
     icon: "1a",
-    descriptionKey: "app.chat.folders.publicDescription",
+    descriptionKey: "folders.publicDescription",
     order: 3,
     color: "amber", // Premium gold/amber for public 1A
     rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN], // Visible to all
@@ -299,9 +299,9 @@ export const DEFAULT_FOLDER_CONFIGS = {
   },
   [DefaultFolderId.CRON]: {
     id: DefaultFolderId.CRON,
-    translationKey: "app.chat.common.cronChats",
+    translationKey: "common.cronChats",
     icon: "clock",
-    descriptionKey: "app.chat.folders.cronDescription",
+    descriptionKey: "folders.cronDescription",
     order: 4,
     color: "green", // Green for automated/cron tasks
     rolesView: [UserRole.ADMIN], // Only admins can view

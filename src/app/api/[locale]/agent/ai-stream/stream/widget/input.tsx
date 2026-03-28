@@ -64,7 +64,7 @@ import {
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 import { CallModeIndicator } from "../hooks/call-mode-indicator";
 import { FileUploadButton } from "../hooks/file-upload-button";
@@ -309,7 +309,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   }, [activeThread, currentSubFolderId, folders, rootFolderPermissions]);
   const noPermissionReason = undefined; // Simplified - full logic can be restored later
 
-  const { t } = simpleT(locale);
+  const { t } = aiStreamScopedTranslation.scopedT(locale);
   const voiceRuntime = useVoiceRuntimeState();
   const voiceUnconfigured = !envAvailability.voice;
 
@@ -529,32 +529,32 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
             <Div className="absolute inset-0 pl-3 pr-3 pointer-events-none hidden @sm:flex flex-col justify-between pb-1">
               <Div className="text-sm text-muted-foreground/70 pt-2">
                 {isImageModel
-                  ? t("app.chat.input.imagePlaceholder")
+                  ? t("input.imagePlaceholder")
                   : isAudioModel
-                    ? t("app.chat.input.audioPlaceholder")
-                    : t("app.chat.input.placeholder")}
+                    ? t("input.audioPlaceholder")
+                    : t("input.placeholder")}
               </Div>
               {!isGenerativeModel && (
                 <Div className="flex items-center gap-2 text-[11px] text-muted-foreground/40">
                   <Span>
                     <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
-                      {t("app.chat.input.keyboardShortcuts.enter")}
+                      {t("input.keyboardShortcuts.enter")}
                     </Kbd>{" "}
-                    {t("app.chat.input.keyboardShortcuts.toSend")}
+                    {t("input.keyboardShortcuts.toSend")}
                   </Span>
                   <Span className="opacity-30">{"/"}</Span>
                   <Span>
                     <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
-                      {t("app.chat.input.keyboardShortcuts.shiftEnter")}
+                      {t("input.keyboardShortcuts.shiftEnter")}
                     </Kbd>{" "}
-                    {t("app.chat.input.keyboardShortcuts.forNewLine")}
+                    {t("input.keyboardShortcuts.forNewLine")}
                   </Span>
                   <Span className="opacity-30">{"/"}</Span>
                   <Span>
                     <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
-                      {t("app.chat.input.keyboardShortcuts.ctrlV")}
+                      {t("input.keyboardShortcuts.ctrlV")}
                     </Kbd>{" "}
-                    {t("app.chat.input.keyboardShortcuts.orPasteFiles")}
+                    {t("input.keyboardShortcuts.orPasteFiles")}
                   </Span>
                 </Div>
               )}
@@ -564,7 +564,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           {/* No permission message */}
           {!canPost && (
             <Div className="absolute pl-3 top-2 left-0 pointer-events-none text-sm text-destructive">
-              {noPermissionReason || t("app.chat.input.noPermission")}
+              {noPermissionReason || t("input.noPermission")}
             </Div>
           )}
         </Div>
@@ -579,13 +579,13 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={ImageSize.SQUARE_1024}>
-                {t("app.chat.imageGen.sizeSquare")}
+                {t("imageGen.sizeSquare")}
               </SelectItem>
               <SelectItem value={ImageSize.LANDSCAPE_1792}>
-                {t("app.chat.imageGen.sizeLandscape")}
+                {t("imageGen.sizeLandscape")}
               </SelectItem>
               <SelectItem value={ImageSize.PORTRAIT_1792}>
-                {t("app.chat.imageGen.sizePortrait")}
+                {t("imageGen.sizePortrait")}
               </SelectItem>
             </SelectContent>
           </Select>
@@ -595,10 +595,10 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={ImageQuality.STANDARD}>
-                {t("app.chat.imageGen.qualityStandard")}
+                {t("imageGen.qualityStandard")}
               </SelectItem>
               <SelectItem value={ImageQuality.HD}>
-                {t("app.chat.imageGen.qualityHD")}
+                {t("imageGen.qualityHD")}
               </SelectItem>
             </SelectContent>
           </Select>
@@ -612,13 +612,13 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={MusicDuration.SHORT}>
-                {t("app.chat.audioGen.durationShort")}
+                {t("audioGen.durationShort")}
               </SelectItem>
               <SelectItem value={MusicDuration.MEDIUM}>
-                {t("app.chat.audioGen.durationMedium")}
+                {t("audioGen.durationMedium")}
               </SelectItem>
               <SelectItem value={MusicDuration.LONG}>
-                {t("app.chat.audioGen.durationLong")}
+                {t("audioGen.durationLong")}
               </SelectItem>
             </SelectContent>
           </Select>
@@ -716,17 +716,17 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                   {voiceUnconfigured ? (
                     <>
                       <P className="font-semibold mb-1">
-                        {t("app.chat.voiceMode.unconfiguredTitle")}
+                        {t("voiceMode.unconfiguredTitle")}
                       </P>
-                      <P>{t("app.chat.voiceMode.unconfiguredDescription")}</P>
+                      <P>{t("voiceMode.unconfiguredDescription")}</P>
                       <P className="mt-1 font-mono text-[10px] opacity-80">
                         EDEN_AI_API_KEY
                       </P>
                     </>
                   ) : ttsAutoplay ? (
-                    t("app.chat.voiceMode.callModeDescription")
+                    t("voiceMode.callModeDescription")
                   ) : (
-                    t("app.chat.voiceMode.callMode")
+                    t("voiceMode.callMode")
                   )}
                 </TooltipContent>
               </Tooltip>
@@ -759,15 +759,15 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                   {voiceUnconfigured ? (
                     <>
                       <P className="font-semibold mb-1">
-                        {t("app.chat.voiceMode.unconfiguredTitle")}
+                        {t("voiceMode.unconfiguredTitle")}
                       </P>
-                      <P>{t("app.chat.voiceMode.unconfiguredDescription")}</P>
+                      <P>{t("voiceMode.unconfiguredDescription")}</P>
                       <P className="mt-1 font-mono text-[10px] opacity-80">
                         EDEN_AI_API_KEY
                       </P>
                     </>
                   ) : (
-                    t("app.chat.voiceMode.tapToRecord")
+                    t("voiceMode.tapToRecord")
                   )}
                 </TooltipContent>
               </Tooltip>
@@ -796,8 +796,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                 </TooltipTrigger>
                 <TooltipContent>
                   {isAborting
-                    ? t("app.chat.actions.cancellingGeneration")
-                    : t("app.chat.actions.stopGeneration")}
+                    ? t("actions.cancellingGeneration")
+                    : t("actions.stopGeneration")}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -815,9 +815,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                     <Send className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>
-                  {t("app.chat.actions.sendMessage")}
-                </TooltipContent>
+                <TooltipContent>{t("actions.sendMessage")}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}

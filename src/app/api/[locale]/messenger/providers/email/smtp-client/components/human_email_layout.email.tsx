@@ -15,8 +15,8 @@ import {
 import type { JSX, ReactNode } from "react";
 
 import { envClient } from "@/config/env-client";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import { scopedTranslation } from "../i18n";
 import { TrackedLink } from "./tracked_link.email";
@@ -33,7 +33,6 @@ interface HumanEmailLayoutProps {
   companyName: string;
   companyEmail: string;
   unsubscribeUrl: string;
-  t: TFunction;
   tracking: TrackingContext;
 }
 
@@ -44,10 +43,10 @@ export function HumanEmailLayout({
   companyName,
   companyEmail,
   unsubscribeUrl,
-  t,
   tracking,
 }: HumanEmailLayoutProps): JSX.Element {
   const { t: st } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
   return (
     <Html lang={locale.split("-")[0]}>
       <Head />
@@ -108,7 +107,7 @@ export function HumanEmailLayout({
               >
                 <Img
                   src={`${envClient.NEXT_PUBLIC_APP_URL}/unbottled-icon.png`}
-                  alt={t("config.appName")}
+                  alt={configT("appName")}
                   width="24"
                   height="24"
                   style={{
@@ -126,7 +125,7 @@ export function HumanEmailLayout({
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {t("config.appName")}
+                  {configT("appName")}
                 </div>
               </div>
               <div

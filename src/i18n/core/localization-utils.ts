@@ -9,10 +9,9 @@ import type z from "zod";
 
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage, Currencies } from "./config";
 import { getCountryFromLocale } from "./language-utils";
-import { simpleT } from "./shared";
-import type { TranslationKey } from "./static-types";
 
 /**
  * Get locale string from CountryLanguage format
@@ -243,9 +242,9 @@ export function getCurrentTimeInTimezone(
  * Returns appropriate timezone for the given locale
  */
 export function getDefaultTimezone(locale: CountryLanguage): string {
-  const { t } = simpleT(locale);
+  const { t } = configScopedTranslation.scopedT(locale);
   const country = getCountryFromLocale(locale);
-  const key: TranslationKey = `config.timezone.${country}`;
+  const key = `timezone.${country}` as Parameters<typeof t>[0];
   const resolved = t(key);
   // If key wasn't found, t() returns the key itself - fall back to UTC
   return resolved === key ? "UTC" : resolved;

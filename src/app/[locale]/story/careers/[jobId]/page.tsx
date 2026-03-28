@@ -17,7 +17,9 @@ import { contactClientRepository } from "@/app/api/[locale]/contact/repository-c
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "./i18n";
+import { scopedTranslation as careersScopedTranslation } from "../i18n";
 
 interface JobType {
   title: string;
@@ -66,25 +68,26 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, jobId } = await params;
+  const { t } = scopedTranslation.scopedT(locale);
   return metadataGenerator(locale, {
     path: `careers/${jobId}`,
-    title: "app.meta.careers.title",
-    description: "app.meta.careers.description",
-    category: "app.meta.careers.category",
+    title: t("meta.title"),
+    description: t("meta.description"),
+    category: t("meta.category"),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/careers-hero.jpg`,
-    imageAlt: "app.meta.careers.imageAlt",
-    keywords: ["app.meta.careers.keywords"],
+    imageAlt: t("meta.imageAlt"),
+    keywords: [t("meta.keywords")],
     additionalMetadata: {
       openGraph: {
-        title: "app.meta.careers.ogTitle",
-        description: "app.meta.careers.ogDescription",
+        title: t("meta.ogTitle"),
+        description: t("meta.ogDescription"),
         url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/careers/${jobId}`,
         type: "website",
       },
       twitter: {
         card: "summary_large_image",
-        title: "app.meta.careers.twitterTitle",
-        description: "app.meta.careers.twitterDescription",
+        title: t("meta.twitterTitle"),
+        description: t("meta.twitterDescription"),
       },
     },
   });
@@ -100,90 +103,44 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<JobPostingPageData> {
   const { locale, jobId } = await params;
-  const { t } = simpleT(locale);
+  const { t } = careersScopedTranslation.scopedT(locale);
 
   // Mock job data - in a real app, this would come from an API or database
   const jobs: Record<string, JobType> = {
     socialMediaManager: {
-      title: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.title",
-      ),
-      shortDescription: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.shortDescription",
-      ),
-      longDescription: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.longDescription",
-      ),
+      title: t("jobs.socialMediaManager.title"),
+      shortDescription: t("jobs.socialMediaManager.shortDescription"),
+      longDescription: t("jobs.socialMediaManager.longDescription"),
       responsibilities: {
-        item1: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.responsibilities.item1",
-        ),
-        item2: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.responsibilities.item2",
-        ),
-        item3: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.responsibilities.item3",
-        ),
-        item4: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.responsibilities.item4",
-        ),
-        item5: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.responsibilities.item5",
-        ),
+        item1: t("jobs.socialMediaManager.responsibilities.item1"),
+        item2: t("jobs.socialMediaManager.responsibilities.item2"),
+        item3: t("jobs.socialMediaManager.responsibilities.item3"),
+        item4: t("jobs.socialMediaManager.responsibilities.item4"),
+        item5: t("jobs.socialMediaManager.responsibilities.item5"),
       },
       requirements: {
-        item1: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item1",
-        ),
-        item2: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item2",
-        ),
-        item3: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item3",
-        ),
-        item4: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item4",
-        ),
-        item5: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item5",
-        ),
+        item1: t("jobs.socialMediaManager.requirements.item1"),
+        item2: t("jobs.socialMediaManager.requirements.item2"),
+        item3: t("jobs.socialMediaManager.requirements.item3"),
+        item4: t("jobs.socialMediaManager.requirements.item4"),
+        item5: t("jobs.socialMediaManager.requirements.item5"),
       },
       qualifications: {
         required: {
-          item1: t(
-            "app.story._components.home.careers.jobs.socialMediaManager.qualifications.required.item1",
-          ),
-          item2: t(
-            "app.story._components.home.careers.jobs.socialMediaManager.qualifications.required.item2",
-          ),
-          item3: t(
-            "app.story._components.home.careers.jobs.socialMediaManager.qualifications.required.item3",
-          ),
+          item1: t("jobs.socialMediaManager.qualifications.required.item1"),
+          item2: t("jobs.socialMediaManager.qualifications.required.item2"),
+          item3: t("jobs.socialMediaManager.qualifications.required.item3"),
         },
         preferred: {
-          item1: t(
-            "app.story._components.home.careers.jobs.socialMediaManager.qualifications.preferred.item1",
-          ),
-          item2: t(
-            "app.story._components.home.careers.jobs.socialMediaManager.qualifications.preferred.item2",
-          ),
-          item3: t(
-            "app.story._components.home.careers.jobs.socialMediaManager.qualifications.preferred.item3",
-          ),
+          item1: t("jobs.socialMediaManager.qualifications.preferred.item1"),
+          item2: t("jobs.socialMediaManager.qualifications.preferred.item2"),
+          item3: t("jobs.socialMediaManager.qualifications.preferred.item3"),
         },
       },
-      location: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.location",
-      ),
-      department: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.department",
-      ),
-      type: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.type",
-      ),
-      experienceLevel: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.experienceLevel",
-      ),
+      location: t("jobs.socialMediaManager.location"),
+      department: t("jobs.socialMediaManager.department"),
+      type: t("jobs.socialMediaManager.type"),
+      experienceLevel: t("jobs.socialMediaManager.experienceLevel"),
       // current date - 2.5 weeks
       postedDate: new Date(
         Date.now() - 2.5 * 7 * 24 * 60 * 60 * 1000,
@@ -194,87 +151,41 @@ export async function tanstackLoader({
       ).toLocaleDateString(locale),
     },
     contentCreator: {
-      title: t("app.story._components.home.careers.jobs.contentCreator.title"),
-      shortDescription: t(
-        "app.story._components.home.careers.jobs.contentCreator.shortDescription",
-      ),
-      longDescription: t(
-        "app.story._components.home.careers.jobs.contentCreator.longDescription",
-      ),
+      title: t("jobs.contentCreator.title"),
+      shortDescription: t("jobs.contentCreator.shortDescription"),
+      longDescription: t("jobs.contentCreator.longDescription"),
       responsibilities: {
-        item1: t(
-          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item1",
-        ),
-        item2: t(
-          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item2",
-        ),
-        item3: t(
-          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item3",
-        ),
-        item4: t(
-          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item4",
-        ),
-        item5: t(
-          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item5",
-        ),
+        item1: t("jobs.contentCreator.responsibilities.item1"),
+        item2: t("jobs.contentCreator.responsibilities.item2"),
+        item3: t("jobs.contentCreator.responsibilities.item3"),
+        item4: t("jobs.contentCreator.responsibilities.item4"),
+        item5: t("jobs.contentCreator.responsibilities.item5"),
       },
       requirements: {
-        item1: t(
-          "app.story._components.home.careers.jobs.contentCreator.requirements.item1",
-        ),
-        item2: t(
-          "app.story._components.home.careers.jobs.contentCreator.requirements.item2",
-        ),
-        item3: t(
-          "app.story._components.home.careers.jobs.contentCreator.requirements.item3",
-        ),
-        item4: t(
-          "app.story._components.home.careers.jobs.contentCreator.requirements.item4",
-        ),
-        item5: t(
-          "app.story._components.home.careers.jobs.contentCreator.requirements.item5",
-        ),
+        item1: t("jobs.contentCreator.requirements.item1"),
+        item2: t("jobs.contentCreator.requirements.item2"),
+        item3: t("jobs.contentCreator.requirements.item3"),
+        item4: t("jobs.contentCreator.requirements.item4"),
+        item5: t("jobs.contentCreator.requirements.item5"),
       },
       qualifications: {
         required: {
-          item1: t(
-            "app.story._components.home.careers.jobs.contentCreator.qualifications.required.item1",
-          ),
-          item2: t(
-            "app.story._components.home.careers.jobs.contentCreator.qualifications.required.item2",
-          ),
-          item3: t(
-            "app.story._components.home.careers.jobs.contentCreator.qualifications.required.item3",
-          ),
+          item1: t("jobs.contentCreator.qualifications.required.item1"),
+          item2: t("jobs.contentCreator.qualifications.required.item2"),
+          item3: t("jobs.contentCreator.qualifications.required.item3"),
         },
         preferred: {
-          item1: t(
-            "app.story._components.home.careers.jobs.contentCreator.qualifications.preferred.item1",
-          ),
-          item2: t(
-            "app.story._components.home.careers.jobs.contentCreator.qualifications.preferred.item2",
-          ),
-          item3: t(
-            "app.story._components.home.careers.jobs.contentCreator.qualifications.preferred.item3",
-          ),
+          item1: t("jobs.contentCreator.qualifications.preferred.item1"),
+          item2: t("jobs.contentCreator.qualifications.preferred.item2"),
+          item3: t("jobs.contentCreator.qualifications.preferred.item3"),
         },
       },
-      location: t(
-        "app.story._components.home.careers.jobs.contentCreator.location",
-      ),
-      department: t(
-        "app.story._components.home.careers.jobs.contentCreator.department",
-      ),
-      type: t("app.story._components.home.careers.jobs.contentCreator.type"),
-      experienceLevel: t(
-        "app.story._components.home.careers.jobs.contentCreator.experienceLevel",
-      ),
-      postedDate: t(
-        "app.story._components.home.careers.jobs.contentCreator.postedDate",
-      ),
-      applicationDeadline: t(
-        "app.story._components.home.careers.jobs.contentCreator.applicationDeadline",
-      ),
+      location: t("jobs.contentCreator.location"),
+      department: t("jobs.contentCreator.department"),
+      type: t("jobs.contentCreator.type"),
+      experienceLevel: t("jobs.contentCreator.experienceLevel"),
+      postedDate: t("jobs.contentCreator.postedDate"),
+      applicationDeadline: t("jobs.contentCreator.applicationDeadline"),
     },
   };
 
@@ -297,7 +208,7 @@ export function TanstackPage({
   job,
   otherJobs,
 }: JobPostingPageData): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = careersScopedTranslation.scopedT(locale);
 
   return (
     <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
@@ -311,9 +222,7 @@ export function TanstackPage({
           >
             <Link href={`/${locale}/story/careers`}>
               <ArrowLeft className="h-4 w-4" />
-              <Span>
-                {t("app.story._components.home.careers.openPositions")}
-              </Span>
+              <Span>{t("openPositions")}</Span>
             </Link>
           </Button>
         </Div>
@@ -330,9 +239,7 @@ export function TanstackPage({
               <Div className="flex flex-col gap-8">
                 <Section>
                   <H2 className="text-2xl font-bold mb-4">
-                    {t(
-                      "app.story._components.home.careers.jobDetail.jobOverview",
-                    )}
+                    {t("jobDetail.jobOverview")}
                   </H2>
                   <P className="text-gray-700 dark:text-gray-300">
                     {job.longDescription}
@@ -341,9 +248,7 @@ export function TanstackPage({
 
                 <Section>
                   <H2 className="text-2xl font-bold mb-4">
-                    {t(
-                      "app.story._components.home.careers.jobDetail.responsibilities",
-                    )}
+                    {t("jobDetail.responsibilities")}
                   </H2>
                   <Ul className="list-disc pl-6 flex flex-col gap-2">
                     {Object.values(job.responsibilities).map(
@@ -361,9 +266,7 @@ export function TanstackPage({
 
                 <Section>
                   <H2 className="text-2xl font-bold mb-4">
-                    {t(
-                      "app.story._components.home.careers.jobDetail.requirements",
-                    )}
+                    {t("jobDetail.requirements")}
                   </H2>
                   <Ul className="list-disc pl-6 flex flex-col gap-2">
                     {Object.values(job.requirements).map(
@@ -381,15 +284,11 @@ export function TanstackPage({
 
                 <Section>
                   <H2 className="text-2xl font-bold mb-4">
-                    {t(
-                      "app.story._components.home.careers.jobDetail.qualifications",
-                    )}
+                    {t("jobDetail.qualifications")}
                   </H2>
 
                   <H3 className="text-xl font-semibold mb-2">
-                    {t(
-                      "app.story._components.home.careers.jobDetail.qualificationsRequired",
-                    )}
+                    {t("jobDetail.qualificationsRequired")}
                   </H3>
                   <Ul className="list-disc pl-6 flex flex-col gap-2 mb-4">
                     {Object.values(job.qualifications.required).map(
@@ -405,9 +304,7 @@ export function TanstackPage({
                   </Ul>
 
                   <H3 className="text-xl font-semibold mb-2">
-                    {t(
-                      "app.story._components.home.careers.jobDetail.qualificationsPreferred",
-                    )}
+                    {t("jobDetail.qualificationsPreferred")}
                   </H3>
                   <Ul className="list-disc pl-6 flex flex-col gap-2">
                     {Object.values(job.qualifications.preferred).map(
@@ -425,62 +322,46 @@ export function TanstackPage({
 
                 <Section>
                   <H2 className="text-2xl font-bold mb-4">
-                    {t("app.story._components.home.careers.benefits.title")}
+                    {t("benefits.title")}
                   </H2>
                   <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Card>
                       <CardContent className="p-4">
                         <H3 className="font-semibold mb-2">
-                          {t(
-                            "app.story._components.home.careers.benefits.growthTitle",
-                          )}
+                          {t("benefits.growthTitle")}
                         </H3>
                         <P className="text-sm text-gray-700 dark:text-gray-300">
-                          {t(
-                            "app.story._components.home.careers.benefits.growthDesc",
-                          )}
+                          {t("benefits.growthDesc")}
                         </P>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
                         <H3 className="font-semibold mb-2">
-                          {t(
-                            "app.story._components.home.careers.benefits.meaningfulTitle",
-                          )}
+                          {t("benefits.meaningfulTitle")}
                         </H3>
                         <P className="text-sm text-gray-700 dark:text-gray-300">
-                          {t(
-                            "app.story._components.home.careers.benefits.meaningfulDesc",
-                          )}
+                          {t("benefits.meaningfulDesc")}
                         </P>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
                         <H3 className="font-semibold mb-2">
-                          {t(
-                            "app.story._components.home.careers.benefits.balanceTitle",
-                          )}
+                          {t("benefits.balanceTitle")}
                         </H3>
                         <P className="text-sm text-gray-700 dark:text-gray-300">
-                          {t(
-                            "app.story._components.home.careers.benefits.balanceDesc",
-                          )}
+                          {t("benefits.balanceDesc")}
                         </P>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
                         <H3 className="font-semibold mb-2">
-                          {t(
-                            "app.story._components.home.careers.benefits.compensationTitle",
-                          )}
+                          {t("benefits.compensationTitle")}
                         </H3>
                         <P className="text-sm text-gray-700 dark:text-gray-300">
-                          {t(
-                            "app.story._components.home.careers.benefits.compensationDesc",
-                          )}
+                          {t("benefits.compensationDesc")}
                         </P>
                       </CardContent>
                     </Card>
@@ -494,57 +375,37 @@ export function TanstackPage({
                 <Card>
                   <CardContent className="p-6">
                     <H3 className="text-xl font-bold mb-4">
-                      {t(
-                        "app.story._components.home.careers.jobDetail.applyNow",
-                      )}
+                      {t("jobDetail.applyNow")}
                     </H3>
                     <Div className="flex flex-col gap-4">
                       <Div className="grid grid-cols-2 gap-2 text-sm">
                         <Div className="text-gray-500 dark:text-gray-400">
-                          {t(
-                            "app.story._components.home.careers.jobDetail.location",
-                          )}
-                          :
+                          {t("jobDetail.location")}:
                         </Div>
                         <Div className="font-medium">{job.location}</Div>
 
                         <Div className="text-gray-500 dark:text-gray-400">
-                          {t(
-                            "app.story._components.home.careers.jobDetail.department",
-                          )}
-                          :
+                          {t("jobDetail.department")}:
                         </Div>
                         <Div className="font-medium">{job.department}</Div>
 
                         <Div className="text-gray-500 dark:text-gray-400">
-                          {t(
-                            "app.story._components.home.careers.jobDetail.employmentType",
-                          )}
-                          :
+                          {t("jobDetail.employmentType")}:
                         </Div>
                         <Div className="font-medium">{job.type}</Div>
 
                         <Div className="text-gray-500 dark:text-gray-400">
-                          {t(
-                            "app.story._components.home.careers.jobDetail.experienceLevel",
-                          )}
-                          :
+                          {t("jobDetail.experienceLevel")}:
                         </Div>
                         <Div className="font-medium">{job.experienceLevel}</Div>
 
                         <Div className="text-gray-500 dark:text-gray-400">
-                          {t(
-                            "app.story._components.home.careers.jobDetail.postedDate",
-                          )}
-                          :
+                          {t("jobDetail.postedDate")}:
                         </Div>
                         <Div className="font-medium">{job.postedDate}</Div>
 
                         <Div className="text-gray-500 dark:text-gray-400">
-                          {t(
-                            "app.story._components.home.careers.jobDetail.applicationDeadline",
-                          )}
-                          :
+                          {t("jobDetail.applicationDeadline")}:
                         </Div>
                         <Div className="font-medium">
                           {job.applicationDeadline}
@@ -557,7 +418,7 @@ export function TanstackPage({
                         <Link
                           href={`mailto:${contactClientRepository.getSupportEmail(locale)}?subject=Application for ${job.title}`}
                         >
-                          {t("app.story._components.home.careers.applyNow")}
+                          {t("applyNow")}
                         </Link>
                       </Button>
                     </Div>
@@ -567,9 +428,7 @@ export function TanstackPage({
                 <Card>
                   <CardContent className="p-6">
                     <H3 className="text-lg font-bold mb-4">
-                      {t(
-                        "app.story._components.home.careers.jobDetail.relatedPositions",
-                      )}
+                      {t("jobDetail.relatedPositions")}
                     </H3>
                     <Div className="flex flex-col gap-3">
                       {otherJobs.map(({ key, job: relatedJob }) => (

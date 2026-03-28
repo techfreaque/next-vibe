@@ -491,4 +491,17 @@ export const translations: typeof enTranslations = {
       title: "Batch-Tool-Aufrufe bestätigen",
     },
   },
+  flatView: {
+    timestamp: {
+      sun: "So",
+      mon: "Mo",
+      tue: "Di",
+      wed: "Mi",
+      thu: "Do",
+      fri: "Fr",
+      sat: "Sa",
+      format:
+        "{{month}}/{{day}}/{{year}}({{dayName}}){{hours}}:{{mins}}:{{secs}}",
+    },
+  },
 };

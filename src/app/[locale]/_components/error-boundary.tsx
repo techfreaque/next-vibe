@@ -19,7 +19,8 @@ import { Component } from "react";
 
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation as pageT } from "./i18n";
 
 // Track errors already caught by a boundary so parent boundaries don't re-throw them
 const handledErrors = new WeakSet<Error>();
@@ -59,7 +60,7 @@ export function DefaultErrorFallback({
   reset,
   locale,
 }: FallbackProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
 
   // Get full stack trace if available
   const stackTrace = error.stack || "No stack trace available";
@@ -81,11 +82,9 @@ export function DefaultErrorFallback({
       <CardContent className="pt-6">
         <Div className="flex flex-col items-center text-center mb-4">
           <Info className="h-12 w-12 text-destructive mb-4" />
-          <H3 className="text-xl font-semibold mb-2">
-            {t("app.common.error.title")}
-          </H3>
+          <H3 className="text-xl font-semibold mb-2">{t("error.title")}</H3>
           <P className="text-sm text-destructive font-medium mb-2">
-            {error.message || t("app.common.errors.unknown")}
+            {error.message || t("error.unknown")}
           </P>
           <Button
             onClick={reset}
@@ -93,7 +92,7 @@ export function DefaultErrorFallback({
             className="flex items-center gap-2 mb-4"
           >
             <RotateCcw className="h-4 w-4" />
-            {t("app.common.error.tryAgain")}
+            {t("error.tryAgain")}
           </Button>
         </Div>
 
@@ -101,7 +100,7 @@ export function DefaultErrorFallback({
         {topComponents && (
           <Div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-md">
             <Span className="text-xs font-semibold text-destructive uppercase tracking-wide block mb-1">
-              {t("app.common.error.boundary.componentStack")}
+              {t("error.boundary.componentStack")}
             </Span>
             <Pre className="text-xs text-destructive/80 whitespace-pre-wrap break-all">
               {topComponents}
@@ -113,7 +112,7 @@ export function DefaultErrorFallback({
         <Accordion type="multiple" collapsible className="space-y-4">
           <AccordionItem value="stackTrace">
             <AccordionTrigger className="text-sm font-semibold">
-              {t("app.common.error.boundary.stackTrace")}
+              {t("error.boundary.stackTrace")}
             </AccordionTrigger>
             <AccordionContent>
               <Pre className="mt-2 p-4 bg-muted rounded-md text-xs overflow-auto max-h-64 border border-border">
@@ -124,7 +123,7 @@ export function DefaultErrorFallback({
 
           <AccordionItem value="componentStack">
             <AccordionTrigger className="text-sm font-semibold">
-              {t("app.common.error.boundary.componentStackFull")}
+              {t("error.boundary.componentStackFull")}
             </AccordionTrigger>
             <AccordionContent>
               <Pre className="mt-2 p-4 bg-muted rounded-md text-xs overflow-auto max-h-64 border border-border">
@@ -135,26 +134,26 @@ export function DefaultErrorFallback({
 
           <AccordionItem value="errorDetails">
             <AccordionTrigger className="text-sm font-semibold">
-              {t("app.common.error.boundary.errorDetails")}
+              {t("error.boundary.errorDetails")}
             </AccordionTrigger>
             <AccordionContent>
               <Div className="mt-2 p-4 bg-muted rounded-md text-xs space-y-2 border border-border">
                 <Div>
                   <Span className="font-semibold">
-                    {t("app.common.error.boundary.name")}
+                    {t("error.boundary.name")}
                   </Span>{" "}
                   {error.name}
                 </Div>
                 <Div>
                   <Span className="font-semibold">
-                    {t("app.common.error.boundary.errorMessage")}
+                    {t("error.boundary.errorMessage")}
                   </Span>{" "}
                   {error.message}
                 </Div>
                 {error.cause !== undefined && (
                   <Div>
                     <Span className="font-semibold">
-                      {t("app.common.error.boundary.cause")}
+                      {t("error.boundary.cause")}
                     </Span>{" "}
                     {String(error.cause)}
                   </Div>

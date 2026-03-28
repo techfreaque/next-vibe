@@ -18,7 +18,7 @@ import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation } from "@/app/[locale]/shared/i18n";
 
 interface SharedTokenPageProps {
   params: Promise<{
@@ -41,7 +41,7 @@ export async function tanstackLoader({
 }: SharedTokenPageProps): Promise<SharedTokenPageData> {
   const { locale, token } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const { t: shareLinksT } = shareLinksScopedTranslation.scopedT(locale);
 
   // Get current user (could be public or authenticated)
@@ -60,8 +60,8 @@ export async function tanstackLoader({
       locale,
       state: {
         kind: "userError",
-        errorTitle: t("app.common.error.title"),
-        errorMessage: t("app.common.error.message"),
+        errorTitle: t("error.title"),
+        errorMessage: t("error.message"),
       },
     };
   }
@@ -78,9 +78,8 @@ export async function tanstackLoader({
       locale,
       state: {
         kind: "shareLinkError",
-        errorTitle: t("app.common.error.title"),
-        errorMessage:
-          shareLinkResponse.message ?? t("app.common.error.message"),
+        errorTitle: t("error.title"),
+        errorMessage: shareLinkResponse.message ?? t("error.message"),
       },
     };
   }

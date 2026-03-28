@@ -94,6 +94,15 @@ export const translations: typeof enTranslations = {
       description:
         "Maximale Gesamttoken des Speicherinhalts pro Runde. Leer lassen für den Systemstandard (1000 Token).",
     },
+    codingAgent: {
+      label: "Coding-Agent",
+      description:
+        "Welcher Coding-Agent-CLI verwendet wird, wenn die KI das Coding-Agent-Tool aufruft. Nur für Admins.",
+      options: {
+        claudeCode: "Claude Code (Standard)",
+        openCode: "OpenCode",
+      },
+    },
     errors: {
       validation: {
         title: "Validierungsfehler",

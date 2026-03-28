@@ -17,7 +17,7 @@ import { REBUILD_ALIAS } from "../../system/server/rebuild/constants";
 import { EXECUTE_TOOL_ALIAS } from "../../system/unified-interface/ai/execute-tool/constants";
 import { WAIT_FOR_TASK_ALIAS } from "../../system/unified-interface/tasks/wait-for-task/constants";
 import { AI_RUN_ALIAS } from "../ai-stream/run/constants";
-import { CLAUDE_CODE_ALIAS } from "../claude-code/constants";
+import { CODING_AGENT_ALIAS } from "../coding-agent/constants";
 import { FETCH_URL_ALIAS } from "../fetch-url-content/constants";
 import { BRAVE_SEARCH_ALIAS } from "../search/brave/constants";
 import { KAGI_ALIAS } from "../search/kagi/constants";
@@ -86,7 +86,7 @@ export const DEFAULT_TOOL_IDS_CUSTOMER = [
 
 /**
  * Default AI tools for admin users.
- * Adds claude-code and other admin-only tools on top of customer defaults.
+ * Adds coding-agent and other admin-only tools on top of customer defaults.
  */
 export const DEFAULT_TOOL_IDS_ADMIN = [
   TOOL_HELP_ALIAS,
@@ -98,7 +98,7 @@ export const DEFAULT_TOOL_IDS_ADMIN = [
   MEMORY_ADD_ALIAS,
   MEMORY_UPDATE_ALIAS,
   MEMORY_DELETE_ALIAS,
-  CLAUDE_CODE_ALIAS,
+  CODING_AGENT_ALIAS,
   AI_RUN_ALIAS,
 ] as const;
 
@@ -117,7 +117,7 @@ export const DEFAULT_TOOL_IDS = DEFAULT_TOOL_IDS_ADMIN;
  * behaviour. User can add/remove tools and promote any to pinned via the tool settings UI.
  */
 export const DEFAULT_REMOTE_TOOL_IDS = [
-  CLAUDE_CODE_ALIAS,
+  CODING_AGENT_ALIAS,
   SSH_EXEC_ALIAS,
   SSH_FILES_READ_ALIAS,
   SSH_FILES_WRITE_ALIAS,
@@ -136,7 +136,7 @@ export const DEFAULT_REMOTE_PINNED_IDS: readonly string[] = [];
  * These are appended to DEFAULT_TOOL_IDS when running in local mode.
  */
 const LOCAL_ADMIN_EXTRA_TOOL_IDS = [
-  CLAUDE_CODE_ALIAS,
+  CODING_AGENT_ALIAS,
   SQL_ALIAS,
   REBUILD_ALIAS,
 ] as const;

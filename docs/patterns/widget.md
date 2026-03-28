@@ -357,20 +357,24 @@ export function MyWidget({ field }: MyWidgetProps): JSX.Element {
 
 **Platform values for `widget.tsx`:**
 
-| Value                  | Context                        |
-| ---------------------- | ------------------------------ |
-| `Platform.NEXT_PAGE`   | Web browser (Next.js)          |
-| `Platform.ELECTRON`    | Desktop app (Electron wrapper) |
-| `Platform.FRAME`       | Embedded vibe-frame widget     |
-| `Platform.TRPC`        | tRPC API call (no UI)          |
+| Value                | Context                        |
+| -------------------- | ------------------------------ |
+| `Platform.NEXT_PAGE` | Web browser (Next.js)          |
+| `Platform.ELECTRON`  | Desktop app (Electron wrapper) |
+| `Platform.FRAME`     | Embedded vibe-frame widget     |
+| `Platform.TRPC`      | tRPC API call (no UI)          |
 
 For React Native-specific utilities (`isNative`, `platformSelect`, etc.), use:
 
 ```typescript
-import { isNative, platformSelect } from "@/app/api/[locale]/system/unified-interface/react-native/platform-helpers";
+import {
+  isNative,
+  platformSelect,
+} from "@/app/api/[locale]/system/unified-interface/react-native/platform-helpers";
 ```
 
 **Rules:**
+
 - Never import React Native modules unconditionally in `widget.tsx` — they crash on web
 - Use `next-vibe-ui/ui/*` components — they are platform-aware and resolve to the correct implementation automatically
 - Keep native branches touch-friendly: larger tap targets, no hover-only interactions, stacked layouts over grids

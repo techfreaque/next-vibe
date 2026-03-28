@@ -11,7 +11,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 interface CallModeIndicatorProps {
   /** Whether to show the indicator */
@@ -24,7 +24,7 @@ export function CallModeIndicator({
   show,
   locale,
 }: CallModeIndicatorProps): JSX.Element | null {
-  const { t } = simpleT(locale);
+  const { t } = aiStreamScopedTranslation.scopedT(locale);
 
   if (!show) {
     return null;
@@ -35,8 +35,7 @@ export function CallModeIndicator({
       <Div className="flex items-center gap-2">
         <Phone className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
         <Span className="text-xs font-medium text-green-700 dark:text-green-300">
-          {t("app.chat.voiceMode.callMode")} -{" "}
-          {t("app.chat.voiceMode.callModeDescription")}
+          {t("voiceMode.callMode")} - {t("voiceMode.callModeDescription")}
         </Span>
       </Div>
     </Div>

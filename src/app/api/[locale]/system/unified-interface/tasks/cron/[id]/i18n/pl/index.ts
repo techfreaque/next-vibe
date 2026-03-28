@@ -377,5 +377,11 @@ export const translations: typeof enTranslations = {
       editDescription:
         "Skonfiguruj parametry wejściowe dla tego endpointu zadania",
     },
+    scheduleAutocomplete: {
+      customBadge: "Własny",
+      noSchedulesFound: "Nie znaleziono harmonogramów",
+      useCustomSchedule: "Użyj własnego harmonogramu",
+      commonSchedules: "Popularne harmonogramy",
+    },
   },
 };

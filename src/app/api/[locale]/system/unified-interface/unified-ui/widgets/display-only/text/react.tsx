@@ -17,7 +17,6 @@ import type {
   ReactStaticWidgetProps,
   ReactWidgetPropsNoValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
-import { simpleT } from "@/i18n/core/shared";
 
 import {
   useWidgetContext,
@@ -131,19 +130,13 @@ export function TextWidget<
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<TEndpoint>();
   const { t: tField } = useWidgetContext();
-  const { t: globalT } = simpleT(locale);
   const form = useWidgetForm();
 
-  // Translate with scoped tField, fall back to globalT if key not found
   const tContext = (
     key: string,
     params?: Parameters<typeof tField>[1],
   ): string => {
-    const result = tField(key, params);
-    if (result === key) {
-      return globalT(key as Parameters<typeof globalT>[0], params);
-    }
-    return result;
+    return tField(key, params);
   };
   const {
     content,

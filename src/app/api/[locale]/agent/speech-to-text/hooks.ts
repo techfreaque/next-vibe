@@ -12,7 +12,7 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 
 import speechToTextDefinitions from "./definition";
 
@@ -53,7 +53,7 @@ export function useEdenAISpeech({
   logger,
   deductCredits,
 }: UseEdenAISpeechOptions): UseEdenAISpeechReturn {
-  const { t } = useMemo(() => simpleT(locale), [locale]);
+  const { t } = useMemo(() => chatScopedTranslation.scopedT(locale), [locale]);
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -112,7 +112,7 @@ export function useEdenAISpeech({
     });
 
     if (!currentEndpoint?.create) {
-      const errorMsg = t("app.chat.hooks.stt.endpoint-not-available");
+      const errorMsg = t("hooks.stt.endpoint-not-available");
       logger.error("STT: Endpoint not available", errorMsg);
       setError(errorMsg);
       onError?.(errorMsg);
@@ -169,7 +169,7 @@ export function useEdenAISpeech({
             setIsProcessing(false);
             cleanup();
           } else {
-            const errorMessage = t("app.chat.hooks.stt.transcription-failed");
+            const errorMessage = t("hooks.stt.transcription-failed");
             logger.error("STT: Transcription failed", errorMessage);
             setError(errorMessage);
             onError?.(errorMessage);
@@ -178,10 +178,9 @@ export function useEdenAISpeech({
           }
         },
         onError: ({ error: apiError }) => {
-          // Translate the error message if it's a translation key
-          const errorMessage = apiError.message
-            ? t(apiError.message, apiError.messageParams)
-            : t("app.chat.hooks.stt.transcription-failed");
+          // Use the error message directly (already human-readable from server)
+          const errorMessage =
+            apiError.message ?? t("hooks.stt.transcription-failed");
           logger.error("STT: API returned error", {
             errorType: apiError.errorType,
             errorMessage: apiError.message,
@@ -197,7 +196,7 @@ export function useEdenAISpeech({
       const errorMsg =
         err instanceof Error
           ? err.message
-          : t("app.chat.hooks.stt.transcription-failed");
+          : t("hooks.stt.transcription-failed");
       logger.error("STT: Exception during transcription", parseError(err));
       setError(errorMsg);
       onError?.(errorMsg);
@@ -239,9 +238,7 @@ export function useEdenAISpeech({
       logger.debug("STT: Recording started");
     } catch (err) {
       const errorMsg =
-        err instanceof Error
-          ? err.message
-          : t("app.chat.hooks.stt.permission-denied");
+        err instanceof Error ? err.message : t("hooks.stt.permission-denied");
       logger.error("STT: Failed to start recording", parseError(err));
       setError(errorMsg);
       onError?.(errorMsg);

@@ -15,7 +15,8 @@ import type React from "react";
 import { getAllTranslatedTemplateMetadata } from "@/app/api/[locale]/messenger/registry/generated";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation as pageT } from "./i18n";
 
 interface EmailTemplatesPageProps {
   params: Promise<{
@@ -63,14 +64,14 @@ export function TanstackPage({
   allTemplates,
   templatesByCategory,
 }: EmailTemplatesPageData): React.JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
 
   return (
     <Div className="flex flex-col gap-6">
       {/* Page Header */}
       <Div>
         <P className="text-gray-600 dark:text-gray-400">
-          {t("app.admin.emails.templates.overview.description")}
+          {t("overview.description")}
         </P>
       </Div>
 
@@ -82,8 +83,8 @@ export function TanstackPage({
             <P className="text-sm text-gray-600 dark:text-gray-400">
               {templates.length}{" "}
               {templates.length === 1
-                ? t("app.admin.emails.templates.overview.template")
-                : t("app.admin.emails.templates.overview.templates")}
+                ? t("overview.template")
+                : t("overview.templates")}
             </P>
           </CardHeader>
           <CardContent>
@@ -104,12 +105,10 @@ export function TanstackPage({
 
                       <Div className="text-xs text-gray-500 dark:text-gray-500 space-y-1">
                         <P>
-                          {t("app.admin.emails.templates.overview.version")}:{" "}
-                          {template.version}
+                          {t("overview.version")}: {template.version}
                         </P>
                         <P>
-                          {t("app.admin.emails.templates.overview.id")}:{" "}
-                          {template.id}
+                          {t("overview.id")}: {template.id}
                         </P>
                       </Div>
 
@@ -117,9 +116,7 @@ export function TanstackPage({
                         <Link
                           href={`/${locale}/admin/messenger/templates/${template.id}`}
                         >
-                          {t(
-                            "app.admin.emails.templates.overview.view_preview",
-                          )}
+                          {t("overview.view_preview")}
                         </Link>
                       </Button>
                     </CardContent>
@@ -135,13 +132,13 @@ export function TanstackPage({
       <Card>
         <CardContent className="flex items-center justify-between p-4">
           <P className="text-gray-600 dark:text-gray-400">
-            {t("app.admin.emails.templates.overview.total")}
+            {t("overview.total")}
           </P>
           <P className="font-medium text-lg">
             {allTemplates.length}{" "}
             {allTemplates.length === 1
-              ? t("app.admin.emails.templates.overview.template")
-              : t("app.admin.emails.templates.overview.templates")}
+              ? t("overview.template")
+              : t("overview.templates")}
           </P>
         </CardContent>
       </Card>

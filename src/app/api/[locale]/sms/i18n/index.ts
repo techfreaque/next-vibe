@@ -6,9 +6,9 @@
  * It does NOT access the global translation object.
  *
  * @example
- * import { simpleT } from "@/app/api/[locale]/sms/i18n";
+ * import { smsScopedT } from "@/app/api/[locale]/sms/i18n";
  *
- * const { t } = simpleT(locale);
+ * const { t } = smsScopedT(locale);
  * t("sms.error.invalid_phone_format");
  * t("sms.error.delivery_failed", { phoneNumber: "+1234567890", error: "Network timeout" });
  */

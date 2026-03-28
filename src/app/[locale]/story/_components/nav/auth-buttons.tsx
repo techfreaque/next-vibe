@@ -5,7 +5,8 @@ import type { JSX } from "react";
 
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../i18n";
 
 interface AuthButtonsProps {
   locale: CountryLanguage;
@@ -16,15 +17,13 @@ export function AuthButtons({ locale }: AuthButtonsProps): JSX.Element {
     return <></>;
   }
 
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <Div className="flex items-center gap-2">
       {/* Login - hidden on mobile, shown md+ */}
       <Button variant="ghost" asChild className="hidden md:inline-flex">
-        <Link href={`/${locale}/user/login`}>
-          {t("app.story._components.nav.user.login")}
-        </Link>
+        <Link href={`/${locale}/user/login`}>{t("nav.user.login")}</Link>
       </Button>
       {/* Signup - always visible, compact on mobile */}
       <Button
@@ -32,9 +31,7 @@ export function AuthButtons({ locale }: AuthButtonsProps): JSX.Element {
         size="sm"
         className="bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 md:text-sm md:h-10 md:px-4 md:py-2"
       >
-        <Link href={`/${locale}/user/signup`}>
-          {t("app.story._components.nav.user.signup")}
-        </Link>
+        <Link href={`/${locale}/user/signup`}>{t("nav.user.signup")}</Link>
       </Button>
     </Div>
   );

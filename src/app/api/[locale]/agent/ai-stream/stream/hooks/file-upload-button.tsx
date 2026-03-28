@@ -30,7 +30,7 @@ import type { JSX } from "react";
 import { memo, useRef, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 import { isAllowedFileType } from "../../../chat/incognito/file-utils";
 
@@ -49,7 +49,7 @@ export const FileUploadButton = memo(function FileUploadButton({
   onFilesSelected,
   onRemoveFile,
 }: FileUploadButtonProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = aiStreamScopedTranslation.scopedT(locale);
   const fileInputRef = useRef<InputRefObject>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
 
@@ -135,8 +135,7 @@ export const FileUploadButton = memo(function FileUploadButton({
             <Div className="space-y-2">
               <Div className="flex items-center justify-between">
                 <Span className="text-sm font-semibold">
-                  {t("app.chat.input.attachments.attachedFiles")} (
-                  {attachments.length})
+                  {t("input.attachments.attachedFiles")} ({attachments.length})
                 </Span>
                 <Button
                   type="button"
@@ -147,7 +146,7 @@ export const FileUploadButton = memo(function FileUploadButton({
                   }}
                   className="h-7 text-xs"
                 >
-                  {t("app.chat.input.attachments.addMore")}
+                  {t("input.attachments.addMore")}
                 </Button>
               </Div>
               <Div className="space-y-1.5 max-h-60 overflow-y-auto">
@@ -193,9 +192,7 @@ export const FileUploadButton = memo(function FileUploadButton({
                 <Paperclip className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>
-              {t("app.chat.input.attachments.uploadFile")}
-            </TooltipContent>
+            <TooltipContent>{t("input.attachments.uploadFile")}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       )}

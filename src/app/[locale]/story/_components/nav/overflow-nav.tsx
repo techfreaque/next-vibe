@@ -24,8 +24,8 @@ import {
 } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation } from "../i18n";
 import type { NavChildItem, NavItemType } from "./nav-constants";
 
 interface OverflowNavProps {
@@ -41,7 +41,7 @@ function OverflowNavItem({
 }: {
   item: NavItemType;
   locale: CountryLanguage;
-  t: ReturnType<typeof simpleT>["t"];
+  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
 }): JSX.Element {
   if (item.children) {
     return (
@@ -75,7 +75,7 @@ function OverflowChildItem({
 }: {
   child: NavChildItem;
   locale: CountryLanguage;
-  t: ReturnType<typeof simpleT>["t"];
+  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
 }): JSX.Element {
   if (child.disabled && child.disabledReason) {
     return (
@@ -108,7 +108,7 @@ function InlineNavItem({
 }: {
   item: NavItemType;
   locale: CountryLanguage;
-  t: ReturnType<typeof simpleT>["t"];
+  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
 }): JSX.Element {
   if (item.children) {
     return (
@@ -182,7 +182,7 @@ export function OverflowNav({
   navigationItems,
   locale,
 }: OverflowNavProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [visibleCount, setVisibleCount] = useState(navigationItems.length);

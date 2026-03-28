@@ -37,7 +37,9 @@ export function useSkill(
           // Without it, SSR would fetch and render skill content that the client can't
           // match on initial render (no data yet) → hydration mismatch → blank flash.
           enabled:
-            !!skillId && (initialData != null || typeof window !== "undefined"),
+            !!skillId &&
+            ((initialData !== null && initialData !== undefined) ||
+              typeof window !== "undefined"),
           refetchOnWindowFocus: false,
           staleTime: 5 * 60 * 1000, // 5 minutes
         },

@@ -19,7 +19,7 @@ import { useEffect, useRef } from "react";
 import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation } from "../i18n";
 
 interface NewsletterPageProps {
   locale: CountryLanguage;
@@ -34,7 +34,7 @@ export function NewsletterPage({
   user,
   userEmail,
 }: NewsletterPageProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   const {
     email,
@@ -75,23 +75,23 @@ export function NewsletterPage({
   const benefits = [
     {
       icon: TrendingUp,
-      title: t("app.story.newsletter.page.benefits.benefit1.title"),
-      description: t("app.story.newsletter.page.benefits.benefit1.description"),
+      title: t("page.benefits.benefit1.title"),
+      description: t("page.benefits.benefit1.description"),
     },
     {
       icon: Zap,
-      title: t("app.story.newsletter.page.benefits.benefit2.title"),
-      description: t("app.story.newsletter.page.benefits.benefit2.description"),
+      title: t("page.benefits.benefit2.title"),
+      description: t("page.benefits.benefit2.description"),
     },
     {
       icon: Mail,
-      title: t("app.story.newsletter.page.benefits.benefit3.title"),
-      description: t("app.story.newsletter.page.benefits.benefit3.description"),
+      title: t("page.benefits.benefit3.title"),
+      description: t("page.benefits.benefit3.description"),
     },
     {
       icon: Users,
-      title: t("app.story.newsletter.page.benefits.benefit4.title"),
-      description: t("app.story.newsletter.page.benefits.benefit4.description"),
+      title: t("page.benefits.benefit4.title"),
+      description: t("page.benefits.benefit4.description"),
     },
   ];
 
@@ -102,16 +102,16 @@ export function NewsletterPage({
         <Div className="container mx-auto max-w-4xl text-center">
           <H1 className="text-4xl md:text-6xl font-bold mb-6 bg-linear-to-br from-blue-600 to-cyan-600 bg-clip-text text-transparent">
             {prefilledEmail !== undefined && prefilledEmail.length > 0
-              ? t("app.story.newsletter.page.emailProvided.title")
-              : t("app.story.newsletter.page.title")}
+              ? t("page.emailProvided.title")
+              : t("page.title")}
           </H1>
           <H2 className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8">
-            {t("app.story.newsletter.page.subtitle")}
+            {t("page.subtitle")}
           </H2>
           <P className="text-lg text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
             {prefilledEmail !== undefined && prefilledEmail.length > 0
-              ? t("app.story.newsletter.page.emailProvided.description")
-              : t("app.story.newsletter.page.heroDescription")}
+              ? t("page.emailProvided.description")
+              : t("page.heroDescription")}
           </P>
 
           {/* Newsletter Form */}
@@ -133,14 +133,14 @@ export function NewsletterPage({
               <Div className="flex flex-col gap-3">
                 <Input<"email">
                   type="email"
-                  placeholder={t("app.story.newsletter.emailPlaceholder")}
+                  placeholder={t("emailPlaceholder")}
                   className="text-center text-lg py-3"
                   autoComplete="email"
                   autoCorrect="off"
                   spellCheck={false}
                   value={email}
                   onChange={handleEmailChange}
-                  aria-label={t("app.story.newsletter.emailPlaceholder")}
+                  aria-label={t("emailPlaceholder")}
                   disabled={isAnyOperationInProgress || isLoggedIn}
                   name="email"
                   id="newsletter-email-page"
@@ -163,13 +163,9 @@ export function NewsletterPage({
                   aria-label={
                     isSubscribed
                       ? showConfirmUnsubscribe
-                        ? t(
-                            "app.story.newsletter.subscription.unsubscribe.confirmButton",
-                          )
-                        : t(
-                            "app.story.newsletter.subscription.unsubscribe.title",
-                          )
-                      : t("app.story.newsletter.page.cta.subscribeButton")
+                        ? t("subscription.unsubscribe.confirmButton")
+                        : t("subscription.unsubscribe.title")
+                      : t("page.cta.subscribeButton")
                   }
                   disabled={isAnyOperationInProgress}
                 >
@@ -188,11 +184,9 @@ export function NewsletterPage({
                   )}
                   {isSubscribed
                     ? showConfirmUnsubscribe
-                      ? t(
-                          "app.story.newsletter.subscription.unsubscribe.confirmButton",
-                        )
-                      : t("app.story.newsletter.subscription.unsubscribe.title")
-                    : t("app.story.newsletter.page.cta.subscribeButton")}
+                      ? t("subscription.unsubscribe.confirmButton")
+                      : t("subscription.unsubscribe.title")
+                    : t("page.cta.subscribeButton")}
                 </Button>
               </Div>
 
@@ -209,7 +203,7 @@ export function NewsletterPage({
                           : "bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400"
                   }`}
                 >
-                  {t(notification.message)}
+                  {notification.message}
                 </Div>
               )}
             </Form>
@@ -217,12 +211,12 @@ export function NewsletterPage({
             {/* Unsubscribe link */}
             <Div className="text-center mt-4">
               <P className="text-sm text-gray-500 dark:text-gray-400">
-                {t("app.story.newsletter.page.unsubscribeText")}{" "}
+                {t("page.unsubscribeText")}{" "}
                 <Link
                   href={`/${locale}/story/newsletter/unsubscribe`}
                   className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
                 >
-                  {t("app.story.newsletter.page.unsubscribeLink")}
+                  {t("page.unsubscribeLink")}
                 </Link>
               </P>
             </Div>
@@ -235,10 +229,10 @@ export function NewsletterPage({
         <Div className="container mx-auto max-w-6xl">
           <Div className="text-center mb-16">
             <H2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t("app.story.newsletter.page.benefits.title")}
+              {t("page.benefits.title")}
             </H2>
             <P className="text-lg text-gray-600 dark:text-gray-400">
-              {t("app.story.newsletter.page.benefits.subtitle")}
+              {t("page.benefits.subtitle")}
             </P>
           </Div>
 
@@ -270,10 +264,10 @@ export function NewsletterPage({
       <Div className="py-16 px-4 md:px-6">
         <Div className="container mx-auto max-w-4xl text-center">
           <H2 className="text-2xl md:text-3xl font-bold mb-4">
-            {t("app.story.newsletter.page.frequency.title")}
+            {t("page.frequency.title")}
           </H2>
           <P className="text-lg text-gray-600 dark:text-gray-400">
-            {t("app.story.newsletter.page.frequency.description")}
+            {t("page.frequency.description")}
           </P>
         </Div>
       </Div>
@@ -282,11 +276,9 @@ export function NewsletterPage({
       <Div className="py-20 px-4 md:px-6 bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600">
         <Div className="container mx-auto max-w-4xl text-center text-white">
           <H2 className="text-3xl md:text-4xl font-bold mb-4">
-            {t("app.story.newsletter.page.cta.title")}
+            {t("page.cta.title")}
           </H2>
-          <P className="text-xl mb-8 opacity-90">
-            {t("app.story.newsletter.page.cta.description")}
-          </P>
+          <P className="text-xl mb-8 opacity-90">{t("page.cta.description")}</P>
           <Button
             onClick={() => {
               // Scroll to top form
@@ -296,7 +288,7 @@ export function NewsletterPage({
             size="lg"
             className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-3"
           >
-            {t("app.story.newsletter.page.cta.subscribeButton")}
+            {t("page.cta.subscribeButton")}
           </Button>
         </Div>
       </Div>

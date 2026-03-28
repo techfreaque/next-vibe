@@ -26,7 +26,8 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useLogout } from "@/app/api/[locale]/user/private/logout/hooks";
 import type { StandardUserType } from "@/app/api/[locale]/user/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../i18n";
 
 interface UserMenuProps {
   user: JwtPayloadType;
@@ -40,7 +41,7 @@ export function UserMenu({
   userProfile,
   locale,
 }: UserMenuProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
   const logout = useLogout(logger, user);
 
@@ -72,25 +73,25 @@ export function UserMenu({
         <DropdownMenuItem asChild className="cursor-pointer">
           <Link href={`/${locale}/threads`}>
             <MessageSquare className="mr-2 h-4 w-4" />
-            <Span>{t("app.story._components.nav.goToApp")}</Span>
+            <Span>{t("nav.goToApp")}</Span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className="cursor-pointer">
           <Link href={`/${locale}/subscription`}>
             <Settings className="mr-2 h-4 w-4" />
-            <Span>{t("app.story._components.nav.pricing")}</Span>
+            <Span>{t("nav.pricing")}</Span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className="cursor-pointer">
           <Link href={`/${locale}/help`}>
             <HelpCircle className="mr-2 h-4 w-4" />
-            <Span>{t("app.story._components.nav.help")}</Span>
+            <Span>{t("nav.help")}</Span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout} className="cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />
-          <Span>{t("app.story._components.nav.logout")}</Span>
+          <Span>{t("nav.logout")}</Span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

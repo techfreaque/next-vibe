@@ -17,8 +17,8 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { configScopedTranslation } from "@/config/i18n";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type {
   EmailCampaignStageValue,
@@ -120,7 +120,7 @@ export class EmailSendingRepository {
           language,
         };
 
-      const { t: globalT } = simpleT(params.locale);
+      const { t: configT } = configScopedTranslation.scopedT(params.locale);
 
       const emailResponse = await SmtpSendingRepository.sendEmail(
         {
@@ -133,7 +133,7 @@ export class EmailSendingRepository {
               ? `${params.replyToName} <${params.replyToEmail}>`
               : undefined,
           unsubscribeUrl: params.unsubscribeUrl,
-          senderName: params.senderName ?? globalT("config.appName"),
+          senderName: params.senderName ?? configT("appName"),
           selectionCriteria,
           skipRateLimitCheck: params.skipRateLimitCheck,
           leadId: params.leadId,

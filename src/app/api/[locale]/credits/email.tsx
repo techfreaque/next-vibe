@@ -20,7 +20,7 @@ import {
   createTrackingContext,
   type TrackingContext,
 } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
-import { simpleT } from "@/i18n/core/shared";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { db } from "@/app/api/[locale]/system/db";
@@ -68,8 +68,8 @@ function CreditPackUserEmail({
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
-  const { t: globalT } = simpleT(locale);
-  const appName = globalT("config.appName");
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
+  const appName = globalT("appName");
   const userTracking = createTrackingContext(
     locale,
     props.leadId,
@@ -242,7 +242,7 @@ export const creditPackUserEmailTemplate: EmailTemplateDefinition<
   },
   render: async ({ requestData, locale, logger }) => {
     const { t } = scopedTranslation.scopedT(locale);
-    const { t: globalT } = simpleT(locale);
+    const { t: globalT } = configScopedTranslation.scopedT(locale);
     try {
       const [userRow] = await db
         .select({ email: users.email, privateName: users.privateName })
@@ -275,7 +275,7 @@ export const creditPackUserEmailTemplate: EmailTemplateDefinition<
         toEmail: templateProps.userEmail,
         toName: templateProps.privateName,
         subject: t("email.creditPack.user.subject", {
-          appName: globalT("config.appName"),
+          appName: globalT("appName"),
         }),
         leadId,
         jsx: creditPackUserEmailTemplate.component({
@@ -322,8 +322,8 @@ function CreditPackAdminEmail({
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
-  const { t: globalT } = simpleT(locale);
-  const appName = globalT("config.appName");
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
+  const appName = globalT("appName");
 
   return (
     <EmailTemplate
@@ -450,7 +450,7 @@ export const creditPackAdminEmailTemplate: EmailTemplateDefinition<
   },
   render: async ({ requestData, locale, user, logger }) => {
     const { t } = scopedTranslation.scopedT(locale);
-    const { t: globalT } = simpleT(locale);
+    const { t: globalT } = configScopedTranslation.scopedT(locale);
     const adminEmail = contactClientRepository.getSupportEmail(locale);
     try {
       const [userRow] = await db
@@ -465,7 +465,7 @@ export const creditPackAdminEmailTemplate: EmailTemplateDefinition<
         toEmail: adminEmail,
         toName: adminEmail,
         subject: t("email.creditPack.admin.subject", {
-          appName: globalT("config.appName"),
+          appName: globalT("appName"),
           credits: requestData.amount,
         }),
         leadId: user.leadId,

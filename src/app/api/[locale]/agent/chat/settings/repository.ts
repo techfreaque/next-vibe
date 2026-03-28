@@ -114,6 +114,7 @@ export class ChatSettingsRepository {
           })) ?? null,
         compactTrigger: setting.compactTrigger ?? defaults.compactTrigger,
         memoryLimit: setting.memoryLimit ?? defaults.memoryLimit,
+        codingAgent: setting.codingAgent ?? defaults.codingAgent,
       };
 
       return success(result);
@@ -226,6 +227,8 @@ export class ChatSettingsRepository {
                   : undefined,
             memoryLimit:
               data.memoryLimit !== undefined ? data.memoryLimit : undefined,
+            codingAgent:
+              data.codingAgent !== undefined ? data.codingAgent : undefined,
           })
           .where(eq(chatSettings.userId, userId))
           .returning();
@@ -273,6 +276,8 @@ export class ChatSettingsRepository {
                 : null,
             memoryLimit:
               data.memoryLimit !== undefined ? data.memoryLimit : null,
+            codingAgent:
+              data.codingAgent !== undefined ? data.codingAgent : null,
           })
           .returning();
       }

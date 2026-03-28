@@ -16,8 +16,8 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as pageT } from "../i18n";
 import { CurrentPageType } from "./admin-users-layout-client";
 
 interface UsersNavigationProps {
@@ -29,38 +29,35 @@ export function UsersNavigation({
   locale,
   currentPage,
 }: UsersNavigationProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
 
   const navigationItems = [
     {
       key: CurrentPageType.overview,
       href: `/${locale}/admin/users` as const,
       icon: BarChart3,
-      label: t("app.admin.users.tabs.stats"),
-      description: t("app.admin.users.tabs.stats_description"),
+      label: t("tabs.stats"),
+      description: t("tabs.stats_description"),
     },
     {
       key: CurrentPageType.list,
       href: `/${locale}/admin/users/list` as const,
       icon: List,
-      label: t("app.admin.users.tabs.list"),
-      description: t("app.admin.users.tabs.list_description"),
+      label: t("tabs.list"),
+      description: t("tabs.list_description"),
     },
     {
       key: CurrentPageType.add,
       href: `/${locale}/admin/users/create` as const,
       icon: UserPlus,
-      label: t("app.admin.users.tabs.add"),
-      description: t("app.admin.users.tabs.add_description"),
+      label: t("tabs.add"),
+      description: t("tabs.add_description"),
     },
   ] as const;
 
   return (
     <Div className="border-b border-gray-200 dark:border-gray-700">
-      <Nav
-        className="flex flex-row gap-8"
-        aria-label={t("app.admin.users.tabs.overview")}
-      >
+      <Nav className="flex flex-row gap-8" aria-label={t("tabs.overview")}>
         {navigationItems.map((item) => {
           const Icon = item.icon;
           const isActive = item.key === currentPage;

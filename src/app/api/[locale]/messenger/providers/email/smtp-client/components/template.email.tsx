@@ -8,9 +8,9 @@ import {
 import type { JSX, ReactNode } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { scopedTranslation } from "../i18n";
 import { EmailImage } from "./email-image.email";
@@ -36,7 +36,7 @@ export function EmailTemplate({
   recipientEmail,
 }: EmailTemplateProps): JSX.Element {
   const currentYear = new Date().getFullYear();
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
   const { t } = scopedTranslation.scopedT(locale);
 
   return (
@@ -83,7 +83,7 @@ export function EmailTemplate({
             >
               <EmailImage
                 src="/images/unbottled-icon.png"
-                alt={globalT("config.appName")}
+                alt={globalT("appName")}
                 width="28"
                 height="28"
                 recipientEmail={recipientEmail}
@@ -102,7 +102,7 @@ export function EmailTemplate({
                   whiteSpace: "nowrap",
                 }}
               >
-                {globalT("config.appName")}
+                {globalT("appName")}
               </div>
             </div>
             <div
@@ -213,7 +213,7 @@ export function EmailTemplate({
             >
               {t("components.email.footer.allRightsReserved", {
                 currentYear,
-                appName: globalT("config.appName"),
+                appName: globalT("appName"),
               })}
             </div>
 
@@ -245,7 +245,7 @@ export function EmailTemplate({
             >
               {t("components.email.footer.copyright", {
                 currentYear,
-                appName: globalT("config.appName"),
+                appName: globalT("appName"),
               })}
             </div>
           </Section>

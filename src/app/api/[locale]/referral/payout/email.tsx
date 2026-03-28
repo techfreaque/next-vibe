@@ -21,8 +21,8 @@ import {
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import { db } from "@/app/api/[locale]/system/db";
 import { users } from "@/app/api/[locale]/user/db";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 import { eq } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -229,7 +229,7 @@ export const payoutUserEmailTemplate: EmailTemplateDefinition<
   },
   render: async ({ requestData, locale, user, logger }) => {
     const { t } = scopedTranslation.scopedT(locale);
-    const { t: globalT } = simpleT(locale);
+    const { t: configT } = configScopedTranslation.scopedT(locale);
     try {
       if (!user.id) {
         return fail({
@@ -249,8 +249,8 @@ export const payoutUserEmailTemplate: EmailTemplateDefinition<
       }
       const isCrypto = requestData.currency !== PayoutCurrency.CREDITS;
       const subject = isCrypto
-        ? `${t("payout.email.user.subjectCrypto")} - ${globalT("config.appName")}`
-        : `${t("payout.email.user.subjectCredits")} - ${globalT("config.appName")}`;
+        ? `${t("payout.email.user.subjectCrypto")} - ${configT("appName")}`
+        : `${t("payout.email.user.subjectCredits")} - ${configT("appName")}`;
       const tracking = createTrackingContext(locale, user.leadId, user.id);
       const jsx = (
         <PayoutUserEmail
@@ -272,7 +272,7 @@ export const payoutUserEmailTemplate: EmailTemplateDefinition<
         toName: userRow.email,
         subject,
         replyToEmail: contactClientRepository.getSupportEmail(locale),
-        replyToName: globalT("config.appName"),
+        replyToName: configT("appName"),
         leadId: user.leadId,
         jsx,
       });
@@ -360,7 +360,7 @@ export const payoutAdminEmailTemplate: EmailTemplateDefinition<
   },
   render: async ({ requestData, locale, user, logger }) => {
     const { t } = scopedTranslation.scopedT(locale);
-    const { t: globalT } = simpleT(locale);
+    const { t: configT } = configScopedTranslation.scopedT(locale);
     const adminEmail = contactClientRepository.getSupportEmail(locale);
     try {
       let userEmail: string | undefined;
@@ -373,8 +373,8 @@ export const payoutAdminEmailTemplate: EmailTemplateDefinition<
       }
       return success({
         toEmail: adminEmail,
-        toName: globalT("config.appName"),
-        subject: `[${globalT("config.appName")}] ${t("payout.email.admin.subject")} - ${requestData.amountCents} ${t("payout.email.admin.credits")} via ${requestData.currency}`,
+        toName: configT("appName"),
+        subject: `[${configT("appName")}] ${t("payout.email.admin.subject")} - ${requestData.amountCents} ${t("payout.email.admin.credits")} via ${requestData.currency}`,
         replyToEmail: userEmail,
         replyToName: userEmail,
         leadId: user.leadId,
@@ -407,11 +407,11 @@ function renderAdminPayoutEmailContent(
   walletAddress: string | null | undefined,
   userEmail: string | undefined,
 ): ReactElement {
-  const { t: globalT } = simpleT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
   return (
     <EmailTemplate
       locale={locale}
-      title={`${t("payout.email.admin.title")} - ${globalT("config.appName")}`}
+      title={`${t("payout.email.admin.title")} - ${configT("appName")}`}
       previewText={t("payout.email.admin.preview")}
       recipientEmail={recipientEmail}
       tracking={createTrackingContext(locale)}

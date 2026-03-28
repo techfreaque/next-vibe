@@ -492,4 +492,17 @@ export const translations: typeof enTranslations = {
       title: "Potwierdź wywołania narzędzi wsadowych",
     },
   },
+  flatView: {
+    timestamp: {
+      sun: "Nie",
+      mon: "Pon",
+      tue: "Wt",
+      wed: "Śr",
+      thu: "Czw",
+      fri: "Pt",
+      sat: "Sob",
+      format:
+        "{{month}}/{{day}}/{{year}}({{dayName}}){{hours}}:{{mins}}:{{secs}}",
+    },
+  },
 };

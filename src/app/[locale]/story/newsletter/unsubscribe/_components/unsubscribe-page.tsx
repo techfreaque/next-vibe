@@ -16,7 +16,7 @@ import React, { useEffect, useRef } from "react";
 import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation } from "../../i18n";
 
 interface UnsubscribePageProps {
   locale: CountryLanguage;
@@ -29,7 +29,7 @@ export function UnsubscribePage({
   prefilledEmail,
   user,
 }: UnsubscribePageProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   const {
     email,
@@ -69,17 +69,15 @@ export function UnsubscribePage({
       <Div className="relative py-20 px-4 md:px-6">
         <Div className="container mx-auto max-w-4xl text-center">
           <H1 className="text-4xl md:text-6xl font-bold mb-6 bg-linear-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-            {t("app.story.newsletter.unsubscribe.page.title")}
+            {t("unsubscribe.page.title")}
           </H1>
           <H2 className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8">
-            {t("app.story.newsletter.unsubscribe.page.subtitle")}
+            {t("unsubscribe.page.subtitle")}
           </H2>
           <P className="text-lg text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
             {prefilledEmail
-              ? t(
-                  "app.story.newsletter.unsubscribe.page.emailProvided.description",
-                )
-              : t("app.story.newsletter.unsubscribe.page.description")}
+              ? t("unsubscribe.page.emailProvided.description")
+              : t("unsubscribe.page.description")}
           </P>
 
           {/* Unsubscribe Form */}
@@ -98,14 +96,14 @@ export function UnsubscribePage({
               <Div className="flex flex-col gap-3">
                 <Input<"email">
                   type="email"
-                  placeholder={t("app.story.newsletter.emailPlaceholder")}
+                  placeholder={t("emailPlaceholder")}
                   className="text-center text-lg py-3"
                   autoComplete="email"
                   autoCorrect="off"
                   spellCheck={false}
                   value={email}
                   onChange={handleEmailChange}
-                  aria-label={t("app.story.newsletter.emailPlaceholder")}
+                  aria-label={t("emailPlaceholder")}
                   disabled={isAnyOperationInProgress || isLoggedIn}
                   name="email"
                   id="newsletter-unsubscribe-email"
@@ -121,12 +119,8 @@ export function UnsubscribePage({
                   variant={showConfirmUnsubscribe ? "default" : "outline"}
                   aria-label={
                     showConfirmUnsubscribe
-                      ? t(
-                          "app.story.newsletter.subscription.unsubscribe.confirmButton",
-                        )
-                      : t(
-                          "app.story.newsletter.unsubscribe.page.unsubscribeButton",
-                        )
+                      ? t("subscription.unsubscribe.confirmButton")
+                      : t("unsubscribe.page.unsubscribeButton")
                   }
                   disabled={isAnyOperationInProgress}
                 >
@@ -140,12 +134,8 @@ export function UnsubscribePage({
                     <X className="h-5 w-5 mr-2" />
                   )}
                   {showConfirmUnsubscribe
-                    ? t(
-                        "app.story.newsletter.subscription.unsubscribe.confirmButton",
-                      )
-                    : t(
-                        "app.story.newsletter.unsubscribe.page.unsubscribeButton",
-                      )}
+                    ? t("subscription.unsubscribe.confirmButton")
+                    : t("unsubscribe.page.unsubscribeButton")}
                 </Button>
               </Div>
 
@@ -162,7 +152,7 @@ export function UnsubscribePage({
                           : "bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400"
                   }`}
                 >
-                  {t(notification.message)}
+                  {notification.message}
                 </Div>
               )}
             </Form>
@@ -170,12 +160,12 @@ export function UnsubscribePage({
             {/* Subscribe link */}
             <Div className="text-center mt-4">
               <P className="text-sm text-gray-500 dark:text-gray-400">
-                {t("app.story.newsletter.unsubscribe.page.subscribeText")}{" "}
+                {t("unsubscribe.page.subscribeText")}{" "}
                 <Link
                   href={`/${locale}/story/newsletter`}
                   className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
                 >
-                  {t("app.story.newsletter.unsubscribe.page.subscribeLink")}
+                  {t("unsubscribe.page.subscribeLink")}
                 </Link>
               </P>
             </Div>
@@ -188,10 +178,10 @@ export function UnsubscribePage({
         <Div className="container mx-auto max-w-4xl">
           <Div className="text-center mb-16">
             <H2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t("app.story.newsletter.unsubscribe.page.info.title")}
+              {t("unsubscribe.page.info.title")}
             </H2>
             <P className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-              {t("app.story.newsletter.unsubscribe.page.info.description")}
+              {t("unsubscribe.page.info.description")}
             </P>
           </Div>
 
@@ -201,14 +191,10 @@ export function UnsubscribePage({
                 <Mail className="h-8 w-8 text-white" />
               </Div>
               <H3 className="text-xl font-semibold mb-3">
-                {t(
-                  "app.story.newsletter.unsubscribe.page.info.immediate.title",
-                )}
+                {t("unsubscribe.page.info.immediate.title")}
               </H3>
               <P className="text-gray-600 dark:text-gray-400">
-                {t(
-                  "app.story.newsletter.unsubscribe.page.info.immediate.description",
-                )}
+                {t("unsubscribe.page.info.immediate.description")}
               </P>
             </Div>
 
@@ -217,14 +203,10 @@ export function UnsubscribePage({
                 <Send className="h-8 w-8 text-white" />
               </Div>
               <H3 className="text-xl font-semibold mb-3">
-                {t(
-                  "app.story.newsletter.unsubscribe.page.info.resubscribe.title",
-                )}
+                {t("unsubscribe.page.info.resubscribe.title")}
               </H3>
               <P className="text-gray-600 dark:text-gray-400">
-                {t(
-                  "app.story.newsletter.unsubscribe.page.info.resubscribe.description",
-                )}
+                {t("unsubscribe.page.info.resubscribe.description")}
               </P>
             </Div>
           </Div>
@@ -235,12 +217,10 @@ export function UnsubscribePage({
       <Div className="py-16 px-4 md:px-6">
         <Div className="container mx-auto max-w-4xl text-center">
           <H2 className="text-2xl md:text-3xl font-bold mb-4">
-            {t("app.story.newsletter.unsubscribe.page.alternatives.title")}
+            {t("unsubscribe.page.alternatives.title")}
           </H2>
           <P className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-            {t(
-              "app.story.newsletter.unsubscribe.page.alternatives.description",
-            )}
+            {t("unsubscribe.page.alternatives.description")}
           </P>
           <Div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
@@ -251,9 +231,7 @@ export function UnsubscribePage({
               size="lg"
               className="px-8 py-3"
             >
-              {t(
-                "app.story.newsletter.unsubscribe.page.alternatives.subscribe",
-              )}
+              {t("unsubscribe.page.alternatives.subscribe")}
             </Button>
             <Button
               onClick={() => {
@@ -263,7 +241,7 @@ export function UnsubscribePage({
               size="lg"
               className="px-8 py-3"
             >
-              {t("app.story.newsletter.unsubscribe.page.alternatives.contact")}
+              {t("unsubscribe.page.alternatives.contact")}
             </Button>
           </Div>
         </Div>

@@ -6,4 +6,9 @@ export const translations: typeof enTranslations = {
   description:
     "Verwalte, welche Werkzeuge der KI zur Verfügung stehen. Pinne Werkzeuge an, um sie immer im Kontext zu haben.",
   openFullPage: "Vollständige Seite öffnen",
+  modal: {
+    title: "KI-Werkzeuge",
+    description:
+      "Verwalte, welche Werkzeuge der KI zur Verfügung stehen. Pinne Werkzeuge an, um sie immer im Kontext zu haben.",
+  },
 };

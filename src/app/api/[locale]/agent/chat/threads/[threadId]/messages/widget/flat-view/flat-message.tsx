@@ -24,7 +24,6 @@ import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { useSkill } from "../../../../../skills/[id]/hooks";
 import { loadMessageAttachments } from "../../hooks/load-message-attachments";
@@ -123,8 +122,6 @@ export const FlatMessage = memo(function FlatMessage({
       });
     })();
   };
-  // simpleT needed for format4chanTimestamp which uses global app.chat.flatView.timestamp.* keys
-  const { t: tGlobal } = simpleT(locale);
 
   // Editor state from Zustand store (shared across all view modes)
   const editingMessageId = useMessageEditorStore((s) => s.editingMessageId);
@@ -431,7 +428,7 @@ export const FlatMessage = memo(function FlatMessage({
           className="text-muted-foreground/80 text-xs font-medium"
           suppressHydrationWarning
         >
-          {format4chanTimestamp(message.createdAt.getTime(), tGlobal)}
+          {format4chanTimestamp(message.createdAt.getTime(), t)}
         </Span>
 
         {/* Post Number */}

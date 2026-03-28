@@ -15,9 +15,9 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
+import { scopedTranslation, type StoryComponentsTranslationKey } from "../i18n";
 import type { NavPaths } from "./nav-constants";
 
 /**
@@ -29,15 +29,15 @@ export interface BadgeTranslationPayload {
 
 export interface NavSingleItemType {
   icon: JSX.Element;
-  title: TranslationKey;
+  title: StoryComponentsTranslationKey;
   href: NavPaths;
   children?: never;
-  badge?: TranslationKey | undefined;
+  badge?: StoryComponentsTranslationKey | undefined;
   badgeTranslationPayload?: BadgeTranslationPayload | undefined;
   badgeVariant?: BadgeVariant | undefined;
   isActive?: boolean | undefined;
   disabled?: boolean | undefined;
-  disabledReason?: TranslationKey | undefined;
+  disabledReason?: StoryComponentsTranslationKey | undefined;
 }
 
 export interface NavSingleItemProps extends NavSingleItemType {
@@ -56,7 +56,7 @@ export function NavSingleItem({
   disabledReason,
   locale,
 }: NavSingleItemProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   if (disabled && disabledReason) {
     return (
@@ -102,13 +102,16 @@ function NavButton({
   t,
 }: {
   icon: JSX.Element;
-  title: TranslationKey;
-  badge: TranslationKey | undefined;
+  title: StoryComponentsTranslationKey;
+  badge: StoryComponentsTranslationKey | undefined;
   badgeTranslationPayload: BadgeTranslationPayload | undefined;
   badgeVariant: BadgeVariant | undefined;
   isActive: boolean | undefined;
   disabled: boolean | undefined;
-  t: TFunction;
+  t: (
+    key: StoryComponentsTranslationKey,
+    params?: Record<string, string | number>,
+  ) => TranslatedKeyType;
 }): JSX.Element {
   return (
     <Button

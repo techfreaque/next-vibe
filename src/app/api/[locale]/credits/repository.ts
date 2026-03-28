@@ -3459,11 +3459,11 @@ export class CreditRepository {
               await import("../messenger/providers/email/smtp-client/email-sending/repository");
             const { contactClientRepository } =
               await import("../contact/repository-client");
-            const { simpleT } = await import("@/i18n/core/shared");
+            const { configScopedTranslation } = await import("@/config/i18n");
             const { createTrackingContext } =
               await import("../messenger/providers/email/smtp-client/components/tracking_context.email");
-            const { t: globalT } = simpleT(userLocale);
-            const appName = globalT("config.appName");
+            const { t: configT } = configScopedTranslation.scopedT(userLocale);
+            const appName = configT("appName");
             const leadId = leadLink?.leadId ?? userId;
 
             const userJsx = creditPackUserEmailTemplate.component({

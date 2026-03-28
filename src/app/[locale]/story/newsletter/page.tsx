@@ -10,8 +10,9 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { scopedTranslation as meScopedTranslation } from "@/app/api/[locale]/user/private/me/i18n";
 import { UserProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation } from "./i18n";
 
 import { NewsletterPage } from "./_components/newsletter-page";
 
@@ -25,26 +26,27 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
 
   return {
-    title: t("app.story.newsletter.page.title", {
-      appName: t("config.appName"),
+    title: t("page.title", {
+      appName: configT("appName"),
     }),
-    description: t("app.story.newsletter.page.description"),
+    description: t("page.description"),
     openGraph: {
-      title: t("app.story.newsletter.page.title", {
-        appName: t("config.appName"),
+      title: t("page.title", {
+        appName: configT("appName"),
       }),
-      description: t("app.story.newsletter.page.description"),
+      description: t("page.description"),
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: t("app.story.newsletter.page.title", {
-        appName: t("config.appName"),
+      title: t("page.title", {
+        appName: configT("appName"),
       }),
-      description: t("app.story.newsletter.page.description"),
+      description: t("page.description"),
     },
   };
 }

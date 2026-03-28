@@ -738,4 +738,68 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  input: {
+    placeholder: "Nachricht senden...",
+    imagePlaceholder: "Beschreibe ein zu generierendes Bild...",
+    audioPlaceholder: "Beschreibe Audio oder Musik zum Generieren...",
+    noPermission: "Du hast keine Berechtigung, hier zu posten",
+    keyboardShortcuts: {
+      enter: "Enter",
+      toSend: "zum Senden",
+      shiftEnter: "Shift+Enter",
+      forNewLine: "für neue Zeile",
+      ctrlV: "Strg+V",
+      orPasteFiles: "oder Dateien einfügen",
+    },
+    speechInput: {
+      transcribing: "Transkribiere...",
+    },
+    attachments: {
+      uploadFile: "Dateien anhängen",
+      attachedFiles: "Angehängte Dateien",
+      addMore: "Weitere hinzufügen",
+    },
+  },
+  imageGen: {
+    sizeSquare: "Quadrat (1024×1024)",
+    sizeLandscape: "Querformat (1792×1024)",
+    sizePortrait: "Hochformat (1024×1792)",
+    qualityStandard: "Standard",
+    qualityHD: "HD",
+  },
+  audioGen: {
+    durationShort: "Kurz (~8s)",
+    durationMedium: "Mittel (~15s)",
+    durationLong: "Lang (~30s)",
+  },
+  voiceMode: {
+    unconfiguredTitle: "Sprache nicht konfiguriert",
+    unconfiguredDescription:
+      "Text-zu-Sprache ist für diese Fertigkeit nicht verfügbar.",
+    callMode: "Anrufmodus",
+    callModeDescription: "KI antwortet mit Sprache",
+    tapToRecord: "Zum Aufnehmen tippen",
+    recording: {
+      paused: "Pausiert",
+      resume: "Fortsetzen",
+      pause: "Pause",
+    },
+    callOverlay: {
+      listening: "Zuhören...",
+    },
+    actions: {
+      cancel: "Abbrechen",
+      toInput: "Zur Eingabe",
+      sendVoice: "Sprachnachricht senden",
+    },
+  },
+  actions: {
+    cancellingGeneration: "Abbrechen...",
+    stopGeneration: "Stopp",
+    sendMessage: "Senden",
+  },
+  toolsButton: {
+    title: "KI-Werkzeuge",
+    tools: "Werkzeuge",
+  },
 };

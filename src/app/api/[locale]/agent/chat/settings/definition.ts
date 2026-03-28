@@ -124,6 +124,13 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.number().int().nullable(),
       }),
+
+      // Coding agent provider (admin-only). null = "claude-code"
+      codingAgent: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(["claude-code", "open-code"]).nullable(),
+      }),
     },
   }),
 
@@ -184,6 +191,7 @@ const { GET } = createEndpoint({
         pinnedTools: null,
         compactTrigger: null,
         memoryLimit: null,
+        codingAgent: null,
       },
     },
   },
@@ -310,6 +318,27 @@ const { POST } = createEndpoint({
         hidden: true,
         columns: 6,
         schema: z.number().int().min(100).max(100000).nullable().optional(),
+      }),
+
+      // Coding agent provider (admin-only). null = "claude-code" (default)
+      codingAgent: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.codingAgent.label" as const,
+        description: "post.codingAgent.description" as const,
+        allowedRoles: [UserRole.ADMIN],
+        columns: 6,
+        options: [
+          {
+            value: "claude-code",
+            label: "post.codingAgent.options.claudeCode" as const,
+          },
+          {
+            value: "open-code",
+            label: "post.codingAgent.options.openCode" as const,
+          },
+        ],
+        schema: z.enum(["claude-code", "open-code"]).nullable().optional(),
       }),
     },
   }),

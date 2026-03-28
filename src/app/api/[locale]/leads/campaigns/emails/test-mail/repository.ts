@@ -21,8 +21,8 @@ import { SmtpSendingRepository } from "@/app/api/[locale]/messenger/providers/em
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { LeadWithEmailType } from "../../../types";
 import { emailService } from "../index";
@@ -111,7 +111,7 @@ export class TestEmailRepository {
       }
 
       const mockLead = this.createMockLead(data, data.testEmail);
-      const { t: simpleLocalT } = simpleT(emailLocale);
+      const { t: configLocalT } = configScopedTranslation.scopedT(emailLocale);
 
       const emailContent = await emailService.renderEmail(
         mockLead,
@@ -119,7 +119,7 @@ export class TestEmailRepository {
         data.emailCampaignStage,
         {
           locale: emailLocale,
-          companyName: simpleLocalT("config.appName"),
+          companyName: configLocalT("appName"),
           companyEmail: contactClientRepository.getSupportEmail(emailLocale),
           campaignId: "test-campaign-id",
           baseUrl: env.NEXT_PUBLIC_APP_URL,
@@ -164,7 +164,7 @@ export class TestEmailRepository {
             html,
             replyTo: contactClientRepository.getSupportEmail(emailLocale),
             unsubscribeUrl,
-            senderName: simpleLocalT("config.appName"),
+            senderName: configLocalT("appName"),
             selectionCriteria,
           },
           logger,

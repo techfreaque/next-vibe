@@ -104,6 +104,8 @@ export const translations = {
             globalOptionsLabel: "Global Options",
             examplesLabel: "Examples",
           },
+          noEndpoint:
+            "This feature is not available yet. Please try again later",
           widgets: {
             common: {
               noDataAvailable: "No data available",

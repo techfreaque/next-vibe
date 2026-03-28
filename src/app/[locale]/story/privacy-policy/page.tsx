@@ -9,10 +9,11 @@ import { Ul } from "next-vibe-ui/ui/ul";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation } from "./i18n";
 
 import { PrivacyPolicyClientInteraction } from "./_components/privacy-policy-client-content";
 import { SupportButton } from "./_components/support-button";
@@ -26,28 +27,29 @@ export async function generateMetadata(
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { locale } = await params;
+  const { t } = scopedTranslation.scopedT(locale);
   const previousImages = (await parent).openGraph?.images || [];
 
   return metadataGenerator(locale, {
     path: "privacy-policy",
-    title: "app.meta.privacyPolicy.title",
-    description: "app.meta.privacyPolicy.description",
+    title: t("meta.title"),
+    description: t("meta.description"),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/privacy-hero.jpg`,
-    category: "app.meta.privacyPolicy.category",
-    imageAlt: "app.meta.privacyPolicy.imageAlt",
-    keywords: ["app.meta.privacyPolicy.keywords"],
+    category: t("meta.category"),
+    imageAlt: t("meta.imageAlt"),
+    keywords: [t("meta.keywords")],
     additionalMetadata: {
       openGraph: {
-        title: "app.meta.privacyPolicy.ogTitle",
-        description: "app.meta.privacyPolicy.ogDescription",
+        title: t("meta.ogTitle"),
+        description: t("meta.ogDescription"),
         url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/privacy-policy`,
         type: "website",
         images: [...previousImages],
       },
       twitter: {
         card: "summary_large_image",
-        title: "app.meta.privacyPolicy.twitterTitle",
-        description: "app.meta.privacyPolicy.twitterDescription",
+        title: t("meta.twitterTitle"),
+        description: t("meta.twitterDescription"),
       },
     },
   });
@@ -70,7 +72,8 @@ export function TanstackPage({
   locale,
   supportEmail,
 }: PrivacyPolicyPageData): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
 
   return (
     <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
@@ -81,10 +84,10 @@ export function TanstackPage({
             <Shield className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </Div>
           <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600">
-            {t("app.story._components.home.privacyPolicy.title")}
+            {t("title")}
           </H1>
           <P className="text-lg text-gray-600 dark:text-gray-400">
-            {t("app.story._components.home.privacyPolicy.lastUpdated")}
+            {t("lastUpdated")}
           </P>
         </Div>
 
@@ -92,8 +95,8 @@ export function TanstackPage({
         <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-8">
           <Div className="prose dark:prose-invert max-w-none">
             <P className="lead text-lg">
-              {t("app.story._components.home.privacyPolicy.introduction", {
-                appName: t("config.appName"),
+              {t("introduction", {
+                appName: configT("appName"),
               })}
             </P>
 
@@ -101,326 +104,190 @@ export function TanstackPage({
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
               <Lock className="h-5 w-5 mr-2" />
-              {t(
-                "app.story._components.home.privacyPolicy.sections.informationCollect.title",
-              )}
+              {t("sections.informationCollect.title")}
             </H2>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.informationCollect.description",
-              )}
-            </P>
+            <P>{t("sections.informationCollect.description")}</P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.personalData.title",
-              )}
+              {t("sections.personalData.title")}
             </H3>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.personalData.description",
-              )}
-            </P>
+            <P>{t("sections.personalData.description")}</P>
             <Ul className="flex flex-col gap-1">
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.personalData.items.name",
-                )}
+                {t("sections.personalData.items.name")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.personalData.items.email",
-                )}
+                {t("sections.personalData.items.email")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.personalData.items.phone",
-                )}
+                {t("sections.personalData.items.phone")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.personalData.items.company",
-                )}
+                {t("sections.personalData.items.company")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.personalData.items.billing",
-                )}
+                {t("sections.personalData.items.billing")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.personalData.items.payment",
-                )}
+                {t("sections.personalData.items.payment")}
               </Li>
             </Ul>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.socialMediaData.title",
-              )}
+              {t("sections.socialMediaData.title")}
             </H3>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.socialMediaData.description",
-              )}
-            </P>
+            <P>{t("sections.socialMediaData.description")}</P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.derivativeData.title",
-              )}
+              {t("sections.derivativeData.title")}
             </H3>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.derivativeData.description",
-              )}
-            </P>
+            <P>{t("sections.derivativeData.description")}</P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.useOfInformation.title",
-              )}
+              {t("sections.useOfInformation.title")}
             </H2>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.useOfInformation.description",
-              )}
-            </P>
+            <P>{t("sections.useOfInformation.description")}</P>
             <Ul className="flex flex-col gap-1">
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.useOfInformation.items.provide",
-                )}
+                {t("sections.useOfInformation.items.provide")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.useOfInformation.items.process",
-                )}
+                {t("sections.useOfInformation.items.process")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.useOfInformation.items.send",
-                )}
+                {t("sections.useOfInformation.items.send")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.useOfInformation.items.respond",
-                )}
+                {t("sections.useOfInformation.items.respond")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.useOfInformation.items.monitor",
-                )}
+                {t("sections.useOfInformation.items.monitor")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.useOfInformation.items.personalize",
-                )}
+                {t("sections.useOfInformation.items.personalize")}
               </Li>
             </Ul>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.disclosure.title",
-              )}
+              {t("sections.disclosure.title")}
             </H2>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.disclosure.description",
-              )}
-            </P>
+            <P>{t("sections.disclosure.description")}</P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.businessTransfers.title",
-              )}
+              {t("sections.businessTransfers.title")}
             </H3>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.businessTransfers.description",
-              )}
-            </P>
+            <P>{t("sections.businessTransfers.description")}</P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.thirdParty.title",
-              )}
+              {t("sections.thirdParty.title")}
             </H3>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.thirdParty.description",
-              )}
-            </P>
+            <P>{t("sections.thirdParty.description")}</P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.legal.title",
-              )}
+              {t("sections.legal.title")}
             </H3>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.legal.description",
-              )}
-            </P>
+            <P>{t("sections.legal.description")}</P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.security.title",
-              )}
+              {t("sections.security.title")}
             </H2>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.security.description",
-              )}
-            </P>
+            <P>{t("sections.security.description")}</P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.rights.title",
-              )}
+              {t("sections.rights.title")}
             </H2>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.rights.description",
-              )}
-            </P>
+            <P>{t("sections.rights.description")}</P>
             <Ul className="flex flex-col gap-1">
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.rights.items.access",
-                )}
+                {t("sections.rights.items.access")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.rights.items.correction",
-                )}
+                {t("sections.rights.items.correction")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.rights.items.deletion",
-                )}
+                {t("sections.rights.items.deletion")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.rights.items.objection",
-                )}
+                {t("sections.rights.items.objection")}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t(
-                  "app.story._components.home.privacyPolicy.sections.rights.items.portability",
-                )}
+                {t("sections.rights.items.portability")}
               </Li>
             </Ul>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.cookies.title",
-              )}
+              {t("sections.cookies.title")}
             </H2>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.cookies.description",
-              )}
-            </P>
+            <P>{t("sections.cookies.description")}</P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.thirdPartySites.title",
-              )}
+              {t("sections.thirdPartySites.title")}
             </H2>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.thirdPartySites.description",
-              )}
-            </P>
+            <P>{t("sections.thirdPartySites.description")}</P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.children.title",
-              )}
+              {t("sections.children.title")}
             </H2>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.children.description",
-              )}
-            </P>
+            <P>{t("sections.children.description")}</P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.changes.title",
-              )}
+              {t("sections.changes.title")}
             </H2>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.changes.description",
-              )}
-            </P>
+            <P>{t("sections.changes.description")}</P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("config.group.contact.title")}
+              {configT("group.contact.title")}
             </H2>
             <SupportButton supportEmail={supportEmail} locale={locale} />
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.gdpr.title",
-              )}
+              {t("sections.gdpr.title")}
             </H2>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.gdpr.description",
-              )}
-            </P>
+            <P>{t("sections.gdpr.description")}</P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.ccpa.title",
-              )}
+              {t("sections.ccpa.title")}
             </H2>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.ccpa.description",
-              )}
-            </P>
+            <P>{t("sections.ccpa.description")}</P>
           </Div>
         </Div>
 

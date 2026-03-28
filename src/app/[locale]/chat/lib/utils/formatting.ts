@@ -5,8 +5,9 @@
  */
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { MessagesT } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/i18n";
+
+import { scopedTranslation as chatScopedTranslation } from "../../i18n";
 
 const TEXT_FORMAT = {
   SHORT_ID_LENGTH: 8,
@@ -23,7 +24,7 @@ export function formatRelativeTime(
   timestamp: number,
   locale: CountryLanguage,
 ): string {
-  const { t } = simpleT(locale);
+  const { t } = chatScopedTranslation.scopedT(locale);
   const now = Date.now();
   const diff = now - timestamp;
   const minutes = Math.floor(diff / 60000);
@@ -31,15 +32,15 @@ export function formatRelativeTime(
   const days = Math.floor(diff / 86400000);
 
   if (days > 0) {
-    return t("app.chat.timestamp.daysAgo", { count: days });
+    return t("timestamp.daysAgo", { count: days });
   }
   if (hours > 0) {
-    return t("app.chat.timestamp.hoursAgo", { count: hours });
+    return t("timestamp.hoursAgo", { count: hours });
   }
   if (minutes > 0) {
-    return t("app.chat.timestamp.minutesAgo", { count: minutes });
+    return t("timestamp.minutesAgo", { count: minutes });
   }
-  return t("app.chat.timestamp.justNow");
+  return t("timestamp.justNow");
 }
 
 /**
@@ -48,7 +49,7 @@ export function formatRelativeTime(
  * @param timestamp - Unix timestamp in milliseconds
  * @returns Formatted timestamp string
  */
-export function format4chanTimestamp(timestamp: number, t: TFunction): string {
+export function format4chanTimestamp(timestamp: number, t: MessagesT): string {
   const date = new Date(timestamp);
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
@@ -56,19 +57,19 @@ export function format4chanTimestamp(timestamp: number, t: TFunction): string {
     TEXT_FORMAT.YEAR_SUBSTRING_LENGTH,
   );
   const dayName = [
-    t("app.chat.flatView.timestamp.sun"),
-    t("app.chat.flatView.timestamp.mon"),
-    t("app.chat.flatView.timestamp.tue"),
-    t("app.chat.flatView.timestamp.wed"),
-    t("app.chat.flatView.timestamp.thu"),
-    t("app.chat.flatView.timestamp.fri"),
-    t("app.chat.flatView.timestamp.sat"),
+    t("flatView.timestamp.sun"),
+    t("flatView.timestamp.mon"),
+    t("flatView.timestamp.tue"),
+    t("flatView.timestamp.wed"),
+    t("flatView.timestamp.thu"),
+    t("flatView.timestamp.fri"),
+    t("flatView.timestamp.sat"),
   ][date.getDay()];
   const hours = String(date.getHours()).padStart(2, "0");
   const mins = String(date.getMinutes()).padStart(2, "0");
   const secs = String(date.getSeconds()).padStart(2, "0");
   // 4chan-style timestamp format, user-facing
-  return t("app.chat.flatView.timestamp.format", {
+  return t("flatView.timestamp.format", {
     month,
     day,
     year,

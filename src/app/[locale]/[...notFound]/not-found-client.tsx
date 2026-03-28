@@ -12,14 +12,15 @@ import { H1, H2, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation as pageT } from "./i18n";
 
 export function NotFoundBackButton({
   locale,
 }: {
   locale: CountryLanguage;
 }): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
   return (
     <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900 flex flex-col items-center justify-center px-4 py-12">
       <Div className="w-full max-w-3xl">
@@ -33,7 +34,7 @@ export function NotFoundBackButton({
                   <Div className="animate-float">
                     <Image
                       src="https://illustrations.popsy.co/white/crashed-error.svg"
-                      alt={t("app.pages.notFound.title")}
+                      alt={t("pages.notFound.title")}
                       width={250}
                       height={250}
                       className="mx-auto"
@@ -48,10 +49,10 @@ export function NotFoundBackButton({
               {/* Right side - Content */}
               <Div className="p-8 md:p-10 flex flex-col justify-center">
                 <H2 className="text-3xl font-bold mb-4 text-blue-600 dark:text-blue-400">
-                  {t("app.pages.notFound.title")}
+                  {t("pages.notFound.title")}
                 </H2>
                 <P className="text-gray-600 dark:text-gray-300 mb-8">
-                  {t("app.pages.notFound.description")}
+                  {t("pages.notFound.description")}
                 </P>
 
                 {/* Buttons */}
@@ -59,7 +60,7 @@ export function NotFoundBackButton({
                   <Button variant="outline" asChild className="group">
                     <Span>
                       <ChevronLeft className="mr-2 h-4 w-4" />
-                      {t("app.pages.notFound.goBack")}
+                      {t("pages.notFound.goBack")}
                     </Span>
                   </Button>
                   <Button
@@ -68,7 +69,7 @@ export function NotFoundBackButton({
                   >
                     <Link href={`/${locale}/threads`}>
                       <Home className="mr-2 h-4 w-4" />
-                      {t("app.pages.notFound.goHome")}
+                      {t("pages.notFound.goHome")}
                     </Link>
                   </Button>
                 </Div>

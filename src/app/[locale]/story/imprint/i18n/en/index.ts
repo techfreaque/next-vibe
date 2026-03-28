@@ -1,6 +1,69 @@
 export const translations = {
+  meta: {
+    title: "Legal Notice - unbottled.ai",
+    category: "Legal",
+    description: "Legal information and company details for unbottled.ai",
+    imageAlt: "Legal Notice",
+    keywords: "imprint, legal notice, company information, unbottled.ai legal",
+    ogTitle: "Legal Notice - unbottled.ai",
+    ogDescription: "Legal information and company details for unbottled.ai",
+    twitterTitle: "Legal Notice - unbottled.ai",
+    twitterDescription:
+      "Legal information and company details for unbottled.ai",
+  },
   printAriaLabel: "Print imprint",
   printButton: "Print",
+  title: "Legal Notice",
+  lastUpdated: "Last updated: January 2025",
+  introduction:
+    "This imprint provides legally required information about {{appName}} in accordance with applicable laws.",
+  sections: {
+    partnerships: {
+      title: "Partnerships & Affiliations",
+      description:
+        "Information about our business partnerships and affiliations.",
+      content:
+        "{{appName}} maintains partnerships with leading AI providers to deliver the best possible service to our users.",
+    },
+    companyInfo: {
+      title: "Company Information",
+      description:
+        "Legal information about {{appName}} and our registered business entity.",
+    },
+    responsiblePerson: {
+      title: "Responsible Person",
+      description:
+        "Information about the person responsible for the content of this website.",
+    },
+    contactInfo: {
+      title: "Contact Information",
+      description: "How to reach us for legal and business inquiries.",
+    },
+    disclaimer: {
+      title: "Disclaimer",
+      copyright: {
+        title: "Copyright",
+        content:
+          "All content on this website is protected by copyright. Unauthorized use is prohibited.",
+      },
+      liability: {
+        title: "Liability",
+        content:
+          "We make no representations or warranties about the completeness, accuracy, or reliability of information on this website.",
+      },
+      links: {
+        title: "External Links",
+        content:
+          "Our website may contain links to external sites. We are not responsible for the content of external websites.",
+      },
+    },
+    disputeResolution: {
+      title: "Dispute Resolution",
+      description: "Information about how disputes are handled and resolved.",
+      content:
+        "Any disputes arising from the use of this website shall be resolved in accordance with applicable law.",
+    },
+  },
   post: {
     title: "Imprint",
     description: "Imprint endpoint",

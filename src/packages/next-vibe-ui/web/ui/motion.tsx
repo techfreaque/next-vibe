@@ -38,6 +38,8 @@ export type MotionTransition = Transition;
 export type MotionDivProps = {
   initial?:
     | {
+        width?: string | number;
+        left?: string | number;
         opacity?: number;
         scale?: number;
         x?: number;
@@ -49,6 +51,7 @@ export type MotionDivProps = {
   animate?:
     | {
         width?: string | number;
+        left?: string | number;
         opacity?: number;
         scale?: number;
         x?: number;
@@ -59,6 +62,7 @@ export type MotionDivProps = {
   exit?:
     | {
         width?: string | number;
+        left?: string | number;
         opacity?: number;
         scale?: number;
         x?: number;
@@ -79,6 +83,9 @@ export type MotionDivProps = {
   >;
   transition?: MotionTransition;
   children?: React.ReactNode;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+  onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
+  onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
 } & StyleType;
 
 export type MotionSpanProps = {
@@ -149,6 +156,9 @@ export function MotionDiv({
   className,
   children,
   style,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
 }: MotionDivProps): JSX.Element {
   return (
     <fmMotion.div
@@ -159,6 +169,9 @@ export function MotionDiv({
       transition={transition}
       className={className}
       style={style}
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       {children}
     </fmMotion.div>

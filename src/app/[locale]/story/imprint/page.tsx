@@ -12,10 +12,12 @@ import { Ul } from "next-vibe-ui/ui/ul";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "./i18n";
 
 import { ImprintClientInteraction } from "./_components/imprint-client-content";
 
@@ -28,28 +30,29 @@ export async function generateMetadata(
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { locale } = await params;
+  const { t } = scopedTranslation.scopedT(locale);
   const previousImages = (await parent).openGraph?.images || [];
 
   return metadataGenerator(locale, {
     path: "imprint",
-    title: "app.meta.imprint.title",
-    description: "app.meta.imprint.description",
+    title: t("meta.title"),
+    description: t("meta.description"),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/imprint-hero.jpg`,
-    category: "app.meta.imprint.category",
-    imageAlt: "app.meta.imprint.imageAlt",
-    keywords: ["app.meta.imprint.keywords"],
+    category: t("meta.category"),
+    imageAlt: t("meta.imageAlt"),
+    keywords: [t("meta.keywords")],
     additionalMetadata: {
       openGraph: {
-        title: "app.meta.imprint.ogTitle",
-        description: "app.meta.imprint.ogDescription",
+        title: t("meta.ogTitle"),
+        description: t("meta.ogDescription"),
         url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/imprint`,
         type: "website",
         images: [...previousImages],
       },
       twitter: {
         card: "summary_large_image",
-        title: "app.meta.imprint.twitterTitle",
-        description: "app.meta.imprint.twitterDescription",
+        title: t("meta.twitterTitle"),
+        description: t("meta.twitterDescription"),
       },
     },
   });
@@ -72,7 +75,8 @@ export function TanstackPage({
   locale,
   supportEmail,
 }: ImprintPageData): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
 
   return (
     <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
@@ -83,10 +87,10 @@ export function TanstackPage({
             <Building className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </Div>
           <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600">
-            {t("app.story._components.home.imprint.title")}
+            {t("title")}
           </H1>
           <P className="text-lg text-gray-600 dark:text-gray-400">
-            {t("app.story._components.home.imprint.lastUpdated")}
+            {t("lastUpdated")}
           </P>
         </Div>
 
@@ -94,8 +98,8 @@ export function TanstackPage({
         <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-8">
           <Div className="prose dark:prose-invert max-w-none">
             <P className="lead text-lg">
-              {t("app.story._components.home.imprint.introduction", {
-                appName: t("config.appName"),
+              {t("introduction", {
+                appName: configT("appName"),
               })}
             </P>
 
@@ -103,24 +107,15 @@ export function TanstackPage({
 
             {/* Partnerships Section */}
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.imprint.sections.partnerships.title",
-              )}
+              {t("sections.partnerships.title")}
             </H2>
-            <P className="mt-2">
-              {t(
-                "app.story._components.home.imprint.sections.partnerships.description",
-              )}
-            </P>
+            <P className="mt-2">{t("sections.partnerships.description")}</P>
             <Alert variant="default" className="mt-4">
               <Info className="h-4 w-4" />
               <AlertDescription>
-                {t(
-                  "app.story._components.home.imprint.sections.partnerships.content",
-                  {
-                    appName: t("config.appName"),
-                  },
-                )}
+                {t("sections.partnerships.content", {
+                  appName: configT("appName"),
+                })}
               </AlertDescription>
             </Alert>
 
@@ -129,30 +124,25 @@ export function TanstackPage({
             {/* Company Information Section */}
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
               <Building className="h-5 w-5 mr-2" />
-              {t(
-                "app.story._components.home.imprint.sections.companyInfo.title",
-              )}
+              {t("sections.companyInfo.title")}
             </H2>
             <P className="mt-2">
-              {t(
-                "app.story._components.home.imprint.sections.companyInfo.description",
-                {
-                  appName: t("config.appName"),
-                },
-              )}
+              {t("sections.companyInfo.description", {
+                appName: configT("appName"),
+              })}
             </P>
             <Ul className="flex flex-col gap-2 mt-4">
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                <Span>{t("config.group.name")}</Span>
+                <Span>{configT("group.name")}</Span>
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                <Span>{t("config.group.legalForm")}</Span>
+                <Span>{configT("group.legalForm")}</Span>
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                <Span>{t("config.group.registrationNumber")}</Span>
+                <Span>{configT("group.registrationNumber")}</Span>
               </Li>
               {/* <Li className="flex items-start">
 <Span className="mr-2 text-blue-500">•</Span>
@@ -168,108 +158,70 @@ export function TanstackPage({
 
             {/* Contact Information Section */}
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.imprint.sections.contactInfo.title",
-              )}
+              {t("sections.contactInfo.title")}
             </H2>
-            <P className="mt-2">
-              {t(
-                "app.story._components.home.imprint.sections.contactInfo.description",
-              )}
-            </P>
+            <P className="mt-2">{t("sections.contactInfo.description")}</P>
 
             <Div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
               <H3 className="font-medium text-lg mb-2">
-                {t("config.group.address.title")}
+                {configT("group.address.title")}
               </H3>
-              <P>{t("config.group.address.street")}</P>
-              <P>{t("config.group.address.city")}</P>
-              <P>{t("config.group.address.country")}</P>
+              <P>{configT("group.address.street")}</P>
+              <P>{configT("group.address.city")}</P>
+              <P>{configT("group.address.country")}</P>
               <P>{supportEmail}</P>
-              {/* <P>{t("app.story._components.home.imprint.sections.contactInfo.communication.phone")}</P> */}
+              {/* <P>{t("sections.contactInfo.communication.phone")}</P> */}
             </Div>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             {/* Responsible Person Section */}
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.imprint.sections.responsiblePerson.title",
-              )}
+              {t("sections.responsiblePerson.title")}
             </H2>
             <P className="mt-2">
-              {t(
-                "app.story._components.home.imprint.sections.responsiblePerson.description",
-              )}
+              {t("sections.responsiblePerson.description")}
             </P>
             <Div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
               <P>
-                <Strong>{t("config.group.responsiblePerson.name")}</Strong>
+                <Strong>{configT("group.responsiblePerson.name")}</Strong>
               </P>
-              <P>{t("config.group.address.addressIn1Line")}</P>
+              <P>{configT("group.address.addressIn1Line")}</P>
             </Div>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             {/* Dispute Resolution Section */}
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.imprint.sections.disputeResolution.title",
-              )}
+              {t("sections.disputeResolution.title")}
             </H2>
             <P className="mt-2">
-              {t(
-                "app.story._components.home.imprint.sections.disputeResolution.description",
-              )}
+              {t("sections.disputeResolution.description")}
             </P>
-            <P className="mt-4">
-              {t(
-                "app.story._components.home.imprint.sections.disputeResolution.content",
-              )}
-            </P>
+            <P className="mt-4">{t("sections.disputeResolution.content")}</P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             {/* Disclaimer Section */}
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
               <FileText className="h-5 w-5 mr-2" />
-              {t(
-                "app.story._components.home.imprint.sections.disclaimer.title",
-              )}
+              {t("sections.disclaimer.title")}
             </H2>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t(
-                "app.story._components.home.imprint.sections.disclaimer.liability.title",
-              )}
+              {t("sections.disclaimer.liability.title")}
             </H3>
-            <P className="mt-2">
-              {t(
-                "app.story._components.home.imprint.sections.disclaimer.liability.content",
-              )}
-            </P>
+            <P className="mt-2">{t("sections.disclaimer.liability.content")}</P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t(
-                "app.story._components.home.imprint.sections.disclaimer.links.title",
-              )}
+              {t("sections.disclaimer.links.title")}
             </H3>
-            <P className="mt-2">
-              {t(
-                "app.story._components.home.imprint.sections.disclaimer.links.content",
-              )}
-            </P>
+            <P className="mt-2">{t("sections.disclaimer.links.content")}</P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t(
-                "app.story._components.home.imprint.sections.disclaimer.copyright.title",
-              )}
+              {t("sections.disclaimer.copyright.title")}
             </H3>
-            <P className="mt-2">
-              {t(
-                "app.story._components.home.imprint.sections.disclaimer.copyright.content",
-              )}
-            </P>
+            <P className="mt-2">{t("sections.disclaimer.copyright.content")}</P>
           </Div>
         </Div>
 

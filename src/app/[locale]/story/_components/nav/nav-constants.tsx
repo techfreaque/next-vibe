@@ -1,3 +1,4 @@
+import { BookOpen } from "next-vibe-ui/ui/icons/BookOpen";
 import { Building } from "next-vibe-ui/ui/icons/Building";
 import { Code } from "next-vibe-ui/ui/icons/Code";
 import { Info } from "next-vibe-ui/ui/icons/Info";
@@ -7,7 +8,7 @@ import { Tag } from "next-vibe-ui/ui/icons/Tag";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import type { JSX } from "react";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { StoryComponentsTranslationKey } from "../i18n";
 
 import type {
   BadgeTranslationPayload,
@@ -23,6 +24,7 @@ export type NavPaths =
   | "/subscription/history"
   | "/story"
   | "/story/about-us"
+  | "/story/blog"
   | "/story/careers"
   | "/story/framework"
   | "/story/invest"
@@ -44,20 +46,20 @@ export type NavBadgeVariant =
 
 export interface NavChildItem {
   icon: JSX.Element;
-  title: TranslationKey;
-  description: TranslationKey;
+  title: StoryComponentsTranslationKey;
+  description: StoryComponentsTranslationKey;
   href: NavPaths;
   children?: never;
-  badge?: TranslationKey | undefined;
+  badge?: StoryComponentsTranslationKey | undefined;
   badgeTranslationPayload?: BadgeTranslationPayload | undefined;
   badgeVariant?: NavBadgeVariant;
   isActive?: boolean | undefined;
   disabled?: boolean | undefined;
-  disabledReason?: TranslationKey | undefined;
+  disabledReason?: StoryComponentsTranslationKey | undefined;
 }
 
 export interface NavParentItemType {
-  title: TranslationKey;
+  title: StoryComponentsTranslationKey;
   icon: JSX.Element;
   href?: never;
   children: NavChildItem[];
@@ -66,45 +68,51 @@ export interface NavParentItemType {
 export const navItems: NavItemType[] = [
   {
     icon: <Sparkles className="h-4 w-4" />,
-    title: "app.story._components.nav.features",
+    title: "nav.features",
     href: "/story",
   },
   {
     icon: <MessageSquare className="h-4 w-4" />,
-    title: "app.story._components.nav.goToApp",
+    title: "nav.goToApp",
     href: "/threads",
   },
   {
     icon: <Code className="h-4 w-4" />,
-    title: "app.story._components.nav.framework",
+    title: "nav.framework",
     href: "/story/framework",
   },
   {
     icon: <Tag className="h-4 w-4" />,
-    title: "app.story._components.nav.pricing",
+    title: "nav.pricing",
     href: "/subscription/overview",
   },
   {
-    title: "app.story._components.nav.company",
+    title: "nav.company",
     icon: <Building className="h-4 w-4" />,
     children: [
       {
         icon: <Info className="h-4 w-4" />,
-        title: "app.story._components.nav.about.title",
-        description: "app.story._components.nav.about.description",
+        title: "nav.about.title",
+        description: "nav.about.description",
         href: "/story/about-us",
       },
       {
         icon: <Building className="h-4 w-4" />,
-        title: "app.story._components.nav.careers.title",
-        description: "app.story._components.nav.careers.description",
+        title: "nav.careers.title",
+        description: "nav.careers.description",
         href: "/story/careers",
       },
       {
         icon: <TrendingUp className="h-4 w-4" />,
-        title: "app.story._components.nav.invest.title",
-        description: "app.story._components.nav.invest.description",
+        title: "nav.invest.title",
+        description: "nav.invest.description",
         href: "/story/invest",
+      },
+      {
+        icon: <BookOpen className="h-4 w-4" />,
+        title: "nav.blog.title",
+        description: "nav.blog.description",
+        href: "/story/blog",
       },
     ],
   },

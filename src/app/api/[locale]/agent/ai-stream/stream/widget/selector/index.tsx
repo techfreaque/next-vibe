@@ -10,7 +10,18 @@ import {
 } from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
+
+// Returns false on server (SSR), true on client after hydration.
+// Used to prevent skill content from rendering during SSR, avoiding hydration mismatches
+// when React Query fetches data server-side but the client starts with no cache.
+function useIsClient(): boolean {
+  return useSyncExternalStore(
+    (cb) => cb,
+    () => true,
+    () => false,
+  );
+}
 
 import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
@@ -71,6 +82,7 @@ export function Selector({
         setModelSelectorOpen(open);
       };
 
+  const isClient = useIsClient();
   const isModelOnly = skillId === NO_SKILL_ID;
   const currentCharaterHook = useSkill(
     isModelOnly ? undefined : skillId,
@@ -97,41 +109,35 @@ export function Selector({
           data-tour={TOUR_DATA_ATTRS.MODEL_SELECTOR}
           suppressHydrationWarning
         >
-          {/* Skill icon - hidden for model-only. Always rendered when not model-only to
-              avoid structural hydration mismatch; content fills in once skill data loads. */}
-          {!isModelOnly && (
+          {/* Skill icon/name/separator - not rendered on SSR to avoid hydration mismatch.
+              React Query fetches skill data server-side but the client starts with no cache,
+              causing a structural child mismatch. useIsClient() returns false on SSR / initial
+              hydration render and true only after the client has mounted. */}
+          {!isModelOnly && isClient && currentSkill?.icon && (
             <Span className="flex items-center justify-center w-5 h-5 shrink-0">
-              <Span className="inline-block h-4 w-4" suppressHydrationWarning>
-                {currentSkill?.icon ? (
-                  <Icon icon={currentSkill.icon} className="h-4 w-4" />
-                ) : null}
-              </Span>
+              <Icon icon={currentSkill.icon} className="h-4 w-4" />
             </Span>
           )}
 
-          {/* Skill name - hidden when container is narrow, always shown when no tools, hidden for model-only */}
-          {!isModelOnly && (
+          {!isModelOnly && isClient && currentSkill?.name && (
             <Span
               className={cn(
                 "max-w-[80px] @xl:max-w-[100px] truncate",
                 modelSupportsTools ? "hidden @md:inline" : "hidden @xs:inline",
               )}
-              suppressHydrationWarning
             >
-              {currentSkill?.name ?? null}
+              {currentSkill.name}
             </Span>
           )}
 
-          {/* Separator - hidden when container is narrow, always shown when no tools, hidden for model-only */}
-          {!isModelOnly && (
+          {!isModelOnly && isClient && currentSkill && (
             <Span
               className={cn(
                 "text-muted-foreground/50",
                 modelSupportsTools ? "hidden @md:inline" : "inline",
               )}
-              suppressHydrationWarning
             >
-              {currentSkill ? "+" : null}
+              +
             </Span>
           )}
 

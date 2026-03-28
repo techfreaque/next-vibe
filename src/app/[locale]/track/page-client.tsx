@@ -12,7 +12,7 @@ import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/h
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation } from "@/app/[locale]/track/i18n";
 
 /**
  * Tracking Page - Records click engagement and handles referral codes
@@ -25,7 +25,7 @@ export default function TrackPage({
   user: JwtPayloadType;
 }): React.ReactElement {
   const searchParams = useSearchParams();
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   const leadId = searchParams.get("leadId") ?? undefined;
   const url = searchParams.get("url") ?? undefined;
@@ -66,7 +66,7 @@ export default function TrackPage({
       <Div className="text-center">
         <Div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
         <P className="text-gray-600 dark:text-gray-400">
-          {t("app.track.tracking.redirecting")}
+          {t("tracking.redirecting")}
         </P>
       </Div>
     </Div>

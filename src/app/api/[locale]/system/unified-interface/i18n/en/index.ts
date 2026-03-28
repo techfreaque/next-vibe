@@ -58,5 +58,13 @@ export const translations = {
     codeQualityFiles: {
       affectedFiles: "Affected Files",
     },
+    formFields: {
+      common: {
+        required: "Required",
+        enterPhoneNumber: "Enter phone number",
+        selectDate: "Select date",
+        unknownFieldType: "Unknown field type",
+      },
+    },
   },
 };

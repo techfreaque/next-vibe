@@ -21,7 +21,7 @@ import { z } from "zod";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { configScopedTranslation } from "@/config/i18n";
 
 import { EmailTemplate } from "../messenger/providers/email/smtp-client/components/template.email";
 import {
@@ -374,7 +374,7 @@ export const contactFormEmailTemplate: EmailTemplateDefinition<
   },
   render: ({ requestData, locale, user }) => {
     const { t: contactT } = scopedTranslation.scopedT(locale);
-    const { t: globalT } = simpleT(locale);
+    const { t: globalT } = configScopedTranslation.scopedT(locale);
     try {
       const templateProps: ContactFormProps = {
         name: requestData.name,
@@ -387,7 +387,7 @@ export const contactFormEmailTemplate: EmailTemplateDefinition<
 
       return success({
         toEmail: contactClientRepository.getSupportEmail(locale),
-        toName: globalT("config.appName"),
+        toName: globalT("appName"),
         subject: contactT("email.partner.subject", {
           subject: requestData.subject,
         }),
@@ -522,7 +522,7 @@ export const adminContactFormEmailTemplate: EmailTemplateDefinition<
         userId: user?.id,
         leadId: user?.leadId,
       };
-      const { t: globalT } = simpleT(locale);
+      const { t: globalT } = configScopedTranslation.scopedT(locale);
 
       return success({
         toEmail: requestData.email,
@@ -531,7 +531,7 @@ export const adminContactFormEmailTemplate: EmailTemplateDefinition<
           subject: requestData.subject,
         }),
         replyToEmail: contactClientRepository.getSupportEmail(locale),
-        replyToName: globalT("config.appName"),
+        replyToName: globalT("appName"),
         leadId: user.leadId,
         jsx: contactFormEmailTemplate.component({
           props: templateProps,

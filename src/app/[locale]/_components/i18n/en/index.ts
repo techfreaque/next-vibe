@@ -1,4 +1,24 @@
 export const translations = {
+  error: {
+    title: "Error",
+    unknown: "An unknown error occurred",
+    tryAgain: "Try Again",
+    boundary: {
+      componentStack: "Component Stack",
+      stackTrace: "Stack Trace",
+      componentStackFull: "Component Stack (full)",
+      errorDetails: "Error Details",
+      name: "Name:",
+      errorMessage: "Message:",
+      cause: "Cause:",
+    },
+  },
+  themeToggle: {
+    enableLightMode: "Enable light mode",
+    enableDarkMode: "Enable dark mode",
+    lightMode: "Light mode",
+    darkMode: "Dark mode",
+  },
   contact: {
     subjects: {
       HELP_SUPPORT: "Help & Support",

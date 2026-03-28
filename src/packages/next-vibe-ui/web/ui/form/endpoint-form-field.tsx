@@ -32,14 +32,13 @@ import {
   Icon,
   type IconKey,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import {
+  scopedTranslation as unifiedInterfaceScopedTranslation,
+  type UnifiedInterfaceT,
+} from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import { simpleT } from "@/i18n/core/shared";
-import type {
-  TFunction,
-  TParams,
-  TranslationKey,
-} from "@/i18n/core/static-types";
+import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
@@ -339,7 +338,7 @@ function renderFieldInput<
   field: ControllerRenderProps<TFieldValues, TName>,
   inputClassName: string,
   t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType, // Adapted translation for definition keys (uses scopedT when available)
-  globalT: TFunction, // Global translation for hardcoded framework keys
+  widgetT: UnifiedInterfaceT, // Scoped translation for hardcoded framework keys
   disabled?: boolean,
 ): JSX.Element {
   switch (config.type) {
@@ -539,7 +538,7 @@ function renderFieldInput<
                 <span>
                   {config.placeholder
                     ? t(config.placeholder)
-                    : globalT("packages.nextVibeUi.web.common.selectDate")}
+                    : widgetT("widgets.formFields.common.selectDate")}
                 </span>
               )}
             </Button>
@@ -610,11 +609,11 @@ function renderFieldInput<
         // eslint-disable-next-line i18next/no-literal-string -- Error handling for invalid config
         throw new Error("Invalid config type for phone field");
       }
-      // Translate placeholder - use adapted t for definition keys, globalT for hardcoded default
+      // Translate placeholder - use adapted t for definition keys, widgetT for hardcoded default
       const phonePlaceholder =
         config.placeholder !== undefined
           ? t(config.placeholder)
-          : globalT("packages.nextVibeUi.web.common.enterPhoneNumber");
+          : widgetT("widgets.formFields.common.enterPhoneNumber");
       return (
         <PhoneField
           value={String(field.value ?? "")}
@@ -750,9 +749,7 @@ function renderFieldInput<
           onBlur={field.onBlur}
           disabled={disabled || false}
           className={cn(inputClassName, "h-10")}
-          placeholder={globalT(
-            "packages.nextVibeUi.web.common.unknownFieldType",
-          )}
+          placeholder={widgetT("widgets.formFields.common.unknownFieldType")}
         />
       );
     }
@@ -815,7 +812,7 @@ export function EndpointFormField<
 
   // Use scoped translation from endpoint.scopedTranslation.scopedT
   const { t } = scopedT(locale);
-  const { t: globalT } = simpleT(locale); // For hardcoded framework keys
+  const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   // Auto-infer config from endpoint fields if not provided
   const config =
@@ -898,7 +895,7 @@ export function EndpointFormField<
                     variant="secondary"
                     className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
                   >
-                    {globalT("packages.nextVibeUi.web.common.required")}
+                    {widgetT("widgets.formFields.common.required")}
                   </Badge>
                 )}
               </div>
@@ -922,7 +919,7 @@ export function EndpointFormField<
                     field,
                     styleClassName.inputClassName,
                     t,
-                    globalT,
+                    widgetT,
                     config.disabled || config.readonly,
                   )}
             </FormControl>

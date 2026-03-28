@@ -9,8 +9,8 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
 import { envClient, platform } from "@/config/env-client";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 export function Logo({
   locale,
@@ -27,7 +27,7 @@ export function Logo({
   size?: string;
   disabled?: boolean;
 }): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
   const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
   const innerClassName = cn(
     "inline-flex items-center gap-1.5 no-underline! hover:no-underline!",
@@ -39,7 +39,7 @@ export function Logo({
         <Image
           fetchPriority="high"
           src={`${platform.isReactNative ? envClient.NEXT_PUBLIC_APP_URL : ""}/images/unbottled-icon-white.png`}
-          alt={t("config.appName")}
+          alt={configT("appName")}
           className={cn(
             "hidden dark:block h-full w-auto object-contain",
             className,
@@ -51,7 +51,7 @@ export function Logo({
         <Image
           fetchPriority="high"
           src={`${platform.isReactNative ? envClient.NEXT_PUBLIC_APP_URL : ""}/images/unbottled-icon.png`}
-          alt={t("config.appName")}
+          alt={configT("appName")}
           className={cn(
             "hidden light:block h-full w-auto object-contain",
             className,
@@ -67,7 +67,7 @@ export function Logo({
           "text-gray-900 dark:text-white",
         )}
       >
-        {t("config.appName")}
+        {configT("appName")}
       </Span>
     </>
   );

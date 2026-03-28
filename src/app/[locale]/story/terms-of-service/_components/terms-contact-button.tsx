@@ -4,8 +4,8 @@ import { Button } from "next-vibe-ui/ui/button";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { configScopedTranslation } from "@/config/i18n";
 import { type CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 export function TermsContactButton({
   supportEmail,
@@ -14,10 +14,10 @@ export function TermsContactButton({
   supportEmail: string;
   locale: CountryLanguage;
 }): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = configScopedTranslation.scopedT(locale);
   return (
     <P>
-      {t("config.group.contact.content")}{" "}
+      {t("group.contact.content")}{" "}
       <Button
         variant="ghost"
         size="unset"

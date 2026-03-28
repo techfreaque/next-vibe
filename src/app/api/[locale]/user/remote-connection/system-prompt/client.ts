@@ -6,7 +6,7 @@ import type { SystemPromptClientParams } from "@/app/api/[locale]/agent/ai-strea
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
-import { simpleT } from "@/i18n/core/shared";
+import { configScopedTranslation } from "@/config/i18n";
 import remoteConnectionEndpoints from "@/app/api/[locale]/user/remote-connection/list/definition";
 
 import type { RemoteInstancesData } from "./prompt";
@@ -20,8 +20,8 @@ export function useRemoteInstancesData(
   const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
   const isDev = envClient.NODE_ENV !== "production";
   const appUrl = envClient.NEXT_PUBLIC_APP_URL;
-  const { t } = simpleT(locale);
-  const appName = t("config.appName");
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
   const connectionsEndpoint = useEndpoint(
     remoteConnectionEndpoints,

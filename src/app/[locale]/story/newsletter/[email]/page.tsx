@@ -10,7 +10,7 @@ import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation } from "../i18n";
 
 import { NewsletterPage } from "../_components/newsletter-page";
 
@@ -31,28 +31,28 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { locale, email } = await params;
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   // Validate email parameter
   if (!isValidEmail(email)) {
     return {
-      title: t("app.story.newsletter.page.invalidEmail.title"),
-      description: t("app.story.newsletter.page.invalidEmail.description"),
+      title: t("page.invalidEmail.title"),
+      description: t("page.invalidEmail.description"),
     };
   }
 
   return {
-    title: t("app.story.newsletter.page.emailProvided.title"),
-    description: t("app.story.newsletter.page.emailProvided.description"),
+    title: t("page.emailProvided.title"),
+    description: t("page.emailProvided.description"),
     openGraph: {
-      title: t("app.story.newsletter.page.emailProvided.title"),
-      description: t("app.story.newsletter.page.emailProvided.description"),
+      title: t("page.emailProvided.title"),
+      description: t("page.emailProvided.description"),
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: t("app.story.newsletter.page.emailProvided.title"),
-      description: t("app.story.newsletter.page.emailProvided.description"),
+      title: t("page.emailProvided.title"),
+      description: t("page.emailProvided.description"),
     },
   };
 }

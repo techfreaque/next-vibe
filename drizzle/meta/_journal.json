@@ -576,6 +576,13 @@
       "when": 1774552145232,
       "tag": "20260326190905_lethal_shotgun",
       "breakpoints": true
+    },
+    {
+      "idx": 82,
+      "version": "7",
+      "when": 1774644204347,
+      "tag": "20260327204324_shocking_manta",
+      "breakpoints": true
     }
   ]
 }

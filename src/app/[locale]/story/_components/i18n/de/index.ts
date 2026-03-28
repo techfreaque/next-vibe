@@ -3,6 +3,30 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   nav: navTranslations,
+  newsletter: {
+    title: "Bleib auf dem Laufenden",
+    description:
+      "Abonniere unseren Newsletter für die neuesten Updates und Einblicke.",
+    emailPlaceholder: "E-Mail eingeben",
+    subscribe: "Abonnieren",
+    subscription: {
+      unsubscribe: {
+        title: "Abmelden",
+        confirmButton: "Abmeldung bestätigen",
+      },
+    },
+  },
+  common: {
+    selector: {
+      country: "Land",
+      language: "Sprache",
+    },
+    accessibility: {
+      srOnly: {
+        toggleMenu: "Menü umschalten",
+      },
+    },
+  },
   home: {
     hero: {
       badge: "Open Source - MIT + GPL v3",
@@ -94,6 +118,41 @@ export const translations: typeof enTranslations = {
           messageResult:
             'Gesendet: "email-sync behoben. Ursache: 5s IMAP-Timeout überschrieb Config. Gepatcht, neu gebaut, 47 ausstehende E-Mails werden jetzt synchronisiert."',
         },
+      },
+    },
+    splitHero: {
+      or: "ODER",
+      clickToExplore: "Klicken zum Erkunden",
+      unbottled: {
+        badge: "KI ohne Zensur",
+        titleLine1: "Deine KI.",
+        titleLine2: "Deine Regeln.",
+        subtitle:
+          "{{modelCount}} Modelle, null Zensur. Jedes Gespräch bleibt deins.",
+        pill1: "{{modelCount}}+ Modelle",
+        pill2: "Nutzergesteuerte Filterung",
+        pill3: "{{skillCount}}+ Skills",
+        cta: "Kostenlos starten",
+      },
+      nextvibe: {
+        badge: "Open-Source-Framework",
+        titleLine1: "Deine Plattform.",
+        titleLine2: "Dein Stack.",
+        subtitle:
+          "Eine Definition → {{toolCount}}+ Tools, CLI, MCP, Web, Mobile, Cron. Fork es. Besitz alles.",
+        pill1: "10 Plattformen, 1 Definition",
+        pill2: "Ultra-striktes TypeScript",
+        pill3: "MIT + GPL v3",
+        ctaGithub: "Auf GitHub starten",
+        ctaDocs: "Dokumentation",
+      },
+      tab: {
+        unbottled: "unbottled.ai",
+        unbottledSub: "Consumer-KI",
+        unbottledDesc: "KI-Plattform für alle",
+        nextvibe: "next-vibe",
+        nextvibeSub: "SaaS-Framework",
+        nextvibeDesc: "Open-Source-Framework, das unbottled.ai antreibt",
       },
     },
     forumHero: {
@@ -1182,6 +1241,7 @@ export const translations: typeof enTranslations = {
       title: "Unternehmen",
       aboutUs: "Über uns",
       careers: "Karriere",
+      blog: "Blog",
       imprint: "Impressum",
       privacyPolicy: "Datenschutz",
       termsOfService: "Nutzungsbedingungen",

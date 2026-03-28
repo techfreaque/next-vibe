@@ -16,7 +16,7 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import { languageConfig } from "@/i18n";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 
 import type { PromptContextData } from "./prompt";
 
@@ -51,8 +51,8 @@ export function usePromptContextData(
   const isAdmin =
     !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
   const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
-  const { t } = simpleT(locale);
-  const appName = t("config.appName");
+  const { t: tChat } = chatScopedTranslation.scopedT(locale);
+  const appName = tChat("config.appName");
 
   const { language, country } = getLanguageAndCountryFromLocale(locale);
   const countryInfo = languageConfig.countryInfo[country];

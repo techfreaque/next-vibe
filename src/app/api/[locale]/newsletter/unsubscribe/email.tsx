@@ -15,8 +15,8 @@ import { z } from "zod";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import { env } from "@/config/env";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { EmailTemplate } from "../../messenger/providers/email/smtp-client/components/template.email";
 import {
@@ -329,11 +329,11 @@ export const adminNewsletterUnsubscribeEmailTemplate: EmailTemplateDefinition<
     unsubscribedEmail: "unsubscribed@example.com",
   },
   render: ({ requestData, locale, t, user }) => {
-    const { t: globalT } = simpleT(locale);
+    const { t: configT } = configScopedTranslation.scopedT(locale);
     try {
       return success({
         toEmail: contactClientRepository.getSupportEmail(locale),
-        toName: globalT("config.appName"),
+        toName: configT("appName"),
         subject: t("email.unsubscribe.admin_unsubscribe_notification.subject"),
         leadId: user.leadId,
         jsx: AdminUnsubscribeNotificationEmailContent({

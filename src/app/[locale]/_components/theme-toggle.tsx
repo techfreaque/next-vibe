@@ -10,7 +10,8 @@ import { useThemeToggle } from "next-vibe-ui/ui/theme-provider";
 import { type JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation as pageT } from "./i18n";
 
 export { useThemeToggle } from "next-vibe-ui/ui/theme-provider";
 
@@ -20,7 +21,7 @@ export function ThemeToggle({
   locale: CountryLanguage;
 }): JSX.Element {
   const { onToggleTheme, theme, isMounted } = useThemeToggle();
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
   return (
     <Button
       variant="ghost"
@@ -30,8 +31,8 @@ export function ThemeToggle({
       suppressHydrationWarning
       aria-label={
         theme === "dark" || !isMounted
-          ? t("app.common.accessibility.srOnly.enableLightMode")
-          : t("app.common.accessibility.srOnly.enableDarkMode")
+          ? t("themeToggle.enableLightMode")
+          : t("themeToggle.enableDarkMode")
       }
     >
       {theme === "dark" || !isMounted ? (
@@ -49,7 +50,7 @@ export function ThemeToggleMobile({
   locale: CountryLanguage;
 }): JSX.Element {
   const { onToggleTheme, theme, isMounted } = useThemeToggle();
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
   return (
     <Div
       className="flex flex-row gap-2 pb-7 border-b text-base font-medium hover:text-primary transition-colors py-2 cursor-pointer"
@@ -62,8 +63,8 @@ export function ThemeToggleMobile({
       )}
       <Span className="text-base font-medium my-auto">
         {theme === "dark" || !isMounted
-          ? t("app.story._components.nav.enableLightMode")
-          : t("app.story._components.nav.enableDarkMode")}
+          ? t("themeToggle.enableLightMode")
+          : t("themeToggle.enableDarkMode")}
       </Span>
     </Div>
   );
@@ -75,18 +76,18 @@ export function ThemeToggleDropdown({
   locale: CountryLanguage;
 }): JSX.Element {
   const { onToggleTheme, theme } = useThemeToggle();
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
   return (
     <DropdownMenuItem onClick={onToggleTheme} className="cursor-pointer">
       {theme === "dark" ? (
         <>
           <Sun className="h-4 w-4 mr-2" />
-          {t("app.chat.common.lightMode")}
+          {t("themeToggle.lightMode")}
         </>
       ) : (
         <>
           <Moon className="h-4 w-4 mr-2" />
-          {t("app.chat.common.darkMode")}
+          {t("themeToggle.darkMode")}
         </>
       )}
     </DropdownMenuItem>

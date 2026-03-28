@@ -16,7 +16,6 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { scopedTranslation as cliScopedTranslation } from "../../../cli/i18n";
 import { Platform } from "../../../shared/types/platform";
@@ -214,7 +213,9 @@ export function InkEndpointPage<
     return (
       <Box>
         <Text color="red">
-          {simpleT(locale).t("app.common.errors.noEndpoint")}
+          {cliScopedTranslation
+            .scopedT(locale)
+            .t("vibe.endpoints.renderers.cliUi.noEndpoint")}
         </Text>
       </Box>
     );

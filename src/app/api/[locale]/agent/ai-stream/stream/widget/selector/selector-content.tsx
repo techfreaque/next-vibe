@@ -13,8 +13,10 @@ import {
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import type { TFunction } from "@/i18n/core/static-types";
+import {
+  scopedTranslation as chatScopedTranslation,
+  type ChatT,
+} from "@/app/api/[locale]/agent/chat/i18n";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 
 const SelectorOnboarding = lazy(() =>
@@ -29,13 +31,13 @@ interface SelectorContentProps {
   locale: CountryLanguage;
 }
 
-function LoadingSpinner({ t }: { t: TFunction }): JSX.Element {
+function LoadingSpinner({ t }: { t: ChatT }): JSX.Element {
   return (
     <Div className="flex items-center justify-center p-8">
       <Div className="flex flex-col items-center gap-3">
         <Div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
         <Span className="text-sm text-muted-foreground">
-          {t("app.chat.selector.loading")}
+          {t("selector.loading")}
         </Span>
       </Div>
     </Div>
@@ -45,7 +47,7 @@ function LoadingSpinner({ t }: { t: TFunction }): JSX.Element {
 export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  const { t } = simpleT(locale);
+  const { t } = chatScopedTranslation.scopedT(locale);
   const setOnboardingComplete = useTourState((s) => s.setOnboardingComplete);
   const { favorites, isInitialLoading: favoritesLoading } = useChatFavorites(
     logger,

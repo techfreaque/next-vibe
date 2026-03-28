@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 
+import { configScopedTranslation } from "../../config/i18n";
 import { METADATA_CONFIG } from "../../config/metadata";
 import type { CountryLanguage } from "./config";
 import { Countries, Languages as LanguagesEnum } from "./config";
-import { simpleT } from "./shared";
-import type { TranslationKey } from "./static-types";
+import type { TranslatedKeyType } from "./scoped-translation";
 
 export interface MetadataConfig {
   baseUrl: string;
-  twitterHandle: TranslationKey;
-  defaultImage: TranslationKey;
-  defaultImageAlt: TranslationKey;
+  twitterHandle: TranslatedKeyType;
+  defaultImage: TranslatedKeyType;
+  defaultImageAlt: TranslatedKeyType;
 
   // Authors and publisher
-  authors: { name: TranslationKey }[];
-  creator: TranslationKey;
-  publisher: TranslationKey;
+  authors: { name: TranslatedKeyType }[];
+  creator: TranslatedKeyType;
+  publisher: TranslatedKeyType;
 
   // Verification
   verification: {
@@ -64,37 +64,37 @@ export interface GenerateMetadataOptions {
    * Title translation key
    * @required
    */
-  title: TranslationKey;
+  title: TranslatedKeyType;
 
   /**
-   * Category translation key
+   * Category
    * @required
    */
-  category: TranslationKey;
+  category: TranslatedKeyType;
 
   /**
-   * Description translation key
+   * Description
    * @required
    */
-  description: TranslationKey;
+  description: TranslatedKeyType;
 
   /**
-   * Default image to use if translation is not found
+   * Default image to use for social sharing
    * @required for social sharing
    */
   image: string;
 
   /**
-   * Image alt text translation key
+   * Image alt text
    * @required for accessibility
    */
-  imageAlt: TranslationKey;
+  imageAlt: TranslatedKeyType;
 
   /**
-   * Keywords translation keys
+   * Keywords
    * @required for SEO
    */
-  keywords: TranslationKey[];
+  keywords: TranslatedKeyType[];
 
   /**
    * Additional metadata to merge with the generated metadata
@@ -136,42 +136,32 @@ export function metadataGenerator(
   locale: CountryLanguage,
   options: GenerateMetadataOptions,
 ): Metadata {
-  // Create translation function
-  const { t } = simpleT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
-  // Extract path from options
   const { path } = options;
 
-  // Set defaults by merging METADATA_CONFIG with options
   const {
     baseUrl,
     additionalMetadata = {},
     generateAlternates = true,
     includeOpenGraph = true,
     includeTwitter = true,
-    category,
-    twitterHandle,
     authors,
     creator,
     publisher,
     verification,
     formatDetection,
     robots,
-    ...otherOptions
   }: GenerateMetadataOptions & MetadataConfig = {
     ...METADATA_CONFIG,
     ...options,
   };
 
-  // Build canonical URL
-
   const canonicalUrl = `${baseUrl}/${locale}${path ? `/${path}` : ""}`;
 
-  // Generate language alternates if enabled
   const languageAlternates: Record<string, string> = {};
-
   if (generateAlternates) {
-    // Combining Languages and Countries to generate all valid combinations
     Object.values(LanguagesEnum).forEach((lang) => {
       Object.values(Countries).forEach((country) => {
         const countryLang = `${lang}-${country}`;
@@ -180,55 +170,30 @@ export function metadataGenerator(
       });
     });
   }
-  const appName = t("config.appName");
 
-  // Get translated values using the provided translation keys
-  const translatedTitle = t(options.title, { appName });
-  const translatedDescription = t(options.description, { appName });
-  const translatedKeywords = options.keywords.map((key) => t(key, { appName }));
-  const translatedImageAlt = t(options.imageAlt, { appName });
-
-  // Build metadata object
   const metadata: Metadata = {
-    ...otherOptions,
-    // Basic metadata
-    title: translatedTitle,
-    description: translatedDescription,
-
-    // SEO metadata
-    keywords: translatedKeywords,
-
-    // Authors and publisher
+    title: options.title,
+    description: options.description,
+    keywords: options.keywords,
     authors,
     creator,
     publisher,
-
-    // Robots
     robots,
-
-    // Alternates
     alternates: {
       canonical: canonicalUrl,
       languages: languageAlternates,
     },
-
-    // Verification
     verification,
-
-    // Category
-    category: t(category),
-    // Application name
+    category: options.category,
     applicationName: appName,
-
-    // Format detection
     formatDetection,
   };
 
   // Add OpenGraph metadata if enabled
   if (includeOpenGraph) {
     metadata.openGraph = {
-      title: translatedTitle,
-      description: translatedDescription,
+      title: options.title,
+      description: options.description,
       url: canonicalUrl,
       siteName: appName,
       type: "website",
@@ -238,20 +203,19 @@ export function metadataGenerator(
           url: options.image,
           width: 1200,
           height: 630,
-          alt: translatedImageAlt,
+          alt: options.imageAlt,
         },
       ],
     };
   }
 
-  // Add Twitter metadata if enabled
   if (includeTwitter) {
     metadata.twitter = {
       card: "summary_large_image",
-      title: translatedTitle,
-      description: translatedDescription,
-      site: twitterHandle,
-      creator: twitterHandle,
+      title: options.title,
+      description: options.description,
+      site: configT("social.twitterHandle"),
+      creator: configT("social.twitterHandle"),
       images: [options.image],
     };
   }

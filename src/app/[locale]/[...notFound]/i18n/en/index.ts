@@ -1,4 +1,29 @@
 export const translations = {
+  pages: {
+    error: {
+      title: "Something went wrong!",
+      message: "We're sorry, but something unexpected happened.",
+      errorId: "Error ID: {{id}}",
+      error_message: "Error: {{message}}",
+      stackTrace: "Stack Trace: {{stack}}",
+      tryAgain: "Try Again",
+      backToHome: "Back to Home",
+    },
+    notFound: {
+      title: "Page Not Found",
+      description:
+        "The page you're looking for doesn't exist or has been moved.",
+      goBack: "Go Back",
+      goHome: "Go Home",
+    },
+  },
+  meta: {
+    title: "404 - Page Not Found",
+    category: "Error",
+    description: "The page you're looking for doesn't exist",
+    imageAlt: "404 Not Found",
+    keywords: "404, not found, error",
+  },
   post: {
     title: "[...notFound]",
     description: "[...notFound] endpoint",

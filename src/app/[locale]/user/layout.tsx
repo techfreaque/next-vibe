@@ -7,6 +7,8 @@ import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
+import { scopedTranslation as pageT } from "./i18n";
+
 /**
  * Generate metadata for the user pages with translations
  */
@@ -16,25 +18,26 @@ export async function generateMetadata({
   params: Promise<{ locale: CountryLanguage }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const { t } = pageT.scopedT(locale);
   return metadataGenerator(locale, {
     path: "user",
-    title: "app.user.meta.profile.title",
-    description: "app.user.meta.profile.description",
-    category: "app.user.meta.profile.category",
+    title: t("meta.profile.title"),
+    description: t("meta.profile.description"),
+    category: t("meta.profile.category"),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/user-hero.jpg`,
-    imageAlt: "app.user.meta.profile.imageAlt",
-    keywords: ["app.user.meta.profile.keywords"],
+    imageAlt: t("meta.profile.imageAlt"),
+    keywords: [t("meta.profile.keywords")],
     additionalMetadata: {
       openGraph: {
-        title: "app.user.meta.profile.ogTitle",
-        description: "app.user.meta.profile.ogDescription",
+        title: t("meta.profile.ogTitle"),
+        description: t("meta.profile.ogDescription"),
         url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/user`,
         type: "website",
       },
       twitter: {
         card: "summary_large_image",
-        title: "app.user.meta.profile.twitterTitle",
-        description: "app.user.meta.profile.twitterDescription",
+        title: t("meta.profile.twitterTitle"),
+        description: t("meta.profile.twitterDescription"),
       },
     },
   });

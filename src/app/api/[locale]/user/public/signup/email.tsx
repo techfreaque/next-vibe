@@ -38,7 +38,7 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { simpleT } from "@/i18n/core/shared";
+import { configScopedTranslation } from "@/config/i18n";
 import { contactClientRepository } from "../../../contact/repository-client";
 import { EmailTemplate } from "../../../messenger/providers/email/smtp-client/components/template.email";
 import {
@@ -81,8 +81,8 @@ function SignupWelcomeEmail({
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
-  const { t: globalT } = simpleT(locale);
-  const appName = globalT("config.appName");
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
+  const appName = globalT("appName");
 
   const modelCategories = [
     {
@@ -455,13 +455,13 @@ async function renderWelcomeEmailByEmail(
     userId: user.id,
     leadId: user.leadId,
   };
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
 
   return success({
     toEmail: user.email,
     toName: user.privateName,
     subject: signupT("email.subject", {
-      appName: globalT("config.appName"),
+      appName: globalT("appName"),
     }),
     leadId: user.leadId,
     jsx: signupWelcomeEmailTemplate.component({
@@ -501,14 +501,14 @@ function renderAdminNotificationEmailContent(
     env.NEXT_PUBLIC_APP_URL,
   );
 
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
 
   return (
     <EmailTemplate
       locale={locale}
       title={t("admin_notification.title")}
       previewText={t("admin_notification.preview", {
-        appName: globalT("config.appName"),
+        appName: globalT("appName"),
       })}
       recipientEmail={recipientEmail}
       tracking={tracking}
@@ -535,7 +535,7 @@ function renderAdminNotificationEmailContent(
         }}
       >
         {t("admin_notification.message", {
-          appName: globalT("config.appName"),
+          appName: globalT("appName"),
         })}
       </Text>
 
@@ -784,7 +784,7 @@ function renderAdminNotificationEmailContent(
       {/* Action Buttons */}
       <Section style={{ textAlign: "center", marginBottom: "32px" }}>
         <Button
-          href={`mailto:${user.email}?subject=Welcome to ${globalT("config.appName")} - Let's get started!`}
+          href={`mailto:${user.email}?subject=Welcome to ${globalT("appName")} - Let's get started!`}
           style={{
             backgroundColor: "#3b82f6",
             borderRadius: "8px",
@@ -813,7 +813,7 @@ function renderAdminNotificationEmailContent(
         }}
       >
         {t("admin_notification.footer", {
-          appName: globalT("config.appName"),
+          appName: globalT("appName"),
         })}
       </Text>
     </EmailTemplate>
@@ -923,7 +923,7 @@ async function renderAdminNotificationByEmail(
   const { t: tUser } = userScopedTranslation.scopedT(locale);
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
   const { t: signupT } = signupScopedTranslation.scopedT(locale);
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
   const userResponse = await UserRepository.getUserByEmail(
     email,
     UserDetailLevel.COMPLETE,
@@ -955,7 +955,7 @@ async function renderAdminNotificationByEmail(
 
   return success({
     toEmail: contactClientRepository.getSupportEmail(locale),
-    toName: globalT("config.appName"),
+    toName: globalT("appName"),
     subject: signupT("admin_notification.subject", {
       privateName: user.privateName,
     }),

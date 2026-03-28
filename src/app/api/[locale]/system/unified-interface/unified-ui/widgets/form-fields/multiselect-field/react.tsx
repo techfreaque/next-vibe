@@ -32,7 +32,6 @@ import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/ap
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ArrayWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
@@ -68,7 +67,6 @@ export function MultiSelectFieldWidget<
   const isDisabled = useWidgetDisabled();
 
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
-  const { t: globalT } = simpleT(locale);
 
   if (!form || !fieldName) {
     return <Div>{widgetT("react.widgets.formField.requiresContext")}</Div>;
@@ -138,7 +136,7 @@ export function MultiSelectFieldWidget<
                     variant="secondary"
                     className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
                   >
-                    {globalT("packages.nextVibeUi.web.common.required")}
+                    {widgetT("widgets.formFields.common.required")}
                   </Badge>
                 )}
               </Div>
@@ -160,16 +158,9 @@ export function MultiSelectFieldWidget<
                     disabled?: boolean;
                     icon?: string;
                   }) => {
-                    const translated = tField(opt.label, opt.labelParams);
                     return {
                       value: String(opt.value),
-                      label:
-                        translated === opt.label
-                          ? globalT(
-                              opt.label as Parameters<typeof globalT>[0],
-                              opt.labelParams,
-                            )
-                          : translated,
+                      label: tField(opt.label, opt.labelParams),
                       disabled: opt.disabled,
                     };
                   },

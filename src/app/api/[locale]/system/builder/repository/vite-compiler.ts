@@ -1266,16 +1266,31 @@ export class ViteCompiler {
                   next();
                 },
               } as never);
-
             },
             handleHotUpdate({ modules, server: viteServer }) {
               const hasSrcChange = modules.some((m) => m.id?.includes("/src/"));
               if (!hasSrcChange) {
                 return;
               }
+              // Clear SSR module runner cache so next SSR request re-evaluates changed modules.
               const ssrEnv = viteServer.environments?.["ssr"];
               if (ssrEnv && isRunnableDevEnvironment(ssrEnv)) {
                 ssrEnv.runner.evaluatedModules.clear();
+              }
+              // Also invalidate the client environment module graph for the changed modules
+              // so Vite re-transforms them and serves updated JS to the browser.
+              const clientEnv = viteServer.environments?.["client"];
+              if (clientEnv) {
+                for (const mod of modules) {
+                  if (mod.id?.includes("/src/")) {
+                    const clientMod = clientEnv.moduleGraph.getModuleById(
+                      mod.id,
+                    );
+                    if (clientMod) {
+                      clientEnv.moduleGraph.invalidateModule(clientMod);
+                    }
+                  }
+                }
               }
             },
           } as Plugin,

@@ -11,8 +11,8 @@ import type React from "react";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as pageT } from "../i18n";
 import { UsersStatsClientPage } from "./page-client";
 
 interface UsersStatsPageProps {
@@ -30,11 +30,11 @@ export async function generateMetadata({
   params,
 }: UsersStatsPageProps): Promise<Metadata> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
 
   return {
-    title: t("app.admin.users.stats.title"),
-    description: t("app.admin.users.stats.description"),
+    title: t("stats.title"),
+    description: t("stats.description"),
   };
 }
 

@@ -2,6 +2,30 @@ import { translations as navTranslations } from "../../nav/i18n/en";
 
 export const translations = {
   nav: navTranslations,
+  newsletter: {
+    title: "Stay Updated",
+    description:
+      "Subscribe to our newsletter for the latest updates and insights.",
+    emailPlaceholder: "Enter email",
+    subscribe: "Subscribe",
+    subscription: {
+      unsubscribe: {
+        title: "Unsubscribe",
+        confirmButton: "Confirm Unsubscribe",
+      },
+    },
+  },
+  common: {
+    selector: {
+      country: "Country",
+      language: "Language",
+    },
+    accessibility: {
+      srOnly: {
+        toggleMenu: "Toggle menu",
+      },
+    },
+  },
   home: {
     hero: {
       badge: "Open source - MIT + GPL v3",
@@ -97,6 +121,41 @@ export const translations = {
           messageResult:
             'Sent: "Heartbeat #47: email-sync fixed. Root cause: hardcoded 5s IMAP timeout. Patched and rebuilt. Everything else healthy."',
         },
+      },
+    },
+    splitHero: {
+      or: "OR",
+      clickToExplore: "Click to explore",
+      unbottled: {
+        badge: "Free speech AI",
+        titleLine1: "Your AI.",
+        titleLine2: "Your Rules.",
+        subtitle:
+          "{{modelCount}} models, zero censorship. Every conversation stays yours.",
+        pill1: "{{modelCount}}+ models",
+        pill2: "User-controlled censorship",
+        pill3: "{{skillCount}}+ skills",
+        cta: "Start Free",
+      },
+      nextvibe: {
+        badge: "Open source framework",
+        titleLine1: "Your Platform.",
+        titleLine2: "Your Stack.",
+        subtitle:
+          "One definition → {{toolCount}}+ tools, CLI, MCP, web, mobile, cron. Fork it. Own everything.",
+        pill1: "10 platforms, 1 definition",
+        pill2: "TypeScript ultra-strict",
+        pill3: "MIT + GPL v3",
+        ctaGithub: "Star on GitHub",
+        ctaDocs: "Read Docs",
+      },
+      tab: {
+        unbottled: "unbottled.ai",
+        unbottledSub: "Consumer AI",
+        unbottledDesc: "AI platform for everyone",
+        nextvibe: "next-vibe",
+        nextvibeSub: "SaaS Framework",
+        nextvibeDesc: "Open-source framework powering unbottled.ai",
       },
     },
     forumHero: {
@@ -1173,6 +1232,7 @@ export const translations = {
       title: "Company",
       aboutUs: "About Us",
       careers: "Careers",
+      blog: "Blog",
       imprint: "Legal Notice",
       privacyPolicy: "Privacy Policy",
       termsOfService: "Terms of Service",

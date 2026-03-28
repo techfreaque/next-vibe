@@ -1,6 +1,30 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  pages: {
+    error: {
+      title: "Coś poszło nie tak!",
+      message: "Przepraszamy, ale coś nieoczekiwanego się wydarzyło.",
+      errorId: "ID błędu: {{id}}",
+      error_message: "Błąd: {{message}}",
+      stackTrace: "Ślad stosu: {{stack}}",
+      tryAgain: "Spróbuj ponownie",
+      backToHome: "Powrót do strony głównej",
+    },
+    notFound: {
+      title: "Strona nie znaleziona",
+      description: "Szukana strona nie istnieje lub została przeniesiona.",
+      goBack: "Wróć",
+      goHome: "Strona główna",
+    },
+  },
+  meta: {
+    title: "404 - Strona nie znaleziona",
+    category: "Błąd",
+    description: "Szukana strona nie istnieje",
+    imageAlt: "404 Nie znaleziono",
+    keywords: "404, nie znaleziono, błąd",
+  },
   post: {
     title: "Tytuł",
     description: "Opis endpointu",

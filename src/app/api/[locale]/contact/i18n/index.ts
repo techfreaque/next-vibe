@@ -1,16 +1,15 @@
 /**
  * Module Scoped Translation
  *
- * This module provides an isolated translation function for the SMS module.
- * It ONLY uses translations from the sms/i18n folder (en, de, pl).
+ * This module provides an isolated translation function for the contact module.
+ * It ONLY uses translations from the contact/i18n folder (en, de, pl).
  * It does NOT access the global translation object.
  *
  * @example
- * import { simpleT } from "@/app/api/[locale]/sms/i18n";
+ * import { contactScopedT } from "@/app/api/[locale]/contact/i18n";
  *
- * const { t } = simpleT(locale);
- * t("sms.error.invalid_phone_format");
- * t("sms.error.delivery_failed", { phoneNumber: "+1234567890", error: "Network timeout" });
+ * const { t } = contactScopedT(locale);
+ * t("contact.error.invalid_email");
  */
 
 import { createScopedTranslation } from "@/i18n/core/scoped-translation";

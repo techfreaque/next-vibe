@@ -29,7 +29,7 @@ import {
   type TrackingContext,
 } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
 import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
-import { simpleT } from "@/i18n/core/shared";
+import { configScopedTranslation } from "@/config/i18n";
 import { env } from "@/config/env";
 
 // ============================================================================
@@ -64,8 +64,8 @@ function PasswordResetConfirmEmail({
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
-  const { t: globalT } = simpleT(locale);
-  const appName = globalT("config.appName");
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
+  const appName = globalT("appName");
   const loginUrl = `${env.NEXT_PUBLIC_APP_URL}/${locale}/threads`;
 
   return (
@@ -195,8 +195,8 @@ export const passwordResetConfirmEmailTemplate: EmailTemplateDefinition<
     });
 
     const { t } = confirmScopedTranslation.scopedT(locale);
-    const { t: globalT } = simpleT(locale);
-    const appName = globalT("config.appName");
+    const { t: globalT } = configScopedTranslation.scopedT(locale);
+    const appName = globalT("appName");
 
     const userResponse = await UserRepository.getUserByEmail(
       requestData.email,

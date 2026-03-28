@@ -22,9 +22,9 @@ import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { simpleT } from "@/i18n/core/shared";
 
 import HelpPageClient from "./page-client";
+import { scopedTranslation as pageT } from "./i18n";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -41,23 +41,24 @@ export interface HelpPageData {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
+  const { t } = pageT.scopedT(locale);
   return metadataGenerator(locale, {
     path: "contact",
-    title: "app.help.meta.contact.title",
-    description: "app.help.meta.contact.description",
-    category: "app.help.meta.contact.category",
+    title: t("meta.contact.title"),
+    description: t("meta.contact.description"),
+    category: t("meta.contact.category"),
     image:
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&h=630&auto=format&fit=crop",
-    imageAlt: "app.help.meta.contact.imageAlt",
-    keywords: ["app.help.meta.contact.keywords"],
+    imageAlt: t("meta.contact.imageAlt"),
+    keywords: [t("meta.contact.keywords")],
     additionalMetadata: {
       openGraph: {
-        title: "app.help.meta.contact.ogTitle",
-        description: "app.help.meta.contact.ogDescription",
+        title: t("meta.contact.ogTitle"),
+        description: t("meta.contact.ogDescription"),
       },
       twitter: {
-        title: "app.help.meta.contact.twitterTitle",
-        description: "app.help.meta.contact.twitterDescription",
+        title: t("meta.contact.twitterTitle"),
+        description: t("meta.contact.twitterDescription"),
       },
     },
   });
@@ -103,7 +104,7 @@ export function TanstackPage({
   packPrice,
   packCredits,
 }: HelpPageData): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
 
   return (
     <Div
@@ -116,7 +117,7 @@ export function TanstackPage({
           className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mb-8"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
-          {t("app.help.nav.home")}
+          {t("nav.home")}
         </Link>
       </Div>
       <HelpPageClient

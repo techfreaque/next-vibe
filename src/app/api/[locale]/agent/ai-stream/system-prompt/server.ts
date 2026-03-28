@@ -19,7 +19,7 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import { languageConfig } from "@/i18n";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 
 import type { PromptContextData } from "./prompt";
 
@@ -54,7 +54,7 @@ export async function loadPromptContextData(
   const isIncognito = rootFolderId === "incognito";
   const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
 
-  const { t } = simpleT(locale);
+  const { t } = chatScopedTranslation.scopedT(locale);
   const appName = t("config.appName");
 
   const { language, country } = getLanguageAndCountryFromLocale(locale);

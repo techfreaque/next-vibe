@@ -1,6 +1,6 @@
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
-import { CLAUDE_CODE_ALIAS } from "@/app/api/[locale]/agent/claude-code/constants";
+import { CODING_AGENT_ALIAS } from "@/app/api/[locale]/agent/coding-agent/constants";
 import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/constants";
 import { BRAVE_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/brave/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
@@ -38,7 +38,7 @@ export const vibeCoderSkill: Skill = {
   voice: TtsVoice.MALE,
   userRole: [UserPermissionRole.ADMIN],
   availableTools: [
-    tool(CLAUDE_CODE_ALIAS),
+    tool(CODING_AGENT_ALIAS),
     tool(EXECUTE_TOOL_ALIAS),
     tool(TOOL_HELP_ALIAS),
     tool(HEALTH_ALIAS),

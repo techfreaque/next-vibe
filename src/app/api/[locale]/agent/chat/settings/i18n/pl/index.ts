@@ -93,6 +93,15 @@ export const translations: typeof enTranslations = {
       description:
         "Maksymalna łączna liczba tokenów treści pamięci wstrzykiwanych na turę. Pozostaw puste, aby użyć domyślnego systemu (1000 tokenów).",
     },
+    codingAgent: {
+      label: "Agent kodowania",
+      description:
+        "Który CLI agenta kodowania używać, gdy AI wywołuje narzędzie agenta kodowania. Tylko dla adminów.",
+      options: {
+        claudeCode: "Claude Code (domyślny)",
+        openCode: "OpenCode",
+      },
+    },
     errors: {
       validation: {
         title: "Błąd walidacji",

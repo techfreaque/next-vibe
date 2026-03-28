@@ -91,6 +91,15 @@ export const translations = {
       description:
         "Maximum total tokens of memory content injected per turn. Leave empty to use the system default (1000 tokens).",
     },
+    codingAgent: {
+      label: "Coding Agent",
+      description:
+        "Which coding agent CLI to use when AI calls the coding agent tool. Admin-only setting.",
+      options: {
+        claudeCode: "Claude Code (default)",
+        openCode: "OpenCode",
+      },
+    },
     errors: {
       validation: {
         title: "Validation Error",

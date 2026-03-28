@@ -13,8 +13,8 @@ import type { JSX } from "react";
 import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation } from "./i18n";
 import CountrySelector from "../../_components/country-selector";
 
 export function NewsletterSignupFooter({
@@ -26,7 +26,7 @@ export function NewsletterSignupFooter({
   user: JwtPayloadType;
   userEmail: string | undefined;
 }): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   const {
     email,
@@ -45,11 +45,9 @@ export function NewsletterSignupFooter({
   return (
     <Div>
       <Div className="mb-6">
-        <H3 className="font-semibold text-lg mb-4">
-          {t("app.newsletter.title")}
-        </H3>
+        <H3 className="font-semibold text-lg mb-4">{t("newsletter.title")}</H3>
         <P className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          {t("app.newsletter.description")}
+          {t("newsletter.description")}
         </P>
 
         {/* Email input and action button */}
@@ -69,14 +67,14 @@ export function NewsletterSignupFooter({
         >
           <Input<"email">
             type="email"
-            placeholder={t("app.newsletter.emailPlaceholder")}
+            placeholder={t("newsletter.emailPlaceholder")}
             className="max-w-[220px]"
             autoComplete="email"
             autoCorrect="off"
             spellCheck={false}
             value={email}
             onChange={handleEmailChange}
-            aria-label={t("app.newsletter.emailPlaceholder")}
+            aria-label={t("newsletter.emailPlaceholder")}
             disabled={isAnyOperationInProgress || isLoggedIn}
             name="email"
             id="newsletter-email-footer"
@@ -97,9 +95,9 @@ export function NewsletterSignupFooter({
             aria-label={
               isSubscribed
                 ? showConfirmUnsubscribe
-                  ? t("app.newsletter.subscription.unsubscribe.confirmButton")
-                  : t("app.newsletter.subscription.unsubscribe.title")
-                : t("app.newsletter.subscribe")
+                  ? t("newsletter.subscription.unsubscribe.confirmButton")
+                  : t("newsletter.subscription.unsubscribe.title")
+                : t("newsletter.subscribe")
             }
             disabled={isAnyOperationInProgress}
           >
@@ -132,15 +130,14 @@ export function NewsletterSignupFooter({
                     : "text-orange-600 dark:text-orange-400"
             }`}
           >
-            {t(notification.message)}
+            {String(notification.message)}
           </Div>
         )}
       </Div>
 
       <Div className="mt-8">
         <H3 className="font-semibold text-lg mb-4">
-          {t("app.common.selector.country")} /{" "}
-          {t("app.common.selector.language")}
+          {t("common.selector.country")} / {t("common.selector.language")}
         </H3>
         <Div className="inline-block">
           <CountrySelector locale={locale} user={user} />

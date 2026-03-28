@@ -20,7 +20,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 interface RecordingModalProps {
   /** Whether currently recording */
@@ -57,7 +57,7 @@ export function RecordingInputArea({
   onSendVoice,
   locale,
 }: RecordingModalProps): JSX.Element | null {
-  const { t } = simpleT(locale);
+  const { t } = aiStreamScopedTranslation.scopedT(locale);
 
   // Don't render if not recording/processing
   if (!isRecording && !isProcessing) {
@@ -89,8 +89,8 @@ export function RecordingInputArea({
               )}
             >
               {isPaused
-                ? t("app.chat.voiceMode.recording.paused")
-                : t("app.chat.voiceMode.callOverlay.listening")}
+                ? t("voiceMode.recording.paused")
+                : t("voiceMode.callOverlay.listening")}
             </Span>
           </Div>
 
@@ -112,7 +112,7 @@ export function RecordingInputArea({
               className="gap-2 text-muted-foreground hover:text-destructive"
             >
               <X className="h-4 w-4" />
-              {t("app.chat.voiceMode.actions.cancel")}
+              {t("voiceMode.actions.cancel")}
             </Button>
 
             {/* Pause/Resume */}
@@ -126,12 +126,12 @@ export function RecordingInputArea({
               {isPaused ? (
                 <>
                   <Play className="h-4 w-4" />
-                  {t("app.chat.voiceMode.recording.resume")}
+                  {t("voiceMode.recording.resume")}
                 </>
               ) : (
                 <>
                   <Pause className="h-4 w-4" />
-                  {t("app.chat.voiceMode.recording.pause")}
+                  {t("voiceMode.recording.pause")}
                 </>
               )}
             </Button>
@@ -145,7 +145,7 @@ export function RecordingInputArea({
               className="gap-2"
             >
               <Type className="h-4 w-4" />
-              {t("app.chat.voiceMode.actions.toInput")}
+              {t("voiceMode.actions.toInput")}
             </Button>
 
             {/* Send Voice (only when no existing input) */}
@@ -158,7 +158,7 @@ export function RecordingInputArea({
                 className="gap-2"
               >
                 <Send className="h-4 w-4" />
-                {t("app.chat.voiceMode.actions.sendVoice")}
+                {t("voiceMode.actions.sendVoice")}
               </Button>
             )}
           </Div>
@@ -168,7 +168,7 @@ export function RecordingInputArea({
         <Div className="flex items-center justify-center gap-3 py-2">
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           <Span className="text-base text-muted-foreground">
-            {t("app.chat.input.speechInput.transcribing")}
+            {t("input.speechInput.transcribing")}
           </Span>
         </Div>
       )}

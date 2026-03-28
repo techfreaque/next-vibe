@@ -15,14 +15,14 @@ import { envClient } from "./env-client";
 export const METADATA_CONFIG: MetadataConfig = {
   // Basic metadata
   baseUrl: envClient.NEXT_PUBLIC_APP_URL,
-  twitterHandle: "config.social.twitterHandle",
-  defaultImage: "config.websiteUrl",
-  defaultImageAlt: "config.appName",
+  twitterHandle: "@unbottled_ai",
+  defaultImage: "https://unbottled.ai",
+  defaultImageAlt: "unbottled.ai",
 
   // Authors and publisher
-  authors: [{ name: "config.group.name" }],
-  creator: "config.group.name",
-  publisher: "config.group.name",
+  authors: [{ name: "Unbottled.ai" }],
+  creator: "Unbottled.ai",
+  publisher: "Unbottled.ai",
 
   // Verification
   verification: {

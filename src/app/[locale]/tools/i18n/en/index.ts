@@ -4,4 +4,9 @@ export const translations = {
   description:
     "Manage which tools are available for the AI to use. Pin tools to always include them in context.",
   openFullPage: "Open full page",
+  modal: {
+    title: "AI Tools",
+    description:
+      "Manage which tools are available for the AI to use. Pin tools to always include them in context.",
+  },
 };

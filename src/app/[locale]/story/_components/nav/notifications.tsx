@@ -22,24 +22,26 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+
+import type { ScopedKey } from "../i18n";
+import { scopedTranslation } from "../i18n";
 
 export function Notifications({
   locale,
 }: {
   locale: CountryLanguage;
 }): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const unreadNotifications: {
-    title: TranslationKey;
-    description: TranslationKey;
+    title: ScopedKey;
+    description: ScopedKey;
     level: "info" | "success" | "warning" | "error";
     href: string;
   }[] = [
     {
-      title: "app.story._components.nav.welcomeNotification.title",
-      description: "app.story._components.nav.welcomeNotification.description",
+      title: "nav.welcomeNotification.title",
+      description: "nav.welcomeNotification.description",
       level: "info",
       href: "/",
     },
@@ -91,7 +93,7 @@ function NotificationButton({
   t,
 }: {
   notificationCount: number | undefined;
-  t: TFunction;
+  t: (key: ScopedKey) => TranslatedKeyType;
 }): JSX.Element {
   const hasNotifications = notificationCount && notificationCount > 0;
 
@@ -123,7 +125,7 @@ function NotificationButton({
         </DropdownMenuTrigger>
       </TooltipTrigger>
       <TooltipContent>
-        <P>{t("app.story._components.nav.notifications")}</P>
+        <P>{t("nav.notifications")}</P>
       </TooltipContent>
     </Tooltip>
   );

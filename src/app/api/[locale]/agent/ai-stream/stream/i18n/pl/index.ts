@@ -724,4 +724,68 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  input: {
+    placeholder: "Wyślij wiadomość...",
+    imagePlaceholder: "Opisz obraz do wygenerowania...",
+    audioPlaceholder: "Opisz dźwięk lub muzykę do wygenerowania...",
+    noPermission: "Nie masz uprawnień do publikowania tutaj",
+    keyboardShortcuts: {
+      enter: "Enter",
+      toSend: "aby wysłać",
+      shiftEnter: "Shift+Enter",
+      forNewLine: "dla nowej linii",
+      ctrlV: "Ctrl+V",
+      orPasteFiles: "lub wklej pliki",
+    },
+    speechInput: {
+      transcribing: "Transkrybuję...",
+    },
+    attachments: {
+      uploadFile: "Załącz pliki",
+      attachedFiles: "Załączone pliki",
+      addMore: "Dodaj więcej",
+    },
+  },
+  imageGen: {
+    sizeSquare: "Kwadrat (1024×1024)",
+    sizeLandscape: "Poziomy (1792×1024)",
+    sizePortrait: "Pionowy (1024×1792)",
+    qualityStandard: "Standard",
+    qualityHD: "HD",
+  },
+  audioGen: {
+    durationShort: "Krótki (~8s)",
+    durationMedium: "Średni (~15s)",
+    durationLong: "Długi (~30s)",
+  },
+  voiceMode: {
+    unconfiguredTitle: "Głos niekonfigurowany",
+    unconfiguredDescription:
+      "Zamiana tekstu na mowę nie jest dostępna dla tej umiejętności.",
+    callMode: "Tryb rozmowy",
+    callModeDescription: "AI odpowie głosem",
+    tapToRecord: "Dotknij, aby nagrać",
+    recording: {
+      paused: "Wstrzymano",
+      resume: "Wznów",
+      pause: "Pauza",
+    },
+    callOverlay: {
+      listening: "Słucham...",
+    },
+    actions: {
+      cancel: "Anuluj",
+      toInput: "Do wpisywania",
+      sendVoice: "Wyślij głos",
+    },
+  },
+  actions: {
+    cancellingGeneration: "Anulowanie...",
+    stopGeneration: "Stop",
+    sendMessage: "Wyślij",
+  },
+  toolsButton: {
+    title: "Narzędzia AI",
+    tools: "Narzędzia",
+  },
 };

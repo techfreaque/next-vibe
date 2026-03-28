@@ -14,8 +14,10 @@ import { contactClientRepository } from "@/app/api/[locale]/contact/repository-c
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { envClient } from "@/config/env-client";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation as pageT } from "./i18n";
 
 interface HelpPageClientProps {
   locale: CountryLanguage;
@@ -36,17 +38,18 @@ export default function HelpPageClient({
   packPrice,
   packCredits,
 }: HelpPageClientProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
   const supportEmail = contactClientRepository.getSupportEmail(locale);
 
   return (
     <Div className="container max-w-6xl mx-auto py-8 px-4">
       <Div className="text-center mb-12">
         <H2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600 text-center">
-          {t("app.help.pages.help.title")}
+          {t("pages.help.title")}
         </H2>
         <P className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto text-center">
-          {t("app.help.pages.help.subtitle")}
+          {t("pages.help.subtitle")}
         </P>
       </Div>
 
@@ -61,14 +64,14 @@ export default function HelpPageClient({
         <Div className="flex flex-col gap-8">
           <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
             <H3 className="text-2xl font-bold mb-6">
-              {t("app.help.pages.help.info.title")}
+              {t("pages.help.info.title")}
             </H3>
             <Div className="flex flex-col gap-6">
               <Div>
                 <Div className="flex items-start mb-2">
                   <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
                   <H3 className="font-medium">
-                    {t("app.help.pages.help.info.supportEmail")}
+                    {t("pages.help.info.supportEmail")}
                   </H3>
                 </Div>
                 <Button
@@ -84,7 +87,7 @@ export default function HelpPageClient({
                 <Div className="flex items-start mb-2">
                   <Globe className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
                   <H3 className="font-medium">
-                    {t("app.help.pages.help.info.website")}
+                    {t("pages.help.info.website")}
                   </H3>
                 </Div>
                 <Link
@@ -93,7 +96,7 @@ export default function HelpPageClient({
                   rel="noopener noreferrer"
                   className="text-blue-600 dark:text-blue-400 hover:underline ml-8"
                 >
-                  {t("app.help.pages.help.info.websiteUrl")}
+                  {t("pages.help.info.websiteUrl")}
                 </Link>
               </Div>
             </Div>
@@ -104,28 +107,28 @@ export default function HelpPageClient({
       {/* FAQ Section */}
       <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-16">
         <H2 className="text-2xl font-bold mb-6 text-center">
-          {t("app.help.pages.help.faq.title")}
+          {t("pages.help.faq.title")}
         </H2>
         <Div className="grid md:grid-cols-2 gap-8">
           <Div>
             <H3 className="text-lg font-semibold mb-2">
-              {t("app.help.pages.help.faq.questions.q1.question", {
-                appName: t("config.appName"),
+              {t("pages.help.faq.questions.q1.question", {
+                appName: configT("appName"),
               })}
             </H3>
             <P className="text-gray-600 dark:text-gray-300">
-              {t("app.help.pages.help.faq.questions.q1.answer", {
-                appName: t("config.appName"),
+              {t("pages.help.faq.questions.q1.answer", {
+                appName: configT("appName"),
                 modelCount,
               })}
             </P>
           </Div>
           <Div>
             <H3 className="text-lg font-semibold mb-2">
-              {t("app.help.pages.help.faq.questions.q2.question")}
+              {t("pages.help.faq.questions.q2.question")}
             </H3>
             <P className="text-gray-600 dark:text-gray-300">
-              {t("app.help.pages.help.faq.questions.q2.answer", {
+              {t("pages.help.faq.questions.q2.answer", {
                 subPrice,
                 subCredits,
                 packPrice,
@@ -135,10 +138,10 @@ export default function HelpPageClient({
           </Div>
           <Div>
             <H3 className="text-lg font-semibold mb-2">
-              {t("app.help.pages.help.faq.questions.q3.question")}
+              {t("pages.help.faq.questions.q3.question")}
             </H3>
             <P className="text-gray-600 dark:text-gray-300">
-              {t("app.help.pages.help.faq.questions.q3.answer", {
+              {t("pages.help.faq.questions.q3.answer", {
                 subPrice,
                 subCredits,
                 packPrice,
@@ -149,10 +152,10 @@ export default function HelpPageClient({
           </Div>
           <Div>
             <H3 className="text-lg font-semibold mb-2">
-              {t("app.help.pages.help.faq.questions.q4.question")}
+              {t("pages.help.faq.questions.q4.question")}
             </H3>
             <P className="text-gray-600 dark:text-gray-300">
-              {t("app.help.pages.help.faq.questions.q4.answer")}
+              {t("pages.help.faq.questions.q4.answer")}
             </P>
           </Div>
         </Div>

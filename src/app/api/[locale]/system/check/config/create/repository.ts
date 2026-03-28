@@ -8,7 +8,6 @@ import "server-only";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { confirm } from "@inquirer/prompts";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -19,7 +18,6 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { ConfigRepositoryImpl } from "../repository";
@@ -37,14 +35,9 @@ export class ConfigCreateRepository {
     platform: Platform,
     locale: CountryLanguage,
   ): Promise<ResponseType<ConfigCreateResponseOutput>> {
-    const isCLI = platform ? isCliPlatform(platform) : false;
-
     logger.debug("[Config Create] Repository received data", {
       data,
-      interactive: data.interactive,
-      interactiveType: typeof data.interactive,
       platform,
-      isCLI,
     });
 
     try {
@@ -60,65 +53,9 @@ export class ConfigCreateRepository {
         });
       }
 
-      // If interactive mode and CLI platform, ask step by step
-      if (data.interactive && isCLI) {
-        // oxlint-disable-next-line no-console
-        console.log(`\n${"═".repeat(60)}`);
-        // oxlint-disable-next-line no-console
-        console.log(`  🔧 ${t("interactive.welcome")}`);
-        // oxlint-disable-next-line no-console
-        console.log("═".repeat(60));
-        // oxlint-disable-next-line no-console
-        console.log(`  ${t("interactive.description")}`);
-        // oxlint-disable-next-line no-console
-        console.log(`${"═".repeat(60)}\n`);
-
-        // Ask each question step by step
-        data.createMcpConfig = await confirm({
-          message: t("interactive.createMcpConfig"),
-          default: data.createMcpConfig,
-        });
-
-        data.updateVscodeSettings = await confirm({
-          message: t("interactive.updateVscodeSettings"),
-          default: data.updateVscodeSettings,
-        });
-
-        data.enableReactRules = await confirm({
-          message: t("interactive.enableReactRules"),
-          default: data.enableReactRules,
-        });
-
-        data.enableNextjsRules = await confirm({
-          message: t("interactive.enableNextjsRules"),
-          default: data.enableNextjsRules,
-        });
-
-        data.enableI18nRules = await confirm({
-          message: t("interactive.enableI18nRules"),
-          default: data.enableI18nRules,
-        });
-
-        data.jsxCapitalization = await confirm({
-          message: t("interactive.jsxCapitalization"),
-          default: data.jsxCapitalization,
-        });
-
-        data.enablePedanticRules = await confirm({
-          message: t("interactive.enablePedanticRules"),
-          default: data.enablePedanticRules,
-        });
-
-        data.enableRestrictedSyntax = await confirm({
-          message: t("interactive.enableRestrictedSyntax"),
-          default: data.enableRestrictedSyntax,
-        });
-
-        data.updatePackageJson = await confirm({
-          message: t("interactive.updatePackageJson"),
-          default: data.updatePackageJson,
-        });
-      }
+      // Interactive mode is handled by the CLI widget (widget.cli.tsx).
+      // By the time this repository runs, data already contains the resolved
+      // boolean values from the wizard — no prompts needed here.
 
       // Create check.config.ts with user-selected options
       const configResult = await ConfigRepositoryImpl.createDefaultCheckConfig(

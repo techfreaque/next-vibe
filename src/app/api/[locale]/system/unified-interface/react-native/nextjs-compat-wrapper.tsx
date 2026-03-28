@@ -37,7 +37,6 @@ import { ActivityIndicator, View } from "react-native";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { scopedTranslation as reactNativeScopedTranslation } from "./i18n";
 
@@ -112,8 +111,6 @@ export function createPageWrapperWithImport(
       () => createEndpointLogger(false, Date.now(), params.locale),
       [params.locale],
     );
-    const { t } = useMemo(() => simpleT(params.locale), [params.locale]);
-
     // Serialize params for stable dependency comparison
     const paramsKey = useMemo(() => JSON.stringify(params), [params]);
 
@@ -173,7 +170,7 @@ export function createPageWrapperWithImport(
         cancelled = true;
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps -- params used via paramsKey for stable comparison
-    }, [logger, paramsKey, t]);
+    }, [logger, paramsKey]);
 
     // Error state
     if (error) {
@@ -241,8 +238,6 @@ export function createPageWrapper(
       () => createEndpointLogger(false, Date.now(), params.locale),
       [params.locale],
     );
-    const { t } = simpleT(params.locale);
-
     useEffect(() => {
       let cancelled = false;
 
@@ -294,7 +289,7 @@ export function createPageWrapper(
       return (): void => {
         cancelled = true;
       };
-    }, [logger, params, t]);
+    }, [logger, params]);
 
     // Error state
     if (error) {

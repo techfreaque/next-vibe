@@ -9,7 +9,7 @@ import React from "react";
 import { CampaignEmailLayout } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
 import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_cta_button.email";
 import { HumanText } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_text.email";
-import { simpleT } from "@/i18n/core/shared";
+import { configScopedTranslation } from "@/config/i18n";
 
 import { EmailCampaignStage } from "../../../enum";
 import type {
@@ -29,7 +29,7 @@ export const quietRecommendationInitialEmail: EmailTemplateFunction = ({
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
   const t = scopedTranslation.scopedT(locale).t;
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t("initial.previewText")}
@@ -47,7 +47,7 @@ export const quietRecommendationInitialEmail: EmailTemplateFunction = ({
 
       <HumanCTAButton
         href={trackingUrl}
-        text={globalT("config.appName")}
+        text={globalT("appName")}
         variant="secondary"
         tracking={tracking}
       />
@@ -73,7 +73,7 @@ export const quietRecommendationFollowup1Email: EmailTemplateFunction = ({
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
   const t = scopedTranslation.scopedT(locale).t;
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t("followup1.previewText")}
@@ -89,7 +89,7 @@ export const quietRecommendationFollowup1Email: EmailTemplateFunction = ({
 
       <HumanCTAButton
         href={trackingUrl}
-        text={globalT("config.appName")}
+        text={globalT("appName")}
         variant="secondary"
         tracking={tracking}
       />
@@ -115,7 +115,7 @@ export const quietRecommendationFollowup2Email: EmailTemplateFunction = ({
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
   const t = scopedTranslation.scopedT(locale).t;
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t("followup2.previewText")}
@@ -131,7 +131,7 @@ export const quietRecommendationFollowup2Email: EmailTemplateFunction = ({
 
       <HumanCTAButton
         href={trackingUrl}
-        text={globalT("config.appName")}
+        text={globalT("appName")}
         variant="secondary"
         tracking={tracking}
       />
@@ -157,7 +157,7 @@ export const quietRecommendationFollowup3Email: EmailTemplateFunction = ({
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
   const t = scopedTranslation.scopedT(locale).t;
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t("followup3.previewText")}
@@ -173,7 +173,7 @@ export const quietRecommendationFollowup3Email: EmailTemplateFunction = ({
 
       <HumanCTAButton
         href={trackingUrl}
-        text={globalT("config.appName")}
+        text={globalT("appName")}
         variant="secondary"
         tracking={tracking}
       />
@@ -199,7 +199,7 @@ export const quietRecommendationNurtureEmail: EmailTemplateFunction = ({
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
   const t = scopedTranslation.scopedT(locale).t;
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t("nurture.previewText")}
@@ -213,7 +213,7 @@ export const quietRecommendationNurtureEmail: EmailTemplateFunction = ({
 
       <HumanCTAButton
         href={trackingUrl}
-        text={globalT("config.appName")}
+        text={globalT("appName")}
         variant="secondary"
         tracking={tracking}
       />
@@ -239,7 +239,7 @@ export const quietRecommendationReactivationEmail: EmailTemplateFunction = ({
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
   const t = scopedTranslation.scopedT(locale).t;
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t("reactivation.previewText")}
@@ -255,7 +255,7 @@ export const quietRecommendationReactivationEmail: EmailTemplateFunction = ({
 
       <HumanCTAButton
         href={trackingUrl}
-        text={globalT("config.appName")}
+        text={globalT("appName")}
         variant="secondary"
         tracking={tracking}
       />

@@ -36,7 +36,7 @@ import {
   type TrackingContext,
 } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
 import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
-import { simpleT } from "@/i18n/core/shared";
+import { configScopedTranslation } from "@/config/i18n";
 
 // ============================================================================
 // SCHEMA
@@ -71,8 +71,8 @@ function PasswordResetRequestEmail({
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
-  const { t: globalT } = simpleT(locale);
-  const appName = globalT("config.appName");
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
+  const appName = globalT("appName");
 
   return (
     <EmailTemplate
@@ -223,7 +223,7 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
 
     const { t } = requestScopedTranslation.scopedT(locale);
     const { t: resetT } = resetPasswordScopedTranslation.scopedT(locale);
-    const { t: globalT } = simpleT(locale);
+    const { t: globalT } = configScopedTranslation.scopedT(locale);
 
     try {
       const userResponse = await UserRepository.getUserByEmail(
@@ -271,7 +271,7 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
       return success({
         toEmail: requestData.email,
         toName: user.publicName,
-        subject: t("email.subject", { appName: globalT("config.appName") }),
+        subject: t("email.subject", { appName: globalT("appName") }),
         leadId: user.leadId,
         jsx: passwordResetRequestEmailTemplate.component({
           props: templateProps,

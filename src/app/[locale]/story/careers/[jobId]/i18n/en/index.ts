@@ -1,4 +1,16 @@
 export const translations = {
+  meta: {
+    title: "Careers - unbottled.ai",
+    category: "Careers",
+    description: "Join our team and help build the future of uncensored AI",
+    imageAlt: "Careers at unbottled.ai",
+    keywords: "careers, jobs, AI jobs, remote work, unbottled.ai careers",
+    ogTitle: "Careers - unbottled.ai",
+    ogDescription: "Join our team and help build the future of uncensored AI",
+    twitterTitle: "Careers - unbottled.ai",
+    twitterDescription:
+      "Join our team and help build the future of uncensored AI",
+  },
   post: {
     title: "[jobId]",
     description: "[jobId] endpoint",

@@ -71,7 +71,6 @@ import {
 } from "@/app/[locale]/chat/lib/utils/folder-utils";
 import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
 import {
-  DEFAULT_FOLDER_CONFIGS,
   DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
@@ -86,7 +85,10 @@ import {
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTouchDevice } from "@/hooks/use-touch-device";
-import { simpleT } from "@/i18n/core/shared";
+import {
+  scopedTranslation as chatScopedTranslation,
+  type ChatT,
+} from "../../i18n";
 
 import type { ChatFolder } from "../../db";
 import createFolderDefinition from "../../folders/[rootFolderId]/create/definition";
@@ -108,6 +110,21 @@ import type {
 import definitions from "./definition";
 
 type FolderFromList = FolderListResponseOutput["folders"][number];
+
+// ---------------------------------------------------------------------------
+// Folder name helper using scoped chat translation
+// ---------------------------------------------------------------------------
+
+function getFolderName(folderId: DefaultFolderId, tChat: ChatT): string {
+  const folderNames: Record<DefaultFolderId, string> = {
+    [DefaultFolderId.PRIVATE]: tChat("config.folders.private"),
+    [DefaultFolderId.INCOGNITO]: tChat("config.folders.incognito"),
+    [DefaultFolderId.SHARED]: tChat("config.folders.shared"),
+    [DefaultFolderId.PUBLIC]: tChat("config.folders.public"),
+    [DefaultFolderId.CRON]: tChat("config.folders.cron"),
+  };
+  return folderNames[folderId];
+}
 
 // ---------------------------------------------------------------------------
 // Color helpers (copied from folders widget)
@@ -174,6 +191,7 @@ function ThreadRow({
   const { locale, logger, user } = useWidgetContext();
   const { t: tFolders } = foldersScopedTranslation.scopedT(locale);
   const { t } = threadsScopedTranslation.scopedT(locale);
+  const { t: tChat } = chatScopedTranslation.scopedT(locale);
   const isTouch = useTouchDevice();
   const [isHovered, setIsHovered] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -521,10 +539,7 @@ function ThreadRow({
                             className="cursor-pointer"
                           >
                             <Icon icon="folder" className="h-4 w-4 mr-2" />
-                            {simpleT(locale).t(
-                              DEFAULT_FOLDER_CONFIGS[item.rootFolderId]
-                                .translationKey,
-                            )}
+                            {getFolderName(item.rootFolderId, tChat)}
                           </DropdownMenuItem>
                         )}
                         {allFolders.map((folder) => (
@@ -627,6 +642,7 @@ function FolderRow({
   const isTouch = useTouchDevice();
   const { locale, logger, user } = useWidgetContext();
   const { t } = foldersScopedTranslation.scopedT(locale);
+  const { t: tChat } = chatScopedTranslation.scopedT(locale);
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
   const activeFolderId = useChatNavigationStore((s) => s.currentSubFolderId);
   const { initialSubFolderContentsData, initialSubFolderId } =
@@ -1021,10 +1037,7 @@ function FolderRow({
                               className="cursor-pointer"
                             >
                               <Icon icon="folder" className="h-4 w-4 mr-2" />
-                              {simpleT(locale).t(
-                                DEFAULT_FOLDER_CONFIGS[activeRootFolderId]
-                                  .translationKey,
-                              )}
+                              {getFolderName(activeRootFolderId, tChat)}
                             </DropdownMenuItem>
                           )}
                           {allFolders

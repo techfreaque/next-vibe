@@ -32,8 +32,8 @@ import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/
 import { isValidEnumValue } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 interface EmailPreviewPageProps {
   params: Promise<{
@@ -81,7 +81,7 @@ export async function tanstackLoader({
   params,
 }: EmailPreviewPageProps): Promise<EmailPreviewPageData> {
   const { locale, journeyVariant, stage } = await params;
-  const { t } = simpleT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
   const { t: scopedT } = leadsScopedTranslation.scopedT(locale);
 
   // Require admin user authentication
@@ -111,7 +111,7 @@ export async function tanstackLoader({
     stage,
     {
       locale,
-      companyName: t("config.appName"),
+      companyName: configT("appName"),
       companyEmail: contactClientRepository.getSupportEmail(locale),
     },
   );
@@ -159,7 +159,7 @@ export async function tanstackLoader({
     stageLabelText: scopedT(stage),
     previousStageLabel: previousStage ? scopedT(previousStage) : null,
     nextStageLabel: nextStage ? scopedT(nextStage) : null,
-    companyName: t("config.appName"),
+    companyName: configT("appName"),
     companyEmail: contactClientRepository.getSupportEmail(locale),
     previewTitle: scopedT("admin.emails.preview_title"),
     backLabel: scopedT("admin.emails.back"),

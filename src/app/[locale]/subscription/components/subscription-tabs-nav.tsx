@@ -13,7 +13,7 @@ import type { JSX } from "react";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation } from "@/app/[locale]/subscription/i18n";
 
 interface SubscriptionTabsNavProps {
   locale: CountryLanguage;
@@ -26,7 +26,7 @@ export function SubscriptionTabsNav({
   activeTab,
   user,
 }: SubscriptionTabsNavProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   const tabs: Array<{
     value: string;
@@ -38,19 +38,19 @@ export function SubscriptionTabsNav({
       value: "overview",
       href: `/${locale}/subscription/overview`,
       icon: TrendingUp,
-      label: t("app.subscription.subscription.tabs.overview"),
+      label: t("subscription.tabs.overview"),
     },
     {
       value: "buy",
       href: `/${locale}/subscription/buy`,
       icon: ShoppingCart,
-      label: t("app.subscription.subscription.tabs.buy"),
+      label: t("subscription.tabs.buy"),
     },
     {
       value: "history",
       href: `/${locale}/subscription/history`,
       icon: History,
-      label: t("app.subscription.subscription.tabs.history"),
+      label: t("subscription.tabs.history"),
     },
     ...(user.isPublic
       ? []
@@ -59,7 +59,7 @@ export function SubscriptionTabsNav({
             value: "remote",
             href: `/${locale}/subscription/remote`,
             icon: Link2,
-            label: t("app.subscription.subscription.tabs.remote"),
+            label: t("subscription.tabs.remote"),
           },
         ]),
   ];

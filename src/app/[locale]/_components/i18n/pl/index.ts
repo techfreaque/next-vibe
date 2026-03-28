@@ -1,6 +1,26 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  error: {
+    title: "Błąd",
+    unknown: "Wystąpił nieznany błąd",
+    tryAgain: "Spróbuj ponownie",
+    boundary: {
+      componentStack: "Stos komponentów",
+      stackTrace: "Ślad stosu",
+      componentStackFull: "Stos komponentów (pełny)",
+      errorDetails: "Szczegóły błędu",
+      name: "Nazwa:",
+      errorMessage: "Wiadomość:",
+      cause: "Przyczyna:",
+    },
+  },
+  themeToggle: {
+    enableLightMode: "Włącz tryb jasny",
+    enableDarkMode: "Włącz tryb ciemny",
+    lightMode: "Tryb jasny",
+    darkMode: "Tryb ciemny",
+  },
   contact: {
     subjects: {
       HELP_SUPPORT: "Pomoc i wsparcie",

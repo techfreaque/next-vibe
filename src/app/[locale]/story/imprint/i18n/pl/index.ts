@@ -1,8 +1,73 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  meta: {
+    title: "Stopka redakcyjna - unbottled.ai",
+    category: "Prawne",
+    description: "Informacje prawne i dane firmy unbottled.ai",
+    imageAlt: "Stopka redakcyjna",
+    keywords:
+      "stopka redakcyjna, nota prawna, informacje o firmie, unbottled.ai prawne",
+    ogTitle: "Stopka redakcyjna - unbottled.ai",
+    ogDescription: "Informacje prawne i dane firmy unbottled.ai",
+    twitterTitle: "Stopka redakcyjna - unbottled.ai",
+    twitterDescription: "Informacje prawne i dane firmy unbottled.ai",
+  },
   printAriaLabel: "Drukuj stopkę",
   printButton: "Drukuj",
+  title: "Nota prawna",
+  lastUpdated: "Ostatnia aktualizacja: styczeń 2025",
+  introduction:
+    "Niniejsza stopka redakcyjna zawiera informacje wymagane przez prawo dotyczące {{appName}} zgodnie z obowiązującymi przepisami.",
+  sections: {
+    partnerships: {
+      title: "Partnerstwa i stowarzyszenia",
+      description:
+        "Informacje o naszych partnerstwach i stowarzyszeniach biznesowych.",
+      content:
+        "{{appName}} utrzymuje partnerstwa z wiodącymi dostawcami AI, aby zapewnić naszym użytkownikom najlepszą możliwą usługę.",
+    },
+    companyInfo: {
+      title: "Informacje o firmie",
+      description:
+        "Informacje prawne o {{appName}} i naszej zarejestrowanej jednostce biznesowej.",
+    },
+    responsiblePerson: {
+      title: "Osoba odpowiedzialna",
+      description:
+        "Informacje o osobie odpowiedzialnej za treść tej strony internetowej.",
+    },
+    contactInfo: {
+      title: "Informacje kontaktowe",
+      description:
+        "Jak się z nami skontaktować w sprawach prawnych i biznesowych.",
+    },
+    disclaimer: {
+      title: "Zastrzeżenie",
+      copyright: {
+        title: "Prawa autorskie",
+        content:
+          "Wszystkie treści na tej stronie są chronione prawem autorskim. Nieautoryzowane użycie jest zabronione.",
+      },
+      liability: {
+        title: "Odpowiedzialność",
+        content:
+          "Nie składamy żadnych oświadczeń ani gwarancji dotyczących kompletności, dokładności ani wiarygodności informacji na tej stronie.",
+      },
+      links: {
+        title: "Linki zewnętrzne",
+        content:
+          "Nasza strona może zawierać linki do zewnętrznych witryn. Nie ponosimy odpowiedzialności za treść zewnętrznych stron internetowych.",
+      },
+    },
+    disputeResolution: {
+      title: "Rozwiązywanie sporów",
+      description:
+        "Informacje o sposobie rozpatrywania i rozwiązywania sporów.",
+      content:
+        "Wszelkie spory wynikające z korzystania z tej strony będą rozstrzygane zgodnie z obowiązującym prawem.",
+    },
+  },
   post: {
     title: "Tytuł",
     description: "Opis endpointu",

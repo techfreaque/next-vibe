@@ -11,7 +11,8 @@ import {
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation as chatScopedTranslation } from "@/app/[locale]/chat/i18n";
 
 /**
  * Check if a folder ID is a default/root folder
@@ -60,7 +61,7 @@ export function getFolderDisplayName(
   folder: ChatFolder,
   locale: CountryLanguage,
 ): string {
-  const { t } = simpleT(locale);
+  const { t } = chatScopedTranslation.scopedT(locale);
 
   // For default folders, always use the translation key from config
   if (isDefaultFolder(folder.id)) {

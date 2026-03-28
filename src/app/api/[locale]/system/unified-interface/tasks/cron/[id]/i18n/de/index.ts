@@ -384,5 +384,11 @@ export const translations: typeof enTranslations = {
       editDescription:
         "Eingabeparameter für diesen Aufgaben-Endpunkt konfigurieren",
     },
+    scheduleAutocomplete: {
+      customBadge: "Benutzerdefiniert",
+      noSchedulesFound: "Keine Zeitpläne gefunden",
+      useCustomSchedule: "Benutzerdefinierten Zeitplan verwenden",
+      commonSchedules: "Häufige Zeitpläne",
+    },
   },
 };

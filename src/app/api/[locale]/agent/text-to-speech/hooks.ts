@@ -12,7 +12,7 @@ import { useEndpointCreate } from "@/app/api/[locale]/system/unified-interface/r
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 
 import { chunkTextForTTS } from "./chunking";
 import textToSpeechDefinitions from "./definition";
@@ -55,7 +55,7 @@ export function useTTSAudio({
   deductCredits,
   messageId,
 }: UseTTSAudioOptions): UseTTSAudioReturn {
-  const { t } = simpleT(locale);
+  const { t } = chatScopedTranslation.scopedT(locale);
 
   // Read reactive state from the persistent store
   const storeState = useTtsStore((s) => s.messages[messageId]);
@@ -194,8 +194,7 @@ export function useTTSAudio({
               errorMessage: endpointError.message,
             });
             const errorMsg =
-              endpointError.message ||
-              t("app.chat.hooks.tts.failed-to-generate");
+              endpointError.message || t("hooks.tts.failed-to-generate");
             setStore(messageId, { error: errorMsg });
             onError?.(errorMsg);
             resolve(null);
@@ -316,14 +315,14 @@ export function useTTSAudio({
       audio.removeEventListener("ended", onEnded);
       audio.removeEventListener("error", onAudioError);
 
-      const audioError = new Error(t("app.chat.hooks.tts.failed-to-play"));
+      const audioError = new Error(t("hooks.tts.failed-to-play"));
       logger.error(
         `TTS: Chunk ${nextIndex + 1} playback error`,
         parseError(audioError),
       );
 
       setStore(messageId, {
-        error: t("app.chat.hooks.tts.failed-to-play"),
+        error: t("hooks.tts.failed-to-play"),
         isPlaying: false,
       });
 
@@ -350,7 +349,7 @@ export function useTTSAudio({
         audio.removeEventListener("loadedmetadata", onLoadedMetadata);
 
         setStore(messageId, {
-          error: t("app.chat.hooks.tts.failed-to-play"),
+          error: t("hooks.tts.failed-to-play"),
           isPlaying: false,
         });
 
@@ -374,7 +373,7 @@ export function useTTSAudio({
     }
 
     if (!ttsForm) {
-      const errorMsg = t("app.chat.hooks.tts.endpoint-not-available");
+      const errorMsg = t("hooks.tts.endpoint-not-available");
       logger.error("TTS: Endpoint not available", errorMsg);
       setStore(messageId, { error: errorMsg });
       onError?.(errorMsg);
@@ -431,9 +430,7 @@ export function useTTSAudio({
       }
 
       const errorMsg =
-        err instanceof Error
-          ? err.message
-          : t("app.chat.hooks.tts.failed-to-generate");
+        err instanceof Error ? err.message : t("hooks.tts.failed-to-generate");
       logger.error("TTS: Exception during processing", parseError(err));
       setStore(messageId, { error: errorMsg, isLoading: false });
       onError?.(errorMsg);

@@ -9,7 +9,7 @@ import React from "react";
 import { CampaignEmailLayout } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
 import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_cta_button.email";
 import { HumanText } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_text.email";
-import { simpleT } from "@/i18n/core/shared";
+import { configScopedTranslation } from "@/config/i18n";
 
 import { EmailCampaignStage } from "../../../enum";
 import type {
@@ -29,7 +29,7 @@ export const winbackInitialEmail: EmailTemplateFunction = ({
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
   const t = scopedTranslation.scopedT(locale).t;
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t("initial.previewText")}
@@ -47,7 +47,7 @@ export const winbackInitialEmail: EmailTemplateFunction = ({
 
       <HumanCTAButton
         href={trackingUrl}
-        text={globalT("config.appName")}
+        text={globalT("appName")}
         variant="primary"
         tracking={tracking}
       />
@@ -73,7 +73,7 @@ export const winbackFollowup1Email: EmailTemplateFunction = ({
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
   const t = scopedTranslation.scopedT(locale).t;
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t("followup1.previewText")}
@@ -91,7 +91,7 @@ export const winbackFollowup1Email: EmailTemplateFunction = ({
 
       <HumanCTAButton
         href={trackingUrl}
-        text={globalT("config.appName")}
+        text={globalT("appName")}
         variant="primary"
         tracking={tracking}
       />
@@ -117,7 +117,7 @@ export const winbackFollowup2Email: EmailTemplateFunction = ({
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
   const t = scopedTranslation.scopedT(locale).t;
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
 
   const emailContent = (
     <CampaignEmailLayout
@@ -134,7 +134,7 @@ export const winbackFollowup2Email: EmailTemplateFunction = ({
 
       <HumanCTAButton
         href={trackingUrl}
-        text={globalT("config.appName")}
+        text={globalT("appName")}
         variant="primary"
         tracking={tracking}
       />
@@ -160,7 +160,7 @@ export const winbackFollowup3Email: EmailTemplateFunction = ({
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
   const t = scopedTranslation.scopedT(locale).t;
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
 
   const emailContent = (
     <CampaignEmailLayout
@@ -177,7 +177,7 @@ export const winbackFollowup3Email: EmailTemplateFunction = ({
 
       <HumanCTAButton
         href={trackingUrl}
-        text={globalT("config.appName")}
+        text={globalT("appName")}
         variant="secondary"
         tracking={tracking}
       />
@@ -203,7 +203,7 @@ export const winbackNurtureEmail: EmailTemplateFunction = ({
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
   const t = scopedTranslation.scopedT(locale).t;
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
 
   const emailContent = (
     <CampaignEmailLayout
@@ -220,7 +220,7 @@ export const winbackNurtureEmail: EmailTemplateFunction = ({
 
       <HumanCTAButton
         href={trackingUrl}
-        text={globalT("config.appName")}
+        text={globalT("appName")}
         variant="secondary"
         tracking={tracking}
       />
@@ -246,7 +246,7 @@ export const winbackReactivationEmail: EmailTemplateFunction = ({
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
   const t = scopedTranslation.scopedT(locale).t;
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
 
   const emailContent = (
     <CampaignEmailLayout
@@ -263,7 +263,7 @@ export const winbackReactivationEmail: EmailTemplateFunction = ({
 
       <HumanCTAButton
         href={trackingUrl}
-        text={globalT("config.appName")}
+        text={globalT("appName")}
         variant="primary"
         tracking={tracking}
       />
