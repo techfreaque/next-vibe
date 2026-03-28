@@ -29,7 +29,7 @@ const { POST } = createEndpoint({
   title: "title",
   description: "description",
   icon: "lock",
-  category: "app.endpointCategories.userAuth",
+  category: "endpointCategories.userAuth",
   tags: ["tag"],
   allowedRoles: [
     UserRole.CUSTOMER,

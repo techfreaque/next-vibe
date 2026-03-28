@@ -39,7 +39,7 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "globe",
-  category: "app.endpointCategories.systemDevTools",
+  category: "endpointCategories.systemDevTools",
 
   tags: [
     "tags.vibeFrame" as const,

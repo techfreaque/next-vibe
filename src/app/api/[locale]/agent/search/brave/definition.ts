@@ -60,7 +60,7 @@ const { GET } = createEndpoint({
     }
     return undefined;
   },
-  category: "app.endpointCategories.ai",
+  category: "endpointCategories.ai",
   tags: ["tags.search" as const, "tags.web" as const, "tags.internet" as const],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

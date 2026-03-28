@@ -6,7 +6,6 @@
 "use client";
 
 import { render } from "@react-email/render";
-import { parseError } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Dialog,
@@ -20,6 +19,7 @@ import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Iframe } from "next-vibe-ui/ui/iframe";
 import { Span } from "next-vibe-ui/ui/span";
 import { H2, P } from "next-vibe-ui/ui/typography";
+import { parseError } from "next-vibe/shared/utils";
 import type React from "react";
 import { useEffect, useState } from "react";
 

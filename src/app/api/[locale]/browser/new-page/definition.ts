@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["browser", "new-page"],
   title: "new-page.title",
   description: "new-page.description",
-  category: "app.endpointCategories.browser",
+  category: "endpointCategories.browser",
   icon: "file-plus",
   tags: [
     "new-page.tags.browserAutomation",

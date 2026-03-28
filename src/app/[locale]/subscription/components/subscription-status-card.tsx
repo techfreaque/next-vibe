@@ -21,7 +21,8 @@ import portalEndpoints from "@/app/api/[locale]/payment/portal/definition";
 import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { scopedTranslation as subscriptionScopedTranslation } from "@/app/api/[locale]/subscription/i18n";
-import { useTranslation } from "@/i18n/core/client";
+import { scopedTranslation as pageSubscriptionScopedTranslation } from "@/app/[locale]/subscription/i18n";
+import { scopedTranslation as appScopedTranslation } from "@/app/[locale]/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { formatDate } from "./types";
@@ -35,7 +36,8 @@ export function SubscriptionStatusCard({
   locale,
   initialSubscription,
 }: SubscriptionStatusCardProps): JSX.Element {
-  const { t } = useTranslation();
+  const { t } = pageSubscriptionScopedTranslation.scopedT(locale);
+  const { t: appT } = appScopedTranslation.scopedT(locale);
   const { t: subscriptionT } = subscriptionScopedTranslation.scopedT(locale);
   const { t: paymentT } = paymentScopedTranslation.scopedT(locale);
 
@@ -61,7 +63,7 @@ export function SubscriptionStatusCard({
   const handleManageSubscription = async (): Promise<void> => {
     if (initialSubscription.provider === PaymentProvider.NOWPAYMENTS) {
       // For NOWPayments, inform user about email-based management
-      alert(t("app.subscription.subscription.manage.nowpayments.info"));
+      alert(t("subscription.manage.nowpayments.info"));
       return;
     }
 
@@ -106,11 +108,9 @@ export function SubscriptionStatusCard({
                 <Div className="p-2 rounded-lg bg-primary/10">
                   <CreditCard className="h-6 w-6 text-primary" />
                 </Div>
-                {t("app.subscription.subscription.title")}
+                {t("subscription.title")}
               </CardTitle>
-              <CardDescription>
-                {t("app.subscription.subscription.description")}
-              </CardDescription>
+              <CardDescription>{t("subscription.description")}</CardDescription>
             </Div>
             <Div className="flex gap-2">
               <Badge
@@ -140,26 +140,26 @@ export function SubscriptionStatusCard({
             <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Div className="p-4 rounded-lg bg-accent border">
                 <Div className="text-sm text-muted-foreground mb-1">
-                  {t("app.subscription.subscription.canceledOn")}
+                  {t("subscription.canceledOn")}
                 </Div>
                 <Div className="text-lg font-semibold">
                   {initialSubscription.canceledAt
                     ? formatDate(initialSubscription.canceledAt, locale)
                     : initialSubscription.endedAt
                       ? formatDate(initialSubscription.endedAt, locale)
-                      : t("app.common.notAvailable")}
+                      : appT("common.notAvailable")}
                 </Div>
               </Div>
               <Div className="p-4 rounded-lg bg-accent border">
                 <Div className="text-sm text-muted-foreground mb-1">
-                  {t("app.subscription.subscription.endedOn")}
+                  {t("subscription.endedOn")}
                 </Div>
                 <Div className="text-lg font-semibold">
                   {initialSubscription.endedAt
                     ? formatDate(initialSubscription.endedAt, locale)
                     : initialSubscription.currentPeriodEnd
                       ? formatDate(initialSubscription.currentPeriodEnd, locale)
-                      : t("app.common.notAvailable")}
+                      : appT("common.notAvailable")}
                 </Div>
               </Div>
             </Div>
@@ -167,7 +167,7 @@ export function SubscriptionStatusCard({
             <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Div className="p-4 rounded-lg bg-accent border">
                 <Div className="text-sm text-muted-foreground mb-1">
-                  {t("app.subscription.subscription.billingInterval")}
+                  {t("subscription.billingInterval")}
                 </Div>
                 <Div className="text-lg font-semibold capitalize">
                   {subscriptionT(initialSubscription.billingInterval)}
@@ -175,7 +175,7 @@ export function SubscriptionStatusCard({
               </Div>
               <Div className="p-4 rounded-lg bg-accent border">
                 <Div className="text-sm text-muted-foreground mb-1">
-                  {t("app.subscription.subscription.currentPeriodStart")}
+                  {t("subscription.currentPeriodStart")}
                 </Div>
                 <Div className="text-lg font-semibold">
                   {formatDate(initialSubscription.currentPeriodStart, locale)}
@@ -184,15 +184,15 @@ export function SubscriptionStatusCard({
               <Div className="p-4 rounded-lg bg-accent border">
                 <Div className="text-sm text-muted-foreground mb-1">
                   {isCanceling
-                    ? t("app.subscription.subscription.endsOn")
-                    : t("app.subscription.subscription.nextBillingDate")}
+                    ? t("subscription.endsOn")
+                    : t("subscription.nextBillingDate")}
                 </Div>
                 <Div className="text-lg font-semibold">
                   {isCanceling
                     ? formatDate(initialSubscription.cancelAt!, locale)
                     : initialSubscription.currentPeriodEnd
                       ? formatDate(initialSubscription.currentPeriodEnd, locale)
-                      : t("app.common.notAvailable")}
+                      : appT("common.notAvailable")}
                 </Div>
               </Div>
             </Div>
@@ -205,17 +205,14 @@ export function SubscriptionStatusCard({
                 <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                 <Div className="text-sm text-amber-800 dark:text-amber-200">
                   <Div className="font-semibold mb-1">
-                    {t("app.subscription.subscription.cancellation.title")}
+                    {t("subscription.cancellation.title")}
                   </Div>
                   <Div>
-                    {t(
-                      "app.subscription.subscription.cancellation.description",
-                      {
-                        date: initialSubscription.cancelAt
-                          ? formatDate(initialSubscription.cancelAt, locale)
-                          : t("app.common.notAvailable"),
-                      },
-                    )}
+                    {t("subscription.cancellation.description", {
+                      date: initialSubscription.cancelAt
+                        ? formatDate(initialSubscription.cancelAt, locale)
+                        : appT("common.notAvailable"),
+                    })}
                   </Div>
                 </Div>
               </Div>
@@ -229,11 +226,9 @@ export function SubscriptionStatusCard({
                 <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                 <Div className="text-sm text-red-800 dark:text-red-200">
                   <Div className="font-semibold mb-1">
-                    {t("app.subscription.subscription.canceled.title")}
+                    {t("subscription.canceled.title")}
                   </Div>
-                  <Div>
-                    {t("app.subscription.subscription.canceled.description")}
-                  </Div>
+                  <Div>{t("subscription.canceled.description")}</Div>
                 </Div>
               </Div>
             </Div>
@@ -249,8 +244,8 @@ export function SubscriptionStatusCard({
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
                 {initialSubscription.provider === PaymentProvider.NOWPAYMENTS
-                  ? t("app.subscription.subscription.manage.nowpayments.button")
-                  : t("app.subscription.subscription.manage.stripe.button")}
+                  ? t("subscription.manage.nowpayments.button")
+                  : t("subscription.manage.stripe.button")}
               </Button>
             </Div>
           )}

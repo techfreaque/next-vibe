@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "server" as const,
-  category: "app.endpointCategories.userAuth",
+  category: "endpointCategories.userAuth",
   tags: ["tags.remoteConnection" as const],
 
   fields: customWidgetObject({

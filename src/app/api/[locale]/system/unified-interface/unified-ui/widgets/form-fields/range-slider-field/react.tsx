@@ -194,8 +194,14 @@ export function RangeSliderFieldWidget<
             </Div>
 
             <FormControl>
-              <RangeSlider<TKey>
-                options={field.options}
+              <RangeSlider
+                options={field.options.map((opt) => ({
+                  ...opt,
+                  label: tField(opt.label),
+                  description: opt.description
+                    ? tField(opt.description)
+                    : undefined,
+                }))}
                 minIndex={minIndex}
                 maxIndex={maxIndex}
                 onChange={(newMinIndex, newMaxIndex) => {
@@ -205,9 +211,16 @@ export function RangeSliderFieldWidget<
                   });
                 }}
                 disabled={isDisabled || field.disabled || field.readonly}
-                minLabel={field.minLabel ? tField(field.minLabel) : undefined}
-                maxLabel={field.maxLabel ? tField(field.maxLabel) : undefined}
-                t={tField}
+                minLabel={
+                  field.minLabel
+                    ? tField(field.minLabel)
+                    : widgetT("widgets.rangeSlider.min")
+                }
+                maxLabel={
+                  field.maxLabel
+                    ? tField(field.maxLabel)
+                    : widgetT("widgets.rangeSlider.max")
+                }
               />
             </FormControl>
 

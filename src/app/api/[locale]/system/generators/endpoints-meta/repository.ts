@@ -25,6 +25,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
+import { scopedTranslation as appLocaleScopedTranslation } from "@/app/[locale]/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
@@ -42,8 +43,8 @@ import {
   pathSegmentsToToolName,
 } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { LiveIndex } from "../shared/live-index";
 import {
   findFilesRecursively,
@@ -361,33 +362,15 @@ export class EndpointsMetaGeneratorRepository {
     locale: CountryLanguage,
     logger?: EndpointLogger,
   ): EndpointMeta[] {
-    const { t: globalT } = simpleT(locale);
+    const { t: appLocaleT } = appLocaleScopedTranslation.scopedT(locale);
 
     const entries = loaded.map(({ definition }) => {
       const { t } = definition.scopedTranslation.scopedT(locale);
 
       // Translate title & description via the endpoint's own scoped i18n
-      let title = definition.title;
-      let description = definition.description;
-      try {
-        title = t(definition.title);
-      } catch {
-        /* missing translation - keep raw key */
-      }
-      try {
-        description = t(definition.description);
-      } catch {
-        /* missing translation - keep raw key */
-      }
-
-      // Translate category via global i18n (cast to string - global keys are wider)
-      let category: string = definition.category;
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        category = globalT(definition.category as any);
-      } catch {
-        /* missing translation - keep raw key */
-      }
+      const title = t(definition.title);
+      const description = t(definition.description);
+      const category: TranslatedKeyType = appLocaleT(definition.category);
 
       // Translate tags via scoped i18n
       const tags = (definition.tags ?? []).map((tag: string) => {

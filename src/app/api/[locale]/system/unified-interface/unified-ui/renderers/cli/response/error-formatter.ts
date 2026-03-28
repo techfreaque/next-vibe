@@ -8,8 +8,7 @@ import type { RouteExecutionResult } from "@/app/api/[locale]/system/unified-int
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { formatValidationErrorDetails } from "@/app/api/[locale]/system/unified-interface/shared/utils/format-validation-error";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 /**
  * Static class for error formatting
@@ -24,7 +23,6 @@ export class CliErrorFormatter {
     verbose: boolean,
     endpoint?: CreateApiEndpointAny | null,
   ): string {
-    const { t } = simpleT(locale);
     const { t: cliT } = cliScopedTranslation.scopedT(locale);
 
     // Format validation errors nicely - each field on its own line
@@ -32,12 +30,9 @@ export class CliErrorFormatter {
     const isValidationError =
       errorParams && "error" in errorParams && "errorCount" in errorParams;
 
-    // Don't interpolate errorParams into the message for validation errors —
-    // the raw error/errorCount values would produce ugly output like "Validation Error ({...})"
-    let errorMessage = t(
-      result.error ?? cliT("vibe.errors.unknownError", result.errorParams),
-      isValidationError ? undefined : result.errorParams,
-    );
+    // TranslatedKeyType values are already translated strings at runtime
+    const errorMessage: string =
+      result.error ?? cliT("vibe.errors.unknownError", result.errorParams);
 
     let detailedError = errorMessage;
     if (isValidationError) {
@@ -65,7 +60,6 @@ export class CliErrorFormatter {
     // Handle error cause chain
     const causeChain = this.formatErrorCauseChain(
       result,
-      t,
       verbose,
       0,
       unknownErrorKey,
@@ -89,10 +83,9 @@ export class CliErrorFormatter {
    */
   private static formatErrorCauseChain(
     result: RouteExecutionResult,
-    t: TFunction,
     verbose: boolean,
     depth = 0,
-    unknownErrorKey?: TranslationKey,
+    unknownErrorKey?: TranslatedKeyType,
   ): string {
     if (!result.cause || depth > 10) {
       // Prevent infinite recursion (increased limit for deep error chains)
@@ -102,11 +95,8 @@ export class CliErrorFormatter {
     const indent = "  ".repeat(depth + 1);
     let output = "";
 
-    // Format cause error message - ErrorResponseType uses 'message' field
-    const causeTranslationKey: TranslationKey =
-      result.cause.message || unknownErrorKey!;
-
-    const causeMessage = t(causeTranslationKey, result.cause.messageParams);
+    // Format cause error message - TranslatedKeyType is already the translated string
+    const causeMessage: string = result.cause.message || unknownErrorKey || "";
 
     // Show error type in verbose mode or for root cause
     const errorTypeInfo =
@@ -137,7 +127,6 @@ export class CliErrorFormatter {
       };
       output += this.formatErrorCauseChain(
         nestedResult,
-        t,
         verbose,
         depth + 1,
         unknownErrorKey,

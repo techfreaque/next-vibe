@@ -6,6 +6,7 @@ import { Cross2Icon } from "next-vibe-ui/ui/icons/Cross2Icon";
 import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "../i18n";
 
 import type { StyleType } from "../utils/style-type";
 
@@ -134,7 +135,8 @@ export function DialogContent({
   children,
   ...props
 }: DialogContentProps): React.JSX.Element {
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   return (
     <DialogPortal>
@@ -151,7 +153,7 @@ export function DialogContent({
         <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
           <Cross2Icon className="h-4 w-4" />
           <span className="sr-only">
-            {t("app.common.accessibility.srOnly.close")}
+            {t("common.accessibility.srOnly.close")}
           </span>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>

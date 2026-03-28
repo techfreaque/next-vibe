@@ -9,6 +9,7 @@ import type { PressableProps, ViewProps } from "react-native";
 import { Dimensions, Pressable, ScrollView, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
 
 import { applyStyleType } from "../../web/utils/style-type";
 import { useIsMobile } from "../hooks/use-mobile";
@@ -461,17 +462,18 @@ function SidebarRail({
   onClick,
 }: SidebarRailProps): React.JSX.Element {
   const { toggleSidebar } = useSidebar();
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <StyledPressable
-      accessibilityLabel={t("app.common.accessibility.srOnly.toggleMenu")}
+      accessibilityLabel={t("common.accessibility.srOnly.toggleMenu")}
       onPress={() => {
         onClick?.();
         toggleSidebar();
       }}
-      accessibilityHint={t("app.common.accessibility.srOnly.toggleMenu")}
+      accessibilityHint={t("common.accessibility.srOnly.toggleMenu")}
       {...applyStyleType({
         nativeStyle,
         className: cn(

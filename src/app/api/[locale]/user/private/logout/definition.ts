@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   title: "title",
   description: "description",
   icon: "log-out",
-  category: "app.endpointCategories.userAuth",
+  category: "endpointCategories.userAuth",
   tags: ["tag"],
   allowedRoles: [
     UserRole.CUSTOMER,

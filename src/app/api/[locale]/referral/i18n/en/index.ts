@@ -160,7 +160,7 @@ export const translations = {
       availableBalance: "Available Balance",
       availableBalanceDescription: "Available balance ready for payout",
       availableBalanceDescriptionLow:
-        "Spend on AI chats - other credits used first. Earn $40 to unlock withdrawal.",
+        "Spend on AI chats - other credits used first. Earn {{minPayout}} to unlock withdrawal.",
       totalRevenueCredits: "Total Revenue (Credits)",
       totalEarnedCredits: "Total Earned (Credits)",
       totalPaidOutCredits: "Total Paid Out (Credits)",
@@ -249,7 +249,7 @@ export const translations = {
     updatedAt: "Updated At",
     referralCode: "Referral Code",
     success:
-      "🎉 Your referral code is ready! Copy the link below and start earning 20% commission on every subscription.",
+      "🎉 Your referral code is ready! Copy the link below and start earning {{directPct}} commission on every subscription — plus bonus earnings from their referrals.",
     message: "Message",
   },
 
@@ -351,7 +351,7 @@ export const translations = {
       cryptoPayout: "Withdraw to Crypto",
       cryptoPayoutDesc: "Request payout in BTC or USDC to your wallet address.",
       minimumNote:
-        "Minimum payout: $40. Crypto payouts are processed within 48 hours after approval.",
+        "Minimum payout: {{minPayout}}. Crypto payouts are processed within {{cryptoPayoutHours}} hours after approval.",
       progressLabel: "Progress to payout",
       unlockedOf: "unlocked of",
       viewHistory: "View History",
@@ -365,7 +365,7 @@ export const translations = {
         previewCrypto: "Your payout request is being processed",
         previewCredits: "Your credits have been converted",
         bodyCrypto:
-          "We have received your payout request. Crypto payouts are processed within 48 hours after admin approval.",
+          "We have received your payout request. Crypto payouts are processed within {{cryptoPayoutHours}} hours after admin approval.",
         bodyCredits:
           "Your referral earnings have been instantly converted to chat credits and added to your account.",
         followUpCrypto:
@@ -394,6 +394,11 @@ export const translations = {
       insufficientBalance: "Insufficient balance for payout",
       notFound: "Payout request not found",
       invalidStatus: "Invalid payout request status for this operation",
+    },
+    success: {
+      creditsConverted: "Credits converted successfully",
+      payoutRequested:
+        "Payout request submitted - processing within {{hours}} hours",
     },
   },
 

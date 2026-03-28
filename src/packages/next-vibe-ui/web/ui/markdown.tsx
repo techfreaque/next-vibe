@@ -12,6 +12,7 @@ import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "../i18n";
 
 import type { StyleType } from "../utils/style-type";
 
@@ -118,7 +119,8 @@ export const Markdown = memo(function Markdown({
   hasContentAfter = false,
   collapseState,
 }: MarkdownProps): JSX.Element {
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   // First process Chat tags (just strip the tags, keep content)
   const contentWithChatProcessed = useMemo(
@@ -480,7 +482,7 @@ export const Markdown = memo(function Markdown({
                   />
                   <Brain className="h-4 w-4 shrink-0" />
                   <span className="flex-1 text-left">
-                    {t("packages.nextVibeUi.web.ui.markdown.thinking")}
+                    {t("ui.markdown.thinking")}
                   </span>
                   {isIncomplete && (
                     <div className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -527,7 +529,8 @@ const CodeBlock = memo(function CodeBlock({
   code: string;
   language: string;
 }): JSX.Element {
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async (): Promise<void> => {
@@ -557,21 +560,17 @@ const CodeBlock = memo(function CodeBlock({
               ? "bg-green-500/20 text-green-400 border border-green-500/30"
               : "bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600",
           )}
-          title={
-            copied
-              ? t("packages.nextVibeUi.web.ui.markdown.copied")
-              : t("packages.nextVibeUi.web.ui.markdown.copyCode")
-          }
+          title={copied ? t("ui.markdown.copied") : t("ui.markdown.copyCode")}
         >
           {copied ? (
             <>
               <Check className="h-3.5 w-3.5" />
-              {t("packages.nextVibeUi.web.ui.markdown.copied")}
+              {t("ui.markdown.copied")}
             </>
           ) : (
             <>
               <Copy className="h-3.5 w-3.5" />
-              {t("packages.nextVibeUi.web.ui.markdown.copy")}
+              {t("ui.markdown.copy")}
             </>
           )}
         </button>

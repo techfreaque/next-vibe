@@ -69,6 +69,7 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { configScopedTranslation } from "@/config/i18n";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import {
@@ -1529,7 +1530,8 @@ export function LeadEditContainer(props: PatchWidgetProps): React.JSX.Element {
   const locale = useWidgetLocale();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.PATCH>();
-  const { t: tGlobal } = useTranslation();
+  const { locale: leadsLocale } = useTranslation();
+  const { t: tGlobal } = configScopedTranslation.scopedT(leadsLocale);
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof definition.PATCH>();
   const onSubmit = useWidgetOnSubmit();

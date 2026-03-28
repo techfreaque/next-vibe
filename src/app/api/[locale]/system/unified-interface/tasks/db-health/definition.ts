@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   aliases: [DB_HEALTH_ALIAS, "db-ping"],
   title: "dbHealth.post.title",
   description: "dbHealth.post.description",
-  category: "app.endpointCategories.systemDatabase",
+  category: "endpointCategories.systemDatabase",
   icon: "database",
   tags: ["dbHealth.tag" as const],
   allowedRoles: [UserRole.ADMIN],

@@ -30,7 +30,7 @@ const { POST } = createEndpoint({
   title: "taskSync.post.title",
   description: "taskSync.post.description",
   icon: "refresh-cw",
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   tags: ["tags.tasks" as const],
   aliases: ["sync", "task-sync"] as const,
   allowedRoles: [

@@ -7,6 +7,7 @@ import { X } from "next-vibe-ui/ui/icons/X";
 import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "../i18n";
 
 import type { StyleType } from "../utils/style-type";
 import { Badge } from "./badge";
@@ -50,7 +51,8 @@ export function MultiSelect(props: MultiSelectProps): React.JSX.Element {
     maxSelections,
     searchable = true,
   } = props;
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
   const [open, setOpen] = React.useState(false);
 
   const handleSelect = (optionValue: string): void => {
@@ -88,10 +90,7 @@ export function MultiSelect(props: MultiSelectProps): React.JSX.Element {
         >
           <div className="flex gap-1 flex-wrap">
             {value.length === 0 ? (
-              <span>
-                {placeholder ||
-                  t("packages.nextVibeUi.web.ui.multiSelect.placeholder")}
-              </span>
+              <span>{placeholder || t("ui.multiSelect.placeholder")}</span>
             ) : (
               selectedOptions.map((option) => (
                 <Badge
@@ -136,8 +135,7 @@ export function MultiSelect(props: MultiSelectProps): React.JSX.Element {
           )}
           <CommandList className="max-h-[300px]">
             <CommandEmpty>
-              {emptyMessage ||
-                t("packages.nextVibeUi.web.ui.multiSelect.noResultsFound")}
+              {emptyMessage || t("ui.multiSelect.noResultsFound")}
             </CommandEmpty>
             <CommandGroup>
               {options.map((option) => {

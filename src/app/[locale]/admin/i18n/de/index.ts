@@ -15,6 +15,11 @@ export const translations: typeof enTranslations = {
     title: "Admin-Dashboard",
     subtitle: "Verwalten Sie Ihre Anwendung von hier aus",
   },
+  vibeFrame: {
+    selectEndpoint: "Endpunkt auswählen...",
+    searchEndpoints: "Endpunkte suchen...",
+    value: "{{value}}",
+  },
   common: {
     active: "Aktiv",
     filter: "Filter",

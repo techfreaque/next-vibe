@@ -12,8 +12,9 @@ import { parseError } from "next-vibe/shared/utils";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation } from "./i18n";
 import {
   createMediaProvider,
   readStringOption,
@@ -44,13 +45,14 @@ export async function generateWithOpenAI(params: {
   size: string;
   quality: string;
   logger: EndpointLogger;
+  locale: CountryLanguage;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, size, quality, logger } = params;
+  const { providerModel, prompt, size, quality, logger, locale } = params;
+  const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.OPENAI_API_KEY) {
     return fail({
-      // eslint-disable-next-line i18next/no-literal-string
-      message: "OpenAI API key not configured" as TranslationKey,
+      message: t("errors.apiKeyNotConfigured"),
       errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
@@ -90,7 +92,7 @@ export async function generateWithOpenAI(params: {
       const errorMsg = data.error?.message ?? `HTTP ${response.status}`;
       logger.error("[OpenAI Images] API error", { error: errorMsg });
       return fail({
-        message: errorMsg as TranslationKey,
+        message: t("errors.externalServiceError", { message: errorMsg }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -99,8 +101,7 @@ export async function generateWithOpenAI(params: {
     if (!imageUrl) {
       logger.error("[OpenAI Images] No image URL in response");
       return fail({
-        // eslint-disable-next-line i18next/no-literal-string
-        message: "No image URL returned" as TranslationKey,
+        message: t("errors.noImageUrl"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -111,13 +112,16 @@ export async function generateWithOpenAI(params: {
     const errorMessage = parseError(error).message;
     logger.error("[OpenAI Images] Request failed", { error: errorMessage });
     return fail({
-      message: errorMessage as TranslationKey,
+      message: t("errors.requestFailed", { message: errorMessage }),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   }
 }
 
-export function createOpenAIImages(logger: EndpointLogger): {
+export function createOpenAIImages(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): {
   chat: (modelId: string) => LanguageModelV2;
 } {
   return createMediaProvider(logger, {
@@ -138,6 +142,7 @@ export function createOpenAIImages(logger: EndpointLogger): {
         size,
         quality,
         logger,
+        locale,
       });
     },
   });

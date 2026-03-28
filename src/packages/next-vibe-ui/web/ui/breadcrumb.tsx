@@ -5,6 +5,7 @@ import { DotsHorizontalIcon } from "next-vibe-ui/ui/icons/DotsHorizontalIcon";
 import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "../i18n";
 
 import type { StyleType } from "../utils/style-type";
 
@@ -279,7 +280,8 @@ export function BreadcrumbEllipsis({
   id,
   "aria-label": ariaLabel,
 }: BreadcrumbEllipsisProps): React.JSX.Element {
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   return (
     <span
@@ -291,9 +293,7 @@ export function BreadcrumbEllipsis({
       aria-label={ariaLabel}
     >
       <DotsHorizontalIcon className="h-4 w-4" />
-      <span className="sr-only">
-        {t("app.common.accessibility.srOnly.more")}
-      </span>
+      <span className="sr-only">{t("common.accessibility.srOnly.more")}</span>
     </span>
   );
 }

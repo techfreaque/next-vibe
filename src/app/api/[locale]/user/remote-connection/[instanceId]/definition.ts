@@ -32,7 +32,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "link" as const,
-  category: "app.endpointCategories.userAuth",
+  category: "endpointCategories.userAuth",
   tags: ["tags.remoteConnection" as const],
   aliases: ["remote-status", "connection-status"] as const,
 

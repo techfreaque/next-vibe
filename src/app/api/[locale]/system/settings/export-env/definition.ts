@@ -37,7 +37,7 @@ export const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "download" as const,
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   tags: ["get.tags.exportEnv" as const],
 
   fields: customWidgetObject({

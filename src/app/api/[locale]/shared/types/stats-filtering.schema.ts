@@ -7,7 +7,7 @@
 import { dateSchema } from "next-vibe/shared/types/common.schema";
 import { z } from "zod";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 // Re-export dateSchema for consistency
 export { dateSchema };
@@ -65,7 +65,7 @@ export enum ChartType {
 const historicalDataPointSchema = z.object({
   date: dateSchema,
   value: z.coerce.number(),
-  label: z.string().optional() as z.ZodType<TranslationKey | undefined>,
+  label: z.string().optional() as z.ZodType<TranslatedKeyType | undefined>,
   labelParams: z
     .record(z.string(), z.union([z.string(), z.coerce.number()]))
     .optional(),
@@ -81,7 +81,7 @@ export type HistoricalDataPointType = z.infer<typeof historicalDataPointSchema>;
  * Structure for a complete data series
  */
 const historicalDataSeriesSchema = z.object({
-  name: z.string() as z.ZodType<TranslationKey>,
+  name: z.string() as z.ZodType<TranslatedKeyType>,
   nameParams: z
     .record(z.string(), z.union([z.string(), z.coerce.number()]))
     .optional(),

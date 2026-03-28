@@ -75,7 +75,7 @@ const { GET } = createEndpoint({
 
   title: "get.title",
   description: "get.description",
-  category: "app.endpointCategories.leads",
+  category: "endpointCategories.leads",
   tags: ["tags.leads", "tags.search"],
 
   fields: customWidgetObject({

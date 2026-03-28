@@ -31,7 +31,7 @@ export const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "link",
-  category: "app.endpointCategories.userAuth",
+  category: "endpointCategories.userAuth",
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   tags: ["tags.remoteConnection" as const],
   aliases: ["remote-connections", "list-connections"] as const,

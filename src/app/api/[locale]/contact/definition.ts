@@ -40,7 +40,7 @@ const { POST } = createEndpoint({
   path: ["contact"] as const,
   title: "title",
   description: "description",
-  category: "app.endpointCategories.messenger",
+  category: "endpointCategories.messenger",
   icon: "mail",
   aliases: [CONTACT_FORM_ALIAS] as const,
   requiresConfirmation: true,

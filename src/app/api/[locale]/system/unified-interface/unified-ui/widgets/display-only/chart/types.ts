@@ -4,7 +4,7 @@
 
 import { z } from "zod";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { SpacingSize, WidgetType } from "../../../../shared/types/enums";
 import type {
@@ -18,7 +18,7 @@ import type {
 export const ChartDataPointSchema = z.object({
   x: z.string(),
   y: z.number(),
-  label: z.string().optional() as z.ZodType<TranslationKey | undefined>,
+  label: z.string().optional() as z.ZodType<TranslatedKeyType | undefined>,
   color: z.string().optional(),
 });
 

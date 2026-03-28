@@ -7,8 +7,7 @@
 
 import type { JSX, ReactNode } from "react";
 
-import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { StyleType } from "../../utils/style-type";
 
@@ -19,8 +18,8 @@ import type { StyleType } from "../../utils/style-type";
 
 export type FormFieldGroupProps = {
   children: ReactNode;
-  title?: TranslationKey;
-  description?: TranslationKey;
+  title?: TranslatedKeyType;
+  description?: TranslatedKeyType;
 } & StyleType;
 
 export function FormFieldGroup({
@@ -30,15 +29,13 @@ export function FormFieldGroup({
   className,
   style,
 }: FormFieldGroupProps): JSX.Element {
-  const { t } = useTranslation();
-
   return (
     <div className={`space-y-4 ${className || ""}`} style={style}>
       {title && (
         <div className="space-y-1">
-          <h3 className="text-lg font-semibold">{t(title)}</h3>
+          <h3 className="text-lg font-semibold">{title}</h3>
           {description && (
-            <p className="text-sm text-muted-foreground">{t(description)}</p>
+            <p className="text-sm text-muted-foreground">{description}</p>
           )}
         </div>
       )}
@@ -54,8 +51,8 @@ export function FormFieldGroup({
 
 export type FormSectionProps = {
   children: ReactNode;
-  title: TranslationKey;
-  description?: TranslationKey;
+  title: TranslatedKeyType;
+  description?: TranslatedKeyType;
   completionStatus?: {
     isComplete: boolean;
     completedFields: number;
@@ -73,13 +70,11 @@ export function FormSection({
   className,
   style,
 }: FormSectionProps): JSX.Element {
-  const { t } = useTranslation();
-
   return (
     <div className={`space-y-6 ${className || ""}`} style={style}>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">{t(title)}</h2>
+          <h2 className="text-2xl font-bold">{title}</h2>
           {completionStatus && (
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">
@@ -95,9 +90,7 @@ export function FormSection({
             </div>
           )}
         </div>
-        {description && (
-          <p className="text-muted-foreground">{t(description)}</p>
-        )}
+        {description && <p className="text-muted-foreground">{description}</p>}
       </div>
       {children}
     </div>

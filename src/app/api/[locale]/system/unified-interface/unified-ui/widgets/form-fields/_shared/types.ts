@@ -15,7 +15,7 @@ import type { IconKey } from "../icon-field/icons";
 
 /**
  * Common properties for form field widgets
- * TKey allows using either global TranslationKey or scoped translation keys
+ * TKey allows scoped translation keys
  * TKey is inferred from label/description values, then validated against expected type
  */
 export interface BaseFormFieldWidgetConfig<

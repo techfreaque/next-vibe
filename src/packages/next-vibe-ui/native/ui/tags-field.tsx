@@ -13,6 +13,7 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/tags-field";
 
 import { useTranslation } from "../../../../i18n/core/client";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
 import { Badge } from "./badge";
 import { Plus, X } from "./icons";
 import { Input } from "./input";
@@ -31,7 +32,8 @@ export function TagsField<TKey extends string>({
   className,
   t,
 }: TagsFieldProps<TKey>): React.JSX.Element {
-  const { t: globalT } = useTranslation();
+  const { locale } = useTranslation();
+  const { t: globalT } = uiScopedTranslation.scopedT(locale);
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -221,12 +223,9 @@ export function TagsField<TKey extends string>({
                         >
                           <Plus size={14} className="mr-2 text-foreground" />
                           <UIText className="text-base">
-                            {globalT(
-                              "packages.nextVibeUi.web.common.addCustomValue",
-                              {
-                                value: inputValue.trim(),
-                              },
-                            )}
+                            {globalT("common.addCustomValue", {
+                              value: inputValue.trim(),
+                            })}
                           </UIText>
                         </Pressable>
                       </View>

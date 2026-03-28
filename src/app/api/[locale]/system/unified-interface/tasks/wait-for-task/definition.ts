@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
       color: "bg-green-500/10 text-green-500",
     },
   },
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   tags: ["tags.tasks" as const],
   allowedRoles: [
     UserRole.ADMIN,

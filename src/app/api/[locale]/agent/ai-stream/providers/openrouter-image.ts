@@ -10,7 +10,9 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { scopedTranslation } from "./i18n";
 
 interface OpenRouterImageResponse {
   data?: Array<{ url?: string; b64_json?: string }>;
@@ -21,13 +23,14 @@ export async function generateWithOpenRouter(params: {
   providerModel: string;
   prompt: string;
   logger: EndpointLogger;
+  locale: CountryLanguage;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, logger } = params;
+  const { providerModel, prompt, logger, locale } = params;
+  const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.OPENROUTER_API_KEY) {
     return fail({
-      // eslint-disable-next-line i18next/no-literal-string
-      message: "OpenRouter API key not configured" as TranslationKey,
+      message: t("errors.apiKeyNotConfigured"),
       errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
@@ -63,7 +66,7 @@ export async function generateWithOpenRouter(params: {
       const errorMsg = data.error?.message ?? `HTTP ${response.status}`;
       logger.error("[OpenRouter Image] API error", { error: errorMsg });
       return fail({
-        message: errorMsg as TranslationKey,
+        message: t("errors.externalServiceError", { message: errorMsg }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -72,8 +75,7 @@ export async function generateWithOpenRouter(params: {
     if (!imageUrl) {
       logger.error("[OpenRouter Image] No image URL in response");
       return fail({
-        // eslint-disable-next-line i18next/no-literal-string
-        message: "No image URL returned" as TranslationKey,
+        message: t("errors.noImageUrl"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -84,7 +86,7 @@ export async function generateWithOpenRouter(params: {
     const errorMessage = parseError(error).message;
     logger.error("[OpenRouter Image] Request failed", { error: errorMessage });
     return fail({
-      message: errorMessage as TranslationKey,
+      message: t("errors.requestFailed", { message: errorMessage }),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   }

@@ -25,10 +25,9 @@ import {
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import { REFERRAL_CONFIG } from "../config";
 import type definition from "./definition";
 import type { PayoutGetResponseOutput } from "./definition";
-
-const MIN_PAYOUT_CENTS = 4000;
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING:
@@ -63,14 +62,14 @@ export function ReferralPayoutContainer({
   };
 
   const available = data?.earnedCreditsAvailable ?? 0;
-  const canRequestPayout = available >= MIN_PAYOUT_CENTS;
+  const canRequestPayout = available >= REFERRAL_CONFIG.MIN_PAYOUT_CENTS;
   const progressPct = Math.min(
     100,
-    Math.round((available / MIN_PAYOUT_CENTS) * 100),
+    Math.round((available / REFERRAL_CONFIG.MIN_PAYOUT_CENTS) * 100),
   );
-  const remainingDollars = `$${((MIN_PAYOUT_CENTS - available) / 100).toFixed(2)}`;
+  const remainingDollars = `$${((REFERRAL_CONFIG.MIN_PAYOUT_CENTS - available) / 100).toFixed(2)}`;
   const availableDollars = `$${(available / 100).toFixed(2)}`;
-  const minDollars = `$${(MIN_PAYOUT_CENTS / 100).toFixed(2)}`;
+  const minDollars = `$${(REFERRAL_CONFIG.MIN_PAYOUT_CENTS / 100).toFixed(2)}`;
   const hasHistory = (data?.payoutHistory.length ?? 0) > 0;
 
   return (

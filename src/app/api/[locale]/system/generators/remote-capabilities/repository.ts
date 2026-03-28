@@ -27,6 +27,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { scopedTranslation as appLocaleScopedTranslation } from "@/app/[locale]/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
@@ -44,7 +45,6 @@ import {
   UserPermissionRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import {
   findFilesRecursively,
@@ -381,35 +381,19 @@ export class RemoteCapabilitiesGeneratorRepository {
     locale: CountryLanguage,
   ): RemoteToolCapability[] {
     const capabilities: RemoteToolCapability[] = [];
-    const { t: globalT } = simpleT(locale);
+    const { t: appLocaleT } = appLocaleScopedTranslation.scopedT(locale);
 
     for (const { definition } of loaded) {
       try {
         const { t } = definition.scopedTranslation.scopedT(locale);
         const toolName = getPreferredToolName(definition);
 
-        let title = definition.title;
-        let description = definition.description ?? definition.title;
-        try {
-          title = t(definition.title);
-        } catch {
-          /* missing translation - keep raw key */
-        }
-        try {
-          description = t(definition.description ?? definition.title);
-        } catch {
-          /* missing translation - keep raw key */
-        }
+        const title = t(definition.title);
 
-        // Translate category via global i18n (category keys are global, e.g. "app.endpointCategories.chat")
-        let category: string | undefined;
-        if (definition.category) {
-          try {
-            category = globalT(definition.category);
-          } catch {
-            category = definition.category;
-          }
-        }
+        const description = t(definition.description ?? definition.title);
+
+        // category is a scoped categories key like "chat"
+        const category = appLocaleT(definition.category);
 
         // Translate tags via scoped i18n
         const tags = (definition.tags ?? []).map((tag: string) => {

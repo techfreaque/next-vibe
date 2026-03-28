@@ -4,7 +4,6 @@
  * Schedule Autocomplete Component
  * Custom autocomplete for cron schedules with human-readable labels
  */
-import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import {
@@ -28,6 +27,7 @@ import {
 } from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 

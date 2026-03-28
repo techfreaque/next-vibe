@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "sparkles",
-  category: "app.endpointCategories.ai",
+  category: "endpointCategories.ai",
   tags: ["tags.streaming", "tags.chat", "tags.ai"],
 
   // No events - ai-stream emits to the messages channel directly.

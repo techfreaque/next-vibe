@@ -3,8 +3,6 @@ import type { MessageResponseType } from "next-vibe/shared/types/response.schema
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
-import { useTranslation } from "@/i18n/core/client";
-
 import type { StyleType } from "../../utils/style-type";
 import { Alert, AlertDescription, AlertTitle } from "../alert";
 
@@ -28,7 +26,6 @@ export type FormAlertProps = {
  */
 export function FormAlert(props: FormAlertProps): JSX.Element | null {
   const { alert, className } = props;
-  const { t } = useTranslation();
 
   // Use alert prop if provided, otherwise fall back to legacy props
 
@@ -62,15 +59,9 @@ export function FormAlert(props: FormAlertProps): JSX.Element | null {
       icon={Icon}
       className={cn("my-4", className)}
     >
-      {alert.title && (
-        <AlertTitle>
-          {t(alert.title.message, alert.title.messageParams)}
-        </AlertTitle>
-      )}
+      {alert.title && <AlertTitle>{alert.title.message}</AlertTitle>}
       {alert.message.message && (
-        <AlertDescription>
-          {t(alert.message.message, alert.message.messageParams)}
-        </AlertDescription>
+        <AlertDescription>{alert.message.message}</AlertDescription>
       )}
     </Alert>
   );

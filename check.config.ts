@@ -29,7 +29,7 @@ const vibeCheck: CheckConfig["vibeCheck"] = {
   timeout: 3600,
   limit: 20000,
   mcpLimit: 20, // Compact limit for MCP platform
-  editorUriScheme: "vscode://file/", // URI scheme for clickable file links
+  editorUriScheme: "cursor://file/", // URI scheme for clickable file links
   // Extensive mode: when false (default), test and generated files are excluded.
   // use "vibe check --extensive" for release validation to catch issues in all files.
   extensive: false,

@@ -162,7 +162,7 @@ export const translations: typeof enTranslations = {
       availableBalance: "Verfügbares Guthaben",
       availableBalanceDescription: "Verfügbares Guthaben für Auszahlung",
       availableBalanceDescriptionLow:
-        "Für KI-Chats ausgeben – andere Credits werden zuerst verwendet. 40 $ verdienen, um Abhebung freizuschalten.",
+        "Für KI-Chats ausgeben – andere Credits werden zuerst verwendet. {{minPayout}} verdienen, um Abhebung freizuschalten.",
       totalRevenueCredits: "Gesamtumsatz (Credits)",
       totalEarnedCredits: "Gesamt verdient (Credits)",
       totalPaidOutCredits: "Gesamt ausgezahlt (Credits)",
@@ -251,7 +251,7 @@ export const translations: typeof enTranslations = {
     updatedAt: "Aktualisiert am",
     referralCode: "Empfehlungscode",
     success:
-      "🎉 Ihr Empfehlungscode ist bereit! Kopieren Sie den Link unten und verdienen Sie 20% Provision auf jedes Abonnement.",
+      "🎉 Ihr Empfehlungscode ist bereit! Kopieren Sie den Link unten und verdienen Sie {{directPct}} Provision auf jedes Abonnement – plus Bonuseinnahmen aus deren Empfehlungen.",
     message: "Nachricht",
   },
 
@@ -355,7 +355,7 @@ export const translations: typeof enTranslations = {
       cryptoPayoutDesc:
         "Auszahlung in BTC oder USDC an Ihre Wallet-Adresse beantragen.",
       minimumNote:
-        "Mindestbetrag: 40 $. Krypto-Auszahlungen werden innerhalb von 48 Stunden nach Genehmigung bearbeitet.",
+        "Mindestbetrag: {{minPayout}}. Krypto-Auszahlungen werden innerhalb von {{cryptoPayoutHours}} Stunden nach Genehmigung bearbeitet.",
       progressLabel: "Fortschritt bis zur Auszahlung",
       unlockedOf: "freigeschaltet von",
       viewHistory: "Verlauf anzeigen",
@@ -369,7 +369,7 @@ export const translations: typeof enTranslations = {
         previewCrypto: "Ihre Auszahlungsanfrage wird bearbeitet",
         previewCredits: "Ihre Credits wurden umgewandelt",
         bodyCrypto:
-          "Wir haben Ihre Auszahlungsanfrage erhalten. Krypto-Auszahlungen werden innerhalb von 48 Stunden nach Admin-Genehmigung bearbeitet.",
+          "Wir haben Ihre Auszahlungsanfrage erhalten. Krypto-Auszahlungen werden innerhalb von {{cryptoPayoutHours}} Stunden nach Admin-Genehmigung bearbeitet.",
         bodyCredits:
           "Ihre Empfehlungseinnahmen wurden sofort in Chat-Credits umgewandelt und Ihrem Konto gutgeschrieben.",
         followUpCrypto:
@@ -394,12 +394,17 @@ export const translations: typeof enTranslations = {
       },
     },
     errors: {
-      minimumAmount: "Mindestauszahlungsbetrag ist $40",
+      minimumAmount: "Mindestauszahlungsbetrag ist {{minPayout}}",
       walletRequired: "Wallet-Adresse für Krypto-Auszahlungen erforderlich",
       insufficientBalance: "Unzureichendes Guthaben für Auszahlung",
       notFound: "Auszahlungsanfrage nicht gefunden",
       invalidStatus:
         "Ungültiger Status der Auszahlungsanfrage für diesen Vorgang",
+    },
+    success: {
+      creditsConverted: "Credits erfolgreich umgewandelt",
+      payoutRequested:
+        "Auszahlungsanfrage eingereicht – Bearbeitung innerhalb von {{hours}} Stunden",
     },
   },
 

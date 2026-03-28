@@ -22,6 +22,7 @@ import type {
 } from "@/app/api/[locale]/user/auth/types";
 import meEndpoints from "@/app/api/[locale]/user/private/me/definition";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { configScopedTranslation } from "@/config/i18n";
 import { useTranslation } from "@/i18n/core/client";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 import { getUniqueLanguages } from "@/i18n/core/language-utils";
@@ -49,8 +50,9 @@ const CountrySelector: FC<CountrySelectorProps> = ({
     language,
     country,
     setLanguage,
-    t,
+    locale: currentLocale,
   } = useTranslation();
+  const { t } = configScopedTranslation.scopedT(currentLocale);
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"country" | "language">("country");
   const [tabHover, setTabHover] = useState<"country" | "language" | null>(null);
@@ -158,7 +160,7 @@ const CountrySelector: FC<CountrySelectorProps> = ({
             >
               {/* <GlobeIcon className="h-4 w-4" /> */}
               <Span className="text-sm">{currentCountry.flag}</Span>
-              {t("app.common.selector.country")}
+              {t("selector.country")}
             </TabsTrigger>
             <TabsTrigger
               value="language"
@@ -167,7 +169,7 @@ const CountrySelector: FC<CountrySelectorProps> = ({
               onMouseLeave={() => setTabHover(null)}
             >
               <Span className="text-sm">{currentLanguageFlag}</Span>
-              {t("app.common.selector.language")}
+              {t("selector.language")}
             </TabsTrigger>
           </TabsList>
 

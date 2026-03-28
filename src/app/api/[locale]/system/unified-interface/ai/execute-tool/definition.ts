@@ -58,7 +58,7 @@ const { POST } = createEndpoint({
     return undefined;
   },
   icon: "zap",
-  category: "app.endpointCategories.system",
+  category: "endpointCategories.system",
   tags: ["tools.get.tags.tools" as const],
   cli: {
     firstCliArgKey: "toolName",

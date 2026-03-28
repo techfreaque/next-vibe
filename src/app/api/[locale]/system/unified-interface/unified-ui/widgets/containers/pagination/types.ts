@@ -4,7 +4,7 @@
 
 import z from "zod";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { SpacingSize } from "../../../../shared/types/enums";
 import { FieldDataType, WidgetType } from "../../../../shared/types/enums";
@@ -77,28 +77,28 @@ const pageCountSchema = z.coerce.number();
 export interface PaginationWidgetConfig<
   TUsage extends FieldUsageConfig = { request: "data"; response: true },
 > extends BaseObjectWidgetConfig<
-  TranslationKey,
+  TranslatedKeyType,
   TUsage,
   "object",
   {
     page: NumberFieldWidgetConfig<
-      TranslationKey,
+      TranslatedKeyType,
       typeof pageSchema,
       { request: "data"; response?: never }
     >;
     limit: NumberFieldWidgetConfig<
-      TranslationKey,
+      TranslatedKeyType,
       typeof limitSchema,
       { request: "data"; response?: never }
     >;
     totalCount: TextWidgetConfig<
-      TranslationKey,
+      TranslatedKeyType,
       typeof totalCountSchema,
       { request?: undefined; response: true },
       "primitive"
     >;
     pageCount: TextWidgetConfig<
-      TranslationKey,
+      TranslatedKeyType,
       typeof pageCountSchema,
       { request?: undefined; response: true },
       "primitive"

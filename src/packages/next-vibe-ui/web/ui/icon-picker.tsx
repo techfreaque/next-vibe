@@ -15,6 +15,7 @@ import {
   type IconKey,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "../i18n";
 
 import { Button } from "./button";
 import { Dialog, DialogContent, DialogTrigger } from "./dialog";
@@ -54,7 +55,8 @@ export function IconPicker({
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   // Filter icons based on search query
   const filteredIcons = useMemo(() => {
@@ -94,7 +96,7 @@ export function IconPicker({
             disabled && "opacity-50 cursor-not-allowed",
             className,
           )}
-          title={t("app.ui.iconPicker.selectIcon")}
+          title={t("ui.iconPicker.selectIcon")}
         >
           {value ? (
             <Icon icon={value} className={iconSizeClasses[size]} />
@@ -113,10 +115,10 @@ export function IconPicker({
           {/* Header with search */}
           <Div className="flex flex-col gap-3 p-4 border-b bg-card shrink-0">
             <Span className="font-semibold text-sm">
-              {t("app.ui.iconPicker.title")}
+              {t("ui.iconPicker.title")}
             </Span>
             <Input
-              placeholder={t("app.ui.iconPicker.searchPlaceholder")}
+              placeholder={t("ui.iconPicker.searchPlaceholder")}
               value={searchQuery}
               onChange={(e): void => setSearchQuery(e.target.value)}
               className="h-9"

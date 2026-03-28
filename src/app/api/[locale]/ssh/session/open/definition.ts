@@ -30,7 +30,7 @@ export const { POST } = createEndpoint({
   title: "session.open.post.title" as const,
   description: "session.open.post.description" as const,
   icon: "terminal",
-  category: "app.endpointCategories.ssh",
+  category: "endpointCategories.ssh",
   allowedRoles: [UserRole.ADMIN],
   tags: ["category" as const],
 

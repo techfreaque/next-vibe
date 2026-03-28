@@ -21,7 +21,6 @@ import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { Platform } from "../shared/types/platform";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 
@@ -39,14 +38,10 @@ export function wrapSuccessResponse<TResponse>(
 /**
  * Builds a clean, human-readable error chain for logging and debugging
  */
-function buildErrorChain(
-  error: ErrorResponseType,
-  locale: CountryLanguage,
-): {
+function buildErrorChain(error: ErrorResponseType): {
   logChain: string[];
   humanReadable: string;
 } {
-  const { t } = simpleT(locale);
   const logChain: string[] = [];
   const humanReadableParts: string[] = [];
 
@@ -56,18 +51,14 @@ function buildErrorChain(
   while (currentError && !currentError.success && depth < 10) {
     // Prevent infinite loops
     const indent = "  ".repeat(depth);
-    const translatedMessage = t(
-      currentError.message,
-      currentError.messageParams,
-    );
 
     // For logging (includes error codes)
     logChain.push(
-      `${indent}${translatedMessage} [${currentError.errorType.errorKey} / ${currentError.errorType.errorCode}]`,
+      `${indent}${currentError.message} [${currentError.errorType.errorKey} / ${currentError.errorType.errorCode}]`,
     );
 
     // For human-readable output (clean and simple)
-    humanReadableParts.push(`${indent}${translatedMessage}`);
+    humanReadableParts.push(`${indent}${currentError.message}`);
 
     currentError = currentError.cause;
     depth++;
@@ -89,7 +80,7 @@ export function wrapErrorResponse(
   logger: EndpointLogger,
 ): NextResponse<ErrorResponseType> {
   // Build clean error chain
-  const { logChain } = buildErrorChain(error, locale);
+  const { logChain } = buildErrorChain(error);
 
   // Log the full error chain for debugging
   logger.error(`API Error:\n${logChain.join("\n")}`, {

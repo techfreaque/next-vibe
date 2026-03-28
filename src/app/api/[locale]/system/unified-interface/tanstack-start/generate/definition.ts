@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   title: "generate.post.title",
   description: "generate.post.description",
   icon: "zap",
-  category: "app.endpointCategories.systemDevTools",
+  category: "endpointCategories.systemDevTools",
   tags: ["generate.post.title"],
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF],
   aliases: ["generate:tanstack", "tanstack:generate"],

@@ -131,7 +131,7 @@ export interface EmailRenderProps<
   user: InferJwtPayloadTypeFromRoles<TUserRoles>;
   // Method shorthand - bivariant under strictFunctionTypes.
   // Allows a template with render(props: EmailRenderProps<..., NarrowKey>) to be
-  // assigned to EmailHandler.template which expects EmailRenderProps<..., TranslationKey>.
+  // assigned to EmailHandler.template which expects EmailRenderProps<..., string>.
   t(key: TScopedTranslationKey, params?: TParams): TranslatedKeyType;
   locale: CountryLanguage;
   logger: EndpointLogger;

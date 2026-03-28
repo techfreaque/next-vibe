@@ -38,7 +38,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "user",
-  category: "app.endpointCategories.userAuth",
+  category: "endpointCategories.userAuth",
   tags: ["tag" as const],
   allowedRoles: [
     UserRole.PUBLIC,
@@ -251,7 +251,7 @@ const { POST } = createEndpoint({
   title: "update.title" as const,
   description: "update.description" as const,
   icon: "user-check" as const,
-  category: "app.endpointCategories.userAuth",
+  category: "endpointCategories.userAuth",
   tags: ["tag" as const],
   allowedRoles: [
     UserRole.PUBLIC,
@@ -650,7 +650,7 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "user-x" as const,
-  category: "app.endpointCategories.userAuth",
+  category: "endpointCategories.userAuth",
   tags: ["tag" as const],
   allowedRoles: [
     UserRole.CUSTOMER,

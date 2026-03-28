@@ -8,8 +8,6 @@
 
 import type { JSX } from "react";
 
-import { useTranslation } from "@/i18n/core/client";
-
 import type {
   FormFieldGroupProps,
   FormSectionProps,
@@ -27,15 +25,13 @@ export function FormFieldGroup({
   description,
   className = "",
 }: FormFieldGroupProps): JSX.Element {
-  const { t } = useTranslation();
-
   return (
     <Div className={`space-y-4 ${className}`}>
       {title && (
         <Div className="space-y-1">
-          <H3 className="text-lg font-semibold">{t(title)}</H3>
+          <H3 className="text-lg font-semibold">{title}</H3>
           {description && (
-            <P className="text-sm text-muted-foreground">{t(description)}</P>
+            <P className="text-sm text-muted-foreground">{description}</P>
           )}
         </Div>
       )}
@@ -51,13 +47,11 @@ export function FormSection({
   completionStatus,
   className = "",
 }: FormSectionProps): JSX.Element {
-  const { t } = useTranslation();
-
   return (
     <Div className={`space-y-6 ${className}`}>
       <Div className="space-y-2">
         <Div className="flex items-center justify-between">
-          <H2 className="text-2xl font-bold">{t(title)}</H2>
+          <H2 className="text-2xl font-bold">{title}</H2>
           {completionStatus && (
             <Div className="flex items-center gap-2">
               <Span className="text-sm text-muted-foreground">
@@ -72,9 +66,7 @@ export function FormSection({
             </Div>
           )}
         </Div>
-        {description && (
-          <P className="text-muted-foreground">{t(description)}</P>
-        )}
+        {description && <P className="text-muted-foreground">{description}</P>}
       </Div>
       {children}
     </Div>

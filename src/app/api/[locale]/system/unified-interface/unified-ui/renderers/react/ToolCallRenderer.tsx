@@ -56,7 +56,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { NavigationStackProvider } from "../../../react/hooks/use-navigation-stack";
 import {
@@ -136,7 +135,6 @@ export function ToolCallRenderer({
   sendMessage,
 }: ToolCallRendererProps): JSX.Element {
   const { t } = reactScopedTranslation.scopedT(locale);
-  const { t: globalT } = simpleT(locale);
   const loadPlatform = platformOverride ?? Platform.NEXT_PAGE;
 
   // Determine if tool is waiting for user confirmation
@@ -360,17 +358,12 @@ export function ToolCallRenderer({
 
   /** Extract a displayable error message from toolCall.error or toolCall.result (when it's an ErrorResponseType) */
   const getErrorMessage = (): string => {
-    // Primary: toolCall.error is ErrorResponseType with typed TranslationKey message
     const err = toolCall.error;
     if (err) {
-      return globalT(
-        err.message,
-        err.messageParams as Record<string, string | number> | undefined,
-      );
+      return err.message;
     }
     // Fallback: toolCall.result is an ErrorResponseType (tool returned fail() without throwing).
     // Display the raw message string - it may be a translation key but ToolCallResult
-    // doesn't carry TranslationKey typing, so we display as-is.
     if (
       resultIsError &&
       typeof toolCall.result === "object" &&
@@ -518,10 +511,10 @@ export function ToolCallRenderer({
   const { displayName, icon } = resolveDisplay();
   const credits = definition?.credits ?? toolCall.creditsUsed ?? 0;
   const creditsDisplay = credits
-    ? globalT(
+    ? t(
         credits === 1
-          ? "app.chat.toolCall.creditsUsed_one"
-          : "app.chat.toolCall.creditsUsed_other",
+          ? "widgets.toolCall.creditsUsed_one"
+          : "widgets.toolCall.creditsUsed_other",
         { cost: credits },
       )
     : null;

@@ -32,7 +32,7 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "trash" as const,
-  category: "app.endpointCategories.userAuth",
+  category: "endpointCategories.userAuth",
   tags: ["tags.remoteConnection" as const],
   aliases: ["remote-disconnect", "disconnect-remote"] as const,
 

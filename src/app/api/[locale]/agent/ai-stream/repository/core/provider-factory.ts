@@ -7,6 +7,7 @@ import {
   type ModelOption,
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { createClaudeCode } from "../../providers/claude-code";
 import { createFalAiAudio } from "../../providers/fal-ai-audio";
@@ -70,6 +71,7 @@ export class ProviderFactory {
   static getProviderForModel(
     modelOption: ModelOption,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): ReturnType<
     | typeof createOpenRouter
     | typeof createUncensoredAI
@@ -100,19 +102,19 @@ export class ProviderFactory {
         return createVeniceAI(logger);
 
       case ApiProvider.OPENAI_IMAGES:
-        return createOpenAIImages(logger);
+        return createOpenAIImages(logger, locale);
 
       case ApiProvider.REPLICATE:
         if ("creditCostPerClip" in modelOption) {
-          return createReplicateAudio(logger, modelOption);
+          return createReplicateAudio(logger, modelOption, locale);
         }
-        return createReplicateImage(logger);
+        return createReplicateImage(logger, locale);
 
       case ApiProvider.FAL_AI:
         if ("creditCostPerClip" in modelOption) {
-          return createFalAiAudio(logger, modelOption);
+          return createFalAiAudio(logger, modelOption, locale);
         }
-        return createFalAiImage(logger);
+        return createFalAiImage(logger, locale);
 
       default: {
         // Custom fetch wrapper that normalizes request body for stable caching

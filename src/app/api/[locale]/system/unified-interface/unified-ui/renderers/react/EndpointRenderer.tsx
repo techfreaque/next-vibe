@@ -16,17 +16,23 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import type { JSX } from "react";
 import { useMemo } from "react";
-import type { DefaultValues, Path, UseFormReturn } from "react-hook-form";
-import type { UseFormProps } from "react-hook-form";
+import type {
+  DefaultValues,
+  Path,
+  UseFormProps,
+  UseFormReturn,
+} from "react-hook-form";
 import { useForm } from "react-hook-form";
 import type { ZodTypeAny } from "zod";
 
-import type { ContentBlock } from "@/app/api/[locale]/shared/types/response.schema";
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type {
+  ContentBlock,
+  ResponseType,
+} from "@/app/api/[locale]/shared/types/response.schema";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { useNavigationStack } from "../../../react/hooks/use-navigation-stack";
 import type { EndpointLogger } from "../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
@@ -99,9 +105,9 @@ export interface EndpointRendererProps<TEndpoint extends CreateApiEndpointAny> {
   /** Whether the form is submitting */
   isSubmitting?: boolean;
   /** Submit button text translation key (deprecated - use submitButton.text) */
-  submitButtonText?: TranslationKey;
+  submitButtonText?: TranslatedKeyType;
   /** Submit button loading text translation key (deprecated - use submitButton.loadingText) */
-  submitButtonLoadingText?: TranslationKey;
+  submitButtonLoadingText?: TranslatedKeyType;
   /** Submit button configuration */
   submitButton?: SubmitButtonConfig<
     TEndpoint["scopedTranslation"]["ScopedTranslationKey"]

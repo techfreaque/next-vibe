@@ -87,7 +87,7 @@ const { DELETE } = createEndpoint({
     return undefined;
   },
   icon: "trash" as const,
-  category: "app.endpointCategories.chatSkills",
+  category: "endpointCategories.chatSkills",
   tags: ["tags.skills" as const],
 
   aliases: [SKILL_DELETE_ALIAS],
@@ -287,7 +287,7 @@ const { PATCH } = createEndpoint({
     return undefined;
   },
   icon: "sparkles" as const,
-  category: "app.endpointCategories.chatSkills",
+  category: "endpointCategories.chatSkills",
   tags: ["tags.skills" as const],
 
   aliases: [SKILL_UPDATE_ALIAS],
@@ -309,7 +309,7 @@ const { PATCH } = createEndpoint({
           data.logger,
           (oldData) => {
             if (!oldData?.success) {
-              return oldData;
+              return undefined;
             }
 
             // If modelSelection changed, update the default variant's modelSelection in variants[]
@@ -702,7 +702,7 @@ const { GET } = createEndpoint({
     return undefined;
   },
   icon: "sparkles" as const,
-  category: "app.endpointCategories.chatSkills",
+  category: "endpointCategories.chatSkills",
   tags: ["tags.skills" as const],
 
   aliases: [SKILL_GET_ALIAS],

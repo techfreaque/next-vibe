@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["messenger", "inbox", "mark-read"],
   title: "title",
   description: "description",
-  category: "app.endpointCategories.messenger",
+  category: "endpointCategories.messenger",
   icon: "check-circle",
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],

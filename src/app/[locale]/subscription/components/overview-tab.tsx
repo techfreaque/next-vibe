@@ -35,6 +35,7 @@ import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
+import { scopedTranslation } from "@/app/[locale]/subscription/i18n";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -80,7 +81,8 @@ export function OverviewTab({
   onSwitchTab,
   envAvailability,
 }: OverviewTabProps): JSX.Element {
-  const { t } = useTranslation();
+  const { locale: currentLocale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(currentLocale);
   const [showLegacyModels, setShowLegacyModels] = useState(false);
 
   const products = productsRepository.getProducts(locale);
@@ -103,15 +105,12 @@ export function OverviewTab({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Info className="h-5 w-5" />
-            {t("app.subscription.subscription.overview.howItWorks.title")}
+            {t("subscription.overview.howItWorks.title")}
           </CardTitle>
           <CardDescription>
-            {t(
-              "app.subscription.subscription.overview.howItWorks.description",
-              {
-                subCredits: subscriptionCredits,
-              },
-            )}
+            {t("subscription.overview.howItWorks.description", {
+              subCredits: subscriptionCredits,
+            })}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -120,19 +119,14 @@ export function OverviewTab({
               <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5" />
               <Div>
                 <P className="font-medium text-amber-900 dark:text-amber-100">
-                  {t(
-                    "app.subscription.subscription.overview.howItWorks.expiring.title",
-                  )}
+                  {t("subscription.overview.howItWorks.expiring.title")}
                 </P>
                 <P className="text-sm text-amber-700 dark:text-amber-300">
-                  {t(
-                    "app.subscription.subscription.overview.howItWorks.expiring.description",
-                    {
-                      subPrice: formatPrice(subscriptionPrice, locale),
-                      subCredits: subscriptionCredits,
-                      modelCount: TOTAL_MODEL_COUNT,
-                    },
-                  )}
+                  {t("subscription.overview.howItWorks.expiring.description", {
+                    subPrice: formatPrice(subscriptionPrice, locale),
+                    subCredits: subscriptionCredits,
+                    modelCount: TOTAL_MODEL_COUNT,
+                  })}
                 </P>
               </Div>
             </Div>
@@ -141,19 +135,14 @@ export function OverviewTab({
               <Sparkles className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5" />
               <Div>
                 <P className="font-medium text-green-900 dark:text-green-100">
-                  {t(
-                    "app.subscription.subscription.overview.howItWorks.permanent.title",
-                  )}
+                  {t("subscription.overview.howItWorks.permanent.title")}
                 </P>
                 <P className="text-sm text-green-700 dark:text-green-300">
-                  {t(
-                    "app.subscription.subscription.overview.howItWorks.permanent.description",
-                    {
-                      packPrice: formatPrice(packPrice, locale),
-                      packCredits,
-                      subCredits: subscriptionCredits,
-                    },
-                  )}
+                  {t("subscription.overview.howItWorks.permanent.description", {
+                    packPrice: formatPrice(packPrice, locale),
+                    packCredits,
+                    subCredits: subscriptionCredits,
+                  })}
                 </P>
               </Div>
             </Div>
@@ -162,17 +151,12 @@ export function OverviewTab({
               <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
               <Div>
                 <P className="font-medium text-blue-900 dark:text-blue-100">
-                  {t(
-                    "app.subscription.subscription.overview.howItWorks.free.title",
-                  )}
+                  {t("subscription.overview.howItWorks.free.title")}
                 </P>
                 <P className="text-sm text-blue-700 dark:text-blue-300">
-                  {t(
-                    "app.subscription.subscription.overview.howItWorks.free.description",
-                    {
-                      count: freeCredits,
-                    },
-                  )}
+                  {t("subscription.overview.howItWorks.free.description", {
+                    count: freeCredits,
+                  })}
                 </P>
               </Div>
             </Div>
@@ -186,10 +170,10 @@ export function OverviewTab({
           <Div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <Div className="flex-1 text-center md:text-left">
               <H4 className="text-2xl font-bold mb-2">
-                {t("app.subscription.subscription.overview.cta.title")}
+                {t("subscription.overview.cta.title")}
               </H4>
               <P className="text-muted-foreground">
-                {t("app.subscription.subscription.overview.cta.description", {
+                {t("subscription.overview.cta.description", {
                   modelCount: TOTAL_MODEL_COUNT,
                 })}
               </P>
@@ -199,7 +183,7 @@ export function OverviewTab({
               onClick={onSwitchTab}
               className="group flex items-center gap-2 shadow-lg hover:shadow-xl transition-all"
             >
-              {t("app.subscription.subscription.overview.cta.button")}
+              {t("subscription.overview.cta.button")}
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Div>
@@ -211,10 +195,10 @@ export function OverviewTab({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Coins className="h-5 w-5" />
-            {t("app.subscription.subscription.overview.costs.title")}
+            {t("subscription.overview.costs.title")}
           </CardTitle>
           <CardDescription>
-            {t("app.subscription.subscription.overview.costs.description")}
+            {t("subscription.overview.costs.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -222,9 +206,7 @@ export function OverviewTab({
             <Div>
               <Div className="flex items-center justify-between mb-2">
                 <H4 className="font-semibold">
-                  {t(
-                    "app.subscription.subscription.overview.costs.models.title",
-                  )}
+                  {t("subscription.overview.costs.models.title")}
                 </H4>
                 <Button
                   variant="outline"
@@ -232,12 +214,8 @@ export function OverviewTab({
                   onClick={() => setShowLegacyModels(!showLegacyModels)}
                 >
                   {showLegacyModels
-                    ? t(
-                        "app.subscription.subscription.overview.costs.models.hideLegacy",
-                      )
-                    : t(
-                        "app.subscription.subscription.overview.costs.models.showLegacy",
-                      )}
+                    ? t("subscription.overview.costs.models.hideLegacy")
+                    : t("subscription.overview.costs.models.showLegacy")}
                 </Button>
               </Div>
               <Div className="flex flex-col gap-6">
@@ -285,7 +263,7 @@ export function OverviewTab({
                     <Div key={modelType}>
                       <H4 className="font-semibold mb-3 text-base">
                         {t(
-                          `app.subscription.subscription.overview.costs.models.types.${modelType}`,
+                          `subscription.overview.costs.models.types.${modelType}`,
                         )}
                       </H4>
                       <Div className="flex flex-col gap-4">
@@ -312,7 +290,7 @@ export function OverviewTab({
                                         <Span className="text-xs text-muted-foreground">
                                           (
                                           {t(
-                                            "app.subscription.subscription.overview.costs.models.legacyBadge",
+                                            "subscription.overview.costs.models.legacyBadge",
                                           )}
                                           )
                                         </Span>
@@ -339,81 +317,59 @@ export function OverviewTab({
 
             <Div>
               <H4 className="font-semibold mb-2">
-                {t(
-                  "app.subscription.subscription.overview.costs.features.title",
-                )}
+                {t("subscription.overview.costs.features.title")}
               </H4>
               <Div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                 <Div className="flex items-center gap-3 p-2 rounded bg-accent">
                   <Span>
-                    {t(
-                      "app.subscription.subscription.overview.costs.features.searchLabel",
-                    )}
+                    {t("subscription.overview.costs.features.searchLabel")}
                   </Span>
                   <Span className="font-mono">
-                    {t(
-                      "app.subscription.subscription.overview.costs.features.costFormat",
-                      {
-                        value: FEATURE_COSTS.BRAVE_SEARCH,
-                        unit: t(
-                          "app.subscription.subscription.overview.costs.features.creditsUnit",
-                        ),
-                      },
-                    )}
+                    {t("subscription.overview.costs.features.costFormat", {
+                      value: FEATURE_COSTS.BRAVE_SEARCH,
+                      unit: t(
+                        "subscription.overview.costs.features.creditsUnit",
+                      ),
+                    })}
                   </Span>
                 </Div>
                 <Div className="flex items-center gap-3 p-2 rounded bg-accent">
                   <Span>
-                    {t(
-                      "app.subscription.subscription.overview.costs.features.fetchUrlLabel",
-                    )}
+                    {t("subscription.overview.costs.features.fetchUrlLabel")}
                   </Span>
                   <Span className="font-mono">
-                    {t(
-                      "app.subscription.subscription.overview.costs.features.costFormat",
-                      {
-                        value: FEATURE_COSTS.FETCH_URL_CONTENT,
-                        unit: t(
-                          "app.subscription.subscription.overview.costs.features.creditsUnit",
-                        ),
-                      },
-                    )}
+                    {t("subscription.overview.costs.features.costFormat", {
+                      value: FEATURE_COSTS.FETCH_URL_CONTENT,
+                      unit: t(
+                        "subscription.overview.costs.features.creditsUnit",
+                      ),
+                    })}
                   </Span>
                 </Div>
                 <Div className="flex items-center gap-3 p-2 rounded bg-accent">
                   <Span>
-                    {t(
-                      "app.subscription.subscription.overview.costs.features.ttsLabel",
-                    )}
+                    {t("subscription.overview.costs.features.ttsLabel")}
                   </Span>
                   <Span className="font-mono">
-                    {t(
-                      "app.subscription.subscription.overview.costs.features.costFormat",
-                      {
-                        value: (FEATURE_COSTS.TTS * 1000).toFixed(2),
-                        unit: t(
-                          "app.subscription.subscription.overview.costs.features.creditsUnit",
-                        ),
-                      },
-                    )}
+                    {t("subscription.overview.costs.features.costFormat", {
+                      value: (FEATURE_COSTS.TTS * 1000).toFixed(2),
+                      unit: t(
+                        "subscription.overview.costs.features.creditsUnit",
+                      ),
+                    })}
                   </Span>
                 </Div>
                 <Div className="flex items-center gap-3 p-2 rounded bg-accent">
                   <Span>
-                    {t(
-                      "app.subscription.subscription.overview.costs.features.sttLabel",
-                    )}
+                    {t("subscription.overview.costs.features.sttLabel")}
                   </Span>
                   <Span className="font-mono">
-                    {t(
-                      "app.subscription.subscription.overview.costs.features.costFormat",
-                      {
-                        value: (FEATURE_COSTS.STT * 60).toFixed(2),
-                        unit: t(
-                          "app.subscription.subscription.overview.costs.features.creditsUnit",
-                        ),
-                      },
-                    )}
+                    {t("subscription.overview.costs.features.costFormat", {
+                      value: (FEATURE_COSTS.STT * 60).toFixed(2),
+                      unit: t(
+                        "subscription.overview.costs.features.creditsUnit",
+                      ),
+                    })}
                   </Span>
                 </Div>
               </Div>

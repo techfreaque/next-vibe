@@ -204,7 +204,6 @@ export function useWidgetEndpoint<
  * Hook to get translation function from context.
  * Pass the endpoint type to enforce scoped key validation:
  *   const t = useWidgetTranslation<typeof definition.GET>();
- * Without a type arg, uses TranslationKey (enforced by translationsKeyTypesafety flag).
  */
 export function useWidgetTranslation<
   TEndpoint extends CreateApiEndpointAny | never = never,

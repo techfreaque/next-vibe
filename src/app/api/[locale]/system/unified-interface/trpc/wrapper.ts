@@ -71,14 +71,12 @@ export function wrapToolsForTRPC<T extends EndpointDefinitionsConstraint>(
             result.errorType || ErrorResponseTypes.INTERNAL_ERROR;
 
           // Build error chain
-          const errorParts: string[] = [
-            ctx.t(result.message, result.messageParams),
-          ];
+          const errorParts: string[] = [result.message ?? ""];
           let currentCause = result.cause;
           let depth = 0;
           while (currentCause && !currentCause.success && depth < 10) {
             errorParts.push(
-              `${"  ".repeat(depth + 1)}${ctx.t(currentCause.message, currentCause.messageParams)}`,
+              `${"  ".repeat(depth + 1)}${currentCause.message ?? ""}`,
             );
             currentCause = currentCause.cause;
             depth++;

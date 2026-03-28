@@ -11,8 +11,8 @@ import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import { translations as configTranslations } from "@/config/i18n/en";

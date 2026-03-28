@@ -163,7 +163,7 @@ export const translations: typeof enTranslations = {
       availableBalance: "Dostępne saldo",
       availableBalanceDescription: "Dostępne saldo gotowe do wypłaty",
       availableBalanceDescriptionLow:
-        "Wydawaj na czaty AI - inne kredyty używane są najpierw. Zarobić $40, aby odblokować wypłatę.",
+        "Wydawaj na czaty AI - inne kredyty używane są najpierw. Zarobić {{minPayout}}, aby odblokować wypłatę.",
       totalRevenueCredits: "Łączny przychód (Kredyty)",
       totalEarnedCredits: "Łącznie zarobione (Kredyty)",
       totalPaidOutCredits: "Łącznie wypłacone (Kredyty)",
@@ -252,7 +252,7 @@ export const translations: typeof enTranslations = {
     updatedAt: "Zaktualizowano",
     referralCode: "Kod polecający",
     success:
-      "🎉 Twój kod polecający jest gotowy! Skopiuj poniższy link i zacznij zarabiać 20% prowizji od każdej subskrypcji.",
+      "🎉 Twój kod polecający jest gotowy! Skopiuj poniższy link i zacznij zarabiać {{directPct}} prowizji od każdej subskrypcji – plus bonusowe zarobki z ich poleceń.",
     message: "Wiadomość",
   },
 
@@ -354,7 +354,7 @@ export const translations: typeof enTranslations = {
       cryptoPayoutDesc:
         "Poproś o wypłatę w BTC lub USDC na swój adres portfela.",
       minimumNote:
-        "Minimalna wypłata: 40 $. Wypłaty krypto są przetwarzane w ciągu 48 godzin po zatwierdzeniu.",
+        "Minimalna wypłata: {{minPayout}}. Wypłaty krypto są przetwarzane w ciągu {{cryptoPayoutHours}} godzin po zatwierdzeniu.",
       progressLabel: "Postęp do wypłaty",
       unlockedOf: "odblokowano z",
       viewHistory: "Zobacz historię",
@@ -368,7 +368,7 @@ export const translations: typeof enTranslations = {
         previewCrypto: "Twoje żądanie wypłaty jest przetwarzane",
         previewCredits: "Twoje kredyty zostały przeliczone",
         bodyCrypto:
-          "Otrzymaliśmy Twoje żądanie wypłaty. Wypłaty krypto są przetwarzane w ciągu 48 godzin po zatwierdzeniu przez administratora.",
+          "Otrzymaliśmy Twoje żądanie wypłaty. Wypłaty krypto są przetwarzane w ciągu {{cryptoPayoutHours}} godzin po zatwierdzeniu przez administratora.",
         bodyCredits:
           "Twoje zarobki z poleceń zostały natychmiast przeliczone na kredyty czatu i dodane do Twojego konta.",
         followUpCrypto:
@@ -392,11 +392,16 @@ export const translations: typeof enTranslations = {
       },
     },
     errors: {
-      minimumAmount: "Minimalna kwota wypłaty to $40",
+      minimumAmount: "Minimalna kwota wypłaty to {{minPayout}}",
       walletRequired: "Adres portfela wymagany dla wypłat krypto",
       insufficientBalance: "Niewystarczające saldo do wypłaty",
       notFound: "Nie znaleziono żądania wypłaty",
       invalidStatus: "Nieprawidłowy status żądania wypłaty dla tej operacji",
+    },
+    success: {
+      creditsConverted: "Kredyty zostały pomyślnie przeliczone",
+      payoutRequested:
+        "Żądanie wypłaty zostało złożone – przetwarzanie w ciągu {{hours}} godzin",
     },
   },
 

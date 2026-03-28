@@ -33,7 +33,7 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "refresh-cw" as const,
-  category: "app.endpointCategories.userAuth",
+  category: "endpointCategories.userAuth",
   tags: ["tags.remoteConnection" as const],
   aliases: ["remote-reauth", "reauth-connection"] as const,
 

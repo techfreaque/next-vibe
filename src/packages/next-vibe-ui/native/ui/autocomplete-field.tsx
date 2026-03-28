@@ -7,6 +7,7 @@ import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text as RNText, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
 import type {
   AutocompleteFieldProps,
   AutocompleteOption,
@@ -36,11 +37,12 @@ export function AutocompleteField({
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isCustomValue, setIsCustomValue] = useState(false);
-  const { t: globalT } = useTranslation();
+  const { locale } = useTranslation();
+  const { t: globalT } = uiScopedTranslation.scopedT(locale);
 
   // Group options by category
   const groupedOptions = useMemo(() => {
-    const groups: Record<string, AutocompleteOption<string>[]> = {};
+    const groups: Record<string, AutocompleteOption[]> = {};
 
     options.forEach((option) => {
       const category = option.category || "other";
@@ -59,7 +61,7 @@ export function AutocompleteField({
       return groupedOptions;
     }
 
-    const filtered: Record<string, AutocompleteOption<string>[]> = {};
+    const filtered: Record<string, AutocompleteOption[]> = {};
 
     Object.entries(groupedOptions).forEach(([category, categoryOptions]) => {
       const matchingOptions = categoryOptions.filter(
@@ -129,11 +131,7 @@ export function AutocompleteField({
             <View className="flex-1 flex-row items-center gap-2 min-w-0">
               {isCustomValue && (
                 <Badge variant="secondary" className="text-xs">
-                  <UIText>
-                    {globalT(
-                      "packages.nextVibeUi.native.ui.autocompleteField.custom",
-                    )}
-                  </UIText>
+                  <UIText>{globalT("common.customValue")}</UIText>
                 </Badge>
               )}
               <RNText
@@ -183,9 +181,7 @@ export function AutocompleteField({
               {Object.keys(filteredGroups).length === 0 ? (
                 <View className="py-6 text-center">
                   <UIText className="text-sm text-muted-foreground text-center">
-                    {globalT(
-                      "packages.nextVibeUi.native.ui.autocompleteField.noOptionsFound",
-                    )}
+                    {globalT("common.noOptionsFound")}
                   </UIText>
                   {allowCustom && searchValue && (
                     <Pressable
@@ -193,12 +189,9 @@ export function AutocompleteField({
                       className="mt-2 items-center"
                     >
                       <UIText className="text-sm text-primary">
-                        {globalT(
-                          "packages.nextVibeUi.native.ui.autocompleteField.use",
-                          {
-                            value: searchValue,
-                          },
-                        )}
+                        {globalT("common.useCustomValue", {
+                          value: searchValue,
+                        })}
                       </UIText>
                     </Pressable>
                   )}
@@ -240,12 +233,9 @@ export function AutocompleteField({
                       className="flex-row items-center rounded-sm px-2 py-2 active:bg-accent"
                     >
                       <UIText className="text-base">
-                        {globalT(
-                          "packages.nextVibeUi.native.ui.autocompleteField.use",
-                          {
-                            value: searchValue,
-                          },
-                        )}
+                        {globalT("common.useCustomValue", {
+                          value: searchValue,
+                        })}
                       </UIText>
                     </Pressable>
                   </View>

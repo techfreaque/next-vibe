@@ -38,7 +38,7 @@ const { POST } = createEndpoint({
   path: ["system", "check", "vibe-check"],
   title: "title",
   description: "description",
-  category: "app.endpointCategories.systemDevTools",
+  category: "endpointCategories.systemDevTools",
   tags: ["tag"],
   icon: "wrench",
   allowedRoles: [

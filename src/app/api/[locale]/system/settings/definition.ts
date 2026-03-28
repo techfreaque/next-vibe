@@ -138,7 +138,7 @@ export const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "settings" as const,
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   tags: ["get.tags.settings" as const],
   aliases: ["system-settings", "settings"] as const,
 
@@ -286,7 +286,7 @@ export const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "settings" as const,
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   tags: ["patch.tags.settings" as const],
   aliases: ["init", "set-setting"] as const,
 

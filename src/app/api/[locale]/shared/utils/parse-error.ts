@@ -1,6 +1,7 @@
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 
-import type { TParams, TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams } from "@/i18n/core/static-types";
 
 /**
  * Custom error class that preserves error type and translation parameters
@@ -8,12 +9,12 @@ import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 class ApiError extends Error {
   errorType?: string;
   messageParams?: TParams;
-  translationKey?: TranslationKey;
+  translationKey?: TranslatedKeyType;
 
   constructor(options: {
     errorType: string;
     messageParams?: TParams;
-    translationKey: TranslationKey;
+    translationKey: TranslatedKeyType;
   }) {
     super(options.translationKey);
     this.name = "ApiError" as const;

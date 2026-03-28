@@ -45,7 +45,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "settings" as const,
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   tags: ["tags.taskSync" as const],
   aliases: ["task-sync-settings", "sync-settings"] as const,
 
@@ -129,7 +129,7 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "settings" as const,
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   tags: ["tags.taskSync" as const],
   aliases: ["update-sync-settings", "toggle-sync"] as const,
 

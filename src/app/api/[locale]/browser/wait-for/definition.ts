@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["browser", "wait-for"],
   title: "wait-for.title",
   description: "wait-for.description",
-  category: "app.endpointCategories.browser",
+  category: "endpointCategories.browser",
   icon: "clock",
   tags: ["wait-for.tags.browserAutomation", "wait-for.tags.waitAutomation"],
 

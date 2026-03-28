@@ -10,6 +10,8 @@ import React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
+
 import type {
   BreadcrumbEllipsisProps,
   BreadcrumbItemProps,
@@ -21,8 +23,7 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/breadcrumb";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { styledNative } from "../utils/style-converter";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
 const StyledView = styled(View, { className: "style" });
 const StyledPressable = styledNative(Pressable);
@@ -32,14 +33,11 @@ export function Breadcrumb({
   style,
   children,
 }: BreadcrumbProps): React.JSX.Element {
-  const { t } = useTranslation();
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <StyledView
-      accessibilityLabel={t(
-        "packages.nextVibeUi.native.ui.breadcrumb.navigation",
-      )}
+      accessibilityLabel="navigation"
       {...applyStyleType({
         nativeStyle,
         className: cn(className),
@@ -218,7 +216,8 @@ export function BreadcrumbEllipsis({
   style,
   "aria-label": ariaLabel,
 }: BreadcrumbEllipsisProps): React.JSX.Element {
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
@@ -231,7 +230,7 @@ export function BreadcrumbEllipsis({
     >
       <RNText className={cn("text-muted-foreground")}>...</RNText>
       <RNText className={cn("sr-only")}>
-        {t("app.common.accessibility.srOnly.more")}
+        {t("common.accessibility.srOnly.more")}
       </RNText>
     </StyledView>
   );

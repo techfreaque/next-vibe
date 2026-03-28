@@ -31,7 +31,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   title: "title",
   description: "description",
-  category: "app.endpointCategories.systemDatabase",
+  category: "endpointCategories.systemDatabase",
   tags: ["tag"],
   icon: "database",
   allowedRoles: [

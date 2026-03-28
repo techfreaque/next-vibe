@@ -33,7 +33,7 @@ const { POST } = createEndpoint({
   title: "speechToText.hotkey.post.title" as const,
   description: "speechToText.hotkey.post.description" as const,
   icon: "mic",
-  category: "app.endpointCategories.ai",
+  category: "endpointCategories.ai",
   tags: [
     "chat.tags.speech" as const,
     "chat.tags.hotkey" as const,

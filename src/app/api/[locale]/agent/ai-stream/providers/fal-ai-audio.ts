@@ -15,9 +15,10 @@ import {
   type ModelOptionAudioBased,
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { MUSIC_DURATION_SECONDS } from "../../music-generation/enum";
+import { scopedTranslation } from "./i18n";
 import {
   createMediaProvider,
   readStringOption,
@@ -43,14 +44,16 @@ export async function generateMusicWithFalAi(params: {
   prompt: string;
   durationSeconds: number;
   logger: EndpointLogger;
+  locale: CountryLanguage;
   signal?: AbortSignal;
 }): Promise<ResponseType<{ audioUrl: string }>> {
-  const { providerModel, prompt, durationSeconds, logger, signal } = params;
+  const { providerModel, prompt, durationSeconds, logger, locale, signal } =
+    params;
+  const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.FAL_AI_API_KEY) {
     return fail({
-      // eslint-disable-next-line i18next/no-literal-string
-      message: "Fal.ai API key not configured" as TranslationKey,
+      message: t("errors.apiKeyNotConfigured"),
       errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
@@ -82,7 +85,7 @@ export async function generateMusicWithFalAi(params: {
         error: errorText,
       });
       return fail({
-        message: `Fal.ai error: ${errorText}` as TranslationKey,
+        message: t("errors.externalServiceError", { message: errorText }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -94,8 +97,7 @@ export async function generateMusicWithFalAi(params: {
     for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
       if (signal?.aborted) {
         return fail({
-          // eslint-disable-next-line i18next/no-literal-string
-          message: "Request aborted" as TranslationKey,
+          message: t("errors.requestAborted"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
@@ -126,8 +128,9 @@ export async function generateMusicWithFalAi(params: {
         );
         if (!resultResponse.ok) {
           return fail({
-            // eslint-disable-next-line i18next/no-literal-string
-            message: "Failed to fetch Fal.ai result" as TranslationKey,
+            message: t("errors.requestFailed", {
+              message: String(resultResponse.status),
+            }),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
@@ -135,8 +138,7 @@ export async function generateMusicWithFalAi(params: {
         const audioUrl = result.audio?.url;
         if (!audioUrl) {
           return fail({
-            // eslint-disable-next-line i18next/no-literal-string
-            message: "No audio URL in Fal.ai response" as TranslationKey,
+            message: t("errors.noAudioUrl"),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
@@ -146,8 +148,7 @@ export async function generateMusicWithFalAi(params: {
 
       if (statusData.status === "FAILED") {
         return fail({
-          // eslint-disable-next-line i18next/no-literal-string
-          message: "Fal.ai music generation failed" as TranslationKey,
+          message: t("errors.generationFailed"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
@@ -159,15 +160,14 @@ export async function generateMusicWithFalAi(params: {
     }
 
     return fail({
-      // eslint-disable-next-line i18next/no-literal-string
-      message: "Fal.ai request timed out after 90 seconds" as TranslationKey,
+      message: t("errors.requestTimedOut"),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   } catch (error) {
     const errorMessage = parseError(error).message;
     logger.error("[Fal.ai Music] Request failed", { error: errorMessage });
     return fail({
-      message: errorMessage as TranslationKey,
+      message: t("errors.requestFailed", { message: errorMessage }),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   }
@@ -176,6 +176,7 @@ export async function generateMusicWithFalAi(params: {
 export function createFalAiAudio(
   logger: EndpointLogger,
   modelConfig: ModelOptionAudioBased,
+  locale: CountryLanguage,
 ): { chat: (modelId: string) => LanguageModelV2 } {
   return createMediaProvider(logger, {
     provider: ApiProvider.FAL_AI,
@@ -196,6 +197,7 @@ export function createFalAiAudio(
         prompt,
         durationSeconds,
         logger,
+        locale,
         signal: options.abortSignal,
       });
     },

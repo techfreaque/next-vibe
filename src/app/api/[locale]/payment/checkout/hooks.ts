@@ -20,6 +20,7 @@ import { useCallback } from "react";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { configScopedTranslation } from "@/config/i18n";
 import { useTranslation } from "@/i18n/core/client";
 
 import type {
@@ -45,7 +46,8 @@ export function useSubscriptionCheckout(
   user: JwtPayloadType,
 ): EndpointReturn<typeof checkoutEndpoints> {
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = configScopedTranslation.scopedT(locale);
 
   // Success callback for subscription checkout
   const handleCheckoutSuccess = useCallback(
@@ -65,7 +67,7 @@ export function useSubscriptionCheckout(
               error: errorMessage,
             });
             toast({
-              title: t("app.common.error.title"),
+              title: t("error.title"),
               description: errorMessage,
               variant: "destructive",
             });
@@ -78,8 +80,8 @@ export function useSubscriptionCheckout(
       } catch (error) {
         logger.error("Payment checkout processing failed", parseError(error));
         toast({
-          title: t("app.common.error.title"),
-          description: t("app.common.error.description"),
+          title: t("error.title"),
+          description: t("error.description"),
           variant: "destructive",
         });
       }

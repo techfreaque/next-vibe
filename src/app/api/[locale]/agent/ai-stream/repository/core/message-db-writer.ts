@@ -20,7 +20,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import {
   chatMessages,
@@ -903,7 +903,7 @@ export class MessageDbWriter {
     parentId: string | null;
     sequenceId: string | null;
     userId: string | undefined;
-    content?: TranslationKey;
+    content?: TranslatedKeyType;
   }): Promise<void> {
     const { threadId, errorType, error, parentId, sequenceId, userId } = params;
     const errorMessageId = crypto.randomUUID();

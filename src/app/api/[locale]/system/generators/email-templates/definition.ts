@@ -26,7 +26,7 @@ const { POST } = createEndpoint({
   path: ["system", "generators", "email-templates"],
   title: "post.title" as const,
   description: "post.description" as const,
-  category: "app.endpointCategories.systemDevTools",
+  category: "endpointCategories.systemDevTools",
   tags: ["post.title" as const],
   icon: "mail",
   allowedRoles: [

@@ -22,7 +22,7 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type {
   EmailCampaignStageValue,
@@ -114,7 +114,7 @@ interface SmtpAccountShape {
 
 interface TestConnectionResult {
   success: boolean;
-  message: TranslationKey;
+  message: TranslatedKeyType;
 }
 
 /**

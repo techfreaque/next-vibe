@@ -29,7 +29,7 @@ const { DELETE } = createEndpoint({
   title: "revoke.title",
   description: "revoke.description",
   icon: "trash",
-  category: "app.endpointCategories.userAuth",
+  category: "endpointCategories.userAuth",
   tags: ["revoke.tag"],
   allowedRoles: [
     UserRole.CUSTOMER,

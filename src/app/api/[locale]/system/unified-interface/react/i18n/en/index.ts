@@ -43,6 +43,13 @@ export const translations = {
       requiresContext:
         "Form field requires form context and field configuration",
     },
+    rangeSlider: {
+      min: "Min",
+      max: "Max",
+    },
+    error: {
+      title: "Error",
+    },
     filterPills: {
       requiresContext:
         "Filter pills widget requires form context and field name",

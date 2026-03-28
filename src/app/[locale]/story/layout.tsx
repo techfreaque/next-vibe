@@ -19,8 +19,8 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { navItems } from "../story/_components/nav/nav-constants";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { navItems } from "../story/_components/nav/nav-constants";
 
 export interface SiteLayoutData {
   locale: CountryLanguage;

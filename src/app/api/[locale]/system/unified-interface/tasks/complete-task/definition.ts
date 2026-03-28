@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
   title: "completeTask.post.title",
   description: "completeTask.post.description",
   icon: "check-circle",
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   tags: ["tags.tasks" as const],
   allowedRoles: [
     UserRole.ADMIN,

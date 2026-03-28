@@ -73,7 +73,7 @@ const { GET } = createEndpoint({
     return undefined;
   },
   icon: "sparkles" as const,
-  category: "app.endpointCategories.chatSkills",
+  category: "endpointCategories.chatSkills",
   tags: ["tags.skills" as const],
 
   options: {},

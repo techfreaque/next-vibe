@@ -40,6 +40,7 @@ import CountrySelector from "@/app/[locale]/_components/country-selector";
 import { ThemeToggle } from "@/app/[locale]/_components/theme-toggle";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserGetResponseOutput } from "@/app/api/[locale]/users/user/[id]/definition";
+import { scopedTranslation } from "@/app/[locale]/admin/_components/i18n";
 import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -68,116 +69,117 @@ export function AdminLayoutClient({
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-  const { t } = useTranslation();
+  const { locale: currentLocale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(currentLocale);
 
   const allNavigation = [
     {
-      name: t("app.admin.components.navigation.dashboard"),
+      name: t("navigation.dashboard"),
       href: `/${locale}/admin` as const,
       icon: Home,
       current: pathname === `/${locale}/admin`,
       hidden: false,
     },
     {
-      name: t("app.admin.components.navigation.leadManagement"),
+      name: t("navigation.leadManagement"),
       href: `/${locale}/admin/leads` as const,
       icon: Users,
       current: pathname.startsWith(`/${locale}/admin/leads`),
       hidden: envClient.NEXT_PUBLIC_LOCAL_MODE,
     },
     {
-      name: t("app.admin.components.navigation.emailCampaigns"),
+      name: t("navigation.emailCampaigns"),
       href: `/${locale}/admin/messenger/campaigns` as const,
       icon: Send,
       current: pathname.startsWith(`/${locale}/admin/messenger/campaigns`),
       hidden: envClient.NEXT_PUBLIC_LOCAL_MODE,
     },
     {
-      name: t("app.admin.components.navigation.users"),
+      name: t("navigation.users"),
       href: `/${locale}/admin/users` as const,
       icon: Users,
       current: pathname.startsWith(`/${locale}/admin/users`),
       hidden: false,
     },
     {
-      name: t("app.admin.components.navigation.emails"),
+      name: t("navigation.emails"),
       href: `/${locale}/admin/messenger` as const,
       icon: Mail,
       current: pathname.startsWith(`/${locale}/admin/messenger`),
       hidden: false,
     },
     {
-      name: t("app.admin.components.navigation.cronTasks"),
+      name: t("navigation.cronTasks"),
       href: `/${locale}/admin/cron` as const,
       icon: Clock,
       current: pathname.startsWith(`/${locale}/admin/cron`),
       hidden: false,
     },
     {
-      name: t("app.admin.components.navigation.sshAccess"),
+      name: t("navigation.sshAccess"),
       href: `/${locale}/admin/ssh` as const,
       icon: Terminal,
       current: pathname.startsWith(`/${locale}/admin/ssh`),
       hidden: false,
     },
     {
-      name: t("app.admin.components.navigation.remoteConnections"),
+      name: t("navigation.remoteConnections"),
       href: `/${locale}/admin/remote` as const,
       icon: Link2,
       current: pathname.startsWith(`/${locale}/admin/remote`),
       hidden: false,
     },
     {
-      name: t("app.admin.components.navigation.vibeSense"),
+      name: t("navigation.vibeSense"),
       href: `/${locale}/admin/vibe-sense` as const,
       icon: Activity,
       current: pathname.startsWith(`/${locale}/admin/vibe-sense`),
       hidden: false,
     },
     {
-      name: t("app.admin.components.navigation.endpoints"),
+      name: t("navigation.endpoints"),
       href: `/${locale}/admin/endpoints` as const,
       icon: Zap,
       current: pathname.startsWith(`/${locale}/admin/endpoints`),
       hidden: false,
     },
     {
-      name: t("app.admin.components.navigation.vibeFrame"),
+      name: t("navigation.vibeFrame"),
       href: `/${locale}/admin/vibe-frame` as const,
       icon: Frame,
       current: pathname.startsWith(`/${locale}/admin/vibe-frame`),
       hidden: false,
     },
     {
-      name: t("app.admin.components.navigation.memories"),
+      name: t("navigation.memories"),
       href: `/${locale}/admin/memories` as const,
       icon: Brain,
       current: pathname.startsWith(`/${locale}/admin/memories`),
       hidden: false,
     },
     {
-      name: t("app.admin.components.navigation.errorMonitor"),
+      name: t("navigation.errorMonitor"),
       href: `/${locale}/admin/error-monitor` as const,
       icon: AlertTriangle,
       current: pathname.startsWith(`/${locale}/admin/error-monitor`),
       hidden: false,
     },
     {
-      name: t("app.admin.components.navigation.skillsModeration"),
+      name: t("navigation.skillsModeration"),
       href: `/${locale}/admin/skills-moderation` as const,
       icon: Shield,
       current: pathname.startsWith(`/${locale}/admin/skills-moderation`),
       hidden: false,
     },
     {
-      name: t("app.admin.components.navigation.referralPayouts"),
+      name: t("navigation.referralPayouts"),
       href: `/${locale}/admin/referral` as const,
       icon: Coins,
       current: pathname.startsWith(`/${locale}/admin/referral`),
       hidden: false,
     },
     {
-      name: t("app.admin.components.navigation.settings"),
+      name: t("navigation.settings"),
       href: `/${locale}/admin/settings` as const,
       icon: Settings,
       current: pathname.startsWith(`/${locale}/admin/settings`),
@@ -217,8 +219,8 @@ export function AdminLayoutClient({
                 <Shield className="h-7 w-7 text-primary shrink-0" />
                 <Span className="text-lg font-bold text-foreground">
                   {isMobile
-                    ? t("app.admin.components.navigation.admin")
-                    : t("app.admin.components.navigation.adminPanel")}
+                    ? t("navigation.admin")
+                    : t("navigation.adminPanel")}
                 </Span>
               </Div>
               {isMobile ? (
@@ -302,7 +304,7 @@ export function AdminLayoutClient({
                   {userData.privateName}
                 </Span>
                 <Span className="text-xs text-foreground/50 truncate">
-                  {t("app.admin.components.navigation.administrator")}
+                  {t("navigation.administrator")}
                 </Span>
               </Div>
             )}
@@ -370,7 +372,7 @@ export function AdminLayoutClient({
           <Div className="flex flex-1 items-center justify-between px-4 lg:px-6 gap-4">
             <H1 className="text-base font-semibold text-foreground truncate">
               {navigation.find((item) => item.current)?.name ??
-                t("app.admin.components.navigation.adminDashboard")}
+                t("navigation.adminDashboard")}
             </H1>
 
             <Div className="flex items-center gap-2 shrink-0">
@@ -380,7 +382,7 @@ export function AdminLayoutClient({
                 href={`/${locale}/threads`}
                 className="hidden sm:inline-flex text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent"
               >
-                {t("app.admin.components.navigation.backToApp")}
+                {t("navigation.backToApp")}
               </Link>
             </Div>
           </Div>

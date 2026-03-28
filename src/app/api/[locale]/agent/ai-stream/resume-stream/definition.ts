@@ -48,7 +48,7 @@ const { POST } = createEndpoint({
   title: "resumeStream.post.title",
   description: "resumeStream.post.description",
   icon: "play",
-  category: "app.endpointCategories.ai",
+  category: "endpointCategories.ai",
   tags: ["tags.ai", "tags.chat"],
 
   fields: objectField(scopedTranslation, {

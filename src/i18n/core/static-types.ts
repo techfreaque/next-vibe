@@ -1,10 +1,5 @@
 import type { ExplicitObjectType } from "next-vibe/shared/types/utils";
 
-import type { translationsKeyTypesafety } from "@/config/debug";
-
-import type { TranslationSchema } from "./config";
-import type { TranslatedKeyType } from "./scoped-translation";
-
 export interface TranslationElement {
   [key: string]: string | number | string[] | TranslationElement;
 }
@@ -22,33 +17,7 @@ export type DotNotation<T> = (
   ? Extract<D, string>
   : never;
 
-// Type for all possible translation keys
-export type TranslationKey = typeof translationsKeyTypesafety extends true
-  ? _TranslationKey
-  : string;
-type _TranslationKey = DotNotation<TranslationSchema> | TranslatedKeyType;
-
-// Utility type to get the type of a value at a specific path
-type PathValue<T, P extends string> = P extends `${infer K}.${infer Rest}`
-  ? K extends keyof T
-    ? PathValue<T[K], Rest>
-    : never
-  : P extends keyof T
-    ? T[P]
-    : never;
-
-// Type for getting the value type of a translation key
-export type TranslationValue<K extends TranslationKey> = PathValue<
-  TranslationSchema,
-  K
->;
-
 export type TParams = Record<string, string | number>;
-export type TFunction = <K extends TranslationKey>(
-  key: K,
-  params?: TParams,
-) => string;
-
 /**
  * Utility type to extract the scoped key type from a scopedT function or scoped translation object
  *

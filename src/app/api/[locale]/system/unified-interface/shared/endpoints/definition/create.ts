@@ -14,6 +14,7 @@
 
 import type { z } from "zod";
 
+import type { AppLocaleTranslationKey } from "@/app/[locale]/i18n";
 import type {
   ApiFormOptions,
   ApiMutationOptions,
@@ -44,7 +45,7 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams, TranslationKey } from "@/i18n/core/static-types";
+import type { TParams } from "@/i18n/core/static-types";
 
 import type { EventSchemas } from "../../../websocket/types";
 import type { EndpointLogger } from "../../logger/endpoint";
@@ -247,7 +248,7 @@ export interface ApiEndpoint<
     };
   };
 
-  readonly category: TranslationKey;
+  readonly category: AppLocaleTranslationKey;
   readonly tags: readonly NoInfer<TScopedTranslationKey>[];
 
   /**
@@ -576,7 +577,7 @@ export function createEndpoint<
   const TMethod extends Methods,
   const TUserRoleValue extends readonly UserRoleValue[],
   const TEvents extends EventSchemas | never,
-  TScopedTranslationKey extends string = TranslationKey,
+  TScopedTranslationKey extends string,
   const TFields extends UnifiedField<
     TScopedTranslationKey,
     z.ZodTypeAny,

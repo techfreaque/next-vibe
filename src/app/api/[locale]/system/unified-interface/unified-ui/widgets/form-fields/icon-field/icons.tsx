@@ -19,7 +19,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { UITranslationKey } from "next-vibe-ui/i18n";
 
 /**
  * Type for React components that accept className prop
@@ -589,11 +589,11 @@ export const Icon: React.FC<{
  */
 export const ICON_CATEGORIES = {
   all: {
-    name: "app.ui.iconPicker.categories.all",
+    name: "ui.iconPicker.categories.all",
     icons: Object.keys(ICON_REGISTRY) as IconKey[],
   },
   general: {
-    name: "app.ui.iconPicker.categories.general",
+    name: "ui.iconPicker.categories.general",
     icons: [
       "folder",
       "folder-open",
@@ -675,7 +675,7 @@ export const ICON_CATEGORIES = {
     ],
   },
   ai: {
-    name: "app.ui.iconPicker.categories.ai",
+    name: "ui.iconPicker.categories.ai",
     icons: [
       "brain",
       "bot",
@@ -698,7 +698,7 @@ export const ICON_CATEGORIES = {
     ],
   },
   education: {
-    name: "app.ui.iconPicker.categories.education",
+    name: "ui.iconPicker.categories.education",
     icons: [
       "book",
       "book-open",
@@ -712,7 +712,7 @@ export const ICON_CATEGORIES = {
     ],
   },
   communication: {
-    name: "app.ui.iconPicker.categories.communication",
+    name: "ui.iconPicker.categories.communication",
     icons: [
       "message-square",
       "message-circle",
@@ -741,7 +741,7 @@ export const ICON_CATEGORIES = {
     ],
   },
   science: {
-    name: "app.ui.iconPicker.categories.science",
+    name: "ui.iconPicker.categories.science",
     icons: [
       "rocket",
       "lightbulb",
@@ -755,7 +755,7 @@ export const ICON_CATEGORIES = {
     ],
   },
   arts: {
-    name: "app.ui.iconPicker.categories.arts",
+    name: "ui.iconPicker.categories.arts",
     icons: [
       "music",
       "palette",
@@ -777,7 +777,7 @@ export const ICON_CATEGORIES = {
     ],
   },
   finance: {
-    name: "app.ui.iconPicker.categories.finance",
+    name: "ui.iconPicker.categories.finance",
     icons: [
       "dollar-sign",
       "trending-up",
@@ -803,7 +803,7 @@ export const ICON_CATEGORIES = {
     ],
   },
   lifestyle: {
-    name: "app.ui.iconPicker.categories.lifestyle",
+    name: "ui.iconPicker.categories.lifestyle",
     icons: [
       "coffee",
       "utensils",
@@ -821,7 +821,7 @@ export const ICON_CATEGORIES = {
     ],
   },
   security: {
-    name: "app.ui.iconPicker.categories.security",
+    name: "ui.iconPicker.categories.security",
     icons: [
       "lock",
       "key",
@@ -834,7 +834,7 @@ export const ICON_CATEGORIES = {
     ],
   },
   programming: {
-    name: "app.ui.iconPicker.categories.programming",
+    name: "ui.iconPicker.categories.programming",
     icons: [
       "si-javascript",
       "si-typescript",
@@ -854,7 +854,7 @@ export const ICON_CATEGORIES = {
     ],
   },
   platforms: {
-    name: "app.ui.iconPicker.categories.platforms",
+    name: "ui.iconPicker.categories.platforms",
     icons: [
       "si-linux",
       "si-apple",
@@ -871,7 +871,7 @@ export const ICON_CATEGORIES = {
     ],
   },
   aiProviders: {
-    name: "app.ui.iconPicker.categories.aiProviders",
+    name: "ui.iconPicker.categories.aiProviders",
     icons: [
       "si-anthropic",
       "si-bytedance",
@@ -886,11 +886,11 @@ export const ICON_CATEGORIES = {
     ],
   },
   media: {
-    name: "app.ui.iconPicker.categories.media",
+    name: "ui.iconPicker.categories.media",
     icons: ["newspaper", "globe", "scale", "file-text", "file-plus"],
   },
   special: {
-    name: "app.ui.iconPicker.categories.special",
+    name: "ui.iconPicker.categories.special",
     icons: [
       "1a",
       "sparkle",
@@ -907,7 +907,7 @@ export const ICON_CATEGORIES = {
     ],
   },
   navigation: {
-    name: "app.ui.iconPicker.categories.navigation",
+    name: "ui.iconPicker.categories.navigation",
     icons: [
       "arrow-left",
       "arrow-left-icon",
@@ -936,7 +936,7 @@ export const ICON_CATEGORIES = {
     ],
   },
   ui: {
-    name: "app.ui.iconPicker.categories.ui",
+    name: "ui.iconPicker.categories.ui",
     icons: [
       "menu",
       "more-horizontal",
@@ -970,7 +970,7 @@ export const ICON_CATEGORIES = {
   },
 } satisfies Record<
   string,
-  { readonly name: TranslationKey; readonly icons: IconKey[] }
+  { readonly name: UITranslationKey; readonly icons: IconKey[] }
 >;
 
 export const ICON_CATEGORIES_LIST = Object.entries(ICON_CATEGORIES) as [

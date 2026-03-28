@@ -22,6 +22,7 @@ import {
   ICON_CATEGORIES_LIST,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
 
 import type { IconPickerProps } from "../../web/ui/icon-picker";
 import { Text } from "./text";
@@ -40,7 +41,8 @@ export function IconPicker({
   const [modalVisible, setModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   // Filter icons based on search query
   const filteredIcons = useMemo(() => {
@@ -81,10 +83,10 @@ export function IconPicker({
           {/* Header with search */}
           <View className="flex flex-col gap-3 p-4 border-b bg-card">
             <Text className="text-lg font-semibold">
-              {t("app.ui.iconPicker.title")}
+              {t("ui.iconPicker.title")}
             </Text>
             <TextInput
-              placeholder={t("app.ui.iconPicker.searchPlaceholder")}
+              placeholder={t("ui.iconPicker.searchPlaceholder")}
               value={searchQuery}
               onChangeText={(text): void => setSearchQuery(text)}
               className="p-2 border border-input rounded-md bg-background"
@@ -154,7 +156,7 @@ export function IconPicker({
               columnWrapperStyle={{ justifyContent: "flex-start" }}
               ListHeaderComponent={
                 <Text className="ml-4 mr-4 mb-2 text-xs text-muted-foreground">
-                  {t("app.ui.iconPicker.showing", {
+                  {t("ui.iconPicker.showing", {
                     count: filteredIcons.length,
                     total: ICON_CATEGORIES[activeCategory].icons.length,
                   })}

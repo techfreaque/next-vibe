@@ -10,21 +10,13 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { LOCALE_COOKIE_NAME } from "@/config/constants";
 
 import { languageConfig } from "..";
-import type { CountryInfo, CountryLanguage } from "./config";
+import type { CountryInfo, CountryLanguage, Languages } from "./config";
 import {
   availableCountries,
   Countries,
   defaultLocaleConfig,
   globalCountryInfo,
-  Languages,
 } from "./config";
-import type {
-  TFunction,
-  TParams,
-  TranslationKey,
-  TranslationValue,
-} from "./static-types";
-import { renderTranslation, translateKey } from "./translation-utils";
 
 // Translation context type with country support
 interface TranslationContextType {
@@ -33,8 +25,6 @@ interface TranslationContextType {
   locale: CountryLanguage;
   setLanguage: (lang: Languages) => void;
   setCountry: (country: Countries) => void;
-  t: TFunction;
-  isRTL: boolean;
   countries: readonly CountryInfo[];
   currentCountry: CountryInfo;
   changeLocale: (country: Countries) => void;
@@ -60,8 +50,6 @@ export const TranslationContext = createContext<TranslationContextType>({
   locale: `${defaultLocaleConfig.language}-${defaultLocaleConfig.country}`,
   setLanguage: defaultSetLanguage,
   setCountry: defaultSetCountry,
-  t: (key: TranslationKey) => key,
-  isRTL: false,
   countries: availableCountries,
   currentCountry: globalCountryInfo,
   changeLocale: defaultChangeLocale,
@@ -188,25 +176,6 @@ export function TranslationProvider({
     void initializeLocale();
   }, [currentLocale, language, country]);
 
-  // Type-safe translation function with parameter support
-  const t: TFunction = <K extends TranslationKey>(
-    key: K,
-    params?: TParams,
-  ): string => {
-    // Use the shared translation utility with client context
-    return translateKey(
-      key,
-      language,
-      params,
-      Languages.EN, // Use EN as fallback language
-
-      "Client",
-    );
-  };
-
-  // Check if the language is RTL (for future support of languages like Arabic, Hebrew)
-  const isRTL = false; // Currently all supported languages are LTR
-
   return (
     <TranslationContext.Provider
       value={{
@@ -215,8 +184,6 @@ export function TranslationProvider({
         setLanguage,
         setCountry,
         locale: `${language}-${country}`,
-        t,
-        isRTL,
         countries: availableCountries,
         currentCountry,
         changeLocale,
@@ -237,25 +204,4 @@ export function useTranslation(): TranslationContextType {
   }
 
   return context;
-}
-
-// Type-safe Trans component for JSX translations
-interface TransProps<K extends TranslationKey> {
-  i18nKey: K;
-  values?: TranslationValue<K> extends string
-    ? Record<string, string | number>
-    : never;
-}
-
-export function Trans<K extends TranslationKey>({
-  i18nKey,
-  values,
-}: TransProps<K>): JSX.Element {
-  const { t } = useTranslation();
-
-  // Use the t function which already uses the shared utility
-  const translatedValue = t(i18nKey, values);
-
-  // Use the shared rendering logic
-  return <>{renderTranslation(translatedValue, i18nKey)}</>;
 }

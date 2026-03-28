@@ -19,7 +19,6 @@ import type {
 import { parseError } from "@/app/api/[locale]/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage, ToolCallResult } from "../../../chat/db";
@@ -765,23 +764,21 @@ export class MessageConverter {
   }
 
   /**
-   * Recursively translate error messages including nested causes
+   * Recursively build error message string from already-translated error chain
+   * (repositories call t("key", params) and store the result; no re-translation needed)
    */
   private static translateErrorRecursive(
     error: ErrorResponseType,
     locale: CountryLanguage,
   ): string {
-    const { t } = simpleT(locale);
-    const mainMessage = t(error.message, error.messageParams);
-
     if (error.cause) {
       const causeMessage = MessageConverter.translateErrorRecursive(
         error.cause,
         locale,
       );
-      return `${mainMessage}\n\nCause: ${causeMessage}`;
+      return `${error.message}\n\nCause: ${causeMessage}`;
     }
 
-    return mainMessage;
+    return error.message;
   }
 }

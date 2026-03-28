@@ -7,9 +7,9 @@
 
 import { z } from "zod";
 
+import type { AppLocaleTranslationKey } from "@/app/[locale]/i18n";
 import type { MultiSelectFieldWidgetConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/multiselect-field/types";
 import type { SelectFieldWidgetConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/types";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { FieldDataType, WidgetType } from "../types/enums";
 
@@ -23,57 +23,57 @@ import { FieldDataType, WidgetType } from "../types/enums";
 export const CURRENCY_OPTIONS = [
   {
     value: "USD",
-    label: "app.currency.usd" as const,
+    label: "currency.usd" as const,
     symbol: "$",
   },
   {
     value: "EUR",
-    label: "app.currency.eur" as const,
+    label: "currency.eur" as const,
     symbol: "€",
   },
   {
     value: "GBP",
-    label: "app.currency.gbp" as const,
+    label: "currency.gbp" as const,
     symbol: "£",
   },
   {
     value: "JPY",
-    label: "app.currency.jpy" as const,
+    label: "currency.jpy" as const,
     symbol: "¥",
   },
   {
     value: "CHF",
-    label: "app.currency.chf" as const,
+    label: "currency.chf" as const,
     symbol: "CHF",
   },
   {
     value: "CAD",
-    label: "app.currency.cad" as const,
+    label: "currency.cad" as const,
     symbol: "C$",
   },
   {
     value: "AUD",
-    label: "app.currency.aud" as const,
+    label: "currency.aud" as const,
     symbol: "A$",
   },
   {
     value: "CNY",
-    label: "app.currency.cny" as const,
+    label: "currency.cny" as const,
     symbol: "¥",
   },
   {
     value: "INR",
-    label: "app.currency.inr" as const,
+    label: "currency.inr" as const,
     symbol: "₹",
   },
   {
     value: "BRL",
-    label: "app.currency.brl" as const,
+    label: "currency.brl" as const,
     symbol: "R$",
   },
 ] satisfies Array<{
   value: string;
-  label: TranslationKey;
+  label: AppLocaleTranslationKey;
   symbol: string;
 }>;
 
@@ -104,66 +104,66 @@ type CurrencyMultiSelectSchemaOptional = z.ZodOptional<
 
 // Overload 1: multiple=true, required=true
 export function currencyField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required: true,
   multiple: true,
 ): MultiSelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   CurrencyMultiSelectSchemaRequired,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Overload 2: multiple=true, required=false
 export function currencyField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required: false,
   multiple: true,
 ): MultiSelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   CurrencyMultiSelectSchemaOptional,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Overload 3: multiple=false, required=true
 export function currencyField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required: true,
   multiple?: false,
 ): SelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   CurrencySelectSchemaRequired,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Overload 4: multiple=false, required=false (DEFAULT)
 export function currencyField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required?: false,
   multiple?: false,
 ): SelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   CurrencySelectSchemaOptional,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Implementation
 export function currencyField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required?: boolean,
   multiple?: boolean,
 ):
   | (MultiSelectFieldWidgetConfig<
-      TranslationKey,
+      AppLocaleTranslationKey,
       CurrencyMultiSelectSchemaRequired | CurrencyMultiSelectSchemaOptional,
       { request: "data"; response?: never }
     > & {
@@ -171,7 +171,7 @@ export function currencyField(
       schemaType: "primitive";
     })
   | (SelectFieldWidgetConfig<
-      TranslationKey,
+      AppLocaleTranslationKey,
       CurrencySelectSchemaRequired | CurrencySelectSchemaOptional,
       { request: "data"; response?: never }
     > & {
@@ -225,20 +225,20 @@ export function currencyField(
  * Common language codes with their names
  */
 export const LANGUAGE_OPTIONS = [
-  { value: "en", label: "app.language.english" as const },
-  { value: "de", label: "app.language.german" as const },
-  { value: "fr", label: "app.language.french" as const },
-  { value: "es", label: "app.language.spanish" as const },
-  { value: "it", label: "app.language.italian" as const },
-  { value: "pt", label: "app.language.portuguese" as const },
-  { value: "nl", label: "app.language.dutch" as const },
-  { value: "ru", label: "app.language.russian" as const },
-  { value: "zh", label: "app.language.chinese" as const },
-  { value: "ja", label: "app.language.japanese" as const },
-  { value: "ko", label: "app.language.korean" as const },
-  { value: "ar", label: "app.language.arabic" as const },
-  { value: "hi", label: "app.language.hindi" as const },
-] as const satisfies Array<{ value: string; label: TranslationKey }>;
+  { value: "en", label: "language.english" as const },
+  { value: "de", label: "language.german" as const },
+  { value: "fr", label: "language.french" as const },
+  { value: "es", label: "language.spanish" as const },
+  { value: "it", label: "language.italian" as const },
+  { value: "pt", label: "language.portuguese" as const },
+  { value: "nl", label: "language.dutch" as const },
+  { value: "ru", label: "language.russian" as const },
+  { value: "zh", label: "language.chinese" as const },
+  { value: "ja", label: "language.japanese" as const },
+  { value: "ko", label: "language.korean" as const },
+  { value: "ar", label: "language.arabic" as const },
+  { value: "hi", label: "language.hindi" as const },
+] as const satisfies Array<{ value: string; label: AppLocaleTranslationKey }>;
 
 export type LanguageCode = (typeof LANGUAGE_OPTIONS)[number]["value"];
 
@@ -270,66 +270,66 @@ type LanguageMultiSelectSchemaOptional = z.ZodOptional<
 
 // Overload 1: multiple=true, required=true
 export function languageField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required: true,
   multiple: true,
 ): MultiSelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   LanguageMultiSelectSchemaRequired,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Overload 2: multiple=true, required=false
 export function languageField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required: false,
   multiple: true,
 ): MultiSelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   LanguageMultiSelectSchemaOptional,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Overload 3: multiple=false, required=true
 export function languageField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required: true,
   multiple?: false,
 ): SelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   LanguageSelectSchemaRequired,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Overload 4: multiple=false, required=false (DEFAULT)
 export function languageField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required?: false,
   multiple?: false,
 ): SelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   LanguageSelectSchemaOptional,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Implementation
 export function languageField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required?: boolean,
   multiple?: boolean,
 ):
   | (MultiSelectFieldWidgetConfig<
-      TranslationKey,
+      AppLocaleTranslationKey,
       LanguageMultiSelectSchemaRequired | LanguageMultiSelectSchemaOptional,
       { request: "data"; response?: never }
     > & {
@@ -337,7 +337,7 @@ export function languageField(
       schemaType: "primitive";
     })
   | (SelectFieldWidgetConfig<
-      TranslationKey,
+      AppLocaleTranslationKey,
       LanguageSelectSchemaRequired | LanguageSelectSchemaOptional,
       { request: "data"; response?: never }
     > & {
@@ -391,34 +391,34 @@ export function languageField(
  * Common country codes with their names
  */
 export const COUNTRY_OPTIONS = [
-  { value: "US", label: "app.country.united_states" as const },
-  { value: "CA", label: "app.country.canada" as const },
+  { value: "US", label: "country.united_states" as const },
+  { value: "CA", label: "country.canada" as const },
   {
     value: "GB",
-    label: "app.country.united_kingdom" as const,
+    label: "country.united_kingdom" as const,
   },
-  { value: "DE", label: "app.country.germany" as const },
-  { value: "FR", label: "app.country.france" as const },
-  { value: "IT", label: "app.country.italy" as const },
-  { value: "ES", label: "app.country.spain" as const },
-  { value: "NL", label: "app.country.netherlands" as const },
-  { value: "CH", label: "app.country.switzerland" as const },
-  { value: "AT", label: "app.country.austria" as const },
-  { value: "BE", label: "app.country.belgium" as const },
-  { value: "SE", label: "app.country.sweden" as const },
-  { value: "NO", label: "app.country.norway" as const },
-  { value: "DK", label: "app.country.denmark" as const },
-  { value: "FI", label: "app.country.finland" as const },
-  { value: "AU", label: "app.country.australia" as const },
-  { value: "NZ", label: "app.country.new_zealand" as const },
-  { value: "JP", label: "app.country.japan" as const },
-  { value: "KR", label: "app.country.south_korea" as const },
-  { value: "CN", label: "app.country.china" as const },
-  { value: "IN", label: "app.country.india" as const },
-  { value: "BR", label: "app.country.brazil" as const },
-  { value: "MX", label: "app.country.mexico" as const },
-  { value: "AR", label: "app.country.argentina" as const },
-] as const satisfies Array<{ value: string; label: TranslationKey }>;
+  { value: "DE", label: "country.germany" as const },
+  { value: "FR", label: "country.france" as const },
+  { value: "IT", label: "country.italy" as const },
+  { value: "ES", label: "country.spain" as const },
+  { value: "NL", label: "country.netherlands" as const },
+  { value: "CH", label: "country.switzerland" as const },
+  { value: "AT", label: "country.austria" as const },
+  { value: "BE", label: "country.belgium" as const },
+  { value: "SE", label: "country.sweden" as const },
+  { value: "NO", label: "country.norway" as const },
+  { value: "DK", label: "country.denmark" as const },
+  { value: "FI", label: "country.finland" as const },
+  { value: "AU", label: "country.australia" as const },
+  { value: "NZ", label: "country.new_zealand" as const },
+  { value: "JP", label: "country.japan" as const },
+  { value: "KR", label: "country.south_korea" as const },
+  { value: "CN", label: "country.china" as const },
+  { value: "IN", label: "country.india" as const },
+  { value: "BR", label: "country.brazil" as const },
+  { value: "MX", label: "country.mexico" as const },
+  { value: "AR", label: "country.argentina" as const },
+] as const satisfies Array<{ value: string; label: AppLocaleTranslationKey }>;
 
 export type CountryCode = (typeof COUNTRY_OPTIONS)[number]["value"];
 
@@ -461,66 +461,66 @@ type CountryMultiSelectSchemaOptional = z.ZodOptional<
 
 // Overload 1: multiple=true, required=true
 export function countryField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required: true,
   multiple: true,
 ): MultiSelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   CountryMultiSelectSchemaRequired,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Overload 2: multiple=true, required=false
 export function countryField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required: false,
   multiple: true,
 ): MultiSelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   CountryMultiSelectSchemaOptional,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Overload 3: multiple=false, required=true
 export function countryField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required: true,
   multiple?: false,
 ): SelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   CountrySelectSchemaRequired,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Overload 4: multiple=false, required=false (DEFAULT)
 export function countryField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required?: false,
   multiple?: false,
 ): SelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   CountrySelectSchemaOptional,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Implementation
 export function countryField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required?: boolean,
   multiple?: boolean,
 ):
   | (MultiSelectFieldWidgetConfig<
-      TranslationKey,
+      AppLocaleTranslationKey,
       CountryMultiSelectSchemaRequired | CountryMultiSelectSchemaOptional,
       { request: "data"; response?: never }
     > & {
@@ -528,7 +528,7 @@ export function countryField(
       schemaType: "primitive";
     })
   | (SelectFieldWidgetConfig<
-      TranslationKey,
+      AppLocaleTranslationKey,
       CountrySelectSchemaRequired | CountrySelectSchemaOptional,
       { request: "data"; response?: never }
     > & {
@@ -582,74 +582,74 @@ export function countryField(
  * Common timezone identifiers
  */
 export const TIMEZONE_OPTIONS = [
-  { value: "UTC", label: "app.timezone.utc" as const },
+  { value: "UTC", label: "timezone.utc" as const },
   {
     value: "America/New_York",
-    label: "app.timezone.eastern" as const,
+    label: "timezone.eastern" as const,
   },
   {
     value: "America/Chicago",
-    label: "app.timezone.central" as const,
+    label: "timezone.central" as const,
   },
   {
     value: "America/Denver",
-    label: "app.timezone.mountain" as const,
+    label: "timezone.mountain" as const,
   },
   {
     value: "America/Los_Angeles",
-    label: "app.timezone.pacific" as const,
+    label: "timezone.pacific" as const,
   },
   {
     value: "Europe/London",
-    label: "app.timezone.london" as const,
+    label: "timezone.london" as const,
   },
   {
     value: "Europe/Paris",
-    label: "app.timezone.paris" as const,
+    label: "timezone.paris" as const,
   },
   {
     value: "Europe/Berlin",
-    label: "app.timezone.berlin" as const,
+    label: "timezone.berlin" as const,
   },
   {
     value: "Europe/Rome",
-    label: "app.timezone.rome" as const,
+    label: "timezone.rome" as const,
   },
   {
     value: "Europe/Madrid",
-    label: "app.timezone.madrid" as const,
+    label: "timezone.madrid" as const,
   },
   {
     value: "Europe/Amsterdam",
-    label: "app.timezone.amsterdam" as const,
+    label: "timezone.amsterdam" as const,
   },
   {
     value: "Europe/Zurich",
-    label: "app.timezone.zurich" as const,
+    label: "timezone.zurich" as const,
   },
   {
     value: "Asia/Tokyo",
-    label: "app.timezone.tokyo" as const,
+    label: "timezone.tokyo" as const,
   },
   {
     value: "Asia/Shanghai",
-    label: "app.timezone.shanghai" as const,
+    label: "timezone.shanghai" as const,
   },
   {
     value: "Asia/Seoul",
-    label: "app.timezone.seoul" as const,
+    label: "timezone.seoul" as const,
   },
   {
     value: "Asia/Mumbai",
-    label: "app.timezone.mumbai" as const,
+    label: "timezone.mumbai" as const,
   },
   {
     value: "Australia/Sydney",
-    label: "app.timezone.sydney" as const,
+    label: "timezone.sydney" as const,
   },
   {
     value: "Pacific/Auckland",
-    label: "app.timezone.auckland" as const,
+    label: "timezone.auckland" as const,
   },
 ] as const;
 
@@ -688,66 +688,66 @@ type TimezoneMultiSelectSchemaOptional = z.ZodOptional<
 
 // Overload 1: multiple=true, required=true
 export function timezoneField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required: true,
   multiple: true,
 ): MultiSelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   TimezoneMultiSelectSchemaRequired,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Overload 2: multiple=true, required=false
 export function timezoneField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required: false,
   multiple: true,
 ): MultiSelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   TimezoneMultiSelectSchemaOptional,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Overload 3: multiple=false, required=true
 export function timezoneField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required: true,
   multiple?: false,
 ): SelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   TimezoneSelectSchemaRequired,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Overload 4: multiple=false, required=false (DEFAULT)
 export function timezoneField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required?: false,
   multiple?: false,
 ): SelectFieldWidgetConfig<
-  TranslationKey,
+  AppLocaleTranslationKey,
   TimezoneSelectSchemaOptional,
   { request: "data"; response?: never }
 > & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
 // Implementation
 export function timezoneField(
-  label: TranslationKey,
-  description: TranslationKey,
-  placeholder: TranslationKey,
+  label: AppLocaleTranslationKey,
+  description: AppLocaleTranslationKey,
+  placeholder: AppLocaleTranslationKey,
   required?: boolean,
   multiple?: boolean,
 ):
   | (MultiSelectFieldWidgetConfig<
-      TranslationKey,
+      AppLocaleTranslationKey,
       TimezoneMultiSelectSchemaRequired | TimezoneMultiSelectSchemaOptional,
       { request: "data"; response?: never }
     > & {
@@ -755,7 +755,7 @@ export function timezoneField(
       schemaType: "primitive";
     })
   | (SelectFieldWidgetConfig<
-      TranslationKey,
+      AppLocaleTranslationKey,
       TimezoneSelectSchemaRequired | TimezoneSelectSchemaOptional,
       { request: "data"; response?: never }
     > & {

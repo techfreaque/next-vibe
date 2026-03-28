@@ -1,10 +1,8 @@
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { enableDebugLogger, mcpSilentMode } from "@/config/debug";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { ErrorResponseType } from "../../../../shared/types/response.schema";
 import { colors, maybeColorize, semantic } from "./colors";
 import { fileLog } from "./file-logger";
@@ -156,11 +154,9 @@ export function createEndpointLogger(
     const elapsed = (Date.now() - startTime) / 1000;
     return `${elapsed.toFixed(3)}s`;
   };
-  const { t } = simpleT(locale);
 
   const formatMessage = (message: string): string => {
-    const text = t(message as TranslationKey);
-    return noTimePrefix ? text : `[${getTimePrefix()}] ${text}`;
+    return noTimePrefix ? message : `[${getTimePrefix()}] ${message}`;
   };
 
   return {
@@ -201,7 +197,7 @@ export function createEndpointLogger(
         writeToFile(`[ERROR] ${formatMessage(message)}`, metadataObj);
       } else {
         // oxlint-disable-next-line no-console
-        console.error(formatMessage(message), error, ...metadata);
+        console.error(formatMessage(message), error, ...metadata, locale);
       }
     },
 
@@ -230,7 +226,7 @@ export function createEndpointLogger(
           writeToFile(`[DEBUG] ${formatMessage(message)}`, metadataObj);
         } else {
           const meta = serializeDebugMeta(metadata);
-          const text = `${t(message as TranslationKey)}${meta}`;
+          const text = `${message}${meta}`;
           const timeTag = noTimePrefix
             ? ""
             : `${colors.dim}[${getTimePrefix()}]${colors.reset} `;
@@ -254,7 +250,7 @@ export function createEndpointLogger(
         writeToFile(`[WARN] ${formatMessage(message)}`, metadataObj);
       } else {
         // oxlint-disable-next-line no-console
-        console.warn(formatMessage(message), ...metadata);
+        console.warn(formatMessage(message), ...metadata, locale);
       }
     },
     isDebugEnabled: debugEnabled || enableDebugLogger,

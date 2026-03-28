@@ -6,12 +6,6 @@
  */
 
 import type { ExtractScopedTranslationKey } from "@/i18n/core/scoped-translation";
-import type { TranslationKey } from "@/i18n/core/static-types";
-
-export interface EnumOptions<T extends Record<string, TranslationKey>> {
-  enum: { readonly [K in keyof T]: T[K] };
-  options: Array<{ value: keyof T; label: T[keyof T] }>;
-}
 
 /**
  * Wrapper function that creates enum-like object where keys map to their values

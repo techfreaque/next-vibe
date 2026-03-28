@@ -8,6 +8,8 @@ import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { scopedTranslation as storyComponentsScopedTranslation } from "@/app/[locale]/story/_components/i18n";
+import { scopedTranslation } from "@/app/[locale]/subscription/i18n";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -20,7 +22,9 @@ export function SubscriptionHeader({
   locale,
   isAuthenticated,
 }: SubscriptionHeaderProps): JSX.Element {
-  const { t } = useTranslation();
+  const { locale: currentLocale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(currentLocale);
+  const { t: storyT } = storyComponentsScopedTranslation.scopedT(currentLocale);
 
   return (
     <>
@@ -31,7 +35,7 @@ export function SubscriptionHeader({
           className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          {t("app.subscription.subscription.backToChat")}
+          {t("subscription.backToChat")}
         </Link>
 
         {/* Auth Buttons for Public Users */}
@@ -39,7 +43,7 @@ export function SubscriptionHeader({
           <Div className="flex gap-2">
             <Button variant="ghost" asChild className="hidden sm:inline-flex">
               <Link href={`/${locale}/user/login`}>
-                {t("app.story._components.nav.user.login")}
+                {storyT("nav.user.login")}
               </Link>
             </Button>
             <Button
@@ -47,7 +51,7 @@ export function SubscriptionHeader({
               className="bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
             >
               <Link href={`/${locale}/user/signup`}>
-                {t("app.story._components.nav.user.signup")}
+                {storyT("nav.user.signup")}
               </Link>
             </Button>
           </Div>
@@ -62,10 +66,10 @@ export function SubscriptionHeader({
         className="text-center flex flex-col gap-4"
       >
         <H1 className="text-4xl font-bold tracking-tight">
-          {t("app.subscription.subscription.title")}
+          {t("subscription.title")}
         </H1>
         <P className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          {t("app.subscription.subscription.description")}
+          {t("subscription.description")}
         </P>
       </MotionDiv>
     </>

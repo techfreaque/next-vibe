@@ -8,8 +8,6 @@ import type { NextRequest } from "next-vibe-ui/lib/request";
 import { ZodError } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import type { EndpointLogger } from "../shared/logger/endpoint";
 
@@ -18,7 +16,6 @@ import type { EndpointLogger } from "../shared/logger/endpoint";
  */
 export interface TRPCContext<TUrlParams> {
   locale: CountryLanguage;
-  t: TFunction;
   request: NextRequest;
   urlPathParams: TUrlParams;
   logger: EndpointLogger;
@@ -34,11 +31,9 @@ export async function createTRPCContext<TUrlParams>(opts: {
   locale: CountryLanguage;
 }): Promise<TRPCContext<TUrlParams>> {
   const { req, urlPathParams = {} as TUrlParams, logger, locale } = opts;
-  const { t } = simpleT(locale);
 
   return {
     locale,
-    t,
     request: req,
     urlPathParams,
     logger,

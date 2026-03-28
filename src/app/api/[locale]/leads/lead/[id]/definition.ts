@@ -59,7 +59,7 @@ const { DELETE } = createEndpoint({
   title: "delete.title",
   description: "delete.description",
   icon: "trash",
-  category: "app.endpointCategories.leads",
+  category: "endpointCategories.leads",
   tags: ["tags.leads", "tags.management"],
 
   fields: objectField(scopedTranslation, {
@@ -162,7 +162,7 @@ const { PATCH } = createEndpoint({
   path: ["leads", "lead", "[id]"],
   title: "patch.title",
   description: "patch.description",
-  category: "app.endpointCategories.leads",
+  category: "endpointCategories.leads",
   tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "user",
@@ -674,7 +674,7 @@ const { GET } = createEndpoint({
   path: ["leads", "lead", "[id]"],
   title: "get.title",
   description: "get.description",
-  category: "app.endpointCategories.leads",
+  category: "endpointCategories.leads",
   tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "user",

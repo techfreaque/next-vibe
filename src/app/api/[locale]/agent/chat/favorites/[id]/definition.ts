@@ -70,7 +70,7 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "trash" as const,
-  category: "app.endpointCategories.chatFavorites",
+  category: "endpointCategories.chatFavorites",
   tags: ["tags.favorites" as const],
 
   aliases: [FAVORITE_DELETE_ALIAS],
@@ -303,7 +303,7 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "edit" as const,
-  category: "app.endpointCategories.chatFavorites",
+  category: "endpointCategories.chatFavorites",
   tags: ["tags.favorites" as const],
 
   aliases: [FAVORITE_UPDATE_ALIAS],
@@ -771,7 +771,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "star" as const,
-  category: "app.endpointCategories.chatFavorites",
+  category: "endpointCategories.chatFavorites",
   tags: ["tags.favorites" as const],
 
   aliases: [FAVORITE_GET_ALIAS],

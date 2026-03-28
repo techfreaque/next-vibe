@@ -30,7 +30,7 @@ export const { GET } = createEndpoint({
   title: "get.title",
   description: "get.description",
   icon: "server",
-  category: "app.endpointCategories.ssh",
+  category: "endpointCategories.ssh",
   allowedRoles: [UserRole.ADMIN],
   tags: ["category" as const],
 
@@ -162,7 +162,7 @@ export const { PATCH } = createEndpoint({
   title: "patch.title",
   description: "patch.description",
   icon: "server",
-  category: "app.endpointCategories.ssh",
+  category: "endpointCategories.ssh",
   allowedRoles: [UserRole.ADMIN],
   tags: ["category" as const],
 
@@ -310,7 +310,7 @@ export const { DELETE } = createEndpoint({
   title: "delete.title",
   description: "delete.description",
   icon: "server",
-  category: "app.endpointCategories.ssh",
+  category: "endpointCategories.ssh",
   allowedRoles: [UserRole.ADMIN],
   tags: ["category" as const],
 

@@ -32,7 +32,7 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "pencil" as const,
-  category: "app.endpointCategories.userAuth",
+  category: "endpointCategories.userAuth",
   tags: ["tags.remoteConnection" as const],
   aliases: ["rename-self", "rename-instance"] as const,
 

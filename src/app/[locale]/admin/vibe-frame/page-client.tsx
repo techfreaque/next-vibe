@@ -50,6 +50,7 @@ import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { scopedTranslation as adminScopedTranslation } from "../i18n";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -211,13 +212,15 @@ function WidgetConfigCard({
   onUpdate,
   onRemove,
   canRemove,
+  t,
 }: {
   widget: WidgetConfig;
   index: number;
-  toolOptions: AutocompleteOption<string>[];
+  toolOptions: AutocompleteOption[];
   onUpdate: (id: string, updates: Partial<WidgetConfig>) => void;
   onRemove: (id: string) => void;
   canRemove: boolean;
+  t: ReturnType<typeof adminScopedTranslation.scopedT>["t"];
 }): JSX.Element {
   const set = useCallback(
     (updates: Partial<WidgetConfig>): void => onUpdate(widget.id, updates),
@@ -262,8 +265,8 @@ function WidgetConfigCard({
           value={widget.endpoint}
           onChange={(val) => set({ endpoint: val })}
           options={toolOptions}
-          placeholder="Select endpoint..."
-          searchPlaceholder="Search..."
+          placeholder={t("vibeFrame.selectEndpoint")}
+          searchPlaceholder={t("vibeFrame.searchEndpoints")}
           allowCustom={true}
         />
 
@@ -271,22 +274,22 @@ function WidgetConfigCard({
         <Section title="Display" icon={Layout} defaultOpen={false}>
           <ConfigField label="Theme">
             <Div className="flex gap-1">
-              {(["system", "light", "dark"] as const).map((t) => (
+              {(["system", "light", "dark"] as const).map((theme) => (
                 <Button
-                  key={t}
-                  variant={widget.theme === t ? "default" : "outline"}
+                  key={theme}
+                  variant={widget.theme === theme ? "default" : "outline"}
                   size="sm"
                   className="flex-1 text-[10px] h-6"
-                  onClick={() => set({ theme: t })}
+                  onClick={() => set({ theme })}
                 >
-                  {t === "system" ? (
+                  {theme === "system" ? (
                     <Settings className="h-3 w-3 mr-1" />
-                  ) : t === "light" ? (
+                  ) : theme === "light" ? (
                     <Sun className="h-3 w-3 mr-1" />
                   ) : (
                     <Moon className="h-3 w-3 mr-1" />
                   )}
-                  {t}
+                  {theme}
                 </Button>
               ))}
             </Div>
@@ -755,6 +758,7 @@ export function VibeFrameTestPageClient({
   const [copied, setCopied] = useState(false);
 
   const serverUrl = envClient.NEXT_PUBLIC_APP_URL;
+  const { t } = adminScopedTranslation.scopedT(locale);
 
   // ── Fetch endpoints from help ─────────────────────────────────────────
 
@@ -778,7 +782,7 @@ export function VibeFrameTestPageClient({
     user,
   );
 
-  const toolOptions = useMemo((): AutocompleteOption<string>[] => {
+  const toolOptions = useMemo((): AutocompleteOption[] => {
     const response = helpState?.read?.response;
     if (!response || response.success !== true) {
       return [];
@@ -788,12 +792,16 @@ export function VibeFrameTestPageClient({
       const label = alias ?? tool.name;
       return {
         value: tool.name,
-        label,
-        description: tool.description,
-        category: tool.category,
+        label: t("vibeFrame.value", { value: label }),
+        description: tool.description
+          ? t("vibeFrame.value", { value: tool.description })
+          : undefined,
+        category: tool.category
+          ? t("vibeFrame.value", { value: tool.category })
+          : undefined,
       };
     });
-  }, [helpState?.read?.response]);
+  }, [helpState?.read?.response, t]);
 
   // ── Event logging ──────────────────────────────────────────────────
 
@@ -981,6 +989,7 @@ ${widgetConfigs}
                 onUpdate={updateWidget}
                 onRemove={removeWidget}
                 canRemove={widgets.length > 1}
+                t={t}
               />
             ))}
           </Div>

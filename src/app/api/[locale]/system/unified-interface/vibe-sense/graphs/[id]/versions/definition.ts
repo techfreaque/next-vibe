@@ -37,7 +37,7 @@ const { GET } = createEndpoint({
   title: "get.title",
   description: "get.description",
   icon: "history",
-  category: "app.endpointCategories.analytics",
+  category: "endpointCategories.analytics",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 

@@ -40,6 +40,13 @@ export const translations: typeof enTranslations = {
       errorDetails: "Fehlerdetails",
       defaultMessage: "Beim Rendern dieses Widgets ist ein Fehler aufgetreten",
     },
+    rangeSlider: {
+      min: "Min",
+      max: "Max",
+    },
+    error: {
+      title: "Fehler",
+    },
     formField: {
       requiresContext:
         "Formularfeld erfordert Formularkontext und Feldkonfiguration",

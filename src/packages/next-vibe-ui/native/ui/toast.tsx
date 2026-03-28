@@ -4,6 +4,8 @@ import { Pressable, View } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
+
 import type {
   ToastActionProps,
   ToastCloseProps,
@@ -160,7 +162,8 @@ export function ToastClose({
   style,
   children,
 }: ToastCloseProps): React.JSX.Element {
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <StyledPressable
@@ -172,7 +175,7 @@ export function ToastClose({
         ),
       })}
       accessibilityRole="button"
-      accessibilityLabel={t("app.common.accessibility.srOnly.close")}
+      accessibilityLabel={t("common.accessibility.srOnly.close")}
     >
       {children ?? <Span className="text-foreground h-4 w-4">✕</Span>}
     </StyledPressable>

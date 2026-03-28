@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { ImapAccountShape } from "../db";
 import type { ImapConnectionStatus, ImapSpecialUseType } from "../enum";
@@ -92,7 +92,7 @@ export interface ImapConnectionTestRequestOutput {
  */
 export interface ImapConnectionTestResponseOutput {
   success: boolean;
-  message: TranslationKey;
+  message: TranslatedKeyType;
   connectionStatus: (typeof ImapConnectionStatus)[keyof typeof ImapConnectionStatus];
   details?: {
     host: string;
@@ -151,5 +151,5 @@ export interface ImapConnectionCloseRequestOutput {
  */
 export interface ImapConnectionCloseResponseOutput {
   success: boolean;
-  message: TranslationKey;
+  message: TranslatedKeyType;
 }

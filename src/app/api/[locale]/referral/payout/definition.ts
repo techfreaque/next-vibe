@@ -6,6 +6,9 @@
 
 import { z } from "zod";
 
+import { REFERRAL_CONFIG } from "../config";
+
+import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -42,7 +45,7 @@ export const { GET } = createEndpoint({
   path: ["referral", "payout"],
   title: "payout.get.title",
   description: "payout.get.description",
-  category: "app.endpointCategories.referral",
+  category: "endpointCategories.referral",
   icon: "wallet",
   tags: ["tags.referral", "tags.get"],
   allowedRoles,
@@ -146,7 +149,7 @@ export const { POST } = createEndpoint({
   path: ["referral", "payout"],
   title: "payout.post.title",
   description: "payout.post.description",
-  category: "app.endpointCategories.referral",
+  category: "endpointCategories.referral",
   icon: "wallet",
   tags: ["tags.referral"],
   allowedRoles,
@@ -163,7 +166,7 @@ export const { POST } = createEndpoint({
         label: "payout.fields.amountCents.label",
         description: "payout.fields.amountCents.description",
         placeholder: "payout.fields.amountCents.placeholder",
-        schema: z.number().min(4000),
+        schema: z.number().min(REFERRAL_CONFIG.MIN_PAYOUT_CENTS),
       }),
       currency: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -186,7 +189,7 @@ export const { POST } = createEndpoint({
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
     },
   }),

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 // Common reusable schemas
 
@@ -58,6 +59,9 @@ export const dateRangeSchema = z.object({
   endDate: dateSchema.nullable(),
 });
 export type DateRangeType = z.infer<typeof dateRangeSchema>;
+
+// Runtime: accepts any string, Type: TranslatedKeyType (already-translated value)
+export const translatedValueSchema = z.string() as z.ZodType<TranslatedKeyType>;
 
 export const undefinedSchema = z.undefined();
 export type UndefinedType = z.input<typeof undefinedSchema>;

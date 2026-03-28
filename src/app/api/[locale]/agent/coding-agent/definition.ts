@@ -49,7 +49,7 @@ const { POST } = createEndpoint({
     return undefined;
   },
   icon: "terminal",
-  category: "app.endpointCategories.ai",
+  category: "endpointCategories.ai",
   tags: ["codingAgent.tags.tasks" as const],
   allowedRoles: [UserRole.ADMIN],
   aliases: [CODING_AGENT_ALIAS, "claude-code", "claude", "open-code"],

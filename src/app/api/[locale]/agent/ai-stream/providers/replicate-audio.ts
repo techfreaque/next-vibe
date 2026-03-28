@@ -15,9 +15,10 @@ import {
   type ModelOptionAudioBased,
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { MUSIC_DURATION_SECONDS } from "../../music-generation/enum";
+import { scopedTranslation } from "./i18n";
 import {
   createMediaProvider,
   readStringOption,
@@ -36,13 +37,15 @@ const MAX_POLL_ATTEMPTS = 30;
 async function pollPrediction(
   predictionId: string,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   signal?: AbortSignal,
 ): Promise<ResponseType<{ audioUrl: string }>> {
+  const { t } = scopedTranslation.scopedT(locale);
+
   for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
     if (signal?.aborted) {
       return fail({
-        // eslint-disable-next-line i18next/no-literal-string
-        message: "Request aborted" as TranslationKey,
+        message: t("errors.requestAborted"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -59,8 +62,7 @@ async function pollPrediction(
     );
     if (!response.ok) {
       return fail({
-        message:
-          `Replicate poll failed: HTTP ${response.status}` as TranslationKey,
+        message: t("errors.pollFailed", { status: String(response.status) }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -71,8 +73,7 @@ async function pollPrediction(
       const audioUrl = Array.isArray(output) ? output[0] : output;
       if (!audioUrl) {
         return fail({
-          // eslint-disable-next-line i18next/no-literal-string
-          message: "No audio URL in Replicate output" as TranslationKey,
+          message: t("errors.noAudioUrl"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
@@ -80,8 +81,9 @@ async function pollPrediction(
     }
     if (prediction.status === "failed" || prediction.status === "canceled") {
       return fail({
-        message: (prediction.error ??
-          `Prediction ${prediction.status}`) as TranslationKey,
+        message: prediction.error
+          ? t("errors.externalServiceError", { message: prediction.error })
+          : t("errors.generationFailed"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -92,9 +94,7 @@ async function pollPrediction(
     });
   }
   return fail({
-    // eslint-disable-next-line i18next/no-literal-string
-    message:
-      "Replicate prediction timed out after 90 seconds" as TranslationKey,
+    message: t("errors.requestTimedOut"),
     errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
   });
 }
@@ -104,14 +104,16 @@ export async function generateMusicWithReplicate(params: {
   prompt: string;
   durationSeconds: number;
   logger: EndpointLogger;
+  locale: CountryLanguage;
   signal?: AbortSignal;
 }): Promise<ResponseType<{ audioUrl: string }>> {
-  const { providerModel, prompt, durationSeconds, logger, signal } = params;
+  const { providerModel, prompt, durationSeconds, logger, locale, signal } =
+    params;
+  const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.REPLICATE_API_TOKEN) {
     return fail({
-      // eslint-disable-next-line i18next/no-literal-string
-      message: "Replicate API token not configured" as TranslationKey,
+      message: t("errors.apiKeyNotConfigured"),
       errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
@@ -151,7 +153,7 @@ export async function generateMusicWithReplicate(params: {
         error: errorText,
       });
       return fail({
-        message: `Replicate error: ${errorText}` as TranslationKey,
+        message: t("errors.externalServiceError", { message: errorText }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -160,12 +162,12 @@ export async function generateMusicWithReplicate(params: {
     logger.info("[Replicate Music] Prediction created, polling", {
       predictionId: prediction.id,
     });
-    return pollPrediction(prediction.id, logger, signal);
+    return pollPrediction(prediction.id, logger, locale, signal);
   } catch (error) {
     const errorMessage = parseError(error).message;
     logger.error("[Replicate Music] Request failed", { error: errorMessage });
     return fail({
-      message: errorMessage as TranslationKey,
+      message: t("errors.requestFailed", { message: errorMessage }),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   }
@@ -174,6 +176,7 @@ export async function generateMusicWithReplicate(params: {
 export function createReplicateAudio(
   logger: EndpointLogger,
   modelConfig: ModelOptionAudioBased,
+  locale: CountryLanguage,
 ): { chat: (modelId: string) => LanguageModelV2 } {
   return createMediaProvider(logger, {
     provider: ApiProvider.REPLICATE,
@@ -194,6 +197,7 @@ export function createReplicateAudio(
         prompt,
         durationSeconds,
         logger,
+        locale,
         signal: options.abortSignal,
       });
     },

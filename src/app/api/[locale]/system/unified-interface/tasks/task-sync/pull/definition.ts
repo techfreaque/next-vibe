@@ -29,7 +29,7 @@ const { POST } = createEndpoint({
   title: "taskSync.pull.post.title" as const,
   description: "taskSync.pull.post.description" as const,
   icon: "download",
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   tags: ["tags.tasks" as const],
   aliases: [TASK_SYNC_ALIAS] as const,
   allowedRoles: [UserRole.ADMIN],

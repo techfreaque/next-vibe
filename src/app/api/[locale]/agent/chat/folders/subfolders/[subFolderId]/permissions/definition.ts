@@ -45,7 +45,7 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "shield",
-  category: "app.endpointCategories.chatThreads",
+  category: "endpointCategories.chatThreads",
   tags: ["tags.folders" as const, "tags.permissions" as const],
 
   fields: objectField(scopedTranslation, {
@@ -263,7 +263,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "shield",
-  category: "app.endpointCategories.chatThreads",
+  category: "endpointCategories.chatThreads",
   tags: ["tags.folders" as const, "tags.permissions" as const],
 
   fields: customWidgetObject({

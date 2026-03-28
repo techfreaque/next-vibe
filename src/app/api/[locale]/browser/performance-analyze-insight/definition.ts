@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["browser", "performance-analyze-insight"],
   title: "performance-analyze-insight.title",
   description: "performance-analyze-insight.description",
-  category: "app.endpointCategories.browserDevTools",
+  category: "endpointCategories.browserDevTools",
   icon: "trending-up",
   tags: [
     "performance-analyze-insight.tags.browserAutomation",

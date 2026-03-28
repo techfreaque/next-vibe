@@ -17,7 +17,7 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import { scopedTranslation } from "./i18n";
 import statusEndpoints from "./status/definition";
@@ -148,7 +148,7 @@ interface NewsletterManagerResult {
   showConfirmUnsubscribe: boolean;
   notification: {
     type: "error" | "success" | "confirm" | "info";
-    message: TranslationKey;
+    message: TranslatedKeyType;
   } | null;
   handleEmailChange: (e: InputChangeEvent<"email">) => void;
   clearMessages: () => void;

@@ -7,6 +7,8 @@ import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
+
 // Import all types and constants from web (web is source of truth)
 import type {
   CountryData,
@@ -37,7 +39,8 @@ export function PhoneField({
   style,
 }: PhoneFieldProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Parse the current value to extract country and number
@@ -155,7 +158,7 @@ export function PhoneField({
               {organizedCountries.preferred.length > 0 && (
                 <View className="border-b border-border">
                   <UIText className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase">
-                    {t("packages.nextVibeUi.native.ui.phoneField.preferred")}
+                    {t("common.preferred")}
                   </UIText>
                   {organizedCountries.preferred.map(renderCountryItem)}
                 </View>
@@ -163,7 +166,7 @@ export function PhoneField({
 
               <View>
                 <UIText className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase">
-                  {t("packages.nextVibeUi.native.ui.phoneField.allCountries")}
+                  {t("common.allCountries")}
                 </UIText>
                 {organizedCountries.others.map(renderCountryItem)}
               </View>

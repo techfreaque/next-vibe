@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import type { TParams, TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams } from "@/i18n/core/static-types";
 
 import { type SharedTranslationKey } from "../i18n";
 
@@ -18,7 +19,7 @@ export function fail({
   messageParams,
   cause,
 }: {
-  message: TranslationKey;
+  message: TranslatedKeyType;
   errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
   messageParams?: TParams;
   cause?: ErrorResponseType;
@@ -55,7 +56,7 @@ export class ErrorResponseError extends Error {
  * @throws ErrorResponseError containing the ErrorResponseType
  */
 export function throwErrorResponse(
-  message: TranslationKey,
+  message: TranslatedKeyType,
   errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements],
   messageParams?: TParams,
 ): never {
@@ -73,7 +74,7 @@ export interface SuccessResponseOptions {
   /** Custom headers to include in the HTTP response */
   headers?: Record<string, string>;
   /** Performance metadata (translation keys as keys, duration in ms as values) */
-  performance?: Partial<Record<TranslationKey, number>>;
+  performance?: Partial<Record<TranslatedKeyType, number>>;
 }
 
 /**
@@ -103,7 +104,7 @@ export function success<TResponse>(
 }
 
 export const messageResponseSchema = z.object({
-  message: z.string() as z.ZodType<TranslationKey>,
+  message: z.string() as z.ZodType<TranslatedKeyType>,
   messageParams: z
     .record(z.string(), z.union([z.string(), z.coerce.number()]))
     .optional(),
@@ -111,7 +112,7 @@ export const messageResponseSchema = z.object({
 
 export const errorResponseSchema = z.object({
   success: z.literal(false),
-  message: z.string() as z.ZodType<TranslationKey>,
+  message: z.string() as z.ZodType<TranslatedKeyType>,
   messageParams: z
     .record(z.string(), z.union([z.string(), z.coerce.number()]))
     .optional(),
@@ -121,9 +122,10 @@ export const errorResponseSchema = z.object({
   }),
 });
 
-export type ResponseType<TResponseData, TKey extends string = TranslationKey> =
-  | SuccessResponseType<TResponseData>
-  | ErrorResponseType<TKey>;
+export type ResponseType<
+  TResponseData,
+  TKey extends TranslatedKeyType = TranslatedKeyType,
+> = SuccessResponseType<TResponseData> | ErrorResponseType<TKey>;
 
 /**
  * Streaming response marker
@@ -266,7 +268,9 @@ export function isContentResponse<T>(
 
 export type MessageResponseType = z.infer<typeof messageResponseSchema>;
 
-export interface ErrorResponseType<TKey extends string = TranslationKey> {
+export interface ErrorResponseType<
+  TKey extends TranslatedKeyType = TranslatedKeyType,
+> {
   success: false;
   message: TKey;
   messageParams?: TParams;
@@ -278,7 +282,7 @@ export interface SuccessResponseType<TResponseData> {
   success: true;
   data: TResponseData;
   isErrorResponse?: true;
-  performance?: Partial<Record<TranslationKey, number>>;
+  performance?: Partial<Record<TranslatedKeyType, number>>;
   /** When true, the task runner will NOT automatically mark this task as completed/failed.
    *  The handler is responsible for managing the task lifecycle externally
    *  (e.g. interactive Claude Code sessions that use the complete-task MCP tool). */

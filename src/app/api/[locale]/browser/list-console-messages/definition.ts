@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["browser", "list-console-messages"],
   title: "list-console-messages.title",
   description: "list-console-messages.description",
-  category: "app.endpointCategories.browserDevTools",
+  category: "endpointCategories.browserDevTools",
   icon: "terminal",
   tags: [
     "list-console-messages.tags.browserAutomation",

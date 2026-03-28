@@ -48,7 +48,7 @@ const { GET } = createEndpoint({
 
   title: "get.title" as const,
   description: "get.description" as const,
-  category: "app.endpointCategories.chatThreads",
+  category: "endpointCategories.chatThreads",
   tags: ["tags.folders" as const],
   icon: "folder" as const,
 

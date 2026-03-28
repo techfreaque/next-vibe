@@ -1,6 +1,4 @@
 import type { LanguageConfig, LanguageDefaults } from "./core/config";
-import type { TranslationElement } from "./core/static-types";
-import { translations as enTranslations } from "./en";
 
 // ----------------
 // CONFIGURATION
@@ -9,14 +7,7 @@ export const languageDefaults = {
   country: "GLOBAL" as const,
   currency: "USD",
   language: "en" as const,
-  translations: enTranslations,
-} satisfies LanguageDefaults<typeof enTranslations>;
-
-export const allTranslations = {
-  de: (): TranslationElement => require("./de").translations,
-  pl: (): TranslationElement => require("./pl").translations,
-  en: enTranslations,
-};
+} satisfies LanguageDefaults;
 
 export const languageConfig = {
   debug: false as boolean,

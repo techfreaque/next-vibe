@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 
+import { configScopedTranslation } from "@/config/i18n";
 import { useTranslation } from "@/i18n/core/client";
 import type { Countries, CountryInfo, Languages } from "@/i18n/core/config";
 import { getUniqueLanguages } from "@/i18n/core/language-utils";
@@ -21,7 +22,7 @@ export const LocaleSelectorContent: FC = () => {
   const language: Languages = translationContext.language;
   const country: Countries = translationContext.country;
   const setLanguage: (lang: Languages) => void = translationContext.setLanguage;
-  const t = translationContext.t;
+  const { t } = configScopedTranslation.scopedT(translationContext.locale);
   const [activeTab, setActiveTab] = useState<"country" | "language">("country");
   const [tabHover, setTabHover] = useState<"country" | "language" | null>(null);
 
@@ -62,7 +63,7 @@ export const LocaleSelectorContent: FC = () => {
             onMouseLeave={() => setTabHover(null)}
           >
             <Span className="text-sm">{currentCountry.flag}</Span>
-            {t("app.common.selector.country")}
+            {t("selector.country")}
           </TabsTrigger>
           <TabsTrigger
             value="language"
@@ -71,7 +72,7 @@ export const LocaleSelectorContent: FC = () => {
             onMouseLeave={() => setTabHover(null)}
           >
             <Span className="text-sm">{currentLanguageFlag}</Span>
-            {t("app.common.selector.language")}
+            {t("selector.language")}
           </TabsTrigger>
         </TabsList>
 

@@ -16,6 +16,11 @@ export const translations = {
     title: "Admin Dashboard",
     subtitle: "Manage your application from here",
   },
+  vibeFrame: {
+    selectEndpoint: "Select endpoint...",
+    searchEndpoints: "Search endpoints...",
+    value: "{{value}}",
+  },
   common: {
     active: "Active",
     filter: "Filter",

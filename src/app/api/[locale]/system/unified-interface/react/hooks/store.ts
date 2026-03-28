@@ -12,12 +12,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { executeQuery } from "./query-executor";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import type { ApiMutationOptions, ApiQueryOptions } from "./types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 // Create a single QueryClient instance
 export const queryClient = new QueryClient({
@@ -208,7 +208,7 @@ export interface QueryStoreType<TResponse> {
   isLoadingFresh: boolean;
   isCachedData: boolean;
   /** @deprecated Use response?.message instead */
-  statusMessage: TranslationKey | undefined;
+  statusMessage: TranslatedKeyType | undefined;
   lastFetchTime: number | null;
 }
 
@@ -224,7 +224,7 @@ export interface MutationStoreType<TResponse> {
   /** @deprecated Use response?.success === false ? response : null instead */
   error: ErrorResponseType | null;
   /** @deprecated Use response?.message instead */
-  statusMessage: TranslationKey | undefined;
+  statusMessage: TranslatedKeyType | undefined;
 }
 
 export const useApiStore = create<ApiStore>((set, get) => ({

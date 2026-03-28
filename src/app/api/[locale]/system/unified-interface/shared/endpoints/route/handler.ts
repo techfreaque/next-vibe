@@ -35,7 +35,7 @@ import type {
 } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams, TranslationKey } from "@/i18n/core/static-types";
+import type { TParams } from "@/i18n/core/static-types";
 
 import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import { generateRoleFilteredRequestSchema } from "../../field/utils";
@@ -116,7 +116,7 @@ export interface SMSHandler<
   TRequest,
   TResponse,
   TUrlVariables,
-  TScopedTranslationKey extends string = TranslationKey,
+  TScopedTranslationKey extends string,
 > {
   readonly ignoreErrors?: boolean;
   readonly render: SmsFunctionType<
@@ -135,7 +135,7 @@ export interface ApiHandlerProps<
   TUrlVariablesOutput,
   TUserRoleValue extends readonly UserRoleValue[],
   TPlatform extends Platform,
-  TScopedTranslationKey extends string = TranslationKey,
+  TScopedTranslationKey extends string,
 > {
   /** Request data (validated by Zod schema) */
   data: TRequestOutput;
@@ -187,7 +187,7 @@ export type ApiHandlerFunction<
   TUrlVariablesOutput,
   TUserRoleValue extends readonly UserRoleValue[],
   TPlatform extends Platform,
-  TScopedTranslationKey extends string = TranslationKey,
+  TScopedTranslationKey extends string,
 > = (
   props: ApiHandlerProps<
     TRequestOutput,
@@ -210,8 +210,8 @@ export interface MethodHandlerConfig<
   TResponseOutput,
   TUrlVariablesOutput,
   TUserRoleValue extends readonly UserRoleValue[],
-  TPlatform extends Platform = Platform,
-  TScopedTranslationKey extends string = TranslationKey,
+  TPlatform extends Platform,
+  TScopedTranslationKey extends string,
 > {
   handler: ApiHandlerFunction<
     TRequestOutput,
@@ -242,7 +242,7 @@ export interface ApiHandlerOptions<
   TUserRoleValue extends readonly UserRoleValue[],
   TEndpoint extends CreateApiEndpointAny,
   TPlatform extends Platform,
-  TScopedTranslationKey extends string = TranslationKey,
+  TScopedTranslationKey extends string,
 > {
   endpoint: TEndpoint;
   handler: ApiHandlerFunction<

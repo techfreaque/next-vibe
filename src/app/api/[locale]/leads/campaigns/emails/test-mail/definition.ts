@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
   path: ["leads", "campaigns", "emails", "test-mail"],
   title: "post.title",
   description: "post.description",
-  category: "app.endpointCategories.leadsCampaigns",
+  category: "endpointCategories.leadsCampaigns",
   tags: ["tags.campaigns", "tags.leads"],
   allowedRoles: [UserRole.ADMIN],
   icon: "send",

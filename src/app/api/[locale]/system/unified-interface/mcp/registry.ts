@@ -14,10 +14,9 @@ import { McpResultFormatter } from "@/app/api/[locale]/system/unified-interface/
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
-import { DefaultFolderId } from "../../../agent/chat/config";
 import { VIBE_CHECK_TOOL_NAMES } from "@/app/api/[locale]/system/check/vibe-check/constants";
+import { DefaultFolderId } from "../../../agent/chat/config";
 import {
   definitionLoader,
   type IDefinitionLoader,
@@ -501,9 +500,8 @@ export class MCPRegistry {
     }
 
     // Error response
-    const { t: globalT } = simpleT(locale);
     const baseMessage = result.message
-      ? globalT(result.message, undefined)
+      ? result.message
       : t("registry.toolExecutionFailed");
 
     const validationDetails = formatValidationErrorDetails(
@@ -513,9 +511,7 @@ export class MCPRegistry {
 
     const errorMessage = validationDetails
       ? `${baseMessage}\n\n${validationDetails}`
-      : result.message
-        ? globalT(result.message, result.messageParams)
-        : t("registry.toolExecutionFailed");
+      : baseMessage;
 
     return this.fail({
       error: errorMessage,

@@ -29,7 +29,7 @@ export const { DELETE } = createEndpoint({
   title: "delete.title",
   description: "delete.description",
   icon: "user",
-  category: "app.endpointCategories.ssh",
+  category: "endpointCategories.ssh",
   allowedRoles: [UserRole.ADMIN],
   tags: ["category" as const],
 

@@ -43,7 +43,7 @@ export const { GET } = createEndpoint({
   title: "get.title",
   description: "get.description",
   icon: "clock",
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,

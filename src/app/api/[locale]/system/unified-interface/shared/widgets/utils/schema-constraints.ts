@@ -51,7 +51,7 @@ export type StringWidgetSchema =
   | z.ZodDefault<z.ZodNullable<z.ZodString>>
   | z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>
   | z.ZodDefault<z.ZodNullable<z.ZodOptional<z.ZodString>>>
-  // Generic string types (e.g., z.string() as z.ZodType<TranslationKey>)
+  // Generic string types (e.g., z.string())
   | z.ZodType<string>
   | z.ZodType<string | null>
   | z.ZodType<string | undefined>

@@ -7,6 +7,7 @@ import { ArrowRightIcon } from "next-vibe-ui/ui/icons/ArrowRightIcon";
 import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "../i18n";
 
 import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
@@ -234,7 +235,8 @@ export interface CarouselButtonProps {
 
 function CarouselPrevious(props: CarouselButtonProps): React.JSX.Element {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   return (
     <Button
@@ -256,7 +258,7 @@ function CarouselPrevious(props: CarouselButtonProps): React.JSX.Element {
     >
       <ArrowLeftIcon className="h-4 w-4" />
       <span className="sr-only">
-        {t("packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide")}
+        {t("common.accessibility.srOnly.previousSlide")}
       </span>
     </Button>
   );
@@ -264,7 +266,8 @@ function CarouselPrevious(props: CarouselButtonProps): React.JSX.Element {
 
 function CarouselNext(props: CarouselButtonProps): React.JSX.Element {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   return (
     <Button
@@ -286,7 +289,7 @@ function CarouselNext(props: CarouselButtonProps): React.JSX.Element {
     >
       <ArrowRightIcon className="h-4 w-4" />
       <span className="sr-only">
-        {t("packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide")}
+        {t("common.accessibility.srOnly.nextSlide")}
       </span>
     </Button>
   );

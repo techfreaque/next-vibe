@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["leads", "ip-match-linking"],
   title: "post.title",
   description: "post.description",
-  category: "app.endpointCategories.leads",
+  category: "endpointCategories.leads",
   icon: "link",
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],

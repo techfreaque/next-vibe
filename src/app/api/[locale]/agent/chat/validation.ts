@@ -12,7 +12,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 /**
  * Validate that thread is not incognito
@@ -20,7 +20,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
  */
 export function validateNotIncognito(
   rootFolderId: DefaultFolderId,
-  forbiddenMessage: TranslationKey,
+  forbiddenMessage: TranslatedKeyType,
 ): ResponseType<never> | null {
   if (rootFolderId === DefaultFolderId.INCOGNITO) {
     return fail({

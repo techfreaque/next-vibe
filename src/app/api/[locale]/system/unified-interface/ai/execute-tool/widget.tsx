@@ -52,6 +52,7 @@ import remoteConnectionListDefinition from "@/app/api/[locale]/user/remote-conne
 
 import type definition from "./definition";
 import type { RouteExecuteResponseInput } from "./definition";
+import { scopedTranslation as executeToolScopedTranslation } from "./i18n";
 
 interface EndpointMethods {
   GET?: CreateApiEndpointAny;
@@ -70,6 +71,7 @@ interface CustomWidgetProps {
 export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
   const form = useWidgetForm<typeof definition.POST>();
   const locale = useWidgetLocale();
+  const { t: tWidget } = executeToolScopedTranslation.scopedT(locale);
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const t = useWidgetTranslation<typeof definition.POST>();
@@ -149,7 +151,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
     user,
   );
 
-  const toolOptions = useMemo((): AutocompleteOption<string>[] => {
+  const toolOptions = useMemo((): AutocompleteOption[] => {
     const response = helpState?.read?.response;
     if (!response || response.success !== true) {
       return [];
@@ -159,12 +161,16 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
       const label = alias ?? tool.name;
       return {
         value: tool.name,
-        label,
-        description: tool.description,
-        category: tool.category,
+        label: tWidget("widget.value", { value: label }),
+        description: tool.description
+          ? tWidget("widget.value", { value: tool.description })
+          : undefined,
+        category: tool.category
+          ? tWidget("widget.value", { value: tool.category })
+          : undefined,
       };
     });
-  }, [helpState?.read?.response]);
+  }, [helpState?.read?.response, tWidget]);
 
   const formInputData = form.watch("input") as
     | Record<string, WidgetData>

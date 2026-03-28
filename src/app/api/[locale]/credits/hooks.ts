@@ -16,6 +16,7 @@ import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hoo
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { configScopedTranslation } from "@/config/i18n";
 import { useTranslation } from "@/i18n/core/client";
 
 import definitions, { type CreditsGetResponseOutput } from "./definition";
@@ -209,7 +210,8 @@ export function useCreditPurchase(
   logger: EndpointLogger,
 ): EndpointReturn<typeof purchaseDefinitions> {
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = configScopedTranslation.scopedT(locale);
 
   // Success callback for credit purchase
   const handlePurchaseSuccess = useCallback(
@@ -229,7 +231,7 @@ export function useCreditPurchase(
               error: errorMessage,
             });
             toast({
-              title: t("app.common.error.title"),
+              title: t("error.title"),
               description: errorMessage,
               variant: "destructive",
             });
@@ -242,8 +244,8 @@ export function useCreditPurchase(
       } catch (error) {
         logger.error("Credits purchase processing failed", parseError(error));
         toast({
-          title: t("app.common.error.title"),
-          description: t("app.common.error.description"),
+          title: t("error.title"),
+          description: t("error.description"),
           variant: "destructive",
         });
       }

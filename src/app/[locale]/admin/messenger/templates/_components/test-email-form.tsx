@@ -19,6 +19,7 @@ import { useMemo, useState } from "react";
 import { useEmailPreviewSendTest } from "@/app/api/[locale]/messenger/preview/send-test/hooks/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { scopedTranslation } from "@/app/[locale]/admin/messenger/templates/i18n";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
@@ -36,7 +37,8 @@ export function TestEmailForm({
   user,
   onSuccess,
 }: TestEmailFormProps): ReactElement {
-  const { t } = useTranslation();
+  const { locale: currentLocale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(currentLocale);
   const [recipientEmail, setRecipientEmail] = useState("");
   const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
@@ -70,9 +72,9 @@ export function TestEmailForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("app.admin.emails.templates.test.title")}</CardTitle>
+        <CardTitle>{t("test.title")}</CardTitle>
         <P className="text-sm text-gray-600 dark:text-gray-400">
-          {t("app.admin.emails.templates.test.description")}
+          {t("test.description")}
         </P>
       </CardHeader>
       <CardContent>
@@ -80,9 +82,7 @@ export function TestEmailForm({
           <Div className="flex flex-col gap-4">
             {/* Recipient Email */}
             <Div>
-              <Label htmlFor="recipientEmail">
-                {t("app.admin.emails.templates.test.recipient")}
-              </Label>
+              <Label htmlFor="recipientEmail">{t("test.recipient")}</Label>
               <Input
                 id="recipientEmail"
                 type="email"
@@ -100,7 +100,7 @@ export function TestEmailForm({
             {/* Template ID Display */}
             <Div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
               <P className="text-sm text-gray-600 dark:text-gray-400">
-                {t("app.admin.emails.templates.test.template")}: {templateId}
+                {t("test.template")}: {templateId}
               </P>
             </Div>
 
@@ -117,7 +117,7 @@ export function TestEmailForm({
             {sendTestEndpoint.create.response?.success && (
               <Div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
                 <P className="text-green-600 dark:text-green-400">
-                  {t("app.admin.emails.templates.test.success")}
+                  {t("test.success")}
                 </P>
               </Div>
             )}
@@ -130,8 +130,8 @@ export function TestEmailForm({
             >
               <Send className="w-4 h-4 mr-2" />
               {sendTestEndpoint.create?.isSubmitting
-                ? t("app.admin.emails.templates.test.sending")
-                : t("app.admin.emails.templates.test.send")}
+                ? t("test.sending")
+                : t("test.send")}
             </Button>
           </Div>
         </Form>

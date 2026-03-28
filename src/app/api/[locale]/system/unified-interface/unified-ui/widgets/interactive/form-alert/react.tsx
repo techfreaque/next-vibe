@@ -6,8 +6,6 @@ import {
 } from "next-vibe-ui/ui/form/form-alert";
 import type { JSX } from "react";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
-
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { ReactStaticWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
@@ -33,7 +31,7 @@ export function FormAlertWidget<
     const alert: FormAlertState = {
       variant: "destructive",
       message: {
-        message: response.message as TranslationKey,
+        message: response.message,
         messageParams: response.messageParams,
       },
     };

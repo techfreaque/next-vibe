@@ -16,7 +16,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams, TranslationKey } from "@/i18n/core/static-types";
+import type { TParams } from "@/i18n/core/static-types";
 
 import { smsEnv } from "./env";
 import { smsScopedT } from "./i18n";
@@ -35,7 +35,7 @@ export async function handleSms<
   TRequest,
   TResponse,
   TUrlVariables,
-  TScopedTranslationKey extends string = TranslationKey,
+  TScopedTranslationKey extends string,
 >({
   sms,
   user,

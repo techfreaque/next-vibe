@@ -33,7 +33,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "list",
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   tags: ["post.fields.ids.label" as const],
   allowedRoles: [
     UserRole.CUSTOMER,

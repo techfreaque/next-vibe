@@ -38,7 +38,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "shield",
-  category: "app.endpointCategories.ai",
+  category: "endpointCategories.ai",
   tags: ["tags.moderation" as const],
 
   fields: customWidgetObject({
@@ -210,7 +210,7 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "shield",
-  category: "app.endpointCategories.ai",
+  category: "endpointCategories.ai",
   tags: ["tags.moderation" as const],
 
   fields: objectField(scopedTranslation, {

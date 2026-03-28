@@ -5,13 +5,11 @@
 
 import type { JSX } from "react";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
-
 import type { RangeSliderProps } from "../../web/ui/range-slider";
 
-export function RangeSlider<TTranslationKey extends string = TranslationKey>(
+export function RangeSlider(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _props: RangeSliderProps<TTranslationKey>,
+  _props: RangeSliderProps,
 ): JSX.Element {
   return <></>;
 }

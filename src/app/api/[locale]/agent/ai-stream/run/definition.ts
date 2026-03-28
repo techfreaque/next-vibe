@@ -74,7 +74,7 @@ const { POST } = createEndpoint({
     return undefined;
   },
   icon: "sparkles",
-  category: "app.endpointCategories.ai",
+  category: "endpointCategories.ai",
   cli: {
     firstCliArgKey: "prompt",
   },

@@ -59,7 +59,7 @@ const { GET } = createEndpoint({
   title: "get.title",
   description: "get.description",
   icon: "clock",
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -195,7 +195,7 @@ const { PUT } = createEndpoint({
   title: "put.title",
   description: "put.description",
   icon: "clock",
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -572,7 +572,7 @@ const { DELETE } = createEndpoint({
   title: "delete.title",
   description: "delete.description",
   icon: "clock",
-  category: "app.endpointCategories.systemTasks",
+  category: "endpointCategories.systemTasks",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,

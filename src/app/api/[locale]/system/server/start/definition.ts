@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -19,7 +20,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import { START_ALIASES } from "./constants";
@@ -32,7 +32,7 @@ const { POST } = createEndpoint({
   aliases: START_ALIASES,
   title: "post.title",
   description: "post.description",
-  category: "app.endpointCategories.systemDevTools",
+  category: "endpointCategories.systemDevTools",
   tags: ["tags.start"],
   icon: "zap",
   allowedRoles: [
@@ -134,7 +134,7 @@ const { POST } = createEndpoint({
       responseMessage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.output.title",
-        schema: z.string() as z.ZodType<TranslationKey>,
+        schema: translatedValueSchema,
       }),
     },
   }),

@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
     return undefined;
   },
   icon: "brain",
-  category: "app.endpointCategories.chatMemories",
+  category: "endpointCategories.chatMemories",
   tags: ["post.tags.memories" as const],
 
   options: {

@@ -1472,44 +1472,64 @@ export function ModelSelector({
                   sideOffset={8}
                 >
                   <RangeSlider
-                    options={INTELLIGENCE_DISPLAY}
+                    options={INTELLIGENCE_DISPLAY.map((opt) => ({
+                      ...opt,
+                      label: t(opt.label),
+                      description: opt.description
+                        ? t(opt.description)
+                        : undefined,
+                    }))}
                     minIndex={intelligenceIndices.min}
                     maxIndex={intelligenceIndices.max}
                     onChange={handleIntelligenceChange}
                     minLabel={t("ranges.intelligenceRange.minLabel")}
                     maxLabel={t("ranges.intelligenceRange.maxLabel")}
                     disabled={readOnly}
-                    t={t}
                   />
                   <RangeSlider
-                    options={CONTENT_DISPLAY}
+                    options={CONTENT_DISPLAY.map((opt) => ({
+                      ...opt,
+                      label: t(opt.label),
+                      description: opt.description
+                        ? t(opt.description)
+                        : undefined,
+                    }))}
                     minIndex={contentIndices.min}
                     maxIndex={contentIndices.max}
                     onChange={handleContentChange}
                     minLabel={t("ranges.contentRange.minLabel")}
                     maxLabel={t("ranges.contentRange.maxLabel")}
                     disabled={readOnly}
-                    t={t}
                   />
                   <RangeSlider
-                    options={SPEED_DISPLAY}
+                    options={SPEED_DISPLAY.map((opt) => ({
+                      ...opt,
+                      label: t(opt.label),
+                      description: opt.description
+                        ? t(opt.description)
+                        : undefined,
+                    }))}
                     minIndex={speedIndices.min}
                     maxIndex={speedIndices.max}
                     onChange={handleSpeedChange}
                     minLabel={t("ranges.speedRange.minLabel")}
                     maxLabel={t("ranges.speedRange.maxLabel")}
                     disabled={readOnly}
-                    t={t}
                   />
                   <RangeSlider
-                    options={PRICE_DISPLAY}
+                    options={PRICE_DISPLAY.map((opt) => ({
+                      ...opt,
+                      label: t(opt.label),
+                      description: opt.description
+                        ? t(opt.description)
+                        : undefined,
+                    }))}
                     minIndex={priceIndices.min}
                     maxIndex={priceIndices.max}
                     onChange={handlePriceChange}
                     minLabel={t("ranges.priceRange.minLabel")}
                     maxLabel={t("ranges.priceRange.maxLabel")}
                     disabled={readOnly}
-                    t={t}
                   />
                 </PopoverContent>
               </Popover>

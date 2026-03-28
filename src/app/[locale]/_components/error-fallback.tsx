@@ -6,19 +6,21 @@ import { H2, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
+import { configScopedTranslation } from "@/config/i18n";
 
 export default function ErrorFallback(): React.JSX.Element {
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = configScopedTranslation.scopedT(locale);
 
   return (
     <Div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
-      <H2 className="text-2xl font-bold mb-4">{t("app.common.error.title")}</H2>
-      <P className="mb-6">{t("app.common.error.message")}</P>
+      <H2 className="text-2xl font-bold mb-4">{t("error.title")}</H2>
+      <P className="mb-6">{t("error.message")}</P>
       <Button
         onClick={() => window.location.reload()}
         className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
       >
-        {t("app.common.error.tryAgain")}
+        {t("error.tryAgain")}
       </Button>
     </Div>
   );

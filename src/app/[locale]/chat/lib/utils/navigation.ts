@@ -11,7 +11,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
 
 /**
  * Get the root folder ID for a given folder
@@ -69,18 +69,18 @@ export function buildFolderUrl(
  */
 export function getNewChatTranslationKey(
   rootFolderId: DefaultFolderId,
-): TranslationKey {
+): ChatTranslationKey {
   switch (rootFolderId) {
     case DefaultFolderId.PRIVATE:
-      return "app.chat.common.newPrivateChat";
+      return "common.newPrivateChat";
     case DefaultFolderId.SHARED:
-      return "app.chat.common.newSharedChat";
+      return "common.newSharedChat";
     case DefaultFolderId.PUBLIC:
-      return "app.chat.common.newPublicChat";
+      return "common.newPublicChat";
     case DefaultFolderId.INCOGNITO:
-      return "app.chat.common.newIncognitoChat";
+      return "common.newIncognitoChat";
     default:
-      return "app.chat.common.newChat";
+      return "common.newChat";
   }
 }
 
@@ -91,17 +91,17 @@ export function getNewChatTranslationKey(
  */
 export function getNewFolderTranslationKey(
   rootFolderId: DefaultFolderId,
-): TranslationKey {
+): ChatTranslationKey {
   switch (rootFolderId) {
     case DefaultFolderId.PRIVATE:
-      return "app.chat.common.newPrivateFolder";
+      return "common.newPrivateFolder";
     case DefaultFolderId.SHARED:
-      return "app.chat.common.newSharedFolder";
+      return "common.newSharedFolder";
     case DefaultFolderId.PUBLIC:
-      return "app.chat.common.newPublicFolder";
+      return "common.newPublicFolder";
     case DefaultFolderId.INCOGNITO:
-      return "app.chat.common.newIncognitoFolder";
+      return "common.newIncognitoFolder";
     default:
-      return "app.chat.folderList.newFolder";
+      return "folderList.newFolder";
   }
 }

@@ -12,8 +12,9 @@ import { parseError } from "next-vibe/shared/utils";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation } from "./i18n";
 import {
   createMediaProvider,
   readStringOption,
@@ -39,14 +40,15 @@ export async function generateWithFalAi(params: {
   prompt: string;
   size: string;
   logger: EndpointLogger;
+  locale: CountryLanguage;
   signal?: AbortSignal;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, size, logger, signal } = params;
+  const { providerModel, prompt, size, logger, locale, signal } = params;
+  const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.FAL_AI_API_KEY) {
     return fail({
-      // eslint-disable-next-line i18next/no-literal-string
-      message: "Fal.ai API key not configured" as TranslationKey,
+      message: t("errors.apiKeyNotConfigured"),
       errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
@@ -85,7 +87,7 @@ export async function generateWithFalAi(params: {
         error: errorText,
       });
       return fail({
-        message: `Fal.ai error: ${errorText}` as TranslationKey,
+        message: t("errors.externalServiceError", { message: errorText }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -97,8 +99,7 @@ export async function generateWithFalAi(params: {
     for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
       if (signal?.aborted) {
         return fail({
-          // eslint-disable-next-line i18next/no-literal-string
-          message: "Request aborted" as TranslationKey,
+          message: t("errors.requestAborted"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
@@ -129,8 +130,9 @@ export async function generateWithFalAi(params: {
         );
         if (!resultResponse.ok) {
           return fail({
-            // eslint-disable-next-line i18next/no-literal-string
-            message: "Failed to fetch Fal.ai result" as TranslationKey,
+            message: t("errors.requestFailed", {
+              message: String(resultResponse.status),
+            }),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
@@ -138,8 +140,7 @@ export async function generateWithFalAi(params: {
         const imageUrl = result.images?.[0]?.url;
         if (!imageUrl) {
           return fail({
-            // eslint-disable-next-line i18next/no-literal-string
-            message: "No image URL in Fal.ai response" as TranslationKey,
+            message: t("errors.noImageUrl"),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
@@ -149,8 +150,7 @@ export async function generateWithFalAi(params: {
 
       if (statusData.status === "FAILED") {
         return fail({
-          // eslint-disable-next-line i18next/no-literal-string
-          message: "Fal.ai generation failed" as TranslationKey,
+          message: t("errors.generationFailed"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
@@ -162,21 +162,23 @@ export async function generateWithFalAi(params: {
     }
 
     return fail({
-      // eslint-disable-next-line i18next/no-literal-string
-      message: "Fal.ai request timed out after 60 seconds" as TranslationKey,
+      message: t("errors.requestTimedOut"),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   } catch (error) {
     const errorMessage = parseError(error).message;
     logger.error("[Fal.ai] Request failed", { error: errorMessage });
     return fail({
-      message: errorMessage as TranslationKey,
+      message: t("errors.requestFailed", { message: errorMessage }),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   }
 }
 
-export function createFalAiImage(logger: EndpointLogger): {
+export function createFalAiImage(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): {
   chat: (modelId: string) => LanguageModelV2;
 } {
   return createMediaProvider(logger, {
@@ -193,6 +195,7 @@ export function createFalAiImage(logger: EndpointLogger): {
         prompt,
         size,
         logger,
+        locale,
         signal: options.abortSignal,
       });
     },

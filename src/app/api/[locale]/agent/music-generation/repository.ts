@@ -15,7 +15,7 @@ import {
 import {
   ApiProvider,
   calculateCreditCost,
-  getModelById,
+  getAllModelOptions,
   type ModelOptionAudioBased,
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -46,9 +46,12 @@ export class MusicGenerationRepository {
     logger: EndpointLogger,
     t: MusicGenerationT,
   ): Promise<ResponseType<MusicGenerationPostResponseOutput>> {
-    const modelConfig = getModelById(data.model);
+    const selectedModel: string = data.model;
+    const modelConfig = getAllModelOptions().find(
+      (m) => m.id === selectedModel,
+    );
 
-    if (modelConfig.modelType !== "audio") {
+    if (!modelConfig || modelConfig.modelType !== "audio") {
       return fail({
         message: t("post.errors.notAnAudioModel"),
         errorType: ErrorResponseTypes.BAD_REQUEST,

@@ -12,41 +12,38 @@ import {
   Icon,
   type IconKey,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams } from "@/i18n/core/static-types";
 
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { Span } from "./span";
 
-export interface RangeSliderOption<TTranslationKey extends string> {
-  label: TTranslationKey;
+export interface RangeSliderOption {
+  label: TranslatedKeyType;
   value: string | number;
   icon?: IconKey;
-  description?: TTranslationKey;
+  description?: TranslatedKeyType;
 }
 
-export interface RangeSliderProps<TTranslationKey extends string> {
-  options: RangeSliderOption<TTranslationKey>[];
+export interface RangeSliderProps {
+  options: RangeSliderOption[];
   minIndex: number;
   maxIndex: number;
   onChange: (minIndex: number, maxIndex: number) => void;
   disabled?: boolean;
-  minLabel?: string;
-  maxLabel?: string;
-  t: (key: TTranslationKey, params?: TParams) => TranslatedKeyType;
+  minLabel: TranslatedKeyType;
+  maxLabel: TranslatedKeyType;
   className?: string;
 }
 
-export function RangeSlider<TTranslationKey extends string = string>({
+export function RangeSlider({
   options,
   minIndex,
   maxIndex,
   onChange,
   disabled = false,
-  minLabel = "MIN",
-  maxLabel = "MAX",
-  t,
+  minLabel,
+  maxLabel,
   className,
-}: RangeSliderProps<TTranslationKey>): React.JSX.Element {
+}: RangeSliderProps): React.JSX.Element {
   const [dragging, setDragging] = React.useState<"min" | "max" | null>(null);
   const trackRef = React.useRef<HTMLDivElement>(null);
 
@@ -365,11 +362,11 @@ export function RangeSlider<TTranslationKey extends string = string>({
                     />
                   )}
                   <Span className="text-xs pt-1 font-semibold whitespace-nowrap">
-                    {t(option.label)}
+                    {option.label}
                   </Span>
                   {option.description && (
                     <Span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                      {t(option.description)}
+                      {option.description}
                     </Span>
                   )}
                 </button>

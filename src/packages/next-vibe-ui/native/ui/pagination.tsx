@@ -7,6 +7,7 @@ import * as React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
 
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
@@ -129,7 +130,8 @@ const PaginationPrevious = ({
   className,
   ...props
 }: PaginationPreviousProps): React.JSX.Element => {
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   return (
     <PaginationLink
@@ -139,7 +141,7 @@ const PaginationPrevious = ({
     >
       <StyledView className="flex flex-row items-center gap-1">
         <ChevronLeftIcon className="h-4 w-4" />
-        <StyledText>{t("app.common.actions.previous")}</StyledText>
+        <StyledText>{t("common.actions.previous")}</StyledText>
       </StyledView>
     </PaginationLink>
   );
@@ -150,7 +152,8 @@ const PaginationNext = ({
   className,
   ...props
 }: PaginationNextProps): React.JSX.Element => {
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   return (
     <PaginationLink
@@ -159,7 +162,7 @@ const PaginationNext = ({
       {...props}
     >
       <StyledView className="flex flex-row items-center gap-1">
-        <StyledText>{t("app.common.actions.next")}</StyledText>
+        <StyledText>{t("common.actions.next")}</StyledText>
         <ChevronRightIcon className="h-4 w-4" />
       </StyledView>
     </PaginationLink>
@@ -171,13 +174,14 @@ const PaginationEllipsis = ({
   className,
   style,
 }: PaginationEllipsisProps): React.JSX.Element => {
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <StyledView
       accessible={true}
-      accessibilityLabel={t("app.common.accessibility.srOnly.more")}
+      accessibilityLabel={t("common.accessibility.srOnly.more")}
       accessibilityElementsHidden={true}
       {...applyStyleType({
         nativeStyle,

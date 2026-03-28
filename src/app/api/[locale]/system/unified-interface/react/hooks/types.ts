@@ -12,8 +12,8 @@ import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { EnhancedMutationResult } from "./use-api-mutation";
 
@@ -106,7 +106,7 @@ export interface ApiQueryReturn<TResponse> {
   isFetching: boolean;
   isCachedData: boolean;
   /** @deprecated Use response?.message instead */
-  statusMessage: TranslationKey | undefined;
+  statusMessage: TranslatedKeyType | undefined;
   status: "loading" | "success" | "error" | "idle";
   refetch: () => Promise<ResponseType<TResponse>>;
   remove: () => void;

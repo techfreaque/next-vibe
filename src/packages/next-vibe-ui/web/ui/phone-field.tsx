@@ -11,6 +11,7 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "../i18n";
 
 import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
@@ -92,7 +93,8 @@ export function PhoneField({
   style,
   name,
 }: PhoneFieldProps): JSX.Element {
-  const { t: _t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t: _t } = uiScopedTranslation.scopedT(locale);
   const [open, setOpen] = useState(false);
 
   // Parse the current value to extract country and number
@@ -182,18 +184,12 @@ export function PhoneField({
         </PopoverTrigger>
         <PopoverContent className="w-[300px] p-0" align="start">
           <Command id="country-listbox">
-            <CommandInput
-              placeholder={_t("packages.nextVibeUi.web.common.searchCountries")}
-            />
+            <CommandInput placeholder={_t("common.searchCountries")} />
             <CommandList className="max-h-[200px]">
-              <CommandEmpty>
-                {_t("packages.nextVibeUi.web.common.noCountryFound")}
-              </CommandEmpty>
+              <CommandEmpty>{_t("common.noCountryFound")}</CommandEmpty>
 
               {organizedCountries.preferred.length > 0 && (
-                <CommandGroup
-                  heading={_t("packages.nextVibeUi.web.common.preferred")}
-                >
+                <CommandGroup heading={_t("common.preferred")}>
                   {organizedCountries.preferred.map((country) => (
                     <CommandItem
                       key={country.code}
@@ -213,9 +209,7 @@ export function PhoneField({
                 </CommandGroup>
               )}
 
-              <CommandGroup
-                heading={_t("packages.nextVibeUi.web.common.allCountries")}
-              >
+              <CommandGroup heading={_t("common.allCountries")}>
                 {organizedCountries.others.map((country) => (
                   <CommandItem
                     key={country.code}

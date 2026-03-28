@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { CreditsT } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { REFERRAL_CONFIG } from "./config";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { users } from "@/app/api/[locale]/user/db";
@@ -83,14 +84,7 @@ interface PayoutRequestResult {
  * Referral Repository Implementation
  */
 export class ReferralRepository {
-  /**
-   * Configuration for referral payout algorithm
-   */
-  private static readonly REFERRAL_CONFIG = {
-    POOL_PERCENTAGE: 0.2, // 20% of transaction goes to referral pool
-    DECAY_RATIO: 0.5, // Each level gets 50% of previous level
-    MAX_LEVELS: 10, // Maximum depth of referral chain
-  } as const;
+  // All commission config lives in ./config.ts — imported as REFERRAL_CONFIG
   /**
    * Create a new referral code
    */
@@ -184,8 +178,8 @@ export class ReferralRepository {
             const [stats] = await db
               .select({
                 totalEarnings: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int`,
-                // Revenue is earnings divided by pool percentage (0.2) = earnings * 5
-                totalRevenue: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int * 5`,
+                // Revenue = earnings / total pool percentage
+                totalRevenue: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int * ${Math.round(1 / (REFERRAL_CONFIG.DIRECT_PERCENTAGE + REFERRAL_CONFIG.UPLINE_PERCENTAGE))}`,
               })
               .from(referralEarnings)
               .innerJoin(
@@ -549,10 +543,15 @@ export class ReferralRepository {
 
       const totalSignups = signupsResult?.count || 0;
 
-      // Calculate total revenue generated (sum of all earnings * 5, since earnings are 20% of revenue)
+      // Calculate total revenue generated (earnings / total pool percentage)
+      const revenueMultiplier = Math.round(
+        1 /
+          (REFERRAL_CONFIG.DIRECT_PERCENTAGE +
+            REFERRAL_CONFIG.UPLINE_PERCENTAGE),
+      );
       const [revenueResult] = await db
         .select({
-          total: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}) * 5, 0)::int`,
+          total: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}) * ${revenueMultiplier}, 0)::int`,
         })
         .from(referralEarnings)
         .where(eq(referralEarnings.earnerUserId, userId));
@@ -603,11 +602,11 @@ export class ReferralRepository {
         availableCreditsTitle: "stats.fields.availableBalance",
         availableCreditsValue: availableCredits,
         availableCreditsDescription:
-          availableCredits >= ReferralRepository.MIN_PAYOUT_CENTS
+          availableCredits >= REFERRAL_CONFIG.MIN_PAYOUT_CENTS
             ? "stats.fields.availableBalanceDescription"
             : "stats.fields.availableBalanceDescriptionLow",
         availableCreditsReadyForPayout:
-          availableCredits >= ReferralRepository.MIN_PAYOUT_CENTS,
+          availableCredits >= REFERRAL_CONFIG.MIN_PAYOUT_CENTS,
       });
     } catch (error) {
       logger.error("Failed to get referral stats", parseError(error));
@@ -774,7 +773,9 @@ export class ReferralRepository {
     let currentUserId: string | null = userId;
 
     // Traverse up the referral chain
-    for (let i = 0; i < ReferralRepository.REFERRAL_CONFIG.MAX_LEVELS; i++) {
+    // chain[0] = direct referrer + up to MAX_UPLINE_LEVELS above them
+    const maxChain = 1 + REFERRAL_CONFIG.MAX_UPLINE_LEVELS;
+    for (let i = 0; i < maxChain; i++) {
       const [referral] = await db
         .select()
         .from(userReferrals)
@@ -797,48 +798,63 @@ export class ReferralRepository {
   }
 
   /**
-   * Calculate commission shares using geometric decay (private helper)
+   * Calculate commission shares using Option A split-pool algorithm.
+   *
+   * chain[0] = direct referrer, always earns DIRECT_PERCENTAGE of the
+   * transaction regardless of chain depth. chain[1..N] = upline, splits
+   * UPLINE_PERCENTAGE with geometric decay. This ensures that being referred
+   * never penalises the direct referrer.
    */
   private static calculateCommissionShares(
     amountCents: number,
     chain: string[],
   ): CommissionShare[] {
-    const poolCents = Math.floor(
-      amountCents * ReferralRepository.REFERRAL_CONFIG.POOL_PERCENTAGE,
-    );
-    const q = ReferralRepository.REFERRAL_CONFIG.DECAY_RATIO;
-    const n = Math.min(
-      chain.length,
-      ReferralRepository.REFERRAL_CONFIG.MAX_LEVELS,
-    );
-
-    if (n === 0) {
+    if (chain.length === 0) {
       return [];
     }
 
-    // Calculate sum of geometric series: S = (1 - q^n) / (1 - q)
-    const sum = (1 - Math.pow(q, n)) / (1 - q);
-
+    const cfg = REFERRAL_CONFIG;
     const shares: CommissionShare[] = [];
-    let totalAllocated = 0;
 
-    // Calculate shares for each level
-    for (let k = 0; k < n; k++) {
-      const weight = Math.pow(q, k);
-      const shareCents = Math.floor((poolCents * weight) / sum);
+    // --- Level 0: flat direct commission ---
+    const directCents = Math.floor(amountCents * cfg.DIRECT_PERCENTAGE);
+    shares.push({
+      earnerUserId: chain[0],
+      level: 0,
+      amountCents: directCents,
+    });
 
-      shares.push({
-        earnerUserId: chain[k],
-        level: k,
-        amountCents: shareCents,
-      });
-
-      totalAllocated += shareCents;
+    // --- Levels 1+: upline pool with geometric decay ---
+    const uplineChain = chain.slice(1, 1 + cfg.MAX_UPLINE_LEVELS);
+    if (uplineChain.length === 0) {
+      return shares;
     }
 
-    // Distribute remainder to level 0 (direct referrer)
-    if (totalAllocated < poolCents && shares.length > 0) {
-      shares[0].amountCents += poolCents - totalAllocated;
+    const uplinePoolCents = Math.floor(amountCents * cfg.UPLINE_PERCENTAGE);
+    const q = cfg.DECAY_RATIO;
+    const n = uplineChain.length;
+
+    // Sum of geometric series: S = (1 - q^n) / (1 - q)
+    const sum = (1 - Math.pow(q, n)) / (1 - q);
+
+    let uplineAllocated = 0;
+    for (let k = 0; k < n; k++) {
+      const weight = Math.pow(q, k);
+      const shareCents = Math.floor((uplinePoolCents * weight) / sum);
+      shares.push({
+        earnerUserId: uplineChain[k],
+        level: k + 1,
+        amountCents: shareCents,
+      });
+      uplineAllocated += shareCents;
+    }
+
+    // Distribute rounding remainder to chain[1] (first upline)
+    if (uplineAllocated < uplinePoolCents) {
+      const firstUpline = shares.find((s) => s.level === 1);
+      if (firstUpline) {
+        firstUpline.amountCents += uplinePoolCents - uplineAllocated;
+      }
     }
 
     return shares;
@@ -846,10 +862,7 @@ export class ReferralRepository {
 
   // ==================== PAYOUT METHODS ====================
 
-  /**
-   * Minimum payout amount in cents ($40)
-   */
-  private static readonly MIN_PAYOUT_CENTS = 4000;
+  // MIN_PAYOUT_CENTS sourced from REFERRAL_CONFIG.MIN_PAYOUT_CENTS
 
   /**
    * Get user's earned credits balance and payout history
@@ -935,7 +948,7 @@ export class ReferralRepository {
     const { t } = scopedTranslation.scopedT(locale);
     try {
       // Validate minimum amount
-      if (amountCents < ReferralRepository.MIN_PAYOUT_CENTS) {
+      if (amountCents < REFERRAL_CONFIG.MIN_PAYOUT_CENTS) {
         return fail({
           message: t("payout.errors.minimumAmount"),
           errorType: ErrorResponseTypes.BAD_REQUEST,

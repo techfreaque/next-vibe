@@ -11,7 +11,8 @@ import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import { uiScopedTranslation } from "../i18n";
 
 import { Badge } from "./badge";
 import { Button } from "./button";
@@ -29,35 +30,31 @@ export enum FormFieldCategory {
   OTHER = "other",
 }
 
-const CATEGORY_TRANSLATION_KEYS: Record<FormFieldCategory, TranslationKey> = {
-  [FormFieldCategory.OTHER]: "packages.nextVibeUi.web.common.other",
-};
-
-// Cross-platform base interface (no TranslationKey dependency)
-export interface AutocompleteOptionBase<TKey extends string> {
+// Cross-platform base interface
+export interface AutocompleteOptionBase {
   value: string;
-  label: TKey;
-  category?: TranslationKey;
-  description?: TKey;
+  label: TranslatedKeyType;
+  category?: TranslatedKeyType;
+  description?: TranslatedKeyType;
 }
 
-export interface AutocompleteOption<TKey extends string> {
+export interface AutocompleteOption {
   value: string;
-  label: TKey;
-  category?: string;
+  label: TranslatedKeyType;
+  category?: TranslatedKeyType;
   /** Optional secondary text shown below the label */
-  description?: TKey;
+  description?: TranslatedKeyType;
 }
 
 export interface AutocompleteFieldProps {
   value?: string;
   onChange: (value: string) => void;
   onBlur?: () => void;
-  options: AutocompleteOption<string>[];
+  options: AutocompleteOption[];
   /** Already-translated placeholder text */
-  placeholder?: string;
+  placeholder?: TranslatedKeyType;
   /** Already-translated search placeholder text */
-  searchPlaceholder?: string;
+  searchPlaceholder?: TranslatedKeyType;
   allowCustom?: boolean;
   disabled?: boolean;
   name?: string;
@@ -76,14 +73,15 @@ export function AutocompleteField({
   className,
   name,
 }: AutocompleteFieldProps): JSX.Element {
-  const { t: globalT } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isCustomValue, setIsCustomValue] = useState(false);
 
   // Group options by category
   const groupedOptions = useMemo(() => {
-    const groups: Record<string, AutocompleteOption<string>[]> = {};
+    const groups: Record<string, AutocompleteOption[]> = {};
 
     options.forEach((option) => {
       const category = option.category || FormFieldCategory.OTHER;
@@ -102,7 +100,7 @@ export function AutocompleteField({
       return groupedOptions;
     }
 
-    const filtered: Record<string, AutocompleteOption<string>[]> = {};
+    const filtered: Record<string, AutocompleteOption[]> = {};
 
     Object.entries(groupedOptions).forEach(([category, categoryOptions]) => {
       const lowerSearch = searchValue.toLowerCase();
@@ -172,7 +170,7 @@ export function AutocompleteField({
               <div className="flex items-center gap-2 flex-1 min-w-0">
                 {isCustomValue && (
                   <Badge variant="secondary" className="text-xs">
-                    {globalT("app.common.customValue")}
+                    {t("common.customValue")}
                   </Badge>
                 )}
                 <span className="truncate">
@@ -211,7 +209,7 @@ export function AutocompleteField({
               <CommandEmpty>
                 <div className="py-6 text-center text-sm">
                   <p className="text-muted-foreground">
-                    {globalT("app.common.noOptionsFound")}
+                    {t("common.noOptionsFound")}
                   </p>
                   {allowCustom && searchValue && (
                     <Button
@@ -220,7 +218,7 @@ export function AutocompleteField({
                       className="mt-2"
                       onClick={() => handleCustomValue(searchValue)}
                     >
-                      {globalT("app.common.useCustomValue", {
+                      {t("common.useCustomValue", {
                         value: searchValue,
                       })}
                     </Button>
@@ -234,14 +232,7 @@ export function AutocompleteField({
                     key={category}
                     heading={
                       category !== FormFieldCategory.OTHER.toString()
-                        ? globalT(
-                            CATEGORY_TRANSLATION_KEYS[
-                              category as FormFieldCategory
-                            ] ||
-                              CATEGORY_TRANSLATION_KEYS[
-                                FormFieldCategory.OTHER
-                              ],
-                          )
+                        ? category
                         : undefined
                     }
                   >
@@ -278,7 +269,7 @@ export function AutocompleteField({
                       className="flex items-center justify-between"
                     >
                       <span>
-                        {globalT("app.common.useCustomValue", {
+                        {t("common.useCustomValue", {
                           value: searchValue,
                         })}
                       </span>

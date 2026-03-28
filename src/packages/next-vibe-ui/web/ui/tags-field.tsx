@@ -11,6 +11,7 @@ import type { JSX } from "react";
 import { useRef, useState } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "../i18n";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
@@ -52,7 +53,8 @@ export function TagsField<TKey extends string>({
   name,
   t,
 }: TagsFieldProps<TKey>): JSX.Element {
-  const { t: globalT } = useTranslation();
+  const { locale } = useTranslation();
+  const { t: globalT } = uiScopedTranslation.scopedT(locale);
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -232,12 +234,9 @@ export function TagsField<TKey extends string>({
                           onClick={() => addTag(inputValue)}
                         >
                           <Plus className="h-3 w-3 mr-2" />
-                          {globalT(
-                            "packages.nextVibeUi.web.common.addCustomValue",
-                            {
-                              value: inputValue.trim(),
-                            },
-                          )}
+                          {globalT("common.addCustomValue", {
+                            value: inputValue.trim(),
+                          })}
                         </Button>
                       </div>
                     )}

@@ -21,7 +21,6 @@ import { useWatch } from "react-hook-form";
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { scopedTranslation as reactScopedTranslation } from "../../../../react/i18n";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
@@ -402,7 +401,7 @@ export function ContainerWidget<
     formAlertState = {
       variant: "destructive",
       message: {
-        message: response.message as TranslationKey,
+        message: response.message,
         messageParams: response.messageParams,
       },
     };

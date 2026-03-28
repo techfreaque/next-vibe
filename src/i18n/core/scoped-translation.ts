@@ -3,6 +3,7 @@
  * Creates module-specific translation functions that work only within a defined scope
  */
 
+import { z } from "zod";
 import { type CountryLanguage, defaultLocale, type Languages } from "./config";
 import { getLanguageFromLocale } from "./language-utils";
 import {
@@ -116,6 +117,12 @@ export function createScopedTranslation<
   readonly scopedT: (locale: CountryLanguage) => {
     t: (key: DotNotation<TEN>, params?: TParams) => TranslatedKeyType;
   };
+  /**
+   * Schema for a field that holds a scoped translation key.
+   * Use when the value is a key string (e.g. "response.totalLeads") that the
+   * frontend/widget will pass to t() to get the translated display string.
+   */
+  readonly translationKeySchema: () => z.ZodType<DotNotation<TEN>>;
 } {
   // Cache resolved translations per language to avoid repeated getter calls
   const resolvedCache = new Map<string, Record<string, NestedValue>>();
@@ -136,6 +143,9 @@ export function createScopedTranslation<
 
   return {
     ScopedTranslationKey: undefined as DotNotation<TEN>,
+    translationKeySchema: () =>
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      z.string() as unknown as z.ZodType<DotNotation<TEN>>,
 
     scopedT: function simpleT(locale: CountryLanguage): {
       t: (key: DotNotation<TEN>, params?: TParams) => TranslatedKeyType;

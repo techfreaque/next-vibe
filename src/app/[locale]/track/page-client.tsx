@@ -6,13 +6,13 @@ import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import { useMemo } from "react";
 
+import { scopedTranslation } from "@/app/[locale]/track/i18n";
 import { LeadSource } from "@/app/api/[locale]/leads/enum";
 import trackingEndpoints from "@/app/api/[locale]/leads/tracking/engagement/definition";
 import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-query";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { scopedTranslation } from "@/app/[locale]/track/i18n";
 
 /**
  * Tracking Page - Records click engagement and handles referral codes

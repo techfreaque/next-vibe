@@ -53,6 +53,7 @@ import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { scopedTranslation as runScopedTranslation } from "./i18n";
 
 import { DefaultFolderId } from "../../chat/config";
 import { ChatMessageRole } from "../../chat/enum";
@@ -137,14 +138,16 @@ function PreCallRow({
   user,
   onRouteIdChange,
   onRemove,
+  t,
 }: {
   call: PreCall;
   index: number;
-  toolOptions: AutocompleteOption<string>[];
+  toolOptions: AutocompleteOption[];
   locale: CountryLanguage;
   user: ReturnType<typeof useWidgetUser>;
   onRouteIdChange: (index: number, routeId: string) => void;
   onRemove: (index: number) => void;
+  t: ReturnType<typeof runScopedTranslation.scopedT>["t"];
 }): JSX.Element {
   const [resolvedEndpoint, setResolvedEndpoint] =
     useState<CreateApiEndpointAny | null>(null);
@@ -200,8 +203,8 @@ function PreCallRow({
             value={call.routeId}
             onChange={(val) => onRouteIdChange(index, val)}
             options={toolOptions}
-            placeholder="Select endpoint..."
-            searchPlaceholder="Search endpoints..."
+            placeholder={t("widget.selectEndpoint")}
+            searchPlaceholder={t("widget.searchEndpoints")}
             allowCustom={true}
           />
         </Div>
@@ -273,12 +276,14 @@ function PreCallsEditor({
   toolOptions,
   locale,
   user,
+  t,
 }: {
   preCalls: PreCall[];
   onChange: (calls: PreCall[]) => void;
-  toolOptions: AutocompleteOption<string>[];
+  toolOptions: AutocompleteOption[];
   locale: CountryLanguage;
   user: ReturnType<typeof useWidgetUser>;
+  t: ReturnType<typeof runScopedTranslation.scopedT>["t"];
 }): JSX.Element {
   const [isExpanded, setIsExpanded] = useState(preCalls.length > 0);
 
@@ -338,6 +343,7 @@ function PreCallsEditor({
               user={user}
               onRouteIdChange={handleRouteIdChange}
               onRemove={handleRemove}
+              t={t}
             />
           ))}
 
@@ -363,6 +369,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   const { children } = field;
   const form = useWidgetForm<typeof definition.POST>();
   const locale = useWidgetLocale();
+  const { t } = runScopedTranslation.scopedT(locale);
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const onSubmit = useWidgetOnSubmit();
@@ -401,7 +408,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
     user,
   );
 
-  const toolOptions = useMemo((): AutocompleteOption<string>[] => {
+  const toolOptions = useMemo((): AutocompleteOption[] => {
     const response = helpState?.read?.response;
     if (!response || response.success !== true) {
       return [];
@@ -411,12 +418,16 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
       const label = alias ?? tool.name;
       return {
         value: tool.name,
-        label,
-        description: tool.description,
-        category: tool.category,
+        label: t("widget.value", { value: label }),
+        description: tool.description
+          ? t("widget.value", { value: tool.description })
+          : undefined,
+        category: tool.category
+          ? t("widget.value", { value: tool.category })
+          : undefined,
       };
     });
-  }, [helpState?.read?.response]);
+  }, [helpState?.read?.response, t]);
 
   // Pre-calls form integration
   const preCalls: PreCall[] = form.watch("preCalls") ?? [];
@@ -638,6 +649,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
                     toolOptions={toolOptions}
                     locale={locale}
                     user={user}
+                    t={t}
                   />
 
                   {/* Tools config */}

@@ -30,7 +30,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "activity",
-  category: "app.endpointCategories.analyticsDataSources",
+  category: "endpointCategories.analyticsDataSources",
   tags: ["tags.vibeSense" as const],
   aliases: [CHAT_THREADS_ACTIVE_TOTAL_ALIAS],
   allowedRoles: [UserRole.ADMIN],

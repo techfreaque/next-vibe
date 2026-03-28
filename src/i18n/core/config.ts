@@ -1,8 +1,11 @@
 // ----------------
 // TYPES
 
-import { allTranslations, languageConfig, languageDefaults } from "../../i18n";
-import type { TranslationKey } from "./static-types";
+import type { configScopedTranslation } from "@/config/i18n";
+import { languageConfig, languageDefaults } from "../../i18n";
+
+type ConfigTranslationKey =
+  (typeof configScopedTranslation)["ScopedTranslationKey"];
 
 // ----------------
 export type Countries = keyof typeof languageConfig.countries;
@@ -10,8 +13,6 @@ export type Currencies = keyof typeof languageConfig.currencies;
 export type Languages =
   (typeof languageConfig.languages)[keyof typeof languageConfig.languages];
 export type CountryLanguage = `${Languages}-${Countries}`;
-
-export type TranslationSchema = typeof languageDefaults.translations;
 
 export interface CountryInfo {
   code: Countries;
@@ -38,24 +39,28 @@ export const LanguagesArr = ["de", "pl", "en"] as const;
  * Countries Options for select fields
  * Maps country codes to translation keys for UI display
  */
-export const CountriesOptions: Array<{ value: string; label: TranslationKey }> =
-  [
-    { value: Countries.GLOBAL, label: "app.common.countries.global" },
-    { value: Countries.DE, label: "app.common.countries.de" },
-    { value: Countries.PL, label: "app.common.countries.pl" },
-    { value: Countries.US, label: "app.common.countries.us" },
-  ];
+export const CountriesOptions: Array<{
+  value: string;
+  label: ConfigTranslationKey;
+}> = [
+  { value: Countries.GLOBAL, label: "countries.global" },
+  { value: Countries.DE, label: "countries.de" },
+  { value: Countries.PL, label: "countries.pl" },
+  { value: Countries.US, label: "countries.us" },
+];
 
 /**
  * Languages Options for select fields
  * Maps language codes to translation keys for UI display
  */
-export const LanguagesOptions: Array<{ value: string; label: TranslationKey }> =
-  [
-    { value: Languages.EN, label: "app.common.languages.en" },
-    { value: Languages.DE, label: "app.common.languages.de" },
-    { value: Languages.PL, label: "app.common.languages.pl" },
-  ];
+export const LanguagesOptions: Array<{
+  value: string;
+  label: ConfigTranslationKey;
+}> = [
+  { value: Languages.EN, label: "languages.en" },
+  { value: Languages.DE, label: "languages.de" },
+  { value: Languages.PL, label: "languages.pl" },
+];
 
 /**
  * Country Filter Enum
@@ -166,7 +171,6 @@ export const CountryLanguageValues = Object.values(
 
 // Other useful exports
 export const currencyByCountry = languageConfig.mappings.currencyByCountry;
-export const translations = allTranslations;
 export const defaultLocaleConfig = languageDefaults;
 export const defaultLocale: CountryLanguage = `${languageDefaults.language}-${languageDefaults.country}`;
 export const globalCountryInfo: CountryInfo = languageConfig.countryInfo
@@ -218,9 +222,8 @@ export interface LanguageConfig {
   };
 }
 
-export interface LanguageDefaults<TTranslationSchema> {
+export interface LanguageDefaults {
   country: string;
   currency: string;
   language: string;
-  translations: TTranslationSchema;
 }

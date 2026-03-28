@@ -50,7 +50,7 @@ const { GET } = createEndpoint({
   path: ["messenger", "accounts", "list"],
   title: "title",
   description: "description",
-  category: "app.endpointCategories.messenger",
+  category: "endpointCategories.messenger",
   icon: "message-circle",
   tags: ["tags.messaging"],
   allowedRoles: [UserRole.ADMIN],

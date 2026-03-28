@@ -6,6 +6,7 @@ import { DotsHorizontalIcon } from "next-vibe-ui/ui/icons/DotsHorizontalIcon";
 import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "../i18n";
 
 import type { StyleType } from "../utils/style-type";
 import { buttonVariants } from "./button";
@@ -113,17 +114,18 @@ const PaginationPrevious = ({
   className,
   ...props
 }: PaginationLinkProps): React.JSX.Element => {
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   return (
     <PaginationLink
-      aria-label={t("app.common.accessibility.srOnly.previousPage")}
+      aria-label={t("common.accessibility.srOnly.previousPage")}
       size="default"
       className={cn("gap-1 pl-2.5", className)}
       {...props}
     >
       <ChevronLeftIcon className="h-4 w-4" />
-      <span>{t("app.common.actions.previous")}</span>
+      <span>{t("common.actions.previous")}</span>
     </PaginationLink>
   );
 };
@@ -133,16 +135,17 @@ const PaginationNext = ({
   className,
   ...props
 }: PaginationLinkProps): React.JSX.Element => {
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   return (
     <PaginationLink
-      aria-label={t("app.common.accessibility.srOnly.nextPage")}
+      aria-label={t("common.accessibility.srOnly.nextPage")}
       size="default"
       className={cn("gap-1 pr-2.5", className)}
       {...props}
     >
-      <span>{t("app.common.actions.next")}</span>
+      <span>{t("common.actions.next")}</span>
       <ChevronRightIcon className="h-4 w-4" />
     </PaginationLink>
   );
@@ -153,7 +156,8 @@ const PaginationEllipsis = ({
   className,
   style,
 }: PaginationEllipsisProps): React.JSX.Element => {
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   return (
     <span
@@ -162,9 +166,7 @@ const PaginationEllipsis = ({
       style={style}
     >
       <DotsHorizontalIcon className="h-4 w-4" />
-      <span className="sr-only">
-        {t("app.common.accessibility.srOnly.more")}
-      </span>
+      <span className="sr-only">{t("common.accessibility.srOnly.more")}</span>
     </span>
   );
 };

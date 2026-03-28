@@ -4,7 +4,8 @@ import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation as appLocaleScopedTranslation } from "@/app/[locale]/i18n";
 
 import { parseError } from "@/app/api/[locale]/shared/utils";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
@@ -191,9 +192,9 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     endpoints: CreateApiEndpointAny[],
     locale: CountryLanguage,
   ): SerializableToolMetadata[] {
+    const { t: appLocaleT } = appLocaleScopedTranslation.scopedT(locale);
     return endpoints.map((definition) => {
       const { t } = definition.scopedTranslation.scopedT(locale);
-      const { t: globalT } = simpleT(locale);
       const method = definition.method;
       const toolName = endpointToToolName(definition);
 
@@ -202,7 +203,7 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
         method,
         title: t(definition.title),
         description: t(definition.description),
-        category: globalT(definition.category),
+        category: appLocaleT(definition.category),
         tags: definition.tags.map((tag) => t(tag)),
         toolName,
         allowedRoles: definition.allowedRoles

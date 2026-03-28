@@ -573,7 +573,7 @@ function renderFieldInput<
           onChange={(value) => field.onChange(value)}
           onBlur={field.onBlur}
           options={(config.options || []).map((opt) => ({
-            ...opt,
+            value: opt.value,
             label: t(opt.label),
           }))}
           placeholder={config.placeholder ? t(config.placeholder) : undefined}

@@ -8,16 +8,16 @@ import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
 import type { JSX } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { scopedTranslation as resetPasswordScopedTranslation } from "@/app/api/[locale]/user/public/reset-password/i18n";
 import { PasswordRepository } from "@/app/api/[locale]/user/public/reset-password/repository";
 import type { ResetPasswordValidateGetResponseOutput } from "@/app/api/[locale]/user/public/reset-password/validate/definition";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import { scopedTranslation as pageT } from "../i18n";
 import ResetPasswordConfirmForm from "./_components/reset-password-confirm-form";

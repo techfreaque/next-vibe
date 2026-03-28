@@ -7,3 +7,6 @@ export const scopedTranslation = createScopedTranslation({
   de: () => require("./de").translations,
   pl: () => require("./pl").translations,
 });
+
+export type AppLocaleTranslationKey =
+  (typeof scopedTranslation)["ScopedTranslationKey"];

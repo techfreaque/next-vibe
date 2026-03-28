@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["newsletter", "unsubscribe", "sync"],
   title: "unsubscribe.sync.post.title",
   description: "unsubscribe.sync.post.description",
-  category: "app.endpointCategories.leadsCampaigns",
+  category: "endpointCategories.leadsCampaigns",
   icon: "refresh-cw",
   tags: ["unsubscribe.sync.tag"],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],

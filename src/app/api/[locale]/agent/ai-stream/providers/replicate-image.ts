@@ -12,8 +12,9 @@ import { parseError } from "next-vibe/shared/utils";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation } from "./i18n";
 import {
   createMediaProvider,
   readStringOption,
@@ -32,13 +33,15 @@ const MAX_POLL_ATTEMPTS = 30;
 async function pollPrediction(
   predictionId: string,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   signal?: AbortSignal,
 ): Promise<ResponseType<{ imageUrl: string }>> {
+  const { t } = scopedTranslation.scopedT(locale);
+
   for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
     if (signal?.aborted) {
       return fail({
-        // eslint-disable-next-line i18next/no-literal-string
-        message: "Request aborted" as TranslationKey,
+        message: t("errors.requestAborted"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -55,8 +58,7 @@ async function pollPrediction(
     );
     if (!response.ok) {
       return fail({
-        message:
-          `Replicate poll failed: HTTP ${response.status}` as TranslationKey,
+        message: t("errors.pollFailed", { status: String(response.status) }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -67,8 +69,7 @@ async function pollPrediction(
       const imageUrl = Array.isArray(output) ? output[0] : output;
       if (!imageUrl) {
         return fail({
-          // eslint-disable-next-line i18next/no-literal-string
-          message: "No image URL in Replicate output" as TranslationKey,
+          message: t("errors.noImageUrl"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
@@ -76,8 +77,9 @@ async function pollPrediction(
     }
     if (prediction.status === "failed" || prediction.status === "canceled") {
       return fail({
-        message: (prediction.error ??
-          `Prediction ${prediction.status}`) as TranslationKey,
+        message: prediction.error
+          ? t("errors.externalServiceError", { message: prediction.error })
+          : t("errors.generationFailed"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -88,9 +90,7 @@ async function pollPrediction(
     });
   }
   return fail({
-    // eslint-disable-next-line i18next/no-literal-string
-    message:
-      "Replicate prediction timed out after 60 seconds" as TranslationKey,
+    message: t("errors.requestTimedOut"),
     errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
   });
 }
@@ -100,14 +100,15 @@ export async function generateWithReplicate(params: {
   prompt: string;
   size: string;
   logger: EndpointLogger;
+  locale: CountryLanguage;
   signal?: AbortSignal;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, size, logger, signal } = params;
+  const { providerModel, prompt, size, logger, locale, signal } = params;
+  const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.REPLICATE_API_TOKEN) {
     return fail({
-      // eslint-disable-next-line i18next/no-literal-string
-      message: "Replicate API token not configured" as TranslationKey,
+      message: t("errors.apiKeyNotConfigured"),
       errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
@@ -152,7 +153,7 @@ export async function generateWithReplicate(params: {
         error: errorText,
       });
       return fail({
-        message: `Replicate error: ${errorText}` as TranslationKey,
+        message: t("errors.externalServiceError", { message: errorText }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -161,18 +162,21 @@ export async function generateWithReplicate(params: {
     logger.info("[Replicate] Prediction created, polling", {
       predictionId: prediction.id,
     });
-    return pollPrediction(prediction.id, logger, signal);
+    return pollPrediction(prediction.id, logger, locale, signal);
   } catch (error) {
     const errorMessage = parseError(error).message;
     logger.error("[Replicate] Request failed", { error: errorMessage });
     return fail({
-      message: errorMessage as TranslationKey,
+      message: t("errors.requestFailed", { message: errorMessage }),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   }
 }
 
-export function createReplicateImage(logger: EndpointLogger): {
+export function createReplicateImage(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): {
   chat: (modelId: string) => LanguageModelV2;
 } {
   return createMediaProvider(logger, {
@@ -189,6 +193,7 @@ export function createReplicateImage(logger: EndpointLogger): {
         prompt,
         size,
         logger,
+        locale,
         signal: options.abortSignal,
       });
     },

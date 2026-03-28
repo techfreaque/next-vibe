@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import type { Metadata } from "next";
-import type { Route } from "next";
+import type { Metadata, Route } from "next";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
@@ -9,11 +8,11 @@ import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   DEV_SEED_PASSWORD,
   DEV_SEED_USERS,
 } from "@/app/api/[locale]/user/dev-seed-users";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { scopedTranslation as loginScopedTranslation } from "@/app/api/[locale]/user/public/login/i18n";
 import type { LoginOptions } from "@/app/api/[locale]/user/public/login/repository";
 import { LoginRepository } from "@/app/api/[locale]/user/public/login/repository";

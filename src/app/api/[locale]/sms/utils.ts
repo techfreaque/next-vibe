@@ -9,7 +9,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams, TranslationKey } from "@/i18n/core/static-types";
+import type { TParams } from "@/i18n/core/static-types";
 
 import { smsEnv } from "./env";
 // Import and re-export enum from separate file to avoid circular dependency
@@ -136,7 +136,7 @@ export interface SmsRenderProps<
   TRequest,
   TResponse,
   TUrlVariables,
-  TScopedTranslationKey extends string = TranslationKey,
+  TScopedTranslationKey extends string,
 > {
   requestData: TRequest;
   urlPathParams: TUrlVariables;
@@ -151,7 +151,7 @@ export type SmsFunctionType<
   TRequest,
   TResponse,
   TUrlVariables,
-  TScopedTranslationKey extends string = TranslationKey,
+  TScopedTranslationKey extends string,
 > = (
   props: SmsRenderProps<
     TRequest,
@@ -214,7 +214,7 @@ export interface SmsHandler<
   TRequest,
   TResponse,
   TUrlVariables,
-  TScopedTranslationKey extends string = TranslationKey,
+  TScopedTranslationKey extends string,
 > {
   readonly ignoreErrors?: boolean;
   readonly render: SmsFunctionType<
@@ -232,7 +232,7 @@ export interface SmsConfig<
   TRequest,
   TResponse,
   TUrlVariables,
-  TScopedTranslationKey extends string = TranslationKey,
+  TScopedTranslationKey extends string,
 > {
   afterHandlerSms?: ReadonlyArray<
     SmsHandler<TRequest, TResponse, TUrlVariables, TScopedTranslationKey>

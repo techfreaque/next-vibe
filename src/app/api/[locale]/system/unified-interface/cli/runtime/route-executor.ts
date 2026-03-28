@@ -20,8 +20,9 @@ import {
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TParams, TranslationKey } from "@/i18n/core/static-types";
+import type { TParams } from "@/i18n/core/static-types";
 
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { TOOL_HELP_ALIAS } from "../../../help/constants";
 import {
   definitionLoader,
@@ -124,8 +125,8 @@ export interface RouteExecutionResult {
   /** CLI response data */
   data?: CliResponseData;
 
-  /** Error message (translation key or plain text) */
-  error?: TranslationKey;
+  /** Error message */
+  error?: TranslatedKeyType;
 
   /** Error parameters for translation */
   errorParams?: TParams;
@@ -143,7 +144,7 @@ export interface RouteExecutionResult {
   };
 
   /** Performance metadata from route execution (translation keys as keys) */
-  performance?: Partial<Record<TranslationKey, number>>;
+  performance?: Partial<Record<TranslatedKeyType, number>>;
 
   /** Time spent loading the endpoint definition + route handler (ms) */
   endpointLoadMs?: number;

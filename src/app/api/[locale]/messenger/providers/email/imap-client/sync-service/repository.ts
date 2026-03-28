@@ -30,7 +30,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { messengerAccounts } from "../../../../accounts/db";
 import { MessengerAccountStatus } from "../../../../accounts/enum";
 import type { SpecialFolderTypeValue } from "../../../../messages/enum";
@@ -64,7 +64,7 @@ function toSpecialFolderType(
 
 interface SyncResult {
   success: boolean;
-  message: TranslationKey;
+  message: TranslatedKeyType;
   results: {
     accountsProcessed: number;
     foldersProcessed: number;

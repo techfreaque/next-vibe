@@ -35,7 +35,7 @@ const { GET } = createEndpoint({
   path: ["leads", "campaigns", "queue"],
   title: "get.title",
   description: "get.description",
-  category: "app.endpointCategories.leadsCampaigns",
+  category: "endpointCategories.leadsCampaigns",
   icon: "list",
   tags: ["title"],
   allowedRoles: [UserRole.ADMIN],

@@ -48,7 +48,7 @@ import {
   SortOrderOptions,
 } from "../enum";
 import { LEADS_STATS_ALIAS } from "./constants";
-import { type LeadsStatsTranslationKey, scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import { LeadsStatsContainer } from "./widget";
 
 // ========== Zod Schemas for Complex Response Types ==========
@@ -62,7 +62,7 @@ const chartDataPointSchema = z.object({
 });
 
 const chartDataSchema = z.object({
-  name: z.string() as z.ZodType<LeadsStatsTranslationKey>,
+  name: scopedTranslation.translationKeySchema(),
   type: z.enum(ChartType),
   data: z.array(chartDataPointSchema),
   color: z.string(),
@@ -270,7 +270,7 @@ const { GET } = createEndpoint({
   aliases: [LEADS_STATS_ALIAS],
   title: "title",
   description: "description",
-  category: "app.endpointCategories.leads",
+  category: "endpointCategories.leads",
   tags: ["tags.leads", "tags.statistics", "tags.analytics"],
   allowedRoles: [UserRole.ADMIN],
   icon: "bar-chart-3",

@@ -22,6 +22,7 @@ import type {
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
+import { scopedTranslation as reactScopedTranslation } from "../i18n";
 
 import type {
   EndpointReturn,
@@ -336,6 +337,7 @@ export function useEndpoint<
     }
 
     const { t: scopedT } = primaryEndpoint.scopedTranslation.scopedT(locale);
+    const { t: reactT } = reactScopedTranslation.scopedT(locale);
 
     // Check for success state
 
@@ -379,7 +381,7 @@ export function useEndpoint<
       return {
         variant: "destructive",
         title: {
-          message: "app.common.error.title",
+          message: reactT("widgets.error.title"),
         },
         message: {
           message: error.message,

@@ -7,7 +7,7 @@ import { dateSchema } from "next-vibe/shared/types/common.schema";
 import { z } from "zod";
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import { scopedTranslation } from "./i18n";
 
@@ -68,12 +68,12 @@ export const { enum: ChartType, options: ChartTypeOptions } = createEnumOptions(
 export const historicalDataPointSchema = z.object({
   date: dateSchema,
   value: z.coerce.number(),
-  label: z.string().optional() as z.ZodType<TranslationKey | undefined>,
+  label: z.string().optional() as z.ZodType<TranslatedKeyType | undefined>,
   metadata: z
     .record(
       z.string(),
       z.union([
-        z.string() as z.ZodType<TranslationKey>,
+        z.string() as z.ZodType<TranslatedKeyType>,
         z.coerce.number(),
         z.boolean(),
       ]),

@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "square",
-  category: "app.endpointCategories.ai",
+  category: "endpointCategories.ai",
   tags: ["tags.streaming"],
 
   errorTypes: {

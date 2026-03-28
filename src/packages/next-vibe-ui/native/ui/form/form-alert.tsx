@@ -13,8 +13,6 @@ import {
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
-import { useTranslation } from "@/i18n/core/client";
-
 // Import all public types from web version (web is source of truth)
 import type { FormAlertProps } from "../../../web/ui/form/form-alert";
 import { convertCSSToViewStyle } from "../../utils/style-converter";
@@ -33,7 +31,6 @@ export function FormAlert({
   className,
   style,
 }: FormAlertProps): JSX.Element | null {
-  const { t } = useTranslation();
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Use alert prop if provided, otherwise fall back to legacy props
@@ -71,15 +68,9 @@ export function FormAlert({
       icon={Icon}
       className={cn("my-4", className)}
     >
-      {alert.title && (
-        <AlertTitle>
-          {t(alert.title.message, alert.title.messageParams)}
-        </AlertTitle>
-      )}
+      {alert.title && <AlertTitle>{alert.title.message}</AlertTitle>}
       {alert.message.message && (
-        <AlertDescription>
-          {t(alert.message.message, alert.message.messageParams)}
-        </AlertDescription>
+        <AlertDescription>{alert.message.message}</AlertDescription>
       )}
     </Alert>
   );

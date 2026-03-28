@@ -38,7 +38,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams, TranslationKey } from "@/i18n/core/static-types";
+import type { TParams } from "@/i18n/core/static-types";
 
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
@@ -350,7 +350,7 @@ function renderFieldInput<
       return (
         <Input
           name={field.name}
-          value={field.value ? t(field.value as TranslationKey) : ""}
+          value={field.value ? t(field.value) : ""}
           onChange={(e) => field.onChange(e.target.value)}
           onBlur={field.onBlur}
           type={config.type}
@@ -379,7 +379,7 @@ function renderFieldInput<
       return (
         <Textarea
           name={field.name}
-          value={field.value ? t(field.value as TranslationKey) : ""}
+          value={field.value ? t(field.value) : ""}
           onChange={(e) => field.onChange(e.target.value)}
           onBlur={field.onBlur}
           className={cn(inputClassName, "min-h-20 resize-none")}
@@ -570,7 +570,7 @@ function renderFieldInput<
           onChange={(value) => field.onChange(value)}
           onBlur={field.onBlur}
           options={(config.options || []).map((opt) => ({
-            ...opt,
+            value: opt.value,
             label: t(opt.label),
           }))}
           placeholder={config.placeholder ? t(config.placeholder) : undefined}
@@ -721,8 +721,12 @@ function renderFieldInput<
             : config.options.length - 1;
 
       return (
-        <RangeSlider<TKey>
-          options={config.options}
+        <RangeSlider
+          options={config.options.map((opt) => ({
+            ...opt,
+            label: t(opt.label),
+            description: opt.description ? t(opt.description) : undefined,
+          }))}
           minIndex={minIndex}
           maxIndex={maxIndex}
           onChange={(newMinIndex, newMaxIndex) => {
@@ -732,9 +736,16 @@ function renderFieldInput<
             });
           }}
           disabled={disabled || config.disabled}
-          minLabel={config.minLabel ? t(config.minLabel) : undefined}
-          maxLabel={config.maxLabel ? t(config.maxLabel) : undefined}
-          t={t}
+          minLabel={
+            config.minLabel
+              ? t(config.minLabel)
+              : widgetT("widgets.rangeSlider.min")
+          }
+          maxLabel={
+            config.maxLabel
+              ? t(config.maxLabel)
+              : widgetT("widgets.rangeSlider.max")
+          }
         />
       );
     }

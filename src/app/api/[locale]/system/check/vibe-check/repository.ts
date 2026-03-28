@@ -15,12 +15,12 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { env } from "@/config/env";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { CheckVibeCheckT, CheckVibeCheckTranslationKey } from "./i18n";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { ConfigRepositoryImpl } from "../config/repository";
 import type { CheckConfig } from "../config/types";
 import type { LintResponseOutput } from "../lint/definition";
@@ -304,7 +304,7 @@ export class VibeCheckRepository {
 
       const pathsToCheck = this.normalizePaths(effectiveData.paths);
       const baseDir = env.PROJECT_ROOT || "./";
-      const performanceTimings: Partial<Record<TranslationKey, number>> = {};
+      const performanceTimings: Partial<Record<TranslatedKeyType, number>> = {};
       let firstCheckStart = 0;
       let lastCheckEnd = 0;
 
@@ -459,7 +459,7 @@ export class VibeCheckRepository {
 
   private static processCheckResults(
     checkResults: PromiseSettledResult<CheckResult>[],
-    performanceTimings: Partial<Record<TranslationKey, number>>,
+    performanceTimings: Partial<Record<TranslatedKeyType, number>>,
     t: CheckVibeCheckT,
   ): { allIssues: CheckIssue[]; hasErrors: boolean } {
     const allIssues: CheckIssue[] = [];

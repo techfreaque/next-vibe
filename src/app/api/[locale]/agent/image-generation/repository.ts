@@ -87,6 +87,7 @@ export class ImageGenerationRepository {
           size: data.size,
           quality: data.quality,
           logger,
+          locale,
         });
         break;
 
@@ -113,6 +114,7 @@ export class ImageGenerationRepository {
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
           logger,
+          locale,
         });
         break;
 

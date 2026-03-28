@@ -11,12 +11,21 @@ import {
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
 import { Gift } from "next-vibe-ui/ui/icons/Gift";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
+import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
+import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Link } from "next-vibe-ui/ui/link";
+import { Separator } from "next-vibe-ui/ui/separator";
+import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
@@ -29,7 +38,119 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { translations as configTranslations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation as pageT } from "./i18n";
+import {
+  scopedTranslation as pageT,
+  getCommissionRows,
+  getReferralParams,
+} from "./i18n";
+import type { ReferralPageT, CommissionRow } from "./i18n";
+
+function CommissionTable({
+  t,
+  rows,
+  p,
+}: {
+  t: ReferralPageT;
+  rows: CommissionRow[];
+  p: Record<string, string>;
+}): JSX.Element {
+  return (
+    <Div className="overflow-hidden rounded-xl border">
+      {/* Header */}
+      <Div className="grid grid-cols-3 bg-muted/60 px-4 py-2.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+        <Span>{t("commissionTable.colLevel")}</Span>
+        <Span>{t("commissionTable.colCut")}</Span>
+        <Span className="hidden sm:block">
+          {t("commissionTable.colExample", p)}
+        </Span>
+      </Div>
+      {rows.map((row, index) => (
+        <Div
+          key={index}
+          className={`grid grid-cols-3 px-4 py-3 border-t text-sm ${
+            index === 0
+              ? "bg-violet-50 dark:bg-violet-950/20 font-semibold"
+              : "bg-background"
+          }`}
+        >
+          <Div className="flex items-center gap-2">
+            <Div
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                index === 0
+                  ? "bg-violet-600 text-white"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {index + 1}
+            </Div>
+            <Span
+              className={
+                index === 0 ? "text-foreground" : "text-muted-foreground"
+              }
+            >
+              {row.who}
+            </Span>
+          </Div>
+          <Div
+            className={`flex items-center ${index === 0 ? "text-violet-600 dark:text-violet-400" : "text-foreground"}`}
+          >
+            {row.pct}
+            {index === 0 && (
+              <Badge className="ml-2 text-xs bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 border-0">
+                {t("commissionTable.alwaysYours")}
+              </Badge>
+            )}
+          </Div>
+          <Div className="hidden sm:flex items-center text-muted-foreground text-xs">
+            {row.example}
+          </Div>
+        </Div>
+      ))}
+    </Div>
+  );
+}
+
+function HowItWorksSteps({
+  t,
+  p,
+}: {
+  t: ReferralPageT;
+  p: Record<string, string>;
+}): JSX.Element {
+  const steps = [
+    {
+      icon: Link2,
+      title: t("howItWorks.step1Title"),
+      body: t("howItWorks.step1Body"),
+    },
+    {
+      icon: Users,
+      title: t("howItWorks.step2Title"),
+      body: t("howItWorks.step2Body", p),
+    },
+    {
+      icon: DollarSign,
+      title: t("howItWorks.step3Title"),
+      body: t("howItWorks.step3Body"),
+    },
+  ];
+
+  return (
+    <Div className="grid gap-4 sm:grid-cols-3">
+      {steps.map((step, i) => (
+        <Div key={i} className="flex flex-col items-start gap-3">
+          <Div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 dark:bg-violet-900/30">
+            <step.icon className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+          </Div>
+          <Div>
+            <Div className="font-semibold text-sm mb-1">{step.title}</Div>
+            <Div className="text-sm text-muted-foreground">{step.body}</Div>
+          </Div>
+        </Div>
+      ))}
+    </Div>
+  );
+}
 
 export function ReferralPageClient({
   locale,
@@ -41,40 +162,94 @@ export function ReferralPageClient({
   user: JwtPayloadType;
 }): JSX.Element {
   const { t } = pageT.scopedT(locale);
+  const commissionRows = getCommissionRows(locale);
+  const p = getReferralParams();
 
   return (
     <Div className="w-full min-h-screen">
-      {/* Background gradient */}
-      <Div className="absolute inset-0 bg-gradient-to-b from-violet-500/5 via-background to-background -z-10" />
+      {/* Background */}
+      <Div className="absolute inset-0 bg-gradient-to-b from-violet-500/8 via-background to-background -z-10" />
 
-      <Div className="container px-4 md:px-6 py-8 md:py-12 max-w-6xl mx-auto">
+      <Div className="container px-4 md:px-6 py-8 md:py-12 max-w-5xl mx-auto">
         {/* Back Button */}
         <Link
           href={`/${locale}/threads`}
-          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-8"
+          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-10"
         >
           <ArrowLeft className="h-4 w-4" />
           {t("backToChat")}
         </Link>
 
-        {/* Hero Section */}
-        <Div className="mb-12">
-          <Badge variant="secondary" className="mb-4 gap-1.5">
+        {/* ── HERO ── */}
+        <Div className="mb-14">
+          <Badge variant="secondary" className="mb-4 gap-1.5 text-xs">
             <Gift className="h-3.5 w-3.5" />
             {t("tagline")}
           </Badge>
           <H1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
             {t("title", { appName: configTranslations.appName })}
           </H1>
-          <P className="text-muted-foreground text-lg max-w-2xl">
-            {t("description", { appName: configTranslations.appName })}
+          <P className="text-muted-foreground text-lg max-w-2xl mb-8">
+            {t("description", { appName: configTranslations.appName, ...p })}
           </P>
+
+          {/* Big number callout */}
+          <Div className="inline-flex items-center gap-4 px-6 py-4 rounded-2xl bg-violet-600 text-white shadow-lg shadow-violet-500/20">
+            <Div>
+              <Div className="text-5xl font-black tracking-tighter">
+                {p.directPct}
+              </Div>
+              <Div className="text-violet-200 text-sm mt-0.5">
+                {t("commissionTable.heroGuarantee")}
+              </Div>
+            </Div>
+            <Separator orientation="vertical" className="h-12 bg-violet-400" />
+            <Div className="text-sm text-violet-100 max-w-[180px] leading-snug">
+              {t("commissionTable.heroNote")}
+            </Div>
+          </Div>
         </Div>
 
-        {/* Stats + How It Works + Withdraw info (authenticated only) */}
-        {isAuthenticated && (
+        {/* ── COMMISSION BREAKDOWN ── */}
+        <Div className="mb-14">
+          <Div className="flex items-center gap-3 mb-2">
+            <TrendingUp className="h-5 w-5 text-violet-500" />
+            <H2 className="text-xl font-bold">{t("commission.title")}</H2>
+          </Div>
+          <P className="text-muted-foreground text-sm mb-6 max-w-2xl">
+            {t("commission.subtitle", p)}
+          </P>
+
+          <CommissionTable t={t} rows={commissionRows} p={p} />
+
+          {/* No-penalty callout */}
+          <Div className="mt-4 flex items-start gap-3 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800">
+            <Shield className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+            <Div>
+              <Div className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
+                {t("commission.noPenalty")}
+              </Div>
+              <Div className="text-xs text-emerald-700 dark:text-emerald-400 mt-0.5">
+                {t("commission.noPenaltyNote", p)}
+              </Div>
+            </Div>
+          </Div>
+        </Div>
+
+        {/* ── HOW IT WORKS ── */}
+        <Div className="mb-14">
+          <Div className="flex items-center gap-3 mb-6">
+            <Sparkles className="h-5 w-5 text-violet-500" />
+            <H2 className="text-xl font-bold">{t("howItWorks.title")}</H2>
+          </Div>
+          <HowItWorksSteps t={t} p={p} />
+        </Div>
+
+        {/* ── AUTHENTICATED SECTION ── */}
+        {isAuthenticated ? (
           <>
-            <Div className="mb-12">
+            {/* Stats */}
+            <Div className="mb-10">
               <H2 className="text-xl font-semibold mb-4">
                 {t("overview.title")}
               </H2>
@@ -84,33 +259,24 @@ export function ReferralPageClient({
                 locale={locale}
               />
             </Div>
-            <Div className="mb-12">
+
+            {/* Earnings / Payout */}
+            <Div className="mb-10">
               <EndpointsPage
                 endpoint={referralPayoutDefinition}
                 user={user}
                 locale={locale}
               />
             </Div>
-          </>
-        )}
 
-        {/* Authenticated: Show Create Code + Codes List */}
-        {isAuthenticated ? (
-          <>
-            {/* Create New Code Section */}
+            {/* Create New Code */}
             <Card className="mb-8">
               <CardHeader>
-                <Div className="flex items-center justify-between">
-                  <Div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Plus className="h-5 w-5" />
-                      {t("createCode.title")}
-                    </CardTitle>
-                    <CardDescription>
-                      {t("manage.createSubtitle")}
-                    </CardDescription>
-                  </Div>
-                </Div>
+                <CardTitle className="flex items-center gap-2">
+                  <Plus className="h-5 w-5" />
+                  {t("createCode.title")}
+                </CardTitle>
+                <CardDescription>{t("manage.createSubtitle")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <EndpointsPage
@@ -121,7 +287,7 @@ export function ReferralPageClient({
               </CardContent>
             </Card>
 
-            {/* Referral Codes List - Full Width */}
+            {/* Codes List */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -140,24 +306,40 @@ export function ReferralPageClient({
             </Card>
           </>
         ) : (
-          /* Not Authenticated: Show Sign Up / Login CTA */
+          /* ── NOT AUTHENTICATED ── */
           <Card className="border-violet-200 dark:border-violet-800 bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30">
-            <CardContent className="pt-8 pb-8">
-              <Div className="text-center space-y-6">
+            <CardContent className="pt-10 pb-10">
+              <Div className="text-center space-y-6 max-w-md mx-auto">
                 <Div className="mx-auto w-16 h-16 rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center">
-                  <Gift className="h-8 w-8 text-violet-600 dark:text-violet-400" />
+                  <DollarSign className="h-8 w-8 text-violet-600 dark:text-violet-400" />
                 </Div>
                 <Div className="space-y-2">
                   <H3 className="text-xl font-semibold">{t("cta.title")}</H3>
-                  <P className="text-muted-foreground max-w-md mx-auto">
-                    {t("cta.description")}
+                  <P className="text-muted-foreground">
+                    {t("cta.description", p)}
                   </P>
                 </Div>
-                <Div className="flex flex-col sm:flex-row gap-3 justify-center">
+
+                {/* Quick pitch bullets */}
+                <Div className="text-left space-y-2">
+                  {[t("cta.pitch1", p), t("cta.pitch2"), t("cta.pitch3")].map(
+                    (pitch, i) => (
+                      <Div key={i} className="flex items-center gap-3 text-sm">
+                        <Div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+                          <Check className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+                        </Div>
+                        <Span className="text-foreground/80">{pitch}</Span>
+                      </Div>
+                    ),
+                  )}
+                </Div>
+
+                <Div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
                   <Button asChild size="lg" className="gap-2">
                     <Link href={`/${locale}/user/signup`}>
                       <UserPlus className="h-4 w-4" />
                       {t("cta.signUp")}
+                      <ArrowRight className="h-4 w-4" />
                     </Link>
                   </Button>
                   <Button asChild variant="outline" size="lg" className="gap-2">

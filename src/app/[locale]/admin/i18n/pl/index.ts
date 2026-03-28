@@ -17,6 +17,11 @@ export const translations: typeof enTranslations = {
     title: "Panel administracyjny",
     subtitle: "Zarządzaj swoją aplikacją stąd",
   },
+  vibeFrame: {
+    selectEndpoint: "Wybierz endpoint...",
+    searchEndpoints: "Szukaj endpointów...",
+    value: "{{value}}",
+  },
   common: {
     active: "Aktywny",
     filter: "Filtruj",

@@ -54,4 +54,25 @@ export const translations = {
     US: "America/New_York",
     GLOBAL: "UTC",
   },
+  selector: {
+    country: "Country",
+    language: "Language",
+  },
+  error: {
+    title: "Something went wrong",
+    message: "An unexpected error occurred. Please refresh the page.",
+    tryAgain: "Try Again",
+    description: "Please try again or contact support if the problem persists.",
+  },
+  countries: {
+    global: "Global",
+    de: "Germany",
+    pl: "Poland",
+    us: "United States",
+  },
+  languages: {
+    en: "English",
+    de: "German",
+    pl: "Polish",
+  },
 };

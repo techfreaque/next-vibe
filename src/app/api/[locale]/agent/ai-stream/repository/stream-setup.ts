@@ -873,6 +873,7 @@ export async function setupAiStream(params: {
   const provider = ProviderFactoryClass.getProviderForModel(
     modelConfig,
     logger,
+    locale,
   );
 
   // Register tool executors for Agent SDK provider (uses CoreTool execute functions)

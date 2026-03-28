@@ -28,7 +28,7 @@ import { PublicCapContainer, PublicCapUpdateContainer } from "./widget";
 const { GET } = createEndpoint({
   scopedTranslation,
   path: ["credits", "public-cap"],
-  category: "app.endpointCategories.credits",
+  category: "endpointCategories.credits",
   tags: ["tags.publicCap", "tags.admin"],
   icon: "shield",
   allowedRoles: [UserRole.ADMIN] as const,
@@ -137,7 +137,7 @@ const { GET } = createEndpoint({
 const { POST } = createEndpoint({
   scopedTranslation,
   path: ["credits", "public-cap"],
-  category: "app.endpointCategories.credits",
+  category: "endpointCategories.credits",
   tags: ["tags.publicCap", "tags.admin"],
   icon: "shield",
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF] as const,

@@ -4,6 +4,8 @@ import type { ScrollView as RNScrollView } from "react-native";
 import { Pressable, ScrollView, Text as RNText, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
+
 import type {
   CarouselApi,
   CarouselButtonProps,
@@ -152,7 +154,8 @@ function CarouselPrevious({
   size = "icon", // Intentionally extracted - not used in React Native
 }: CarouselButtonProps): React.JSX.Element {
   const { scrollPrev, canScrollPrev } = useCarousel();
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   return (
     <StyledPressable
@@ -160,13 +163,9 @@ function CarouselPrevious({
       disabled={!canScrollPrev}
       className={cn("absolute", className)}
       accessibilityRole="button"
-      accessibilityLabel={t(
-        "packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide",
-      )}
+      accessibilityLabel={t("common.accessibility.srOnly.previousSlide")}
     >
-      <StyledText>
-        {t("packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide")}
-      </StyledText>
+      <StyledText>{t("common.accessibility.srOnly.previousSlide")}</StyledText>
     </StyledPressable>
   );
 }
@@ -179,7 +178,8 @@ function CarouselNext({
   size = "icon", // Intentionally extracted - not used in React Native
 }: CarouselButtonProps): React.JSX.Element {
   const { scrollNext, canScrollNext } = useCarousel();
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
 
   return (
     <StyledPressable
@@ -187,13 +187,9 @@ function CarouselNext({
       disabled={!canScrollNext}
       className={cn("absolute", className)}
       accessibilityRole="button"
-      accessibilityLabel={t(
-        "packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide",
-      )}
+      accessibilityLabel={t("common.accessibility.srOnly.nextSlide")}
     >
-      <StyledText>
-        {t("packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide")}
-      </StyledText>
+      <StyledText>{t("common.accessibility.srOnly.nextSlide")}</StyledText>
     </StyledPressable>
   );
 }

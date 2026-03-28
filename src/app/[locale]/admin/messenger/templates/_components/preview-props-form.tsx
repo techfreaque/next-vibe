@@ -26,6 +26,7 @@ import type { ReactElement } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { TranslatedPreviewFieldConfig } from "@/app/api/[locale]/messenger/registry/template";
+import { scopedTranslation } from "@/app/[locale]/admin/messenger/templates/i18n";
 import { useTranslation } from "@/i18n/core/client";
 
 interface PreviewPropsFormProps {
@@ -39,7 +40,8 @@ export function PreviewPropsForm({
   defaultProps,
   onPropsChange,
 }: PreviewPropsFormProps): ReactElement | null {
-  const { t } = useTranslation();
+  const { locale: currentLocale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(currentLocale);
   const [props, setProps] =
     useState<Record<string, string | number | boolean>>(defaultProps);
 
@@ -232,11 +234,7 @@ export function PreviewPropsForm({
                 required={config.required}
               >
                 <SelectTrigger id={fieldId}>
-                  <SelectValue
-                    placeholder={t(
-                      "app.admin.emails.templates.preview.form.select_option",
-                    )}
-                  />
+                  <SelectValue placeholder={t("preview.form.select_option")} />
                 </SelectTrigger>
                 <SelectContent>
                   {config.options?.map((option) => (
@@ -271,9 +269,7 @@ export function PreviewPropsForm({
         <Div className="flex items-center justify-between">
           <Div className="flex items-center gap-2">
             <Settings2 className="w-5 h-5" />
-            <CardTitle>
-              {t("app.admin.emails.templates.preview.form.title")}
-            </CardTitle>
+            <CardTitle>{t("preview.form.title")}</CardTitle>
           </Div>
           <Button
             variant="outline"
@@ -282,11 +278,11 @@ export function PreviewPropsForm({
             type="button"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
-            {t("app.admin.emails.templates.preview.form.reset")}
+            {t("preview.form.reset")}
           </Button>
         </Div>
         <P className="text-sm text-gray-600 dark:text-gray-400">
-          {t("app.admin.emails.templates.preview.form.description")}
+          {t("preview.form.description")}
         </P>
       </CardHeader>
       <CardContent>
