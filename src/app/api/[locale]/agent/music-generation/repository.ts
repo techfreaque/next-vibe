@@ -22,6 +22,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { generateMusicWithFalAi } from "../ai-stream/providers/fal-ai-audio";
+import { generateMusicWithReplicate } from "../ai-stream/providers/replicate-audio";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -32,8 +34,6 @@ import type {
 } from "./definition";
 import { MUSIC_DURATION_SECONDS } from "./enum";
 import type { MusicGenerationT } from "./i18n";
-import { generateMusicWithFalAi } from "../ai-stream/providers/fal-ai-audio";
-import { generateMusicWithReplicate } from "../ai-stream/providers/replicate-audio";
 
 export class MusicGenerationRepository {
   /**
@@ -92,6 +92,7 @@ export class MusicGenerationRepository {
           prompt: data.prompt,
           durationSeconds,
           logger,
+          locale,
         });
         break;
 
@@ -101,6 +102,7 @@ export class MusicGenerationRepository {
           prompt: data.prompt,
           durationSeconds,
           logger,
+          locale,
         });
         break;
 

@@ -392,9 +392,9 @@ const ownershipIcon = {
 
 interface SkillCardProps {
   icon: IconKey | null;
-  name: TranslatedKeyType | null;
-  tagline: TranslatedKeyType | null;
-  description: TranslatedKeyType | null;
+  name: string | null;
+  tagline: string | null;
+  description: string | null;
   voice: typeof TtsVoiceValue | null;
   skillOwnership: typeof SkillOwnershipTypeValue;
   locale: CountryLanguage;
@@ -456,21 +456,17 @@ export function SkillCard({
         <Div className="flex-1 min-w-0">
           <Div className="flex items-center gap-2 mb-1">
             <Span className="font-semibold text-lg">
-              {name ? t(name) : <Skeleton className="h-7 w-48" />}
+              {name ? name : <Skeleton className="h-7 w-48" />}
             </Span>
             {isAddedToFav && (
               <Star className="h-4 w-4 fill-primary text-primary" />
             )}
           </Div>
           <Div className="text-sm text-muted-foreground mb-2">
-            {tagline ? t(tagline) : <Skeleton className="h-5 w-32" />}
+            {tagline ? tagline : <Skeleton className="h-5 w-32" />}
           </Div>
           <Div className="text-sm text-muted-foreground/70 line-clamp-2">
-            {description ? (
-              t(description)
-            ) : (
-              <Skeleton className="h-10 w-full" />
-            )}
+            {description ? description : <Skeleton className="h-10 w-full" />}
           </Div>
         </Div>
       </Div>

@@ -97,6 +97,7 @@ export class ImageGenerationRepository {
           prompt: data.prompt,
           size: data.size,
           logger,
+          locale,
         });
         break;
 
@@ -106,6 +107,7 @@ export class ImageGenerationRepository {
           prompt: data.prompt,
           size: data.size,
           logger,
+          locale,
         });
         break;
 
