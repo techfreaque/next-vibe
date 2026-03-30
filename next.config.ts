@@ -24,7 +24,6 @@ const nextConfig: NextConfig = {
       "react-icons",
       "date-fns",
       "lodash",
-      "react-syntax-highlighter",
       "refractor",
       "react-day-picker",
       "victory-core",

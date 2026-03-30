@@ -13,7 +13,11 @@ import { useCallback, useMemo, useState } from "react";
 import { CodeBlock } from "next-vibe-ui/ui/markdown";
 import { useInView } from "react-intersection-observer";
 
-import { type EndpointPlatformKey, PLATFORM_COUNT } from "@/config/constants";
+import {
+  ENDPOINT_PLATFORMS,
+  type EndpointPlatformKey,
+  PLATFORM_COUNT,
+} from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
@@ -24,7 +28,6 @@ interface ArchitectureProps {
 
 interface PlatformMeta {
   icon: string;
-  key: EndpointPlatformKey;
   color: string;
   bgColor: string;
   borderColor: string;
@@ -32,20 +35,19 @@ interface PlatformMeta {
   filename: string;
 }
 
-const PLATFORMS: PlatformMeta[] = [
-  {
+// Exhaustive — TS errors if any EndpointPlatformKey is missing or misspelled
+const PLATFORM_META: Record<EndpointPlatformKey, PlatformMeta> = {
+  webApi: {
     icon: "🌍",
-    key: "webApi",
     color: "text-teal-600 dark:text-teal-400",
     bgColor: "bg-teal-50 dark:bg-teal-950/30",
     borderColor: "border-teal-200 dark:border-teal-800/50",
     activeColor:
       "bg-teal-600 text-white hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600",
-    filename: "HTTP Request",
+    filename: "fetch()",
   },
-  {
+  reactUi: {
     icon: "🌐",
-    key: "reactUi",
     color: "text-blue-600 dark:text-blue-400",
     bgColor: "bg-blue-50 dark:bg-blue-950/30",
     borderColor: "border-blue-200 dark:border-blue-800/50",
@@ -53,9 +55,8 @@ const PLATFORMS: PlatformMeta[] = [
       "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600",
     filename: "widget.tsx",
   },
-  {
+  cli: {
     icon: "⌨️",
-    key: "cli",
     color: "text-green-600 dark:text-green-400",
     bgColor: "bg-green-50 dark:bg-green-950/30",
     borderColor: "border-green-200 dark:border-green-800/50",
@@ -63,9 +64,8 @@ const PLATFORMS: PlatformMeta[] = [
       "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600",
     filename: "terminal",
   },
-  {
+  aiTool: {
     icon: "🤖",
-    key: "aiTool",
     color: "text-purple-600 dark:text-purple-400",
     bgColor: "bg-purple-50 dark:bg-purple-950/30",
     borderColor: "border-purple-200 dark:border-purple-800/50",
@@ -73,9 +73,8 @@ const PLATFORMS: PlatformMeta[] = [
       "bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600",
     filename: "definition.ts",
   },
-  {
+  mcpServer: {
     icon: "🔌",
-    key: "mcpServer",
     color: "text-orange-600 dark:text-orange-400",
     bgColor: "bg-orange-50 dark:bg-orange-950/30",
     borderColor: "border-orange-200 dark:border-orange-800/50",
@@ -83,9 +82,8 @@ const PLATFORMS: PlatformMeta[] = [
       "bg-orange-600 text-white hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600",
     filename: "mcp-tool.json",
   },
-  {
+  reactNative: {
     icon: "📱",
-    key: "reactNative",
     color: "text-cyan-600 dark:text-cyan-400",
     bgColor: "bg-cyan-50 dark:bg-cyan-950/30",
     borderColor: "border-cyan-200 dark:border-cyan-800/50",
@@ -93,9 +91,8 @@ const PLATFORMS: PlatformMeta[] = [
       "bg-cyan-600 text-white hover:bg-cyan-700 dark:bg-cyan-500 dark:hover:bg-cyan-600",
     filename: "widget.tsx",
   },
-  {
+  cron: {
     icon: "⏰",
-    key: "cron",
     color: "text-red-600 dark:text-red-400",
     bgColor: "bg-red-50 dark:bg-red-950/30",
     borderColor: "border-red-200 dark:border-red-800/50",
@@ -103,9 +100,8 @@ const PLATFORMS: PlatformMeta[] = [
       "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600",
     filename: "task-runner.ts",
   },
-  {
+  websocket: {
     icon: "⚡",
-    key: "websocket",
     color: "text-yellow-600 dark:text-yellow-400",
     bgColor: "bg-yellow-50 dark:bg-yellow-950/30",
     borderColor: "border-yellow-200 dark:border-yellow-800/50",
@@ -113,9 +109,8 @@ const PLATFORMS: PlatformMeta[] = [
       "bg-yellow-600 text-white hover:bg-yellow-700 dark:bg-yellow-500 dark:hover:bg-yellow-600",
     filename: "server.ts",
   },
-  {
+  electron: {
     icon: "🖥️",
-    key: "electron",
     color: "text-slate-600 dark:text-slate-400",
     bgColor: "bg-slate-50 dark:bg-slate-950/30",
     borderColor: "border-slate-200 dark:border-slate-800/50",
@@ -123,9 +118,8 @@ const PLATFORMS: PlatformMeta[] = [
       "bg-slate-600 text-white hover:bg-slate-700 dark:bg-slate-500 dark:hover:bg-slate-600",
     filename: "terminal",
   },
-  {
+  adminPanel: {
     icon: "🛡️",
-    key: "adminPanel",
     color: "text-indigo-600 dark:text-indigo-400",
     bgColor: "bg-indigo-50 dark:bg-indigo-950/30",
     borderColor: "border-indigo-200 dark:border-indigo-800/50",
@@ -133,9 +127,8 @@ const PLATFORMS: PlatformMeta[] = [
       "bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600",
     filename: "definition.ts",
   },
-  {
+  vibeFrame: {
     icon: "🪟",
-    key: "vibeFrame",
     color: "text-pink-600 dark:text-pink-400",
     bgColor: "bg-pink-50 dark:bg-pink-950/30",
     borderColor: "border-pink-200 dark:border-pink-800/50",
@@ -143,9 +136,8 @@ const PLATFORMS: PlatformMeta[] = [
       "bg-pink-600 text-white hover:bg-pink-700 dark:bg-pink-500 dark:hover:bg-pink-600",
     filename: "embed.html",
   },
-  {
+  remoteSkill: {
     icon: "📜",
-    key: "remoteSkill",
     color: "text-amber-600 dark:text-amber-400",
     bgColor: "bg-amber-50 dark:bg-amber-950/30",
     borderColor: "border-amber-200 dark:border-amber-800/50",
@@ -153,9 +145,8 @@ const PLATFORMS: PlatformMeta[] = [
       "bg-amber-600 text-white hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600",
     filename: "skill.ts",
   },
-  {
+  vibeBoard: {
     icon: "🔮",
-    key: "vibeBoard",
     color: "text-violet-600 dark:text-violet-400",
     bgColor: "bg-violet-50 dark:bg-violet-950/30",
     borderColor: "border-violet-200 dark:border-violet-800/50",
@@ -163,7 +154,13 @@ const PLATFORMS: PlatformMeta[] = [
       "bg-violet-600 text-white hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600",
     filename: "definition.ts",
   },
-];
+};
+
+// Ordered list derived from the canonical ENDPOINT_PLATFORMS — order matches constants.ts
+const PLATFORMS = ENDPOINT_PLATFORMS.map((key) => ({
+  key,
+  ...PLATFORM_META[key],
+}));
 
 // ─── Platform panels ──────────────────────────────────────────────────────────
 
