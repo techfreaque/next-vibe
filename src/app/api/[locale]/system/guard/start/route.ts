@@ -9,12 +9,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import guardStartEndpoints from "./definition";
-import { GuardStartRepository } from "./repository";
 
 export const { tools } = endpointsHandler({
   endpoint: guardStartEndpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, t }) => {
+    handler: async ({ data, logger, t }) => {
+      const { GuardStartRepository } = await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      );
       return GuardStartRepository.startGuard(data, logger, t);
     },
   },

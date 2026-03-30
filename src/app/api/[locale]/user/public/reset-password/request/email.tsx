@@ -16,7 +16,8 @@ import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/regis
 import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import { RESET_TOKEN_EXPIRY } from "@/config/constants";
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { UserDetailLevel } from "../../../enum";
 import { UserRepository } from "../../../repository";
@@ -46,6 +47,7 @@ const passwordResetRequestPropsSchema = z.object({
   publicName: z.string(),
   userId: z.string(),
   passwordResetUrl: z.string().url(),
+  totalModelCount: z.number(),
 });
 
 type PasswordResetRequestProps = z.infer<
@@ -146,7 +148,7 @@ function PasswordResetRequestEmail({
           paddingTop: "20px",
         }}
       >
-        {t("email.promoText", { modelCount: TOTAL_MODEL_COUNT })}
+        {t("email.promoText", { modelCount: props.totalModelCount })}
       </Text>
 
       <Text
@@ -215,6 +217,7 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
     publicName: "Max Mustermann",
     userId: "example-user-id-123",
     passwordResetUrl: "https://example.com/user/reset-password/token123",
+    totalModelCount: 42,
   },
   render: async ({ requestData, locale, logger }) => {
     logger.debug("Rendering password reset email", {
@@ -266,6 +269,7 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
         publicName: user.publicName,
         userId: user.id,
         passwordResetUrl,
+        totalModelCount: getAvailableModelCount(getAgentEnvAvailability(), false),
       };
 
       return success({

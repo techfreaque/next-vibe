@@ -9,12 +9,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import releaseToolEndpoints from "./definition";
-import { releaseToolRepository } from "./repository";
 
 export const { tools } = endpointsHandler({
   endpoint: releaseToolEndpoints,
   [Methods.POST]: {
-    handler: ({ data, locale, logger }) => {
+    handler: async ({ data, locale, logger }) => {
+      const { releaseToolRepository } = await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      );
       return releaseToolRepository.execute(data, locale, logger);
     },
   },

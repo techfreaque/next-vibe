@@ -1,6 +1,5 @@
 /* eslint-disable i18next/no-literal-string */
 import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 
 export interface RemoteInstancesData {
   remoteConnections: Array<{ instanceId: string }>;
@@ -16,6 +15,8 @@ export interface RemoteInstancesData {
   isLocalMode: boolean;
   /** Whether running in development environment */
   isDev: boolean;
+  /** Dynamic model count for current user/env */
+  totalModelCount: number;
 }
 
 // ─── System context (leading, admin only) ─────────────────────────────────────
@@ -49,7 +50,7 @@ export const systemContextFragment: SystemPromptFragment<RemoteInstancesData> =
 
       if (isDev) {
         lines.push(`- **Environment:** development (NODE_ENV=development)`);
-        lines.push(`- **Models available:** ${TOTAL_MODEL_COUNT}`);
+        lines.push(`- **Models available:** ${data.totalModelCount}`);
         lines.push(
           `- **Note:** Dev mode - hot reload active, DB may contain test data, errors are verbose.`,
         );

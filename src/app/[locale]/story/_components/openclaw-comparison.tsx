@@ -8,7 +8,6 @@ import { H2, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { TOTAL_CHARACTER_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
@@ -16,6 +15,7 @@ import { scopedTranslation } from "./i18n";
 interface OpenClawComparisonProps {
   locale: CountryLanguage;
   totalToolCount: number;
+  variant?: "unbottled" | "nextvibe";
 }
 
 interface ComparisonCardProps {
@@ -80,15 +80,17 @@ function ComparisonCard({
 
 export function OpenClawComparison({
   locale,
-  totalToolCount,
+  variant = "unbottled",
 }: OpenClawComparisonProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
-  const interpolation = {
-    skillCount: TOTAL_CHARACTER_COUNT,
-    toolCount: totalToolCount,
-  };
+  const ns =
+    variant === "nextvibe"
+      ? ("home.comparisonNextvibe" as const)
+      : ("home.comparison" as const);
+
+  const usLabel = t(`${ns}.usLabel`);
 
   return (
     <Div className="relative overflow-hidden" ref={ref as never}>
@@ -100,43 +102,41 @@ export function OpenClawComparison({
         >
           <Div className="text-center mb-12">
             <H2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">
-              {t("home.comparison.title")}
+              {t(`${ns}.title`)}
             </H2>
             <P className="mx-auto max-w-[600px] text-muted-foreground md:text-lg">
-              {t("home.comparison.subtitle")}
+              {t(`${ns}.subtitle`)}
             </P>
           </Div>
 
           <Div className="mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-6">
             <ComparisonCard
-              label={t("home.comparison.cards.architecture.label")}
-              themLabel={t("home.comparison.themLabel")}
-              them={t("home.comparison.cards.architecture.them")}
-              usLabel={t("home.comparison.usLabel")}
-              us={t("home.comparison.cards.architecture.us", interpolation)}
-              whyItMatters={t(
-                "home.comparison.cards.architecture.whyItMatters",
-              )}
+              label={t(`${ns}.cards.card1.label`)}
+              themLabel={t(`${ns}.cards.card1.themLabel`)}
+              them={t(`${ns}.cards.card1.them`)}
+              usLabel={usLabel}
+              us={t(`${ns}.cards.card1.us`)}
+              whyItMatters={t(`${ns}.cards.card1.whyItMatters`)}
               delay={0.1}
               inView={inView}
             />
             <ComparisonCard
-              label={t("home.comparison.cards.costControl.label")}
-              themLabel={t("home.comparison.themLabel")}
-              them={t("home.comparison.cards.costControl.them")}
-              usLabel={t("home.comparison.usLabel")}
-              us={t("home.comparison.cards.costControl.us")}
-              whyItMatters={t("home.comparison.cards.costControl.whyItMatters")}
+              label={t(`${ns}.cards.card2.label`)}
+              themLabel={t(`${ns}.cards.card2.themLabel`)}
+              them={t(`${ns}.cards.card2.them`)}
+              usLabel={usLabel}
+              us={t(`${ns}.cards.card2.us`)}
+              whyItMatters={t(`${ns}.cards.card2.whyItMatters`)}
               delay={0.2}
               inView={inView}
             />
             <ComparisonCard
-              label={t("home.comparison.cards.ownership.label")}
-              themLabel={t("home.comparison.themLabel")}
-              them={t("home.comparison.cards.ownership.them")}
-              usLabel={t("home.comparison.usLabel")}
-              us={t("home.comparison.cards.ownership.us")}
-              whyItMatters={t("home.comparison.cards.ownership.whyItMatters")}
+              label={t(`${ns}.cards.card3.label`)}
+              themLabel={t(`${ns}.cards.card3.themLabel`)}
+              them={t(`${ns}.cards.card3.them`)}
+              usLabel={usLabel}
+              us={t(`${ns}.cards.card3.us`)}
+              whyItMatters={t(`${ns}.cards.card3.whyItMatters`)}
               delay={0.3}
               inView={inView}
             />

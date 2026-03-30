@@ -19,10 +19,7 @@ import type React from "react";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
-import {
-  FEATURED_MODELS,
-  TOTAL_MODEL_COUNT,
-} from "@/app/api/[locale]/agent/models/models";
+import { FEATURED_MODELS } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
@@ -37,12 +34,14 @@ interface FeaturesProps {
   locale: CountryLanguage;
   subPrice: number;
   subCurrency: string;
+  totalModelCount: number;
 }
 
 export default function Features({
   locale,
   subPrice,
   subCurrency,
+  totalModelCount,
 }: FeaturesProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const [ref, inView] = useInView({
@@ -54,7 +53,7 @@ export default function Features({
     {
       icon: <Zap className="h-10 w-10 text-cyan-500" />,
       title: t("home.features.models.title", {
-        modelCount: TOTAL_MODEL_COUNT,
+        modelCount: totalModelCount,
       }),
       description: t("home.features.models.description", {
         featuredModels: [

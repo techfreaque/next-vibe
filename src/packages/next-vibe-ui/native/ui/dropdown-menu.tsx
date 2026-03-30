@@ -173,8 +173,7 @@ function DropdownMenuSubContent({
     </DropdownMenuPrimitive.SubContent>
   );
 }
-DropdownMenuSubContent.displayName =
-  DropdownMenuPrimitive.SubContent.displayName;
+DropdownMenuSubContent.displayName = "DropdownMenuSubContent";
 
 function DropdownMenuContent({
   className,

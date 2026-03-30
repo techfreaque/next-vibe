@@ -4,13 +4,11 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import endpoints from "./definition";
 import { CliNowpaymentsRepositoryImpl } from "./repository";
 
-const repository = new CliNowpaymentsRepositoryImpl();
-
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, locale, t }) => {
-      return repository.execute(data, locale, t);
+      return CliNowpaymentsRepositoryImpl.execute(data, locale, t);
     },
   },
 });

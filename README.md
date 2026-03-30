@@ -16,7 +16,36 @@ One endpoint definition. 13 platforms. Not generated code that drifts - one livi
 
 ## Getting Started
 
-### Step 1 - Pick an AI Provider
+### Step 1 - Clone and Install
+
+```bash
+git clone https://github.com/techfreaque/next-vibe
+cd next-vibe
+bun install
+```
+
+### Step 2 - Start the Server
+
+Three commands, three situations:
+
+```bash
+vibe dev                  # local development
+vibe build && vibe start  # production, first time
+vibe rebuild              # production, after changes
+```
+
+**`vibe dev`** — for local development. Starts PostgreSQL in Docker, runs migrations, seeds data, hot reload. No `.env` editing needed.
+
+**`vibe build && vibe start`** — for your first production deploy on a server. Build the app, then start the production server with cron tasks.
+
+**`vibe rebuild`** — for updating a running production server. Runs `vibe check`, rebuilds, and hot-restarts with zero downtime. This is what you run after asking the AI to build or change something.
+
+### Step 3 - Login and Configure
+
+Open the app and click **"Login as Admin"** — no password required in dev mode. The setup wizard walks you through:
+
+- Choosing and configuring your AI provider (Claude Code, OpenRouter, etc.)
+- Setting your admin password
 
 **Option A: Claude Code** _(recommended - no API key needed)_
 
@@ -26,75 +55,31 @@ If you have a Claude subscription and the [Claude Code CLI](https://claude.ai/co
 claude login
 ```
 
-Select any `claude-code-*` model in the model selector. Claude Code integrates two ways:
-
-- **As a model provider** - Thea uses your local Claude session as her AI brain, billed to your existing subscription.
-- **As a tool** - Thea spawns Claude Code to execute tasks silently in the background or interactively.
+Then select any `claude-code-*` model in the model picker.
 
 **Option B: OpenRouter** _(200+ models, pay per use)_
 
-```
-OPENROUTER_API_KEY="sk-or-v1-..."   # openrouter.ai/keys
-```
-
-Gives you Claude, ChatGPT, Gemini, Llama, Mistral, DeepSeek, and everything else.
+Paste your key from [openrouter.ai/keys](https://openrouter.ai/keys) in the wizard. Claude, ChatGPT, Gemini, Llama, Mistral, DeepSeek, and everything else.
 
 ---
 
-### Step 2 - Choose Your Setup
+### Choose Your Deployment
 
-#### 1. AI-Powered Workstation - Your Always-On Agent
-
-Run NextVibe on hardware you own: a VPS, a Mac Mini, a home server. Thea runs 24/7 with shell access, knows your codebase, monitors the platform, and delegates work to Claude Code while you sleep.
-
-```bash
-git clone https://github.com/techfreaque/next-vibe
-cd next-vibe
-cp .env.example .env
-# Set VIBE_ADMIN_USER_PASSWORD + your AI provider (see above)
-bun install
-vibe build && vibe start
-```
-
-#### 2. Self-Hosted Platform - The WordPress Route
+#### Self-Hosted Platform - The WordPress Route
 
 Full production deployment on your own domain. Works on any VPS. Scales to Kubernetes when you need it.
 
 ```bash
-git clone https://github.com/techfreaque/next-vibe
-cd next-vibe
-cp .env.example .env
+# docker deployment script
 bash scripts/install-docker.sh
+# Or run on the machine itself
 vibe build && vibe start
 # Point Caddy / nginx at port 3000 - done
 ```
 
 **Kubernetes:** edit `k8s/secret.yaml`, then `kubectl apply -k k8s/`. Templates for web, task workers, Redis, ingress, and namespace included.
 
-**Connect your local machine** so Thea can route tasks to your dev tools:
-
-```bash
-vibe remote-connect --instance-id=hermes --remote-url=https://your-domain.com --email=you@example.com --password=...
-```
-
-Memories and tasks sync every 60 seconds. No port forwarding, no VPN - local instance initiates the connection on the pulse.
-
-#### 3. Local Development - Build Your Own SaaS
-
-```bash
-git clone https://github.com/YOUR_USERNAME/next-vibe
-cd next-vibe
-cp .env.example .env
-bun install
-vibe dev
-```
-
-`vibe dev` starts PostgreSQL in Docker, runs migrations, seeds data, and launches the dev server with hot reload.
-
-```bash
-vibe check     # lint + typecheck
-vibe rebuild   # push to production - check + rebuild + hot-restart, zero downtime
-```
+**Connect your local machine** so Thea can route tasks to your dev tools: go to **Admin → Remote Connections** in the dashboard and add your local instance URL. Memories and tasks sync every 60 seconds. No port forwarding, no VPN — your local instance initiates the connection on the pulse.
 
 ---
 

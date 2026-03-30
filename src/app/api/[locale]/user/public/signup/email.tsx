@@ -13,9 +13,10 @@ import type { ReactElement } from "react";
 import React from "react";
 import { z } from "zod";
 
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   FEATURED_MODELS,
-  TOTAL_MODEL_COUNT,
+  getAvailableModelCount,
 } from "@/app/api/[locale]/agent/models/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
@@ -64,6 +65,7 @@ const signupWelcomePropsSchema = z.object({
   privateName: z.string(),
   userId: z.string(),
   leadId: z.string(),
+  totalModelCount: z.number(),
 });
 
 type SignupWelcomeProps = z.infer<typeof signupWelcomePropsSchema>;
@@ -111,7 +113,7 @@ function SignupWelcomeEmail({
       title={t("email.headline")}
       previewText={t("email.previewText", {
         privateName: props.privateName,
-        modelCount: TOTAL_MODEL_COUNT,
+        modelCount: props.totalModelCount,
       })}
       recipientEmail={recipientEmail}
       tracking={tracking}
@@ -161,7 +163,7 @@ function SignupWelcomeEmail({
           }}
         >
           {t("email.models.title", {
-            modelCount: TOTAL_MODEL_COUNT,
+            modelCount: props.totalModelCount,
           })}
         </Text>
 
@@ -227,7 +229,7 @@ function SignupWelcomeEmail({
         {[
           t("email.free.credits"),
           t("email.free.allModels", {
-            modelCount: TOTAL_MODEL_COUNT,
+            modelCount: props.totalModelCount,
           }),
           t("email.free.uncensored"),
           t("email.free.chatModes"),
@@ -413,6 +415,7 @@ export const signupWelcomeEmailTemplate: EmailTemplateDefinition<
     privateName: "Max",
     userId: "example-user-id-123",
     leadId: "example-lead-id-456",
+    totalModelCount: 42,
   },
   render: ({ requestData, locale, logger }) =>
     renderWelcomeEmailByEmail(requestData.email, locale, undefined, logger),
@@ -454,6 +457,7 @@ async function renderWelcomeEmailByEmail(
     privateName: user.privateName,
     userId: user.id,
     leadId: user.leadId,
+    totalModelCount: getAvailableModelCount(getAgentEnvAvailability(), false),
   };
   const { t: globalT } = configScopedTranslation.scopedT(locale);
 

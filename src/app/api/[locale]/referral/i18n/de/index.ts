@@ -126,6 +126,7 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         empty: "Sie haben noch keine Empfehlungscodes",
+        emptyHint: "Erstellen Sie Ihren ersten Code oben ↑",
         copied: "Kopiert!",
         copy: "Link kopieren",
         visitors: "Besucher",
@@ -133,6 +134,8 @@ export const translations: typeof enTranslations = {
         revenue: "Umsatz",
         earnings: "Einnahmen",
         inactive: "Dieser Empfehlungscode ist inaktiv",
+        conversionHint:
+          "Jeder {{examplePrice}}/Monat-Abonnent bringt Ihnen {{exampleEarning}}/Monat – wiederkehrend",
       },
     },
   },
@@ -150,6 +153,10 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Statistiken abgerufen",
       description: "Ihre Empfehlungsstatistiken erfolgreich abgerufen",
+    },
+    widget: {
+      emptyMessage:
+        "Noch keine Aktivität – teilen Sie Ihren Empfehlungslink, um zu verdienen",
     },
     fields: {
       totalSignups: "Anmeldungen gesamt",
@@ -359,6 +366,7 @@ export const translations: typeof enTranslations = {
       progressLabel: "Fortschritt bis zur Auszahlung",
       unlockedOf: "freigeschaltet von",
       viewHistory: "Verlauf anzeigen",
+      historyEmpty: "Ihre Auszahlungen erscheinen hier",
     },
     email: {
       user: {

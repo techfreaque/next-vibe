@@ -12,6 +12,19 @@ import type { MarkdownProps } from "../../web/ui/markdown";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 
+export const CodeBlock = memo(function CodeBlock({
+  code,
+}: {
+  code: string;
+  language: string;
+}): React.JSX.Element {
+  return (
+    <View className="rounded-lg bg-slate-900 p-4">
+      <RNText className="text-xs font-mono text-slate-300">{code}</RNText>
+    </View>
+  );
+});
+
 export const Markdown = memo(function Markdown({
   className,
   style,

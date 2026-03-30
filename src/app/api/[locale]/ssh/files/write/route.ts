@@ -6,12 +6,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { FilesWriteRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, user, t }) =>
-      FilesWriteRepository.write(data, logger, user, t),
+    handler: async ({ data, logger, user, t }) => {
+      const { FilesWriteRepository } = await import("./repository");
+      return FilesWriteRepository.write(data, logger, user, t);
+    },
   },
 });

@@ -1,16 +1,16 @@
 export const translations = {
   page: {
-    title: "next-vibe Blog",
+    title: "The Build Log",
     subtitle:
-      "Deep dives into the architecture, decisions, and ideas behind next-vibe and unbottled.ai.",
+      "How unbottled.ai and next-vibe got built. The architecture decisions, the dead ends, the things that turned out to matter.",
     meta: {
-      title: "Blog - next-vibe",
+      title: "Build Log - next-vibe & unbottled.ai",
       description:
-        "Engineering deep dives, architecture decisions, and the ideas behind next-vibe and unbottled.ai.",
+        "Engineering deep dives into the decisions behind next-vibe and unbottled.ai. Unified surfaces, TypeScript enforcement, Vibe Sense, and the story of building both.",
       category: "Blog",
-      imageAlt: "next-vibe Blog",
+      imageAlt: "next-vibe & unbottled.ai Build Log",
       keywords:
-        "next-vibe, blog, TypeScript, architecture, SaaS, AI, open-source, engineering",
+        "next-vibe, unbottled.ai, blog, TypeScript, architecture, SaaS, AI, open-source, engineering",
     },
   },
   posts: {
@@ -49,20 +49,50 @@ export const translations = {
         "The post we're writing for Hacker News. TypeScript supremacy, unified surfaces, and a trading bot that can't trade.",
       readTime: "5 min read",
     },
+    referralBeginners: {
+      title:
+        "I've never done affiliate marketing. Can I actually earn money here?",
+      category: "Referrals",
+      excerpt:
+        "Honest answer: yes, with realistic expectations. Here's how the recurring commission model works if you've never referred anyone before.",
+      readTime: "6 min read",
+    },
+    referralAffiliatePros: {
+      title:
+        "I'm an affiliate marketer. What's different about AI subscriptions?",
+      category: "Referrals",
+      excerpt:
+        "The floor is higher and it rises over time. Monthly recurring commissions from AI subscribers who spend more as the platform grows.",
+      readTime: "7 min read",
+    },
+    referralDevelopers: {
+      title: "You built something with AI. Now earn from sharing it.",
+      category: "Referrals",
+      excerpt:
+        "Your referral link is a revenue stream you haven't turned on yet. Blog posts, READMEs, tutorials — the math for technical audiences.",
+      readTime: "5 min read",
+    },
   },
   labels: {
     readMore: "Read more",
     allPosts: "All posts",
     featured: "Featured",
     new: "New",
+    draft: "Draft",
   },
   ui: {
-    featuredFileBar: "definition.ts → web · cli · mcp · native · cron",
+    heroTagline: "next-vibe · unbottled.ai",
+    featuredFileBar:
+      "definition.ts → web · cli · mcp · native · cron · 10 more",
     hnSiteName: "Hacker News",
-    hnNav: "submit · login · new · ask · show · jobs",
+    hnNav: "new · past · comments · ask · show · jobs · submit",
     hnPoints: "points:",
     hnComments: "comments:",
     hnAuthor: "author:",
     hnTags: "> next-vibe · TypeScript · OSS · SaaS · AI",
+    hnDraftPoints: "— (not submitted)",
+    hnDraftComments: "— (not submitted)",
+    hnDraftStatus: "draft",
+    vibeFrameEmbedCaption: "Any endpoint. Two script tags. On any site.",
   },
 };

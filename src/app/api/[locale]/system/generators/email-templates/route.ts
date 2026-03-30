@@ -6,13 +6,20 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definition from "./definition";
-import { EmailTemplateGeneratorRepository } from "./repository";
 
 export const { tools } = endpointsHandler({
   endpoint: definition,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger, t }) =>
-      EmailTemplateGeneratorRepository.generateEmailTemplates(data, logger, t),
+    handler: async ({ data, logger, t }) => {
+      const { EmailTemplateGeneratorRepository } = await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      );
+      return EmailTemplateGeneratorRepository.generateEmailTemplates(
+        data,
+        logger,
+        t,
+      );
+    },
   },
 });

@@ -21,11 +21,7 @@ import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import {
-  ModelId,
-  TOTAL_CHARACTER_COUNT,
-  TOTAL_MODEL_COUNT,
-} from "@/app/api/[locale]/agent/models/models";
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -39,6 +35,8 @@ type ScopedT = ReturnType<(typeof scopedTranslation)["scopedT"]>["t"];
 interface HeroProps {
   locale: CountryLanguage;
   totalToolCount: number;
+  totalModelCount: number;
+  totalSkillCount: number;
 }
 
 type DemoId =
@@ -283,7 +281,7 @@ function buildResearchDemo(t: ScopedT): DemoData {
     seq,
     ModelId.CLAUDE_OPUS_4_6,
     "toolu_search",
-    "web-search",
+    "brave-search",
     { query: "Portugal D7 visa freelancer 2026 tax NHR", maxResults: 5 },
     {
       results: [
@@ -775,7 +773,12 @@ function buildDemo(id: DemoId, t: ScopedT): DemoData {
 // Hero component
 // ============================================================================
 
-const Hero = ({ locale, totalToolCount }: HeroProps): JSX.Element => {
+const Hero = ({
+  locale,
+  totalToolCount,
+  totalModelCount,
+  totalSkillCount,
+}: HeroProps): JSX.Element => {
   const { t } = scopedTranslation.scopedT(locale);
 
   const logger = useMemo(
@@ -828,8 +831,8 @@ const Hero = ({ locale, totalToolCount }: HeroProps): JSX.Element => {
           {/* Subtitle */}
           <P className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
             {t("home.hero.subtitle", {
-              modelCount: TOTAL_MODEL_COUNT,
-              skillCount: TOTAL_CHARACTER_COUNT,
+              modelCount: totalModelCount,
+              skillCount: totalSkillCount,
               toolCount: totalToolCount,
             })}
           </P>

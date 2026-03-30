@@ -61,14 +61,23 @@ export class GenerateTanstackRoutesRepository {
   }
   /** UI source dir: page.tsx + layout.tsx */
   private static get UI_DIR(): string {
-    return join(GenerateTanstackRoutesRepository.PROJECT_ROOT, "src/app/[locale]");
+    return join(
+      GenerateTanstackRoutesRepository.PROJECT_ROOT,
+      "src/app/[locale]",
+    );
   }
   /** API source dir: route.ts */
   private static get API_DIR(): string {
-    return join(GenerateTanstackRoutesRepository.PROJECT_ROOT, "src/app/api/[locale]");
+    return join(
+      GenerateTanstackRoutesRepository.PROJECT_ROOT,
+      "src/app/api/[locale]",
+    );
   }
   private static get ROUTES_DIR(): string {
-    return join(GenerateTanstackRoutesRepository.PROJECT_ROOT, "src/app-tanstack/routes");
+    return join(
+      GenerateTanstackRoutesRepository.PROJECT_ROOT,
+      "src/app-tanstack/routes",
+    );
   }
   private static readonly WRAPPER_IMPORT: string =
     "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";

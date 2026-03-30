@@ -32,7 +32,7 @@ const testObject: object = {};
 // TEST 3: throw statement (SHOULD ERROR)
 // ============================================================================
 
-function testThrow() {
+function testThrow(): void {
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
   throw new Error("error"); // Should error: Usage of 'throw' statements is not allowed
 }

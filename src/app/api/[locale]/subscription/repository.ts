@@ -6,6 +6,8 @@
 import "server-only";
 
 import { desc, eq, sql } from "drizzle-orm";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -913,6 +915,10 @@ export class SubscriptionRepository {
                     userId,
                     leadId,
                     planName: subRecord.planId,
+                    totalModelCount: getAvailableModelCount(
+                      getAgentEnvAvailability(),
+                      false,
+                    ),
                   },
                   t,
                   locale: userLocale,

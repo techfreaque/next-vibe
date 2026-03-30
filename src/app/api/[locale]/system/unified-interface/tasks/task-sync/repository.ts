@@ -728,7 +728,7 @@ export class TaskSyncRepository {
   static async getSharedMemories(params: {
     logger: EndpointLogger;
     userId?: string;
-  }) {
+  }): Promise<ResponseType<{ memories: SyncedMemory[] }>> {
     const { logger, userId } = params;
     try {
       // Fetch: isShared=true (active) OR has syncId with isShared=false (tombstone)

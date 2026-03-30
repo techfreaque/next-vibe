@@ -9,12 +9,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { OxlintRepository } from "./repository";
 
 export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: async ({ data, logger, platform, t, locale, streamContext }) => {
+      const { OxlintRepository } = await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      );
       return await OxlintRepository.execute(
         data,
         logger,

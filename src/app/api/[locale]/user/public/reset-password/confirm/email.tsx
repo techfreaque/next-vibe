@@ -11,7 +11,8 @@ import {
 import type { ReactElement } from "react";
 import { z } from "zod";
 
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -39,6 +40,7 @@ import { env } from "@/config/env";
 const passwordResetConfirmPropsSchema = z.object({
   publicName: z.string(),
   userId: z.string(),
+  totalModelCount: z.number(),
 });
 
 type PasswordResetConfirmProps = z.infer<
@@ -74,7 +76,7 @@ function PasswordResetConfirmEmail({
       title={t("email.title")}
       previewText={t("email.previewText", {
         appName,
-        modelCount: TOTAL_MODEL_COUNT,
+        modelCount: props.totalModelCount,
       })}
       recipientEmail={recipientEmail}
       tracking={tracking}
@@ -128,7 +130,7 @@ function PasswordResetConfirmEmail({
           marginBottom: "8px",
         }}
       >
-        {t("email.promoText", { modelCount: TOTAL_MODEL_COUNT })}
+        {t("email.promoText", { modelCount: props.totalModelCount })}
       </Text>
 
       <Text
@@ -188,6 +190,7 @@ export const passwordResetConfirmEmailTemplate: EmailTemplateDefinition<
   exampleProps: {
     publicName: "Max Mustermann",
     userId: "example-user-id-123",
+    totalModelCount: 42,
   },
   render: async ({ requestData, locale, logger }) => {
     logger.debug("Rendering password reset confirmation email", {
@@ -217,6 +220,7 @@ export const passwordResetConfirmEmailTemplate: EmailTemplateDefinition<
     const templateProps: PasswordResetConfirmProps = {
       publicName: user.publicName,
       userId: user.id,
+      totalModelCount: getAvailableModelCount(getAgentEnvAvailability(), false),
     };
 
     return success({

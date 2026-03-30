@@ -215,9 +215,9 @@ export const translations: typeof enTranslations = {
     repositoryPara:
       "Funkcje repozytorium nigdy nie rzucają. Błędy propagują jako dane - typowane, explicite i możliwe do złapania przez wywołującego. AI może rozumować o ścieżkach błędów. Brak niespodziewanych wyjątków.",
     repositoryCodeComment: "// Zwraca ResponseType<T> - nigdy nie rzuca",
-    routeTitle: "route.ts - cztery linie",
+    routeTitle: "route.ts - cały most",
     routePara:
-      "route.ts to cztery linie. endpointsHandler obsługuje walidację, uwierzytelnianie, logowanie i ekspozycję dla wszystkich 13 platform. To cały most.",
+      "route.ts łączy definicję z handlerem. endpointsHandler obsługuje walidację, uwierzytelnianie, logowanie i ekspozycję dla wszystkich 13 platform. Właściwa logika biznesowa to jedna linia.",
     statsTitle: "Liczby",
     statEndpoints: "374 endpointy",
     statEndpointsDetail: "Jeden wzorzec, zastosowany 374 razy",
@@ -232,14 +232,14 @@ export const translations: typeof enTranslations = {
   onePatternQuote: "Jeden wzorzec. Powtórzony 374 razy.",
 
   vibeSenseTeaser: {
-    eyebrow: "Następnie w Video 2",
+    eyebrow: "Co dalej",
     title: "Vibe Sense: Potok jest platformą",
     description:
       "Każdy węzeł w grafie Vibe Sense to zwykły endpoint next-vibe. Ten sam createEndpoint(). Ta sama struktura 3 plików. Wskaźnik EMA to endpoint. Ewaluator progowy to endpoint. I ponieważ to endpoint - możesz go wywołać z CLI, z AI, skądkolwiek.",
     calloutLine: "Potok jest platformą.",
     teaser:
       "Vibe Sense to po prostu... więcej endpointów. To samo, zastosowane do danych szeregów czasowych. Lejki leadów. Ekonomia kredytów. Wzrost użytkowników. Twoja platforma obserwuje siebie.",
-    cta: "Czytaj: Vibe Sense - Trzecia warstwa",
+    cta: "Powrót do bloga",
   },
 
   closing: {

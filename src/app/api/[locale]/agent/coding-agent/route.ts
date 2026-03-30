@@ -6,16 +6,16 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { endpoints } from "./definition";
 import { runCodingAgent } from "./repository";
 import { claudeCodeConfig } from "./providers/claude-code/repository";
 import { openCodeConfig } from "./providers/open-code/repository";
-import { endpoints } from "./definition";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, logger, t, cronTaskId, streamContext }) =>
-      runCodingAgent(
+    handler: ({ data, user, logger, t, cronTaskId, streamContext }) => {
+      return runCodingAgent(
         data.provider === "open-code" ? openCodeConfig : claudeCodeConfig,
         data,
         user,
@@ -23,6 +23,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         cronTaskId,
         streamContext,
-      ),
+      );
+    },
   },
 });

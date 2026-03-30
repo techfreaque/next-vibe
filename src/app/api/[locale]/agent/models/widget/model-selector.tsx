@@ -59,6 +59,7 @@ import {
   getAllModelOptions,
   getCreditCostFromModel,
   getModelById,
+  isModelProviderAvailable,
   modelProviders,
   type ModelId,
   type ModelOption,
@@ -442,28 +443,7 @@ export function isProviderAvailable(
   if (!envAvailability) {
     return true;
   }
-  switch (model.apiProvider) {
-    case ApiProvider.OPENROUTER:
-      return envAvailability.openRouter;
-    case ApiProvider.CLAUDE_CODE:
-      return envAvailability.claudeCode;
-    case ApiProvider.UNCENSORED_AI:
-      return envAvailability.uncensoredAI;
-    case ApiProvider.FREEDOMGPT:
-      return envAvailability.freedomGPT;
-    case ApiProvider.GAB_AI:
-      return envAvailability.gabAI;
-    case ApiProvider.VENICE_AI:
-      return envAvailability.veniceAI;
-    case ApiProvider.OPENAI_IMAGES:
-      return envAvailability.openAiImages;
-    case ApiProvider.REPLICATE:
-      return envAvailability.replicate;
-    case ApiProvider.FAL_AI:
-      return envAvailability.falAi;
-    default:
-      return true;
-  }
+  return isModelProviderAvailable(model, envAvailability);
 }
 
 /** Map ApiProvider to the availability key */

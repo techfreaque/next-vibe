@@ -5,10 +5,6 @@
 
 import "server-only";
 
-import { readdir, stat } from "node:fs/promises";
-import { homedir } from "node:os";
-import { join, resolve } from "node:path";
-
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -33,18 +29,6 @@ import type {
 import type { FilesListT } from "./i18n";
 
 export class FilesListRepository {
-  private static resolvePath(inputPath?: string): string {
-    const raw = inputPath ?? "~";
-    if (raw === "~" || raw.startsWith("~/")) {
-      return join(homedir(), raw.slice(1));
-    }
-    return resolve(raw);
-  }
-
-  private static isValidPath(p: string): boolean {
-    return p.startsWith("/") && !p.includes("..");
-  }
-
   static async list(
     data: FilesListRequestOutput,
     logger: EndpointLogger,
@@ -55,9 +39,19 @@ export class FilesListRepository {
       return FilesListRepository.listSftp(data, user, logger, t);
     }
 
-    const dirPath = FilesListRepository.resolvePath(data.path);
+    // Dynamic imports keep node:fs/promises, node:os, node:path out of the
+    // static module graph so Turbopack's NFT tracer doesn't scan the whole project.
+    const { readdir, stat } = await import("node:fs/promises");
+    const { homedir } = await import("node:os");
+    const { join, resolve } = await import("node:path");
 
-    if (!FilesListRepository.isValidPath(dirPath)) {
+    const raw = data.path ?? "~";
+    const dirPath =
+      raw === "~" || raw.startsWith("~/")
+        ? join(homedir(), raw.slice(1))
+        : resolve(raw);
+
+    if (!dirPath.startsWith("/") || dirPath.includes("..")) {
       return fail({
         message: t("errors.invalidPath"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -71,7 +65,6 @@ export class FilesListRepository {
       const entries: FilesListResponseOutput["entries"] = [];
 
       for (const name of names) {
-        // Use template string to prevent Turbopack from statically tracing paths
         const fullPath = `${dirPath}/${name}`;
         try {
           const st = await stat(fullPath);

@@ -53,20 +53,50 @@ export const translations: typeof enTranslations = {
         "Post, który piszemy dla Hacker News. Supremacja TypeScript, zunifikowane powierzchnie i bot tradingowy, który nie może handlować.",
       readTime: "5 min czytania",
     },
+    referralBeginners: {
+      title:
+        "Nigdy nie robiłem marketingu afiliacyjnego. Czy naprawdę mogę tu zarobić?",
+      category: "Polecenia",
+      excerpt:
+        "Uczciwa odpowiedź: tak, z realistycznymi oczekiwaniami. Jak działa model prowizji cyklicznych, gdy nigdy wcześniej nikogo nie poleciłeś.",
+      readTime: "6 min czytania",
+    },
+    referralAffiliatePros: {
+      title: "Jestem marketerem afiliacyjnym. Co jest inne w subskrypcjach AI?",
+      category: "Polecenia",
+      excerpt:
+        "Poziom bazowy jest wyższy i rośnie z czasem. Miesięczne prowizje od abonentów AI, którzy wydają więcej w miarę jak platforma staje się potężniejsza.",
+      readTime: "7 min czytania",
+    },
+    referralDevelopers: {
+      title: "Zbudowałeś coś z AI. Teraz zarabiaj na dzieleniu się tym.",
+      category: "Polecenia",
+      excerpt:
+        "Twój link polecający to strumień przychodów, którego jeszcze nie uruchomiłeś. Posty na blogu, README, tutoriale — matematyka dla odbiorców technicznych.",
+      readTime: "5 min czytania",
+    },
   },
   labels: {
     readMore: "Czytaj więcej",
     allPosts: "Wszystkie posty",
     featured: "Wyróżniony",
     new: "Nowy",
+    draft: "Szkic",
   },
   ui: {
-    featuredFileBar: "definition.ts → web · cli · mcp · native · cron",
+    heroTagline: "next-vibe · unbottled.ai",
+    featuredFileBar:
+      "definition.ts → web · cli · mcp · native · cron · 10 więcej",
     hnSiteName: "Hacker News",
     hnNav: "dodaj · zaloguj · nowe · pytaj · pokaż · praca",
     hnPoints: "punkty:",
     hnComments: "komentarze:",
     hnAuthor: "autor:",
     hnTags: "> next-vibe · TypeScript · OSS · SaaS · AI",
+    hnDraftPoints: "— (nie zgłoszono)",
+    hnDraftComments: "— (nie zgłoszono)",
+    hnDraftStatus: "szkic",
+    vibeFrameEmbedCaption:
+      "Dowolny endpoint. Dwa tagi script. Na każdej stronie.",
   },
 };

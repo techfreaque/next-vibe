@@ -1,6 +1,8 @@
 import "server-only";
 
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
@@ -20,12 +22,18 @@ export async function loadRemoteInstancesData(
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
 
+  const totalModelCount = getAvailableModelCount(
+    getAgentEnvAvailability(),
+    isAdmin,
+  );
+
   const base = {
     isAdmin,
     appName,
     appUrl,
     isLocalMode,
     isDev,
+    totalModelCount,
   };
 
   if (!userId || isIncognito || isExposedFolder) {

@@ -128,4 +128,19 @@ export const translations = {
     minimumNote:
       "Minimum payout: {{minPayout}}. Crypto payouts processed within {{cryptoPayoutHours}} hours after approval.",
   },
+  audienceCallout: {
+    title: "What makes this different?",
+    newTitle: "New to referral programs?",
+    newBody:
+      "Multi-level means you earn not just from people you refer directly, but from their referrals too — passively. And unlike a one-time sale, AI subscriptions renew monthly. You earn every month, forever.",
+    proTitle: "Already in affiliate marketing?",
+    proBody:
+      "The floor here is higher than most. A casual user averages ~$8/mo. A heavy AI user easily spends $100-200+/mo — one power user earns you more than a dozen casual referrals. And as the platform adds models and capabilities, ARPU grows. Your existing referrals earn you more over time without any extra work.",
+  },
+  discord: {
+    title: "Join the community",
+    description:
+      "Get help, share strategies, and connect with other affiliates in our Discord.",
+    cta: "Join Discord",
+  },
 };

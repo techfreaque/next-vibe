@@ -6,8 +6,9 @@ import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-strea
 import { memories as memoriesTable } from "@/app/api/[locale]/agent/chat/memories/db";
 import {
   FEATURED_MODELS,
-  TOTAL_MODEL_COUNT,
+  getAvailableModelCount,
 } from "@/app/api/[locale]/agent/models/models";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   ProductIds,
   productsRepository,
@@ -127,7 +128,7 @@ export async function loadPromptContextData(
     subLabel,
     packLabel,
     uncensoredNames: FEATURED_MODELS.uncensored.join(", "),
-    totalModelCount: TOTAL_MODEL_COUNT,
+    totalModelCount: getAvailableModelCount(getAgentEnvAvailability(), isAdmin),
     isExposedFolder,
     privateName,
     publicName,

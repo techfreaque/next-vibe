@@ -6,12 +6,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { FilesReadRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ data, logger, user, t }) =>
-      FilesReadRepository.read(data, logger, user, t),
+    handler: async ({ data, logger, user, t }) => {
+      const { FilesReadRepository } = await import("./repository");
+      return FilesReadRepository.read(data, logger, user, t);
+    },
   },
 });

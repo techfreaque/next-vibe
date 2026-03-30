@@ -2,11 +2,11 @@ export const translations = {
   meta: {
     title: "I got fired. This is what I built instead. - next-vibe",
     description:
-      "A federated widget engine built at a job that no longer exists. Now any next-vibe endpoint is embeddable anywhere in two script tags.",
+      "A sandboxed widget engine that turned into the rendering half of remote tool execution. Any next-vibe endpoint — on any server — is now a live, interactive widget you can embed anywhere.",
     category: "VibeFrame",
-    imageAlt: "VibeFrame - Federated Widget Engine",
+    imageAlt: "VibeFrame - Remote Tool Execution & Sandboxed Widget Rendering",
     keywords:
-      "VibeFrame, federated widgets, iframe, postMessage, next-vibe, embeddable, TypeScript",
+      "VibeFrame, remote tool execution, federated widgets, iframe, postMessage, next-vibe, embeddable, TypeScript",
   },
   hero: {
     backToBlog: "Back to Blog",
@@ -14,22 +14,22 @@ export const translations = {
     readTime: "11 min read",
     title: "I got fired. This is what I built instead.",
     subtitle:
-      "A federated widget engine built at a job that no longer exists. Now any next-vibe endpoint is embeddable anywhere in two script tags.",
+      "A widget engine built in spare time after work — SSR+CSR, under 15kb, faster and more featured than the day job version. It sat on my hard drive for six months. Then next-vibe needed it.",
     quote: "I was about to show it to my team. Then I got fired.",
   },
   origin: {
     title: "The origin story",
     paragraph1:
-      "I spent three months building something at my day job that I never got to show anyone. The codebase I was working in was a disaster. Every time we needed to embed a third-party widget - a form, a chat bubble, a dashboard panel - it was the same story. Someone drops a script tag in a page, it starts reading cookies, intercepting clicks, injecting DOM nodes wherever it wants. No sandbox. No isolation. And when it breaks, good luck figuring out why.",
+      "My day job had a widget problem. Other sites would import our JavaScript to display a widget — a form, a chat bubble, a dashboard panel. The script was non-performant, bloated, slow to load. Third-party sites importing it were visibly paying the cost. In my spare time after work, I started building a replacement.",
     paragraph2:
-      "I built an alternative. A lightweight federated widget engine that could safely embed anything - any form, any UI, any tool - in a sandboxed iframe on any page. Proper postMessage protocol. No shared state between host and widget. Trigger system, display modes, the whole thing.",
+      "The prototype came out cleaner than I expected. SSR and CSR support — SSR for speed, CSR for interactivity. Under 15kb total. Faster than the day job version. More features. Fully reactive, fully typesafe. A proper postMessage protocol between the iframe and the host page. No shared state. Trigger system, display modes, display frequency controls. I was about to show it to my team. Then I got fired.",
     paragraph3:
-      "I was about to show it to my team. Then I got fired. The codebase sat dead on my hard drive for months. Then I realized: the architecture was exactly what next-vibe needed.",
+      "The codebase sat on my hard drive for about six months. Then I realized what next-vibe actually needed it for: not just forms — but rendering the full interactive UI of a tool running on a remote server, inside a sandbox, on any page. That is remote tool execution with a live UI.",
   },
   problem: {
     title: "The problem with script tags",
     paragraph1:
-      "When you embed third-party content with a bare script tag, you have no sandbox. That script has full access to the page - the DOM, cookies, localStorage, event listeners, everything. If that script is buggy, your page breaks. If it's malicious, your users are exposed.",
+      "When you embed third-party content with a bare script tag, you pay in two ways. Performance: the script has to load, parse, and execute before anything renders. If the third-party server is slow, your page waits. And security: that script has full access to the page — the DOM, cookies, localStorage, event listeners. If it's buggy, your page breaks. If it's malicious, your users are exposed.",
     paragraph2:
       "The standard safe alternative is an iframe. But iframes do not communicate with the parent page by default. Resize events do not bubble. Form submissions do not propagate. The host page cannot inject data. You end up with a dumb isolated box that cannot tell its parent anything.",
     bridgeTitle: "What you actually need is a bridge.",
@@ -89,20 +89,20 @@ export const translations = {
   embed: {
     title: "Two script tags. Done.",
     description:
-      "Port it in. Any endpoint becomes embeddable. Any widget is now a first-class citizen on any website.",
+      "Any endpoint becomes embeddable. The tool runs on its own server. The widget renders in a sandbox on your page. Full features, zero shared state.",
     twoScriptTags: "Two script tags. Done.",
     codeCaption: "The complete embed code for a contact form from unbottled.ai",
     adminDescription:
       "The admin panel generates this for you. Pick endpoint, pick display mode, pick trigger. Copy. Paste anywhere.",
   },
   vibeSense: {
-    title: "The side effect I did not plan",
+    title: "Not a side effect. The point.",
     paragraph1:
-      "When I ported VibeFrame into next-vibe, I realized it was not just forms that became embeddable. Any endpoint's UI is embeddable. Including Vibe Sense graph visualizations.",
+      "When I ported VibeFrame into next-vibe, the first thing I embedded was not a contact form. It was a Vibe Sense graph — a live data visualization from the platform, rendering as a widget on an external page.",
     paragraph2:
-      "A live lead funnel graph from the platform - with real data, live indicators - rendering as a widget on an external page. This is not a screenshot. It is not a static export. The data refreshes. The graph reacts.",
+      "Real data. Live indicators. The graph reacts to what is happening on the remote server. This is not a screenshot or a static export. The tool is running on its server. VibeFrame renders its widget UI in a sandbox wherever you need it.",
     paragraph3:
-      "The architecture that I built to safely embed third-party widgets turned out to also be the architecture for giving every endpoint a public-facing iframe presence. That is the thing about building the right abstraction. It does more than you planned.",
+      "That is when the architecture clicked. VibeFrame was not just a way to embed forms. It was the rendering half of remote tool execution — the missing piece that makes a distributed tool system feel like a single coherent platform.",
   },
   federated: {
     title: "Federated embedding",
@@ -114,32 +114,49 @@ export const translations = {
       "The definition travels with the widget. The server that owns the endpoint owns the render.",
   },
   skills: {
-    title: "Skills: both a persona and a tool configuration",
+    title: "Skills: the invocation half",
     intro:
-      "I want to tell you about how skills in this platform evolved, because the same pattern applies.",
+      "VibeFrame handles rendering. Skills handle invocation. A skill declares exactly which tools an AI has access to — specific endpoints in the registry, with Zod-validated inputs and typed outputs. The user picks a persona. The AI gets a bounded tool set.",
     userPerspective: "User perspective",
     aiPerspective: "AI perspective",
     userDescription:
       "A skill is a persona. A tutor, a coder, a storyteller, an uncensored writer. Each skill has a name, a system prompt, a voice, a personality.",
     aiDescription:
-      "A skill is a skill set. Each skill declares which tools it has access to. Specific endpoints in the registry, with Zod-validated inputs and typed outputs.",
-    keyLine: "User sees a skill. The AI sees a tool configuration.",
+      "A skill is a tool configuration. Each skill declares which endpoints it can call — including tools on remote instances. Zod-validated inputs. Typed outputs. No ambiguity.",
+    keyLine: "User sees a persona. The AI sees a tool configuration.",
     activeToolsTitle: "The activeTools array",
     activeToolsDescription:
-      "This is the reveal. Not abstract capabilities described in a markdown file. These are specific endpoints, callable from the same tool interface as everything else.",
-    composableTitle: "Composable reasoning",
+      "Not abstract capabilities described in prose. These are specific endpoints — callable via the same execute-tool interface, whether they run locally or on a remote next-vibe instance across the network.",
+    composableTitle: "Tools can live anywhere",
     composableDescription:
-      "Not one big agent that knows everything. A collection of specialists with clearly bounded capabilities, orchestrated by an agent that knows which specialist to call.",
+      "A tool call in next-vibe is not limited to the local server. The execute-tool system routes calls to whichever instance owns that endpoint. The calling AI does not need to know where it runs. It calls, the right server answers.",
     bothAtOnce: "A skill is both at once.",
   },
+  remoteExecution: {
+    title: "Remote tool execution",
+    paragraph1:
+      "Here is the thing that connects VibeFrame and the tool registry. When an AI calls execute-tool with a remote endpoint, next-vibe routes the call to the target instance. That instance executes the tool, returns the result. Standard enough.",
+    paragraph2:
+      "But every endpoint in next-vibe also has a widget — a typed, fully-featured UI component that knows how to render that tool's inputs and outputs. VibeFrame can take that widget and render it in a sandboxed iframe on any page, communicating with the tool's server via postMessage.",
+    paragraph3:
+      "Put those two together: you can call a tool on a remote server and render its full interactive UI in a sandbox on your page. The tool runs where it lives. The UI appears where you need it. No shared state. No security compromise. Full features.",
+    diagramAI: "AI Agent",
+    diagramExecute: "execute-tool",
+    diagramRemote: "Remote Instance",
+    diagramVibeFrame: "VibeFrame",
+    diagramWidget: "Sandboxed Widget UI",
+    diagramAILabel: "calls tool",
+    diagramRemoteLabel: "executes, returns result",
+    diagramWidgetLabel: "renders full UI in sandbox",
+    callout:
+      "The server that owns the tool owns the UI. VibeFrame renders it anywhere you need it. This is what remote tool execution looks like with a full frontend.",
+  },
   close: {
-    title: "What these two things have in common",
-    vibeFrame:
-      "VibeFrame makes the platform embeddable anywhere. Any endpoint, any widget, any UI - two script tags, it is on any website. The platform's presence extends beyond its own domain.",
-    skills:
-      "Skills make the platform composable. Any reasoning task, any capability domain - route to the right skill, get the right model with the right tools. The platform's intelligence extends beyond a single conversation thread.",
+    title: "What they have in common",
+    paragraph:
+      "VibeFrame and the tool registry solve the same problem from opposite ends. The tool registry handles invocation — any endpoint on any instance, callable from any AI. VibeFrame handles rendering — any widget from any instance, embeddable on any page. Remote tool execution is the bridge between them: call the tool, render its UI.",
     together:
-      "Together: your platform can appear anywhere and reason about anything.",
+      "A distributed tool system with a distributed rendering system. That is next-vibe.",
     finalLine:
       "I never got to show it to those colleagues. But I am showing it to you.",
     github: "View on GitHub",

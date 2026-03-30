@@ -12,13 +12,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { ChatFileRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
     handler: async ({ urlPathParams, user, logger, t, locale }) => {
+      const { ChatFileRepository } = await import("./repository");
       const result = await ChatFileRepository.getFile(
         urlPathParams,
         user,

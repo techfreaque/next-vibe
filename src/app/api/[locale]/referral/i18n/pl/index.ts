@@ -126,6 +126,7 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         empty: "Nie masz jeszcze żadnych kodów polecających",
+        emptyHint: "Utwórz swój pierwszy kod powyżej ↑",
         copied: "Skopiowano!",
         copy: "Kopiuj link",
         visitors: "Odwiedzający",
@@ -133,6 +134,8 @@ export const translations: typeof enTranslations = {
         revenue: "Przychód",
         earnings: "Zarobki",
         inactive: "Ten kod polecający jest nieaktywny",
+        conversionHint:
+          "Każdy subskrybent za {{examplePrice}}/mies. przynosi Ci {{exampleEarning}}/mies. – cyklicznie",
       },
     },
   },
@@ -150,6 +153,10 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Statystyki pobrane",
       description: "Pomyślnie pobrano Twoje statystyki poleceń",
+    },
+    widget: {
+      emptyMessage:
+        "Brak aktywności – udostępnij link polecający, aby zacząć zarabiać",
     },
     fields: {
       totalSignups: "Łączne rejestracje",
@@ -358,6 +365,7 @@ export const translations: typeof enTranslations = {
       progressLabel: "Postęp do wypłaty",
       unlockedOf: "odblokowano z",
       viewHistory: "Zobacz historię",
+      historyEmpty: "Twoje wypłaty pojawią się tutaj",
     },
     email: {
       user: {

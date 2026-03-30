@@ -41,7 +41,7 @@ import { scopedTranslation } from "./i18n";
 export class StripeProvider implements PaymentProvider {
   private static readonly _stripe = paymentEnv.STRIPE_SECRET_KEY
     ? new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
-        apiVersion: "2026-02-25.clover",
+        apiVersion: "2026-03-25.dahlia",
       })
     : null;
 

@@ -574,9 +574,44 @@ export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
           <H3 className="text-xl font-bold mb-2 font-mono text-blue-600 dark:text-blue-400">
             {t("underTheHoodSection.definitionTitle")}
           </H3>
-          <P className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
+          <P className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
             {t("underTheHoodSection.definitionPara")}
           </P>
+
+          <CodeBlock className="mb-6">
+            {`// definition.ts
+const { POST } = createEndpoint({
+  scopedTranslation,
+  aliases: [EXPLAIN_TO_MY_BOSS_ALIAS],
+  method: Methods.POST,
+  path: ["explain", "to-my-boss"],
+  title: "post.title",
+  description: "post.description",
+  icon: "sparkles",
+  category: "endpointCategories.ai",
+  allowedRoles: [UserRole.USER],
+  fields: objectField(scopedTranslation, {
+    usage: { request: "data", response: true },
+    children: {
+      decision: requestField(scopedTranslation, {
+        label: "post.fields.decision.label",
+        description: "post.fields.decision.description",
+        schema: z.string().min(1).max(2000),
+        fieldType: FieldDataType.TEXTAREA,
+      }),
+      justification: responseField(scopedTranslation, {
+        label: "post.fields.justification.label",
+        description: "post.fields.justification.description",
+        schema: z.string(),
+        fieldType: FieldDataType.TEXTAREA,
+      }),
+    },
+  }),
+  errorTypes: { /* ... all 9 required error types ... */ },
+  successTypes: { title: "post.success.title", description: "post.success.description" },
+  examples: { requests: { default: { decision: "Migrate to Bun" } }, responses: { default: { justification: "..." } } },
+});`}
+          </CodeBlock>
 
           {/* repository.ts */}
           <H3 className="text-xl font-bold mb-2 font-mono text-green-600 dark:text-green-400">
@@ -587,12 +622,18 @@ export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
           </P>
 
           <CodeBlock className="mb-6">
-            {`static async generate(data, user, logger): Promise<ResponseType<Response>> {
-  ${t("underTheHoodSection.repositoryCodeComment")}
+            {`// repository.ts
+${t("underTheHoodSection.repositoryCodeComment")}
+export async function explainToMyBoss(
+  data: { decision: string },
+  logger: Logger,
+): Promise<ResponseType<{ justification: string }>> {
   const result = await ai.generateText({
-    prompt: buildPrompt(data.decision, data.context),
+    prompt: buildPrompt(data.decision),
   });
-  if (!result) return fail({ message: t("errors.ai"), errorType: SERVER_ERROR });
+  if (!result.text) {
+    return fail({ message: "AI returned empty response", errorType: EndpointErrorTypes.SERVER_ERROR });
+  }
   return success({ justification: result.text });
 }`}
           </CodeBlock>
@@ -606,11 +647,16 @@ export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
           </P>
 
           <CodeBlock className="mb-8">
-            {`import { endpointsHandler } from "next-vibe/server";
-import { explainToMyBossDefinition } from "./definition";
-import { ExplainToMyBossRepository } from "./repository";
+            {`// route.ts
+import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
+import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import definitions from "./definition";
+import { explainToMyBoss } from "./repository";
 
-export const { POST } = endpointsHandler(explainToMyBossDefinition, ExplainToMyBossRepository);`}
+export const { POST, tools } = endpointsHandler({
+  endpoint: definitions,
+  [Methods.POST]: { handler: ({ data, logger }) => explainToMyBoss(data, logger) },
+});`}
           </CodeBlock>
 
           {/* Stats grid */}

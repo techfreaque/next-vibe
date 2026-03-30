@@ -2,9 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Show HN: next-vibe - Szkic - Blog next-vibe",
+    title: "Show HN: next-vibe — jeden endpoint, każda powierzchnia",
     description:
-      "Post na Hacker News, który piszemy. Supremacja TypeScript, zunifikowane powierzchnie i bot tradingowy, który nie może handlować.",
+      "Post Show HN dla next-vibe i rozumowanie za nim. Supremacja TypeScript, zunifikowane powierzchnie i przypadkowy silnik grafu.",
     category: "Społeczność",
     imageAlt: "Show HN: next-vibe",
     keywords:
@@ -12,38 +12,25 @@ export const translations: typeof enTranslations = {
   },
   hero: {
     backToBlog: "Powrót do bloga",
-    category: "Społeczność",
+    category: "Show HN",
     readTime: "5 min czytania",
-    title: "Show HN: next-vibe",
+    title: "Show HN: next-vibe — jeden endpoint, każda powierzchnia",
+    subtitle: "Właściwy post — i rozumowanie za nim.",
+  },
+  post: {
+    label: "Post",
+    body: "Znudziło mi się pisanie tej samej logiki pięć razy.\n\nKażda funkcja potrzebowała formularza web, polecenia CLI, narzędzia MCP dla agentów AI, czasem ekranu mobilnego. Ta sama walidacja Zod, to samo i18n, ta sama obsługa błędów — tylko inaczej ubrana. Więc zbudowałem next-vibe: framework, w którym piszesz jeden plik definition.ts na funkcję i renderuje się jako wszystkie jednocześnie.\n\nReguła jest surowa: typy muszą być całkowicie zgodne. Żadnego any, żadnego unknown, żadnych asercji typów (as X), żadnych instrukcji throw. Jeśli twoje typy są błędne, twoja architektura jest błędna. Zbudowaliśmy vibe check do egzekwowania — Oxlint + ESLint + TypeScript równolegle, z niestandardowymi wtyczkami dla reguł specyficznych dla projektu.\n\nZasila też unbottled.ai (50+ modeli AI, kontrolowana przez użytkownika cenzura). Ta sama baza kodu działa jako aplikacja web Next.js, serwer dev TanStack/Vite, aplikacja mobilna React Native, CLI, serwer MCP, system cron i magistrala zdarzeń WebSocket. Jedna definicja endpointu. Bez duplikacji.\n\nNajdziwniejsza część: porzucony bot tradingowy, który napisałem lata temu, stał się najbardziej interesującą częścią. Vibe Sense to węzłowy silnik analityki — źródła danych, wskaźniki (EMA, SMA, Wstęgi Bollingera), ewaluatory emitujące sygnały. Bez wykonywania zleceń. Każdy węzeł to standardowy endpoint HTTP: można go curlovać, jest dostępny przez MCP, indywidualnie testowalny. Silnik grafu to harmonogramista, nie DSL.",
+    note: "To jest post idący na Hacker News. Tytuł i pierwsze dwa zdania są wszystkim.",
+  },
+  behind: {
+    label: "Za postem",
     subtitle:
-      "Post na Hacker News, który piszemy. Dwa kąty. Jedna decyzja. Oto rozumowanie.",
-    hnBadge: "Show HN",
-    hnSubtext: "Szkic w trakcie",
+      "Dlaczego ten kąt, co jeszcze rozważaliśmy i jakie były kompromisy.",
   },
-  intro: {
-    title: "Piszemy post Show HN",
-    paragraph1:
-      "Każdy projekt techniczny w końcu pyta: jak przedstawić się Hacker News? Tytuł jest wszystkim. Pierwsze dwa zdania decydują, czy ktoś kliknie, czy przewinie.",
-    paragraph2:
-      "Mamy dwa kąty. Oba są prawdziwe. Oba są prawdziwymi częściami next-vibe. Pytanie brzmi, który mocniej ląduje na HN - i który rozpoczyna rozmowę, którą naprawdę chcemy przeprowadzić.",
-  },
-  optionA: {
-    badge: "Opcja A",
-    title: "Supremacja TypeScript",
-    hnTitle:
-      "Show HN: next-vibe – framework TypeScript-first, gdzie any, unknown, object, as X i throw są zakazane",
-    body: "Większość projektów TypeScript traktuje system typów jako opcjonalne zabezpieczenia. My traktujemy go jako strukturę nośną. Reguła w next-vibe jest prosta: typy muszą być całkowicie zgodne - żadnego any, żadnego unknown, żadnego gołego object, żadnych asercji typów (as X), żadnych wyjątków. Jeśli twoje typy są błędne, architektura jest błędna.\n\nAby to wyegzekwować, zbudowaliśmy vibe check: narzędzie jakości kodu, które uruchamia Oxlint (Rust), ESLint i sprawdzanie typów TypeScript równolegle.",
-    reasoning:
-      "Hardkorowi użytkownicy TypeScript zaangażują się natychmiast. Zakazane wzorce są konkretne i kontrowersyjne. Inżynierowie HN mają opinie na temat any i throw. Ten kąt zaprasza do sprzeciwu - a na HN sprzeciw to zaangażowanie.",
-  },
-  optionB: {
-    badge: "Opcja B",
-    title: "Zunifikowana powierzchnia",
-    hnTitle:
-      "Show HN: next-vibe – jedna definicja endpointu staje się web UI, CLI, narzędziem MCP, natywną aplikacją, zadaniem cron i węzłem grafu",
-    body: "Znudziło mi się pisanie tej samej logiki pięć razy. Każda funkcja potrzebowała formularza web, polecenia CLI, narzędzia MCP dla agentów AI, czasem ekranu mobilnego. Ta sama walidacja, to samo i18n, ta sama obsługa błędów - tylko inaczej ubrana.\n\nnext-vibe rozwiązuje to za pomocą jednego pliku definition.ts na funkcję. Opisujesz pola, schematy Zod, etykiety, typy błędów i przykłady raz.",
-    reasoning:
-      "Ból, z którym można się utożsamić: pisanie tej samej rzeczy pięć razy. Rozwiązanie jest konkretne i możliwe do demonstracji. Kąt węzła grafu jest nowatorski. Kąt MCP + agentów AI jest aktualny.",
+  whyAngle: {
+    title: "Dlaczego kąt zunifikowanej powierzchni",
+    p1: "Ból, z którym można się utożsamić — pisanie tej samej rzeczy pięć razy — trafia do każdego developera, który zbudował prawdziwy produkt. To nie jest abstrakcja. Każdy inżynier, który utrzymywał endpoint REST, wrapper CLI i klienta mobilnego dla tej samej funkcji, zna to uczucie.",
+    p2: "Reguły TypeScript są najbardziej kontrowersyjną częścią. Inżynierowie HN mają silne opinie na temat any i throw. Zaczynanie od zunifikowanej powierzchni daje szersze zaangażowanie; kąt TypeScript napędza komentarze.",
   },
   bannedPatterns: {
     title: "Zakazane wzorce",
@@ -83,75 +70,23 @@ export const translations: typeof enTranslations = {
     title: "Kąt bota tradingowego",
     subtitle: "Bot tradingowy, który nie może handlować",
     description:
-      "Vibe Sense to węzłowy silnik analityki rynkowej. Źródła danych, wskaźniki (EMA, SMA, Wstęgi Bollingera), ewaluatory emitujące sygnały i węzły akcji reagujące na te sygnały. Bez wykonywania zleceń.",
+      "Vibe Sense zaczął jako bot tradingowy. Nigdy nie wykonywał zleceń — tylko obserwował ceny i wyzwalał sygnały. Kiedy go porzuciłem, architektura potoku przeżyła: źródła danych łączą się ze wskaźnikami, wskaźniki zasilają ewaluatory, ewaluatory wysyłają sygnały, sygnały wyzwalają akcje. Każdy węzeł to endpoint HTTP.",
     hookForComments:
-      "Każdy węzeł w grafie to tylko endpoint HTTP - możesz zrobić curl do dowolnego kroku w potoku, testować go w izolacji lub wywoływać z agenta AI. Silnik grafu to harmonogramista, nie DSL.",
+      "Każdy węzeł w grafie to tylko endpoint HTTP — możesz zrobić curl do dowolnego kroku w potoku, testować go w izolacji lub wywoływać z agenta AI. Silnik grafu to harmonogramista, nie DSL.",
     whyItMatters:
       "Ponieważ każdy węzeł to standardowy endpoint, są one indywidualnie testowalne przez CLI, dostępne dla agentów AI przez MCP i buforowane z tą samą infrastrukturą co wszystko inne.",
   },
-  angles: {
-    title: "Kąty uszeregowane według prawdopodobnego traction na HN",
-    intro:
-      "Na podstawie rozpoznawania wzorców w stosunku do tego, co faktycznie działa na HN:",
+  alternatives: {
+    title: "Alternatywne tytuły, które rozważaliśmy",
     items: {
-      typescript: {
-        rank: "1",
-        title: "Supremacja TypeScript + checker",
-        reason:
-          "Kontrowersyjny, techniczny, konkretny. Inżynierowie mają opinie.",
-      },
-      unifiedSurface: {
-        rank: "2",
-        title:
-          "Zunifikowana powierzchnia - jedna definicja, wszystkie powierzchnie",
-        reason:
-          "Ból, z którym można się utożsamić. Każdy developer pisał ten sam formularz pięć razy.",
-      },
-      vibeSense: {
-        rank: "3",
-        title: "Silnik grafu Vibe Sense na endpointach",
-        reason:
-          "Nowatorska architektura. Endpoint HTTP jako węzeł grafu to ciekawa koncepcja.",
-      },
-      agentCoordination: {
-        rank: "4",
-        title: "Warstwa koordynacji agentów AI",
-        reason:
-          "Ciekawe, ale zakopane w treści. Lepiej jako haczyk w komentarzach.",
-      },
-      freeSpeech: {
-        rank: "5",
-        title: "Kąt wolności słowa unbottled.ai",
-        reason:
-          "Generuje dyskusję, ale ryzykuje wykolejenie rozmowy technicznej.",
-      },
-    },
-  },
-  titleAlternatives: {
-    title: "Alternatywne opcje tytułu",
-    items: {
-      alt1: "Show HN: Zakazałem any, unknown, object i as X w naszej bazie kodu TypeScript - oto egzekutor",
-      alt2: "Show HN: next-vibe – TypeScript tak rygorystyczny, że napisaliśmy własny linter zakazujący throw",
-      alt3: "Show HN: next-vibe – jedna definicja endpointu, sześć powierzchni (web/CLI/MCP/native/cron/graph)",
+      alt1: "Show HN: Zakazałem any, unknown, object i as X w naszej bazie kodu TypeScript — oto egzekutor",
+      alt2: "Show HN: next-vibe — TypeScript tak rygorystyczny, że napisaliśmy własny linter zakazujący throw",
+      alt3: "Show HN: next-vibe — jedna definicja endpointu, sześć powierzchni (web/CLI/MCP/native/cron/graph)",
       alt4: "Show HN: Zbudowaliśmy silnik grafu szeregów czasowych, gdzie każdy węzeł to tylko endpoint HTTP",
     },
   },
-  decision: {
-    title: "Rekomendacja",
-    option: "Opcja A",
-    reasoning:
-      "Opcja A dla bardziej opiniotwórczego i technicznego haczyka. Hardkorowi użytkownicy TypeScript zaangażują się natychmiast. Opcja B jeśli chcesz pokazać pełną szerokość. Kąt zakazanych wzorców TypeScript jest najbardziej konkretny, najbardziej kontrowersyjny i najbardziej prawdopodobny do napędzania komentarzy.",
-    cta: "Zobacz na GitHubie",
-    github: "github.com/techfreaque/next-vibe",
-  },
-  ui: {
-    hnSiteName: "Hacker News",
-    hnNavFull:
-      "Hacker News | nowe | poprzednie | komentarze | pytaj | pokaż | praca | dodaj",
-    hnNavShort:
-      "nowe | poprzednie | komentarze | pytaj | pokaż | praca | dodaj",
-    hnPostMeta: "42 punkty od techfreaque 2 godziny temu | 18 komentarzy",
-    hnRecommended: "polecany",
-    hookForCommentsLabel: "Haczyk do komentarzy",
+  cta: {
+    github: "Zobacz na GitHubie",
+    githubUrl: "github.com/techfreaque/next-vibe",
   },
 };

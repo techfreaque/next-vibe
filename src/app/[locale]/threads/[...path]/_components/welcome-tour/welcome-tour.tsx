@@ -7,6 +7,8 @@ import { ACTIONS, EVENTS, Joyride, STATUS } from "react-joyride";
 
 import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
@@ -48,6 +50,8 @@ export function WelcomeTour({
   autoStart = true,
 }: WelcomeTourProps): React.ReactElement | null {
   const { t } = scopedTranslation.scopedT(locale);
+  const envAvailability = useEnvAvailability();
+  const totalModelCount = getAvailableModelCount(envAvailability, false);
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [steps, setSteps] = useState<TourStepConfig[]>([]);
@@ -89,7 +93,7 @@ export function WelcomeTour({
   }, []);
 
   // Get tour steps with translations
-  const tourSteps = getTourSteps(t, isAuthenticated, locale);
+  const tourSteps = getTourSteps(t, isAuthenticated, locale, totalModelCount);
 
   // Initialize tour on mount - uses empty deps intentionally as this should only run once
   /* eslint-disable react-hooks/exhaustive-deps */

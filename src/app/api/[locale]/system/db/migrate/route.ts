@@ -9,12 +9,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import migrateEndpoints from "./definition";
-import { DatabaseMigrationRepository } from "./repository";
 
 export const { tools } = endpointsHandler({
   endpoint: migrateEndpoints,
   [Methods.POST]: {
-    handler: ({ t, logger }) => {
+    handler: async ({ t, logger }) => {
+      const { DatabaseMigrationRepository } = await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      );
       return DatabaseMigrationRepository.runMigrations(t, logger);
     },
   },

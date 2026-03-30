@@ -207,9 +207,9 @@ export const translations = {
     repositoryPara:
       "Repository functions never throw. Errors propagate as data - typed, explicit, and catchable by the caller. The AI can reason about failure paths. No surprise exceptions.",
     repositoryCodeComment: "// Returns ResponseType<T> - never throws",
-    routeTitle: "route.ts - four lines",
+    routeTitle: "route.ts - the entire bridge",
     routePara:
-      "route.ts is four lines. endpointsHandler handles validation, auth, logging, and exposure to all 13 platforms. That's the entire bridge.",
+      "route.ts wires the definition to the handler. endpointsHandler takes care of validation, auth, logging, and exposure to all 13 platforms. The actual business logic is one line.",
     statsTitle: "The numbers",
     statEndpoints: "374 endpoints",
     statEndpointsDetail: "One pattern, applied 374 times",
@@ -224,14 +224,14 @@ export const translations = {
   onePatternQuote: "One pattern. Repeated 374 times.",
 
   vibeSenseTeaser: {
-    eyebrow: "Coming up in Video 2",
+    eyebrow: "Up next",
     title: "Vibe Sense: The pipeline is the platform",
     description:
       "Every node in a Vibe Sense graph is a regular next-vibe endpoint. The same createEndpoint(). The same 3-file structure. An EMA indicator is an endpoint. A threshold evaluator is an endpoint. And because it's an endpoint - you can call it from the CLI, from the AI, from anywhere.",
     calloutLine: "The pipeline is the platform.",
     teaser:
       "Vibe Sense is just... more endpoints. The same thing, applied to time series data. Lead funnels. Credit economy. User growth. Your platform watching itself.",
-    cta: "Read: Vibe Sense - The Third Layer",
+    cta: "Back to Blog",
   },
 
   closing: {

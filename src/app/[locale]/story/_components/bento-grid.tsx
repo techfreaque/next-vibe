@@ -20,10 +20,6 @@ import type React from "react";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
-import {
-  TOTAL_CHARACTER_COUNT,
-  TOTAL_MODEL_COUNT,
-} from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
@@ -31,18 +27,22 @@ import { scopedTranslation } from "./i18n";
 interface BentoGridProps {
   locale: CountryLanguage;
   totalToolCount: number;
+  totalModelCount: number;
+  totalSkillCount: number;
 }
 
 export function BentoGrid({
   locale,
   totalToolCount,
+  totalModelCount,
+  totalSkillCount,
 }: BentoGridProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   const interpolation = {
-    modelCount: TOTAL_MODEL_COUNT,
-    skillCount: TOTAL_CHARACTER_COUNT,
+    modelCount: totalModelCount,
+    skillCount: totalSkillCount,
     toolCount: totalToolCount,
   };
 

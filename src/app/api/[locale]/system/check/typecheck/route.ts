@@ -14,7 +14,9 @@ export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: async ({ data, logger, platform, t, locale, streamContext }) => {
-      const { TypecheckRepository } = await import("./repository");
+      const { TypecheckRepository } = await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      );
       return await TypecheckRepository.execute(
         data,
         logger,

@@ -2,17 +2,18 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { LinuxUserDeleteRepository } from "./repository";
 
 export const { DELETE, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.DELETE]: {
-    handler: ({ data, logger, urlPathParams, t }) =>
-      LinuxUserDeleteRepository.delete(
+    handler: async ({ data, logger, urlPathParams, t }) => {
+      const { LinuxUserDeleteRepository } = await import("./repository");
+      return LinuxUserDeleteRepository.delete(
         data,
         logger,
         urlPathParams?.["username"] ?? "",
         t,
-      ),
+      );
+    },
   },
 });

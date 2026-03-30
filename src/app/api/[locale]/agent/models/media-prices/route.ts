@@ -6,11 +6,15 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import mediaPricesEndpoints from "./definition";
-import { MediaPricesRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: mediaPricesEndpoints,
   [Methods.GET]: {
-    handler: ({ logger, t }) => MediaPricesRepository.fetchAndUpdate(logger, t),
+    handler: async ({ logger, t }) => {
+      const { MediaPricesRepository } = await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      );
+      return MediaPricesRepository.fetchAndUpdate(logger, t);
+    },
   },
 });

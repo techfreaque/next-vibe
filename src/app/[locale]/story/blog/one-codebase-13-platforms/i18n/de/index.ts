@@ -211,9 +211,9 @@ export const translations: typeof enTranslations = {
     repositoryPara:
       "Repository-Funktionen werfen nie. Fehler propagieren als Daten - typisiert, explizit und für den Aufrufer fangbar. Die KI kann über Fehlerpfade nachdenken. Keine überraschenden Exceptions.",
     repositoryCodeComment: "// Gibt ResponseType<T> zurück - wirft niemals",
-    routeTitle: "route.ts - vier Zeilen",
+    routeTitle: "route.ts - die gesamte Brücke",
     routePara:
-      "route.ts ist vier Zeilen. endpointsHandler kümmert sich um Validierung, Authentifizierung, Logging und Exposition für alle 13 Plattformen. Das ist die gesamte Brücke.",
+      "route.ts verbindet die Definition mit dem Handler. endpointsHandler kümmert sich um Validierung, Authentifizierung, Logging und Exposition für alle 13 Plattformen. Die eigentliche Geschäftslogik ist eine Zeile.",
     statsTitle: "Die Zahlen",
     statEndpoints: "374 Endpoints",
     statEndpointsDetail: "Ein Pattern, 374 Mal angewendet",
@@ -228,14 +228,14 @@ export const translations: typeof enTranslations = {
   onePatternQuote: "Ein Pattern. 374 Mal wiederholt.",
 
   vibeSenseTeaser: {
-    eyebrow: "Als nächstes in Video 2",
+    eyebrow: "Als nächstes",
     title: "Vibe Sense: Die Pipeline ist die Plattform",
     description:
       "Jeder Node in einem Vibe-Sense-Graphen ist ein regulärer next-vibe-Endpoint. Das gleiche createEndpoint(). Die gleiche 3-Datei-Struktur. Ein EMA-Indikator ist ein Endpoint. Ein Schwellenwert-Evaluator ist ein Endpoint. Und weil es ein Endpoint ist - kannst du ihn von der CLI, von der KI, von überall aufrufen.",
     calloutLine: "Die Pipeline ist die Plattform.",
     teaser:
       "Vibe Sense ist einfach... mehr Endpoints. Das gleiche Prinzip, angewendet auf Zeitreihendaten. Lead-Funnels. Kreditwirtschaft. Benutzerwachstum. Deine Plattform beobachtet sich selbst.",
-    cta: "Lesen: Vibe Sense - Die dritte Schicht",
+    cta: "Zurück zum Blog",
   },
 
   closing: {

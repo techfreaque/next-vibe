@@ -31,6 +31,7 @@ import {
 import { CronTaskPriority, TaskCategory } from "../enum";
 import type { TasksTranslationKey } from "../i18n";
 import type { TaskRunner } from "../unified-runner/types";
+import { DEV_WATCHER_TASK_NAME } from "./constants";
 
 export { DEV_WATCHER_TASK_NAME } from "./constants";
 

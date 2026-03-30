@@ -22,16 +22,8 @@ interface NgrokApiResponse {
   tunnels: NgrokTunnel[];
 }
 
-interface CliNowpaymentsRepository {
-  execute(
-    params: RequestSchema,
-    locale: string,
-    t: NowpaymentsCliT,
-  ): Promise<ResponseType<ResponseSchema>>;
-}
-
-export class CliNowpaymentsRepositoryImpl implements CliNowpaymentsRepository {
-  async execute(
+export class CliNowpaymentsRepositoryImpl {
+  static async execute(
     params: RequestSchema,
     locale: string,
     t: NowpaymentsCliT,
@@ -40,13 +32,17 @@ export class CliNowpaymentsRepositoryImpl implements CliNowpaymentsRepository {
 
     switch (operation) {
       case "check":
-        return this.checkNgrokInstallation();
+        return CliNowpaymentsRepositoryImpl.checkNgrokInstallation();
       case "install":
-        return this.getInstallInstructions();
+        return CliNowpaymentsRepositoryImpl.getInstallInstructions();
       case "tunnel":
-        return this.executeNgrokTunnelBlocking(port, locale, t);
+        return CliNowpaymentsRepositoryImpl.executeNgrokTunnelBlocking(
+          port,
+          locale,
+          t,
+        );
       case "status":
-        return this.checkTunnelStatus();
+        return CliNowpaymentsRepositoryImpl.checkTunnelStatus();
       default:
         return fail({
           message: t("post.errors.validationFailed.title"),
@@ -56,7 +52,9 @@ export class CliNowpaymentsRepositoryImpl implements CliNowpaymentsRepository {
     }
   }
 
-  private checkNgrokInstallation(): Promise<ResponseType<ResponseSchema>> {
+  private static checkNgrokInstallation(): Promise<
+    ResponseType<ResponseSchema>
+  > {
     return new Promise((resolve) => {
       const ngrok = spawn("ngrok", ["version"]);
       let output = "";
@@ -99,7 +97,7 @@ export class CliNowpaymentsRepositoryImpl implements CliNowpaymentsRepository {
     });
   }
 
-  private getInstallInstructions(): ResponseType<ResponseSchema> {
+  private static getInstallInstructions(): ResponseType<ResponseSchema> {
     return success({
       success: true,
       instructions: `To install ngrok:
@@ -116,7 +114,7 @@ Or use package managers:
     });
   }
 
-  private async executeNgrokTunnelBlocking(
+  private static async executeNgrokTunnelBlocking(
     port: number,
     locale: string,
     t: NowpaymentsCliT,
@@ -133,7 +131,7 @@ Or use package managers:
     });
 
     // Query ngrok API to get tunnel URL
-    const tunnelUrl = await this.getTunnelUrl();
+    const tunnelUrl = await CliNowpaymentsRepositoryImpl.getTunnelUrl();
 
     if (!tunnelUrl) {
       return fail({
@@ -146,7 +144,7 @@ Or use package managers:
     const webhookUrl = `${tunnelUrl}/api/${locale}/payment/providers/nowpayments/webhook`;
 
     // Update .env file
-    this.updateTunnelUrl(tunnelUrl);
+    CliNowpaymentsRepositoryImpl.updateTunnelUrl(tunnelUrl);
 
     process.stdout.write(`\n✅ ngrok tunnel started successfully!\n\n`);
     process.stdout.write(`📍 Tunnel URL: ${tunnelUrl}\n`);
@@ -172,7 +170,7 @@ Or use package managers:
     });
   }
 
-  private async getTunnelUrl(): Promise<string | null> {
+  private static async getTunnelUrl(): Promise<string | null> {
     try {
       const response = await fetch("http://localhost:4040/api/tunnels");
       const data = (await response.json()) as NgrokApiResponse;
@@ -183,7 +181,7 @@ Or use package managers:
     }
   }
 
-  private updateTunnelUrl(tunnelUrl: string): void {
+  private static updateTunnelUrl(tunnelUrl: string): void {
     const envPath = join(process.cwd(), ".env");
     let envContent = readFileSync(envPath, "utf-8");
 
@@ -201,7 +199,9 @@ Or use package managers:
     process.stdout.write(`✅ Updated .env file with tunnel URL\n`);
   }
 
-  private async checkTunnelStatus(): Promise<ResponseType<ResponseSchema>> {
+  private static async checkTunnelStatus(): Promise<
+    ResponseType<ResponseSchema>
+  > {
     try {
       const response = await fetch("http://localhost:4040/api/tunnels");
       const data = (await response.json()) as NgrokApiResponse;

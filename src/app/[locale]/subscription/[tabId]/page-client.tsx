@@ -14,6 +14,7 @@ import { OverviewTab } from "@/app/[locale]/subscription/components/overview-tab
 import { SubscriptionHeader } from "@/app/[locale]/subscription/components/subscription-header";
 import { SubscriptionTabsNav } from "@/app/[locale]/subscription/components/subscription-tabs-nav";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import creditsDefinition from "@/app/api/[locale]/credits/definition";
 import type { CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
@@ -92,6 +93,7 @@ export function SubscriptionPageClient({
         <OverviewTab
           locale={locale}
           envAvailability={envAvailability}
+          totalModelCount={getAvailableModelCount(envAvailability, isAdmin)}
           onSwitchTab={() => {
             // Navigation handled by SubscriptionTabsNav links
           }}

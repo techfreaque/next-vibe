@@ -14,7 +14,8 @@ import { Separator } from "next-vibe-ui/ui/separator";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -87,16 +88,24 @@ function ValueCard({
 
 export interface AboutUsPageData {
   locale: CountryLanguage;
+  totalModelCount: number;
 }
 
 export async function tanstackLoader({
   params,
 }: Props): Promise<AboutUsPageData> {
   const { locale } = await params;
-  return { locale };
+  const totalModelCount = getAvailableModelCount(
+    getAgentEnvAvailability(),
+    false,
+  );
+  return { locale, totalModelCount };
 }
 
-export function TanstackPage({ locale }: AboutUsPageData): JSX.Element {
+export function TanstackPage({
+  locale,
+  totalModelCount,
+}: AboutUsPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
@@ -239,7 +248,7 @@ export function TanstackPage({ locale }: AboutUsPageData): JSX.Element {
               <H3 className="text-2xl font-bold mb-2">{appName}</H3>
               <P className="text-lg opacity-90">
                 {t("hero.subtitle", {
-                  modelCount: TOTAL_MODEL_COUNT,
+                  modelCount: totalModelCount,
                 })}
               </P>
             </Div>

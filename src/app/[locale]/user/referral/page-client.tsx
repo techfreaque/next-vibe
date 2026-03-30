@@ -15,8 +15,10 @@ import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
 import { Gift } from "next-vibe-ui/ui/icons/Gift";
+import { Lightbulb } from "next-vibe-ui/ui/icons/Lightbulb";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
@@ -33,6 +35,7 @@ import referralPayoutDefinition from "@/app/api/[locale]/referral/payout/definit
 import referralStatsDefinition from "@/app/api/[locale]/referral/stats/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { configScopedTranslation } from "@/config/i18n";
 import { translations as configTranslations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -159,6 +162,7 @@ export function ReferralPageClient({
   user: JwtPayloadType;
 }): JSX.Element {
   const { t } = pageT.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
   const commissionRows = getCommissionRows(locale);
   const p = getReferralParams();
 
@@ -231,6 +235,32 @@ export function ReferralPageClient({
           </P>
 
           <CommissionTable t={t} rows={commissionRows} p={p} />
+        </Div>
+
+        {/* ── AUDIENCE CALLOUT ── */}
+        <Div className="mb-12">
+          <Div className="flex items-center gap-2 mb-4">
+            <Lightbulb className="h-5 w-5 text-violet-500" />
+            <H2 className="text-xl font-bold">{t("audienceCallout.title")}</H2>
+          </Div>
+          <Div className="grid gap-4 sm:grid-cols-2">
+            <Div className="rounded-xl border border-l-4 border-l-emerald-500 p-5 bg-emerald-50/50 dark:bg-emerald-950/20">
+              <Div className="font-semibold text-sm mb-2 text-emerald-800 dark:text-emerald-300">
+                {t("audienceCallout.newTitle")}
+              </Div>
+              <P className="text-sm text-muted-foreground leading-relaxed">
+                {t("audienceCallout.newBody")}
+              </P>
+            </Div>
+            <Div className="rounded-xl border border-l-4 border-l-violet-500 p-5 bg-violet-50/50 dark:bg-violet-950/20">
+              <Div className="font-semibold text-sm mb-2 text-violet-800 dark:text-violet-300">
+                {t("audienceCallout.proTitle")}
+              </Div>
+              <P className="text-sm text-muted-foreground leading-relaxed">
+                {t("audienceCallout.proBody")}
+              </P>
+            </Div>
+          </Div>
         </Div>
 
         {/* ── HOW IT WORKS ── */}
@@ -351,6 +381,39 @@ export function ReferralPageClient({
             </CardContent>
           </Card>
         )}
+
+        {/* ── DISCORD CTA ── */}
+        <Div className="mt-10">
+          <Div className="rounded-xl bg-linear-to-r from-violet-600 to-indigo-600 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <Div className="flex items-center gap-4">
+              <Div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/20">
+                <MessageSquare className="h-6 w-6 text-white" />
+              </Div>
+              <Div>
+                <Div className="font-semibold text-white text-base">
+                  {t("discord.title")}
+                </Div>
+                <Div className="text-sm text-violet-100 mt-0.5">
+                  {t("discord.description")}
+                </Div>
+              </Div>
+            </Div>
+            <Button
+              asChild
+              size="lg"
+              className="shrink-0 bg-white text-violet-700 hover:bg-violet-50 font-semibold gap-2"
+            >
+              <Link
+                href={configT("social.discordInvite")}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageSquare className="h-4 w-4" />
+                {t("discord.cta")}
+              </Link>
+            </Button>
+          </Div>
+        </Div>
       </Div>
     </Div>
   );

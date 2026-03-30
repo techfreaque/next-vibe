@@ -21,7 +21,7 @@ export const { tools } = endpointsHandler({
       // Dynamic import prevents Turbopack NFT from statically tracing process.cwd()
       // and filesystem calls in repository.ts during production builds.
       const { SetupInstallRepository } = await import(
-        /* turbopackIgnore: true */ "./repository"
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
       );
       return SetupInstallRepository.installCli(data, user, t);
     },

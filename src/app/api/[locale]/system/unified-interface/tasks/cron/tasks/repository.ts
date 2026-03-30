@@ -395,7 +395,7 @@ export class CronTasksListRepository {
       };
 
       // Server-side sort
-      const sortOrder = (() => {
+      const sortOrder = ((): ReturnType<typeof asc> => {
         switch (data.sort) {
           case "name_asc":
             return asc(cronTasks.displayName);

@@ -1,19 +1,18 @@
 "use client";
 
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Bot } from "next-vibe-ui/ui/icons/Bot";
-import { Brain } from "next-vibe-ui/ui/icons/Brain";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
 import { Lock } from "next-vibe-ui/ui/icons/Lock";
-import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { ShieldPlus } from "next-vibe-ui/ui/icons/ShieldPlus";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
-import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { MotionDiv } from "next-vibe-ui/ui/motion";
+import { Users } from "next-vibe-ui/ui/icons/Users";
+import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
-import { H2, H3, P } from "next-vibe-ui/ui/typography";
+import { H3, P } from "next-vibe-ui/ui/typography";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -28,8 +27,6 @@ import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[thread
 import {
   FEATURED_MODELS,
   ModelId,
-  TOTAL_CHARACTER_COUNT,
-  TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/agent/models/models";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -44,6 +41,8 @@ type ScopedT = ReturnType<(typeof scopedTranslation)["scopedT"]>["t"];
 interface CapabilityShowcaseProps {
   locale: CountryLanguage;
   totalToolCount: number;
+  totalModelCount: number;
+  totalProviderCount: number;
 }
 
 interface CapabilityBlockProps {
@@ -73,7 +72,6 @@ function CapabilityBlock({
         animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
         transition={{ duration: 0.6, delay }}
       >
-        {/* Text side */}
         <Div className={reversed ? "md:[direction:ltr]" : ""}>
           <Span className="text-sm font-medium text-primary uppercase tracking-wider mb-3 block">
             {label}
@@ -85,8 +83,6 @@ function CapabilityBlock({
             {description}
           </P>
         </Div>
-
-        {/* Visual side */}
         <Div className={reversed ? "md:[direction:ltr]" : ""}>{visual}</Div>
       </MotionDiv>
     </Div>
@@ -94,7 +90,7 @@ function CapabilityBlock({
 }
 
 // ---------------------------------------------------------------------------
-// Mock message helpers (same pattern as hero.tsx)
+// Mock message helpers
 // ---------------------------------------------------------------------------
 
 function baseMockMsg(overrides: {
@@ -157,8 +153,9 @@ function mkAssistantMsg(
   tid: string,
   seq: string,
   content: string,
-  extra?: Partial<ChatMessage["metadata"]>,
+  extra?: Partial<ChatMessage["metadata"]> & { model?: ChatMessage["model"] },
 ): ChatMessage {
+  const { model: modelOverride, ...metaExtra } = extra ?? {};
   return baseMockMsg({
     id,
     threadId: tid,
@@ -168,165 +165,437 @@ function mkAssistantMsg(
     depth: 1,
     sequenceId: seq,
     isAI: true,
-    model: ModelId.CLAUDE_OPUS_4_6,
-    metadata: { ...extra },
+    model: modelOverride ?? ModelId.CLAUDE_OPUS_4_6,
+    metadata: { ...metaExtra },
   });
 }
 
-function buildPulseFixGroup(t: ScopedT): MessageGroup {
-  const tid = "demo-pulse";
-  const seq = "pulse-seq";
+// ---------------------------------------------------------------------------
+// Memory demo — context-aware follow-up (search-memory tool call)
+// ---------------------------------------------------------------------------
 
-  // Thea's AI heartbeat: sees house hunt in memories → searches listings → emails best matches
+function buildMemoryContextGroup(t: ScopedT): MessageGroup {
+  const tid = "demo-memory-context";
+  const seq = "memory-context-seq";
+
   const reasoning = mkAssistantMsg(
     tid,
     tid,
     seq,
-    t("home.capabilities.autonomous.reasoning"),
+    t("home.capabilities.memory.demos.context.reasoning"),
+  );
+
+  const memoryTool = mkToolMsg(
+    "context-memory-search",
+    tid,
+    seq,
+    "toolu_mem1",
+    "memories-search",
+    { query: t("home.capabilities.memory.demos.context.searchQuery") },
+    {
+      results: [
+        {
+          memoryNumber: 1,
+          content: t("home.capabilities.memory.demos.context.memoryResult"),
+          tags: ["investor-call", "objections", "follow-up"],
+          priority: 85,
+          isArchived: false,
+          createdAt: "2026-03-18T14:30:00Z",
+        },
+      ],
+      total: 1,
+    },
+    320,
+  );
+
+  const response = mkAssistantMsg(
+    "context-response",
+    tid,
+    seq,
+    t("home.capabilities.memory.demos.context.summaryResponse"),
+    { promptTokens: 2100, completionTokens: 160 },
+  );
+
+  return {
+    primary: reasoning,
+    continuations: [memoryTool, response],
+    sequenceId: seq,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Memory demo — project continuation (search-memory tool call)
+// ---------------------------------------------------------------------------
+
+function buildMemoryProjectGroup(t: ScopedT): MessageGroup {
+  const tid = "demo-memory-project";
+  const seq = "memory-project-seq";
+
+  const reasoning = mkAssistantMsg(
+    tid,
+    tid,
+    seq,
+    t("home.capabilities.memory.demos.project.reasoning"),
+  );
+
+  const memoryTool = mkToolMsg(
+    "project-memory-search",
+    tid,
+    seq,
+    "toolu_mem2",
+    "memories-search",
+    { query: t("home.capabilities.memory.demos.project.searchQuery") },
+    {
+      results: [
+        {
+          memoryNumber: 2,
+          content: t("home.capabilities.memory.demos.project.memoryResult"),
+          tags: ["launch-plan", "progress", "pricing"],
+          priority: 90,
+          isArchived: false,
+          createdAt: "2026-03-22T09:15:00Z",
+        },
+      ],
+      total: 1,
+    },
+    290,
+  );
+
+  const response = mkAssistantMsg(
+    "project-response",
+    tid,
+    seq,
+    t("home.capabilities.memory.demos.project.summaryResponse"),
+    { promptTokens: 1900, completionTokens: 200 },
+  );
+
+  return {
+    primary: reasoning,
+    continuations: [memoryTool, response],
+    sequenceId: seq,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Search demo — live news (web-search with real results)
+// ---------------------------------------------------------------------------
+
+function buildSearchNewsGroup(t: ScopedT): MessageGroup {
+  const tid = "demo-search-news";
+  const seq = "search-news-seq";
+
+  const reasoning1 = mkAssistantMsg(
+    tid,
+    tid,
+    seq,
+    t("home.capabilities.search.demos.news.reasoning1"),
   );
 
   const searchTool = mkToolMsg(
-    "pulse-search",
+    "news-search",
     tid,
     seq,
-    "toolu_search",
-    "web-search",
+    "toolu_search1",
+    "brave-search",
     {
-      query: "Haus kaufen München 4 Zimmer Garten bis 800000 Euro neu",
+      query: t("home.capabilities.search.demos.news.searchQuery"),
       maxResults: 5,
     },
     {
       results: [
         {
-          title: "Neuhausen: Einfamilienhaus 5 Zimmer, Garten, 749.000 €",
-          url: "https://www.immobilienscout24.de/expose/123456",
-          snippet:
-            "Großzügiges Einfamilienhaus in Neuhausen, 5 Zimmer, 160m², Garten 200m². Ruhige Lage, U-Bahn 5 min.",
-          age: "3 hours ago",
-          source: "ImmobilienScout24",
+          title: t("home.capabilities.search.demos.news.result1Title"),
+          url: "https://www.skyscanner.com/transport/flights/",
+          snippet: t("home.capabilities.search.demos.news.result1Snippet"),
+          age: "live",
+          source: "Skyscanner",
         },
         {
-          title: "Schwabing: Stadthaus 4 Zimmer, Dachterrasse, 795.000 €",
-          url: "https://www.immowelt.de/expose/789012",
-          snippet:
-            "Modernes Stadthaus in Schwabing, 4 Zimmer, 140m², große Dachterrasse. Toplage.",
-          age: "6 hours ago",
-          source: "Immowelt",
+          title: t("home.capabilities.search.demos.news.result2Title"),
+          url: "https://www.kayak.com/flights/",
+          snippet: t("home.capabilities.search.demos.news.result2Snippet"),
+          age: "live",
+          source: "Kayak",
         },
         {
-          title: "Pasing: Reihenmittelhaus 4 Zimmer, Garten, 690.000 €",
-          url: "https://www.immobilienscout24.de/expose/345678",
-          snippet:
-            "Gepflegtes Reihenmittelhaus in Pasing, 4 Zimmer, 130m², Garten 120m². S-Bahn direkt.",
-          age: "9 hours ago",
-          source: "ImmobilienScout24",
+          title: t("home.capabilities.search.demos.news.result3Title"),
+          url: "https://www.google.com/travel/flights",
+          snippet: t("home.capabilities.search.demos.news.result3Snippet"),
+          age: "live",
+          source: "Google Flights",
         },
       ],
     },
-    1400,
+    920,
+  );
+
+  const reasoning2 = mkAssistantMsg(
+    "news-reasoning2",
+    tid,
+    seq,
+    t("home.capabilities.search.demos.news.reasoning2"),
   );
 
   const fetchTool = mkToolMsg(
-    "pulse-fetch",
+    "news-fetch",
     tid,
     seq,
-    "toolu_fetch",
+    "toolu_fetch_news1",
     "fetch-url-content",
-    { url: "https://www.immobilienscout24.de/expose/123456" },
+    { url: "https://www.kayak.com/flights/" },
     {
       message:
-        "Successfully fetched content from: https://www.immobilienscout24.de/expose/123456",
-      content:
-        "# Neuhausen: Einfamilienhaus\n\n5 Zimmer · 160m² · Garten 200m² · Baujahr 1998 · renoviert 2021\nHeizung: Wärmepumpe · KfW 85\nKontakt: Makler Schmidt, 089-123456",
-      fetchedUrl: "https://www.immobilienscout24.de/expose/123456",
+        "Successfully fetched content from: https://www.kayak.com/flights/",
+      content: t("home.capabilities.search.demos.news.fetchContent"),
+      fetchedUrl: "https://www.kayak.com/flights/",
       statusCode: 200,
-      timeElapsed: 1800,
+      timeElapsed: 1340,
     },
-    1800,
-  );
-
-  const emailTool = mkToolMsg(
-    "pulse-email",
-    tid,
-    seq,
-    "toolu_email",
-    "emails_send_POST",
-    {
-      recipient: {
-        to: "max@unbottled.ai",
-        toName: "Max",
-      },
-      emailContent: {
-        subject: t("home.capabilities.autonomous.emailSubject"),
-        html: "<p>3 new Munich listings matching your criteria. Neuhausen looks strongest - 5 rooms, garden, 749k, listed 3h ago. Details inside.</p>",
-        text: "3 new Munich listings matching your criteria. Neuhausen looks strongest - 5 rooms, garden, 749k, listed 3h ago. Details inside.",
-      },
-      senderSettings: {
-        senderName: "Thea",
-      },
-      campaignTracking: {},
-      smsNotifications: {
-        sendSmsNotification: false,
-      },
-    },
-    {
-      response: {
-        deliveryStatus: {
-          success: true,
-          messageId: "msg_house_hunt_001",
-          sentAt: "2026-02-27T06:14:00.000Z",
-          response: "250 OK: Message accepted",
-        },
-        accountInfo: {
-          accountId: "acc_primary",
-          accountName: "Primary SMTP",
-        },
-        deliveryResults: {
-          accepted: ["max@unbottled.ai"],
-          rejected: [],
-        },
-        smsResult: {
-          success: false,
-          error: "SMS notifications disabled",
-        },
-      },
-    },
-    900,
+    1340,
   );
 
   const response = mkAssistantMsg(
-    "pulse-response",
+    "news-response",
     tid,
     seq,
-    t("home.capabilities.autonomous.summaryResponse"),
-    { promptTokens: 2800, completionTokens: 220 },
+    t("home.capabilities.search.demos.news.summaryResponse"),
+    { promptTokens: 2100, completionTokens: 180 },
   );
 
   return {
-    primary: reasoning,
-    continuations: [searchTool, fetchTool, emailTool, response],
+    primary: reasoning1,
+    continuations: [searchTool, reasoning2, fetchTool, response],
     sequenceId: seq,
   };
 }
 
-function AutonomousVisual({
-  locale,
-}: {
-  locale: CountryLanguage;
-}): JSX.Element {
+// ---------------------------------------------------------------------------
+// Search demo — deep read (web-search → fetch-url-content chain)
+// ---------------------------------------------------------------------------
+
+function buildSearchDeepReadGroup(t: ScopedT): MessageGroup {
+  const tid = "demo-search-deep";
+  const seq = "search-deep-seq";
+
+  const reasoning1 = mkAssistantMsg(
+    tid,
+    tid,
+    seq,
+    t("home.capabilities.search.demos.deepRead.reasoning1"),
+  );
+
+  const searchTool = mkToolMsg(
+    "deep-search",
+    tid,
+    seq,
+    "toolu_search2",
+    "brave-search",
+    {
+      query: t("home.capabilities.search.demos.deepRead.searchQuery"),
+      maxResults: 4,
+    },
+    {
+      results: [
+        {
+          title: t("home.capabilities.search.demos.deepRead.result1Title"),
+          url: "https://www.tripadvisor.com/Restaurant_Review-123456",
+          snippet: t("home.capabilities.search.demos.deepRead.result1Snippet"),
+          age: "3 days ago",
+          source: "TripAdvisor",
+        },
+        {
+          title: t("home.capabilities.search.demos.deepRead.result2Title"),
+          url: "https://www.yelp.com/biz/trattoria-roma-123",
+          snippet: t("home.capabilities.search.demos.deepRead.result2Snippet"),
+          age: "1 week ago",
+          source: "Yelp",
+        },
+      ],
+    },
+    870,
+  );
+
+  const reasoning2 = mkAssistantMsg(
+    "deep-reasoning2",
+    tid,
+    seq,
+    t("home.capabilities.search.demos.deepRead.reasoning2"),
+  );
+
+  const fetchTool = mkToolMsg(
+    "deep-fetch",
+    tid,
+    seq,
+    "toolu_fetch1",
+    "fetch-url-content",
+    { url: "https://www.tripadvisor.com/Restaurant_Review-123456" },
+    {
+      message:
+        "Successfully fetched content from: https://www.tripadvisor.com/Restaurant_Review-123456",
+      content: t("home.capabilities.search.demos.deepRead.fetchContent"),
+      fetchedUrl: "https://www.tripadvisor.com/Restaurant_Review-123456",
+      statusCode: 200,
+      timeElapsed: 1480,
+    },
+    1480,
+  );
+
+  const response = mkAssistantMsg(
+    "deep-response",
+    tid,
+    seq,
+    t("home.capabilities.search.demos.deepRead.summaryResponse"),
+    { promptTokens: 2800, completionTokens: 220 },
+  );
+
+  return {
+    primary: reasoning1,
+    continuations: [searchTool, reasoning2, fetchTool, response],
+    sequenceId: seq,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Search demo — compare two angles (two web-searches)
+// ---------------------------------------------------------------------------
+
+function buildSearchCompareGroup(t: ScopedT): MessageGroup {
+  const tid = "demo-search-compare";
+  const seq = "search-compare-seq";
+
+  const reasoning1 = mkAssistantMsg(
+    tid,
+    tid,
+    seq,
+    t("home.capabilities.search.demos.compare.reasoning1"),
+  );
+
+  const search1Tool = mkToolMsg(
+    "compare-search1",
+    tid,
+    seq,
+    "toolu_search3a",
+    "brave-search",
+    {
+      query: t("home.capabilities.search.demos.compare.searchQuery1"),
+      maxResults: 4,
+    },
+    {
+      results: [
+        {
+          title: t("home.capabilities.search.demos.compare.result1aTitle"),
+          url: "https://www.gsmarena.com/iphone_16_review-123",
+          snippet: t("home.capabilities.search.demos.compare.result1aSnippet"),
+          age: "2 months ago",
+          source: "GSMArena",
+        },
+        {
+          title: t("home.capabilities.search.demos.compare.result1bTitle"),
+          url: "https://www.theverge.com/iphone-16-review",
+          snippet: t("home.capabilities.search.demos.compare.result1bSnippet"),
+          age: "2 months ago",
+          source: "The Verge",
+        },
+      ],
+    },
+    910,
+  );
+
+  const reasoning2 = mkAssistantMsg(
+    "compare-reasoning2",
+    tid,
+    seq,
+    t("home.capabilities.search.demos.compare.reasoning2"),
+  );
+
+  const search2Tool = mkToolMsg(
+    "compare-search2",
+    tid,
+    seq,
+    "toolu_search3b",
+    "brave-search",
+    {
+      query: t("home.capabilities.search.demos.compare.searchQuery2"),
+      maxResults: 4,
+    },
+    {
+      results: [
+        {
+          title: t("home.capabilities.search.demos.compare.result2aTitle"),
+          url: "https://www.macrumors.com/iphone-17-rumors",
+          snippet: t("home.capabilities.search.demos.compare.result2aSnippet"),
+          age: "1 week ago",
+          source: "MacRumors",
+        },
+        {
+          title: t("home.capabilities.search.demos.compare.result2bTitle"),
+          url: "https://9to5mac.com/iphone-17-release-date",
+          snippet: t("home.capabilities.search.demos.compare.result2bSnippet"),
+          age: "3 days ago",
+          source: "9to5Mac",
+        },
+      ],
+    },
+    940,
+  );
+
+  const response = mkAssistantMsg(
+    "compare-response",
+    tid,
+    seq,
+    t("home.capabilities.search.demos.compare.summaryResponse"),
+    { promptTokens: 2800, completionTokens: 240 },
+  );
+
+  return {
+    primary: reasoning1,
+    continuations: [search1Tool, reasoning2, search2Tool, response],
+    sequenceId: seq,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Memory Visual with tabs
+// ---------------------------------------------------------------------------
+
+type MemoryDemoId = "context" | "project";
+const MEMORY_DEMOS: MemoryDemoId[] = ["context", "project"];
+
+function MemoryVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
     [locale],
   );
-  const group = useMemo(() => buildPulseFixGroup(t), [t]);
-  const pulseUserMsg = useMemo(
+  const [activeId, setActiveId] = useState<MemoryDemoId>("context");
+
+  const handleSelect = useCallback((id: MemoryDemoId) => {
+    setActiveId(id);
+  }, []);
+
+  const userMessages: Record<MemoryDemoId, string> = useMemo(
+    () => ({
+      context: t("home.capabilities.memory.demos.context.userMessage"),
+      project: t("home.capabilities.memory.demos.project.userMessage"),
+    }),
+    [t],
+  );
+
+  const groups: Record<MemoryDemoId, MessageGroup> = useMemo(
+    () => ({
+      context: buildMemoryContextGroup(t),
+      project: buildMemoryProjectGroup(t),
+    }),
+    [t],
+  );
+
+  const userMsg = useMemo(
     () =>
       baseMockMsg({
-        id: "pulse-user",
-        threadId: "demo-pulse",
+        id: `memory-user-${activeId}`,
+        threadId: `demo-memory-${activeId}`,
         role: ChatMessageRole.USER,
-        content: t("home.capabilities.autonomous.pulseAlert"),
+        content: userMessages[activeId],
         parentId: null,
         depth: 0,
         sequenceId: null,
@@ -334,146 +603,499 @@ function AutonomousVisual({
         model: null,
         metadata: {},
       }),
-    [t],
+    [activeId, userMessages],
   );
 
   return (
-    <MockChatProvider>
-      <Div className="rounded-lg border bg-card/50 overflow-hidden p-4 space-y-1">
-        <UserMessageBubble
-          message={pulseUserMsg}
-          locale={locale}
-          logger={logger}
-          rootFolderId={DefaultFolderId.PUBLIC}
-          user={{
-            isPublic: false,
-            leadId: "00000000-0000-0000-0000-000000000000",
-            id: "00000000-0000-0000-0000-000000000000",
-            roles: [UserPermissionRole.ADMIN],
-          }}
-          deductCredits={null}
-        />
-        <GroupedAssistantMessage
-          group={group}
-          locale={locale}
-          logger={logger}
-          readOnly
-          showAuthor
-          platformOverride={Platform.CLI}
-          onAnswerAsModel={null}
-          collapseState={null}
-          rootFolderId={DefaultFolderId.PUBLIC}
-          user={{
-            id: "00000000-0000-0000-0000-000000000000",
-            isPublic: false,
-            leadId: "00000000-0000-0000-0000-000000000000",
-            roles: [UserPermissionRole.ADMIN],
-          }}
-          sendMessage={null}
-          deductCredits={null}
-          ttsAutoplay={false}
-          ttsVoice={undefined}
-          onVote={null}
-          userVote={null}
-          voteScore={0}
-        />
+    <Div>
+      <Div className="flex flex-wrap gap-2 mb-4">
+        {MEMORY_DEMOS.map((id) => (
+          <Button
+            key={id}
+            variant="ghost"
+            size="sm"
+            onClick={() => handleSelect(id)}
+            className={cn(
+              "rounded-full px-4 py-1.5 text-xs font-medium transition-all",
+              activeId === id
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+          >
+            {t(`home.capabilities.memory.demos.${id}.tab`)}
+          </Button>
+        ))}
       </Div>
-    </MockChatProvider>
+      <MockChatProvider>
+        <Div className="rounded-lg border bg-card/50 overflow-hidden p-4 space-y-1 max-h-[32rem] overflow-y-auto">
+          <UserMessageBubble
+            message={userMsg}
+            locale={locale}
+            logger={logger}
+            rootFolderId={DefaultFolderId.PUBLIC}
+            user={{
+              isPublic: false,
+              leadId: "00000000-0000-0000-0000-000000000000",
+              id: "00000000-0000-0000-0000-000000000000",
+              roles: [UserPermissionRole.ADMIN],
+            }}
+            deductCredits={null}
+          />
+          <AnimatePresence mode="wait">
+            <MotionDiv
+              key={activeId}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              <GroupedAssistantMessage
+                group={groups[activeId]}
+                locale={locale}
+                logger={logger}
+                readOnly
+                showAuthor
+                platformOverride={Platform.CLI}
+                onAnswerAsModel={null}
+                collapseState={null}
+                rootFolderId={DefaultFolderId.PUBLIC}
+                user={{
+                  id: "00000000-0000-0000-0000-000000000000",
+                  isPublic: false,
+                  leadId: "00000000-0000-0000-0000-000000000000",
+                  roles: [UserPermissionRole.ADMIN],
+                }}
+                sendMessage={null}
+                deductCredits={null}
+                ttsAutoplay={false}
+                ttsVoice={undefined}
+                onVote={null}
+                userVote={null}
+                voteScore={0}
+              />
+            </MotionDiv>
+          </AnimatePresence>
+        </Div>
+      </MockChatProvider>
+    </Div>
   );
 }
 
-function ModelsVisual(): JSX.Element {
-  const tiers = [
+// ---------------------------------------------------------------------------
+// Models Visual — tier badges + censorship demo using real message components
+// ---------------------------------------------------------------------------
+
+type CensorDemoId = "mainstream" | "open" | "uncensored";
+
+function buildModelsDemoGroup(
+  t: ScopedT,
+  activeId: CensorDemoId,
+): MessageGroup {
+  const tid = `demo-models-${activeId}`;
+  const seq = `models-${activeId}-seq`;
+  const model =
+    activeId === "mainstream"
+      ? ModelId.GPT_5_4
+      : activeId === "open"
+        ? ModelId.KIMI_K2_5
+        : ModelId.UNCENSORED_LM_V1_2;
+  const content =
+    activeId === "mainstream"
+      ? t("home.capabilities.models.demo.mainstreamResponse")
+      : activeId === "open"
+        ? t("home.capabilities.models.demo.openResponse")
+        : t("home.capabilities.models.demo.uncensoredResponse");
+
+  if (activeId === "open") {
+    const reasoning = mkAssistantMsg(
+      `models-open-reasoning`,
+      tid,
+      seq,
+      t("home.capabilities.models.demo.openReasoning"),
+      { model },
+    );
+    const response = mkAssistantMsg(`models-open-response`, tid, seq, content, {
+      model,
+      promptTokens: 390,
+      completionTokens: 85,
+    });
+    return { primary: reasoning, continuations: [response], sequenceId: seq };
+  }
+
+  const response = mkAssistantMsg(
+    `models-${activeId}-response`,
+    tid,
+    seq,
+    content,
     {
+      model,
+      promptTokens: activeId === "mainstream" ? 420 : 380,
+      completionTokens: activeId === "mainstream" ? 60 : 95,
+    },
+  );
+  return { primary: response, continuations: [], sequenceId: seq };
+}
+
+function ModelsVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
+  const [activeId, setActiveId] = useState<CensorDemoId>("mainstream");
+
+  const handleSelect = useCallback((id: CensorDemoId) => {
+    setActiveId(id);
+  }, []);
+
+  const tiers: {
+    id: CensorDemoId;
+    name: string;
+    className: string;
+    activeRingClass: string;
+    models: string;
+  }[] = [
+    {
+      id: "mainstream",
       name: "Mainstream",
       className:
         "bg-indigo-50 dark:bg-indigo-500/15 text-indigo-800 dark:text-indigo-200 border-indigo-200 dark:border-indigo-500/30",
+      activeRingClass: "ring-2 ring-indigo-500",
       models: FEATURED_MODELS.mainstream.join(", "),
     },
     {
+      id: "open",
       name: "Open",
       className:
         "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-500/30",
+      activeRingClass: "ring-2 ring-emerald-500",
       models: FEATURED_MODELS.open.join(", "),
     },
     {
+      id: "uncensored",
       name: "Uncensored",
       className:
         "bg-rose-50 dark:bg-rose-500/15 text-rose-800 dark:text-rose-200 border-rose-200 dark:border-rose-500/30",
+      activeRingClass: "ring-2 ring-rose-500",
       models: FEATURED_MODELS.uncensored.join(", "),
     },
   ];
 
-  return (
-    <Div className="space-y-4">
-      {tiers.map((tier) => (
-        <Div
-          key={tier.name}
-          className={`rounded-lg border p-4 ${tier.className}`}
-        >
-          <Div className="flex items-center gap-2 mb-2">
-            <Sparkles className="h-4 w-4" />
-            <Span className="font-semibold text-sm">{tier.name}</Span>
-          </Div>
-          <P className="text-sm opacity-90">{tier.models}</P>
-        </Div>
-      ))}
-    </Div>
+  const userMsg = useMemo(
+    () =>
+      baseMockMsg({
+        id: `models-user-${activeId}`,
+        threadId: `demo-models-${activeId}`,
+        role: ChatMessageRole.USER,
+        content: t("home.capabilities.models.demo.userQuestion"),
+        parentId: null,
+        depth: 0,
+        sequenceId: null,
+        isAI: false,
+        model: null,
+        metadata: {},
+      }),
+    [activeId, t],
   );
-}
 
-function ToolsVisual(): JSX.Element {
-  const tools = [
-    { icon: Terminal, label: "SSH & Shell" },
-    { icon: Globe, label: "Browser" },
-    { icon: Zap, label: "Email" },
-    { icon: Brain, label: "Memory" },
-    { icon: Bot, label: "Sub-agents" },
-    { icon: Shield, label: "Search" },
-  ];
+  const group = useMemo(() => buildModelsDemoGroup(t, activeId), [t, activeId]);
 
   return (
-    <Div className="grid grid-cols-3 gap-3">
-      {tools.map((item) => (
-        <Div
-          key={item.label}
-          className="rounded-lg border bg-card/50 p-4 flex flex-col items-center gap-2 text-center"
-        >
-          <item.icon className="h-6 w-6 text-primary" />
-          <Span className="text-xs font-medium text-muted-foreground">
-            {item.label}
+    <Div className="space-y-5">
+      {/* Tier badges — click to switch demo */}
+      <Div className="space-y-3">
+        {tiers.map((tier) => (
+          <Button
+            key={tier.id}
+            variant="ghost"
+            onClick={() => handleSelect(tier.id)}
+            className={cn(
+              "w-full justify-start text-left rounded-lg border p-4 h-auto transition-all",
+              tier.className,
+              activeId === tier.id ? tier.activeRingClass : "hover:opacity-80",
+            )}
+          >
+            <Div className="w-full">
+              <Div className="flex items-center gap-2 mb-2">
+                <Sparkles className="h-4 w-4" />
+                <Span className="font-semibold text-sm">{tier.name}</Span>
+              </Div>
+              <P className="text-sm opacity-90 whitespace-normal text-left">
+                {tier.models}
+              </P>
+            </Div>
+          </Button>
+        ))}
+      </Div>
+
+      {/* Censorship demo — same question, real message components */}
+      <Div>
+        <Div className="flex items-center justify-between mb-3">
+          <Span className="text-xs font-mono text-muted-foreground">
+            {t("home.capabilities.models.demo.question")}
           </Span>
+          <Div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleSelect("mainstream")}
+              className={cn(
+                "rounded-full px-3 py-1 text-xs font-medium transition-all h-auto",
+                activeId === "mainstream"
+                  ? "bg-indigo-600 text-white hover:bg-indigo-600"
+                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              {t("home.capabilities.models.demo.mainstreamTab")}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleSelect("open")}
+              className={cn(
+                "rounded-full px-3 py-1 text-xs font-medium transition-all h-auto",
+                activeId === "open"
+                  ? "bg-emerald-600 text-white hover:bg-emerald-600"
+                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              {t("home.capabilities.models.demo.openTab")}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleSelect("uncensored")}
+              className={cn(
+                "rounded-full px-3 py-1 text-xs font-medium transition-all h-auto",
+                activeId === "uncensored"
+                  ? "bg-rose-600 text-white hover:bg-rose-600"
+                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              {t("home.capabilities.models.demo.uncensoredTab")}
+            </Button>
+          </Div>
         </Div>
-      ))}
+        <MockChatProvider>
+          <Div className="rounded-lg border bg-card/50 overflow-hidden p-4 space-y-1 max-h-[32rem] overflow-y-auto">
+            <UserMessageBubble
+              message={userMsg}
+              locale={locale}
+              logger={logger}
+              rootFolderId={DefaultFolderId.PUBLIC}
+              user={{
+                isPublic: false,
+                leadId: "00000000-0000-0000-0000-000000000000",
+                id: "00000000-0000-0000-0000-000000000000",
+                roles: [UserPermissionRole.ADMIN],
+              }}
+              deductCredits={null}
+            />
+            <AnimatePresence mode="wait">
+              <MotionDiv
+                key={activeId}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.2 }}
+              >
+                <GroupedAssistantMessage
+                  group={group}
+                  locale={locale}
+                  logger={logger}
+                  readOnly
+                  showAuthor
+                  platformOverride={Platform.CLI}
+                  onAnswerAsModel={null}
+                  collapseState={null}
+                  rootFolderId={DefaultFolderId.PUBLIC}
+                  user={{
+                    id: "00000000-0000-0000-0000-000000000000",
+                    isPublic: false,
+                    leadId: "00000000-0000-0000-0000-000000000000",
+                    roles: [UserPermissionRole.ADMIN],
+                  }}
+                  sendMessage={null}
+                  deductCredits={null}
+                  ttsAutoplay={false}
+                  ttsVoice={undefined}
+                  onVote={null}
+                  userVote={null}
+                  voteScore={0}
+                />
+              </MotionDiv>
+            </AnimatePresence>
+          </Div>
+        </MockChatProvider>
+      </Div>
     </Div>
   );
 }
 
-function PrivacyVisual(): JSX.Element {
+// ---------------------------------------------------------------------------
+// Search Visual with tabs
+// ---------------------------------------------------------------------------
+
+type SearchDemoId = "news" | "deepRead" | "compare";
+const SEARCH_DEMOS: SearchDemoId[] = ["news", "deepRead", "compare"];
+
+function SearchVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
+  const [activeId, setActiveId] = useState<SearchDemoId>("news");
+
+  const handleSelect = useCallback((id: SearchDemoId) => {
+    setActiveId(id);
+  }, []);
+
+  const userMessages: Record<SearchDemoId, string> = useMemo(
+    () => ({
+      news: t("home.capabilities.search.demos.news.userMessage"),
+      deepRead: t("home.capabilities.search.demos.deepRead.userMessage"),
+      compare: t("home.capabilities.search.demos.compare.userMessage"),
+    }),
+    [t],
+  );
+
+  const groups: Record<SearchDemoId, MessageGroup> = useMemo(
+    () => ({
+      news: buildSearchNewsGroup(t),
+      deepRead: buildSearchDeepReadGroup(t),
+      compare: buildSearchCompareGroup(t),
+    }),
+    [t],
+  );
+
+  const userMsg = useMemo(
+    () =>
+      baseMockMsg({
+        id: `search-user-${activeId}`,
+        threadId: `demo-search-${activeId}`,
+        role: ChatMessageRole.USER,
+        content: userMessages[activeId],
+        parentId: null,
+        depth: 0,
+        sequenceId: null,
+        isAI: false,
+        model: null,
+        metadata: {},
+      }),
+    [activeId, userMessages],
+  );
+
+  return (
+    <Div>
+      <Div className="flex flex-wrap gap-2 mb-4">
+        {SEARCH_DEMOS.map((id) => (
+          <Button
+            key={id}
+            variant="ghost"
+            size="sm"
+            onClick={() => handleSelect(id)}
+            className={cn(
+              "rounded-full px-4 py-1.5 text-xs font-medium transition-all",
+              activeId === id
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+          >
+            {t(`home.capabilities.search.demos.${id}.tab`)}
+          </Button>
+        ))}
+      </Div>
+      <MockChatProvider>
+        <Div className="rounded-lg border bg-card/50 overflow-hidden p-4 space-y-1 max-h-[32rem] overflow-y-auto">
+          <UserMessageBubble
+            message={userMsg}
+            locale={locale}
+            logger={logger}
+            rootFolderId={DefaultFolderId.PUBLIC}
+            user={{
+              isPublic: false,
+              leadId: "00000000-0000-0000-0000-000000000000",
+              id: "00000000-0000-0000-0000-000000000000",
+              roles: [UserPermissionRole.ADMIN],
+            }}
+            deductCredits={null}
+          />
+          <AnimatePresence mode="wait">
+            <MotionDiv
+              key={activeId}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              <GroupedAssistantMessage
+                group={groups[activeId]}
+                locale={locale}
+                logger={logger}
+                readOnly
+                showAuthor
+                platformOverride={Platform.CLI}
+                onAnswerAsModel={null}
+                collapseState={null}
+                rootFolderId={DefaultFolderId.PUBLIC}
+                user={{
+                  id: "00000000-0000-0000-0000-000000000000",
+                  isPublic: false,
+                  leadId: "00000000-0000-0000-0000-000000000000",
+                  roles: [UserPermissionRole.ADMIN],
+                }}
+                sendMessage={null}
+                deductCredits={null}
+                ttsAutoplay={false}
+                ttsVoice={undefined}
+                onVote={null}
+                userVote={null}
+                voteScore={0}
+              />
+            </MotionDiv>
+          </AnimatePresence>
+        </Div>
+      </MockChatProvider>
+    </Div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Privacy Visual — matches real folder bar colors/icons
+// ---------------------------------------------------------------------------
+
+function PrivacyVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+
   const levels = [
     {
-      name: "Private",
-      desc: "Server-stored, your eyes only",
+      key: "private" as const,
       icon: Lock,
-      opacity: "opacity-100",
+      iconClass: "text-sky-600 dark:text-sky-300",
+      bgClass:
+        "bg-sky-50 dark:bg-sky-500/15 border-sky-200 dark:border-sky-500/30",
     },
     {
-      name: "Shared",
-      desc: "Collaborative access",
-      icon: Bot,
-      opacity: "opacity-85",
+      key: "shared" as const,
+      icon: Users,
+      iconClass: "text-teal-600 dark:text-teal-300",
+      bgClass:
+        "bg-teal-50 dark:bg-teal-500/15 border-teal-200 dark:border-teal-500/30",
     },
     {
-      name: "Public",
-      desc: "Community forum",
+      key: "public" as const,
       icon: Globe,
-      opacity: "opacity-70",
+      iconClass: "text-amber-600 dark:text-amber-300",
+      bgClass:
+        "bg-amber-50 dark:bg-amber-500/15 border-amber-200 dark:border-amber-500/30",
     },
     {
-      name: "Incognito",
-      desc: "Never leaves browser",
-      icon: Shield,
-      opacity: "opacity-100 text-green-500",
+      key: "incognito" as const,
+      icon: ShieldPlus,
+      iconClass: "text-purple-600 dark:text-purple-300",
+      bgClass:
+        "bg-purple-50 dark:bg-purple-500/15 border-purple-200 dark:border-purple-500/30",
     },
   ];
 
@@ -481,13 +1103,17 @@ function PrivacyVisual(): JSX.Element {
     <Div className="space-y-3">
       {levels.map((level) => (
         <Div
-          key={level.name}
-          className="flex items-center gap-4 rounded-lg border bg-card/50 p-4"
+          key={level.key}
+          className={`flex items-center gap-4 rounded-lg border p-4 ${level.bgClass}`}
         >
-          <level.icon className={`h-5 w-5 shrink-0 ${level.opacity}`} />
+          <level.icon className={`h-5 w-5 shrink-0 ${level.iconClass}`} />
           <Div>
-            <P className="font-medium text-sm">{level.name}</P>
-            <P className="text-xs text-muted-foreground">{level.desc}</P>
+            <P className="font-medium text-sm">
+              {t(`home.capabilities.privacy.levels.${level.key}.name`)}
+            </P>
+            <P className="text-xs text-muted-foreground">
+              {t(`home.capabilities.privacy.levels.${level.key}.desc`)}
+            </P>
           </Div>
         </Div>
       ))}
@@ -495,59 +1121,49 @@ function PrivacyVisual(): JSX.Element {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Main export
+// ---------------------------------------------------------------------------
+
 export function CapabilityShowcase({
   locale,
-  totalToolCount,
+  totalModelCount,
+  totalProviderCount,
 }: CapabilityShowcaseProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 });
+  const [ref] = useInView({ triggerOnce: true, threshold: 0.05 });
 
   const interpolation = {
-    modelCount: TOTAL_MODEL_COUNT,
-    skillCount: TOTAL_CHARACTER_COUNT,
-    toolCount: totalToolCount,
+    modelCount: totalModelCount,
+    providerCount: totalProviderCount,
   };
 
   return (
     <Div className="relative overflow-hidden" ref={ref as never}>
       <Div className="container relative px-4 md:px-6">
-        <MotionDiv
-          className="text-center mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6 }}
-        >
-          <H2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-            {t("home.agent.title")}
-          </H2>
-        </MotionDiv>
-
         <CapabilityBlock
-          label={t("home.capabilities.autonomous.label")}
-          title={t("home.capabilities.autonomous.title")}
-          description={t(
-            "home.capabilities.autonomous.description",
-            interpolation,
-          )}
-          visual={<AutonomousVisual locale={locale} />}
+          label={t("home.capabilities.models.label")}
+          title={t("home.capabilities.models.title", interpolation)}
+          description={t("home.capabilities.models.description", interpolation)}
+          visual={<ModelsVisual locale={locale} />}
           reversed={false}
           delay={0}
         />
 
         <CapabilityBlock
-          label={t("home.capabilities.models.label")}
-          title={t("home.capabilities.models.title", interpolation)}
-          description={t("home.capabilities.models.description")}
-          visual={<ModelsVisual />}
+          label={t("home.capabilities.memory.label")}
+          title={t("home.capabilities.memory.title")}
+          description={t("home.capabilities.memory.description")}
+          visual={<MemoryVisual locale={locale} />}
           reversed={true}
           delay={0}
         />
 
         <CapabilityBlock
-          label={t("home.capabilities.tools.label")}
-          title={t("home.capabilities.tools.title")}
-          description={t("home.capabilities.tools.description")}
-          visual={<ToolsVisual />}
+          label={t("home.capabilities.search.label")}
+          title={t("home.capabilities.search.title")}
+          description={t("home.capabilities.search.description")}
+          visual={<SearchVisual locale={locale} />}
           reversed={false}
           delay={0}
         />
@@ -556,7 +1172,7 @@ export function CapabilityShowcase({
           label={t("home.capabilities.privacy.label")}
           title={t("home.capabilities.privacy.title")}
           description={t("home.capabilities.privacy.description")}
-          visual={<PrivacyVisual />}
+          visual={<PrivacyVisual locale={locale} />}
           reversed={true}
           delay={0}
         />

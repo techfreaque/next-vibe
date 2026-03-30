@@ -19,8 +19,16 @@ import { useState } from "react";
 
 import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import { REFERRAL_CONFIG } from "../../config";
 import type definition from "./definition";
 import type { CodesListGetResponseOutput } from "./definition";
+
+function formatDollars(cents: number): string {
+  const dollars = cents / 100;
+  return dollars % 1 === 0
+    ? `$${dollars.toFixed(0)}`
+    : `$${dollars.toFixed(2)}`;
+}
 
 /**
  * Props for custom widget
@@ -55,12 +63,15 @@ export function ReferralCodesListContainer({
 
   if (codes.length === 0) {
     return (
-      <Div className="flex flex-col items-center justify-center py-12 text-center">
-        <Div className="rounded-full bg-muted p-3 mb-4">
+      <Div className="flex flex-col items-center justify-center py-12 text-center gap-2">
+        <Div className="rounded-full bg-muted p-3">
           <Link2 className="h-6 w-6 text-muted-foreground" />
         </Div>
         <Div className="text-sm font-medium text-muted-foreground">
           {t("codes.list.widget.empty")}
+        </Div>
+        <Div className="text-xs text-muted-foreground/70">
+          {t("codes.list.widget.emptyHint")}
         </Div>
       </Div>
     );
@@ -88,24 +99,28 @@ export function ReferralCodesListContainer({
                   )}
                 </Div>
               </Div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="shrink-0"
-                onClick={() => handleCopy(code.code, index)}
-              >
-                {copiedIndex === index ? (
-                  <>
-                    <Check className="h-4 w-4 mr-2" />
-                    {t("codes.list.widget.copied")}
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-4 w-4 mr-2" />
-                    {t("codes.list.widget.copy")}
-                  </>
-                )}
-              </Button>
+              <Div className="flex flex-col items-end gap-0.5 shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleCopy(code.code, index)}
+                >
+                  {copiedIndex === index ? (
+                    <>
+                      <Check className="h-4 w-4 mr-2 text-emerald-500" />
+                      {t("codes.list.widget.copied")}
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4 mr-2" />
+                      {t("codes.list.widget.copy")}
+                    </>
+                  )}
+                </Button>
+                <Div className="text-xs text-muted-foreground/60 font-mono truncate max-w-[140px]">
+                  {`/track?ref=${code.code}`}
+                </Div>
+              </Div>
             </Div>
 
             {/* Stats Grid */}
@@ -139,7 +154,7 @@ export function ReferralCodesListContainer({
                   {t("codes.list.widget.revenue")}
                 </Div>
                 <Div className="text-lg font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
-                  {code.totalRevenueCents}
+                  {formatDollars(code.totalRevenueCents)}
                 </Div>
               </Div>
 
@@ -150,9 +165,24 @@ export function ReferralCodesListContainer({
                   {t("codes.list.widget.earnings")}
                 </Div>
                 <Div className="text-lg font-semibold tabular-nums text-blue-600 dark:text-blue-400">
-                  {code.totalEarningsCents}
+                  {formatDollars(code.totalEarningsCents)}
                 </Div>
               </Div>
+            </Div>
+
+            {/* Conversion rate hint */}
+            <Div className="px-4 py-2 border-t bg-muted/20 text-xs text-muted-foreground/70">
+              {t("codes.list.widget.conversionHint", {
+                exampleEarning: formatDollars(
+                  Math.round(
+                    REFERRAL_CONFIG.EXAMPLE_PRICE_CENTS *
+                      REFERRAL_CONFIG.DIRECT_PERCENTAGE,
+                  ),
+                ),
+                examplePrice: formatDollars(
+                  REFERRAL_CONFIG.EXAMPLE_PRICE_CENTS,
+                ),
+              })}
             </Div>
 
             {/* Inactive Warning */}

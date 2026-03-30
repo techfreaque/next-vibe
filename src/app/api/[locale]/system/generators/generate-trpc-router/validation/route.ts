@@ -10,12 +10,19 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { TRPCValidationRepository } from "./repository";
 
 export const { tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: ({ data, logger, t }) =>
-      TRPCValidationRepository.executeValidationOperation(data, logger, t),
+    handler: async ({ data, logger, t }) => {
+      const { TRPCValidationRepository } = await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      );
+      return TRPCValidationRepository.executeValidationOperation(
+        data,
+        logger,
+        t,
+      );
+    },
   },
 });

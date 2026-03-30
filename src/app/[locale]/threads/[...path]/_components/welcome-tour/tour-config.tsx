@@ -8,7 +8,6 @@ import type { Step } from "react-joyride";
 
 import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
 import type { ThreadsWidgetT } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import {
   ProductIds,
   productsRepository,
@@ -137,6 +136,7 @@ export const getTourSteps = (
   t: ThreadsWidgetT,
   isAuthenticated = false,
   locale: CountryLanguage,
+  totalModelCount = 0,
 ): TourStepConfig[] => {
   const appName = t("config.appName");
   const sub = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
@@ -153,7 +153,7 @@ export const getTourSteps = (
           </H2>
           <P className="text-base">
             {t("components.welcomeTour.welcome.description", {
-              modelCount: String(TOTAL_MODEL_COUNT),
+              modelCount: String(totalModelCount),
             })}
           </P>
           <P className="text-sm text-muted-foreground">
@@ -174,7 +174,7 @@ export const getTourSteps = (
           </H3>
           <P className="text-sm">
             {t("components.welcomeTour.aiCompanion.description", {
-              modelCount: String(TOTAL_MODEL_COUNT),
+              modelCount: String(totalModelCount),
             })}
           </P>
           <P className="text-xs text-muted-foreground">

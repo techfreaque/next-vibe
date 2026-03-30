@@ -246,6 +246,7 @@ export const templateMetadataMap: Record<
     exampleProps: {
       publicName: "Max Mustermann",
       userId: "example-user-id-123",
+      totalModelCount: 42,
     },
   },
   "password-reset-request": {
@@ -259,6 +260,7 @@ export const templateMetadataMap: Record<
       publicName: "Max Mustermann",
       userId: "example-user-id-123",
       passwordResetUrl: "https://example.com/user/reset-password/token123",
+      totalModelCount: 42,
     },
   },
   "referral-payout-admin": {
@@ -295,6 +297,7 @@ export const templateMetadataMap: Record<
       privateName: "Max",
       userId: "example-user-id-123",
       leadId: "example-lead-id-456",
+      totalModelCount: 42,
     },
   },
   "subscription-success": {
@@ -309,6 +312,7 @@ export const templateMetadataMap: Record<
       userId: "example-user-id-123",
       leadId: "example-lead-id-456",
       planName: "Premium Plan",
+      totalModelCount: 42,
     },
   },
   "user-create-admin-notification": {
@@ -337,6 +341,7 @@ export const templateMetadataMap: Record<
       privateName: "Max",
       userId: "example-user-id-123",
       leadId: "example-lead-id-456",
+      totalModelCount: 42,
     },
   },
 };

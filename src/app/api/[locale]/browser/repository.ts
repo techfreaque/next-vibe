@@ -113,6 +113,24 @@ export class BrowserRepository {
   private static isInitialized = false;
 
   /**
+   * The browser page index owned by this process.
+   * Allocated once on startup via new_page. Every tool call (except the
+   * page-management ones) auto-selects this page first so multiple concurrent
+   * MCP processes don't step on each other's tabs.
+   */
+  private static processPageIndex: number | null = null;
+
+  /**
+   * Tools that manage pages themselves — skip the auto-select-page prefix.
+   */
+  private static readonly PAGE_MGMT_TOOLS = new Set([
+    "new_page",
+    "close_page",
+    "list_pages",
+    "select_page",
+  ]);
+
+  /**
    * Execute a Chrome DevTools MCP tool
    */
   static async executeTool(
@@ -261,12 +279,58 @@ export class BrowserRepository {
     try {
       await BrowserRepository.startMCPServer(logger);
       const initialized = await BrowserRepository.initializeMCP(logger);
-      return initialized;
+      if (!initialized) {
+        return false;
+      }
+      // Claim a dedicated page for this process so multiple concurrent MCP
+      // processes each operate on their own tab within the shared Chrome.
+      await BrowserRepository.claimProcessPage(logger);
+      return true;
     } catch (error) {
       logger.error("[Browser Repository] Failed to ensure MCP server", {
         error: error instanceof Error ? error.message : String(error),
       });
       return false;
+    }
+  }
+
+  /**
+   * Allocate a new browser page for this process and store its index.
+   */
+  private static async claimProcessPage(logger: EndpointLogger): Promise<void> {
+    try {
+      const result = await BrowserRepository.callTool("new_page", {}, logger);
+      if (!result.success) {
+        logger.warn(
+          "[Browser Repository] new_page failed, using page 1 as fallback",
+          {
+            error: result.error,
+          },
+        );
+        BrowserRepository.processPageIndex = 1;
+        return;
+      }
+      // Response text looks like: "Page created.\n## Pages\n1: about:blank\n2: about:blank [selected]"
+      // Extract the [selected] page index.
+      const mcpResult = result.result as
+        | { content?: Array<{ type: string; text?: string }> }
+        | undefined;
+      const text =
+        mcpResult?.content?.find((b) => b.type === "text")?.text ?? "";
+      const match = /^(\d+):[^\n]*\[selected\]/m.exec(text);
+      const pageIndex = match ? parseInt(match[1], 10) : null;
+      BrowserRepository.processPageIndex = pageIndex;
+      logger.info(
+        "[Browser Repository] Claimed browser page for this process",
+        {
+          pageIndex,
+          pid: process.pid,
+        },
+      );
+    } catch (error) {
+      logger.warn("[Browser Repository] Could not claim process page", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 
@@ -351,13 +415,44 @@ export class BrowserRepository {
   }
 
   /**
-   * Call a tool via MCP
+   * Call a tool via MCP.
+   * For page-scoped tools, auto-selects this process's page first so concurrent
+   * MCP processes don't interfere with each other's tabs.
    */
   private static async callTool(
     toolName: string,
     args: Record<string, JsonValue>,
     logger: EndpointLogger,
   ): Promise<{ success: boolean; result?: JsonValue; error?: string }> {
+    // Auto-select this process's page before any page-scoped operation.
+    if (
+      !BrowserRepository.PAGE_MGMT_TOOLS.has(toolName) &&
+      BrowserRepository.processPageIndex !== null
+    ) {
+      const selectRequest: MCPRequest = {
+        jsonrpc: "2.0",
+        id: BrowserRepository.nextRequestId++,
+        method: "tools/call",
+        params: {
+          name: "select_page",
+          arguments: { index: BrowserRepository.processPageIndex },
+        },
+      };
+      try {
+        await BrowserRepository.sendRequest(selectRequest, logger);
+      } catch (err) {
+        logger.warn("[Browser Repository] Auto select_page failed", {
+          pageIndex: BrowserRepository.processPageIndex,
+          error: err instanceof Error ? err.message : String(err),
+        });
+      }
+    }
+
+    // If the caller is explicitly selecting a page, update our tracked index.
+    if (toolName === "select_page" && typeof args.index === "number") {
+      BrowserRepository.processPageIndex = args.index;
+    }
+
     const toolRequest: MCPRequest = {
       jsonrpc: "2.0",
       id: BrowserRepository.nextRequestId++,
@@ -486,6 +581,7 @@ export class BrowserRepository {
       BrowserRepository.mcpProcess = null;
       BrowserRepository.isInitialized = false;
     }
+    BrowserRepository.processPageIndex = null;
     BrowserRepository.pendingRequests.clear();
   }
 }

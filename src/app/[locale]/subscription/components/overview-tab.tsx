@@ -25,7 +25,6 @@ import {
   type ModelDefinition,
   modelDefinitions,
   modelProviders,
-  TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/agent/models/models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { isProviderAvailable } from "@/app/api/[locale]/agent/models/widget/model-selector";
@@ -45,6 +44,7 @@ interface OverviewTabProps {
   locale: CountryLanguage;
   onSwitchTab: () => void;
   envAvailability: AgentEnvAvailability;
+  totalModelCount: number;
 }
 
 const MODEL_TYPE_ORDER = ["text", "image", "audio", "video"] as const;
@@ -80,6 +80,7 @@ export function OverviewTab({
   locale,
   onSwitchTab,
   envAvailability,
+  totalModelCount,
 }: OverviewTabProps): JSX.Element {
   const { locale: currentLocale } = useTranslation();
   const { t } = scopedTranslation.scopedT(currentLocale);
@@ -125,7 +126,7 @@ export function OverviewTab({
                   {t("subscription.overview.howItWorks.expiring.description", {
                     subPrice: formatPrice(subscriptionPrice, locale),
                     subCredits: subscriptionCredits,
-                    modelCount: TOTAL_MODEL_COUNT,
+                    modelCount: totalModelCount,
                   })}
                 </P>
               </Div>
@@ -174,7 +175,7 @@ export function OverviewTab({
               </H4>
               <P className="text-muted-foreground">
                 {t("subscription.overview.cta.description", {
-                  modelCount: TOTAL_MODEL_COUNT,
+                  modelCount: totalModelCount,
                 })}
               </P>
             </Div>

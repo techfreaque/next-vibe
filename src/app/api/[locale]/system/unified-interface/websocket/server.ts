@@ -251,13 +251,15 @@ export function startWebSocketServer(
     port,
     hostname,
     reusePort: true, // allow re-binding after restart without waiting for TIME_WAIT
-    idleTimeout: 0, // 0 = no idle timeout; SSR renders can take >10s on cold start
+    // Use max value (255s) instead of 0 - Bun 1.3.x ignores idleTimeout: 0
+    // and falls back to the 10s uWS default, killing slow SSR cold-starts.
+    // 255s covers even the slowest first-load (full dep pre-bundle ~30-60s).
+    idleTimeout: 255,
 
     async fetch(req, bunServer): Promise<Response> {
-      // Disable per-request idle timeout so long SSR renders (cold module
-      // evaluation, slow DB queries) don't get killed mid-flight.
-      // The server-level idleTimeout only covers WebSocket connections;
-      // HTTP requests use a separate 10s default that must be reset here.
+      // Also disable per-request idle timeout (belt-and-suspenders).
+      // On Bun versions where server.timeout(req, 0) works, this overrides
+      // the server-level 255s back to infinite for long-lived SSE streams.
       bunServer.timeout(req, 0);
 
       const url = new URL(req.url);
@@ -368,10 +370,35 @@ export function startWebSocketServer(
           : null;
 
       const PROXY_RETRY_DELAYS = [500, 1000, 2000, 4000, 8000];
+      // Timeout for a single proxy attempt. Vite can take 30-60s on cold start
+      // for the first SSR render (full dep pre-bundle + module evaluation).
+      // If it takes longer than this, something is genuinely stuck - return 504.
+      const PROXY_REQUEST_TIMEOUT_MS = 90_000;
       let lastProxyError = "Unknown error";
 
       for (let attempt = 0; attempt <= PROXY_RETRY_DELAYS.length; attempt++) {
         const proxyResult = await new Promise<Response | null>((resolve) => {
+          let settled = false;
+          // settle() wraps resolve() with a guard so the timeout and the
+          // normal response path can't both resolve the Promise.
+          const settle = (result: Response | null): void => {
+            if (settled) {
+              return;
+            }
+            settled = true;
+            clearTimeout(timeoutHandle);
+            // eslint-disable-next-line promise/no-multiple-resolved
+            resolve(result);
+          };
+          const timeoutHandle = setTimeout(() => {
+            proxyReq.destroy(new Error("upstream timeout"));
+            settle(
+              new Response(
+                "Gateway Timeout: Vite dev server is not responding",
+                { status: 504 },
+              ),
+            );
+          }, PROXY_REQUEST_TIMEOUT_MS);
           const proxyReq = http.request(
             {
               hostname: "127.0.0.1",
@@ -412,7 +439,7 @@ export function startWebSocketServer(
                 },
               });
 
-              resolve(
+              settle(
                 new Response(stream, {
                   status: proxyRes.statusCode ?? 200,
                   headers: resHeaders,
@@ -428,7 +455,7 @@ export function startWebSocketServer(
             // While shutting down - return 502 immediately, no retry.
             if (isConnRefused && !shuttingDown) {
               lastProxyError = err.message;
-              resolve(null); // null = retry
+              settle(null); // null = retry
               return;
             }
             if (!shuttingDown) {
@@ -437,7 +464,7 @@ export function startWebSocketServer(
                 path: url.pathname,
               });
             }
-            resolve(new Response("Bad Gateway", { status: 502 }));
+            settle(new Response("Bad Gateway", { status: 502 }));
           });
 
           // Write buffered body

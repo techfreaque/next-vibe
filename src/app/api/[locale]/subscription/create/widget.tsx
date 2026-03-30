@@ -32,11 +32,13 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
 import {
   PaymentProvider,
   type PaymentProviderValue,
 } from "@/app/api/[locale]/payment/enum";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   ProductIds,
   productsRepository,
@@ -92,6 +94,9 @@ export function SubscriptionCreateContainer({
   const onSubmit = useWidgetOnSubmit();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
+  const envAvailability = useEnvAvailability();
+  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
+  const totalModelCount = getAvailableModelCount(envAvailability, isAdmin);
 
   // Get current subscription status
   const subscriptionEndpoint = useSubscription(logger, user);
@@ -228,7 +233,7 @@ export function SubscriptionCreateContainer({
                 subscriptionProduct.currency,
               ),
               subCredits: subscriptionCredits,
-              modelCount: TOTAL_MODEL_COUNT,
+              modelCount: totalModelCount,
             })}
           </CardDescription>
         </CardHeader>
@@ -304,7 +309,7 @@ export function SubscriptionCreateContainer({
               <Calendar className="h-4 w-4 text-amber-600" />
               <Span>
                 {t("buy.subscription.features.expiry", {
-                  modelCount: TOTAL_MODEL_COUNT,
+                  modelCount: totalModelCount,
                 })}
               </Span>
             </Div>

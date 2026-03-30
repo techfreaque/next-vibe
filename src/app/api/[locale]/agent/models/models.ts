@@ -1,5 +1,6 @@
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
+import { STANDARD_MARKUP_PERCENTAGE } from "../../products/constants";
 import {
   ContentLevel,
   type ContentLevelValue,
@@ -3298,14 +3299,130 @@ export function calculateCreditCost(
 }
 
 /**
- * Total number of AI models available (conceptual models, not provider variants)
+ * Minimal env availability shape required by model count helpers.
+ * Mirrors AgentEnvAvailability - usable on both server and client.
  */
-export const TOTAL_MODEL_COUNT = Object.keys(modelDefinitions).length;
+export interface ModelProviderEnvAvailability {
+  openRouter: boolean;
+  claudeCode: boolean;
+  uncensoredAI: boolean;
+  freedomGPT: boolean;
+  gabAI: boolean;
+  veniceAI: boolean;
+  openAiImages: boolean;
+  replicate: boolean;
+  falAi: boolean;
+}
 
 /**
- * Total number of pre-built AI characters/personas.
- * 2 companions + 7 coding + 10 creative + 4 education
- * + 6 analysis + 16 assistant + 1 roleplay + 6 controversial = 52
+ * Returns true when the given model's API provider is configured in the environment.
+ * Extracted here (alongside modelDefinitions) so it works on both server and client
+ * without pulling in server-only env modules.
+ */
+export function isModelProviderAvailable(
+  model: ModelOption,
+  env: ModelProviderEnvAvailability,
+): boolean {
+  switch (model.apiProvider) {
+    case ApiProvider.OPENROUTER:
+      return env.openRouter;
+    case ApiProvider.CLAUDE_CODE:
+      return env.claudeCode;
+    case ApiProvider.UNCENSORED_AI:
+      return env.uncensoredAI;
+    case ApiProvider.FREEDOMGPT:
+      return env.freedomGPT;
+    case ApiProvider.GAB_AI:
+      return env.gabAI;
+    case ApiProvider.VENICE_AI:
+      return env.veniceAI;
+    case ApiProvider.OPENAI_IMAGES:
+      return env.openAiImages;
+    case ApiProvider.REPLICATE:
+      return env.replicate;
+    case ApiProvider.FAL_AI:
+      return env.falAi;
+    default:
+      return true;
+  }
+}
+
+/**
+ * Total number of AI models available (conceptual models, not provider variants).
+ * Counts all non-admin-only models — the public-facing baseline.
+ * For the count a specific user actually sees, use getAvailableModelCount().
+ */
+export const TOTAL_MODEL_COUNT = Object.values(modelDefinitions).filter((def) =>
+  def.providers.some((p) => !p.adminOnly),
+).length;
+
+/**
+ * Total number of AI provider companies (OpenAI, Anthropic, Google, etc.).
+ * For the count available on a specific instance, use getAvailableProviderCount().
+ */
+export const TOTAL_PROVIDER_COUNT = Object.keys(modelProviders).length;
+
+/**
+ * Returns how many conceptual models are accessible to a user given their role
+ * and the current server's env key configuration.
+ *
+ * - Non-admins: only models with at least one non-admin-only provider that is
+ *   also available in the env.
+ * - Admins: all models regardless of adminOnly or env availability.
+ */
+export function getAvailableModelCount(
+  env: ModelProviderEnvAvailability,
+  isAdmin: boolean,
+): number {
+  return Object.values(modelDefinitions).filter((def) => {
+    const visibleProviders = isAdmin
+      ? def.providers
+      : def.providers.filter((p) => !p.adminOnly);
+    if (visibleProviders.length === 0) {
+      return false;
+    }
+    if (isAdmin) {
+      return true;
+    }
+    return visibleProviders.some((p) => {
+      const option = modelOptionsIndex[p.id];
+      return option ? isModelProviderAvailable(option, env) : false;
+    });
+  }).length;
+}
+
+/**
+ * Returns how many distinct API providers are configured in the environment.
+ * Admins see all providers regardless of key presence.
+ */
+export function getAvailableProviderCount(
+  env: ModelProviderEnvAvailability,
+  isAdmin: boolean,
+): number {
+  if (isAdmin) {
+    return Object.keys(modelProviders).length;
+  }
+  // Count providers that have at least one non-adminOnly model available in env
+  const availableProviderIds = new Set<string>();
+  for (const def of Object.values(modelDefinitions)) {
+    const publicProviders = def.providers.filter((p) => !p.adminOnly);
+    for (const p of publicProviders) {
+      const option = modelOptionsIndex[p.id];
+      if (option && isModelProviderAvailable(option, env)) {
+        availableProviderIds.add(def.by);
+        break;
+      }
+    }
+  }
+  return availableProviderIds.size;
+}
+
+/**
+ * Total number of pre-built AI skills/personas accessible to regular customers.
+ * Source of truth: DEFAULT_SKILLS in generated/skills-index (52 skills as of last gen).
+ * Kept as a constant here to avoid a circular import (skills → models → skills).
+ * Update this when the generator output changes, or use getAvailableSkillCount()
+ * from skills/config for user-role-aware counts.
  */
 export const TOTAL_CHARACTER_COUNT = 52;
 

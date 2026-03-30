@@ -2,12 +2,19 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { SkillsIndexGeneratorRepository } from "./repository";
 
 export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, t }) =>
-      SkillsIndexGeneratorRepository.generateSkillsIndex(data, logger, t),
+    handler: async ({ data, logger, t }) => {
+      const { SkillsIndexGeneratorRepository } = await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      );
+      return SkillsIndexGeneratorRepository.generateSkillsIndex(
+        data,
+        logger,
+        t,
+      );
+    },
   },
 });

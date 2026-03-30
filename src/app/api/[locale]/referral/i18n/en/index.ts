@@ -124,6 +124,7 @@ export const translations = {
       },
       widget: {
         empty: "You don't have any referral codes yet",
+        emptyHint: "Create your first code above ↑",
         copied: "Copied!",
         copy: "Copy Link",
         visitors: "Visitors",
@@ -131,6 +132,8 @@ export const translations = {
         revenue: "Revenue",
         earnings: "Earnings",
         inactive: "This referral code is inactive",
+        conversionHint:
+          "Every {{examplePrice}}/mo subscriber earns you {{exampleEarning}}/mo — recurring",
       },
     },
   },
@@ -148,6 +151,10 @@ export const translations = {
     success: {
       title: "Stats Retrieved",
       description: "Successfully retrieved your referral statistics",
+    },
+    widget: {
+      emptyMessage:
+        "No activity yet — share your referral link to start earning",
     },
     fields: {
       totalSignups: "Total Signups",
@@ -355,6 +362,7 @@ export const translations = {
       progressLabel: "Progress to payout",
       unlockedOf: "unlocked of",
       viewHistory: "View History",
+      historyEmpty: "Your payouts will appear here",
     },
     email: {
       user: {

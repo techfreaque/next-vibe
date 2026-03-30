@@ -9,13 +9,15 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import guardDestroyEndpoints from "./definition";
-import { GuardDestroyRepository } from "./repository";
 
 export const { tools } = endpointsHandler({
   endpoint: guardDestroyEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger, t }) => {
+    handler: async ({ data, logger, t }) => {
+      const { GuardDestroyRepository } = await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      );
       return GuardDestroyRepository.destroyGuard(data, logger, t);
     },
   },

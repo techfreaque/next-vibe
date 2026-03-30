@@ -13,6 +13,8 @@ import { Wallet } from "next-vibe-ui/ui/icons/Wallet";
 
 import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import { Link2 } from "next-vibe-ui/ui/icons/Link2";
+
 import { REFERRAL_CONFIG } from "../config";
 import type definition from "./definition";
 import type { StatsGetResponseOutput } from "./definition";
@@ -26,9 +28,12 @@ interface CustomWidgetProps {
   } & (typeof definition.GET)["fields"];
 }
 
-/** Format credit cents as dollars: 100 credits = $1 */
+/** Format credit cents as dollars: 100 credits = $1. Drops .00 for whole dollar amounts. */
 function formatDollars(credits: number): string {
-  return `$${(credits / 100).toFixed(2)}`;
+  const dollars = credits / 100;
+  return dollars % 1 === 0
+    ? `$${dollars.toFixed(0)}`
+    : `$${dollars.toFixed(2)}`;
 }
 
 /**
@@ -92,64 +97,78 @@ export function ReferralStatsContainer({
     return <Div />;
   }
 
+  const allZero =
+    stats.totalSignupsValue === 0 &&
+    stats.totalRevenueValue === 0 &&
+    stats.totalEarnedValue === 0 &&
+    stats.availableCreditsValue === 0;
+
   return (
-    <Div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <StatCard
-        title={t(stats.totalSignupsTitle)}
-        IconComponent={Users}
-        iconColorClassName={"text-slate-700 dark:text-slate-300"}
-        iconBgClassName={"bg-slate-100 dark:bg-slate-800"}
-        value={stats.totalSignupsValue}
-        valueColorClassName={"text-foreground"}
-        description={t(stats.totalSignupsDescription)}
-      />
+    <Div className="space-y-4">
+      {allZero && (
+        <Div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-muted/50 border text-sm text-muted-foreground">
+          <Link2 className="h-4 w-4 shrink-0 text-violet-400" />
+          <Div>{t("stats.widget.emptyMessage")}</Div>
+        </Div>
+      )}
+      <Div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title={t(stats.totalSignupsTitle)}
+          IconComponent={Users}
+          iconColorClassName={"text-slate-700 dark:text-slate-300"}
+          iconBgClassName={"bg-slate-100 dark:bg-slate-800"}
+          value={stats.totalSignupsValue}
+          valueColorClassName={"text-foreground"}
+          description={t(stats.totalSignupsDescription)}
+        />
 
-      <StatCard
-        title={t(stats.totalRevenueTitle)}
-        IconComponent={TrendingUp}
-        iconColorClassName={"text-emerald-700 dark:text-emerald-300"}
-        iconBgClassName={"bg-emerald-100 dark:bg-emerald-900/30"}
-        value={stats.totalRevenueValue}
-        valueColorClassName={"text-emerald-600 dark:text-emerald-400"}
-        description={t(stats.totalRevenueDescription)}
-        formatAsDollars
-      />
+        <StatCard
+          title={t(stats.totalRevenueTitle)}
+          IconComponent={TrendingUp}
+          iconColorClassName={"text-emerald-700 dark:text-emerald-300"}
+          iconBgClassName={"bg-emerald-100 dark:bg-emerald-900/30"}
+          value={stats.totalRevenueValue}
+          valueColorClassName={"text-emerald-600 dark:text-emerald-400"}
+          description={t(stats.totalRevenueDescription)}
+          formatAsDollars
+        />
 
-      <StatCard
-        title={t(stats.totalEarnedTitle)}
-        IconComponent={DollarSign}
-        iconColorClassName={"text-blue-700 dark:text-blue-300"}
-        iconBgClassName={"bg-blue-100 dark:bg-blue-900/30"}
-        value={stats.totalEarnedValue}
-        valueColorClassName={"text-blue-600 dark:text-blue-400"}
-        description={t(stats.totalEarnedDescription)}
-        formatAsDollars
-      />
+        <StatCard
+          title={t(stats.totalEarnedTitle)}
+          IconComponent={DollarSign}
+          iconColorClassName={"text-blue-700 dark:text-blue-300"}
+          iconBgClassName={"bg-blue-100 dark:bg-blue-900/30"}
+          value={stats.totalEarnedValue}
+          valueColorClassName={"text-blue-600 dark:text-blue-400"}
+          description={t(stats.totalEarnedDescription)}
+          formatAsDollars
+        />
 
-      <StatCard
-        title={t(stats.availableCreditsTitle)}
-        IconComponent={Wallet}
-        iconColorClassName={
-          stats.availableCreditsReadyForPayout
-            ? "text-violet-700 dark:text-violet-300"
-            : "text-amber-700 dark:text-amber-300"
-        }
-        iconBgClassName={
-          stats.availableCreditsReadyForPayout
-            ? "bg-violet-100 dark:bg-violet-900/30"
-            : "bg-amber-100 dark:bg-amber-900/30"
-        }
-        value={stats.availableCreditsValue}
-        valueColorClassName={
-          stats.availableCreditsReadyForPayout
-            ? "text-violet-600 dark:text-violet-400"
-            : "text-amber-600 dark:text-amber-400"
-        }
-        description={t(stats.availableCreditsDescription, {
-          minPayout: `$${(REFERRAL_CONFIG.MIN_PAYOUT_CENTS / 100).toFixed(2)}`,
-        })}
-        formatAsDollars
-      />
+        <StatCard
+          title={t(stats.availableCreditsTitle)}
+          IconComponent={Wallet}
+          iconColorClassName={
+            stats.availableCreditsReadyForPayout
+              ? "text-violet-700 dark:text-violet-300"
+              : "text-amber-700 dark:text-amber-300"
+          }
+          iconBgClassName={
+            stats.availableCreditsReadyForPayout
+              ? "bg-violet-100 dark:bg-violet-900/30"
+              : "bg-amber-100 dark:bg-amber-900/30"
+          }
+          value={stats.availableCreditsValue}
+          valueColorClassName={
+            stats.availableCreditsReadyForPayout
+              ? "text-violet-600 dark:text-violet-400"
+              : "text-amber-600 dark:text-amber-400"
+          }
+          description={t(stats.availableCreditsDescription, {
+            minPayout: `$${(REFERRAL_CONFIG.MIN_PAYOUT_CENTS / 100).toFixed(2)}`,
+          })}
+          formatAsDollars
+        />
+      </Div>
     </Div>
   );
 }

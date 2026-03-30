@@ -650,20 +650,32 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
               </P>
               <CodeBlock terminalLabel="analytics/indicators/ema/definition.ts">
                 {`const { POST } = createEndpoint({
+  scopedTranslation,
+  aliases: [EMA_ALIAS],
+  method: Methods.POST,
   path: ["analytics", "indicators", "ema"],
+  title: "post.title",
+  description: "post.description",
+  icon: "activity",
+  category: "endpointCategories.analytics",
   tags: ["tags.vibeSense"],
   allowedRoles: [UserRole.ADMIN],
-
   fields: objectField(scopedTranslation, {
+    usage: { request: "data", response: true },
     children: {
-      source: timeSeriesRequestField(...),
-      period: requestField(..., {
+      source: timeSeriesRequestField(scopedTranslation, { ... }),
+      period: requestField(scopedTranslation, {
         fieldType: FieldDataType.NUMBER,
         schema: z.number().int().min(1).max(500),
+        label: "post.fields.period.label",
+        description: "post.fields.period.description",
       }),
-      result: timeSeriesResponseField(...),
+      result: timeSeriesResponseField(scopedTranslation, { ... }),
     },
   }),
+  errorTypes: { /* all 9 required */ },
+  successTypes: { title: "post.success.title", description: "post.success.description" },
+  examples: { requests: { default: { period: 7 } }, responses: { default: { result: [] } } },
 });`}
               </CodeBlock>
             </Div>
@@ -676,21 +688,21 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
                 {t(`unified.insight`)}
               </P>
               <CodeBlock terminalLabel="analytics/indicators/ema/repository.ts">
-                {`export function computeEma(
-  points: TimeSeries,
-  period: number,
-): TimeSeries {
-  const k = 2 / (period + 1);
+                {`// Returns ResponseType<T> — never throws
+export async function computeEmaHandler(
+  data: { source: TimeSeries; period: number },
+): Promise<ResponseType<{ result: TimeSeries }>> {
+  const k = 2 / (data.period + 1);
   let ema: number | undefined;
-
-  return points.map((p) => {
-    ema =
-      ema === undefined
-        ? p.value
-        : p.value * k + ema * (1 - k);
+  const result = data.source.map((p) => {
+    ema = ema === undefined ? p.value : p.value * k + ema * (1 - k);
     return { timestamp: p.timestamp, value: ema };
   });
-}`}
+  return success({ result });
+}
+
+// route.ts wires it in one line:
+// [Methods.POST]: { handler: ({ data }) => computeEmaHandler(data) }`}
               </CodeBlock>
             </Div>
           </Div>

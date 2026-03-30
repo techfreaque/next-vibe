@@ -9,12 +9,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import startEndpoints from "./definition";
-import { ServerStartRepository } from "./repository";
 
 export const { tools } = endpointsHandler({
   endpoint: startEndpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) => {
+    handler: async ({ data, user, locale, logger }) => {
+      const { ServerStartRepository } = await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      );
       return ServerStartRepository.startServer(data, user, locale, logger);
     },
   },

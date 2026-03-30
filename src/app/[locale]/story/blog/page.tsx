@@ -5,7 +5,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { BookOpen } from "next-vibe-ui/ui/icons/BookOpen";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
-import { Code } from "next-vibe-ui/ui/icons/Code";
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
@@ -64,27 +63,11 @@ interface BlogPost {
   icon: string;
 }
 
-const VIBE_CHECK_SNIPPET = `$ vibe check src/
-  ✓ 847 files checked
-  ✗ 3 errors found
-
-  src/api/chat/repo.ts:42
-    no-explicit-any: Unexpected any.
-    Avoid \`any\` - fix the type.
-
-  src/api/chat/repo.ts:67
-    no-throw: Use fail() not throw.`;
-
-const GRAPH_ASCII = `  nodes: [price, rsi, ema]
-  ┌─────┐   ┌─────┐
-  │price│──▶│ rsi │
-  └─────┘   └──┬──┘
-               │ signal
-            ┌──▼──┐
-            │alert│
-            └─────┘`;
-
-function ReadTimeBadge({ children }: { children: ReactNode }): JSX.Element {
+export function ReadTimeBadge({
+  children,
+}: {
+  children: ReactNode;
+}): JSX.Element {
   return (
     <Span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
       <Clock className="h-3 w-3" />
@@ -93,7 +76,7 @@ function ReadTimeBadge({ children }: { children: ReactNode }): JSX.Element {
   );
 }
 
-function CategoryBadge({
+export function CategoryBadge({
   label,
   className,
 }: {
@@ -113,7 +96,69 @@ function CategoryBadge({
 export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
+  const VIBE_CHECK_SNIPPET = `$ vibe check src/
+  ✓ 847 files checked
+  ✗ 3 errors found
+
+  src/api/chat/repo.ts:42
+    no-explicit-any: Unexpected any.
+    Avoid \`any\` - fix the type.
+
+  src/api/chat/repo.ts:67
+    no-throw: Use fail() not throw.`;
+
+  const GRAPH_ASCII = `  nodes: [price, rsi, ema]
+  ┌─────┐   ┌─────┐
+  │price│──▶│ rsi │
+  └─────┘   └──┬──┘
+               │ signal
+            ┌──▼──┐
+            │alert│
+            └─────┘`;
+
   const BLOG_POSTS: BlogPost[] = [
+    {
+      slug: "referral-for-beginners",
+      titleKey: "posts.referralBeginners.title",
+      categoryKey: "posts.referralBeginners.category",
+      excerptKey: "posts.referralBeginners.excerpt",
+      readTimeKey: "posts.referralBeginners.readTime",
+      accentColor: "text-emerald-400",
+      borderColor: "border-emerald-500/40",
+      bgGradient:
+        "bg-linear-to-br from-emerald-950/70 via-slate-900 to-slate-950 dark:from-emerald-950/50",
+      badgeColor:
+        "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20",
+      icon: "🌱",
+    },
+    {
+      slug: "referral-for-affiliate-pros",
+      titleKey: "posts.referralAffiliatePros.title",
+      categoryKey: "posts.referralAffiliatePros.category",
+      excerptKey: "posts.referralAffiliatePros.excerpt",
+      readTimeKey: "posts.referralAffiliatePros.readTime",
+      accentColor: "text-violet-400",
+      borderColor: "border-violet-500/40",
+      bgGradient:
+        "bg-linear-to-br from-violet-950/70 via-slate-900 to-slate-950 dark:from-violet-950/50",
+      badgeColor:
+        "bg-violet-500/10 text-violet-400 border-violet-500/30 hover:bg-violet-500/20",
+      icon: "📊",
+    },
+    {
+      slug: "referral-for-developers",
+      titleKey: "posts.referralDevelopers.title",
+      categoryKey: "posts.referralDevelopers.category",
+      excerptKey: "posts.referralDevelopers.excerpt",
+      readTimeKey: "posts.referralDevelopers.readTime",
+      accentColor: "text-cyan-400",
+      borderColor: "border-cyan-500/40",
+      bgGradient:
+        "bg-linear-to-br from-cyan-950/70 via-slate-900 to-slate-950 dark:from-cyan-950/50",
+      badgeColor:
+        "bg-cyan-500/10 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/20",
+      icon: "🛠️",
+    },
     {
       slug: "one-codebase-13-platforms",
       titleKey: "posts.oneCodebase.title",
@@ -188,7 +233,7 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
 
   const [featured, ...rest] = BLOG_POSTS;
   const gridPosts = rest.slice(0, 3);
-  const hnPost = rest[3];
+  const morePosts = rest.slice(3);
 
   return (
     <Div className="min-h-screen bg-slate-950">
@@ -424,99 +469,52 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
           </Div>
         </Div>
 
-        {/* HN-style terminal card */}
-        {hnPost !== undefined && (
+        {/* Additional posts grid */}
+        {morePosts.length > 0 && (
           <Div>
             <Separator className="bg-slate-800 mb-8" />
-            <Link
-              href={`/${locale}/story/blog/${hnPost.slug}`}
-              className="block group"
-            >
-              <Card
-                className={`relative overflow-hidden border-2 ${hnPost.borderColor} bg-stone-950 transition-all duration-300 hover:shadow-2xl hover:shadow-orange-600/10 hover:-translate-y-0.5`}
-              >
-                {/* HN-style orange header bar */}
-                <Div className="flex items-center gap-3 px-6 py-3 bg-orange-600/90">
-                  <Span className="text-white font-bold text-sm tracking-wide">
-                    Y
-                  </Span>
-                  <Span className="text-white/90 text-xs font-medium">
-                    {t("ui.hnSiteName")}
-                  </Span>
-                  <Span className="text-white/60 text-xs ml-auto">
-                    {t("ui.hnNav")}
-                  </Span>
-                </Div>
-
-                <CardHeader className="pt-6 pb-3 px-8">
-                  <Div className="flex flex-wrap items-center gap-3 mb-3">
-                    <Span className="text-2xl">{hnPost.icon}</Span>
-                    <CategoryBadge
-                      label={t(hnPost.categoryKey as Parameters<typeof t>[0])}
-                      className={hnPost.badgeColor}
-                    />
-                    <Badge
-                      variant="outline"
-                      className="text-xs font-medium px-2 py-0.5 bg-orange-600/10 text-orange-500 border-orange-600/30"
-                    >
-                      {t("labels.new")}
-                    </Badge>
-                    <ReadTimeBadge>
-                      {t(hnPost.readTimeKey as Parameters<typeof t>[0])}
-                    </ReadTimeBadge>
-                  </Div>
-                  <H2 className="text-xl md:text-2xl font-bold text-white group-hover:text-orange-500 transition-colors">
-                    {t(hnPost.titleKey as Parameters<typeof t>[0])}
-                  </H2>
-                </CardHeader>
-
-                <CardContent className="px-8 pb-8">
-                  <Div className="md:flex gap-8 items-start">
-                    <P className="text-slate-300 leading-relaxed flex-1 mb-4 md:mb-0">
-                      {t(hnPost.excerptKey as Parameters<typeof t>[0])}
-                    </P>
-                    {/* Terminal-style metadata */}
-                    <Div className="flex-shrink-0 font-mono text-xs text-slate-400 bg-black/60 border border-slate-700/50 rounded-lg px-4 py-3 space-y-1 min-w-[200px]">
-                      <Div className="flex items-center gap-2">
-                        <Code className="h-3 w-3 text-orange-500" />
-                        <Span className="text-orange-500">
-                          {t("ui.hnPoints")}
-                        </Span>
-                        <Span>1,847</Span>
+            <Div className="grid md:grid-cols-3 gap-6">
+              {morePosts.map((post) => (
+                <Link
+                  key={post.slug}
+                  href={`/${locale}/story/blog/${post.slug}`}
+                  className="block group"
+                >
+                  <Card
+                    className={`h-full relative overflow-hidden border ${post.borderColor} ${post.bgGradient} transition-all duration-300 hover:shadow-xl hover:-translate-y-1`}
+                  >
+                    <CardHeader className="pb-3">
+                      <Div className="flex items-center gap-2 mb-3">
+                        <Span className="text-2xl">{post.icon}</Span>
+                        <CategoryBadge
+                          label={t(post.categoryKey as Parameters<typeof t>[0])}
+                          className={post.badgeColor}
+                        />
                       </Div>
-                      <Div className="flex items-center gap-2">
-                        <Span className="text-orange-500 w-3 text-center">
-                          #
+                      <H3 className="text-lg font-bold text-white leading-snug group-hover:text-slate-300 transition-colors">
+                        {t(post.titleKey as Parameters<typeof t>[0])}
+                      </H3>
+                    </CardHeader>
+                    <CardContent>
+                      <P className="text-sm text-slate-400 leading-relaxed mb-4">
+                        {t(post.excerptKey as Parameters<typeof t>[0])}
+                      </P>
+                      <Div className="flex items-center justify-between">
+                        <ReadTimeBadge>
+                          {t(post.readTimeKey as Parameters<typeof t>[0])}
+                        </ReadTimeBadge>
+                        <Span
+                          className={`inline-flex items-center gap-1 text-xs font-medium ${post.accentColor} group-hover:gap-2 transition-all`}
+                        >
+                          {t("labels.readMore")}
+                          <ArrowRight className="h-3 w-3" />
                         </Span>
-                        <Span className="text-orange-500">
-                          {t("ui.hnComments")}
-                        </Span>
-                        <Span>342</Span>
                       </Div>
-                      <Div className="flex items-center gap-2">
-                        <Span className="text-orange-500 w-3 text-center">
-                          @
-                        </Span>
-                        <Span className="text-orange-500">
-                          {t("ui.hnAuthor")}
-                        </Span>
-                        <Span>max</Span>
-                      </Div>
-                    </Div>
-                  </Div>
-
-                  <Div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between">
-                    <Span className="text-xs text-slate-500 font-mono">
-                      {t("ui.hnTags")}
-                    </Span>
-                    <Span className="inline-flex items-center gap-2 text-sm font-medium text-orange-500 group-hover:gap-3 transition-all">
-                      {t("labels.readMore")}
-                      <ArrowRight className="h-4 w-4" />
-                    </Span>
-                  </Div>
-                </CardContent>
-              </Card>
-            </Link>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </Div>
           </Div>
         )}
       </Div>

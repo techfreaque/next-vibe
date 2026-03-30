@@ -3,6 +3,7 @@ import { Bot } from "next-vibe-ui/ui/icons/Bot";
 import { BookOpen } from "next-vibe-ui/ui/icons/BookOpen";
 import { Briefcase } from "next-vibe-ui/ui/icons/Briefcase";
 import { Folder } from "next-vibe-ui/ui/icons/Folder";
+import { SiGithub } from "next-vibe-ui/ui/icons/SiGithub";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
@@ -15,8 +16,9 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import { configScopedTranslation } from "@/config/i18n";
+import { envClient } from "@/config/env-client";
+import { GITHUB_REPO_URL } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
@@ -25,9 +27,10 @@ import { Logo } from "../../_components/logo";
 
 interface FooterProps {
   locale: CountryLanguage;
+  totalModelCount: number;
 }
 
-const Footer: React.FC<FooterProps> = ({ locale }) => {
+const Footer: React.FC<FooterProps> = ({ locale, totalModelCount }) => {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const currentYear = new Date().getFullYear();
@@ -44,12 +47,12 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
             <Logo locale={locale} pathName="/story" />
             <P className="text-sm text-gray-600 dark:text-gray-400 max-w-xs">
               {t("footer.tagline", {
-                modelCount: TOTAL_MODEL_COUNT,
+                modelCount: totalModelCount,
               })}
             </P>
             <P className="text-sm text-gray-600 dark:text-gray-400 max-w-xs">
               {t("footer.privacyTagline", {
-                modelCount: TOTAL_MODEL_COUNT,
+                modelCount: totalModelCount,
               })}
             </P>
           </Div>
@@ -235,16 +238,25 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
               appName: configT("appName"),
             })}
           </P>
-          <Div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <Span>{t("footer.builtWith")}</Span>
+          <Div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
             <Link
-              href="https://github.com/techfreaque/next-vibe"
-              className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+              href={GITHUB_REPO_URL}
+              className="hover:text-gray-900 dark:hover:text-gray-100 transition-colors flex items-center gap-1.5"
               target="_blank"
               rel="noopener noreferrer"
             >
-              {configT("framework")}
+              <SiGithub className="h-4 w-4" />
+              <Span>{t("footer.github")}</Span>
             </Link>
+            <Div className="flex items-center gap-2">
+              <Span>{t("footer.builtWith")}</Span>
+              <Link
+                href={`${envClient.NEXT_PUBLIC_PROJECT_URL}/${locale}/story/framework`}
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+              >
+                {configT("framework")}
+              </Link>
+            </Div>
           </Div>
         </Div>
       </Div>

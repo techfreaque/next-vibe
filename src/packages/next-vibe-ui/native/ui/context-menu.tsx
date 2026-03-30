@@ -177,7 +177,7 @@ function ContextMenuSubContent({
     </ContextMenuPrimitive.SubContent>
   );
 }
-ContextMenuSubContent.displayName = ContextMenuPrimitive.SubContent.displayName;
+ContextMenuSubContent.displayName = "ContextMenuSubContent";
 
 function ContextMenuContent({
   className,

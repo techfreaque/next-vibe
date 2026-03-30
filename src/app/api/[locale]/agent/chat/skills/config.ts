@@ -8,7 +8,10 @@
  */
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  UserPermissionRole,
+  type UserPermissionRoleValue,
+} from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
 import { TtsVoice, type TtsVoiceValue } from "../../text-to-speech/enum";
@@ -25,11 +28,29 @@ import {
   type SkillOwnershipTypeValue,
 } from "./enum";
 import type { SkillsTranslationKey } from "./i18n";
-export {
+import {
   COMPANION_SKILLS,
   DEFAULT_SKILLS,
 } from "@/app/api/[locale]/system/generated/skills-index";
+export { COMPANION_SKILLS, DEFAULT_SKILLS };
 export type VariantModelSelection = ModelSelectionSimple;
+
+/**
+ * Returns how many default skills are accessible to a user with the given roles.
+ * Mirrors the filtering logic in SkillsRepository.filterDefaultSkills().
+ */
+export function getAvailableSkillCount(
+  userRoles: (typeof UserPermissionRoleValue)[],
+): number {
+  return DEFAULT_SKILLS.filter((skill) => {
+    const allowedRoles = skill.userRole ?? [
+      UserPermissionRole.PUBLIC,
+      UserPermissionRole.CUSTOMER,
+      UserPermissionRole.ADMIN,
+    ];
+    return userRoles.some((role) => allowedRoles.some((r) => r === role));
+  }).length;
+}
 
 /**
  * A named variant of a skill with its own model selection.

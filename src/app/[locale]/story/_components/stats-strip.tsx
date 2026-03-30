@@ -6,10 +6,6 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
-import {
-  TOTAL_CHARACTER_COUNT,
-  TOTAL_MODEL_COUNT,
-} from "@/app/api/[locale]/agent/models/models";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -18,24 +14,71 @@ import { scopedTranslation } from "./i18n";
 interface StatsStripProps {
   locale: CountryLanguage;
   totalEndpointCount: number;
+  totalModelCount: number;
+  totalProviderCount: number;
+  totalSkillCount: number;
+  variant: "unbottled" | "personal" | "nextvibe";
 }
 
 export function StatsStrip({
   locale,
   totalEndpointCount,
+  totalModelCount,
+  totalProviderCount,
+  totalSkillCount,
+  variant,
 }: StatsStripProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
-  const stats = [
-    { value: TOTAL_MODEL_COUNT.toString(), label: t("home.stats.models") },
-    { value: `${TOTAL_CHARACTER_COUNT}+`, label: t("home.stats.skills") },
-    { value: `${totalEndpointCount}+`, label: t("home.stats.endpoints") },
-    {
-      value: Object.keys(Platform).length + 1, // +1 for react-native which uses env
-      label: t("home.stats.interfaces"),
-    },
-  ];
+  const platformCount = Object.keys(Platform).length + 1;
+
+  const statsByVariant = {
+    unbottled: [
+      {
+        value: totalModelCount.toString(),
+        label: t("home.stats.models", {
+          providerCount: String(totalProviderCount),
+        }),
+      },
+      { value: `${totalSkillCount}+`, label: t("home.stats.skills") },
+      {
+        value: t("home.stats.freeCreditsValue"),
+        label: t("home.stats.freeCredits"),
+      },
+      {
+        value: t("home.stats.incognitoValue"),
+        label: t("home.stats.incognito"),
+      },
+    ],
+    personal: [
+      {
+        value: totalModelCount.toString(),
+        label: t("home.stats.models", {
+          providerCount: String(totalProviderCount),
+        }),
+      },
+      { value: `${totalSkillCount}+`, label: t("home.stats.skills") },
+      {
+        value: `${totalEndpointCount}+`,
+        label: t("home.stats.adminEndpoints"),
+      },
+      { value: platformCount.toString(), label: t("home.stats.interfaces") },
+    ],
+    nextvibe: [
+      { value: `${totalEndpointCount}+`, label: t("home.stats.endpoints") },
+      { value: platformCount.toString(), label: t("home.stats.interfaces") },
+      {
+        value: totalModelCount.toString(),
+        label: t("home.stats.models", {
+          providerCount: String(totalProviderCount),
+        }),
+      },
+      { value: `${totalSkillCount}+`, label: t("home.stats.skills") },
+    ],
+  };
+
+  const stats = statsByVariant[variant];
 
   return (
     <Div className="relative overflow-hidden bg-muted/30" ref={ref as never}>

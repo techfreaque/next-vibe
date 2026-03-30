@@ -7,7 +7,8 @@ import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
 import {
   ProductIds,
   productsRepository,
@@ -37,6 +38,7 @@ export interface HelpPageData {
   subCredits: number;
   packPrice: string;
   packCredits: number;
+  modelCount: number;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -86,6 +88,9 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
   const packCredits = products[ProductIds.CREDIT_PACK].credits;
   const currencySymbol = countryInfo.symbol;
 
+  const isAdmin = !jwtUser.isPublic && jwtUser.roles.includes(UserRole.ADMIN);
+  const modelCount = getAvailableModelCount(getAgentEnvAvailability(), isAdmin);
+
   return {
     locale,
     jwtUser,
@@ -93,6 +98,7 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
     subCredits,
     packPrice: `${currencySymbol}${packPrice}`,
     packCredits,
+    modelCount,
   };
 }
 
@@ -103,6 +109,7 @@ export function TanstackPage({
   subCredits,
   packPrice,
   packCredits,
+  modelCount,
 }: HelpPageData): JSX.Element {
   const { t } = pageT.scopedT(locale);
 
@@ -123,7 +130,7 @@ export function TanstackPage({
       <HelpPageClient
         locale={locale}
         user={jwtUser}
-        modelCount={TOTAL_MODEL_COUNT}
+        modelCount={modelCount}
         subPrice={subPrice}
         subCredits={subCredits}
         packPrice={packPrice}

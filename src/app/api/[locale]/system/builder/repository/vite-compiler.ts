@@ -8,12 +8,12 @@ import type { Server as NodeHttpServer } from "node:http";
 import { networkInterfaces } from "node:os";
 import { basename, dirname, resolve } from "node:path";
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
 import {
@@ -927,7 +927,7 @@ export class ViteCompiler {
           // Shim for TanStack Start virtual modules that aren't provided in dev mode.
           // "tanstack-start-injected-head-scripts:v" is imported by the server env at runtime
           // (router-manifest.js). TanStack's own dev plugin provides it only when its
-          // configureServer hook runs — but that requires the full TanStack dev server setup.
+          // configureServer hook runs - but that requires the full TanStack dev server setup.
           // We provide a no-op shim so the import resolves without error.
           // The actual preamble is now injected directly in the <Head> component.
           {
@@ -1133,7 +1133,7 @@ export class ViteCompiler {
             },
           } as Plugin,
           // Polyfill CommonJS `require()` for the i18n lazy-loader pattern:
-          // `() => require("./de").translations` — SSR gets node:module createRequire,
+          // `() => require("./de").translations` - SSR gets node:module createRequire,
           // client gets require() calls rewritten to static import references.
           // apply:"serve" prevents this from running during esbuild dep pre-bundling.
           {
@@ -1241,7 +1241,7 @@ export class ViteCompiler {
             name: "ssr-clear-on-hmr",
             configureServer(srv) {
               // Intercept /@tanstack-start/styles.css before TanStack's handler.
-              // CSS is declared via head() ?url link — this bundle is redundant.
+              // CSS is declared via head() ?url link - this bundle is redundant.
               // unshift so we run before all other middleware.
               srv.middlewares.stack.unshift({
                 route: "",
@@ -1268,27 +1268,40 @@ export class ViteCompiler {
               } as never);
             },
             handleHotUpdate({ modules, server: viteServer }) {
-              const hasSrcChange = modules.some((m) => m.id?.includes("/src/"));
-              if (!hasSrcChange) {
+              const srcModules = modules.filter((m) => m.id?.includes("/src/"));
+              if (srcModules.length === 0) {
                 return;
               }
-              // Clear SSR module runner cache so next SSR request re-evaluates changed modules.
+              // Invalidate only the changed src/ modules in the SSR runner cache,
+              // rather than clearing the entire cache. Clearing the whole cache can
+              // race with in-flight module evaluations (e.g. fetchModule for env.ts),
+              // causing the module runner to throw "mistakenly invalidated during
+              // fetch phase" and leaving the transport in a hung state.
               const ssrEnv = viteServer.environments?.["ssr"];
               if (ssrEnv && isRunnableDevEnvironment(ssrEnv)) {
-                ssrEnv.runner.evaluatedModules.clear();
+                for (const mod of srcModules) {
+                  if (!mod.id) {
+                    continue;
+                  }
+                  const ssrMod = ssrEnv.runner.evaluatedModules.getModuleById(
+                    mod.id,
+                  );
+                  if (ssrMod) {
+                    ssrEnv.runner.evaluatedModules.invalidateModule(ssrMod);
+                  }
+                }
               }
-              // Also invalidate the client environment module graph for the changed modules
-              // so Vite re-transforms them and serves updated JS to the browser.
+              // Also invalidate the client environment module graph for the changed
+              // modules so Vite re-transforms them and serves updated JS to the browser.
               const clientEnv = viteServer.environments?.["client"];
               if (clientEnv) {
-                for (const mod of modules) {
-                  if (mod.id?.includes("/src/")) {
-                    const clientMod = clientEnv.moduleGraph.getModuleById(
-                      mod.id,
-                    );
-                    if (clientMod) {
-                      clientEnv.moduleGraph.invalidateModule(clientMod);
-                    }
+                for (const mod of srcModules) {
+                  if (!mod.id) {
+                    continue;
+                  }
+                  const clientMod = clientEnv.moduleGraph.getModuleById(mod.id);
+                  if (clientMod) {
+                    clientEnv.moduleGraph.invalidateModule(clientMod);
                   }
                 }
               }
@@ -1331,6 +1344,10 @@ export class ViteCompiler {
             // @source scanner re-evaluating all watched files.
             ignored: [
               "**/.tmp/**",
+              "**/.next/**",
+              "**/.next-prod/**",
+              "**/.next-rebuild/**",
+              "**/node_modules/**",
               "**/routeTree.gen.ts",
               "**/app-tanstack/routes/**",
               "**/system/generated/**",
@@ -1354,35 +1371,21 @@ export class ViteCompiler {
         // the Next.js Vite cache in node_modules/.vite/deps/
         cacheDir: resolve(ROOT_DIR, "node_modules/.vite-tanstack"),
         logLevel: "info",
-        // Pre-bundle animation/observer packages for SSR too.
-        // Without this the SSR module runner loads their raw ESM which has
-        // internal circular exports - Vite's circular detection fires and
-        // returns partial exports of the importing page before all const
-        // __vite_ssr_import_N__ assignments are done, causing TDZ errors.
-        ssr: {
-          optimizeDeps: {
-            include: [
-              // Pre-bundle React in SSR so jsx-dev-runtime is fully initialized
-              // before any user module runs. Without this, circular imports in
-              // page.tsx files cause TDZ: "Cannot access '__vite_ssr_import_N__'
-              // before initialization" because React's ESM exports are partially
-              // evaluated when the circular module fires.
-              "react",
-              "react/jsx-dev-runtime",
-              "react/jsx-runtime",
-              "react-dom",
-              "framer-motion",
-              "react-intersection-observer",
-              "react-joyride",
-            ],
-          },
-        },
         // Disable auto-discovery: scanning src/app/** pulls in server-only deps
         // (ssh2, react-native, lightningcss, .node binaries) into the client
         // optimizeDeps scan and causes esbuild errors. Instead, list only the
         // CJS packages that are actually needed client-side.
+        //
+        // CRITICAL: holdUntilCrawlEnd: false prevents SSR from hanging.
+        // When holdUntilCrawlEnd is true (Vite default), SSR transformRequest
+        // waits on the client depOptimizationProcessing promise which only
+        // resolves after the client crawl + esbuild run completes. On cold
+        // start this blocks the first SSR request for several seconds.
+        // Setting holdUntilCrawlEnd: false allows deps to be served on-demand
+        // while pre-bundling runs in the background — no SSR blocking.
         optimizeDeps: {
           noDiscovery: true,
+          holdUntilCrawlEnd: false,
           include: [
             // Mirrored from .vite/deps/_metadata.json (Next.js pre-bundle list),
             // minus server-only packages (pg, ssh2, argon2, drizzle, etc.)

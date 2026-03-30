@@ -7,6 +7,8 @@ import type { JSX, ReactNode } from "react";
 
 import Footer from "@/app/[locale]/story/_components/footer";
 import { Navbar } from "@/app/[locale]/story/_components/nav/navbar";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -27,6 +29,7 @@ export interface SiteLayoutData {
   user: JwtPayloadType;
   userProfile: StandardUserType | undefined;
   hasSubscription: boolean;
+  totalModelCount: number;
   children?: ReactNode;
 }
 
@@ -70,7 +73,13 @@ export async function tanstackLoader({
       : undefined;
   }
 
-  return { locale, user, userProfile, hasSubscription };
+  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
+  const totalModelCount = getAvailableModelCount(
+    getAgentEnvAvailability(),
+    isAdmin,
+  );
+
+  return { locale, user, userProfile, hasSubscription, totalModelCount };
 }
 
 export function TanstackPage({
@@ -78,6 +87,7 @@ export function TanstackPage({
   user,
   userProfile,
   hasSubscription,
+  totalModelCount,
   children,
 }: SiteLayoutData): JSX.Element {
   return (
@@ -91,7 +101,7 @@ export function TanstackPage({
           navigationItems={navItems}
         />
         {children}
-        <Footer locale={locale} />
+        <Footer locale={locale} totalModelCount={totalModelCount} />
       </Div>
     </PageLayout>
   );

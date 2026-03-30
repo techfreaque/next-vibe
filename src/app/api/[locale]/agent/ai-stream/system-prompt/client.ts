@@ -5,8 +5,9 @@ import { useMemo } from "react";
 import type { SystemPromptClientParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import {
   FEATURED_MODELS,
-  TOTAL_MODEL_COUNT,
+  getAvailableModelCount,
 } from "@/app/api/[locale]/agent/models/models";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import {
   ProductIds,
   productsRepository,
@@ -50,6 +51,7 @@ export function usePromptContextData(
   const isPublicUser = user.isPublic;
   const isAdmin =
     !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+  const envAvailability = useEnvAvailability();
   const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
   const { t: tChat } = chatScopedTranslation.scopedT(locale);
   const appName = tChat("config.appName");
@@ -96,7 +98,7 @@ export function usePromptContextData(
       subLabel,
       packLabel,
       uncensoredNames: FEATURED_MODELS.uncensored.join(", "),
-      totalModelCount: TOTAL_MODEL_COUNT,
+      totalModelCount: getAvailableModelCount(envAvailability, isAdmin),
       isExposedFolder,
       privateName,
       publicName,
@@ -122,5 +124,6 @@ export function usePromptContextData(
     isExposedFolder,
     isPublicUser,
     isAdmin,
+    envAvailability,
   ]);
 }

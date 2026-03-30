@@ -23,12 +23,17 @@ import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
 import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetTranslation,
+  useWidgetUser,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 
 import type definition from "./definition";
@@ -64,6 +69,11 @@ export function CreditsBalanceContainer({
   const t = useWidgetTranslation<typeof definition.GET>();
   const credits = field.value;
   const { locale } = useTranslation();
+  const widgetUser = useWidgetUser();
+  const envAvailability = useEnvAvailability();
+  const isAdmin =
+    !widgetUser.isPublic && widgetUser.roles.includes(UserRole.ADMIN);
+  const totalModelCount = getAvailableModelCount(envAvailability, isAdmin);
 
   const subscriptionProduct = productsRepository.getProduct(
     ProductIds.SUBSCRIPTION,
@@ -92,7 +102,7 @@ export function CreditsBalanceContainer({
               </CardTitle>
               <CardDescription>
                 {t("get.balance.description", {
-                  modelCount: TOTAL_MODEL_COUNT,
+                  modelCount: totalModelCount,
                 })}
               </CardDescription>
             </Div>

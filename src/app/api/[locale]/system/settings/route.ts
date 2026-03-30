@@ -34,7 +34,9 @@ const patchHandler: ApiHandlerFunction<any, any, any, any, any, any> = ({
 export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ logger, t }) => SystemSettingsRepository.getSettings(logger, t),
+    handler: ({ logger, t }) => {
+      return SystemSettingsRepository.getSettings(logger, t);
+    },
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [Methods.PATCH]: { handler: patchHandler } as any,

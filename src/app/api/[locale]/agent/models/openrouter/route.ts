@@ -6,12 +6,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import openRouterEndpoints from "./definition";
-import { OpenRouterModelsRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: openRouterEndpoints,
   [Methods.GET]: {
-    handler: ({ logger, t }) =>
-      OpenRouterModelsRepository.fetchModels(logger, t),
+    handler: async ({ logger, t }) => {
+      const { OpenRouterModelsRepository } = await import("./repository");
+      return OpenRouterModelsRepository.fetchModels(logger, t);
+    },
   },
 });

@@ -22,6 +22,8 @@ import {
 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { VibeFrameDemo } from "./demo";
+
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
@@ -141,42 +143,6 @@ export function TanstackPage({ locale }: FiredPageData): JSX.Element {
     t("displayModes.triggers.viewport"),
   ];
 
-  const embedCode = `<script src="https://unbottled.ai/vibe-frame/vibe-frame.js"></script>
-<script>
-  VibeFrame.mount(
-    [
-      {
-        endpoint: "contact_POST",
-        target: "#contact-form",
-        theme: "system",
-        display: "inline",
-      },
-    ],
-    {
-      serverUrl: "https://unbottled.ai",
-      locale: "en-US",
-    },
-  );
-</script>`;
-
-  const federatedCode = `VibeFrame.mount(
-  [
-    {
-      endpoint: "contact_POST",
-      serverUrl: "https://my-platform.com",
-      target: "#contact",
-    },
-    {
-      endpoint: "leads_campaigns_stats_GET",
-      serverUrl: "https://analytics.my-platform.com",
-      target: "#stats",
-    },
-  ],
-  {
-    serverUrl: "https://my-platform.com",
-  },
-);`;
-
   const activeToolsCode = `activeTools: [
   tool(CLAUDE_CODE_ALIAS),
   tool(EXECUTE_TOOL_ALIAS),
@@ -234,11 +200,6 @@ export function TanstackPage({ locale }: FiredPageData): JSX.Element {
           <P className="text-gray-300 text-lg leading-relaxed mb-6">
             {t("origin.paragraph2")}
           </P>
-          <Div className="bg-gray-900 border border-gray-700 rounded-xl p-8 my-8">
-            <P className="text-2xl font-bold text-white text-center leading-relaxed">
-              {t("hero.quote")}
-            </P>
-          </Div>
           <P className="text-gray-300 text-lg leading-relaxed">
             {t("origin.paragraph3")}
           </P>
@@ -369,7 +330,7 @@ export function TanstackPage({ locale }: FiredPageData): JSX.Element {
 
         <Separator className="border-gray-800 my-16" />
 
-        {/* Embed Code */}
+        {/* Embed / Demo */}
         <Div className="mb-20">
           <H2 className="text-3xl font-bold mb-4 text-white">
             {t("embed.title")}
@@ -378,27 +339,7 @@ export function TanstackPage({ locale }: FiredPageData): JSX.Element {
             {t("embed.description")}
           </P>
 
-          <Div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 mb-6">
-            <Div className="flex items-center gap-2 mb-4">
-              <Div className="w-3 h-3 rounded-full bg-red-500" />
-              <Div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <Div className="w-3 h-3 rounded-full bg-green-500" />
-              <Muted className="text-xs text-gray-500 ml-2 font-mono">
-                index.html
-              </Muted>
-            </Div>
-            <CodeBlock>{embedCode}</CodeBlock>
-          </Div>
-
-          <Div className="text-center py-6">
-            <P className="text-4xl font-bold text-purple-400">
-              {t("embed.twoScriptTags")}
-            </P>
-          </Div>
-
-          <Muted className="text-sm text-gray-500 text-center">
-            {t("embed.codeCaption")}
-          </Muted>
+          <VibeFrameDemo locale={locale} />
 
           <Div className="mt-6 bg-purple-950/30 border border-purple-700/50 rounded-xl p-5">
             <P className="text-purple-200 text-sm leading-relaxed">
@@ -438,17 +379,6 @@ export function TanstackPage({ locale }: FiredPageData): JSX.Element {
             {t("federated.description")}
           </P>
 
-          <Div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 mb-6">
-            <Div className="flex items-center gap-2 mb-4">
-              <Div className="w-3 h-3 rounded-full bg-red-500" />
-              <Div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <Div className="w-3 h-3 rounded-full bg-green-500" />
-              <Muted className="text-xs text-gray-500 ml-2 font-mono">
-                embed.js
-              </Muted>
-            </Div>
-            <CodeBlock>{federatedCode}</CodeBlock>
-          </Div>
           <Muted className="text-sm text-gray-500 text-center mb-8">
             {t("federated.codeCaption")}
           </Muted>
@@ -535,7 +465,7 @@ export function TanstackPage({ locale }: FiredPageData): JSX.Element {
             <CodeBlock>{activeToolsCode}</CodeBlock>
           </Div>
 
-          {/* Composable reasoning */}
+          {/* Tools can live anywhere */}
           <H3 className="text-xl font-semibold mb-4 text-gray-200">
             {t("skills.composableTitle")}
           </H3>
@@ -552,26 +482,81 @@ export function TanstackPage({ locale }: FiredPageData): JSX.Element {
 
         <Separator className="border-gray-800 my-16" />
 
+        {/* Remote Execution */}
+        <Div className="mb-20">
+          <H2 className="text-3xl font-bold mb-8 text-white">
+            {t("remoteExecution.title")}
+          </H2>
+          <P className="text-gray-300 text-lg leading-relaxed mb-6">
+            {t("remoteExecution.paragraph1")}
+          </P>
+          <P className="text-gray-300 text-lg leading-relaxed mb-6">
+            {t("remoteExecution.paragraph2")}
+          </P>
+          <P className="text-gray-300 text-lg leading-relaxed mb-8">
+            {t("remoteExecution.paragraph3")}
+          </P>
+
+          {/* Flow diagram */}
+          <Div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 mb-8">
+            <Div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <Div className="flex-1 bg-blue-950/50 border border-blue-700 rounded-xl p-4 text-center">
+                <Div className="text-blue-300 font-bold text-sm mb-1">
+                  {t("remoteExecution.diagramAI")}
+                </Div>
+                <Div className="text-blue-500 font-mono text-xs">
+                  {t("remoteExecution.diagramExecute")}
+                </Div>
+              </Div>
+              <Div className="flex flex-col items-center gap-1 flex-shrink-0">
+                <Div className="hidden md:block w-12 h-0.5 bg-purple-500" />
+                <Muted className="text-xs text-gray-500 text-center">
+                  {t("remoteExecution.diagramAILabel")}
+                </Muted>
+              </Div>
+              <Div className="flex-1 bg-emerald-950/50 border border-emerald-700 rounded-xl p-4 text-center">
+                <Div className="text-emerald-300 font-bold text-sm mb-1">
+                  {t("remoteExecution.diagramRemote")}
+                </Div>
+                <Muted className="text-xs text-gray-500">
+                  {t("remoteExecution.diagramRemoteLabel")}
+                </Muted>
+              </Div>
+              <Div className="flex flex-col items-center gap-1 flex-shrink-0">
+                <Div className="hidden md:block w-12 h-0.5 bg-purple-500" />
+                <Muted className="text-xs text-gray-500 text-center">
+                  {t("remoteExecution.diagramWidgetLabel")}
+                </Muted>
+              </Div>
+              <Div className="flex-1 bg-purple-950/50 border border-purple-700 rounded-xl p-4 text-center">
+                <Div className="text-purple-300 font-bold text-sm mb-1">
+                  {t("remoteExecution.diagramVibeFrame")}
+                </Div>
+                <Div className="text-purple-500 font-mono text-xs">
+                  {t("remoteExecution.diagramWidget")}
+                </Div>
+              </Div>
+            </Div>
+          </Div>
+
+          <Div className="bg-amber-950/30 border border-amber-700/50 rounded-xl p-6">
+            <P className="text-amber-200 leading-relaxed">
+              {t("remoteExecution.callout")}
+            </P>
+          </Div>
+        </Div>
+
+        <Separator className="border-gray-800 my-16" />
+
         {/* Close */}
         <Div className="mb-16">
           <H2 className="text-3xl font-bold mb-8 text-white">
             {t("close.title")}
           </H2>
 
-          <Div className="space-y-6 mb-12">
-            <Div className="flex gap-4 p-6 bg-purple-950/30 border border-purple-700/50 rounded-xl">
-              <Div className="w-1 bg-purple-500 rounded-full flex-shrink-0" />
-              <P className="text-gray-300 leading-relaxed">
-                {t("close.vibeFrame")}
-              </P>
-            </Div>
-            <Div className="flex gap-4 p-6 bg-blue-950/30 border border-blue-700/50 rounded-xl">
-              <Div className="w-1 bg-blue-500 rounded-full flex-shrink-0" />
-              <P className="text-gray-300 leading-relaxed">
-                {t("close.skills")}
-              </P>
-            </Div>
-          </Div>
+          <P className="text-gray-300 text-lg leading-relaxed mb-10">
+            {t("close.paragraph")}
+          </P>
 
           <Div className="bg-gray-900 border border-gray-700 rounded-xl p-8 mb-12 text-center">
             <P className="text-xl font-semibold text-white mb-0">

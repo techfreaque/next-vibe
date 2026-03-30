@@ -15,8 +15,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { JwtPayloadType } from "../../../../../user/auth/types";
-import { SetupInstallRepository } from "../install/repository";
-import { SetupUninstallRepository } from "../uninstall/repository";
 import type { UpdateRequestOutput, UpdateResponseOutput } from "./definition";
 import type { SetupUpdateT } from "./i18n";
 
@@ -31,6 +29,13 @@ export class SetupUpdateRepository {
     t: SetupUpdateT,
   ): Promise<ResponseType<UpdateResponseOutput>> {
     try {
+      const { SetupUninstallRepository } = await import(
+        /* turbopackIgnore: true */ "../uninstall/repository"
+      );
+      const { SetupInstallRepository } = await import(
+        /* turbopackIgnore: true */ "../install/repository"
+      );
+
       // First uninstall existing CLI
       const uninstallResult = await SetupUninstallRepository.uninstallCli(
         { verbose: data.verbose },

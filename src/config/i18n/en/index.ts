@@ -43,7 +43,7 @@ export const translations = {
   social: {
     twitterHandle: "@unbottled_ai",
     twitterUrl: "https://twitter.com/unbottled_ai",
-    discordInvite: "https://discord.gg/unbottled",
+    discordInvite: "https://discord.gg/hBuA22SzkR",
     linkedinUrl: "https://linkedin.com/company/unbottled",
     facebookUrl: "https://facebook.com/unbottled",
     instagramUrl: "https://instagram.com/unbottled",

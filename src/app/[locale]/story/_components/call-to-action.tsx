@@ -15,9 +15,10 @@ import { scopedTranslation } from "./i18n";
 
 interface CallToActionProps {
   locale: CountryLanguage;
+  totalModelCount: number;
 }
 
-const CallToAction: FC<CallToActionProps> = ({ locale }) => {
+const CallToAction: FC<CallToActionProps> = ({ locale, totalModelCount }) => {
   const { t } = scopedTranslation.scopedT(locale);
   const [ref, inView] = useInView({
     triggerOnce: true,
@@ -44,7 +45,7 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
                 {t("home.cta.title")}
               </H2>
               <P className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto mb-8 leading-relaxed">
-                {t("home.cta.subtitle")}
+                {t("home.cta.subtitle", { modelCount: totalModelCount })}
               </P>
 
               <Div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -64,7 +65,7 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
                   className="bg-transparent border-white text-white hover:bg-white/10"
                   asChild
                 >
-                  <Link href="https://github.com/techfreaque/next-vibe">
+                  <Link href={`/${locale}/subscription/overview`}>
                     {t("home.cta.viewPlans")}
                   </Link>
                 </Button>

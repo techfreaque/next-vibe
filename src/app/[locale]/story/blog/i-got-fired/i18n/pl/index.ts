@@ -5,11 +5,12 @@ export const translations: typeof enTranslations = {
     title:
       "Zostałem zwolniony. To jest to, co zamiast tego zbudowałem. - next-vibe",
     description:
-      "Sfederowany silnik widżetów zbudowany w pracy, której już nie ma. Teraz każdy endpoint next-vibe można osadzić wszędzie w dwóch tagach script.",
+      "Silnik widżetów w piaskownicy, który stał się połową renderowania zdalnego wykonywania narzędzi. Każdy endpoint next-vibe — na dowolnym serwerze — jest teraz żywym, interaktywnym widżetem, który można osadzić wszędzie.",
     category: "VibeFrame",
-    imageAlt: "VibeFrame - Sfederowany Silnik Widżetów",
+    imageAlt:
+      "VibeFrame - Zdalne wykonywanie narzędzi i renderowanie widżetów w piaskownicy",
     keywords:
-      "VibeFrame, sfederowane widżety, iframe, postMessage, next-vibe, osadzalny, TypeScript",
+      "VibeFrame, zdalne wykonywanie narzędzi, sfederowane widżety, iframe, postMessage, next-vibe, osadzalny, TypeScript",
   },
   hero: {
     backToBlog: "Powrót do bloga",
@@ -17,23 +18,23 @@ export const translations: typeof enTranslations = {
     readTime: "11 min czytania",
     title: "Zostałem zwolniony. To jest to, co zamiast tego zbudowałem.",
     subtitle:
-      "Sfederowany silnik widżetów zbudowany w pracy, której już nie ma. Teraz każdy endpoint next-vibe można osadzić wszędzie w dwóch tagach script.",
+      "Silnik widżetów zbudowany w wolnym czasie po pracy — SSR+CSR, poniżej 15 KB, szybszy i bardziej funkcjonalny niż wersja z codziennej pracy. Leżał na moim dysku przez sześć miesięcy. Potem next-vibe go potrzebował.",
     quote:
       "Miałem właśnie pokazać to mojemu zespołowi. Potem zostałem zwolniony.",
   },
   origin: {
     title: "Historia powstania",
     paragraph1:
-      "Spędziłem trzy miesiące budując coś w swojej codziennej pracy, czego nigdy nie mogłem nikomu pokazać. Baza kodu, nad którą pracowałem, była katastrofą. Za każdym razem, gdy musieliśmy osadzić widżet zewnętrzny - formularz, bąbelek czatu, panel pulpitu nawigacyjnego - była ta sama historia.",
+      "Moja codzienna praca miała problem z widżetami. Inne strony importowały nasz JavaScript, żeby wyświetlić widżet — formularz, bąbelek czatu, panel pulpitu nawigacyjnego. Skrypt był nieefektywny, napuchły, wolno się ładował. Strony trzecie, które go importowały, wyraźnie płaciły za to cenę. W wolnym czasie po pracy zacząłem budować zamiennik.",
     paragraph2:
-      "Zbudowałem alternatywę. Lekki sfederowany silnik widżetów, który mógł bezpiecznie osadzać wszystko - każdy formularz, każde UI, każde narzędzie - w sandboxowanym iframe na dowolnej stronie. Właściwy protokół postMessage. Brak wspólnego stanu między hostem a widżetem. System wyzwalaczy, tryby wyświetlania, cały zestaw.",
+      "Prototyp wyszedł lepiej niż się spodziewałem. Obsługa SSR i CSR — SSR dla szybkości, CSR dla interaktywności. Poniżej 15 KB łącznie. Szybszy niż wersja z codziennej pracy. Więcej funkcji. W pełni reaktywny, w pełni bezpieczny typowo. Właściwy protokół postMessage między iframe a stroną hosta. Brak wspólnego stanu. System wyzwalaczy, tryby wyświetlania, kontrolki częstotliwości wyświetlania. Miałem właśnie pokazać to mojemu zespołowi. Potem zostałem zwolniony.",
     paragraph3:
-      "Miałem właśnie pokazać to mojemu zespołowi. Potem zostałem zwolniony. Baza kodu leżała martwa na moim dysku przez miesiące. Potem zdałem sobie sprawę: ta architektura była dokładnie tym, czego potrzebował next-vibe.",
+      "Baza kodu leżała na moim dysku przez około sześć miesięcy. Potem zdałem sobie sprawę, do czego next-vibe tego naprawdę potrzebował: nie tylko formularzy — ale renderowania pełnego interaktywnego UI narzędzia działającego na zdalnym serwerze, w piaskownicy, na dowolnej stronie. To zdalne wykonywanie narzędzi z żywym UI.",
   },
   problem: {
     title: "Problem z tagami script",
     paragraph1:
-      "Gdy osadzasz treści zewnętrzne za pomocą nagiego tagu script, nie masz sandboxa. Ten skrypt ma pełny dostęp do strony - DOM, ciasteczka, localStorage, nasłuchiwacze zdarzeń, wszystko.",
+      "Gdy osadzasz treści zewnętrzne za pomocą nagiego tagu script, płacisz na dwa sposoby. Wydajność: skrypt musi się załadować, przetworzyć i wykonać zanim cokolwiek się wyrenderuje. Jeśli serwer zewnętrzny jest wolny, twoja strona czeka. I bezpieczeństwo: ten skrypt ma pełny dostęp do strony — DOM, ciasteczka, localStorage, nasłuchiwacze zdarzeń. Jeśli jest wadliwy, twoja strona się psuje. Jeśli jest złośliwy, twoi użytkownicy są narażeni.",
     paragraph2:
       "Standardową bezpieczną alternatywą jest iframe. Ale iframe domyślnie nie komunikuje się ze stroną nadrzędną. Zdarzenia zmiany rozmiaru nie bąbelkują. Przesyłanie formularzy nie propaguje. Kończysz z głupim izolowanym pudełkiem, które nie może nic powiedzieć swojemu rodzicowi.",
     bridgeTitle: "To, czego naprawdę potrzebujesz, to most.",
@@ -94,7 +95,7 @@ export const translations: typeof enTranslations = {
   embed: {
     title: "Dwa tagi script. Gotowe.",
     description:
-      "Portowane. Każdy endpoint staje się osadzalny. Każdy widżet jest teraz obywatelem pierwszej klasy na każdej stronie.",
+      "Każdy endpoint staje się osadzalny. Narzędzie działa na własnym serwerze. Widżet renderuje się w piaskownicy na twojej stronie. Pełne funkcje, zero wspólnego stanu.",
     twoScriptTags: "Dwa tagi script. Gotowe.",
     codeCaption:
       "Kompletny kod osadzania dla formularza kontaktowego z unbottled.ai",
@@ -102,13 +103,13 @@ export const translations: typeof enTranslations = {
       "Panel administracyjny generuje to dla ciebie. Wybierz endpoint, wybierz tryb wyświetlania, wybierz wyzwalacz. Kopiuj. Wklej wszędzie.",
   },
   vibeSense: {
-    title: "Efekt uboczny, którego nie planowałem",
+    title: "Nie efekt uboczny. Sedno sprawy.",
     paragraph1:
-      "Gdy przeniosłem VibeFrame do next-vibe, zdałem sobie sprawę, że nie tylko formularze stały się osadzalne. UI każdego endpointu jest osadzalna. Włącznie z wizualizacjami wykresów Vibe Sense.",
+      "Gdy przeniosłem VibeFrame do next-vibe, pierwszą rzeczą, którą osadzałem, nie był formularz kontaktowy. Był to wykres Vibe Sense — żywa wizualizacja danych z platformy, renderowana jako widżet na zewnętrznej stronie.",
     paragraph2:
-      "Wykres lejka leadów na żywo z platformy - z prawdziwymi danymi, wskaźnikami na żywo - renderowany jako widżet na zewnętrznej stronie. To nie jest zrzut ekranu. To nie są eksporty statyczne. Dane się odświeżają. Wykres reaguje.",
+      "Prawdziwe dane. Żywe wskaźniki. Wykres reaguje na to, co dzieje się na zdalnym serwerze. To nie jest zrzut ekranu ani eksport statyczny. Narzędzie działa na swoim serwerze. VibeFrame renderuje jego UI widżetu w piaskownicy wszędzie tam, gdzie tego potrzebujesz.",
     paragraph3:
-      "Architektura, którą zbudowałem do bezpiecznego osadzania widżetów zewnętrznych, okazała się również architekturą nadającą każdemu endpointowi publiczną obecność iframe. To właśnie w tym tkwi sens budowania właściwej abstrakcji. Robi więcej niż planowałeś.",
+      "Wtedy architektura zaskoczyła. VibeFrame nie był tylko sposobem na osadzanie formularzy. Był połową renderowania zdalnego wykonywania narzędzi — brakującym elementem, który sprawia, że rozproszony system narzędzi wydaje się jedną spójną platformą.",
   },
   federated: {
     title: "Sfederowane osadzanie",
@@ -120,32 +121,49 @@ export const translations: typeof enTranslations = {
       "Definicja podróżuje z widżetem. Serwer, który jest właścicielem endpointu, jest właścicielem renderowania.",
   },
   skills: {
-    title: "Skille: zarówno persona, jak i konfiguracja narzędzi",
+    title: "Skille: połowa wywołań",
     intro:
-      "Chcę opowiedzieć o tym, jak skille na tej platformie ewoluowały, bo ten sam wzorzec ma zastosowanie.",
+      "VibeFrame obsługuje renderowanie. Skille obsługują wywołania. Skill deklaruje dokładnie, jakie narzędzia ma AI — konkretne endpointy w rejestrze, z walidowanymi przez Zod wejściami i typowanymi wyjściami. Użytkownik wybiera personę. AI otrzymuje ograniczony zestaw narzędzi.",
     userPerspective: "Perspektywa użytkownika",
     aiPerspective: "Perspektywa AI",
     userDescription:
       "Skill to persona. Korepetytor, programista, gawędziarz. Każdy skill ma nazwę, system prompt, głos, osobowość.",
     aiDescription:
-      "Skill to zestaw umiejętności. Każdy skill deklaruje, do jakich narzędzi ma dostęp. Konkretne endpointy w rejestrze, z walidowanymi przez Zod wejściami i typowanymi wyjściami.",
-    keyLine: "Użytkownik widzi skill. AI widzi konfigurację narzędzi.",
+      "Skill to konfiguracja narzędzi. Każdy skill deklaruje, które endpointy może wywoływać — w tym narzędzia na zdalnych instancjach. Walidowane przez Zod wejścia. Typowane wyjścia. Żadnej niejednoznaczności.",
+    keyLine: "Użytkownik widzi personę. AI widzi konfigurację narzędzi.",
     activeToolsTitle: "Tablica activeTools",
     activeToolsDescription:
-      "To jest odkrycie. Nie abstrakcyjne możliwości opisane w pliku markdown. To są konkretne endpointy, wywoływalne z tego samego interfejsu narzędzi co wszystko inne.",
-    composableTitle: "Komponowalne rozumowanie",
+      "Nie abstrakcyjne możliwości opisane w prozie. To konkretne endpointy — wywoływalne przez ten sam interfejs execute-tool, niezależnie od tego, czy działają lokalnie czy na zdalnej instancji next-vibe przez sieć.",
+    composableTitle: "Narzędzia mogą mieszkać wszędzie",
     composableDescription:
-      "Nie jeden duży agent, który wie wszystko. Zbiór specjalistów z wyraźnie ograniczonymi możliwościami, orkiestrowany przez agenta, który wie, którego specjalistę wezwać.",
+      "Wywołanie narzędzia w next-vibe nie jest ograniczone do lokalnego serwera. System execute-tool kieruje wywołania do instancji, która posiada ten endpoint. Wywołująca AI nie musi wiedzieć, gdzie on działa. Dzwoni, właściwy serwer odpowiada.",
     bothAtOnce: "Skill jest jednocześnie obydwoma.",
   },
+  remoteExecution: {
+    title: "Zdalne wykonywanie narzędzi",
+    paragraph1:
+      "Oto co łączy VibeFrame i rejestr narzędzi. Gdy AI wywołuje execute-tool ze zdalnym endpointem, next-vibe kieruje wywołanie do docelowej instancji. Ta instancja wykonuje narzędzie i zwraca wynik. Dość standardowo.",
+    paragraph2:
+      "Ale każdy endpoint w next-vibe ma też widżet — typowaną, w pełni wyposażoną komponentę UI, która wie, jak renderować wejścia i wyjścia tego narzędzia. VibeFrame może wziąć ten widżet i renderować go w sandboxowanym iframe na dowolnej stronie, komunikując się z serwerem narzędzia przez postMessage.",
+    paragraph3:
+      "Połącz te dwa elementy: możesz wywołać narzędzie na zdalnym serwerze i renderować jego pełne interaktywne UI w piaskownicy na swojej stronie. Narzędzie działa tam, gdzie mieszka. UI pojawia się tam, gdzie go potrzebujesz. Żaden wspólny stan. Żaden kompromis bezpieczeństwa. Pełne funkcje.",
+    diagramAI: "Agent AI",
+    diagramExecute: "execute-tool",
+    diagramRemote: "Zdalna instancja",
+    diagramVibeFrame: "VibeFrame",
+    diagramWidget: "Widżet UI w piaskownicy",
+    diagramAILabel: "wywołuje narzędzie",
+    diagramRemoteLabel: "wykonuje, zwraca wynik",
+    diagramWidgetLabel: "renderuje pełne UI w piaskownicy",
+    callout:
+      "Serwer, który posiada narzędzie, posiada UI. VibeFrame renderuje ją wszędzie, gdzie jej potrzebujesz. Tak wygląda zdalne wykonywanie narzędzi z pełnym frontendem.",
+  },
   close: {
-    title: "Co te dwie rzeczy mają wspólnego",
-    vibeFrame:
-      "VibeFrame sprawia, że platforma jest osadzalna wszędzie. Każdy endpoint, każdy widżet, każde UI - dwa tagi script i jest na każdej stronie. Obecność platformy wykracza poza jej własną domenę.",
-    skills:
-      "Skille sprawiają, że platforma jest komponowalna. Każde zadanie rozumowania, każda domena możliwości - przekieruj do właściwego skilla, uzyskaj właściwy model z właściwymi narzędziami.",
+    title: "Co mają wspólnego",
+    paragraph:
+      "VibeFrame i rejestr narzędzi rozwiązują ten sam problem z przeciwnych stron. Rejestr narzędzi obsługuje wywołania — każdy endpoint na dowolnej instancji, wywoływalny z dowolnej AI. VibeFrame obsługuje renderowanie — każdy widżet z dowolnej instancji, osadzalny na dowolnej stronie. Zdalne wykonywanie narzędzi to most między nimi: wywołaj narzędzie, renderuj jego UI.",
     together:
-      "Razem: twoja platforma może pojawiać się wszędzie i rozumować o wszystkim.",
+      "Rozproszony system narzędzi z rozproszonym systemem renderowania. To jest next-vibe.",
     finalLine:
       "Nigdy nie mogłem tego pokazać tym kolegom. Ale pokazuję to tobie.",
     github: "Zobacz na GitHubie",

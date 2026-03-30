@@ -9,14 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
+import { UnifiedTaskRunnerRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, user, locale, logger }) => {
-      // Lazy import to avoid creating connections during route discovery
-      const { UnifiedTaskRunnerRepository } = await import("./repository");
-      return await UnifiedTaskRunnerRepository.manageRunner(
+    handler: ({ data, user, locale, logger }) => {
+      return UnifiedTaskRunnerRepository.manageRunner(
         data,
         user,
         locale,

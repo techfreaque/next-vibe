@@ -4,6 +4,12 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { getMaxToolCountAllPlatforms } from "@/app/api/[locale]/agent/chat/default-tool-counts";
+import { getAvailableSkillCount } from "@/app/api/[locale]/agent/chat/skills/config";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import {
+  getAvailableModelCount,
+  getAvailableProviderCount,
+} from "@/app/api/[locale]/agent/models/models";
 import {
   ProductIds,
   productsRepository,
@@ -51,6 +57,9 @@ interface StoryPageData {
   locale: CountryLanguage;
   totalToolCount: number;
   totalEndpointCount: number;
+  totalModelCount: number;
+  totalProviderCount: number;
+  totalSkillCount: number;
   subPrice: number;
   subCurrency: string;
   hasUser: boolean;
@@ -77,10 +86,20 @@ export async function tanstackLoader({
   const country = getCountryFromLocale(locale);
   const countryInfo = languageConfig.countryInfo[country];
 
+  const user = userResponse.success ? userResponse.data : null;
+  const isAdmin = user
+    ? !user.isPublic && user.roles.includes(UserRole.ADMIN)
+    : false;
+  const userRoles = user ? user.roles : [UserRole.PUBLIC];
+  const env = getAgentEnvAvailability();
+
   return {
     locale,
     totalToolCount,
     totalEndpointCount,
+    totalModelCount: getAvailableModelCount(env, isAdmin),
+    totalProviderCount: getAvailableProviderCount(env, isAdmin),
+    totalSkillCount: getAvailableSkillCount(userRoles),
     subPrice: products[ProductIds.SUBSCRIPTION].price,
     subCurrency: countryInfo.symbol,
     hasUser: userResponse.success && !!userResponse.data,
@@ -91,6 +110,9 @@ export function TanstackPage({
   locale,
   totalToolCount,
   totalEndpointCount,
+  totalModelCount,
+  totalProviderCount,
+  totalSkillCount,
   subPrice,
   subCurrency,
   hasUser,
@@ -118,6 +140,9 @@ export function TanstackPage({
       locale={locale}
       totalToolCount={totalToolCount}
       totalEndpointCount={totalEndpointCount}
+      totalModelCount={totalModelCount}
+      totalProviderCount={totalProviderCount}
+      totalSkillCount={totalSkillCount}
       subPrice={subPrice}
       subCurrency={subCurrency}
     />

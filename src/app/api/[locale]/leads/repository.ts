@@ -1081,7 +1081,7 @@ export class LeadsRepository {
     email: string,
     logger: EndpointLogger,
     t: LeadsT,
-  ) {
+  ): Promise<ResponseType<{ success: boolean; leadFound: boolean }>> {
     try {
       logger.debug("Updating lead status on newsletter unsubscribe", { email });
 

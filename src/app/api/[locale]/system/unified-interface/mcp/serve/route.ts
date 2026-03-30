@@ -7,7 +7,9 @@ export const { tools } = endpointsHandler({
   endpoint: serveDefinition,
   [Methods.POST]: {
     handler: async ({ logger, locale, user }) => {
-      const { MCPServeRepository } = await import("./repository");
+      const { MCPServeRepository } = await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      );
       return await MCPServeRepository.startServer(logger, locale, user);
     },
   },

@@ -14,9 +14,10 @@ import {
 import type { ReactElement } from "react";
 import { z } from "zod";
 
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   FEATURED_MODELS,
-  TOTAL_MODEL_COUNT,
+  getAvailableModelCount,
 } from "@/app/api/[locale]/agent/models/models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -65,6 +66,7 @@ const subscriptionSuccessPropsSchema = z.object({
   userId: z.string(),
   leadId: z.string(),
   planName: z.string(),
+  totalModelCount: z.number(),
 });
 
 type SubscriptionSuccessProps = z.infer<typeof subscriptionSuccessPropsSchema>;
@@ -112,7 +114,7 @@ function SubscriptionSuccessEmail({
       title={t("email.success.headline")}
       previewText={t("email.success.previewText", {
         privateName: props.privateName,
-        modelCount: TOTAL_MODEL_COUNT,
+        modelCount: props.totalModelCount,
       })}
       recipientEmail={recipientEmail}
       tracking={tracking}
@@ -185,7 +187,7 @@ function SubscriptionSuccessEmail({
           }}
         >
           {t("email.success.models.title", {
-            modelCount: TOTAL_MODEL_COUNT,
+            modelCount: props.totalModelCount,
           })}
         </Span>
 
@@ -253,7 +255,7 @@ function SubscriptionSuccessEmail({
         {[
           t("email.success.included.credits"),
           t("email.success.included.models", {
-            modelCount: TOTAL_MODEL_COUNT,
+            modelCount: props.totalModelCount,
           }),
           t("email.success.included.nolimits"),
           t("email.success.included.uncensored"),
@@ -456,6 +458,7 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
     userId: "example-user-id-123",
     leadId: "example-lead-id-456",
     planName: "Premium Plan",
+    totalModelCount: 42,
   },
   render: ({ user, requestData, locale }) => {
     const { t } = subscriptionScopedTranslation.scopedT(locale);
@@ -466,6 +469,10 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
         userId: requestData.user?.id ?? user.id,
         leadId: requestData.user?.leadId ?? user.leadId,
         planName: requestData.planName ?? "",
+        totalModelCount: getAvailableModelCount(
+          getAgentEnvAvailability(),
+          false,
+        ),
       };
       const tracking = createTrackingContext(
         locale,

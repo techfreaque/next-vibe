@@ -6,12 +6,19 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { EndpointsMetaGeneratorRepository } from "./repository";
 
 export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, t }) =>
-      EndpointsMetaGeneratorRepository.generateEndpointsMeta(data, logger, t),
+    handler: async ({ data, logger, t }) => {
+      const { EndpointsMetaGeneratorRepository } = await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      );
+      return EndpointsMetaGeneratorRepository.generateEndpointsMeta(
+        data,
+        logger,
+        t,
+      );
+    },
   },
 });

@@ -84,44 +84,40 @@ export function ReferralPayoutContainer({
               {t("payout.widget.howItWorksTitle")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <Div className="flex gap-4">
-              <Div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-sm font-bold">
-                1
-              </Div>
-              <Div>
-                <Div className="font-medium text-sm">
-                  {t("payout.widget.step1Title")}
-                </Div>
-                <Div className="text-xs text-muted-foreground">
-                  {t("payout.widget.step1Body")}
-                </Div>
-              </Div>
-            </Div>
-            <Div className="flex gap-4">
-              <Div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-sm font-bold">
-                2
-              </Div>
-              <Div>
-                <Div className="font-medium text-sm">
-                  {t("payout.widget.step2Title")}
-                </Div>
-                <Div className="text-xs text-muted-foreground">
-                  {t("payout.widget.step2Body")}
-                </Div>
-              </Div>
-            </Div>
-            <Div className="flex gap-4">
-              <Div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-sm font-bold">
-                3
-              </Div>
-              <Div>
-                <Div className="font-medium text-sm">
-                  {t("payout.widget.step3Title")}
-                </Div>
-                <Div className="text-xs text-muted-foreground">
-                  {t("payout.widget.step3Body")}
-                </Div>
+          <CardContent>
+            <Div className="relative">
+              {/* Connector line */}
+              <Div className="absolute left-4 top-8 bottom-8 w-px bg-violet-200 dark:bg-violet-800" />
+              <Div className="space-y-6">
+                {[
+                  {
+                    key: "step1",
+                    title: t("payout.widget.step1Title"),
+                    body: t("payout.widget.step1Body"),
+                  },
+                  {
+                    key: "step2",
+                    title: t("payout.widget.step2Title"),
+                    body: t("payout.widget.step2Body"),
+                  },
+                  {
+                    key: "step3",
+                    title: t("payout.widget.step3Title"),
+                    body: t("payout.widget.step3Body"),
+                  },
+                ].map((step, i) => (
+                  <Div key={step.key} className="flex gap-4 relative">
+                    <Div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-sm font-bold z-10">
+                      {i + 1}
+                    </Div>
+                    <Div className="pt-1">
+                      <Div className="font-medium text-sm">{step.title}</Div>
+                      <Div className="text-xs text-muted-foreground mt-0.5">
+                        {step.body}
+                      </Div>
+                    </Div>
+                  </Div>
+                ))}
               </Div>
             </Div>
           </CardContent>
@@ -230,18 +226,18 @@ export function ReferralPayoutContainer({
         </Card>
       </Div>
 
-      {/* Payout History - only shown when entries exist */}
-      {hasHistory && (
-        <Card>
-          <CardHeader className="pb-3">
-            <Div className="flex items-center justify-between">
-              <CardTitle className="text-base flex items-center gap-2">
-                <History className="h-4 w-4" />
-                {t("payout.widget.payoutHistory")}
-              </CardTitle>
-            </Div>
-          </CardHeader>
-          <CardContent className="p-0">
+      {/* Payout History - always shown */}
+      <Card>
+        <CardHeader className="pb-3">
+          <Div className="flex items-center justify-between">
+            <CardTitle className="text-base flex items-center gap-2">
+              <History className="h-4 w-4" />
+              {t("payout.widget.payoutHistory")}
+            </CardTitle>
+          </Div>
+        </CardHeader>
+        <CardContent className="p-0">
+          {hasHistory ? (
             <Div className="divide-y">
               {data?.payoutHistory.map((item) => (
                 <Div
@@ -251,8 +247,7 @@ export function ReferralPayoutContainer({
                   <Div className="flex-1 min-w-0">
                     <Div className="flex items-center gap-2 flex-wrap">
                       <Span className="font-medium text-sm tabular-nums">
-                        {item.amountCents.toLocaleString()}{" "}
-                        {t("payout.widget.credits")}
+                        {`$${(item.amountCents / 100).toFixed(2)}`}
                       </Span>
                       <Span className="text-xs text-muted-foreground">
                         {item.currency}
@@ -284,9 +279,14 @@ export function ReferralPayoutContainer({
                 </Div>
               ))}
             </Div>
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <Div className="flex flex-col items-center justify-center py-8 text-center gap-2 text-muted-foreground">
+              <Download className="h-5 w-5 opacity-30" />
+              <Div className="text-sm">{t("payout.widget.historyEmpty")}</Div>
+            </Div>
+          )}
+        </CardContent>
+      </Card>
     </Div>
   );
 }

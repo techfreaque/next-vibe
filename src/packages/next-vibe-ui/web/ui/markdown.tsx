@@ -522,7 +522,7 @@ export const Markdown = memo(function Markdown({
 });
 
 // Code block component with copy button
-const CodeBlock = memo(function CodeBlock({
+export const CodeBlock = memo(function CodeBlock({
   code,
   language,
 }: {

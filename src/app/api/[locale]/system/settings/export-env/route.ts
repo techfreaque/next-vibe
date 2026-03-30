@@ -11,6 +11,8 @@ import { ExportEnvRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ logger, t }) => ExportEnvRepository.exportProdEnv(logger, t),
+    handler: ({ logger, t }) => {
+      return ExportEnvRepository.exportProdEnv(logger, t);
+    },
   },
 });
