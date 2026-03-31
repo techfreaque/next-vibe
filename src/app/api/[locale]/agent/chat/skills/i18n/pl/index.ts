@@ -1062,10 +1062,10 @@ export const translations: typeof enTranslations = {
       "Pobierz wszystkie dostępne postaciy (domyślne + niestandardowe)",
     fields: {
       query: {
-        label: "Szukaj",
+        label: "Szukaj (opcjonalne)",
         description:
-          "Szukaj postaci po nazwie, opisie lub kategorii. Zwraca kompaktowe wyniki.",
-        placeholder: "np. badania, programowanie, statystyki",
+          "Filtruj postacie po słowie kluczowym. Słowa oddzielone spacją są wszystkie wymagane. Wyszukiwanie podciągów bez rozróżniania wielkości liter po nazwie, tagline, opisie, kategorii. Pozostaw puste aby wyświetlić wszystkie.",
+        placeholder: "np. badania, generowanie obrazów",
       },
       skillId: {
         label: "ID postaci",
@@ -1232,6 +1232,9 @@ export const translations: typeof enTranslations = {
       text: "Utwórz niestandardową postacię",
       loadingText: "Tworzenie postacię...",
     },
+    backButton: {
+      label: "Wstecz",
+    },
     container: {
       title: "Utwórz nową postacię",
       description: "Zdefiniuj nową niestandardową postacię",
@@ -1393,21 +1396,43 @@ export const translations: typeof enTranslations = {
       description:
         "Liczba tokenów wyzwalająca kompresję rozmowy. Null = domyślna globalna.",
     },
+    chatModel: {
+      label: "Model czatu",
+      placeholder: "Domyślny systemowy",
+    },
     voice: {
       label: "Głos",
       description: "Głos zamiany tekstu na mowę dla tej postaciy",
+      placeholder: "Domyślny systemowy",
     },
     sttModel: {
       label: "Model mowy na tekst",
       description: "Model używany do rozpoznawania mowy",
+      placeholder: "Domyślny systemowy",
     },
     visionBridgeModel: {
       label: "Model wizji",
       description: "Model używany do analizy obrazów",
+      placeholder: "Domyślny systemowy",
     },
     translationModel: {
       label: "Model tłumaczenia",
       description: "Model używany do tłumaczenia tekstu",
+    },
+    imageGenModel: {
+      label: "Model generowania obrazów",
+      description: "Model do generowania obrazów",
+      placeholder: "Domyślny systemowy",
+    },
+    musicGenModel: {
+      label: "Model generowania muzyki",
+      description: "Model do generowania muzyki",
+      placeholder: "Domyślny systemowy",
+    },
+    videoGenModel: {
+      label: "Model generowania wideo",
+      description: "Model do generowania wideo",
+      placeholder: "Domyślny systemowy",
     },
     defaultChatMode: {
       label: "Domyślny tryb czatu",

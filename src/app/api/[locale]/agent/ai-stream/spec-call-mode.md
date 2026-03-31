@@ -2,7 +2,7 @@
 
 ## Core Principle
 
-Call mode makes every model feel like a live voice conversation. The user speaks naturally, pauses are detected automatically, and the AI always responds with audio. Whether the active model is GPT-4o Realtime or DeepSeek, the interaction feels the same — the pipeline fills whatever gaps exist silently.
+Call mode makes every model feel like a live voice conversation. The user speaks naturally, pauses are detected automatically, and the AI always responds with audio. Whether the active model is GPT-4o Realtime or DeepSeek, the interaction feels the same - the pipeline fills whatever gaps exist silently.
 
 ---
 
@@ -27,11 +27,11 @@ silence:   RMS < threshold for 800ms after speech → seal chunk, send
 
 Tunable parameters (with sensible defaults):
 
-- `silenceThresholdMs: 800` — how long silence must hold before triggering send
-- `speechThresholdRms: 0.01` — amplitude above which input is considered speech
-- `minSpeechDurationMs: 300` — ignore sub-300ms utterances (cough, breath)
+- `silenceThresholdMs: 800` - how long silence must hold before triggering send
+- `speechThresholdRms: 0.01` - amplitude above which input is considered speech
+- `minSpeechDurationMs: 300` - ignore sub-300ms utterances (cough, breath)
 
-The client does not stream raw audio continuously to the server. It accumulates audio during speech, then sends the sealed chunk as a single request when VAD triggers — same as the existing manual voice recording flow, just automated.
+The client does not stream raw audio continuously to the server. It accumulates audio during speech, then sends the sealed chunk as a single request when VAD triggers - same as the existing manual voice recording flow, just automated.
 
 **Why client-side VAD**: consistent behavior regardless of network conditions. Avoids streaming silence. Reuses the existing audio recording infrastructure. Server-side VAD (used by GPT-4o Realtime and Gemini Live natively) is handled by those models' own APIs when in native mode.
 
@@ -74,9 +74,9 @@ Models: any LLM with `inputs: ["audio"]` but `outputs: ["text"]`
 sealed audio chunk → LLM → text response → TTS bridge → audio stream back
 ```
 
-No STT step — audio passed directly to the LLM.
+No STT step - audio passed directly to the LLM.
 
-### Assembled (text in, text out) — most models today
+### Assembled (text in, text out) - most models today
 
 Models: Claude, DeepSeek, Grok, most OpenRouter models
 
@@ -130,7 +130,7 @@ State is managed in the voice mode store (`stream/hooks/voice-mode/store.ts`), e
 
 ## Persistence
 
-Call mode threads persist by default — same as voice mode. Every turn is stored as a message with `inputModality: "audio"` and a text variant (transcript). The user can scroll back and read the full conversation, toggle to see transcripts, or re-play generated audio if the URL is still valid.
+Call mode threads persist by default - same as voice mode. Every turn is stored as a message with `inputModality: "audio"` and a text variant (transcript). The user can scroll back and read the full conversation, toggle to see transcripts, or re-play generated audio if the URL is still valid.
 
 ---
 
@@ -158,4 +158,4 @@ Call mode threads persist by default — same as voice mode. Every turn is store
 | `stream/hooks/send-message.ts`        | Auto-send on VAD trigger in call mode                                           |
 | `stream/widget/`                      | Call mode UI: ambient indicator (not a record button), turn state visualization |
 | `agent/chat/favorites/db.ts`          | `defaultChatMode` can be set to `"call"`                                        |
-| `agent/chat/skills/config.ts`         | `defaultChatMode` on skill — companion skills default to `"call"`               |
+| `agent/chat/skills/config.ts`         | `defaultChatMode` on skill - companion skills default to `"call"`               |

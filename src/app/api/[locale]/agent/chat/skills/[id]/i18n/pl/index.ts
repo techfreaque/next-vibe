@@ -9,6 +9,13 @@ export const translations: typeof enTranslations = {
     MALE: "Męski głos",
     FEMALE: "Damski głos",
   },
+  enums: {
+    ownershipType: {
+      system: "Wbudowana umiejętność",
+      user: "Stworzone przez Ciebie",
+      public: "Ze społeczności",
+    },
+  },
 
   get: {
     title: "Pobierz postacię",
@@ -132,6 +139,9 @@ export const translations: typeof enTranslations = {
         description: "Wystąpił konflikt z bieżącym stanem",
       },
     },
+    voiceModelSelection: {
+      systemDefault: "Domyślny systemu",
+    },
     success: {
       title: "Sukces",
       description: "Postać pobrana pomyślnie",
@@ -221,21 +231,43 @@ export const translations: typeof enTranslations = {
       description:
         "Włącz, aby udostępnić swoją postać społeczności. Po wyłączeniu postać pozostaje prywatna i widoczna tylko dla Ciebie.",
     },
+    chatModel: {
+      label: "Model czatu",
+      placeholder: "Domyślny systemowy",
+    },
     voice: {
       label: "Głos",
       description: "Głos tekstu na mowę dla tej postaciy",
+      placeholder: "Domyślny systemu",
     },
     sttModel: {
       label: "Model mowy na tekst",
       description: "Model używany do rozpoznawania mowy",
+      placeholder: "Domyślny systemu",
     },
     visionBridgeModel: {
       label: "Model wizji",
       description: "Model używany do analizy obrazów",
+      placeholder: "Domyślny systemu",
     },
     translationModel: {
       label: "Model tłumaczenia",
       description: "Model używany do tłumaczenia tekstu",
+    },
+    imageGenModel: {
+      label: "Model generowania obrazów",
+      description: "Model do generowania obrazów",
+      placeholder: "Domyślny systemu",
+    },
+    musicGenModel: {
+      label: "Model generowania muzyki",
+      description: "Model do generowania muzyki",
+      placeholder: "Domyślny systemu",
+    },
+    videoGenModel: {
+      label: "Model generowania wideo",
+      description: "Model do generowania wideo",
+      placeholder: "Domyślny systemu",
     },
     defaultChatMode: {
       label: "Domyślny tryb czatu",

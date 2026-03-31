@@ -130,5 +130,12 @@ export const translations: typeof enTranslations = {
       title: "Sukces",
       description: "Folder zaktualizowany pomyślnie",
     },
+    backButton: {
+      label: "Wstecz",
+    },
+    submitButton: {
+      label: "Zaktualizuj",
+      loadingText: "Aktualizuję...",
+    },
   },
 };

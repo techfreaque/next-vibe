@@ -52,6 +52,8 @@ export class AiStreamRunRepository {
   private static stripThinkTags(content: string): string {
     let result = content.replace(/<think>[\s\S]*?<\/think>/gi, "");
     result = result.replace(/<think>[\s\S]*$/i, "");
+    // Strip orphaned closing tags left when opening tag was in a prior DB chunk
+    result = result.replace(/<\/think>/gi, "");
     return result.trim();
   }
 
@@ -171,6 +173,9 @@ export class AiStreamRunRepository {
               modelId: undefined,
               favoriteId: undefined,
               headless: undefined,
+              imageGenModelId: undefined,
+              musicGenModelId: undefined,
+              videoGenModelId: undefined,
               waitingForRemoteResult: undefined,
               pendingEscalatedTaskId: undefined,
               cancelPendingStreamTimer: undefined,

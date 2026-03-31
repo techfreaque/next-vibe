@@ -8,6 +8,7 @@ import { z } from "zod";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   objectField,
   requestField,
@@ -49,6 +50,9 @@ const { GET } = createEndpoint({
     }
     return undefined;
   },
+
+  // Credit cost - use calculated price from centralized pricing
+  credits: FEATURE_COSTS.KAGI_SEARCH, // 1.95 credits per search
   category: "endpointCategories.ai",
   tags: ["tags.search" as const, "tags.web" as const, "tags.ai" as const],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
@@ -67,9 +71,6 @@ const { GET } = createEndpoint({
       autoSubmit: false, // Don't auto-submit, wait for user to press search
     },
   },
-
-  // Credit cost - use calculated price from centralized pricing
-  credits: FEATURE_COSTS.KAGI_SEARCH, // 1.95 credits per search
   icon: "search",
 
   fields: customWidgetObject({
@@ -85,6 +86,13 @@ const { GET } = createEndpoint({
         placeholder: "get.fields.query.placeholder" as const,
         columns: 12,
         schema: z.string().min(1).max(400),
+      }),
+
+      backButton: backButton(scopedTranslation, {
+        label: "get.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
       }),
 
       output: responseField(scopedTranslation, {

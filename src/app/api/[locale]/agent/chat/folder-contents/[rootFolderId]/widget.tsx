@@ -57,7 +57,7 @@ import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import { success } from "next-vibe/shared/types/response.schema";
 import { cn } from "next-vibe/shared/utils";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   chatColors,
@@ -84,6 +84,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import {
   scopedTranslation as chatScopedTranslation,
@@ -99,10 +100,7 @@ import { FolderPermissionsDialog } from "../../folders/[rootFolderId]/widget/fol
 import renameDefinitions from "../../folders/subfolders/[subFolderId]/rename/definition";
 import { useChatBootContext } from "../../hooks/context";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
-import { buildMessagesChannel } from "../../threads/[threadId]/messages/channel";
-import type { StreamingStateChangedEventData } from "../../threads/[threadId]/messages/events";
 import { scopedTranslation as threadsScopedTranslation } from "../../threads/i18n";
-import { subscribeToChannel } from "../../../../system/unified-interface/websocket/client";
 import type {
   FolderContentsItem,
   FolderContentsResponseOutput,
@@ -204,21 +202,9 @@ function ThreadRow({
   const isActive = activeThreadId === item.id;
   const isIncognito = item.rootFolderId === DefaultFolderId.INCOGNITO;
 
-  // Track streaming state locally so WS events from other tabs update the indicator.
-  // Initialized from server-side value; updated by STREAMING_STATE_CHANGED WS events.
-  const [wsStreamingState, setWsStreamingState] = useState(item.streamingState);
-  useEffect(() => {
-    setWsStreamingState(item.streamingState);
-  }, [item.streamingState]);
-  useEffect(() => {
-    return subscribeToChannel<StreamingStateChangedEventData>(
-      buildMessagesChannel(item.id),
-      "streaming-state-changed",
-      (data) => {
-        setWsStreamingState(data.state);
-      },
-    );
-  }, [item.id]);
+  const navIsStreaming = useChatNavigationStore((s) => s.isStreaming);
+  const isThreadStreaming =
+    item.streamingState !== "idle" || (isActive && navIsStreaming);
 
   const handleThreadClick = (e: DivMouseEvent): void => {
     if (isEditing) {
@@ -582,7 +568,7 @@ function ThreadRow({
             </DropdownMenu>
           )}
 
-        {wsStreamingState !== null && wsStreamingState !== "idle" && (
+        {isThreadStreaming && (
           /* eslint-disable i18next/no-literal-string */
           <Div className="flex items-center gap-0.5 shrink-0">
             <Div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:0ms]" />
@@ -1323,6 +1309,7 @@ interface CustomWidgetProps {
 export function FolderContentsWidget({
   field,
 }: CustomWidgetProps): React.JSX.Element {
+  const children = field.children;
   // field.value is undefined while loading, and { items: [] } when loaded with no results.
   // Never show an empty state while loading.
   const fieldItems = field.value?.items;
@@ -1435,6 +1422,7 @@ export function FolderContentsWidget({
 
   return (
     <Div>
+      <NavigateButtonWidget field={children.backButton} />
       <ItemSection
         label={t("widget.folderList.pinned")}
         items={grouped.pinned}

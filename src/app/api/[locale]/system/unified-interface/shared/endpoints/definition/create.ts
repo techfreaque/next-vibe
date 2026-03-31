@@ -47,6 +47,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+
 import type { EventSchemas } from "../../../websocket/types";
 import type { EndpointLogger } from "../../logger/endpoint";
 
@@ -275,6 +277,36 @@ export interface ApiEndpoint<
    * Credit cost for this endpoint (0 = free, undefined = free)
    */
   readonly credits?: number;
+
+  /**
+   * Optional function that computes the actual credit cost from the request/response data.
+   * Called on every render - takes precedence over the static `credits` field.
+   * Return undefined to fall back to `credits` or `toolCall.creditsUsed`.
+   * Follows the same pattern as `dynamicTitle`.
+   */
+  readonly dynamicCredits?: (data: {
+    request?: Partial<InferRequestInput<TFields>>;
+    response?: Partial<InferResponseInput<TFields>>;
+  }) => number | undefined;
+
+  /**
+   * Optional function that patches stream context values onto request fields before execution.
+   * Called by tools-loader when the tool is invoked by the AI stream.
+   * Returned fields are merged into the request args, overriding any AI-supplied values.
+   * Use this to inject resolved model IDs, settings, or context-derived values as request fields
+   * so they appear in the tool call display and drive repository logic — not as opaque side-effects.
+   */
+  readonly streamContextPatch?: (
+    context: ToolExecutionContext,
+  ) => Partial<InferRequestInput<TFields>>;
+
+  /**
+   * Whether the tool call block starts expanded in the chat UI.
+   * Defaults to false (collapsed). Set to true for tools whose output
+   * should be immediately visible (e.g. image/music/video generation).
+   */
+  readonly defaultExpanded?: boolean;
+
   /**
    * Whether this tool requires confirmation before execution when called by AI
    * Defaults to false (no confirmation required)
@@ -644,6 +676,9 @@ export function createEndpoint<
     aliases: config.aliases,
     cli: config.cli,
     credits: config.credits,
+    dynamicCredits: config.dynamicCredits,
+    streamContextPatch: config.streamContextPatch,
+    defaultExpanded: config.defaultExpanded,
     icon: config.icon,
     events: config.events,
     options: config.options,

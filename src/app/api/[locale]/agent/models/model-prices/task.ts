@@ -1,7 +1,7 @@
 /**
  * Unified Model Prices Update Task
  * Fetches live prices from ALL provider APIs and updates models.ts.
- * Runs weekly — replaces the separate media-prices and openrouter tasks.
+ * Runs weekly - replaces the separate media-prices and openrouter tasks.
  */
 
 import "server-only";

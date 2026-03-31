@@ -326,6 +326,8 @@ export const translations = {
         copy: "Copy",
         copied: "Copied",
         download: "Download",
+        showPrompt: "Show prompt",
+        hidePrompt: "Hide prompt",
       },
     },
     messages: {

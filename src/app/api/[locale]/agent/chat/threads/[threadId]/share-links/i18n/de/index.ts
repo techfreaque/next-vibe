@@ -125,6 +125,9 @@ export const translations: typeof enTranslations = {
         description: "Diese Ressource wurde geändert",
       },
     },
+    backButton: {
+      label: "Zurück",
+    },
     success: {
       title: "Erfolg",
       description: "Teilen-Links erfolgreich abgerufen",
@@ -198,6 +201,13 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Diese Ressource wurde geändert",
       },
+    },
+    backButton: {
+      label: "Zurück",
+    },
+    submitButton: {
+      label: "Link erstellen",
+      loadingText: "Erstellen…",
     },
     success: {
       title: "Erfolg",
@@ -278,6 +288,13 @@ export const translations: typeof enTranslations = {
         description: "Diese Ressource wurde geändert",
       },
     },
+    backButton: {
+      label: "Zurück",
+    },
+    submitButton: {
+      label: "Änderungen speichern",
+      loadingText: "Speichern…",
+    },
     success: {
       title: "Erfolg",
       description: "Teilen-Link erfolgreich aktualisiert",
@@ -337,6 +354,13 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Diese Ressource wurde geändert",
       },
+    },
+    backButton: {
+      label: "Zurück",
+    },
+    submitButton: {
+      label: "Link widerrufen",
+      loadingText: "Widerrufen…",
     },
     success: {
       title: "Erfolg",

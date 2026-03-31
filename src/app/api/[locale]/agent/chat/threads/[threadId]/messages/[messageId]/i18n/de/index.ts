@@ -89,6 +89,9 @@ export const translations: typeof enTranslations = {
         description: "Die angegebene Nachricht existiert nicht",
       },
     },
+    backButton: {
+      label: "Zurück",
+    },
     success: {
       title: "Erfolg",
       description: "Nachricht erfolgreich abgerufen",
@@ -194,6 +197,13 @@ export const translations: typeof enTranslations = {
         description: "Die angegebene Nachricht existiert nicht",
       },
     },
+    backButton: {
+      label: "Zurück",
+    },
+    submitButton: {
+      label: "Änderungen speichern",
+      loadingText: "Speichern…",
+    },
     success: {
       title: "Erfolg",
       description: "Nachricht erfolgreich aktualisiert",
@@ -211,6 +221,10 @@ export const translations: typeof enTranslations = {
       "Möchten Sie diese Nachricht wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
     backButton: {
       label: "Abbrechen",
+    },
+    submitButton: {
+      label: "Löschen",
+      loadingText: "Löschen…",
     },
     deleteButton: {
       label: "Löschen",

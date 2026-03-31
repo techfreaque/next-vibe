@@ -53,6 +53,7 @@ import {
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { useTranslation } from "@/i18n/core/client";
 
 import type definition from "./definition";
@@ -93,6 +94,7 @@ export function CreditsPurchaseContainer({
   const user = useWidgetUser();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
+  const children = field.children;
 
   const products = productsRepository.getProducts(locale);
   const packProduct = products[ProductIds.CREDIT_PACK];
@@ -280,15 +282,18 @@ export function CreditsPurchaseContainer({
                 )}
               </Div>
 
-              {/* Buy Button - opens provider modal */}
-              <Button
-                type="button"
-                className="w-full"
-                size="lg"
-                onClick={handleBuy}
-              >
-                {t("post.submit.text")}
-              </Button>
+              {/* Navigation + Buy Button */}
+              <Div className="flex gap-2">
+                <NavigateButtonWidget field={children.backButton} />
+                <Button
+                  type="button"
+                  className="flex-1"
+                  size="lg"
+                  onClick={handleBuy}
+                >
+                  {t("post.submit.text")}
+                </Button>
+              </Div>
 
               {/* Response - Checkout Link (fallback if redirect doesn't work) */}
               {field.value?.checkoutUrl && (

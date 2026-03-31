@@ -1,21 +1,21 @@
 "use client";
 
 import { Br } from "next-vibe-ui/ui/br";
+import type { ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { Bot } from "next-vibe-ui/ui/icons/Bot";
-import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { Code } from "next-vibe-ui/ui/icons/Code";
 import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { Key } from "next-vibe-ui/ui/icons/Key";
 import { Layers } from "next-vibe-ui/ui/icons/Layers";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import type { ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
@@ -88,7 +88,7 @@ const NEXTVIBE_GRID: CSSProperties = {
   pointerEvents: "none",
 };
 
-/** Shared panel wrapper — centers content vertically & horizontally */
+/** Shared panel wrapper - centers content vertically & horizontally */
 function Panel({
   bg,
   glow,
@@ -200,7 +200,7 @@ export function SplitHero({
 
   return (
     <Div className="relative flex flex-col md:flex-row">
-      {/* Desktop vertical dividers — positioned at 1/3 and 2/3 */}
+      {/* Desktop vertical dividers - positioned at 1/3 and 2/3 */}
       <Div className="absolute inset-y-0 left-1/3 hidden md:flex -translate-x-1/2">
         <VerticalDivider label={orLabel} />
       </Div>
@@ -271,7 +271,7 @@ interface PanelContentProps {
   totalModelCount?: number;
 }
 
-/** Shared inner content layout — always centered within its panel */
+/** Shared inner content layout - always centered within its panel */
 function PanelInner({ children }: { children: React.ReactNode }): JSX.Element {
   return (
     <Div className="relative z-10 w-full px-8 md:px-10 lg:px-14 py-14 md:py-20 flex flex-col items-center text-center">

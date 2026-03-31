@@ -39,6 +39,7 @@ export const MUSIC_MODEL_IDS = [
   ModelId.MUSICGEN_STEREO,
   ModelId.STABLE_AUDIO,
   ModelId.UDIO_V2,
+  ModelId.MODELSLAB_MUSIC_GEN,
 ] as const;
 
 export type MusicModelId = (typeof MUSIC_MODEL_IDS)[number];

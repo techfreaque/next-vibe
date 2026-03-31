@@ -133,6 +133,9 @@ export async function sendTestRequest<
         callerCallbackMode: undefined,
         onEscalatedTaskCancel: undefined,
         escalateToTask: undefined,
+        imageGenModelId: undefined,
+        musicGenModelId: undefined,
+        videoGenModelId: undefined,
       },
     });
 

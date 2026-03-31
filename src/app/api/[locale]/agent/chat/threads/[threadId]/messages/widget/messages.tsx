@@ -38,6 +38,9 @@ import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import characterDefinitions from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import type { TtsModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -70,6 +73,19 @@ import { LinearMessageView } from "./linear-view/view";
 import { DebugLinearMessageView } from "./linear-view/view-debug";
 import { groupMessagesBySequence } from "./message-grouping";
 import { ThreadedMessage } from "./threaded-view/view";
+
+/**
+ * Resolve a ModelSelectionSimple voice selection to a TtsModelId.
+ * Returns the manualModelId for MANUAL selections, undefined otherwise.
+ */
+function resolveVoiceId(
+  sel: ModelSelectionSimple | null | undefined,
+): TtsModelId | undefined {
+  if (sel?.selectionType === ModelSelectionType.MANUAL) {
+    return sel.manualModelId as TtsModelId;
+  }
+  return undefined;
+}
 
 /**
  * Find compaction point indices in a message path.
@@ -258,7 +274,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       availableTools: effectiveSettings.availableTools,
       pinnedTools: effectiveSettings.pinnedTools,
       ttsAutoplay: effectiveSettings.ttsAutoplay,
-      voiceId: effectiveSettings.voiceId,
+      voiceModelSelection: effectiveSettings.voiceModelSelection,
     },
   });
 
@@ -1130,7 +1146,9 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                     user={user}
                     ttsAutoplay={effectiveSettings.ttsAutoplay}
                     deductCredits={deductCredits}
-                    voiceId={effectiveSettings.voiceId}
+                    voiceId={resolveVoiceId(
+                      effectiveSettings.voiceModelSelection,
+                    )}
                   />
                 </ErrorBoundary>
               ))
@@ -1249,7 +1267,9 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                           isLoadingNewerHistory={isLoadingNewerHistory}
                           onVoteMessage={voteMessage}
                           ttsAutoplay={effectiveSettings.ttsAutoplay}
-                          voiceId={effectiveSettings.voiceId}
+                          voiceId={resolveVoiceId(
+                            effectiveSettings.voiceModelSelection,
+                          )}
                         />
                       ) : (
                         <LinearMessageView
@@ -1285,7 +1305,9 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                           isLoadingNewerHistory={isLoadingNewerHistory}
                           onVoteMessage={voteMessage}
                           ttsAutoplay={effectiveSettings.ttsAutoplay}
-                          voiceId={effectiveSettings.voiceId}
+                          voiceId={resolveVoiceId(
+                            effectiveSettings.voiceModelSelection,
+                          )}
                         />
                       )}
                     </ErrorBoundary>

@@ -688,7 +688,7 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
                 {t(`unified.insight`)}
               </P>
               <CodeBlock terminalLabel="analytics/indicators/ema/repository.ts">
-                {`// Returns ResponseType<T> — never throws
+                {`// Returns ResponseType<T> - never throws
 export async function computeEmaHandler(
   data: { source: TimeSeries; period: number },
 ): Promise<ResponseType<{ result: TimeSeries }>> {

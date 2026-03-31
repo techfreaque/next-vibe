@@ -75,5 +75,12 @@ export const translations: typeof enTranslations = {
       title: "Erfolg",
       description: "Ordner erfolgreich umbenannt",
     },
+    backButton: {
+      label: "Zurück",
+    },
+    submitButton: {
+      label: "Umbenennen",
+      loadingText: "Umbenennen...",
+    },
   },
 };

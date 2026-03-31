@@ -329,6 +329,8 @@ export const translations: typeof enTranslations = {
         copy: "Kopiuj",
         copied: "Skopiowano",
         download: "Pobierz",
+        showPrompt: "Pokaż prompt",
+        hidePrompt: "Ukryj prompt",
       },
     },
     messages: {

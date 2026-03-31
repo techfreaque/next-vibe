@@ -133,7 +133,7 @@ export const translations = {
         earnings: "Earnings",
         inactive: "This referral code is inactive",
         conversionHint:
-          "Every {{examplePrice}}/mo subscriber earns you {{exampleEarning}}/mo — recurring",
+          "Every {{examplePrice}}/mo subscriber earns you {{exampleEarning}}/mo - recurring",
       },
     },
   },
@@ -154,7 +154,7 @@ export const translations = {
     },
     widget: {
       emptyMessage:
-        "No activity yet — share your referral link to start earning",
+        "No activity yet - share your referral link to start earning",
     },
     fields: {
       totalSignups: "Total Signups",

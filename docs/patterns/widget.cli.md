@@ -184,14 +184,14 @@ const output =
       : renderListCli(value);
 ```
 
-**MCP list format** — one line per item, pipe-separated fields:
+**MCP list format** - one line per item, pipe-separated fields:
 
 ```
 SkillName - tagline • modelInfo • provider
 Page 1/3 - use page=2 for next
 ```
 
-**CLI list format** — aligned columns, chalk colors, grouped by section:
+**CLI list format** - aligned columns, chalk colors, grouped by section:
 
 ```
   Skills

@@ -11,6 +11,7 @@ import { type JSX } from "react";
 import { useWidgetForm } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import type definition from "./definition";
@@ -34,14 +35,9 @@ export function FolderCreateContainer({
 
       <IconFieldWidget field={children.icon} fieldName="icon" />
 
+      <NavigateButtonWidget field={children.backButton} />
       <SubmitButtonWidget<typeof definition.POST>
-        field={{
-          text: "submitButton.label",
-          loadingText: "submitButton.loadingText",
-          icon: "folder-plus",
-          variant: "primary",
-          className: "w-full",
-        }}
+        field={children.submitButton}
       />
     </Div>
   );

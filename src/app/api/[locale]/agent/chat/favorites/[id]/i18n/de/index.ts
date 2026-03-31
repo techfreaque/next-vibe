@@ -206,21 +206,43 @@ export const translations: typeof enTranslations = {
     customName: {
       label: "Benutzerdefinierter Name",
     },
+    chatModel: {
+      label: "Chat-Modell",
+      placeholder: "Von Fertigkeit übernehmen",
+    },
     voice: {
       label: "KI-Stimme",
       description: "Wählen Sie die Stimme für Ihren KI-Assistenten",
+      placeholder: "Vom Charakter erben",
     },
     sttModel: {
       label: "Sprache-zu-Text-Modell",
       description: "Modell für die Spracherkennung",
+      placeholder: "Vom Charakter erben",
     },
     visionBridgeModel: {
       label: "Vision-Modell",
       description: "Modell für die Bildanalyse",
+      placeholder: "Vom Charakter erben",
     },
     translationModel: {
       label: "Übersetzungsmodell",
       description: "Modell für die Textübersetzung",
+    },
+    imageGenModel: {
+      label: "Bildgenerierungsmodell",
+      description: "Modell zur Bilderstellung",
+      placeholder: "Vom Charakter erben",
+    },
+    musicGenModel: {
+      label: "Musikgenerierungsmodell",
+      description: "Modell zur Musikerstellung",
+      placeholder: "Vom Charakter erben",
+    },
+    videoGenModel: {
+      label: "Video-Generierungsmodell",
+      description: "Modell zur Videoerstellung",
+      placeholder: "Vom Charakter erben",
     },
     defaultChatMode: {
       label: "Standard-Chat-Modus",
@@ -331,6 +353,12 @@ export const translations: typeof enTranslations = {
       label: "Gesperrte Tools",
       description:
         "Bestimmte Tools für diesen Slot sperren – zusätzlich zur Liste des Skills. Diese Tools können unabhängig von anderen Einstellungen nicht aufgerufen werden.",
+      clearAll: "Alle löschen",
+      noToolsFound: "Keine Tools gefunden",
+      blockedNote:
+        "Gesperrte Tools können unabhängig von anderen Einstellungen nicht aufgerufen werden.",
+      searchPlaceholder: "Tools suchen...",
+      blocked: "gesperrt",
     },
     promptAppend: {
       label: "Prompt-Anhang",

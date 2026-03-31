@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
     title: "Eine Definition.",
     titleAccent: "Dreizehn Plattformn.",
     subtitle:
-      "next-vibe macht aus einer einzigen TypeScript-Definition dreizehn Plattformn gleichzeitig — Web-Formular, CLI-Befehl, MCP-Tool, Mobile-Screen, Cron-Job, WebSocket, Admin-Panel und mehr. Vollständig typsicher, ohne Drift, ohne Wiederholung.",
+      "next-vibe macht aus einer einzigen TypeScript-Definition dreizehn Plattformn gleichzeitig - Web-Formular, CLI-Befehl, MCP-Tool, Mobile-Screen, Cron-Job, WebSocket, Admin-Panel und mehr. Vollständig typsicher, ohne Drift, ohne Wiederholung.",
     ctaGithub: "Auf GitHub staren",
     ctaDocs: "Pattern-Dokumentation lesen",
     stat1Label: "typed endpoints",
@@ -32,23 +32,23 @@ export const translations: typeof enTranslations = {
     eyebrow: "Das Problem",
     title: "Du hast dasselbe dreizehnmal gebaut.",
     subtitle:
-      "Jedes Feature braucht ein Web-Formular, CLI-Befehl, MCP-Tool, Mobile-Screen, Cron-Job, WebSocket-Handler, Admin-Panel und mehr. Gleiche Validierung, gleiche i18n, gleiche Fehlerbehandlung — nur anders verkleidet. Jedes Mal.",
+      "Jedes Feature braucht ein Web-Formular, CLI-Befehl, MCP-Tool, Mobile-Screen, Cron-Job, WebSocket-Handler, Admin-Panel und mehr. Gleiche Validierung, gleiche i18n, gleiche Fehlerbehandlung - nur anders verkleidet. Jedes Mal.",
     callout: "next-vibe baut alle dreizehn aus einer Datei.",
   },
   pattern: {
     eyebrow: "Das Muster",
     title: "Zwei Dateien erforderlich. Jede Plattform.",
     subtitle:
-      "Jedes Feature lebt in einem Ordner. Nur definition.ts und route.ts sind Pflicht — alles andere ist optional.",
-    definitionTitle: "definition.ts — der Vertrag",
+      "Jedes Feature lebt in einem Ordner. Nur definition.ts und route.ts sind Pflicht - alles andere ist optional.",
+    definitionTitle: "definition.ts - der Vertrag",
     definitionBody:
-      "Felder, Zod-Schemas, Labels, Fehlertypen und Beispiele einmal deklarieren. Diese Datei ist die einzige Quelle der Wahrheit — das Framework liest sie zur Laufzeit auf jeder Plattform.",
-    routeTitle: "route.ts — die Logik",
+      "Felder, Zod-Schemas, Labels, Fehlertypen und Beispiele einmal deklarieren. Diese Datei ist die einzige Quelle der Wahrheit - das Framework liest sie zur Laufzeit auf jeder Plattform.",
+    routeTitle: "repository.ts - die Logik",
     routeBody:
-      "Definition mit Handler verbinden. Validierung, Auth, Logging und Registrierung auf allen Plattformn laufen automatisch. Business-Logik lebt direkt hier — keine separate Datei nötig.",
-    widgetTitle: "widget.tsx — die UI (optional)",
+      "Business-Logik lebt hier - DB-Abfragen, Auth-Prüfungen, Fehlerbehandlung mit success()/fail(). Die route.ts ist nur ein dünner Delegator; Validierung, Logging und Plattform-Registrierung laufen automatisch.",
+    widgetTitle: "widget.tsx - die UI (optional)",
     widgetBody:
-      "Ohne Widget rendert das Framework deine Felder automatisch auf jeder Plattform. Füge widget.tsx hinzu, um vollständige Kontrolle über das Aussehen im Web und auf Native zu haben — dieselbe Komponente rendert in Admin-Panels, eingebetteten Widgets und Mobile-Screens.",
+      "Ohne Widget rendert das Framework deine Felder automatisch auf jeder Plattform. Füge widget.tsx hinzu, um vollständige Kontrolle über das Aussehen im Web und auf Native zu haben - dieselbe Komponente rendert in Admin-Panels, eingebetteten Widgets und Mobile-Screens.",
     deleteLine:
       "Ordner löschen. Das Feature verschwindet sofort von jeder Plattform.",
   },
@@ -64,7 +64,7 @@ export const translations: typeof enTranslations = {
       },
       reactUi: {
         label: "React UI",
-        description: "Automatisch generiertes Formular — kein JSX nötig",
+        description: "Automatisch generiertes Formular - kein JSX nötig",
       },
       cli: {
         label: "CLI",
@@ -97,7 +97,7 @@ export const translations: typeof enTranslations = {
       },
       adminPanel: {
         label: "Admin-Panel",
-        description: "Automatisch generiertes Admin-UI — kein dedizierter Code",
+        description: "Automatisch generiertes Admin-UI - kein dedizierter Code",
       },
       vibeFrame: {
         label: "VibeFrame-Widget",
@@ -110,7 +110,7 @@ export const translations: typeof enTranslations = {
       vibeBoard: {
         label: "Vibe Sense-Knoten",
         description:
-          "Knoten in einem Live-Datenflussgraphen — derselbe Endpoint",
+          "Knoten in einem Live-Datenflussgraphen - derselbe Endpoint",
       },
     },
   },
@@ -118,7 +118,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "TypeScript-Suprematie",
     title: "Kein any. Kein unknown. Kein throw.",
     subtitle:
-      "Typen müssen vollständig übereinstimmen — keine Ausnahmen. Das ist keine Stilpräferenz. Es ist eine Strukturregel, zur Build-Zeit durch vibe check durchgesetzt.",
+      "Typen müssen vollständig übereinstimmen - keine Ausnahmen. Das ist keine Stilpräferenz. Es ist eine Strukturregel, zur Build-Zeit durch vibe check durchgesetzt.",
     patterns: {
       any: {
         name: "kein any",
@@ -170,17 +170,17 @@ export const translations: typeof enTranslations = {
     step3: {
       label: "Als Admin einloggen",
       description:
-        'App öffnen und "Als Admin einloggen" klicken — der Setup-Assistent führt durch API-Keys und Admin-Passwort.',
+        'App öffnen und "Als Admin einloggen" klicken - der Setup-Assistent führt durch API-Keys und Admin-Passwort.',
     },
     step4: {
       label: "KI fragen",
       description:
-        "unbottled.ai-Chat oder Claude Code öffnen und das gewünschte Feature beschreiben. Die KI schreibt alle Dateien — Definition, Route, Widget, i18n — und führt vibe check automatisch aus.",
+        "unbottled.ai-Chat oder Claude Code öffnen und das gewünschte Feature beschreiben. Die KI schreibt alle Dateien - Definition, Route, Widget, i18n - und führt vibe check automatisch aus.",
     },
     step5: {
       label: "Deployen",
       description:
-        "vibe rebuild aktualisiert die Produktion mit Zero Downtime. Es prüft, baut neu und startet hot-restart — kein manuelles Bearbeiten, kein Ausfall.",
+        "vibe rebuild aktualisiert die Produktion mit Zero Downtime. Es prüft, baut neu und startet hot-restart - kein manuelles Bearbeiten, kein Ausfall.",
     },
     docsLink: "Pattern-Dokumentation",
     githubLink: "github.com/techfreaque/next-vibe",

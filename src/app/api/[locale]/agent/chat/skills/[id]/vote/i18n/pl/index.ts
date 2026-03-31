@@ -54,6 +54,9 @@ export const translations: typeof enTranslations = {
       voteCount: { content: "Liczba głosów" },
       trustLevel: { content: "Poziom zaufania" },
     },
+    backButton: {
+      label: "Wstecz",
+    },
     button: {
       vote: "Głosuj za",
       unvote: "Usuń głos",

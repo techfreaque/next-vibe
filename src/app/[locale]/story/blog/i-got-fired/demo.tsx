@@ -117,7 +117,7 @@ function buildEmbedGroup(): MessageGroup {
     "embed-reasoning",
     tid,
     seq,
-    "I'll call the contact form endpoint on unbottled.ai. The response includes full widget data — the same UI renders here via the platform's widget system.",
+    "I'll call the contact form endpoint on unbottled.ai. The response includes full widget data - the same UI renders here via the platform's widget system.",
   );
 
   const tool = mkToolMsg(
@@ -136,7 +136,7 @@ function buildEmbedGroup(): MessageGroup {
       widgetData: {
         fields: ["name", "email", "subject", "message"],
         submitLabel: "Send message",
-        successMessage: "Thanks — we'll get back to you within 24h.",
+        successMessage: "Thanks - we'll get back to you within 24h.",
       },
       renderedBy: "EndpointsPage",
     },
@@ -147,7 +147,7 @@ function buildEmbedGroup(): MessageGroup {
     "embed-response",
     tid,
     seq,
-    "Contact form is live. The widget renders directly — same definition, same UI, zero extra work. Expand the tool call to see the widget data.",
+    "Contact form is live. The widget renders directly - same definition, same UI, zero extra work. Expand the tool call to see the widget data.",
     { promptTokens: 320, completionTokens: 42 },
   );
 
@@ -158,7 +158,7 @@ function buildEmbedGroup(): MessageGroup {
   };
 }
 
-// Demo 2: federated — Hermes calls a Vibe Sense graph from a remote analytics instance
+// Demo 2: federated - Hermes calls a Vibe Sense graph from a remote analytics instance
 function buildFederatedGroup(): MessageGroup {
   const tid = "demo-blog-federated";
   const seq = "federated-seq";
@@ -167,7 +167,7 @@ function buildFederatedGroup(): MessageGroup {
     "federated-reasoning",
     tid,
     seq,
-    "Pulling the lead funnel graph from the analytics instance. Different server, different database — same tool interface.",
+    "Pulling the lead funnel graph from the analytics instance. Different server, different database - same tool interface.",
   );
 
   const tool = mkToolMsg(
@@ -183,7 +183,7 @@ function buildFederatedGroup(): MessageGroup {
     },
     {
       graphId: "lead-funnel-q1",
-      title: "Lead funnel — Q1 2026",
+      title: "Lead funnel - Q1 2026",
       nodes: 8,
       edges: 11,
       liveData: true,
@@ -198,7 +198,7 @@ function buildFederatedGroup(): MessageGroup {
     "federated-response",
     tid,
     seq,
-    "Graph loaded from the analytics instance. The widget renders the live data — the tool runs on its server, the UI appears here. No shared state between instances.",
+    "Graph loaded from the analytics instance. The widget renders the live data - the tool runs on its server, the UI appears here. No shared state between instances.",
     { promptTokens: 440, completionTokens: 55 },
   );
 
@@ -209,7 +209,7 @@ function buildFederatedGroup(): MessageGroup {
   };
 }
 
-// Demo 3: full remote execution chain — Hermes calls Thea, Thea processes, result + widget back
+// Demo 3: full remote execution chain - Hermes calls Thea, Thea processes, result + widget back
 function buildRemoteGroup(): MessageGroup {
   const tid = "demo-blog-remote";
   const seq = "remote-seq";
@@ -218,7 +218,7 @@ function buildRemoteGroup(): MessageGroup {
     "remote-reasoning",
     tid,
     seq,
-    "Calling pulse-execute on Thea's instance to check the task health state. She owns the task runner — I route the call to her.",
+    "Calling pulse-execute on Thea's instance to check the task health state. She owns the task runner - I route the call to her.",
   );
 
   const remoteTool = mkToolMsg(
@@ -240,7 +240,7 @@ function buildRemoteGroup(): MessageGroup {
         {
           id: "task-price-sync-008",
           name: "model-price-sync",
-          lastError: "OpenRouter API returned 429 — rate limited",
+          lastError: "OpenRouter API returned 429 - rate limited",
           failedAt: "2026-03-29T09:01:44Z",
         },
       ],
@@ -254,7 +254,7 @@ function buildRemoteGroup(): MessageGroup {
     "remote-response",
     tid,
     seq,
-    "Thea's pulse ran on her instance. One task is rate-limited on model price sync. I can see her full widget output — expand the tool call. The server that owns the tool owns the UI.",
+    "Thea's pulse ran on her instance. One task is rate-limited on model price sync. I can see her full widget output - expand the tool call. The server that owns the tool owns the UI.",
     { promptTokens: 680, completionTokens: 72 },
   );
 
@@ -382,7 +382,7 @@ export function VibeFrameDemo({
                 sendMessage={null}
                 deductCredits={null}
                 ttsAutoplay={false}
-                ttsVoice={undefined}
+                voiceId={undefined}
                 onVote={null}
                 userVote={null}
                 voteScore={0}

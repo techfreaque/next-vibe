@@ -13,6 +13,11 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
+import type {
+  ImageGenModelId,
+  MusicGenModelId,
+  VideoGenModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -40,6 +45,7 @@ import {
 } from "./core/wake-up-channel";
 import { serializeError } from "./error-utils";
 import { CompactingHandler } from "./handlers/compacting-handler";
+import { GapFillExecutor } from "./handlers/gap-fill-executor";
 import { InitialEventsHandler } from "./handlers/initial-events-handler";
 import { MessageContextBuilder } from "./handlers/message-context-builder";
 import { StreamErrorCatchHandler } from "./handlers/stream-error-catch-handler";
@@ -98,6 +104,11 @@ export class AiStreamRepository {
     excludeMemories?: boolean;
     favoriteIdOverride?: string;
     sequenceIdOverride?: string;
+    mediaModelOverrides?: {
+      musicGenModelId?: MusicGenModelId;
+      videoGenModelId?: VideoGenModelId;
+      imageGenModelId?: ImageGenModelId;
+    };
   }): Promise<ResponseType<HeadlessAiStreamResult>>;
 
   /** Interactive overload - returns response output (events stream via WS) */
@@ -126,6 +137,7 @@ export class AiStreamRepository {
     excludeMemories,
     favoriteIdOverride,
     sequenceIdOverride,
+    mediaModelOverrides,
   }: {
     data: AiStreamPostRequestOutput;
     locale: CountryLanguage;
@@ -138,6 +150,11 @@ export class AiStreamRepository {
     excludeMemories?: boolean;
     favoriteIdOverride?: string;
     sequenceIdOverride?: string;
+    mediaModelOverrides?: {
+      musicGenModelId?: MusicGenModelId;
+      videoGenModelId?: VideoGenModelId;
+      imageGenModelId?: ImageGenModelId;
+    };
   }): Promise<
     | ResponseType<AiStreamPostResponseOutput>
     | ResponseType<HeadlessAiStreamResult>
@@ -163,6 +180,7 @@ export class AiStreamRepository {
       extraInstructions,
       excludeMemories,
       favoriteIdOverride,
+      mediaModelOverrides,
     });
 
     if (!setupResult.success) {
@@ -452,6 +470,58 @@ export class AiStreamRepository {
               ? (compactingCheck.failedCompactingMessage.parentId ?? null)
               : (effectiveParentMessageId ?? null);
 
+            // Pre-gap-fill the branch messages so the compacting LLM gets text variants
+            // for any images/audio that the compacting model can't handle natively.
+            let preFilledHistoryMessages:
+              | Parameters<
+                  (typeof CompactingHandler)["executeCompacting"]
+                >["0"]["preFilledHistoryMessages"]
+              | undefined;
+            const isPureMediaGenForCompacting =
+              modelConfig.modelRole === "image-gen" ||
+              modelConfig.modelRole === "video-gen" ||
+              modelConfig.modelRole === "audio-gen";
+            if (!isPureMediaGenForCompacting) {
+              try {
+                const { MessageConverter } =
+                  await import("./handlers/message-converter");
+                const preConvertedHistory =
+                  await MessageConverter.toAiSdkMessages(
+                    compactingCheck.branchMessages,
+                    logger,
+                    data.timezone,
+                    data.rootFolderId,
+                    locale,
+                  );
+                const gapFilledForCompacting = await GapFillExecutor.runGapFill(
+                  {
+                    messages: preConvertedHistory,
+                    chatHistory: compactingCheck.branchMessages,
+                    activeModel: modelConfig,
+                    bridgeContext,
+                    dbWriter: ctx.dbWriter,
+                    abortSignal: streamAbortController.signal,
+                    isIncognito,
+                    logger,
+                    user,
+                    locale,
+                  },
+                );
+                preFilledHistoryMessages = gapFilledForCompacting as Parameters<
+                  (typeof CompactingHandler)["executeCompacting"]
+                >["0"]["preFilledHistoryMessages"];
+              } catch (gapErr) {
+                // Non-fatal: compacting continues without pre-filled variants
+                logger.warn(
+                  "[Compacting] Pre-compacting gap fill failed, proceeding without variants",
+                  {
+                    error:
+                      gapErr instanceof Error ? gapErr.message : String(gapErr),
+                  },
+                );
+              }
+            }
+
             // Compacting gets its own sequenceId so it appears as a
             // separate, independently-deletable message group in the UI.
             const compactingSequenceId = crypto.randomUUID();
@@ -475,6 +545,7 @@ export class AiStreamRepository {
               timezone: data.timezone,
               rootFolderId: data.rootFolderId,
               compactingMessageCreatedAt,
+              preFilledHistoryMessages,
               t: aiStreamT,
             });
 
@@ -563,6 +634,35 @@ export class AiStreamRepository {
           if (truncated.length !== messages.length) {
             messages.length = 0;
             messages.push(...truncated);
+          }
+
+          // Gap-fill: replace unsupported attachment parts with text variants
+          // via vision bridge / STT. Skip for pure media-generation models.
+          const isPureMediaGen =
+            modelConfig.modelRole === "image-gen" ||
+            modelConfig.modelRole === "video-gen" ||
+            modelConfig.modelRole === "audio-gen";
+          if (!isPureMediaGen) {
+            const chatHistory = [
+              ...compactingCheck.branchMessages,
+              ...(compactingCheck.currentUserMessage
+                ? [compactingCheck.currentUserMessage]
+                : []),
+            ];
+            const gapFilledMessages = await GapFillExecutor.runGapFill({
+              messages,
+              chatHistory,
+              activeModel: modelConfig,
+              bridgeContext,
+              dbWriter: ctx.dbWriter,
+              abortSignal: streamAbortController.signal,
+              isIncognito,
+              logger,
+              user,
+              locale,
+            });
+            messages.length = 0;
+            messages.push(...gapFilledMessages);
           }
 
           logger.debug(
@@ -833,6 +933,52 @@ export class AiStreamRepository {
             },
           );
         });
+      }
+
+      // Persist error to DB so it survives refresh and appears at correct branch position.
+      // Only for authenticated (non-incognito) threads where we have a threadId.
+      const errorThreadId = threadResultThreadId ?? data.threadId;
+      if (errorThreadId && !isIncognito && userId) {
+        try {
+          const errorMessageId = crypto.randomUUID();
+          const errorContent = aiStreamT("route.errors.streamCreationFailed");
+          // Place error at the same level as the user message (sibling, not child).
+          // The client's addErrorMessageToChat also uses data.parentMessageId so
+          // the WS-resolved parentId matches the client-optimistic parentId.
+          const errorParentId = data.parentMessageId ?? null;
+          await MessagesRepository.createErrorMessage({
+            messageId: errorMessageId,
+            threadId: errorThreadId,
+            content: errorContent,
+            errorType: "STREAM_ERROR",
+            parentId: errorParentId,
+            userId,
+            sequenceId: null,
+            logger,
+          });
+          publishWsEvent(
+            {
+              channel: buildMessagesChannel(errorThreadId),
+              event: "message-created",
+              data: createStreamEvent.messageCreated({
+                messageId: errorMessageId,
+                threadId: errorThreadId,
+                role: ChatMessageRole.ERROR,
+                content: errorContent,
+                parentId: errorParentId,
+                sequenceId: null,
+                model: null,
+                skill: null,
+              }).data,
+            },
+            logger,
+          );
+        } catch (emitErr) {
+          logger.warn("[AiStream] Failed to persist stream error to DB", {
+            threadId: errorThreadId,
+            error: emitErr instanceof Error ? emitErr.message : String(emitErr),
+          });
+        }
       }
 
       return fail({

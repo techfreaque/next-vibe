@@ -14,6 +14,8 @@ export interface PriceUpdate {
   field:
     | "creditCostPerImage"
     | "creditCostPerClip"
+    | "creditCostPerSecond"
+    | "creditCostPerCharacter"
     | "inputTokenCost"
     | "outputTokenCost"
     | "cacheReadTokenCost"

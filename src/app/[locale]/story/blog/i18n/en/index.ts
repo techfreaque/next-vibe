@@ -69,7 +69,7 @@ export const translations = {
       title: "You built something with AI. Now earn from sharing it.",
       category: "Referrals",
       excerpt:
-        "Your referral link is a revenue stream you haven't turned on yet. Blog posts, READMEs, tutorials — the math for technical audiences.",
+        "Your referral link is a revenue stream you haven't turned on yet. Blog posts, READMEs, tutorials - the math for technical audiences.",
       readTime: "5 min read",
     },
   },
@@ -79,6 +79,7 @@ export const translations = {
     featured: "Featured",
     new: "New",
     draft: "Draft",
+    referralSection: "Referral Program",
   },
   ui: {
     heroTagline: "next-vibe · unbottled.ai",

@@ -13,7 +13,7 @@ export const translations: typeof enTranslations = {
   },
   hero: {
     backToBlog: "Zurück zum Blog",
-    brand: "unbottled.ai — ",
+    brand: "unbottled.ai - ",
     icon: "🌱",
     category: "Für Einsteiger",
     readTime: "5 Min. Lesezeit",

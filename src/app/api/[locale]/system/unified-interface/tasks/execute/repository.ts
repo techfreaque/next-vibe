@@ -276,6 +276,9 @@ export class TaskExecuteRepository {
               callerCallbackMode: undefined,
               onEscalatedTaskCancel: undefined,
               escalateToTask: undefined,
+              imageGenModelId: undefined,
+              musicGenModelId: undefined,
+              videoGenModelId: undefined,
             },
           }),
           new Promise<never>((...[, reject]) => {

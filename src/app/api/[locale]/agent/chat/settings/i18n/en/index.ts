@@ -74,14 +74,32 @@ export const translations = {
     ttsVoice: {
       label: "TTS Voice",
     },
+    voiceModelSelection: {
+      label: "Voice Model",
+      placeholder: "System default",
+    },
     sttModel: {
       label: "Speech-to-Text Model",
+      placeholder: "System default",
     },
     visionBridgeModel: {
       label: "Vision Model",
+      placeholder: "System default",
     },
     translationModel: {
       label: "Translation Model",
+    },
+    imageGenModel: {
+      label: "Image Generation Model",
+      placeholder: "System default",
+    },
+    musicGenModel: {
+      label: "Music Generation Model",
+      placeholder: "System default",
+    },
+    videoGenModel: {
+      label: "Video Generation Model",
+      placeholder: "System default",
     },
     defaultChatMode: {
       label: "Default Chat Mode",
@@ -153,6 +171,12 @@ export const translations = {
     success: {
       title: "Settings Saved",
       description: "Your settings have been saved successfully",
+    },
+  },
+  patch: {
+    chatModel: {
+      label: "Chat Model",
+      placeholder: "System default",
     },
   },
 };

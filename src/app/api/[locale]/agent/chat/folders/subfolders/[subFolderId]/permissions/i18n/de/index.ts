@@ -101,6 +101,7 @@ export const translations: typeof enTranslations = {
       title: "Erfolg",
       description: "Ordnerberechtigungen erfolgreich abgerufen",
     },
+    backButton: { label: "Zurück" },
   },
   enums: {
     userRole: {
@@ -235,6 +236,11 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Erfolg",
       description: "Ordnerberechtigungen erfolgreich aktualisiert",
+    },
+    backButton: { label: "Zurück" },
+    submitButton: {
+      label: "Berechtigungen aktualisieren",
+      loadingText: "Aktualisieren...",
     },
   },
 };

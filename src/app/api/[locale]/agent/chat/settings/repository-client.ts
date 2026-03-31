@@ -12,12 +12,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
-import {
-  DEFAULT_TTS_VOICE_ID,
-  defaultModel,
-  type ModelId,
-  type TtsModelId,
-} from "../../models/models";
+import { defaultModel, type ModelId } from "../../models/models";
 import type { ChatMode } from "../../models/enum";
 
 import { ViewMode } from "../enum";
@@ -83,10 +78,12 @@ export class ChatSettingsRepositoryClient {
       selectedSkill: "thea",
       activeFavoriteId: null,
       ttsAutoplay: false,
-      voiceId: DEFAULT_TTS_VOICE_ID,
-      sttModelId: undefined,
-      visionBridgeModelId: undefined,
+      voiceModelSelection: null,
+      sttModelSelection: undefined,
+      visionBridgeModelSelection: undefined,
       translationModelId: undefined,
+      imageGenModelSelection: undefined,
+      musicGenModelSelection: undefined,
       defaultChatMode: undefined,
       viewMode: ViewMode.LINEAR,
       availableTools: null,
@@ -124,10 +121,13 @@ export class ChatSettingsRepositoryClient {
             ? overrides.activeFavoriteId
             : defaults.activeFavoriteId,
         ttsAutoplay: overrides.ttsAutoplay ?? defaults.ttsAutoplay,
-        voiceId: overrides.voiceId ?? defaults.voiceId,
-        sttModelId: overrides.sttModelId ?? defaults.sttModelId,
-        visionBridgeModelId:
-          overrides.visionBridgeModelId ?? defaults.visionBridgeModelId,
+        voiceModelSelection:
+          overrides.voiceModelSelection ?? defaults.voiceModelSelection,
+        sttModelSelection:
+          overrides.sttModelSelection ?? defaults.sttModelSelection,
+        visionBridgeModelSelection:
+          overrides.visionBridgeModelSelection ??
+          defaults.visionBridgeModelSelection,
         translationModelId:
           overrides.translationModelId ?? defaults.translationModelId,
         defaultChatMode:
@@ -181,14 +181,24 @@ export class ChatSettingsRepositoryClient {
     if (settings.ttsAutoplay !== defaults.ttsAutoplay) {
       overrides.ttsAutoplay = settings.ttsAutoplay;
     }
-    if (settings.voiceId !== defaults.voiceId) {
-      overrides.voiceId = settings.voiceId;
+    if (
+      JSON.stringify(settings.voiceModelSelection) !==
+      JSON.stringify(defaults.voiceModelSelection)
+    ) {
+      overrides.voiceModelSelection = settings.voiceModelSelection;
     }
-    if (settings.sttModelId !== defaults.sttModelId) {
-      overrides.sttModelId = settings.sttModelId;
+    if (
+      JSON.stringify(settings.sttModelSelection) !==
+      JSON.stringify(defaults.sttModelSelection)
+    ) {
+      overrides.sttModelSelection = settings.sttModelSelection;
     }
-    if (settings.visionBridgeModelId !== defaults.visionBridgeModelId) {
-      overrides.visionBridgeModelId = settings.visionBridgeModelId;
+    if (
+      JSON.stringify(settings.visionBridgeModelSelection) !==
+      JSON.stringify(defaults.visionBridgeModelSelection)
+    ) {
+      overrides.visionBridgeModelSelection =
+        settings.visionBridgeModelSelection;
     }
     if (settings.translationModelId !== defaults.translationModelId) {
       overrides.translationModelId = settings.translationModelId;
@@ -246,10 +256,12 @@ export class ChatSettingsRepositoryClient {
         updates.ttsAutoplay !== undefined
           ? updates.ttsAutoplay
           : current.ttsAutoplay,
-      voiceId: updates.voiceId ?? current.voiceId,
-      sttModelId: updates.sttModelId ?? current.sttModelId,
-      visionBridgeModelId:
-        updates.visionBridgeModelId ?? current.visionBridgeModelId,
+      voiceModelSelection:
+        updates.voiceModelSelection ?? current.voiceModelSelection,
+      sttModelSelection: updates.sttModelSelection ?? current.sttModelSelection,
+      visionBridgeModelSelection:
+        updates.visionBridgeModelSelection ??
+        current.visionBridgeModelSelection,
       translationModelId:
         updates.translationModelId ?? current.translationModelId,
       defaultChatMode: updates.defaultChatMode ?? current.defaultChatMode,
@@ -298,13 +310,11 @@ export class ChatSettingsRepositoryClient {
     favoriteId: string;
     modelId: ModelId | null;
     skillId: string | null;
-    voiceId: TtsModelId | null;
     logger: EndpointLogger;
     locale: CountryLanguage;
     user: JwtPayloadType;
   }): Promise<void> {
-    const { favoriteId, modelId, skillId, voiceId, logger, locale, user } =
-      params;
+    const { favoriteId, modelId, skillId, logger, locale, user } = params;
 
     const { apiClient } =
       await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
@@ -330,9 +340,6 @@ export class ChatSettingsRepositoryClient {
         }
         if (skillId) {
           updatedData.selectedSkill = skillId;
-        }
-        if (voiceId) {
-          updatedData.voiceId = voiceId;
         }
 
         return {
@@ -371,7 +378,6 @@ export class ChatSettingsRepositoryClient {
           activeFavoriteId: favoriteId,
           ...(modelId && { selectedModel: modelId }),
           ...(skillId && { selectedSkill: skillId }),
-          ...(voiceId && { voiceId: voiceId }),
         },
         undefined,
         locale,

@@ -15,6 +15,8 @@ import { clearDraft } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import { stripSpecialTags } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
+
 import { DefaultFolderId } from "../../../../config";
 import type { ChatMessage, MessageMetadata } from "../../../../db";
 import { ChatMessageRole } from "../../../../enum";
@@ -202,24 +204,12 @@ function handleMessageCreated(
     }
   }
 
-  // For server-confirmed assistant messages: remove any optimistic placeholder
-  // (tagged with metadata.isOptimistic) that was added client-side while waiting.
-  if (isAssistantOrTool) {
-    const msgs = getCachedMessages(e.threadId, rootFolderId, logger);
-    for (const m of msgs) {
-      if (m.metadata?.isOptimistic) {
-        removeMessage(e.threadId, rootFolderId, logger, m.id);
-      }
-    }
-    // Mark as actively streaming so LoadingIndicator shows immediately
-    if (!serverMetadata.isStreaming) {
-      serverMetadata.isStreaming = true;
-    }
+  // Mark as actively streaming so LoadingIndicator shows immediately
+  if (isAssistantOrTool && !serverMetadata.isStreaming) {
+    serverMetadata.isStreaming = true;
   }
 
-  // Upsert: if the message exists (optimistic user message), update it;
-  // otherwise add a new one.
-  upsertMessage(e.threadId, rootFolderId, logger, {
+  const newMsg: ChatMessage = {
     id: e.messageId,
     threadId: e.threadId,
     role: e.role,
@@ -241,7 +231,26 @@ function handleMessageCreated(
     createdAt: new Date(),
     updatedAt: new Date(),
     searchVector: null,
-  });
+  };
+
+  if (isAssistantOrTool) {
+    // Remove optimistic placeholder(s) and insert real message atomically in a
+    // single updateMessages call to avoid any transient state where both exist
+    // simultaneously (which would show a "1/2" branch indicator).
+    updateMessages(e.threadId, rootFolderId, logger, (msgs) => {
+      const withoutOptimistic = msgs.filter((m) => !m.metadata?.isOptimistic);
+      const idx = withoutOptimistic.findIndex((m) => m.id === newMsg.id);
+      if (idx === -1) {
+        return [...withoutOptimistic, newMsg];
+      }
+      const next = [...withoutOptimistic];
+      next[idx] = newMsg;
+      return next;
+    });
+  } else {
+    // For user/error messages: simple upsert (no optimistic placeholder to remove)
+    upsertMessage(e.threadId, rootFolderId, logger, newMsg);
+  }
 
   // When the first ASSISTANT message arrives in incognito mode,
   // also save the pending user message (upsertMessage already handles the assistant).
@@ -364,12 +373,15 @@ function handleContentDone(
     finishReason: e.finishReason ?? undefined,
     isStreaming: false,
   };
+  // Strip think/chat tags from final content - the server sends raw content
+  // including reasoning blocks; the UI and localStorage should store clean text.
+  const cleanContent = e.content ? stripSpecialTags(e.content) : e.content;
   updateMessages(threadId, rootFolderId, logger, (msgs) =>
     msgs.map((m) =>
       m.id === e.messageId
         ? {
             ...m,
-            content: e.content,
+            content: cleanContent,
             metadata: { ...m.metadata, ...tokenMetadata },
             updatedAt: new Date(),
           }
@@ -593,6 +605,85 @@ function handleError(
   });
 }
 
+function handleGeneratedMediaAdded(
+  e: StreamEventDataMap[StreamEventType.GENERATED_MEDIA_ADDED],
+  threadId: string,
+  rootFolderId: DefaultFolderId,
+  logger: EndpointLogger,
+): void {
+  updateMessages(threadId, rootFolderId, logger, (msgs) =>
+    msgs.map((m) => {
+      if (m.id !== e.messageId) {
+        return m;
+      }
+      return {
+        ...m,
+        metadata: {
+          ...m.metadata,
+          generatedMedia: e.generatedMedia as MessageMetadata["generatedMedia"],
+          creditCost:
+            (m.metadata?.creditCost ?? 0) + e.generatedMedia.creditCost,
+        },
+        updatedAt: new Date(),
+      };
+    }),
+  );
+}
+
+function handleGapFillStarted(
+  e: StreamEventDataMap[StreamEventType.GAP_FILL_STARTED],
+  threadId: string,
+  rootFolderId: DefaultFolderId,
+  logger: EndpointLogger,
+): void {
+  // Mark the message as having a gap-fill in progress
+  updateMessages(threadId, rootFolderId, logger, (msgs) =>
+    msgs.map((m) => {
+      if (m.id !== e.messageId) {
+        return m;
+      }
+      return {
+        ...m,
+        metadata: {
+          ...m.metadata,
+          isStreaming: true,
+        },
+        updatedAt: new Date(),
+      };
+    }),
+  );
+}
+
+function handleGapFillCompleted(
+  e: StreamEventDataMap[StreamEventType.GAP_FILL_COMPLETED],
+  threadId: string,
+  rootFolderId: DefaultFolderId,
+  logger: EndpointLogger,
+): void {
+  updateMessages(threadId, rootFolderId, logger, (msgs) =>
+    msgs.map((m) => {
+      if (m.id !== e.messageId) {
+        return m;
+      }
+      const existingVariants = m.metadata?.variants ?? [];
+      return {
+        ...m,
+        metadata: {
+          ...m.metadata,
+          isStreaming: false,
+          variants: [
+            ...existingVariants.filter(
+              (v) => v.modality !== e.variant.modality,
+            ),
+            e.variant as NonNullable<MessageMetadata["variants"]>[number],
+          ],
+        },
+        updatedAt: new Date(),
+      };
+    }),
+  );
+}
+
 // ============================================================================
 // FACTORY
 // ============================================================================
@@ -655,6 +746,15 @@ export function createMessageEventHandlers(
     },
     [StreamEventType.COMPACTING_DONE]: (e) => {
       handleCompactingDone(e, threadId, rootFolderId, logger);
+    },
+    [StreamEventType.GENERATED_MEDIA_ADDED]: (e) => {
+      handleGeneratedMediaAdded(e, threadId, rootFolderId, logger);
+    },
+    [StreamEventType.GAP_FILL_STARTED]: (e) => {
+      handleGapFillStarted(e, threadId, rootFolderId, logger);
+    },
+    [StreamEventType.GAP_FILL_COMPLETED]: (e) => {
+      handleGapFillCompleted(e, threadId, rootFolderId, logger);
     },
   };
 }

@@ -60,14 +60,12 @@ interface BlogPost {
   borderColor: string;
   bgGradient: string;
   badgeColor: string;
-  icon: string;
+  snippet: string;
+  snippetColor: string;
+  snippetBorder: string;
 }
 
-export function ReadTimeBadge({
-  children,
-}: {
-  children: ReactNode;
-}): JSX.Element {
+function ReadTimeBadge({ children }: { children: ReactNode }): JSX.Element {
   return (
     <Span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
       <Clock className="h-3 w-3" />
@@ -76,7 +74,7 @@ export function ReadTimeBadge({
   );
 }
 
-export function CategoryBadge({
+function CategoryBadge({
   label,
   className,
 }: {
@@ -96,69 +94,7 @@ export function CategoryBadge({
 export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
-  const VIBE_CHECK_SNIPPET = `$ vibe check src/
-  ✓ 847 files checked
-  ✗ 3 errors found
-
-  src/api/chat/repo.ts:42
-    no-explicit-any: Unexpected any.
-    Avoid \`any\` - fix the type.
-
-  src/api/chat/repo.ts:67
-    no-throw: Use fail() not throw.`;
-
-  const GRAPH_ASCII = `  nodes: [price, rsi, ema]
-  ┌─────┐   ┌─────┐
-  │price│──▶│ rsi │
-  └─────┘   └──┬──┘
-               │ signal
-            ┌──▼──┐
-            │alert│
-            └─────┘`;
-
-  const BLOG_POSTS: BlogPost[] = [
-    {
-      slug: "referral-for-beginners",
-      titleKey: "posts.referralBeginners.title",
-      categoryKey: "posts.referralBeginners.category",
-      excerptKey: "posts.referralBeginners.excerpt",
-      readTimeKey: "posts.referralBeginners.readTime",
-      accentColor: "text-emerald-400",
-      borderColor: "border-emerald-500/40",
-      bgGradient:
-        "bg-linear-to-br from-emerald-950/70 via-slate-900 to-slate-950 dark:from-emerald-950/50",
-      badgeColor:
-        "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20",
-      icon: "🌱",
-    },
-    {
-      slug: "referral-for-affiliate-pros",
-      titleKey: "posts.referralAffiliatePros.title",
-      categoryKey: "posts.referralAffiliatePros.category",
-      excerptKey: "posts.referralAffiliatePros.excerpt",
-      readTimeKey: "posts.referralAffiliatePros.readTime",
-      accentColor: "text-violet-400",
-      borderColor: "border-violet-500/40",
-      bgGradient:
-        "bg-linear-to-br from-violet-950/70 via-slate-900 to-slate-950 dark:from-violet-950/50",
-      badgeColor:
-        "bg-violet-500/10 text-violet-400 border-violet-500/30 hover:bg-violet-500/20",
-      icon: "📊",
-    },
-    {
-      slug: "referral-for-developers",
-      titleKey: "posts.referralDevelopers.title",
-      categoryKey: "posts.referralDevelopers.category",
-      excerptKey: "posts.referralDevelopers.excerpt",
-      readTimeKey: "posts.referralDevelopers.readTime",
-      accentColor: "text-cyan-400",
-      borderColor: "border-cyan-500/40",
-      bgGradient:
-        "bg-linear-to-br from-cyan-950/70 via-slate-900 to-slate-950 dark:from-cyan-950/50",
-      badgeColor:
-        "bg-cyan-500/10 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/20",
-      icon: "🛠️",
-    },
+  const ALL_POSTS: BlogPost[] = [
     {
       slug: "one-codebase-13-platforms",
       titleKey: "posts.oneCodebase.title",
@@ -167,11 +103,19 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
       readTimeKey: "posts.oneCodebase.readTime",
       accentColor: "text-cyan-400",
       borderColor: "border-cyan-500/40",
-      bgGradient:
-        "bg-linear-to-br from-cyan-950/80 via-slate-900 to-slate-950 dark:from-cyan-950/60 dark:via-slate-900 dark:to-slate-950",
+      bgGradient: "bg-linear-to-br from-cyan-950/80 via-slate-900 to-slate-950",
       badgeColor:
         "bg-cyan-500/10 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/20",
-      icon: "🏗️",
+      snippet: `createEndpoint({ path: ["chat", "threads"] })
+  ↓ web form      ↓ CLI command
+  ↓ MCP tool      ↓ native screen
+  ↓ cron job      ↓ AI tool schema
+  ↓ WebSocket     ↓ admin panel
+  ↓ agent skill   ↓ Vibe Sense node
+  ↓ VibeFrame widget  ↓ Electron
+  → 13 platforms. zero extra code.`,
+      snippetColor: "text-cyan-300/80",
+      snippetBorder: "border-cyan-900/40",
     },
     {
       slug: "type-checker-made-ai-stop-lying",
@@ -182,10 +126,20 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
       accentColor: "text-violet-400",
       borderColor: "border-violet-500/40",
       bgGradient:
-        "bg-linear-to-br from-violet-950/70 via-slate-900 to-slate-950 dark:from-violet-950/50",
+        "bg-linear-to-br from-violet-950/70 via-slate-900 to-slate-950",
       badgeColor:
         "bg-violet-500/10 text-violet-400 border-violet-500/30 hover:bg-violet-500/20",
-      icon: "🛡️",
+      snippet: `$ vibe check src/
+  ✓ 847 files checked
+  ✗ 3 errors
+
+  repo.ts:42  no-explicit-any
+    → Unexpected any. Fix the type.
+
+  repo.ts:67  no-throw
+    → Use fail() not throw.`,
+      snippetColor: "text-slate-300/80",
+      snippetBorder: "border-slate-700/40",
     },
     {
       slug: "dead-trading-bot-to-monitoring-engine",
@@ -196,10 +150,19 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
       accentColor: "text-emerald-400",
       borderColor: "border-emerald-500/40",
       bgGradient:
-        "bg-linear-to-br from-emerald-950/70 via-slate-900 to-slate-950 dark:from-emerald-950/50",
+        "bg-linear-to-br from-emerald-950/70 via-slate-900 to-slate-950",
       badgeColor:
         "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20",
-      icon: "📈",
+      snippet: `DataSource → Indicator → Evaluator → Action
+
+  [leads/created] ──▶ [ema_7d]
+  [leads/converted] ─▶ [conversion_rate]
+                           │
+                      [drop > 20%?]
+                           │
+                      [alert: Slack]`,
+      snippetColor: "text-emerald-400/70",
+      snippetBorder: "border-emerald-900/40",
     },
     {
       slug: "i-got-fired",
@@ -210,10 +173,18 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
       accentColor: "text-orange-400",
       borderColor: "border-orange-500/40",
       bgGradient:
-        "bg-linear-to-br from-orange-950/70 via-slate-900 to-slate-950 dark:from-orange-950/50",
+        "bg-linear-to-br from-orange-950/70 via-slate-900 to-slate-950",
       badgeColor:
         "bg-orange-500/10 text-orange-400 border-orange-500/30 hover:bg-orange-500/20",
-      icon: "💼",
+      snippet: `<script src="https://vibe.js/embed.js"></script>
+<vibe-widget
+  endpoint="https://unbottled.ai/api/chat"
+  trigger="scroll"
+  display="slide-in"
+  theme="dark"
+/>`,
+      snippetColor: "text-orange-400/70",
+      snippetBorder: "border-orange-900/40",
     },
     {
       slug: "hackernews",
@@ -224,16 +195,86 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
       accentColor: "text-orange-500",
       borderColor: "border-orange-600/40",
       bgGradient:
-        "bg-linear-to-br from-orange-950/60 via-stone-900 to-stone-950 dark:from-orange-950/40",
+        "bg-linear-to-br from-orange-950/60 via-stone-900 to-stone-950",
       badgeColor:
         "bg-orange-600/10 text-orange-500 border-orange-600/30 hover:bg-orange-600/20",
-      icon: "🔶",
+      snippet: `Show HN: next-vibe - one endpoint, every surface
+
+  Got tired of writing the same logic 5 times.
+  One definition.ts → web form, CLI, MCP tool,
+  mobile screen, cron job. Automatically.
+
+  TypeScript rules enforced by the framework.
+  Zero any. Zero throw. Zero hardcoded strings.`,
+      snippetColor: "text-orange-400/70",
+      snippetBorder: "border-orange-900/30",
+    },
+    // - referral posts mixed in —
+    {
+      slug: "referral-for-developers",
+      titleKey: "posts.referralDevelopers.title",
+      categoryKey: "posts.referralDevelopers.category",
+      excerptKey: "posts.referralDevelopers.excerpt",
+      readTimeKey: "posts.referralDevelopers.readTime",
+      accentColor: "text-cyan-400",
+      borderColor: "border-cyan-500/40",
+      bgGradient: "bg-linear-to-br from-cyan-950/70 via-slate-900 to-slate-950",
+      badgeColor:
+        "bg-cyan-500/10 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/20",
+      snippet: `## Built with next-vibe
+
+  This project uses [unbottled.ai](https://unbottled.ai)
+  for AI features. 50+ models, uncensored options,
+  privacy-first. <!-- ref: your-code-here -->
+
+  Payout: BTC · USDC · Credits. Min: $40.`,
+      snippetColor: "text-cyan-400/70",
+      snippetBorder: "border-cyan-900/40",
+    },
+    {
+      slug: "referral-for-beginners",
+      titleKey: "posts.referralBeginners.title",
+      categoryKey: "posts.referralBeginners.category",
+      excerptKey: "posts.referralBeginners.excerpt",
+      readTimeKey: "posts.referralBeginners.readTime",
+      accentColor: "text-emerald-400",
+      borderColor: "border-emerald-500/40",
+      bgGradient:
+        "bg-linear-to-br from-emerald-950/70 via-slate-900 to-slate-950",
+      badgeColor:
+        "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20",
+      snippet: `You → friend signs up → $0.80–$8/mo recurring
+         └→ their friend → $0.40–$4/mo
+               └→ their friend → also yours
+
+  No one-time payouts. Every month, forever.`,
+      snippetColor: "text-emerald-400/70",
+      snippetBorder: "border-emerald-900/40",
+    },
+    {
+      slug: "referral-for-affiliate-pros",
+      titleKey: "posts.referralAffiliatePros.title",
+      categoryKey: "posts.referralAffiliatePros.category",
+      excerptKey: "posts.referralAffiliatePros.excerpt",
+      readTimeKey: "posts.referralAffiliatePros.readTime",
+      accentColor: "text-violet-400",
+      borderColor: "border-violet-500/40",
+      bgGradient:
+        "bg-linear-to-br from-violet-950/70 via-slate-900 to-slate-950",
+      badgeColor:
+        "bg-violet-500/10 text-violet-400 border-violet-500/30 hover:bg-violet-500/20",
+      snippet: `1 casual user   ($8/mo)  → you earn $0.80/mo
+  1 developer     ($200/mo)→ you earn $20/mo
+  1 power user    ($500/mo)→ you earn $50/mo
+
+  Platform adds features → users spend more
+  → your old referrals pay you more. Forever.`,
+      snippetColor: "text-violet-400/70",
+      snippetBorder: "border-violet-900/40",
     },
   ];
 
-  const [featured, ...rest] = BLOG_POSTS;
-  const gridPosts = rest.slice(0, 3);
-  const morePosts = rest.slice(3);
+  const [featured, ...rest] = ALL_POSTS;
 
   return (
     <Div className="min-h-screen bg-slate-950">
@@ -256,7 +297,7 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
       </Div>
 
       <Div className="container mx-auto px-4 py-16 space-y-16">
-        {/* Featured post - full width hero card */}
+        {/* Featured post */}
         {featured !== undefined && (
           <Div>
             <Div className="flex items-center gap-2 mb-6">
@@ -285,238 +326,103 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
                   </Span>
                 </Div>
 
-                <CardHeader className="pt-8 pb-4 px-8">
-                  <Div className="flex flex-wrap items-center gap-3 mb-4">
-                    <Span className="text-3xl">{featured.icon}</Span>
-                    <CategoryBadge
-                      label={t(featured.categoryKey as Parameters<typeof t>[0])}
-                      className={featured.badgeColor}
-                    />
-                    <ReadTimeBadge>
-                      {t(featured.readTimeKey as Parameters<typeof t>[0])}
-                    </ReadTimeBadge>
+                <Div className="md:grid md:grid-cols-2 md:gap-0">
+                  <Div>
+                    <CardHeader className="pt-8 pb-4 px-8">
+                      <Div className="flex flex-wrap items-center gap-3 mb-4">
+                        <CategoryBadge
+                          label={t(
+                            featured.categoryKey as Parameters<typeof t>[0],
+                          )}
+                          className={featured.badgeColor}
+                        />
+                        <ReadTimeBadge>
+                          {t(featured.readTimeKey as Parameters<typeof t>[0])}
+                        </ReadTimeBadge>
+                      </Div>
+                      <H2
+                        className={`text-2xl md:text-3xl font-bold text-white leading-tight group-hover:${featured.accentColor} transition-colors`}
+                      >
+                        {t(featured.titleKey as Parameters<typeof t>[0])}
+                      </H2>
+                    </CardHeader>
+
+                    <CardContent className="px-8 pb-8">
+                      <P className="text-slate-300 text-base leading-relaxed mb-6">
+                        {t(featured.excerptKey as Parameters<typeof t>[0])}
+                      </P>
+                      <Span
+                        className={`inline-flex items-center gap-2 text-sm font-medium ${featured.accentColor} group-hover:gap-3 transition-all`}
+                      >
+                        {t("labels.readMore")}
+                        <ArrowRight className="h-4 w-4" />
+                      </Span>
+                    </CardContent>
                   </Div>
-                  <H2
-                    className={`text-2xl md:text-4xl font-bold text-white leading-tight group-hover:${featured.accentColor} transition-colors`}
-                  >
-                    {t(featured.titleKey as Parameters<typeof t>[0])}
-                  </H2>
-                </CardHeader>
 
-                <CardContent className="px-8 pb-8">
-                  <P className="text-slate-300 text-lg leading-relaxed max-w-3xl mb-6">
-                    {t(featured.excerptKey as Parameters<typeof t>[0])}
-                  </P>
-
-                  {/* Inline code preview */}
-                  <Div className="font-mono text-xs text-emerald-400/80 bg-black/40 border border-slate-700/50 rounded-lg px-4 py-3 max-w-xl mb-6 whitespace-pre leading-relaxed">
-                    {`createEndpoint({\n  path: ["chat", "threads"],\n  // → web form, CLI command,\n  // → MCP tool, native screen,\n  // → cron job - automatically\n})`}
+                  {/* Code preview panel */}
+                  <Div className="hidden md:flex items-center justify-center px-8 py-8 border-l border-cyan-800/20">
+                    <Div
+                      className={`font-mono text-xs leading-relaxed ${featured.snippetColor} bg-black/40 border ${featured.snippetBorder} rounded-lg px-5 py-4 w-full whitespace-pre`}
+                    >
+                      {featured.snippet}
+                    </Div>
                   </Div>
-
-                  <Span
-                    className={`inline-flex items-center gap-2 text-sm font-medium ${featured.accentColor} group-hover:gap-3 transition-all`}
-                  >
-                    {t("labels.readMore")}
-                    <ArrowRight className="h-4 w-4" />
-                  </Span>
-                </CardContent>
+                </Div>
               </Card>
             </Link>
           </Div>
         )}
 
-        {/* 3-column grid for posts 2–4 */}
-        <Div>
-          <Div className="flex items-center gap-2 mb-6">
-            <Separator className="flex-1 bg-slate-800" />
-          </Div>
-
-          <Div className="grid md:grid-cols-3 gap-6">
-            {/* TypeScript post - with vibe check code snippet */}
-            {gridPosts[0] !== undefined && (
-              <Link
-                href={`/${locale}/story/blog/${gridPosts[0].slug}`}
-                className="block group"
+        {/* All remaining posts - 2-column grid, mixed */}
+        <Div className="grid md:grid-cols-2 gap-6">
+          {rest.map((post) => (
+            <Link
+              key={post.slug}
+              href={`/${locale}/story/blog/${post.slug}`}
+              className="block group"
+            >
+              <Card
+                className={`h-full relative overflow-hidden border ${post.borderColor} ${post.bgGradient} transition-all duration-300 hover:shadow-xl hover:-translate-y-1`}
               >
-                <Card
-                  className={`h-full relative overflow-hidden border ${gridPosts[0].borderColor} ${gridPosts[0].bgGradient} transition-all duration-300 hover:shadow-xl hover:shadow-violet-500/10 hover:-translate-y-1`}
-                >
-                  <CardHeader className="pb-3">
-                    <Div className="flex items-center gap-2 mb-3">
-                      <Span className="text-2xl">{gridPosts[0].icon}</Span>
-                      <CategoryBadge
-                        label={t(
-                          gridPosts[0].categoryKey as Parameters<typeof t>[0],
-                        )}
-                        className={gridPosts[0].badgeColor}
-                      />
-                    </Div>
-                    <H3 className="text-lg font-bold text-white leading-snug group-hover:text-violet-400 transition-colors">
-                      {t(gridPosts[0].titleKey as Parameters<typeof t>[0])}
-                    </H3>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <P className="text-sm text-slate-400 leading-relaxed">
-                      {t(gridPosts[0].excerptKey as Parameters<typeof t>[0])}
-                    </P>
-                    {/* vibe check snippet */}
-                    <Div className="font-mono text-[10px] leading-relaxed text-slate-300/80 bg-black/50 border border-slate-700/40 rounded-md px-3 py-2.5 whitespace-pre overflow-hidden">
-                      {VIBE_CHECK_SNIPPET}
-                    </Div>
-                    <Div className="flex items-center justify-between pt-1">
-                      <ReadTimeBadge>
-                        {t(gridPosts[0].readTimeKey as Parameters<typeof t>[0])}
-                      </ReadTimeBadge>
-                      <Span className="inline-flex items-center gap-1 text-xs font-medium text-violet-400 group-hover:gap-2 transition-all">
-                        {t("labels.readMore")}
-                        <ArrowRight className="h-3 w-3" />
-                      </Span>
-                    </Div>
-                  </CardContent>
-                </Card>
-              </Link>
-            )}
-
-            {/* Trading bot post - with ASCII graph */}
-            {gridPosts[1] !== undefined && (
-              <Link
-                href={`/${locale}/story/blog/${gridPosts[1].slug}`}
-                className="block group"
-              >
-                <Card
-                  className={`h-full relative overflow-hidden border ${gridPosts[1].borderColor} ${gridPosts[1].bgGradient} transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1`}
-                >
-                  <CardHeader className="pb-3">
-                    <Div className="flex items-center gap-2 mb-3">
-                      <Span className="text-2xl">{gridPosts[1].icon}</Span>
-                      <CategoryBadge
-                        label={t(
-                          gridPosts[1].categoryKey as Parameters<typeof t>[0],
-                        )}
-                        className={gridPosts[1].badgeColor}
-                      />
-                    </Div>
-                    <H3 className="text-lg font-bold text-white leading-snug group-hover:text-emerald-400 transition-colors">
-                      {t(gridPosts[1].titleKey as Parameters<typeof t>[0])}
-                    </H3>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <P className="text-sm text-slate-400 leading-relaxed">
-                      {t(gridPosts[1].excerptKey as Parameters<typeof t>[0])}
-                    </P>
-                    {/* ASCII graph accent */}
-                    <Div className="font-mono text-[10px] leading-relaxed text-emerald-400/70 bg-black/50 border border-emerald-900/40 rounded-md px-3 py-2.5 whitespace-pre overflow-hidden">
-                      {GRAPH_ASCII}
-                    </Div>
-                    <Div className="flex items-center justify-between pt-1">
-                      <ReadTimeBadge>
-                        {t(gridPosts[1].readTimeKey as Parameters<typeof t>[0])}
-                      </ReadTimeBadge>
-                      <Span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-400 group-hover:gap-2 transition-all">
-                        {t("labels.readMore")}
-                        <ArrowRight className="h-3 w-3" />
-                      </Span>
-                    </Div>
-                  </CardContent>
-                </Card>
-              </Link>
-            )}
-
-            {/* "I got fired" post */}
-            {gridPosts[2] !== undefined && (
-              <Link
-                href={`/${locale}/story/blog/${gridPosts[2].slug}`}
-                className="block group"
-              >
-                <Card
-                  className={`h-full relative overflow-hidden border ${gridPosts[2].borderColor} ${gridPosts[2].bgGradient} transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1`}
-                >
-                  <CardHeader className="pb-3">
-                    <Div className="flex items-center gap-2 mb-3">
-                      <Span className="text-2xl">{gridPosts[2].icon}</Span>
-                      <CategoryBadge
-                        label={t(
-                          gridPosts[2].categoryKey as Parameters<typeof t>[0],
-                        )}
-                        className={gridPosts[2].badgeColor}
-                      />
-                    </Div>
-                    <H3 className="text-lg font-bold text-white leading-snug group-hover:text-orange-400 transition-colors">
-                      {t(gridPosts[2].titleKey as Parameters<typeof t>[0])}
-                    </H3>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <P className="text-sm text-slate-400 leading-relaxed">
-                      {t(gridPosts[2].excerptKey as Parameters<typeof t>[0])}
-                    </P>
-                    {/* Widget embed snippet */}
-                    <Div className="font-mono text-[10px] leading-relaxed text-orange-400/70 bg-black/50 border border-orange-900/40 rounded-md px-3 py-2.5 whitespace-pre overflow-hidden">
-                      {`<script src="vibe.js"></script>\n<vibe-widget\n  endpoint="/api/chat"\n  theme="dark"\n/>`}
-                    </Div>
-                    <Div className="flex items-center justify-between pt-1">
-                      <ReadTimeBadge>
-                        {t(gridPosts[2].readTimeKey as Parameters<typeof t>[0])}
-                      </ReadTimeBadge>
-                      <Span className="inline-flex items-center gap-1 text-xs font-medium text-orange-400 group-hover:gap-2 transition-all">
-                        {t("labels.readMore")}
-                        <ArrowRight className="h-3 w-3" />
-                      </Span>
-                    </Div>
-                  </CardContent>
-                </Card>
-              </Link>
-            )}
-          </Div>
-        </Div>
-
-        {/* Additional posts grid */}
-        {morePosts.length > 0 && (
-          <Div>
-            <Separator className="bg-slate-800 mb-8" />
-            <Div className="grid md:grid-cols-3 gap-6">
-              {morePosts.map((post) => (
-                <Link
-                  key={post.slug}
-                  href={`/${locale}/story/blog/${post.slug}`}
-                  className="block group"
-                >
-                  <Card
-                    className={`h-full relative overflow-hidden border ${post.borderColor} ${post.bgGradient} transition-all duration-300 hover:shadow-xl hover:-translate-y-1`}
+                <CardHeader className="pb-3">
+                  <Div className="flex items-center gap-2 mb-3">
+                    <CategoryBadge
+                      label={t(post.categoryKey as Parameters<typeof t>[0])}
+                      className={post.badgeColor}
+                    />
+                    <ReadTimeBadge>
+                      {t(post.readTimeKey as Parameters<typeof t>[0])}
+                    </ReadTimeBadge>
+                  </Div>
+                  <H3
+                    className={`text-lg font-bold text-white leading-snug group-hover:${post.accentColor} transition-colors`}
                   >
-                    <CardHeader className="pb-3">
-                      <Div className="flex items-center gap-2 mb-3">
-                        <Span className="text-2xl">{post.icon}</Span>
-                        <CategoryBadge
-                          label={t(post.categoryKey as Parameters<typeof t>[0])}
-                          className={post.badgeColor}
-                        />
-                      </Div>
-                      <H3 className="text-lg font-bold text-white leading-snug group-hover:text-slate-300 transition-colors">
-                        {t(post.titleKey as Parameters<typeof t>[0])}
-                      </H3>
-                    </CardHeader>
-                    <CardContent>
-                      <P className="text-sm text-slate-400 leading-relaxed mb-4">
-                        {t(post.excerptKey as Parameters<typeof t>[0])}
-                      </P>
-                      <Div className="flex items-center justify-between">
-                        <ReadTimeBadge>
-                          {t(post.readTimeKey as Parameters<typeof t>[0])}
-                        </ReadTimeBadge>
-                        <Span
-                          className={`inline-flex items-center gap-1 text-xs font-medium ${post.accentColor} group-hover:gap-2 transition-all`}
-                        >
-                          {t("labels.readMore")}
-                          <ArrowRight className="h-3 w-3" />
-                        </Span>
-                      </Div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </Div>
-          </Div>
-        )}
+                    {t(post.titleKey as Parameters<typeof t>[0])}
+                  </H3>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <P className="text-sm text-slate-400 leading-relaxed">
+                    {t(post.excerptKey as Parameters<typeof t>[0])}
+                  </P>
+                  <Div
+                    className={`font-mono text-[10px] leading-relaxed ${post.snippetColor} bg-black/50 border ${post.snippetBorder} rounded-md px-3 py-2.5 whitespace-pre overflow-hidden`}
+                  >
+                    {post.snippet}
+                  </Div>
+                  <Div className="flex items-center justify-end pt-1">
+                    <Span
+                      className={`inline-flex items-center gap-1 text-xs font-medium ${post.accentColor} group-hover:gap-2 transition-all`}
+                    >
+                      {t("labels.readMore")}
+                      <ArrowRight className="h-3 w-3" />
+                    </Span>
+                  </Div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </Div>
       </Div>
     </Div>
   );

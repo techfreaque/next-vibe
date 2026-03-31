@@ -65,6 +65,9 @@ export const translations = {
     action: {
       moderate: "Moderate",
     },
+    backButton: {
+      label: "Back",
+    },
   },
   patch: {
     title: "Moderate Skill",

@@ -8,6 +8,7 @@ import { z } from "zod";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   objectField,
   requestField,
@@ -141,6 +142,13 @@ const { GET } = createEndpoint({
         ],
         columns: 4,
         schema: z.enum(FRESHNESS_OPTIONS).optional(),
+      }),
+
+      backButton: backButton(scopedTranslation, {
+        label: "get.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
       }),
 
       // === RESPONSE FIELDS ===

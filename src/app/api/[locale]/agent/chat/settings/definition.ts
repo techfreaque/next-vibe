@@ -10,18 +10,19 @@ import {
   ChatModeOptions,
 } from "@/app/api/[locale]/agent/models/enum";
 import {
-  DEFAULT_TTS_VOICE_ID,
+  ChatModelIdOptions,
   LLM_MODEL_IDS,
   LlmModelIdOptions,
   ModelId,
-  ModelIdOptions,
-  STT_MODEL_IDS,
-  SttModelIdOptions,
-  TTS_MODEL_IDS,
-  TtsModelIdOptions,
-  VISION_MODEL_IDS,
-  VisionModelIdOptions,
 } from "@/app/api/[locale]/agent/models/models";
+import {
+  imageGenModelSelectionSchema,
+  musicGenModelSelectionSchema,
+  sttModelSelectionSchema,
+  videoGenModelSelectionSchema,
+  visionModelSelectionSchema,
+  voiceModelSelectionSchema,
+} from "@/app/api/[locale]/agent/models/types";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -88,25 +89,40 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.boolean(),
       }),
-      voiceId: responseField(scopedTranslation, {
+      voiceModelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.enum(TTS_MODEL_IDS),
+        schema: voiceModelSelectionSchema.nullable(),
       }),
-      sttModelId: responseField(scopedTranslation, {
+      sttModelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.enum(STT_MODEL_IDS).optional(),
+        schema: sttModelSelectionSchema.nullable().optional(),
       }),
-      visionBridgeModelId: responseField(scopedTranslation, {
+      visionBridgeModelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.enum(VISION_MODEL_IDS).optional(),
+        schema: visionModelSelectionSchema.nullable().optional(),
       }),
       translationModelId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(LLM_MODEL_IDS).optional(),
+      }),
+      imageGenModelSelection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: imageGenModelSelectionSchema.nullable().optional(),
+      }),
+      musicGenModelSelection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: musicGenModelSelectionSchema.nullable().optional(),
+      }),
+      videoGenModelSelection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: videoGenModelSelectionSchema.nullable().optional(),
       }),
       defaultChatMode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -217,7 +233,7 @@ const { GET } = createEndpoint({
         selectedSkill: "default",
         activeFavoriteId: null,
         ttsAutoplay: false,
-        voiceId: DEFAULT_TTS_VOICE_ID,
+        voiceModelSelection: null,
         viewMode: ViewMode.LINEAR,
         availableTools: null,
         pinnedTools: null,
@@ -258,7 +274,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.selectedModel.label" as const,
-        options: ModelIdOptions,
+        options: ChatModelIdOptions,
         columns: 6,
         schema: z.enum(ModelId).optional(),
       }),
@@ -283,29 +299,26 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.boolean().optional(),
       }),
-      voiceId: requestField(scopedTranslation, {
+      voiceModelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
+        fieldType: FieldDataType.TEXT,
         label: "post.ttsVoice.label" as const,
-        options: TtsModelIdOptions,
         columns: 6,
-        schema: z.enum(TTS_MODEL_IDS).optional(),
+        schema: voiceModelSelectionSchema.nullable().optional(),
       }),
-      sttModelId: requestField(scopedTranslation, {
+      sttModelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
+        fieldType: FieldDataType.TEXT,
         label: "post.sttModel.label" as const,
-        options: SttModelIdOptions,
         columns: 6,
-        schema: z.enum(STT_MODEL_IDS).optional(),
+        schema: sttModelSelectionSchema.nullable().optional(),
       }),
-      visionBridgeModelId: requestField(scopedTranslation, {
+      visionBridgeModelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
+        fieldType: FieldDataType.TEXT,
         label: "post.visionBridgeModel.label" as const,
-        options: VisionModelIdOptions,
         columns: 6,
-        schema: z.enum(VISION_MODEL_IDS).optional(),
+        schema: visionModelSelectionSchema.nullable().optional(),
       }),
       translationModelId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -314,6 +327,27 @@ const { POST } = createEndpoint({
         options: LlmModelIdOptions,
         columns: 6,
         schema: z.enum(LLM_MODEL_IDS).optional(),
+      }),
+      imageGenModelSelection: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.imageGenModel.label" as const,
+        columns: 6,
+        schema: imageGenModelSelectionSchema.nullable().optional(),
+      }),
+      musicGenModelSelection: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.musicGenModel.label" as const,
+        columns: 6,
+        schema: musicGenModelSelectionSchema.nullable().optional(),
+      }),
+      videoGenModelSelection: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.videoGenModel.label" as const,
+        columns: 6,
+        schema: videoGenModelSelectionSchema.nullable().optional(),
       }),
       defaultChatMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -455,8 +489,8 @@ const { POST } = createEndpoint({
     requests: {
       update: {
         ttsAutoplay: true,
-        sttModelId: undefined,
-        visionBridgeModelId: undefined,
+        sttModelSelection: undefined,
+        visionBridgeModelSelection: undefined,
         translationModelId: undefined,
         defaultChatMode: undefined,
       },

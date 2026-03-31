@@ -20,6 +20,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/react";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 
 import type definition from "./definition";
 import type { FolderPermissionsGetResponseOutput } from "./definition";
@@ -137,6 +138,8 @@ export function FolderPermissionsContainer({
           {t("get.edit")}
         </Button>
       </Div>
+
+      <NavigateButtonWidget field={children.backButton} />
 
       {/* Description */}
       <Div className="px-6 pt-6 pb-4">

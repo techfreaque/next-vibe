@@ -11,10 +11,12 @@ import {
 } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   requestField,
   requestUrlPathParamsField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -125,6 +127,22 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "response.folder.updatedAt.content" as const,
         schema: dateSchema,
+      }),
+
+      // === BUTTONS ===
+      backButton: backButton(scopedTranslation, {
+        label: "backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data&urlPathParams" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "submitButton.label" as const,
+        loadingText: "submitButton.loadingText" as const,
+        icon: "folder-plus",
+        variant: "primary",
+        className: "w-full",
+        usage: { request: "data&urlPathParams" },
       }),
     },
   }),

@@ -80,6 +80,16 @@ const { GET } = createEndpoint({
         schema: z.string().url().min(1),
       }),
 
+      query: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.query.title" as const,
+        description: "get.fields.query.description" as const,
+        placeholder: "get.fields.query.placeholder" as const,
+        columns: 12,
+        schema: z.string().optional(),
+      }),
+
       // === RESPONSE FIELDS ===
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -117,6 +127,20 @@ const { GET } = createEndpoint({
         content: "get.response.timeElapsed.title" as const,
         columns: 6,
         schema: z.number().optional(),
+      }),
+
+      truncated: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.truncated.title" as const,
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
+
+      truncatedNote: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.truncatedNote.title" as const,
+        columns: 12,
+        schema: z.string().optional(),
       }),
     },
   }),

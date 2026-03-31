@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "unbottled.ai selbst hosten — Deine Instanz, Deine Regeln",
+    title: "unbottled.ai selbst hosten - Deine Instanz, Deine Regeln",
     description:
       "Betreibe den vollständigen unbottled.ai-Stack auf deinem eigenen Server. Eigene API-Keys, Thea als KI-Admin, volle Kontrolle. Für immer kostenlos.",
     category: "Self-Host",
@@ -11,25 +11,25 @@ export const translations: typeof enTranslations = {
       "self-host, next-vibe, unbottled.ai, open-source, KI, VPS, Docker, Kubernetes",
   },
   hero: {
-    badge: "Für immer kostenlos — MIT + GPL v3",
+    badge: "Für immer kostenlos - MIT + GPL v3",
     title: "Selbst betreiben.",
     titleHighlight: "Alles besitzen.",
     subtitle:
-      "Der vollständige unbottled.ai-Stack auf deinem eigenen Server. Jedes Modell, jedes Tool, jede Funktion — plus Thea als KI-Admin, die deine Instanz rund um die Uhr überwacht und selbst repariert.",
+      "Der vollständige unbottled.ai-Stack auf deinem eigenen Server. Jedes Modell, jedes Tool, jede Funktion - plus Thea als KI-Admin, die deine Instanz rund um die Uhr überwacht und selbst repariert.",
     ctaQuickstart: "Zum Schnellstart",
     ctaGithub: "Auf GitHub starten",
   },
   includes: {
     title: "Alles was die Cloud hat. Und mehr.",
     items: {
-      models: "42+ Modelle — eigene API-Keys, direkt bei Providern zahlen",
+      models: "42+ Modelle - eigene API-Keys, direkt bei Providern zahlen",
       memory: "Persistentes Gedächtnis, Inkognito-Modus, 4 Datenschutzstufen",
       search: "Live-Websuche + vollständiges Seitenabrufen",
       thea: "Thea: KI-Admin, die überwacht, selbst repariert und Tools auf Befehl erstellt",
       admin: "Admin-Dashboard, DB-Studio, Cron-Dashboard, Systemüberwachung",
-      ssh: "SSH, Browser-Automatisierung, E-Mail-Client — Theas Tools",
+      ssh: "SSH, Browser-Automatisierung, E-Mail-Client - Theas Tools",
       sync: "Lokale Instanz-Synchronisation mit unbottled.ai Cloud (Beta)",
-      free: "Für immer kostenlos — MIT + GPL v3, kein Vendor-Lock-in",
+      free: "Für immer kostenlos - MIT + GPL v3, kein Vendor-Lock-in",
     },
   },
   quickstart: {
@@ -47,7 +47,7 @@ export const translations: typeof enTranslations = {
     step3: {
       title: "Einloggen und konfigurieren",
       description:
-        'Auf der Login-Seite auf "Als Admin einloggen" klicken — kein Passwort im Dev-Modus nötig. Der Einrichtungsassistent führt durch API-Key-Setup und Admin-Passwort.',
+        'Auf der Login-Seite auf "Als Admin einloggen" klicken - kein Passwort im Dev-Modus nötig. Der Einrichtungsassistent führt durch API-Key-Setup und Admin-Passwort.',
     },
     step4: {
       title: "KI-Provider wählen",
@@ -66,7 +66,7 @@ export const translations: typeof enTranslations = {
   vps: {
     title: "Auf einem VPS deployen?",
     description:
-      "Funktioniert auf jedem Linux-VPS. nginx oder Caddy auf Port 3000 zeigen — fertig.",
+      "Funktioniert auf jedem Linux-VPS. nginx oder Caddy auf Port 3000 zeigen - fertig.",
     docker: "Docker-Setup",
     kubernetes: "Kubernetes",
     kubernetesDescription:
@@ -75,7 +75,7 @@ export const translations: typeof enTranslations = {
   localSync: {
     title: "Lokalen Rechner verbinden (Beta)",
     description:
-      "Thea kann Aufgaben an Claude Code auf deinem Entwicklungsrechner weiterleiten. Gehe zu Admin → Remote-Verbindungen im Dashboard und füge deine lokale Instanz-URL hinzu. Erinnerungen und Aufgaben synchronisieren alle 60 Sekunden — kein Port-Forwarding, kein VPN.",
+      "Thea kann Aufgaben an Claude Code auf deinem Entwicklungsrechner weiterleiten. Gehe zu Admin → Remote-Verbindungen im Dashboard und füge deine lokale Instanz-URL hinzu. Erinnerungen und Aufgaben synchronisieren alle 60 Sekunden - kein Port-Forwarding, kein VPN.",
   },
   enterprise: {
     title: "Hilfe beim Einrichten gesucht?",

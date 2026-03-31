@@ -27,8 +27,13 @@ import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
 import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
+import { lazy } from "react";
+
 import { scopedTranslation } from "./i18n";
-import { ThreadsListContainer } from "./widget/widget";
+
+const ThreadsListContainer = lazy(() =>
+  import("./widget/widget").then((m) => ({ default: m.ThreadsListContainer })),
+);
 
 /**
  * Get Threads List Endpoint (GET)

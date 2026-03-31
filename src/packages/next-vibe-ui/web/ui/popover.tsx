@@ -37,6 +37,11 @@ export type PopoverContentProps = {
   sideOffset?: number;
   alignOffset?: number;
   side?: "top" | "right" | "bottom" | "left";
+  avoidCollisions?: boolean;
+  collisionPadding?:
+    | number
+    | Partial<Record<"top" | "right" | "bottom" | "left", number>>;
+  collisionBoundary?: Element | null | Array<Element | null>;
   onOpenAutoFocus?: (event: Event) => void;
   onCloseAutoFocus?: (event: Event) => void;
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
@@ -44,6 +49,8 @@ export type PopoverContentProps = {
   onInteractOutside?: (event: Event) => void;
   forceMount?: true;
   id?: string;
+  container?: HTMLElement | null;
+  noPortal?: boolean;
 } & StyleType;
 
 export type PopoverCloseProps = {
@@ -105,6 +112,9 @@ export function PopoverContent({
   sideOffset = 4,
   alignOffset,
   side,
+  avoidCollisions,
+  collisionPadding,
+  collisionBoundary,
   onOpenAutoFocus,
   onCloseAutoFocus,
   onEscapeKeyDown,
@@ -112,30 +122,41 @@ export function PopoverContent({
   onInteractOutside,
   forceMount,
   id,
+  container,
+  noPortal,
   children,
 }: PopoverContentProps): React.JSX.Element {
+  const content = (
+    <PopoverPrimitive.Content
+      align={align}
+      sideOffset={sideOffset}
+      alignOffset={alignOffset}
+      side={side}
+      avoidCollisions={avoidCollisions}
+      collisionPadding={collisionPadding}
+      collisionBoundary={collisionBoundary}
+      onOpenAutoFocus={onOpenAutoFocus}
+      onCloseAutoFocus={onCloseAutoFocus}
+      onEscapeKeyDown={onEscapeKeyDown}
+      onPointerDownOutside={onPointerDownOutside}
+      onInteractOutside={onInteractOutside}
+      forceMount={forceMount}
+      id={id}
+      className={cn(
+        "z-[400] w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        className,
+      )}
+      style={style}
+    >
+      {children}
+    </PopoverPrimitive.Content>
+  );
+  if (noPortal) {
+    return content;
+  }
   return (
-    <PopoverPrimitive.Portal>
-      <PopoverPrimitive.Content
-        align={align}
-        sideOffset={sideOffset}
-        alignOffset={alignOffset}
-        side={side}
-        onOpenAutoFocus={onOpenAutoFocus}
-        onCloseAutoFocus={onCloseAutoFocus}
-        onEscapeKeyDown={onEscapeKeyDown}
-        onPointerDownOutside={onPointerDownOutside}
-        onInteractOutside={onInteractOutside}
-        forceMount={forceMount}
-        id={id}
-        className={cn(
-          "z-[400] w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-          className,
-        )}
-        style={style}
-      >
-        {children}
-      </PopoverPrimitive.Content>
+    <PopoverPrimitive.Portal container={container}>
+      {content}
     </PopoverPrimitive.Portal>
   );
 }

@@ -108,6 +108,13 @@ export const translations: typeof enTranslations = {
               "Konflikt wykonania - możliwe że inna sesja już działa",
           },
         },
+        backButton: {
+          label: "Wstecz",
+        },
+        submitButton: {
+          label: "Wyślij",
+          loadingText: "Wysyłanie...",
+        },
         success: {
           title: "Agent kodowania zakończony",
           description:

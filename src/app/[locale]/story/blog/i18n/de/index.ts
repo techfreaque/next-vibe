@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
       title: "Du hast etwas mit KI gebaut. Jetzt verdiene damit beim Teilen.",
       category: "Empfehlungen",
       excerpt:
-        "Dein Empfehlungslink ist ein Einkommensstrom, den du noch nicht aktiviert hast. Blog-Posts, READMEs, Tutorials — die Mathematik für technische Zielgruppen.",
+        "Dein Empfehlungslink ist ein Einkommensstrom, den du noch nicht aktiviert hast. Blog-Posts, READMEs, Tutorials - die Mathematik für technische Zielgruppen.",
       readTime: "5 Min. Lesezeit",
     },
   },
@@ -82,6 +82,7 @@ export const translations: typeof enTranslations = {
     featured: "Empfohlen",
     new: "Neu",
     draft: "Entwurf",
+    referralSection: "Empfehlungsprogramm",
   },
   ui: {
     heroTagline: "next-vibe · unbottled.ai",

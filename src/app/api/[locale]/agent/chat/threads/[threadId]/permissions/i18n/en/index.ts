@@ -86,6 +86,9 @@ export const translations = {
         description: "There was a conflict with the current state",
       },
     },
+    backButton: {
+      label: "Back",
+    },
     success: {
       title: "Success",
       description: "Thread permissions retrieved successfully",
@@ -199,6 +202,13 @@ export const translations = {
         title: "Conflict",
         description: "There was a conflict with the current state",
       },
+    },
+    backButton: {
+      label: "Back",
+    },
+    submitButton: {
+      label: "Save Permissions",
+      loadingText: "Saving…",
     },
     success: {
       title: "Success",

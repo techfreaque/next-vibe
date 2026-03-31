@@ -29,6 +29,13 @@ export const translations: typeof enTranslations = {
         description: "Wyjściowe zdarzenia sygnałów",
       },
     },
+    backButton: {
+      label: "Wstecz",
+    },
+    submitButton: {
+      label: "Oblicz",
+      loadingText: "Obliczanie…",
+    },
     success: {
       title: "Próg oceniony",
       description: "Zdarzenia sygnałów zwrócone",

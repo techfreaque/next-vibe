@@ -12,6 +12,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { type JSX } from "react";
 
 import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import { SkillTrustLevel } from "../../enum";
@@ -25,21 +26,23 @@ interface CustomWidgetProps {
 }
 
 export function SkillVoteContainer({ field }: CustomWidgetProps): JSX.Element {
+  const children = field.children;
   const data = field.value;
   const t = useWidgetTranslation<typeof definition.POST>();
 
   return (
     <Div className="flex flex-col gap-4 p-4">
-      {/* Vote button */}
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{
-          text: data?.voted ? "post.button.unvote" : "post.button.vote",
-          loadingText: "post.button.loading",
-          icon: "thumbs-up",
-          variant: data?.voted ? "default" : "outline",
-          className: "w-full gap-2",
-        }}
-      />
+      <Div className="flex flex-row gap-2">
+        <NavigateButtonWidget field={children.backButton} />
+        {/* Vote button - dynamic text based on current vote state */}
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{
+            ...children.submitButton,
+            text: data?.voted ? "post.button.unvote" : "post.button.vote",
+            variant: data?.voted ? "default" : "outline",
+          }}
+        />
+      </Div>
 
       {/* Result after voting */}
       {data && (

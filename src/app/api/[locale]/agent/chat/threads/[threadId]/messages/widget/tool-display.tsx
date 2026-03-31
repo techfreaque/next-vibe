@@ -108,7 +108,7 @@ export const ToolDisplay = memo(function ToolDisplay({
     return null;
   }
 
-  // Tool calls should always start collapsed unless overridden
+  // defaultExpanded is declared in each endpoint's definition — no hardcoded list here.
   const defaultOpen = defaultOpenProp ?? false;
 
   return (

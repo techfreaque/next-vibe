@@ -3,6 +3,7 @@
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import type definition from "./definition";
@@ -17,15 +18,12 @@ interface DeleteFolderWidgetProps {
 export function DeleteFolderContainer({
   field,
 }: DeleteFolderWidgetProps): JSX.Element {
-  void field;
+  const children = field.children;
   return (
     <Div className="flex flex-col gap-4 p-4">
+      <NavigateButtonWidget field={children.backButton} />
       <SubmitButtonWidget<typeof definition.DELETE>
-        field={{
-          icon: "folder-x",
-          variant: "destructive",
-          className: "w-full",
-        }}
+        field={children.submitButton}
       />
     </Div>
   );

@@ -14,6 +14,7 @@ import {
   useWidgetForm,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
@@ -131,8 +132,6 @@ export function FolderMoveContainer({ field }: MoveWidgetProps): JSX.Element {
         );
       });
 
-  void field;
-
   return (
     <Div className="flex flex-col gap-4 p-4">
       <Div className="text-sm text-muted-foreground">
@@ -164,13 +163,8 @@ export function FolderMoveContainer({ field }: MoveWidgetProps): JSX.Element {
         <Div className="flex flex-col gap-1">{renderFolder(null, 0)}</Div>
       </ScrollArea>
 
-      <SubmitButtonWidget<MoveDefinition>
-        field={{
-          icon: "folder-input",
-          variant: "primary",
-          className: "w-full",
-        }}
-      />
+      <NavigateButtonWidget field={field.children.backButton} />
+      <SubmitButtonWidget<MoveDefinition> field={field.children.submitButton} />
     </Div>
   );
 }

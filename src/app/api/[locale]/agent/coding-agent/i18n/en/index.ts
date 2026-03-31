@@ -104,6 +104,13 @@ export const translations = {
             description: "Execution conflict - another session may be running",
           },
         },
+        backButton: {
+          label: "Back",
+        },
+        submitButton: {
+          label: "Submit",
+          loadingText: "Submitting...",
+        },
         success: {
           title: "Coding Agent Completed",
           description:

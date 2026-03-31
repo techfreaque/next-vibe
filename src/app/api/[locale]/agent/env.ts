@@ -171,6 +171,16 @@ const baseFields = {
     onboardingStep: 4,
     onboardingGroup: "ai",
   },
+  MODELSLAB_API_KEY: {
+    schema: z.string().optional(),
+    example: "your-modelslab-key",
+    comment:
+      "ModelsLab API key for music generation and text-to-video - get yours at https://modelslab.com/account/api",
+    commented: true,
+    sensitive: true,
+    onboardingStep: 4,
+    onboardingGroup: "ai",
+  },
 } as const;
 
 // S3 storage specific fields

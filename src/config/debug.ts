@@ -4,6 +4,8 @@ export let enableDebugLogger = false;
 export let debugMiddleware = false;
 // set by the mcp server to disable all console output
 export let mcpSilentMode = false;
+// set by vibe dev to additionally write all logger output to .tmp/vibe-dev.log
+export let devFileLogging = false;
 // Shows the translation keys in the UI
 export const translationsKeyMode = false;
 // Speeds up the typecheck by 100x but disables translation typesafety
@@ -27,4 +29,12 @@ export function enableDebug(): void {
  */
 export function enableMcpSilentMode(): void {
   mcpSilentMode = true;
+}
+
+/**
+ * Used to enable dev file logging at runtime (set at vibe dev startup)
+ * All logger.* calls will additionally write to .tmp/vibe-dev.log alongside console output
+ */
+export function enableDevFileLogging(): void {
+  devFileLogging = true;
 }

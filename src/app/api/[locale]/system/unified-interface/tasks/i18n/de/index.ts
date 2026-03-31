@@ -251,14 +251,23 @@ export const translations: typeof enTranslations = {
   dbHealth: {
     tag: "Datenbank",
     post: {
-      title: "DB-Gesundheitsprüfung",
-      description: "Datenbankverbindung prüfen",
+      title: "System-Gesundheitsprüfung",
+      description: "Datenbank, Arbeitsspeicher und Festplatte prüfen",
       container: {
-        title: "Datenbankgesundheit",
-        description: "Datenbankverbindung überprüfen",
+        title: "Systemgesundheit",
+        description:
+          "DB-Verbindung, Speicherauslastung und Festplattenauslastung",
       },
       response: {
         healthy: "Gesund",
+        status: "Status",
+        dbResponseMs: "DB-Antwortzeit (ms)",
+        memoryUsedPct: "Speicher genutzt (%)",
+        heapUsedMb: "Heap genutzt (MB)",
+        rssMb: "RSS (MB)",
+        diskUsedPct: "Festplatte genutzt (%)",
+        uptimeHours: "Laufzeit (Stunden)",
+        warnings: "Warnungen",
       },
       errors: {
         unauthorized: {

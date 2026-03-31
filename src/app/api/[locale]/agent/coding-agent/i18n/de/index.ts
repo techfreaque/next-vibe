@@ -109,6 +109,13 @@ export const translations: typeof enTranslations = {
               "Ausführungskonflikt - möglicherweise läuft bereits eine Sitzung",
           },
         },
+        backButton: {
+          label: "Zurück",
+        },
+        submitButton: {
+          label: "Absenden",
+          loadingText: "Absenden...",
+        },
         success: {
           title: "Coding-Agent abgeschlossen",
           description:

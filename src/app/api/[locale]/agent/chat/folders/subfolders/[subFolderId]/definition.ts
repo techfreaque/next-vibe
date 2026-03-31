@@ -12,10 +12,12 @@ import {
 } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   objectField,
   requestUrlPathParamsField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -209,6 +211,22 @@ const { DELETE } = createEndpoint({
         type: WidgetType.TEXT,
         content: "delete.response.updatedAt.content" as const,
         schema: dateSchema,
+      }),
+
+      // === BUTTONS ===
+      backButton: backButton(scopedTranslation, {
+        label: "delete.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "urlPathParams" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "delete.submitButton.label" as const,
+        loadingText: "delete.submitButton.loadingText" as const,
+        icon: "folder-x",
+        variant: "destructive",
+        className: "w-full",
+        usage: { request: "urlPathParams" },
       }),
     },
   }),

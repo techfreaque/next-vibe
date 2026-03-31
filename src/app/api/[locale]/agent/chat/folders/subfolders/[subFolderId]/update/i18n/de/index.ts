@@ -132,5 +132,12 @@ export const translations: typeof enTranslations = {
       title: "Erfolg",
       description: "Ordner erfolgreich aktualisiert",
     },
+    backButton: {
+      label: "Zurück",
+    },
+    submitButton: {
+      label: "Aktualisieren",
+      loadingText: "Aktualisieren...",
+    },
   },
 };

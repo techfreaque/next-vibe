@@ -242,7 +242,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       availableTools: effectiveSettings.availableTools,
       pinnedTools: effectiveSettings.pinnedTools,
       ttsAutoplay: effectiveSettings.ttsAutoplay,
-      voiceId: effectiveSettings.voiceId,
+      voiceModelSelection: effectiveSettings.voiceModelSelection,
     }),
     [
       effectiveSettings.selectedModel,
@@ -250,7 +250,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       effectiveSettings.availableTools,
       effectiveSettings.pinnedTools,
       effectiveSettings.ttsAutoplay,
-      effectiveSettings.voiceId,
+      effectiveSettings.voiceModelSelection,
     ],
   );
 

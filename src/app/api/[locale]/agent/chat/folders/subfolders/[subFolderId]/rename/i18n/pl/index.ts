@@ -75,5 +75,12 @@ export const translations: typeof enTranslations = {
       title: "Sukces",
       description: "Nazwa folderu zmieniona pomyślnie",
     },
+    backButton: {
+      label: "Wstecz",
+    },
+    submitButton: {
+      label: "Zmień nazwę",
+      loadingText: "Zmieniam nazwę...",
+    },
   },
 };

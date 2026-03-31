@@ -6,7 +6,7 @@
 import "server-only";
 
 import { asc, eq, inArray } from "drizzle-orm";
-import type { TtsModelId } from "@/app/api/[locale]/agent/models/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/models/types";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -94,7 +94,7 @@ export class ChatFavoritesRepository {
           let characterName = null;
           let characterTagline = null;
           let characterDescription = null;
-          let characterVoice: TtsModelId | null = null;
+          let characterVoice: VoiceModelSelection | null = null;
 
           if (favorite.skillId && favorite.skillId.trim() !== "") {
             const skillResult = await SkillsRepository.getSkillById(
@@ -108,7 +108,7 @@ export class ChatFavoritesRepository {
               characterName = skillResult.data.name;
               characterTagline = skillResult.data.tagline;
               characterDescription = skillResult.data.description;
-              characterVoice = skillResult.data.voiceId ?? null;
+              characterVoice = skillResult.data.voiceModelSelection ?? null;
               // Resolve variant's modelSelection from the skill's variants list
               const variants = skillResult.data.variants;
               const variant = favorite.variantId
@@ -126,7 +126,7 @@ export class ChatFavoritesRepository {
               skillId: favorite.skillId,
               variantId: favorite.variantId ?? null,
               customIcon: favorite.customIcon,
-              voiceId: favorite.voiceId,
+              voiceModelSelection: favorite.voiceModelSelection ?? null,
               modelSelection: favorite.modelSelection,
               position: favorite.position,
             },

@@ -18,8 +18,9 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/react";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
+import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 
 import type definition from "./definition";
 import type { SkillModerationGetResponseOutput } from "./definition";
@@ -54,6 +55,10 @@ export function SkillModerationContainer({
 
   return (
     <Div className="flex flex-col gap-4 p-4">
+      <Div className="flex flex-row gap-2">
+        <NavigateButtonWidget field={children.backButton} />
+      </Div>
+
       {/* Header */}
       <Div className="flex items-center justify-between">
         <Div className="flex items-center gap-2">

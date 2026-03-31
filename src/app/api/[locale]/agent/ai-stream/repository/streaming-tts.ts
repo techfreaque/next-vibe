@@ -674,6 +674,8 @@ export class StreamingTTSHandler {
     result = result.replace(/<think>[\s\S]*?<\/think>/gi, "");
     // Remove unclosed think tags
     result = result.replace(/<think>[\s\S]*/gi, "");
+    // Remove orphaned closing tags
+    result = result.replace(/<\/think>/gi, "");
 
     // Remove closed Chat tags
     result = result.replace(/<Chat>[\s\S]*?<\/Chat>/gi, "");

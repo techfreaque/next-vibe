@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
+import { Button } from "next-vibe-ui/ui/button";
 import { Container } from "next-vibe-ui/ui/container";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowDown } from "next-vibe-ui/ui/icons/ArrowDown";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
-import { Button } from "next-vibe-ui/ui/button";
 import { Link } from "next-vibe-ui/ui/link";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
@@ -13,10 +13,10 @@ import type { JSX } from "react";
 
 import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { ContactFormSection } from "../_components/contact-form-section";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
+import { ContactFormSection } from "../_components/contact-form-section";
 
 import { scopedTranslation } from "./i18n";
 
@@ -64,14 +64,14 @@ vibe dev
 \`\`\``;
 
 const OPTION_A_MD = `\`\`\`bash
-# Claude Code — no API key needed
+# Claude Code - no API key needed
 # Requires Claude subscription + Claude Code CLI
 claude login   # sign in once
 # Then select any claude-code-* model in the model picker
 \`\`\``;
 
 const OPTION_B_MD = `\`\`\`bash
-# OpenRouter — 200+ models, pay per use
+# OpenRouter - 200+ models, pay per use
 # Paste your key in Settings → API Keys
 # Get yours at openrouter.ai/keys
 \`\`\``;
@@ -195,7 +195,7 @@ function SelfHostPageContent({
               {t("quickstart.subtitle")}
             </P>
 
-            {/* Step 1 — Clone */}
+            {/* Step 1 - Clone */}
             <Div className="mb-8">
               <H3 className="text-lg font-semibold mb-1">
                 1. {t("quickstart.step1.title")}
@@ -208,7 +208,7 @@ function SelfHostPageContent({
               </Div>
             </Div>
 
-            {/* Step 2 — vibe dev */}
+            {/* Step 2 - vibe dev */}
             <Div className="mb-8">
               <H3 className="text-lg font-semibold mb-1">
                 2. {t("quickstart.step2.title")}
@@ -221,7 +221,7 @@ function SelfHostPageContent({
               </Div>
             </Div>
 
-            {/* Step 3 — Login and wizard */}
+            {/* Step 3 - Login and wizard */}
             <Div className="mb-8">
               <H3 className="text-lg font-semibold mb-1">
                 3. {t("quickstart.step3.title")}
@@ -231,7 +231,7 @@ function SelfHostPageContent({
               </P>
             </Div>
 
-            {/* Step 4 — Pick provider */}
+            {/* Step 4 - Pick provider */}
             <Div className="mb-2">
               <H3 className="text-lg font-semibold mb-4">
                 4. {t("quickstart.step4.title")}

@@ -338,6 +338,9 @@ export class RouteDelegationHandler {
                   callerCallbackMode: undefined,
                   onEscalatedTaskCancel: undefined,
                   escalateToTask: undefined,
+                  imageGenModelId: undefined,
+                  musicGenModelId: undefined,
+                  videoGenModelId: undefined,
                 },
               });
             return result;
@@ -494,6 +497,9 @@ export class RouteDelegationHandler {
             callerCallbackMode: undefined,
             onEscalatedTaskCancel: undefined,
             escalateToTask: undefined,
+            imageGenModelId: undefined,
+            musicGenModelId: undefined,
+            videoGenModelId: undefined,
           },
         });
 

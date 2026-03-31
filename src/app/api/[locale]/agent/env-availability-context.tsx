@@ -29,6 +29,7 @@ const ALL_AVAILABLE: AgentEnvAvailability = {
   openAiImages: true,
   replicate: true,
   falAi: true,
+  modelsLab: true,
 };
 
 const EnvAvailabilityContext =

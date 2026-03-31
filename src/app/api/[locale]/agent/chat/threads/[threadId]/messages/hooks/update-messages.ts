@@ -97,9 +97,13 @@ export function updateMessages(
     }
 
     // Incognito: persist changed messages to localStorage.
+    // Skip optimistic placeholders - they are ephemeral UI state and must not
+    // pollute localStorage (they would show as orphaned branches after reload).
     if (rootFolderId === DefaultFolderId.INCOGNITO) {
       for (const msg of result[0]!) {
-        void saveMessage(msg);
+        if (!msg.metadata?.isOptimistic) {
+          void saveMessage(msg);
+        }
       }
     }
   }

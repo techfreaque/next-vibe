@@ -179,6 +179,9 @@ export const translations: typeof enTranslations = {
         title: "Wykonanie AI zakończone",
         description: "Zakończono pomyślnie",
       },
+      backButton: {
+        label: "Wstecz",
+      },
     },
   },
   post: {

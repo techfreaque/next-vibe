@@ -2,10 +2,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   objectField,
   requestField,
   requestUrlPathParamsField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -90,6 +92,14 @@ const { GET } = createEndpoint({
         description: "get.response.rolesAdmin.description" as const,
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
+      }),
+
+      // === NAVIGATION ===
+      backButton: backButton(scopedTranslation, {
+        label: "get.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
       }),
     },
   }),
@@ -273,6 +283,22 @@ const { PATCH } = createEndpoint({
         description: "patch.response.rolesAdmin.description" as const,
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
+      }),
+
+      // === NAVIGATION ===
+      backButton: backButton(scopedTranslation, {
+        label: "patch.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "patch.submitButton.label" as const,
+        loadingText: "patch.submitButton.loadingText" as const,
+        icon: "send",
+        variant: "primary",
+        className: "w-full",
+        usage: { request: "data" },
       }),
     },
   }),

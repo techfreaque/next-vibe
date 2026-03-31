@@ -96,6 +96,9 @@ export const translations = {
       description: "A folder with this name already exists",
     },
   },
+  backButton: {
+    label: "Back",
+  },
   submitButton: {
     label: "Create Folder",
     loadingText: "Creating...",

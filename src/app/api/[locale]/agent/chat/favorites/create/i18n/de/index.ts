@@ -44,21 +44,43 @@ export const translations: typeof enTranslations = {
       label: "Benutzerdefiniertes Symbol",
       description: "Optionales benutzerdefiniertes Symbol für diesen Favoriten",
     },
+    chatModel: {
+      label: "Chat-Modell",
+      placeholder: "Von Fertigkeit übernehmen",
+    },
     voice: {
       label: "Stimme",
       description: "Text-to-Speech-Stimmpräferenz",
+      placeholder: "Von Skill erben",
     },
     sttModel: {
       label: "Sprache-zu-Text-Modell",
       description: "Modell zur Spracherkennung",
+      placeholder: "Vom Skill erben",
     },
     visionBridgeModel: {
       label: "Vision-Modell",
       description: "Modell zur Bildanalyse",
+      placeholder: "Vom Skill erben",
     },
     translationModel: {
       label: "Übersetzungsmodell",
       description: "Modell zur Textübersetzung",
+    },
+    imageGenModel: {
+      label: "Bildgenerierungsmodell",
+      description: "Modell zur Bilderstellung",
+      placeholder: "Von Skill erben",
+    },
+    musicGenModel: {
+      label: "Musikgenerierungsmodell",
+      description: "Modell zur Musikerstellung",
+      placeholder: "Von Skill erben",
+    },
+    videoGenModel: {
+      label: "Video-Generierungsmodell",
+      description: "Modell zur Videoerstellung",
+      placeholder: "Von Skill erben",
     },
     defaultChatMode: {
       label: "Standard-Chat-Modus",

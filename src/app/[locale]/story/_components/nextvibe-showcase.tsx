@@ -1,7 +1,7 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
@@ -210,7 +210,7 @@ function buildEndpointGroup(t: ScopedT): MessageGroup {
   };
 }
 
-// Surfaces: no tool needed — Thea explains what the endpoint became (pure reasoning)
+// Surfaces: no tool needed - Thea explains what the endpoint became (pure reasoning)
 function buildSurfacesGroup(t: ScopedT): MessageGroup {
   const tid = "demo-nextvibe-surfaces";
   const seq = "surfaces-seq";
@@ -435,7 +435,7 @@ function NextVibeDemoVisual({
                 sendMessage={null}
                 deductCredits={null}
                 ttsAutoplay={false}
-                ttsVoice={undefined}
+                voiceId={undefined}
                 onVote={null}
                 userVote={null}
                 voteScore={0}

@@ -6,10 +6,12 @@ import {
 } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   objectField,
   requestField,
   requestUrlPathParamsField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -181,6 +183,22 @@ const { PATCH } = createEndpoint({
         type: WidgetType.TEXT,
         content: "patch.response.folder.updatedAt.content" as const,
         schema: dateSchema,
+      }),
+
+      // === BUTTONS ===
+      backButton: backButton(scopedTranslation, {
+        label: "patch.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data&urlPathParams" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "patch.submitButton.label" as const,
+        loadingText: "patch.submitButton.loadingText" as const,
+        icon: "folder-pen",
+        variant: "primary",
+        className: "w-full",
+        usage: { request: "data&urlPathParams" },
       }),
     },
   }),

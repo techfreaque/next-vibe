@@ -596,6 +596,15 @@ export const translations: typeof enTranslations = {
         "Stable Audio - Model generowania muzyki i dźwięku Stability AI dla wysokiej jakości klipów",
       udioV2:
         "Udio v2 - Wysokiej jakości generowanie muzyki AI z wokalem i pełną jakością produkcji",
+      modelsLabMusicGen:
+        "ModelsLab Music Gen - Generowanie muzyki AI z opisów tekstowych, obsługuje MP3/WAV/FLAC",
+      modelsLabCogVideoX:
+        "CogVideoX - Model tekst-na-wideo ModelsLab do generowania krótkich klipów",
+      modelsLabWanx: "Wanx - Model generowania wideo z tekstu ModelsLab",
+      modelsLabWan22:
+        "Wan 2.2 Ultra - Wysokiej jakości model tekst-na-wideo ModelsLab",
+      modelsLabWan21:
+        "Wan 2.1 Ultra - Model tekst-na-wideo ModelsLab z ulepszoną jakością",
     },
   },
   modelUtilities: {

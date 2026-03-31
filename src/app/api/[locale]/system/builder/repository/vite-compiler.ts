@@ -3,6 +3,7 @@
  * Compiles files using Vite
  */
 
+import { devFileLog } from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
 import { existsSync, mkdirSync, statSync } from "node:fs";
 import type { Server as NodeHttpServer } from "node:http";
 import { networkInterfaces } from "node:os";
@@ -605,11 +606,11 @@ export class ViteCompiler {
             }
             let result = code;
             result = result.replace(
-              /\nexport default async function\s+\w+[\s\S]*?(?=\nexport |\n\/\/|$)/,
+              /\nexport default async function\s+\w+[\s\S]*?(?=\nexport |\nfunction |\nconst |\nclass |\ninterface |\ntype |\n\/\/|$)/,
               "\n",
             );
             result = result.replace(
-              /\nexport async function tanstackLoader[\s\S]*?(?=\nexport |\n\/\/|$)/,
+              /\nexport async function tanstackLoader[\s\S]*?(?=\nexport |\nfunction |\nconst |\nclass |\ninterface |\ntype |\n\/\/|$)/,
               "\n",
             );
             // Remove imports whose bindings are no longer referenced.
@@ -879,7 +880,9 @@ export class ViteCompiler {
       const viteLogger = {
         hasWarned: false,
         info(msg: string): void {
-          process.stdout.write(`${fmtVite(msg)}\n`);
+          const line = `${fmtVite(msg)}\n`;
+          process.stdout.write(line);
+          devFileLog(line.trimEnd());
         },
         warn(msg: string): void {
           // Suppress sourcemap warnings for packages that ship without source files
@@ -887,17 +890,23 @@ export class ViteCompiler {
             return;
           }
           this.hasWarned = true;
-          process.stdout.write(`${fmtVite(msg)}\n`);
+          const line = `${fmtVite(msg)}\n`;
+          process.stdout.write(line);
+          devFileLog(line.trimEnd());
         },
         warnOnce(msg: string): void {
           if (msg.includes("points to missing source files")) {
             return;
           }
           this.hasWarned = true;
-          process.stdout.write(`${fmtVite(msg)}\n`);
+          const line = `${fmtVite(msg)}\n`;
+          process.stdout.write(line);
+          devFileLog(line.trimEnd());
         },
         error(msg: string): void {
-          process.stderr.write(`${fmtVite(msg)}\n`);
+          const line = `${fmtVite(msg)}\n`;
+          process.stderr.write(line);
+          devFileLog(line.trimEnd());
         },
         clearScreen(): void {
           /* no-op */
@@ -1037,12 +1046,12 @@ export class ViteCompiler {
               let result = code;
               // Remove export default async function (Next.js server component)
               result = result.replace(
-                /\nexport default async function\s+\w+[\s\S]*?(?=\nexport |\n\/\/|$)/,
+                /\nexport default async function\s+\w+[\s\S]*?(?=\nexport |\nfunction |\nconst |\nclass |\ninterface |\ntype |\n\/\/|$)/,
                 "\n",
               );
               // Remove export async function tanstackLoader
               result = result.replace(
-                /\nexport async function tanstackLoader[\s\S]*?(?=\nexport |\n\/\/|$)/,
+                /\nexport async function tanstackLoader[\s\S]*?(?=\nexport |\nfunction |\nconst |\nclass |\ninterface |\ntype |\n\/\/|$)/,
                 "\n",
               );
               // Remove import lines whose bindings are no longer referenced.
@@ -1355,6 +1364,11 @@ export class ViteCompiler {
               "**/app-native/**",
               "**/test-files/**",
             ],
+            // usePolling is required for paths with square brackets (e.g. [locale]).
+            // Chokidar treats brackets as glob patterns and won't watch those paths via inotify.
+            // Polling is slower but correctly tracks all file changes.
+            usePolling: true,
+            interval: 300,
           },
           // When running behind a proxy (e.g. Bun WS proxy on publicPort), tell Vite's
           // injected HMR client to connect to the proxy port instead of the internal port.
@@ -1382,7 +1396,7 @@ export class ViteCompiler {
         // resolves after the client crawl + esbuild run completes. On cold
         // start this blocks the first SSR request for several seconds.
         // Setting holdUntilCrawlEnd: false allows deps to be served on-demand
-        // while pre-bundling runs in the background — no SSR blocking.
+        // while pre-bundling runs in the background - no SSR blocking.
         optimizeDeps: {
           noDiscovery: true,
           holdUntilCrawlEnd: false,
@@ -1528,6 +1542,7 @@ export class ViteCompiler {
         )
         .join("\n");
       process.stdout.write(`${formatted}\n`);
+      devFileLog(formatted);
 
       return {
         success: true,

@@ -3,12 +3,13 @@
  * Fetches per-image USD from the frontend models API:
  * GET https://openrouter.ai/api/frontend/models
  *
- * Supported pricing_json keys:
- *   bfl:informational_output_megapixels   — USD per MP (1 MP ≈ 1024×1024)
- *   sourceful:cents_per_image_output      — cents per image (÷ 100)
- *   seedream:cents_per_image_output       — cents per image (÷ 100)
- *   gemini:image_output_tokens            — USD per token × 1000 tokens/image
- *   openai_responses:image_output_tokens  — USD per token × 1000 tokens/image
+ * Supported pricing_json keys (flat per-image models only):
+ *   bfl:informational_output_megapixels   - USD per MP (1 MP ≈ 1024×1024)
+ *   sourceful:cents_per_image_output      - cents per image (÷ 100)
+ *   seedream:cents_per_image_output       - cents per image (÷ 100)
+ *
+ * Token-based image models (gemini image-preview, gpt-5-image, etc.) use
+ * inputTokenCost/outputTokenCost and are priced by openrouter-token instead.
  */
 
 import "server-only";
@@ -52,16 +53,6 @@ function derivePerImageUsd(
   const seedreamCents = n("seedream:cents_per_image_output");
   if (seedreamCents !== null && seedreamCents > 0) {
     return seedreamCents / 100;
-  }
-
-  const geminiTok = n("gemini:image_output_tokens");
-  if (geminiTok !== null && geminiTok > 0) {
-    return geminiTok * 1000;
-  }
-
-  const openaiTok = n("openai_responses:image_output_tokens");
-  if (openaiTok !== null && openaiTok > 0) {
-    return openaiTok * 1000;
   }
 
   return null;

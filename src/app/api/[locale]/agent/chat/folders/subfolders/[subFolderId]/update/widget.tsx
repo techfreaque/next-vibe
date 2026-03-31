@@ -6,6 +6,7 @@ import type { JSX } from "react";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
 import { MultiSelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/multiselect-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import type definition from "./definition";
@@ -50,12 +51,9 @@ export function UpdateFolderContainer({
         field={children.rolesAdmin}
         fieldName="rolesAdmin"
       />
+      <NavigateButtonWidget field={children.backButton} />
       <SubmitButtonWidget<typeof definition.PATCH>
-        field={{
-          icon: "folder-pen",
-          variant: "primary",
-          className: "w-full",
-        }}
+        field={children.submitButton}
       />
     </Div>
   );

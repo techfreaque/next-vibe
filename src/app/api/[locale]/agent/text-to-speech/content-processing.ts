@@ -26,6 +26,9 @@ export function stripThinkTags(content: string): string {
   // Remove unclosed think tags: <think>... (everything after <think>)
   processed = processed.replaceAll(/<think>[\s\S]*$/gi, "");
 
+  // Remove orphaned closing tags left when opening tag was in a prior chunk
+  processed = processed.replaceAll(/<\/think>/gi, "");
+
   // Trim whitespace
   const result = processed.trim();
 

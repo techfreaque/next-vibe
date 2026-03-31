@@ -98,6 +98,7 @@ export const translations: typeof enTranslations = {
       title: "Sukces",
       description: "Uprawnienia folderu zostały pomyślnie pobrane",
     },
+    backButton: { label: "Wstecz" },
   },
   enums: {
     userRole: {
@@ -230,6 +231,11 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Sukces",
       description: "Uprawnienia folderu zostały pomyślnie zaktualizowane",
+    },
+    backButton: { label: "Wstecz" },
+    submitButton: {
+      label: "Aktualizuj uprawnienia",
+      loadingText: "Aktualizowanie...",
     },
   },
 };

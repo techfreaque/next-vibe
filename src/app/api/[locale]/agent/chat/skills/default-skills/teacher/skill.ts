@@ -48,7 +48,7 @@ export const teacherSkill: Skill = {
       variantName: "skills.teacher.variants.gemini" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GEMINI_3_PRO,
+        manualModelId: ModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,

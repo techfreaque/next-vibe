@@ -167,6 +167,12 @@ const ToolMessage = memo(
       return null;
     }
 
+    // Synthetic tool messages (image_gen, audio_gen, video_gen) exist only for LLM context.
+    // The media is already shown via generatedMedia on the ASSISTANT message above.
+    if (message.metadata.toolCall.toolName.endsWith("_gen")) {
+      return null;
+    }
+
     return (
       <ToolDisplay
         toolCall={message.metadata.toolCall}
@@ -310,6 +316,55 @@ function MediaActions({
   );
 }
 
+/**
+ * Generated image with prompt toggle.
+ * Shows the image by default; clicking "Show prompt" swaps it for the refined prompt text.
+ */
+function GeneratedImageWithPrompt({
+  url,
+  prompt,
+  locale,
+}: {
+  url: string;
+  prompt: string;
+  locale: CountryLanguage;
+}): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const [showPrompt, setShowPrompt] = useState(false);
+
+  return (
+    <Div className="mt-2 max-w-lg">
+      {showPrompt ? (
+        <P className="text-sm text-muted-foreground italic px-1">{prompt}</P>
+      ) : (
+        <Image
+          src={url}
+          alt={prompt || "Generated image"}
+          unoptimized
+          width={1024}
+          height={1024}
+          className="rounded-lg w-full h-auto"
+        />
+      )}
+      <Div className="flex items-center gap-1 mt-1.5">
+        <MediaActions url={url} type="image" locale={locale} />
+        {prompt ? (
+          <Button
+            variant="ghost"
+            size="unset"
+            onClick={() => setShowPrompt((v) => !v)}
+            className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs text-muted-foreground hover:text-foreground"
+          >
+            {showPrompt
+              ? t("widget.common.generatedMediaActions.hidePrompt")
+              : t("widget.common.generatedMediaActions.showPrompt")}
+          </Button>
+        ) : null}
+      </Div>
+    </Div>
+  );
+}
+
 const AssistantContentMessage = memo(
   function AssistantContentMessage({
     message,
@@ -337,21 +392,11 @@ const AssistantContentMessage = memo(
         {/* Generated Media (image / audio / video) */}
         {generatedMedia ? (
           generatedMedia.type === "image" && generatedMedia.url ? (
-            <Div className="mt-2 max-w-lg">
-              <Image
-                src={generatedMedia.url}
-                alt={generatedMedia.prompt ?? "Generated image"}
-                unoptimized
-                width={1024}
-                height={1024}
-                className="rounded-lg w-full h-auto"
-              />
-              <MediaActions
-                url={generatedMedia.url}
-                type="image"
-                locale={locale}
-              />
-            </Div>
+            <GeneratedImageWithPrompt
+              url={generatedMedia.url}
+              prompt={generatedMedia.prompt ?? ""}
+              locale={locale}
+            />
           ) : generatedMedia.type === "audio" && generatedMedia.url ? (
             <Div className="mt-2 w-full">
               <Audio src={generatedMedia.url} controls className="w-full" />

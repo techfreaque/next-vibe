@@ -23,12 +23,12 @@ import type { JSX } from "react";
 
 import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { envClient } from "@/config/env-client";
 import {
   ENDPOINT_PLATFORMS,
   GITHUB_REPO_URL,
   PLATFORM_COUNT,
 } from "@/config/constants";
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
@@ -70,12 +70,6 @@ function getCodeSnippets(locale: CountryLanguage): {
       ? "Przepisz wszystko na TypeScript"
       : "Rewrite everything in TypeScript";
 
-  const allErrorTypesComment = isDE
-    ? "// ... alle 9 Fehlertypen erforderlich"
-    : isPL
-      ? "// ... wszystkie 9 typów błędów wymagane"
-      : "// ... all 9 error types required";
-
   const devLabel = isDE
     ? "# development"
     : isPL
@@ -83,16 +77,16 @@ function getCodeSnippets(locale: CountryLanguage): {
       : "# development";
 
   const prodLabel = isDE
-    ? "# production — erster Start"
+    ? "# production - erster Start"
     : isPL
-      ? "# production — pierwsze uruchomienie"
-      : "# production — first start";
+      ? "# production - pierwsze uruchomienie"
+      : "# production - first start";
 
   const rebuildLabel = isDE
-    ? "# production — nach Änderungen"
+    ? "# production - nach Änderungen"
     : isPL
-      ? "# production — po zmianach"
-      : "# production — after changes";
+      ? "# production - po zmianach"
+      : "# production - after changes";
 
   const aiChatComment = isDE
     ? "# In unbottled.ai-Chat oder Claude Code:"
@@ -115,60 +109,76 @@ function getCodeSnippets(locale: CountryLanguage): {
   // prettier-ignore
   const definitionCode = [
     "```typescript",
-    "export const { POST } = createEndpoint({",
+    "const { POST } = createEndpoint({",
     "  scopedTranslation,",
     "  method: Methods.POST,",
     '  path: ["explain", "to-my-boss"],',
     '  title: "post.title" as const,',
-    '  category: "endpointCategories.ai" as const,',
-    "  allowedRoles: [UserRole.CUSTOMER] as const,",
-    "  customWidget: customWidgetObject(ExplainContainer),",
-    "  fields: {",
-    "    decision: requestField(scopedTranslation, {",
-    "      fieldType: FieldDataType.TEXT,",
-    "      type: WidgetType.FORM_FIELD,",
-    '      label: "post.decision.label" as const,',
-    "      schema: z.string().min(10),",
-    "    }),",
-    "    justification: responseField(scopedTranslation, {",
-    "      type: WidgetType.TEXT,",
-    '      label: "post.justification.label" as const,',
-    "      schema: z.string(),",
-    "    }),",
-    "  },",
+    '  description: "post.description" as const,',
+    '  icon: "sparkles",',
+    '  category: "endpointCategories.ai",',
+    "  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,",
+    "  fields: customWidgetObject({",
+    "    render: ExplainContainer,",
+    "    usage: { request: \"data\", response: true } as const,",
+    "    children: {",
+    "      decision: requestField(scopedTranslation, {",
+    "        type: WidgetType.FORM_FIELD,",
+    "        fieldType: FieldDataType.TEXTAREA,",
+    '        label: "post.decision.label" as const,',
+    "        columns: 12,",
+    "        schema: z.string().min(10),",
+    "      }),",
+    "      justification: responseField(scopedTranslation, {",
+    "        type: WidgetType.TEXT,",
+    '        content: "post.justification.content" as const,',
+    "        schema: z.string(),",
+    "      }),",
+    "    },",
+    "  }),",
     "  errorTypes: {",
-    `    [EndpointErrorTypes.UNAUTHORIZED]: { title: "post.errors.unauthorized.title" as const, description: "post.errors.unauthorized.description" as const },`,
-    `    ${allErrorTypesComment}`,
+    `    [EndpointErrorTypes.UNAUTHORIZED]:      { title: "post.errors.unauthorized.title" as const,      description: "post.errors.unauthorized.description" as const },`,
+    `    [EndpointErrorTypes.SERVER_ERROR]:      { title: "post.errors.serverError.title" as const,       description: "post.errors.serverError.description" as const },`,
+    "    // ... other error types",
     "  },",
-    '  successTypes: { title: "post.success.title" as const },',
-    `  examples: { requests: { default: { decision: "${exampleDecision}" } } },`,
+    '  successTypes: { title: "post.success.title" as const, description: "post.success.description" as const },',
+    `  examples: { requests: { default: { decision: "${exampleDecision}" } }, responses: { default: { justification: "..." } } },`,
     "});",
     "",
     "export type ExplainResponseOutput = typeof POST.types.ResponseOutput;",
-    "export default { POST };",
+    "const definitions = { POST } as const;",
+    "export default definitions;",
     "```",
   ].join("\n");
 
   // prettier-ignore
   const routeCode = [
     "```typescript",
-    "export const { POST, tools } = endpointsHandler({",
-    "  endpoint: endpoints,",
-    "  [Methods.POST]: {",
-    "    handler: async ({ data, user, logger, t }) => {",
-    "      const result = await callAI({",
-    `        prompt: t("post.systemPrompt"),`,
-    "        input: data.decision,",
-    "        user,",
-    "        logger,",
-    "      });",
-    "      if (!result.ok) {",
-    "        return fail({ message: result.error, errorType: EndpointErrorTypes.SERVER_ERROR });",
-    "      }",
-    "      return success({ justification: result.text });",
-    "    },",
-    "  },",
-    "});",
+    'import "server-only";',
+    "",
+    "export class ExplainRepository {",
+    "  static async explainToMyBoss(",
+    "    data: ExplainRequestOutput,",
+    "    user: JwtPayloadType,",
+    "    logger: EndpointLogger,",
+    "    t: ExplainT,",
+    "  ): Promise<ResponseType<ExplainResponseOutput>> {",
+    "    if (!user.id) {",
+    "      return fail({ message: t(\"post.errors.unauthorized.title\"), errorType: ErrorResponseTypes.UNAUTHORIZED });",
+    "    }",
+    "    try {",
+    "      const [saved] = await db",
+    "        .insert(explainResults)",
+    "        .values({ userId: user.id, decision: data.decision })",
+    "        .returning();",
+    "      logger.info(\"Saved decision\", { userId: user.id, id: saved.id });",
+    "      return success({ justification: saved.justification ?? \"\" });",
+    "    } catch (error) {",
+    "      logger.error(\"Failed to save decision\", parseError(error));",
+    "      return fail({ message: t(\"post.errors.serverError.title\"), errorType: ErrorResponseTypes.INTERNAL_ERROR });",
+    "    }",
+    "  }",
+    "}",
     "```",
   ].join("\n");
 
@@ -183,31 +193,26 @@ function getCodeSnippets(locale: CountryLanguage): {
     `  } & (typeof definition.POST)["fields"];`,
     "}",
     "",
-    "export function ExplainContainer({ field }: CustomWidgetProps): React.JSX.Element {",
+    "export function ExplainContainer({ field }: CustomWidgetProps): JSX.Element {",
     "  const children = field.children;",
-    "  const form = useWidgetForm<typeof definition.POST>();",
     "  const emptyField = useMemo(() => ({}), []);",
     "",
     "  return (",
-    '    <Div className="flex flex-col gap-0">',
-    '      <Div className="flex flex-row gap-2 p-4">',
-    "        <SubmitButtonWidget<typeof definition.POST>",
-    "          field={{",
-    '            text: "post.submitButton.label",',
-    '            loadingText: "post.submitButton.loadingText",',
-    '            icon: "sparkles",',
-    '            variant: "primary",',
-    "          }}",
-    "        />",
-    "      </Div>",
-    '      <Div className="px-4 pb-4 flex flex-col gap-4">',
-    "        <FormAlertWidget field={emptyField} />",
-    "        <AlertWidget",
-    '          fieldName="justification"',
-    "          field={withValue(children.justification, field.value?.justification, null)}",
-    "        />",
-    '        <TextareaFieldWidget fieldName="decision" field={children.decision} />',
-    "      </Div>",
+    '    <Div className="flex flex-col gap-4 p-4">',
+    "      <TextareaFieldWidget fieldName=\"decision\" field={children.decision} />",
+    "      <SubmitButtonWidget<typeof definition.POST>",
+    "        field={{",
+    '          text: "Explain to my boss",',
+    '          loadingText: "Explaining...",',
+    '          icon: "sparkles",',
+    '          variant: "primary",',
+    "        }}",
+    "      />",
+    "      <FormAlertWidget field={emptyField} />",
+    "      <AlertWidget",
+    '        fieldName="justification"',
+    "        field={withValue(children.justification, field.value?.justification, null)}",
+    "      />",
     "    </Div>",
     "  );",
     "}",

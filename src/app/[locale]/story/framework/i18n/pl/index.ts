@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
     title: "Jedna definicja.",
     titleAccent: "Trzynaście platform.",
     subtitle:
-      "next-vibe zamienia pojedynczą definicję TypeScript w trzynaście platform naraz — formularz web, polecenie CLI, narzędzie MCP, ekran mobilny, cron job, WebSocket, panel admina i więcej. Pełne bezpieczeństwo typów, zero dryfu, zero powtórzeń.",
+      "next-vibe zamienia pojedynczą definicję TypeScript w trzynaście platform naraz - formularz web, polecenie CLI, narzędzie MCP, ekran mobilny, cron job, WebSocket, panel admina i więcej. Pełne bezpieczeństwo typów, zero dryfu, zero powtórzeń.",
     ctaGithub: "Daj gwiazdkę na GitHub",
     ctaDocs: "Czytaj dokumentację wzorców",
     stat1Label: "typed endpoints",
@@ -32,23 +32,23 @@ export const translations: typeof enTranslations = {
     eyebrow: "Problem",
     title: "Budowałeś to samo trzynaście razy.",
     subtitle:
-      "Każdy feature potrzebuje formularza web, polecenia CLI, narzędzia MCP, ekranu mobilnego, cron joba, handlera WebSocket, panelu admina i więcej. Ta sama walidacja, ten sam i18n, ta sama obsługa błędów — tylko inaczej ubrana. Za każdym razem.",
+      "Każdy feature potrzebuje formularza web, polecenia CLI, narzędzia MCP, ekranu mobilnego, cron joba, handlera WebSocket, panelu admina i więcej. Ta sama walidacja, ten sam i18n, ta sama obsługa błędów - tylko inaczej ubrana. Za każdym razem.",
     callout: "next-vibe buduje wszystkie trzynaście z jednego pliku.",
   },
   pattern: {
     eyebrow: "Wzorzec",
     title: "Dwa pliki wymagane. Każda platforma.",
     subtitle:
-      "Każdy feature żyje w folderze. Tylko definition.ts i route.ts są wymagane — wszystko inne jest opcjonalne.",
-    definitionTitle: "definition.ts — kontrakt",
+      "Każdy feature żyje w folderze. Tylko definition.ts i route.ts są wymagane - wszystko inne jest opcjonalne.",
+    definitionTitle: "definition.ts - kontrakt",
     definitionBody:
-      "Zadeklaruj pola, schematy Zod, etykiety, typy błędów i przykłady raz. Ten plik jest jedynym źródłem prawdy — framework odczytuje go w czasie wykonania na każdej platformie.",
-    routeTitle: "route.ts — logika",
+      "Zadeklaruj pola, schematy Zod, etykiety, typy błędów i przykłady raz. Ten plik jest jedynym źródłem prawdy - framework odczytuje go w czasie wykonania na każdej platformie.",
+    routeTitle: "repository.ts - logika",
     routeBody:
-      "Połącz definicję z handlerem. Walidacja, auth, logowanie i rejestracja na wszystkich platformach działają automatycznie. Logika biznesowa żyje tu — bez osobnego pliku.",
-    widgetTitle: "widget.tsx — UI (opcjonalny)",
+      "Logika biznesowa żyje tu - zapytania DB, sprawdzanie uprawnień, obsługa błędów z success()/fail(). Plik route.ts to tylko cienki delegator; walidacja, logowanie i rejestracja platform działają automatycznie.",
+    widgetTitle: "widget.tsx - UI (opcjonalny)",
     widgetBody:
-      "Bez widgetu framework automatycznie renderuje pola na każdej platformie. Dodaj widget.tsx, żeby w pełni kontrolować wygląd na web i native — ten sam komponent renderuje w panelach admina, osadzonych widgetach i ekranach mobilnych.",
+      "Bez widgetu framework automatycznie renderuje pola na każdej platformie. Dodaj widget.tsx, żeby w pełni kontrolować wygląd na web i native - ten sam komponent renderuje w panelach admina, osadzonych widgetach i ekranach mobilnych.",
     deleteLine: "Usuń folder. Feature znika z każdej platformy naraz.",
   },
   surfaces: {
@@ -63,7 +63,7 @@ export const translations: typeof enTranslations = {
       },
       reactUi: {
         label: "React UI",
-        description: "Automatycznie generowany formularz — bez JSX",
+        description: "Automatycznie generowany formularz - bez JSX",
       },
       cli: {
         label: "CLI",
@@ -99,7 +99,7 @@ export const translations: typeof enTranslations = {
       adminPanel: {
         label: "Panel administracyjny",
         description:
-          "Automatycznie generowany panel admina — bez dedykowanego kodu",
+          "Automatycznie generowany panel admina - bez dedykowanego kodu",
       },
       vibeFrame: {
         label: "Widget VibeFrame",
@@ -112,7 +112,7 @@ export const translations: typeof enTranslations = {
       vibeBoard: {
         label: "Węzeł Vibe Sense",
         description:
-          "Węzeł w grafie przepływu danych na żywo — ten sam endpoint",
+          "Węzeł w grafie przepływu danych na żywo - ten sam endpoint",
       },
     },
   },
@@ -120,7 +120,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Supremacja TypeScript",
     title: "Żadnego any. Żadnego unknown. Żadnego throw.",
     subtitle:
-      "Typy muszą być całkowicie zgodne — bez wyjątków. To nie jest preferencja stylistyczna. To reguła strukturalna wymuszana w czasie budowania przez vibe check.",
+      "Typy muszą być całkowicie zgodne - bez wyjątków. To nie jest preferencja stylistyczna. To reguła strukturalna wymuszana w czasie budowania przez vibe check.",
     patterns: {
       any: {
         name: "brak any",
@@ -172,17 +172,17 @@ export const translations: typeof enTranslations = {
     step3: {
       label: "Zaloguj jako admin",
       description:
-        'Otwórz aplikację i kliknij "Zaloguj jako admin" — kreator konfiguracji przeprowadzi przez klucze API i hasło admina.',
+        'Otwórz aplikację i kliknij "Zaloguj jako admin" - kreator konfiguracji przeprowadzi przez klucze API i hasło admina.',
     },
     step4: {
       label: "Zapytaj AI",
       description:
-        "Otwórz czat unbottled.ai lub Claude Code i opisz feature, który chcesz. AI napisze wszystkie pliki — definicję, route, widget, i18n — i automatycznie uruchomi vibe check.",
+        "Otwórz czat unbottled.ai lub Claude Code i opisz feature, który chcesz. AI napisze wszystkie pliki - definicję, route, widget, i18n - i automatycznie uruchomi vibe check.",
     },
     step5: {
       label: "Wdróż",
       description:
-        "vibe rebuild aktualizuje produkcję bez przestojów. Sprawdza, przebudowuje i hot-restartuje — bez ręcznego edytowania plików, bez przestojów.",
+        "vibe rebuild aktualizuje produkcję bez przestojów. Sprawdza, przebudowuje i hot-restartuje - bez ręcznego edytowania plików, bez przestojów.",
     },
     docsLink: "Dokumentacja wzorców",
     githubLink: "github.com/techfreaque/next-vibe",

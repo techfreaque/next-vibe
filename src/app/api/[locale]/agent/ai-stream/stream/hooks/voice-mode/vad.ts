@@ -92,7 +92,7 @@ export class VoiceActivityDetector {
             if (speechDuration >= this.config.minSpeechDurationMs) {
               this.sealAndSend();
             } else {
-              // Too short — discard
+              // Too short - discard
               this.resetSpeech();
             }
           }

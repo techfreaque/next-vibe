@@ -16,11 +16,16 @@ import {
   ApiProvider,
   calculateCreditCost,
   getModelById,
+  isModelProviderAvailable,
   type ModelOptionImageBased,
 } from "@/app/api/[locale]/agent/models/models";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import type { ImageGenModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
 
 import { generateWithFalAi } from "../ai-stream/providers/fal-ai-image";
 import { generateWithOpenAI } from "../ai-stream/providers/openai-images";
@@ -36,6 +41,11 @@ import type {
 } from "./definition";
 import type { ImageGenerationT } from "./i18n";
 
+interface MediaGenStreamContext {
+  threadId?: string | undefined;
+  aiMessageId?: string | undefined;
+}
+
 export class ImageGenerationRepository {
   /**
    * Generate an image from a text prompt
@@ -46,10 +56,12 @@ export class ImageGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: ImageGenerationT,
+    streamContext?: MediaGenStreamContext,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
-    const modelConfig = getModelById(data.model);
+    // model is already resolved via streamContextPatch in tools-loader (from ToolExecutionContext.imageGenModelId)
+    const modelConfig = getModelById(data.model as ImageGenModelId);
 
-    if (modelConfig.modelType !== "image") {
+    if (modelConfig.modelRole !== "image-gen") {
       return fail({
         message: t("post.errors.notAnImageModel"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -58,6 +70,19 @@ export class ImageGenerationRepository {
 
     const imageModel = modelConfig as ModelOptionImageBased;
     const creditCost = calculateCreditCost(imageModel, 0, 0);
+
+    // Check provider availability before attempting generation
+    const envAvailability = getAgentEnvAvailability();
+    if (!isModelProviderAvailable(imageModel, envAvailability)) {
+      return fail({
+        message: t("post.errors.notConfigured", {
+          label: imageModel.apiProvider,
+          envKey: "N/A",
+          url: "https://unbottled.ai",
+        }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
 
     logger.info("[ImageGen] Starting image generation", {
       model: data.model,
@@ -140,7 +165,34 @@ export class ImageGenerationRepository {
       });
     }
 
-    const { imageUrl } = generationResult.data;
+    let { imageUrl } = generationResult.data;
+
+    // Upload to our storage so the URL is persistent and access-controlled
+    if (streamContext?.threadId) {
+      try {
+        const storage = getStorageAdapter();
+        const arrayBuf = await fetch(imageUrl).then((r) => r.arrayBuffer());
+        const imageBuffer = Buffer.from(new Uint8Array(arrayBuf));
+        const ext = imageUrl.includes("webp") ? "webp" : "png";
+        const uploadResult = await storage.uploadFile(imageBuffer, {
+          filename: `generated-image-${Date.now()}.${ext}`,
+          mimeType: `image/${ext}`,
+          threadId: streamContext.threadId,
+          userId: user.id,
+        });
+        imageUrl = uploadResult.url;
+      } catch (uploadErr) {
+        logger.error(
+          "[ImageGen] Failed to upload to storage, using provider URL",
+          {
+            error:
+              uploadErr instanceof Error
+                ? uploadErr.message
+                : String(uploadErr),
+          },
+        );
+      }
+    }
 
     const deductResult = await deductMediaCredits(
       user,

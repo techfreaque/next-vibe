@@ -16,6 +16,11 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { SeedRepository } from "@/app/api/[locale]/system/db/seed/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
+  devFileLog,
+  truncateDevLog,
+  writeDevLogOfflineHint,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
+import {
   createNextjsFormatter,
   formatActionCommand,
   formatCommand,
@@ -31,6 +36,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import { UnifiedTaskRunnerRepository } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/repository";
 import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import { enableDevFileLogging } from "@/config/debug";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -269,6 +275,12 @@ export class DevRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<never> {
+    // Truncate dev log and enable file logging from line one - before any other output
+    truncateDevLog();
+    enableDevFileLogging();
+    // Guaranteed last-resort offline hint - process.on("exit") always fires, even on crash
+    process.on("exit", writeDevLogOfflineHint);
+
     // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
     const port =
       data.port ?? DevRepository.portFromUrl(env.NEXT_PUBLIC_APP_URL) ?? 3000;
@@ -986,20 +998,24 @@ export class DevRepository {
       const formatNextjs = createNextjsFormatter(nextPort, port);
       if (!disableProxy) {
         const rewritePort = (chunk: Buffer): void => {
-          process.stdout.write(
-            formatNextjs(
-              chunk.toString().replaceAll(String(nextPort), String(port)),
-            ),
+          const formatted = formatNextjs(
+            chunk.toString().replaceAll(String(nextPort), String(port)),
           );
+          process.stdout.write(formatted);
+          devFileLog(formatted.trimEnd());
         };
         nextProcess.stdout?.on("data", rewritePort);
         nextProcess.stderr?.on("data", rewritePort);
       } else {
         nextProcess.stdout?.on("data", (chunk: Buffer) => {
-          process.stdout.write(formatNextjs(chunk.toString()));
+          const formatted = formatNextjs(chunk.toString());
+          process.stdout.write(formatted);
+          devFileLog(formatted.trimEnd());
         });
         nextProcess.stderr?.on("data", (chunk: Buffer) => {
-          process.stderr.write(formatNextjs(chunk.toString()));
+          const formatted = formatNextjs(chunk.toString());
+          process.stderr.write(formatted);
+          devFileLog(formatted.trimEnd());
         });
       }
 

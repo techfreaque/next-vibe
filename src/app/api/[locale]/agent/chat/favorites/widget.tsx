@@ -46,7 +46,6 @@ import React, { useCallback, useMemo, useState } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/models/models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
@@ -806,7 +805,6 @@ export function FavoritesListContainer({
         favoriteId: item.id,
         modelId: item.modelId,
         skillId: item.skillId,
-        voiceId: item.voiceId,
         logger,
         locale,
         user,
@@ -1116,7 +1114,7 @@ function AddVariantButton({
           data: {
             skillId,
             icon: cachedData.data.icon ?? undefined,
-            voiceId: cachedData.data.voiceId ?? DEFAULT_TTS_VOICE_ID,
+            voiceModelSelection: cachedData.data.voiceModelSelection ?? null,
             modelSelection: null,
           },
           popNavigationOnSuccess: 1,
@@ -1140,7 +1138,8 @@ function AddVariantButton({
         data: {
           skillId,
           icon: characterResponse.data.icon ?? undefined,
-          voiceId: characterResponse.data.voiceId ?? DEFAULT_TTS_VOICE_ID,
+          voiceModelSelection:
+            characterResponse.data.voiceModelSelection ?? null,
           modelSelection: null,
         },
         popNavigationOnSuccess: 1,

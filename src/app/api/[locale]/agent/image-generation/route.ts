@@ -17,7 +17,14 @@ import { ImageGenerationRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger, t }) =>
-      ImageGenerationRepository.generateImage(data, user, locale, logger, t),
+    handler: ({ data, user, locale, logger, t, streamContext }) =>
+      ImageGenerationRepository.generateImage(
+        data,
+        user,
+        locale,
+        logger,
+        t,
+        streamContext,
+      ),
   },
 });

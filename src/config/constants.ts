@@ -3,7 +3,7 @@ export const GITHUB_REPO_URL = "https://github.com/techfreaque/next-vibe"; // es
 
 /**
  * Canonical list of platforms that every next-vibe endpoint automatically becomes.
- * Add a new entry here when a new platform is supported — all platform counts across
+ * Add a new entry here when a new platform is supported - all platform counts across
  * the app derive from this array's length via PLATFORM_COUNT.
  */
 export const ENDPOINT_PLATFORMS = [
@@ -24,7 +24,7 @@ export const ENDPOINT_PLATFORMS = [
 
 export type EndpointPlatformKey = (typeof ENDPOINT_PLATFORMS)[number];
 
-/** Derived count — use this instead of the magic number 13. */
+/** Derived count - use this instead of the magic number 13. */
 export const PLATFORM_COUNT = ENDPOINT_PLATFORMS.length;
 
 export const LOCALE_COOKIE_NAME = "locale";

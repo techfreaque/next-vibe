@@ -1,5 +1,8 @@
 /* eslint-disable i18next/no-literal-string */
-import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+import type {
+  MediaCapabilitiesParams,
+  SystemPromptFragment,
+} from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 
 // ─── Unified prompt context data ──────────────────────────────────────────────
@@ -31,6 +34,8 @@ export interface PromptContextData {
   isAdmin: boolean;
   /** Computed from DB counts: no memories + no tasks = fresh user */
   isFreshUser: boolean;
+  /** Resolved media generation capabilities (image-gen, music-gen, video-gen) */
+  mediaCapabilities: MediaCapabilitiesParams | null;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -430,3 +435,58 @@ This user has **no account** - they browse as a guest identified by a browser ID
 - Favour concise responses unless detail is truly needed - it makes their credits go further.`;
   },
 };
+
+export const mediaCapabilitiesFragment: SystemPromptFragment<PromptContextData> =
+  {
+    id: "media-capabilities",
+    placement: "leading",
+    priority: 75,
+    condition: (data) => data.mediaCapabilities !== null,
+    build: (data) => {
+      const mc = data.mediaCapabilities;
+      if (!mc) {
+        return null;
+      }
+      const {
+        nativeOutputs,
+        imageGenModelName,
+        musicGenModelName,
+        videoGenModelName,
+      } = mc;
+      const lines: string[] = [];
+
+      if (nativeOutputs.includes("image")) {
+        lines.push(
+          `- Images: native (model outputs images directly without a separate tool)`,
+        );
+      } else {
+        lines.push(
+          `- Images: ${imageGenModelName} available via generate_image tool`,
+        );
+      }
+
+      if (nativeOutputs.includes("audio")) {
+        lines.push(
+          `- Music/audio: native (model outputs audio directly without a separate tool)`,
+        );
+      } else if (musicGenModelName) {
+        lines.push(
+          `- Music/audio: ${musicGenModelName} available via generate_music tool`,
+        );
+      }
+      // If musicGenModelName is null: tool is removed from the active set, omit from prompt
+
+      if (nativeOutputs.includes("video")) {
+        lines.push(
+          `- Video: native (model outputs video directly without a separate tool)`,
+        );
+      } else if (videoGenModelName) {
+        lines.push(
+          `- Video: ${videoGenModelName} available via generate_video tool`,
+        );
+      }
+      // If videoGenModelName is null: tool is removed from the active set, omit from prompt
+
+      return `## Media capabilities\n${lines.join("\n")}`;
+    },
+  };

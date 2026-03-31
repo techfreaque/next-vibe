@@ -67,7 +67,7 @@ export interface SkillDataForFavorite {
   name: string | null;
   tagline: string | null;
   description: string | null;
-  voiceId: string | null;
+  voiceModelSelection: ModelSelectionSimple | null;
   modelSelection: ModelSelectionSimple | null;
 }
 
@@ -134,7 +134,7 @@ export function useAddToFavorites({
             name: cachedData.data.name,
             tagline: cachedData.data.tagline,
             description: cachedData.data.description,
-            voiceId: cachedData.data.voiceId ?? null,
+            voiceModelSelection: cachedData.data.voiceModelSelection ?? null,
             modelSelection: null,
           };
         } else {
@@ -159,7 +159,8 @@ export function useAddToFavorites({
             name: characterResponse.data.name,
             tagline: characterResponse.data.tagline,
             description: characterResponse.data.description,
-            voiceId: characterResponse.data.voiceId ?? null,
+            voiceModelSelection:
+              characterResponse.data.voiceModelSelection ?? null,
             modelSelection: null,
           };
         }
@@ -184,7 +185,7 @@ export function useAddToFavorites({
           skillId: skillId,
           variantId: variantId ?? null,
           icon: charData.icon ?? undefined,
-          voiceId: null,
+          voiceModelSelection: null,
           modelSelection: null,
         },
         undefined,
@@ -203,7 +204,7 @@ export function useAddToFavorites({
         skillId: skillId,
         variantId: variantId ?? null,
         customIcon: null,
-        voiceId: null,
+        voiceModelSelection: null,
         modelSelection: null,
         position: 0,
       };

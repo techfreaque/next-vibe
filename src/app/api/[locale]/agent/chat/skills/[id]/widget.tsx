@@ -11,6 +11,7 @@ import {
   CollapsibleTrigger,
 } from "next-vibe-ui/ui/collapsible";
 import { Div } from "next-vibe-ui/ui/div";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
@@ -26,7 +27,19 @@ import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
 import { useCallback, useMemo, useState } from "react";
 
-import { ModelSelector } from "@/app/api/[locale]/agent/models/widget/model-selector";
+import {
+  imageGenModelSelectionSchema,
+  musicGenModelSelectionSchema,
+  sttModelSelectionSchema,
+  videoGenModelSelectionSchema,
+  visionModelSelectionSchema,
+  voiceModelSelectionSchema,
+} from "@/app/api/[locale]/agent/models/types";
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
+import {
+  ModelSelector,
+  ModelSelectorTrigger,
+} from "@/app/api/[locale]/agent/models/widget/model-selector";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
@@ -57,10 +70,16 @@ import {
   ToolsConfigEdit,
   type ToolsConfigValue,
 } from "../../../tools/widget/tools-config-widget";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import {
+  getAllModelOptions,
+  getDefaultModelForRole,
+} from "@/app/api/[locale]/agent/models/models";
 import { useAddToFavorites } from "../../favorites/create/hooks";
 import { useChatFavorites } from "../../favorites/hooks/hooks";
 import { CompactTriggerEdit } from "../../settings/widget";
 import {
+  ModelSelectionType,
   SkillOwnershipType,
   type SkillOwnershipTypeValue,
 } from "../../skills/enum";
@@ -101,10 +120,80 @@ export function SkillEditContainer({
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const t = useWidgetTranslation<typeof definitionPatch.PATCH>();
   const form = useWidgetForm<typeof definitionPatch.PATCH>();
   const skillId = form.watch("id");
   const skillHook = useSkill(skillId, user, logger);
   const skillOwnership = skillHook.read?.data?.skillOwnership;
+
+  const envAvailability = useEnvAvailability();
+
+  // Single active selector state replaces 5 separate open/close states
+  const [activeSelector, setActiveSelector] = useState<
+    | "chat"
+    | "voice"
+    | "imageGen"
+    | "musicGen"
+    | "videoGen"
+    | "stt"
+    | "visionBridge"
+    | null
+  >(null);
+
+  // Platform-level default model selections (env-aware)
+  const platformTtsDefault = useMemo((): ModelSelectionSimple | undefined => {
+    const m = getDefaultModelForRole(["tts"], envAvailability);
+    if (!m) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+  }, [envAvailability]);
+
+  const platformImageGenDefault = useMemo(():
+    | ModelSelectionSimple
+    | undefined => {
+    const m = getDefaultModelForRole(["image-gen"], envAvailability);
+    if (!m) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+  }, [envAvailability]);
+
+  const platformMusicGenDefault = useMemo(():
+    | ModelSelectionSimple
+    | undefined => {
+    const m = getDefaultModelForRole(["audio-gen"], envAvailability);
+    if (!m) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+  }, [envAvailability]);
+
+  const platformVideoGenDefault = useMemo(():
+    | ModelSelectionSimple
+    | undefined => {
+    const m = getDefaultModelForRole(["video-gen"], envAvailability);
+    if (!m) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+  }, [envAvailability]);
+
+  const platformSttDefault = useMemo((): ModelSelectionSimple | undefined => {
+    const m = getDefaultModelForRole(["stt"], envAvailability);
+    if (!m) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+  }, [envAvailability]);
+
+  const platformLlmDefault = useMemo((): ModelSelectionSimple | undefined => {
+    const m = getDefaultModelForRole(["llm"], envAvailability, ["image"]);
+    if (!m) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+  }, [envAvailability]);
 
   // Stable props
   const emptyField = useMemo(() => ({}), []);
@@ -146,13 +235,19 @@ export function SkillEditContainer({
     <Div className="flex flex-col gap-0">
       {/* Top Actions: Back, Delete, Submit */}
       <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
-        {/* Back Button */}
-        <NavigateButtonWidget
-          field={{
-            icon: "arrow-left",
-            variant: "outline",
-          }}
-        />
+        {/* Back Button - returns to selector when a model selector is open */}
+        {activeSelector !== null ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => setActiveSelector(null)}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        ) : (
+          <NavigateButtonWidget field={children.backButton} />
+        )}
 
         {/* Delete Button - only show if user owns the skill */}
         {skillOwnership === SkillOwnershipType.USER && (
@@ -164,17 +259,13 @@ export function SkillEditContainer({
             className="ml-auto"
           >
             <Trash2 className="h-4 w-4" />
-            {/* {t("patch.deleteButton.label")} */}
           </Button>
         )}
 
         {/* Submit Button */}
         <SubmitButtonWidget<typeof definitionPatch.PATCH>
           field={{
-            text: "patch.submitButton.label",
-            loadingText: "patch.submitButton.loadingText",
-            icon: "save",
-            variant: "primary",
+            ...children.submitButton,
             className:
               skillOwnership !== SkillOwnershipType.USER
                 ? "ml-auto"
@@ -185,74 +276,444 @@ export function SkillEditContainer({
 
       {/* Scrollable Form Container */}
       <Div className="group overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4">
-        {/* Form Alert */}
-        <FormAlertWidget field={emptyField} />
-
-        {/* Success message (response only) */}
-        <AlertWidget
-          fieldName="success"
-          field={withValue(children.success, field.value?.success, null)}
-        />
-
-        <Div className="flex flex-col gap-4">
-          {/* Skill Info Card */}
-          <IconFieldWidget fieldName="icon" field={children.icon} />
-          <TextFieldWidget fieldName="name" field={children.name} />
-          <TextFieldWidget fieldName="tagline" field={children.tagline} />
-          <TextFieldWidget
-            fieldName="description"
-            field={children.description}
+        {activeSelector === "chat" ? (
+          <ModelSelector
+            modelSelection={form.watch("modelSelection") ?? undefined}
+            onChange={(sel) => {
+              form.setValue("modelSelection", sel);
+            }}
+            onSelect={() => setActiveSelector(null)}
+            locale={locale}
+            user={user}
+            chatOnly
           />
-
-          {/* Additional Fields */}
-          <SelectFieldWidget fieldName="category" field={children.category} />
-          <BooleanFieldWidget fieldName="isPublic" field={children.isPublic} />
-          <TextFieldWidget fieldName="voiceId" field={children.voiceId} />
-          <TextareaFieldWidget
-            fieldName="systemPrompt"
-            field={children.systemPrompt}
+        ) : activeSelector === "voice" ? (
+          <ModelSelector
+            allowedRoles={["tts"]}
+            modelSelection={form.watch("voiceModelSelection") ?? undefined}
+            onChange={(sel) => {
+              const parsed = voiceModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "voiceModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = voiceModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformTtsDefault !== undefined &&
+                "manualModelId" in platformTtsDefault &&
+                platformTtsDefault.manualModelId === value.manualModelId;
+              form.setValue("voiceModelSelection", isDefault ? null : value, {
+                shouldDirty: true,
+              });
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
           />
-          {form && (
-            <ModelSelector
-              modelSelection={form.watch("modelSelection") ?? undefined}
-              onChange={(selection) =>
-                form.setValue("modelSelection", selection)
-              }
-              locale={locale}
-              user={user}
-            />
-          )}
+        ) : activeSelector === "imageGen" ? (
+          <ModelSelector
+            allowedRoles={["image-gen"]}
+            modelSelection={form.watch("imageGenModelSelection") ?? undefined}
+            onChange={(sel) => {
+              const parsed = imageGenModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "imageGenModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = imageGenModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformImageGenDefault !== undefined &&
+                "manualModelId" in platformImageGenDefault &&
+                platformImageGenDefault.manualModelId === value.manualModelId;
+              form.setValue(
+                "imageGenModelSelection",
+                isDefault ? null : value,
+                { shouldDirty: true },
+              );
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : activeSelector === "musicGen" ? (
+          <ModelSelector
+            allowedRoles={["audio-gen"]}
+            modelSelection={form.watch("musicGenModelSelection") ?? undefined}
+            onChange={(sel) => {
+              const parsed = musicGenModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "musicGenModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = musicGenModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformMusicGenDefault !== undefined &&
+                "manualModelId" in platformMusicGenDefault &&
+                platformMusicGenDefault.manualModelId === value.manualModelId;
+              form.setValue(
+                "musicGenModelSelection",
+                isDefault ? null : value,
+                { shouldDirty: true },
+              );
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : activeSelector === "videoGen" ? (
+          <ModelSelector
+            allowedRoles={["video-gen"]}
+            modelSelection={form.watch("videoGenModelSelection") ?? undefined}
+            onChange={(sel) => {
+              const parsed = videoGenModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "videoGenModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = videoGenModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformVideoGenDefault !== undefined &&
+                "manualModelId" in platformVideoGenDefault &&
+                platformVideoGenDefault.manualModelId === value.manualModelId;
+              form.setValue(
+                "videoGenModelSelection",
+                isDefault ? null : value,
+                { shouldDirty: true },
+              );
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : activeSelector === "stt" ? (
+          <ModelSelector
+            allowedRoles={["stt"]}
+            modelSelection={form.watch("sttModelSelection") ?? undefined}
+            onChange={(sel) => {
+              const parsed = sttModelSelectionSchema.nullable().safeParse(sel);
+              form.setValue(
+                "sttModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = sttModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformSttDefault !== undefined &&
+                "manualModelId" in platformSttDefault &&
+                platformSttDefault.manualModelId === value.manualModelId;
+              form.setValue("sttModelSelection", isDefault ? null : value, {
+                shouldDirty: true,
+              });
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : activeSelector === "visionBridge" ? (
+          <ModelSelector
+            allowedRoles={["llm"]}
+            requiredInputs={["image"]}
+            modelSelection={
+              form.watch("visionBridgeModelSelection") ?? undefined
+            }
+            onChange={(sel) => {
+              const parsed = visionModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "visionBridgeModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = visionModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformLlmDefault !== undefined &&
+                "manualModelId" in platformLlmDefault &&
+                platformLlmDefault.manualModelId === value.manualModelId;
+              form.setValue(
+                "visionBridgeModelSelection",
+                isDefault ? null : value,
+                { shouldDirty: true },
+              );
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : (
+          <>
+            {/* Form Alert */}
+            <FormAlertWidget field={emptyField} />
 
-          {/* Context Memory Budget */}
-          {form && (
-            <CompactTriggerEdit
-              value={form.watch("compactTrigger") ?? null}
-              onChange={(v) =>
-                form.setValue("compactTrigger", v, { shouldDirty: true })
-              }
-              modelSelection={form.watch("modelSelection") ?? null}
-              user={user}
+            {/* Success message (response only) */}
+            <AlertWidget
+              fieldName="success"
+              field={withValue(children.success, field.value?.success, null)}
             />
-          )}
 
-          {/* Tool configuration - per-skill override */}
-          {form && (
-            <ToolsConfigEdit
-              value={toolsValue}
-              onChange={handleToolsChange}
-              user={user}
-              logger={logger}
-            />
-          )}
-        </Div>
+            <Div className="flex flex-col gap-4">
+              {/* Skill Info Card */}
+              <IconFieldWidget fieldName="icon" field={children.icon} />
+              <TextFieldWidget fieldName="name" field={children.name} />
+              <TextFieldWidget fieldName="tagline" field={children.tagline} />
+              <TextFieldWidget
+                fieldName="description"
+                field={children.description}
+              />
+
+              {/* Additional Fields */}
+              <SelectFieldWidget
+                fieldName="category"
+                field={children.category}
+              />
+              <BooleanFieldWidget
+                fieldName="isPublic"
+                field={children.isPublic}
+              />
+              {/* voiceModelSelection, imageGenModelSelection, musicGenModelSelection are JSONB fields managed via ModelSelector, not rendered as text inputs */}
+              <TextareaFieldWidget
+                fieldName="systemPrompt"
+                field={children.systemPrompt}
+              />
+
+              {/* Chat model selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.chatModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("modelSelection") ?? undefined}
+                    placeholder={t("patch.chatModel.placeholder")}
+                    onClick={() => setActiveSelector("chat")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Voice (TTS) model selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.voice.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("voiceModelSelection")}
+                    allowedRoles={["tts"]}
+                    defaultModelSelection={platformTtsDefault}
+                    placeholder={t("patch.voice.placeholder")}
+                    onClick={() => setActiveSelector("voice")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Image Generation model selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.imageGenModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("imageGenModelSelection")}
+                    allowedRoles={["image-gen"]}
+                    defaultModelSelection={platformImageGenDefault}
+                    placeholder={t("patch.imageGenModel.placeholder")}
+                    onClick={() => setActiveSelector("imageGen")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Music Generation model selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.musicGenModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("musicGenModelSelection")}
+                    allowedRoles={["audio-gen"]}
+                    defaultModelSelection={platformMusicGenDefault}
+                    placeholder={t("patch.musicGenModel.placeholder")}
+                    onClick={() => setActiveSelector("musicGen")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Video Generation model selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.videoGenModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("videoGenModelSelection")}
+                    allowedRoles={["video-gen"]}
+                    defaultModelSelection={platformVideoGenDefault}
+                    placeholder={t("patch.videoGenModel.placeholder")}
+                    onClick={() => setActiveSelector("videoGen")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* STT model selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.sttModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("sttModelSelection")}
+                    allowedRoles={["stt"]}
+                    defaultModelSelection={platformSttDefault}
+                    placeholder={t("patch.sttModel.placeholder")}
+                    onClick={() => setActiveSelector("stt")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Vision Bridge model selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.visionBridgeModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("visionBridgeModelSelection")}
+                    allowedRoles={["llm"]}
+                    requiredInputs={["image"]}
+                    defaultModelSelection={platformLlmDefault}
+                    placeholder={t("patch.visionBridgeModel.placeholder")}
+                    onClick={() => setActiveSelector("visionBridge")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Context Memory Budget */}
+              {form && (
+                <CompactTriggerEdit
+                  value={form.watch("compactTrigger") ?? null}
+                  onChange={(v) =>
+                    form.setValue("compactTrigger", v, { shouldDirty: true })
+                  }
+                  modelSelection={form.watch("modelSelection") ?? null}
+                  user={user}
+                />
+              )}
+
+              {/* Tool configuration - per-skill override */}
+              {form && (
+                <ToolsConfigEdit
+                  value={toolsValue}
+                  onChange={handleToolsChange}
+                  user={user}
+                  logger={logger}
+                />
+              )}
+            </Div>
+          </>
+        )}
       </Div>
     </Div>
   );
 }
 
-/**
- * Custom container widget for skill viewing
- */
+function useViewDefaults(): {
+  tts: ModelSelectionSimple | undefined;
+  imageGen: ModelSelectionSimple | undefined;
+  musicGen: ModelSelectionSimple | undefined;
+  videoGen: ModelSelectionSimple | undefined;
+  stt: ModelSelectionSimple | undefined;
+  llm: ModelSelectionSimple | undefined;
+} {
+  const env = useEnvAvailability();
+  return useMemo(() => {
+    const mk = (
+      roles: Parameters<typeof getDefaultModelForRole>[0],
+    ): ModelSelectionSimple | undefined => {
+      const m = getDefaultModelForRole(roles, env);
+      if (!m) {
+        return undefined;
+      }
+      return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+    };
+    return {
+      tts: mk(["tts"]),
+      imageGen: mk(["image-gen"]),
+      musicGen: mk(["audio-gen"]),
+      videoGen: mk(["video-gen"]),
+      stt: mk(["stt"]),
+      llm: mk(["llm"]),
+    };
+  }, [env]);
+}
+
 export function SkillViewContainer({
   field,
 }: GetWidgetProps): React.JSX.Element {
@@ -262,6 +723,7 @@ export function SkillViewContainer({
   const context = useWidgetContext();
   const { logger, user } = context;
   const locale = useWidgetLocale();
+  const viewDefaults = useViewDefaults();
   const t = useWidgetTranslation<typeof definitionGet.GET>();
   const variants = field.value?.variants;
   const defaultVariant = variants?.find((v) => v.isDefault) ?? variants?.[0];
@@ -343,16 +805,106 @@ export function SkillViewContainer({
         readOnly={true}
         locale={locale}
         user={user}
+        chatOnly
       />
+
+      {/* Voice (TTS) - View Only */}
+      <Div className="flex flex-col gap-1">
+        <Span className="text-xs font-medium text-muted-foreground">
+          {t("patch.voice.label")}
+        </Span>
+        <ModelSelectorTrigger
+          modelSelection={field.value?.voiceModelSelection ?? undefined}
+          allowedRoles={["tts"]}
+          defaultModelSelection={viewDefaults.tts}
+          placeholder={t("patch.voice.placeholder")}
+          locale={locale}
+          user={user}
+        />
+      </Div>
+
+      {/* Image Generation - View Only */}
+      <Div className="flex flex-col gap-1">
+        <Span className="text-xs font-medium text-muted-foreground">
+          {t("patch.imageGenModel.label")}
+        </Span>
+        <ModelSelectorTrigger
+          modelSelection={field.value?.imageGenModelSelection ?? undefined}
+          allowedRoles={["image-gen"]}
+          defaultModelSelection={viewDefaults.imageGen}
+          placeholder={t("patch.imageGenModel.placeholder")}
+          locale={locale}
+          user={user}
+        />
+      </Div>
+
+      {/* Music Generation - View Only */}
+      <Div className="flex flex-col gap-1">
+        <Span className="text-xs font-medium text-muted-foreground">
+          {t("patch.musicGenModel.label")}
+        </Span>
+        <ModelSelectorTrigger
+          modelSelection={field.value?.musicGenModelSelection ?? undefined}
+          allowedRoles={["audio-gen"]}
+          defaultModelSelection={viewDefaults.musicGen}
+          placeholder={t("patch.musicGenModel.placeholder")}
+          locale={locale}
+          user={user}
+        />
+      </Div>
+
+      {/* Video Generation - View Only */}
+      <Div className="flex flex-col gap-1">
+        <Span className="text-xs font-medium text-muted-foreground">
+          {t("patch.videoGenModel.label")}
+        </Span>
+        <ModelSelectorTrigger
+          modelSelection={field.value?.videoGenModelSelection ?? undefined}
+          allowedRoles={["video-gen"]}
+          defaultModelSelection={viewDefaults.videoGen}
+          placeholder={t("patch.videoGenModel.placeholder")}
+          locale={locale}
+          user={user}
+        />
+      </Div>
+
+      {/* STT - View Only */}
+      <Div className="flex flex-col gap-1">
+        <Span className="text-xs font-medium text-muted-foreground">
+          {t("patch.sttModel.label")}
+        </Span>
+        <ModelSelectorTrigger
+          modelSelection={field.value?.sttModelSelection ?? undefined}
+          allowedRoles={["stt"]}
+          defaultModelSelection={viewDefaults.stt}
+          placeholder={t("patch.sttModel.placeholder")}
+          locale={locale}
+          user={user}
+        />
+      </Div>
+
+      {/* Vision Bridge - View Only */}
+      <Div className="flex flex-col gap-1">
+        <Span className="text-xs font-medium text-muted-foreground">
+          {t("patch.visionBridgeModel.label")}
+        </Span>
+        <ModelSelectorTrigger
+          modelSelection={field.value?.visionBridgeModelSelection ?? undefined}
+          allowedRoles={["llm"]}
+          requiredInputs={["image"]}
+          defaultModelSelection={viewDefaults.llm}
+          placeholder={t("patch.visionBridgeModel.placeholder")}
+          locale={locale}
+          user={user}
+        />
+      </Div>
     </>
   );
 
   return (
     <Div className="flex flex-col gap-0">
       <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
-        <NavigateButtonWidget
-          field={{ icon: "arrow-left", variant: "outline" }}
-        />
+        <NavigateButtonWidget field={children.backButton} />
       </Div>
 
       <Div className="group overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4 flex flex-col gap-4">
@@ -361,7 +913,7 @@ export function SkillViewContainer({
           name={field.value?.name ?? null}
           tagline={field.value?.tagline ?? null}
           description={field.value?.description ?? null}
-          voiceId={field.value?.voiceId ?? null}
+          voiceModelSelection={field.value?.voiceModelSelection ?? null}
           skillOwnership={skillOwnership ?? SkillOwnershipType.SYSTEM}
           locale={locale}
           isLoading={!field.value}
@@ -388,12 +940,48 @@ const ownershipIcon = {
   [SkillOwnershipType.PUBLIC]: Users,
 };
 
+function VoiceDisplayName({
+  voiceModelSelection,
+  t,
+}: {
+  voiceModelSelection: SkillGetResponseOutput["voiceModelSelection"];
+  t: ReturnType<typeof useWidgetTranslation>;
+}): React.JSX.Element {
+  const resolved = useMemo(() => {
+    if (!voiceModelSelection) {
+      return null;
+    }
+    if ("manualModelId" in voiceModelSelection) {
+      const all = getAllModelOptions();
+      return (
+        all.find((m) => m.id === voiceModelSelection.manualModelId) ?? null
+      );
+    }
+    return null;
+  }, [voiceModelSelection]);
+  if (!voiceModelSelection) {
+    return (
+      <Span className="text-muted-foreground/60">
+        {t("get.voiceModelSelection.systemDefault")}
+      </Span>
+    );
+  }
+  return (
+    <Span>
+      {resolved?.name ??
+        ("manualModelId" in voiceModelSelection
+          ? String(voiceModelSelection.manualModelId)
+          : "Custom voice")}
+    </Span>
+  );
+}
+
 interface SkillCardProps {
   icon: IconKey | null;
   name: string | null;
   tagline: string | null;
   description: string | null;
-  voiceId: string | null | undefined;
+  voiceModelSelection: SkillGetResponseOutput["voiceModelSelection"];
   skillOwnership: typeof SkillOwnershipTypeValue;
   locale: CountryLanguage;
   isLoading?: boolean;
@@ -418,7 +1006,7 @@ export function SkillCard({
   name,
   tagline,
   description,
-  voiceId,
+  voiceModelSelection,
   skillOwnership,
   locale,
   isLoading = false,
@@ -471,7 +1059,7 @@ export function SkillCard({
       <Div className="flex items-center gap-3 pt-3 border-t">
         <Div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Volume2 className="w-3.5 h-3.5" />
-          <Span>{voiceId ?? <Skeleton className="h-4 w-16" />}</Span>
+          <VoiceDisplayName voiceModelSelection={voiceModelSelection} t={t} />
         </Div>
         {!isLoading && (
           <Div
@@ -634,7 +1222,7 @@ function CustomizeAndAddButton({
         data: {
           skillId: skillId,
           icon: fullChar.icon ?? undefined,
-          voiceId: fullChar.voiceId ?? undefined,
+          voiceModelSelection: undefined,
           modelSelection: null,
         },
         replaceOnSuccess: {

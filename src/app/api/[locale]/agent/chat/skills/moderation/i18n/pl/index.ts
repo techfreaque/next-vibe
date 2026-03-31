@@ -72,6 +72,13 @@ export const translations = {
       title: "Umiejętności załadowane",
       description: "Zgłoszone umiejętności pobrane pomyślnie",
     },
+    empty: "Brak zgłoszonych umiejętności - społeczność wygląda zdrowo!",
+    action: {
+      moderate: "Moderuj",
+    },
+    backButton: {
+      label: "Wstecz",
+    },
   },
   patch: {
     title: "Moderuj umiejętność",

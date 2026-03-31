@@ -16,7 +16,7 @@ export const translations = {
     title: "One definition.",
     titleAccent: "Thirteen platforms.",
     subtitle:
-      "next-vibe turns a single TypeScript definition into thirteen platforms at once — web form, CLI command, MCP tool, mobile screen, cron job, WebSocket, admin panel, and more. Full type safety, zero drift, zero repetition.",
+      "next-vibe turns a single TypeScript definition into thirteen platforms at once - web form, CLI command, MCP tool, mobile screen, cron job, WebSocket, admin panel, and more. Full type safety, zero drift, zero repetition.",
     ctaGithub: "Star on GitHub",
     ctaDocs: "Read the pattern docs",
     stat1Label: "typed endpoints",
@@ -30,23 +30,23 @@ export const translations = {
     eyebrow: "The problem",
     title: "You've built the same thing thirteen times.",
     subtitle:
-      "Every feature needs a web form, CLI command, MCP tool, mobile screen, cron job, WebSocket handler, admin panel, and more. Same validation, same i18n, same error handling — just dressed differently. Every time.",
+      "Every feature needs a web form, CLI command, MCP tool, mobile screen, cron job, WebSocket handler, admin panel, and more. Same validation, same i18n, same error handling - just dressed differently. Every time.",
     callout: "next-vibe builds all thirteen from one file.",
   },
   pattern: {
     eyebrow: "The pattern",
     title: "Two files required. Every platform.",
     subtitle:
-      "Each feature lives in a folder. Only definition.ts and route.ts are required — everything else is optional.",
-    definitionTitle: "definition.ts — the contract",
+      "Each feature lives in a folder. Only definition.ts and route.ts are required - everything else is optional.",
+    definitionTitle: "definition.ts - the contract",
     definitionBody:
-      "Declare your fields, Zod schemas, labels, error types, and examples once. This file is the single source of truth — the framework reads it at runtime on every platform.",
-    routeTitle: "route.ts — the logic",
+      "Declare your fields, Zod schemas, labels, error types, and examples once. This file is the single source of truth - the framework reads it at runtime on every platform.",
+    routeTitle: "repository.ts - the logic",
     routeBody:
-      "Wire the definition to your handler. Validation, auth, logging, and registration across all platforms happen automatically. Business logic lives right here — no separate file needed.",
-    widgetTitle: "widget.tsx — the UI (optional)",
+      "Business logic lives here - DB queries, auth checks, error handling with success()/fail(). The route.ts is just a thin delegator; validation, logging, and platform registration happen automatically.",
+    widgetTitle: "widget.tsx - the UI (optional)",
     widgetBody:
-      "Without a widget, the framework auto-renders your fields on every platform. Add widget.tsx to fully control how your feature looks on web and native — the same component renders in admin panels, embedded widgets, and mobile screens.",
+      "Without a widget, the framework auto-renders your fields on every platform. Add widget.tsx to fully control how your feature looks on web and native - the same component renders in admin panels, embedded widgets, and mobile screens.",
     deleteLine:
       "Delete the folder. The feature disappears from every platform at once.",
   },
@@ -62,7 +62,7 @@ export const translations = {
       },
       reactUi: {
         label: "React UI",
-        description: "Auto-generated form — no JSX required",
+        description: "Auto-generated form - no JSX required",
       },
       cli: {
         label: "CLI",
@@ -94,7 +94,7 @@ export const translations = {
       },
       adminPanel: {
         label: "Admin Panel",
-        description: "Auto-generated admin UI — no dedicated code",
+        description: "Auto-generated admin UI - no dedicated code",
       },
       vibeFrame: {
         label: "VibeFrame Widget",
@@ -106,7 +106,7 @@ export const translations = {
       },
       vibeBoard: {
         label: "Vibe Sense Node",
-        description: "Node in a live data-flow graph — same endpoint",
+        description: "Node in a live data-flow graph - same endpoint",
       },
     },
   },
@@ -114,7 +114,7 @@ export const translations = {
     eyebrow: "TypeScript supremacy",
     title: "No any. No unknown. No throw.",
     subtitle:
-      "Types must align completely — no exceptions. This isn't a style preference. It's a structural rule enforced at build time by vibe check.",
+      "Types must align completely - no exceptions. This isn't a style preference. It's a structural rule enforced at build time by vibe check.",
     patterns: {
       any: {
         name: "no any",
@@ -166,17 +166,17 @@ export const translations = {
     step3: {
       label: "Login as Admin",
       description:
-        'Open the app and click "Login as Admin" — the setup wizard walks you through API keys and admin password.',
+        'Open the app and click "Login as Admin" - the setup wizard walks you through API keys and admin password.',
     },
     step4: {
       label: "Ask the AI",
       description:
-        "Open unbottled.ai chat or Claude Code and describe the feature you want. The AI writes all the files — definition, route, widget, i18n — and runs vibe check automatically.",
+        "Open unbottled.ai chat or Claude Code and describe the feature you want. The AI writes all the files - definition, route, widget, i18n - and runs vibe check automatically.",
     },
     step5: {
       label: "Ship",
       description:
-        "vibe rebuild updates production with zero downtime. It checks, rebuilds, and hot-restarts — no manual file editing, no downtime.",
+        "vibe rebuild updates production with zero downtime. It checks, rebuilds, and hot-restarts - no manual file editing, no downtime.",
     },
     docsLink: "Pattern documentation",
     githubLink: "github.com/techfreaque/next-vibe",

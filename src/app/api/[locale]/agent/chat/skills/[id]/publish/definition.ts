@@ -14,10 +14,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   requestField,
   requestUrlPathParamsField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -92,6 +94,22 @@ const { PATCH } = createEndpoint({
         type: WidgetType.TEXT,
         content: "patch.response.publishedAt" as const,
         schema: z.string().datetime().nullable(),
+      }),
+
+      backButton: backButton(scopedTranslation, {
+        label: "patch.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data&urlPathParams" },
+      }),
+
+      submitButton: submitButton(scopedTranslation, {
+        label: "patch.button.submit" as const,
+        loadingText: "patch.button.loading" as const,
+        icon: "send",
+        variant: "primary",
+        className: "ml-auto",
+        usage: { request: "data&urlPathParams" },
       }),
     },
   }),

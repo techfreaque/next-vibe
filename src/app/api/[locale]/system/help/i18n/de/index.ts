@@ -13,10 +13,10 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       query: {
-        label: "Suchanfrage",
+        label: "Suchanfrage (optional)",
         description:
-          "Tools nach Name, Beschreibung, Alias oder Tag durchsuchen. Sucht in allen Sprachen.",
-        placeholder: "z.B. Suche, Speicher, Abruf...",
+          "Tools nach Stichwort filtern. Leerzeichen-getrennte Wörter sind alle erforderlich. Sucht über Name, Aliase, Beschreibung, Tags — Name/Alias-Treffer werden höher gewichtet. Exakter Name/Alias-Treffer zeigt automatisch Volldetails. Leer lassen um alle anzuzeigen.",
+        placeholder: "z.B. URL abrufen, Bildgenerator...",
       },
       category: {
         label: "Kategoriefilter",

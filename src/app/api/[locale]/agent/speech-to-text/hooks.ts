@@ -8,11 +8,11 @@
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { useCallback, useMemo, useRef, useState } from "react";
 
+import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 
 import speechToTextDefinitions from "./definition";
 
@@ -291,13 +291,16 @@ export function useEdenAISpeech({
           });
 
           // Create audio blob from chunks
+          const mimeType = mediaRecorder.mimeType || "audio/webm";
           const audioBlob = new Blob(audioChunksRef.current, {
-            type: mediaRecorder.mimeType || "audio/webm",
+            type: mimeType,
           });
 
-          // Create File object
+          // Create File object - always set an explicit audio MIME type so
+          // server-side validation (file.type.startsWith("audio/")) passes even
+          // when the browser doesn't propagate the codec string through FormData.
           const audioFile = new File([audioBlob], "recording.webm", {
-            type: audioBlob.type,
+            type: mimeType,
           });
 
           logger.debug("STT: Audio file created", {

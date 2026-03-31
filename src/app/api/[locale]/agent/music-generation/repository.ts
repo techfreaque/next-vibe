@@ -22,7 +22,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
+
 import { generateMusicWithFalAi } from "../ai-stream/providers/fal-ai-audio";
+import { generateMusicWithModelsLab } from "../ai-stream/providers/modelslab-audio";
 import { generateMusicWithReplicate } from "../ai-stream/providers/replicate-audio";
 import {
   checkMediaBalance,
@@ -35,6 +38,10 @@ import type {
 import { MUSIC_DURATION_SECONDS } from "./enum";
 import type { MusicGenerationT } from "./i18n";
 
+interface MediaGenStreamContext {
+  threadId?: string | undefined;
+}
+
 export class MusicGenerationRepository {
   /**
    * Generate music from a text prompt
@@ -45,7 +52,9 @@ export class MusicGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: MusicGenerationT,
+    streamContext?: MediaGenStreamContext,
   ): Promise<ResponseType<MusicGenerationPostResponseOutput>> {
+    // model is already resolved via streamContextPatch in tools-loader (from ToolExecutionContext.musicGenModelId)
     const selectedModel: string = data.model;
     const modelConfig = getAllModelOptions().find(
       (m) => m.id === selectedModel,
@@ -106,6 +115,15 @@ export class MusicGenerationRepository {
         });
         break;
 
+      case ApiProvider.MODELSLAB:
+        generationResult = await generateMusicWithModelsLab({
+          prompt: data.prompt,
+          durationSeconds,
+          logger,
+          locale,
+        });
+        break;
+
       default:
         return fail({
           message: t("post.errors.notConfigured", {
@@ -126,7 +144,33 @@ export class MusicGenerationRepository {
       });
     }
 
-    const { audioUrl } = generationResult.data;
+    let { audioUrl } = generationResult.data;
+
+    // Upload to our storage so the URL is persistent and access-controlled
+    if (streamContext?.threadId) {
+      try {
+        const storage = getStorageAdapter();
+        const arrayBuf = await fetch(audioUrl).then((r) => r.arrayBuffer());
+        const audioBuffer = Buffer.from(new Uint8Array(arrayBuf));
+        const uploadResult = await storage.uploadFile(audioBuffer, {
+          filename: `generated-audio-${Date.now()}.mp3`,
+          mimeType: "audio/mpeg",
+          threadId: streamContext.threadId,
+          userId: user.id,
+        });
+        audioUrl = uploadResult.url;
+      } catch (uploadErr) {
+        logger.error(
+          "[MusicGen] Failed to upload to storage, using provider URL",
+          {
+            error:
+              uploadErr instanceof Error
+                ? uploadErr.message
+                : String(uploadErr),
+          },
+        );
+      }
+    }
 
     const deductResult = await deductMediaCredits(
       user,
@@ -146,6 +190,10 @@ export class MusicGenerationRepository {
       durationSeconds,
     });
 
-    return success({ audioUrl, creditCost, durationSeconds });
+    return success({
+      audioUrl,
+      creditCost,
+      durationSeconds,
+    });
   }
 }

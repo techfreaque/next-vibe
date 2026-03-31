@@ -72,6 +72,8 @@ export const translations: typeof enTranslations = {
       title: "Sukces",
       description: "Folder przeniesiony pomyślnie",
     },
+    backButton: { label: "Wstecz" },
+    submitButton: { label: "Przenieś folder", loadingText: "Przenoszenie..." },
   },
   widget: {
     moveFolder: {

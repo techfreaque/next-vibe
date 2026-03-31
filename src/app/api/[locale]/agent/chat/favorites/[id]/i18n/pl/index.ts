@@ -202,21 +202,43 @@ export const translations: typeof enTranslations = {
     customName: {
       label: "Nazwa niestandardowa",
     },
+    chatModel: {
+      label: "Model czatu",
+      placeholder: "Odziedzicz z umiejętności",
+    },
     voice: {
       label: "Głos AI",
       description: "Wybierz głos dla swojego asystenta AI",
+      placeholder: "Dziedzicz z postaci",
     },
     sttModel: {
       label: "Model mowy na tekst",
       description: "Model używany do rozpoznawania mowy",
+      placeholder: "Dziedzicz z postaci",
     },
     visionBridgeModel: {
       label: "Model wizji",
       description: "Model używany do analizy obrazów",
+      placeholder: "Dziedzicz z postaci",
     },
     translationModel: {
       label: "Model tłumaczenia",
       description: "Model używany do tłumaczenia tekstu",
+    },
+    imageGenModel: {
+      label: "Model generowania obrazów",
+      description: "Model do generowania obrazów",
+      placeholder: "Dziedzicz z postaci",
+    },
+    musicGenModel: {
+      label: "Model generowania muzyki",
+      description: "Model do generowania muzyki",
+      placeholder: "Dziedzicz z postaci",
+    },
+    videoGenModel: {
+      label: "Model generowania wideo",
+      description: "Model do generowania wideo",
+      placeholder: "Dziedzicz z postaci",
     },
     defaultChatMode: {
       label: "Domyślny tryb czatu",
@@ -324,6 +346,12 @@ export const translations: typeof enTranslations = {
       label: "Zablokowane narzędzia",
       description:
         "Zablokuj określone narzędzia dla tego slotu – dodatkowo do listy blokad skilla. Te narzędzia nie mogą być wywoływane niezależnie od innych ustawień.",
+      clearAll: "Wyczyść wszystko",
+      noToolsFound: "Nie znaleziono narzędzi",
+      blockedNote:
+        "Zablokowane narzędzia nie mogą być wywoływane niezależnie od innych ustawień.",
+      searchPlaceholder: "Szukaj narzędzi...",
+      blocked: "zablokowane",
     },
     promptAppend: {
       label: "Dołączenie do promptu",

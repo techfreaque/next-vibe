@@ -53,6 +53,13 @@ export const translations = {
     },
     redirecting: "Redirecting to checkout...",
     openCheckout: "Open Checkout",
+    backButton: {
+      label: "Back",
+    },
+    submitButton: {
+      label: "Purchase Credits",
+      loadingText: "Processing...",
+    },
     success: {
       title: "Checkout Created",
       description: "Stripe checkout session created successfully",

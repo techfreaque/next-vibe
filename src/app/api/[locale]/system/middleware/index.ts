@@ -93,6 +93,14 @@ export async function middleware(
 ): Promise<NextResponse> {
   const path = request.nextUrl.pathname;
 
+  // Reconstruct the public origin from proxy headers so redirects in TanStack
+  // dev mode point to port 3000 (proxy) rather than port 3100 (internal Vite).
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const forwardedProto = request.headers.get("x-forwarded-proto") ?? "http";
+  const publicOrigin = forwardedHost
+    ? `${forwardedProto}://${forwardedHost}`
+    : new URL(request.url).origin;
+
   // Skip for static files
   if (shouldSkipPath(path)) {
     return NextResponseClass.next();
@@ -130,7 +138,7 @@ export async function middleware(
         // /en/foo -> /foo
         stripped = `/${pathParts.slice(1).join("/")}`;
       }
-      const redirectUrl = new URL(stripped || "/", request.url);
+      const redirectUrl = new URL(stripped || "/", publicOrigin);
       redirectUrl.search = request.nextUrl.search;
       return NextResponseClass.redirect(redirectUrl);
     }
@@ -157,7 +165,7 @@ export async function middleware(
       newPath = `/${detectedLocale}${path}`;
     }
 
-    const redirectUrl = new URL(newPath, request.url);
+    const redirectUrl = new URL(newPath, publicOrigin);
     redirectUrl.search = request.nextUrl.search;
     return NextResponseClass.redirect(redirectUrl);
   }

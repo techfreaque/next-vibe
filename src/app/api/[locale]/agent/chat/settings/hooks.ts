@@ -8,10 +8,8 @@
 import { useCallback, useMemo } from "react";
 
 import type { ViewModeValue } from "@/app/api/[locale]/agent/chat/enum";
-import type {
-  ModelId,
-  TtsModelId,
-} from "@/app/api/[locale]/agent/models/models";
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/models/types";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -35,7 +33,7 @@ interface UseChatSettingsReturn {
     favoriteId: string,
     skillId: string,
     modelId: ModelId,
-    voiceId: TtsModelId,
+    voiceModelSelection: VoiceModelSelection | null,
   ) => void;
   setTTSAutoplay: (autoplay: boolean) => void;
   setViewMode: (mode: typeof ViewModeValue) => void;
@@ -125,8 +123,11 @@ export function useChatSettings(
       if (updates.ttsAutoplay !== undefined) {
         endpoint.create?.setValue("ttsAutoplay", updates.ttsAutoplay);
       }
-      if (updates.voiceId !== undefined) {
-        endpoint.create?.setValue("voiceId", updates.voiceId);
+      if (updates.voiceModelSelection !== undefined) {
+        endpoint.create?.setValue(
+          "voiceModelSelection",
+          updates.voiceModelSelection,
+        );
       }
       if (updates.viewMode !== undefined) {
         endpoint.create?.setValue("viewMode", updates.viewMode);
@@ -182,13 +183,13 @@ export function useChatSettings(
       favoriteId: string,
       skillId: string,
       modelId: ModelId,
-      voiceId: TtsModelId,
+      voiceModelSelection: VoiceModelSelection | null,
     ) => {
       void updateSettings({
         activeFavoriteId: favoriteId,
         selectedSkill: skillId,
         selectedModel: modelId,
-        voiceId: voiceId,
+        voiceModelSelection,
       });
     },
     [updateSettings],

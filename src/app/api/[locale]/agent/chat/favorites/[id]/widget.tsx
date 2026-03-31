@@ -25,7 +25,10 @@ import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
-import { ModelSelector } from "@/app/api/[locale]/agent/models/widget/model-selector";
+import {
+  ModelSelector,
+  ModelSelectorTrigger,
+} from "@/app/api/[locale]/agent/models/widget/model-selector";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -38,20 +41,30 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
 import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import helpDefinitions from "@/app/api/[locale]/system/help/definition";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { getDefaultModelForRole } from "../../../models/models";
 import type { ModelSelectionSimple } from "../../../models/types";
+import {
+  imageGenModelSelectionSchema,
+  musicGenModelSelectionSchema,
+  sttModelSelectionSchema,
+  videoGenModelSelectionSchema,
+  visionModelSelectionSchema,
+  voiceModelSelectionSchema,
+} from "../../../models/types";
 import {
   ToolsConfigEdit,
   type ToolEntry,
   type ToolsConfigValue,
 } from "../../../tools/widget/tools-config-widget";
 
+import { ModelSelectionType } from "../../skills/enum";
 import { useChatSettings } from "../../settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../settings/repository-client";
 import { CompactTriggerEdit } from "../../settings/widget";
@@ -91,6 +104,24 @@ export function FavoriteEditContainer({
   const favoriteModelSelection: ModelSelectionSimple | undefined =
     form.watch("modelSelection") ?? undefined;
 
+  const [activeSelector, setActiveSelector] = useState<
+    | "chat"
+    | "voice"
+    | "imageGen"
+    | "musicGen"
+    | "videoGen"
+    | "stt"
+    | "visionBridge"
+    | null
+  >(null);
+
+  const voiceModelSelection = form.watch("voiceModelSelection");
+  const imageGenModelSelection = form.watch("imageGenModelSelection");
+  const musicGenModelSelection = form.watch("musicGenModelSelection");
+  const videoGenModelSelection = form.watch("videoGenModelSelection");
+  const sttModelSelection = form.watch("sttModelSelection");
+  const visionBridgeModelSelection = form.watch("visionBridgeModelSelection");
+
   // characterModelSelection lives on the GET endpoint (not PATCH).
   // Use useEndpoint to read the cached GET response so we get the variant's selection.
   const favoriteId = form.watch("id");
@@ -125,6 +156,63 @@ export function FavoriteEditContainer({
 
   // Stable props
   const emptyField = useMemo(() => ({}), []);
+
+  const envAvailability = useEnvAvailability();
+
+  // Platform-level default model selections (env-aware)
+  const platformTtsDefault = useMemo((): ModelSelectionSimple | undefined => {
+    const m = getDefaultModelForRole(["tts"], envAvailability);
+    if (!m) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+  }, [envAvailability]);
+
+  const platformImageGenDefault = useMemo(():
+    | ModelSelectionSimple
+    | undefined => {
+    const m = getDefaultModelForRole(["image-gen"], envAvailability);
+    if (!m) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+  }, [envAvailability]);
+
+  const platformMusicGenDefault = useMemo(():
+    | ModelSelectionSimple
+    | undefined => {
+    const m = getDefaultModelForRole(["audio-gen"], envAvailability);
+    if (!m) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+  }, [envAvailability]);
+
+  const platformVideoGenDefault = useMemo(():
+    | ModelSelectionSimple
+    | undefined => {
+    const m = getDefaultModelForRole(["video-gen"], envAvailability);
+    if (!m) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+  }, [envAvailability]);
+
+  const platformSttDefault = useMemo((): ModelSelectionSimple | undefined => {
+    const m = getDefaultModelForRole(["stt"], envAvailability);
+    if (!m) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+  }, [envAvailability]);
+
+  const platformLlmDefault = useMemo((): ModelSelectionSimple | undefined => {
+    const m = getDefaultModelForRole(["llm"], envAvailability, ["image"]);
+    if (!m) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+  }, [envAvailability]);
 
   const watchedAllowedTools = form.watch("availableTools") ?? null;
   const watchedPinnedTools = form.watch("pinnedTools") ?? null;
@@ -226,13 +314,11 @@ export function FavoriteEditContainer({
 
     const modelId = favorite?.modelId ?? null;
     const currentSkillId = favorite?.skillId ?? null;
-    const currentVoiceId = favorite?.voiceId ?? null;
 
     await ChatSettingsRepositoryClient.selectFavorite({
       favoriteId: activatingFavoriteId,
       modelId,
       skillId: currentSkillId,
-      voiceId: currentVoiceId,
       logger,
       locale,
       user,
@@ -300,12 +386,18 @@ export function FavoriteEditContainer({
     <Div className="flex flex-col gap-0">
       {/* Top Actions: Back, Delete, Submit */}
       <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
-        <NavigateButtonWidget
-          field={{
-            icon: "arrow-left",
-            variant: "outline",
-          }}
-        />
+        {activeSelector !== null ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => setActiveSelector(null)}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        ) : (
+          <NavigateButtonWidget field={children.backButton} />
+        )}
         <NavigateButtonWidget
           field={{
             ...children.deleteButton,
@@ -315,12 +407,7 @@ export function FavoriteEditContainer({
         {(form.formState.isDirty || isSubmitting) && (
           <>
             <SubmitButtonWidget<typeof definitionPatch.PATCH>
-              field={{
-                text: "patch.saveButton.label",
-                loadingText: "patch.saveButton.loadingText",
-                icon: "save",
-                variant: "outline",
-              }}
+              field={children.saveButton}
             />
             {!isActiveFavorite && (
               <SaveAndUseButton
@@ -339,169 +426,566 @@ export function FavoriteEditContainer({
 
       {/* Scrollable Form Container */}
       <Div className="group overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4">
-        <FormAlertWidget field={emptyField} />
+        {activeSelector === "chat" && form ? (
+          <ModelSelector
+            modelSelection={favoriteModelSelection}
+            onChange={(selection) => {
+              form.setValue("modelSelection", selection, {
+                shouldDirty: true,
+              });
+            }}
+            onSelect={(confirmed) => {
+              const charSel = isNoSkill
+                ? undefined
+                : (favoriteCharacterModelSelection ?? characterModelSelection);
+              const isMatchingSkill =
+                confirmed !== null &&
+                confirmed.selectionType === ModelSelectionType.MANUAL &&
+                charSel !== null &&
+                charSel !== undefined &&
+                charSel.selectionType === ModelSelectionType.MANUAL &&
+                charSel.manualModelId === confirmed.manualModelId;
+              form.setValue(
+                "modelSelection",
+                isMatchingSkill ? null : confirmed,
+                { shouldDirty: true },
+              );
+              setActiveSelector(null);
+            }}
+            characterModelSelection={
+              isNoSkill
+                ? undefined
+                : (favoriteCharacterModelSelection ?? characterModelSelection)
+            }
+            locale={locale}
+            user={user}
+            chatOnly
+          />
+        ) : activeSelector === "voice" && form ? (
+          <ModelSelector
+            allowedRoles={["tts"]}
+            modelSelection={voiceModelSelection ?? undefined}
+            characterModelSelection={
+              characterData?.voiceModelSelection ?? platformTtsDefault
+            }
+            onChange={(sel) => {
+              const parsed = voiceModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "voiceModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = voiceModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformTtsDefault !== undefined &&
+                "manualModelId" in platformTtsDefault &&
+                platformTtsDefault.manualModelId === value.manualModelId;
+              form.setValue("voiceModelSelection", isDefault ? null : value, {
+                shouldDirty: true,
+              });
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : activeSelector === "imageGen" && form ? (
+          <ModelSelector
+            allowedRoles={["image-gen"]}
+            modelSelection={imageGenModelSelection ?? undefined}
+            characterModelSelection={
+              characterData?.imageGenModelSelection ?? platformImageGenDefault
+            }
+            onChange={(sel) => {
+              const parsed = imageGenModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "imageGenModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = imageGenModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformImageGenDefault !== undefined &&
+                "manualModelId" in platformImageGenDefault &&
+                platformImageGenDefault.manualModelId === value.manualModelId;
+              form.setValue(
+                "imageGenModelSelection",
+                isDefault ? null : value,
+                { shouldDirty: true },
+              );
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : activeSelector === "musicGen" && form ? (
+          <ModelSelector
+            allowedRoles={["audio-gen"]}
+            modelSelection={musicGenModelSelection ?? undefined}
+            characterModelSelection={
+              characterData?.musicGenModelSelection ?? platformMusicGenDefault
+            }
+            onChange={(sel) => {
+              const parsed = musicGenModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "musicGenModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = musicGenModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformMusicGenDefault !== undefined &&
+                "manualModelId" in platformMusicGenDefault &&
+                platformMusicGenDefault.manualModelId === value.manualModelId;
+              form.setValue(
+                "musicGenModelSelection",
+                isDefault ? null : value,
+                { shouldDirty: true },
+              );
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : activeSelector === "videoGen" && form ? (
+          <ModelSelector
+            allowedRoles={["video-gen"]}
+            modelSelection={videoGenModelSelection ?? undefined}
+            characterModelSelection={
+              characterData?.videoGenModelSelection ?? platformVideoGenDefault
+            }
+            onChange={(sel) => {
+              const parsed = videoGenModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "videoGenModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = videoGenModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformVideoGenDefault !== undefined &&
+                "manualModelId" in platformVideoGenDefault &&
+                platformVideoGenDefault.manualModelId === value.manualModelId;
+              form.setValue(
+                "videoGenModelSelection",
+                isDefault ? null : value,
+                { shouldDirty: true },
+              );
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : activeSelector === "stt" && form ? (
+          <ModelSelector
+            allowedRoles={["stt"]}
+            modelSelection={sttModelSelection ?? undefined}
+            characterModelSelection={
+              characterData?.sttModelSelection ?? platformSttDefault
+            }
+            onChange={(sel) => {
+              const parsed = sttModelSelectionSchema.nullable().safeParse(sel);
+              form.setValue(
+                "sttModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = sttModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformSttDefault !== undefined &&
+                "manualModelId" in platformSttDefault &&
+                platformSttDefault.manualModelId === value.manualModelId;
+              form.setValue("sttModelSelection", isDefault ? null : value, {
+                shouldDirty: true,
+              });
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : activeSelector === "visionBridge" && form ? (
+          <ModelSelector
+            allowedRoles={["llm"]}
+            requiredInputs={["image"]}
+            modelSelection={visionBridgeModelSelection ?? undefined}
+            characterModelSelection={
+              characterData?.visionBridgeModelSelection ?? platformLlmDefault
+            }
+            onChange={(sel) => {
+              const parsed = visionModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "visionBridgeModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = visionModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformLlmDefault !== undefined &&
+                "manualModelId" in platformLlmDefault &&
+                platformLlmDefault.manualModelId === value.manualModelId;
+              form.setValue(
+                "visionBridgeModelSelection",
+                isDefault ? null : value,
+                { shouldDirty: true },
+              );
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : (
+          <>
+            <FormAlertWidget field={emptyField} />
 
-        <AlertWidget
-          fieldName="success"
-          field={withValue(children.success, field.value?.success, null)}
-        />
+            <AlertWidget
+              fieldName="success"
+              field={withValue(children.success, field.value?.success, null)}
+            />
 
-        <Div className="flex flex-col gap-4">
-          {/* Skill Info Card with Editable Icon integrated */}
-          {!isNoSkill && (
-            <Div className="flex flex-col gap-3">
-              <Div className="flex items-start gap-4 p-6 rounded-xl border bg-card transition-colors">
-                {/* Editable Icon Field in icon position */}
-                <Div className="flex-shrink-0">
-                  <IconFieldWidget fieldName="icon" field={children.icon} />
-                </Div>
+            <Div className="flex flex-col gap-4">
+              {/* Skill Info Card with Editable Icon integrated */}
+              {!isNoSkill && (
+                <Div className="flex flex-col gap-3">
+                  <Div className="flex items-start gap-4 p-6 rounded-xl border bg-card transition-colors">
+                    {/* Editable Icon Field in icon position */}
+                    <Div className="flex-shrink-0">
+                      <IconFieldWidget fieldName="icon" field={children.icon} />
+                    </Div>
 
-                {/* Skill Content */}
-                <Div className="flex-1 min-w-0 space-y-2">
-                  <Div className="flex items-baseline gap-2 flex-wrap">
-                    <Span className="text-lg font-semibold text-foreground">
-                      {characterData?.name ? (
-                        characterData.name
-                      ) : (
-                        <Skeleton className="h-6 w-48" />
-                      )}
-                    </Span>
-                    <Span className="text-sm text-muted-foreground">
-                      {characterData?.tagline ? (
-                        characterData.tagline
-                      ) : (
-                        <Skeleton className="h-4 w-64" />
-                      )}
-                    </Span>
+                    {/* Skill Content */}
+                    <Div className="flex-1 min-w-0 space-y-2">
+                      <Div className="flex items-baseline gap-2 flex-wrap">
+                        <Span className="text-lg font-semibold text-foreground">
+                          {characterData?.name ? (
+                            characterData.name
+                          ) : (
+                            <Skeleton className="h-6 w-48" />
+                          )}
+                        </Span>
+                        <Span className="text-sm text-muted-foreground">
+                          {characterData?.tagline ? (
+                            characterData.tagline
+                          ) : (
+                            <Skeleton className="h-4 w-64" />
+                          )}
+                        </Span>
+                      </Div>
+                      <Div className="text-sm text-foreground/80">
+                        {characterData?.description ? (
+                          characterData.description
+                        ) : (
+                          <>
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-full" />
+                          </>
+                        )}
+                      </Div>
+                    </Div>
                   </Div>
-                  <Div className="text-sm text-foreground/80">
-                    {characterData?.description ? (
-                      characterData.description
-                    ) : (
-                      <>
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-full" />
-                      </>
-                    )}
+
+                  {/* Action Buttons */}
+                  <Div className="flex flex-col gap-2">
+                    {/* Customize Skill Button */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="default"
+                      onClick={handleCustomizeSkill}
+                      className="gap-2"
+                    >
+                      <Settings className="h-4 w-4" />
+                      {t("patch.customizeSkillButton.label")}
+                    </Button>
                   </Div>
                 </Div>
-              </Div>
+              )}
 
-              {/* Action Buttons */}
-              <Div className="flex flex-col gap-2">
-                {/* Customize Skill Button */}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="default"
-                  onClick={handleCustomizeSkill}
-                  className="gap-2"
-                >
-                  <Settings className="h-4 w-4" />
-                  {t("patch.customizeSkillButton.label")}
-                </Button>
-              </Div>
+              {/* Use This Favorite Button - always show */}
+              <Button
+                type="button"
+                variant={isActiveFavorite ? "outline" : "default"}
+                size="default"
+                onClick={handleUseThisFavorite}
+                disabled={isActiveFavorite}
+                className="gap-2"
+              >
+                <CheckCircle className="h-4 w-4" />
+                {isActiveFavorite
+                  ? t("patch.currentlyActiveButton.label")
+                  : isNoSkill
+                    ? t("patch.useThisModelButton.label")
+                    : t("patch.useThisSkillButton.label")}
+              </Button>
+
+              {/* Chat Model Selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.chatModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={favoriteModelSelection ?? null}
+                    characterModelSelection={
+                      isNoSkill
+                        ? undefined
+                        : (favoriteCharacterModelSelection ??
+                          characterModelSelection)
+                    }
+                    placeholder={t("patch.chatModel.placeholder")}
+                    onClick={() => setActiveSelector("chat")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Voice Model Selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.voice.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={voiceModelSelection ?? null}
+                    characterModelSelection={
+                      characterData?.voiceModelSelection ?? platformTtsDefault
+                    }
+                    allowedRoles={["tts"]}
+                    defaultModelSelection={platformTtsDefault}
+                    placeholder={t("patch.voice.placeholder")}
+                    onClick={() => setActiveSelector("voice")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Image Generation Model Selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.imageGenModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={imageGenModelSelection ?? null}
+                    characterModelSelection={
+                      characterData?.imageGenModelSelection ??
+                      platformImageGenDefault
+                    }
+                    allowedRoles={["image-gen"]}
+                    defaultModelSelection={platformImageGenDefault}
+                    placeholder={t("patch.imageGenModel.placeholder")}
+                    onClick={() => setActiveSelector("imageGen")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Music Generation Model Selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.musicGenModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={musicGenModelSelection ?? null}
+                    characterModelSelection={
+                      characterData?.musicGenModelSelection ??
+                      platformMusicGenDefault
+                    }
+                    allowedRoles={["audio-gen"]}
+                    defaultModelSelection={platformMusicGenDefault}
+                    placeholder={t("patch.musicGenModel.placeholder")}
+                    onClick={() => setActiveSelector("musicGen")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Video Generation Model Selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.videoGenModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={videoGenModelSelection ?? null}
+                    characterModelSelection={
+                      characterData?.videoGenModelSelection ??
+                      platformVideoGenDefault
+                    }
+                    allowedRoles={["video-gen"]}
+                    defaultModelSelection={platformVideoGenDefault}
+                    placeholder={t("patch.videoGenModel.placeholder")}
+                    onClick={() => setActiveSelector("videoGen")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* STT Model Selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.sttModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={sttModelSelection ?? null}
+                    characterModelSelection={
+                      characterData?.sttModelSelection ?? platformSttDefault
+                    }
+                    allowedRoles={["stt"]}
+                    defaultModelSelection={platformSttDefault}
+                    placeholder={t("patch.sttModel.placeholder")}
+                    onClick={() => setActiveSelector("stt")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Vision Bridge Model Selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.visionBridgeModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={visionBridgeModelSelection ?? null}
+                    characterModelSelection={
+                      characterData?.visionBridgeModelSelection ??
+                      platformLlmDefault
+                    }
+                    allowedRoles={["llm"]}
+                    requiredInputs={["image"]}
+                    defaultModelSelection={platformLlmDefault}
+                    placeholder={t("patch.visionBridgeModel.placeholder")}
+                    onClick={() => setActiveSelector("visionBridge")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Context Memory Budget - per-slot override */}
+              {form && (
+                <CompactTriggerEdit
+                  value={form.watch("compactTrigger") ?? null}
+                  onChange={(v) =>
+                    form.setValue("compactTrigger", v, { shouldDirty: true })
+                  }
+                  modelSelection={favoriteModelSelection ?? null}
+                  characterModelSelection={
+                    favoriteCharacterModelSelection ??
+                    characterModelSelection ??
+                    null
+                  }
+                  label={t("patch.slotOverride.label")}
+                  user={user}
+                />
+              )}
+
+              {/* Tool configuration - per-slot override */}
+              {form && (
+                <ToolsConfigEdit
+                  value={toolsValue}
+                  onChange={handleToolsChange}
+                  user={user}
+                  logger={logger}
+                  label={t("patch.slotOverride.label")}
+                  skillAvailableTools={characterData?.availableTools ?? null}
+                  skillPinnedTools={characterData?.pinnedTools ?? null}
+                />
+              )}
+
+              {/* Denied tools - block specific tools for this slot */}
+              {form && (
+                <DeniedToolsEdit
+                  value={watchedDeniedTools}
+                  onChange={handleDeniedToolsChange}
+                  user={user}
+                  logger={logger}
+                  label={t("patch.deniedTools.label")}
+                  description={t("patch.deniedTools.description")}
+                  t={t}
+                />
+              )}
+
+              {/* Prompt append - extra instructions for this slot */}
+              {form && (
+                <Div className="flex flex-col gap-2">
+                  <Label className="text-sm font-medium">
+                    {t("patch.promptAppend.label")}
+                  </Label>
+                  <Span className="text-xs text-muted-foreground">
+                    {t("patch.promptAppend.description")}
+                  </Span>
+                  <Textarea
+                    value={watchedPromptAppend ?? ""}
+                    onChange={(e) => handlePromptAppendChange(e.target.value)}
+                    placeholder={t("patch.promptAppend.placeholder")}
+                    minRows={3}
+                    maxRows={10}
+                  />
+                </Div>
+              )}
             </Div>
-          )}
-
-          {/* Use This Favorite Button - always show */}
-          <Button
-            type="button"
-            variant={isActiveFavorite ? "outline" : "default"}
-            size="default"
-            onClick={handleUseThisFavorite}
-            disabled={isActiveFavorite}
-            className="gap-2"
-          >
-            <CheckCircle className="h-4 w-4" />
-            {isActiveFavorite
-              ? t("patch.currentlyActiveButton.label")
-              : isNoSkill
-                ? t("patch.useThisModelButton.label")
-                : t("patch.useThisSkillButton.label")}
-          </Button>
-
-          <TextFieldWidget fieldName="voiceId" field={children.voiceId} />
-          {form && (
-            <ModelSelector
-              modelSelection={favoriteModelSelection}
-              onChange={(selection) =>
-                form.setValue("modelSelection", selection, {
-                  shouldDirty: true,
-                })
-              }
-              characterModelSelection={
-                isNoSkill
-                  ? undefined
-                  : (favoriteCharacterModelSelection ?? characterModelSelection)
-              }
-              locale={locale}
-              user={user}
-            />
-          )}
-
-          {/* Context Memory Budget - per-slot override */}
-          {form && (
-            <CompactTriggerEdit
-              value={form.watch("compactTrigger") ?? null}
-              onChange={(v) =>
-                form.setValue("compactTrigger", v, { shouldDirty: true })
-              }
-              modelSelection={favoriteModelSelection ?? null}
-              characterModelSelection={
-                favoriteCharacterModelSelection ??
-                characterModelSelection ??
-                null
-              }
-              label={t("patch.slotOverride.label")}
-              user={user}
-            />
-          )}
-
-          {/* Tool configuration - per-slot override */}
-          {form && (
-            <ToolsConfigEdit
-              value={toolsValue}
-              onChange={handleToolsChange}
-              user={user}
-              logger={logger}
-              label={t("patch.slotOverride.label")}
-              skillAvailableTools={characterData?.availableTools ?? null}
-              skillPinnedTools={characterData?.pinnedTools ?? null}
-            />
-          )}
-
-          {/* Denied tools - block specific tools for this slot */}
-          {form && (
-            <DeniedToolsEdit
-              value={watchedDeniedTools}
-              onChange={handleDeniedToolsChange}
-              user={user}
-              logger={logger}
-              label={t("patch.deniedTools.label")}
-              description={t("patch.deniedTools.description")}
-            />
-          )}
-
-          {/* Prompt append - extra instructions for this slot */}
-          {form && (
-            <Div className="flex flex-col gap-2">
-              <Label className="text-sm font-medium">
-                {t("patch.promptAppend.label")}
-              </Label>
-              <Span className="text-xs text-muted-foreground">
-                {t("patch.promptAppend.description")}
-              </Span>
-              <Textarea
-                value={watchedPromptAppend ?? ""}
-                onChange={(e) => handlePromptAppendChange(e.target.value)}
-                placeholder={t("patch.promptAppend.placeholder")}
-                minRows={3}
-                maxRows={10}
-              />
-            </Div>
-          )}
-        </Div>
+          </>
+        )}
       </Div>
     </Div>
   );
@@ -509,7 +993,6 @@ export function FavoriteEditContainer({
 
 // ─── Denied Tools Edit ────────────────────────────────────────────────────────
 
-/* eslint-disable oxlint-plugin-i18n/no-literal-string */
 function DeniedToolsEdit({
   value,
   onChange,
@@ -517,11 +1000,13 @@ function DeniedToolsEdit({
   logger,
   label,
   description,
+  t,
 }: {
   value: ToolEntry[] | null;
   onChange: (denied: ToolEntry[] | null) => void;
   user: ReturnType<typeof useWidgetUser>;
   logger: ReturnType<typeof useWidgetLogger>;
+  t: ReturnType<typeof useWidgetTranslation>;
   label: string;
   description: string;
 }): JSX.Element {
@@ -548,7 +1033,7 @@ function DeniedToolsEdit({
   );
 
   const deniedSet = useMemo(
-    () => new Set((value ?? []).map((t) => t.toolId)),
+    () => new Set((value ?? []).map((entry) => entry.toolId)),
     [value],
   );
 
@@ -558,16 +1043,16 @@ function DeniedToolsEdit({
     }
     const q = searchQuery.toLowerCase();
     return availableTools.filter(
-      (t) =>
-        t.name.toLowerCase().includes(q) ||
-        t.description.toLowerCase().includes(q) ||
-        t.aliases?.some((a) => a.toLowerCase().includes(q)),
+      (tool) =>
+        tool.name.toLowerCase().includes(q) ||
+        tool.description.toLowerCase().includes(q) ||
+        tool.aliases?.some((a) => a.toLowerCase().includes(q)),
     );
   }, [availableTools, searchQuery]);
 
   const handleToggle = (toolId: string): void => {
     if (deniedSet.has(toolId)) {
-      const next = (value ?? []).filter((t) => t.toolId !== toolId);
+      const next = (value ?? []).filter((entry) => entry.toolId !== toolId);
       onChange(next.length === 0 ? null : next);
     } else {
       onChange([...(value ?? []), { toolId, requiresConfirmation: false }]);
@@ -610,7 +1095,7 @@ function DeniedToolsEdit({
           <Div className="flex gap-2">
             <Input
               type="text"
-              placeholder="Search tools..."
+              placeholder={t("patch.deniedTools.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1"
@@ -622,7 +1107,7 @@ function DeniedToolsEdit({
                 size="sm"
                 onClick={handleReset}
               >
-                Clear all
+                {t("patch.deniedTools.clearAll")}
               </Button>
             )}
           </Div>
@@ -630,7 +1115,7 @@ function DeniedToolsEdit({
           <Div className="flex flex-col divide-y border rounded-lg overflow-y-auto max-h-[30dvh]">
             {filteredTools.length === 0 ? (
               <Div className="px-3 py-4 text-sm text-muted-foreground text-center">
-                No tools found
+                {t("patch.deniedTools.noToolsFound")}
               </Div>
             ) : (
               filteredTools.map((tool) => {
@@ -652,7 +1137,7 @@ function DeniedToolsEdit({
                     </Div>
                     {isDenied && (
                       <Span className="text-[10px] text-destructive font-medium shrink-0">
-                        blocked
+                        {t("patch.deniedTools.blocked")}
                       </Span>
                     )}
                   </Div>
@@ -662,7 +1147,7 @@ function DeniedToolsEdit({
           </Div>
 
           <Span className="text-[10px] text-muted-foreground">
-            Blocked tools cannot be called regardless of other settings.
+            {t("patch.deniedTools.blockedNote")}
           </Span>
         </Div>
       )}
@@ -741,7 +1226,6 @@ function SaveAndUseButton({
           favoriteId,
           modelId,
           skillId: favoriteData.skillId || null,
-          voiceId: favoriteData.voiceId || null,
           logger,
           locale,
           user,

@@ -14,6 +14,7 @@ import "server-only";
 import { eq, sql } from "drizzle-orm";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 
+import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
 import { db } from "@/app/api/[locale]/system/db";
@@ -702,6 +703,7 @@ export class MessageDbWriter {
     userId: string | undefined;
     messagesToCompact: Array<{ createdAt: Date; id: string }>;
     createdAt: Date;
+    containsMediaReferences: boolean;
   }): Promise<void> {
     const {
       messageId,
@@ -712,6 +714,7 @@ export class MessageDbWriter {
       skill,
       messagesToCompact,
       createdAt,
+      containsMediaReferences,
     } = params;
 
     // SSE
@@ -727,6 +730,7 @@ export class MessageDbWriter {
       metadata: {
         isCompacting: true,
         compactedMessageCount: messagesToCompact.length,
+        ...(containsMediaReferences && { containsMediaReferences: true }),
       },
     });
     this.enqueue(event);
@@ -755,6 +759,7 @@ export class MessageDbWriter {
               ]?.createdAt.toISOString() ?? "",
           },
           originalMessageIds: messagesToCompact.map((m) => m.id),
+          ...(containsMediaReferences && { containsMediaReferences: true }),
         },
         createdAt,
       });
@@ -1005,6 +1010,214 @@ export class MessageDbWriter {
           "[MessageDbWriter] Failed to create generated media message",
           {
             messageId,
+            error: err instanceof Error ? err.message : String(err),
+          },
+        );
+      }
+    }
+  }
+
+  /**
+   * Attach generated media to an existing assistant message (no new message created).
+   * Emits GENERATED_MEDIA_ADDED SSE and updates the DB metadata JSONB.
+   * Used when an LLM emits text first, then a file part - both belong in the same bubble.
+   */
+  async emitGeneratedMediaOnExistingMessage(params: {
+    messageId: string;
+    generatedMedia: MessageMetadata["generatedMedia"];
+  }): Promise<void> {
+    const { messageId, generatedMedia } = params;
+
+    if (!generatedMedia) {
+      return;
+    }
+
+    // SSE: GENERATED_MEDIA_ADDED - tells the frontend to attach media to existing message
+    const event = createStreamEvent.generatedMediaAdded({
+      messageId,
+      generatedMedia: {
+        type: generatedMedia.type,
+        url: generatedMedia.url,
+        prompt: generatedMedia.prompt ?? "",
+        modelId: generatedMedia.modelId ?? "",
+        mimeType: generatedMedia.mimeType ?? "",
+        creditCost: generatedMedia.creditCost ?? 0,
+        status: (generatedMedia.status ?? "complete") as
+          | "complete"
+          | "pending"
+          | "failed",
+      },
+    });
+    this.enqueue(event);
+
+    // DB: merge generatedMedia into existing message metadata
+    if (!this.isIncognito) {
+      try {
+        await db
+          .update(chatMessages)
+          .set({
+            metadata: sql`metadata || ${JSON.stringify({ generatedMedia, creditCost: generatedMedia.creditCost })}::jsonb`,
+            updatedAt: new Date(),
+          })
+          .where(eq(chatMessages.id, messageId));
+      } catch (err) {
+        this.logger.warn(
+          "[MessageDbWriter] Failed to attach generated media to existing message",
+          {
+            messageId,
+            error: err instanceof Error ? err.message : String(err),
+          },
+        );
+      }
+    }
+  }
+
+  /**
+   * Emit TOOL_RESULT_UPDATED SSE and update the DB row with the real result.
+   * Called when an async job completes and the previously-pending tool result is ready.
+   */
+  async emitToolResultUpdated(params: {
+    messageId: string;
+    toolCallId: string;
+    result: ToolCallResult;
+    toolCall: ToolCall; // full updated toolCall with result
+  }): Promise<void> {
+    const { messageId, toolCallId, result, toolCall } = params;
+
+    // SSE: TOOL_RESULT_UPDATED so frontend can update the pending bubble
+    const event = createStreamEvent.toolResultUpdated({
+      messageId,
+      toolCallId,
+      result,
+    });
+    this.enqueue(event);
+
+    // DB: backfill the result into the tool message
+    if (!this.isIncognito) {
+      try {
+        await db
+          .update(chatMessages)
+          .set({ metadata: { toolCall }, updatedAt: new Date() })
+          .where(eq(chatMessages.id, messageId));
+      } catch (err) {
+        this.logger.warn(
+          "[MessageDbWriter] Failed to update tool result in DB",
+          {
+            messageId,
+            error: err instanceof Error ? err.message : String(err),
+          },
+        );
+      }
+    }
+  }
+
+  /**
+   * Write a synthetic TOOL message row for a natively-generated file part.
+   * The LLM emitted a file directly (e.g. Gemini Flash Image); this creates
+   * a sibling TOOL message so subsequent turns see the file URL in tool-result context.
+   * No SSE is emitted - the message is invisible to the user but visible to the LLM.
+   */
+  async emitSyntheticToolMessage(params: {
+    messageId: string;
+    threadId: string;
+    parentId: string | null;
+    userId: string | undefined;
+    model: ModelId;
+    skill: string;
+    sequenceId: string | null;
+    toolCall: ToolCall;
+  }): Promise<void> {
+    const {
+      messageId,
+      threadId,
+      parentId,
+      model,
+      skill,
+      sequenceId,
+      toolCall,
+    } = params;
+
+    if (this.isIncognito) {
+      return;
+    }
+
+    try {
+      await db.insert(chatMessages).values({
+        id: messageId,
+        threadId,
+        role: ChatMessageRole.TOOL,
+        content: null,
+        parentId,
+        authorId: params.userId ?? null,
+        sequenceId,
+        isAI: true,
+        model,
+        skill,
+        metadata: { toolCall },
+      });
+    } catch (err) {
+      this.logger.warn(
+        "[MessageDbWriter] Failed to insert synthetic tool message",
+        {
+          messageId,
+          error: err instanceof Error ? err.message : String(err),
+        },
+      );
+    }
+  }
+
+  /**
+   * Emit GAP_FILL_STARTED SSE event.
+   * Called when a modality bridge begins running on a message attachment.
+   */
+  emitGapFillStarted(params: {
+    messageId: string;
+    bridgeType: "stt" | "vision" | "translation" | "tts";
+    modality: Modality;
+  }): void {
+    const event = createStreamEvent.gapFillStarted(params);
+    this.enqueue(event);
+  }
+
+  /**
+   * Emit GAP_FILL_COMPLETED SSE event and persist the variant to DB.
+   * Called when a modality bridge finishes and the text variant is ready.
+   */
+  async emitGapFillCompleted(params: {
+    messageId: string;
+    bridgeType: "stt" | "vision" | "translation" | "tts";
+    modality: Modality;
+    variant: {
+      modality: Modality;
+      content: string;
+      modelId: ModelId;
+      creditCost: number;
+      createdAt: string;
+    };
+  }): Promise<void> {
+    const event = createStreamEvent.gapFillCompleted(params);
+    this.enqueue(event);
+
+    // Persist variant to DB (non-incognito only)
+    if (!this.isIncognito) {
+      try {
+        // Append variant to existing variants array in metadata
+        await db
+          .update(chatMessages)
+          .set({
+            metadata: sql`jsonb_set(
+              COALESCE(metadata, '{}'),
+              '{variants}',
+              COALESCE(metadata->'variants', '[]') || ${JSON.stringify([params.variant])}::jsonb
+            )`,
+            updatedAt: new Date(),
+          })
+          .where(eq(chatMessages.id, params.messageId));
+      } catch (err) {
+        this.logger.warn(
+          "[MessageDbWriter] Failed to persist gap-fill variant",
+          {
+            messageId: params.messageId,
             error: err instanceof Error ? err.message : String(err),
           },
         );

@@ -14,9 +14,12 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type {
+  ImageGenModelId,
   LlmModelId,
+  MusicGenModelId,
   SttModelId,
   TtsModelId,
+  VideoGenModelId,
   VisionModelId,
 } from "../../models/models";
 import type { ModelSelectionSimple } from "../../models/types";
@@ -96,6 +99,9 @@ export interface Skill {
   visionBridgeModelId?: VisionModelId;
   translationModelId?: LlmModelId;
   defaultChatMode?: ChatMode;
+  imageGenModelId?: ImageGenModelId;
+  musicGenModelId?: MusicGenModelId;
+  videoGenModelId?: VideoGenModelId;
   suggestedPrompts: SkillsTranslationKey[];
   /** Named variants. Expanded as grouped rows in skill list. */
   variants: SkillVariant[];

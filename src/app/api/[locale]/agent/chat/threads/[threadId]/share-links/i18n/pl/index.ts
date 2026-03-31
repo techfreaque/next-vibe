@@ -125,6 +125,9 @@ export const translations: typeof enTranslations = {
         description: "Ten zasób został zmodyfikowany",
       },
     },
+    backButton: {
+      label: "Wstecz",
+    },
     success: {
       title: "Sukces",
       description: "Linki udostępniania pobrane pomyślnie",
@@ -197,6 +200,13 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Ten zasób został zmodyfikowany",
       },
+    },
+    backButton: {
+      label: "Wstecz",
+    },
+    submitButton: {
+      label: "Utwórz link",
+      loadingText: "Tworzenie…",
     },
     success: {
       title: "Sukces",
@@ -275,6 +285,13 @@ export const translations: typeof enTranslations = {
         description: "Ten zasób został zmodyfikowany",
       },
     },
+    backButton: {
+      label: "Wstecz",
+    },
+    submitButton: {
+      label: "Zapisz zmiany",
+      loadingText: "Zapisywanie…",
+    },
     success: {
       title: "Sukces",
       description: "Link udostępniania zaktualizowany pomyślnie",
@@ -334,6 +351,13 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Ten zasób został zmodyfikowany",
       },
+    },
+    backButton: {
+      label: "Wstecz",
+    },
+    submitButton: {
+      label: "Unieważnij link",
+      loadingText: "Unieważnianie…",
     },
     success: {
       title: "Sukces",

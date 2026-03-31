@@ -22,7 +22,10 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { buildTrailingSystemMessage, generateSystemPrompt } from "./assembler";
-import type { SystemPromptServerParams } from "./types";
+import type {
+  MediaCapabilitiesParams,
+  SystemPromptServerParams,
+} from "./types";
 
 export interface SystemPromptResult {
   systemPrompt: string;
@@ -41,6 +44,7 @@ export async function buildSystemPrompt(params: {
   headless?: boolean;
   excludeMemories?: boolean;
   memoryLimit?: number | null;
+  mediaCapabilities?: MediaCapabilitiesParams;
   threadId: string | null;
   voiceTranscription?: {
     wasTranscribed: boolean;
@@ -59,6 +63,7 @@ export async function buildSystemPrompt(params: {
     headless,
     excludeMemories,
     memoryLimit,
+    mediaCapabilities,
     voiceTranscription,
   } = params;
 
@@ -88,6 +93,7 @@ export async function buildSystemPrompt(params: {
     callMode: callMode ?? false,
     extraInstructions: extraInstructions ?? "",
     memoryLimit: memoryLimit ?? null,
+    mediaCapabilities,
   };
 
   const { leading, trailing } = await loadAllPromptFragments(serverParams);

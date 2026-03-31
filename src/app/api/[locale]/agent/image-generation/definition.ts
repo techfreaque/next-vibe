@@ -7,9 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   requestField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -17,10 +19,12 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazy } from "react";
+import { IMAGE_GEN_MODEL_IDS } from "@/app/api/[locale]/agent/models/models";
 import {
-  IMAGE_MODEL_IDS,
   IMAGE_QUALITY_VALUES,
   IMAGE_SIZE_VALUES,
   ImageModelOptions,
@@ -29,8 +33,13 @@ import {
   ImageSize,
   ImageSizeOptions,
 } from "./enum";
+
+import { IMAGE_GEN_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { ImageGenerationContainer } from "./widget";
+
+const ImageGenerationContainer = lazy(() =>
+  import("./widget").then((m) => ({ default: m.ImageGenerationContainer })),
+);
 
 /**
  * Image Generation Endpoint (POST)
@@ -40,18 +49,29 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["agent", "image-generation"],
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.CUSTOMER,
-    UserRole.PUBLIC,
-    UserRole.AI_TOOL_OFF,
-  ],
+  aliases: [IMAGE_GEN_ALIAS],
+  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
 
   title: "post.title",
   description: "post.description",
   icon: "image",
   category: "endpointCategories.ai",
   tags: ["tags.image", "tags.generation", "tags.ai"],
+  dynamicTitle: ({ request }) => {
+    const prompt = request?.prompt as string | undefined;
+    if (!prompt?.trim()) {
+      return undefined;
+    }
+    const short = prompt.length > 50 ? `${prompt.slice(0, 50)}...` : prompt;
+    return {
+      message: "post.dynamicTitle" as const,
+      messageParams: { prompt: short },
+    };
+  },
+
+  defaultExpanded: true,
+  dynamicCredits: ({ response }) => response?.creditCost,
+  streamContextPatch: (ctx) => ({ model: ctx.imageGenModelId }),
 
   fields: customWidgetObject({
     render: ImageGenerationContainer,
@@ -74,7 +94,8 @@ const { POST } = createEndpoint({
         description: "post.model.description",
         columns: 6,
         options: ImageModelOptions,
-        schema: z.enum(IMAGE_MODEL_IDS).default(IMAGE_MODEL_IDS[0]),
+        schema: z.enum(IMAGE_GEN_MODEL_IDS).default(IMAGE_GEN_MODEL_IDS[0]),
+        hiddenForPlatforms: [Platform.AI, Platform.MCP],
       }),
       size: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -94,6 +115,22 @@ const { POST } = createEndpoint({
         options: ImageQualityOptions,
         schema: z.enum(IMAGE_QUALITY_VALUES).default(ImageQuality.STANDARD),
       }),
+      backButton: backButton(scopedTranslation, {
+        label: "post.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
+      }),
+
+      submitButton: submitButton(scopedTranslation, {
+        label: "post.submitButton.label" as const,
+        loadingText: "post.submitButton.loadingText" as const,
+        icon: "send",
+        variant: "primary",
+        className: "w-full",
+        usage: { request: "data" },
+      }),
+
       // === RESPONSE FIELDS ===
       imageUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -104,6 +141,18 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "post.response.creditCost",
         schema: z.number(),
+      }),
+      /** Reference to input media used for media-to-media generation (e.g. image-to-image) */
+      inputRef: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.inputRef",
+        schema: z.string().optional(),
+      }),
+      /** Async job ID for polling (video generation only) */
+      jobId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.jobId",
+        schema: z.string().optional(),
       }),
     },
   }),
@@ -156,7 +205,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         prompt: "A photorealistic sunset over a mountain lake",
-        model: IMAGE_MODEL_IDS[0],
+        model: IMAGE_GEN_MODEL_IDS[0],
         size: ImageSize.SQUARE_1024,
         quality: ImageQuality.STANDARD,
       },

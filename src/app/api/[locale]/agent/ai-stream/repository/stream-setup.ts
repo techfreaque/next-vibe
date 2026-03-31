@@ -19,8 +19,11 @@ import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availabilit
 import {
   ApiProvider,
   getModelById,
+  type ImageGenModelId,
   type ModelOption,
+  type MusicGenModelId,
   type TtsModelId,
+  type VideoGenModelId,
 } from "@/app/api/[locale]/agent/models/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
@@ -175,6 +178,12 @@ export async function setupAiStream(params: {
   headless: boolean | undefined;
   /** Override the favoriteId stored in streamContext (used by headless runs with explicit favoriteId) */
   favoriteIdOverride: string | undefined;
+  /** Override resolved media gen models — used by integration tests to force a specific provider */
+  mediaModelOverrides?: {
+    musicGenModelId?: MusicGenModelId;
+    videoGenModelId?: VideoGenModelId;
+    imageGenModelId?: ImageGenModelId;
+  };
 }): Promise<ResponseType<StreamSetupResult>> {
   const {
     data,
@@ -186,6 +195,7 @@ export async function setupAiStream(params: {
     ipAddress,
     aiStreamT,
     sttT,
+    mediaModelOverrides,
   } = params;
   const isIncognito = data.rootFolderId === "incognito";
 
@@ -250,6 +260,9 @@ export async function setupAiStream(params: {
         leafMessageId: data.leafMessageId ?? undefined,
         skillId: data.skill,
         modelId: data.model,
+        imageGenModelId: undefined,
+        musicGenModelId: undefined,
+        videoGenModelId: undefined,
         favoriteId: params.favoriteIdOverride,
         headless: params.headless,
         waitingForRemoteResult: undefined,
@@ -288,7 +301,7 @@ export async function setupAiStream(params: {
     modelConfig.apiProvider === ApiProvider.EDEN_AI_TTS ||
     modelConfig.apiProvider === ApiProvider.EDEN_AI_STT
   ) {
-    logger.warn("[Setup] TTS/STT model routed to LLM stream — invalid", {
+    logger.warn("[Setup] TTS/STT model routed to LLM stream - invalid", {
       model: data.model,
       provider: modelConfig.apiProvider,
     });
@@ -766,9 +779,9 @@ export async function setupAiStream(params: {
       if (uuidPattern.test(data.skill)) {
         const [customSkillRow] = await db
           .select({
-            voiceId: customSkills.voiceId,
-            sttModelId: customSkills.sttModelId,
-            visionBridgeModelId: customSkills.visionBridgeModelId,
+            voiceModelSelection: customSkills.voiceModelSelection,
+            sttModelSelection: customSkills.sttModelSelection,
+            visionBridgeModelSelection: customSkills.visionBridgeModelSelection,
             translationModelId: customSkills.translationModelId,
             defaultChatMode: customSkills.defaultChatMode,
           })
@@ -776,13 +789,30 @@ export async function setupAiStream(params: {
           .where(eq(customSkills.id, data.skill))
           .limit(1);
         if (customSkillRow) {
+          // Custom skills use ModelSelectionSimple - map them to the BridgeFavorite shape
+          // for the modality resolver (skill scalar IDs will be null)
           skillConfig = {
-            voiceId: customSkillRow.voiceId ?? undefined,
-            sttModelId: customSkillRow.sttModelId ?? undefined,
-            visionBridgeModelId:
-              customSkillRow.visionBridgeModelId ?? undefined,
+            voiceId: undefined,
+            sttModelId: undefined,
+            visionBridgeModelId: undefined,
             translationModelId: customSkillRow.translationModelId ?? undefined,
             defaultChatMode: customSkillRow.defaultChatMode ?? undefined,
+            imageGenModelId: undefined,
+            musicGenModelId: undefined,
+            videoGenModelId: undefined,
+          };
+          // Store the JSONB selections in favConfig so ModalityResolver picks them up
+          // (custom skill overrides are treated as a "virtual favorite" layer here)
+          favoriteConfig = {
+            voiceModelSelection: customSkillRow.voiceModelSelection ?? null,
+            sttModelSelection: customSkillRow.sttModelSelection ?? null,
+            visionBridgeModelSelection:
+              customSkillRow.visionBridgeModelSelection ?? null,
+            translationModelId: customSkillRow.translationModelId ?? null,
+            defaultChatMode: customSkillRow.defaultChatMode ?? null,
+            imageGenModelSelection: null,
+            musicGenModelSelection: null,
+            videoGenModelId: null,
           };
         }
       } else {
@@ -798,11 +828,14 @@ export async function setupAiStream(params: {
       const [userSettingsRow] = await db
         .select({
           activeFavoriteId: chatSettings.activeFavoriteId,
-          voiceId: chatSettings.voiceId,
-          sttModelId: chatSettings.sttModelId,
-          visionBridgeModelId: chatSettings.visionBridgeModelId,
+          voiceModelSelection: chatSettings.voiceModelSelection,
+          sttModelSelection: chatSettings.sttModelSelection,
+          visionBridgeModelSelection: chatSettings.visionBridgeModelSelection,
           translationModelId: chatSettings.translationModelId,
           defaultChatMode: chatSettings.defaultChatMode,
+          imageGenModelSelection: chatSettings.imageGenModelSelection,
+          musicGenModelSelection: chatSettings.musicGenModelSelection,
+          videoGenModelId: chatSettings.videoGenModelId,
         })
         .from(chatSettings)
         .where(eq(chatSettings.userId, userId))
@@ -832,14 +865,49 @@ export async function setupAiStream(params: {
   })();
 
   // Resolve TTS voice via cascade (replaces hardcoded data.voiceMode.voice)
-  const resolvedTtsVoiceId = ModalityResolver.resolveTtsVoiceId(bridgeContext);
-  const resolvedTtsModel = ModalityResolver.resolveTtsModel(bridgeContext);
+  const resolvedTtsVoiceId = ModalityResolver.resolveTtsVoiceId(
+    bridgeContext,
+    user,
+  );
+  const resolvedTtsModel = ModalityResolver.resolveTtsModel(
+    bridgeContext,
+    user,
+  );
+
+  // Resolve per-media-type generator models via cascade
+  const resolvedImageGenModel = ModalityResolver.resolveImageGenModel(
+    bridgeContext,
+    user,
+  );
+  const resolvedMusicGenModel = ModalityResolver.resolveMusicGenModel(
+    bridgeContext,
+    user,
+  );
+  const resolvedVideoGenModel =
+    ModalityResolver.resolveVideoGenModel(bridgeContext);
+
+  // Apply test overrides — only set in integration tests to bypass user-settings cascade
+  const effectiveImageGenModel = mediaModelOverrides?.imageGenModelId
+    ? getModelById(mediaModelOverrides.imageGenModelId)
+    : resolvedImageGenModel;
+  const effectiveMusicGenModel = mediaModelOverrides?.musicGenModelId
+    ? getModelById(mediaModelOverrides.musicGenModelId)
+    : resolvedMusicGenModel;
+  const effectiveVideoGenModel = mediaModelOverrides?.videoGenModelId
+    ? getModelById(mediaModelOverrides.videoGenModelId)
+    : resolvedVideoGenModel;
 
   logger.debug("[Setup] Bridge models resolved via cascade", {
     ttsModelId: resolvedTtsModel.id,
-    sttModelId: ModalityResolver.resolveSttModel(bridgeContext).id,
-    hasVisionBridge: !!ModalityResolver.resolveVisionBridgeModel(bridgeContext),
+    sttModelId: ModalityResolver.resolveSttModel(bridgeContext, user).id,
+    hasVisionBridge: !!ModalityResolver.resolveVisionBridgeModel(
+      bridgeContext,
+      user,
+    ),
     hasTranslation: !!ModalityResolver.resolveTranslationModel(bridgeContext),
+    imageGenModelId: effectiveImageGenModel.id,
+    musicGenModelId: effectiveMusicGenModel?.id ?? null,
+    videoGenModelId: effectiveVideoGenModel?.id ?? null,
   });
 
   // Build complete system prompt from skill and formatting instructions
@@ -852,7 +920,6 @@ export async function setupAiStream(params: {
       rootFolderId: data.rootFolderId,
       subFolderId: data.subFolderId ?? null,
       callMode: data.voiceMode?.enabled,
-      // Merge extraInstructions with favorite's promptAppend (both go into headless context section)
       extraInstructions:
         [params.extraInstructions, resolvedToolConfig.promptAppend]
           .filter(Boolean)
@@ -860,6 +927,12 @@ export async function setupAiStream(params: {
       headless: params.headless,
       excludeMemories: params.excludeMemories,
       memoryLimit: resolvedToolConfig.memoryLimit,
+      mediaCapabilities: {
+        nativeOutputs: modelConfig.outputs ?? [],
+        imageGenModelName: effectiveImageGenModel.name,
+        musicGenModelName: effectiveMusicGenModel?.name ?? null,
+        videoGenModelName: effectiveVideoGenModel?.name ?? null,
+      },
       threadId: threadResult.data.threadId,
       voiceTranscription: voiceTranscription
         ? {
@@ -886,6 +959,9 @@ export async function setupAiStream(params: {
     aiMessageId,
     skillId: data.skill,
     modelId: data.model,
+    imageGenModelId: effectiveImageGenModel.id,
+    musicGenModelId: effectiveMusicGenModel?.id ?? undefined,
+    videoGenModelId: effectiveVideoGenModel?.id ?? undefined,
     headless: params.headless,
     // favoriteId: from headless override (run endpoint) - lets resume-stream reload full context
     favoriteId: params.favoriteIdOverride,
@@ -957,6 +1033,26 @@ export async function setupAiStream(params: {
     return tools.filter((t) => !resolvedToolConfig.deniedToolIds.has(t.toolId));
   };
 
+  // Remove media generation tools when no model is configured for that modality.
+  // If music/video gen model is null, the tool would fail at runtime anyway —
+  // removing it keeps the tool set honest and avoids confusing the LLM.
+  const filterUnavailableMediaTools = <T extends { toolId: string }>(
+    tools: T[] | null | undefined,
+  ): T[] | null | undefined => {
+    if (!tools) {
+      return tools;
+    }
+    return tools.filter((t) => {
+      if (t.toolId === "generate_music" && !effectiveMusicGenModel) {
+        return false;
+      }
+      if (t.toolId === "generate_video" && !effectiveVideoGenModel) {
+        return false;
+      }
+      return true;
+    });
+  };
+
   const {
     tools,
     toolsConfig,
@@ -966,11 +1062,13 @@ export async function setupAiStream(params: {
     modelConfig,
     // Tool config cascade: cascade-resolved (favorite/skill) takes precedence over client-provided.
     // deniedTools are stripped from both sets before reaching the AI SDK.
-    pinnedTools: applyDeniedFilter(
-      resolvedToolConfig.pinnedTools ?? data.pinnedTools,
+    pinnedTools: filterUnavailableMediaTools(
+      applyDeniedFilter(resolvedToolConfig.pinnedTools ?? data.pinnedTools),
     ),
-    availableTools: applyDeniedFilter(
-      resolvedToolConfig.availableTools ?? data.availableTools,
+    availableTools: filterUnavailableMediaTools(
+      applyDeniedFilter(
+        resolvedToolConfig.availableTools ?? data.availableTools,
+      ),
     ),
     user,
     locale,

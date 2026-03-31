@@ -185,6 +185,9 @@ export const translations: typeof enTranslations = {
         title: "KI-Ausführung abgeschlossen",
         description: "Erfolgreich abgeschlossen",
       },
+      backButton: {
+        label: "Zurück",
+      },
     },
   },
   post: {

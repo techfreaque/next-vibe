@@ -14,8 +14,9 @@
 import { z } from "zod";
 
 import {
+  CHAT_MODEL_IDS,
+  ChatModelIdOptions,
   ModelId,
-  ModelIdOptions,
 } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -81,8 +82,8 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         columns: 6,
-        options: ModelIdOptions,
-        schema: z.enum(ModelId).optional(),
+        options: ChatModelIdOptions,
+        schema: z.enum(CHAT_MODEL_IDS).optional(),
       }),
 
       skillId: requestField(scopedTranslation, {

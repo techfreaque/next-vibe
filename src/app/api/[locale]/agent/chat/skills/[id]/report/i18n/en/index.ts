@@ -56,6 +56,9 @@ export const translations = {
       reported: { content: "Reported" },
       reportCount: { content: "Report Count" },
     },
+    backButton: {
+      label: "Back",
+    },
     button: {
       submit: "Submit Report",
       loading: "Submitting...",

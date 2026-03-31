@@ -107,6 +107,12 @@ let messageSaveQueue: Promise<void> = Promise.resolve();
  * Uses a queue to prevent concurrent writes from causing race conditions
  */
 export async function saveMessage(message: ChatMessage): Promise<void> {
+  // Never persist optimistic placeholders - they are ephemeral UI state and
+  // would show as orphaned branches on reload.
+  if (message.metadata?.isOptimistic) {
+    return;
+  }
+
   // Chain this save operation after the previous one completes.
   // .catch(() => {}) ensures a failed predecessor doesn't break the chain.
   messageSaveQueue = messageSaveQueue

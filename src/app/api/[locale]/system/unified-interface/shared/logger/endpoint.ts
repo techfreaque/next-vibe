@@ -1,11 +1,15 @@
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { enableDebugLogger, mcpSilentMode } from "@/config/debug";
+import {
+  devFileLogging,
+  enableDebugLogger,
+  mcpSilentMode,
+} from "@/config/debug";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { ErrorResponseType } from "../../../../shared/types/response.schema";
 import { colors, maybeColorize, semantic } from "./colors";
-import { fileLog } from "./file-logger";
+import { devFileLog, fileLog } from "./file-logger";
 
 /**
  * Logger metadata - structured data for logging
@@ -161,17 +165,20 @@ export function createEndpointLogger(
 
   return {
     info(message: string, ...metadata: LoggerMetadata[]): void {
+      const metadataObj = metadata.length > 0 ? { metadata } : undefined;
       if (mcpSilentMode) {
         if (!(debugEnabled || enableDebugLogger)) {
           // use --verbose / or set
           return;
         }
         // In MCP mode, dynamically import and log to file instead of console
-        const metadataObj = metadata.length > 0 ? { metadata } : undefined;
         writeToFile(`[INFO] ${formatMessage(message)}`, metadataObj);
       } else {
         // oxlint-disable-next-line no-console
         console.log(formatMessage(message), ...metadata);
+      }
+      if (devFileLogging) {
+        devFileLog(formatMessage(message), metadataObj);
       }
     },
 
@@ -183,32 +190,43 @@ export function createEndpointLogger(
       // Fire global error sink if registered (server-only persistence)
       globalErrorSink?.("error", message, error, metadata);
 
+      const typedError = error ? parseError(error) : undefined;
+      const metadataObj = {
+        ...(typedError !== undefined && { error: typedError }),
+        ...(metadata.length > 0 && { metadata }),
+      };
+      const hasMetadata = Object.keys(metadataObj).length > 0;
+
       if (mcpSilentMode) {
         if (!(debugEnabled || enableDebugLogger)) {
           // use --verbose / or set src/config/debug.ts to true
           return;
         }
         // In MCP mode, dynamically import and log to file instead of console
-        const typedError = error ? parseError(error) : undefined;
-        const metadataObj = {
-          error: typedError,
-          ...(metadata.length > 0 && { metadata }),
-        };
-        writeToFile(`[ERROR] ${formatMessage(message)}`, metadataObj);
+        writeToFile(
+          `[ERROR] ${formatMessage(message)}`,
+          hasMetadata ? metadataObj : undefined,
+        );
       } else {
         // oxlint-disable-next-line no-console
         console.error(formatMessage(message), error, ...metadata, locale);
       }
+      if (devFileLogging) {
+        devFileLog(
+          formatMessage(message),
+          hasMetadata ? metadataObj : undefined,
+        );
+      }
     },
 
     vibe(message: string, ...metadata: LoggerMetadata[]): void {
+      const metadataObj = metadata.length > 0 ? { metadata } : undefined;
       if (mcpSilentMode) {
         if (!(debugEnabled || enableDebugLogger)) {
           // use --verbose / or set src/config/debug.ts to true
           return;
         }
         // In MCP mode, log to file instead of console
-        const metadataObj = metadata.length > 0 ? { metadata } : undefined;
         writeToFile(`[VIBE] [${getTimePrefix()}] ${message}`, metadataObj);
       } else {
         // Special vibe formatting - messages are plain strings
@@ -216,13 +234,17 @@ export function createEndpointLogger(
         // oxlint-disable-next-line no-console
         console.log(`${vibePrefix}${message}`, ...metadata);
       }
+      if (devFileLogging) {
+        const vibePrefix = noTimePrefix ? "" : `[${getTimePrefix()}] `;
+        devFileLog(`${vibePrefix}${message}`, metadataObj);
+      }
     },
 
     debug(message: string, ...metadata: LoggerMetadata[]): void {
       if (debugEnabled || enableDebugLogger) {
+        const metadataObj = metadata.length > 0 ? { metadata } : undefined;
         if (mcpSilentMode) {
           // In MCP mode, dynamically import and log to file instead of console
-          const metadataObj = metadata.length > 0 ? { metadata } : undefined;
           writeToFile(`[DEBUG] ${formatMessage(message)}`, metadataObj);
         } else {
           const meta = serializeDebugMeta(metadata);
@@ -234,23 +256,31 @@ export function createEndpointLogger(
           // oxlint-disable-next-line no-console
           console.log(line);
         }
+        if (devFileLogging) {
+          const meta = serializeDebugMeta(metadata);
+          const timeTag = noTimePrefix ? "" : `[${getTimePrefix()}] `;
+          devFileLog(`${timeTag}${message}${meta}`, metadataObj);
+        }
       }
     },
     warn(message: string, ...metadata: LoggerMetadata[]): void {
       // Fire global error sink for warnings too
       globalErrorSink?.("warn", message, undefined, metadata);
 
+      const metadataObj = metadata.length > 0 ? { metadata } : undefined;
       if (mcpSilentMode) {
         if (!(debugEnabled || enableDebugLogger)) {
           // use --verbose / or set src/config/debug.ts to true
           return;
         }
         // In MCP mode, dynamically import and log to file instead of console
-        const metadataObj = metadata.length > 0 ? { metadata } : undefined;
         writeToFile(`[WARN] ${formatMessage(message)}`, metadataObj);
       } else {
         // oxlint-disable-next-line no-console
         console.warn(formatMessage(message), ...metadata, locale);
+      }
+      if (devFileLogging) {
+        devFileLog(formatMessage(message), metadataObj);
       }
     },
     isDebugEnabled: debugEnabled || enableDebugLogger,

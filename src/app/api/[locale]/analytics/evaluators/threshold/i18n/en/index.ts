@@ -22,6 +22,13 @@ export const translations = {
       },
       signals: { label: "Signals", description: "Output signal events" },
     },
+    backButton: {
+      label: "Back",
+    },
+    submitButton: {
+      label: "Evaluate",
+      loadingText: "Evaluating…",
+    },
     success: {
       title: "Threshold evaluated",
       description: "Signal events returned",

@@ -40,6 +40,7 @@ function buildCompactingInstructions(): string {
 - Significant code, technical details, or instructions (keep verbatim if important)
 - The most recent topic/task being worked on
 - Results of tool calls and actions taken
+- CDN URLs for images, audio, and video - copy these verbatim exactly as they appear (e.g. https://...)
 
 **What to omit:**
 - System instructions, skill personas, or role-play framing
@@ -83,6 +84,8 @@ export class CompactingHandler {
     rootFolderId: DefaultFolderId;
     compactingMessageCreatedAt: Date;
     t: AiStreamT;
+    /** Pre-gap-filled history messages. When provided, skip internal MessageConverter call. */
+    preFilledHistoryMessages?: Parameters<typeof streamText>[0]["messages"];
   }): Promise<
     | {
         success: true;
@@ -116,13 +119,16 @@ export class CompactingHandler {
 
     const compactingMessageId = uuidv4();
 
-    const historyMessages = await MessageConverter.toAiSdkMessages(
-      branchMessages,
-      logger,
-      timezone,
-      rootFolderId,
-      ctx.locale,
-    );
+    // Use pre-gap-filled messages if provided (avoids re-conversion + gap fill is already done)
+    const historyMessages = params.preFilledHistoryMessages
+      ? params.preFilledHistoryMessages
+      : await MessageConverter.toAiSdkMessages(
+          branchMessages,
+          logger,
+          timezone,
+          rootFolderId,
+          ctx.locale,
+        );
 
     const { formatAbsoluteTimestamp } =
       await import("../system-prompt/message-metadata");
@@ -151,6 +157,16 @@ export class CompactingHandler {
       { role: "system" as const, content: finalContextMessage },
     ];
 
+    // Check if any message being compacted has generated media or variants
+    const containsMediaReferences = messagesToCompact.some(
+      (m) =>
+        (m.metadata?.generatedMedia !== null &&
+          m.metadata?.generatedMedia !== undefined) ||
+        (m.metadata?.variants !== null &&
+          m.metadata?.variants !== undefined &&
+          m.metadata.variants.length > 0),
+    );
+
     // Emit MESSAGE_CREATED SSE + insert to DB
     await ctx.dbWriter.emitCompactingMessageCreated({
       messageId: compactingMessageId,
@@ -162,6 +178,7 @@ export class CompactingHandler {
       userId,
       messagesToCompact,
       createdAt: compactingMessageCreatedAt,
+      containsMediaReferences,
     });
 
     // Re-parent user message: compacting inserted itself before the user message,

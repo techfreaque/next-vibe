@@ -113,6 +113,8 @@ export const translations = {
       conflict: { title: "Konflikt", description: "Nie można usunąć folderu" },
     },
     success: { title: "Sukces", description: "Folder usunięty pomyślnie" },
+    backButton: { label: "Wstecz" },
+    submitButton: { label: "Usuń folder", loadingText: "Usuwanie..." },
   },
 
   errors: {

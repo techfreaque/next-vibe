@@ -52,7 +52,6 @@ import { useSelectorOnboardingContext } from "../../ai-stream/stream/widget/sele
 import { useAddToFavorites } from "../favorites/create/hooks";
 import { useChatFavorites } from "../favorites/hooks/hooks";
 import skillDetailDefinitions from "./[id]/definition";
-import { DEFAULT_TTS_VOICE_ID } from "../../models/models";
 import { COMPANION_SKILLS } from "./config";
 import type definition from "./definition";
 import type { SkillListItem, SkillListResponseOutput } from "./definition";
@@ -1313,7 +1312,7 @@ function EditFavBeforeAddButton({
           skillId: char.id,
           variantId: defaultVariantId ?? undefined,
           icon: fullChar.icon ?? undefined,
-          voiceId: fullChar.voiceId ?? DEFAULT_TTS_VOICE_ID,
+          voiceModelSelection: undefined,
           modelSelection: null,
         },
         replaceOnSuccess: {
@@ -1479,7 +1478,6 @@ function SkillFavoriteActions({
         favoriteId: favoriteIds[0],
         modelId,
         skillId: char.id,
-        voiceId: favorite.voiceId || null,
         logger,
         locale,
         user,
@@ -1539,7 +1537,6 @@ function SkillFavoriteActions({
         favoriteId,
         modelId,
         skillId: char.id,
-        voiceId: favorite.voiceId || null,
         logger,
         locale,
         user,
@@ -1595,7 +1592,7 @@ function SkillFavoriteActions({
         skillId: char.id,
         variantId: variantId ?? undefined,
         icon: fullChar.icon ?? undefined,
-        voiceId: fullChar.voiceId ?? DEFAULT_TTS_VOICE_ID,
+        voiceModelSelection: undefined,
         modelSelection: null,
       },
       replaceOnSuccess: {

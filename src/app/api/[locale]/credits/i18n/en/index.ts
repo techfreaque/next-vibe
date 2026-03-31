@@ -454,6 +454,13 @@ export const translations = {
           content: "Result",
         },
       },
+      backButton: {
+        label: "Back",
+      },
+      submitButton: {
+        label: "Add Credits",
+        loadingText: "Adding...",
+      },
       success: {
         title: "Credits Added",
         description: "Credits have been added to the user account",

@@ -87,6 +87,9 @@ export const translations: typeof enTranslations = {
         description: "Określona wiadomość nie istnieje",
       },
     },
+    backButton: {
+      label: "Wstecz",
+    },
     success: { title: "Sukces", description: "Wiadomość pobrana pomyślnie" },
   },
   patch: {
@@ -185,6 +188,13 @@ export const translations: typeof enTranslations = {
         description: "Określona wiadomość nie istnieje",
       },
     },
+    backButton: {
+      label: "Wstecz",
+    },
+    submitButton: {
+      label: "Zapisz zmiany",
+      loadingText: "Zapisywanie…",
+    },
     success: {
       title: "Sukces",
       description: "Wiadomość zaktualizowana pomyślnie",
@@ -202,6 +212,10 @@ export const translations: typeof enTranslations = {
       "Czy na pewno chcesz usunąć tę wiadomość? Tej akcji nie można cofnąć.",
     backButton: {
       label: "Anuluj",
+    },
+    submitButton: {
+      label: "Usuń",
+      loadingText: "Usuwanie…",
     },
     deleteButton: {
       label: "Usuń",

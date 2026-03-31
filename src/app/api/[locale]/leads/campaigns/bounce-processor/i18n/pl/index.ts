@@ -92,6 +92,13 @@ export const translations: typeof enTranslations = {
       leadsUpdated: "Zaktualizowane leady",
       campaignsCancelled: "Anulowane kampanie",
     },
+    backButton: {
+      label: "Wstecz",
+    },
+    submitButton: {
+      label: "Zapisz ustawienia",
+      loadingText: "Zapisywanie...",
+    },
     success: {
       title: "Przetwarzanie zwrotów zakończone",
       description: "Powiadomienia o zwrotach przetworzone pomyślnie",
@@ -138,6 +145,9 @@ export const translations: typeof enTranslations = {
       timeout: "Limit czasu",
       retries: "Ponowne próby",
       retryDelay: "Opóźnienie ponownej próby",
+    },
+    backButton: {
+      label: "Wstecz",
     },
     success: {
       title: "Konfiguracja załadowana pomyślnie",

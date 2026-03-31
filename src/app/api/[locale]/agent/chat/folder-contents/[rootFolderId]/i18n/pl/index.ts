@@ -86,5 +86,8 @@ export const translations = {
       title: "Sukces",
       description: "Zawartość folderu pobrana pomyślnie",
     },
+    backButton: {
+      label: "Wstecz",
+    },
   },
 };

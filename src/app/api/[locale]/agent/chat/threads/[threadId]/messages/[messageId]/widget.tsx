@@ -66,21 +66,9 @@ export function DeleteMessageWidget({
       )}
 
       <Div className="flex items-center gap-2">
-        <NavigateButtonWidget
-          field={{
-            icon: "arrow-left",
-            variant: "outline",
-            label: t("delete.backButton.label"),
-          }}
-        />
+        <NavigateButtonWidget field={children.backButton} />
         <SubmitButtonWidget<typeof definitions.DELETE>
-          field={{
-            text: "delete.deleteButton.label",
-            loadingText: "delete.deleteButton.loadingText",
-            icon: "trash",
-            variant: "destructive",
-            className: "ml-auto",
-          }}
+          field={children.submitButton}
         />
       </Div>
     </Div>

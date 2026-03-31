@@ -304,10 +304,30 @@ export function ToolCallRenderer({
       const result = await tryLoadIdentifier(toolCall.toolName);
       if (result.success) {
         setDefinition(result.data);
+        // Apply definition's defaultExpanded once loaded, but only if there's no user override
+        if (result.data.defaultExpanded !== undefined) {
+          const hasUserOverride =
+            collapseState &&
+            messageId !== undefined &&
+            collapseState.isCollapsed(
+              { messageId, sectionType: "tool", sectionIndex: toolIndex },
+              !result.data.defaultExpanded,
+            ) !== !result.data.defaultExpanded;
+          if (!hasUserOverride) {
+            setIsOpen(result.data.defaultExpanded);
+          }
+        }
       }
     };
     void loadDef();
-  }, [toolCall.toolName, definition, tryLoadIdentifier]);
+  }, [
+    toolCall.toolName,
+    definition,
+    tryLoadIdentifier,
+    collapseState,
+    messageId,
+    toolIndex,
+  ]);
 
   const hasResult = Boolean(toolCall.result);
   // Detect error: toolCall.error should be an ErrorResponseType (object with success=false).
@@ -509,7 +529,23 @@ export function ToolCallRenderer({
   };
 
   const { displayName, icon } = resolveDisplay();
-  const credits = definition?.credits ?? toolCall.creditsUsed ?? 0;
+
+  // dynamicCredits is fully typed at each definition site; here we call it via CreateApiEndpointAny
+  // which erases the concrete field types - use the same erased-fn pattern as dynamicTitle
+  type DynamicCreditsFn = (data: {
+    request?: ToolCall["args"];
+    response?: ToolCall["result"];
+  }) => number | undefined;
+
+  const dynamicCreditsFn = definition?.dynamicCredits as
+    | DynamicCreditsFn
+    | undefined;
+  const dynamicCost = dynamicCreditsFn?.({
+    request: toolCall.args,
+    response: toolCall.result,
+  });
+  const credits =
+    dynamicCost ?? definition?.credits ?? toolCall.creditsUsed ?? 0;
   const creditsDisplay = credits
     ? t(
         credits === 1
@@ -520,12 +556,7 @@ export function ToolCallRenderer({
     : null;
 
   return (
-    <Div
-      className={cn(
-        "rounded-lg border border-border/50 bg-muted overflow-hidden",
-        "transition-all duration-200",
-      )}
-    >
+    <Div className="rounded-lg border border-border/50 bg-muted overflow-hidden">
       <Collapsible open={isOpen} onOpenChange={handleToggle}>
         {/* Header */}
         <CollapsibleTrigger asChild>

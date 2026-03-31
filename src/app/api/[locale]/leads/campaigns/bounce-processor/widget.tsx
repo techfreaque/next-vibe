@@ -27,6 +27,7 @@ import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/
 import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import type definition from "./definition";
@@ -179,14 +180,12 @@ export function BounceProcessorConfigWidget({
       </Card>
 
       {/* Submit */}
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{
-          text: "widget.save",
-          loadingText: "widget.saving",
-          icon: "save",
-          variant: "primary",
-        }}
-      />
+      <Div className="flex gap-2">
+        <NavigateButtonWidget field={children.backButton} />
+        <SubmitButtonWidget<typeof definition.POST>
+          field={children.submitButton}
+        />
+      </Div>
     </Div>
   );
 }

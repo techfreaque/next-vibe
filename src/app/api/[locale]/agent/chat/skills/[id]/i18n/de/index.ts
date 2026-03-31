@@ -9,6 +9,13 @@ export const translations: typeof enTranslations = {
     MALE: "Männliche Stimme",
     FEMALE: "Weibliche Stimme",
   },
+  enums: {
+    ownershipType: {
+      system: "Eingebaute Fertigkeit",
+      user: "Von dir erstellt",
+      public: "Aus der Community",
+    },
+  },
 
   get: {
     title: "Charakter abrufen",
@@ -135,6 +142,9 @@ export const translations: typeof enTranslations = {
         description: "Ein Konflikt mit dem aktuellen Zustand ist aufgetreten",
       },
     },
+    voiceModelSelection: {
+      systemDefault: "Systemstandard",
+    },
     success: {
       title: "Erfolg",
       description: "Charakter erfolgreich abgerufen",
@@ -225,21 +235,43 @@ export const translations: typeof enTranslations = {
       description:
         "Aktivieren Sie dies, um Ihren Charakter mit der Community zu teilen. Wenn deaktiviert, bleibt der Charakter privat und nur für Sie sichtbar.",
     },
+    chatModel: {
+      label: "Chat-Modell",
+      placeholder: "Systemstandard",
+    },
     voice: {
       label: "Stimme",
       description: "Text-zu-Sprache-Stimme für diesen Charakter",
+      placeholder: "Systemstandard",
     },
     sttModel: {
       label: "Sprache-zu-Text-Modell",
       description: "Modell für die Spracherkennung",
+      placeholder: "Systemstandard",
     },
     visionBridgeModel: {
       label: "Vision-Modell",
       description: "Modell für die Bildanalyse",
+      placeholder: "Systemstandard",
     },
     translationModel: {
       label: "Übersetzungsmodell",
       description: "Modell für die Textübersetzung",
+    },
+    imageGenModel: {
+      label: "Bildgenerierungsmodell",
+      description: "Modell zur Bilderstellung",
+      placeholder: "Systemstandard",
+    },
+    musicGenModel: {
+      label: "Musikgenerierungsmodell",
+      description: "Modell zur Musikerstellung",
+      placeholder: "Systemstandard",
+    },
+    videoGenModel: {
+      label: "Video-Generierungsmodell",
+      description: "Modell zur Videoerstellung",
+      placeholder: "Systemstandard",
     },
     defaultChatMode: {
       label: "Standard-Chat-Modus",

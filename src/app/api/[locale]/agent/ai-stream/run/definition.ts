@@ -13,13 +13,15 @@
 import { z } from "zod";
 
 import {
+  CHAT_MODEL_IDS,
+  ChatModelIdOptions,
   getModelById,
   ModelId,
-  ModelIdOptions,
 } from "@/app/api/[locale]/agent/models/models";
 import { DEFAULT_SKILL_IDS } from "@/app/api/[locale]/system/generated/skills-index";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   objectField,
   requestDataArrayOptionalField,
@@ -107,9 +109,9 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.SELECT,
         label: "run.post.fields.model.label",
         description: "run.post.fields.model.description",
-        options: ModelIdOptions,
+        options: ChatModelIdOptions,
         columns: 6,
-        schema: z.enum(ModelId).optional(),
+        schema: z.enum(CHAT_MODEL_IDS).optional(),
       }),
 
       skill: requestField(scopedTranslation, {
@@ -414,6 +416,14 @@ const { POST } = createEndpoint({
             }),
           },
         }),
+      }),
+
+      // === BUTTONS ===
+      backButton: backButton(scopedTranslation, {
+        label: "run.post.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
       }),
     },
   }),

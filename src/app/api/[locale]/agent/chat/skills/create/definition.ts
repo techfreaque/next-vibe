@@ -13,23 +13,25 @@ import {
   LLM_MODEL_IDS,
   LlmModelIdOptions,
   ModelId,
-  STT_MODEL_IDS,
-  SttModelIdOptions,
-  TTS_MODEL_IDS,
-  TtsModelIdOptions,
-  VISION_MODEL_IDS,
-  VisionModelIdOptions,
 } from "@/app/api/[locale]/agent/models/models";
 import {
+  imageGenModelSelectionSchema,
   modelSelectionSchemaSimple,
   type ModelSelectionSimple,
+  musicGenModelSelectionSchema,
+  sttModelSelectionSchema,
+  videoGenModelSelectionSchema,
+  visionModelSelectionSchema,
+  voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/models/types";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   requestField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -54,7 +56,11 @@ import { CategoryOptions, SkillCategory, SkillCategoryDB } from "../enum";
 import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "../i18n";
 import { SkillsRepositoryClient } from "../repository-client";
-import { SkillCreateContainer } from "./widget";
+import { lazy } from "react";
+
+const SkillCreateContainer = lazy(() =>
+  import("./widget").then((m) => ({ default: m.SkillCreateContainer })),
+);
 
 /**
  * Create Skill Endpoint (POST)
@@ -290,11 +296,10 @@ const { POST } = createEndpoint({
           descriptionStyle: "inline",
         },
       }),
-      voiceId: requestField(scopedTranslation, {
-        schema: z.enum(TTS_MODEL_IDS).nullable().optional(),
+      voiceModelSelection: requestField(scopedTranslation, {
+        schema: voiceModelSelectionSchema.nullable().optional(),
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: TtsModelIdOptions,
+        fieldType: FieldDataType.TEXT,
         label: "post.voice.label" as const,
         description: "post.voice.description" as const,
         columns: 6,
@@ -303,11 +308,10 @@ const { POST } = createEndpoint({
           optionalColor: "transparent",
         },
       }),
-      sttModelId: requestField(scopedTranslation, {
-        schema: z.enum(STT_MODEL_IDS).nullable().optional(),
+      sttModelSelection: requestField(scopedTranslation, {
+        schema: sttModelSelectionSchema.nullable().optional(),
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: SttModelIdOptions,
+        fieldType: FieldDataType.TEXT,
         label: "post.sttModel.label" as const,
         description: "post.sttModel.description" as const,
         columns: 6,
@@ -316,11 +320,10 @@ const { POST } = createEndpoint({
           optionalColor: "transparent",
         },
       }),
-      visionBridgeModelId: requestField(scopedTranslation, {
-        schema: z.enum(VISION_MODEL_IDS).nullable().optional(),
+      visionBridgeModelSelection: requestField(scopedTranslation, {
+        schema: visionModelSelectionSchema.nullable().optional(),
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: VisionModelIdOptions,
+        fieldType: FieldDataType.TEXT,
         label: "post.visionBridgeModel.label" as const,
         description: "post.visionBridgeModel.description" as const,
         columns: 6,
@@ -336,6 +339,42 @@ const { POST } = createEndpoint({
         options: LlmModelIdOptions,
         label: "post.translationModel.label" as const,
         description: "post.translationModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      imageGenModelSelection: requestField(scopedTranslation, {
+        schema: imageGenModelSelectionSchema.nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.imageGenModel.label" as const,
+        description: "post.imageGenModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      musicGenModelSelection: requestField(scopedTranslation, {
+        schema: musicGenModelSelectionSchema.nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.musicGenModel.label" as const,
+        description: "post.musicGenModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      videoGenModelSelection: requestField(scopedTranslation, {
+        schema: videoGenModelSelectionSchema.nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.videoGenModel.label" as const,
+        description: "post.videoGenModel.description" as const,
         columns: 6,
         theme: {
           descriptionStyle: "inline",
@@ -428,6 +467,22 @@ const { POST } = createEndpoint({
         content: "post.response.id.content" as const,
         hidden: true,
       }),
+
+      // === BUTTONS ===
+      backButton: backButton(scopedTranslation, {
+        label: "post.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "post.submitButton.text" as const,
+        loadingText: "post.submitButton.loadingText" as const,
+        icon: "plus",
+        variant: "primary",
+        className: "ml-auto",
+        usage: { request: "data" },
+      }),
     },
   }),
 
@@ -491,9 +546,12 @@ const { POST } = createEndpoint({
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: ModelId.GPT_5,
         },
-        voiceId: undefined,
-        sttModelId: undefined,
-        visionBridgeModelId: undefined,
+        voiceModelSelection: undefined,
+        sttModelSelection: undefined,
+        visionBridgeModelSelection: undefined,
+        imageGenModelSelection: undefined,
+        musicGenModelSelection: undefined,
+        videoGenModelSelection: undefined,
         translationModelId: undefined,
         defaultChatMode: undefined,
         availableTools: [
@@ -514,9 +572,12 @@ const { POST } = createEndpoint({
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: ModelId.GPT_5,
         },
-        voiceId: undefined,
-        sttModelId: undefined,
-        visionBridgeModelId: undefined,
+        voiceModelSelection: undefined,
+        sttModelSelection: undefined,
+        visionBridgeModelSelection: undefined,
+        imageGenModelSelection: undefined,
+        musicGenModelSelection: undefined,
+        videoGenModelSelection: undefined,
         translationModelId: undefined,
         defaultChatMode: undefined,
         availableTools: [
@@ -553,9 +614,12 @@ const { POST } = createEndpoint({
             max: SpeedLevel.THOROUGH,
           },
         },
-        voiceId: undefined,
-        sttModelId: undefined,
-        visionBridgeModelId: undefined,
+        voiceModelSelection: undefined,
+        sttModelSelection: undefined,
+        visionBridgeModelSelection: undefined,
+        imageGenModelSelection: undefined,
+        musicGenModelSelection: undefined,
+        videoGenModelSelection: undefined,
         translationModelId: undefined,
         defaultChatMode: undefined,
         availableTools: null,

@@ -9,8 +9,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   objectField,
   requestField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -89,6 +91,22 @@ const { POST } = createEndpoint({
       }),
       signals: signalsResponseField(scopedTranslation, {
         label: "post.fields.signals.label",
+      }),
+
+      // === NAVIGATION ===
+      backButton: backButton(scopedTranslation, {
+        label: "post.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "post.submitButton.label" as const,
+        loadingText: "post.submitButton.loadingText" as const,
+        icon: "send",
+        variant: "primary",
+        className: "w-full",
+        usage: { request: "data" },
       }),
     },
   }),

@@ -13,6 +13,7 @@ import { type JSX } from "react";
 
 import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import type definition from "./definition";
@@ -46,22 +47,19 @@ export function SkillReportContainer({
 
   return (
     <Div className="flex flex-col gap-4 p-4">
+      <Div className="flex flex-row gap-2">
+        <NavigateButtonWidget field={children.backButton} />
+        <SubmitButtonWidget<typeof definition.POST>
+          field={children.submitButton}
+        />
+      </Div>
+
       <Div className="flex items-center gap-2 text-sm text-muted-foreground">
         <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
         <Span>{t("post.description")}</Span>
       </Div>
 
       <TextareaFieldWidget field={children.reason} fieldName="reason" />
-
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{
-          text: "post.button.submit",
-          loadingText: "post.button.loading",
-          icon: "alert-triangle",
-          variant: "destructive",
-          className: "w-full",
-        }}
-      />
     </Div>
   );
 }

@@ -171,7 +171,7 @@ function mkAssistantMsg(
 }
 
 // ---------------------------------------------------------------------------
-// Memory demo — context-aware follow-up (search-memory tool call)
+// Memory demo - context-aware follow-up (search-memory tool call)
 // ---------------------------------------------------------------------------
 
 function buildMemoryContextGroup(t: ScopedT): MessageGroup {
@@ -224,7 +224,7 @@ function buildMemoryContextGroup(t: ScopedT): MessageGroup {
 }
 
 // ---------------------------------------------------------------------------
-// Memory demo — project continuation (search-memory tool call)
+// Memory demo - project continuation (search-memory tool call)
 // ---------------------------------------------------------------------------
 
 function buildMemoryProjectGroup(t: ScopedT): MessageGroup {
@@ -277,7 +277,7 @@ function buildMemoryProjectGroup(t: ScopedT): MessageGroup {
 }
 
 // ---------------------------------------------------------------------------
-// Search demo — live news (web-search with real results)
+// Search demo - live news (web-search with real results)
 // ---------------------------------------------------------------------------
 
 function buildSearchNewsGroup(t: ScopedT): MessageGroup {
@@ -370,7 +370,7 @@ function buildSearchNewsGroup(t: ScopedT): MessageGroup {
 }
 
 // ---------------------------------------------------------------------------
-// Search demo — deep read (web-search → fetch-url-content chain)
+// Search demo - deep read (web-search → fetch-url-content chain)
 // ---------------------------------------------------------------------------
 
 function buildSearchDeepReadGroup(t: ScopedT): MessageGroup {
@@ -456,7 +456,7 @@ function buildSearchDeepReadGroup(t: ScopedT): MessageGroup {
 }
 
 // ---------------------------------------------------------------------------
-// Search demo — compare two angles (two web-searches)
+// Search demo - compare two angles (two web-searches)
 // ---------------------------------------------------------------------------
 
 function buildSearchCompareGroup(t: ScopedT): MessageGroup {
@@ -668,7 +668,7 @@ function MemoryVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
                 sendMessage={null}
                 deductCredits={null}
                 ttsAutoplay={false}
-                ttsVoice={undefined}
+                voiceId={undefined}
                 onVote={null}
                 userVote={null}
                 voteScore={0}
@@ -682,7 +682,7 @@ function MemoryVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
 }
 
 // ---------------------------------------------------------------------------
-// Models Visual — tier badges + censorship demo using real message components
+// Models Visual - tier badges + censorship demo using real message components
 // ---------------------------------------------------------------------------
 
 type CensorDemoId = "mainstream" | "open" | "uncensored";
@@ -802,7 +802,7 @@ function ModelsVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
 
   return (
     <Div className="space-y-5">
-      {/* Tier badges — click to switch demo */}
+      {/* Tier badges - click to switch demo */}
       <Div className="space-y-3">
         {tiers.map((tier) => (
           <Button
@@ -828,7 +828,7 @@ function ModelsVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
         ))}
       </Div>
 
-      {/* Censorship demo — same question, real message components */}
+      {/* Censorship demo - same question, real message components */}
       <Div>
         <Div className="flex items-center justify-between mb-3">
           <Span className="text-xs font-mono text-muted-foreground">
@@ -918,7 +918,7 @@ function ModelsVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
                   sendMessage={null}
                   deductCredits={null}
                   ttsAutoplay={false}
-                  ttsVoice={undefined}
+                  voiceId={undefined}
                   onVote={null}
                   userVote={null}
                   voteScore={0}
@@ -1048,7 +1048,7 @@ function SearchVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
                 sendMessage={null}
                 deductCredits={null}
                 ttsAutoplay={false}
-                ttsVoice={undefined}
+                voiceId={undefined}
                 onVote={null}
                 userVote={null}
                 voteScore={0}
@@ -1062,7 +1062,7 @@ function SearchVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
 }
 
 // ---------------------------------------------------------------------------
-// Privacy Visual — matches real folder bar colors/icons
+// Privacy Visual - matches real folder bar colors/icons
 // ---------------------------------------------------------------------------
 
 function PrivacyVisual({ locale }: { locale: CountryLanguage }): JSX.Element {

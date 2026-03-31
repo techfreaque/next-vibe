@@ -92,5 +92,8 @@ export const translations = {
       title: "Erfolg",
       description: "Ordnerinhalt erfolgreich abgerufen",
     },
+    backButton: {
+      label: "Zurück",
+    },
   },
 };

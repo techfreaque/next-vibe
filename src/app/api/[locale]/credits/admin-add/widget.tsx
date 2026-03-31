@@ -21,11 +21,12 @@ import type { JSX } from "react";
 
 import {
   useWidgetForm,
-  useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import type definition from "./definition";
 import type { AdminAddCreditsPostResponseOutput } from "./definition";
@@ -41,8 +42,8 @@ export function AdminAddCreditsContainer({
 }: CustomWidgetProps): JSX.Element {
   const t = useWidgetTranslation<typeof definition.POST>();
   const form = useWidgetForm();
-  const onSubmit = useWidgetOnSubmit();
   const user = useWidgetUser();
+  const children = field.children;
 
   const amount = form.watch("amount") ?? 100;
   const targetUserId = form.watch("targetUserId");
@@ -108,9 +109,12 @@ export function AdminAddCreditsContainer({
           </Div>
         </Div>
 
-        <Button type="button" className="w-full" size="lg" onClick={onSubmit}>
-          {t("adminAdd.post.title")}
-        </Button>
+        <Div className="flex gap-2">
+          <NavigateButtonWidget field={children.backButton} />
+          <SubmitButtonWidget<typeof definition.POST>
+            field={children.submitButton}
+          />
+        </Div>
       </CardContent>
     </Card>
   );

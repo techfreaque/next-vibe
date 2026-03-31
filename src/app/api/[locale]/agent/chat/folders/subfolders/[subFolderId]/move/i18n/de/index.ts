@@ -75,6 +75,11 @@ export const translations: typeof enTranslations = {
       title: "Erfolg",
       description: "Ordner erfolgreich verschoben",
     },
+    backButton: { label: "Zurück" },
+    submitButton: {
+      label: "Ordner verschieben",
+      loadingText: "Verschieben...",
+    },
   },
   widget: {
     moveFolder: {

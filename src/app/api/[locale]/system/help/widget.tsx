@@ -217,8 +217,8 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     [response],
   );
   const totalCount = response?.totalCount ?? 0;
-  const pinnedCount = response?.pinnedCount;
-  const allowedCount = response?.allowedCount;
+  const serverPinnedCount = response?.pinnedCount;
+  const serverAllowedCount = response?.allowedCount;
   const categories = response?.categories ?? [];
   const hint = response?.hint;
 
@@ -323,29 +323,23 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   }, [visibleTools]);
 
   const stats = useMemo(() => {
-    if (user?.isPublic) {
-      const pinnedCount2 = effectiveEnabledTools.filter(
-        (et) => et.pinned,
-      ).length;
-      const allowedCount2 = effectiveEnabledTools.length;
+    if (enabledTools === null) {
+      // Default: no explicit settings - use server-computed counts (accurate over full tool set)
       return {
-        pinned: pinnedCount2,
-        enabled: allowedCount2 > 0 ? allowedCount2 : totalCount,
+        pinned: serverPinnedCount ?? 0,
+        enabled: serverAllowedCount ?? totalCount,
         total: totalCount,
       };
     }
+    // Explicit settings: compute live from local state so toggles update instantly
+    const pinned = enabledTools.filter((et) => et.pinned).length;
+    const allowed = enabledTools.length;
     return {
-      pinned: pinnedCount ?? 0,
-      enabled: allowedCount ?? totalCount,
+      pinned,
+      enabled: allowed > 0 ? allowed : totalCount,
       total: totalCount,
     };
-  }, [
-    user?.isPublic,
-    effectiveEnabledTools,
-    pinnedCount,
-    allowedCount,
-    totalCount,
-  ]);
+  }, [enabledTools, serverPinnedCount, serverAllowedCount, totalCount]);
 
   const allVisibleEnabled = useMemo(
     () =>

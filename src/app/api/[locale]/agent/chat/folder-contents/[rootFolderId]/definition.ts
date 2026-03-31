@@ -12,6 +12,7 @@ import {
 } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   objectField,
   requestField,
@@ -35,8 +36,13 @@ import {
 
 import { DefaultFolderId } from "../../config";
 import { ThreadStatusDB, ThreadStatusOptions } from "../../enum";
+import { lazy } from "react";
+
 import { scopedTranslation } from "./i18n";
-import { FolderContentsWidget } from "./widget";
+
+const FolderContentsWidget = lazy(() =>
+  import("./widget").then((m) => ({ default: m.FolderContentsWidget })),
+);
 
 const { GET } = createEndpoint({
   scopedTranslation,
@@ -341,6 +347,13 @@ const { GET } = createEndpoint({
             }),
           },
         }),
+      }),
+
+      backButton: backButton(scopedTranslation, {
+        label: "get.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data&urlPathParams" },
       }),
     },
   }),

@@ -64,8 +64,8 @@ export class StreamingTTSBuffer {
     }
     if (delta.includes("</think>")) {
       this.isInsideThinkTag = false;
-      // Strip any special tags from buffer
-      this.buffer = stripSpecialTags(this.buffer);
+      // Strip any special tags from buffer (including orphaned closing tags)
+      this.buffer = stripSpecialTags(this.buffer).replace(/<\/think>/gi, "");
       return;
     }
 

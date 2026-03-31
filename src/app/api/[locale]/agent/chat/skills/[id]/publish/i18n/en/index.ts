@@ -55,6 +55,9 @@ export const translations = {
       status: { content: "Status" },
       publishedAt: { content: "Published At" },
     },
+    backButton: {
+      label: "Back",
+    },
     button: {
       submit: "Save Status",
       loading: "Saving...",

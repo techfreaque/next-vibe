@@ -38,6 +38,8 @@ export interface AgentEnvAvailability {
   replicate: boolean;
   /** Fal.ai (fast image and video inference) */
   falAi: boolean;
+  /** ModelsLab (music generation, text-to-video) */
+  modelsLab: boolean;
 }
 
 /**
@@ -63,6 +65,7 @@ export function getAgentEnvAvailability(): AgentEnvAvailability {
     openAiImages: Boolean(agentEnv.OPENAI_API_KEY),
     replicate: Boolean(agentEnv.REPLICATE_API_TOKEN),
     falAi: Boolean(agentEnv.FAL_AI_API_KEY),
+    modelsLab: Boolean(agentEnv.MODELSLAB_API_KEY),
   };
 }
 
@@ -135,6 +138,11 @@ export const PROVIDER_SETUP_INSTRUCTIONS = {
     envKey: "FAL_AI_API_KEY",
     url: "https://fal.ai/dashboard/keys",
     label: "Fal.ai",
+  },
+  modelsLab: {
+    envKey: "MODELSLAB_API_KEY",
+    url: "https://modelslab.com/account/api",
+    label: "ModelsLab",
   },
 } as const satisfies Record<
   Exclude<keyof AgentEnvAvailability, "anySearch">,

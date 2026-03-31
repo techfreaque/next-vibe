@@ -3,12 +3,13 @@ import "server-only";
 import { count, eq } from "drizzle-orm";
 
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 import { memories as memoriesTable } from "@/app/api/[locale]/agent/chat/memories/db";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   FEATURED_MODELS,
   getAvailableModelCount,
 } from "@/app/api/[locale]/agent/models/models";
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   ProductIds,
   productsRepository,
@@ -20,7 +21,6 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import { languageConfig } from "@/i18n";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
-import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 
 import type { PromptContextData } from "./prompt";
 
@@ -44,8 +44,9 @@ export async function loadPromptContextData(
     subFolderId,
     headless = false,
     callMode = false,
-    extraInstructions = "",
+    extraInstructions,
     isExposedFolder,
+    mediaCapabilities,
   } = params;
 
   const userId = user.isPublic ? undefined : user.id;
@@ -122,7 +123,7 @@ export async function loadPromptContextData(
     subFolderId,
     headless,
     callMode,
-    extraInstructions,
+    extraInstructions: extraInstructions ?? "",
     isLocalMode,
     freeTierCredits,
     subLabel,
@@ -135,5 +136,6 @@ export async function loadPromptContextData(
     isPublicUser,
     isAdmin,
     isFreshUser,
+    mediaCapabilities: mediaCapabilities ?? null,
   };
 }

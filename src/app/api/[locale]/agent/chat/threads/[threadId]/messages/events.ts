@@ -3,6 +3,7 @@
  * 100% typesafe event definitions shared between server and client
  */
 
+import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 
@@ -42,6 +43,13 @@ export enum StreamEventType {
   TASK_COMPLETED = "task-completed",
   // Thread streaming state changed (e.g. stream ended but task is still in flight → "waiting")
   STREAMING_STATE_CHANGED = "streaming-state-changed",
+  // Generated media attached to existing assistant message (LLM reasoned then emitted file)
+  GENERATED_MEDIA_ADDED = "generated-media-added",
+  // Gap-fill bridge events (modality bridge running on a message before it can be sent to LLM)
+  GAP_FILL_STARTED = "gap-fill-started",
+  GAP_FILL_COMPLETED = "gap-fill-completed",
+  // Tool result updated (async job completed - pending tool result backfilled)
+  TOOL_RESULT_UPDATED = "tool-result-updated",
 }
 
 /**
@@ -295,6 +303,73 @@ export interface StreamingStateChangedEventData {
 }
 
 /**
+ * Generated media added to existing assistant message event data.
+ * Emitted when an LLM reasons (emitting text) and then emits a file part.
+ * Instead of creating a new message, the media is attached to the existing text message.
+ */
+export interface GeneratedMediaAddedEventData {
+  /** The existing assistant message ID to attach media to */
+  messageId: string;
+  /** The generated media metadata */
+  generatedMedia: {
+    type: "image" | "audio" | "video";
+    url: string | undefined;
+    prompt: string;
+    modelId: string;
+    mimeType: string;
+    creditCost: number;
+    status: "complete" | "pending" | "failed";
+  };
+}
+
+/**
+ * Gap fill started event data
+ * Emitted when a modality bridge (STT, vision) begins running on a message attachment.
+ */
+export interface GapFillStartedEventData {
+  /** The message ID whose attachment is being gap-filled */
+  messageId: string;
+  /** Which bridge type is running */
+  bridgeType: "stt" | "vision" | "translation" | "tts";
+  /** The attachment modality being converted */
+  modality: Modality;
+}
+
+/**
+ * Gap fill completed event data
+ * Emitted when the modality bridge finishes and the text variant is ready.
+ */
+export interface GapFillCompletedEventData {
+  /** The message ID whose attachment was gap-filled */
+  messageId: string;
+  /** Which bridge type ran */
+  bridgeType: "stt" | "vision" | "translation" | "tts";
+  /** The attachment modality that was converted */
+  modality: Modality;
+  /** The produced text variant */
+  variant: {
+    modality: Modality;
+    content: string;
+    modelId: ModelId;
+    creditCost: number;
+    createdAt: string;
+  };
+}
+
+/**
+ * Tool result updated event data
+ * Emitted when an async job completes and a previously-pending tool result is backfilled.
+ */
+export interface ToolResultUpdatedEventData {
+  /** The TOOL message ID whose result was updated */
+  messageId: string;
+  /** The tool call ID that was updated */
+  toolCallId: string;
+  /** The updated result */
+  result: ToolCallResult;
+}
+
+/**
  * Event type to data mapping
  */
 export interface StreamEventDataMap {
@@ -327,6 +402,13 @@ export interface StreamEventDataMap {
   [StreamEventType.TASK_COMPLETED]: TaskCompletedEventData;
   // Thread streaming state changed
   [StreamEventType.STREAMING_STATE_CHANGED]: StreamingStateChangedEventData;
+  // Generated media attached to existing assistant message
+  [StreamEventType.GENERATED_MEDIA_ADDED]: GeneratedMediaAddedEventData;
+  // Gap-fill bridge events
+  [StreamEventType.GAP_FILL_STARTED]: GapFillStartedEventData;
+  [StreamEventType.GAP_FILL_COMPLETED]: GapFillCompletedEventData;
+  // Tool result updated
+  [StreamEventType.TOOL_RESULT_UPDATED]: ToolResultUpdatedEventData;
 }
 
 /**
@@ -477,6 +559,34 @@ export const createStreamEvent = {
     data: StreamingStateChangedEventData,
   ): StreamEvent<StreamEventType.STREAMING_STATE_CHANGED> => ({
     type: StreamEventType.STREAMING_STATE_CHANGED,
+    data,
+  }),
+
+  generatedMediaAdded: (
+    data: GeneratedMediaAddedEventData,
+  ): StreamEvent<StreamEventType.GENERATED_MEDIA_ADDED> => ({
+    type: StreamEventType.GENERATED_MEDIA_ADDED,
+    data,
+  }),
+
+  gapFillStarted: (
+    data: GapFillStartedEventData,
+  ): StreamEvent<StreamEventType.GAP_FILL_STARTED> => ({
+    type: StreamEventType.GAP_FILL_STARTED,
+    data,
+  }),
+
+  gapFillCompleted: (
+    data: GapFillCompletedEventData,
+  ): StreamEvent<StreamEventType.GAP_FILL_COMPLETED> => ({
+    type: StreamEventType.GAP_FILL_COMPLETED,
+    data,
+  }),
+
+  toolResultUpdated: (
+    data: ToolResultUpdatedEventData,
+  ): StreamEvent<StreamEventType.TOOL_RESULT_UPDATED> => ({
+    type: StreamEventType.TOOL_RESULT_UPDATED,
     data,
   }),
 };

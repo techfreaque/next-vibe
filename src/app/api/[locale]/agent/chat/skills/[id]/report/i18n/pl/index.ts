@@ -61,6 +61,9 @@ export const translations: typeof enTranslations = {
       reported: { content: "Zgłoszono" },
       reportCount: { content: "Liczba zgłoszeń" },
     },
+    backButton: {
+      label: "Wstecz",
+    },
     button: {
       submit: "Wyślij zgłoszenie",
       loading: "Wysyłanie...",

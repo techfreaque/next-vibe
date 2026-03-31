@@ -5,7 +5,6 @@
 
 import "server-only";
 
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/models/models";
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -20,6 +19,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { ModelRole } from "@/app/api/[locale]/agent/models/enum";
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
+import { getDefaultModelForRole } from "@/app/api/[locale]/agent/models/models";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { scopedTranslation as charactersScopedTranslation } from "../../skills/i18n";
 import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
@@ -33,6 +36,27 @@ import type {
   FavoriteUpdateUrlVariablesOutput,
 } from "./definition";
 import type { FavoriteByIdT } from "./i18n";
+
+/**
+ * Normalize a model selection: if it equals the platform default for the given roles,
+ * return null so we don't store redundant data.
+ */
+function normalizeModelSelection<T extends ModelSelectionSimple>(
+  sel: T | null | undefined,
+  roles: ModelRole[],
+): T | null {
+  if (!sel) {
+    return null;
+  }
+  if (sel.selectionType !== ModelSelectionType.MANUAL) {
+    return sel;
+  }
+  const def = getDefaultModelForRole(roles);
+  if (def && "manualModelId" in sel && sel.manualModelId === def.id) {
+    return null;
+  }
+  return sel;
+}
 
 /**
  * Single Favorite Repository
@@ -102,8 +126,6 @@ export class SingleFavoriteRepository {
       }
 
       const character = characterResult.data;
-      const voiceId =
-        favorite.voiceId ?? character?.voiceId ?? DEFAULT_TTS_VOICE_ID;
 
       // Build modelSelection response
       // If favorite has custom selection, return it; otherwise return null (use character defaults)
@@ -135,10 +157,25 @@ export class SingleFavoriteRepository {
         tagline: character?.tagline ?? charactersT("skills.default.tagline"),
         description:
           character?.description ?? charactersT("skills.default.description"),
-        voiceId,
-        sttModelId: favorite.sttModelId ?? undefined,
-        visionBridgeModelId: favorite.visionBridgeModelId ?? undefined,
+        voiceModelSelection: favorite.voiceModelSelection ?? null,
+        sttModelSelection: favorite.sttModelSelection ?? undefined,
+        visionBridgeModelSelection:
+          favorite.visionBridgeModelSelection ?? undefined,
         translationModelId: favorite.translationModelId ?? undefined,
+        imageGenModelSelection:
+          favorite.imageGenModelSelection ??
+          character?.imageGenModelSelection ??
+          undefined,
+        musicGenModelSelection:
+          favorite.musicGenModelSelection ??
+          character?.musicGenModelSelection ??
+          undefined,
+        videoGenModelSelection: favorite.videoGenModelId
+          ? {
+              selectionType: ModelSelectionType.MANUAL,
+              manualModelId: favorite.videoGenModelId,
+            }
+          : undefined,
         defaultChatMode: favorite.defaultChatMode ?? undefined,
         modelSelection,
         characterModelSelection,
@@ -223,27 +260,45 @@ export class SingleFavoriteRepository {
         }
       }
 
-      // Only store voice if different from character default (null = cascade to skill)
-      const voiceToStore =
-        character && data.voiceId === character.voiceId ? null : data.voiceId;
-
       // Only store customIcon if different from character default
       const customIconToStore =
         character && data.icon === character.icon ? null : data.icon;
 
       // Only store bridge models if different from character defaults (null = cascade to skill)
-      const sttModelIdToStore =
-        character && data.sttModelId === character.sttModelId
-          ? null
-          : (data.sttModelId ?? null);
-      const visionBridgeModelIdToStore =
-        character && data.visionBridgeModelId === character.visionBridgeModelId
-          ? null
-          : (data.visionBridgeModelId ?? null);
+      // Also normalize against platform defaults: store null if value equals platform default
+      const voiceModelSelectionToStore = normalizeModelSelection(
+        data.voiceModelSelection !== undefined
+          ? data.voiceModelSelection
+          : null,
+        ["tts"],
+      );
+      const sttModelSelectionToStore = normalizeModelSelection(
+        data.sttModelSelection !== undefined ? data.sttModelSelection : null,
+        ["stt"],
+      );
+      const visionBridgeModelSelectionToStore =
+        data.visionBridgeModelSelection !== undefined
+          ? data.visionBridgeModelSelection
+          : null;
       const translationModelIdToStore =
         character && data.translationModelId === character.translationModelId
           ? null
           : (data.translationModelId ?? null);
+      const imageGenModelSelectionToStore = normalizeModelSelection(
+        data.imageGenModelSelection !== undefined
+          ? data.imageGenModelSelection
+          : null,
+        ["image-gen"],
+      );
+      const musicGenModelSelectionToStore =
+        data.musicGenModelSelection !== undefined
+          ? data.musicGenModelSelection
+          : null;
+      const videoGenModelIdToStore =
+        data.videoGenModelSelection?.selectionType ===
+          ModelSelectionType.MANUAL && data.videoGenModelSelection.manualModelId
+          ? data.videoGenModelSelection.manualModelId
+          : null;
       const defaultChatModeToStore =
         character && data.defaultChatMode === character.defaultChatMode
           ? null
@@ -257,10 +312,13 @@ export class SingleFavoriteRepository {
         .set({
           skillId: data.skillId,
           customIcon: customIconToStore,
-          voiceId: voiceToStore ?? null,
-          sttModelId: sttModelIdToStore,
-          visionBridgeModelId: visionBridgeModelIdToStore,
+          voiceModelSelection: voiceModelSelectionToStore,
+          sttModelSelection: sttModelSelectionToStore,
+          visionBridgeModelSelection: visionBridgeModelSelectionToStore,
           translationModelId: translationModelIdToStore,
+          imageGenModelSelection: imageGenModelSelectionToStore,
+          musicGenModelSelection: musicGenModelSelectionToStore,
+          videoGenModelId: videoGenModelIdToStore,
           defaultChatMode: defaultChatModeToStore,
           modelSelection: modelSelectionToStore,
           compactTrigger: data.compactTrigger ?? null,
@@ -363,7 +421,6 @@ export class SingleFavoriteRepository {
       const deleted = result[0];
       return success({
         skillId: deleted.skillId,
-        voiceId: deleted.voiceId,
         modelSelection: deleted.modelSelection,
         createdAt: deleted.createdAt,
         updatedAt: deleted.updatedAt,

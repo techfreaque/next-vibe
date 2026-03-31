@@ -105,6 +105,7 @@ export function usePromptContextData(
       isPublicUser,
       isAdmin,
       isFreshUser,
+      mediaCapabilities: null,
     };
   }, [
     userData,

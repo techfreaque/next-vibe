@@ -2,12 +2,14 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   responseArrayOptionalField,
   objectField,
   requestField,
   requestUrlPathParamsField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -169,6 +171,22 @@ const { PATCH } = createEndpoint({
           schema: z.enum(UserRoleDB),
         }),
       }),
+
+      // === BUTTONS ===
+      backButton: backButton(scopedTranslation, {
+        label: "patch.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data&urlPathParams" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "patch.submitButton.label" as const,
+        loadingText: "patch.submitButton.loadingText" as const,
+        icon: "shield",
+        variant: "primary",
+        className: "w-full",
+        usage: { request: "data&urlPathParams" },
+      }),
     },
   }),
 
@@ -327,6 +345,14 @@ const { GET } = createEndpoint({
           text: "get.response.rolesAdmin.label" as const,
           schema: z.enum(UserRoleDB),
         }),
+      }),
+
+      // === BUTTONS ===
+      backButton: backButton(scopedTranslation, {
+        label: "get.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "urlPathParams" },
       }),
     },
   }),

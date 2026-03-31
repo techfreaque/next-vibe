@@ -43,6 +43,8 @@ import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import {
   useWidgetContext,
   useWidgetDisabled,
@@ -219,6 +221,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
   const isDisabled = useWidgetDisabled();
   useWidgetContext();
 
+  const children = field.children;
   const result = field.value;
   const promptValue = form.watch("prompt") ?? "";
   const providerValue = (form.watch("provider") ?? "claude-code") as
@@ -419,6 +422,12 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
     >
       <ChatBootContext.Provider value={FAKE_BOOT_VALUE}>
         <Div className="flex flex-col h-[520px] min-h-[320px]">
+          <Div className="flex items-center gap-2 px-2 pt-2">
+            <NavigateButtonWidget field={children.backButton} />
+            <SubmitButtonWidget<typeof definition.POST>
+              field={children.submitButton}
+            />
+          </Div>
           <Div className="flex-1 overflow-y-auto min-h-0 py-2">
             {hasSentMessage && promptValue && (
               <UserMessageBubble

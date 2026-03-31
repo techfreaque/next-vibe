@@ -12,10 +12,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   requestField,
   requestUrlPathParamsField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -75,6 +77,22 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "post.response.reportCount" as const,
         schema: z.number().int().nonnegative(),
+      }),
+
+      backButton: backButton(scopedTranslation, {
+        label: "post.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data&urlPathParams" },
+      }),
+
+      submitButton: submitButton(scopedTranslation, {
+        label: "post.button.submit" as const,
+        loadingText: "post.button.loading" as const,
+        icon: "alert-triangle",
+        variant: "destructive",
+        className: "ml-auto",
+        usage: { request: "data&urlPathParams" },
       }),
     },
   }),

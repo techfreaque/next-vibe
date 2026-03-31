@@ -87,6 +87,9 @@ export const translations: typeof enTranslations = {
         description: "Wystąpił konflikt z bieżącym stanem",
       },
     },
+    backButton: {
+      label: "Wstecz",
+    },
     success: {
       title: "Sukces",
       description: "Uprawnienia wątku zostały pomyślnie pobrane",
@@ -200,6 +203,13 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Wystąpił konflikt z bieżącym stanem",
       },
+    },
+    backButton: {
+      label: "Wstecz",
+    },
+    submitButton: {
+      label: "Zapisz uprawnienia",
+      loadingText: "Zapisywanie…",
     },
     success: {
       title: "Sukces",

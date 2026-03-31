@@ -31,7 +31,7 @@ export const translations = {
         model: {
           label: "Model",
           description:
-            "AI model to use. Optional when favoriteId or skill is provided (resolved from their modelSelection). Fast & cheap: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.6, gpt-5-pro. Free: qwen3_235b-free, gpt-oss-120b-free. Overrides the model from favoriteId or skill when set.",
+            "Chat/language model (LLM) to use for text reasoning and conversation. Optional when favoriteId or skill is provided. Fast & cheap: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.6, gpt-5-pro. Free: qwen3_235b-free, gpt-oss-120b-free. NOTE: This is NOT for image/audio/video generation - use generate_image, generate_music, or generate_video tools instead.",
         },
         skill: {
           label: "Skill",
@@ -190,6 +190,9 @@ export const translations = {
       success: {
         title: "AI Run Complete",
         description: "The AI agent completed successfully",
+      },
+      backButton: {
+        label: "Back",
       },
     },
   },

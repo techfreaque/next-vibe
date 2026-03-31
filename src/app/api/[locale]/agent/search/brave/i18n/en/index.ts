@@ -13,6 +13,9 @@ export const translations = {
       label: "Search",
       loadingText: "Searching...",
     },
+    backButton: {
+      label: "Back",
+    },
     fields: {
       query: {
         title: "Search Query",

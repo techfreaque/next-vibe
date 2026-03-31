@@ -8,11 +8,13 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -156,6 +158,14 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         content: "get.response.message.updatedAt.content" as const,
         schema: dateSchema,
+      }),
+
+      // === NAVIGATION ===
+      backButton: backButton(scopedTranslation, {
+        label: "get.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
       }),
     },
   }),
@@ -311,6 +321,22 @@ const { PATCH } = createEndpoint({
         type: WidgetType.TEXT,
         content: "patch.response.message.updatedAt.content" as const,
         schema: dateSchema,
+      }),
+
+      // === NAVIGATION ===
+      backButton: backButton(scopedTranslation, {
+        label: "patch.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "patch.submitButton.label" as const,
+        loadingText: "patch.submitButton.loadingText" as const,
+        icon: "send",
+        variant: "primary",
+        className: "w-full",
+        usage: { request: "data" },
       }),
     },
   }),
@@ -507,6 +533,22 @@ const { DELETE } = createEndpoint({
         type: WidgetType.TEXT,
         content: "delete.response.createdAt.content" as const,
         schema: dateSchema,
+      }),
+
+      // === NAVIGATION ===
+      backButton: backButton(scopedTranslation, {
+        label: "delete.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "delete.submitButton.label" as const,
+        loadingText: "delete.submitButton.loadingText" as const,
+        icon: "trash",
+        variant: "primary",
+        className: "w-full",
+        usage: { request: "data" },
       }),
     },
   }),

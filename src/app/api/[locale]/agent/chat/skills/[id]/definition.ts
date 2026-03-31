@@ -10,21 +10,20 @@ import {
   ChatModeOptions,
 } from "@/app/api/[locale]/agent/models/enum";
 import {
-  DEFAULT_TTS_VOICE_ID,
   getModelDisplayName,
   LLM_MODEL_IDS,
   LlmModelIdOptions,
   ModelId,
-  STT_MODEL_IDS,
-  SttModelIdOptions,
-  TTS_MODEL_IDS,
-  TtsModelIdOptions,
-  VISION_MODEL_IDS,
-  VisionModelIdOptions,
 } from "@/app/api/[locale]/agent/models/models";
 import {
+  imageGenModelSelectionSchema,
   modelSelectionSchemaSimple,
+  musicGenModelSelectionSchema,
   skillVariantSchema,
+  sttModelSelectionSchema,
+  videoGenModelSelectionSchema,
+  visionModelSelectionSchema,
+  voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/models/types";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -71,7 +70,14 @@ import type { SkillListResponseOutput } from "../definition";
 import { CategoryOptions, SkillCategory } from "../enum";
 import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "./i18n";
-import { SkillEditContainer, SkillViewContainer } from "./widget";
+import { lazy } from "react";
+
+const SkillEditContainer = lazy(() =>
+  import("./widget").then((m) => ({ default: m.SkillEditContainer })),
+);
+const SkillViewContainer = lazy(() =>
+  import("./widget").then((m) => ({ default: m.SkillViewContainer })),
+);
 
 /**
  * Delete Skill Endpoint (DELETE)
@@ -345,7 +351,9 @@ const { PATCH } = createEndpoint({
                   data.requestData.description ?? oldData.data.description,
                 category: data.requestData.category ?? oldData.data.category,
                 isPublic: data.requestData.isPublic ?? oldData.data.isPublic,
-                voiceId: data.requestData.voiceId ?? oldData.data.voiceId,
+                voiceModelSelection:
+                  data.requestData.voiceModelSelection ??
+                  oldData.data.voiceModelSelection,
                 systemPrompt:
                   data.requestData.systemPrompt ?? oldData.data.systemPrompt,
                 variants: newVariants,
@@ -534,11 +542,10 @@ const { PATCH } = createEndpoint({
           descriptionStyle: "inline",
         } as const,
       }),
-      voiceId: requestField(scopedTranslation, {
-        schema: z.enum(TTS_MODEL_IDS).nullable().optional(),
+      voiceModelSelection: requestField(scopedTranslation, {
+        schema: voiceModelSelectionSchema.nullable().optional(),
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: TtsModelIdOptions,
+        fieldType: FieldDataType.TEXT,
         label: "patch.voice.label" as const,
         description: "patch.voice.description" as const,
         columns: 6,
@@ -547,11 +554,10 @@ const { PATCH } = createEndpoint({
           optionalColor: "transparent",
         },
       }),
-      sttModelId: requestField(scopedTranslation, {
-        schema: z.enum(STT_MODEL_IDS).nullable().optional(),
+      sttModelSelection: requestField(scopedTranslation, {
+        schema: sttModelSelectionSchema.nullable().optional(),
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: SttModelIdOptions,
+        fieldType: FieldDataType.TEXT,
         label: "patch.sttModel.label" as const,
         description: "patch.sttModel.description" as const,
         columns: 6,
@@ -560,11 +566,10 @@ const { PATCH } = createEndpoint({
           optionalColor: "transparent",
         },
       }),
-      visionBridgeModelId: requestField(scopedTranslation, {
-        schema: z.enum(VISION_MODEL_IDS).nullable().optional(),
+      visionBridgeModelSelection: requestField(scopedTranslation, {
+        schema: visionModelSelectionSchema.nullable().optional(),
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: VisionModelIdOptions,
+        fieldType: FieldDataType.TEXT,
         label: "patch.visionBridgeModel.label" as const,
         description: "patch.visionBridgeModel.description" as const,
         columns: 6,
@@ -580,6 +585,42 @@ const { PATCH } = createEndpoint({
         options: LlmModelIdOptions,
         label: "patch.translationModel.label" as const,
         description: "patch.translationModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      imageGenModelSelection: requestField(scopedTranslation, {
+        schema: imageGenModelSelectionSchema.nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.imageGenModel.label" as const,
+        description: "patch.imageGenModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      musicGenModelSelection: requestField(scopedTranslation, {
+        schema: musicGenModelSelectionSchema.nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.musicGenModel.label" as const,
+        description: "patch.musicGenModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      videoGenModelSelection: requestField(scopedTranslation, {
+        schema: videoGenModelSelectionSchema.nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.videoGenModel.label" as const,
+        description: "patch.videoGenModel.description" as const,
         columns: 6,
         theme: {
           descriptionStyle: "inline",
@@ -661,6 +702,22 @@ const { PATCH } = createEndpoint({
           .nullable()
           .optional(),
       }),
+
+      // === BUTTONS ===
+      backButton: backButton(scopedTranslation, {
+        label: "patch.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data&urlPathParams" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "patch.submitButton.label" as const,
+        loadingText: "patch.submitButton.loadingText" as const,
+        icon: "save",
+        variant: "primary",
+        className: "ml-auto",
+        usage: { request: "data&urlPathParams" },
+      }),
     },
   }),
 
@@ -718,9 +775,12 @@ const { PATCH } = createEndpoint({
         category: SkillCategory.CODING,
         tagline: "Updated tagline",
         isPublic: true,
-        voiceId: DEFAULT_TTS_VOICE_ID,
-        sttModelId: undefined,
-        visionBridgeModelId: undefined,
+        voiceModelSelection: null,
+        sttModelSelection: undefined,
+        visionBridgeModelSelection: undefined,
+        imageGenModelSelection: undefined,
+        musicGenModelSelection: undefined,
+        videoGenModelSelection: undefined,
         translationModelId: undefined,
         defaultChatMode: undefined,
         modelSelection: {
@@ -825,25 +885,41 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.boolean(),
       }),
-      voiceId: responseField(scopedTranslation, {
-        type: WidgetType.BADGE,
-        variant: "default",
-        schema: z.enum(TTS_MODEL_IDS).nullable().optional(),
-      }),
-      sttModelId: responseField(scopedTranslation, {
+      voiceModelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.enum(STT_MODEL_IDS).nullable().optional(),
+        schema: voiceModelSelectionSchema.nullable(),
       }),
-      visionBridgeModelId: responseField(scopedTranslation, {
+      sttModelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.enum(VISION_MODEL_IDS).nullable().optional(),
+        schema: sttModelSelectionSchema.nullable(),
+      }),
+      visionBridgeModelSelection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: visionModelSelectionSchema.nullable(),
       }),
       translationModelId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(LLM_MODEL_IDS).nullable().optional(),
+      }),
+      imageGenModelSelection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: imageGenModelSelectionSchema.nullable(),
+      }),
+      musicGenModelSelection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: musicGenModelSelectionSchema.nullable(),
+      }),
+
+      videoGenModelSelection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: videoGenModelSelectionSchema.nullable(),
       }),
       defaultChatMode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -896,6 +972,14 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.array(skillVariantSchema),
+      }),
+
+      // === BUTTONS ===
+      backButton: backButton(scopedTranslation, {
+        label: "get.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "urlPathParams" },
       }),
     },
   }),
@@ -954,7 +1038,12 @@ const { GET } = createEndpoint({
         category: SkillCategory.ASSISTANT,
         isPublic: false,
         skillOwnership: SkillOwnershipType.SYSTEM,
-        voiceId: DEFAULT_TTS_VOICE_ID,
+        voiceModelSelection: null,
+        sttModelSelection: null,
+        visionBridgeModelSelection: null,
+        imageGenModelSelection: null,
+        musicGenModelSelection: null,
+        videoGenModelSelection: null,
         systemPrompt: "",
         compactTrigger: null,
         availableTools: null,
@@ -985,7 +1074,15 @@ const { GET } = createEndpoint({
         category: SkillCategory.CODING,
         isPublic: true,
         skillOwnership: SkillOwnershipType.PUBLIC,
-        voiceId: ModelId.OPENAI_ONYX,
+        voiceModelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ModelId.OPENAI_ONYX,
+        },
+        sttModelSelection: null,
+        visionBridgeModelSelection: null,
+        imageGenModelSelection: null,
+        musicGenModelSelection: null,
+        videoGenModelSelection: null,
         systemPrompt: "You are an expert code reviewer...",
         compactTrigger: null,
         availableTools: null,

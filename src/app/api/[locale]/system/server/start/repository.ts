@@ -40,9 +40,11 @@ import { scopedTranslation as dockerOperationsScopedTranslation } from "../../db
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
 import { ServerFramework } from "../enum";
 import {
+  addPidToFile,
   cleanupPidFile,
   isPortOwnedByUs,
   killPreviousInstance,
+  removePidFromFile,
   VIBE_START_PID_FILE,
   writePidFile,
 } from "../pid";
@@ -56,11 +58,17 @@ import { scopedTranslation as serverStartScopedTranslation } from "./i18n";
 /**
  * Server Start Repository
  */
+/** Restart backoff delays in ms (doubles each attempt, capped at 30s) */
+const NEXT_RESTART_DELAYS = [2000, 4000, 8000, 16000, 30000];
+
 export class ServerStartRepository {
   private static taskRunnerStarted = false;
   private static nextServerProcess: ChildProcess | null = null;
   private static wsServerHandle: WebSocketServerHandle | null = null;
   private static runningProcesses: Map<string, ChildProcess> = new Map();
+  /** Set to true when we intentionally stop Next.js (shutdown / SIGUSR1) - suppresses auto-restart */
+  private static nextServerShuttingDown = false;
+  private static nextRestartCount = 0;
 
   /** Extract port number from a URL string, returns undefined if not parseable */
   private static portFromUrl(url: string | undefined): number | undefined {
@@ -454,6 +462,8 @@ export class ServerStartRepository {
     process.off("SIGTERM", earlyExitHandler);
 
     const handleShutdown = (): void => {
+      // Signal auto-restart loop not to re-spawn after we kill Next.js
+      ServerStartRepository.nextServerShuttingDown = true;
       cleanupPidFile(VIBE_START_PID_FILE);
       ServerStartRepository.stopAllProcesses();
       process.exit(0);
@@ -466,6 +476,9 @@ export class ServerStartRepository {
     process.on("SIGUSR1", () => {
       logger.info("🔄 Received SIGUSR1 - restarting server...");
 
+      // Suppress auto-restart while we intentionally kill the old process
+      ServerStartRepository.nextServerShuttingDown = true;
+
       if (ServerStartRepository.wsServerHandle) {
         ServerStartRepository.wsServerHandle.stop();
         ServerStartRepository.wsServerHandle = null;
@@ -477,6 +490,10 @@ export class ServerStartRepository {
         ServerStartRepository.nextServerProcess.kill("SIGTERM");
         ServerStartRepository.nextServerProcess = null;
       }
+
+      // Re-enable auto-restart for the new process before spawning
+      ServerStartRepository.nextServerShuttingDown = false;
+      ServerStartRepository.nextRestartCount = 0;
 
       ServerStartRepository.startNextServer(port, logger, t, data.profile)
         .then((result) => {
@@ -492,6 +509,31 @@ export class ServerStartRepository {
             error: parseError(error).message,
           });
         });
+    });
+
+    // Catch unhandled errors so crashes are never silent
+    process.on("uncaughtException", (err) => {
+      const mem = process.memoryUsage();
+      logger.error("[Start] Uncaught exception - shutting down", {
+        error: err.message,
+        stack: err.stack,
+        uptime: Math.floor(process.uptime()),
+        heapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
+        rssMb: Math.round(mem.rss / 1024 / 1024),
+      });
+      process.exit(1);
+    });
+    process.on("unhandledRejection", (reason) => {
+      const mem = process.memoryUsage();
+      const message = reason instanceof Error ? reason.message : String(reason);
+      const stack = reason instanceof Error ? reason.stack : undefined;
+      logger.error("[Start] Unhandled promise rejection", {
+        error: message,
+        stack,
+        uptime: Math.floor(process.uptime()),
+        heapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
+        rssMb: Math.round(mem.rss / 1024 / 1024),
+      });
     });
 
     // Profiling keypress: 'p' → stop server and open CPU profile
@@ -802,42 +844,119 @@ export class ServerStartRepository {
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
-      const nextProcess = spawn(
-        "bun",
-        ["run", "next", "start", "--port", String(nextPort)],
-        {
-          stdio: "pipe",
-          env: {
-            ...process.env,
-            NODE_ENV: "production",
-            NEXT_DIST_DIR: ".next-prod",
-            PORT: String(nextPort),
-            ...profilingEnv,
-          } as NodeJS.ProcessEnv,
-        },
-      );
-      ServerStartRepository.nextServerProcess = nextProcess;
-
-      // Pipe Next.js output so crashes are never silent
-      // Replace internal nextPort with public port in output (proxy mode)
       const formatNextjs = createNextjsFormatter(nextPort, port);
-      nextProcess.stdout?.on("data", (chunk: Buffer) => {
-        process.stdout.write(formatNextjs(chunk.toString()));
-      });
-      nextProcess.stderr?.on("data", (chunk: Buffer) => {
-        process.stderr.write(formatNextjs(chunk.toString()));
-      });
-      nextProcess.on("exit", (code, signal) => {
-        if (code !== 0 && code !== null) {
-          logger.error(
-            `Next.js exited unexpectedly with code ${code} - shutting down`,
+
+      /** Spawn Next.js, wire stdio, register exit→restart handler. Returns the child process. */
+      const spawnNextProcess = (): ChildProcess => {
+        const proc = spawn(
+          "bun",
+          ["run", "next", "start", "--port", String(nextPort)],
+          {
+            stdio: "pipe",
+            env: {
+              ...process.env,
+              NODE_ENV: "production",
+              NEXT_DIST_DIR: ".next-prod",
+              PORT: String(nextPort),
+              // 8 GB heap for Next.js - leaves headroom for Bun proxy + OS + Postgres on 16 GB server.
+              // Without this Node defaults to ~4 GB and gets OOM-killed under load.
+              NODE_OPTIONS:
+                `${process.env["NODE_OPTIONS"] ?? ""} --max-old-space-size=8192`.trim(),
+              ...profilingEnv,
+            } as NodeJS.ProcessEnv,
+          },
+        );
+
+        proc.stdout?.on("data", (chunk: Buffer) => {
+          process.stdout.write(formatNextjs(chunk.toString()));
+        });
+        proc.stderr?.on("data", (chunk: Buffer) => {
+          process.stderr.write(formatNextjs(chunk.toString()));
+        });
+
+        proc.on("exit", (code, signal) => {
+          ServerStartRepository.nextServerProcess = null;
+          removePidFromFile(VIBE_START_PID_FILE, proc.pid ?? 0);
+
+          // Intentional shutdown (our SIGTERM or process exit) - do not restart
+          if (ServerStartRepository.nextServerShuttingDown) {
+            return;
+          }
+
+          const mem = process.memoryUsage();
+          const diag = {
+            code,
+            signal,
+            restartCount: ServerStartRepository.nextRestartCount,
+            uptime: Math.floor(process.uptime()),
+            heapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
+            rssMb: Math.round(mem.rss / 1024 / 1024),
+            nextPort,
+          };
+
+          const isCleanExit = code === 0 || signal === "SIGTERM";
+          if (isCleanExit) {
+            // clean exit without shuttingDown flag = unexpected (e.g. Next.js self-exited 0)
+            logger.warn(
+              "Next.js exited cleanly but unexpectedly - restarting",
+              diag,
+            );
+          } else {
+            logger.error(
+              signal
+                ? `Next.js killed by signal ${signal} - restarting`
+                : `Next.js exited with code ${String(code)} - restarting`,
+              diag,
+            );
+          }
+
+          const attempt = ServerStartRepository.nextRestartCount;
+          const delay =
+            NEXT_RESTART_DELAYS[
+              Math.min(attempt, NEXT_RESTART_DELAYS.length - 1)
+            ] ?? 30000;
+          ServerStartRepository.nextRestartCount++;
+
+          logger.warn(
+            `Next.js restart #${ServerStartRepository.nextRestartCount} in ${delay}ms`,
           );
-          process.exit(1);
-        } else if (signal && signal !== "SIGTERM") {
-          logger.error(`Next.js killed by signal ${signal} - shutting down`);
-          process.exit(1);
-        }
-      });
+
+          setTimeout(() => {
+            if (ServerStartRepository.nextServerShuttingDown) {
+              return;
+            }
+            logger.info(
+              `Restarting Next.js (attempt #${ServerStartRepository.nextRestartCount})...`,
+            );
+            const newProc = spawnNextProcess();
+            ServerStartRepository.nextServerProcess = newProc;
+            addPidToFile(VIBE_START_PID_FILE, newProc.pid ?? 0);
+            // Wait for it to be ready so proxy stops returning 503
+            ServerStartRepository.waitForNextServer(
+              `http://127.0.0.1:${nextPort}`,
+              60000,
+              logger,
+            )
+              .then(() => {
+                // Reset restart counter on successful recovery
+                ServerStartRepository.nextRestartCount = 0;
+                logger.info("Next.js recovered successfully");
+                return;
+              })
+              .catch(() => {
+                logger.warn(
+                  "Next.js did not respond after restart within timeout",
+                );
+              });
+          }, delay);
+        });
+
+        return proc;
+      };
+
+      const nextProcess = spawnNextProcess();
+      ServerStartRepository.nextServerProcess = nextProcess;
+      addPidToFile(VIBE_START_PID_FILE, nextProcess.pid ?? 0);
 
       // --- Start WS server (proxy or sidecar depending on mode) ---
       const wsHandle = startWebSocketServer({ port: wsPort, logger });

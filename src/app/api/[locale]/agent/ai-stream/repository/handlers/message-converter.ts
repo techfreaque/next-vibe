@@ -11,6 +11,11 @@ import type {
   ErrorResponseType,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/shared/utils";
+import type { Modality } from "@/app/api/[locale]/agent/models/enum";
+import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
+import { IMAGE_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/image-generation/constants";
+import { AUDIO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/music-generation/constants";
+import { VIDEO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/video-generation/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -39,6 +44,7 @@ export class MessageConverter {
     message: ChatMessage | { role: ChatMessageRole; content: string },
     logger: EndpointLogger,
     locale: CountryLanguage,
+    modelConfig?: ModelOption,
   ): Promise<ModelMessage | ModelMessage[] | null> {
     switch (message.role) {
       case ChatMessageRole.USER: {
@@ -143,6 +149,8 @@ export class MessageConverter {
         if (message.content?.trim()) {
           const strippedContent = message.content
             .replace(/<think>[\s\S]*?<\/think>/g, "")
+            .replace(/<think>[\s\S]*$/i, "")
+            .replace(/<\/think>/gi, "")
             .trim();
           if (strippedContent) {
             assistantParts.push({ type: "text", text: strippedContent });
@@ -219,7 +227,11 @@ export class MessageConverter {
                 ),
               }
             : toolCall.result
-              ? MessageConverter.buildToolResultOutput(toolCall.result)
+              ? MessageConverter.buildToolResultOutput(
+                  toolCall.result,
+                  toolCall.toolName,
+                  modelConfig,
+                )
               : toolCall.waitingForConfirmation
                 ? {
                     type: "json" as const,
@@ -353,6 +365,7 @@ export class MessageConverter {
     timezone: string,
     rootFolderId: DefaultFolderId,
     locale: CountryLanguage,
+    modelConfig?: ModelOption,
   ): Promise<ModelMessage[]> {
     const result: ModelMessage[] = [];
 
@@ -524,7 +537,11 @@ export class MessageConverter {
                 ),
               }
             : toolCall.result
-              ? MessageConverter.buildToolResultOutput(toolCall.result)
+              ? MessageConverter.buildToolResultOutput(
+                  toolCall.result,
+                  toolCall.toolName,
+                  modelConfig,
+                )
               : toolCall.waitingForConfirmation
                 ? {
                     type: "json" as const,
@@ -635,6 +652,7 @@ export class MessageConverter {
         msg,
         logger,
         locale,
+        modelConfig,
       );
       if (converted !== null) {
         // If it's an array, flatten it into the result
@@ -712,8 +730,16 @@ export class MessageConverter {
    * When the result contains a ContentResponse (with __isContentResponse marker),
    * we use the AI SDK's `type: 'content'` format with `file-data` parts so the
    * model can actually "see" images (e.g. screenshots from browser tools).
+   *
+   * For media tool results (image_gen / video_gen / audio_gen) applies modality-aware logic:
+   * - Model supports the media modality → pass file URL (model can see it natively)
+   * - Model does not support it → pass only text description (gap-fill ensures text is populated)
    */
-  private static buildToolResultOutput(result: ToolCallResult | undefined):
+  private static buildToolResultOutput(
+    result: ToolCallResult | undefined,
+    toolName?: string,
+    modelConfig?: ModelOption,
+  ):
     | {
         type: "json";
         value: ToolCallResult | null;
@@ -755,6 +781,67 @@ export class MessageConverter {
       if (contentParts.length > 0) {
         return { type: "content", value: contentParts };
       }
+    }
+
+    // Media tool result modality-aware handling:
+    // image_gen / video_gen / audio_gen results carry { file, text, mediaType, creditCost }
+    // The model should see the file only if it natively supports that modality;
+    // otherwise it sees only the text description (gap-fill guarantees text is populated).
+    const MEDIA_TOOL_NAMES = [
+      IMAGE_GEN_TOOL_NAME,
+      VIDEO_GEN_TOOL_NAME,
+      AUDIO_GEN_TOOL_NAME,
+    ] as const;
+    if (
+      toolName &&
+      MEDIA_TOOL_NAMES.includes(
+        toolName as (typeof MEDIA_TOOL_NAMES)[number],
+      ) &&
+      result &&
+      typeof result === "object" &&
+      !Array.isArray(result)
+    ) {
+      const mediaResult = result as {
+        file?: string;
+        text?: string | null;
+        mediaType?: string;
+        creditCost?: number;
+      };
+
+      // Determine which modality this tool produces
+      const modality: Modality =
+        toolName === IMAGE_GEN_TOOL_NAME
+          ? "image"
+          : toolName === VIDEO_GEN_TOOL_NAME
+            ? "video"
+            : "audio";
+
+      const modelCanSee = modelConfig?.inputs?.includes(modality) ?? false;
+
+      if (modelCanSee && mediaResult.file) {
+        // Model supports this modality — pass file URL so it can see its own output.
+        // Preserve text alongside so model has both the visual and the description.
+        return {
+          type: "json" as const,
+          value: {
+            file: mediaResult.file,
+            text: mediaResult.text ?? null,
+            mediaType: mediaResult.mediaType ?? null,
+            creditCost: mediaResult.creditCost ?? null,
+          } satisfies ToolCallResult,
+        };
+      }
+
+      // Model cannot see the file — pass only text description.
+      // gap-fill-executor ensures text is populated before this runs.
+      return {
+        type: "json" as const,
+        value: {
+          text: mediaResult.text ?? "[generated media]",
+          mediaType: mediaResult.mediaType ?? null,
+          creditCost: mediaResult.creditCost ?? null,
+        } satisfies ToolCallResult,
+      };
     }
 
     return { type: "json", value: result ?? null };

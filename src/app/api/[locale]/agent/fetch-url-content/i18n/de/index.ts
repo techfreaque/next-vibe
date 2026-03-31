@@ -16,6 +16,12 @@ export const translations = {
           "Die vollständige URL zum Abrufen (muss http:// oder https:// enthalten)",
         placeholder: "https://beispiel.de",
       },
+      query: {
+        title: "Suchanfrage (optional)",
+        description:
+          "Regex-Filter nach dem Abrufen. Nur Absätze die das Muster treffen werden zurückgegeben, nach Trefferzahl gewichtet, bis zum Zeichenlimit. Ohne Angabe erhält man die vollständige Seite (bei großen Seiten mittig gekürzt). Syntax: JS-Regex — 'Authentifizierung', '(login|signup)', 'class\\s+\\w+'. Ungültiger Regex fällt auf wörtliche Übereinstimmung zurück.",
+        placeholder: "Authentifizierung",
+      },
     },
     response: {
       message: {
@@ -25,6 +31,14 @@ export const translations = {
       content: {
         title: "Inhalt",
         description: "Der extrahierte Inhalt im Markdown-Format",
+      },
+      truncated: {
+        title: "Gekürzt",
+        description: "Ob der Inhalt aufgrund der Größe gekürzt wurde",
+      },
+      truncatedNote: {
+        title: "Kürzungshinweis",
+        description: "Details zur Kürzung und wie man mehr Inhalt erhält",
       },
       url: {
         title: "Original ansehen",
@@ -58,5 +72,33 @@ export const translations = {
     scraping: "Scraping",
     web: "Web",
     content: "Inhalt",
+  },
+  cleanup: {
+    post: {
+      title: "URL-Cache Bereinigung",
+      description: "Veraltete URL-Cache-Dateien älter als 7 Tage löschen",
+      container: {
+        title: "Bereinigungsergebnisse",
+        description: "Zusammenfassung der gelöschten Cache-Dateien",
+      },
+      response: {
+        deletedCount: "Gelöschte Dateien",
+        totalScanned: "Gesamt gescannt",
+        retentionDays: "Aufbewahrungstage",
+      },
+      success: {
+        title: "Cache bereinigt",
+        description: "Veraltete URL-Cache-Dateien wurden entfernt",
+      },
+    },
+    errors: {
+      server: {
+        title: "Bereinigungsfehler",
+        description:
+          "Beim Bereinigen des URL-Caches ist ein Fehler aufgetreten",
+      },
+    },
+    name: "URL-Cache Bereinigung",
+    description: "Wöchentliche Bereinigung veralteter URL-Cache-Dateien",
   },
 };

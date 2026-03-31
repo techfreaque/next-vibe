@@ -33,10 +33,15 @@ export const translations = {
       "Używa modelu, do którego ta postać została zaprojektowana",
     typeChat: "Czat",
     typeImage: "Obraz",
+    typeVideo: "Wideo",
     typeAudio: "Audio",
     filters: "Filtry",
     filtersActive: "Filtry ({{count}})",
     clearFilter: "Wyczyść",
+    inherited: "Odziedziczone",
+    platformDefault: "Domyślny",
+    searchPlaceholder: "Szukaj modeli…",
+    noSearchResults: "Nie znaleziono modeli dla {{query}}",
   },
   tiers: {
     intelligence: {
@@ -130,6 +135,21 @@ export const translations = {
       simpleLabel: "Prosty cennik:",
       simpleExplanation:
         " Każda wiadomość kosztuje tyle samo, niezależnie czy krótka czy długa. Nie trzeba liczyć tokenów.",
+    },
+    media: {
+      perImage: "za obraz",
+      perClip: "za klip",
+      perSecond: "za sekundę",
+      perClipDuration: "za klip ({{duration}}s)",
+      costPerImage: "Koszt za obraz:",
+      costPerClip: "Koszt za klip:",
+      costPerSecond: "Koszt za sekundę:",
+      imageDescription:
+        "Stały koszt za wygenerowany obraz, niezależnie od rozdzielczości.",
+      clipDescription: "Stały koszt za wygenerowany klip audio.",
+      videoDescription:
+        "Naliczanie za sekundę wygenerowanego wideo (domyślnie {{duration}}s).",
+      sttDescription: "Naliczanie za sekundę transkrybowanego audio.",
     },
     creditValue: "1 kredyt = {{value}}",
   },

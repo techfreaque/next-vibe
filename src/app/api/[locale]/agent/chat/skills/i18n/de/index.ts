@@ -1060,10 +1060,10 @@ export const translations: typeof enTranslations = {
       "Alle verfügbaren Charaktere abrufen (Standard + benutzerdefiniert)",
     fields: {
       query: {
-        label: "Suche",
+        label: "Suche (optional)",
         description:
-          "Charaktere nach Name, Beschreibung oder Kategorie suchen. Gibt kompakte Ergebnisse zurück.",
-        placeholder: "z.B. Recherche, Programmierung, Statistik",
+          "Charaktere nach Stichwort filtern. Leerzeichen-getrennte Wörter sind alle erforderlich. Groß-/Kleinschreibung-unempfindliche Teilstring-Suche über Name, Tagline, Beschreibung, Kategorie. Leer lassen um alle anzuzeigen.",
+        placeholder: "z.B. Recherche, Bildgenerator",
       },
       skillId: {
         label: "Charakter-ID",
@@ -1233,6 +1233,9 @@ export const translations: typeof enTranslations = {
       text: "Benutzerdefinierten Charakter erstellen",
       loadingText: "Charakter wird erstellt...",
     },
+    backButton: {
+      label: "Zurück",
+    },
     container: {
       title: "Neuen Charakter erstellen",
       description: "Einen neuen benutzerdefinierten Charakter definieren",
@@ -1398,21 +1401,43 @@ export const translations: typeof enTranslations = {
       description:
         "Token-Anzahl für automatische Gesprächskomprimierung. Null = globaler Standard.",
     },
+    chatModel: {
+      label: "Chat-Modell",
+      placeholder: "Systemstandard",
+    },
     voice: {
       label: "Stimme",
       description: "Text-zu-Sprache-Stimme für diesen Charakter",
+      placeholder: "Systemstandard",
     },
     sttModel: {
       label: "Sprache-zu-Text-Modell",
       description: "Modell für die Spracherkennung",
+      placeholder: "Systemstandard",
     },
     visionBridgeModel: {
       label: "Vision-Modell",
       description: "Modell für die Bildanalyse",
+      placeholder: "Systemstandard",
     },
     translationModel: {
       label: "Übersetzungsmodell",
       description: "Modell für die Textübersetzung",
+    },
+    imageGenModel: {
+      label: "Bildgenerierungsmodell",
+      description: "Modell zur Bilderstellung",
+      placeholder: "Systemstandard",
+    },
+    musicGenModel: {
+      label: "Musikgenerierungsmodell",
+      description: "Modell zur Musikerstellung",
+      placeholder: "Systemstandard",
+    },
+    videoGenModel: {
+      label: "Video-Generierungsmodell",
+      description: "Modell zur Videoerstellung",
+      placeholder: "Systemstandard",
     },
     defaultChatMode: {
       label: "Standard-Chat-Modus",

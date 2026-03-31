@@ -122,6 +122,8 @@ export const translations = {
       },
     },
     success: { title: "Success", description: "Folder deleted successfully" },
+    backButton: { label: "Back" },
+    submitButton: { label: "Delete Folder", loadingText: "Deleting..." },
   },
 
   errors: {

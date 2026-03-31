@@ -7,6 +7,7 @@ export const translations = {
   },
   post: {
     title: "Bild generieren",
+    dynamicTitle: "Bild: {{prompt}}",
     description: "Erstelle ein Bild aus einer Textbeschreibung mit KI",
     form: {
       title: "Bildgenerierung",
@@ -34,13 +35,21 @@ export const translations = {
       standard: "Standard",
       hd: "HD",
     },
+    download: "Herunterladen",
+    dimensionSeparator: "×",
+    backButton: {
+      label: "Zurück",
+    },
     submitButton: {
       text: "Bild generieren",
+      label: "Bild generieren",
       loadingText: "Generiere...",
     },
     response: {
       imageUrl: "URL des generierten Bildes",
       creditCost: "Verwendete Credits",
+      inputRef: "Eingabe-Medienreferenz",
+      jobId: "Asynchrone Job-ID",
     },
     errors: {
       validation_failed: {

@@ -13,6 +13,7 @@
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Brain } from "next-vibe-ui/ui/icons/Brain";
 import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
 import { Info } from "next-vibe-ui/ui/icons/Info";
@@ -32,11 +33,15 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { COMPACT_TRIGGER } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import type { Modality, ModelRole } from "@/app/api/[locale]/agent/models/enum";
 import {
+  getDefaultModelForRole,
   getModelById,
   type ModelId,
 } from "@/app/api/[locale]/agent/models/models";
@@ -45,7 +50,18 @@ import type {
   ManualModelSelection,
   ModelSelectionSimple,
 } from "@/app/api/[locale]/agent/models/types";
+import {
+  ModelSelector,
+  ModelSelectorTrigger,
+} from "@/app/api/[locale]/agent/models/widget/model-selector";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import type {
+  ChatSettingsGetResponseOutput,
+  ChatSettingsUpdateRequestOutput,
+} from "./definition";
+import { scopedTranslation } from "./i18n";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -395,6 +411,301 @@ function CostMemoryBar({
           }}
         />
       </Div>
+    </Div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// SettingsModelSelectorsSection
+// ---------------------------------------------------------------------------
+
+export type ActiveSelector =
+  | "chat"
+  | "voice"
+  | "imageGen"
+  | "musicGen"
+  | "videoGen"
+  | "stt"
+  | "vision"
+  | null;
+
+export interface SettingsModelSelectorsSectionProps {
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+  settings: ChatSettingsGetResponseOutput | null;
+  updateSettings: (
+    updates: Partial<ChatSettingsUpdateRequestOutput>,
+  ) => Promise<void>;
+}
+
+interface SelectorConfig {
+  key: keyof Pick<
+    ChatSettingsUpdateRequestOutput,
+    | "voiceModelSelection"
+    | "imageGenModelSelection"
+    | "musicGenModelSelection"
+    | "videoGenModelSelection"
+    | "sttModelSelection"
+    | "visionBridgeModelSelection"
+  >;
+  selectorKey: Exclude<ActiveSelector, "chat" | null>;
+  labelKey: Parameters<ReturnType<typeof scopedTranslation.scopedT>["t"]>[0];
+  placeholderKey: Parameters<
+    ReturnType<typeof scopedTranslation.scopedT>["t"]
+  >[0];
+  allowedRoles: ModelRole[];
+  /** When set, only models with all these input modalities are shown (e.g. vision bridge: ["image"]) */
+  requiredInputs?: Modality[];
+  /** Platform-level default selection to display when no value is set */
+  defaultModelSelection?: ModelSelectionSimple;
+}
+
+function makeDefaultSelection(
+  roles: ModelRole[],
+  env?: ReturnType<typeof useEnvAvailability>,
+  requiredInputs?: Modality[],
+): ModelSelectionSimple | undefined {
+  const m = getDefaultModelForRole(roles, env, requiredInputs);
+  if (!m) {
+    return undefined;
+  }
+  return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+}
+
+// Static config (no defaults - computed inside component with env awareness)
+const SELECTOR_CONFIGS: Omit<SelectorConfig, "defaultModelSelection">[] = [
+  {
+    key: "voiceModelSelection",
+    selectorKey: "voice",
+    labelKey: "post.voiceModelSelection.label",
+    placeholderKey: "post.voiceModelSelection.placeholder",
+    allowedRoles: ["tts"],
+  },
+  {
+    key: "imageGenModelSelection",
+    selectorKey: "imageGen",
+    labelKey: "post.imageGenModel.label",
+    placeholderKey: "post.imageGenModel.placeholder",
+    allowedRoles: ["image-gen"],
+  },
+  {
+    key: "musicGenModelSelection",
+    selectorKey: "musicGen",
+    labelKey: "post.musicGenModel.label",
+    placeholderKey: "post.musicGenModel.placeholder",
+    allowedRoles: ["audio-gen"],
+  },
+  {
+    key: "videoGenModelSelection",
+    selectorKey: "videoGen",
+    labelKey: "post.videoGenModel.label",
+    placeholderKey: "post.videoGenModel.placeholder",
+    allowedRoles: ["video-gen"],
+  },
+  {
+    key: "sttModelSelection",
+    selectorKey: "stt",
+    labelKey: "post.sttModel.label",
+    placeholderKey: "post.sttModel.placeholder",
+    allowedRoles: ["stt"],
+  },
+  {
+    key: "visionBridgeModelSelection",
+    selectorKey: "vision",
+    labelKey: "post.visionBridgeModel.label",
+    placeholderKey: "post.visionBridgeModel.placeholder",
+    allowedRoles: ["llm"],
+    requiredInputs: ["image"] as Modality[],
+  },
+];
+
+function getModelSelectionFromSettings(
+  settings: ChatSettingsGetResponseOutput | null,
+  key: SelectorConfig["key"],
+): ModelSelectionSimple | null {
+  const raw = settings?.[key];
+  if (raw === null || raw === undefined) {
+    return null;
+  }
+  // All five fields use schemas compatible with ModelSelectionSimple
+  // (voiceModelSelectionSchema, imageGenModelSelectionSchema, etc. extend the
+  // same union shape). We verify the required discriminant field exists.
+  if (
+    typeof raw === "object" &&
+    "selectionType" in raw &&
+    typeof raw.selectionType === "string"
+  ) {
+    return raw as ModelSelectionSimple;
+  }
+  return null;
+}
+
+function getChatModelSelection(
+  settings: ChatSettingsGetResponseOutput | null,
+): ModelSelectionSimple | null {
+  const modelId = settings?.selectedModel;
+  if (modelId === null || modelId === undefined) {
+    return null;
+  }
+  const manualSelection: ManualModelSelection = {
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: modelId,
+  };
+  return manualSelection;
+}
+
+export function SettingsModelSelectorsSection({
+  locale,
+  user,
+  settings,
+  updateSettings,
+}: SettingsModelSelectorsSectionProps): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const envAvailability = useEnvAvailability();
+
+  const [activeSelector, setActiveSelector] = useState<ActiveSelector>(null);
+
+  // Env-aware defaults - recompute when env changes
+  const selectorDefaults = useMemo(
+    () =>
+      Object.fromEntries(
+        SELECTOR_CONFIGS.map((c) => [
+          c.key,
+          makeDefaultSelection(
+            c.allowedRoles,
+            envAvailability,
+            c.requiredInputs,
+          ),
+        ]),
+      ) as Record<SelectorConfig["key"], ModelSelectionSimple | undefined>,
+    [envAvailability],
+  );
+
+  // ── Full-panel takeover: chat model ──────────────────────────────────────
+  if (activeSelector === "chat") {
+    const chatSelection = getChatModelSelection(settings);
+    return (
+      <Div className="flex flex-col gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => setActiveSelector(null)}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <ModelSelector
+          modelSelection={chatSelection ?? undefined}
+          onChange={async (sel) => {
+            if (
+              sel !== null &&
+              sel.selectionType === ModelSelectionType.MANUAL
+            ) {
+              await updateSettings({
+                selectedModel: (sel as ManualModelSelection).manualModelId,
+              });
+            }
+          }}
+          onSelect={() => setActiveSelector(null)}
+          locale={locale}
+          user={user}
+          chatOnly
+        />
+      </Div>
+    );
+  }
+
+  // ── Full-panel takeover: media model selectors ───────────────────────────
+  if (activeSelector !== null) {
+    const config = SELECTOR_CONFIGS.find(
+      (c) => c.selectorKey === activeSelector,
+    );
+    if (config !== undefined) {
+      const currentSelection = getModelSelectionFromSettings(
+        settings,
+        config.key,
+      );
+      return (
+        <Div className="flex flex-col gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => setActiveSelector(null)}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <ModelSelector
+            allowedRoles={config.allowedRoles}
+            requiredInputs={config.requiredInputs}
+            modelSelection={currentSelection ?? undefined}
+            onChange={async (sel) => {
+              await updateSettings({ [config.key]: sel });
+            }}
+            onSelect={async (confirmed) => {
+              const defaultSel = selectorDefaults[config.key];
+              const isDefault =
+                confirmed !== null &&
+                confirmed.selectionType === ModelSelectionType.MANUAL &&
+                defaultSel?.selectionType === ModelSelectionType.MANUAL &&
+                defaultSel.manualModelId === confirmed.manualModelId;
+              await updateSettings({
+                [config.key]: isDefault ? null : confirmed,
+              });
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        </Div>
+      );
+    }
+  }
+
+  // ── Default view: trigger cards ──────────────────────────────────────────
+  const chatSelection = getChatModelSelection(settings);
+
+  return (
+    <Div className="flex flex-col gap-3">
+      {/* Chat model trigger */}
+      <Div className="flex flex-col gap-1">
+        <Span className="text-xs font-medium text-muted-foreground">
+          {t("patch.chatModel.label")}
+        </Span>
+        <ModelSelectorTrigger
+          modelSelection={chatSelection}
+          placeholder={t("patch.chatModel.placeholder")}
+          onClick={() => setActiveSelector("chat")}
+          locale={locale}
+          user={user}
+        />
+      </Div>
+
+      {/* Media model triggers */}
+      {SELECTOR_CONFIGS.map((config) => {
+        const currentSelection = getModelSelectionFromSettings(
+          settings,
+          config.key,
+        );
+
+        return (
+          <Div key={config.key} className="flex flex-col gap-1">
+            <Span className="text-xs font-medium text-muted-foreground">
+              {t(config.labelKey)}
+            </Span>
+            <ModelSelectorTrigger
+              modelSelection={currentSelection}
+              allowedRoles={config.allowedRoles}
+              requiredInputs={config.requiredInputs}
+              defaultModelSelection={selectorDefaults[config.key]}
+              placeholder={t(config.placeholderKey)}
+              onClick={() => setActiveSelector(config.selectorKey)}
+              locale={locale}
+              user={user}
+            />
+          </Div>
+        );
+      })}
     </Div>
   );
 }

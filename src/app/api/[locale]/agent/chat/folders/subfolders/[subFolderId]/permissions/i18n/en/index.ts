@@ -95,6 +95,7 @@ export const translations = {
       title: "Success",
       description: "Folder permissions retrieved successfully",
     },
+    backButton: { label: "Back" },
   },
   enums: {
     userRole: {
@@ -226,5 +227,7 @@ export const translations = {
       title: "Success",
       description: "Folder permissions updated successfully",
     },
+    backButton: { label: "Back" },
+    submitButton: { label: "Update Permissions", loadingText: "Updating..." },
   },
 };

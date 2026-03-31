@@ -65,6 +65,12 @@ export interface StorageAdapter {
    * Used for passing file data to AI when processing message history
    */
   readFileAsBase64(fileId: string, threadId: string): Promise<string | null>;
+
+  /**
+   * List all file metadata entries within a given threadId namespace.
+   * Used for cleanup tasks that need to enumerate files without knowing their IDs.
+   */
+  listFilesByThread(threadId: string): Promise<FileMetadata[]>;
 }
 
 export interface FileUploadResult {

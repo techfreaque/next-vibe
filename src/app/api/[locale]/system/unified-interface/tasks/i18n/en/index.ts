@@ -242,14 +242,22 @@ export const translations = {
   dbHealth: {
     tag: "Database",
     post: {
-      title: "DB Health Check",
-      description: "Check database connectivity",
+      title: "System Health Check",
+      description: "Check database, memory, and disk health",
       container: {
-        title: "Database Health",
-        description: "Verify database connection is healthy",
+        title: "System Health",
+        description: "DB connectivity, memory usage, and disk usage",
       },
       response: {
         healthy: "Healthy",
+        status: "Status",
+        dbResponseMs: "DB Response (ms)",
+        memoryUsedPct: "Memory Used (%)",
+        heapUsedMb: "Heap Used (MB)",
+        rssMb: "RSS (MB)",
+        diskUsedPct: "Disk Used (%)",
+        uptimeHours: "Uptime (hours)",
+        warnings: "Warnings",
       },
       errors: {
         unauthorized: {

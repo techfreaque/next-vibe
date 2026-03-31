@@ -1,0 +1,1 @@
+ALTER TABLE "chat_threads" DROP COLUMN "chat_mode";

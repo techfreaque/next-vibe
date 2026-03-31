@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   objectField,
   responseArrayField,
   responseField,
@@ -18,9 +19,14 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+
+const ModelPricesWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.ModelPricesWidget })),
+);
 
 const { GET } = createEndpoint({
   scopedTranslation,
@@ -36,16 +42,12 @@ const { GET } = createEndpoint({
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  aliases: ["update-all-model-prices"],
+  aliases: ["update-model-prices"],
   icon: "database",
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    linkable: true,
-    title: "get.form.title" as const,
-    layoutType: LayoutType.STACKED,
-    columns: 12,
-    usage: { response: true },
+  fields: customWidgetObject({
+    render: ModelPricesWidget,
+    usage: { response: true } as const,
     children: {
       summary: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,

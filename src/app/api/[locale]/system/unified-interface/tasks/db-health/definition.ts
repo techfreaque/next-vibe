@@ -46,6 +46,46 @@ const { POST } = createEndpoint({
         content: "dbHealth.post.response.healthy",
         schema: z.boolean(),
       }),
+      status: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "dbHealth.post.response.status",
+        schema: z.enum(["ok", "warning", "critical"]),
+      }),
+      dbResponseMs: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "dbHealth.post.response.dbResponseMs",
+        schema: z.number(),
+      }),
+      memoryUsedPct: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "dbHealth.post.response.memoryUsedPct",
+        schema: z.number(),
+      }),
+      heapUsedMb: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "dbHealth.post.response.heapUsedMb",
+        schema: z.number(),
+      }),
+      rssMb: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "dbHealth.post.response.rssMb",
+        schema: z.number(),
+      }),
+      diskUsedPct: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "dbHealth.post.response.diskUsedPct",
+        schema: z.number().nullable(),
+      }),
+      uptimeHours: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "dbHealth.post.response.uptimeHours",
+        schema: z.number(),
+      }),
+      warnings: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "dbHealth.post.response.warnings",
+        schema: z.array(z.string()),
+      }),
     },
   }),
 
@@ -94,7 +134,19 @@ const { POST } = createEndpoint({
   },
 
   examples: {
-    responses: { default: { healthy: true } },
+    responses: {
+      default: {
+        healthy: true,
+        status: "ok",
+        dbResponseMs: 4,
+        memoryUsedPct: 42,
+        heapUsedMb: 512,
+        rssMb: 780,
+        diskUsedPct: 38,
+        uptimeHours: 72,
+        warnings: [],
+      },
+    },
   },
 });
 

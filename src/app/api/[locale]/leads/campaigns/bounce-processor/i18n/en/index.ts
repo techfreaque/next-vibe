@@ -90,6 +90,13 @@ export const translations = {
       leadsUpdated: "Leads Updated",
       campaignsCancelled: "Campaigns Cancelled",
     },
+    backButton: {
+      label: "Back",
+    },
+    submitButton: {
+      label: "Save Settings",
+      loadingText: "Saving...",
+    },
     success: {
       title: "Bounce Processing Completed",
       description: "Bounce notifications processed successfully",
@@ -136,6 +143,9 @@ export const translations = {
       timeout: "Timeout",
       retries: "Retries",
       retryDelay: "Retry Delay",
+    },
+    backButton: {
+      label: "Back",
     },
     success: {
       title: "Config Retrieved Successfully",

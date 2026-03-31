@@ -34,15 +34,15 @@ vibe build && vibe start  # production, first time
 vibe rebuild              # production, after changes
 ```
 
-**`vibe dev`** — for local development. Starts PostgreSQL in Docker, runs migrations, seeds data, hot reload. No `.env` editing needed.
+**`vibe dev`** - for local development. Starts PostgreSQL in Docker, runs migrations, seeds data, hot reload. No `.env` editing needed.
 
-**`vibe build && vibe start`** — for your first production deploy on a server. Build the app, then start the production server with cron tasks.
+**`vibe build && vibe start`** - for your first production deploy on a server. Build the app, then start the production server with cron tasks.
 
-**`vibe rebuild`** — for updating a running production server. Runs `vibe check`, rebuilds, and hot-restarts with zero downtime. This is what you run after asking the AI to build or change something.
+**`vibe rebuild`** - for updating a running production server. Runs `vibe check`, rebuilds, and hot-restarts with zero downtime. This is what you run after asking the AI to build or change something.
 
 ### Step 3 - Login and Configure
 
-Open the app and click **"Login as Admin"** — no password required in dev mode. The setup wizard walks you through:
+Open the app and click **"Login as Admin"** - no password required in dev mode. The setup wizard walks you through:
 
 - Choosing and configuring your AI provider (Claude Code, OpenRouter, etc.)
 - Setting your admin password
@@ -79,7 +79,7 @@ vibe build && vibe start
 
 **Kubernetes:** edit `k8s/secret.yaml`, then `kubectl apply -k k8s/`. Templates for web, task workers, Redis, ingress, and namespace included.
 
-**Connect your local machine** so Thea can route tasks to your dev tools: go to **Admin → Remote Connections** in the dashboard and add your local instance URL. Memories and tasks sync every 60 seconds. No port forwarding, no VPN — your local instance initiates the connection on the pulse.
+**Connect your local machine** so Thea can route tasks to your dev tools: go to **Admin → Remote Connections** in the dashboard and add your local instance URL. Memories and tasks sync every 60 seconds. No port forwarding, no VPN - your local instance initiates the connection on the pulse.
 
 ---
 

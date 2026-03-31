@@ -45,21 +45,43 @@ export const translations: typeof enTranslations = {
       label: "Ikona niestandardowa",
       description: "Opcjonalna ikona niestandardowa dla tego ulubionego",
     },
+    chatModel: {
+      label: "Model czatu",
+      placeholder: "Odziedzicz z umiejętności",
+    },
     voice: {
       label: "Głos",
       description: "Preferencje głosu text-to-speech",
+      placeholder: "Dziedzicz ze skilla",
     },
     sttModel: {
       label: "Model mowy na tekst",
       description: "Model do rozpoznawania mowy",
+      placeholder: "Dziedzicz ze skilla",
     },
     visionBridgeModel: {
       label: "Model wizji",
       description: "Model do analizy obrazu",
+      placeholder: "Dziedzicz ze skilla",
     },
     translationModel: {
       label: "Model tłumaczenia",
       description: "Model do tłumaczenia tekstu",
+    },
+    imageGenModel: {
+      label: "Model generowania obrazów",
+      description: "Model do generowania obrazów",
+      placeholder: "Dziedzicz ze skilla",
+    },
+    musicGenModel: {
+      label: "Model generowania muzyki",
+      description: "Model do generowania muzyki",
+      placeholder: "Dziedzicz ze skilla",
+    },
+    videoGenModel: {
+      label: "Model generowania wideo",
+      description: "Model do generowania wideo",
+      placeholder: "Dziedzicz ze skilla",
     },
     defaultChatMode: {
       label: "Domyślny tryb czatu",

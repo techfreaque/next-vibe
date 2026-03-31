@@ -59,6 +59,9 @@ const VIBE_SENSE_STREAM_CONTEXT: ToolExecutionContext = {
   callerCallbackMode: undefined,
   onEscalatedTaskCancel: undefined,
   escalateToTask: undefined,
+  imageGenModelId: undefined,
+  musicGenModelId: undefined,
+  videoGenModelId: undefined,
 };
 
 // ─── Execution Context ────────────────────────────────────────────────────────

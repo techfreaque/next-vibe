@@ -106,5 +106,8 @@ export const translations = {
       title: "Success",
       description: "Folder contents retrieved successfully",
     },
+    backButton: {
+      label: "Back",
+    },
   },
 };

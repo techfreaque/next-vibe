@@ -72,5 +72,12 @@ export const translations = {
       title: "Success",
       description: "Folder renamed successfully",
     },
+    backButton: {
+      label: "Back",
+    },
+    submitButton: {
+      label: "Rename",
+      loadingText: "Renaming...",
+    },
   },
 };

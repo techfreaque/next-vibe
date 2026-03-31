@@ -7,10 +7,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   objectField,
   requestField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -102,6 +104,20 @@ const { POST } = createEndpoint({
         label: "put.retryDelay.label",
         description: "put.retryDelay.description",
         schema: z.coerce.number().min(1000).max(300000).default(30000),
+      }),
+      backButton: backButton(scopedTranslation, {
+        label: "post.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "post.submitButton.label" as const,
+        loadingText: "post.submitButton.loadingText" as const,
+        icon: "send",
+        variant: "primary",
+        className: "w-full",
+        usage: { request: "data" },
       }),
       // Response fields
       bouncesFound: responseField(scopedTranslation, {
@@ -242,6 +258,12 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         content: "get.response.retryDelay",
         schema: z.number().min(1000).max(300000).default(30000),
+      }),
+      backButton: backButton(scopedTranslation, {
+        label: "get.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
       }),
     },
   }),

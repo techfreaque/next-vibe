@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
       title: "Zbudowałeś coś z AI. Teraz zarabiaj na dzieleniu się tym.",
       category: "Polecenia",
       excerpt:
-        "Twój link polecający to strumień przychodów, którego jeszcze nie uruchomiłeś. Posty na blogu, README, tutoriale — matematyka dla odbiorców technicznych.",
+        "Twój link polecający to strumień przychodów, którego jeszcze nie uruchomiłeś. Posty na blogu, README, tutoriale - matematyka dla odbiorców technicznych.",
       readTime: "5 min czytania",
     },
   },
@@ -82,6 +82,7 @@ export const translations: typeof enTranslations = {
     featured: "Wyróżniony",
     new: "Nowy",
     draft: "Szkic",
+    referralSection: "Program poleceń",
   },
   ui: {
     heroTagline: "next-vibe · unbottled.ai",

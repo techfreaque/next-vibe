@@ -253,14 +253,22 @@ export const translations: typeof enTranslations = {
   dbHealth: {
     tag: "Baza danych",
     post: {
-      title: "Sprawdzenie zdrowia DB",
-      description: "Sprawdź połączenie z bazą danych",
+      title: "Sprawdzenie zdrowia systemu",
+      description: "Sprawdź bazę danych, pamięć i dysk",
       container: {
-        title: "Zdrowie bazy danych",
-        description: "Sprawdź, czy połączenie z bazą danych jest zdrowe",
+        title: "Zdrowie systemu",
+        description: "Połączenie DB, użycie pamięci i dysku",
       },
       response: {
         healthy: "Zdrowy",
+        status: "Status",
+        dbResponseMs: "Czas odpowiedzi DB (ms)",
+        memoryUsedPct: "Użycie pamięci (%)",
+        heapUsedMb: "Użycie sterty (MB)",
+        rssMb: "RSS (MB)",
+        diskUsedPct: "Użycie dysku (%)",
+        uptimeHours: "Czas działania (godz.)",
+        warnings: "Ostrzeżenia",
       },
       errors: {
         unauthorized: {

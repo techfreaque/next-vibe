@@ -234,9 +234,6 @@ export class StreamExecutionHandler {
     if (hasGenerationSettings) {
       providerOptions["generation"] = generationSettings;
     }
-    if (isPureGenerator) {
-      generationSettings["isGeneratorModel"] = "true";
-    }
     if (
       modelConfig.outputs?.includes("image") ||
       modelConfig.modelRole === "image-gen"
@@ -249,7 +246,8 @@ export class StreamExecutionHandler {
     const streamResult = aiStreamText({
       model: provider.chat(modelConfig.providerModel) as LanguageModel,
       messages,
-      temperature: DEFAULT_TEMPERATURE,
+      // Image-gen models (e.g. gpt-5-image-mini) reject the temperature param
+      ...(isPureGenerator ? {} : { temperature: DEFAULT_TEMPERATURE }),
       abortSignal: streamAbortController.signal,
       system: systemWithCacheControl,
       ...(Object.keys(providerOptions).length > 0 ? { providerOptions } : {}),

@@ -52,6 +52,7 @@ import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/u
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { scopedTranslation as runScopedTranslation } from "./i18n";
 
@@ -577,6 +578,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   return (
     <InputHeightProvider height={inputHeight}>
       <Div className="relative h-[600px]">
+        <NavigateButtonWidget field={children.backButton} />
         <FormAlertWidget field={emptyField} />
 
         {/* Messages area - full height, scrollable, padded below floating input */}

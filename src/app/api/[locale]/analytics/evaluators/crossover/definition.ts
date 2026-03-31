@@ -6,7 +6,11 @@
  */
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import {
+  backButton,
+  objectField,
+  submitButton,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -70,6 +74,22 @@ const { POST } = createEndpoint({
       }),
       signals: signalsResponseField(scopedTranslation, {
         label: "post.fields.signals.label",
+      }),
+
+      // === NAVIGATION ===
+      backButton: backButton(scopedTranslation, {
+        label: "post.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "post.submitButton.label" as const,
+        loadingText: "post.submitButton.loadingText" as const,
+        icon: "send",
+        variant: "primary",
+        className: "w-full",
+        usage: { request: "data" },
       }),
     },
   }),

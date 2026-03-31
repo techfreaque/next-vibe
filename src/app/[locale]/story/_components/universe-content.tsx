@@ -261,7 +261,7 @@ export function UniverseContent({
 
   return (
     <Div id="universe-content" className="relative">
-      {/* Tab switcher — full-width grid matching the 3-panel hero exactly */}
+      {/* Tab switcher - full-width grid matching the 3-panel hero exactly */}
       <Div className="sticky top-16 md:top-20 z-40 bg-background/95 backdrop-blur-lg border-b border-border/40">
         <Div className="grid grid-cols-3">
           {tabs.map((tab) => (

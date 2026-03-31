@@ -126,5 +126,12 @@ export const translations = {
       title: "Success",
       description: "Folder updated successfully",
     },
+    backButton: {
+      label: "Back",
+    },
+    submitButton: {
+      label: "Update",
+      loadingText: "Updating...",
+    },
   },
 };

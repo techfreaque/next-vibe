@@ -55,6 +55,13 @@ export const translations: typeof enTranslations = {
     },
     redirecting: "Weiterleitung zum Checkout...",
     openCheckout: "Checkout öffnen",
+    backButton: {
+      label: "Zurück",
+    },
+    submitButton: {
+      label: "Credits kaufen",
+      loadingText: "Wird verarbeitet...",
+    },
     success: {
       title: "Checkout erstellt",
       description: "Stripe-Checkout-Sitzung erfolgreich erstellt",

@@ -15,6 +15,7 @@ import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/
 import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import { useWidgetDisabled } from "../../../system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -62,14 +63,17 @@ export function BraveSearchResultsContainer({
           </Div>
           <FormAlertWidget field={{}} />
 
-          <SubmitButtonWidget<typeof definition.GET>
-            field={{
-              text: "get.submitButton.label",
-              loadingText: "get.submitButton.loadingText",
-              icon: "search",
-              variant: "primary",
-            }}
-          />
+          <Div className="flex gap-2">
+            <NavigateButtonWidget field={children.backButton} />
+            <SubmitButtonWidget<typeof definition.GET>
+              field={{
+                text: "get.submitButton.label",
+                loadingText: "get.submitButton.loadingText",
+                icon: "search",
+                variant: "primary",
+              }}
+            />
+          </Div>
         </Div>
       ) : (
         <TextFieldWidget fieldName="query" field={children.query} />

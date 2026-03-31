@@ -68,6 +68,8 @@ export const translations = {
       title: "Success",
       description: "Folder moved successfully",
     },
+    backButton: { label: "Back" },
+    submitButton: { label: "Move Folder", loadingText: "Moving..." },
   },
   widget: {
     moveFolder: {

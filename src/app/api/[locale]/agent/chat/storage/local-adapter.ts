@@ -230,9 +230,44 @@ export class LocalStorageAdapter implements StorageAdapter {
       );
       const buffer = await fs.readFile(filePath);
       return buffer.toString("base64");
-    } catch (error) {
+    } catch {
       // File doesn't exist or couldn't be read
       return null;
     }
+  }
+
+  async listFilesByThread(threadId: string): Promise<FileMetadata[]> {
+    if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
+      return [];
+    }
+
+    const metadataDir = path.join(
+      agentEnv.CHAT_STORAGE_PATH,
+      threadId,
+      ".metadata",
+    );
+
+    const results: FileMetadata[] = [];
+
+    try {
+      const files = await fs.readdir(metadataDir);
+      for (const file of files) {
+        if (!file.endsWith(".json")) {
+          continue;
+        }
+        try {
+          const raw = await fs.readFile(path.join(metadataDir, file), "utf-8");
+          const metadata = JSON.parse(raw) as FileMetadata;
+          metadata.uploadedAt = new Date(metadata.uploadedAt);
+          results.push(metadata);
+        } catch {
+          // Skip unreadable metadata files
+        }
+      }
+    } catch {
+      // Directory doesn't exist — return empty
+    }
+
+    return results;
   }
 }

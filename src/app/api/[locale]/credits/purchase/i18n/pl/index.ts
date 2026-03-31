@@ -55,6 +55,13 @@ export const translations: typeof enTranslations = {
     },
     redirecting: "Przekierowanie do płatności...",
     openCheckout: "Otwórz płatność",
+    backButton: {
+      label: "Wstecz",
+    },
+    submitButton: {
+      label: "Kup kredyty",
+      loadingText: "Przetwarzanie...",
+    },
     success: {
       title: "Płatność utworzona",
       description: "Sesja płatności Stripe została pomyślnie utworzona",

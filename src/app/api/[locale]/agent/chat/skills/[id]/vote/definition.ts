@@ -12,9 +12,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   requestUrlPathParamsField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -70,6 +72,22 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "post.response.trustLevel" as const,
         schema: z.string(),
+      }),
+
+      backButton: backButton(scopedTranslation, {
+        label: "post.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "urlPathParams" },
+      }),
+
+      submitButton: submitButton(scopedTranslation, {
+        label: "post.button.vote" as const,
+        loadingText: "post.button.loading" as const,
+        icon: "thumbs-up",
+        variant: "outline",
+        className: "ml-auto",
+        usage: { request: "urlPathParams" },
       }),
     },
   }),

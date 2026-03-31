@@ -33,10 +33,4 @@ export const DEV_SEED_USERS = [
     publicName: "User2 Corp",
     role: "CUSTOMER",
   },
-  {
-    email: "lowcredits@example.com",
-    privateName: "Low Credits User",
-    publicName: "Low Credits Corp",
-    role: "CUSTOMER",
-  },
 ] as const;

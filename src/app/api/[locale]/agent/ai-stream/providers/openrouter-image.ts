@@ -14,8 +14,14 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
 
-interface OpenRouterImageResponse {
-  data?: Array<{ url?: string; b64_json?: string }>;
+interface OpenRouterImageMessage {
+  role: string;
+  content: string | null;
+  images?: Array<{ type: string; image_url?: { url: string } }>;
+}
+
+interface OpenRouterChatResponse {
+  choices?: Array<{ message?: OpenRouterImageMessage }>;
   error?: { message: string; code?: number };
 }
 
@@ -42,7 +48,7 @@ export async function generateWithOpenRouter(params: {
 
   try {
     const response = await fetch(
-      "https://openrouter.ai/api/v1/images/generations",
+      "https://openrouter.ai/api/v1/chat/completions",
       {
         method: "POST",
         headers: {
@@ -54,14 +60,29 @@ export async function generateWithOpenRouter(params: {
         },
         body: JSON.stringify({
           model: providerModel,
-          prompt,
-          n: 1,
-          response_format: "url",
+          messages: [{ role: "user", content: prompt }],
         }),
       },
     );
 
-    const data = (await response.json()) as OpenRouterImageResponse;
+    const rawText = await response.text();
+
+    let data: OpenRouterChatResponse;
+    try {
+      data = JSON.parse(rawText) as OpenRouterChatResponse;
+    } catch {
+      logger.error("[OpenRouter Image] Failed to parse response as JSON", {
+        status: response.status,
+        body: rawText.slice(0, 500),
+      });
+      return fail({
+        message: t("errors.requestFailed", {
+          message: `Non-JSON response (HTTP ${response.status}): ${rawText.slice(0, 200)}`,
+        }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
     if (!response.ok || data.error) {
       const errorMsg = data.error?.message ?? `HTTP ${response.status}`;
       logger.error("[OpenRouter Image] API error", { error: errorMsg });
@@ -71,9 +92,17 @@ export async function generateWithOpenRouter(params: {
       });
     }
 
-    const imageUrl = data.data?.[0]?.url;
+    const message = data.choices?.[0]?.message;
+
+    // Images are returned in message.images array as { type: "image_url", image_url: { url } }
+    const imageEntry = message?.images?.[0];
+    const imageUrl = imageEntry?.image_url?.url;
+
     if (!imageUrl) {
-      logger.error("[OpenRouter Image] No image URL in response");
+      logger.error("[OpenRouter Image] No image in response", {
+        hasImages: Boolean(message?.images),
+        imagesCount: message?.images?.length ?? 0,
+      });
       return fail({
         message: t("errors.noImageUrl"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,

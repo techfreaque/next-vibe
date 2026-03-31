@@ -7,6 +7,7 @@ export const translations = {
   },
   post: {
     title: "Generuj obraz",
+    dynamicTitle: "Obraz: {{prompt}}",
     description: "Wygeneruj obraz z opisu tekstowego przy użyciu AI",
     form: {
       title: "Generowanie obrazu",
@@ -34,13 +35,21 @@ export const translations = {
       standard: "Standardowa",
       hd: "HD",
     },
+    download: "Pobierz",
+    dimensionSeparator: "×",
+    backButton: {
+      label: "Wstecz",
+    },
     submitButton: {
       text: "Generuj obraz",
+      label: "Generuj obraz",
       loadingText: "Generowanie...",
     },
     response: {
       imageUrl: "URL wygenerowanego obrazu",
       creditCost: "Użyte kredyty",
+      inputRef: "Referencja do mediów wejściowych",
+      jobId: "ID zadania asynchronicznego",
     },
     errors: {
       validation_failed: {

@@ -121,7 +121,7 @@ export class BrowserRepository {
   private static processPageIndex: number | null = null;
 
   /**
-   * Tools that manage pages themselves — skip the auto-select-page prefix.
+   * Tools that manage pages themselves - skip the auto-select-page prefix.
    */
   private static readonly PAGE_MGMT_TOOLS = new Set([
     "new_page",

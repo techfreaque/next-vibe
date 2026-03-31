@@ -388,6 +388,13 @@ export const translations: typeof enTranslations = {
           content: "Ergebnis",
         },
       },
+      backButton: {
+        label: "Zurück",
+      },
+      submitButton: {
+        label: "Guthaben hinzufügen",
+        loadingText: "Wird hinzugefügt...",
+      },
       success: {
         title: "Guthaben hinzugefügt",
         description: "Guthaben wurde dem Benutzerkonto hinzugefügt",

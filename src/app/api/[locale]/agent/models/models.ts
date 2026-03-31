@@ -1,6 +1,4 @@
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { STANDARD_MARKUP_PERCENTAGE } from "../../products/repository-client";
-
 import { STANDARD_MARKUP_PERCENTAGE } from "../../products/constants";
 import {
   ContentLevel,
@@ -56,7 +54,6 @@ export enum ModelId {
   GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS = "gemini-3.1-pro-preview-customtools",
   GEMINI_3_1_FLASH_IMAGE_PREVIEW = "gemini-3.1-flash-image-preview",
   GEMINI_3_1_FLASH_LITE_PREVIEW = "gemini-3.1-flash-lite-preview",
-  GEMINI_3_PRO = "gemini-3-pro",
   GEMINI_3_FLASH = "gemini-3-flash",
   GEMINI_2_5_PRO = "gemini-2.5-pro",
   GEMINI_2_5_FLASH = "gemini-2.5-flash",
@@ -125,6 +122,53 @@ export enum ModelId {
   MUSICGEN_STEREO = "musicgen-stereo",
   STABLE_AUDIO = "stable-audio",
   UDIO_V2 = "udio-v2",
+  MODELSLAB_MUSIC_GEN = "modelslab-music-gen",
+
+  // Video generation models
+  MODELSLAB_WAN_2_5_T2V = "modelslab-wan-2-5-t2v",
+  MODELSLAB_WAN_2_5_I2V = "modelslab-wan-2-5-i2v",
+  MODELSLAB_WAN_2_6_T2V = "modelslab-wan-2-6-t2v",
+  MODELSLAB_WAN_2_6_I2V = "modelslab-wan-2-6-i2v",
+  MODELSLAB_WAN_2_6_I2V_FLASH = "modelslab-wan-2-6-i2v-flash",
+  MODELSLAB_SEEDANCE_T2V = "modelslab-seedance-t2v",
+  MODELSLAB_SEEDANCE_I2V = "modelslab-seedance-i2v",
+  MODELSLAB_OMNIHUMAN = "modelslab-omnihuman",
+  MODELSLAB_SEEDANCE_1_PRO_I2V = "modelslab-seedance-1-pro-i2v",
+  MODELSLAB_SEEDANCE_1_PRO_FAST_I2V = "modelslab-seedance-1-pro-fast-i2v",
+  MODELSLAB_SEEDANCE_1_PRO_FAST_T2V = "modelslab-seedance-1-pro-fast-t2v",
+  MODELSLAB_OMNIHUMAN_1_5 = "modelslab-omnihuman-1-5",
+  MODELSLAB_SEEDANCE_1_5_PRO = "modelslab-seedance-1-5-pro",
+  MODELSLAB_VEO_2 = "modelslab-veo-2",
+  MODELSLAB_VEO_3 = "modelslab-veo-3",
+  MODELSLAB_VEO_3_FAST = "modelslab-veo-3-fast",
+  MODELSLAB_VEO_3_FAST_PREVIEW = "modelslab-veo-3-fast-preview",
+  MODELSLAB_VEO_3_1 = "modelslab-veo-3-1",
+  MODELSLAB_VEO_3_1_FAST = "modelslab-veo-3-1-fast",
+  MODELSLAB_KLING_V2_1_I2V = "modelslab-kling-v2-1-i2v",
+  MODELSLAB_KLING_V2_5_TURBO_I2V = "modelslab-kling-v2-5-turbo-i2v",
+  MODELSLAB_KLING_V2_5_TURBO_T2V = "modelslab-kling-v2-5-turbo-t2v",
+  MODELSLAB_KLING_V2_MASTER_T2V = "modelslab-kling-v2-master-t2v",
+  MODELSLAB_KLING_V2_MASTER_I2V = "modelslab-kling-v2-master-i2v",
+  MODELSLAB_KLING_V2_1_MASTER_T2V = "modelslab-kling-v2-1-master-t2v",
+  MODELSLAB_KLING_V2_1_MASTER_I2V = "modelslab-kling-v2-1-master-i2v",
+  MODELSLAB_KLING_V1_6_MULTI_I2V = "modelslab-kling-v1-6-multi-i2v",
+  MODELSLAB_KLING_3_0_T2V = "modelslab-kling-3-0-t2v",
+  MODELSLAB_LTX_2_PRO_T2V = "modelslab-ltx-2-pro-t2v",
+  MODELSLAB_LTX_2_PRO_I2V = "modelslab-ltx-2-pro-i2v",
+  MODELSLAB_LTX_2_3_PRO_I2V = "modelslab-ltx-2-3-pro-i2v",
+  MODELSLAB_HAILUO_2_3_T2V = "modelslab-hailuo-2-3-t2v",
+  MODELSLAB_HAILUO_02_T2V = "modelslab-hailuo-02-t2v",
+  MODELSLAB_HAILUO_2_3_I2V = "modelslab-hailuo-2-3-i2v",
+  MODELSLAB_HAILUO_2_3_FAST_I2V = "modelslab-hailuo-2-3-fast-i2v",
+  MODELSLAB_HAILUO_02_I2V = "modelslab-hailuo-02-i2v",
+  MODELSLAB_HAILUO_02_START_END = "modelslab-hailuo-02-start-end",
+  MODELSLAB_SORA_2 = "modelslab-sora-2",
+  MODELSLAB_SORA_2_PRO = "modelslab-sora-2-pro",
+  MODELSLAB_GEN4_T2I_TURBO = "modelslab-gen4-t2i-turbo",
+  MODELSLAB_GEN4_ALEPH = "modelslab-gen4-aleph",
+  MODELSLAB_LIPSYNC_2 = "modelslab-lipsync-2",
+  MODELSLAB_GROK_T2V = "modelslab-grok-t2v",
+  MODELSLAB_GROK_I2V = "modelslab-grok-i2v",
 
   // TTS voices
   OPENAI_ALLOY = "openai-alloy",
@@ -144,7 +188,7 @@ export enum ModelId {
 }
 
 /**
- * TTS model IDs — ModelId values with modelRole: "tts"
+ * TTS model IDs - ModelId values with modelRole: "tts"
  * Use this type for voiceId fields instead of plain string or ModelId
  */
 export type TtsModelId =
@@ -181,7 +225,7 @@ export const TTS_MODEL_IDS = [
 export const DEFAULT_TTS_VOICE_ID: TtsModelId = ModelId.OPENAI_NOVA;
 
 /**
- * STT model IDs — ModelId values with modelRole: "stt"
+ * STT model IDs - ModelId values with modelRole: "stt"
  */
 export type SttModelId = ModelId.OPENAI_WHISPER | ModelId.DEEPGRAM_NOVA_2;
 
@@ -211,6 +255,7 @@ export enum ApiProvider {
   DEEPGRAM = "deepgram",
   EDEN_AI_TTS = "eden-ai-tts",
   EDEN_AI_STT = "eden-ai-stt",
+  MODELSLAB = "modelslab",
 }
 
 // eslint-disable-next-line i18next/no-literal-string -- API provider names are technical identifiers
@@ -230,6 +275,7 @@ export const apiProviderDisplayNames: Record<ApiProvider, string> = {
   [ApiProvider.DEEPGRAM]: "Deepgram",
   [ApiProvider.EDEN_AI_TTS]: "Eden AI TTS",
   [ApiProvider.EDEN_AI_STT]: "Eden AI STT",
+  [ApiProvider.MODELSLAB]: "ModelsLab",
 };
 
 /**
@@ -471,10 +517,23 @@ export type ModelOption =
   | ModelOptionTtsBased
   | ModelOptionSttBased;
 
+/** ModelOption narrowed to an image-gen model — id is ImageGenModelId */
+export type ImageGenModelOption = ModelOption & { id: ImageGenModelId };
+/** ModelOption narrowed to a music/audio-gen model — id is MusicGenModelId */
+export type MusicGenModelOption = ModelOption & { id: MusicGenModelId };
+/** ModelOption narrowed to a video-gen model — id is VideoGenModelId */
+export type VideoGenModelOption = ModelOption & { id: VideoGenModelId };
+
 export function isModelOptionAudioBased(
   m: ModelOption,
 ): m is ModelOptionAudioBased {
   return m.modelRole === "audio-gen";
+}
+
+export function isModelOptionVideoBased(
+  m: ModelOption,
+): m is ModelOptionVideoBased {
+  return m.modelRole === "video-gen";
 }
 
 export interface ModelProvider {
@@ -596,6 +655,46 @@ export const modelProviders: Record<string, ModelProvider> = {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Sourceful",
     icon: "image",
+  },
+  modelsLab: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "ModelsLab",
+    icon: "music",
+  },
+  byteplus: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "BytePlus",
+    icon: "video",
+  },
+  klingai: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Kling AI",
+    icon: "video",
+  },
+  ltx: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "LTX",
+    icon: "video",
+  },
+  minimax: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "MiniMax",
+    icon: "video",
+  },
+  runway: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Runway",
+    icon: "video",
+  },
+  sync: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Sync",
+    icon: "video",
+  },
+  xai: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "xAI",
+    icon: "video",
   },
 };
 
@@ -822,10 +921,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "anthropic/claude-haiku-4.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1,
-        outputTokenCost: 5,
-        cacheReadTokenCost: 0.1,
-        cacheWriteTokenCost: 1.25,
+        inputTokenCost: 1, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 5, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.1, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 1.25, // updated: 2026-03-31 from openrouter-api
       },
       {
         id: ModelId.CLAUDE_CODE_HAIKU,
@@ -871,10 +970,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "anthropic/claude-opus-4.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 5,
-        outputTokenCost: 25,
-        cacheReadTokenCost: 0.5,
-        cacheWriteTokenCost: 6.25,
+        inputTokenCost: 5, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 25, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.5, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 6.25, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -912,10 +1011,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "anthropic/claude-opus-4.6",
         creditCost: calculateCreditCost,
-        inputTokenCost: 5,
-        outputTokenCost: 25,
-        cacheReadTokenCost: 0.5,
-        cacheWriteTokenCost: 6.25,
+        inputTokenCost: 5, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 25, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.5, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 6.25, // updated: 2026-03-31 from openrouter-api
       },
       {
         id: ModelId.CLAUDE_CODE_OPUS,
@@ -961,10 +1060,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "anthropic/claude-sonnet-4.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 3,
-        outputTokenCost: 15,
-        cacheReadTokenCost: 0.3,
-        cacheWriteTokenCost: 3.75,
+        inputTokenCost: 3, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 15, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.3, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 3.75, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1002,10 +1101,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "anthropic/claude-sonnet-4.6",
         creditCost: calculateCreditCost,
-        inputTokenCost: 3,
-        outputTokenCost: 15,
-        cacheReadTokenCost: 0.3,
-        cacheWriteTokenCost: 3.75,
+        inputTokenCost: 3, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 15, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.3, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 3.75, // updated: 2026-03-31 from openrouter-api
       },
       {
         id: ModelId.CLAUDE_CODE_SONNET,
@@ -1052,9 +1151,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "x-ai/grok-4",
         creditCost: calculateCreditCost,
-        inputTokenCost: 3,
-        outputTokenCost: 15,
-        cacheReadTokenCost: 0.75,
+        inputTokenCost: 3, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 15, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.75, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1089,9 +1188,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "x-ai/grok-4-fast",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.2,
-        outputTokenCost: 0.5,
-        cacheReadTokenCost: 0.05,
+        inputTokenCost: 0.2, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 0.5, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.05, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1121,8 +1220,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "x-ai/grok-4.20-beta",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2,
-        outputTokenCost: 6,
+        inputTokenCost: 2, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 6, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1157,8 +1256,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 15,
-        outputTokenCost: 120,
+        inputTokenCost: 15, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 120, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1189,8 +1288,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5.4-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 30,
-        outputTokenCost: 180,
+        inputTokenCost: 30, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 180, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1227,8 +1326,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5.2-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 21,
-        outputTokenCost: 168,
+        inputTokenCost: 21, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 168, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1266,9 +1365,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5-codex",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.25,
-        outputTokenCost: 10,
-        cacheReadTokenCost: 0.13,
+        inputTokenCost: 1.25, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 10, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.13, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1299,9 +1398,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5.3-codex",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.75,
-        outputTokenCost: 14,
-        cacheReadTokenCost: 0.18,
+        inputTokenCost: 1.75, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 14, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.18, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1336,9 +1435,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5.1-codex",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.25,
-        outputTokenCost: 10,
-        cacheReadTokenCost: 0.13,
+        inputTokenCost: 1.25, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 10, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.13, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1374,9 +1473,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5.1",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.25,
-        outputTokenCost: 10,
-        cacheReadTokenCost: 0.13,
+        inputTokenCost: 1.25, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 10, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.13, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1407,9 +1506,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5.4",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.5,
-        outputTokenCost: 15,
-        cacheReadTokenCost: 0.25,
+        inputTokenCost: 2.5, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 15, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.25, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1445,8 +1544,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5.4-mini",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.75,
-        outputTokenCost: 4.5,
+        inputTokenCost: 0.75, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 4.5, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1477,8 +1576,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5.4-nano",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.2,
-        outputTokenCost: 1.25,
+        inputTokenCost: 0.2, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 1.25, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1509,9 +1608,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5.2",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.75,
-        outputTokenCost: 14,
-        cacheReadTokenCost: 0.18,
+        inputTokenCost: 1.75, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 14, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.18, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1547,9 +1646,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5.3-chat",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.75,
-        outputTokenCost: 14,
-        cacheReadTokenCost: 0.18,
+        inputTokenCost: 1.75, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 14, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.18, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1580,9 +1679,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5.2-chat",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.75,
-        outputTokenCost: 14,
-        cacheReadTokenCost: 0.18,
+        inputTokenCost: 1.75, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 14, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.18, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1620,9 +1719,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.25,
-        outputTokenCost: 10,
-        cacheReadTokenCost: 0.13,
+        inputTokenCost: 1.25, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 10, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.13, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1653,9 +1752,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5-mini",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.25,
-        outputTokenCost: 2,
-        cacheReadTokenCost: 0.03,
+        inputTokenCost: 0.25, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 2, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.03, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1686,9 +1785,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5-nano",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.05,
-        outputTokenCost: 0.4,
-        cacheReadTokenCost: 0.01,
+        inputTokenCost: 0.05, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 0.4, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.01, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1721,8 +1820,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-oss-120b",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.04,
-        outputTokenCost: 0.19,
+        inputTokenCost: 0.04, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 0.19, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1749,9 +1848,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "moonshotai/kimi-k2.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.42,
-        outputTokenCost: 2.2,
-        cacheReadTokenCost: 0.21,
+        inputTokenCost: 0.42, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 2.2, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.21, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1783,9 +1882,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "moonshotai/kimi-k2-0905",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.4,
-        outputTokenCost: 2,
-        cacheReadTokenCost: 0.15,
+        inputTokenCost: 0.4, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 2, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.15, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1817,9 +1916,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "moonshotai/kimi-k2-thinking",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.47,
-        outputTokenCost: 2,
-        cacheReadTokenCost: 0.14,
+        inputTokenCost: 0.47, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 2, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.14, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1852,8 +1951,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.72,
-        outputTokenCost: 2.3,
+        inputTokenCost: 0.72, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 2.3, // updated: 2026-03-31 from openrouter-api
         cacheReadTokenCost: 0.16,
       },
     ],
@@ -1885,8 +1984,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-5-turbo",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.2,
-        outputTokenCost: 4,
+        inputTokenCost: 1.2, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 4, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1917,9 +2016,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-4.7",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.39,
-        outputTokenCost: 1.75,
-        cacheReadTokenCost: 0.2,
+        inputTokenCost: 0.39, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 1.75, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.2, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1949,9 +2048,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-4.7-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.06,
-        outputTokenCost: 0.4,
-        cacheReadTokenCost: 0.01,
+        inputTokenCost: 0.06, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 0.4, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.01, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -1976,9 +2075,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-4.5-air",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.13,
-        outputTokenCost: 0.85,
-        cacheReadTokenCost: 0.03,
+        inputTokenCost: 0.13, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 0.85, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.03, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2003,8 +2102,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-4.6",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.39,
-        outputTokenCost: 1.9,
+        inputTokenCost: 0.39, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 1.9, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2036,9 +2135,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-4.5v",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.6,
-        outputTokenCost: 1.8,
-        cacheReadTokenCost: 0.11,
+        inputTokenCost: 0.6, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 1.8, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.11, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2063,8 +2162,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "minimax/minimax-m2.7",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.3,
-        outputTokenCost: 1.2,
+        inputTokenCost: 0.3, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 1.2, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2094,8 +2193,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "xiaomi/mimo-v2-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1,
-        outputTokenCost: 3,
+        inputTokenCost: 1, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 3, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2127,10 +2226,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "google/gemini-2.5-flash-lite",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.1,
-        outputTokenCost: 0.4,
-        cacheReadTokenCost: 0.01,
-        cacheWriteTokenCost: 0.08,
+        inputTokenCost: 0.1, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 0.4, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.01, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 0.08, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2160,10 +2259,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "google/gemini-2.5-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.3,
-        outputTokenCost: 2.5,
-        cacheReadTokenCost: 0.03,
-        cacheWriteTokenCost: 0.08,
+        inputTokenCost: 0.3, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 2.5, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.03, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 0.08, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2193,10 +2292,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "google/gemini-2.5-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.25,
-        outputTokenCost: 10,
-        cacheReadTokenCost: 0.13,
-        cacheWriteTokenCost: 0.38,
+        inputTokenCost: 1.25, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 10, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.13, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 0.38, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2226,10 +2325,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "google/gemini-3.1-pro-preview-customtools",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2,
-        outputTokenCost: 12,
-        cacheReadTokenCost: 0.2,
-        cacheWriteTokenCost: 0.38,
+        inputTokenCost: 2, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 12, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.2, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 0.38, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2262,7 +2361,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "google/gemini-3.1-flash-image-preview",
-        creditCostPerImage: 6, // updated by media-prices updater
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.5, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 3, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2298,10 +2399,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "google/gemini-3.1-flash-lite-preview",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.25,
-        outputTokenCost: 1.5,
-        cacheReadTokenCost: 0.03,
-        cacheWriteTokenCost: 0.08,
+        inputTokenCost: 0.25, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 1.5, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.03, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 0.08, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2309,44 +2410,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
-    content: ContentLevel.MAINSTREAM,
-    features: {
-      ...defaultFeatures,
-      toolCalling: true,
-    },
-  },
-  [ModelId.GEMINI_3_PRO]: {
-    name: "Gemini 3 Pro",
-    by: "google",
-    description: "chat.models.descriptions.gemini3Pro",
-    parameterCount: undefined,
-    contextWindow: 1048576,
-    icon: "si-googlegemini",
-    modelRole: "llm",
-    inputs: ["text", "image", "file"],
-    outputs: ["text"],
-    providers: [
-      {
-        id: ModelId.GEMINI_3_PRO,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "google/gemini-3-pro-preview",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 2,
-        outputTokenCost: 12,
-        cacheReadTokenCost: 0.2,
-        cacheWriteTokenCost: 0.38,
-      },
-    ],
-
-    utilities: [
-      ModelUtility.LEGACY,
-      ModelUtility.SMART,
-      ModelUtility.CODING,
-      ModelUtility.REASONING,
-    ],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -2369,10 +2432,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "google/gemini-3-flash-preview",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.5,
-        outputTokenCost: 3,
-        cacheReadTokenCost: 0.05,
-        cacheWriteTokenCost: 0.08,
+        inputTokenCost: 0.5, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 3, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.05, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 0.08, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2420,8 +2483,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "deepseek/deepseek-v3.2",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.26,
-        outputTokenCost: 0.38,
+        inputTokenCost: 0.26, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 0.38, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2446,8 +2509,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "deepseek/deepseek-chat-v3.1",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.15,
-        outputTokenCost: 0.75,
+        inputTokenCost: 0.15, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 0.75, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2472,9 +2535,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "deepseek/deepseek-r1-0528",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.45,
-        outputTokenCost: 2.15,
-        cacheReadTokenCost: 0.22,
+        inputTokenCost: 0.45, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 2.15, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.22, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2504,8 +2567,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "qwen/qwen3-235b-a22b",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.45,
-        outputTokenCost: 1.82,
+        inputTokenCost: 0.45, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 1.82, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2530,8 +2593,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "deepseek/deepseek-r1-distill-qwen-32b",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.29,
-        outputTokenCost: 0.29,
+        inputTokenCost: 0.29, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 0.29, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2560,8 +2623,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "qwen/qwen-2.5-7b-instruct",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.04,
-        outputTokenCost: 0.1,
+        inputTokenCost: 0.04, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 0.1, // updated: 2026-03-31 from openrouter-api
       },
     ],
 
@@ -2594,7 +2657,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.DALL_E_3,
         apiProvider: ApiProvider.OPENAI_IMAGES,
         providerModel: "dall-e-3",
-        creditCostPerImage: 4, // updated by media-prices updater
+        creditCostPerImage: 4, // updated: 2026-03-31 from openai-static
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
@@ -2623,7 +2686,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.GPT_IMAGE_1,
         apiProvider: ApiProvider.OPENAI_IMAGES,
         providerModel: "gpt-image-1",
-        creditCostPerImage: 2,
+        creditCostPerImage: 2, // updated: 2026-03-31 from openai-static
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
@@ -2650,9 +2713,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     providers: [
       {
         id: ModelId.FLUX_SCHNELL,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "black-forest-labs/flux-schnell",
-        creditCostPerImage: 0.3, // updated by media-prices updater
+        apiProvider: ApiProvider.FAL_AI,
+        providerModel: "fal-ai/flux/schnell",
+        creditCostPerImage: 0.3, // updated: 2026-03-31 from fal-ai-static
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
@@ -2681,7 +2744,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.FLUX_PRO,
         apiProvider: ApiProvider.REPLICATE,
         providerModel: "black-forest-labs/flux-1.1-pro",
-        creditCostPerImage: 4, // updated by media-prices updater
+        creditCostPerImage: 4, // updated: 2026-03-31 from replicate-html-per-image
       },
     ],
     utilities: [
@@ -2714,7 +2777,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.SDXL,
         apiProvider: ApiProvider.REPLICATE,
         providerModel: "stability-ai/sdxl",
-        creditCostPerImage: 0.43, // updated by media-prices updater
+        creditCostPerImage: 0.4, // updated: 2026-03-31 from replicate-html-p50
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
@@ -2744,7 +2807,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.FLUX_2_MAX,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "black-forest-labs/flux.2-max",
-        creditCostPerImage: 7, // updated by media-prices updater
+        creditCostPerImage: 7, // updated: 2026-03-31 from openrouter-api
       },
     ],
     utilities: [
@@ -2777,7 +2840,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.FLUX_2_KLEIN_4B,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "black-forest-labs/flux.2-klein-4b",
-        creditCostPerImage: 1.4, // updated by media-prices updater
+        creditCostPerImage: 1.4, // updated: 2026-03-31 from openrouter-api
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
@@ -2806,7 +2869,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.RIVERFLOW_V2_PRO,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "sourceful/riverflow-v2-pro",
-        creditCostPerImage: 15, // updated by media-prices updater
+        creditCostPerImage: 15, // updated: 2026-03-31 from openrouter-api
       },
     ],
     utilities: [
@@ -2839,7 +2902,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.RIVERFLOW_V2_FAST,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "sourceful/riverflow-v2-fast",
-        creditCostPerImage: 2, // updated by media-prices updater
+        creditCostPerImage: 2, // updated: 2026-03-31 from openrouter-api
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
@@ -2868,7 +2931,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.RIVERFLOW_V2_MAX_PREVIEW,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "sourceful/riverflow-v2-max-preview",
-        creditCostPerImage: 7.5, // updated by media-prices updater
+        creditCostPerImage: 7.5, // updated: 2026-03-31 from openrouter-api
       },
     ],
     utilities: [
@@ -2901,7 +2964,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.RIVERFLOW_V2_STANDARD_PREVIEW,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "sourceful/riverflow-v2-standard-preview",
-        creditCostPerImage: 3.5, // updated by media-prices updater
+        creditCostPerImage: 3.5, // updated: 2026-03-31 from openrouter-api
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
@@ -2930,7 +2993,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.RIVERFLOW_V2_FAST_PREVIEW,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "sourceful/riverflow-v2-fast-preview",
-        creditCostPerImage: 3, // updated by media-prices updater
+        creditCostPerImage: 3, // updated: 2026-03-31 from openrouter-api
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
@@ -2959,7 +3022,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.FLUX_2_FLEX,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "black-forest-labs/flux.2-flex",
-        creditCostPerImage: 6, // updated by media-prices updater
+        creditCostPerImage: 6, // updated: 2026-03-31 from openrouter-api
       },
     ],
     utilities: [
@@ -2992,7 +3055,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.FLUX_2_PRO,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "black-forest-labs/flux.2-pro",
-        creditCostPerImage: 3, // updated by media-prices updater
+        creditCostPerImage: 3, // updated: 2026-03-31 from openrouter-api
       },
     ],
     utilities: [
@@ -3016,7 +3079,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 65536,
     icon: "si-googlegemini",
-    // modelType intentionally omitted (defaults to "text") — multimodal chat model,
+    // modelType intentionally omitted (defaults to "text") - multimodal chat model,
     // not a pure image generator. Routes through stream; outputs["image"] drives
     // the modalities passed to OpenRouter.
     modelRole: "image-gen",
@@ -3027,7 +3090,11 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "google/gemini-3-pro-image-preview",
-        creditCostPerImage: 12, // updated by media-prices updater
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 12, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.2, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 0.38, // updated: 2026-03-31 from openrouter-api
       },
     ],
     utilities: [
@@ -3054,7 +3121,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    // modelType omitted (defaults to "text") — chat-style multimodal model via OpenRouter.
+    // modelType omitted (defaults to "text") - chat-style multimodal model via OpenRouter.
     // modelTypes includes "image" so it appears in both Chat and Image tabs.
     modelRole: "image-gen",
     inputs: ["text", "image"],
@@ -3064,7 +3131,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.GPT_5_IMAGE_MINI,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5-image-mini",
-        creditCostPerImage: 0.8, // updated by media-prices updater
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2.5, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 2, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 0.25, // updated: 2026-03-31 from openrouter-api
       },
     ],
     utilities: [
@@ -3089,7 +3159,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    // modelType omitted (defaults to "text") — chat-style multimodal model via OpenRouter.
+    // modelType omitted (defaults to "text") - chat-style multimodal model via OpenRouter.
     // modelTypes includes "image" so it appears in both Chat and Image tabs.
     modelRole: "image-gen",
     inputs: ["text", "image"],
@@ -3099,7 +3169,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.GPT_5_IMAGE,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-5-image",
-        creditCostPerImage: 4, // updated by media-prices updater
+        creditCost: calculateCreditCost,
+        inputTokenCost: 10, // updated: 2026-03-31 from openrouter-api
+        outputTokenCost: 10, // updated: 2026-03-31 from openrouter-api
+        cacheReadTokenCost: 1.25, // updated: 2026-03-31 from openrouter-api
       },
     ],
     utilities: [
@@ -3133,7 +3206,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.SEEDREAM_4_5,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "bytedance-seed/seedream-4.5",
-        creditCostPerImage: 4, // updated by media-prices updater
+        creditCostPerImage: 4, // updated: 2026-03-31 from openrouter-api
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
@@ -3167,7 +3240,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.MUSICGEN_STEREO,
         apiProvider: ApiProvider.REPLICATE,
         providerModel: "meta/musicgen",
-        creditCostPerClip: 5.4, // updated by media-prices updater
+        creditCostPerClip: 5.2, // updated: 2026-03-31 from replicate-html-p50
         defaultDurationSeconds: 8,
       },
     ],
@@ -3196,9 +3269,10 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     providers: [
       {
         id: ModelId.STABLE_AUDIO,
-        apiProvider: ApiProvider.REPLICATE,
-        providerModel: "stability-ai/stable-audio",
-        creditCostPerClip: 26, // updated by media-prices updater
+        apiProvider: ApiProvider.FAL_AI,
+        // TODO: price not found from fal-ai: No static price defined - update FAL_AI_STATIC_PRICES in fal-ai.ts manually
+        providerModel: "fal-ai/stable-audio",
+        creditCostPerClip: 1, // updated: 2026-03-31 from fal-ai-static
         defaultDurationSeconds: 20,
       },
     ],
@@ -3229,7 +3303,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.UDIO_V2,
         apiProvider: ApiProvider.FAL_AI,
         providerModel: "fal-ai/udio",
-        creditCostPerClip: 5, // updated by media-prices updater
+        creditCostPerClip: 5, // updated: 2026-03-31 from fal-ai-static
         defaultDurationSeconds: 30,
       },
     ],
@@ -3237,6 +3311,1479 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_MUSIC_GEN]: {
+    name: "ModelsLab Music Gen",
+    by: "modelsLab",
+    description:
+      "chat.models.descriptions.modelsLabMusicGen" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "music",
+    modelType: "audio",
+    modelRole: "audio-gen",
+    inputs: ["text"],
+    outputs: ["audio"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_MUSIC_GEN,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "music_gen",
+        creditCostPerClip: 21, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 30,
+      },
+    ],
+    utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  // =============================================
+  // VIDEO GENERATION MODELS (ModelsLab)
+  // =============================================
+
+  [ModelId.MODELSLAB_WAN_2_5_T2V]: {
+    name: "Wan 2.5 T2V",
+    by: "alibaba",
+    description:
+      "chat.models.descriptions.modelsLabWan25T2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_WAN_2_5_T2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "wan2.5-t2v" uses multiplier pricing ($0.500000x base compute) - cannot auto-convert to credits, set manually
+        providerModel: "wan2.5-t2v",
+        creditCostPerSecond: 50, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_WAN_2_5_I2V]: {
+    name: "Wan 2.5 I2V",
+    by: "alibaba",
+    description:
+      "chat.models.descriptions.modelsLabWan25I2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_WAN_2_5_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "wan2.5-i2v" uses multiplier pricing ($0.500000x base compute) - cannot auto-convert to credits, set manually
+        providerModel: "wan2.5-i2v",
+        creditCostPerSecond: 50, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_WAN_2_6_T2V]: {
+    name: "Wan 2.6 T2V",
+    by: "alibaba",
+    description:
+      "chat.models.descriptions.modelsLabWan26T2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_WAN_2_6_T2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "wan2.6-t2v" uses multiplier pricing ($0.500000x base compute) - cannot auto-convert to credits, set manually
+        providerModel: "wan2.6-t2v",
+        creditCostPerSecond: 50, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_WAN_2_6_I2V]: {
+    name: "Wan 2.6 I2V",
+    by: "alibaba",
+    description:
+      "chat.models.descriptions.modelsLabWan26I2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_WAN_2_6_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "wan2.6-i2v" uses multiplier pricing ($0.500000x base compute) - cannot auto-convert to credits, set manually
+        providerModel: "wan2.6-i2v",
+        creditCostPerSecond: 50, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_WAN_2_6_I2V_FLASH]: {
+    name: "Wan 2.6 I2V Flash",
+    by: "alibaba",
+    description:
+      "chat.models.descriptions.modelsLabWan26I2VFlash" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_WAN_2_6_I2V_FLASH,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "wan2.6-i2v-flash" uses multiplier pricing ($0.050000x base compute) - cannot auto-convert to credits, set manually
+        providerModel: "wan2.6-i2v-flash",
+        creditCostPerSecond: 5, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_SEEDANCE_T2V]: {
+    name: "Seedance T2V",
+    by: "byteplus",
+    description:
+      "chat.models.descriptions.modelsLabSeedanceT2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_SEEDANCE_T2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "seedance-t2v",
+        creditCostPerSecond: 5.5, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_SEEDANCE_I2V]: {
+    name: "Seedance I2V",
+    by: "byteplus",
+    description:
+      "chat.models.descriptions.modelsLabSeedanceI2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_SEEDANCE_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "seedance-i2v",
+        creditCostPerSecond: 5.5, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_OMNIHUMAN]: {
+    name: "Omnihuman",
+    by: "byteplus",
+    description:
+      "chat.models.descriptions.modelsLabOmnihuman" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_OMNIHUMAN,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "omni-human",
+        creditCostPerSecond: 16.8, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_SEEDANCE_1_PRO_I2V]: {
+    name: "Seedance 1.0 Pro I2V",
+    by: "byteplus",
+    description:
+      "chat.models.descriptions.modelsLabSeedance1ProI2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_SEEDANCE_1_PRO_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "seedance-1.0-pro-i2v",
+        creditCostPerSecond: 4.4, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_SEEDANCE_1_PRO_FAST_I2V]: {
+    name: "Seedance 1.0 Pro Fast I2V",
+    by: "byteplus",
+    description:
+      "chat.models.descriptions.modelsLabSeedance1ProFastI2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_SEEDANCE_1_PRO_FAST_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "seedance-1.0-pro-fast-i2v",
+        creditCostPerSecond: 3.12, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_SEEDANCE_1_PRO_FAST_T2V]: {
+    name: "Seedance 1.0 Pro Fast T2V",
+    by: "byteplus",
+    description:
+      "chat.models.descriptions.modelsLabSeedance1ProFastT2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_SEEDANCE_1_PRO_FAST_T2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "seedance-1.0-pro-fast-t2v",
+        creditCostPerSecond: 3.12, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_OMNIHUMAN_1_5]: {
+    name: "Omnihuman 1.5",
+    by: "byteplus",
+    description:
+      "chat.models.descriptions.modelsLabOmnihuman15" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_OMNIHUMAN_1_5,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "omnihuman-1.5" (pricing id: "omnihuman-1.5") not found on ModelsLab pricing page
+        providerModel: "omni-human-1.5",
+        creditCostPerSecond: 14, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_SEEDANCE_1_5_PRO]: {
+    name: "Seedance 1.5 Pro",
+    by: "byteplus",
+    description:
+      "chat.models.descriptions.modelsLabSeedance15Pro" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_SEEDANCE_1_5_PRO,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "seedance-1.5-pro" (pricing id: "seedance-1.5-pro") not found on ModelsLab pricing page
+        providerModel: "seedance-1-5-pro",
+        creditCostPerSecond: 6.2, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_VEO_2]: {
+    name: "Veo 2",
+    by: "google",
+    description:
+      "chat.models.descriptions.modelsLabVeo2" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_VEO_2,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "veo-2" (pricing id: "veo-2") not found on ModelsLab pricing page
+        providerModel: "veo-2",
+        creditCostPerSecond: 66, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_VEO_3]: {
+    name: "Veo 3",
+    by: "google",
+    description:
+      "chat.models.descriptions.modelsLabVeo3" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_VEO_3,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "veo-3" (pricing id: "veo-3") not found on ModelsLab pricing page
+        providerModel: "veo-3",
+        creditCostPerSecond: 83, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_VEO_3_FAST]: {
+    name: "Veo 3 Fast",
+    by: "google",
+    description:
+      "chat.models.descriptions.modelsLabVeo3Fast" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_VEO_3_FAST,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "veo-3.0-fast-generate",
+        creditCostPerSecond: 18, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_VEO_3_FAST_PREVIEW]: {
+    name: "Veo 3 Fast Preview",
+    by: "google",
+    description:
+      "chat.models.descriptions.modelsLabVeo3FastPreview" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_VEO_3_FAST_PREVIEW,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "veo-3-fast-preview" (pricing id: "veo-3-fast-preview") not found on ModelsLab pricing page
+        providerModel: "veo-3.0-fast-generate-preview",
+        creditCostPerSecond: 12, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_VEO_3_1]: {
+    name: "Veo 3.1",
+    by: "google",
+    description:
+      "chat.models.descriptions.modelsLabVeo31" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_VEO_3_1,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "veo-3.1",
+        creditCostPerSecond: 48, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_VEO_3_1_FAST]: {
+    name: "Veo 3.1 Fast",
+    by: "google",
+    description:
+      "chat.models.descriptions.modelsLabVeo31Fast" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_VEO_3_1_FAST,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "veo-3.1-fast",
+        creditCostPerSecond: 24, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_KLING_V2_1_I2V]: {
+    name: "Kling V2.1 I2V",
+    by: "klingai",
+    description:
+      "chat.models.descriptions.modelsLabKlingV21I2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_KLING_V2_1_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "kling-v2.1-i2v" (pricing id: "kling-v2.1-i2v") not found on ModelsLab pricing page
+        providerModel: "kling-v2-1-i2v",
+        creditCostPerSecond: 6.72, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_KLING_V2_5_TURBO_I2V]: {
+    name: "Kling V2.5 Turbo I2V",
+    by: "klingai",
+    description:
+      "chat.models.descriptions.modelsLabKlingV25TurboI2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_KLING_V2_5_TURBO_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "kling-v2-5-turbo-i2v" (pricing id: "kling-v2-5-turbo-i2v") not found on ModelsLab pricing page
+        providerModel: "kling-v2-5-turbo-i2v",
+        creditCostPerSecond: 8.4, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_KLING_V2_5_TURBO_T2V]: {
+    name: "Kling V2.5 Turbo T2V",
+    by: "klingai",
+    description:
+      "chat.models.descriptions.modelsLabKlingV25TurboT2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_KLING_V2_5_TURBO_T2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "kling-v2.5-turbo-t2v" (pricing id: "kling-v2.5-turbo-t2v") not found on ModelsLab pricing page
+        providerModel: "kling-v2-5-turbo-t2v",
+        creditCostPerSecond: 8.4, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_KLING_V2_MASTER_T2V]: {
+    name: "Kling V2 Master T2V",
+    by: "klingai",
+    description:
+      "chat.models.descriptions.modelsLabKlingV2MasterT2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_KLING_V2_MASTER_T2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "kling-v2-master-t2v",
+        creditCostPerSecond: 33.6, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_KLING_V2_MASTER_I2V]: {
+    name: "Kling V2 Master I2V",
+    by: "klingai",
+    description:
+      "chat.models.descriptions.modelsLabKlingV2MasterI2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_KLING_V2_MASTER_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "kling-v2-master-i2v",
+        creditCostPerSecond: 33.6, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_KLING_V2_1_MASTER_T2V]: {
+    name: "Kling V2.1 Master T2V",
+    by: "klingai",
+    description:
+      "chat.models.descriptions.modelsLabKlingV21MasterT2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_KLING_V2_1_MASTER_T2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "kling-v2.1-master-t2v" (pricing id: "kling-v2.1-master-t2v") not found on ModelsLab pricing page
+        providerModel: "kling-v2-1-master-t2v",
+        creditCostPerSecond: 33.6, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_KLING_V2_1_MASTER_I2V]: {
+    name: "Kling V2.1 Master I2V",
+    by: "klingai",
+    description:
+      "chat.models.descriptions.modelsLabKlingV21MasterI2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_KLING_V2_1_MASTER_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "kling-v2.1-master-i2v" (pricing id: "kling-v2.1-master-i2v") not found on ModelsLab pricing page
+        providerModel: "kling-v2-1-master-i2v",
+        creditCostPerSecond: 33.6, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_KLING_V1_6_MULTI_I2V]: {
+    name: "Kling V1.6 Multi I2V",
+    by: "klingai",
+    description:
+      "chat.models.descriptions.modelsLabKlingV16MultiI2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_KLING_V1_6_MULTI_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "kling-v1.6-multi-i2v" (pricing id: "kling-v1.6-multi-i2v") not found on ModelsLab pricing page
+        providerModel: "kling-v1-6",
+        creditCostPerSecond: 12, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_KLING_3_0_T2V]: {
+    name: "Kling 3.0 T2V",
+    by: "klingai",
+    description:
+      "chat.models.descriptions.modelsLabKling30T2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_KLING_3_0_T2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "kling-3.0-t2v" (pricing id: "kling-3.0-t2v") not found on ModelsLab pricing page
+        providerModel: "kling-v3-t2v",
+        creditCostPerSecond: 10, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_LTX_2_PRO_T2V]: {
+    name: "LTX 2 PRO T2V",
+    by: "ltx",
+    description:
+      "chat.models.descriptions.modelsLabLtx2ProT2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_LTX_2_PRO_T2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "ltx-2-pro-t2v" uses multiplier pricing ($0.070000x base compute) - cannot auto-convert to credits, set manually
+        providerModel: "ltx-2-pro-t2v",
+        creditCostPerSecond: 7, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_LTX_2_PRO_I2V]: {
+    name: "LTX 2 PRO I2V",
+    by: "ltx",
+    description:
+      "chat.models.descriptions.modelsLabLtx2ProI2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_LTX_2_PRO_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "ltx-2-pro-i2v" uses multiplier pricing ($0.260000x base compute) - cannot auto-convert to credits, set manually
+        providerModel: "ltx-2-pro-i2v",
+        creditCostPerSecond: 26, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_LTX_2_3_PRO_I2V]: {
+    name: "LTX 2.3 Pro I2V",
+    by: "ltx",
+    description:
+      "chat.models.descriptions.modelsLabLtx23ProI2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_LTX_2_3_PRO_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "ltx-2-3-pro-i2v" uses multiplier pricing ($0.070000x base compute) - cannot auto-convert to credits, set manually
+        providerModel: "ltx-2-3-pro-i2v",
+        creditCostPerSecond: 7, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_HAILUO_2_3_T2V]: {
+    name: "Hailuo 2.3 T2V",
+    by: "minimax",
+    description:
+      "chat.models.descriptions.modelsLabHailuo23T2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_HAILUO_2_3_T2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "hailuo-2.3-t2v" (pricing id: "hailuo-2.3-t2v") not found on ModelsLab pricing page
+        providerModel: "Hailuo-2.3-t2v",
+        creditCostPerSecond: 5.5, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_HAILUO_02_T2V]: {
+    name: "Hailuo 02 T2V",
+    by: "minimax",
+    description:
+      "chat.models.descriptions.modelsLabHailuo02T2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_HAILUO_02_T2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "hailuo-02-t2v" (pricing id: "hailuo-02-t2v") not found on ModelsLab pricing page
+        providerModel: "Hailuo-02-t2v",
+        creditCostPerSecond: 2, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_HAILUO_2_3_I2V]: {
+    name: "Hailuo 2.3 I2V",
+    by: "minimax",
+    description:
+      "chat.models.descriptions.modelsLabHailuo23I2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_HAILUO_2_3_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "hailuo-2.3-i2v" (pricing id: "hailuo-2.3-i2v") not found on ModelsLab pricing page
+        providerModel: "Hailuo-2.3-i2v",
+        creditCostPerSecond: 5.5, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_HAILUO_2_3_FAST_I2V]: {
+    name: "Hailuo 2.3 Fast I2V",
+    by: "minimax",
+    description:
+      "chat.models.descriptions.modelsLabHailuo23FastI2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_HAILUO_2_3_FAST_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "hailuo-2.3-fast-i2v" (pricing id: "hailuo-2.3-fast-i2v") not found on ModelsLab pricing page
+        providerModel: "Hailuo-2.3-Fast-i2v",
+        creditCostPerSecond: 3.8, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_HAILUO_02_I2V]: {
+    name: "Hailuo 02 I2V",
+    by: "minimax",
+    description:
+      "chat.models.descriptions.modelsLabHailuo02I2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_HAILUO_02_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "hailuo-02-i2v" (pricing id: "hailuo-02-i2v") not found on ModelsLab pricing page
+        providerModel: "Hailuo-02-i2v",
+        creditCostPerSecond: 9.8, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_HAILUO_02_START_END]: {
+    name: "Hailuo 02 Start/End",
+    by: "minimax",
+    description:
+      "chat.models.descriptions.modelsLabHailuo02StartEnd" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_HAILUO_02_START_END,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "Hailuo-02-start-end" (pricing id: "Hailuo-02-start-end-frame") not found on ModelsLab pricing page
+        providerModel: "Hailuo-02-start-end",
+        creditCostPerSecond: 9.7, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_SORA_2]: {
+    name: "Sora 2",
+    by: "openAI",
+    description:
+      "chat.models.descriptions.modelsLabSora2" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_SORA_2,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "sora-2",
+        creditCostPerSecond: 12.5, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_SORA_2_PRO]: {
+    name: "Sora 2 Pro",
+    by: "openAI",
+    description:
+      "chat.models.descriptions.modelsLabSora2Pro" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_SORA_2_PRO,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "sora-2-pro" (pricing id: "sora-2-pro") not found on ModelsLab pricing page
+        providerModel: "sora-2-pro-t2v",
+        creditCostPerSecond: 36, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_GEN4_T2I_TURBO]: {
+    name: "Gen4 T2I Turbo",
+    by: "runway",
+    description:
+      "chat.models.descriptions.modelsLabGen4T2ITurbo" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_GEN4_T2I_TURBO,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "gen4_image_turbo",
+        creditCostPerImage: 2.5, // updated: 2026-03-31 from modelslab.com
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_GEN4_ALEPH]: {
+    name: "Gen4 Aleph",
+    by: "runway",
+    description:
+      "chat.models.descriptions.modelsLabGen4Aleph" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_GEN4_ALEPH,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "gen4-aleph" (pricing id: "gen4-aleph") not found on ModelsLab pricing page
+        providerModel: "gen4_aleph",
+        creditCostPerSecond: 18, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_LIPSYNC_2]: {
+    name: "Lipsync 2",
+    by: "sync",
+    description:
+      "chat.models.descriptions.modelsLabLipsync2" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_LIPSYNC_2,
+        apiProvider: ApiProvider.MODELSLAB,
+        providerModel: "lipsync-2",
+        creditCostPerSecond: 7, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_GROK_T2V]: {
+    name: "Grok T2V",
+    by: "xai",
+    description:
+      "chat.models.descriptions.modelsLabGrokT2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_GROK_T2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "grok-t2v" uses multiplier pricing ($0.060000x base compute) - cannot auto-convert to credits, set manually
+        providerModel: "grok-t2v",
+        creditCostPerSecond: 6, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ModelId.MODELSLAB_GROK_I2V]: {
+    name: "Grok I2V",
+    by: "xai",
+    description:
+      "chat.models.descriptions.modelsLabGrokI2V" as AgentTranslationKey,
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    modelType: "video",
+    modelRole: "video-gen",
+    inputs: ["text"],
+    outputs: ["video"],
+    providers: [
+      {
+        id: ModelId.MODELSLAB_GROK_I2V,
+        apiProvider: ApiProvider.MODELSLAB,
+        // TODO: price not found from modelslab: Model "grok-i2v" uses multiplier pricing ($0.060000x base compute) - cannot auto-convert to credits, set manually
+        providerModel: "grok-i2v",
+        creditCostPerSecond: 6, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -3254,7 +4801,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     description: "agent.models.openaiAlloy.description" as AgentTranslationKey,
     contextWindow: 0,
     parameterCount: undefined,
-    icon: "volume-2" as IconKey,
+    icon: "volume-2",
     modelRole: "tts",
     inputs: ["text"],
     outputs: ["audio"],
@@ -3275,13 +4822,13 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.OPENAI_ALLOY,
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "tts-1",
-        creditCostPerCharacter: 0.00052,
+        creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
       {
         id: ModelId.OPENAI_ALLOY,
         apiProvider: ApiProvider.EDEN_AI_TTS,
         providerModel: "openai",
-        creditCostPerCharacter: 0.00056,
+        creditCostPerCharacter: 0.0018, // updated: 2026-03-31 from edenai.co
       },
     ],
   },
@@ -3291,7 +4838,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     description: "agent.models.openaiNova.description" as AgentTranslationKey,
     contextWindow: 0,
     parameterCount: undefined,
-    icon: "volume-2" as IconKey,
+    icon: "volume-2",
     modelRole: "tts",
     inputs: ["text"],
     outputs: ["audio"],
@@ -3312,13 +4859,13 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.OPENAI_NOVA,
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "tts-1",
-        creditCostPerCharacter: 0.00052,
+        creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
       {
         id: ModelId.OPENAI_NOVA,
         apiProvider: ApiProvider.EDEN_AI_TTS,
         providerModel: "openai",
-        creditCostPerCharacter: 0.00056,
+        creditCostPerCharacter: 0.0018, // updated: 2026-03-31 from edenai.co
       },
     ],
   },
@@ -3328,7 +4875,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     description: "agent.models.openaiOnyx.description" as AgentTranslationKey,
     contextWindow: 0,
     parameterCount: undefined,
-    icon: "volume-2" as IconKey,
+    icon: "volume-2",
     modelRole: "tts",
     inputs: ["text"],
     outputs: ["audio"],
@@ -3349,13 +4896,13 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.OPENAI_ONYX,
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "tts-1",
-        creditCostPerCharacter: 0.00052,
+        creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
       {
         id: ModelId.OPENAI_ONYX,
         apiProvider: ApiProvider.EDEN_AI_TTS,
         providerModel: "openai",
-        creditCostPerCharacter: 0.00056,
+        creditCostPerCharacter: 0.0018, // updated: 2026-03-31 from edenai.co
       },
     ],
   },
@@ -3365,7 +4912,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     description: "agent.models.openaiEcho.description" as AgentTranslationKey,
     contextWindow: 0,
     parameterCount: undefined,
-    icon: "volume-2" as IconKey,
+    icon: "volume-2",
     modelRole: "tts",
     inputs: ["text"],
     outputs: ["audio"],
@@ -3386,7 +4933,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.OPENAI_ECHO,
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "tts-1",
-        creditCostPerCharacter: 0.00052,
+        creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
     ],
   },
@@ -3397,7 +4944,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       "agent.models.openaiShimmer.description" as AgentTranslationKey,
     contextWindow: 0,
     parameterCount: undefined,
-    icon: "volume-2" as IconKey,
+    icon: "volume-2",
     modelRole: "tts",
     inputs: ["text"],
     outputs: ["audio"],
@@ -3418,7 +4965,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.OPENAI_SHIMMER,
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "tts-1",
-        creditCostPerCharacter: 0.00052,
+        creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
     ],
   },
@@ -3428,7 +4975,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     description: "agent.models.openaiFable.description" as AgentTranslationKey,
     contextWindow: 0,
     parameterCount: undefined,
-    icon: "volume-2" as IconKey,
+    icon: "volume-2",
     modelRole: "tts",
     inputs: ["text"],
     outputs: ["audio"],
@@ -3449,7 +4996,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.OPENAI_FABLE,
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "tts-1",
-        creditCostPerCharacter: 0.00052,
+        creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
     ],
   },
@@ -3460,7 +5007,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       "agent.models.elevenlabsRachel.description" as AgentTranslationKey,
     contextWindow: 0,
     parameterCount: undefined,
-    icon: "volume-2" as IconKey,
+    icon: "volume-2",
     modelRole: "tts",
     inputs: ["text"],
     outputs: ["audio"],
@@ -3481,7 +5028,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.ELEVENLABS_RACHEL,
         apiProvider: ApiProvider.ELEVENLABS,
         providerModel: "21m00Tcm4TlvDq8ikWAM",
-        creditCostPerCharacter: 0.001,
+        creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
       },
     ],
   },
@@ -3492,7 +5039,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       "agent.models.elevenlabsJosh.description" as AgentTranslationKey,
     contextWindow: 0,
     parameterCount: undefined,
-    icon: "volume-2" as IconKey,
+    icon: "volume-2",
     modelRole: "tts",
     inputs: ["text"],
     outputs: ["audio"],
@@ -3513,7 +5060,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.ELEVENLABS_JOSH,
         apiProvider: ApiProvider.ELEVENLABS,
         providerModel: "TxGEqnHWrfWFTfGW9XjX",
-        creditCostPerCharacter: 0.001,
+        creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
       },
     ],
   },
@@ -3524,7 +5071,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       "agent.models.elevenlabsBella.description" as AgentTranslationKey,
     contextWindow: 0,
     parameterCount: undefined,
-    icon: "volume-2" as IconKey,
+    icon: "volume-2",
     modelRole: "tts",
     inputs: ["text"],
     outputs: ["audio"],
@@ -3545,7 +5092,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.ELEVENLABS_BELLA,
         apiProvider: ApiProvider.ELEVENLABS,
         providerModel: "EXAVITQu4vr4xnSDxMaL",
-        creditCostPerCharacter: 0.001,
+        creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
       },
     ],
   },
@@ -3556,7 +5103,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       "agent.models.elevenlabsAdam.description" as AgentTranslationKey,
     contextWindow: 0,
     parameterCount: undefined,
-    icon: "volume-2" as IconKey,
+    icon: "volume-2",
     modelRole: "tts",
     inputs: ["text"],
     outputs: ["audio"],
@@ -3577,7 +5124,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.ELEVENLABS_ADAM,
         apiProvider: ApiProvider.ELEVENLABS,
         providerModel: "pNInz6obpgDQGcFmaJgB",
-        creditCostPerCharacter: 0.001,
+        creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
       },
     ],
   },
@@ -3593,7 +5140,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       "agent.models.openaiWhisper.description" as AgentTranslationKey,
     contextWindow: 0,
     parameterCount: undefined,
-    icon: "mic" as IconKey,
+    icon: "mic",
     modelRole: "stt",
     inputs: ["audio"],
     outputs: ["text"],
@@ -3613,13 +5160,13 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.OPENAI_WHISPER,
         apiProvider: ApiProvider.OPENAI_STT,
         providerModel: "whisper-1",
-        creditCostPerSecond: 0.013,
+        creditCostPerSecond: 0.012, // updated: 2026-03-31 from edenai.co
       },
       {
         id: ModelId.OPENAI_WHISPER,
         apiProvider: ApiProvider.EDEN_AI_STT,
         providerModel: "openai",
-        creditCostPerSecond: 0.015,
+        creditCostPerSecond: 0.012, // updated: 2026-03-31 from edenai.co
       },
     ],
   },
@@ -3630,7 +5177,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       "agent.models.deepgramNova2.description" as AgentTranslationKey,
     contextWindow: 0,
     parameterCount: undefined,
-    icon: "mic" as IconKey,
+    icon: "mic",
     modelRole: "stt",
     inputs: ["audio"],
     outputs: ["text"],
@@ -3650,7 +5197,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.DEEPGRAM_NOVA_2,
         apiProvider: ApiProvider.DEEPGRAM,
         providerModel: "nova-2",
-        creditCostPerSecond: 0.008,
+        creditCostPerSecond: 0.0097, // updated: 2026-03-31 from deepgram.com
       },
     ],
   },
@@ -3763,6 +5310,10 @@ export const defaultModel = ModelId.KIMI_K2;
  * @param modelId - The model identifier to look up
  * @returns The model configuration object
  */
+export function getModelById(modelId: ImageGenModelId): ImageGenModelOption;
+export function getModelById(modelId: MusicGenModelId): MusicGenModelOption;
+export function getModelById(modelId: VideoGenModelId): VideoGenModelOption;
+export function getModelById(modelId: ModelId): ModelOption;
 export function getModelById(modelId: ModelId): ModelOption {
   const foundModel = modelOptionsIndex[modelId];
 
@@ -3836,7 +5387,7 @@ export const SttModelIdOptions = STT_MODEL_IDS.map((id) => ({
 }));
 
 /**
- * LLM model IDs — all ModelId values with modelRole: "llm"
+ * LLM model IDs - all ModelId values with modelRole: "llm"
  * Used for visionBridgeModelId and translationModelId selectors.
  */
 export const LLM_MODEL_IDS = Object.values(modelOptionsIndex)
@@ -3851,7 +5402,7 @@ export const LlmModelIdOptions = LLM_MODEL_IDS.map((id) => ({
 }));
 
 /**
- * Vision-capable LLM model IDs (accept image input) — for visionBridgeModelId.
+ * Vision-capable LLM model IDs (accept image input) - for visionBridgeModelId.
  */
 export const VISION_MODEL_IDS = Object.values(modelOptionsIndex)
   .filter((m) => m.modelRole === "llm" && m.inputs.includes("image"))
@@ -3863,6 +5414,263 @@ export const VisionModelIdOptions = VISION_MODEL_IDS.map((id) => ({
   value: id,
   label: modelOptionsIndex[id]?.name ?? id,
 }));
+
+/**
+ * Image generation model IDs - all ModelId values with modelRole: "image-gen"
+ * Used for imageGenModelId selectors.
+ * Static list kept in sync with modelOptionsIndex entries where modelRole === "image-gen".
+ */
+export type ImageGenModelId =
+  | ModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW
+  | ModelId.DALL_E_3
+  | ModelId.GPT_IMAGE_1
+  | ModelId.FLUX_SCHNELL
+  | ModelId.FLUX_PRO
+  | ModelId.SDXL
+  | ModelId.FLUX_2_MAX
+  | ModelId.FLUX_2_KLEIN_4B
+  | ModelId.RIVERFLOW_V2_PRO
+  | ModelId.RIVERFLOW_V2_FAST
+  | ModelId.RIVERFLOW_V2_MAX_PREVIEW
+  | ModelId.RIVERFLOW_V2_STANDARD_PREVIEW
+  | ModelId.RIVERFLOW_V2_FAST_PREVIEW
+  | ModelId.FLUX_2_FLEX
+  | ModelId.FLUX_2_PRO
+  | ModelId.GEMINI_3_PRO_IMAGE_PREVIEW
+  | ModelId.GPT_5_IMAGE_MINI
+  | ModelId.GPT_5_IMAGE
+  | ModelId.SEEDREAM_4_5;
+
+export const IMAGE_GEN_MODEL_IDS = [
+  ModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
+  ModelId.DALL_E_3,
+  ModelId.GPT_IMAGE_1,
+  ModelId.FLUX_SCHNELL,
+  ModelId.FLUX_PRO,
+  ModelId.SDXL,
+  ModelId.FLUX_2_MAX,
+  ModelId.FLUX_2_KLEIN_4B,
+  ModelId.RIVERFLOW_V2_PRO,
+  ModelId.RIVERFLOW_V2_FAST,
+  ModelId.RIVERFLOW_V2_MAX_PREVIEW,
+  ModelId.RIVERFLOW_V2_STANDARD_PREVIEW,
+  ModelId.RIVERFLOW_V2_FAST_PREVIEW,
+  ModelId.FLUX_2_FLEX,
+  ModelId.FLUX_2_PRO,
+  ModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
+  ModelId.GPT_5_IMAGE_MINI,
+  ModelId.GPT_5_IMAGE,
+  ModelId.SEEDREAM_4_5,
+] as const satisfies ImageGenModelId[];
+
+export const DEFAULT_IMAGE_GEN_MODEL_ID: ImageGenModelId =
+  ModelId.GEMINI_3_PRO_IMAGE_PREVIEW;
+
+export const ImageGenModelIdOptions = IMAGE_GEN_MODEL_IDS.map((id) => ({
+  value: id,
+  label: modelOptionsIndex[id]?.name ?? id,
+}));
+
+/**
+ * Music/audio generation model IDs - all ModelId values with modelRole: "audio-gen"
+ * Used for musicGenModelId selectors.
+ * Static list kept in sync with modelOptionsIndex entries where modelRole === "audio-gen".
+ */
+export type MusicGenModelId =
+  | ModelId.MUSICGEN_STEREO
+  | ModelId.STABLE_AUDIO
+  | ModelId.UDIO_V2
+  | ModelId.MODELSLAB_MUSIC_GEN;
+
+export const MUSIC_GEN_MODEL_IDS = [
+  ModelId.MUSICGEN_STEREO,
+  ModelId.STABLE_AUDIO,
+  ModelId.UDIO_V2,
+  ModelId.MODELSLAB_MUSIC_GEN,
+] as const satisfies MusicGenModelId[];
+
+export const MusicGenModelIdOptions = MUSIC_GEN_MODEL_IDS.map((id) => ({
+  value: id,
+  label: modelOptionsIndex[id]?.name ?? id,
+}));
+
+/**
+ * Video generation model IDs - all ModelId values with modelRole: "video-gen"
+ * Used for videoGenModelId selectors.
+ * Static list kept in sync with modelOptionsIndex entries where modelRole === "video-gen".
+ */
+export type VideoGenModelId =
+  | ModelId.MODELSLAB_WAN_2_5_T2V
+  | ModelId.MODELSLAB_WAN_2_5_I2V
+  | ModelId.MODELSLAB_WAN_2_6_T2V
+  | ModelId.MODELSLAB_WAN_2_6_I2V
+  | ModelId.MODELSLAB_WAN_2_6_I2V_FLASH
+  | ModelId.MODELSLAB_SEEDANCE_T2V
+  | ModelId.MODELSLAB_SEEDANCE_I2V
+  | ModelId.MODELSLAB_OMNIHUMAN
+  | ModelId.MODELSLAB_SEEDANCE_1_PRO_I2V
+  | ModelId.MODELSLAB_SEEDANCE_1_PRO_FAST_I2V
+  | ModelId.MODELSLAB_SEEDANCE_1_PRO_FAST_T2V
+  | ModelId.MODELSLAB_OMNIHUMAN_1_5
+  | ModelId.MODELSLAB_SEEDANCE_1_5_PRO
+  | ModelId.MODELSLAB_VEO_2
+  | ModelId.MODELSLAB_VEO_3
+  | ModelId.MODELSLAB_VEO_3_FAST
+  | ModelId.MODELSLAB_VEO_3_FAST_PREVIEW
+  | ModelId.MODELSLAB_VEO_3_1
+  | ModelId.MODELSLAB_VEO_3_1_FAST
+  | ModelId.MODELSLAB_KLING_V2_1_I2V
+  | ModelId.MODELSLAB_KLING_V2_5_TURBO_I2V
+  | ModelId.MODELSLAB_KLING_V2_5_TURBO_T2V
+  | ModelId.MODELSLAB_KLING_V2_MASTER_T2V
+  | ModelId.MODELSLAB_KLING_V2_MASTER_I2V
+  | ModelId.MODELSLAB_KLING_V2_1_MASTER_T2V
+  | ModelId.MODELSLAB_KLING_V2_1_MASTER_I2V
+  | ModelId.MODELSLAB_KLING_V1_6_MULTI_I2V
+  | ModelId.MODELSLAB_KLING_3_0_T2V
+  | ModelId.MODELSLAB_LTX_2_PRO_T2V
+  | ModelId.MODELSLAB_LTX_2_PRO_I2V
+  | ModelId.MODELSLAB_LTX_2_3_PRO_I2V
+  | ModelId.MODELSLAB_HAILUO_2_3_T2V
+  | ModelId.MODELSLAB_HAILUO_02_T2V
+  | ModelId.MODELSLAB_HAILUO_2_3_I2V
+  | ModelId.MODELSLAB_HAILUO_2_3_FAST_I2V
+  | ModelId.MODELSLAB_HAILUO_02_I2V
+  | ModelId.MODELSLAB_HAILUO_02_START_END
+  | ModelId.MODELSLAB_SORA_2
+  | ModelId.MODELSLAB_SORA_2_PRO
+  | ModelId.MODELSLAB_GEN4_T2I_TURBO
+  | ModelId.MODELSLAB_GEN4_ALEPH
+  | ModelId.MODELSLAB_LIPSYNC_2
+  | ModelId.MODELSLAB_GROK_T2V
+  | ModelId.MODELSLAB_GROK_I2V;
+
+export const VIDEO_GEN_MODEL_IDS = [
+  ModelId.MODELSLAB_WAN_2_5_T2V,
+  ModelId.MODELSLAB_WAN_2_5_I2V,
+  ModelId.MODELSLAB_WAN_2_6_T2V,
+  ModelId.MODELSLAB_WAN_2_6_I2V,
+  ModelId.MODELSLAB_WAN_2_6_I2V_FLASH,
+  ModelId.MODELSLAB_SEEDANCE_T2V,
+  ModelId.MODELSLAB_SEEDANCE_I2V,
+  ModelId.MODELSLAB_OMNIHUMAN,
+  ModelId.MODELSLAB_SEEDANCE_1_PRO_I2V,
+  ModelId.MODELSLAB_SEEDANCE_1_PRO_FAST_I2V,
+  ModelId.MODELSLAB_SEEDANCE_1_PRO_FAST_T2V,
+  ModelId.MODELSLAB_OMNIHUMAN_1_5,
+  ModelId.MODELSLAB_SEEDANCE_1_5_PRO,
+  ModelId.MODELSLAB_VEO_2,
+  ModelId.MODELSLAB_VEO_3,
+  ModelId.MODELSLAB_VEO_3_FAST,
+  ModelId.MODELSLAB_VEO_3_FAST_PREVIEW,
+  ModelId.MODELSLAB_VEO_3_1,
+  ModelId.MODELSLAB_VEO_3_1_FAST,
+  ModelId.MODELSLAB_KLING_V2_1_I2V,
+  ModelId.MODELSLAB_KLING_V2_5_TURBO_I2V,
+  ModelId.MODELSLAB_KLING_V2_5_TURBO_T2V,
+  ModelId.MODELSLAB_KLING_V2_MASTER_T2V,
+  ModelId.MODELSLAB_KLING_V2_MASTER_I2V,
+  ModelId.MODELSLAB_KLING_V2_1_MASTER_T2V,
+  ModelId.MODELSLAB_KLING_V2_1_MASTER_I2V,
+  ModelId.MODELSLAB_KLING_V1_6_MULTI_I2V,
+  ModelId.MODELSLAB_KLING_3_0_T2V,
+  ModelId.MODELSLAB_LTX_2_PRO_T2V,
+  ModelId.MODELSLAB_LTX_2_PRO_I2V,
+  ModelId.MODELSLAB_LTX_2_3_PRO_I2V,
+  ModelId.MODELSLAB_HAILUO_2_3_T2V,
+  ModelId.MODELSLAB_HAILUO_02_T2V,
+  ModelId.MODELSLAB_HAILUO_2_3_I2V,
+  ModelId.MODELSLAB_HAILUO_2_3_FAST_I2V,
+  ModelId.MODELSLAB_HAILUO_02_I2V,
+  ModelId.MODELSLAB_HAILUO_02_START_END,
+  ModelId.MODELSLAB_SORA_2,
+  ModelId.MODELSLAB_SORA_2_PRO,
+  ModelId.MODELSLAB_GEN4_T2I_TURBO,
+  ModelId.MODELSLAB_GEN4_ALEPH,
+  ModelId.MODELSLAB_LIPSYNC_2,
+  ModelId.MODELSLAB_GROK_T2V,
+  ModelId.MODELSLAB_GROK_I2V,
+] as const satisfies VideoGenModelId[];
+
+export const VideoGenModelIdOptions = VIDEO_GEN_MODEL_IDS.map((id) => ({
+  value: id,
+  label: modelOptionsIndex[id]?.name ?? id,
+}));
+
+/**
+ * Chat model IDs - models suitable for the main chat LLM selector.
+ * Excludes pure media-generation (image-gen, video-gen, audio-gen),
+ * speech (tts, stt), and embedding roles.
+ */
+export const CHAT_MODEL_IDS = Object.values(modelOptionsIndex)
+  .filter(
+    (m) =>
+      m.modelRole !== "image-gen" &&
+      m.modelRole !== "video-gen" &&
+      m.modelRole !== "audio-gen" &&
+      m.modelRole !== "tts" &&
+      m.modelRole !== "stt" &&
+      m.modelRole !== "embedding",
+  )
+  .map((m) => m.id) as ModelId[];
+
+export type ChatModelId = (typeof CHAT_MODEL_IDS)[number];
+
+export const ChatModelIdOptions = CHAT_MODEL_IDS.map((id) => ({
+  value: id,
+  label: modelOptionsIndex[id]?.name ?? id,
+}));
+
+/**
+ * Returns the best available platform-level default ModelOption for a given role.
+ *
+ * When `env` is provided, only models whose API provider is configured are
+ * considered - so the trigger always shows a model the user can actually use.
+ * When `env` is omitted, the original hardcoded defaults are used (backward-compat).
+ *
+ * Priority: configured hardcoded default first, then any available model for
+ * the role, then null (shows placeholder text instead).
+ */
+export function getDefaultModelForRole(
+  roles: ModelRole[],
+  env?: ModelProviderEnvAvailability,
+  requiredInputs?: Modality[],
+): ModelOption | null {
+  const matchesInputs = (m: ModelOption): boolean =>
+    !requiredInputs || requiredInputs.every((mod) => m.inputs.includes(mod));
+
+  // Try hardcoded defaults first (preferred UX anchors) - only when no input filter
+  if (!requiredInputs) {
+    const hardcodedDefaults: Partial<Record<ModelRole, ModelId>> = {
+      tts: DEFAULT_TTS_VOICE_ID,
+      stt: DEFAULT_STT_MODEL_ID,
+      "image-gen": DEFAULT_IMAGE_GEN_MODEL_ID,
+    };
+    for (const role of roles) {
+      const defaultId = hardcodedDefaults[role];
+      if (defaultId) {
+        const m = getModelById(defaultId);
+        if (m && (!env || isModelProviderAvailable(m, env))) {
+          return m;
+        }
+      }
+    }
+  }
+  // Fallback: first non-admin available model for this role set (+ optional input filter)
+  if (env) {
+    const candidate = getAllModelOptions().find(
+      (m) =>
+        (roles as string[]).includes(m.modelRole) &&
+        !m.adminOnly &&
+        isModelProviderAvailable(m, env) &&
+        matchesInputs(m),
+    );
+    if (candidate) {
+      return candidate;
+    }
+  }
+  return null;
+}
 
 /**
  * Get credit cost from a ModelOption object
@@ -4026,6 +5834,7 @@ export interface ModelProviderEnvAvailability {
   openAiImages: boolean;
   replicate: boolean;
   falAi: boolean;
+  modelsLab: boolean;
 }
 
 /**
@@ -4056,6 +5865,8 @@ export function isModelProviderAvailable(
       return env.replicate;
     case ApiProvider.FAL_AI:
       return env.falAi;
+    case ApiProvider.MODELSLAB:
+      return env.modelsLab;
     default:
       return true;
   }
@@ -4063,7 +5874,7 @@ export function isModelProviderAvailable(
 
 /**
  * Total number of AI models available (conceptual models, not provider variants).
- * Counts all non-admin-only models — the public-facing baseline.
+ * Counts all non-admin-only models - the public-facing baseline.
  * For the count a specific user actually sees, use getAvailableModelCount().
  */
 export const TOTAL_MODEL_COUNT = Object.values(modelDefinitions).filter((def) =>
@@ -4148,7 +5959,7 @@ export const FEATURED_MODELS = {
   mainstream: [
     modelDefinitions[ModelId.CLAUDE_OPUS_4_6].name,
     modelDefinitions[ModelId.GPT_5_4_PRO].name,
-    modelDefinitions[ModelId.GEMINI_3_PRO].name,
+    modelDefinitions[ModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS].name,
     modelDefinitions[ModelId.GROK_4_20_BETA].name,
   ],
   open: [

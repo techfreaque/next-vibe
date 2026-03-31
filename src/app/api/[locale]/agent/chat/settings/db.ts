@@ -18,13 +18,14 @@ import type { z } from "zod";
 import { users } from "@/app/api/[locale]/user/db";
 
 import type { ChatMode } from "../../models/enum";
+import type { LlmModelId, ModelId, VideoGenModelId } from "../../models/models";
 import type {
-  LlmModelId,
-  ModelId,
-  SttModelId,
-  TtsModelId,
-  VisionModelId,
-} from "../../models/models";
+  ImageGenModelSelection,
+  MusicGenModelSelection,
+  SttModelSelection,
+  VisionModelSelection,
+  VoiceModelSelection,
+} from "../../models/types";
 import type { ViewModeValue } from "../enum";
 import type { ToolConfigItem } from "./definition";
 
@@ -51,20 +52,33 @@ export const chatSettings = pgTable("chat_settings", {
   // TTS settings - only store if different from default
   ttsAutoplay: jsonb("tts_autoplay").$type<boolean>(),
 
-  // TTS voice model ID - user's preferred voice (null = system default openai-alloy)
-  voiceId: text("voice_id").$type<TtsModelId>(),
+  // Voice model selection (null = system default)
+  voiceModelSelection: jsonb(
+    "voice_model_selection",
+  ).$type<VoiceModelSelection>(),
 
-  // STT model preference (null = system default openai-whisper)
-  sttModelId: text("stt_model_id").$type<SttModelId>(),
+  // STT model selection (null = system default)
+  sttModelSelection: jsonb("stt_model_selection").$type<SttModelSelection>(),
 
-  // Vision bridge model (null = best vision model user has access to)
-  visionBridgeModelId: text("vision_bridge_model_id").$type<VisionModelId>(),
+  // Vision bridge model selection (null = best vision model user has access to)
+  visionBridgeModelSelection: jsonb(
+    "vision_bridge_model_selection",
+  ).$type<VisionModelSelection>(),
 
   // Translation model for pure generators (null = fast cheap LLM)
   translationModelId: text("translation_model_id").$type<LlmModelId>(),
 
   // Default chat mode (null = "text")
   defaultChatMode: text("default_chat_mode").$type<ChatMode>(),
+
+  // Image/music/video gen model selections (null = system default)
+  imageGenModelSelection: jsonb(
+    "image_gen_model_selection",
+  ).$type<ImageGenModelSelection>(),
+  musicGenModelSelection: jsonb(
+    "music_gen_model_selection",
+  ).$type<MusicGenModelSelection>(),
+  videoGenModelId: text("video_gen_model_id").$type<VideoGenModelId>(),
 
   // UI preferences - only store if different from default
   viewMode: jsonb("view_mode").$type<typeof ViewModeValue>(),

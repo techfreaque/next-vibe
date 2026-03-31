@@ -66,6 +66,9 @@ export const translations: typeof enTranslations = {
       status: { content: "Status" },
       publishedAt: { content: "Veröffentlicht am" },
     },
+    backButton: {
+      label: "Zurück",
+    },
     button: {
       submit: "Status speichern",
       loading: "Wird gespeichert...",

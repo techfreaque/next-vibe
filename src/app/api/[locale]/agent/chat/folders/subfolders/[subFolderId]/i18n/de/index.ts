@@ -125,6 +125,8 @@ export const translations = {
       },
     },
     success: { title: "Erfolg", description: "Ordner erfolgreich gelöscht" },
+    backButton: { label: "Zurück" },
+    submitButton: { label: "Ordner löschen", loadingText: "Löschen..." },
   },
 
   errors: {

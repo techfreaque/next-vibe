@@ -1,6 +1,6 @@
 {
-  "id": "0af2a3ae-3ad4-4e32-b2c0-e42789f20cc6",
-  "prevId": "d299888b-5510-429e-8bdb-e38dde19ddad",
+  "id": "f50d661d-f269-412f-ae45-64950da66b18",
+  "prevId": "d67b1be9-bed5-4df7-bb86-f27c6cb11a81",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -722,6 +722,13 @@
           "notNull": true,
           "default": "'idle'"
         },
+        "chat_mode": {
+          "name": "chat_mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'text'"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -1201,21 +1208,21 @@
           "primaryKey": false,
           "notNull": false
         },
-        "voice_id": {
-          "name": "voice_id",
-          "type": "text",
+        "voice_model_selection": {
+          "name": "voice_model_selection",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
-        "stt_model_id": {
-          "name": "stt_model_id",
-          "type": "text",
+        "stt_model_selection": {
+          "name": "stt_model_selection",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
-        "vision_bridge_model_id": {
-          "name": "vision_bridge_model_id",
-          "type": "text",
+        "vision_bridge_model_selection": {
+          "name": "vision_bridge_model_selection",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
@@ -1227,6 +1234,24 @@
         },
         "default_chat_mode": {
           "name": "default_chat_mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_gen_model_selection": {
+          "name": "image_gen_model_selection",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "music_gen_model_selection": {
+          "name": "music_gen_model_selection",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "video_gen_model_id": {
+          "name": "video_gen_model_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -1490,21 +1515,21 @@
           "primaryKey": false,
           "notNull": false
         },
-        "voice_id": {
-          "name": "voice_id",
-          "type": "text",
+        "voice_model_selection": {
+          "name": "voice_model_selection",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
-        "stt_model_id": {
-          "name": "stt_model_id",
-          "type": "text",
+        "stt_model_selection": {
+          "name": "stt_model_selection",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
-        "vision_bridge_model_id": {
-          "name": "vision_bridge_model_id",
-          "type": "text",
+        "vision_bridge_model_selection": {
+          "name": "vision_bridge_model_selection",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
@@ -1516,6 +1541,24 @@
         },
         "default_chat_mode": {
           "name": "default_chat_mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_gen_model_selection": {
+          "name": "image_gen_model_selection",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "music_gen_model_selection": {
+          "name": "music_gen_model_selection",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "video_gen_model_id": {
+          "name": "video_gen_model_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -1547,6 +1590,12 @@
         "memory_limit": {
           "name": "memory_limit",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "coding_agent": {
+          "name": "coding_agent",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
@@ -1648,21 +1697,21 @@
           "primaryKey": false,
           "notNull": true
         },
-        "voice_id": {
-          "name": "voice_id",
-          "type": "text",
+        "voice_model_selection": {
+          "name": "voice_model_selection",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
-        "stt_model_id": {
-          "name": "stt_model_id",
-          "type": "text",
+        "stt_model_selection": {
+          "name": "stt_model_selection",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
-        "vision_bridge_model_id": {
-          "name": "vision_bridge_model_id",
-          "type": "text",
+        "vision_bridge_model_selection": {
+          "name": "vision_bridge_model_selection",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
@@ -1674,6 +1723,24 @@
         },
         "default_chat_mode": {
           "name": "default_chat_mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_gen_model_selection": {
+          "name": "image_gen_model_selection",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "music_gen_model_selection": {
+          "name": "music_gen_model_selection",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "video_gen_model_id": {
+          "name": "video_gen_model_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false

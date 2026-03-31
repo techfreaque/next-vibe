@@ -7,6 +7,7 @@ export const translations = {
   },
   post: {
     title: "Generate Music",
+    dynamicTitle: "Music: {{prompt}}",
     description: "Generate music from a text prompt using AI",
     form: {
       title: "Music Generation",
@@ -28,14 +29,22 @@ export const translations = {
       medium: "Medium (~20s)",
       long: "Long (~30s)",
     },
+    download: "Download",
+    separator: "·",
+    backButton: {
+      label: "Back",
+    },
     submitButton: {
       text: "Generate Music",
+      label: "Generate Music",
       loadingText: "Generating...",
     },
     response: {
       audioUrl: "Generated audio URL",
       creditCost: "Credits used",
       durationSeconds: "Duration in seconds",
+      inputRef: "Input media reference",
+      jobId: "Async job ID",
     },
     errors: {
       validation_failed: {

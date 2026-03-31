@@ -27,12 +27,18 @@ import { useRef, useState } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
+import { STANDARD_MARKUP_PERCENTAGE } from "../../../products/constants";
 import {
   COMPACT_TRIGGER,
   COMPACT_TRIGGER_PERCENTAGE,
 } from "../../ai-stream/repository/core/constants";
 import { scopedTranslation } from "../i18n";
-import { getCreditCostFromModel, getModelById, type ModelId } from "../models";
+import {
+  calculateCreditCost,
+  getCreditCostFromModel,
+  getModelById,
+  type ModelId,
+} from "../models";
 
 /**
  * Props for ModelCreditDisplay component
@@ -143,18 +149,40 @@ export function ModelCreditDisplay({
   // Determine if token-based
   const isTokenBased = typeof model.creditCost === "function";
 
-  // Per-image or per-clip fixed cost
+  // Media type detection
+  const isImage = "creditCostPerImage" in model;
+  const isClip = "creditCostPerClip" in model;
+  const isVideo =
+    "creditCostPerSecond" in model && "defaultDurationSeconds" in model;
+  const isStt =
+    "creditCostPerSecond" in model && !("defaultDurationSeconds" in model);
+
+  // Per-image or per-clip fixed cost - stored raw, apply markup for display
+  const rawMediaCost = isImage
+    ? (model as { creditCostPerImage: number }).creditCostPerImage
+    : isClip
+      ? (model as { creditCostPerClip: number }).creditCostPerClip
+      : null;
   const fixedMediaCost =
-    "creditCostPerImage" in model
-      ? (model as { creditCostPerImage: number }).creditCostPerImage
-      : "creditCostPerClip" in model
-        ? (model as { creditCostPerClip: number }).creditCostPerClip
-        : null;
+    rawMediaCost !== null
+      ? Math.round(rawMediaCost * (1 + STANDARD_MARKUP_PERCENTAGE) * 10000) /
+        10000
+      : null;
+
+  // Per-second cost (video or STT) - calculateCreditCost already applies markup
+  const isPerSecond = isVideo || isStt;
+  const computedPerSecondCost = isPerSecond
+    ? calculateCreditCost(model, 0, 0)
+    : null;
+  const defaultDuration = isVideo
+    ? (model as { defaultDurationSeconds: number }).defaultDurationSeconds
+    : null;
 
   // Check if truly free (model.creditCost === 0, not rounded to 0)
   const isTrulyFree =
     !isTokenBased &&
     fixedMediaCost === null &&
+    !isPerSecond &&
     typeof model.creditCost === "number" &&
     model.creditCost === 0;
 
@@ -168,22 +196,21 @@ export function ModelCreditDisplay({
   const midCost =
     costRanges.length > 1 ? costRanges[1].cost : (minCost + maxCost) / 2;
 
-  // Format cost text - show middle value with range indicator for token-based models
+  // Format cost text with proper unit per media type
   let costText: string;
   if (isTrulyFree) {
     costText = t("selector.free");
   } else if (isTokenBased) {
-    // Show middle value with ~ to indicate it varies
     costText = `~${midCost} credits`;
-  } else if (fixedMediaCost !== null) {
-    // Per-image or per-clip
-    if (fixedMediaCost === 1) {
-      costText = t("credits.credit", { count: fixedMediaCost });
-    } else {
-      costText = t("credits.credits", { count: fixedMediaCost });
-    }
+  } else if (fixedMediaCost !== null && isImage) {
+    costText = `${fixedMediaCost} ${t("creditDisplay.media.perImage")}`;
+  } else if (fixedMediaCost !== null && isClip) {
+    costText = `${fixedMediaCost} ${t("creditDisplay.media.perClip")}`;
+  } else if (computedPerSecondCost !== null && isVideo) {
+    costText = `${computedPerSecondCost} ${t("creditDisplay.media.perClipDuration", { duration: defaultDuration ?? 0 })}`;
+  } else if (computedPerSecondCost !== null && isStt) {
+    costText = `${computedPerSecondCost} ${t("creditDisplay.media.perSecond")}`;
   } else {
-    // Fixed cost models
     const cost = typeof model.creditCost === "number" ? model.creditCost : 0;
     if (cost === 1) {
       costText = t("credits.credit", { count: cost });
@@ -251,10 +278,12 @@ export function ModelCreditDisplay({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-80"
+          className="w-80 overflow-y-auto max-h-[var(--radix-popper-available-height)]"
           align="start"
           side="bottom"
           sideOffset={8}
+          avoidCollisions
+          collisionPadding={{ top: 8, right: 8, bottom: 8, left: 8 }}
           onPointerDownOutside={(e) => {
             e.preventDefault();
           }}
@@ -368,7 +397,17 @@ export function ModelCreditDisplay({
                 <Span className="text-xs text-muted-foreground block leading-relaxed">
                   {isTrulyFree
                     ? t("creditDisplay.fixed.freeDescription")
-                    : t("creditDisplay.fixed.fixedDescription")}
+                    : isImage
+                      ? t("creditDisplay.media.imageDescription")
+                      : isClip
+                        ? t("creditDisplay.media.clipDescription")
+                        : isVideo
+                          ? t("creditDisplay.media.videoDescription", {
+                              duration: defaultDuration ?? 0,
+                            })
+                          : isStt
+                            ? t("creditDisplay.media.sttDescription")
+                            : t("creditDisplay.fixed.fixedDescription")}
                 </Span>
               </Div>
 
@@ -376,7 +415,13 @@ export function ModelCreditDisplay({
               {!isTrulyFree && (
                 <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <Span className="text-xs font-medium text-muted-foreground">
-                    {t("creditDisplay.fixed.costPerMessage")}
+                    {isImage
+                      ? t("creditDisplay.media.costPerImage")
+                      : isClip
+                        ? t("creditDisplay.media.costPerClip")
+                        : isVideo || isStt
+                          ? t("creditDisplay.media.costPerSecond")
+                          : t("creditDisplay.fixed.costPerMessage")}
                   </Span>
                   <Span className="text-sm font-bold">{costText}</Span>
                 </Div>

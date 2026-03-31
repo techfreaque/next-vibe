@@ -13,6 +13,7 @@ import { type JSX } from "react";
 import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import { SkillStatus } from "../../enum";
@@ -34,6 +35,12 @@ export function SkillPublishContainer({
 
   return (
     <Div className="flex flex-col gap-4 p-4">
+      <Div className="flex flex-row gap-2">
+        <NavigateButtonWidget field={children.backButton} />
+        <SubmitButtonWidget<typeof definition.PATCH>
+          field={children.submitButton}
+        />
+      </Div>
       {/* Success banner after publish */}
       {data?.status_response === SkillStatus.PUBLISHED && (
         <Div className="rounded-lg border border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/20 p-3 flex items-center gap-2">
@@ -47,16 +54,6 @@ export function SkillPublishContainer({
       <SelectFieldWidget field={children.status} fieldName="status" />
 
       <TextareaFieldWidget field={children.changeNote} fieldName="changeNote" />
-
-      <SubmitButtonWidget<typeof definition.PATCH>
-        field={{
-          text: "patch.button.submit",
-          loadingText: "patch.button.loading",
-          icon: "send",
-          variant: "primary",
-          className: "w-full",
-        }}
-      />
     </Div>
   );
 }

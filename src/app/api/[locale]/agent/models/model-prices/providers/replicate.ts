@@ -30,10 +30,13 @@ export class ReplicatePriceFetcher extends PriceFetcher {
 
     for (const def of Object.values(modelDefinitions)) {
       for (const providerConfig of def.providers) {
-        if (
-          providerConfig.apiProvider !== ApiProvider.REPLICATE ||
-          !("creditCostPerImage" in providerConfig)
-        ) {
+        if (providerConfig.apiProvider !== ApiProvider.REPLICATE) {
+          continue;
+        }
+
+        const isImage = "creditCostPerImage" in providerConfig;
+        const isAudio = "creditCostPerClip" in providerConfig;
+        if (!isImage && !isAudio) {
           continue;
         }
 
@@ -54,7 +57,7 @@ export class ReplicatePriceFetcher extends PriceFetcher {
             modelId: providerConfig.id,
             name: def.name,
             provider: ApiProvider.REPLICATE,
-            field: "creditCostPerImage",
+            field: isImage ? "creditCostPerImage" : "creditCostPerClip",
             value: this.usdToCredits(result.usd),
             source: result.source,
             providerModel: providerConfig.providerModel,

@@ -1,5 +1,5 @@
 /**
- * OpenAI Images price fetcher — static prices only.
+ * OpenAI Images price fetcher - static prices only.
  *
  * TODO: OpenAI has no machine-readable pricing API.
  * Update OPENAI_IMAGE_STATIC_PRICES manually when OpenAI changes pricing:
@@ -13,7 +13,7 @@ import { ApiProvider, modelDefinitions } from "../../models";
 import type { ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
 
-// USD per image — standard quality 1024×1024
+// USD per image - standard quality 1024×1024
 const OPENAI_IMAGE_STATIC_PRICES: Record<string, number> = {
   "dall-e-3": 0.04,
   "gpt-image-1": 0.02,
@@ -43,7 +43,7 @@ export class OpenAiImagePriceFetcher extends PriceFetcher {
             modelId: providerConfig.id,
             provider: ApiProvider.OPENAI_IMAGES,
             reason:
-              "No static price defined — update OPENAI_IMAGE_STATIC_PRICES in openai-images.ts manually",
+              "No static price defined - update OPENAI_IMAGE_STATIC_PRICES in openai-images.ts manually",
           });
           logger.debug("OpenAI Images: no static price defined", {
             providerModel: providerConfig.providerModel,

@@ -14,10 +14,8 @@ import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/defi
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import pathDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/definition";
 import threadsDefinition from "@/app/api/[locale]/agent/chat/threads/definition";
-import type {
-  ModelId,
-  TtsModelId,
-} from "@/app/api/[locale]/agent/models/models";
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -59,7 +57,7 @@ export interface SendMessageDeps {
     availableTools: ToolConfigItem[] | null;
     pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
-    voiceId: TtsModelId;
+    voiceModelSelection: ModelSelectionSimple | null | undefined;
   };
   locale: CountryLanguage;
 }

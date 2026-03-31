@@ -77,14 +77,32 @@ export const translations: typeof enTranslations = {
     ttsVoice: {
       label: "TTS Stimme",
     },
+    voiceModelSelection: {
+      label: "Sprachmodell",
+      placeholder: "Systemstandard",
+    },
     sttModel: {
       label: "Sprache-zu-Text-Modell",
+      placeholder: "Systemstandard",
     },
     visionBridgeModel: {
       label: "Vision-Modell",
+      placeholder: "Systemstandard",
     },
     translationModel: {
       label: "Übersetzungsmodell",
+    },
+    imageGenModel: {
+      label: "Bildgenerierungsmodell",
+      placeholder: "Systemstandard",
+    },
+    musicGenModel: {
+      label: "Musikgenerierungsmodell",
+      placeholder: "Systemstandard",
+    },
+    videoGenModel: {
+      label: "Video-Generierungsmodell",
+      placeholder: "Systemstandard",
     },
     defaultChatMode: {
       label: "Standard-Chat-Modus",
@@ -158,6 +176,12 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Einstellungen gespeichert",
       description: "Ihre Einstellungen wurden erfolgreich gespeichert",
+    },
+  },
+  patch: {
+    chatModel: {
+      label: "Chat-Modell",
+      placeholder: "Systemstandard",
     },
   },
 };

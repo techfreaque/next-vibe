@@ -16,6 +16,13 @@ export const translations: typeof enTranslations = {
       },
       signals: { label: "Signale", description: "Ausgabe-Signalereignisse" },
     },
+    backButton: {
+      label: "Zurück",
+    },
+    submitButton: {
+      label: "Auswerten",
+      loadingText: "Auswerten…",
+    },
     success: {
       title: "Kreuzung ausgewertet",
       description: "Signalereignisse zurückgegeben",

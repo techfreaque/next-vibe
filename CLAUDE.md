@@ -16,11 +16,10 @@
 
 ## Dev & Build Commands
 
-- **Check server:** `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/test/system/server/health` - `000` = not running, anything else = running
-- **`vibe dev`** - dev server, default port 3000, auto-increments (3002, 3004…) if taken. One instance per project; re-running kills and replaces it. Default: TanStack/Vite. `--framework=next` for Next.js.
-- **`vibe rebuild`** - zero-downtime production update (preferred over stop/start).
-- **`vibe build && vibe start`** - only for fresh production start (no running instance).
-- **Rule:** Never start/restart/rebuild unless explicitly asked. Just make the code changes.
+- **Server status:** `grep "^PORT:" .tmp/.vibe-dev.pid` → shows active port. Read `.tmp/vibe-dev.log` for recent logs/errors; last line `--- server offline ---` means stopped.
+- **`vibe dev`** - dev server (TanStack/Vite default). Auto-increments port if 3000 is taken. One instance per project; re-running replaces it. Use `nohup vibe dev > /dev/null 2>&1 &` for background. Hot reload — no restart needed between code changes unless explicitly broken.
+- **`vibe rebuild`** - zero-downtime update. Use for all production updates. `vibe build && vibe start` only for a fresh first start (no running instance).
+- **Rule:** `vibe dev`, `vibe rebuild` are safe to run anytime without asking.
 
 ## DB & Code Generation
 
@@ -105,12 +104,28 @@ src/app/api/[locale]/<category>/<feature>/
 
 ## Testing
 
-- **Lint/types:** `mcp hermes-dev check` (0 errors required before done)
-- **CLI:** `vibe <tool>` during development for endpoint smoke tests
-- **Browser E2E (required for all user-facing changes):** Use `browser_*` MCP tools (Chrome DevTools). If unavailable, `vibe help browser`. CLI alone is not sufficient - browser verification is the final step.
+**Every step is a hard gate. Never skip. Never declare done early. Never say "should work" without proof.**
+
+A claim about functionality is worthless without verification. The user should never have to ask "did you test it?"
+
+**Mandatory sequence - all 4 steps, every time, for any user-facing change:**
+
+1. **Lint/types:** `mcp hermes-dev check` or `vibe check <path>` → must end at 0 errors project wide unless told otherwise by user
+2. **`vibe gen`** → must complete with 0 warnings for all endpoints and route count must increase. If this fails the tool is not registered and step 3 is meaningless.
+3. **CLI:** `vibe <alias> "<arg>"` → run it, screenshot the output mentally. Ask: would a first-time user be impressed? Every field renders, layout is intentional, colors/structure match the data. Not a raw dump. Not "good enough". A purpose-built experience for that specific tool. MCP path must be compact and parseable by AI.
+4. **Browser E2E:** use `browser_*` MCP tools (find them via `mcp hermes-dev tool-help query=browser`). Submit a real request. Take a screenshot. Ask: does this look like a finished product feature or a dev prototype? Animations, loading states, result layout - all intentional. If anything looks off, fix it before declaring done.
+
+**"It works" is not done. Done means it works AND looks like it was crafted specifically for this use case.**
 
 ## End-of-Session Protocol
 
 1. **TASK_ID provided** → `complete-task` via MCP: `taskId`, `status` (`status.completed`/`status.failed`/`status.cancelled`), `summary` (2-3 sentences), `output` (key-value facts).
 2. **No task ID** → summary: what was done, files changed, follow-ups.
 3. Concise and confident. Only ask approval for architectural decisions.
+
+## Memory & CLAUDE.md Hygiene
+
+- After discovering new stable patterns, update CLAUDE.md or memory files proactively.
+- Keep CLAUDE.md under ~130 lines. If adding, remove something outdated first.
+- Remove entries that are stale, superseded, or only needed once.
+- When user says "remember X" or "always do Y" — write it immediately.

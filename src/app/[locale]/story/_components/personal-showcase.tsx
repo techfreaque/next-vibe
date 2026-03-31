@@ -1,7 +1,7 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
@@ -79,7 +79,7 @@ function PersonalBlock({
 }
 
 // ---------------------------------------------------------------------------
-// Mock helpers (local copies — same shape as capability-showcase)
+// Mock helpers (local copies - same shape as capability-showcase)
 // ---------------------------------------------------------------------------
 
 function baseMockMsg(overrides: {
@@ -330,7 +330,7 @@ function buildSshGroup(t: ScopedT): MessageGroup {
     },
     {
       stdout:
-        "Already up to date.\nFast-forward\n src/app/api/[locale]/agent/models/models.ts | 3 +--\n 1 file changed\nbun install v1.2.4 — 0 new packages",
+        "Already up to date.\nFast-forward\n src/app/api/[locale]/agent/models/models.ts | 3 +--\n 1 file changed\nbun install v1.2.4 - 0 new packages",
       stderr: "",
       exitCode: 0,
       status: "SUCCESS",
@@ -422,7 +422,7 @@ function buildClaudeCodeGroup(t: ScopedT): MessageGroup {
 }
 
 // ---------------------------------------------------------------------------
-// DemoVisual — shared tab + chat renderer
+// DemoVisual - shared tab + chat renderer
 // ---------------------------------------------------------------------------
 
 type PersonalDemoId = "heartbeat" | "ssh" | "claudeCode";
@@ -541,7 +541,7 @@ function PersonalDemoVisual({
                 sendMessage={null}
                 deductCredits={null}
                 ttsAutoplay={false}
-                ttsVoice={undefined}
+                voiceId={undefined}
                 onVote={null}
                 userVote={null}
                 voteScore={0}

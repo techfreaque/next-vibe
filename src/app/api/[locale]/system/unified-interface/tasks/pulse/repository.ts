@@ -699,6 +699,9 @@ export class PulseHealthRepository {
                       modelId: undefined,
                       favoriteId: undefined,
                       headless: undefined,
+                      imageGenModelId: undefined,
+                      musicGenModelId: undefined,
+                      videoGenModelId: undefined,
                       waitingForRemoteResult: undefined,
                       abortSignal: taskAbortController.signal,
                       callerCallbackMode: undefined,
@@ -1000,6 +1003,11 @@ export class PulseHealthRepository {
     },
   ): Promise<ResponseType<void>> {
     try {
+      // Only persist failures — successful pulses are silent going forward
+      if (isSuccessful) {
+        return success(undefined);
+      }
+
       // Persist to pulseExecutions table if summary is available
       if (summary) {
         await PulseHealthRepository.createExecution(

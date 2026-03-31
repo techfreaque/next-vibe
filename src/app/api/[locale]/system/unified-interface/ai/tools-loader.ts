@@ -151,10 +151,28 @@ function createToolFromEndpoint(
       // handler receives it (execute-tool handles all callbackModes natively).
       const { callbackMode: callbackModeParam, ...strippedParams } = (params ??
         {}) as Record<string, JsonValue>;
-      const restParams =
+      const baseParams =
         toolName === "execute-tool" && callbackModeParam !== undefined
           ? { ...strippedParams, callbackMode: callbackModeParam }
           : strippedParams;
+
+      // Apply streamContextPatch if the endpoint declares one.
+      // This injects resolved values (e.g. imageGenModelId) into request args
+      // so they appear in the tool call display and drive repository logic.
+      // Erased call type — TFields=any in CreateApiEndpointAny, so return is Record<string,JsonValue>
+      type StreamContextPatchFn = (
+        ctx: ToolExecutionContext,
+      ) => Record<string, JsonValue>;
+      const patchFn = endpoint.streamContextPatch as
+        | StreamContextPatchFn
+        | undefined;
+      const contextPatch =
+        context.streamContext && patchFn
+          ? patchFn(context.streamContext)
+          : undefined;
+      const restParams = contextPatch
+        ? { ...baseParams, ...contextPatch }
+        : baseParams;
 
       const { CallbackMode: CM } =
         await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");

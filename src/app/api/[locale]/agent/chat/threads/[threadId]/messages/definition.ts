@@ -28,8 +28,13 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { DefaultFolderId } from "../../../config";
 import type { MessageMetadata } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
+import { lazy } from "react";
+
 import { scopedTranslation } from "./i18n";
-import { MessagesWidget } from "./widget/widget";
+
+const MessagesWidget = lazy(() =>
+  import("./widget/widget").then((m) => ({ default: m.MessagesWidget })),
+);
 
 /**
  * Get Messages List Endpoint (GET)

@@ -180,6 +180,8 @@ export interface MessageMetadata {
     end: string; // ISO timestamp
   };
   originalMessageIds?: string[]; // For audit/debugging
+  /** True when one or more compacted messages contained generatedMedia or variants */
+  containsMediaReferences?: boolean;
 
   // Attachments
   attachments?: {
@@ -227,7 +229,7 @@ export interface MessageMetadata {
 
   // Pipeline steps for multi-step turns (STT → LLM → TTS, translation → image-gen, etc.)
   pipelineSteps?: Array<{
-    type: "stt" | "tts" | "vision-bridge" | "translation" | "routing";
+    type: "stt" | "tts" | "vision" | "translation" | "routing" | "gap-fill";
     modelId: ModelId;
     creditCost: number;
     durationMs?: number;

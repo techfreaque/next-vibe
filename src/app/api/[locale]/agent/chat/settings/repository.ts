@@ -18,6 +18,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import { ModelSelectionType } from "../skills/enum";
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
 import { getDefaultToolIdsForUser } from "../constants";
 import { chatSettings } from "./db";
@@ -100,12 +101,25 @@ export class ChatSettingsRepository {
         selectedSkill: setting.selectedSkill ?? defaults.selectedSkill,
         activeFavoriteId: setting.activeFavoriteId ?? defaults.activeFavoriteId,
         ttsAutoplay: setting.ttsAutoplay ?? defaults.ttsAutoplay,
-        voiceId: setting.voiceId ?? defaults.voiceId,
-        sttModelId: setting.sttModelId ?? defaults.sttModelId,
-        visionBridgeModelId:
-          setting.visionBridgeModelId ?? defaults.visionBridgeModelId,
+        voiceModelSelection:
+          setting.voiceModelSelection ?? defaults.voiceModelSelection,
+        sttModelSelection:
+          setting.sttModelSelection ?? defaults.sttModelSelection,
+        visionBridgeModelSelection:
+          setting.visionBridgeModelSelection ??
+          defaults.visionBridgeModelSelection,
         translationModelId:
           setting.translationModelId ?? defaults.translationModelId,
+        imageGenModelSelection:
+          setting.imageGenModelSelection ?? defaults.imageGenModelSelection,
+        musicGenModelSelection:
+          setting.musicGenModelSelection ?? defaults.musicGenModelSelection,
+        videoGenModelSelection: setting.videoGenModelId
+          ? {
+              selectionType: ModelSelectionType.MANUAL,
+              manualModelId: setting.videoGenModelId,
+            }
+          : undefined,
         defaultChatMode: setting.defaultChatMode ?? defaults.defaultChatMode,
         viewMode: setting.viewMode ?? defaults.viewMode,
         availableTools:
@@ -208,23 +222,37 @@ export class ChatSettingsRepository {
                 : data.ttsAutoplay === defaults.ttsAutoplay
                   ? null
                   : undefined,
-            voiceId:
-              data.voiceId && data.voiceId !== defaults.voiceId
-                ? data.voiceId
-                : data.voiceId === defaults.voiceId
-                  ? null
-                  : undefined,
-            sttModelId:
-              data.sttModelId !== undefined
-                ? (data.sttModelId ?? null)
+            voiceModelSelection:
+              data.voiceModelSelection !== undefined
+                ? (data.voiceModelSelection ?? null)
                 : undefined,
-            visionBridgeModelId:
-              data.visionBridgeModelId !== undefined
-                ? (data.visionBridgeModelId ?? null)
+            sttModelSelection:
+              data.sttModelSelection !== undefined
+                ? (data.sttModelSelection ?? null)
+                : undefined,
+            visionBridgeModelSelection:
+              data.visionBridgeModelSelection !== undefined
+                ? (data.visionBridgeModelSelection ?? null)
                 : undefined,
             translationModelId:
               data.translationModelId !== undefined
                 ? (data.translationModelId ?? null)
+                : undefined,
+            imageGenModelSelection:
+              data.imageGenModelSelection !== undefined
+                ? (data.imageGenModelSelection ?? null)
+                : undefined,
+            musicGenModelSelection:
+              data.musicGenModelSelection !== undefined
+                ? (data.musicGenModelSelection ?? null)
+                : undefined,
+            videoGenModelId:
+              data.videoGenModelSelection !== undefined
+                ? data.videoGenModelSelection?.selectionType ===
+                    ModelSelectionType.MANUAL &&
+                  data.videoGenModelSelection.manualModelId
+                  ? data.videoGenModelSelection.manualModelId
+                  : null
                 : undefined,
             defaultChatMode:
               data.defaultChatMode !== undefined
@@ -280,13 +308,18 @@ export class ChatSettingsRepository {
               data.ttsAutoplay !== defaults.ttsAutoplay
                 ? data.ttsAutoplay
                 : null,
-            voiceId:
-              data.voiceId && data.voiceId !== defaults.voiceId
-                ? data.voiceId
-                : null,
-            sttModelId: data.sttModelId ?? null,
-            visionBridgeModelId: data.visionBridgeModelId ?? null,
+            voiceModelSelection: data.voiceModelSelection ?? null,
+            sttModelSelection: data.sttModelSelection ?? null,
+            visionBridgeModelSelection: data.visionBridgeModelSelection ?? null,
             translationModelId: data.translationModelId ?? null,
+            imageGenModelSelection: data.imageGenModelSelection ?? null,
+            musicGenModelSelection: data.musicGenModelSelection ?? null,
+            videoGenModelId:
+              data.videoGenModelSelection?.selectionType ===
+                ModelSelectionType.MANUAL &&
+              data.videoGenModelSelection.manualModelId
+                ? data.videoGenModelSelection.manualModelId
+                : null,
             defaultChatMode: data.defaultChatMode ?? null,
             viewMode:
               data.viewMode && data.viewMode !== defaults.viewMode

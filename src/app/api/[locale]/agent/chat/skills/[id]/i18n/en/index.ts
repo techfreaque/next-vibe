@@ -7,6 +7,13 @@ export const translations = {
     MALE: "Male voice",
     FEMALE: "Female voice",
   },
+  enums: {
+    ownershipType: {
+      system: "Built-in skill",
+      user: "Created by you",
+      public: "From community",
+    },
+  },
 
   get: {
     title: "Get skill",
@@ -130,6 +137,9 @@ export const translations = {
         description: "A conflict occurred with the current state",
       },
     },
+    voiceModelSelection: {
+      systemDefault: "System default",
+    },
     success: {
       title: "Success",
       description: "skill retrieved successfully",
@@ -210,22 +220,44 @@ export const translations = {
       description:
         "Enable this to share your skill with the community. When disabled, the skill remains private and only visible to you.",
     },
+    chatModel: {
+      label: "Chat Model",
+      placeholder: "System default",
+    },
     voice: {
       label: "Voice",
       description:
         "Select a text-to-speech voice for audio responses. Each skill can have their own unique voice.",
+      placeholder: "System default",
     },
     sttModel: {
       label: "Speech-to-Text Model",
       description: "Model used for speech recognition",
+      placeholder: "System default",
     },
     visionBridgeModel: {
       label: "Vision Model",
       description: "Model used for image analysis",
+      placeholder: "System default",
     },
     translationModel: {
       label: "Translation Model",
       description: "Model used for text translation",
+    },
+    imageGenModel: {
+      label: "Image Generation Model",
+      description: "Model used for generating images",
+      placeholder: "System default",
+    },
+    musicGenModel: {
+      label: "Music Generation Model",
+      description: "Model used for generating music",
+      placeholder: "System default",
+    },
+    videoGenModel: {
+      label: "Video Generation Model",
+      description: "Model used for generating videos",
+      placeholder: "System default",
     },
     defaultChatMode: {
       label: "Default Chat Mode",

@@ -42,21 +42,43 @@ export const translations = {
       label: "Custom Icon",
       description: "Optional custom icon for this favorite",
     },
+    chatModel: {
+      label: "Chat Model",
+      placeholder: "Inherit from skill",
+    },
     voice: {
       label: "Voice",
       description: "Text-to-speech voice preference",
+      placeholder: "Inherit from skill",
     },
     sttModel: {
       label: "Speech-to-Text Model",
       description: "Model used for speech recognition",
+      placeholder: "Inherit from skill",
     },
     visionBridgeModel: {
       label: "Vision Model",
       description: "Model used for image analysis",
+      placeholder: "Inherit from skill",
     },
     translationModel: {
       label: "Translation Model",
       description: "Model used for text translation",
+    },
+    imageGenModel: {
+      label: "Image Generation Model",
+      description: "Model used for generating images",
+      placeholder: "Inherit from skill",
+    },
+    musicGenModel: {
+      label: "Music Generation Model",
+      description: "Model used for generating music",
+      placeholder: "Inherit from skill",
+    },
+    videoGenModel: {
+      label: "Video Generation Model",
+      description: "Model used for generating videos",
+      placeholder: "Inherit from skill",
     },
     defaultChatMode: {
       label: "Default Chat Mode",

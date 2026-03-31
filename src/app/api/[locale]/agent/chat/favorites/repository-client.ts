@@ -27,12 +27,14 @@ import {
 import type {
   FiltersModelSelection,
   ManualModelSelection,
+  VoiceModelSelection,
 } from "../../models/types";
 
 import { STORAGE_KEYS } from "../constants";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
 import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
+import { ModelSelectionType } from "../skills/enum";
 import { SkillsRepositoryClient } from "../skills/repository-client";
 import type {
   FavoriteGetModelSelection,
@@ -57,7 +59,7 @@ interface StoredLocalFavorite {
   skillId: string;
   variantId: string | null;
   customIcon: IconKey | null;
-  voiceId: TtsModelId | null;
+  voiceModelSelection: VoiceModelSelection | null;
   modelSelection: FavoriteGetModelSelection | null;
   position: number;
 }
@@ -98,7 +100,7 @@ export class ChatFavoritesRepositoryClient {
           character?.tagline ? tChar(character.tagline) : null,
           character?.description ? tChar(character.description) : null,
           activeFavoriteId,
-          character?.voiceId ?? null,
+          null,
           locale,
           user,
         );
@@ -141,7 +143,7 @@ export class ChatFavoritesRepositoryClient {
         id,
         skillId: data.skillId ?? "default",
         variantId: data.variantId ?? null,
-        voiceId: data.voiceId ?? null,
+        voiceModelSelection: data.voiceModelSelection ?? null,
         modelSelection: data.modelSelection,
         customIcon: null,
         position: currentConfigs.length,
@@ -227,7 +229,7 @@ export class ChatFavoritesRepositoryClient {
         ...existing,
         skillId,
         customIcon: customIconToStore,
-        voiceId: data.voiceId ?? null,
+        voiceModelSelection: data.voiceModelSelection ?? null,
         modelSelection: data.modelSelection,
       };
 
@@ -320,7 +322,7 @@ export class ChatFavoritesRepositoryClient {
     characterTagline: string | null,
     characterDescription: string | null,
     activeFavoriteId: string | null,
-    characterVoice: TtsModelId | null,
+    characterVoiceSelection: VoiceModelSelection | null,
     locale: CountryLanguage,
     user: JwtPayloadType,
   ): FavoriteCard {
@@ -332,13 +334,30 @@ export class ChatFavoritesRepositoryClient {
     );
     const hasSkill = stored.skillId !== "default";
 
+    // Resolve voice model ID from MANUAL selection, falling back to character voice or default
+    const resolveVoiceId = (
+      sel: VoiceModelSelection | null | undefined,
+    ): TtsModelId | null => {
+      if (
+        sel?.selectionType === ModelSelectionType.MANUAL &&
+        sel.manualModelId
+      ) {
+        return sel.manualModelId;
+      }
+      return null;
+    };
+    const resolvedVoiceId =
+      resolveVoiceId(stored.voiceModelSelection) ??
+      resolveVoiceId(characterVoiceSelection) ??
+      DEFAULT_TTS_VOICE_ID;
+
     // Flattened structure - no nested content/titleRow/modelRow
     return {
       id: stored.id,
       skillId: stored.skillId,
       variantId: stored.variantId ?? null,
       modelId: bestModel?.id ?? null,
-      voiceId: stored.voiceId ?? characterVoice ?? DEFAULT_TTS_VOICE_ID,
+      voiceId: resolvedVoiceId,
       position: stored.position,
       icon: stored.customIcon ?? characterIcon ?? bestModel?.icon ?? "bot",
       name: characterName ?? bestModel?.name ?? t("fallbacks.unknown"),
@@ -385,7 +404,7 @@ export class ChatFavoritesRepositoryClient {
         name: t("fallbacks.unknownSkill"),
         tagline: t("fallbacks.noTagline"),
         description: t("fallbacks.noDescription"),
-        voiceId: stored.voiceId,
+        voiceModelSelection: stored.voiceModelSelection ?? null,
         modelSelection: stored.modelSelection, // null or actual selection
         characterModelSelection: null,
         compactTrigger: null,
@@ -411,7 +430,7 @@ export class ChatFavoritesRepositoryClient {
       name: character.name ? tChar(character.name) : t("fallbacks.unknown"),
       tagline: character.tagline ? tChar(character.tagline) : "",
       description: character.description ? tChar(character.description) : "",
-      voiceId: stored.voiceId ?? character.voiceId ?? null,
+      voiceModelSelection: stored.voiceModelSelection ?? null,
       modelSelection: stored.modelSelection, // null = use character defaults
       characterModelSelection: effectiveCharacterModelSelection,
       compactTrigger: null,

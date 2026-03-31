@@ -17,6 +17,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import { withValue } from "../../../system/unified-interface/unified-ui/widgets/_shared/field-helpers";
@@ -64,14 +65,17 @@ export function KagiSearchResultsContainer({
         <Div className="flex flex-col gap-4 p-4 border rounded-lg bg-card">
           <TextFieldWidget fieldName="query" field={children.query} />
           <FormAlertWidget field={{}} />
-          <SubmitButtonWidget<typeof definition.GET>
-            field={{
-              text: "get.submitButton.label",
-              loadingText: "get.submitButton.loadingText",
-              icon: "search",
-              variant: "primary",
-            }}
-          />
+          <Div className="flex gap-2">
+            <NavigateButtonWidget field={children.backButton} />
+            <SubmitButtonWidget<typeof definition.GET>
+              field={{
+                text: "get.submitButton.label",
+                loadingText: "get.submitButton.loadingText",
+                icon: "search",
+                variant: "primary",
+              }}
+            />
+          </Div>
         </Div>
       ) : (
         <TextFieldWidget fieldName="query" field={children.query} />

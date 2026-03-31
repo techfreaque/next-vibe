@@ -153,6 +153,26 @@ export function subscribeToMessages(
       StreamEventType.TASK_COMPLETED,
       handlers[StreamEventType.TASK_COMPLETED],
     ),
+    sub(
+      channel,
+      StreamEventType.STREAMING_STATE_CHANGED,
+      handlers[StreamEventType.STREAMING_STATE_CHANGED],
+    ),
+    sub(
+      channel,
+      StreamEventType.GENERATED_MEDIA_ADDED,
+      handlers[StreamEventType.GENERATED_MEDIA_ADDED],
+    ),
+    sub(
+      channel,
+      StreamEventType.GAP_FILL_STARTED,
+      handlers[StreamEventType.GAP_FILL_STARTED],
+    ),
+    sub(
+      channel,
+      StreamEventType.GAP_FILL_COMPLETED,
+      handlers[StreamEventType.GAP_FILL_COMPLETED],
+    ),
   ];
 
   return (): void => {

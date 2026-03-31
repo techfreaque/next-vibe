@@ -16,6 +16,8 @@ import {
   type ModelId,
   type TtsModelId,
 } from "@/app/api/[locale]/agent/models/models";
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
+import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -56,7 +58,7 @@ export interface MessageOperationDeps {
     availableTools: ToolConfigItem[] | null;
     pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
-    voiceId: TtsModelId;
+    voiceModelSelection: ModelSelectionSimple | null | undefined;
   };
   /** Called immediately after the optimistic user message is added - switches the visible branch */
   setLeafMessageId?: (messageId: string) => void;
@@ -222,10 +224,17 @@ export async function createAndSendUserMessage(
       });
     }
 
-    // Voice mode settings - use ttsAutoplay and voiceId from chat settings
+    // Voice mode settings - resolve TTS voice from selection or fall back to default
+    const resolvedVoiceModel = settings.voiceModelSelection
+      ? SkillsRepositoryClient.getBestModelByRole(
+          settings.voiceModelSelection,
+          ["tts"],
+          user,
+        )
+      : null;
     const effectiveVoiceMode = {
       enabled: settings.ttsAutoplay,
-      voice: settings.voiceId ?? DEFAULT_TTS_VOICE_ID,
+      voice: (resolvedVoiceModel?.id ?? DEFAULT_TTS_VOICE_ID) as TtsModelId,
     };
 
     // Get user's timezone from browser

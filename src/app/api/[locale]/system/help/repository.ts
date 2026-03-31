@@ -34,6 +34,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import type { CliCompatiblePlatform } from "../unified-interface/cli/runtime/route-executor";
 import { generateSchemaForUsage } from "../unified-interface/shared/field/utils";
+import {
+  searchField,
+  searchItems,
+} from "../unified-interface/shared/search/in-memory-search";
 import type { CreateApiEndpointAny } from "../unified-interface/shared/types/endpoint-base";
 import { FieldUsage } from "../unified-interface/shared/types/enums";
 import { Platform } from "../unified-interface/shared/types/platform";
@@ -345,19 +349,6 @@ export class HelpRepository {
       credits: tool.credits,
       platforms,
     };
-  }
-
-  private static buildMetaSearchIndex(tool: EndpointMeta): string {
-    return [
-      tool.title,
-      tool.description,
-      tool.category,
-      ...tool.tags,
-      tool.toolName,
-      ...tool.aliases,
-    ]
-      .join(" ")
-      .toLowerCase();
   }
 
   /** Lazy-load the full endpoint definition for parameter schema (detail view only) */
@@ -744,11 +735,11 @@ export class HelpRepository {
     if (platformFilter) {
       const mapped = HelpRepository.mapFilterToPlatform(platformFilter);
       discoveryPlatform = mapped === "all" ? Platform.CLI : mapped;
-    } else if (!isAdmin && !isCompact) {
-      // Customers and public users on web always discover AI-accessible tools
+    } else if (!isCompact) {
+      // Web (all roles): default to AI tool set - admin can override with platformFilter
       discoveryPlatform = Platform.AI;
     } else {
-      // Admin (no filter) and compact platforms: use actual calling platform
+      // Compact platforms (AI/MCP/CRON/CLI): use actual calling platform
       discoveryPlatform = platform;
     }
 
@@ -940,12 +931,6 @@ export class HelpRepository {
     const query = data.query?.toLowerCase().trim();
     const category = data.category?.toLowerCase().trim();
 
-    // Build search index once
-    const searchIndexMap = new Map<string, string>();
-    for (const m of platformFilteredMeta) {
-      searchIndexMap.set(m.toolName, HelpRepository.buildMetaSearchIndex(m));
-    }
-
     // Auto-upgrade to detail mode on exact name/alias match
     if (query && !category) {
       const exactMatch = platformFilteredMeta.find(
@@ -981,16 +966,15 @@ export class HelpRepository {
     let filtered = platformFilteredMeta;
 
     if (query) {
-      filtered = filtered.filter((m) => {
-        if (
-          m.toolName.toLowerCase().includes(query) ||
-          m.aliases.some((a) => a.toLowerCase().includes(query)) ||
-          m.description.toLowerCase().includes(query) ||
-          m.tags.some((t) => t.toLowerCase().includes(query))
-        ) {
-          return true;
-        }
-        return searchIndexMap.get(m.toolName)?.includes(query) ?? false;
+      filtered = searchItems(filtered, {
+        query,
+        fields: [
+          searchField((m) => m.toolName, 1.0),
+          searchField((m) => m.aliases, 0.8),
+          searchField((m) => m.description, 0.3),
+          searchField((m) => m.tags, 0.2),
+          searchField((m) => m.category, 0.1),
+        ],
       });
     }
 

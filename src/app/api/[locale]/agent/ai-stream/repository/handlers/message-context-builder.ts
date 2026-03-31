@@ -100,27 +100,23 @@ export class MessageContextBuilder {
         continue;
       }
 
-      const originalCount = message.metadata.attachments.length;
+      // Filter out image and file attachments that model cannot handle natively.
+      // Exception: if a cached text variant exists for this message, inject it as
+      // text content instead of dropping. If no variant exists, keep the attachment
+      // so GapFillExecutor can bridge it after conversion.
+      const cachedTextVariant = message.metadata.variants?.find(
+        (v) => v.modality === "text" && v.content,
+      );
 
-      // Filter out image and file attachments
       message.metadata.attachments = message.metadata.attachments.filter(
         (attachment) => {
           const mimeType = attachment.mimeType?.toLowerCase() || "";
 
-          // If model is provided, use supportsAttachmentNatively for precise filtering
-          if (model) {
-            if (this.supportsAttachmentNatively({ mimeType }, model)) {
-              return true;
-            }
-            const isImage = mimeType.startsWith("image/");
-            const isFile =
-              mimeType.startsWith("application/") ||
-              mimeType.startsWith("text/");
-            if (isImage || isFile) {
-              totalRemoved++;
-              formatSet.add(isImage ? "image" : "file");
-              return false;
-            }
+          const nativelySupported = model
+            ? this.supportsAttachmentNatively({ mimeType }, model)
+            : false;
+
+          if (nativelySupported) {
             return true;
           }
 
@@ -128,12 +124,22 @@ export class MessageContextBuilder {
           const isFile =
             mimeType.startsWith("application/") || mimeType.startsWith("text/");
 
-          if (isImage || isFile) {
+          if (!isImage && !isFile) {
+            return true;
+          }
+
+          // Has cached text variant → inject into content, then drop the attachment
+          if (cachedTextVariant) {
+            const description = cachedTextVariant.content;
+            message.content = message.content
+              ? `${message.content}\n\n[Attachment description: ${description}]`
+              : `[Attachment description: ${description}]`;
             totalRemoved++;
             formatSet.add(isImage ? "image" : "file");
             return false;
           }
 
+          // No cached variant → keep attachment so GapFillExecutor can bridge it
           return true;
         },
       );
@@ -141,13 +147,6 @@ export class MessageContextBuilder {
       // If all attachments were removed, remove the attachments array
       if (message.metadata.attachments.length === 0) {
         delete message.metadata.attachments;
-      }
-
-      const removedCount =
-        originalCount - (message.metadata.attachments?.length || 0);
-      if (removedCount > 0) {
-        // Optionally clear content if it was only describing the attachment
-        // For now, we keep the text content even if attachments are removed
       }
     }
 
@@ -407,24 +406,24 @@ export class MessageContextBuilder {
         params.modelConfig ??
         getModelById(params.upcomingResponseContext.model);
 
-      if (!modelConfig.inputs?.includes("image")) {
-        const result = this.stripAttachmentsFromMessages(
-          contextMessages,
-          modelConfig.name,
-          modelConfig,
-        );
+      // Always run strip logic - it uses supportsAttachmentNatively per-attachment,
+      // injects cached text variants, and keeps un-bridged attachments for GapFillExecutor.
+      const result = this.stripAttachmentsFromMessages(
+        contextMessages,
+        modelConfig.name,
+        modelConfig,
+      );
 
-        if (result.totalRemoved > 0) {
-          visionWarningMessage = result.warningMessage;
-          params.logger.info(
-            "[BuildMessageContext] Removed attachments for non-vision model",
-            {
-              model: modelConfig.name,
-              attachmentsRemoved: result.totalRemoved,
-              formats: result.formats.join(", "),
-            },
-          );
-        }
+      if (result.totalRemoved > 0) {
+        visionWarningMessage = result.warningMessage;
+        params.logger.info(
+          "[BuildMessageContext] Replaced attachments with cached variants",
+          {
+            model: modelConfig.name,
+            attachmentsReplaced: result.totalRemoved,
+            formats: result.formats.join(", "),
+          },
+        );
       }
     }
 
@@ -436,12 +435,34 @@ export class MessageContextBuilder {
             params.timezone,
             params.rootFolderId,
             params.locale,
+            params.modelConfig,
           )
         : [];
 
     params.logger.debug("[BuildMessageContext] Converted to AI SDK format", {
       convertedMessages: messages.length,
     });
+
+    // Strip unsupported file/image parts from ASSISTANT messages in history.
+    // Assistant messages can carry generated images (file parts) from previous turns.
+    // If the active model doesn't support image input, drop those parts to avoid
+    // API errors - GapFill only handles user messages, not assistant history.
+    if (params.modelConfig && !params.modelConfig.inputs?.includes("image")) {
+      for (const msg of messages) {
+        if (msg.role === "assistant" && Array.isArray(msg.content)) {
+          // MessageConverter may inject file parts for generated images.
+          // The AI SDK types don't include "file" in AssistantContent but
+          // the runtime value can have it - cast to access the type field.
+          const parts = msg.content as Array<{ type: string }>;
+          const filtered = parts.filter(
+            (part) => part.type !== "file" && part.type !== "image",
+          );
+          if (filtered.length !== parts.length) {
+            (msg as { content: typeof filtered }).content = filtered;
+          }
+        }
+      }
+    }
 
     // Add vision warning as system message if needed
     if (visionWarningMessage) {
@@ -689,6 +710,40 @@ export class MessageContextBuilder {
       compactTrigger,
     } = params;
 
+    // Pure generator models (image-gen, video-gen, audio-gen) have no meaningful text
+    // context window - skip compacting entirely to avoid sending them to chat/completions.
+    const modelConfigEarly = getModelById(model);
+    if (
+      modelConfigEarly.modelRole === "image-gen" ||
+      modelConfigEarly.modelRole === "video-gen" ||
+      modelConfigEarly.modelRole === "audio-gen"
+    ) {
+      logger.debug(
+        "[Compacting] Skipping compacting for pure generator model",
+        { model, modelRole: modelConfigEarly.modelRole },
+      );
+      const branchMessagesEarly = await this.fetchBranchMessages({
+        threadId,
+        parentMessageId,
+        isIncognito,
+        messageHistory,
+        logger,
+      });
+      const currentUserMessage =
+        branchMessagesEarly.find((m) => m.id === currentUserMessageId) ?? null;
+      return {
+        shouldCompact: false,
+        isEmergencyCompact: false,
+        totalTokens: 0,
+        modelContextWindow: modelConfigEarly.contextWindow,
+        branchMessages: branchMessagesEarly,
+        messagesToCompact: [],
+        currentUserMessage,
+        lastCompactingMessage: null,
+        failedCompactingMessage: null,
+      };
+    }
+
     // Step 1: Get branch messages (server DB or incognito storage)
     const branchMessages = await this.fetchBranchMessages({
       threadId,
@@ -872,6 +927,7 @@ export class MessageContextBuilder {
     /** Pre-built trailing system message string, built in builder.ts via generator.ts */
     trailingSystemMessage: string;
     locale: CountryLanguage;
+    modelConfig?: ModelOption;
   }): Promise<ModelMessage[] | null> {
     const {
       compactedSummary,
@@ -924,6 +980,7 @@ export class MessageContextBuilder {
         params.timezone,
         params.rootFolderId,
         params.locale,
+        params.modelConfig,
       );
       messages.push(...converted);
     }

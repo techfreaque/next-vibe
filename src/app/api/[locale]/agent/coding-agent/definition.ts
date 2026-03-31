@@ -9,9 +9,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   requestField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -117,6 +119,22 @@ const { POST } = createEndpoint({
         description: "codingAgent.run.post.fields.interactiveMode.description",
         columns: 6,
         schema: z.boolean().default(false),
+      }),
+
+      backButton: backButton(scopedTranslation, {
+        label: "codingAgent.run.post.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
+      }),
+
+      submitButton: submitButton(scopedTranslation, {
+        label: "codingAgent.run.post.submitButton.label" as const,
+        loadingText: "codingAgent.run.post.submitButton.loadingText" as const,
+        icon: "send",
+        variant: "primary",
+        className: "w-full",
+        usage: { request: "data" },
       }),
 
       // ── Response fields ─────────────────────────────────────────────────

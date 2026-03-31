@@ -73,6 +73,13 @@ export const translations = {
       title: "Skills geladen",
       description: "Gemeldete Skills erfolgreich abgerufen",
     },
+    empty: "Keine gemeldeten Skills - die Community sieht gesund aus!",
+    action: {
+      moderate: "Moderieren",
+    },
+    backButton: {
+      label: "Zurück",
+    },
   },
   patch: {
     title: "Skill moderieren",

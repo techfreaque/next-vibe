@@ -7,6 +7,7 @@ export const translations = {
   },
   post: {
     title: "Generate Image",
+    dynamicTitle: "Image: {{prompt}}",
     description: "Generate an image from a text prompt using AI",
     form: {
       title: "Image Generation",
@@ -34,13 +35,21 @@ export const translations = {
       standard: "Standard",
       hd: "HD",
     },
+    download: "Download",
+    dimensionSeparator: "×",
+    backButton: {
+      label: "Back",
+    },
     submitButton: {
       text: "Generate Image",
+      label: "Generate Image",
       loadingText: "Generating...",
     },
     response: {
       imageUrl: "Generated image URL",
       creditCost: "Credits used",
+      inputRef: "Input media reference",
+      jobId: "Async job ID",
     },
     errors: {
       validation_failed: {

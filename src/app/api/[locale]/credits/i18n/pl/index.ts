@@ -382,6 +382,13 @@ export const translations: typeof enTranslations = {
           content: "Wynik",
         },
       },
+      backButton: {
+        label: "Wstecz",
+      },
+      submitButton: {
+        label: "Dodaj kredyty",
+        loadingText: "Dodawanie...",
+      },
       success: {
         title: "Kredyty dodane",
         description: "Kredyty zostały dodane do konta użytkownika",

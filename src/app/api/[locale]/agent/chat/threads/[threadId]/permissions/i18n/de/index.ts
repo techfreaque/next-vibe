@@ -92,6 +92,9 @@ export const translations: typeof enTranslations = {
         description: "Es gab einen Konflikt mit dem aktuellen Zustand",
       },
     },
+    backButton: {
+      label: "Zurück",
+    },
     success: {
       title: "Erfolg",
       description: "Thread-Berechtigungen erfolgreich abgerufen",
@@ -209,6 +212,13 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Es gab einen Konflikt mit dem aktuellen Zustand",
       },
+    },
+    backButton: {
+      label: "Zurück",
+    },
+    submitButton: {
+      label: "Berechtigungen speichern",
+      loadingText: "Speichern…",
     },
     success: {
       title: "Erfolg",

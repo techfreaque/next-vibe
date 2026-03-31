@@ -120,6 +120,9 @@ export const translations = {
         description: "This resource has been modified",
       },
     },
+    backButton: {
+      label: "Back",
+    },
     success: {
       title: "Success",
       description: "Share links retrieved successfully",
@@ -191,6 +194,13 @@ export const translations = {
         title: "Conflict",
         description: "This resource has been modified",
       },
+    },
+    backButton: {
+      label: "Back",
+    },
+    submitButton: {
+      label: "Create Link",
+      loadingText: "Creating…",
     },
     success: {
       title: "Success",
@@ -267,6 +277,13 @@ export const translations = {
         description: "This resource has been modified",
       },
     },
+    backButton: {
+      label: "Back",
+    },
+    submitButton: {
+      label: "Save Changes",
+      loadingText: "Saving…",
+    },
     success: {
       title: "Success",
       description: "Share link updated successfully",
@@ -325,6 +342,13 @@ export const translations = {
         title: "Conflict",
         description: "This resource has been modified",
       },
+    },
+    backButton: {
+      label: "Back",
+    },
+    submitButton: {
+      label: "Revoke Link",
+      loadingText: "Revoking…",
     },
     success: {
       title: "Success",

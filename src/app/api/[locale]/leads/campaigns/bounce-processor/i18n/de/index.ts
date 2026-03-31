@@ -95,6 +95,13 @@ export const translations: typeof enTranslations = {
       leadsUpdated: "Leads aktualisiert",
       campaignsCancelled: "Kampagnen abgebrochen",
     },
+    backButton: {
+      label: "Zurück",
+    },
+    submitButton: {
+      label: "Einstellungen speichern",
+      loadingText: "Wird gespeichert...",
+    },
     success: {
       title: "Bounce-Verarbeitung abgeschlossen",
       description: "Bounce-Benachrichtigungen erfolgreich verarbeitet",
@@ -144,6 +151,9 @@ export const translations: typeof enTranslations = {
       timeout: "Timeout",
       retries: "Wiederholungen",
       retryDelay: "Wiederholungsverzögerung",
+    },
+    backButton: {
+      label: "Zurück",
     },
     success: {
       title: "Konfiguration erfolgreich geladen",

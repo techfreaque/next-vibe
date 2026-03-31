@@ -589,21 +589,23 @@ const { POST } = createEndpoint({
   description: "post.description",
   icon: "sparkles",
   category: "endpointCategories.ai",
-  allowedRoles: [UserRole.USER],
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   fields: objectField(scopedTranslation, {
+    type: WidgetType.CONTAINER,
     usage: { request: "data", response: true },
     children: {
       decision: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
         label: "post.fields.decision.label",
         description: "post.fields.decision.description",
         schema: z.string().min(1).max(2000),
-        fieldType: FieldDataType.TEXTAREA,
+        columns: 12,
       }),
       justification: responseField(scopedTranslation, {
-        label: "post.fields.justification.label",
-        description: "post.fields.justification.description",
+        type: WidgetType.TEXT,
+        content: "post.fields.justification.content",
         schema: z.string(),
-        fieldType: FieldDataType.TEXTAREA,
       }),
     },
   }),

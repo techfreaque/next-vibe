@@ -110,6 +110,9 @@ export const translations = {
         description: "The specified message does not exist",
       },
     },
+    backButton: {
+      label: "Back",
+    },
     success: {
       title: "Success",
       description: "Message retrieved successfully",
@@ -227,6 +230,13 @@ export const translations = {
         description: "The specified message does not exist",
       },
     },
+    backButton: {
+      label: "Back",
+    },
+    submitButton: {
+      label: "Save Changes",
+      loadingText: "Saving…",
+    },
     success: {
       title: "Success",
       description: "Message updated successfully",
@@ -244,6 +254,10 @@ export const translations = {
       "Are you sure you want to delete this message? This action cannot be undone.",
     backButton: {
       label: "Cancel",
+    },
+    submitButton: {
+      label: "Delete",
+      loadingText: "Deleting…",
     },
     deleteButton: {
       label: "Delete",

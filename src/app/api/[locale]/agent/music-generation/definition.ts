@@ -7,9 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   requestField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -17,8 +19,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazy } from "react";
 import {
   DEFAULT_MUSIC_DURATION,
   MUSIC_DURATION_VALUES,
@@ -26,8 +30,13 @@ import {
   MusicDurationOptions,
   MusicModelOptions,
 } from "./enum";
+
+import { MUSIC_GEN_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { MusicGenerationContainer } from "./widget";
+
+const MusicGenerationContainer = lazy(() =>
+  import("./widget").then((m) => ({ default: m.MusicGenerationContainer })),
+);
 
 /**
  * Music Generation Endpoint (POST)
@@ -37,18 +46,29 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["agent", "music-generation"],
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.CUSTOMER,
-    UserRole.PUBLIC,
-    UserRole.AI_TOOL_OFF,
-  ],
+  aliases: [MUSIC_GEN_ALIAS],
+  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
 
   title: "post.title",
   description: "post.description",
   icon: "music",
   category: "endpointCategories.ai",
   tags: ["tags.music", "tags.generation", "tags.ai"],
+  dynamicTitle: ({ request }) => {
+    const prompt = request?.prompt as string | undefined;
+    if (!prompt?.trim()) {
+      return undefined;
+    }
+    const short = prompt.length > 50 ? `${prompt.slice(0, 50)}...` : prompt;
+    return {
+      message: "post.dynamicTitle" as const,
+      messageParams: { prompt: short },
+    };
+  },
+
+  defaultExpanded: true,
+  dynamicCredits: ({ response }) => response?.creditCost,
+  streamContextPatch: (ctx) => ({ model: ctx.musicGenModelId }),
 
   fields: customWidgetObject({
     render: MusicGenerationContainer,
@@ -72,6 +92,7 @@ const { POST } = createEndpoint({
         columns: 6,
         options: MusicModelOptions,
         schema: z.enum(MUSIC_MODEL_IDS).default(MUSIC_MODEL_IDS[0]),
+        hiddenForPlatforms: [Platform.AI, Platform.MCP],
       }),
       duration: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -82,6 +103,22 @@ const { POST } = createEndpoint({
         options: MusicDurationOptions,
         schema: z.enum(MUSIC_DURATION_VALUES).default(DEFAULT_MUSIC_DURATION),
       }),
+      backButton: backButton(scopedTranslation, {
+        label: "post.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data" },
+      }),
+
+      submitButton: submitButton(scopedTranslation, {
+        label: "post.submitButton.label" as const,
+        loadingText: "post.submitButton.loadingText" as const,
+        icon: "send",
+        variant: "primary",
+        className: "w-full",
+        usage: { request: "data" },
+      }),
+
       // === RESPONSE FIELDS ===
       audioUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -97,6 +134,18 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "post.response.durationSeconds",
         schema: z.number(),
+      }),
+      /** Reference to input media used for media-to-media generation */
+      inputRef: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.inputRef",
+        schema: z.string().optional(),
+      }),
+      /** Async job ID for polling (future async generation) */
+      jobId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.jobId",
+        schema: z.string().optional(),
       }),
     },
   }),

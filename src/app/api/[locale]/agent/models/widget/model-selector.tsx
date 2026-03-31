@@ -18,7 +18,9 @@ import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
 import { Filter } from "next-vibe-ui/ui/icons/Filter";
+import { Search } from "next-vibe-ui/ui/icons/Search";
 import { X } from "next-vibe-ui/ui/icons/X";
+import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import {
   Popover,
@@ -52,6 +54,7 @@ import {
 import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import type { Modality, ModelRole } from "@/app/api/[locale]/agent/models/enum";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
   ApiProvider,
@@ -89,7 +92,7 @@ interface ModelCardProps {
   locale: CountryLanguage;
 }
 
-function ModelCard({
+export function ModelCard({
   model,
   isBest,
   selected,
@@ -404,6 +407,13 @@ export interface ModelSelectorProps {
   onChange?: (selection: ModelSelectionSimple | null) => void;
 
   /**
+   * Callback fired only when the user explicitly clicks a model row to confirm selection.
+   * Receives the confirmed value so callers can apply isDefault checks and close the panel.
+   * Unlike onChange which fires on every tab/filter change.
+   */
+  onSelect?: (value: ModelSelectionSimple | null) => void | Promise<void>;
+
+  /**
    * Skill's model selection (optional, for CHARACTER_BASED mode)
    */
   characterModelSelection?: ModelSelectionSimple | undefined;
@@ -433,6 +443,25 @@ export interface ModelSelectorProps {
    * Use in onboarding or embedded contexts where double-border is undesirable.
    */
   compact?: boolean;
+
+  /**
+   * Chat-only mode - restricts model selector to LLM (text) models only.
+   * Hides Image/Audio type tabs. Use when selecting a chat LLM, not a media model.
+   */
+  chatOnly?: boolean;
+
+  /**
+   * When set, show only models whose modelRole is in this array (bypasses LLM hard-filter).
+   * Use for TTS, STT, image-gen, music-gen, vision-bridge selectors.
+   * When undefined, defaults to LLM-only behavior.
+   */
+  allowedRoles?: ModelRole[];
+
+  /**
+   * When set, only show models whose `inputs` array includes ALL of these modalities.
+   * Use for vision-bridge (requiredInputs={["image"]}) to filter LLMs to vision-capable ones.
+   */
+  requiredInputs?: Modality[];
 }
 
 /** Returns true if the model's provider is available given current env */
@@ -493,6 +522,10 @@ function getSetupRequiredMessage(
       return envAvailability.falAi
         ? null
         : `${t("selector.addEnvKey")}: FAL_AI_API_KEY → fal.ai/dashboard/keys`;
+    case ApiProvider.MODELSLAB:
+      return envAvailability.modelsLab
+        ? null
+        : `${t("selector.addEnvKey")}: MODELSLAB_API_KEY → modelslab.com`;
     default:
       return null;
   }
@@ -501,35 +534,76 @@ function getSetupRequiredMessage(
 export function ModelSelector({
   modelSelection,
   onChange,
+  onSelect,
   characterModelSelection,
   readOnly = false,
   envAvailability: envAvailabilityProp,
   locale,
   user,
   compact = false,
+  chatOnly = false,
+  allowedRoles,
+  requiredInputs,
 }: ModelSelectorProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   // Prefer prop (for non-chat contexts), fall back to context (chat pages)
   const envAvailabilityCtx = useEnvAvailability();
   const envAvailability = envAvailabilityProp ?? envAvailabilityCtx;
-  // UI state - initialize to CHARACTER_BASED if modelSelection is null and we have character defaults
+  // UI state - initialize to CHARACTER_BASED if modelSelection is null or matches the character selection
+  const isMatchingCharacterSelection =
+    !!modelSelection &&
+    !!characterModelSelection &&
+    modelSelection.selectionType === ModelSelectionType.MANUAL &&
+    characterModelSelection.selectionType === ModelSelectionType.MANUAL &&
+    modelSelection.manualModelId === characterModelSelection.manualModelId;
   const [useSkillBased, setUseSkillBased] = useState(
-    !modelSelection && !!characterModelSelection,
+    (!modelSelection || isMatchingCharacterSelection) &&
+      !!characterModelSelection,
   );
 
-  // Reset to CHARACTER_BASED when characterModelSelection changes and we have no modelSelection
+  // Reset to CHARACTER_BASED when characterModelSelection changes and we have no modelSelection (or matching)
   useEffect(() => {
-    if (!modelSelection && characterModelSelection) {
+    if (
+      (!modelSelection ||
+        (modelSelection.selectionType === ModelSelectionType.MANUAL &&
+          characterModelSelection?.selectionType ===
+            ModelSelectionType.MANUAL &&
+          modelSelection.manualModelId ===
+            characterModelSelection.manualModelId)) &&
+      characterModelSelection
+    ) {
       setUseSkillBased(true);
     }
   }, [characterModelSelection, modelSelection]);
 
   const [showAllModels, setShowAllModels] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const showUnfilteredModels = false;
   const [showLegacyByGroup, setShowLegacyByGroup] = useState<
     Record<string, boolean>
   >({});
-  const [modelTypeTab, setModelTypeTab] = useState<ModelType>("text");
+  // When allowedRoles is set, default tab to the appropriate type
+  const defaultModelTypeTab = useMemo((): ModelType => {
+    if (!allowedRoles) {
+      return "text";
+    }
+    if (allowedRoles.includes("image-gen")) {
+      return "image";
+    }
+    if (allowedRoles.includes("video-gen")) {
+      return "video";
+    }
+    if (
+      allowedRoles.includes("tts") ||
+      allowedRoles.includes("stt") ||
+      allowedRoles.includes("audio-gen")
+    ) {
+      return "audio";
+    }
+    return "text";
+  }, [allowedRoles]);
+  const [modelTypeTab, setModelTypeTab] =
+    useState<ModelType>(defaultModelTypeTab);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
 
@@ -609,6 +683,7 @@ export function ModelSelector({
       | typeof ModelSelectionType.FILTERS
       | typeof ModelSelectionType.MANUAL,
   ): void => {
+    setSearchQuery("");
     if (newMode === ModelSelectionType.CHARACTER_BASED) {
       // Toggle UI state and set form value to null
       setUseSkillBased(true);
@@ -630,9 +705,15 @@ export function ModelSelector({
       };
 
       if (newMode === ModelSelectionType.MANUAL) {
-        // Try to keep current model if available, otherwise use best filtered model
+        // Try to keep current model, otherwise pick first available filtered model
+        const firstAvailable = filteredModels.find((m) =>
+          isProviderAvailable(m, envAvailability),
+        );
         const currentModel =
-          manualModelId ?? bestFilteredModel?.id ?? getAllModelOptions()[0]?.id;
+          manualModelId ??
+          firstAvailable?.id ??
+          filteredModels[0]?.id ??
+          getAllModelOptions()[0]?.id;
         updateValue({
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: currentModel,
@@ -815,7 +896,7 @@ export function ModelSelector({
   const handleModelSelect = (modelId: ModelId): void => {
     // When selecting a model, preserve current filter/sort settings
     setUseSkillBased(false);
-    updateValue({
+    const selected: ModelSelectionSimple = {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: modelId,
       intelligenceRange: getRangeFromIndices(
@@ -827,13 +908,16 @@ export function ModelSelector({
       speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
       sortBy,
       sortDirection,
-    });
+    };
+    updateValue(selected);
+    onSelect?.(selected);
   };
 
   // Type tab change handler
   const handleTypeTabChange = (newType: ModelType): void => {
     setModelTypeTab(newType);
     setShowAllModels(false);
+    setSearchQuery("");
     if (newType !== "text") {
       // Image/audio: force MANUAL, auto-select first available model of that type
       setUseSkillBased(false);
@@ -1064,6 +1148,23 @@ export function ModelSelector({
   const priceRange = getRangeFromIndices(priceIndices, PRICE_DISPLAY);
 
   const filteredModels = useMemo(() => {
+    if (allowedRoles) {
+      // Media model selector: bypass LLM hard-filter, use role-based filtering
+      const base = SkillsRepositoryClient.getFilteredModelsByRole(
+        activeSelection.selectionType === ModelSelectionType.FILTERS ||
+          activeSelection.selectionType === ModelSelectionType.MANUAL
+          ? activeSelection
+          : null,
+        allowedRoles,
+        user,
+      );
+      const withInputFilter = requiredInputs
+        ? base.filter((m) =>
+            requiredInputs.every((mod) => m.inputs.includes(mod)),
+          )
+        : base;
+      return withInputFilter.filter((m) => m.modelTypes.includes(modelTypeTab));
+    }
     const filtersModelSelection: FiltersModelSelection = {
       selectionType: ModelSelectionType.FILTERS,
       intelligenceRange,
@@ -1081,6 +1182,9 @@ export function ModelSelector({
     );
     return base.filter((m) => m.modelTypes.includes(modelTypeTab));
   }, [
+    allowedRoles,
+    requiredInputs,
+    activeSelection,
     intelligenceRange,
     priceRange,
     contentRange,
@@ -1126,7 +1230,17 @@ export function ModelSelector({
   // Get models to show (filtered or all), always constrained by type tab
   const modelsToShow = filterUnavailableProviders(
     showUnfilteredModels
-      ? getAllModelOptions().filter((m) => m.modelTypes.includes(modelTypeTab))
+      ? getAllModelOptions().filter(
+          (m) =>
+            m.modelTypes.includes(modelTypeTab) &&
+            (modelTypeTab !== "text" ||
+              (m.modelRole !== "image-gen" &&
+                m.modelRole !== "video-gen" &&
+                m.modelRole !== "audio-gen" &&
+                m.modelRole !== "tts" &&
+                m.modelRole !== "stt" &&
+                m.modelRole !== "embedding")),
+        )
       : filteredModels,
   );
 
@@ -1143,10 +1257,23 @@ export function ModelSelector({
     );
   }, [modelsToShow]);
 
+  // Search-filtered models (applied after all other filters)
+  const searchFilteredModels = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) {
+      return modelsToShow;
+    }
+    return modelsToShow.filter(
+      (m) =>
+        m.name.toLowerCase().includes(q) ||
+        modelProviders[m.provider]?.name.toLowerCase().includes(q),
+    );
+  }, [searchQuery, modelsToShow]);
+
   // Sort and group models
   const sortedAndGroupedModels = useMemo(() => {
     if (!sortBy) {
-      return { ungrouped: modelsToShow };
+      return { ungrouped: searchFilteredModels };
     }
 
     // Get sort value and label based on field
@@ -1200,10 +1327,9 @@ export function ModelSelector({
       }
     };
 
-    // modelsToShow is already sorted by filteredModels (primary + secondary sort)
-    // Just group by primary sort label, preserving existing order within groups
+    // searchFilteredModels is already sorted; just group by primary sort label
     const grouped: Record<string, ModelOption[]> = {};
-    for (const model of modelsToShow) {
+    for (const model of searchFilteredModels) {
       const { label } = getSortInfo(model);
       if (!grouped[label]) {
         grouped[label] = [];
@@ -1212,7 +1338,7 @@ export function ModelSelector({
     }
 
     return grouped;
-  }, [modelsToShow, sortBy, t]);
+  }, [searchFilteredModels, sortBy, t]);
 
   // Get display models (limited or all)
   const displayModels = useMemo(() => {
@@ -1221,7 +1347,8 @@ export function ModelSelector({
       sortedAndGroupedModels.ungrouped
     ) {
       const ungrouped = sortedAndGroupedModels.ungrouped;
-      if (showAllModels) {
+      // Always show all results when searching
+      if (showAllModels || searchQuery.trim()) {
         return ungrouped;
       }
       const slice = ungrouped.slice(0, 3);
@@ -1240,11 +1367,26 @@ export function ModelSelector({
     }
     // With grouping - return all groups (show more/less handled per group)
     return sortedAndGroupedModels;
-  }, [sortedAndGroupedModels, showAllModels, mode, manualModelId]);
+  }, [sortedAndGroupedModels, showAllModels, searchQuery, mode, manualModelId]);
 
   // Available type tabs (only show tabs that have at least 1 accessible model)
   const allModels = useMemo(() => getAllModelOptions(), []);
   const availableTypes = useMemo((): ModelType[] => {
+    if (chatOnly) {
+      return ["text"];
+    }
+    // When allowedRoles is set, only show the tab matching that role's primary type.
+    // Models like Gemini image-gen have modelTypes: ["text","image"] but in a media
+    // selector we only want the media tab (image/audio/video), not the chat tab.
+    if (allowedRoles) {
+      const hasRoleType = allModels.some(
+        (m) =>
+          allowedRoles.includes(m.modelRole as ModelRole) &&
+          m.modelTypes.includes(defaultModelTypeTab) &&
+          (isAdmin || isProviderAvailable(m, envAvailability)),
+      );
+      return hasRoleType ? [defaultModelTypeTab] : [];
+    }
     const types: ModelType[] = ["text"];
     const hasImage = allModels.some(
       (m) =>
@@ -1263,7 +1405,14 @@ export function ModelSelector({
       types.push("audio");
     }
     return types;
-  }, [allModels, isAdmin, envAvailability]);
+  }, [
+    chatOnly,
+    allowedRoles,
+    defaultModelTypeTab,
+    allModels,
+    isAdmin,
+    envAvailability,
+  ]);
 
   const activeFilterChips = buildFilterChips({
     intelligenceIndices,
@@ -1311,7 +1460,9 @@ export function ModelSelector({
                   ? t("selector.typeChat")
                   : type === "image"
                     ? t("selector.typeImage")
-                    : t("selector.typeAudio")}
+                    : type === "video"
+                      ? t("selector.typeVideo")
+                      : t("selector.typeAudio")}
               </Button>
             ))}
           </Div>
@@ -1406,11 +1557,38 @@ export function ModelSelector({
           </Div>
         )}
 
-        {/* Filters + Sort rows - only for text/chat models */}
-        {modelTypeTab === "text" && (
-          <Div className="flex flex-col gap-2">
-            {/* Row 1: Filters */}
-            <Div className="flex items-center gap-2 flex-wrap">
+        {/* Toolbar: search + filters + sort - single integrated row */}
+        {(modelTypeTab === "text" || !!allowedRoles) && (
+          <Div className="flex flex-col gap-1.5">
+            {/* Row 1: search input + filter button + sort button */}
+            <Div className="flex items-center gap-1.5">
+              {/* Search input - hidden in Skill Default mode */}
+              {mode !== ModelSelectionType.CHARACTER_BASED &&
+                allModels.length > 3 && (
+                  <Div className="relative flex-1 min-w-0">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                    <Input
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder={t("selector.searchPlaceholder")}
+                      className="pl-8 pr-7 h-8 text-xs"
+                      disabled={readOnly}
+                    />
+                    {searchQuery && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-muted rounded-sm"
+                        onClick={() => setSearchQuery("")}
+                        disabled={readOnly}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </Div>
+                )}
+
               {/* Filters popover */}
               <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
                 <PopoverTrigger asChild>
@@ -1425,7 +1603,7 @@ export function ModelSelector({
                     }
                     size="sm"
                     className={cn(
-                      "h-7 gap-1.5 text-xs shrink-0",
+                      "h-8 gap-1.5 text-xs shrink-0",
                       activeFilterChips.filter(
                         (c) => c.key !== "sort" && c.key !== "sort2",
                       ).length > 0 &&
@@ -1446,56 +1624,63 @@ export function ModelSelector({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-96 p-3 flex flex-col gap-3 overflow-y-auto max-h-[min(420px,80svh)]"
+                  className="w-80 p-3 flex flex-col gap-3 overflow-y-auto max-h-[min(480px,var(--radix-popper-available-height))]"
                   align="start"
-                  side="top"
-                  sideOffset={8}
+                  side="bottom"
+                  sideOffset={6}
+                  avoidCollisions
+                  collisionPadding={8}
                 >
-                  <RangeSlider
-                    options={INTELLIGENCE_DISPLAY.map((opt) => ({
-                      ...opt,
-                      label: t(opt.label),
-                      description: opt.description
-                        ? t(opt.description)
-                        : undefined,
-                    }))}
-                    minIndex={intelligenceIndices.min}
-                    maxIndex={intelligenceIndices.max}
-                    onChange={handleIntelligenceChange}
-                    minLabel={t("ranges.intelligenceRange.minLabel")}
-                    maxLabel={t("ranges.intelligenceRange.maxLabel")}
-                    disabled={readOnly}
-                  />
-                  <RangeSlider
-                    options={CONTENT_DISPLAY.map((opt) => ({
-                      ...opt,
-                      label: t(opt.label),
-                      description: opt.description
-                        ? t(opt.description)
-                        : undefined,
-                    }))}
-                    minIndex={contentIndices.min}
-                    maxIndex={contentIndices.max}
-                    onChange={handleContentChange}
-                    minLabel={t("ranges.contentRange.minLabel")}
-                    maxLabel={t("ranges.contentRange.maxLabel")}
-                    disabled={readOnly}
-                  />
-                  <RangeSlider
-                    options={SPEED_DISPLAY.map((opt) => ({
-                      ...opt,
-                      label: t(opt.label),
-                      description: opt.description
-                        ? t(opt.description)
-                        : undefined,
-                    }))}
-                    minIndex={speedIndices.min}
-                    maxIndex={speedIndices.max}
-                    onChange={handleSpeedChange}
-                    minLabel={t("ranges.speedRange.minLabel")}
-                    maxLabel={t("ranges.speedRange.maxLabel")}
-                    disabled={readOnly}
-                  />
+                  {/* Intelligence/Content/Speed only meaningful for LLMs, not media-gen models */}
+                  {(!allowedRoles || allowedRoles.includes("llm")) && (
+                    <>
+                      <RangeSlider
+                        options={INTELLIGENCE_DISPLAY.map((opt) => ({
+                          ...opt,
+                          label: t(opt.label),
+                          description: opt.description
+                            ? t(opt.description)
+                            : undefined,
+                        }))}
+                        minIndex={intelligenceIndices.min}
+                        maxIndex={intelligenceIndices.max}
+                        onChange={handleIntelligenceChange}
+                        minLabel={t("ranges.intelligenceRange.minLabel")}
+                        maxLabel={t("ranges.intelligenceRange.maxLabel")}
+                        disabled={readOnly}
+                      />
+                      <RangeSlider
+                        options={CONTENT_DISPLAY.map((opt) => ({
+                          ...opt,
+                          label: t(opt.label),
+                          description: opt.description
+                            ? t(opt.description)
+                            : undefined,
+                        }))}
+                        minIndex={contentIndices.min}
+                        maxIndex={contentIndices.max}
+                        onChange={handleContentChange}
+                        minLabel={t("ranges.contentRange.minLabel")}
+                        maxLabel={t("ranges.contentRange.maxLabel")}
+                        disabled={readOnly}
+                      />
+                      <RangeSlider
+                        options={SPEED_DISPLAY.map((opt) => ({
+                          ...opt,
+                          label: t(opt.label),
+                          description: opt.description
+                            ? t(opt.description)
+                            : undefined,
+                        }))}
+                        minIndex={speedIndices.min}
+                        maxIndex={speedIndices.max}
+                        onChange={handleSpeedChange}
+                        minLabel={t("ranges.speedRange.minLabel")}
+                        maxLabel={t("ranges.speedRange.maxLabel")}
+                        disabled={readOnly}
+                      />
+                    </>
+                  )}
                   <RangeSlider
                     options={PRICE_DISPLAY.map((opt) => ({
                       ...opt,
@@ -1514,32 +1699,7 @@ export function ModelSelector({
                 </PopoverContent>
               </Popover>
 
-              {/* Active filter chips (range filters only) */}
-              {activeFilterChips
-                .filter((c) => c.key !== "sort" && c.key !== "sort2")
-                .map((chip) => (
-                  <Div
-                    key={chip.key}
-                    className="flex items-center gap-1 h-7 px-2 rounded-md bg-primary/10 border border-primary/20 text-primary text-xs font-medium"
-                  >
-                    <Span>{chip.label}</Span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-4 w-4 p-0 hover:bg-primary/20 rounded-sm ml-0.5"
-                      onClick={chip.onRemove}
-                      disabled={readOnly}
-                    >
-                      <X className="h-2.5 w-2.5" />
-                    </Button>
-                  </Div>
-                ))}
-            </Div>
-
-            {/* Row 2: Sort */}
-            <Div className="flex items-center gap-2 flex-wrap">
-              {/* Sort popover - already rendered above, move trigger here */}
+              {/* Sort popover */}
               <Popover open={sortOpen} onOpenChange={setSortOpen}>
                 <PopoverTrigger asChild>
                   <Button
@@ -1547,7 +1707,7 @@ export function ModelSelector({
                     variant={sortBy ? "secondary" : "outline"}
                     size="sm"
                     className={cn(
-                      "h-7 gap-1.5 text-xs shrink-0",
+                      "h-8 gap-1.5 text-xs shrink-0",
                       sortBy &&
                         "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20",
                     )}
@@ -1558,17 +1718,24 @@ export function ModelSelector({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-72 p-3 flex flex-col gap-3"
+                  className="w-72 p-3 flex flex-col gap-3 overflow-y-auto max-h-[var(--radix-popper-available-height)]"
                   align="start"
-                  side="top"
-                  sideOffset={8}
+                  side="bottom"
+                  sideOffset={6}
+                  avoidCollisions
+                  collisionPadding={8}
                 >
                   <Div className="flex flex-col gap-1.5">
                     <Span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
                       {t("selector.sortBy")}
                     </Span>
                     <Div className="flex flex-wrap gap-1">
-                      {ModelSortFieldOptions.map((option) => (
+                      {ModelSortFieldOptions.filter(
+                        (option) =>
+                          !allowedRoles ||
+                          allowedRoles.includes("llm") ||
+                          option.value === ModelSortField.PRICE,
+                      ).map((option) => (
                         <Button
                           key={option.value}
                           type="button"
@@ -1633,14 +1800,15 @@ export function ModelSelector({
                   )}
                 </PopoverContent>
               </Popover>
+            </Div>
 
-              {/* Active sort chips */}
-              {activeFilterChips
-                .filter((c) => c.key === "sort" || c.key === "sort2")
-                .map((chip) => (
+            {/* Row 2: active filter + sort chips (only when any are active) */}
+            {activeFilterChips.length > 0 && (
+              <Div className="flex items-center gap-1.5 flex-wrap">
+                {activeFilterChips.map((chip) => (
                   <Div
                     key={chip.key}
-                    className="flex items-center gap-1 h-7 px-2 rounded-md bg-primary/10 border border-primary/20 text-primary text-xs font-medium"
+                    className="flex items-center gap-1 h-6 px-2 rounded-md bg-primary/10 border border-primary/20 text-primary text-xs font-medium"
                   >
                     <Span>{chip.label}</Span>
                     <Button
@@ -1655,7 +1823,8 @@ export function ModelSelector({
                     </Button>
                   </Div>
                 ))}
-            </Div>
+              </Div>
+            )}
           </Div>
         )}
 
@@ -1701,7 +1870,7 @@ export function ModelSelector({
                     />
                   );
                 })}
-                {modelsToShow.length > 3 && (
+                {modelsToShow.length > 3 && !searchQuery.trim() && (
                   <Button
                     type="button"
                     variant="ghost"
@@ -1728,7 +1897,9 @@ export function ModelSelector({
               </Div>
             ) : (
               <Div className="p-4 text-center text-sm text-muted-foreground border rounded-lg">
-                {t("selector.noMatchingModels")}
+                {searchQuery.trim()
+                  ? t("selector.noSearchResults", { query: searchQuery.trim() })
+                  : t("selector.noMatchingModels")}
               </Div>
             )
           ) : (
@@ -1825,5 +1996,186 @@ export function ModelSelector({
         </Div>
       </Div>
     </TooltipProvider>
+  );
+}
+
+export interface ModelSelectorTriggerProps {
+  /** Current model selection (the chosen value) */
+  modelSelection: ModelSelectionSimple | null | undefined;
+  /** Character/skill's model selection (for CHARACTER_BASED fallback display) */
+  characterModelSelection?: ModelSelectionSimple;
+  /** When set, resolve best model from this role set instead of LLM models */
+  allowedRoles?: ModelRole[];
+  /**
+   * When set, only show models whose `inputs` array includes ALL of these modalities.
+   * Use for vision-bridge (requiredInputs={["image"]}) to filter LLMs to vision-capable ones.
+   */
+  requiredInputs?: Modality[];
+  /**
+   * Platform-level default model selection (for roles that have a system default,
+   * e.g. TTS → Nova, STT → Whisper, image-gen → DALL-E 3).
+   * When `modelSelection` is null and this is provided, shows the default model
+   * with a "Default" badge instead of showing `placeholder`.
+   */
+  defaultModelSelection?: ModelSelectionSimple;
+  /** Placeholder text shown when no model is selected (e.g. "Inherit from skill", "System default") */
+  placeholder: string;
+  /** Click handler - opens the inline panel. Omit for read-only. */
+  onClick?: () => void;
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+}
+
+/**
+ * Collapsed model selector trigger card.
+ * Shows the currently-selected (or inherited) model with icon, name, provider, and price badge.
+ * Clicking opens the full inline ModelSelector panel.
+ */
+export function ModelSelectorTrigger({
+  modelSelection,
+  characterModelSelection,
+  allowedRoles,
+  defaultModelSelection,
+  placeholder,
+  onClick,
+  locale,
+  user,
+}: ModelSelectorTriggerProps): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const envAvailability = useEnvAvailability();
+
+  // Resolve the best model to display
+  const resolvedModel = useMemo((): ModelOption | null => {
+    const effectiveSelection =
+      modelSelection ??
+      characterModelSelection ??
+      defaultModelSelection ??
+      null;
+    if (!effectiveSelection) {
+      return null;
+    }
+    if (allowedRoles) {
+      return SkillsRepositoryClient.getBestModelByRole(
+        effectiveSelection,
+        allowedRoles,
+        user,
+      );
+    }
+    return SkillsRepositoryClient.getBestModelForSkill(
+      effectiveSelection,
+      user,
+    );
+  }, [
+    modelSelection,
+    characterModelSelection,
+    defaultModelSelection,
+    allowedRoles,
+    user,
+  ]);
+
+  const isClickable = !!onClick;
+  const isInherited = !modelSelection && !!characterModelSelection;
+  const isPlatformDefault =
+    !modelSelection && !characterModelSelection && !!defaultModelSelection;
+  const isUnavailable =
+    resolvedModel !== null &&
+    !isProviderAvailable(resolvedModel, envAvailability);
+
+  return (
+    <Div
+      onClick={isClickable ? onClick : undefined}
+      className={cn(
+        "flex items-center gap-2.5 p-2.5 rounded-lg border transition-all",
+        isClickable &&
+          "cursor-pointer hover:bg-muted/50 hover:border-primary/30",
+        !isClickable && "cursor-default",
+      )}
+    >
+      {resolvedModel ? (
+        <>
+          <Div
+            className={cn(
+              "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
+              isUnavailable ? "bg-muted/30" : "bg-muted",
+            )}
+          >
+            <Icon
+              icon={resolvedModel.icon}
+              className={cn(
+                "h-4 w-4",
+                isUnavailable && "text-muted-foreground",
+              )}
+            />
+          </Div>
+          <Div className="flex-1 min-w-0">
+            <Div className="flex items-center gap-1.5">
+              <Span
+                className={cn(
+                  "text-sm font-medium truncate",
+                  isUnavailable && "text-muted-foreground",
+                )}
+              >
+                {resolvedModel.name}
+              </Span>
+              {isInherited && (
+                <Badge
+                  variant="secondary"
+                  className="text-[9px] h-4 px-1.5 shrink-0"
+                >
+                  {t("selector.inherited")}
+                </Badge>
+              )}
+              {isPlatformDefault && (
+                <Badge
+                  variant="outline"
+                  className="text-[9px] h-4 px-1.5 shrink-0"
+                >
+                  {t("selector.platformDefault")}
+                </Badge>
+              )}
+              {isUnavailable && (
+                <Badge
+                  variant="outline"
+                  className="text-[9px] h-4 px-1.5 shrink-0 border-amber-400/50 text-amber-600 dark:text-amber-400"
+                >
+                  <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
+                  {t("selector.setupRequired")}
+                </Badge>
+              )}
+            </Div>
+            <Span className="text-[11px] text-muted-foreground">
+              {modelProviders[resolvedModel.provider]?.name ??
+                resolvedModel.provider}
+            </Span>
+          </Div>
+          <Div className="flex items-center gap-1.5 shrink-0">
+            {!isUnavailable && (
+              <ModelCreditDisplay
+                modelId={resolvedModel.id}
+                variant="badge"
+                badgeVariant="secondary"
+                className="text-[10px] h-5"
+                locale={locale}
+              />
+            )}
+            {isClickable && (
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            )}
+          </Div>
+        </>
+      ) : (
+        <>
+          <Div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-muted/50">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+          </Div>
+          <Div className="flex-1 min-w-0">
+            <Span className="text-sm text-muted-foreground">{placeholder}</Span>
+          </Div>
+          {isClickable && (
+            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+          )}
+        </>
+      )}
+    </Div>
   );
 }

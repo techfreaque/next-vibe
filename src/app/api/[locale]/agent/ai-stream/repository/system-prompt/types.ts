@@ -41,6 +41,17 @@ export interface SystemPromptServerParams {
   extraInstructions?: string;
   /** Resolved memory token limit from cascade: favorite → skill → settings → null (use default) */
   memoryLimit?: number | null;
+  /** Resolved media generation capabilities for the current request */
+  mediaCapabilities?: MediaCapabilitiesParams;
+}
+
+/** Resolved media generation model info passed from stream-setup to the system prompt fragment. */
+export interface MediaCapabilitiesParams {
+  /** Native outputs of the primary LLM (e.g. ["image"] for image-native models) */
+  nativeOutputs: string[];
+  imageGenModelName: string;
+  musicGenModelName: string | null;
+  videoGenModelName: string | null;
 }
 
 /**

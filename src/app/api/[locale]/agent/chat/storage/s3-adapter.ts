@@ -311,4 +311,49 @@ export class S3StorageAdapter implements StorageAdapter {
       return null;
     }
   }
+
+  async listFilesByThread(threadId: string): Promise<FileMetadata[]> {
+    if (agentEnv.CHAT_STORAGE_TYPE !== "s3") {
+      return [];
+    }
+
+    const prefix = `chat-attachments/${threadId}/.metadata/`;
+    const results: FileMetadata[] = [];
+
+    try {
+      const listCommand = new ListObjectsV2Command({
+        Bucket: this.bucket,
+        Prefix: prefix,
+      });
+
+      const response = await this.client.send(listCommand);
+      const objects = response.Contents ?? [];
+
+      for (const obj of objects) {
+        if (!obj.Key?.endsWith(".json")) {
+          continue;
+        }
+        try {
+          const getCommand = new GetObjectCommand({
+            Bucket: this.bucket,
+            Key: obj.Key,
+          });
+          const result = await this.client.send(getCommand);
+          const body = await result.Body?.transformToString();
+          if (!body) {
+            continue;
+          }
+          const metadata = JSON.parse(body) as FileMetadata;
+          metadata.uploadedAt = new Date(metadata.uploadedAt);
+          results.push(metadata);
+        } catch {
+          // Skip unreadable metadata objects
+        }
+      }
+    } catch {
+      // Bucket/prefix doesn't exist — return empty
+    }
+
+    return results;
+  }
 }

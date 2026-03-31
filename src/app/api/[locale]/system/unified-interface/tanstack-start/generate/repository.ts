@@ -182,7 +182,7 @@ export class GenerateTanstackRoutesRepository {
 
     // Generate layout files.
     // Route groups like (other) map to pathless TanStack layout segments (_other),
-    // so each layout gets a unique flat name — no deduplication needed.
+    // so each layout gets a unique flat name - no deduplication needed.
     for (const relPath of allLayouts) {
       const dir = dirname(relPath);
       // Root layout (dir === ".") is handled by __root.tsx - skip it here
@@ -736,7 +736,7 @@ export class GenerateTanstackRoutesRepository {
    * Convert a single Next.js path segment to a TanStack path segment.
    *
    * Route groups like `(other)` become pathless layout segments `_other`.
-   * TanStack pathless routes use a leading `_` — they wrap children without
+   * TanStack pathless routes use a leading `_` - they wrap children without
    * adding a URL segment, exactly mirroring Next.js route group behaviour.
    *
    * [locale] is NOT stripped here - it becomes $locale in the route path.

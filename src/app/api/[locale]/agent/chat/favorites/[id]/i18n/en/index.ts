@@ -200,21 +200,43 @@ export const translations = {
     customName: {
       label: "Custom Name",
     },
+    chatModel: {
+      label: "Chat Model",
+      placeholder: "Inherit from skill",
+    },
     voice: {
       label: "AI Voice",
       description: "Choose the voice for your AI assistant",
+      placeholder: "Inherit from skill",
     },
     sttModel: {
       label: "Speech-to-Text Model",
       description: "Model used for speech recognition",
+      placeholder: "Inherit from skill",
     },
     visionBridgeModel: {
       label: "Vision Model",
       description: "Model used for image analysis",
+      placeholder: "Inherit from skill",
     },
     translationModel: {
       label: "Translation Model",
       description: "Model used for text translation",
+    },
+    imageGenModel: {
+      label: "Image Generation Model",
+      description: "Model used for generating images",
+      placeholder: "Inherit from skill",
+    },
+    musicGenModel: {
+      label: "Music Generation Model",
+      description: "Model used for generating music",
+      placeholder: "Inherit from skill",
+    },
+    videoGenModel: {
+      label: "Video Generation Model",
+      description: "Model used for generating videos",
+      placeholder: "Inherit from skill",
     },
     defaultChatMode: {
       label: "Default Chat Mode",
@@ -319,6 +341,12 @@ export const translations = {
       label: "Denied Tools",
       description:
         "Block specific tools for this slot on top of the skill's own denied list. These tools cannot be called regardless of other settings.",
+      clearAll: "Clear all",
+      noToolsFound: "No tools found",
+      blockedNote:
+        "Blocked tools cannot be called regardless of other settings.",
+      searchPlaceholder: "Search tools...",
+      blocked: "blocked",
     },
     promptAppend: {
       label: "Prompt Append",

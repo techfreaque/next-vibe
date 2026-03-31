@@ -17,10 +17,15 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { ChatMode } from "@/app/api/[locale]/agent/models/enum";
 import type {
   LlmModelId,
-  SttModelId,
-  TtsModelId,
-  VisionModelId,
+  VideoGenModelId,
 } from "@/app/api/[locale]/agent/models/models";
+import type {
+  ImageGenModelSelection,
+  MusicGenModelSelection,
+  SttModelSelection,
+  VisionModelSelection,
+  VoiceModelSelection,
+} from "@/app/api/[locale]/agent/models/types";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
@@ -55,20 +60,33 @@ export const chatFavorites = pgTable("chat_favorites", {
   // Custom icon (emoji or icon identifier)
   customIcon: text("custom_icon").$type<IconKey>(),
 
-  // TTS voice model ID (each voice IS a model, this replaces the old MALE/FEMALE enum)
-  voiceId: text("voice_id").$type<TtsModelId>(),
+  // Voice model selection (null = cascade to skill → user settings → system default)
+  voiceModelSelection: jsonb(
+    "voice_model_selection",
+  ).$type<VoiceModelSelection>(),
 
-  // STT model preference (null = cascade to user settings → system default)
-  sttModelId: text("stt_model_id").$type<SttModelId>(),
+  // STT model selection (null = cascade to user settings → system default)
+  sttModelSelection: jsonb("stt_model_selection").$type<SttModelSelection>(),
 
-  // Vision bridge model (null = cascade to user settings → system default)
-  visionBridgeModelId: text("vision_bridge_model_id").$type<VisionModelId>(),
+  // Vision bridge model selection (null = cascade to user settings → system default)
+  visionBridgeModelSelection: jsonb(
+    "vision_bridge_model_selection",
+  ).$type<VisionModelSelection>(),
 
   // Translation model for pure generators (null = cascade)
   translationModelId: text("translation_model_id").$type<LlmModelId>(),
 
   // Default chat mode for this favorite (null = cascade to skill → user settings → "text")
   defaultChatMode: text("default_chat_mode").$type<ChatMode>(),
+
+  // Image/music/video gen model selections (null = cascade to skill → user settings → system default)
+  imageGenModelSelection: jsonb(
+    "image_gen_model_selection",
+  ).$type<ImageGenModelSelection>(),
+  musicGenModelSelection: jsonb(
+    "music_gen_model_selection",
+  ).$type<MusicGenModelSelection>(),
+  videoGenModelId: text("video_gen_model_id").$type<VideoGenModelId>(),
 
   // Model selection (stores only MANUAL or FILTERS, null means use character defaults)
   modelSelection: jsonb("model_selection").$type<FavoriteGetModelSelection>(),

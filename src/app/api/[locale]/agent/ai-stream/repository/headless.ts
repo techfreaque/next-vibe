@@ -9,10 +9,13 @@ import "server-only";
 
 import { and, desc, eq } from "drizzle-orm";
 
-import {
-  DEFAULT_TTS_VOICE_ID,
-  type ModelId,
+import type {
+  ImageGenModelId,
+  ModelId,
+  MusicGenModelId,
+  VideoGenModelId,
 } from "@/app/api/[locale]/agent/models/models";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/models/models";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -123,6 +126,14 @@ export interface HeadlessAiStreamParams {
    */
   wakeUpRevival?: boolean;
   /**
+   * Override the derived operation for test / special-case callers.
+   * When set to "send", the prompt is treated as a new user message appended
+   * to the thread history — parentMessageId is still used for history loading
+   * but the AI receives the prompt as a user turn, not an answer-as-ai continuation.
+   * Use this in integration tests to simulate normal user multi-turn conversations.
+   */
+  operationOverride?: "send";
+  /**
    * Explicit parent message ID for history loading.
    * When provided, skips the "find last message by createdAt" query and uses
    * this ID directly as the starting point for building message ancestry.
@@ -136,6 +147,16 @@ export interface HeadlessAiStreamParams {
    * as the synthetic assistant + deferred tool pair that precede it.
    */
   sequenceIdOverride?: string;
+  /**
+   * Override resolved media gen models — bypasses the user-settings cascade.
+   * Used in integration tests to force a specific provider (e.g. modelslab-music-gen)
+   * regardless of what the admin user has saved in their settings.
+   */
+  mediaModelOverrides?: {
+    musicGenModelId?: MusicGenModelId;
+    videoGenModelId?: VideoGenModelId;
+    imageGenModelId?: ImageGenModelId;
+  };
   /** System user context for execution */
   user: JwtPayloadType;
   /** Locale for i18n */
@@ -256,8 +277,10 @@ export async function runHeadlessAiStream(
     preCalls,
     excludeMemories,
     wakeUpRevival,
+    operationOverride,
     explicitParentMessageId,
     sequenceIdOverride,
+    mediaModelOverrides,
     user,
     locale,
     logger,
@@ -453,11 +476,12 @@ export async function runHeadlessAiStream(
     // CONTINUE_CONVERSATION_PROMPT. The AI sees the deferred tool result as
     // the last message and responds naturally.
     const operation =
-      wakeUpRevival && parentMessageIdForAi
+      operationOverride ??
+      (wakeUpRevival && parentMessageIdForAi
         ? "wakeup-resume"
         : parentMessageIdForAi
           ? "answer-as-ai"
-          : "send";
+          : "send");
 
     logger.debug("[Headless] operation resolved", {
       operation,
@@ -471,7 +495,7 @@ export async function runHeadlessAiStream(
       rootFolderId,
       subFolderId: subFolderId ?? null,
       threadId: effectiveThreadId,
-      userMessageId: parentMessageIdForAi ? null : userMessageId,
+      userMessageId: operation !== "answer-as-ai" ? userMessageId : null,
       parentMessageId: parentMessageIdForAi,
       content: prompt,
       role: ChatMessageRole.USER,
@@ -500,6 +524,7 @@ export async function runHeadlessAiStream(
       excludeMemories,
       favoriteIdOverride: favoriteId,
       sequenceIdOverride,
+      mediaModelOverrides,
     });
 
     if (!result.success) {

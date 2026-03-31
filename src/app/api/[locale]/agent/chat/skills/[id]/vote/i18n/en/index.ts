@@ -46,6 +46,9 @@ export const translations = {
       voteCount: { content: "Vote Count" },
       trustLevel: { content: "Trust Level" },
     },
+    backButton: {
+      label: "Back",
+    },
     button: {
       vote: "Upvote",
       unvote: "Remove Vote",

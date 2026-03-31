@@ -6,9 +6,10 @@
 import { z } from "zod";
 
 import {
+  CHAT_MODEL_IDS,
+  ChatModelIdOptions,
   DEFAULT_TTS_VOICE_ID,
   ModelId,
-  ModelIdOptions,
   TTS_MODEL_IDS,
   TtsModelIdOptions,
 } from "@/app/api/[locale]/agent/models/models";
@@ -199,9 +200,9 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.SELECT,
         label: "post.model.label",
         description: "post.model.description",
-        options: ModelIdOptions,
+        options: ChatModelIdOptions,
         columns: 4,
-        schema: z.enum(ModelId),
+        schema: z.enum(CHAT_MODEL_IDS),
       }),
       skill: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -433,7 +434,12 @@ const { POST } = createEndpoint({
               })
               .refine(
                 (file) => {
-                  const allowedTypes = ["audio/", "application/octet-stream"];
+                  // Note: Bun reports audio/webm recordings as "video/webm" (strips codecs param)
+                  const allowedTypes = [
+                    "audio/",
+                    "video/webm",
+                    "application/octet-stream",
+                  ];
                   return allowedTypes.some((type) =>
                     file.type.startsWith(type),
                   );

@@ -15,6 +15,9 @@ export const translations: typeof enTranslations = {
       label: "Suchen",
       loadingText: "Suche läuft...",
     },
+    backButton: {
+      label: "Zurück",
+    },
     fields: {
       query: {
         title: "Suchanfrage",

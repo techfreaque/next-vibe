@@ -11,6 +11,11 @@ import {
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
+import type {
+  ImageGenModelId,
+  MusicGenModelId,
+  VideoGenModelId,
+} from "@/app/api/[locale]/agent/models/models";
 
 /**
  * Default folder IDs
@@ -99,6 +104,12 @@ export interface ToolExecutionContext {
   skillId: string | undefined;
   /** The model being used (e.g. "claude-sonnet-4-6") */
   modelId: string | undefined;
+  /** Resolved image gen model ID from skill/favorite/settings cascade */
+  imageGenModelId: ImageGenModelId | undefined;
+  /** Resolved music gen model ID from skill/favorite/settings cascade */
+  musicGenModelId: MusicGenModelId | undefined;
+  /** Resolved video gen model ID from skill/favorite/settings cascade */
+  videoGenModelId: VideoGenModelId | undefined;
   /** Whether this is a headless/cron invocation */
   headless: boolean | undefined;
   /**

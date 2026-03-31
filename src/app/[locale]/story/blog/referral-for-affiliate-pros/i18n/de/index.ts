@@ -13,7 +13,7 @@ export const translations: typeof enTranslations = {
   },
   hero: {
     backToBlog: "Zurück zum Blog",
-    brand: "unbottled.ai — ",
+    brand: "unbottled.ai - ",
     icon: "📊",
     category: "Für Affiliate-Profis",
     readTime: "6 Min. Lesezeit",
@@ -28,9 +28,9 @@ export const translations: typeof enTranslations = {
     powerUserTitle: "Der Power-User-Multiplikator",
     powerUserBody:
       "Entwickler und KI-intensive Nutzer geben 200$+/Monat ohne nachzudenken aus – der durchschnittliche Entwickler hat heute ein 200$/Monat Claude Code- oder Codex-Abo als Baseline. Eine Power-User-Empfehlung bringt dir 20$+/Monat – wiederkehrend. Das ist mehr als 12 normale Empfehlungen zusammen.",
-    floorTitle: "Das steigende Minimum",
+    floorTitle: "Deine alten Empfehlungen werden mit der Zeit wertvoller",
     floorBody:
-      "KI-Plattformen, die im Laufe der Zeit Modelle und Funktionen hinzufügen, sehen ihren ARPU wachsen. Empfehlungen, die du vor sechs Monaten gemacht hast, bringen dir heute mehr als damals, weil die Plattform wertvoller geworden ist. Deine bestehende Empfehlungsbasis wächst ohne zusätzliche Arbeit.",
+      "Unbottled.ai fügt ständig neue Modelle und Funktionen hinzu – und wenn die Plattform wertvoller wird, geben Nutzer mehr aus. Eine Empfehlung, die du vor sechs Monaten gemacht hast, bringt dir heute mehr Provision als damals – ohne dass du irgendetwas getan hast. Deine bestehende Empfehlungsbasis arbeitet also im Hintergrund weiter für dich.",
     tableTitle: "Provisionszenarien",
     tableHeaderProfile: "Nutzerprofil",
     tableHeaderSpend: "Monatliche Ausgaben",
@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
       "unbottled.ai hat eine spezifische Positionierung: KI mit freier Meinungsäußerung und 50+ Modellen, nutzergesteuerter Inhaltsfilterung, privacy-first. Das spricht an:",
     group1Title: "Entwickler und technische Nutzer",
     group1Body:
-      "Leute, die API-Zugang wollen, restriktive KI-Richtlinien hassen und bereits für mehrere KI-Abonnements zahlen. Hoher ARPU, hohe Retention.",
+      "Leute, die API-Zugang wollen, restriktive KI-Richtlinien hassen und bereits für mehrere KI-Abonnements zahlen. Geben viel aus, bleiben lange.",
     group2Title: "Datenschutzbewusste Nutzer",
     group2Body:
       "Leute, die auf Signal umgestiegen sind, VPNs nutzen, ihre Tools selbst hosten. Sie kümmern sich darum, wo ihre Daten landen. Open-Source und privacy-first konvertiert hier gut.",
@@ -78,7 +78,7 @@ export const translations: typeof enTranslations = {
       "Vergleichs-Content konvertiert Affiliate-Traffic gut. Hebe die Modellvielfalt, die Preisgestaltung und die Free-Speech-Positionierung von unbottled.ai gegenüber Single-Model-Tools hervor.",
     angle2Title: "Entwickler-Community-Posts",
     angle2Body:
-      "GitHub-README-Abschnitte, Dev-Discord-Server, r/LocalLLaMA, Hacker News. Technische Nutzer haben höheren ARPU und empfehlen Tools in ihren Communities.",
+      "GitHub-README-Abschnitte, Dev-Discord-Server, r/LocalLLaMA, Hacker News. Technische Nutzer geben mehr aus und empfehlen Tools aktiv in ihren Communities weiter.",
     angle3Title: "Privacy/Self-Hosting-Communities",
     angle3Body:
       "r/selfhosted, Privacy-Foren, Mastodon-Instanzen. Der Open-Source-Charakter der Plattform und die Self-Hosting-Option kommen hier gut an.",
@@ -94,7 +94,7 @@ export const translations: typeof enTranslations = {
   },
   close: {
     title: "Lohnt sich als Ergänzung",
-    p1: "Das ist nicht das am höchsten zahlende Affiliate-Programm, das du betreiben wirst. Es ist ein Programm mit wiederkehrender Provision in einer Kategorie (KI-Tools), die schnell wächst und wo Power-User-ARPU bereits hoch ist und nach oben tendiert.",
+    p1: "Das ist nicht das am höchsten zahlende Affiliate-Programm, das du betreiben wirst. Es ist ein Programm mit wiederkehrender Provision in einer Kategorie (KI-Tools), die schnell wächst – und wo Vielnutzer bereits viel ausgeben, mit steigender Tendenz.",
     p2: "Wenn du eine Zielgruppe hast, die sich mit einem der oben genannten Segmente überschneidet, ist ein Code und ein Post die Investition wert.",
     createCode: "Empfehlungscode erstellen",
     joinDiscord: "Discord beitreten",

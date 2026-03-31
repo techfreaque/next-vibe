@@ -90,11 +90,12 @@ export class DatabaseGenerateRepository {
       // - stdout/stderr: pipe + FORCE_COLOR so we get colors in buffer
       // - Wait up to 6s for "No schema changes" → suppress entirely
       // - After 6s without it → flush buffer to stdout and pipe live from then on
+      // - FORCE_TTY=1 tells drizzle-kit's TTY check to treat stdin as a TTY
       const exitCode = await new Promise<number>((resolve, reject) => {
         const child = spawn("bunx", ["drizzle-kit", "generate"], {
           stdio: ["inherit", "pipe", "pipe"],
           cwd: process.cwd(),
-          env: { ...spawnEnv, FORCE_COLOR: "1" },
+          env: { ...spawnEnv, FORCE_COLOR: "1", FORCE_TTY: "1" },
         });
 
         const chunks: Buffer[] = [];

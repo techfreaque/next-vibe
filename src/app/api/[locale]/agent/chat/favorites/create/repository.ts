@@ -19,6 +19,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { ModelRole } from "@/app/api/[locale]/agent/models/enum";
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
+import { getDefaultModelForRole } from "@/app/api/[locale]/agent/models/models";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
 import type {
@@ -26,6 +30,27 @@ import type {
   FavoriteCreateResponseOutput,
 } from "./definition";
 import type { FavoriteCreateT } from "./i18n";
+
+/**
+ * Normalize a model selection: if it equals the platform default for the given roles,
+ * return null so we don't store redundant data.
+ */
+function normalizeModelSelection<T extends ModelSelectionSimple>(
+  sel: T | null | undefined,
+  roles: ModelRole[],
+): T | null {
+  if (!sel) {
+    return null;
+  }
+  if (sel.selectionType !== ModelSelectionType.MANUAL) {
+    return sel;
+  }
+  const def = getDefaultModelForRole(roles);
+  if (def && "manualModelId" in sel && sel.manualModelId === def.id) {
+    return null;
+  }
+  return sel;
+}
 
 /**
  * Favorites Create Repository
@@ -82,31 +107,40 @@ export class FavoritesCreateRepository {
         character = characterResult.data;
       }
 
-      // Only store voiceId if different from character default (null = cascade to skill)
-      const voiceToStore =
-        character && data.voiceId === character.voiceId ? null : data.voiceId;
-
-      // Only store bridge models if different from character defaults (null = cascade to skill)
-      const sttModelIdToStore =
-        character && data.sttModelId === character.sttModelId
-          ? null
-          : (data.sttModelId ?? null);
-      const visionBridgeModelIdToStore =
-        character && data.visionBridgeModelId === character.visionBridgeModelId
-          ? null
-          : (data.visionBridgeModelId ?? null);
+      // Store model selections normalized: null = not set / cascade to skill or platform default
+      const voiceToStore = normalizeModelSelection(
+        data.voiceModelSelection ?? null,
+        ["tts"],
+      );
+      const sttModelSelectionToStore = normalizeModelSelection(
+        data.sttModelSelection ?? null,
+        ["stt"],
+      );
+      const visionBridgeModelSelectionToStore =
+        data.visionBridgeModelSelection ?? null;
       const translationModelIdToStore =
         character && data.translationModelId === character.translationModelId
           ? null
           : (data.translationModelId ?? null);
+      const imageGenModelSelectionToStore = normalizeModelSelection(
+        data.imageGenModelSelection ?? null,
+        ["image-gen"],
+      );
+      const musicGenModelSelectionToStore = data.musicGenModelSelection ?? null;
+      const videoGenModelIdToStore =
+        data.videoGenModelSelection?.selectionType ===
+          ModelSelectionType.MANUAL && data.videoGenModelSelection.manualModelId
+          ? data.videoGenModelSelection.manualModelId
+          : null;
       const defaultChatModeToStore =
         character && data.defaultChatMode === character.defaultChatMode
           ? null
           : (data.defaultChatMode ?? null);
 
-      // If a variantId is provided, resolve its modelSelection from the skill's variants.
+      // If a variantId is provided and no explicit model selection was provided,
+      // resolve the variant's default modelSelection from the skill's variants.
       let modelSelectionToStore = data.modelSelection;
-      if (data.variantId && data.skillId) {
+      if (!modelSelectionToStore && data.variantId && data.skillId) {
         const skillResult = await SkillsRepository.getSkillById(
           { id: data.skillId },
           user,
@@ -139,10 +173,13 @@ export class FavoritesCreateRepository {
           variantId: data.variantId ?? null,
           customName: null,
           customIcon: null,
-          voiceId: voiceToStore ?? null,
-          sttModelId: sttModelIdToStore,
-          visionBridgeModelId: visionBridgeModelIdToStore,
+          voiceModelSelection: voiceToStore,
+          sttModelSelection: sttModelSelectionToStore,
+          visionBridgeModelSelection: visionBridgeModelSelectionToStore,
           translationModelId: translationModelIdToStore,
+          imageGenModelSelection: imageGenModelSelectionToStore,
+          musicGenModelSelection: musicGenModelSelectionToStore,
+          videoGenModelId: videoGenModelIdToStore,
           defaultChatMode: defaultChatModeToStore,
           modelSelection: modelSelectionToStore,
           compactTrigger: data.compactTrigger ?? null,

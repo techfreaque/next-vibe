@@ -10,17 +10,18 @@ import {
   ChatModeOptions,
 } from "@/app/api/[locale]/agent/models/enum";
 import {
-  DEFAULT_TTS_VOICE_ID,
   LLM_MODEL_IDS,
   LlmModelIdOptions,
-  STT_MODEL_IDS,
-  SttModelIdOptions,
-  TTS_MODEL_IDS,
-  TtsModelIdOptions,
-  VISION_MODEL_IDS,
-  VisionModelIdOptions,
 } from "@/app/api/[locale]/agent/models/models";
-import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/types";
+import {
+  imageGenModelSelectionSchema,
+  modelSelectionSchemaSimple,
+  musicGenModelSelectionSchema,
+  sttModelSelectionSchema,
+  videoGenModelSelectionSchema,
+  visionModelSelectionSchema,
+  voiceModelSelectionSchema,
+} from "@/app/api/[locale]/agent/models/types";
 import {
   dateSchema,
   iconSchema,
@@ -64,8 +65,13 @@ import {
   FAVORITE_GET_ALIAS,
   FAVORITE_UPDATE_ALIAS,
 } from "../constants";
+import { lazy } from "react";
+
 import { scopedTranslation } from "./i18n";
-import { FavoriteEditContainer } from "./widget";
+
+const FavoriteEditContainer = lazy(() =>
+  import("./widget").then((m) => ({ default: m.FavoriteEditContainer })),
+);
 
 /**
  * Delete Favorite Endpoint (DELETE)
@@ -221,10 +227,6 @@ const { DELETE } = createEndpoint({
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
-      voiceId: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        schema: z.enum(TTS_MODEL_IDS).nullable(),
-      }),
       modelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: modelSelectionSchemaSimple.nullable(),
@@ -291,7 +293,6 @@ const { DELETE } = createEndpoint({
     responses: {
       delete: {
         skillId: "thea",
-        voiceId: null,
         modelSelection: null,
         createdAt: "2024-01-15T10:00:00.000Z",
         updatedAt: "2024-01-15T10:00:00.000Z",
@@ -367,7 +368,9 @@ const { PATCH } = createEndpoint({
                 data: {
                   ...prevData.data,
                   selectedModel: modelId,
-                  voiceId: requestData.voiceId ?? prevData.data.voiceId,
+                  voiceModelSelection:
+                    requestData.voiceModelSelection ??
+                    prevData.data.voiceModelSelection,
                 },
               };
             },
@@ -381,7 +384,9 @@ const { PATCH } = createEndpoint({
               user,
               {
                 selectedModel: modelId,
-                voiceId: requestData.voiceId ?? settingsData.data.voiceId,
+                voiceModelSelection:
+                  requestData.voiceModelSelection ??
+                  settingsData.data.voiceModelSelection,
               },
               undefined,
               locale,
@@ -471,7 +476,8 @@ const { PATCH } = createEndpoint({
                         skillId: fav.skillId,
                         variantId: fav.variantId ?? null,
                         customIcon: requestData.icon ?? null,
-                        voiceId: requestData.voiceId ?? null,
+                        voiceModelSelection:
+                          requestData.voiceModelSelection ?? null,
                         modelSelection: requestData.modelSelection,
                         position: fav.position,
                       },
@@ -512,7 +518,9 @@ const { PATCH } = createEndpoint({
                 characterName: prevData.data.name,
                 characterTagline: prevData.data.tagline,
                 characterDescription: prevData.data.description,
-                voiceId: requestData.voiceId ?? null,
+                voiceModelSelection:
+                  requestData.voiceModelSelection ??
+                  prevData.data.voiceModelSelection,
                 modelSelection: requestData.modelSelection,
               },
             };
@@ -579,44 +587,29 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
 
-      voiceId: requestField(scopedTranslation, {
+      voiceModelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: TtsModelIdOptions,
+        fieldType: FieldDataType.TEXT,
         label: "patch.voice.label" as const,
         description: "patch.voice.description" as const,
         columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-        schema: z.enum(TTS_MODEL_IDS).nullable().optional(),
+        schema: voiceModelSelectionSchema.nullable().optional(),
       }),
-      sttModelId: requestField(scopedTranslation, {
+      sttModelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: SttModelIdOptions,
+        fieldType: FieldDataType.TEXT,
         label: "patch.sttModel.label" as const,
         description: "patch.sttModel.description" as const,
         columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-        schema: z.enum(STT_MODEL_IDS).nullable().optional(),
+        schema: sttModelSelectionSchema.nullable().optional(),
       }),
-      visionBridgeModelId: requestField(scopedTranslation, {
+      visionBridgeModelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: VisionModelIdOptions,
+        fieldType: FieldDataType.TEXT,
         label: "patch.visionBridgeModel.label" as const,
         description: "patch.visionBridgeModel.description" as const,
         columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-        schema: z.enum(VISION_MODEL_IDS).nullable().optional(),
+        schema: visionModelSelectionSchema.nullable().optional(),
       }),
       translationModelId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -630,6 +623,30 @@ const { PATCH } = createEndpoint({
           optionalColor: "transparent",
         },
         schema: z.enum(LLM_MODEL_IDS).nullable().optional(),
+      }),
+      imageGenModelSelection: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.imageGenModel.label" as const,
+        description: "patch.imageGenModel.description" as const,
+        columns: 6,
+        schema: imageGenModelSelectionSchema.nullable().optional(),
+      }),
+      musicGenModelSelection: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.musicGenModel.label" as const,
+        description: "patch.musicGenModel.description" as const,
+        columns: 6,
+        schema: musicGenModelSelectionSchema.nullable().optional(),
+      }),
+      videoGenModelSelection: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.videoGenModel.label" as const,
+        description: "patch.videoGenModel.description" as const,
+        columns: 6,
+        schema: videoGenModelSelectionSchema.nullable().optional(),
       }),
       defaultChatMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -730,6 +747,21 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.number().int().min(100).max(100000).nullable().optional(),
       }),
+
+      backButton: backButton(scopedTranslation, {
+        label: "patch.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "data&urlPathParams" },
+      }),
+
+      saveButton: submitButton(scopedTranslation, {
+        label: "patch.saveButton.label" as const,
+        loadingText: "patch.saveButton.loadingText" as const,
+        icon: "save",
+        variant: "outline",
+        usage: { request: "data&urlPathParams" },
+      }),
     },
   }),
 
@@ -782,7 +814,12 @@ const { PATCH } = createEndpoint({
       update: {
         skillId: "thea",
         icon: "sun" as const,
-        voiceId: DEFAULT_TTS_VOICE_ID,
+        voiceModelSelection: null,
+        sttModelSelection: null,
+        visionBridgeModelSelection: null,
+        imageGenModelSelection: null,
+        musicGenModelSelection: null,
+        videoGenModelSelection: null,
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
           intelligenceRange: {
@@ -932,28 +969,46 @@ const { GET } = createEndpoint({
         schema: z.string(),
       }),
 
-      voiceId: responseField(scopedTranslation, {
-        type: WidgetType.BADGE,
-        variant: "default",
-        schema: z.enum(TTS_MODEL_IDS).nullable(),
-      }),
-
-      sttModelId: responseField(scopedTranslation, {
+      voiceModelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.enum(STT_MODEL_IDS).optional(),
+        schema: voiceModelSelectionSchema.nullable(),
       }),
 
-      visionBridgeModelId: responseField(scopedTranslation, {
+      sttModelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.enum(VISION_MODEL_IDS).optional(),
+        schema: sttModelSelectionSchema.nullable().optional(),
+      }),
+
+      visionBridgeModelSelection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: visionModelSelectionSchema.nullable().optional(),
       }),
 
       translationModelId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(LLM_MODEL_IDS).optional(),
+      }),
+
+      imageGenModelSelection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: imageGenModelSelectionSchema.nullable().optional(),
+      }),
+
+      musicGenModelSelection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: musicGenModelSelectionSchema.nullable().optional(),
+      }),
+
+      videoGenModelSelection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: videoGenModelSelectionSchema.nullable().optional(),
       }),
 
       defaultChatMode: responseField(scopedTranslation, {
@@ -1084,7 +1139,12 @@ const { GET } = createEndpoint({
         name: "fallbacks.unknownSkill" as const,
         tagline: "fallbacks.noTagline" as const,
         description: "fallbacks.noDescription" as const,
-        voiceId: null,
+        voiceModelSelection: null,
+        sttModelSelection: null,
+        visionBridgeModelSelection: null,
+        imageGenModelSelection: null,
+        musicGenModelSelection: null,
+        videoGenModelSelection: null,
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
           priceRange: {

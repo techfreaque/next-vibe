@@ -7,6 +7,7 @@ export const translations = {
   },
   post: {
     title: "Generuj muzykę",
+    dynamicTitle: "Muzyka: {{prompt}}",
     description: "Wygeneruj muzykę z opisu tekstowego przy użyciu AI",
     form: {
       title: "Generowanie muzyki",
@@ -28,14 +29,22 @@ export const translations = {
       medium: "Średni (~20 sek.)",
       long: "Długi (~30 sek.)",
     },
+    download: "Pobierz",
+    separator: "·",
+    backButton: {
+      label: "Wstecz",
+    },
     submitButton: {
       text: "Generuj muzykę",
+      label: "Generuj muzykę",
       loadingText: "Generowanie...",
     },
     response: {
       audioUrl: "URL wygenerowanego audio",
       creditCost: "Użyte kredyty",
       durationSeconds: "Czas trwania w sekundach",
+      inputRef: "Referencja do mediów wejściowych",
+      jobId: "ID zadania asynchronicznego",
     },
     errors: {
       validation_failed: {

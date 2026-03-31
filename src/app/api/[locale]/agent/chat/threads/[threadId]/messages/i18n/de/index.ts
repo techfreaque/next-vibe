@@ -328,6 +328,8 @@ export const translations: typeof enTranslations = {
         copy: "Kopieren",
         copied: "Kopiert",
         download: "Herunterladen",
+        showPrompt: "Prompt anzeigen",
+        hidePrompt: "Prompt ausblenden",
       },
     },
     messages: {
