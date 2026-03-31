@@ -185,13 +185,19 @@ objectField(st, { type: WidgetType.CONTAINER, usage: {}, children: {...} })
 
 ## Custom Widget Integration
 
-When the auto-rendered UI isn't sufficient, use `customWidgetObject` to wire a React component directly into the definition:
+When the auto-rendered UI isn't sufficient, use `customWidgetObject` to wire a React component directly into the definition.
+
+**CRITICAL: Always use `lazyCliWidget` — never statically import `widget.tsx`.** Static import breaks `vibe gen` (SSR/bun module resolution fails). `lazyCliWidget` also automatically routes `import("./widget")` → `widget.cli.tsx` in CLI/MCP context (the Bun plugin intercepts by name).
 
 ```typescript
-import { SkillCreateContainer } from "./widget";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
+const SkillCreateContainer = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.SkillCreateContainer })),
+);
 
 fields: customWidgetObject({
-  render: SkillCreateContainer,    // ← component reference
+  render: SkillCreateContainer,    // ← lazy component reference
   usage: { request: "data", response: true } as const,
   children: {
     name: requestField(scopedTranslation, {
@@ -793,7 +799,9 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 // Local imports - always use ./i18n (module-local scope)
 import { scopedTranslation } from "./i18n";
 import { MyEnum, MyEnumOptions } from "./enum";
-import { MyWidget } from "./widget"; // if using customWidgetObject
+// if using customWidgetObject — ALWAYS lazy, never static import:
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+const MyWidget = lazyCliWidget(() => import("./widget").then((m) => ({ default: m.MyWidget })));
 ```
 
 **Rules:**
@@ -1071,6 +1079,7 @@ verbose: requestField(st, { schema: z.boolean().default(false), ... })
 - [ ] Optional primitives use `.optional()` on Zod schema
 - [ ] Optional arrays use `responseArrayOptionalField(st, { ..., child })`
 - [ ] Custom widget uses `customWidgetObject({ render, usage, children })`
+- [ ] Widget imported via `lazyCliWidget` (NEVER static `import { X } from "./widget"`)
 - [ ] Error types: all 9 `EndpointErrorTypes` present
 - [ ] Examples structure correct (not wrapped in method name)
 - [ ] Type exports follow naming convention
