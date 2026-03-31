@@ -72,7 +72,12 @@ const { POST } = createEndpoint({
               })
               .refine(
                 (file) => {
-                  const allowedTypes = ["audio/", "application/octet-stream"];
+                  // Note: Bun reports audio/webm recordings as "video/webm" (strips codecs param)
+                  const allowedTypes = [
+                    "audio/",
+                    "video/webm",
+                    "application/octet-stream",
+                  ];
                   return allowedTypes.some((type) =>
                     file.type.startsWith(type),
                   );

@@ -1,6 +1,6 @@
 /**
  * Speech-to-Text Repository
- * Handles audio transcription using Eden AI
+ * Routes transcription requests to the correct provider based on the STT model's ApiProvider.
  */
 
 import "server-only";
@@ -13,7 +13,17 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import {
+  buildMissingKeyMessage,
+  getAgentEnvAvailability,
+  PROVIDER_SETUP_INSTRUCTIONS,
+} from "@/app/api/[locale]/agent/env-availability";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
+import {
+  ApiProvider,
+  getModelById,
+  ModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -34,13 +44,11 @@ import type { SpeechToTextT } from "./i18n";
  * Speech-to-Text Repository
  */
 export class SpeechToTextRepository {
-  /** Server-side provider configuration - hardcoded to use OpenAI Whisper via Eden AI */
-  private static readonly STT_PROVIDER = "openai"; // Eden AI expects "openai" for Whisper
-  private static readonly STT_MODEL = "whisper-1";
   private static readonly MAX_POLLING_ATTEMPTS = 30;
   private static readonly POLLING_INTERVAL_MS = 1000;
+
   /**
-   * Transcribe audio to text
+   * Transcribe audio to text using model-based provider routing
    */
   static async transcribeAudio(
     file: File,
@@ -48,13 +56,16 @@ export class SpeechToTextRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: SpeechToTextT,
+    sttModelId?: string,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
-    // Server-side language configuration - ignore client input
+    const resolvedModelId = (sttModelId ?? ModelId.OPENAI_WHISPER) as ModelId;
+    const modelOption = getModelById(resolvedModelId);
     const language = getLanguageFromLocale(locale);
 
-    logger.debug("Starting audio transcription", {
-      provider: this.STT_PROVIDER,
-      model: this.STT_MODEL,
+    logger.debug("[STT] Starting audio transcription", {
+      sttModelId: resolvedModelId,
+      apiProvider: modelOption.apiProvider,
+      providerModel: modelOption.providerModel,
       language,
       fileSize: file.size,
       fileName: file.name,
@@ -63,7 +74,7 @@ export class SpeechToTextRepository {
 
     const tCredits = creditsScopedTranslation.scopedT(locale).t;
 
-    // Check minimum balance upfront (cost of ~5 seconds)
+    // Check minimum balance upfront
     const balanceResult = await CreditRepository.getBalance(
       user.isPublic && user.leadId
         ? { leadId: user.leadId }
@@ -76,7 +87,7 @@ export class SpeechToTextRepository {
     );
 
     if (!balanceResult.success) {
-      logger.error("Failed to check balance for STT", {
+      logger.error("[STT] Failed to check balance", {
         error: balanceResult.message,
       });
       return fail({
@@ -86,7 +97,7 @@ export class SpeechToTextRepository {
     }
 
     if (balanceResult.data.total < STT_MINIMUM_BALANCE) {
-      logger.warn("Insufficient credits for STT", {
+      logger.warn("[STT] Insufficient credits", {
         balance: balanceResult.data.total,
         minimum: STT_MINIMUM_BALANCE,
       });
@@ -101,133 +112,97 @@ export class SpeechToTextRepository {
     }
 
     try {
-      // Convert File to Buffer for Eden AI
-      const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      let transcriptionResult: ResponseType<{
+        text: string;
+        confidence: number | undefined;
+        duration: number;
+        edenAiCostUsd: number | undefined;
+      }>;
 
-      // Create form data for Eden AI
-      const formData = new FormData();
-      const blob = new Blob([buffer], { type: file.type });
-      formData.append("file", blob, file.name);
-      formData.append("providers", this.STT_PROVIDER); // Use provider/model format
-      formData.append("language", language);
+      switch (modelOption.apiProvider) {
+        case ApiProvider.OPENAI_STT:
+          transcriptionResult =
+            await SpeechToTextRepository.transcribeWithOpenAI(
+              file,
+              modelOption.providerModel,
+              language,
+              logger,
+              t,
+            );
+          break;
 
-      logger.debug("Sending request to Eden AI", {
-        provider: this.STT_PROVIDER,
-        model: this.STT_MODEL,
-        language,
-        fileType: file.type,
-        fileSize: file.size,
-      });
+        case ApiProvider.EDEN_AI_STT:
+          transcriptionResult =
+            await SpeechToTextRepository.transcribeWithEdenAI(
+              file,
+              modelOption.providerModel,
+              language,
+              logger,
+              t,
+            );
+          break;
 
-      // Call Eden AI API
-      const response = await fetch(
-        "https://api.edenai.run/v2/audio/speech_to_text_async",
-        {
-          method: "POST",
-          headers: {
-            // eslint-disable-next-line i18next/no-literal-string
-            Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
-          },
-          body: formData,
-        },
-      );
+        case ApiProvider.DEEPGRAM:
+          transcriptionResult =
+            await SpeechToTextRepository.transcribeWithDeepgram(
+              file,
+              modelOption.providerModel,
+              language,
+              logger,
+              t,
+            );
+          break;
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        logger.error("Eden AI API error", {
-          status: response.status,
-          error: errorText,
-          provider: this.STT_PROVIDER,
-          language,
-        });
-        return fail({
-          message: t("post.errors.transcriptionFailed"),
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: {
-            error: errorText,
-          },
-        });
+        default:
+          logger.error("[STT] Unsupported STT provider", {
+            apiProvider: modelOption.apiProvider,
+            sttModelId: resolvedModelId,
+          });
+          return fail({
+            message: t("post.errors.transcriptionFailed"),
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          });
       }
 
-      const responseData = (await response.json()) as {
-        public_id?: string;
-      };
-      const publicId = responseData.public_id;
-
-      logger.debug("Received response from Eden AI", {
-        publicId,
-        responseKeys: Object.keys(responseData),
-        fullResponse: JSON.stringify(responseData),
-      });
-
-      if (!publicId) {
-        logger.error("No public ID received from Eden AI", {
-          responseData: JSON.stringify(responseData),
-        });
-        return fail({
-          message: t("post.errors.noPublicId"),
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        });
+      if (!transcriptionResult.success) {
+        return transcriptionResult;
       }
 
-      logger.debug("Starting polling for transcription results", { publicId });
+      const { text, confidence, duration, edenAiCostUsd } =
+        transcriptionResult.data;
 
-      // Poll for results
-      const pollResult = await SpeechToTextRepository.pollForResults(
-        publicId,
-        this.STT_PROVIDER, // Use provider/model format to match Eden AI response
-        logger,
-        t,
-      );
-
-      if (!pollResult.success) {
-        return pollResult;
-      }
-
-      // Calculate credits based on actual cost from Eden AI when available,
-      // falling back to duration-based calculation.
-      // Eden AI returns cost in USD - convert to credits using CREDIT_VALUE_USD with our markup.
-      const audioDurationSeconds = pollResult.data.duration;
-      const edenAiCostUsd = pollResult.data.edenAiCostUsd;
-
+      // Calculate credits
       let creditsNeeded: number;
       if (
         edenAiCostUsd !== null &&
         edenAiCostUsd !== undefined &&
         edenAiCostUsd > 0
       ) {
-        // Use Eden AI's actual cost with our standard markup applied
         creditsNeeded =
           (edenAiCostUsd * (1 + STANDARD_MARKUP_PERCENTAGE)) / CREDIT_VALUE_USD;
-        logger.debug("STT: Using Eden AI cost for credit calculation", {
+        logger.debug("[STT] Using actual cost for credit calculation", {
           edenAiCostUsd,
           creditsNeeded,
         });
-      } else if (audioDurationSeconds > 0) {
-        creditsNeeded = audioDurationSeconds * STT_COST_PER_SECOND;
+      } else if (duration > 0) {
+        creditsNeeded = duration * STT_COST_PER_SECOND;
       } else {
-        // Eden AI returned neither cost nor duration - charge minimum (1 second)
         logger.error(
-          "STT: Eden AI did not return cost or audio_duration - charging 1-second minimum",
-          {
-            pollResult: JSON.stringify(pollResult.data),
-            provider: this.STT_PROVIDER,
-          },
+          "[STT] Provider did not return cost or duration - charging 1-second minimum",
+          { sttModelId: resolvedModelId },
         );
         creditsNeeded = STT_COST_PER_SECOND;
       }
 
-      logger.debug("Transcription successful", {
-        textLength: pollResult.data.text.length,
-        provider: this.STT_PROVIDER,
-        model: this.STT_MODEL,
-        audioDurationSeconds,
+      logger.debug("[STT] Transcription successful", {
+        textLength: text.length,
+        sttModelId: resolvedModelId,
+        apiProvider: modelOption.apiProvider,
+        duration,
         creditsNeeded,
-        costPerSecond: STT_COST_PER_SECOND,
       });
 
-      // Deduct credits AFTER successful completion based on actual duration (graceful - allows partial to 0)
+      // Deduct credits AFTER successful completion
       const deductResult = await CreditRepository.deductCreditsForSTT(
         user,
         creditsNeeded,
@@ -237,9 +212,9 @@ export class SpeechToTextRepository {
       );
 
       if (!deductResult.success) {
-        logger.error("Failed to deduct STT credits", {
+        logger.error("[STT] Failed to deduct credits", {
           creditsNeeded,
-          audioDurationSeconds,
+          duration,
         });
         return fail({
           message: t("post.errors.creditsFailed"),
@@ -248,30 +223,27 @@ export class SpeechToTextRepository {
       }
 
       if (deductResult.data.partialDeduction) {
-        logger.info(
-          "STT: Partial credit deduction (insufficient funds, deducted to 0)",
-          {
-            requestedCost: creditsNeeded,
-            audioDurationSeconds,
-          },
-        );
+        logger.info("[STT] Partial credit deduction (insufficient funds)", {
+          requestedCost: creditsNeeded,
+          duration,
+        });
       }
 
       return success({
         creditCost: creditsNeeded,
         response: {
           success: true,
-          text: pollResult.data.text,
-          provider: this.STT_PROVIDER,
-          confidence: pollResult.data.confidence,
+          text,
+          provider: modelOption.apiProvider,
+          confidence,
         },
       });
     } catch (error) {
       const errorMessage = parseError(error).message;
-      logger.error("Failed to transcribe audio", {
+      logger.error("[STT] Failed to transcribe audio", {
         error: errorMessage,
-        provider: this.STT_PROVIDER,
-        model: this.STT_MODEL,
+        sttModelId: resolvedModelId,
+        apiProvider: modelOption.apiProvider,
       });
 
       return fail({
@@ -282,6 +254,271 @@ export class SpeechToTextRepository {
         },
       });
     }
+  }
+
+  /**
+   * Transcribe using OpenAI Whisper API directly
+   */
+  private static async transcribeWithOpenAI(
+    file: File,
+    providerModel: string,
+    language: string,
+    logger: EndpointLogger,
+    t: SpeechToTextT,
+  ): Promise<
+    ResponseType<{
+      text: string;
+      confidence: number | undefined;
+      duration: number;
+      edenAiCostUsd: number | undefined;
+    }>
+  > {
+    if (!agentEnv.OPENAI_API_KEY) {
+      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiImages;
+      logger.error("[STT] OpenAI API key not configured");
+      return fail({
+        message: t("post.errors.transcriptionFailed"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: {
+          error: `${label} key (${envKey}) not configured. Get yours at ${url}`,
+        },
+      });
+    }
+
+    const formData = new FormData();
+    formData.append("file", file, file.name);
+    formData.append("model", providerModel);
+    formData.append("language", language);
+    formData.append("response_format", "verbose_json");
+
+    logger.debug("[STT] Calling OpenAI Whisper API", {
+      model: providerModel,
+      language,
+      fileSize: file.size,
+    });
+
+    const response = await fetch(
+      "https://api.openai.com/v1/audio/transcriptions",
+      {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          Authorization: `Bearer ${agentEnv.OPENAI_API_KEY}`,
+        },
+        body: formData,
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      logger.error("[STT] OpenAI Whisper API error", {
+        status: response.status,
+        error: errorText,
+      });
+      return fail({
+        message: t("post.errors.transcriptionFailed"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: { error: errorText },
+      });
+    }
+
+    const data = (await response.json()) as {
+      text?: string;
+      duration?: number;
+      segments?: Array<{ avg_logprob?: number }>;
+    };
+
+    const text = data.text ?? "";
+    const duration = data.duration ?? 0;
+    // OpenAI doesn't return a confidence score directly, approximate from log prob
+    const confidence =
+      data.segments && data.segments.length > 0
+        ? Math.exp(
+            data.segments.reduce((sum, s) => sum + (s.avg_logprob ?? 0), 0) /
+              data.segments.length,
+          )
+        : undefined;
+
+    return success({ text, confidence, duration, edenAiCostUsd: undefined });
+  }
+
+  /**
+   * Transcribe using Eden AI (async polling flow)
+   * providerModel = Eden AI provider name, e.g. "openai"
+   */
+  private static async transcribeWithEdenAI(
+    file: File,
+    providerModel: string,
+    language: string,
+    logger: EndpointLogger,
+    t: SpeechToTextT,
+  ): Promise<
+    ResponseType<{
+      text: string;
+      confidence: number | undefined;
+      duration: number;
+      edenAiCostUsd: number | undefined;
+    }>
+  > {
+    const availability = getAgentEnvAvailability();
+    if (!availability.voice) {
+      logger.error(
+        "[STT] Eden AI not configured",
+        buildMissingKeyMessage("voice"),
+      );
+      return fail({
+        message: t("post.errors.transcriptionFailed"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const formData = new FormData();
+    const blob = new Blob([buffer], { type: file.type });
+    formData.append("file", blob, file.name);
+    formData.append("providers", providerModel);
+    formData.append("language", language);
+
+    logger.debug("[STT] Sending request to Eden AI", {
+      provider: providerModel,
+      language,
+      fileSize: file.size,
+    });
+
+    const response = await fetch(
+      "https://api.edenai.run/v2/audio/speech_to_text_async",
+      {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
+        },
+        body: formData,
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      logger.error("[STT] Eden AI API error", {
+        status: response.status,
+        error: errorText,
+        provider: providerModel,
+        language,
+      });
+      return fail({
+        message: t("post.errors.transcriptionFailed"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: { error: errorText },
+      });
+    }
+
+    const responseData = (await response.json()) as { public_id?: string };
+    const publicId = responseData.public_id;
+
+    if (!publicId) {
+      logger.error("[STT] No public ID from Eden AI", {
+        responseData: JSON.stringify(responseData),
+      });
+      return fail({
+        message: t("post.errors.noPublicId"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    return SpeechToTextRepository.pollForResults(
+      publicId,
+      providerModel,
+      logger,
+      t,
+    );
+  }
+
+  /**
+   * Transcribe using Deepgram API
+   */
+  private static async transcribeWithDeepgram(
+    file: File,
+    providerModel: string,
+    language: string,
+    logger: EndpointLogger,
+    t: SpeechToTextT,
+  ): Promise<
+    ResponseType<{
+      text: string;
+      confidence: number | undefined;
+      duration: number;
+      edenAiCostUsd: number | undefined;
+    }>
+  > {
+    if (!agentEnv.DEEPGRAM_API_KEY) {
+      logger.error("[STT] Deepgram API key not configured");
+      return fail({
+        message: t("post.errors.transcriptionFailed"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: {
+          error:
+            "DEEPGRAM_API_KEY not configured. Get yours at https://console.deepgram.com",
+        },
+      });
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+
+    logger.debug("[STT] Calling Deepgram API", {
+      model: providerModel,
+      language,
+      fileSize: file.size,
+    });
+
+    const url = new URL("https://api.deepgram.com/v1/listen");
+    url.searchParams.set("model", providerModel);
+    url.searchParams.set("language", language);
+
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        // eslint-disable-next-line i18next/no-literal-string
+        Authorization: `Token ${agentEnv.DEEPGRAM_API_KEY}`,
+        "Content-Type": file.type || "audio/mpeg",
+      },
+      body: arrayBuffer,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      logger.error("[STT] Deepgram API error", {
+        status: response.status,
+        error: errorText,
+      });
+      return fail({
+        message: t("post.errors.transcriptionFailed"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: { error: errorText },
+      });
+    }
+
+    const data = (await response.json()) as {
+      results?: {
+        channels?: Array<{
+          alternatives?: Array<{
+            transcript?: string;
+            confidence?: number;
+          }>;
+        }>;
+      };
+      metadata?: {
+        duration?: number;
+      };
+    };
+
+    const alt = data.results?.channels?.[0]?.alternatives?.[0];
+    const text = alt?.transcript ?? "";
+    const confidence = alt?.confidence;
+    const duration = data.metadata?.duration ?? 0;
+
+    return success({ text, confidence, duration, edenAiCostUsd: undefined });
   }
 
   /**
@@ -319,7 +556,7 @@ export class SpeechToTextRepository {
         );
 
         if (!response.ok) {
-          logger.error("Failed to poll transcription results", {
+          logger.error("[STT] Failed to poll transcription results", {
             status: response.status,
             publicId,
           });
@@ -332,13 +569,11 @@ export class SpeechToTextRepository {
         const resultData = (await response.json()) as {
           status: "pending" | "processing" | "finished" | "failed";
           results: {
-            [provider: string]: {
+            [providerKey: string]: {
               id?: string;
               text?: string;
               confidence?: number;
-              diarization?: {
-                total_speakers?: number;
-              };
+              diarization?: { total_speakers?: number };
               audio_duration?: number;
               error?: string | { message?: string; type?: string };
               final_status?: string;
@@ -347,24 +582,22 @@ export class SpeechToTextRepository {
           };
         };
 
-        logger.debug("Polling response received", {
+        logger.debug("[STT] Polling response received", {
           status: resultData.status,
           hasResults: !!resultData.results,
           provider,
           providerResultKeys: resultData.results?.[provider]
             ? Object.keys(resultData.results[provider])
             : [],
-          fullResults: JSON.stringify(resultData.results),
         });
 
         if (resultData.status === "finished") {
           const providerResult = resultData.results[provider];
 
           if (!providerResult) {
-            logger.error("Provider result not found in response", {
+            logger.error("[STT] Provider result not found in response", {
               provider,
               availableProviders: Object.keys(resultData.results || {}),
-              fullResponse: JSON.stringify(resultData),
             });
             return fail({
               message: t("post.errors.transcriptionFailed"),
@@ -375,55 +608,42 @@ export class SpeechToTextRepository {
             });
           }
 
-          // Check for provider-level errors
           if (
             providerResult.error ||
             providerResult.final_status === "failed"
           ) {
-            // Handle both string and object error formats
             const errorMessage =
               typeof providerResult.error === "string"
                 ? providerResult.error
                 : providerResult.error?.message || "Unknown provider error";
 
-            logger.error("Provider returned error", {
+            logger.error("[STT] Provider returned error", {
               provider,
               error: errorMessage,
-              errorType:
-                typeof providerResult.error === "object"
-                  ? providerResult.error?.type
-                  : undefined,
               finalStatus: providerResult.final_status,
-              fullProviderResult: JSON.stringify(providerResult),
             });
 
-            // Return user-friendly error message instead of exposing raw API error
             return fail({
               message: t("post.errors.providerError"),
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
             });
           }
 
-          const transcription = providerResult?.text || "";
+          const transcription = providerResult?.text ?? "";
           const confidence = providerResult?.confidence;
-          const duration = providerResult?.audio_duration || 0;
+          const duration = providerResult?.audio_duration ?? 0;
           const edenAiCostUsd = providerResult?.cost;
 
-          logger.debug("Transcription completed", {
+          logger.debug("[STT] Transcription completed", {
             textLength: transcription.length,
             attempts,
             confidence,
             duration,
             edenAiCostUsd,
-            hasText: !!providerResult?.text,
-            providerResultStructure: JSON.stringify(providerResult),
           });
 
           if (!transcription || transcription.length === 0) {
-            logger.warn("Empty transcription received", {
-              providerResult: JSON.stringify(providerResult),
-              duration,
-            });
+            logger.warn("[STT] Empty transcription received", { duration });
           }
 
           return success({
@@ -433,7 +653,7 @@ export class SpeechToTextRepository {
             edenAiCostUsd,
           });
         } else if (resultData.status === "failed") {
-          logger.error("Transcription failed", { publicId, provider });
+          logger.error("[STT] Transcription failed", { publicId, provider });
           return fail({
             message: t("post.errors.failed"),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
@@ -441,28 +661,26 @@ export class SpeechToTextRepository {
         }
 
         attempts++;
-        logger.debug("Polling for transcription results", {
+        logger.debug("[STT] Polling for transcription results", {
           attempts,
           publicId,
           status: resultData.status,
         });
       } catch (error) {
         const errorMessage = parseError(error).message;
-        logger.error("Error while polling", {
+        logger.error("[STT] Error while polling", {
           error: errorMessage,
           attempts,
         });
         return fail({
           message: t("post.errors.transcriptionFailed"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: {
-            error: errorMessage,
-          },
+          messageParams: { error: errorMessage },
         });
       }
     }
 
-    logger.error("Transcription timeout", { publicId, provider });
+    logger.error("[STT] Transcription timeout", { publicId, provider });
     return fail({
       message: t("post.errors.timeout"),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,

@@ -10,8 +10,10 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
-import { DEFAULT_TTS_VOICE } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import {
+  DEFAULT_TTS_VOICE_ID,
+  type ModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -120,7 +122,7 @@ export async function answerAsAI(
       messageHistory: messageHistory ?? [],
       attachments: attachments && attachments.length > 0 ? attachments : null,
       toolConfirmations: null,
-      voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE },
+      voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
       audioInput: { file: null },
       timezone,
     });

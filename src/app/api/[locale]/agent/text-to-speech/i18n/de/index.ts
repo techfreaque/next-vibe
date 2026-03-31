@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
     form: {
       title: "Text-zu-Sprache-Konvertierung",
       description:
-        "Geben Sie Text ein, um ihn in Sprache umzuwandeln (Amazon Polly: ~0,00052 Credits pro Zeichen)",
+        "Geben Sie Text ein, um ihn in Sprache umzuwandeln (OpenAI TTS: ~0,00052 Credits pro Zeichen)",
     },
     text: {
       label: "Text",
@@ -27,24 +27,15 @@ export const translations: typeof enTranslations = {
       placeholder:
         "Geben Sie den Text ein, den Sie in Sprache umwandeln möchten...",
     },
-    provider: {
-      label: "Anbieter",
-      description: "KI-Anbieter für Sprachsynthese",
-    },
     voice: {
       label: "Stimme",
-      description: "Stimmtyp für Sprachsynthese",
-    },
-    language: {
-      label: "Sprache",
-      description: "Sprache für Sprachsynthese",
+      description: "Stimmmodell für Sprachsynthese",
     },
     response: {
       title: "Audio-Ergebnis",
       description: "Die generierte Sprachaudio",
       success: "Erfolg",
       audioUrl: "Audio-URL",
-      provider: "Verwendeter Anbieter",
     },
     errors: {
       validation_failed: {
@@ -86,7 +77,6 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Ein Konflikt ist aufgetreten",
       },
-      apiKeyMissing: "Eden AI API-Schlüssel ist nicht konfiguriert",
       notConfigured:
         "{{label}} API-Schlüssel nicht konfiguriert. Fügen Sie {{envKey}}=<ihr-schlüssel> zu Ihrer .env-Datei hinzu. Holen Sie sich Ihren Schlüssel auf {{url}}",
       conversionFailed: "Sprachsynthese fehlgeschlagen: {{error}}",
@@ -95,6 +85,8 @@ export const translations: typeof enTranslations = {
       audioFetchFailed: "Fehler beim Abrufen der Audiodatei",
       providerError: "Anbieterfehler: {{error}}",
       internalError: "Interner Serverfehler",
+      unsupportedProvider:
+        "Nicht unterstützter TTS-Anbieter für Stimme: {{voiceId}}",
       creditsFailed: "Fehler beim Abziehen der Credits: {{error}}",
       balanceCheckFailed:
         "Ihr Guthaben konnte nicht überprüft werden. Bitte versuchen Sie es erneut",
@@ -106,18 +98,6 @@ export const translations: typeof enTranslations = {
       description: "Text erfolgreich in Sprache umgewandelt",
       conversionComplete: "Sprachsynthese erfolgreich abgeschlossen",
     },
-  },
-  providers: {
-    openai: "OpenAI",
-    google: "Google Text-to-Speech",
-    amazon: "Amazon Polly",
-    microsoft: "Microsoft Azure",
-    ibm: "IBM Watson",
-    lovoai: "Lovo AI",
-  },
-  voices: {
-    MALE: "Männliche Stimme",
-    FEMALE: "Weibliche Stimme",
   },
   languages: {
     en: "Englisch",

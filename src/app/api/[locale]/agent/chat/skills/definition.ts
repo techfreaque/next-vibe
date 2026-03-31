@@ -26,8 +26,12 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../shared/types/common.schema";
-import { ModelId, TOTAL_MODEL_COUNT } from "../../models/models";
-import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
+import {
+  DEFAULT_TTS_VOICE_ID,
+  ModelId,
+  TOTAL_MODEL_COUNT,
+} from "../../models/models";
+
 import createFavoriteDefinitions from "../favorites/create/definition";
 import { NO_SKILL_ID, SKILLS_LIST_ALIAS } from "./constants";
 import {
@@ -183,7 +187,7 @@ const { GET } = createEndpoint({
               name: undefined,
               tagline: undefined,
               description: undefined,
-              voice: DEFAULT_TTS_VOICE,
+              voiceId: DEFAULT_TTS_VOICE_ID,
               modelSelection: {
                 selectionType: ModelSelectionType.FILTERS,
                 sortBy: ModelSortField.CONTENT,

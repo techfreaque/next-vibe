@@ -16,8 +16,8 @@ import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
 import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import type { TtsModelId } from "@/app/api/[locale]/agent/models/models";
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
-import type { TtsVoice } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -88,7 +88,7 @@ export interface LinearMessageViewProps {
     | ((messageId: string, vote: 1 | -1 | 0) => Promise<void>)
     | null;
   ttsAutoplay: boolean;
-  ttsVoice: (typeof TtsVoice)[keyof typeof TtsVoice] | undefined;
+  voiceId: TtsModelId | undefined;
   /** Optional debug slots - only provided by DebugLinearMessageView */
   debugLeading?: JSX.Element;
   renderDebugBeforeMessage?: (
@@ -129,7 +129,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   isLoadingNewerHistory,
   onVoteMessage,
   ttsAutoplay,
-  ttsVoice,
+  voiceId,
   debugLeading,
   renderDebugBeforeMessage,
   debugTrailing,
@@ -294,7 +294,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                           sendMessage={sendMessage}
                           deductCredits={deductCredits}
                           ttsAutoplay={ttsAutoplay}
-                          ttsVoice={ttsVoice}
+                          voiceId={voiceId}
                           className={index === 0 ? "md:mt-10" : undefined}
                           onVote={onVoteMessage}
                           userVote={

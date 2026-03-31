@@ -46,6 +46,7 @@ import React, { useCallback, useMemo, useState } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/models/models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
@@ -67,7 +68,6 @@ import {
   Icon,
   type IconKey,
 } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { scopedTranslation as ttsScopedTranslation } from "../../text-to-speech/i18n";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
 import { NO_SKILL_ID } from "../skills/constants";
@@ -520,7 +520,7 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
                 />
               </>
             ) : null}
-            {item.voice ? (
+            {item.voiceId ? (
               <>
                 <TextWidget
                   field={fieldChildren.favorites.child.children.separator2}
@@ -530,9 +530,7 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
                     "separator2",
                   )}
                 />
-                <Span className="opacity-60">
-                  {ttsScopedTranslation.scopedT(locale).t(item.voice)}
-                </Span>
+                <Span className="opacity-60">{item.voiceId}</Span>
               </>
             ) : null}
           </Div>
@@ -808,7 +806,7 @@ export function FavoritesListContainer({
         favoriteId: item.id,
         modelId: item.modelId,
         skillId: item.skillId,
-        voice: item.voice,
+        voiceId: item.voiceId,
         logger,
         locale,
         user,
@@ -1104,8 +1102,6 @@ function AddVariantButton({
       const characterSingleDefinitions =
         await import("../skills/[id]/definition");
       const createFavoriteDefinitions = await import("./create/definition");
-      const { DEFAULT_TTS_VOICE } = await import("../../text-to-speech/enum");
-
       // Fetch character data from cache or API
       const cachedData = apiClient.getEndpointData(
         characterSingleDefinitions.default.GET,
@@ -1120,7 +1116,7 @@ function AddVariantButton({
           data: {
             skillId,
             icon: cachedData.data.icon ?? undefined,
-            voice: cachedData.data.voice ?? DEFAULT_TTS_VOICE,
+            voiceId: cachedData.data.voiceId ?? DEFAULT_TTS_VOICE_ID,
             modelSelection: null,
           },
           popNavigationOnSuccess: 1,
@@ -1144,7 +1140,7 @@ function AddVariantButton({
         data: {
           skillId,
           icon: characterResponse.data.icon ?? undefined,
-          voice: characterResponse.data.voice ?? DEFAULT_TTS_VOICE,
+          voiceId: characterResponse.data.voiceId ?? DEFAULT_TTS_VOICE_ID,
           modelSelection: null,
         },
         popNavigationOnSuccess: 1,

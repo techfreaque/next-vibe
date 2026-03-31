@@ -375,8 +375,9 @@ import {
 
 **Rules:**
 
-- Never import React Native modules unconditionally in `widget.tsx` - they crash on web
-- Use `next-vibe-ui/ui/*` components - they are platform-aware and resolve to the correct implementation automatically
+
+- Never import React Native modules unconditionally in `widget.tsx` — they crash on web
+- Use `next-vibe-ui/ui/*` components — they are platform-aware and resolve to the correct implementation automatically
 - Keep native branches touch-friendly: larger tap targets, no hover-only interactions, stacked layouts over grids
 
 ## Dialog Wrapper Pattern

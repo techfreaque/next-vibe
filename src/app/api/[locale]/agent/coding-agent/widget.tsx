@@ -459,7 +459,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
                 sendMessage={null}
                 deductCredits={noopDeduct}
                 ttsAutoplay={false}
-                ttsVoice={undefined}
+                voiceId={undefined}
                 onVote={null}
                 userVote={null}
                 voteScore={0}

@@ -11,14 +11,14 @@ import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
 import { cn } from "next-vibe/shared/utils";
-import type React from "react";
+import React from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { TtsModelId } from "@/app/api/[locale]/agent/models/models";
 import {
   prepareTextForTTS,
   stripThinkTags,
 } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
-import type { TtsVoice } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -57,13 +57,24 @@ interface AssistantMessageActionsProps {
   /** TTS autoplay setting */
   ttsAutoplay: boolean;
   /** TTS voice preference */
-  ttsVoice: (typeof TtsVoice)[keyof typeof TtsVoice] | undefined;
+  voiceId: TtsModelId | undefined;
   /** Credit deduction callback (null in read-only mode) */
   deductCredits: ((creditCost: number, feature: string) => void) | null;
   /** Vote callback - null when voting is not available */
   onVote: ((messageId: string, vote: 1 | -1 | 0) => Promise<void>) | null;
   userVote: "up" | "down" | null;
   voteScore: number;
+  /** Gap-fill variants (e.g. transcription, image description) stored on the message */
+  variants?: Array<{ modality: string; content: string }> | null;
+  /** The input modality of the original user message (audio, image, etc.) */
+  inputModality?: string | null;
+  /** Pipeline steps for assembled modality pipelines (e.g. stt → tts) */
+  pipelineSteps?: Array<{
+    type: string;
+    modelId: string;
+    creditCost: number;
+    durationMs?: number;
+  }> | null;
 }
 
 export function AssistantMessageActions({
@@ -86,11 +97,12 @@ export function AssistantMessageActions({
   readOnly,
   user,
   ttsAutoplay,
-  ttsVoice,
+  voiceId,
   deductCredits,
   onVote,
   userVote,
   voteScore,
+  pipelineSteps,
 }: AssistantMessageActionsProps): React.JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const isTouch = useTouchDevice();
@@ -129,7 +141,7 @@ export function AssistantMessageActions({
     text: ttsText,
     enabled: ttsAutoplay,
     isStreaming: isMessageStreaming,
-    voice: ttsVoice,
+    voiceId,
     locale,
     user,
     logger,
@@ -348,6 +360,11 @@ export function AssistantMessageActions({
               {t("widget.common.assistantMessageActions.timeToFirstToken", {
                 seconds: (timeToFirstToken / 1000).toFixed(1),
               })}
+            </Span>
+          )}
+          {pipelineSteps && pipelineSteps.length > 0 && (
+            <Span className="text-muted-foreground text-xs before:content-['·'] before:mx-1">
+              {pipelineSteps.map((s) => s.type).join(" → ")}
             </Span>
           )}
         </Div>

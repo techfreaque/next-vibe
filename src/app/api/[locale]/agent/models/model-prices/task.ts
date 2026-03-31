@@ -1,7 +1,7 @@
 /**
- * Media Model Prices Update Task
- * Fetches live prices from provider APIs and updates models.ts.
- * Dev-only - runs once a week.
+ * Unified Model Prices Update Task
+ * Fetches live prices from ALL provider APIs and updates models.ts.
+ * Runs weekly — replaces the separate media-prices and openrouter tasks.
  */
 
 import "server-only";
@@ -25,10 +25,10 @@ import {
 import definitions from "./definition";
 import { tools } from "./route";
 
-const mediaPricesTask = createCronTask(definitions.GET, tools.GET, {
-  id: "update-media-model-prices",
-  name: "updateMediaModelPrices.name" as const,
-  description: "updateMediaModelPrices.description" as const,
+const modelPricesTask = createCronTask(definitions.GET, tools.GET, {
+  id: "update-all-model-prices",
+  name: "updateAllModelPrices.name" as const,
+  description: "updateAllModelPrices.description" as const,
   schedule: CRON_SCHEDULES.WEEKLY_MONDAY_6AM,
   category: TaskCategory.MAINTENANCE,
   enabled: env.NODE_ENV === Environment.DEVELOPMENT,
@@ -38,5 +38,5 @@ const mediaPricesTask = createCronTask(definitions.GET, tools.GET, {
   taskInput: undefined,
 });
 
-export const tasks: Task[] = [mediaPricesTask];
+export const tasks: Task[] = [modelPricesTask];
 export default tasks;

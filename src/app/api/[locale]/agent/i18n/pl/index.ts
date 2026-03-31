@@ -1,6 +1,5 @@
 import { translations as aiStreamTranslations } from "../../ai-stream/stream/i18n/pl";
 import { translations as chatTranslations } from "../../chat/i18n/pl";
-import { translations as openrouterTranslations } from "../../models/openrouter/i18n/pl";
 import { translations as searchTranslations } from "../../search/i18n/pl";
 import { translations as speechToTextTranslations } from "../../speech-to-text/i18n/pl";
 import { translations as textToSpeechTranslations } from "../../text-to-speech/i18n/pl";
@@ -155,9 +154,7 @@ export const translations: typeof enTranslations = {
   },
   aiStream: aiStreamTranslations,
   chat: chatTranslations,
-  models: {
-    openrouter: openrouterTranslations,
-  },
+
   search: searchTranslations,
   speechToText: speechToTextTranslations,
   textToSpeech: textToSpeechTranslations,

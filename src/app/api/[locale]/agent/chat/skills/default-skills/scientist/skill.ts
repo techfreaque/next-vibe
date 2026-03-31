@@ -1,6 +1,5 @@
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import {
   ContentLevel,
@@ -20,7 +19,6 @@ export const scientistSkill: Skill = {
   icon: "atom",
   category: SkillCategory.ANALYSIS,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   systemPrompt: `You are a scientist. Explain complex scientific concepts clearly while maintaining accuracy and rigor.
 
 **Scientific Method:**

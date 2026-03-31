@@ -17,8 +17,8 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
 import { processMessageGroupForTTS } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
-import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
+import type { TtsModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTouchDevice } from "@/hooks/use-touch-device";
@@ -77,7 +77,7 @@ interface ThreadedMessageProps {
   user: JwtPayloadType;
   ttsAutoplay: boolean;
   deductCredits: (amount: number, feature: string) => void;
-  ttsVoice: typeof TtsVoiceValue;
+  voiceId: TtsModelId | undefined;
 }
 
 export function ThreadedMessage({
@@ -100,7 +100,7 @@ export function ThreadedMessage({
   user,
   ttsAutoplay,
   deductCredits,
-  ttsVoice,
+  voiceId,
 }: ThreadedMessageProps): JSX.Element {
   // Navigation state from Zustand store
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
@@ -319,7 +319,7 @@ export function ThreadedMessage({
     user,
     logger,
     deductCredits,
-    voice: ttsVoice,
+    voiceId,
   });
 
   const hasReplies = replies.length > 0;
@@ -572,7 +572,7 @@ export function ThreadedMessage({
                       user={user}
                       ttsAutoplay={ttsAutoplay}
                       deductCredits={deductCredits}
-                      ttsVoice={ttsVoice}
+                      voiceId={voiceId}
                     />
                   </ErrorBoundary>
                 ))}

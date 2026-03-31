@@ -82,9 +82,27 @@ export class FavoritesCreateRepository {
         character = characterResult.data;
       }
 
-      // Only store voice if different from character default
+      // Only store voiceId if different from character default (null = cascade to skill)
       const voiceToStore =
-        character && data.voice === character.voice ? null : data.voice;
+        character && data.voiceId === character.voiceId ? null : data.voiceId;
+
+      // Only store bridge models if different from character defaults (null = cascade to skill)
+      const sttModelIdToStore =
+        character && data.sttModelId === character.sttModelId
+          ? null
+          : (data.sttModelId ?? null);
+      const visionBridgeModelIdToStore =
+        character && data.visionBridgeModelId === character.visionBridgeModelId
+          ? null
+          : (data.visionBridgeModelId ?? null);
+      const translationModelIdToStore =
+        character && data.translationModelId === character.translationModelId
+          ? null
+          : (data.translationModelId ?? null);
+      const defaultChatModeToStore =
+        character && data.defaultChatMode === character.defaultChatMode
+          ? null
+          : (data.defaultChatMode ?? null);
 
       // If a variantId is provided, resolve its modelSelection from the skill's variants.
       let modelSelectionToStore = data.modelSelection;
@@ -100,7 +118,7 @@ export class FavoritesCreateRepository {
             (v) => v.id === data.variantId,
           );
           if (variant) {
-            modelSelectionToStore = variant.modelSelection;
+            modelSelectionToStore = variant.modelSelection ?? null;
           }
         }
       }
@@ -121,7 +139,11 @@ export class FavoritesCreateRepository {
           variantId: data.variantId ?? null,
           customName: null,
           customIcon: null,
-          voice: voiceToStore,
+          voiceId: voiceToStore ?? null,
+          sttModelId: sttModelIdToStore,
+          visionBridgeModelId: visionBridgeModelIdToStore,
+          translationModelId: translationModelIdToStore,
+          defaultChatMode: defaultChatModeToStore,
           modelSelection: modelSelectionToStore,
           compactTrigger: data.compactTrigger ?? null,
           availableTools: data.availableTools ?? null,

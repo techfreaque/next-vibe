@@ -1,4 +1,5 @@
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { STANDARD_MARKUP_PERCENTAGE } from "../../products/repository-client";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "../../products/constants";
 import {
@@ -10,20 +11,17 @@ import {
   type SpeedLevelValue,
 } from "../chat/skills/enum";
 import type { AgentTranslationKey } from "../i18n";
-import { ModelUtility, type ModelUtilityValue } from "./enum";
+import {
+  type Modality,
+  type ModelRole,
+  ModelUtility,
+  type ModelUtilityValue,
+} from "./enum";
 
 /**
- * Model Features - Binary capabilities
+ * Model Features - Binary capabilities (slimmed down; modality handled via inputs/outputs)
  */
 export interface ModelFeatures {
-  imageInput: boolean;
-  pdfInput: boolean;
-  imageOutput: boolean;
-  /** Whether size/quality UI controls are meaningful for this model's image output.
-   * true = pure generators (Flux, DALL-E, etc.) that accept imageSize/imageQuality params.
-   * false = chat models that produce images inline (Gemini image, GPT-5 Image). */
-  imageOutputSettings: boolean;
-  audioOutput: boolean;
   streaming: boolean;
   toolCalling: boolean;
 }
@@ -127,7 +125,72 @@ export enum ModelId {
   MUSICGEN_STEREO = "musicgen-stereo",
   STABLE_AUDIO = "stable-audio",
   UDIO_V2 = "udio-v2",
+
+  // TTS voices
+  OPENAI_ALLOY = "openai-alloy",
+  OPENAI_NOVA = "openai-nova",
+  OPENAI_ONYX = "openai-onyx",
+  OPENAI_ECHO = "openai-echo",
+  OPENAI_SHIMMER = "openai-shimmer",
+  OPENAI_FABLE = "openai-fable",
+  ELEVENLABS_RACHEL = "elevenlabs-rachel",
+  ELEVENLABS_JOSH = "elevenlabs-josh",
+  ELEVENLABS_BELLA = "elevenlabs-bella",
+  ELEVENLABS_ADAM = "elevenlabs-adam",
+
+  // STT models
+  OPENAI_WHISPER = "openai-whisper",
+  DEEPGRAM_NOVA_2 = "deepgram-nova-2",
 }
+
+/**
+ * TTS model IDs — ModelId values with modelRole: "tts"
+ * Use this type for voiceId fields instead of plain string or ModelId
+ */
+export type TtsModelId =
+  | ModelId.OPENAI_ALLOY
+  | ModelId.OPENAI_NOVA
+  | ModelId.OPENAI_ONYX
+  | ModelId.OPENAI_ECHO
+  | ModelId.OPENAI_SHIMMER
+  | ModelId.OPENAI_FABLE
+  | ModelId.ELEVENLABS_RACHEL
+  | ModelId.ELEVENLABS_JOSH
+  | ModelId.ELEVENLABS_BELLA
+  | ModelId.ELEVENLABS_ADAM;
+
+/**
+ * All valid TTS voice model IDs (for Zod enum validation)
+ */
+export const TTS_MODEL_IDS = [
+  ModelId.OPENAI_ALLOY,
+  ModelId.OPENAI_NOVA,
+  ModelId.OPENAI_ONYX,
+  ModelId.OPENAI_ECHO,
+  ModelId.OPENAI_SHIMMER,
+  ModelId.OPENAI_FABLE,
+  ModelId.ELEVENLABS_RACHEL,
+  ModelId.ELEVENLABS_JOSH,
+  ModelId.ELEVENLABS_BELLA,
+  ModelId.ELEVENLABS_ADAM,
+] as const satisfies TtsModelId[];
+
+/**
+ * System default TTS voice ID
+ */
+export const DEFAULT_TTS_VOICE_ID: TtsModelId = ModelId.OPENAI_NOVA;
+
+/**
+ * STT model IDs — ModelId values with modelRole: "stt"
+ */
+export type SttModelId = ModelId.OPENAI_WHISPER | ModelId.DEEPGRAM_NOVA_2;
+
+export const STT_MODEL_IDS = [
+  ModelId.OPENAI_WHISPER,
+  ModelId.DEEPGRAM_NOVA_2,
+] as const satisfies SttModelId[];
+
+export const DEFAULT_STT_MODEL_ID: SttModelId = ModelId.OPENAI_WHISPER;
 
 /**
  * API Provider enum - determines which API to use for the model
@@ -142,6 +205,12 @@ export enum ApiProvider {
   OPENAI_IMAGES = "openai-images",
   REPLICATE = "replicate",
   FAL_AI = "fal-ai",
+  OPENAI_TTS = "openai-tts",
+  OPENAI_STT = "openai-stt",
+  ELEVENLABS = "elevenlabs",
+  DEEPGRAM = "deepgram",
+  EDEN_AI_TTS = "eden-ai-tts",
+  EDEN_AI_STT = "eden-ai-stt",
 }
 
 // eslint-disable-next-line i18next/no-literal-string -- API provider names are technical identifiers
@@ -155,6 +224,12 @@ export const apiProviderDisplayNames: Record<ApiProvider, string> = {
   [ApiProvider.OPENAI_IMAGES]: "OpenAI Images",
   [ApiProvider.REPLICATE]: "Replicate",
   [ApiProvider.FAL_AI]: "Fal.ai",
+  [ApiProvider.OPENAI_TTS]: "OpenAI TTS",
+  [ApiProvider.OPENAI_STT]: "OpenAI STT",
+  [ApiProvider.ELEVENLABS]: "ElevenLabs",
+  [ApiProvider.DEEPGRAM]: "Deepgram",
+  [ApiProvider.EDEN_AI_TTS]: "Eden AI TTS",
+  [ApiProvider.EDEN_AI_STT]: "Eden AI STT",
 };
 
 /**
@@ -217,12 +292,38 @@ export interface ModelProviderConfigAudioBased {
   outputTokenCost?: never;
   adminOnly?: boolean;
 }
+export interface ModelProviderConfigTtsBased {
+  id: ModelId;
+  apiProvider: ApiProvider;
+  providerModel: string;
+  creditCostPerCharacter: number;
+  adminOnly?: boolean;
+}
+export interface ModelProviderConfigSttBased {
+  id: ModelId;
+  apiProvider: ApiProvider;
+  providerModel: string;
+  creditCostPerSecond: number;
+  adminOnly?: boolean;
+}
 export type ModelProviderConfig =
   | ModelProviderConfigTokenBased
   | ModelProviderConfigCreditBased
   | ModelProviderConfigImageBased
   | ModelProviderConfigVideoBased
-  | ModelProviderConfigAudioBased;
+  | ModelProviderConfigAudioBased
+  | ModelProviderConfigTtsBased
+  | ModelProviderConfigSttBased;
+
+/**
+ * Optional voice metadata for TTS models
+ */
+export interface TtsVoiceMeta {
+  gender?: "male" | "female" | "neutral";
+  preview?: string;
+  language?: string;
+  style?: string;
+}
 
 /**
  * Model definition - canonical source of truth for each conceptual model.
@@ -247,6 +348,14 @@ export interface ModelDefinition {
   modelType?: ModelType;
   /** All tabs this model should appear in. Defaults to [modelType]. Use for cross-tab models (e.g. multimodal chat). */
   modelTypes?: ModelType[];
+  /** What role this model plays in the modality system */
+  modelRole: ModelRole;
+  /** Native input modalities this model accepts */
+  inputs: Modality[];
+  /** Native output modalities this model produces */
+  outputs: Modality[];
+  /** Optional voice metadata for TTS models */
+  voiceMeta?: TtsVoiceMeta;
 }
 
 /**
@@ -296,6 +405,14 @@ export interface ModelOptionBase {
   modelType: ModelType;
   /** All tabs this model appears in. Defaults to [modelType]. Cross-tab models list multiple types. */
   modelTypes: ModelType[];
+  /** What role this model plays in the modality system */
+  modelRole: ModelRole;
+  /** Native input modalities this model accepts */
+  inputs: Modality[];
+  /** Native output modalities this model produces */
+  outputs: Modality[];
+  /** Optional voice metadata for TTS models */
+  voiceMeta?: TtsVoiceMeta;
 }
 export interface ModelOptionTokenBased extends ModelOptionBase {
   creditCost: typeof calculateCreditCost;
@@ -331,12 +448,34 @@ export interface ModelOptionAudioBased extends ModelOptionBase {
   outputTokenCost?: never;
 }
 
+export interface ModelOptionTtsBased extends ModelOptionBase {
+  creditCostPerCharacter: number;
+  creditCost?: never;
+  inputTokenCost?: never;
+  outputTokenCost?: never;
+}
+
+export interface ModelOptionSttBased extends ModelOptionBase {
+  creditCostPerSecond: number;
+  creditCost?: never;
+  inputTokenCost?: never;
+  outputTokenCost?: never;
+}
+
 export type ModelOption =
   | ModelOptionTokenBased
   | ModelOptionCreditBased
   | ModelOptionImageBased
   | ModelOptionVideoBased
-  | ModelOptionAudioBased;
+  | ModelOptionAudioBased
+  | ModelOptionTtsBased
+  | ModelOptionSttBased;
+
+export function isModelOptionAudioBased(
+  m: ModelOption,
+): m is ModelOptionAudioBased {
+  return m.modelRole === "audio-gen";
+}
 
 export interface ModelProvider {
   name: string;
@@ -443,6 +582,16 @@ export const modelProviders: Record<string, ModelProvider> = {
     name: "ByteDance",
     icon: "si-bytedance",
   },
+  elevenlabs: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "ElevenLabs",
+    icon: "volume-2",
+  },
+  deepgram: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Deepgram",
+    icon: "mic",
+  },
   sourceful: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Sourceful",
@@ -452,13 +601,15 @@ export const modelProviders: Record<string, ModelProvider> = {
 
 // Default features for models without specific features
 const defaultFeatures: ModelFeatures = {
-  imageInput: false,
-  pdfInput: false,
-  imageOutput: false,
-  imageOutputSettings: false,
-  audioOutput: false,
   streaming: true,
   toolCalling: false,
+};
+
+// Default modality declarations for LLMs (text-only)
+const defaultLlmModality = {
+  modelRole: "llm" as ModelRole,
+  inputs: ["text"] as Modality[],
+  outputs: ["text"] as Modality[],
 };
 
 // Model names and icons are technical identifiers that should not be translated
@@ -470,6 +621,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 32768,
     icon: "uncensored-ai",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.UNCENSORED_LM_V1_2,
@@ -499,6 +651,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 32768,
     icon: "freedom-gpt-logo",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.FREEDOMGPT_LIBERTY,
@@ -528,6 +681,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 131072,
     icon: "gab-ai-logo",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.GAB_AI_ARYA,
@@ -561,6 +715,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: 24,
     contextWindow: 32000,
     icon: "venice-ai-logo",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.VENICE_UNCENSORED,
@@ -658,6 +813,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 200000,
     icon: "si-anthropic",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.CLAUDE_HAIKU_4_5,
@@ -692,8 +850,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
@@ -706,6 +862,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 200000,
     icon: "si-anthropic",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.CLAUDE_OPUS_4_5,
@@ -733,8 +892,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
@@ -746,6 +903,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 1000000,
     icon: "si-anthropic",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.CLAUDE_OPUS_4_6,
@@ -781,8 +941,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
@@ -794,6 +952,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 1000000,
     icon: "si-anthropic",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.CLAUDE_SONNET_4_5,
@@ -821,8 +982,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
@@ -834,6 +993,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 1000000,
     icon: "si-anthropic",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.CLAUDE_SONNET_4_6,
@@ -869,8 +1031,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
@@ -883,6 +1043,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 256000,
     icon: "si-x",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GROK_4,
@@ -907,8 +1070,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
   },
@@ -919,6 +1080,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 2000000,
     icon: "si-x",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GROK_4_FAST,
@@ -938,8 +1102,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
   },
@@ -950,6 +1112,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 2000000,
     icon: "si-x",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GROK_4_20_BETA,
@@ -973,8 +1138,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
   },
@@ -985,6 +1148,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GTP_5_PRO,
@@ -1003,8 +1169,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY],
@@ -1016,6 +1180,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 1050000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_4_PRO,
@@ -1040,8 +1207,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY],
@@ -1053,6 +1218,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_2_PRO,
@@ -1078,8 +1246,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY],
@@ -1091,6 +1257,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_CODEX,
@@ -1110,8 +1279,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CREATIVE],
@@ -1123,6 +1290,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_3_CODEX,
@@ -1146,8 +1316,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CREATIVE],
@@ -1159,6 +1327,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_1_CODEX,
@@ -1183,8 +1354,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY],
@@ -1196,6 +1365,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_1,
@@ -1215,8 +1387,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY],
@@ -1228,6 +1398,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 1050000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_4,
@@ -1252,8 +1425,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY],
@@ -1265,6 +1436,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_4_MINI,
@@ -1283,8 +1457,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY],
@@ -1296,6 +1468,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_4_NANO,
@@ -1314,8 +1489,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.ANALYSIS],
@@ -1327,6 +1500,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_2,
@@ -1351,8 +1527,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY],
@@ -1364,6 +1538,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 128000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_3_CHAT,
@@ -1383,8 +1560,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY],
@@ -1396,6 +1571,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 128000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_2_CHAT,
@@ -1422,8 +1600,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY],
@@ -1435,6 +1611,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5,
@@ -1454,8 +1633,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY],
@@ -1467,6 +1644,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_MINI,
@@ -1486,8 +1666,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.ANALYSIS],
@@ -1499,6 +1677,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GPT_5_NANO,
@@ -1518,8 +1699,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
     weaknesses: [
@@ -1535,6 +1714,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: 117,
     contextWindow: 131072,
     icon: "si-openai",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.GPT_OSS_120B,
@@ -1560,15 +1740,18 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: 1000,
     contextWindow: 262144,
     icon: "moon",
+    modelRole: "llm",
+    inputs: ["text", "image"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.KIMI_K2_5,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "moonshotai/kimi-k2.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.45,
+        inputTokenCost: 0.42,
         outputTokenCost: 2.2,
-        cacheReadTokenCost: 0.22,
+        cacheReadTokenCost: 0.21,
       },
     ],
 
@@ -1584,7 +1767,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
-    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.KIMI_K2]: {
     name: "Kimi K2",
@@ -1593,6 +1776,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: 1000,
     contextWindow: 131072,
     icon: "moon",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.KIMI_K2,
@@ -1626,6 +1810,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: 1000,
     contextWindow: 131072,
     icon: "moon",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.KIMI_K2_THINKING,
@@ -1660,6 +1845,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 80000,
     icon: "si-zendesk",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.GLM_5,
@@ -1692,6 +1878,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 202752,
     icon: "si-zendesk",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.GLM_5_TURBO,
@@ -1723,6 +1910,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 202752,
     icon: "si-zendesk",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.GLM_4_7,
@@ -1754,6 +1942,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 202752,
     icon: "si-zendesk",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.GLM_4_7_FLASH,
@@ -1780,6 +1969,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 131072,
     icon: "si-zendesk",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.GLM_4_5_AIR,
@@ -1806,6 +1996,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 204800,
     icon: "si-zendesk",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.GLM_4_6,
@@ -1836,6 +2027,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: 106,
     contextWindow: 65536,
     icon: "si-zendesk",
+    modelRole: "llm",
+    inputs: ["text", "image"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GLM_4_5V,
@@ -1853,7 +2047,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
-    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.MINIMAX_M2_7]: {
     name: "MiniMax M2.7",
@@ -1862,6 +2056,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 204800,
     icon: "si-minimax",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.MINIMAX_M2_7,
@@ -1892,6 +2087,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 1048576,
     icon: "si-xiaomi",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.MIMO_V2_PRO,
@@ -1922,6 +2118,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 1048576,
     icon: "si-googlegemini",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GEMINI_2_5_FLASH_LITE,
@@ -1942,8 +2141,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
   },
@@ -1954,6 +2151,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 1048576,
     icon: "si-googlegemini",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GEMINI_2_5_FLASH,
@@ -1974,8 +2174,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
   },
@@ -1986,6 +2184,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 1048576,
     icon: "si-googlegemini",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GEMINI_2_5_PRO,
@@ -2006,8 +2207,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
   },
@@ -2018,6 +2217,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 1048576,
     icon: "si-googlegemini",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
@@ -2042,8 +2244,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
   },
@@ -2054,6 +2254,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 65536,
     icon: "si-googlegemini",
+    modelRole: "image-gen",
+    inputs: ["text", "image"],
+    outputs: ["text", "image"],
     providers: [
       {
         id: ModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
@@ -2074,8 +2277,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      imageOutput: true,
     },
     // modelType omitted (defaults to "text") - primary UI mode is chat (no size/quality dropdowns).
     // modelTypes includes "image" so this model appears in both the Chat and Image tabs.
@@ -2088,6 +2289,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 1048576,
     icon: "si-googlegemini",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GEMINI_3_1_FLASH_LITE_PREVIEW,
@@ -2108,8 +2312,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
   },
@@ -2120,6 +2322,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 1048576,
     icon: "si-googlegemini",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GEMINI_3_PRO,
@@ -2145,8 +2350,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
   },
@@ -2157,6 +2360,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 1048576,
     icon: "si-googlegemini",
+    modelRole: "llm",
+    inputs: ["text", "image", "file"],
+    outputs: ["text"],
     providers: [
       {
         id: ModelId.GEMINI_3_FLASH,
@@ -2177,8 +2383,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
       toolCalling: true,
     },
   },
@@ -2209,6 +2413,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: 671,
     contextWindow: 163840,
     icon: "whale",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.DEEPSEEK_V32,
@@ -2234,6 +2439,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: 671,
     contextWindow: 32768,
     icon: "whale",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.DEEPSEEK_V31,
@@ -2259,6 +2465,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: 671,
     contextWindow: 163840,
     icon: "whale",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.DEEPSEEK_R1,
@@ -2290,6 +2497,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: 235,
     contextWindow: 131072,
     icon: "si-alibabadotcom",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.QWEN3_235B_FREE,
@@ -2315,6 +2523,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: 70,
     contextWindow: 32768,
     icon: "whale",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.DEEPSEEK_R1_DISTILL,
@@ -2344,6 +2553,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: 7,
     contextWindow: 32768,
     icon: "si-alibabadotcom",
+    ...defaultLlmModality,
     providers: [
       {
         id: ModelId.QWEN_2_5_7B,
@@ -2376,6 +2586,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "si-openai",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.DALL_E_3,
@@ -2392,8 +2605,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
   [ModelId.GPT_IMAGE_1]: {
@@ -2404,6 +2615,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "si-openai",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.GPT_IMAGE_1,
@@ -2420,8 +2634,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
   [ModelId.FLUX_SCHNELL]: {
@@ -2432,6 +2644,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "image",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.FLUX_SCHNELL,
@@ -2448,8 +2663,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
   [ModelId.FLUX_PRO]: {
@@ -2460,6 +2673,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "image",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.FLUX_PRO,
@@ -2480,8 +2696,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
   [ModelId.SDXL]: {
@@ -2492,12 +2706,15 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "image",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.SDXL,
         apiProvider: ApiProvider.REPLICATE,
         providerModel: "stability-ai/sdxl",
-        creditCostPerImage: 0.44, // updated by media-prices updater
+        creditCostPerImage: 0.43, // updated by media-prices updater
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
@@ -2508,8 +2725,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
 
@@ -2521,6 +2736,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "image",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.FLUX_2_MAX,
@@ -2541,8 +2759,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
   [ModelId.FLUX_2_KLEIN_4B]: {
@@ -2553,6 +2769,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "image",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.FLUX_2_KLEIN_4B,
@@ -2569,8 +2788,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
   [ModelId.RIVERFLOW_V2_PRO]: {
@@ -2581,6 +2798,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "image",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.RIVERFLOW_V2_PRO,
@@ -2601,8 +2821,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
   [ModelId.RIVERFLOW_V2_FAST]: {
@@ -2613,6 +2831,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "image",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.RIVERFLOW_V2_FAST,
@@ -2629,8 +2850,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
   [ModelId.RIVERFLOW_V2_MAX_PREVIEW]: {
@@ -2641,6 +2860,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "image",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.RIVERFLOW_V2_MAX_PREVIEW,
@@ -2661,8 +2883,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
   [ModelId.RIVERFLOW_V2_STANDARD_PREVIEW]: {
@@ -2673,6 +2893,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "image",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.RIVERFLOW_V2_STANDARD_PREVIEW,
@@ -2689,8 +2912,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
   [ModelId.RIVERFLOW_V2_FAST_PREVIEW]: {
@@ -2701,6 +2922,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "image",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.RIVERFLOW_V2_FAST_PREVIEW,
@@ -2717,8 +2941,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
   [ModelId.FLUX_2_FLEX]: {
@@ -2729,6 +2951,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "image",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.FLUX_2_FLEX,
@@ -2749,8 +2974,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
   [ModelId.FLUX_2_PRO]: {
@@ -2761,6 +2984,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "image",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.FLUX_2_PRO,
@@ -2781,8 +3007,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
   [ModelId.GEMINI_3_PRO_IMAGE_PREVIEW]: {
@@ -2792,9 +3016,12 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 65536,
     icon: "si-googlegemini",
-    // modelType intentionally omitted (defaults to "text") - multimodal chat model,
-    // not a pure image generator. Routes through stream; imageOutput: true drives
+    // modelType intentionally omitted (defaults to "text") — multimodal chat model,
+    // not a pure image generator. Routes through stream; outputs["image"] drives
     // the modalities passed to OpenRouter.
+    modelRole: "image-gen",
+    inputs: ["text", "image"],
+    outputs: ["text", "image"],
     providers: [
       {
         id: ModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
@@ -2815,8 +3042,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageInput: true,
-      imageOutput: true,
     },
     // modelType omitted (defaults to "text") - primary UI mode is chat.
     // modelTypes includes "image" so this model appears in both the Chat and Image tabs.
@@ -2829,8 +3054,11 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    // modelType omitted (defaults to "text") - chat-style multimodal model via OpenRouter.
+    // modelType omitted (defaults to "text") — chat-style multimodal model via OpenRouter.
     // modelTypes includes "image" so it appears in both Chat and Image tabs.
+    modelRole: "image-gen",
+    inputs: ["text", "image"],
+    outputs: ["text", "image"],
     providers: [
       {
         id: ModelId.GPT_5_IMAGE_MINI,
@@ -2851,8 +3079,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageInput: true,
-      imageOutput: true,
     },
     modelTypes: ["text", "image"],
   },
@@ -2863,8 +3089,11 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    // modelType omitted (defaults to "text") - chat-style multimodal model via OpenRouter.
+    // modelType omitted (defaults to "text") — chat-style multimodal model via OpenRouter.
     // modelTypes includes "image" so it appears in both Chat and Image tabs.
+    modelRole: "image-gen",
+    inputs: ["text", "image"],
+    outputs: ["text", "image"],
     providers: [
       {
         id: ModelId.GPT_5_IMAGE,
@@ -2885,8 +3114,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageInput: true,
-      imageOutput: true,
     },
     modelTypes: ["text", "image"],
   },
@@ -2898,6 +3125,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "image",
     modelType: "image",
+    modelRole: "image-gen",
+    inputs: ["text"],
+    outputs: ["image"],
     providers: [
       {
         id: ModelId.SEEDREAM_4_5,
@@ -2914,8 +3144,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      imageOutput: true,
-      imageOutputSettings: true,
     },
   },
 
@@ -2931,6 +3159,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "music",
     modelType: "audio",
+    modelRole: "audio-gen",
+    inputs: ["text"],
+    outputs: ["audio"],
     providers: [
       {
         id: ModelId.MUSICGEN_STEREO,
@@ -2948,7 +3179,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      audioOutput: true,
     },
   },
 
@@ -2960,6 +3190,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "music",
     modelType: "audio",
+    modelRole: "audio-gen",
+    inputs: ["text"],
+    outputs: ["audio"],
     providers: [
       {
         id: ModelId.STABLE_AUDIO,
@@ -2977,7 +3210,6 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      audioOutput: true,
     },
   },
 
@@ -2989,6 +3221,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     contextWindow: 0,
     icon: "music",
     modelType: "audio",
+    modelRole: "audio-gen",
+    inputs: ["text"],
+    outputs: ["audio"],
     providers: [
       {
         id: ModelId.UDIO_V2,
@@ -3006,8 +3241,418 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
-      audioOutput: true,
     },
+  },
+
+  // =============================================
+  // TTS MODELS
+  // =============================================
+
+  [ModelId.OPENAI_ALLOY]: {
+    name: "Alloy",
+    by: "openAI",
+    description: "agent.models.openaiAlloy.description" as AgentTranslationKey,
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2" as IconKey,
+    modelRole: "tts",
+    inputs: ["text"],
+    outputs: ["audio"],
+    voiceMeta: { gender: "neutral", style: "conversational", language: "en" },
+    utilities: [ModelUtility.TTS],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.OPENAI_ALLOY,
+        apiProvider: ApiProvider.OPENAI_TTS,
+        providerModel: "tts-1",
+        creditCostPerCharacter: 0.00052,
+      },
+      {
+        id: ModelId.OPENAI_ALLOY,
+        apiProvider: ApiProvider.EDEN_AI_TTS,
+        providerModel: "openai",
+        creditCostPerCharacter: 0.00056,
+      },
+    ],
+  },
+  [ModelId.OPENAI_NOVA]: {
+    name: "Nova",
+    by: "openAI",
+    description: "agent.models.openaiNova.description" as AgentTranslationKey,
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2" as IconKey,
+    modelRole: "tts",
+    inputs: ["text"],
+    outputs: ["audio"],
+    voiceMeta: { gender: "female", style: "warm", language: "en" },
+    utilities: [ModelUtility.TTS],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.OPENAI_NOVA,
+        apiProvider: ApiProvider.OPENAI_TTS,
+        providerModel: "tts-1",
+        creditCostPerCharacter: 0.00052,
+      },
+      {
+        id: ModelId.OPENAI_NOVA,
+        apiProvider: ApiProvider.EDEN_AI_TTS,
+        providerModel: "openai",
+        creditCostPerCharacter: 0.00056,
+      },
+    ],
+  },
+  [ModelId.OPENAI_ONYX]: {
+    name: "Onyx",
+    by: "openAI",
+    description: "agent.models.openaiOnyx.description" as AgentTranslationKey,
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2" as IconKey,
+    modelRole: "tts",
+    inputs: ["text"],
+    outputs: ["audio"],
+    voiceMeta: { gender: "male", style: "deep", language: "en" },
+    utilities: [ModelUtility.TTS],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.OPENAI_ONYX,
+        apiProvider: ApiProvider.OPENAI_TTS,
+        providerModel: "tts-1",
+        creditCostPerCharacter: 0.00052,
+      },
+      {
+        id: ModelId.OPENAI_ONYX,
+        apiProvider: ApiProvider.EDEN_AI_TTS,
+        providerModel: "openai",
+        creditCostPerCharacter: 0.00056,
+      },
+    ],
+  },
+  [ModelId.OPENAI_ECHO]: {
+    name: "Echo",
+    by: "openAI",
+    description: "agent.models.openaiEcho.description" as AgentTranslationKey,
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2" as IconKey,
+    modelRole: "tts",
+    inputs: ["text"],
+    outputs: ["audio"],
+    voiceMeta: { gender: "male", language: "en" },
+    utilities: [ModelUtility.TTS],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.OPENAI_ECHO,
+        apiProvider: ApiProvider.OPENAI_TTS,
+        providerModel: "tts-1",
+        creditCostPerCharacter: 0.00052,
+      },
+    ],
+  },
+  [ModelId.OPENAI_SHIMMER]: {
+    name: "Shimmer",
+    by: "openAI",
+    description:
+      "agent.models.openaiShimmer.description" as AgentTranslationKey,
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2" as IconKey,
+    modelRole: "tts",
+    inputs: ["text"],
+    outputs: ["audio"],
+    voiceMeta: { gender: "female", language: "en" },
+    utilities: [ModelUtility.TTS],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.OPENAI_SHIMMER,
+        apiProvider: ApiProvider.OPENAI_TTS,
+        providerModel: "tts-1",
+        creditCostPerCharacter: 0.00052,
+      },
+    ],
+  },
+  [ModelId.OPENAI_FABLE]: {
+    name: "Fable",
+    by: "openAI",
+    description: "agent.models.openaiFable.description" as AgentTranslationKey,
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2" as IconKey,
+    modelRole: "tts",
+    inputs: ["text"],
+    outputs: ["audio"],
+    voiceMeta: { gender: "male", style: "expressive", language: "en" },
+    utilities: [ModelUtility.TTS],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.OPENAI_FABLE,
+        apiProvider: ApiProvider.OPENAI_TTS,
+        providerModel: "tts-1",
+        creditCostPerCharacter: 0.00052,
+      },
+    ],
+  },
+  [ModelId.ELEVENLABS_RACHEL]: {
+    name: "Rachel",
+    by: "elevenlabs",
+    description:
+      "agent.models.elevenlabsRachel.description" as AgentTranslationKey,
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2" as IconKey,
+    modelRole: "tts",
+    inputs: ["text"],
+    outputs: ["audio"],
+    voiceMeta: { gender: "female", style: "calm", language: "en" },
+    utilities: [ModelUtility.TTS, ModelUtility.SMART],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.ELEVENLABS_RACHEL,
+        apiProvider: ApiProvider.ELEVENLABS,
+        providerModel: "21m00Tcm4TlvDq8ikWAM",
+        creditCostPerCharacter: 0.001,
+      },
+    ],
+  },
+  [ModelId.ELEVENLABS_JOSH]: {
+    name: "Josh",
+    by: "elevenlabs",
+    description:
+      "agent.models.elevenlabsJosh.description" as AgentTranslationKey,
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2" as IconKey,
+    modelRole: "tts",
+    inputs: ["text"],
+    outputs: ["audio"],
+    voiceMeta: { gender: "male", style: "deep", language: "en" },
+    utilities: [ModelUtility.TTS, ModelUtility.SMART],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.ELEVENLABS_JOSH,
+        apiProvider: ApiProvider.ELEVENLABS,
+        providerModel: "TxGEqnHWrfWFTfGW9XjX",
+        creditCostPerCharacter: 0.001,
+      },
+    ],
+  },
+  [ModelId.ELEVENLABS_BELLA]: {
+    name: "Bella",
+    by: "elevenlabs",
+    description:
+      "agent.models.elevenlabsBella.description" as AgentTranslationKey,
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2" as IconKey,
+    modelRole: "tts",
+    inputs: ["text"],
+    outputs: ["audio"],
+    voiceMeta: { gender: "female", style: "friendly", language: "en" },
+    utilities: [ModelUtility.TTS, ModelUtility.SMART],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.ELEVENLABS_BELLA,
+        apiProvider: ApiProvider.ELEVENLABS,
+        providerModel: "EXAVITQu4vr4xnSDxMaL",
+        creditCostPerCharacter: 0.001,
+      },
+    ],
+  },
+  [ModelId.ELEVENLABS_ADAM]: {
+    name: "Adam",
+    by: "elevenlabs",
+    description:
+      "agent.models.elevenlabsAdam.description" as AgentTranslationKey,
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2" as IconKey,
+    modelRole: "tts",
+    inputs: ["text"],
+    outputs: ["audio"],
+    voiceMeta: { gender: "male", style: "authoritative", language: "en" },
+    utilities: [ModelUtility.TTS, ModelUtility.SMART],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.ELEVENLABS_ADAM,
+        apiProvider: ApiProvider.ELEVENLABS,
+        providerModel: "pNInz6obpgDQGcFmaJgB",
+        creditCostPerCharacter: 0.001,
+      },
+    ],
+  },
+
+  // =============================================
+  // STT MODELS
+  // =============================================
+
+  [ModelId.OPENAI_WHISPER]: {
+    name: "Whisper",
+    by: "openAI",
+    description:
+      "agent.models.openaiWhisper.description" as AgentTranslationKey,
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "mic" as IconKey,
+    modelRole: "stt",
+    inputs: ["audio"],
+    outputs: ["text"],
+    utilities: [ModelUtility.STT],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.OPENAI_WHISPER,
+        apiProvider: ApiProvider.OPENAI_STT,
+        providerModel: "whisper-1",
+        creditCostPerSecond: 0.013,
+      },
+      {
+        id: ModelId.OPENAI_WHISPER,
+        apiProvider: ApiProvider.EDEN_AI_STT,
+        providerModel: "openai",
+        creditCostPerSecond: 0.015,
+      },
+    ],
+  },
+  [ModelId.DEEPGRAM_NOVA_2]: {
+    name: "Nova-2",
+    by: "deepgram",
+    description:
+      "agent.models.deepgramNova2.description" as AgentTranslationKey,
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "mic" as IconKey,
+    modelRole: "stt",
+    inputs: ["audio"],
+    outputs: ["text"],
+    utilities: [ModelUtility.STT, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.DEEPGRAM_NOVA_2,
+        apiProvider: ApiProvider.DEEPGRAM,
+        providerModel: "nova-2",
+        creditCostPerSecond: 0.008,
+      },
+    ],
   },
 };
 /* eslint-enable i18next/no-literal-string */
@@ -3041,6 +3686,10 @@ function buildModelOptions(): Record<string, ModelOption> {
         adminOnly: provider.adminOnly,
         modelType: def.modelType ?? "text",
         modelTypes: def.modelTypes ?? [def.modelType ?? "text"],
+        modelRole: def.modelRole,
+        inputs: def.inputs,
+        outputs: def.outputs,
+        voiceMeta: def.voiceMeta,
       };
 
       if ("creditCostPerImage" in provider) {
@@ -3054,12 +3703,25 @@ function buildModelOptions(): Record<string, ModelOption> {
           creditCostPerClip: provider.creditCostPerClip,
           defaultDurationSeconds: provider.defaultDurationSeconds,
         } as ModelOptionAudioBased;
-      } else if ("creditCostPerSecond" in provider) {
+      } else if ("creditCostPerCharacter" in provider) {
+        result[provider.id] = {
+          ...base,
+          creditCostPerCharacter: provider.creditCostPerCharacter,
+        } as ModelOptionTtsBased;
+      } else if (
+        "creditCostPerSecond" in provider &&
+        "defaultDurationSeconds" in provider
+      ) {
         result[provider.id] = {
           ...base,
           creditCostPerSecond: provider.creditCostPerSecond,
           defaultDurationSeconds: provider.defaultDurationSeconds,
         } as ModelOptionVideoBased;
+      } else if ("creditCostPerSecond" in provider) {
+        result[provider.id] = {
+          ...base,
+          creditCostPerSecond: provider.creditCostPerSecond,
+        } as ModelOptionSttBased;
       } else if (typeof provider.creditCost === "number") {
         result[provider.id] = {
           ...base,
@@ -3158,6 +3820,51 @@ export const ModelIdOptions = Object.values(modelOptionsIndex).map((model) => ({
 }));
 
 /**
+ * TTS voice options for SELECT fields (voiceId)
+ */
+export const TtsModelIdOptions = TTS_MODEL_IDS.map((id) => ({
+  value: id,
+  label: modelOptionsIndex[id]?.name ?? id,
+}));
+
+/**
+ * STT model options for SELECT fields (sttModelId)
+ */
+export const SttModelIdOptions = STT_MODEL_IDS.map((id) => ({
+  value: id,
+  label: modelOptionsIndex[id]?.name ?? id,
+}));
+
+/**
+ * LLM model IDs — all ModelId values with modelRole: "llm"
+ * Used for visionBridgeModelId and translationModelId selectors.
+ */
+export const LLM_MODEL_IDS = Object.values(modelOptionsIndex)
+  .filter((m) => m.modelRole === "llm")
+  .map((m) => m.id) as ModelId[];
+
+export type LlmModelId = (typeof LLM_MODEL_IDS)[number];
+
+export const LlmModelIdOptions = LLM_MODEL_IDS.map((id) => ({
+  value: id,
+  label: modelOptionsIndex[id]?.name ?? id,
+}));
+
+/**
+ * Vision-capable LLM model IDs (accept image input) — for visionBridgeModelId.
+ */
+export const VISION_MODEL_IDS = Object.values(modelOptionsIndex)
+  .filter((m) => m.modelRole === "llm" && m.inputs.includes("image"))
+  .map((m) => m.id) as ModelId[];
+
+export type VisionModelId = (typeof VISION_MODEL_IDS)[number];
+
+export const VisionModelIdOptions = VISION_MODEL_IDS.map((id) => ({
+  value: id,
+  label: modelOptionsIndex[id]?.name ?? id,
+}));
+
+/**
  * Get credit cost from a ModelOption object
  * Handles both function and number types
  * @param model - The model option object
@@ -3246,10 +3953,17 @@ export function calculateCreditCost(
     );
   }
   if ("creditCostPerSecond" in modelOption) {
+    if ("defaultDurationSeconds" in modelOption) {
+      // Video model: fixed upfront cost for default duration
+      return roundMediaCost(
+        modelOption.creditCostPerSecond *
+          modelOption.defaultDurationSeconds *
+          (1 + STANDARD_MARKUP_PERCENTAGE),
+      );
+    }
+    // STT model: creditCostPerSecond displayed as rate, not upfront
     return roundMediaCost(
-      modelOption.creditCostPerSecond *
-        modelOption.defaultDurationSeconds *
-        (1 + STANDARD_MARKUP_PERCENTAGE),
+      modelOption.creditCostPerSecond * (1 + STANDARD_MARKUP_PERCENTAGE),
     );
   }
 
@@ -3433,9 +4147,9 @@ export const FEATURED_MODELS = {
   // Representative picks per category - used in marketing content and emails
   mainstream: [
     modelDefinitions[ModelId.CLAUDE_OPUS_4_6].name,
-    modelDefinitions[ModelId.GPT_5_2_PRO].name,
+    modelDefinitions[ModelId.GPT_5_4_PRO].name,
     modelDefinitions[ModelId.GEMINI_3_PRO].name,
-    modelDefinitions[ModelId.GROK_4].name,
+    modelDefinitions[ModelId.GROK_4_20_BETA].name,
   ],
   open: [
     modelDefinitions[ModelId.DEEPSEEK_R1].name,
@@ -3449,3 +4163,23 @@ export const FEATURED_MODELS = {
     modelDefinitions[ModelId.VENICE_UNCENSORED].name,
   ],
 } as const;
+
+/**
+ * Returns true if the model natively accepts the given input modality.
+ */
+export function hasNativeInput(
+  model: ModelOption,
+  modality: Modality,
+): boolean {
+  return model.inputs.includes(modality);
+}
+
+/**
+ * Returns true if the model natively produces the given output modality.
+ */
+export function hasNativeOutput(
+  model: ModelOption,
+  modality: Modality,
+): boolean {
+  return model.outputs.includes(modality);
+}

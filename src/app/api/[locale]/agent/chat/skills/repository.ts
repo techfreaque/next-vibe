@@ -29,7 +29,7 @@ import {
   getModelDisplayName,
   modelProviders,
 } from "../../models/models";
-import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
+
 import type {
   SkillDeleteResponseOutput,
   SkillGetResponseOutput,
@@ -152,7 +152,7 @@ export class SkillsRepository {
             tagline: customSkills.tagline,
             ownershipType: customSkills.ownershipType,
             modelSelection: customSkills.modelSelection,
-            voice: customSkills.voice,
+            voiceId: customSkills.voiceId,
             voteCount: customSkills.voteCount,
             trustLevel: customSkills.trustLevel,
           })
@@ -424,14 +424,18 @@ export class SkillsRepository {
       // Check default skills first
       const defaultSkill = DEFAULT_SKILLS.find((p) => p.id === skillId);
       if (defaultSkill) {
-        return success({
+        return success<SkillGetResponseOutput>({
           icon: defaultSkill.icon,
           name: t(defaultSkill.name),
           tagline: t(defaultSkill.tagline),
           description: t(defaultSkill.description),
           category: defaultSkill.category,
           isPublic: false,
-          voice: defaultSkill.voice,
+          voiceId: defaultSkill.voiceId,
+          sttModelId: defaultSkill.sttModelId ?? null,
+          visionBridgeModelId: defaultSkill.visionBridgeModelId ?? null,
+          translationModelId: defaultSkill.translationModelId ?? null,
+          defaultChatMode: defaultSkill.defaultChatMode ?? null,
           systemPrompt: defaultSkill.systemPrompt,
           skillOwnership: SkillOwnershipType.SYSTEM,
           compactTrigger: null,
@@ -459,7 +463,11 @@ export class SkillsRepository {
           description: null,
           category: NO_SKILL.category,
           isPublic: false,
-          voice: NO_SKILL.voice,
+          voiceId: NO_SKILL.voiceId,
+          sttModelId: null,
+          visionBridgeModelId: null,
+          translationModelId: null,
+          defaultChatMode: null,
           systemPrompt: null,
           skillOwnership: SkillOwnershipType.SYSTEM,
           compactTrigger: null,
@@ -519,7 +527,11 @@ export class SkillsRepository {
         description: customSkill.description,
         category: customSkill.category,
         isPublic: customSkill.ownershipType === SkillOwnershipType.PUBLIC,
-        voice: customSkill.voice || DEFAULT_TTS_VOICE,
+        voiceId: customSkill.voiceId ?? null,
+        sttModelId: customSkill.sttModelId ?? null,
+        visionBridgeModelId: customSkill.visionBridgeModelId ?? null,
+        translationModelId: customSkill.translationModelId ?? null,
+        defaultChatMode: customSkill.defaultChatMode ?? null,
         systemPrompt: customSkill.systemPrompt,
         skillOwnership: customSkill.ownershipType,
         compactTrigger: customSkill.compactTrigger ?? null,
@@ -614,7 +626,11 @@ export class SkillsRepository {
           icon: data.icon,
           systemPrompt: data.systemPrompt,
           category: data.category,
-          voice: data.voice,
+          voiceId: data.voiceId ?? null,
+          sttModelId: data.sttModelId ?? null,
+          visionBridgeModelId: data.visionBridgeModelId ?? null,
+          translationModelId: data.translationModelId ?? null,
+          defaultChatMode: data.defaultChatMode ?? null,
           modelSelection:
             data.modelSelection ?? SkillsRepository.DEFAULT_MODEL_SELECTION,
           ownershipType: data.isPublic
@@ -679,7 +695,11 @@ export class SkillsRepository {
             icon: data.icon,
             systemPrompt: data.systemPrompt,
             category: data.category,
-            voice: data.voice,
+            voiceId: data.voiceId ?? null,
+            sttModelId: data.sttModelId ?? null,
+            visionBridgeModelId: data.visionBridgeModelId ?? null,
+            translationModelId: data.translationModelId ?? null,
+            defaultChatMode: data.defaultChatMode ?? null,
             modelSelection:
               data.modelSelection ?? SkillsRepository.DEFAULT_MODEL_SELECTION,
             ownershipType: data.isPublic

@@ -14,7 +14,13 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import type { ChatMode } from "@/app/api/[locale]/agent/models/enum";
+import type {
+  LlmModelId,
+  SttModelId,
+  TtsModelId,
+  VisionModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
@@ -49,8 +55,20 @@ export const chatFavorites = pgTable("chat_favorites", {
   // Custom icon (emoji or icon identifier)
   customIcon: text("custom_icon").$type<IconKey>(),
 
-  // Custom TTS voice (overrides character voice, null means use character default)
-  voice: text("voice").$type<typeof TtsVoiceValue>(),
+  // TTS voice model ID (each voice IS a model, this replaces the old MALE/FEMALE enum)
+  voiceId: text("voice_id").$type<TtsModelId>(),
+
+  // STT model preference (null = cascade to user settings → system default)
+  sttModelId: text("stt_model_id").$type<SttModelId>(),
+
+  // Vision bridge model (null = cascade to user settings → system default)
+  visionBridgeModelId: text("vision_bridge_model_id").$type<VisionModelId>(),
+
+  // Translation model for pure generators (null = cascade)
+  translationModelId: text("translation_model_id").$type<LlmModelId>(),
+
+  // Default chat mode for this favorite (null = cascade to skill → user settings → "text")
+  defaultChatMode: text("default_chat_mode").$type<ChatMode>(),
 
   // Model selection (stores only MANUAL or FILTERS, null means use character defaults)
   modelSelection: jsonb("model_selection").$type<FavoriteGetModelSelection>(),

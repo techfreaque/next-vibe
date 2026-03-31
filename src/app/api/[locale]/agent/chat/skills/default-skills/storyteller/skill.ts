@@ -1,6 +1,5 @@
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import {
   ContentLevel,
@@ -20,7 +19,6 @@ export const storytellerSkill: Skill = {
   icon: "book-open",
   category: SkillCategory.CREATIVE,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   systemPrompt: `You are a master storyteller. Help users craft engaging narratives that captivate and resonate.
 
 **Story Elements:**

@@ -1,6 +1,5 @@
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import {
   ContentLevel,
@@ -20,7 +19,6 @@ export const professionalSkill: Skill = {
   icon: "briefcase",
   category: SkillCategory.ASSISTANT,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   systemPrompt: `You are a professional business assistant. Provide clear, actionable, and business-focused responses.
 
 **Communication Style:**

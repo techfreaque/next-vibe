@@ -5,7 +5,21 @@
 
 import { z } from "zod";
 
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import {
+  CHAT_MODE_IDS,
+  ChatModeOptions,
+} from "@/app/api/[locale]/agent/models/enum";
+import {
+  LLM_MODEL_IDS,
+  LlmModelIdOptions,
+  ModelId,
+  STT_MODEL_IDS,
+  SttModelIdOptions,
+  TTS_MODEL_IDS,
+  TtsModelIdOptions,
+  VISION_MODEL_IDS,
+  VisionModelIdOptions,
+} from "@/app/api/[locale]/agent/models/models";
 import {
   modelSelectionSchemaSimple,
   type ModelSelectionSimple,
@@ -26,11 +40,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../../shared/types/common.schema";
-import {
-  DEFAULT_TTS_VOICE,
-  TtsVoiceDB,
-  TtsVoiceOptions,
-} from "../../../text-to-speech/enum";
 import {
   CATEGORY_CONFIG,
   ContentLevel,
@@ -281,18 +290,70 @@ const { POST } = createEndpoint({
           descriptionStyle: "inline",
         },
       }),
-      voice: requestField(scopedTranslation, {
+      voiceId: requestField(scopedTranslation, {
+        schema: z.enum(TTS_MODEL_IDS).nullable().optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
+        options: TtsModelIdOptions,
         label: "post.voice.label" as const,
         description: "post.voice.description" as const,
-        options: TtsVoiceOptions,
         columns: 6,
         theme: {
           descriptionStyle: "inline",
           optionalColor: "transparent",
         },
-        schema: z.enum(TtsVoiceDB).default(DEFAULT_TTS_VOICE),
+      }),
+      sttModelId: requestField(scopedTranslation, {
+        schema: z.enum(STT_MODEL_IDS).nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: SttModelIdOptions,
+        label: "post.sttModel.label" as const,
+        description: "post.sttModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      visionBridgeModelId: requestField(scopedTranslation, {
+        schema: z.enum(VISION_MODEL_IDS).nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: VisionModelIdOptions,
+        label: "post.visionBridgeModel.label" as const,
+        description: "post.visionBridgeModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      translationModelId: requestField(scopedTranslation, {
+        schema: z.enum(LLM_MODEL_IDS).nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: LlmModelIdOptions,
+        label: "post.translationModel.label" as const,
+        description: "post.translationModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      defaultChatMode: requestField(scopedTranslation, {
+        schema: z.enum(CHAT_MODE_IDS).nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: ChatModeOptions,
+        label: "post.defaultChatMode.label" as const,
+        description: "post.defaultChatMode.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
       }),
       systemPrompt: requestField(scopedTranslation, {
         schema: z.string().nullable(),
@@ -430,7 +491,11 @@ const { POST } = createEndpoint({
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: ModelId.GPT_5,
         },
-        voice: undefined,
+        voiceId: undefined,
+        sttModelId: undefined,
+        visionBridgeModelId: undefined,
+        translationModelId: undefined,
+        defaultChatMode: undefined,
         availableTools: [
           { toolId: "execute-tool", requiresConfirmation: false },
         ],
@@ -449,7 +514,11 @@ const { POST } = createEndpoint({
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: ModelId.GPT_5,
         },
-        voice: undefined,
+        voiceId: undefined,
+        sttModelId: undefined,
+        visionBridgeModelId: undefined,
+        translationModelId: undefined,
+        defaultChatMode: undefined,
         availableTools: [
           { toolId: "execute-tool", requiresConfirmation: false },
         ],
@@ -484,7 +553,11 @@ const { POST } = createEndpoint({
             max: SpeedLevel.THOROUGH,
           },
         },
-        voice: undefined,
+        voiceId: undefined,
+        sttModelId: undefined,
+        visionBridgeModelId: undefined,
+        translationModelId: undefined,
+        defaultChatMode: undefined,
         availableTools: null,
         pinnedTools: null,
       },

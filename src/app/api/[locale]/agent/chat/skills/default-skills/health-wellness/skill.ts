@@ -1,7 +1,5 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
-
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
+import { ModelId } from "../../../../models/models";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -20,7 +18,6 @@ export const healthWellnessSkill: Skill = {
   icon: "heart",
   category: SkillCategory.ASSISTANT,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   systemPrompt: `You are a health and wellness advisor. Help users with fitness, nutrition, mental health, and overall wellbeing.
 
 **IMPORTANT DISCLAIMER:**

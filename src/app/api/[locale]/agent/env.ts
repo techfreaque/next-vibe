@@ -151,6 +151,26 @@ const baseFields = {
     onboardingStep: 4,
     onboardingGroup: "ai",
   },
+  ELEVENLABS_API_KEY: {
+    schema: z.string().optional(),
+    example: "your-elevenlabs-key",
+    comment:
+      "ElevenLabs API key for high-quality TTS voices - get yours at https://elevenlabs.io/app/settings/api-keys",
+    commented: true,
+    sensitive: true,
+    onboardingStep: 4,
+    onboardingGroup: "ai",
+  },
+  DEEPGRAM_API_KEY: {
+    schema: z.string().optional(),
+    example: "your-deepgram-key",
+    comment:
+      "Deepgram API key for fast, accurate STT - get yours at https://console.deepgram.com",
+    commented: true,
+    sensitive: true,
+    onboardingStep: 4,
+    onboardingGroup: "ai",
+  },
 } as const;
 
 // S3 storage specific fields

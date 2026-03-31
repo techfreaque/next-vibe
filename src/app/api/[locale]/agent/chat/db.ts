@@ -42,6 +42,7 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
+import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { leads } from "@/app/api/[locale]/leads/db";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
@@ -219,6 +220,27 @@ export interface MessageMetadata {
     /** Async generation status (video only) */
     status?: "pending" | "complete" | "failed";
   };
+
+  // Modality provenance
+  inputModality?: Modality;
+  outputModality?: Modality;
+
+  // Pipeline steps for multi-step turns (STT → LLM → TTS, translation → image-gen, etc.)
+  pipelineSteps?: Array<{
+    type: "stt" | "tts" | "vision-bridge" | "translation" | "routing";
+    modelId: ModelId;
+    creditCost: number;
+    durationMs?: number;
+  }>;
+
+  // Gap-fill translations: each modality gap produces a variant stored here
+  variants?: Array<{
+    modality: Modality;
+    content: string; // text content or storage URL
+    modelId?: ModelId; // which bridge model produced this
+    creditCost?: number;
+    createdAt: string; // ISO timestamp
+  }>;
 }
 
 /**

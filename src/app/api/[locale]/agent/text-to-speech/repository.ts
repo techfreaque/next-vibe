@@ -1,6 +1,6 @@
 /**
  * Text-to-Speech Repository
- * Handles text-to-speech conversion using Eden AI
+ * Routes TTS requests to the correct provider based on the voice model's ApiProvider.
  */
 
 import "server-only";
@@ -15,6 +15,10 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
+import {
+  ApiProvider,
+  getModelById,
+} from "@/app/api/[locale]/agent/models/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -30,7 +34,6 @@ import type {
   TextToSpeechPostRequestOutput,
   TextToSpeechPostResponseOutput,
 } from "./definition";
-import { TtsVoice } from "./enum";
 import type { TextToSpeechT } from "./i18n";
 
 interface EdenAITTSResponse {
@@ -51,52 +54,130 @@ interface EdenAITTSResponse {
 export class TextToSpeechRepository {
   /**
    * Map locale to language code for TTS
-   * Uses getLanguageFromLocale to extract language
    */
   private static mapLocaleToLanguage(locale: CountryLanguage): string {
     return getLanguageFromLocale(locale);
   }
 
   /**
-   * Convert localized TtsVoiceValue to raw API string
-   * Converts "voices.MALE" -> "MALE"
+   * Extract the voice name for OpenAI TTS from the model ID.
+   * "openai-nova" → "nova", "openai-alloy" → "alloy", etc.
    */
-  private static convertVoiceToApiFormat(voice: string): "MALE" | "FEMALE" {
-    switch (voice) {
-      case TtsVoice.MALE:
-        return "MALE";
-      case TtsVoice.FEMALE:
-        return "FEMALE";
-      default:
-        // Default to MALE if unknown
-        return "FEMALE";
-    }
+  private static getOpenAIVoiceName(modelId: string): string {
+    const parts = modelId.split("-");
+    // modelId format: "openai-<voice>" → take everything after "openai-"
+    return parts.slice(1).join("-");
   }
 
   /**
-   * Convert text to speech
+   * Fetch and convert audio URL to base64 data URL
    */
-  static async convertTextToSpeech(
-    data: TextToSpeechPostRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
+  private static async fetchAndConvertAudio(
+    audioResourceUrl: string,
     logger: EndpointLogger,
     t: TextToSpeechT,
-  ): Promise<ResponseType<TextToSpeechPostResponseOutput>> {
-    // Server-side configuration
-    const provider = "openai";
-    const language = TextToSpeechRepository.mapLocaleToLanguage(locale);
-    const apiVoice = TextToSpeechRepository.convertVoiceToApiFormat(data.voice);
+  ): Promise<ResponseType<string>> {
+    const audioResponse = await fetch(audioResourceUrl);
+    if (!audioResponse.ok) {
+      logger.error("Failed to fetch audio file", {
+        status: audioResponse.status,
+        audioUrl: audioResourceUrl,
+      });
+      return fail({
+        message: t("post.errors.audioFetchFailed"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
 
-    logger.info("Starting text-to-speech conversion", {
-      provider,
-      voice: data.voice,
-      apiVoice,
+    const audioBuffer = await audioResponse.arrayBuffer();
+    let contentType = audioResponse.headers.get("content-type") || "audio/mpeg";
+
+    if (
+      contentType === "binary/octet-stream" ||
+      contentType === "application/octet-stream"
+    ) {
+      contentType = "audio/mpeg";
+    }
+
+    const base64Audio = Buffer.from(audioBuffer).toString("base64");
+    // eslint-disable-next-line i18next/no-literal-string
+    return success(`data:${contentType};base64,${base64Audio}`);
+  }
+
+  /**
+   * Convert text to speech via OpenAI TTS API directly
+   */
+  private static async callOpenAITTS(
+    text: string,
+    voiceId: string,
+    providerModel: string,
+    language: string,
+    logger: EndpointLogger,
+    t: TextToSpeechT,
+  ): Promise<ResponseType<string>> {
+    if (!agentEnv.OPENAI_API_KEY) {
+      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiImages;
+      return fail({
+        message: t("post.errors.notConfigured", { label, envKey, url }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    const voiceName = TextToSpeechRepository.getOpenAIVoiceName(voiceId);
+
+    logger.debug("[TTS] Calling OpenAI TTS API", {
+      voiceId,
+      voiceName,
+      model: providerModel,
       language,
-      textLength: data.text.length,
     });
 
-    // Check API key - show setup instructions in LOCAL_MODE
+    const response = await fetch("https://api.openai.com/v1/audio/speech", {
+      method: "POST",
+      headers: {
+        // eslint-disable-next-line i18next/no-literal-string
+        Authorization: `Bearer ${agentEnv.OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: providerModel,
+        input: text,
+        voice: voiceName,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      logger.error("[TTS] OpenAI TTS API error", {
+        status: response.status,
+        error: errorText,
+      });
+      return fail({
+        message: t("post.errors.conversionFailed", { error: errorText }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    const contentType = response.headers.get("content-type") || "audio/mpeg";
+    const base64Audio = Buffer.from(audioBuffer).toString("base64");
+    // eslint-disable-next-line i18next/no-literal-string
+    return success(`data:${contentType};base64,${base64Audio}`);
+  }
+
+  /**
+   * Convert text to speech via Eden AI TTS API
+   * providerModel = "openai" (the Eden AI provider name)
+   * voiceGender = "MALE" | "FEMALE" based on voiceMeta
+   */
+  private static async callEdenAITTS(
+    text: string,
+    providerModel: string,
+    voiceGender: "MALE" | "FEMALE",
+    language: string,
+    logger: EndpointLogger,
+    t: TextToSpeechT,
+  ): Promise<ResponseType<string>> {
     if (!agentEnv.EDEN_AI_API_KEY) {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.voice;
       return fail({
@@ -105,9 +186,157 @@ export class TextToSpeechRepository {
       });
     }
 
+    logger.debug("[TTS] Calling Eden AI TTS API", {
+      provider: providerModel,
+      gender: voiceGender,
+      language,
+    });
+
+    const response = await fetch(
+      "https://api.edenai.run/v2/audio/text_to_speech",
+      {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          providers: providerModel,
+          text,
+          language: language.toLowerCase(),
+          option: voiceGender,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      logger.error("[TTS] Eden AI TTS API error", {
+        status: response.status,
+        error: errorText,
+      });
+      return fail({
+        message: t("post.errors.conversionFailed", { error: errorText }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    const responseData = (await response.json()) as EdenAITTSResponse;
+    const providerResult = responseData[providerModel];
+
+    if (providerResult?.error || providerResult?.status === "fail") {
+      const errorMessage =
+        providerResult?.error?.message ?? "Unknown provider error";
+      logger.error("[TTS] Eden AI provider error", {
+        provider: providerModel,
+        error: errorMessage,
+      });
+      return fail({
+        message: t("post.errors.providerError", { error: errorMessage }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    const audioResourceUrl = providerResult?.audio_resource_url;
+    if (!audioResourceUrl) {
+      logger.error("[TTS] No audio URL in Eden AI response", { providerModel });
+      return fail({
+        message: t("post.errors.noAudioUrl"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    return TextToSpeechRepository.fetchAndConvertAudio(
+      audioResourceUrl,
+      logger,
+      t,
+    );
+  }
+
+  /**
+   * Convert text to speech via ElevenLabs API
+   * providerModel = voice ID (e.g., "21m00Tcm4TlvDq8ikWAM")
+   */
+  private static async callElevenLabsTTS(
+    text: string,
+    providerModel: string,
+    logger: EndpointLogger,
+    t: TextToSpeechT,
+  ): Promise<ResponseType<string>> {
+    if (!agentEnv.ELEVENLABS_API_KEY) {
+      return fail({
+        message: t("post.errors.notConfigured", {
+          label: "ElevenLabs",
+          envKey: "ELEVENLABS_API_KEY",
+          url: "https://elevenlabs.io/app/settings/api-keys",
+        }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    logger.debug("[TTS] Calling ElevenLabs TTS API", {
+      voiceId: providerModel,
+    });
+
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${providerModel}`,
+      {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          "xi-api-key": agentEnv.ELEVENLABS_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text,
+          model_id: "eleven_monolingual_v1",
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      logger.error("[TTS] ElevenLabs TTS API error", {
+        status: response.status,
+        error: errorText,
+      });
+      return fail({
+        message: t("post.errors.conversionFailed", { error: errorText }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    const contentType = response.headers.get("content-type") || "audio/mpeg";
+    const base64Audio = Buffer.from(audioBuffer).toString("base64");
+    // eslint-disable-next-line i18next/no-literal-string
+    return success(`data:${contentType};base64,${base64Audio}`);
+  }
+
+  /**
+   * Convert text to speech using model-based provider routing
+   */
+  static async convertTextToSpeech(
+    data: TextToSpeechPostRequestOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    t: TextToSpeechT,
+  ): Promise<ResponseType<TextToSpeechPostResponseOutput>> {
+    const modelOption = getModelById(data.voiceId);
+    const language = TextToSpeechRepository.mapLocaleToLanguage(locale);
+
+    logger.info("[TTS] Starting text-to-speech conversion", {
+      voiceId: data.voiceId,
+      provider: modelOption.apiProvider,
+      language,
+      textLength: data.text.length,
+    });
+
     const tCredits = creditsScopedTranslation.scopedT(locale).t;
 
-    // Check minimum balance upfront (cost of ~50 characters)
+    // Check minimum balance upfront
     const balanceResult = await CreditRepository.getBalance(
       user.isPublic && user.leadId
         ? { leadId: user.leadId }
@@ -120,7 +349,7 @@ export class TextToSpeechRepository {
     );
 
     if (!balanceResult.success) {
-      logger.error("Failed to check balance for TTS", {
+      logger.error("[TTS] Failed to check balance", {
         error: balanceResult.message,
       });
       return fail({
@@ -130,7 +359,7 @@ export class TextToSpeechRepository {
     }
 
     if (balanceResult.data.total < TTS_MINIMUM_BALANCE) {
-      logger.warn("Insufficient credits for TTS", {
+      logger.warn("[TTS] Insufficient credits", {
         balance: balanceResult.data.total,
         minimum: TTS_MINIMUM_BALANCE,
       });
@@ -144,137 +373,73 @@ export class TextToSpeechRepository {
       });
     }
 
-    // Calculate credits based on character count
-    // Amazon TTS: $4 per 1M chars + 30% markup = $5.20 per 1M chars
     const characterCount = data.text.length;
     const creditsNeeded = characterCount * TTS_COST_PER_CHARACTER;
 
-    logger.info("Calculating TTS credits", {
+    logger.info("[TTS] Calculating TTS credits", {
       characterCount,
       creditsNeeded,
-      costPerCharacter: TTS_COST_PER_CHARACTER,
     });
 
     try {
-      logger.debug("Sending request to Eden AI", {
-        provider,
-        voice: data.voice,
-        language,
+      let audioResult: ResponseType<string>;
+
+      switch (modelOption.apiProvider) {
+        case ApiProvider.OPENAI_TTS:
+          audioResult = await TextToSpeechRepository.callOpenAITTS(
+            data.text,
+            data.voiceId,
+            modelOption.providerModel,
+            language,
+            logger,
+            t,
+          );
+          break;
+
+        case ApiProvider.EDEN_AI_TTS: {
+          const gender =
+            modelOption.voiceMeta?.gender === "male" ? "MALE" : "FEMALE";
+          audioResult = await TextToSpeechRepository.callEdenAITTS(
+            data.text,
+            modelOption.providerModel,
+            gender,
+            language,
+            logger,
+            t,
+          );
+          break;
+        }
+
+        case ApiProvider.ELEVENLABS:
+          audioResult = await TextToSpeechRepository.callElevenLabsTTS(
+            data.text,
+            modelOption.providerModel,
+            logger,
+            t,
+          );
+          break;
+
+        default:
+          return fail({
+            message: t("post.errors.unsupportedProvider", {
+              voiceId: data.voiceId,
+            }),
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          });
+      }
+
+      if (!audioResult.success) {
+        return audioResult;
+      }
+
+      const audioUrl = audioResult.data;
+
+      logger.info("[TTS] Text-to-speech conversion successful", {
+        audioSize: audioUrl.length,
+        provider: modelOption.apiProvider,
       });
 
-      // Call Eden AI TTS API
-      const response = await fetch(
-        "https://api.edenai.run/v2/audio/text_to_speech",
-        {
-          method: "POST",
-          headers: {
-            // eslint-disable-next-line i18next/no-literal-string
-            Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            providers: provider,
-            text: data.text,
-            language: language.toLowerCase(),
-            option: apiVoice,
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        logger.error("Eden AI TTS API error", {
-          status: response.status,
-          error: errorText,
-        });
-        return fail({
-          message: t("post.errors.conversionFailed"),
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: {
-            error: errorText,
-          },
-        });
-      }
-
-      const responseData = (await response.json()) as EdenAITTSResponse;
-      logger.debug("Received response from Eden AI", {
-        hasProviderResult: !!responseData[provider],
-      });
-
-      // Extract audio URL from response
-      const providerResult = responseData[provider];
-
-      // Check for provider-level errors
-      if (providerResult?.error || providerResult?.status === "fail") {
-        const errorMessage =
-          providerResult.error?.message || "Unknown provider error";
-        logger.error("Provider returned error", {
-          provider,
-          error: errorMessage,
-          errorType: providerResult.error?.type,
-        });
-        return fail({
-          message: t("post.errors.providerError"),
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: {
-            error: errorMessage,
-          },
-        });
-      }
-
-      const audioResourceUrl = providerResult?.audio_resource_url;
-
-      if (!audioResourceUrl) {
-        logger.error("No audio URL in response", {
-          provider,
-          responseKeys: Object.keys(responseData),
-        });
-        return fail({
-          message: t("post.errors.noAudioUrl"),
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        });
-      }
-
-      logger.debug("Fetching audio from URL", { audioUrl: audioResourceUrl });
-
-      // Fetch the audio file
-      const audioResponse = await fetch(audioResourceUrl);
-      if (!audioResponse.ok) {
-        logger.error("Failed to fetch audio file", {
-          status: audioResponse.status,
-          audioUrl: audioResourceUrl,
-        });
-        return fail({
-          message: t("post.errors.audioFetchFailed"),
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        });
-      }
-
-      const audioBuffer = await audioResponse.arrayBuffer();
-      let contentType =
-        audioResponse.headers.get("content-type") || "audio/mpeg";
-
-      // Normalize content type - some providers return generic types
-      if (
-        contentType === "binary/octet-stream" ||
-        contentType === "application/octet-stream"
-      ) {
-        contentType = "audio/mpeg";
-        logger.debug("Normalized content type from octet-stream to audio/mpeg");
-      }
-
-      // Convert to base64 data URL
-      const base64Audio = Buffer.from(audioBuffer).toString("base64");
-      // eslint-disable-next-line i18next/no-literal-string
-      const audioUrl = `data:${contentType};base64,${base64Audio}`;
-
-      logger.info("Text-to-speech conversion successful", {
-        audioSize: audioBuffer.byteLength,
-        contentType,
-        provider,
-      });
-
-      // Deduct credits AFTER successful completion (graceful - allows partial to 0)
+      // Deduct credits AFTER successful completion
       const deductResult = await CreditRepository.deductCreditsForTTS(
         user,
         creditsNeeded,
@@ -284,24 +449,20 @@ export class TextToSpeechRepository {
       );
 
       if (!deductResult.success) {
-        logger.error("Failed to deduct TTS credits", {
-          creditsNeeded,
-          characterCount,
-        });
+        logger.error("[TTS] Failed to deduct credits", { creditsNeeded });
         return fail({
-          message: t("post.errors.creditsFailed"),
+          message: t("post.errors.creditsFailed", {
+            error: deductResult.message,
+          }),
           errorType: ErrorResponseTypes.PAYMENT_ERROR,
         });
       }
 
       if (deductResult.data.partialDeduction) {
-        logger.info(
-          "TTS: Partial credit deduction (insufficient funds, deducted to 0)",
-          {
-            requestedCost: creditsNeeded,
-            characterCount,
-          },
-        );
+        logger.info("[TTS] Partial credit deduction (insufficient funds)", {
+          requestedCost: creditsNeeded,
+          characterCount,
+        });
       }
 
       return success({
@@ -310,17 +471,14 @@ export class TextToSpeechRepository {
       });
     } catch (error) {
       const errorMessage = parseError(error).message;
-      logger.error("Failed to convert text to speech", {
+      logger.error("[TTS] Failed to convert text to speech", {
         error: errorMessage,
-        provider,
+        voiceId: data.voiceId,
       });
 
       return fail({
-        message: t("post.errors.conversionFailed"),
+        message: t("post.errors.conversionFailed", { error: errorMessage }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: {
-          error: errorMessage,
-        },
       });
     }
   }

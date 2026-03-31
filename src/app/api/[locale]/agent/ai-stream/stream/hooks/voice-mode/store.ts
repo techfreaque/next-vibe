@@ -8,6 +8,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import type { ChatMode } from "@/app/api/[locale]/agent/models/enum";
+
 // ─── Voice Mode Types ─────────────────────────────────────────────────────────
 
 /**
@@ -29,10 +31,10 @@ export interface VoiceMode {
   /** Auto-play TTS for AI responses */
   autoPlayTTS: boolean;
   /**
-   * Call mode enabled per model+skill combination
+   * Chat mode per model+skill combination
    * Key format: `${modelId}:${skillId}`
    */
-  callModeByConfig: Record<string, boolean>;
+  chatModeByConfig: Record<string, ChatMode>;
 }
 
 /**
@@ -65,7 +67,7 @@ export const DEFAULT_VOICE_MODE: VoiceMode = {
   enabled: true,
   inputMode: "transcribe",
   autoPlayTTS: false,
-  callModeByConfig: {},
+  chatModeByConfig: {},
 };
 
 /**
@@ -96,10 +98,10 @@ interface VoiceModeState {
   // Settings actions
   setInputMode: (mode: VoiceInputMode) => void;
   setAutoPlayTTS: (autoPlay: boolean) => void;
-  /** Set call mode for a specific model+skill combination */
-  setCallMode: (modelId: string, skillId: string, enabled: boolean) => void;
-  /** Get call mode for a specific model+skill combination */
-  getCallMode: (modelId: string, skillId: string) => boolean;
+  /** Set chat mode for a specific model+skill combination */
+  setChatMode: (modelId: string, skillId: string, mode: ChatMode) => void;
+  /** Get chat mode for a specific model+skill combination */
+  getChatMode: (modelId: string, skillId: string) => ChatMode;
 
   // Runtime actions
   setRecording: (recording: boolean) => void;
@@ -133,23 +135,23 @@ export const useVoiceModeStore = create<VoiceModeState>()(
         }));
       },
 
-      setCallMode: (modelId, skillId, enabled): void => {
+      setChatMode: (modelId, skillId, mode): void => {
         const key = getCallModeKey(modelId, skillId);
         set((state) => ({
           settings: {
             ...state.settings,
-            callModeByConfig: {
-              ...state.settings.callModeByConfig,
-              [key]: enabled,
+            chatModeByConfig: {
+              ...state.settings.chatModeByConfig,
+              [key]: mode,
             },
           },
         }));
       },
 
-      getCallMode: (modelId, skillId): boolean => {
+      getChatMode: (modelId, skillId): ChatMode => {
         const key = getCallModeKey(modelId, skillId);
         return (
-          useVoiceModeStore.getState().settings.callModeByConfig[key] ?? false
+          useVoiceModeStore.getState().settings.chatModeByConfig[key] ?? "text"
         );
       },
 
@@ -197,15 +199,31 @@ export const useVoiceModeStore = create<VoiceModeState>()(
       // Migrate old storage format to new format
       merge: (persisted, current) => {
         const persistedState = persisted as
-          | { settings?: Partial<VoiceMode> }
+          | {
+              settings?: Partial<VoiceMode> & {
+                callModeByConfig?: Record<string, boolean>;
+              };
+            }
           | undefined;
+
+        // Migrate old boolean callModeByConfig to ChatMode chatModeByConfig
+        const oldCallMode = persistedState?.settings?.callModeByConfig;
+        const migratedChatMode: Record<string, ChatMode> = {};
+        if (oldCallMode) {
+          for (const [key, val] of Object.entries(oldCallMode)) {
+            migratedChatMode[key] = val ? "voice" : "text";
+          }
+        }
+
         return {
           ...current,
           settings: {
             ...current.settings,
             ...persistedState?.settings,
-            // Ensure callModeByConfig exists (migrate from old callMode)
-            callModeByConfig: persistedState?.settings?.callModeByConfig ?? {},
+            chatModeByConfig: {
+              ...migratedChatMode,
+              ...(persistedState?.settings?.chatModeByConfig ?? {}),
+            },
           },
         };
       },

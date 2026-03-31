@@ -4,6 +4,7 @@ import type { JSONValue } from "ai";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import {
   ApiProvider,
+  isModelOptionAudioBased,
   type ModelOption,
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -105,13 +106,13 @@ export class ProviderFactory {
         return createOpenAIImages(logger, locale);
 
       case ApiProvider.REPLICATE:
-        if ("creditCostPerClip" in modelOption) {
+        if (isModelOptionAudioBased(modelOption)) {
           return createReplicateAudio(logger, modelOption, locale);
         }
         return createReplicateImage(logger, locale);
 
       case ApiProvider.FAL_AI:
-        if ("creditCostPerClip" in modelOption) {
+        if (isModelOptionAudioBased(modelOption)) {
           return createFalAiAudio(logger, modelOption, locale);
         }
         return createFalAiImage(logger, locale);

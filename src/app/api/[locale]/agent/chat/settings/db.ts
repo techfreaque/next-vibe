@@ -4,14 +4,27 @@
  */
 
 import { relations } from "drizzle-orm";
-import { integer, jsonb, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
 import { users } from "@/app/api/[locale]/user/db";
 
-import type { ModelId } from "../../models/models";
-import type { TtsVoiceValue } from "../../text-to-speech/enum";
+import type { ChatMode } from "../../models/enum";
+import type {
+  LlmModelId,
+  ModelId,
+  SttModelId,
+  TtsModelId,
+  VisionModelId,
+} from "../../models/models";
 import type { ViewModeValue } from "../enum";
 import type { ToolConfigItem } from "./definition";
 
@@ -37,7 +50,21 @@ export const chatSettings = pgTable("chat_settings", {
 
   // TTS settings - only store if different from default
   ttsAutoplay: jsonb("tts_autoplay").$type<boolean>(),
-  ttsVoice: jsonb("tts_voice").$type<typeof TtsVoiceValue>(),
+
+  // TTS voice model ID - user's preferred voice (null = system default openai-alloy)
+  voiceId: text("voice_id").$type<TtsModelId>(),
+
+  // STT model preference (null = system default openai-whisper)
+  sttModelId: text("stt_model_id").$type<SttModelId>(),
+
+  // Vision bridge model (null = best vision model user has access to)
+  visionBridgeModelId: text("vision_bridge_model_id").$type<VisionModelId>(),
+
+  // Translation model for pure generators (null = fast cheap LLM)
+  translationModelId: text("translation_model_id").$type<LlmModelId>(),
+
+  // Default chat mode (null = "text")
+  defaultChatMode: text("default_chat_mode").$type<ChatMode>(),
 
   // UI preferences - only store if different from default
   viewMode: jsonb("view_mode").$type<typeof ViewModeValue>(),
@@ -82,9 +109,9 @@ export const selectChatSettingsSchema = createSelectSchema(chatSettings);
 export const insertChatSettingsSchema = createInsertSchema(chatSettings);
 
 /**
- * Type for settings model
+ * Type for settings model - uses $inferSelect to respect .$type<> annotations
  */
-export type ChatSettings = z.infer<typeof selectChatSettingsSchema>;
+export type ChatSettings = typeof chatSettings.$inferSelect;
 
 /**
  * Type for new settings model

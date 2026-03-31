@@ -6,7 +6,6 @@ import { KAGI_ALIAS } from "@/app/api/[locale]/agent/search/kagi/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
@@ -33,7 +32,6 @@ export const researchAgentSkill: Skill = {
   icon: "magnifying-glass-icon",
   category: SkillCategory.ASSISTANT,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   userRole: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
   availableTools: [
     tool(BRAVE_SEARCH_ALIAS),

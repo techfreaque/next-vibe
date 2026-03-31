@@ -210,6 +210,22 @@ export const translations: typeof enTranslations = {
       label: "KI-Stimme",
       description: "Wählen Sie die Stimme für Ihren KI-Assistenten",
     },
+    sttModel: {
+      label: "Sprache-zu-Text-Modell",
+      description: "Modell für die Spracherkennung",
+    },
+    visionBridgeModel: {
+      label: "Vision-Modell",
+      description: "Modell für die Bildanalyse",
+    },
+    translationModel: {
+      label: "Übersetzungsmodell",
+      description: "Modell für die Textübersetzung",
+    },
+    defaultChatMode: {
+      label: "Standard-Chat-Modus",
+      description: "Standardmodus beim Öffnen dieses Chats",
+    },
     mode: {
       label: "Auswahlmodus",
     },

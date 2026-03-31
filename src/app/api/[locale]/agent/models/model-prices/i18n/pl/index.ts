@@ -1,59 +1,58 @@
-import type { translations as enTranslations } from "../en";
-
-export const translations: typeof enTranslations = {
+export const translations = {
   category: "Agent",
 
   get: {
-    title: "Pobierz ceny modeli OpenRouter",
+    title: "Aktualizuj wszystkie ceny modeli",
     description:
-      "Pobierz ceny modeli i metadane z API OpenRouter i zaktualizuj models.ts",
+      "Pobierz aktualne ceny dla wszystkich modeli z każdego API dostawcy (OpenRouter, Replicate itp.) i zaktualizuj models.ts",
     form: {
-      title: "Ceny modeli OpenRouter",
+      title: "Aktualizator cen modeli",
     },
     response: {
       summary: {
         title: "Podsumowanie aktualizacji",
-        totalModels: "Wszystkie modele",
-        modelsFound: "Modele znalezione",
-        modelsUpdated: "Modele zaktualizowane",
+        totalProviders: "Uruchomione dostawcy",
+        totalModels: "Łącznie modeli",
+        modelsUpdated: "Zaktualizowane modele",
         fileUpdated: "Plik zaktualizowany",
       },
-      models: {
+      updates: {
         title: "Zaktualizowane modele",
         model: {
-          id: "ID modelu",
-          name: "Nazwa modelu",
-          contextLength: "Długość kontekstu",
-          inputTokenCost: "Koszt wejściowy ($/1M tokenów)",
-          outputTokenCost: "Koszt wyjściowy ($/1M tokenów)",
-          cacheReadTokenCost: "Koszt odczytu cache ($/1M tokenów)",
-          cacheWriteTokenCost: "Koszt zapisu cache ($/1M tokenów)",
-        },
-      },
-      missingOpenRouterModels: {
-        title: "Brakujące modele OpenRouter",
-        model: {
           modelId: "ID modelu",
-          openRouterId: "ID OpenRouter",
-          suggestion: "Sugestia",
+          name: "Nazwa modelu",
+          provider: "Dostawca",
+          field: "Pole ceny",
+          value: "Nowa wartość",
+          source: "Źródło ceny",
         },
       },
-      nonOpenRouterModels: {
-        title: "Modele spoza OpenRouter",
+      failures: {
+        title: "Nieudane pobrania cen",
         model: {
           modelId: "ID modelu",
           provider: "Dostawca",
+          reason: "Powód",
+        },
+      },
+      providerResults: {
+        title: "Wyniki dostawców",
+        model: {
+          provider: "Dostawca",
+          modelsFound: "Znalezione modele",
+          modelsUpdated: "Zaktualizowane",
+          error: "Błąd",
         },
       },
     },
     errors: {
       server: {
         title: "Błąd serwera",
-        description: "Nie udało się pobrać danych z API OpenRouter",
+        description: "Nie udało się zaktualizować cen modeli",
       },
       network: {
         title: "Błąd sieci",
-        description: "Nie można połączyć się z API OpenRouter",
+        description: "Nie można połączyć się z API cen",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -64,8 +63,8 @@ export const translations: typeof enTranslations = {
         description: "Nieprawidłowe parametry żądania",
       },
       unauthorized: {
-        title: "Brak autoryzacji",
-        description: "Nie jesteś upoważniony do wykonania tej akcji",
+        title: "Nieautoryzowany",
+        description: "Nie masz uprawnień do wykonania tej akcji",
       },
       forbidden: {
         title: "Zabronione",
@@ -86,10 +85,15 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Sukces",
-      description: "Pomyślnie pobrano i zaktualizowano ceny modeli",
+      description: "Pomyślnie pobrano i zaktualizowano wszystkie ceny modeli",
     },
   },
   tags: {
     models: "Modele",
+  },
+  updateAllModelPrices: {
+    name: "Aktualizuj wszystkie ceny modeli",
+    description:
+      "Pobiera aktualne ceny dla wszystkich modeli z każdego API dostawcy i aktualizuje models.ts",
   },
 };

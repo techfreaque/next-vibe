@@ -65,6 +65,9 @@ function getModelSortPrice(def: ModelDefinition): number {
   if ("creditCostPerSecond" in p) {
     return p.creditCostPerSecond;
   }
+  if ("creditCostPerCharacter" in p) {
+    return p.creditCostPerCharacter;
+  }
   // Token-based: use a typical 16k input / 1.5k output scenario
   if (
     "inputTokenCost" in p &&
@@ -73,7 +76,9 @@ function getModelSortPrice(def: ModelDefinition): number {
   ) {
     return p.inputTokenCost * 16000 + p.outputTokenCost * 1500;
   }
-  return typeof p.creditCost === "number" ? p.creditCost : 0;
+  return "creditCost" in p && typeof p.creditCost === "number"
+    ? p.creditCost
+    : 0;
 }
 
 export function OverviewTab({

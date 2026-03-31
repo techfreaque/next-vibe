@@ -6,8 +6,21 @@
 import { z } from "zod";
 
 import {
+  CHAT_MODE_IDS,
+  ChatModeOptions,
+} from "@/app/api/[locale]/agent/models/enum";
+import {
+  DEFAULT_TTS_VOICE_ID,
+  LLM_MODEL_IDS,
+  LlmModelIdOptions,
   ModelId,
   ModelIdOptions,
+  STT_MODEL_IDS,
+  SttModelIdOptions,
+  TTS_MODEL_IDS,
+  TtsModelIdOptions,
+  VISION_MODEL_IDS,
+  VisionModelIdOptions,
 } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -24,7 +37,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { TtsVoiceDB, TtsVoiceOptions } from "../../text-to-speech/enum";
 import { ViewMode, ViewModeDB, ViewModeOptions } from "../enum";
 import {
   CHAT_SETTINGS_GET_ALIAS,
@@ -76,10 +88,30 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.boolean(),
       }),
-      ttsVoice: responseField(scopedTranslation, {
+      voiceId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.enum(TtsVoiceDB),
+        schema: z.enum(TTS_MODEL_IDS),
+      }),
+      sttModelId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(STT_MODEL_IDS).optional(),
+      }),
+      visionBridgeModelId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(VISION_MODEL_IDS).optional(),
+      }),
+      translationModelId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(LLM_MODEL_IDS).optional(),
+      }),
+      defaultChatMode: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(CHAT_MODE_IDS).optional(),
       }),
       viewMode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -185,7 +217,7 @@ const { GET } = createEndpoint({
         selectedSkill: "default",
         activeFavoriteId: null,
         ttsAutoplay: false,
-        ttsVoice: TtsVoiceDB[0],
+        voiceId: DEFAULT_TTS_VOICE_ID,
         viewMode: ViewMode.LINEAR,
         availableTools: null,
         pinnedTools: null,
@@ -251,13 +283,45 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.boolean().optional(),
       }),
-      ttsVoice: requestField(scopedTranslation, {
+      voiceId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.ttsVoice.label" as const,
-        options: TtsVoiceOptions,
+        options: TtsModelIdOptions,
         columns: 6,
-        schema: z.enum(TtsVoiceDB).optional(),
+        schema: z.enum(TTS_MODEL_IDS).optional(),
+      }),
+      sttModelId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.sttModel.label" as const,
+        options: SttModelIdOptions,
+        columns: 6,
+        schema: z.enum(STT_MODEL_IDS).optional(),
+      }),
+      visionBridgeModelId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.visionBridgeModel.label" as const,
+        options: VisionModelIdOptions,
+        columns: 6,
+        schema: z.enum(VISION_MODEL_IDS).optional(),
+      }),
+      translationModelId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.translationModel.label" as const,
+        options: LlmModelIdOptions,
+        columns: 6,
+        schema: z.enum(LLM_MODEL_IDS).optional(),
+      }),
+      defaultChatMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.defaultChatMode.label" as const,
+        options: ChatModeOptions,
+        columns: 6,
+        schema: z.enum(CHAT_MODE_IDS).optional(),
       }),
       viewMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -391,6 +455,10 @@ const { POST } = createEndpoint({
     requests: {
       update: {
         ttsAutoplay: true,
+        sttModelId: undefined,
+        visionBridgeModelId: undefined,
+        translationModelId: undefined,
+        defaultChatMode: undefined,
       },
     },
   },

@@ -5,6 +5,7 @@
 
 import "server-only";
 
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/models/models";
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -19,7 +20,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { DEFAULT_TTS_VOICE } from "../../../text-to-speech/enum";
 import { scopedTranslation as charactersScopedTranslation } from "../../skills/i18n";
 import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
@@ -102,7 +102,8 @@ export class SingleFavoriteRepository {
       }
 
       const character = characterResult.data;
-      const voice = favorite.voice || character?.voice || DEFAULT_TTS_VOICE;
+      const voiceId =
+        favorite.voiceId ?? character?.voiceId ?? DEFAULT_TTS_VOICE_ID;
 
       // Build modelSelection response
       // If favorite has custom selection, return it; otherwise return null (use character defaults)
@@ -134,7 +135,11 @@ export class SingleFavoriteRepository {
         tagline: character?.tagline ?? charactersT("skills.default.tagline"),
         description:
           character?.description ?? charactersT("skills.default.description"),
-        voice,
+        voiceId,
+        sttModelId: favorite.sttModelId ?? undefined,
+        visionBridgeModelId: favorite.visionBridgeModelId ?? undefined,
+        translationModelId: favorite.translationModelId ?? undefined,
+        defaultChatMode: favorite.defaultChatMode ?? undefined,
         modelSelection,
         characterModelSelection,
         compactTrigger: favorite.compactTrigger ?? null,
@@ -218,13 +223,31 @@ export class SingleFavoriteRepository {
         }
       }
 
-      // Only store voice if different from character default
+      // Only store voice if different from character default (null = cascade to skill)
       const voiceToStore =
-        character && data.voice === character.voice ? null : data.voice;
+        character && data.voiceId === character.voiceId ? null : data.voiceId;
 
       // Only store customIcon if different from character default
       const customIconToStore =
         character && data.icon === character.icon ? null : data.icon;
+
+      // Only store bridge models if different from character defaults (null = cascade to skill)
+      const sttModelIdToStore =
+        character && data.sttModelId === character.sttModelId
+          ? null
+          : (data.sttModelId ?? null);
+      const visionBridgeModelIdToStore =
+        character && data.visionBridgeModelId === character.visionBridgeModelId
+          ? null
+          : (data.visionBridgeModelId ?? null);
+      const translationModelIdToStore =
+        character && data.translationModelId === character.translationModelId
+          ? null
+          : (data.translationModelId ?? null);
+      const defaultChatModeToStore =
+        character && data.defaultChatMode === character.defaultChatMode
+          ? null
+          : (data.defaultChatMode ?? null);
 
       // Store modelSelection directly (null = use character defaults)
       const modelSelectionToStore = data.modelSelection;
@@ -234,7 +257,11 @@ export class SingleFavoriteRepository {
         .set({
           skillId: data.skillId,
           customIcon: customIconToStore,
-          voice: voiceToStore,
+          voiceId: voiceToStore ?? null,
+          sttModelId: sttModelIdToStore,
+          visionBridgeModelId: visionBridgeModelIdToStore,
+          translationModelId: translationModelIdToStore,
+          defaultChatMode: defaultChatModeToStore,
           modelSelection: modelSelectionToStore,
           compactTrigger: data.compactTrigger ?? null,
           availableTools: data.availableTools ?? null,
@@ -336,7 +363,7 @@ export class SingleFavoriteRepository {
       const deleted = result[0];
       return success({
         skillId: deleted.skillId,
-        voice: deleted.voice,
+        voiceId: deleted.voiceId,
         modelSelection: deleted.modelSelection,
         createdAt: deleted.createdAt,
         updatedAt: deleted.updatedAt,

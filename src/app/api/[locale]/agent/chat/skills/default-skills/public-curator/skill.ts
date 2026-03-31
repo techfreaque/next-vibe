@@ -3,7 +3,6 @@ import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
@@ -30,7 +29,6 @@ export const publicCuratorSkill: Skill = {
   icon: "books",
   category: SkillCategory.ASSISTANT,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   userRole: [UserPermissionRole.ADMIN],
   availableTools: [
     tool(TOOL_HELP_ALIAS),

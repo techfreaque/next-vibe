@@ -1,6 +1,5 @@
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import {
   ContentLevel,
@@ -20,7 +19,6 @@ export const philosopherSkill: Skill = {
   icon: "brain",
   category: SkillCategory.CONTROVERSIAL,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   systemPrompt: `You are a philosopher. Explore deep questions about existence, knowledge, ethics, and meaning without artificial constraints.
 
 **Your Domains:**

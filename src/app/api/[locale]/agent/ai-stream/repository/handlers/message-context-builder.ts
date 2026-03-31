@@ -43,9 +43,50 @@ export class MessageContextBuilder {
    * Strip attachments from messages for non-vision models
    * Operates on ChatMessage objects BEFORE conversion to AI SDK format
    */
+  /**
+   * Check if model natively supports an attachment's modality.
+   * Uses inputs[] array if available, falls back to legacy feature flags.
+   */
+  static supportsAttachmentNatively(
+    attachment: { mimeType: string },
+    model: ModelOption,
+  ): boolean {
+    const mimeType = attachment.mimeType.toLowerCase();
+
+    // Use new inputs[] array if available
+    if (model.inputs && model.inputs.length > 0) {
+      if (mimeType.startsWith("image/")) {
+        return model.inputs.includes("image");
+      }
+      if (mimeType.startsWith("video/")) {
+        return model.inputs.includes("video");
+      }
+      if (mimeType.startsWith("audio/")) {
+        return model.inputs.includes("audio");
+      }
+      if (mimeType.startsWith("application/pdf")) {
+        return model.inputs.includes("file");
+      }
+      if (mimeType.startsWith("text/")) {
+        return model.inputs.includes("file");
+      }
+      return false;
+    }
+
+    // Fallback: use inputs[] array
+    if (mimeType.startsWith("image/")) {
+      return model.inputs?.includes("image") ?? false;
+    }
+    if (mimeType.startsWith("application/pdf")) {
+      return model.inputs?.includes("file") ?? false;
+    }
+    return false;
+  }
+
   private static stripAttachmentsFromMessages(
     messages: ChatMessage[],
     modelName: string,
+    model?: ModelOption,
   ): {
     totalRemoved: number;
     formats: string[];
@@ -65,6 +106,24 @@ export class MessageContextBuilder {
       message.metadata.attachments = message.metadata.attachments.filter(
         (attachment) => {
           const mimeType = attachment.mimeType?.toLowerCase() || "";
+
+          // If model is provided, use supportsAttachmentNatively for precise filtering
+          if (model) {
+            if (this.supportsAttachmentNatively({ mimeType }, model)) {
+              return true;
+            }
+            const isImage = mimeType.startsWith("image/");
+            const isFile =
+              mimeType.startsWith("application/") ||
+              mimeType.startsWith("text/");
+            if (isImage || isFile) {
+              totalRemoved++;
+              formatSet.add(isImage ? "image" : "file");
+              return false;
+            }
+            return true;
+          }
+
           const isImage = mimeType.startsWith("image/");
           const isFile =
             mimeType.startsWith("application/") || mimeType.startsWith("text/");
@@ -348,10 +407,11 @@ export class MessageContextBuilder {
         params.modelConfig ??
         getModelById(params.upcomingResponseContext.model);
 
-      if (!modelConfig.features.imageInput) {
+      if (!modelConfig.inputs?.includes("image")) {
         const result = this.stripAttachmentsFromMessages(
           contextMessages,
           modelConfig.name,
+          modelConfig,
         );
 
         if (result.totalRemoved > 0) {

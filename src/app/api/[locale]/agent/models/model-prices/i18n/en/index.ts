@@ -2,56 +2,57 @@ export const translations = {
   category: "Agent",
 
   get: {
-    title: "Fetch OpenRouter Model Pricing",
+    title: "Update All Model Prices",
     description:
-      "Fetch model pricing and metadata from OpenRouter API and update models.ts",
+      "Fetch live pricing for all models from every provider API (OpenRouter, Replicate, etc.) and update models.ts",
     form: {
-      title: "OpenRouter Model Pricing",
+      title: "Model Price Updater",
     },
     response: {
       summary: {
         title: "Update Summary",
+        totalProviders: "Providers Run",
         totalModels: "Total Models",
-        modelsFound: "Models Found",
         modelsUpdated: "Models Updated",
         fileUpdated: "File Updated",
       },
-      models: {
+      updates: {
         title: "Updated Models",
         model: {
-          id: "Model ID",
-          name: "Model Name",
-          contextLength: "Context Length",
-          inputTokenCost: "Input Cost ($/1M tokens)",
-          outputTokenCost: "Output Cost ($/1M tokens)",
-          cacheReadTokenCost: "Cache Read Cost ($/1M tokens)",
-          cacheWriteTokenCost: "Cache Write Cost ($/1M tokens)",
-        },
-      },
-      missingOpenRouterModels: {
-        title: "Missing OpenRouter Models",
-        model: {
           modelId: "Model ID",
-          openRouterId: "OpenRouter ID",
-          suggestion: "Suggestion",
+          name: "Model Name",
+          provider: "Provider",
+          field: "Price Field",
+          value: "New Value",
+          source: "Price Source",
         },
       },
-      nonOpenRouterModels: {
-        title: "Non-OpenRouter Models",
+      failures: {
+        title: "Price Fetch Failures",
         model: {
           modelId: "Model ID",
           provider: "Provider",
+          reason: "Reason",
+        },
+      },
+      providerResults: {
+        title: "Provider Results",
+        model: {
+          provider: "Provider",
+          modelsFound: "Models Found",
+          modelsUpdated: "Updated",
+          error: "Error",
         },
       },
     },
     errors: {
       server: {
         title: "Server Error",
-        description: "Failed to fetch from OpenRouter API",
+        description: "Failed to update model prices",
       },
       network: {
         title: "Network Error",
-        description: "Could not connect to OpenRouter API",
+        description: "Could not connect to pricing APIs",
       },
       unknown: {
         title: "Unknown Error",
@@ -84,10 +85,15 @@ export const translations = {
     },
     success: {
       title: "Success",
-      description: "Successfully fetched and updated model pricing",
+      description: "Successfully fetched and updated all model prices",
     },
   },
   tags: {
     models: "Models",
+  },
+  updateAllModelPrices: {
+    name: "Update All Model Prices",
+    description:
+      "Fetches live pricing for all models from every provider API and updates models.ts",
   },
 };

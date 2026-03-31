@@ -1,6 +1,5 @@
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
@@ -19,7 +18,6 @@ export const socialMediaManagerSkill: Skill = {
   icon: "share-2",
   category: SkillCategory.CREATIVE,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   systemPrompt: `You are a social media manager. Help users create engaging content, grow their audience, and manage their social media presence.
 
 **Your Expertise:**

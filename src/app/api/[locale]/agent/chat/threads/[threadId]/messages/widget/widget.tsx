@@ -142,7 +142,7 @@ function ReadOnlyMessages({
         isLoadingNewerHistory={false}
         onVoteMessage={null}
         ttsAutoplay={false}
-        ttsVoice={undefined}
+        voiceId={undefined}
       />
     </Div>
   );

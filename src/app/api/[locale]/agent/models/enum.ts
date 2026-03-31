@@ -48,6 +48,11 @@ export const {
   ROLEPLAY_DARK: "modelUtilities.roleplayDark",
   CONSPIRACY: "modelUtilities.conspiracy",
 
+  // Modality-specific
+  TTS: "modelUtilities.tts",
+  STT: "modelUtilities.stt",
+  VIDEO_GEN: "modelUtilities.videoGen",
+
   // Meta
   LEGACY: "modelUtilities.legacy",
   UNCENSORED: "modelUtilities.uncensored",
@@ -80,6 +85,46 @@ export const ModelUtilityDB = [
   ModelUtility.OFFENSIVE_LANGUAGE,
   ModelUtility.ROLEPLAY_DARK,
   ModelUtility.CONSPIRACY,
+  ModelUtility.TTS,
+  ModelUtility.STT,
+  ModelUtility.VIDEO_GEN,
   ModelUtility.LEGACY,
   ModelUtility.UNCENSORED,
 ] as const;
+
+// ============================================
+// MODALITY TYPES
+// ============================================
+
+export type ModelRole =
+  | "llm"
+  | "tts"
+  | "stt"
+  | "image-gen"
+  | "video-gen"
+  | "audio-gen"
+  | "embedding"
+  | "router";
+
+export type Modality = "text" | "audio" | "image" | "video" | "file";
+
+// ============================================
+// CHAT MODE
+// ============================================
+
+export type ChatMode = "text" | "voice" | "call";
+
+export const CHAT_MODE_IDS = [
+  "text",
+  "voice",
+  "call",
+] as const satisfies ChatMode[];
+
+export const ChatModeOptions: Array<{ value: ChatMode; label: string }> = [
+  // eslint-disable-next-line i18next/no-literal-string -- UI labels for chat mode
+  { value: "text", label: "Text" },
+  // eslint-disable-next-line i18next/no-literal-string -- UI labels for chat mode
+  { value: "voice", label: "Voice" },
+  // eslint-disable-next-line i18next/no-literal-string -- UI labels for chat mode
+  { value: "call", label: "Call" },
+];

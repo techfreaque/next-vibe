@@ -5,12 +5,22 @@
 
 import { z } from "zod";
 
-import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/types";
 import {
-  TtsVoice,
-  TtsVoiceDB,
-  TtsVoiceOptions,
-} from "@/app/api/[locale]/agent/text-to-speech/enum";
+  CHAT_MODE_IDS,
+  ChatModeOptions,
+} from "@/app/api/[locale]/agent/models/enum";
+import {
+  DEFAULT_TTS_VOICE_ID,
+  LLM_MODEL_IDS,
+  LlmModelIdOptions,
+  STT_MODEL_IDS,
+  SttModelIdOptions,
+  TTS_MODEL_IDS,
+  TtsModelIdOptions,
+  VISION_MODEL_IDS,
+  VisionModelIdOptions,
+} from "@/app/api/[locale]/agent/models/models";
+import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/types";
 import {
   dateSchema,
   iconSchema,
@@ -211,9 +221,9 @@ const { DELETE } = createEndpoint({
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
-      voice: responseField(scopedTranslation, {
+      voiceId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        schema: z.enum(TtsVoiceDB).nullable(),
+        schema: z.enum(TTS_MODEL_IDS).nullable(),
       }),
       modelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -281,7 +291,7 @@ const { DELETE } = createEndpoint({
     responses: {
       delete: {
         skillId: "thea",
-        voice: null,
+        voiceId: null,
         modelSelection: null,
         createdAt: "2024-01-15T10:00:00.000Z",
         updatedAt: "2024-01-15T10:00:00.000Z",
@@ -357,7 +367,7 @@ const { PATCH } = createEndpoint({
                 data: {
                   ...prevData.data,
                   selectedModel: modelId,
-                  ttsVoice: requestData.voice ?? prevData.data.ttsVoice,
+                  voiceId: requestData.voiceId ?? prevData.data.voiceId,
                 },
               };
             },
@@ -371,7 +381,7 @@ const { PATCH } = createEndpoint({
               user,
               {
                 selectedModel: modelId,
-                ttsVoice: requestData.voice ?? settingsData.data.ttsVoice,
+                voiceId: requestData.voiceId ?? settingsData.data.voiceId,
               },
               undefined,
               locale,
@@ -461,7 +471,7 @@ const { PATCH } = createEndpoint({
                         skillId: fav.skillId,
                         variantId: fav.variantId ?? null,
                         customIcon: requestData.icon ?? null,
-                        voice: requestData.voice ?? null,
+                        voiceId: requestData.voiceId ?? null,
                         modelSelection: requestData.modelSelection,
                         position: fav.position,
                       },
@@ -502,7 +512,7 @@ const { PATCH } = createEndpoint({
                 characterName: prevData.data.name,
                 characterTagline: prevData.data.tagline,
                 characterDescription: prevData.data.description,
-                voice: requestData.voice ?? null,
+                voiceId: requestData.voiceId ?? null,
                 modelSelection: requestData.modelSelection,
               },
             };
@@ -569,18 +579,70 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
 
-      voice: requestField(scopedTranslation, {
+      voiceId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
+        options: TtsModelIdOptions,
         label: "patch.voice.label" as const,
         description: "patch.voice.description" as const,
-        options: TtsVoiceOptions,
         columns: 6,
         theme: {
           descriptionStyle: "inline",
           optionalColor: "transparent",
         },
-        schema: z.enum(TtsVoiceDB).nullable().optional(),
+        schema: z.enum(TTS_MODEL_IDS).nullable().optional(),
+      }),
+      sttModelId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: SttModelIdOptions,
+        label: "patch.sttModel.label" as const,
+        description: "patch.sttModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+        schema: z.enum(STT_MODEL_IDS).nullable().optional(),
+      }),
+      visionBridgeModelId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: VisionModelIdOptions,
+        label: "patch.visionBridgeModel.label" as const,
+        description: "patch.visionBridgeModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+        schema: z.enum(VISION_MODEL_IDS).nullable().optional(),
+      }),
+      translationModelId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: LlmModelIdOptions,
+        label: "patch.translationModel.label" as const,
+        description: "patch.translationModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+        schema: z.enum(LLM_MODEL_IDS).nullable().optional(),
+      }),
+      defaultChatMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: ChatModeOptions,
+        label: "patch.defaultChatMode.label" as const,
+        description: "patch.defaultChatMode.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+        schema: z.enum(CHAT_MODE_IDS).nullable().optional(),
       }),
 
       modelSelection: requestField(scopedTranslation, {
@@ -720,7 +782,7 @@ const { PATCH } = createEndpoint({
       update: {
         skillId: "thea",
         icon: "sun" as const,
-        voice: TtsVoice.FEMALE,
+        voiceId: DEFAULT_TTS_VOICE_ID,
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
           intelligenceRange: {
@@ -870,10 +932,34 @@ const { GET } = createEndpoint({
         schema: z.string(),
       }),
 
-      voice: responseField(scopedTranslation, {
+      voiceId: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         variant: "default",
-        schema: z.enum(TtsVoiceDB).nullable(),
+        schema: z.enum(TTS_MODEL_IDS).nullable(),
+      }),
+
+      sttModelId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(STT_MODEL_IDS).optional(),
+      }),
+
+      visionBridgeModelId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(VISION_MODEL_IDS).optional(),
+      }),
+
+      translationModelId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(LLM_MODEL_IDS).optional(),
+      }),
+
+      defaultChatMode: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(CHAT_MODE_IDS).optional(),
       }),
 
       modelSelection: responseField(scopedTranslation, {
@@ -998,7 +1084,7 @@ const { GET } = createEndpoint({
         name: "fallbacks.unknownSkill" as const,
         tagline: "fallbacks.noTagline" as const,
         description: "fallbacks.noDescription" as const,
-        voice: null,
+        voiceId: null,
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
           priceRange: {

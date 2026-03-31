@@ -3,7 +3,6 @@ import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { envClient } from "@/config/env-client";
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import { MEMORY_UPDATE_ALIAS } from "../../../memories/[id]/constants";
 import { MEMORY_LIST_ALIAS } from "../../../memories/constants";
 import { MEMORY_ADD_ALIAS } from "../../../memories/create/constants";
@@ -29,7 +28,6 @@ export const codeArchitectSkill: Skill = {
   icon: "code",
   category: SkillCategory.CODING,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.MALE,
   userRole: envClient.NEXT_PUBLIC_LOCAL_MODE ? [UserPermissionRole.ADMIN] : [],
   availableTools: [
     tool(CODING_AGENT_ALIAS),

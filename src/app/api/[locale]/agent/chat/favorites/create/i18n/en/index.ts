@@ -46,6 +46,22 @@ export const translations = {
       label: "Voice",
       description: "Text-to-speech voice preference",
     },
+    sttModel: {
+      label: "Speech-to-Text Model",
+      description: "Model used for speech recognition",
+    },
+    visionBridgeModel: {
+      label: "Vision Model",
+      description: "Model used for image analysis",
+    },
+    translationModel: {
+      label: "Translation Model",
+      description: "Model used for text translation",
+    },
+    defaultChatMode: {
+      label: "Default Chat Mode",
+      description: "Default mode when opening this chat",
+    },
     mode: {
       label: "Selection Mode",
       description: "How the model should be selected",

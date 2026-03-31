@@ -100,7 +100,13 @@ export class ChatSettingsRepository {
         selectedSkill: setting.selectedSkill ?? defaults.selectedSkill,
         activeFavoriteId: setting.activeFavoriteId ?? defaults.activeFavoriteId,
         ttsAutoplay: setting.ttsAutoplay ?? defaults.ttsAutoplay,
-        ttsVoice: setting.ttsVoice ?? defaults.ttsVoice,
+        voiceId: setting.voiceId ?? defaults.voiceId,
+        sttModelId: setting.sttModelId ?? defaults.sttModelId,
+        visionBridgeModelId:
+          setting.visionBridgeModelId ?? defaults.visionBridgeModelId,
+        translationModelId:
+          setting.translationModelId ?? defaults.translationModelId,
+        defaultChatMode: setting.defaultChatMode ?? defaults.defaultChatMode,
         viewMode: setting.viewMode ?? defaults.viewMode,
         availableTools:
           (setting.availableTools ?? defaults.availableTools)?.map((tool) => ({
@@ -202,12 +208,28 @@ export class ChatSettingsRepository {
                 : data.ttsAutoplay === defaults.ttsAutoplay
                   ? null
                   : undefined,
-            ttsVoice:
-              data.ttsVoice && data.ttsVoice !== defaults.ttsVoice
-                ? data.ttsVoice
-                : data.ttsVoice === defaults.ttsVoice
+            voiceId:
+              data.voiceId && data.voiceId !== defaults.voiceId
+                ? data.voiceId
+                : data.voiceId === defaults.voiceId
                   ? null
                   : undefined,
+            sttModelId:
+              data.sttModelId !== undefined
+                ? (data.sttModelId ?? null)
+                : undefined,
+            visionBridgeModelId:
+              data.visionBridgeModelId !== undefined
+                ? (data.visionBridgeModelId ?? null)
+                : undefined,
+            translationModelId:
+              data.translationModelId !== undefined
+                ? (data.translationModelId ?? null)
+                : undefined,
+            defaultChatMode:
+              data.defaultChatMode !== undefined
+                ? (data.defaultChatMode ?? null)
+                : undefined,
             viewMode:
               data.viewMode && data.viewMode !== defaults.viewMode
                 ? data.viewMode
@@ -258,10 +280,14 @@ export class ChatSettingsRepository {
               data.ttsAutoplay !== defaults.ttsAutoplay
                 ? data.ttsAutoplay
                 : null,
-            ttsVoice:
-              data.ttsVoice && data.ttsVoice !== defaults.ttsVoice
-                ? data.ttsVoice
+            voiceId:
+              data.voiceId && data.voiceId !== defaults.voiceId
+                ? data.voiceId
                 : null,
+            sttModelId: data.sttModelId ?? null,
+            visionBridgeModelId: data.visionBridgeModelId ?? null,
+            translationModelId: data.translationModelId ?? null,
+            defaultChatMode: data.defaultChatMode ?? null,
             viewMode:
               data.viewMode && data.viewMode !== defaults.viewMode
                 ? data.viewMode

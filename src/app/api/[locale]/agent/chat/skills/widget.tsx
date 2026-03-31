@@ -48,18 +48,15 @@ import { useTouchDevice } from "@/hooks/use-touch-device";
 import { cn } from "../../../shared/utils";
 import { Icon } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useSelectorOnboardingContext } from "../../ai-stream/stream/widget/selector/selector-onboarding/context";
-import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
+
 import { useAddToFavorites } from "../favorites/create/hooks";
 import { useChatFavorites } from "../favorites/hooks/hooks";
 import skillDetailDefinitions from "./[id]/definition";
+import { DEFAULT_TTS_VOICE_ID } from "../../models/models";
 import { COMPANION_SKILLS } from "./config";
 import type definition from "./definition";
 import type { SkillListItem, SkillListResponseOutput } from "./definition";
-import {
-  ModelSelectionType,
-  SkillOwnershipType,
-  SkillTrustLevel,
-} from "./enum";
+import { SkillOwnershipType, SkillTrustLevel } from "./enum";
 
 /**
  * Props for custom widget
@@ -1310,20 +1307,14 @@ function EditFavBeforeAddButton({
         await import("../favorites/[id]/definition");
 
       const defaultVariantId = char.isVariant ? (char.variantId ?? null) : null;
-      const variantModelSelection = char.isVariant
-        ? {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: char.modelId,
-          }
-        : null;
 
       navigate(createFavoriteDefinitions.default.POST, {
         data: {
           skillId: char.id,
           variantId: defaultVariantId ?? undefined,
           icon: fullChar.icon ?? undefined,
-          voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
-          modelSelection: variantModelSelection,
+          voiceId: fullChar.voiceId ?? DEFAULT_TTS_VOICE_ID,
+          modelSelection: null,
         },
         replaceOnSuccess: {
           endpoint: editFavoriteDefinitions.default.PATCH,
@@ -1488,7 +1479,7 @@ function SkillFavoriteActions({
         favoriteId: favoriteIds[0],
         modelId,
         skillId: char.id,
-        voice: favorite.voice || null,
+        voiceId: favorite.voiceId || null,
         logger,
         locale,
         user,
@@ -1548,7 +1539,7 @@ function SkillFavoriteActions({
         favoriteId,
         modelId,
         skillId: char.id,
-        voice: favorite.voice || null,
+        voiceId: favorite.voiceId || null,
         logger,
         locale,
         user,
@@ -1598,20 +1589,14 @@ function SkillFavoriteActions({
       await import("../favorites/[id]/definition");
 
     const variantId = char.isVariant ? (char.variantId ?? null) : null;
-    const variantModelSelection = char.isVariant
-      ? {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: char.modelId,
-        }
-      : null;
 
     navigate(createFavoriteDefinitions.default.POST, {
       data: {
         skillId: char.id,
         variantId: variantId ?? undefined,
         icon: fullChar.icon ?? undefined,
-        voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
-        modelSelection: variantModelSelection,
+        voiceId: fullChar.voiceId ?? DEFAULT_TTS_VOICE_ID,
+        modelSelection: null,
       },
       replaceOnSuccess: {
         endpoint: editFavoriteDefinitions.default.PATCH,

@@ -7,6 +7,12 @@
 
 import "server-only";
 
+import {
+  ApiProvider,
+  getModelById,
+  type TtsModelId,
+} from "@/app/api/[locale]/agent/models/models";
+
 import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
@@ -20,7 +26,6 @@ import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import type { WsEmitCallback } from "../../chat/threads/[threadId]/messages/emitter";
 import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
-import { TtsVoice, type TtsVoiceValue } from "../../text-to-speech/enum";
 
 /**
  * Minimum skills before emitting a TTS chunk
@@ -60,7 +65,7 @@ export class StreamingTTSHandler {
   private readonly wsEmit: WsEmitCallback | null;
   private readonly logger: EndpointLogger;
   private readonly locale: CountryLanguage;
-  private readonly voice: typeof TtsVoiceValue;
+  private readonly voiceId: TtsModelId;
   private readonly user: JwtPayloadType;
   private isEnabled: boolean;
   private isCancelled = false;
@@ -76,14 +81,14 @@ export class StreamingTTSHandler {
     wsEmit: WsEmitCallback | null;
     logger: EndpointLogger;
     locale: CountryLanguage;
-    voice: typeof TtsVoiceValue;
+    voiceId: TtsModelId;
     user: JwtPayloadType;
     enabled: boolean;
   }) {
     this.wsEmit = params.wsEmit;
     this.logger = params.logger;
     this.locale = params.locale;
-    this.voice = params.voice;
+    this.voiceId = params.voiceId;
     this.user = params.user;
     this.isEnabled = params.enabled;
   }
@@ -314,7 +319,7 @@ export class StreamingTTSHandler {
           textLength: cleanText.length,
           chunkIndex: chunkIdx,
           locale: this.locale,
-          voice: this.voice,
+          voiceId: this.voiceId,
         });
       }
     } catch (error) {
@@ -328,116 +333,47 @@ export class StreamingTTSHandler {
   }
 
   /**
-   * Generate TTS audio using Eden AI
-   * Returns base64 data URL or null on failure
+   * Generate TTS audio using model-based provider routing.
+   * Routes to OpenAI TTS, Eden AI TTS, or ElevenLabs based on the voice model's ApiProvider.
+   * Returns base64 data URL or null on failure.
    */
   private async generateTTS(text: string): Promise<string | null> {
-    if (!agentEnv.EDEN_AI_API_KEY) {
-      this.logger.error(
-        "[Streaming TTS] Eden AI API key not configured - TTS disabled",
-      );
-      return null;
-    }
-
+    const modelOption = getModelById(this.voiceId);
     const language = getLanguageFromLocale(this.locale);
-    const voiceOption = this.voice === TtsVoice.MALE ? "MALE" : "FEMALE";
 
-    this.logger.debug("[Streaming TTS] Calling Eden AI TTS API", {
+    this.logger.debug("[Streaming TTS] Generating TTS", {
+      voiceId: this.voiceId,
+      apiProvider: modelOption.apiProvider,
       textLength: text.length,
       language,
-      voice: voiceOption,
     });
 
     try {
-      const response = await fetch(
-        "https://api.edenai.run/v2/audio/text_to_speech",
-        {
-          method: "POST",
-          headers: {
-            // eslint-disable-next-line i18next/no-literal-string
-            Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            providers: "openai",
+      switch (modelOption.apiProvider) {
+        case ApiProvider.OPENAI_TTS:
+          return await this.callOpenAITTS(text, modelOption.providerModel);
+
+        case ApiProvider.EDEN_AI_TTS: {
+          const gender =
+            modelOption.voiceMeta?.gender === "male" ? "MALE" : "FEMALE";
+          return await this.callEdenAITTS(
             text,
-            language: language.toLowerCase(),
-            option: voiceOption,
-          }),
-        },
-      );
+            modelOption.providerModel,
+            gender,
+            language,
+          );
+        }
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        this.logger.error("[Streaming TTS] Eden AI API HTTP error", {
-          status: response.status,
-          statusText: response.statusText,
-          error: errorText,
-          textLength: text.length,
-        });
-        return null;
+        case ApiProvider.ELEVENLABS:
+          return await this.callElevenLabsTTS(text, modelOption.providerModel);
+
+        default:
+          this.logger.error("[Streaming TTS] Unsupported TTS provider", {
+            apiProvider: modelOption.apiProvider,
+            voiceId: this.voiceId,
+          });
+          return null;
       }
-
-      interface EdenAITTSResponse {
-        [provider: string]: {
-          audio_resource_url?: string;
-          error?: { message?: string };
-          status?: string;
-        };
-      }
-
-      const responseData = (await response.json()) as EdenAITTSResponse;
-      const providerResult = responseData.openai;
-
-      if (providerResult?.error || providerResult?.status === "fail") {
-        this.logger.error("[Streaming TTS] OpenAI provider error via Eden AI", {
-          error: providerResult.error?.message,
-          status: providerResult.status,
-          fullResponse: JSON.stringify(responseData).substring(0, 500),
-        });
-        return null;
-      }
-
-      const audioResourceUrl = providerResult?.audio_resource_url;
-      if (!audioResourceUrl) {
-        this.logger.error("[Streaming TTS] No audio URL in Eden AI response", {
-          fullResponse: JSON.stringify(responseData).substring(0, 500),
-        });
-        return null;
-      }
-
-      // Fetch the audio file and convert to base64
-      const audioResponse = await fetch(audioResourceUrl);
-      if (!audioResponse.ok) {
-        this.logger.error(
-          "[Streaming TTS] Failed to fetch audio file from URL",
-          {
-            status: audioResponse.status,
-            statusText: audioResponse.statusText,
-            url: audioResourceUrl.substring(0, 100),
-          },
-        );
-        return null;
-      }
-
-      const audioBuffer = await audioResponse.arrayBuffer();
-      let contentType =
-        audioResponse.headers.get("content-type") || "audio/mpeg";
-
-      if (
-        contentType === "binary/octet-stream" ||
-        contentType === "application/octet-stream"
-      ) {
-        contentType = "audio/mpeg";
-      }
-
-      const base64Audio = Buffer.from(audioBuffer).toString("base64");
-      this.logger.debug("[Streaming TTS] Successfully generated audio", {
-        audioSizeBytes: audioBuffer.byteLength,
-        contentType,
-      });
-      // eslint-disable-next-line i18next/no-literal-string
-      return `data:${contentType};base64,${base64Audio}`;
     } catch (error) {
       this.logger.error("[Streaming TTS] TTS generation exception", {
         error: parseError(error).message,
@@ -446,6 +382,193 @@ export class StreamingTTSHandler {
       });
       return null;
     }
+  }
+
+  /**
+   * Call OpenAI TTS API directly
+   */
+  private async callOpenAITTS(
+    text: string,
+    providerModel: string,
+  ): Promise<string | null> {
+    if (!agentEnv.OPENAI_API_KEY) {
+      this.logger.error("[Streaming TTS] OpenAI API key not configured");
+      return null;
+    }
+
+    // Derive voice name from model ID: "openai-nova" → "nova"
+    const voiceName = this.voiceId.split("-").slice(1).join("-");
+
+    const response = await fetch("https://api.openai.com/v1/audio/speech", {
+      method: "POST",
+      headers: {
+        // eslint-disable-next-line i18next/no-literal-string
+        Authorization: `Bearer ${agentEnv.OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: providerModel,
+        input: text,
+        voice: voiceName,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      this.logger.error("[Streaming TTS] OpenAI TTS API error", {
+        status: response.status,
+        error: errorText,
+      });
+      return null;
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    const contentType = response.headers.get("content-type") || "audio/mpeg";
+    const base64Audio = Buffer.from(audioBuffer).toString("base64");
+    this.logger.debug("[Streaming TTS] OpenAI TTS succeeded", {
+      audioSizeBytes: audioBuffer.byteLength,
+    });
+    // eslint-disable-next-line i18next/no-literal-string
+    return `data:${contentType};base64,${base64Audio}`;
+  }
+
+  /**
+   * Call Eden AI TTS API
+   */
+  private async callEdenAITTS(
+    text: string,
+    providerModel: string,
+    voiceGender: "MALE" | "FEMALE",
+    language: string,
+  ): Promise<string | null> {
+    if (!agentEnv.EDEN_AI_API_KEY) {
+      this.logger.error("[Streaming TTS] Eden AI API key not configured");
+      return null;
+    }
+
+    interface EdenAITTSResponse {
+      [provider: string]: {
+        audio_resource_url?: string;
+        error?: { message?: string };
+        status?: string;
+      };
+    }
+
+    const response = await fetch(
+      "https://api.edenai.run/v2/audio/text_to_speech",
+      {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          providers: providerModel,
+          text,
+          language: language.toLowerCase(),
+          option: voiceGender,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      this.logger.error("[Streaming TTS] Eden AI TTS API error", {
+        status: response.status,
+        error: errorText,
+      });
+      return null;
+    }
+
+    const responseData = (await response.json()) as EdenAITTSResponse;
+    const providerResult = responseData[providerModel];
+
+    if (providerResult?.error || providerResult?.status === "fail") {
+      this.logger.error("[Streaming TTS] Eden AI provider error", {
+        provider: providerModel,
+        error: providerResult?.error?.message,
+      });
+      return null;
+    }
+
+    const audioResourceUrl = providerResult?.audio_resource_url;
+    if (!audioResourceUrl) {
+      this.logger.error("[Streaming TTS] No audio URL in Eden AI response");
+      return null;
+    }
+
+    const audioResponse = await fetch(audioResourceUrl);
+    if (!audioResponse.ok) {
+      this.logger.error("[Streaming TTS] Failed to fetch audio from URL", {
+        status: audioResponse.status,
+        url: audioResourceUrl.substring(0, 100),
+      });
+      return null;
+    }
+
+    const audioBuffer = await audioResponse.arrayBuffer();
+    let contentType = audioResponse.headers.get("content-type") || "audio/mpeg";
+    if (
+      contentType === "binary/octet-stream" ||
+      contentType === "application/octet-stream"
+    ) {
+      contentType = "audio/mpeg";
+    }
+
+    const base64Audio = Buffer.from(audioBuffer).toString("base64");
+    this.logger.debug("[Streaming TTS] Eden AI TTS succeeded", {
+      audioSizeBytes: audioBuffer.byteLength,
+    });
+    // eslint-disable-next-line i18next/no-literal-string
+    return `data:${contentType};base64,${base64Audio}`;
+  }
+
+  /**
+   * Call ElevenLabs TTS API
+   */
+  private async callElevenLabsTTS(
+    text: string,
+    providerModel: string,
+  ): Promise<string | null> {
+    if (!agentEnv.ELEVENLABS_API_KEY) {
+      this.logger.error("[Streaming TTS] ElevenLabs API key not configured");
+      return null;
+    }
+
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${providerModel}`,
+      {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          "xi-api-key": agentEnv.ELEVENLABS_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text,
+          model_id: "eleven_monolingual_v1",
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      this.logger.error("[Streaming TTS] ElevenLabs TTS API error", {
+        status: response.status,
+        error: errorText,
+      });
+      return null;
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    const contentType = response.headers.get("content-type") || "audio/mpeg";
+    const base64Audio = Buffer.from(audioBuffer).toString("base64");
+    this.logger.debug("[Streaming TTS] ElevenLabs TTS succeeded", {
+      audioSizeBytes: audioBuffer.byteLength,
+    });
+    // eslint-disable-next-line i18next/no-literal-string
+    return `data:${contentType};base64,${base64Audio}`;
   }
 
   /**
@@ -603,7 +726,7 @@ export function createStreamingTTSHandler(params: {
   wsEmit: WsEmitCallback | null;
   logger: EndpointLogger;
   locale: CountryLanguage;
-  voice: typeof TtsVoiceValue;
+  voiceId: TtsModelId;
   user: JwtPayloadType;
   enabled: boolean;
 }): StreamingTTSHandler {

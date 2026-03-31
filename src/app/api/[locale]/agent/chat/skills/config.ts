@@ -13,9 +13,14 @@ import {
   type UserPermissionRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
-import { TtsVoice, type TtsVoiceValue } from "../../text-to-speech/enum";
-
+import type {
+  LlmModelId,
+  SttModelId,
+  TtsModelId,
+  VisionModelId,
+} from "../../models/models";
+import type { ModelSelectionSimple } from "../../models/types";
+import type { ChatMode } from "../../models/enum";
 import type { ToolConfigItem } from "../settings/definition";
 import { NO_SKILL_ID } from "./constants";
 import {
@@ -86,7 +91,11 @@ export interface Skill {
   icon: IconKey;
   systemPrompt: string;
   category: typeof SkillCategoryValue;
-  voice: typeof TtsVoiceValue;
+  voiceId?: TtsModelId;
+  sttModelId?: SttModelId;
+  visionBridgeModelId?: VisionModelId;
+  translationModelId?: LlmModelId;
+  defaultChatMode?: ChatMode;
   suggestedPrompts: SkillsTranslationKey[];
   /** Named variants. Expanded as grouped rows in skill list. */
   variants: SkillVariant[];
@@ -129,7 +138,7 @@ export const NO_SKILL = {
   id: NO_SKILL_ID,
   category: SkillCategory.ASSISTANT,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
+  voiceId: undefined,
   suggestedPrompts: [
     "skills.default.suggestedPrompts.0" as const,
     "skills.default.suggestedPrompts.1" as const,

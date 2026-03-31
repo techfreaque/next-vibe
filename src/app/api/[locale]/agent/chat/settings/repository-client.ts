@@ -12,9 +12,14 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
-import { defaultModel, type ModelId } from "../../models/models";
-import type { TtsVoiceValue } from "../../text-to-speech/enum";
-import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
+import {
+  DEFAULT_TTS_VOICE_ID,
+  defaultModel,
+  type ModelId,
+  type TtsModelId,
+} from "../../models/models";
+import type { ChatMode } from "../../models/enum";
+
 import { ViewMode } from "../enum";
 import type {
   ChatSettingsGetResponseOutput,
@@ -78,7 +83,11 @@ export class ChatSettingsRepositoryClient {
       selectedSkill: "thea",
       activeFavoriteId: null,
       ttsAutoplay: false,
-      ttsVoice: DEFAULT_TTS_VOICE,
+      voiceId: DEFAULT_TTS_VOICE_ID,
+      sttModelId: undefined,
+      visionBridgeModelId: undefined,
+      translationModelId: undefined,
+      defaultChatMode: undefined,
       viewMode: ViewMode.LINEAR,
       availableTools: null,
       pinnedTools: null,
@@ -115,7 +124,15 @@ export class ChatSettingsRepositoryClient {
             ? overrides.activeFavoriteId
             : defaults.activeFavoriteId,
         ttsAutoplay: overrides.ttsAutoplay ?? defaults.ttsAutoplay,
-        ttsVoice: overrides.ttsVoice ?? defaults.ttsVoice,
+        voiceId: overrides.voiceId ?? defaults.voiceId,
+        sttModelId: overrides.sttModelId ?? defaults.sttModelId,
+        visionBridgeModelId:
+          overrides.visionBridgeModelId ?? defaults.visionBridgeModelId,
+        translationModelId:
+          overrides.translationModelId ?? defaults.translationModelId,
+        defaultChatMode:
+          (overrides.defaultChatMode as ChatMode | undefined) ??
+          defaults.defaultChatMode,
         viewMode: overrides.viewMode ?? defaults.viewMode,
         availableTools:
           "availableTools" in overrides
@@ -164,8 +181,20 @@ export class ChatSettingsRepositoryClient {
     if (settings.ttsAutoplay !== defaults.ttsAutoplay) {
       overrides.ttsAutoplay = settings.ttsAutoplay;
     }
-    if (settings.ttsVoice !== defaults.ttsVoice) {
-      overrides.ttsVoice = settings.ttsVoice;
+    if (settings.voiceId !== defaults.voiceId) {
+      overrides.voiceId = settings.voiceId;
+    }
+    if (settings.sttModelId !== defaults.sttModelId) {
+      overrides.sttModelId = settings.sttModelId;
+    }
+    if (settings.visionBridgeModelId !== defaults.visionBridgeModelId) {
+      overrides.visionBridgeModelId = settings.visionBridgeModelId;
+    }
+    if (settings.translationModelId !== defaults.translationModelId) {
+      overrides.translationModelId = settings.translationModelId;
+    }
+    if (settings.defaultChatMode !== defaults.defaultChatMode) {
+      overrides.defaultChatMode = settings.defaultChatMode;
     }
     if (settings.viewMode !== defaults.viewMode) {
       overrides.viewMode = settings.viewMode;
@@ -217,7 +246,13 @@ export class ChatSettingsRepositoryClient {
         updates.ttsAutoplay !== undefined
           ? updates.ttsAutoplay
           : current.ttsAutoplay,
-      ttsVoice: updates.ttsVoice ?? current.ttsVoice,
+      voiceId: updates.voiceId ?? current.voiceId,
+      sttModelId: updates.sttModelId ?? current.sttModelId,
+      visionBridgeModelId:
+        updates.visionBridgeModelId ?? current.visionBridgeModelId,
+      translationModelId:
+        updates.translationModelId ?? current.translationModelId,
+      defaultChatMode: updates.defaultChatMode ?? current.defaultChatMode,
       viewMode: updates.viewMode ?? current.viewMode,
       availableTools:
         updates.availableTools !== undefined
@@ -263,12 +298,12 @@ export class ChatSettingsRepositoryClient {
     favoriteId: string;
     modelId: ModelId | null;
     skillId: string | null;
-    voice: typeof TtsVoiceValue | null;
+    voiceId: TtsModelId | null;
     logger: EndpointLogger;
     locale: CountryLanguage;
     user: JwtPayloadType;
   }): Promise<void> {
-    const { favoriteId, modelId, skillId, voice, logger, locale, user } =
+    const { favoriteId, modelId, skillId, voiceId, logger, locale, user } =
       params;
 
     const { apiClient } =
@@ -296,8 +331,8 @@ export class ChatSettingsRepositoryClient {
         if (skillId) {
           updatedData.selectedSkill = skillId;
         }
-        if (voice) {
-          updatedData.ttsVoice = voice;
+        if (voiceId) {
+          updatedData.voiceId = voiceId;
         }
 
         return {
@@ -336,7 +371,7 @@ export class ChatSettingsRepositoryClient {
           activeFavoriteId: favoriteId,
           ...(modelId && { selectedModel: modelId }),
           ...(skillId && { selectedSkill: skillId }),
-          ...(voice && { ttsVoice: voice }),
+          ...(voiceId && { voiceId: voiceId }),
         },
         undefined,
         locale,

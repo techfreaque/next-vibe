@@ -76,6 +76,18 @@ export const translations: typeof enTranslations = {
     ttsVoice: {
       label: "Głos TTS",
     },
+    sttModel: {
+      label: "Model mowy na tekst",
+    },
+    visionBridgeModel: {
+      label: "Model wizji",
+    },
+    translationModel: {
+      label: "Model tłumaczenia",
+    },
+    defaultChatMode: {
+      label: "Domyślny tryb czatu",
+    },
     viewMode: {
       label: "Tryb widoku",
     },

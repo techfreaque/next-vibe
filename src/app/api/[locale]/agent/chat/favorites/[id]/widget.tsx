@@ -38,7 +38,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
 import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
@@ -226,13 +226,13 @@ export function FavoriteEditContainer({
 
     const modelId = favorite?.modelId ?? null;
     const currentSkillId = favorite?.skillId ?? null;
-    const currentVoice = favorite?.voice ?? null;
+    const currentVoiceId = favorite?.voiceId ?? null;
 
     await ChatSettingsRepositoryClient.selectFavorite({
       favoriteId: activatingFavoriteId,
       modelId,
       skillId: currentSkillId,
-      voice: currentVoice,
+      voiceId: currentVoiceId,
       logger,
       locale,
       user,
@@ -421,7 +421,7 @@ export function FavoriteEditContainer({
                 : t("patch.useThisSkillButton.label")}
           </Button>
 
-          <SelectFieldWidget fieldName="voice" field={children.voice} />
+          <TextFieldWidget fieldName="voiceId" field={children.voiceId} />
           {form && (
             <ModelSelector
               modelSelection={favoriteModelSelection}
@@ -741,7 +741,7 @@ function SaveAndUseButton({
           favoriteId,
           modelId,
           skillId: favoriteData.skillId || null,
-          voice: favoriteData.voice || null,
+          voiceId: favoriteData.voiceId || null,
           logger,
           locale,
           user,

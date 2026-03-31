@@ -9,7 +9,10 @@ import "server-only";
 
 import { and, desc, eq } from "drizzle-orm";
 
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import {
+  DEFAULT_TTS_VOICE_ID,
+  type ModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -33,7 +36,6 @@ import {
 } from "../../chat/skills/create/definition";
 import { SkillsRepositoryClient } from "../../chat/skills/repository-client";
 import { ThreadsRepository } from "../../chat/threads/repository";
-import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import type { AiStreamPostRequestOutput } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
 import { AiStreamRepository } from "./index";
@@ -479,7 +481,7 @@ export async function runHeadlessAiStream(
       pinnedTools: pinnedTools ?? null,
       toolConfirmations: null,
       messageHistory: [] as AiStreamPostRequestOutput["messageHistory"],
-      voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE },
+      voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
       audioInput: { file: null },
       resumeToken: null,
       timezone: "UTC",

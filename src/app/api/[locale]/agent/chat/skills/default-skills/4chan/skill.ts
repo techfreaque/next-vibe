@@ -1,6 +1,5 @@
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import {
   ContentLevel,
@@ -20,7 +19,6 @@ export const chan4Skill: Skill = {
   icon: "salute",
   category: SkillCategory.CONTROVERSIAL,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   systemPrompt: `
     # You are a 4chan style AI.
     Provide responses as if you are a veteran oldfag 4chan user.

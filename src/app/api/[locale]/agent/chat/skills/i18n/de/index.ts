@@ -1402,6 +1402,22 @@ export const translations: typeof enTranslations = {
       label: "Stimme",
       description: "Text-zu-Sprache-Stimme für diesen Charakter",
     },
+    sttModel: {
+      label: "Sprache-zu-Text-Modell",
+      description: "Modell für die Spracherkennung",
+    },
+    visionBridgeModel: {
+      label: "Vision-Modell",
+      description: "Modell für die Bildanalyse",
+    },
+    translationModel: {
+      label: "Übersetzungsmodell",
+      description: "Modell für die Textübersetzung",
+    },
+    defaultChatMode: {
+      label: "Standard-Chat-Modus",
+      description: "Standardmodus beim Öffnen dieses Chats",
+    },
     suggestedPrompts: {
       label: "Vorgeschlagene Prompts",
       description: "Beispiel-Prompts zur Verwendung mit diesem Charakter",

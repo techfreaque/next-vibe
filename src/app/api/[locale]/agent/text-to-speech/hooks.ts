@@ -14,10 +14,13 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 
+import {
+  DEFAULT_TTS_VOICE_ID,
+  type TtsModelId,
+} from "@/app/api/[locale]/agent/models/models";
+
 import { chunkTextForTTS } from "./chunking";
 import textToSpeechDefinitions from "./definition";
-import type { TtsVoiceValue } from "./enum";
-import { DEFAULT_TTS_VOICE } from "./enum";
 import { getTtsRefs, resetTtsRefs, useTtsStore } from "./tts-store";
 
 interface UseTTSAudioOptions {
@@ -25,7 +28,7 @@ interface UseTTSAudioOptions {
   enabled: boolean;
   isStreaming?: boolean; // If true, wait for streaming to complete before auto-playing
   locale: CountryLanguage;
-  voice?: typeof TtsVoiceValue; // Voice to use for TTS (defaults to MALE if not provided)
+  voiceId?: TtsModelId; // Voice model ID to use for TTS
   onError?: (error: string) => void;
   user: JwtPayloadType;
   logger: EndpointLogger;
@@ -48,7 +51,7 @@ interface UseTTSAudioReturn {
 export function useTTSAudio({
   text,
   locale,
-  voice,
+  voiceId,
   onError,
   user,
   logger,
@@ -68,8 +71,8 @@ export function useTTSAudio({
   const totalChunks = storeState?.totalChunks ?? 0;
   const error = storeState?.error ?? null;
 
-  // Use voice from props (set by chat settings)
-  const voicePreference = voice ?? DEFAULT_TTS_VOICE;
+  // Use voiceId from props (set by chat settings)
+  const voicePreference = voiceId ?? DEFAULT_TTS_VOICE_ID;
 
   // Use endpoint create directly - avoids shared instance key problem that causes
   // infinite re-renders when multiple messages each call useTTSAudio simultaneously.
@@ -161,7 +164,7 @@ export function useTTSAudio({
       return new Promise((resolve) => {
         // Set form values for this chunk
         ttsForm.form.setValue("text", chunkText);
-        ttsForm.form.setValue("voice", voicePreference);
+        ttsForm.form.setValue("voiceId", voicePreference);
 
         // Submit form
         void ttsForm.submitForm({

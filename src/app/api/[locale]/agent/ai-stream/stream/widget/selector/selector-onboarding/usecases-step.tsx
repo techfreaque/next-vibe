@@ -96,7 +96,7 @@ interface SeededEntry {
   id: string;
   skillId: string;
   variantId: string | null;
-  modelSelection: ModelSelectionSimple;
+  modelSelection: ModelSelectionSimple | null;
 }
 
 interface SeedResult {
@@ -125,8 +125,8 @@ async function seedFavorites(
       skillId: companionId,
       variantId: variant.id,
       icon: companion.icon,
-      voice: companion.voice,
-      modelSelection: variant.modelSelection,
+      voiceId: companion.voiceId,
+      modelSelection: variant.modelSelection ?? null,
     });
     if (id) {
       if (variant.isDefault ?? false) {
@@ -136,7 +136,7 @@ async function seedFavorites(
         id,
         skillId: companionId,
         variantId: variant.id,
-        modelSelection: variant.modelSelection,
+        modelSelection: variant.modelSelection ?? null,
       });
     }
   }
@@ -172,18 +172,34 @@ async function seedFavorites(
         continue;
       }
 
-      for (const variant of skill.variants) {
+      const skillVariants = skill.variants ?? [];
+      if (skillVariants.length > 0) {
+        for (const variant of skillVariants) {
+          const id = await addFavorite({
+            skillId,
+            variantId: variant.id,
+            modelSelection: variant.modelSelection ?? null,
+          });
+          if (id) {
+            entries.push({
+              id,
+              skillId,
+              variantId: variant.id,
+              modelSelection: variant.modelSelection ?? null,
+            });
+          }
+        }
+      } else {
         const id = await addFavorite({
           skillId,
-          variantId: variant.id,
-          modelSelection: variant.modelSelection,
+          modelSelection: null,
         });
         if (id) {
           entries.push({
             id,
             skillId,
-            variantId: variant.id,
-            modelSelection: variant.modelSelection,
+            variantId: null,
+            modelSelection: null,
           });
         }
       }
@@ -247,7 +263,7 @@ export function UsecasesStep({
             skillId: entry.skillId,
             variantId: entry.variantId,
             customIcon: skill?.icon ?? null,
-            voice: skill?.voice ?? null,
+            voiceId: skill?.voiceId ?? null,
             modelSelection: entry.modelSelection,
             position: index,
           },
@@ -257,7 +273,7 @@ export function UsecasesStep({
           skill?.tagline ? tSkill(skill.tagline) : null,
           skill?.description ? tSkill(skill.description) : null,
           firstId,
-          skill?.voice ?? null,
+          skill?.voiceId ?? null,
           locale,
           user,
         );
@@ -298,12 +314,12 @@ export function UsecasesStep({
         if (firstCompanionId) {
           const defaultEntry = entries.find((e) => e.id === firstCompanionId);
           const activeModelId =
-            defaultEntry?.modelSelection.selectionType ===
+            defaultEntry?.modelSelection?.selectionType ===
             ModelSelectionType.MANUAL
               ? defaultEntry.modelSelection.manualModelId
               : ModelId.KIMI_K2_5;
           const companion = COMPANION_SKILLS.find((c) => c.id === companionId);
-          const voice = settings?.ttsVoice ?? companion?.voice;
+          const voice = settings?.voiceId ?? companion?.voiceId;
           if (voice) {
             setActiveFavorite(
               firstCompanionId,
@@ -333,7 +349,7 @@ export function UsecasesStep({
     addFavorite,
     applyOptimisticFavorites,
     setActiveFavorite,
-    settings?.ttsVoice,
+    settings?.voiceId,
     onDone,
     userRoles,
     logger,

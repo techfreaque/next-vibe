@@ -74,6 +74,18 @@ export const translations = {
     ttsVoice: {
       label: "TTS Voice",
     },
+    sttModel: {
+      label: "Speech-to-Text Model",
+    },
+    visionBridgeModel: {
+      label: "Vision Model",
+    },
+    translationModel: {
+      label: "Translation Model",
+    },
+    defaultChatMode: {
+      label: "Default Chat Mode",
+    },
     viewMode: {
       label: "View Mode",
     },

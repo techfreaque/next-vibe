@@ -29,8 +29,11 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../shared/types/common.schema";
-import { ModelId } from "../../models/models";
-import { TtsVoiceValue } from "../../text-to-speech/enum";
+import {
+  DEFAULT_TTS_VOICE_ID,
+  ModelId,
+  TTS_MODEL_IDS,
+} from "../../models/models";
 import { FAVORITES_LIST_ALIAS } from "./constants";
 import type { FavoritesTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
@@ -174,12 +177,10 @@ const { GET } = createEndpoint({
               hidden: true,
               schema: z.enum(ModelId).nullable(),
             }),
-            voice: responseField(scopedTranslation, {
+            voiceId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
-              schema: z.string().nullable() as z.ZodType<
-                typeof TtsVoiceValue | null
-              >,
+              schema: z.enum(TTS_MODEL_IDS).nullable(),
             }),
             position: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -324,7 +325,7 @@ const { GET } = createEndpoint({
             skillId: "default",
             variantId: null,
             modelId: ModelId.CLAUDE_SONNET_4_5,
-            voice: TtsVoiceValue,
+            voiceId: DEFAULT_TTS_VOICE_ID,
             position: 0,
             icon: "sparkles",
             name: "Thea",

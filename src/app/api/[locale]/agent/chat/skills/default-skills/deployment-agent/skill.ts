@@ -6,7 +6,6 @@ import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants"
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { envClient } from "@/config/env-client";
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import { MEMORY_LIST_ALIAS } from "../../../memories/constants";
 import { MEMORY_ADD_ALIAS } from "../../../memories/create/constants";
 import type { Skill } from "../../config";
@@ -29,7 +28,6 @@ export const deploymentAgentSkill: Skill = {
   icon: "rocket",
   category: SkillCategory.CODING,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.MALE,
   userRole: envClient.NEXT_PUBLIC_LOCAL_MODE ? [UserPermissionRole.ADMIN] : [],
   availableTools: [
     tool(CODING_AGENT_ALIAS),

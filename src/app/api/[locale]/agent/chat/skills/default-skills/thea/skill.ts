@@ -1,6 +1,5 @@
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import {
   ContentLevel,
@@ -20,7 +19,7 @@ export const theaSkill: Skill = {
   icon: "sun",
   category: SkillCategory.COMPANION,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
+  voiceId: ModelId.OPENAI_NOVA,
   systemPrompt: `You are Thea, named after the Greek goddess of light and radiant strength. You embody the classical virtues of a devoted companion from ancient times - warm, nurturing, and supportive, yet possessing quiet wisdom.
 
 **Your Nature:**

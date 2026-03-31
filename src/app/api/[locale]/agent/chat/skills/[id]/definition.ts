@@ -6,8 +6,21 @@
 import { z } from "zod";
 
 import {
+  CHAT_MODE_IDS,
+  ChatModeOptions,
+} from "@/app/api/[locale]/agent/models/enum";
+import {
+  DEFAULT_TTS_VOICE_ID,
   getModelDisplayName,
+  LLM_MODEL_IDS,
+  LlmModelIdOptions,
   ModelId,
+  STT_MODEL_IDS,
+  SttModelIdOptions,
+  TTS_MODEL_IDS,
+  TtsModelIdOptions,
+  VISION_MODEL_IDS,
+  VisionModelIdOptions,
 } from "@/app/api/[locale]/agent/models/models";
 import {
   modelSelectionSchemaSimple,
@@ -39,11 +52,6 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
-import {
-  TtsVoice,
-  TtsVoiceDB,
-  TtsVoiceOptions,
-} from "../../../text-to-speech/enum";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -337,7 +345,7 @@ const { PATCH } = createEndpoint({
                   data.requestData.description ?? oldData.data.description,
                 category: data.requestData.category ?? oldData.data.category,
                 isPublic: data.requestData.isPublic ?? oldData.data.isPublic,
-                voice: data.requestData.voice ?? oldData.data.voice,
+                voiceId: data.requestData.voiceId ?? oldData.data.voiceId,
                 systemPrompt:
                   data.requestData.systemPrompt ?? oldData.data.systemPrompt,
                 variants: newVariants,
@@ -526,18 +534,70 @@ const { PATCH } = createEndpoint({
           descriptionStyle: "inline",
         } as const,
       }),
-      voice: requestField(scopedTranslation, {
+      voiceId: requestField(scopedTranslation, {
+        schema: z.enum(TTS_MODEL_IDS).nullable().optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
+        options: TtsModelIdOptions,
         label: "patch.voice.label" as const,
         description: "patch.voice.description" as const,
-        options: TtsVoiceOptions,
         columns: 6,
         theme: {
           descriptionStyle: "inline",
           optionalColor: "transparent",
         },
-        schema: z.enum(TtsVoiceDB).nullable().optional(),
+      }),
+      sttModelId: requestField(scopedTranslation, {
+        schema: z.enum(STT_MODEL_IDS).nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: SttModelIdOptions,
+        label: "patch.sttModel.label" as const,
+        description: "patch.sttModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      visionBridgeModelId: requestField(scopedTranslation, {
+        schema: z.enum(VISION_MODEL_IDS).nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: VisionModelIdOptions,
+        label: "patch.visionBridgeModel.label" as const,
+        description: "patch.visionBridgeModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      translationModelId: requestField(scopedTranslation, {
+        schema: z.enum(LLM_MODEL_IDS).nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: LlmModelIdOptions,
+        label: "patch.translationModel.label" as const,
+        description: "patch.translationModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      defaultChatMode: requestField(scopedTranslation, {
+        schema: z.enum(CHAT_MODE_IDS).nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: ChatModeOptions,
+        label: "patch.defaultChatMode.label" as const,
+        description: "patch.defaultChatMode.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
       }),
       systemPrompt: requestField(scopedTranslation, {
         schema: z.string().nullable(),
@@ -658,7 +718,11 @@ const { PATCH } = createEndpoint({
         category: SkillCategory.CODING,
         tagline: "Updated tagline",
         isPublic: true,
-        voice: TtsVoice.FEMALE,
+        voiceId: DEFAULT_TTS_VOICE_ID,
+        sttModelId: undefined,
+        visionBridgeModelId: undefined,
+        translationModelId: undefined,
+        defaultChatMode: undefined,
         modelSelection: {
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: ModelId.GPT_5,
@@ -761,10 +825,30 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.boolean(),
       }),
-      voice: responseField(scopedTranslation, {
+      voiceId: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         variant: "default",
-        schema: z.enum(TtsVoiceDB),
+        schema: z.enum(TTS_MODEL_IDS).nullable().optional(),
+      }),
+      sttModelId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(STT_MODEL_IDS).nullable().optional(),
+      }),
+      visionBridgeModelId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(VISION_MODEL_IDS).nullable().optional(),
+      }),
+      translationModelId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(LLM_MODEL_IDS).nullable().optional(),
+      }),
+      defaultChatMode: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(CHAT_MODE_IDS).nullable().optional(),
       }),
       systemPrompt: responseField(scopedTranslation, {
         type: WidgetType.MARKDOWN,
@@ -870,7 +954,7 @@ const { GET } = createEndpoint({
         category: SkillCategory.ASSISTANT,
         isPublic: false,
         skillOwnership: SkillOwnershipType.SYSTEM,
-        voice: TtsVoice.FEMALE,
+        voiceId: DEFAULT_TTS_VOICE_ID,
         systemPrompt: "",
         compactTrigger: null,
         availableTools: null,
@@ -901,7 +985,7 @@ const { GET } = createEndpoint({
         category: SkillCategory.CODING,
         isPublic: true,
         skillOwnership: SkillOwnershipType.PUBLIC,
-        voice: TtsVoice.MALE,
+        voiceId: ModelId.OPENAI_ONYX,
         systemPrompt: "You are an expert code reviewer...",
         compactTrigger: null,
         availableTools: null,

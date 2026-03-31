@@ -33,6 +33,7 @@ import type {
 } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
 import { clearStreamingState } from "./core/stream-registry";
+import { ModalityResolver } from "./core/modality-resolver";
 import {
   subscribeWakeUpSignal,
   type WakeUpPayload,
@@ -238,6 +239,7 @@ export class AiStreamRepository {
       effectiveCompactTrigger,
       streamContext,
       skipAiTurn,
+      bridgeContext,
     } = setupResult.data;
 
     // All confirmations were wakeUp-pending - no AI turn needed here.
@@ -599,6 +601,8 @@ export class AiStreamRepository {
             imageSize: data.imageSize ?? undefined,
             imageQuality: data.imageQuality ?? undefined,
             musicDuration: data.musicDuration ?? undefined,
+            translationModel:
+              ModalityResolver.resolveTranslationModel(bridgeContext),
           });
 
           // After stream completes, capture the last assistant message ID from the writer.

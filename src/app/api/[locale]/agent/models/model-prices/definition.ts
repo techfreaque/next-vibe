@@ -1,6 +1,7 @@
 /**
- * Media Model Prices Endpoint Definition
- * Fetches real-time pricing for image/audio models and updates models.ts
+ * Unified Model Prices Endpoint Definition
+ * Fetches live pricing for ALL models from ALL providers and updates models.ts.
+ * Replaces the separate media-prices and openrouter endpoints.
  */
 
 import { z } from "zod";
@@ -24,7 +25,7 @@ import { scopedTranslation } from "./i18n";
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "models", "media-prices"],
+  path: ["agent", "models", "model-prices"],
   title: "get.title" as const,
   description: "get.description" as const,
   category: "endpointCategories.ai",
@@ -35,8 +36,8 @@ const { GET } = createEndpoint({
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  aliases: ["update-media-model-prices"],
-  icon: "image",
+  aliases: ["update-all-model-prices"],
+  icon: "database",
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
@@ -53,32 +54,36 @@ const { GET } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
+          totalProviders: responseField(scopedTranslation, {
+            type: WidgetType.STAT,
+            label: "get.response.summary.totalProviders" as const,
+            columns: 3,
+            schema: z.number(),
+          }),
           totalModels: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "get.response.summary.totalModels" as const,
-            columns: 4,
+            columns: 3,
             schema: z.number(),
           }),
           modelsUpdated: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "get.response.summary.modelsUpdated" as const,
-            columns: 4,
+            columns: 3,
             schema: z.number(),
           }),
           fileUpdated: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             label: "get.response.summary.fileUpdated" as const,
-            columns: 4,
+            columns: 3,
             schema: z.boolean(),
           }),
         },
       }),
 
-      models: responseArrayField(scopedTranslation, {
+      providerResults: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        title: "get.response.models.title" as const,
-        cardTitle: "name",
-        cardSubtitle: "id",
+        title: "get.response.providerResults.title" as const,
         columns: 12,
         child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
@@ -86,40 +91,113 @@ const { GET } = createEndpoint({
           columns: 12,
           usage: { response: true },
           children: {
-            id: responseField(scopedTranslation, {
+            provider: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              label: "get.response.providerResults.model.provider" as const,
+              columns: 3,
+              schema: z.string(),
+            }),
+            modelsFound: responseField(scopedTranslation, {
+              type: WidgetType.STAT,
+              label: "get.response.providerResults.model.modelsFound" as const,
+              columns: 3,
+              schema: z.number(),
+            }),
+            modelsUpdated: responseField(scopedTranslation, {
+              type: WidgetType.STAT,
+              label:
+                "get.response.providerResults.model.modelsUpdated" as const,
+              columns: 3,
+              schema: z.number(),
+            }),
+            error: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              label: "get.response.models.model.id" as const,
-              columns: 4,
+              label: "get.response.providerResults.model.error" as const,
+              columns: 3,
+              schema: z.string().optional(),
+            }),
+          },
+        }),
+      }),
+
+      updates: responseArrayField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.updates.title" as const,
+        cardTitle: "name",
+        cardSubtitle: "modelId",
+        columns: 12,
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            modelId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.updates.model.modelId" as const,
+              columns: 3,
               schema: z.string(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              label: "get.response.models.model.name" as const,
+              label: "get.response.updates.model.name" as const,
+              columns: 3,
+              schema: z.string(),
+            }),
+            provider: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              label: "get.response.updates.model.provider" as const,
+              columns: 2,
+              schema: z.string(),
+            }),
+            field: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.updates.model.field" as const,
+              columns: 2,
+              schema: z.string(),
+            }),
+            value: responseField(scopedTranslation, {
+              type: WidgetType.STAT,
+              label: "get.response.updates.model.value" as const,
+              columns: 1,
+              schema: z.number(),
+            }),
+            source: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              label: "get.response.updates.model.source" as const,
+              columns: 1,
+              schema: z.string(),
+            }),
+          },
+        }),
+      }),
+
+      failures: responseArrayField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.failures.title" as const,
+        columns: 12,
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            modelId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.failures.model.modelId" as const,
               columns: 4,
               schema: z.string(),
             }),
             provider: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              label: "get.response.models.model.provider" as const,
+              label: "get.response.failures.model.provider" as const,
               columns: 4,
               schema: z.string(),
             }),
-            costUsd: responseField(scopedTranslation, {
-              type: WidgetType.STAT,
-              label: "get.response.models.model.costUsd" as const,
-              columns: 3,
-              schema: z.number(),
-            }),
-            creditCost: responseField(scopedTranslation, {
-              type: WidgetType.STAT,
-              label: "get.response.models.model.creditCost" as const,
-              columns: 3,
-              schema: z.number(),
-            }),
-            source: responseField(scopedTranslation, {
-              type: WidgetType.BADGE,
-              label: "get.response.models.model.source" as const,
-              columns: 6,
+            reason: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.failures.model.reason" as const,
+              columns: 4,
               schema: z.string(),
             }),
           },
@@ -176,11 +254,14 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         summary: {
+          totalProviders: 0,
           totalModels: 0,
           modelsUpdated: 0,
           fileUpdated: false,
         },
-        models: [],
+        providerResults: [],
+        updates: [],
+        failures: [],
       },
     },
   },
@@ -188,4 +269,4 @@ const { GET } = createEndpoint({
 
 export default { GET };
 
-export type MediaPricesGetResponseOutput = typeof GET.types.ResponseOutput;
+export type ModelPricesGetResponseOutput = typeof GET.types.ResponseOutput;

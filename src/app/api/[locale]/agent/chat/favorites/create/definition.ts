@@ -5,6 +5,21 @@
 
 import { z } from "zod";
 
+import {
+  CHAT_MODE_IDS,
+  ChatModeOptions,
+} from "@/app/api/[locale]/agent/models/enum";
+import {
+  DEFAULT_TTS_VOICE_ID,
+  LLM_MODEL_IDS,
+  LlmModelIdOptions,
+  STT_MODEL_IDS,
+  SttModelIdOptions,
+  TTS_MODEL_IDS,
+  TtsModelIdOptions,
+  VISION_MODEL_IDS,
+  VisionModelIdOptions,
+} from "@/app/api/[locale]/agent/models/models";
 import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/types";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -21,11 +36,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../../shared/types/common.schema";
-import {
-  TtsVoice,
-  TtsVoiceDB,
-  TtsVoiceOptions,
-} from "../../../text-to-speech/enum";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
@@ -111,7 +121,7 @@ const { POST } = createEndpoint({
           skillId: requestData.skillId ?? "default",
           variantId: requestData.variantId ?? null,
           customIcon: null,
-          voice: requestData.voice ?? null,
+          voiceId: requestData.voiceId ?? null,
           modelSelection: requestData.modelSelection,
           position: 0, // Will be set correctly by the list
         };
@@ -218,18 +228,70 @@ const { POST } = createEndpoint({
         } as const,
       }),
 
-      voice: requestField(scopedTranslation, {
+      voiceId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
+        options: TtsModelIdOptions,
         label: "post.voice.label" as const,
         description: "post.voice.description" as const,
-        options: TtsVoiceOptions,
         columns: 6,
         theme: {
           descriptionStyle: "inline",
           optionalColor: "transparent",
         },
-        schema: z.enum(TtsVoiceDB).nullable().optional(),
+        schema: z.enum(TTS_MODEL_IDS).nullable().optional(),
+      }),
+      sttModelId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: SttModelIdOptions,
+        label: "post.sttModel.label" as const,
+        description: "post.sttModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+        schema: z.enum(STT_MODEL_IDS).nullable().optional(),
+      }),
+      visionBridgeModelId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: VisionModelIdOptions,
+        label: "post.visionBridgeModel.label" as const,
+        description: "post.visionBridgeModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+        schema: z.enum(VISION_MODEL_IDS).nullable().optional(),
+      }),
+      translationModelId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: LlmModelIdOptions,
+        label: "post.translationModel.label" as const,
+        description: "post.translationModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+        schema: z.enum(LLM_MODEL_IDS).nullable().optional(),
+      }),
+      defaultChatMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        options: ChatModeOptions,
+        label: "post.defaultChatMode.label" as const,
+        description: "post.defaultChatMode.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+        schema: z.enum(CHAT_MODE_IDS).nullable().optional(),
       }),
 
       modelSelection: requestField(scopedTranslation, {
@@ -342,7 +404,7 @@ const { POST } = createEndpoint({
       create: {
         skillId: "thea",
         icon: "female" as const,
-        voice: TtsVoice.FEMALE,
+        voiceId: DEFAULT_TTS_VOICE_ID,
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
           intelligenceRange: {

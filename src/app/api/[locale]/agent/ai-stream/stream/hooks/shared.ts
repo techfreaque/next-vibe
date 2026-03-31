@@ -11,9 +11,11 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import { upsertMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/update-messages";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
-import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
-import { DEFAULT_TTS_VOICE } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import {
+  DEFAULT_TTS_VOICE_ID,
+  type ModelId,
+  type TtsModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -54,7 +56,7 @@ export interface MessageOperationDeps {
     availableTools: ToolConfigItem[] | null;
     pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
-    ttsVoice: typeof TtsVoiceValue;
+    voiceId: TtsModelId;
   };
   /** Called immediately after the optimistic user message is added - switches the visible branch */
   setLeafMessageId?: (messageId: string) => void;
@@ -220,10 +222,10 @@ export async function createAndSendUserMessage(
       });
     }
 
-    // Voice mode settings - use ttsAutoplay and ttsVoice from chat settings
+    // Voice mode settings - use ttsAutoplay and voiceId from chat settings
     const effectiveVoiceMode = {
       enabled: settings.ttsAutoplay,
-      voice: settings.ttsVoice ?? DEFAULT_TTS_VOICE,
+      voice: settings.voiceId ?? DEFAULT_TTS_VOICE_ID,
     };
 
     // Get user's timezone from browser

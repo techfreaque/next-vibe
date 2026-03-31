@@ -16,7 +16,6 @@ import { PULSE_EXECUTE_ALIAS } from "@/app/api/[locale]/system/unified-interface
 import { PULSE_STATUS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/status/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
 import {
@@ -37,7 +36,6 @@ export const cronManagerSkill: Skill = {
   icon: "clock",
   category: SkillCategory.ASSISTANT,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   userRole: [UserPermissionRole.ADMIN],
   availableTools: [
     tool(CRON_LIST_ALIAS),

@@ -215,6 +215,22 @@ export const translations = {
       description:
         "Select a text-to-speech voice for audio responses. Each skill can have their own unique voice.",
     },
+    sttModel: {
+      label: "Speech-to-Text Model",
+      description: "Model used for speech recognition",
+    },
+    visionBridgeModel: {
+      label: "Vision Model",
+      description: "Model used for image analysis",
+    },
+    translationModel: {
+      label: "Translation Model",
+      description: "Model used for text translation",
+    },
+    defaultChatMode: {
+      label: "Default Chat Mode",
+      description: "Default mode when opening this chat",
+    },
     systemPrompt: {
       label: "System Prompt",
       description:

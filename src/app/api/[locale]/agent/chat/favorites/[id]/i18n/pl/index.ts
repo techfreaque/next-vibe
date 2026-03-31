@@ -206,6 +206,22 @@ export const translations: typeof enTranslations = {
       label: "Głos AI",
       description: "Wybierz głos dla swojego asystenta AI",
     },
+    sttModel: {
+      label: "Model mowy na tekst",
+      description: "Model używany do rozpoznawania mowy",
+    },
+    visionBridgeModel: {
+      label: "Model wizji",
+      description: "Model używany do analizy obrazów",
+    },
+    translationModel: {
+      label: "Model tłumaczenia",
+      description: "Model używany do tłumaczenia tekstu",
+    },
+    defaultChatMode: {
+      label: "Domyślny tryb czatu",
+      description: "Domyślny tryb przy otwieraniu tego czatu",
+    },
     mode: {
       label: "Tryb wyboru",
     },

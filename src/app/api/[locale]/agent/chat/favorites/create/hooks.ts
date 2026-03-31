@@ -17,7 +17,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { IconKey } from "../../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { ModelSelectionSimple } from "../../../models/types";
-import type { TtsVoiceValue } from "../../../text-to-speech/enum";
 import characterSingleDefinitions from "../../skills/[id]/definition";
 import { ChatFavoritesRepositoryClient } from "../repository-client";
 import favoritesDefinition, {
@@ -68,12 +67,8 @@ export interface SkillDataForFavorite {
   name: string | null;
   tagline: string | null;
   description: string | null;
-  voice: typeof TtsVoiceValue | null;
-  variants: Array<{
-    id: string;
-    modelSelection: ModelSelectionSimple;
-    isDefault?: boolean;
-  }>;
+  voiceId: string | null;
+  modelSelection: ModelSelectionSimple | null;
 }
 
 export interface UseAddToFavoritesOptions {
@@ -139,8 +134,8 @@ export function useAddToFavorites({
             name: cachedData.data.name,
             tagline: cachedData.data.tagline,
             description: cachedData.data.description,
-            voice: cachedData.data.voice,
-            variants: cachedData.data.variants ?? null,
+            voiceId: cachedData.data.voiceId ?? null,
+            modelSelection: null,
           };
         } else {
           // Fetch from API
@@ -164,8 +159,8 @@ export function useAddToFavorites({
             name: characterResponse.data.name,
             tagline: characterResponse.data.tagline,
             description: characterResponse.data.description,
-            voice: characterResponse.data.voice,
-            variants: characterResponse.data.variants ?? null,
+            voiceId: characterResponse.data.voiceId ?? null,
+            modelSelection: null,
           };
         }
       }
@@ -189,7 +184,7 @@ export function useAddToFavorites({
           skillId: skillId,
           variantId: variantId ?? null,
           icon: charData.icon ?? undefined,
-          voice: null,
+          voiceId: null,
           modelSelection: null,
         },
         undefined,
@@ -208,7 +203,7 @@ export function useAddToFavorites({
         skillId: skillId,
         variantId: variantId ?? null,
         customIcon: null,
-        voice: null,
+        voiceId: null,
         modelSelection: null,
         position: 0,
       };
@@ -221,15 +216,10 @@ export function useAddToFavorites({
             return oldData;
           }
 
-          // Resolve variant modelSelection from the skill's variants
-          const variantModelSel = variantId
-            ? charData.variants?.find((v) => v.id === variantId)?.modelSelection
-            : undefined;
-
           const newFavorite =
             ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
               newFavoriteConfig,
-              variantModelSel ?? null,
+              null,
               charData.icon,
               charData.name,
               charData.tagline,

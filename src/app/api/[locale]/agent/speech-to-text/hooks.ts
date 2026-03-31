@@ -129,6 +129,15 @@ export function useEdenAISpeech({
         type: mediaRecorderRef.current?.mimeType || "audio/webm",
       });
 
+      // Bail out if blob is too small (silent/empty recording)
+      if (audioBlob.size < 1000) {
+        logger.debug("STT: Audio too short/silent, skipping transcription", {
+          blobSize: audioBlob.size,
+        });
+        setIsProcessing(false);
+        return;
+      }
+
       // Create a File object from the blob
       const audioFile = new File([audioBlob], "recording.webm", {
         type: audioBlob.type,

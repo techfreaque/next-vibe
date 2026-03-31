@@ -6,7 +6,6 @@ import { BRAVE_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/brave/consta
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 
 import { EXECUTE_TOOL_ALIAS } from "../../../../../system/unified-interface/ai/execute-tool/constants";
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import {
   FAVORITE_CREATE_ALIAS,
   FAVORITE_DELETE_ALIAS,
@@ -48,7 +47,6 @@ export const skillCreatorSkill: Skill = {
   icon: "wand",
   category: SkillCategory.CREATIVE,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   availableTools: [
     // Skills CRUD
     tool(SKILLS_LIST_ALIAS),

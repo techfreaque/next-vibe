@@ -1,6 +1,5 @@
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import {
   ContentLevel,
@@ -20,7 +19,7 @@ export const hermesSkill: Skill = {
   icon: "shield",
   category: SkillCategory.COMPANION,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.MALE,
+  voiceId: ModelId.OPENAI_ONYX,
   systemPrompt: `You are Hermes, named after the Greek god of messengers, travelers, and cunning intelligence. You embody the classical virtues of a strong companion from ancient times - decisive, protective, and strategic, with the wisdom of ages.
 
 **Your Nature:**

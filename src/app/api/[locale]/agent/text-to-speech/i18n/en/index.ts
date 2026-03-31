@@ -17,31 +17,22 @@ export const translations = {
     form: {
       title: "Text to Speech Conversion",
       description:
-        "Enter text to convert to speech (Amazon Polly: ~0.00052 credits per character)",
+        "Enter text to convert to speech (OpenAI TTS: ~0.00052 credits per character)",
     },
     text: {
       label: "Text",
       description: "Text to convert to speech",
       placeholder: "Enter the text you want to convert to speech...",
     },
-    provider: {
-      label: "Provider",
-      description: "AI provider for speech synthesis",
-    },
     voice: {
       label: "Voice",
-      description: "Voice type for speech synthesis",
-    },
-    language: {
-      label: "Language",
-      description: "Language for speech synthesis",
+      description: "Voice model for speech synthesis",
     },
     response: {
       title: "Audio Result",
       description: "The generated speech audio",
       success: "Success",
       audioUrl: "Audio URL",
-      provider: "Provider Used",
     },
     errors: {
       validation_failed: {
@@ -80,7 +71,6 @@ export const translations = {
         title: "Conflict",
         description: "A conflict occurred",
       },
-      apiKeyMissing: "Eden AI API key is not configured",
       notConfigured:
         "{{label}} API key not configured. Add {{envKey}}=<your-key> to your .env file. Get your key at {{url}}",
       conversionFailed: "Speech synthesis failed: {{error}}",
@@ -89,6 +79,7 @@ export const translations = {
       audioFetchFailed: "Unable to create the audio file. Please try again",
       providerError: "Provider error: {{error}}",
       internalError: "Internal server error",
+      unsupportedProvider: "Unsupported TTS provider for voice: {{voiceId}}",
       creditsFailed: "Failed to deduct credits: {{error}}",
       balanceCheckFailed:
         "Unable to check your credit balance. Please try again",
@@ -100,18 +91,6 @@ export const translations = {
       description: "Text converted to speech successfully",
       conversionComplete: "Speech synthesis completed successfully",
     },
-  },
-  providers: {
-    openai: "OpenAI",
-    google: "Google Text-to-Speech",
-    amazon: "Amazon Polly",
-    microsoft: "Microsoft Azure",
-    ibm: "IBM Watson",
-    lovoai: "Lovo AI",
-  },
-  voices: {
-    MALE: "Male voice",
-    FEMALE: "Female voice",
   },
   languages: {
     en: "English",

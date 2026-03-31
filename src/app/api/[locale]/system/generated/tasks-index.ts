@@ -16,7 +16,7 @@ import type {
 } from "../unified-interface/tasks/unified-runner/types";
 
 import { tasks as taskModule0 } from "../../agent/ai-stream/run/task";
-import { tasks as taskModule1 } from "../../agent/models/media-prices/task";
+import { tasks as taskModule1 } from "../../agent/models/model-prices/task";
 import { tasks as taskModule2 } from "../../credits/expire/task";
 import { tasks as taskModule3 } from "../../leads/ip-match-linking/task";
 import { tasks as taskModule4 } from "../../messenger/providers/email/imap-client/sync/task";

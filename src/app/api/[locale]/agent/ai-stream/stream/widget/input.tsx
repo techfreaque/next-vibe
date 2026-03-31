@@ -242,7 +242,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       availableTools: effectiveSettings.availableTools,
       pinnedTools: effectiveSettings.pinnedTools,
       ttsAutoplay: effectiveSettings.ttsAutoplay,
-      ttsVoice: effectiveSettings.ttsVoice,
+      voiceId: effectiveSettings.voiceId,
     }),
     [
       effectiveSettings.selectedModel,
@@ -250,7 +250,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       effectiveSettings.availableTools,
       effectiveSettings.pinnedTools,
       effectiveSettings.ttsAutoplay,
-      effectiveSettings.ttsVoice,
+      effectiveSettings.voiceId,
     ],
   );
 
@@ -324,10 +324,9 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   // isGenerativeModel: pure generator - no streaming conversation, hides voice/call mode
   const isGenerativeModel = isImageModel || isAudioModel;
   // Feature-flag driven UI: use capability flags instead of modelType for these
-  const hasImageOutputSettings =
-    currentModel?.features.imageOutputSettings === true;
+  const hasImageOutputSettings = currentModel?.modelRole === "image-gen";
   const showFileUpload =
-    !isGenerativeModel || (currentModel?.features.imageInput ?? false);
+    !isGenerativeModel || currentModel?.inputs?.includes("image") === true;
 
   // Generation settings from store
   const imageSize = useChatInputStore((s) => s.imageSize);

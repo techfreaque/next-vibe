@@ -1,6 +1,6 @@
 /**
  * Text-to-Speech API Route Definition
- * Converts text to speech using Eden AI providers
+ * Converts text to speech using AI providers (OpenAI TTS, ElevenLabs, Eden AI)
  */
 
 import { z } from "zod";
@@ -20,12 +20,17 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { DEFAULT_TTS_VOICE, TtsVoiceOptions } from "./enum";
+import {
+  DEFAULT_TTS_VOICE_ID,
+  ModelId,
+  TTS_MODEL_IDS,
+  TtsModelIdOptions,
+} from "@/app/api/[locale]/agent/models/models";
 import { scopedTranslation } from "./i18n";
 
 /**
  * Text-to-Speech Endpoint (POST)
- * Converts text to speech audio using Eden AI
+ * Converts text to speech audio using model-based provider routing
  */
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -62,14 +67,14 @@ const { POST } = createEndpoint({
         placeholder: "post.text.placeholder",
         schema: z.string().min(1).max(5000),
       }),
-      voice: requestField(scopedTranslation, {
+      voiceId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.voice.label",
         description: "post.voice.description",
         columns: 12,
-        options: TtsVoiceOptions,
-        schema: z.string().default(DEFAULT_TTS_VOICE),
+        options: TtsModelIdOptions,
+        schema: z.enum(TTS_MODEL_IDS).default(DEFAULT_TTS_VOICE_ID),
       }),
 
       audioUrl: responseField(scopedTranslation, {
@@ -79,7 +84,7 @@ const { POST } = createEndpoint({
       }),
       creditCost: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.creditCost",
+        content: "post.response.audioUrl",
         schema: z.number().optional(),
       }),
     },
@@ -133,7 +138,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         text: "Hello, this is a test of the text to speech system.",
-        voice: "MALE",
+        voiceId: ModelId.OPENAI_NOVA,
       },
     },
     responses: {

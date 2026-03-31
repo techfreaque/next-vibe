@@ -13,8 +13,10 @@ import { retryMessage as retryMessageOp } from "@/app/api/[locale]/agent/ai-stre
 import { sendMessage as sendMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import messageIdDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition";
 import voteDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
-import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import type {
+  ModelId,
+  TtsModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import {
@@ -102,7 +104,7 @@ interface MessageOperationsDeps {
     availableTools: ToolConfigItem[] | null;
     pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
-    ttsVoice: typeof TtsVoiceValue;
+    voiceId: TtsModelId;
   };
 }
 

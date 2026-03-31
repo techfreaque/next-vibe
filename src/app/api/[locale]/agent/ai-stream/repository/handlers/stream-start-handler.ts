@@ -6,13 +6,13 @@ import "server-only";
 
 import type { ModelMessage, ToolResultPart } from "ai";
 
+import type { TtsModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";
 import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
-import type { TtsVoiceValue } from "../../../text-to-speech/enum";
 import type { StreamContext } from "../core/stream-context";
 import { StreamContextInitializer } from "../core/stream-context-initializer";
 import {
@@ -42,7 +42,7 @@ export class StreamStartHandler {
     voiceMode:
       | {
           enabled: boolean;
-          voice: typeof TtsVoiceValue;
+          voiceId: TtsModelId;
         }
       | null
       | undefined;
@@ -151,12 +151,12 @@ export class StreamStartHandler {
         wsEmit: wsEmit ?? null,
         logger,
         locale,
-        voice: voiceMode.voice,
+        voiceId: voiceMode.voiceId,
         user,
         enabled: true,
       });
       logger.debug("[AI Stream] Voice mode enabled - streaming TTS active", {
-        voice: voiceMode.voice,
+        voiceId: voiceMode.voiceId,
         enabled: voiceMode.enabled,
       });
     }

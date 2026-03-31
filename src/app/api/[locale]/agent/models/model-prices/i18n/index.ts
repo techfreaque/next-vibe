@@ -8,7 +8,7 @@ export const scopedTranslation = createScopedTranslation({
   pl: () => require("./pl").translations,
 });
 
-export type MediaPricesTranslationKey =
+export type ModelPricesTranslationKey =
   (typeof scopedTranslation)["ScopedTranslationKey"];
 
-export type MediaPricesT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+export type ModelPricesT = ReturnType<typeof scopedTranslation.scopedT>["t"];

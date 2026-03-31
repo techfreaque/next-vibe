@@ -18,15 +18,17 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../../shared/utils";
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { getModelDisplayName, modelProviders } from "../../models/models";
+import {
+  DEFAULT_TTS_VOICE_ID,
+  type TtsModelId,
+  getModelDisplayName,
+  modelProviders,
+} from "../../models/models";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
 } from "../../models/types";
-import {
-  DEFAULT_TTS_VOICE,
-  type TtsVoiceValue,
-} from "../../text-to-speech/enum";
+
 import { STORAGE_KEYS } from "../constants";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
@@ -55,7 +57,7 @@ interface StoredLocalFavorite {
   skillId: string;
   variantId: string | null;
   customIcon: IconKey | null;
-  voice: typeof TtsVoiceValue | null;
+  voiceId: TtsModelId | null;
   modelSelection: FavoriteGetModelSelection | null;
   position: number;
 }
@@ -96,7 +98,7 @@ export class ChatFavoritesRepositoryClient {
           character?.tagline ? tChar(character.tagline) : null,
           character?.description ? tChar(character.description) : null,
           activeFavoriteId,
-          character?.voice ?? null,
+          character?.voiceId ?? null,
           locale,
           user,
         );
@@ -139,7 +141,7 @@ export class ChatFavoritesRepositoryClient {
         id,
         skillId: data.skillId ?? "default",
         variantId: data.variantId ?? null,
-        voice: data.voice ?? null,
+        voiceId: data.voiceId ?? null,
         modelSelection: data.modelSelection,
         customIcon: null,
         position: currentConfigs.length,
@@ -225,7 +227,7 @@ export class ChatFavoritesRepositoryClient {
         ...existing,
         skillId,
         customIcon: customIconToStore,
-        voice: data.voice ?? null,
+        voiceId: data.voiceId ?? null,
         modelSelection: data.modelSelection,
       };
 
@@ -318,7 +320,7 @@ export class ChatFavoritesRepositoryClient {
     characterTagline: string | null,
     characterDescription: string | null,
     activeFavoriteId: string | null,
-    characterVoice: typeof TtsVoiceValue | null,
+    characterVoice: TtsModelId | null,
     locale: CountryLanguage,
     user: JwtPayloadType,
   ): FavoriteCard {
@@ -336,7 +338,7 @@ export class ChatFavoritesRepositoryClient {
       skillId: stored.skillId,
       variantId: stored.variantId ?? null,
       modelId: bestModel?.id ?? null,
-      voice: stored.voice ?? characterVoice ?? DEFAULT_TTS_VOICE,
+      voiceId: stored.voiceId ?? characterVoice ?? DEFAULT_TTS_VOICE_ID,
       position: stored.position,
       icon: stored.customIcon ?? characterIcon ?? bestModel?.icon ?? "bot",
       name: characterName ?? bestModel?.name ?? t("fallbacks.unknown"),
@@ -383,7 +385,7 @@ export class ChatFavoritesRepositoryClient {
         name: t("fallbacks.unknownSkill"),
         tagline: t("fallbacks.noTagline"),
         description: t("fallbacks.noDescription"),
-        voice: stored.voice,
+        voiceId: stored.voiceId,
         modelSelection: stored.modelSelection, // null or actual selection
         characterModelSelection: null,
         compactTrigger: null,
@@ -409,7 +411,7 @@ export class ChatFavoritesRepositoryClient {
       name: character.name ? tChar(character.name) : t("fallbacks.unknown"),
       tagline: character.tagline ? tChar(character.tagline) : "",
       description: character.description ? tChar(character.description) : "",
-      voice: stored.voice ?? character.voice,
+      voiceId: stored.voiceId ?? character.voiceId ?? null,
       modelSelection: stored.modelSelection, // null = use character defaults
       characterModelSelection: effectiveCharacterModelSelection,
       compactTrigger: null,

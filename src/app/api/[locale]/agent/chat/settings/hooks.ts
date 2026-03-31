@@ -8,8 +8,10 @@
 import { useCallback, useMemo } from "react";
 
 import type { ViewModeValue } from "@/app/api/[locale]/agent/chat/enum";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
-import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import type {
+  ModelId,
+  TtsModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -33,7 +35,7 @@ interface UseChatSettingsReturn {
     favoriteId: string,
     skillId: string,
     modelId: ModelId,
-    voice: typeof TtsVoiceValue,
+    voiceId: TtsModelId,
   ) => void;
   setTTSAutoplay: (autoplay: boolean) => void;
   setViewMode: (mode: typeof ViewModeValue) => void;
@@ -123,8 +125,8 @@ export function useChatSettings(
       if (updates.ttsAutoplay !== undefined) {
         endpoint.create?.setValue("ttsAutoplay", updates.ttsAutoplay);
       }
-      if (updates.ttsVoice !== undefined) {
-        endpoint.create?.setValue("ttsVoice", updates.ttsVoice);
+      if (updates.voiceId !== undefined) {
+        endpoint.create?.setValue("voiceId", updates.voiceId);
       }
       if (updates.viewMode !== undefined) {
         endpoint.create?.setValue("viewMode", updates.viewMode);
@@ -180,13 +182,13 @@ export function useChatSettings(
       favoriteId: string,
       skillId: string,
       modelId: ModelId,
-      voice: typeof TtsVoiceValue,
+      voiceId: TtsModelId,
     ) => {
       void updateSettings({
         activeFavoriteId: favoriteId,
         selectedSkill: skillId,
         selectedModel: modelId,
-        ttsVoice: voice,
+        voiceId: voiceId,
       });
     },
     [updateSettings],

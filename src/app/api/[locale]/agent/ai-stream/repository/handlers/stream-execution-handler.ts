@@ -6,6 +6,7 @@ import "server-only";
 
 import type { JSONValue, LanguageModel, ModelMessage } from "ai";
 import {
+  generateText as aiGenerateText,
   streamText as aiStreamText,
   stepCountIs,
   type StopCondition,
@@ -70,6 +71,8 @@ export class StreamExecutionHandler {
     imageSize?: string;
     imageQuality?: string;
     musicDuration?: string;
+    /** Optional translation model for pure generator pipeline (image-gen/video-gen/audio-gen) */
+    translationModel?: ModelOption | null;
   }): Promise<void> {
     const {
       provider,
@@ -157,11 +160,87 @@ export class StreamExecutionHandler {
 
     const mediaCreditCost = calculateCreditCost(modelConfig, 0, 0, 0, 0);
 
+    // Pure generator pipeline: for image-gen / video-gen / audio-gen models, run a
+    // translation LLM step first to produce a refined prompt from the conversation history.
+    // This allows the user to reference previous context ("make it more dramatic") rather
+    // than requiring a complete self-contained prompt each time.
+    const isPureGenerator =
+      modelConfig.modelRole === "image-gen" ||
+      modelConfig.modelRole === "video-gen" ||
+      modelConfig.modelRole === "audio-gen";
+
+    if (isPureGenerator && mediaPrompt && params.translationModel) {
+      const translationModelConfig = params.translationModel;
+      logger.debug(
+        "[Execution] Running translation LLM step for pure generator",
+        {
+          generatorModel: modelConfig.id,
+          translationModel: translationModelConfig.id,
+        },
+      );
+      try {
+        const conversationContext = messages
+          .slice(-6) // last 3 turns for context
+          .map((m) => {
+            const textContent =
+              typeof m.content === "string"
+                ? m.content
+                : Array.isArray(m.content)
+                  ? m.content
+                      .filter(
+                        (p): p is { type: "text"; text: string } =>
+                          p.type === "text",
+                      )
+                      .map((p) => p.text)
+                      .join(" ")
+                  : "";
+            return `${m.role}: ${textContent}`;
+          })
+          .filter(Boolean)
+          .join("\n");
+
+        const translationResult = await aiGenerateText({
+          model: provider.chat(
+            translationModelConfig.providerModel,
+          ) as LanguageModel,
+          abortSignal: streamAbortController.signal,
+          messages: [
+            {
+              role: "user" as const,
+              content: `You are a prompt engineer. Given the conversation below and the user's latest request, write a single optimized prompt for a ${modelConfig.modelRole?.replace("-gen", "")} generation model. Output ONLY the prompt, no explanation.\n\nConversation:\n${conversationContext}\n\nUser's latest request: ${mediaPrompt}\n\nOptimized generation prompt:`,
+            },
+          ],
+        });
+        const refinedPrompt = translationResult.text.trim();
+        if (refinedPrompt) {
+          mediaPrompt = refinedPrompt;
+          logger.debug("[Execution] Translation step produced refined prompt", {
+            originalLength: mediaPrompt.length,
+            refinedLength: refinedPrompt.length,
+          });
+        }
+      } catch (translationError) {
+        // Non-fatal: fall back to raw user prompt
+        logger.warn("[Execution] Translation step failed, using raw prompt", {
+          error:
+            translationError instanceof Error
+              ? translationError.message
+              : String(translationError),
+        });
+      }
+    }
+
     const providerOptions: Record<string, Record<string, JSONValue>> = {};
     if (hasGenerationSettings) {
       providerOptions["generation"] = generationSettings;
     }
-    if (modelConfig.features.imageOutput) {
+    if (isPureGenerator) {
+      generationSettings["isGeneratorModel"] = "true";
+    }
+    if (
+      modelConfig.outputs?.includes("image") ||
+      modelConfig.modelRole === "image-gen"
+    ) {
       providerOptions["openrouter"] = {
         modalities: ["text", "image"] as JSONValue,
       };

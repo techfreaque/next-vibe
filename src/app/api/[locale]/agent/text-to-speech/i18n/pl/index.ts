@@ -19,31 +19,22 @@ export const translations: typeof enTranslations = {
     form: {
       title: "Konwersja tekstu na mowę",
       description:
-        "Wprowadź tekst do przekształcenia na mowę (Amazon Polly: ~0,00052 kredytów na znak)",
+        "Wprowadź tekst do przekształcenia na mowę (OpenAI TTS: ~0,00052 kredytów na znak)",
     },
     text: {
       label: "Tekst",
       description: "Tekst do przekształcenia na mowę",
       placeholder: "Wprowadź tekst, który chcesz przekształcić na mowę...",
     },
-    provider: {
-      label: "Dostawca",
-      description: "Dostawca AI do syntezy mowy",
-    },
     voice: {
       label: "Głos",
-      description: "Typ głosu do syntezy mowy",
-    },
-    language: {
-      label: "Język",
-      description: "Język do syntezy mowy",
+      description: "Model głosu do syntezy mowy",
     },
     response: {
       title: "Wynik audio",
       description: "Wygenerowane audio mowy",
       success: "Sukces",
       audioUrl: "URL audio",
-      provider: "Użyty dostawca",
     },
     errors: {
       validation_failed: {
@@ -82,14 +73,14 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Wystąpił konflikt",
       },
-      apiKeyMissing: "Klucz API Eden AI nie jest skonfigurowany",
       notConfigured:
         "Klucz API {{label}} nie jest skonfigurowany. Dodaj {{envKey}}=<twój-klucz> do pliku .env. Pobierz klucz na {{url}}",
-      conversionFailed: "Synteza mowy nie powiodła się: {error}",
+      conversionFailed: "Synteza mowy nie powiodła się: {{error}}",
       noText: "Nie podano tekstu",
       noAudioUrl: "Nie otrzymano URL audio od dostawcy",
-      providerError: "Błąd dostawcy: {error}",
+      providerError: "Błąd dostawcy: {{error}}",
       internalError: "Wewnętrzny błąd serwera",
+      unsupportedProvider: "Nieobsługiwany dostawca TTS dla głosu: {{voiceId}}",
       creditsFailed: "Nie udało się odjąć kredytów: {{error}}",
       audioFetchFailed: "Nie można utworzyć pliku audio. Spróbuj ponownie",
       balanceCheckFailed:
@@ -102,18 +93,6 @@ export const translations: typeof enTranslations = {
       description: "Tekst pomyślnie przekształcony na mowę",
       conversionComplete: "Synteza mowy zakończona pomyślnie",
     },
-  },
-  providers: {
-    openai: "OpenAI",
-    google: "Google Text-to-Speech",
-    amazon: "Amazon Polly",
-    microsoft: "Microsoft Azure",
-    ibm: "IBM Watson",
-    lovoai: "Lovo AI",
-  },
-  voices: {
-    MALE: "Męski głos",
-    FEMALE: "Damski głos",
   },
   languages: {
     en: "Angielski",

@@ -6,6 +6,7 @@
 import "server-only";
 
 import { asc, eq, inArray } from "drizzle-orm";
+import type { TtsModelId } from "@/app/api/[locale]/agent/models/models";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -39,9 +40,7 @@ import type { FavoriteSummaryItem } from "./system-prompt/prompt";
 import type { FavoritesT } from "./i18n";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
 
-/**
- * Chat Favorites Repository
- */
+/** Chat Favorites Repository */
 export class ChatFavoritesRepository {
   /**
    * Get all favorites for the authenticated user
@@ -95,7 +94,7 @@ export class ChatFavoritesRepository {
           let characterName = null;
           let characterTagline = null;
           let characterDescription = null;
-          let characterVoice = null;
+          let characterVoice: TtsModelId | null = null;
 
           if (favorite.skillId && favorite.skillId.trim() !== "") {
             const skillResult = await SkillsRepository.getSkillById(
@@ -109,7 +108,7 @@ export class ChatFavoritesRepository {
               characterName = skillResult.data.name;
               characterTagline = skillResult.data.tagline;
               characterDescription = skillResult.data.description;
-              characterVoice = skillResult.data.voice;
+              characterVoice = skillResult.data.voiceId ?? null;
               // Resolve variant's modelSelection from the skill's variants list
               const variants = skillResult.data.variants;
               const variant = favorite.variantId
@@ -127,7 +126,7 @@ export class ChatFavoritesRepository {
               skillId: favorite.skillId,
               variantId: favorite.variantId ?? null,
               customIcon: favorite.customIcon,
-              voice: favorite.voice,
+              voiceId: favorite.voiceId,
               modelSelection: favorite.modelSelection,
               position: favorite.position,
             },

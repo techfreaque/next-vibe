@@ -10,7 +10,6 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { USERS_LIST_ALIAS } from "@/app/api/[locale]/users/list/constants";
 import { USERS_STATS_ALIAS } from "@/app/api/[locale]/users/stats/constants";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import { MEMORY_LIST_ALIAS } from "../../../memories/constants";
 import { MEMORY_ADD_ALIAS } from "../../../memories/create/constants";
 import type { Skill } from "../../config";
@@ -33,7 +32,6 @@ export const statsAnalystSkill: Skill = {
   icon: "bar-chart-3",
   category: SkillCategory.ANALYSIS,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   userRole: [UserPermissionRole.ADMIN],
   availableTools: [
     tool(LEADS_STATS_ALIAS),

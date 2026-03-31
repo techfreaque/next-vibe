@@ -49,6 +49,22 @@ export const translations: typeof enTranslations = {
       label: "Głos",
       description: "Preferencje głosu text-to-speech",
     },
+    sttModel: {
+      label: "Model mowy na tekst",
+      description: "Model do rozpoznawania mowy",
+    },
+    visionBridgeModel: {
+      label: "Model wizji",
+      description: "Model do analizy obrazu",
+    },
+    translationModel: {
+      label: "Model tłumaczenia",
+      description: "Model do tłumaczenia tekstu",
+    },
+    defaultChatMode: {
+      label: "Domyślny tryb czatu",
+      description: "Domyślny tryb przy otwieraniu tego czatu",
+    },
     mode: {
       label: "Tryb wyboru",
       description: "Sposób wyboru modelu",

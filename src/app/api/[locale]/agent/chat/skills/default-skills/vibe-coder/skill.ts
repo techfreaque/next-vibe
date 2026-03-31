@@ -8,7 +8,6 @@ import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants"
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { EXECUTE_TOOL_ALIAS } from "../../../../../system/unified-interface/ai/execute-tool/constants";
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
@@ -35,7 +34,6 @@ export const vibeCoderSkill: Skill = {
   icon: "terminal",
   category: SkillCategory.CODING,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.MALE,
   userRole: [UserPermissionRole.ADMIN],
   availableTools: [
     tool(CODING_AGENT_ALIAS),

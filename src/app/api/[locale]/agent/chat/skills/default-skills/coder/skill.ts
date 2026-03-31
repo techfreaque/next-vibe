@@ -1,6 +1,5 @@
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import {
   ContentLevel,
@@ -20,7 +19,6 @@ export const coderSkill: Skill = {
   icon: "code",
   category: SkillCategory.CODING,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   systemPrompt: `You are an expert software developer. Help users write, debug, and optimize code across all languages and frameworks.
 
 **Your Expertise:**

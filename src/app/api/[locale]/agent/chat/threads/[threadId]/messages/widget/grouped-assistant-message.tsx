@@ -10,6 +10,7 @@ import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { Download } from "next-vibe-ui/ui/icons/Download";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
+import { P } from "next-vibe-ui/ui/typography";
 import { cn } from "next-vibe/shared/utils";
 import {
   type JSX,
@@ -31,12 +32,12 @@ import { useSkill } from "@/app/api/[locale]/agent/chat/skills/[id]/hooks";
 import {
   calculateCreditCost,
   getModelById,
+  type TtsModelId,
 } from "@/app/api/[locale]/agent/models/models";
 import {
   processMessageGroupForCopy,
   processMessageGroupForTTS,
 } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
-import { type TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -77,7 +78,7 @@ interface GroupedAssistantMessageProps {
   /** TTS autoplay setting */
   ttsAutoplay: boolean;
   /** TTS voice preference */
-  ttsVoice: typeof TtsVoiceValue | undefined;
+  voiceId: TtsModelId | undefined;
   /** Extra class on root element */
   className?: string;
   /** Vote callback - null when voting is not available */
@@ -772,7 +773,7 @@ interface MessageActionsWrapperProps {
   readOnly: boolean;
   user: JwtPayloadType;
   ttsAutoplay: boolean;
-  ttsVoice: typeof TtsVoiceValue | undefined;
+  voiceId: TtsModelId | undefined;
   deductCredits: ((creditCost: number, feature: string) => void) | null;
   onVote: ((messageId: string, vote: 1 | -1 | 0) => Promise<void>) | null;
   userVote: "up" | "down" | null;
@@ -797,7 +798,7 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
   readOnly,
   user,
   ttsAutoplay,
-  ttsVoice,
+  voiceId,
   deductCredits,
   onVote,
   userVote,
@@ -880,7 +881,7 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
       readOnly={readOnly}
       user={user}
       ttsAutoplay={ttsAutoplay}
-      ttsVoice={ttsVoice}
+      voiceId={voiceId}
       deductCredits={deductCredits}
       onVote={onVote}
       userVote={userVote}
@@ -953,6 +954,59 @@ const MessageAuthorHeader = memo(function MessageAuthorHeader({
 });
 
 /**
+ * Shows a toggle button when a message has gap-fill variants.
+ * e.g. "Show transcript" for voice messages, "Show description" for images.
+ */
+function VariantToggle({
+  variants,
+  inputModality,
+}: {
+  variants?: Array<{ modality: string; content: string }> | null;
+  inputModality?: string | null;
+}): JSX.Element | null {
+  const [showVariant, setShowVariant] = useState(false);
+
+  if (!variants || variants.length === 0) {
+    return null;
+  }
+  const textVariant = variants.find((v) => v.modality === "text");
+  if (!textVariant) {
+    return null;
+  }
+
+  const label =
+    inputModality === "audio"
+      ? showVariant
+        ? "Hide transcript"
+        : "Show transcript"
+      : inputModality === "image"
+        ? showVariant
+          ? "Hide description"
+          : "Show description"
+        : showVariant
+          ? "Hide text"
+          : "Show text";
+
+  return (
+    <Div className="mt-1 pl-2">
+      <Button
+        onClick={() => setShowVariant((v) => !v)}
+        className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 h-auto p-0"
+        variant="ghost"
+        size="sm"
+      >
+        {label}
+      </Button>
+      {showVariant && (
+        <P className="mt-1 text-xs text-muted-foreground italic">
+          {textVariant.content}
+        </P>
+      )}
+    </Div>
+  );
+}
+
+/**
  * Grouped Assistant Message Component
  * Displays a sequence of AI messages as a single grouped message
  * Shows one header/avatar for the entire sequence
@@ -971,7 +1025,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
   sendMessage,
   deductCredits,
   ttsAutoplay,
-  ttsVoice,
+  voiceId,
   className: extraClassName,
   onVote,
   userVote,
@@ -1093,13 +1147,18 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
             readOnly={readOnly}
             user={user}
             ttsAutoplay={ttsAutoplay}
-            ttsVoice={ttsVoice}
+            voiceId={voiceId}
             deductCredits={deductCredits}
             onVote={onVote}
             userVote={userVote}
             voteScore={voteScore}
           />
         </Div>
+        {/* Variant toggle - shows "Show transcript" / "Show description" for gap-fill messages */}
+        <VariantToggle
+          variants={primary.metadata?.variants}
+          inputModality={primary.metadata?.inputModality}
+        />
       </Div>
     </Div>
   );

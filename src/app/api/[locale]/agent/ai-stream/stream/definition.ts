@@ -6,8 +6,11 @@
 import { z } from "zod";
 
 import {
+  DEFAULT_TTS_VOICE_ID,
   ModelId,
   ModelIdOptions,
+  TTS_MODEL_IDS,
+  TtsModelIdOptions,
 } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -31,7 +34,6 @@ import { DefaultFolderId } from "../../chat/config";
 import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
 import { type ChatMessage, selectChatMessageSchema } from "../../chat/db";
 import { ChatMessageRole, ChatMessageRoleOptions } from "../../chat/enum";
-import { DEFAULT_TTS_VOICE, TtsVoice } from "../../text-to-speech/enum";
 import { AI_STREAM_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { AiStreamWidget } from "./widget/widget";
@@ -399,20 +401,11 @@ const { POST } = createEndpoint({
           voice: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
+            options: TtsModelIdOptions,
             label: "post.voiceMode.voice.label",
             description: "post.voiceMode.voice.description",
-            options: [
-              {
-                value: TtsVoice.MALE,
-                label: "post.voiceMode.voice.male",
-              },
-              {
-                value: TtsVoice.FEMALE,
-                label: "post.voiceMode.voice.female",
-              },
-            ],
             columns: 6,
-            schema: z.enum(TtsVoice).default(DEFAULT_TTS_VOICE),
+            schema: z.enum(TTS_MODEL_IDS).default(DEFAULT_TTS_VOICE_ID),
           }),
         },
       }),

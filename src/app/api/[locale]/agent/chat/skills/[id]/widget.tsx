@@ -27,7 +27,6 @@ import { Span } from "next-vibe-ui/ui/span";
 import { useCallback, useMemo, useState } from "react";
 
 import { ModelSelector } from "@/app/api/[locale]/agent/models/widget/model-selector";
-import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
@@ -208,7 +207,7 @@ export function SkillEditContainer({
           {/* Additional Fields */}
           <SelectFieldWidget fieldName="category" field={children.category} />
           <BooleanFieldWidget fieldName="isPublic" field={children.isPublic} />
-          <SelectFieldWidget fieldName="voice" field={children.voice} />
+          <TextFieldWidget fieldName="voiceId" field={children.voiceId} />
           <TextareaFieldWidget
             fieldName="systemPrompt"
             field={children.systemPrompt}
@@ -362,7 +361,7 @@ export function SkillViewContainer({
           name={field.value?.name ?? null}
           tagline={field.value?.tagline ?? null}
           description={field.value?.description ?? null}
-          voice={field.value?.voice ?? null}
+          voiceId={field.value?.voiceId ?? null}
           skillOwnership={skillOwnership ?? SkillOwnershipType.SYSTEM}
           locale={locale}
           isLoading={!field.value}
@@ -394,7 +393,7 @@ interface SkillCardProps {
   name: string | null;
   tagline: string | null;
   description: string | null;
-  voice: typeof TtsVoiceValue | null;
+  voiceId: string | null | undefined;
   skillOwnership: typeof SkillOwnershipTypeValue;
   locale: CountryLanguage;
   isLoading?: boolean;
@@ -419,7 +418,7 @@ export function SkillCard({
   name,
   tagline,
   description,
-  voice,
+  voiceId,
   skillOwnership,
   locale,
   isLoading = false,
@@ -472,7 +471,7 @@ export function SkillCard({
       <Div className="flex items-center gap-3 pt-3 border-t">
         <Div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Volume2 className="w-3.5 h-3.5" />
-          <Span>{voice ? t(voice) : <Skeleton className="h-4 w-16" />}</Span>
+          <Span>{voiceId ?? <Skeleton className="h-4 w-16" />}</Span>
         </Div>
         {!isLoading && (
           <Div
@@ -603,8 +602,6 @@ function CustomizeAndAddButton({
         await import("../../favorites/create/definition");
       const editFavoriteDefinitions =
         await import("../../favorites/[id]/definition");
-      const { DEFAULT_TTS_VOICE } =
-        await import("../../../text-to-speech/enum");
 
       // Use field data if available, otherwise fetch
       let fullChar = field.value;
@@ -637,7 +634,7 @@ function CustomizeAndAddButton({
         data: {
           skillId: skillId,
           icon: fullChar.icon ?? undefined,
-          voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
+          voiceId: fullChar.voiceId ?? undefined,
           modelSelection: null,
         },
         replaceOnSuccess: {

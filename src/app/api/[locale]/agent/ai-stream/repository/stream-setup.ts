@@ -20,6 +20,7 @@ import {
   ApiProvider,
   getModelById,
   type ModelOption,
+  type TtsModelId,
 } from "@/app/api/[locale]/agent/models/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
@@ -40,14 +41,11 @@ import { chatSettings } from "../../chat/settings/db";
 import { DEFAULT_SKILLS } from "../../chat/skills/config";
 import { customSkills } from "../../chat/skills/db";
 import { ThreadsRepository } from "../../chat/threads/repository";
-import {
-  DEFAULT_TTS_VOICE,
-  type TtsVoiceValue,
-} from "../../text-to-speech/enum";
 import { type AiStreamPostRequestOutput } from "../stream/definition";
 import { AbortControllerSetup } from "./core/abort-controller-setup";
 import { AbortReason, COMPACT_TRIGGER, isStreamAbort } from "./core/constants";
 import { CreditValidatorHandler } from "./core/credit-validator-handler";
+import { type BridgeContext, ModalityResolver } from "./core/modality-resolver";
 import { ProviderFactory as ProviderFactoryClass } from "./core/provider-factory";
 import { StreamRegistry } from "./core/stream-registry";
 import { ToolsSetupHandler } from "./core/tools-setup-handler";
@@ -99,7 +97,7 @@ export interface StreamSetupResult {
   /** Voice mode settings for TTS streaming */
   voiceMode?: {
     enabled: boolean;
-    voice: typeof TtsVoiceValue;
+    voiceId: TtsModelId;
   } | null;
   /** Voice transcription metadata (when audioInput was provided) */
   voiceTranscription?: {
@@ -156,6 +154,8 @@ export interface StreamSetupResult {
    * The AI turn should be skipped - resume-stream will handle revival for each task.
    */
   skipAiTurn?: boolean;
+  /** Resolved bridge models for STT, TTS, vision, and translation */
+  bridgeContext: BridgeContext;
 }
 
 export async function setupAiStream(params: {
@@ -278,6 +278,25 @@ export async function setupAiStream(params: {
     });
   }
   const modelConfig = getModelById(data.model);
+
+  // Guard: TTS/STT models are dispatched via their own handlers, not the LLM stream pipeline
+  if (
+    modelConfig.apiProvider === ApiProvider.OPENAI_TTS ||
+    modelConfig.apiProvider === ApiProvider.OPENAI_STT ||
+    modelConfig.apiProvider === ApiProvider.ELEVENLABS ||
+    modelConfig.apiProvider === ApiProvider.DEEPGRAM ||
+    modelConfig.apiProvider === ApiProvider.EDEN_AI_TTS ||
+    modelConfig.apiProvider === ApiProvider.EDEN_AI_STT
+  ) {
+    logger.warn("[Setup] TTS/STT model routed to LLM stream — invalid", {
+      model: data.model,
+      provider: modelConfig.apiProvider,
+    });
+    return fail({
+      message: aiStreamT("route.errors.invalidRequestData"),
+      errorType: ErrorResponseTypes.BAD_REQUEST,
+    });
+  }
 
   // Guard: check that the required API key for this model's provider is configured
   const providerKeyMissing = ((): string | null => {
@@ -732,6 +751,97 @@ export async function setupAiStream(params: {
     };
   })();
 
+  // Resolve bridge models via cascade: skill → favorite → userSettings → system default
+  // This wires the ModalityResolver into the stream pipeline so all downstream
+  // handlers (STT, TTS, vision bridge, translation) use the correct models.
+  const bridgeContext = await (async (): Promise<BridgeContext> => {
+    let skillConfig: BridgeContext["skill"] = null;
+    let favoriteConfig: BridgeContext["favorite"] = null;
+    let userSettingsConfig: BridgeContext["userSettings"] = null;
+
+    // Resolve skill: default skills come from config, custom skills from DB
+    if (data.skill) {
+      const uuidPattern =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidPattern.test(data.skill)) {
+        const [customSkillRow] = await db
+          .select({
+            voiceId: customSkills.voiceId,
+            sttModelId: customSkills.sttModelId,
+            visionBridgeModelId: customSkills.visionBridgeModelId,
+            translationModelId: customSkills.translationModelId,
+            defaultChatMode: customSkills.defaultChatMode,
+          })
+          .from(customSkills)
+          .where(eq(customSkills.id, data.skill))
+          .limit(1);
+        if (customSkillRow) {
+          skillConfig = {
+            voiceId: customSkillRow.voiceId ?? undefined,
+            sttModelId: customSkillRow.sttModelId ?? undefined,
+            visionBridgeModelId:
+              customSkillRow.visionBridgeModelId ?? undefined,
+            translationModelId: customSkillRow.translationModelId ?? undefined,
+            defaultChatMode: customSkillRow.defaultChatMode ?? undefined,
+          };
+        }
+      } else {
+        const defaultSkill = DEFAULT_SKILLS.find((c) => c.id === data.skill);
+        if (defaultSkill) {
+          skillConfig = defaultSkill;
+        }
+      }
+    }
+
+    // Resolve favorite: use activeFavoriteId from settings
+    if (userId) {
+      const [userSettingsRow] = await db
+        .select({
+          activeFavoriteId: chatSettings.activeFavoriteId,
+          voiceId: chatSettings.voiceId,
+          sttModelId: chatSettings.sttModelId,
+          visionBridgeModelId: chatSettings.visionBridgeModelId,
+          translationModelId: chatSettings.translationModelId,
+          defaultChatMode: chatSettings.defaultChatMode,
+        })
+        .from(chatSettings)
+        .where(eq(chatSettings.userId, userId))
+        .limit(1);
+
+      if (userSettingsRow) {
+        userSettingsConfig = userSettingsRow;
+
+        if (userSettingsRow.activeFavoriteId) {
+          const [favRow] = await db
+            .select()
+            .from(chatFavorites)
+            .where(eq(chatFavorites.id, userSettingsRow.activeFavoriteId))
+            .limit(1);
+          if (favRow) {
+            favoriteConfig = favRow;
+          }
+        }
+      }
+    }
+
+    return {
+      skill: skillConfig,
+      favorite: favoriteConfig,
+      userSettings: userSettingsConfig,
+    };
+  })();
+
+  // Resolve TTS voice via cascade (replaces hardcoded data.voiceMode.voice)
+  const resolvedTtsVoiceId = ModalityResolver.resolveTtsVoiceId(bridgeContext);
+  const resolvedTtsModel = ModalityResolver.resolveTtsModel(bridgeContext);
+
+  logger.debug("[Setup] Bridge models resolved via cascade", {
+    ttsModelId: resolvedTtsModel.id,
+    sttModelId: ModalityResolver.resolveSttModel(bridgeContext).id,
+    hasVisionBridge: !!ModalityResolver.resolveVisionBridgeModel(bridgeContext),
+    hasTranslation: !!ModalityResolver.resolveTranslationModel(bridgeContext),
+  });
+
   // Build complete system prompt from skill and formatting instructions
   const { systemPrompt: builtSystemPrompt, trailingSystemMessage } =
     await buildSystemPrompt({
@@ -1169,7 +1279,7 @@ export async function setupAiStream(params: {
       voiceMode: data.voiceMode
         ? {
             enabled: data.voiceMode.enabled ?? false,
-            voice: data.voiceMode.voice ?? DEFAULT_TTS_VOICE,
+            voiceId: resolvedTtsVoiceId,
           }
         : null,
       voiceTranscription,
@@ -1183,6 +1293,7 @@ export async function setupAiStream(params: {
       streamAbortController,
       effectiveCompactTrigger,
       streamContext,
+      bridgeContext,
     },
   };
 }

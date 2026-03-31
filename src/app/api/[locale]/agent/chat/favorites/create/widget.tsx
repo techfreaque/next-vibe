@@ -25,7 +25,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
 import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
@@ -61,7 +61,7 @@ export function FavoriteCreateContainer({
 
   const emptyField = useMemo(() => ({}), []);
   const skillId = form.watch("skillId");
-  const voice = form.watch("voice");
+  const voiceId = form.watch("voiceId");
   const isNoSkill = skillId === NO_SKILL_ID;
 
   const favoriteModelSelection: ModelSelectionSimple | undefined =
@@ -104,7 +104,7 @@ export function FavoriteCreateContainer({
         activeFavoriteId: null,
         selectedSkill: skillId,
         selectedModel,
-        ttsVoice: voice ?? characterData?.voice ?? undefined,
+        voiceId: voiceId ?? characterData?.voiceId ?? undefined,
       });
 
       // Navigate back
@@ -182,7 +182,7 @@ export function FavoriteCreateContainer({
             </Div>
           )}
 
-          <SelectFieldWidget fieldName="voice" field={children.voice} />
+          <TextFieldWidget fieldName="voiceId" field={children.voiceId} />
           {form && (
             <ModelSelector
               modelSelection={favoriteModelSelection}

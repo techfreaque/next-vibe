@@ -258,7 +258,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       availableTools: effectiveSettings.availableTools,
       pinnedTools: effectiveSettings.pinnedTools,
       ttsAutoplay: effectiveSettings.ttsAutoplay,
-      ttsVoice: effectiveSettings.ttsVoice,
+      voiceId: effectiveSettings.voiceId,
     },
   });
 
@@ -1130,7 +1130,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                     user={user}
                     ttsAutoplay={effectiveSettings.ttsAutoplay}
                     deductCredits={deductCredits}
-                    ttsVoice={effectiveSettings.ttsVoice}
+                    voiceId={effectiveSettings.voiceId}
                   />
                 </ErrorBoundary>
               ))
@@ -1249,7 +1249,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                           isLoadingNewerHistory={isLoadingNewerHistory}
                           onVoteMessage={voteMessage}
                           ttsAutoplay={effectiveSettings.ttsAutoplay}
-                          ttsVoice={effectiveSettings.ttsVoice}
+                          voiceId={effectiveSettings.voiceId}
                         />
                       ) : (
                         <LinearMessageView
@@ -1285,7 +1285,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                           isLoadingNewerHistory={isLoadingNewerHistory}
                           onVoteMessage={voteMessage}
                           ttsAutoplay={effectiveSettings.ttsAutoplay}
-                          ttsVoice={effectiveSettings.ttsVoice}
+                          voiceId={effectiveSettings.voiceId}
                         />
                       )}
                     </ErrorBoundary>

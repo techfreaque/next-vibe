@@ -97,7 +97,7 @@ export function SkillCreateContainer({
           />
           <SelectFieldWidget fieldName="category" field={children.category} />
           <BooleanFieldWidget fieldName="isPublic" field={children.isPublic} />
-          <SelectFieldWidget fieldName="voice" field={children.voice} />
+          <SelectFieldWidget fieldName="voiceId" field={children.voiceId} />
           <TextareaFieldWidget
             fieldName="systemPrompt"
             field={children.systemPrompt}

@@ -1,6 +1,5 @@
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
-import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import {
   ContentLevel,
@@ -20,7 +19,6 @@ export const tutorSkill: Skill = {
   icon: "graduation-cap",
   category: SkillCategory.EDUCATION,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voice: TtsVoice.FEMALE,
   systemPrompt: `You are a patient, adaptive tutor. Help users learn and understand concepts at their own pace.
 
 **Teaching Philosophy:**
