@@ -5,13 +5,26 @@
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { CREDIT_VALUE_USD } from "@/app/api/[locale]/products/constants";
-import type { ApiProvider, ModelId } from "../../models";
+import type { Modality } from "../../enum";
+import type { ApiProvider } from "../../models";
+
+export interface ModalityUpdate {
+  modelId: string;
+  name: string;
+  provider: ApiProvider;
+  /** enum key for locating the model block (e.g. "GPT_5_2_PRO") */
+  enumKey: string;
+  inputs: Modality[];
+  outputs: Modality[];
+  source: string;
+}
 
 export interface PriceUpdate {
-  modelId: ModelId;
+  modelId: string;
   name: string;
   provider: ApiProvider;
   field:
+    | "creditCost"
     | "creditCostPerImage"
     | "creditCostPerClip"
     | "creditCostPerSecond"
@@ -30,7 +43,7 @@ export interface PriceUpdate {
 }
 
 export interface PriceFailure {
-  modelId: ModelId;
+  modelId: string;
   provider: ApiProvider;
   reason: string;
 }
@@ -40,6 +53,7 @@ export interface ProviderPriceResult {
   modelsFound: number;
   modelsUpdated: number;
   updates: PriceUpdate[];
+  modalityUpdates?: ModalityUpdate[];
   failures: PriceFailure[];
   error?: string;
 }

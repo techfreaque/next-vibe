@@ -29,15 +29,17 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../shared/types/common.schema";
-import {
-  DEFAULT_TTS_VOICE_ID,
-  ModelId,
-  TTS_MODEL_IDS,
-} from "../../models/models";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { lazy } from "react";
 import { FAVORITES_LIST_ALIAS } from "./constants";
 import type { FavoritesTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
-import { FavoritesListContainer } from "./widget";
+
+const FavoritesListContainer = lazy(() =>
+  import("./widget").then((m) => ({ default: m.FavoritesListContainer })),
+);
 
 /**
  * Get Favorites List Endpoint (GET)
@@ -172,15 +174,20 @@ const { GET } = createEndpoint({
               hidden: true,
               schema: z.string().nullable(),
             }),
+            customVariantName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.string().nullable(),
+            }),
             modelId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
-              schema: z.enum(ModelId).nullable(),
+              schema: z.enum(ChatModelId).nullable(),
             }),
             voiceId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
-              schema: z.enum(TTS_MODEL_IDS).nullable(),
+              schema: z.enum(TtsModelId).nullable(),
             }),
             position: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -324,7 +331,8 @@ const { GET } = createEndpoint({
             id: "550e8400-e29b-41d4-a716-446655440000",
             skillId: "default",
             variantId: null,
-            modelId: ModelId.CLAUDE_SONNET_4_5,
+            customVariantName: null,
+            modelId: ChatModelId.CLAUDE_SONNET_4_5,
             voiceId: DEFAULT_TTS_VOICE_ID,
             position: 0,
             icon: "sparkles",

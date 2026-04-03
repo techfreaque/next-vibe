@@ -15,7 +15,7 @@
 import { z } from "zod";
 
 import {
-  objectFieldNew,
+  objectField,
   objectOptionalField,
   requestDataArrayField,
   requestDataArrayOptionalField,
@@ -50,7 +50,7 @@ const optionalArrayField = requestDataArrayField(
     description: "app.admin.common.actions.back",
     optional: true,
   } as const,
-  objectFieldNew({
+  objectField({
     type: WidgetType.CONTAINER,
     title: "test" as TranslationKey,
     description: "test" as TranslationKey,
@@ -76,7 +76,7 @@ const optionalArrayField = requestDataArrayField(
 const testResponseArrayOptional = responseArrayOptionalField({
   type: WidgetType.CONTAINER,
   title: "app.test.optional.array.title" as TranslationKey,
-  child: objectFieldNew({
+  child: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 2,

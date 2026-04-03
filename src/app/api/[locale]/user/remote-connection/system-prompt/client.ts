@@ -4,12 +4,12 @@ import { useMemo } from "react";
 
 import type { SystemPromptClientParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import remoteConnectionEndpoints from "@/app/api/[locale]/user/remote-connection/list/definition";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
-import remoteConnectionEndpoints from "@/app/api/[locale]/user/remote-connection/list/definition";
 
 import type { RemoteInstancesData } from "./prompt";
 

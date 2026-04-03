@@ -155,7 +155,7 @@ export const translations: typeof enTranslations = {
       },
       permanent: {
         title: "Permanente Credits",
-        description: "Laufen nie ab – gehören Ihnen",
+        description: "Laufen nie ab - gehören Ihnen",
         adminDescription: "Permanente Credits - laufen nie ab",
       },
       free: {
@@ -167,7 +167,7 @@ export const translations: typeof enTranslations = {
       earned: {
         title: "Verdiente Credits",
         description:
-          "Durch Empfehlungen verdient – klicken Sie, um Freunde einzuladen",
+          "Durch Empfehlungen verdient - klicken Sie, um Freunde einzuladen",
       },
       spending: {
         title: "Eigene verdiente Credits",

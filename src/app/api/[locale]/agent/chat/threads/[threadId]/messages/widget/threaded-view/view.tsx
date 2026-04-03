@@ -18,7 +18,7 @@ import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
 import { processMessageGroupForTTS } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
-import type { TtsModelId } from "@/app/api/[locale]/agent/models/models";
+import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTouchDevice } from "@/hooks/use-touch-device";
@@ -297,10 +297,13 @@ export function ThreadedMessage({
   const [ttsText, setTtsText] = React.useState<string>("");
 
   React.useEffect(() => {
-    void processMessageGroupForTTS(allMessagesInGroup, locale, logger).then(
-      setTtsText,
-    );
-  }, [allMessagesInGroup, locale, logger]);
+    void processMessageGroupForTTS(
+      allMessagesInGroup,
+      locale,
+      logger,
+      user,
+    ).then(setTtsText);
+  }, [allMessagesInGroup, locale, logger, user]);
 
   const {
     isLoading: isTTSLoading,

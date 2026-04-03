@@ -12,25 +12,29 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getImageGenModelById } from "@/app/api/[locale]/agent/image-generation/models";
 import {
   ApiProvider,
   calculateCreditCost,
-  getModelById,
   isModelProviderAvailable,
-  type ModelOptionImageBased,
 } from "@/app/api/[locale]/agent/models/models";
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import type { ImageGenModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
+import { parseStorageUrl } from "@/app/api/[locale]/agent/chat/storage/url-utils";
 
+import { DefaultFolderId } from "../chat/config";
+import { NO_SKILL_ID } from "../chat/skills/constants";
 import { generateWithFalAi } from "../ai-stream/providers/fal-ai-image";
 import { generateWithOpenAI } from "../ai-stream/providers/openai-images";
 import { generateWithOpenRouter } from "../ai-stream/providers/openrouter-image";
 import { generateWithReplicate } from "../ai-stream/providers/replicate-image";
+import { runHeadlessAiStream } from "../ai-stream/repository/headless";
+import { scopedTranslation as aiStreamScopedTranslation } from "../ai-stream/stream/i18n";
+import type { ChatModelId } from "../ai-stream/models";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -58,22 +62,27 @@ export class ImageGenerationRepository {
     t: ImageGenerationT,
     streamContext?: MediaGenStreamContext,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
-    // model is already resolved via streamContextPatch in tools-loader (from ToolExecutionContext.imageGenModelId)
-    const modelConfig = getModelById(data.model as ImageGenModelId);
+    // model is resolved via serverDefault on the field definition (from ToolExecutionContext.imageGenModelId)
+    const modelConfig = getImageGenModelById(data.model);
 
-    if (modelConfig.modelRole !== "image-gen") {
-      return fail({
-        message: t("post.errors.notAnImageModel"),
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-      });
+    // Token-based multimodal model → use headless AI runner as polyfill
+    // Credits are deducted by the AI stream itself (per-token pricing).
+    if (!modelConfig.creditCostPerImage) {
+      return ImageGenerationRepository.generateViaHeadless(
+        data,
+        user,
+        locale,
+        logger,
+        t,
+        streamContext,
+      );
     }
 
-    const imageModel = modelConfig as ModelOptionImageBased;
+    const imageModel = modelConfig;
     const creditCost = calculateCreditCost(imageModel, 0, 0);
 
     // Check provider availability before attempting generation
-    const envAvailability = getAgentEnvAvailability();
-    if (!isModelProviderAvailable(imageModel, envAvailability)) {
+    if (!isModelProviderAvailable(imageModel, agentEnvAvailability)) {
       return fail({
         message: t("post.errors.notConfigured", {
           label: imageModel.apiProvider,
@@ -212,5 +221,124 @@ export class ImageGenerationRepository {
     });
 
     return success({ imageUrl, creditCost });
+  }
+
+  /**
+   * Headless AI runner polyfill for token-based multimodal models (e.g. GPT-5 Image, Gemini).
+   * Runs the AI with no tools, no persistence, and a lean image-generation prompt.
+   * The model natively outputs an image as a file part; credits are deducted per-token by the stream.
+   */
+  private static async generateViaHeadless(
+    data: ImageGenerationPostRequestOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    t: ImageGenerationT,
+    streamContext?: MediaGenStreamContext,
+  ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
+    logger.info("[ImageGen] Using headless AI runner for token-based model", {
+      model: data.model,
+      promptLength: data.prompt.length,
+    });
+
+    const { t: aiStreamT } = aiStreamScopedTranslation.scopedT(locale);
+
+    const sizeHint = data.size ? ` Output size: ${data.size}.` : "";
+    const qualityHint = data.quality ? ` Quality: ${data.quality}.` : "";
+
+    // ImageGenModelId and ChatModelId share string values for multimodal models
+    const chatModelId = data.model as string as ChatModelId;
+
+    const result = await runHeadlessAiStream({
+      model: chatModelId,
+      skill: NO_SKILL_ID,
+      prompt: `Generate an image: ${data.prompt}${sizeHint}${qualityHint}`,
+      pinnedTools: [],
+      availableTools: [],
+      // Always "none" — the outer AI stream persists the tool result.
+      // Using "append" with the same threadId would re-register in StreamRegistry,
+      // aborting the outer stream (superseded).
+      threadMode: "none",
+      // Do NOT pass outer threadId — using the same threadId would re-register
+      // in StreamRegistry, aborting the outer stream. FilePartHandler uploads to
+      // an ephemeral thread; we re-upload to the real thread below.
+      rootFolderId: DefaultFolderId.INCOGNITO,
+      headlessInstructions:
+        "You are an image generator. Output exactly one image based on the user's prompt. Do not output any text — only the image.",
+      maxTurns: 1,
+      user,
+      locale,
+      logger,
+      t: aiStreamT,
+    });
+
+    if (!result.success) {
+      return fail({
+        message: result.message,
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    let imageUrl = result.data.lastGeneratedMediaUrl;
+    if (!imageUrl) {
+      return fail({
+        message: t("post.errors.generationFailed", {
+          error: "Model did not generate an image",
+        }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    // Re-upload from ephemeral storage to the real thread's storage so the
+    // file-serving route can find it (it checks thread ownership in DB).
+    if (streamContext?.threadId) {
+      try {
+        const storage = getStorageAdapter();
+        // The ephemeral URL points to our file-serving API which requires DB thread lookup.
+        // Read the file directly from storage instead of HTTP fetch.
+        const parsed = parseStorageUrl(imageUrl);
+        let imageBuffer: Buffer | null = null;
+        if (parsed) {
+          const base64 = await storage.readFileAsBase64(
+            parsed.fileId,
+            parsed.threadId,
+          );
+          if (base64) {
+            imageBuffer = Buffer.from(base64, "base64");
+          }
+        }
+        if (!imageBuffer) {
+          // Fallback to HTTP fetch for external URLs
+          const arrayBuf = await fetch(imageUrl).then((r) => r.arrayBuffer());
+          imageBuffer = Buffer.from(new Uint8Array(arrayBuf));
+        }
+        const ext = imageUrl.includes("webp")
+          ? "webp"
+          : imageUrl.includes("jpeg") || imageUrl.includes("jpg")
+            ? "jpeg"
+            : "png";
+        const uploadResult = await storage.uploadFile(imageBuffer, {
+          filename: `generated-image-${Date.now()}.${ext}`,
+          mimeType: `image/${ext}`,
+          threadId: streamContext.threadId,
+          userId: user.id,
+        });
+        imageUrl = uploadResult.url;
+      } catch (uploadErr) {
+        logger.error(
+          "[ImageGen] Failed to re-upload headless image to thread storage",
+          {
+            error:
+              uploadErr instanceof Error
+                ? uploadErr.message
+                : String(uploadErr),
+          },
+        );
+        // Fall through with the ephemeral URL
+      }
+    }
+
+    // Credit cost is 0 here — already deducted per-token by the AI stream
+    return success({ imageUrl, creditCost: 0 });
   }
 }

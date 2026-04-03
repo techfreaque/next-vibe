@@ -7,11 +7,7 @@
 
 import "server-only";
 
-import {
-  ApiProvider,
-  getModelById,
-  type TtsModelId,
-} from "@/app/api/[locale]/agent/models/models";
+import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 
 import { parseError } from "next-vibe/shared/utils";
 
@@ -26,6 +22,7 @@ import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import type { WsEmitCallback } from "../../chat/threads/[threadId]/messages/emitter";
 import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
+import { getTtsModelById, type TtsModelId } from "../../text-to-speech/models";
 
 /**
  * Minimum skills before emitting a TTS chunk
@@ -338,7 +335,7 @@ export class StreamingTTSHandler {
    * Returns base64 data URL or null on failure.
    */
   private async generateTTS(text: string): Promise<string | null> {
-    const modelOption = getModelById(this.voiceId);
+    const modelOption = getTtsModelById(this.voiceId);
     const language = getLanguageFromLocale(this.locale);
 
     this.logger.debug("[Streaming TTS] Generating TTS", {

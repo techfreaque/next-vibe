@@ -7,7 +7,7 @@ import "server-only";
 import type { JSONValue } from "ai";
 
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { AbortReason, isStreamAbort } from "../core/constants";
@@ -24,7 +24,7 @@ export class StreamErrorCatchHandler {
     error: Error | JSONValue;
     ctx: StreamContext;
     maxDuration: number;
-    model: ModelId;
+    model: ChatModelId;
     threadId: string;
     userId: string | undefined;
     logger: EndpointLogger;

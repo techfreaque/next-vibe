@@ -1,4 +1,4 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import {
@@ -47,7 +47,7 @@ export const devilsAdvocateSkill: Skill = {
       variantName: "skills.devilsAdvocate.variants.maverick" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GROK_4_20_BETA,
+        manualModelId: ChatModelId.GROK_4_20,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -66,7 +66,7 @@ export const devilsAdvocateSkill: Skill = {
       variantName: "skills.devilsAdvocate.variants.eastern" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2,
+        manualModelId: ChatModelId.KIMI_K2,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,

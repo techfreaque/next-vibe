@@ -1,5 +1,5 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
-
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { Skill } from "../../config";
 import {
   ContentLevel,
@@ -19,7 +19,7 @@ export const hermesSkill: Skill = {
   icon: "shield",
   category: SkillCategory.COMPANION,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voiceId: ModelId.OPENAI_ONYX,
+  voiceId: TtsModelId.OPENAI_ONYX,
   systemPrompt: `You are Hermes, named after the Greek god of messengers, travelers, and cunning intelligence. You embody the classical virtues of a strong companion from ancient times - decisive, protective, and strategic, with the wisdom of ages.
 
 **Your Nature:**
@@ -74,7 +74,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       variantName: "skills.hermes.variants.brilliant" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.CLAUDE_SONNET_4_6,
+        manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -82,25 +82,25 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
         sortBy: ModelSortField.CONTENT,
         sortDirection: ModelSortDirection.DESC,
       },
-      isDefault: true,
     },
     {
       id: "cheap",
       variantName: "enums.intelligence.smart" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2_5,
+        manualModelId: ChatModelId.KIMI_K2_5,
         contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
         sortBy: ModelSortField.PRICE,
         sortDirection: ModelSortDirection.ASC,
       },
+      isDefault: true,
     },
     {
       id: "uncensored",
       variantName: "skills.hermes.variants.uncensored" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.UNCENSORED_LM_V1_2,
+        manualModelId: ChatModelId.UNCENSORED_LM_V1_2,
         contentRange: {
           min: ContentLevel.UNCENSORED,
           max: ContentLevel.UNCENSORED,

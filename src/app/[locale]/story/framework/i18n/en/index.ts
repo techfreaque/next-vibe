@@ -1,7 +1,7 @@
 export const translations = {
   title: "next-vibe Framework",
   description:
-    "The open-source SaaS framework powering unbottled.ai. Define it once, it exists everywhere.",
+    "The open-source SaaS framework powering {{appName}}. Define it once, it exists everywhere.",
   meta: {
     title: "next-vibe Framework",
     description:
@@ -153,7 +153,7 @@ export const translations = {
   quickstart: {
     eyebrow: "Get started",
     title: "Fork, ask, ship.",
-    subtitle: "You're at unbottled.ai's level from day one.",
+    subtitle: "You're at {{appName}}'s level from day one.",
     step1: {
       label: "Fork & clone",
       description: "Fork on GitHub, then clone your fork locally.",
@@ -171,7 +171,7 @@ export const translations = {
     step4: {
       label: "Ask the AI",
       description:
-        "Open unbottled.ai chat or Claude Code and describe the feature you want. The AI writes all the files - definition, route, widget, i18n - and runs vibe check automatically.",
+        "Open {{appName}} chat or Claude Code and describe the feature you want. The AI writes all the files - definition, route, widget, i18n - and runs vibe check automatically.",
     },
     step5: {
       label: "Ship",

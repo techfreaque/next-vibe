@@ -10,6 +10,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserDetailLevel } from "../user/enum";
 import { UserRepository } from "../user/repository";
+import { DEV_SEED_DEMO_USER_EMAIL } from "../users/seeds";
 import type { NewNewsletterSubscription } from "./db";
 import { NewsletterSubscriptionStatus } from "./enum";
 
@@ -20,7 +21,7 @@ function createNewsletterSeed(
   overrides?: Partial<NewNewsletterSubscription>,
 ): NewNewsletterSubscription {
   return {
-    email: "demo@example.com",
+    email: DEV_SEED_DEMO_USER_EMAIL,
     status: NewsletterSubscriptionStatus.SUBSCRIBED,
     subscriptionDate: new Date(),
     preferences: {
@@ -41,7 +42,7 @@ export async function dev(
   try {
     // Get existing users for newsletter subscriptions
     const demoUserResponse = await UserRepository.getUserByEmail(
-      "demo@example.com",
+      DEV_SEED_DEMO_USER_EMAIL,
       UserDetailLevel.STANDARD,
       locale,
       logger,
@@ -57,7 +58,7 @@ export async function dev(
     // Create newsletter subscriptions for development users
     const subscriptions = [
       createNewsletterSeed({
-        email: "demo@example.com",
+        email: DEV_SEED_DEMO_USER_EMAIL,
         userId: demoUserResponse.success
           ? demoUserResponse.data?.id
           : undefined,

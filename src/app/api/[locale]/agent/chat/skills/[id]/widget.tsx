@@ -12,34 +12,67 @@ import {
 } from "next-vibe-ui/ui/collapsible";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { Check } from "next-vibe-ui/ui/icons/Check";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Share2 } from "next-vibe-ui/ui/icons/Share2";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Star } from "next-vibe-ui/ui/icons/Star";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { User } from "next-vibe-ui/ui/icons/User";
 import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
+import { Input } from "next-vibe-ui/ui/input";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
 import { useCallback, useMemo, useState } from "react";
 
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
 import {
+  DEFAULT_CHAT_MODEL_SELECTION,
+  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+} from "@/app/api/[locale]/agent/ai-stream/constants";
+import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
+import type {
+  AudioVisionModelSelection,
+  ChatModelSelection,
+  ImageGenModelSelection,
+  ImageVisionModelSelection,
+  MusicGenModelSelection,
+  SttModelSelection,
+  VideoGenModelSelection,
+  VideoVisionModelSelection,
+  VoiceModelSelection,
+} from "@/app/api/[locale]/agent/models/types";
+import {
+  audioVisionModelSelectionSchema,
+  chatModelSelectionSchema,
   imageGenModelSelectionSchema,
+  imageVisionModelSelectionSchema,
   musicGenModelSelectionSchema,
   sttModelSelectionSchema,
   videoGenModelSelectionSchema,
-  visionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
   voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/models/types";
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
+import { ttsModelOptions } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
@@ -70,11 +103,6 @@ import {
   ToolsConfigEdit,
   type ToolsConfigValue,
 } from "../../../tools/widget/tools-config-widget";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import {
-  getAllModelOptions,
-  getDefaultModelForRole,
-} from "@/app/api/[locale]/agent/models/models";
 import { useAddToFavorites } from "../../favorites/create/hooks";
 import { useChatFavorites } from "../../favorites/hooks/hooks";
 import { CompactTriggerEdit } from "../../settings/widget";
@@ -136,64 +164,168 @@ export function SkillEditContainer({
     | "musicGen"
     | "videoGen"
     | "stt"
-    | "visionBridge"
+    | "imageVision"
+    | "videoVision"
+    | "audioVision"
     | null
   >(null);
 
   // Platform-level default model selections (env-aware)
-  const platformTtsDefault = useMemo((): ModelSelectionSimple | undefined => {
-    const m = getDefaultModelForRole(["tts"], envAvailability);
+  const platformChatDefault = useMemo((): ChatModelSelection | undefined => {
+    const m = SkillsRepositoryClient.getBestModelForSkill(
+      DEFAULT_CHAT_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const parsed = chatModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
+
+  const platformTtsDefault = useMemo((): VoiceModelSelection | undefined => {
+    const m = SkillsRepositoryClient.getBestTtsModel(
+      DEFAULT_TTS_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const parsed = voiceModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
 
   const platformImageGenDefault = useMemo(():
-    | ModelSelectionSimple
+    | ImageGenModelSelection
     | undefined => {
-    const m = getDefaultModelForRole(["image-gen"], envAvailability);
+    const m = SkillsRepositoryClient.getBestImageGenModel(
+      DEFAULT_IMAGE_GEN_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const parsed = imageGenModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
 
   const platformMusicGenDefault = useMemo(():
-    | ModelSelectionSimple
+    | MusicGenModelSelection
     | undefined => {
-    const m = getDefaultModelForRole(["audio-gen"], envAvailability);
+    const m = SkillsRepositoryClient.getBestMusicGenModel(
+      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const parsed = musicGenModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
 
   const platformVideoGenDefault = useMemo(():
-    | ModelSelectionSimple
+    | VideoGenModelSelection
     | undefined => {
-    const m = getDefaultModelForRole(["video-gen"], envAvailability);
+    const m = SkillsRepositoryClient.getBestVideoGenModel(
+      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const parsed = videoGenModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
 
-  const platformSttDefault = useMemo((): ModelSelectionSimple | undefined => {
-    const m = getDefaultModelForRole(["stt"], envAvailability);
+  const platformSttDefault = useMemo((): SttModelSelection | undefined => {
+    const m = SkillsRepositoryClient.getBestSttModel(
+      DEFAULT_STT_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const parsed = sttModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
 
-  const platformLlmDefault = useMemo((): ModelSelectionSimple | undefined => {
-    const m = getDefaultModelForRole(["llm"], envAvailability, ["image"]);
+  const platformImageVisionDefault = useMemo(():
+    | ImageVisionModelSelection
+    | undefined => {
+    const m = SkillsRepositoryClient.getBestImageVisionModel(
+      DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const parsed = imageVisionModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
+
+  const platformVideoVisionDefault = useMemo(():
+    | VideoVisionModelSelection
+    | undefined => {
+    const m = SkillsRepositoryClient.getBestVideoVisionModel(
+      DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const parsed = videoVisionModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
+
+  const platformAudioVisionDefault = useMemo(():
+    | AudioVisionModelSelection
+    | undefined => {
+    const m = SkillsRepositoryClient.getBestAudioVisionModel(
+      DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const parsed = audioVisionModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
 
   // Stable props
   const emptyField = useMemo(() => ({}), []);
@@ -280,7 +412,12 @@ export function SkillEditContainer({
           <ModelSelector
             modelSelection={form.watch("modelSelection") ?? undefined}
             onChange={(sel) => {
-              form.setValue("modelSelection", sel);
+              const parsed = chatModelSelectionSchema.nullable().safeParse(sel);
+              form.setValue(
+                "modelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
             }}
             onSelect={() => setActiveSelector(null)}
             locale={locale}
@@ -456,36 +593,115 @@ export function SkillEditContainer({
             locale={locale}
             user={user}
           />
-        ) : activeSelector === "visionBridge" ? (
+        ) : activeSelector === "imageVision" ? (
           <ModelSelector
             allowedRoles={["llm"]}
             requiredInputs={["image"]}
             modelSelection={
-              form.watch("visionBridgeModelSelection") ?? undefined
+              form.watch("imageVisionModelSelection") ?? undefined
             }
             onChange={(sel) => {
-              const parsed = visionModelSelectionSchema
+              const parsed = imageVisionModelSelectionSchema
                 .nullable()
                 .safeParse(sel);
               form.setValue(
-                "visionBridgeModelSelection",
+                "imageVisionModelSelection",
                 parsed.success ? parsed.data : null,
                 { shouldDirty: true },
               );
             }}
             onSelect={(confirmed) => {
-              const parsed = visionModelSelectionSchema
+              const parsed = imageVisionModelSelectionSchema
                 .nullable()
                 .safeParse(confirmed);
               const value = parsed.success ? parsed.data : null;
               const isDefault =
                 value !== null &&
                 "manualModelId" in value &&
-                platformLlmDefault !== undefined &&
-                "manualModelId" in platformLlmDefault &&
-                platformLlmDefault.manualModelId === value.manualModelId;
+                platformImageVisionDefault !== undefined &&
+                "manualModelId" in platformImageVisionDefault &&
+                platformImageVisionDefault.manualModelId ===
+                  value.manualModelId;
               form.setValue(
-                "visionBridgeModelSelection",
+                "imageVisionModelSelection",
+                isDefault ? null : value,
+                { shouldDirty: true },
+              );
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : activeSelector === "videoVision" ? (
+          <ModelSelector
+            allowedRoles={["llm"]}
+            requiredInputs={["video"]}
+            modelSelection={
+              form.watch("videoVisionModelSelection") ?? undefined
+            }
+            onChange={(sel) => {
+              const parsed = videoVisionModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "videoVisionModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = videoVisionModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformVideoVisionDefault !== undefined &&
+                "manualModelId" in platformVideoVisionDefault &&
+                platformVideoVisionDefault.manualModelId ===
+                  value.manualModelId;
+              form.setValue(
+                "videoVisionModelSelection",
+                isDefault ? null : value,
+                { shouldDirty: true },
+              );
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : activeSelector === "audioVision" ? (
+          <ModelSelector
+            allowedRoles={["llm"]}
+            requiredInputs={["audio"]}
+            modelSelection={
+              form.watch("audioVisionModelSelection") ?? undefined
+            }
+            onChange={(sel) => {
+              const parsed = audioVisionModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "audioVisionModelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true },
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = audioVisionModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformAudioVisionDefault !== undefined &&
+                "manualModelId" in platformAudioVisionDefault &&
+                platformAudioVisionDefault.manualModelId ===
+                  value.manualModelId;
+              form.setValue(
+                "audioVisionModelSelection",
                 isDefault ? null : value,
                 { shouldDirty: true },
               );
@@ -538,6 +754,7 @@ export function SkillEditContainer({
                   </Span>
                   <ModelSelectorTrigger
                     modelSelection={form.watch("modelSelection") ?? undefined}
+                    defaultModelSelection={platformChatDefault}
                     placeholder={t("patch.chatModel.placeholder")}
                     onClick={() => setActiveSelector("chat")}
                     locale={locale}
@@ -636,19 +853,57 @@ export function SkillEditContainer({
                 </Div>
               )}
 
-              {/* Vision Bridge model selector */}
+              {/* Image Vision model selector */}
               {form && (
                 <Div className="flex flex-col gap-1">
                   <Span className="text-xs font-medium text-muted-foreground">
-                    {t("patch.visionBridgeModel.label")}
+                    {t("patch.imageVisionModel.label")}
                   </Span>
                   <ModelSelectorTrigger
-                    modelSelection={form.watch("visionBridgeModelSelection")}
+                    modelSelection={form.watch("imageVisionModelSelection")}
                     allowedRoles={["llm"]}
                     requiredInputs={["image"]}
-                    defaultModelSelection={platformLlmDefault}
-                    placeholder={t("patch.visionBridgeModel.placeholder")}
-                    onClick={() => setActiveSelector("visionBridge")}
+                    defaultModelSelection={platformImageVisionDefault}
+                    placeholder={t("patch.imageVisionModel.placeholder")}
+                    onClick={() => setActiveSelector("imageVision")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Video Vision model selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.videoVisionModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("videoVisionModelSelection")}
+                    allowedRoles={["llm"]}
+                    requiredInputs={["video"]}
+                    defaultModelSelection={platformVideoVisionDefault}
+                    placeholder={t("patch.videoVisionModel.placeholder")}
+                    onClick={() => setActiveSelector("videoVision")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Audio Vision model selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("patch.audioVisionModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("audioVisionModelSelection")}
+                    allowedRoles={["llm"]}
+                    requiredInputs={["audio"]}
+                    defaultModelSelection={platformAudioVisionDefault}
+                    placeholder={t("patch.audioVisionModel.placeholder")}
+                    onClick={() => setActiveSelector("audioVision")}
                     locale={locale}
                     user={user}
                   />
@@ -685,33 +940,149 @@ export function SkillEditContainer({
 }
 
 function useViewDefaults(): {
-  tts: ModelSelectionSimple | undefined;
-  imageGen: ModelSelectionSimple | undefined;
-  musicGen: ModelSelectionSimple | undefined;
-  videoGen: ModelSelectionSimple | undefined;
-  stt: ModelSelectionSimple | undefined;
-  llm: ModelSelectionSimple | undefined;
+  tts: VoiceModelSelection | undefined;
+  imageGen: ImageGenModelSelection | undefined;
+  musicGen: MusicGenModelSelection | undefined;
+  videoGen: VideoGenModelSelection | undefined;
+  stt: SttModelSelection | undefined;
+  imageVision: ImageVisionModelSelection | undefined;
+  videoVision: VideoVisionModelSelection | undefined;
+  audioVision: AudioVisionModelSelection | undefined;
 } {
   const env = useEnvAvailability();
+  const user = useWidgetUser();
   return useMemo(() => {
-    const mk = (
-      roles: Parameters<typeof getDefaultModelForRole>[0],
-    ): ModelSelectionSimple | undefined => {
-      const m = getDefaultModelForRole(roles, env);
+    const mkVoice = (): VoiceModelSelection | undefined => {
+      const m = SkillsRepositoryClient.getBestTtsModel(
+        DEFAULT_TTS_MODEL_SELECTION,
+        user,
+        env,
+      );
       if (!m) {
         return undefined;
       }
-      return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+      const p = voiceModelSelectionSchema.safeParse({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: m.id,
+      });
+      return p.success ? p.data : undefined;
+    };
+    const mkImageGen = (): ImageGenModelSelection | undefined => {
+      const m = SkillsRepositoryClient.getBestImageGenModel(
+        DEFAULT_IMAGE_GEN_MODEL_SELECTION,
+        user,
+        env,
+      );
+      if (!m) {
+        return undefined;
+      }
+      const p = imageGenModelSelectionSchema.safeParse({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: m.id,
+      });
+      return p.success ? p.data : undefined;
+    };
+    const mkMusicGen = (): MusicGenModelSelection | undefined => {
+      const m = SkillsRepositoryClient.getBestMusicGenModel(
+        DEFAULT_MUSIC_GEN_MODEL_SELECTION,
+        user,
+        env,
+      );
+      if (!m) {
+        return undefined;
+      }
+      const p = musicGenModelSelectionSchema.safeParse({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: m.id,
+      });
+      return p.success ? p.data : undefined;
+    };
+    const mkVideoGen = (): VideoGenModelSelection | undefined => {
+      const m = SkillsRepositoryClient.getBestVideoGenModel(
+        DEFAULT_VIDEO_GEN_MODEL_SELECTION,
+        user,
+        env,
+      );
+      if (!m) {
+        return undefined;
+      }
+      const p = videoGenModelSelectionSchema.safeParse({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: m.id,
+      });
+      return p.success ? p.data : undefined;
+    };
+    const mkStt = (): SttModelSelection | undefined => {
+      const m = SkillsRepositoryClient.getBestSttModel(
+        DEFAULT_STT_MODEL_SELECTION,
+        user,
+        env,
+      );
+      if (!m) {
+        return undefined;
+      }
+      const p = sttModelSelectionSchema.safeParse({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: m.id,
+      });
+      return p.success ? p.data : undefined;
+    };
+    const mkImageVision = (): ImageVisionModelSelection | undefined => {
+      const m = SkillsRepositoryClient.getBestImageVisionModel(
+        DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+        user,
+        env,
+      );
+      if (!m) {
+        return undefined;
+      }
+      const p = imageVisionModelSelectionSchema.safeParse({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: m.id,
+      });
+      return p.success ? p.data : undefined;
+    };
+    const mkVideoVision = (): VideoVisionModelSelection | undefined => {
+      const m = SkillsRepositoryClient.getBestVideoVisionModel(
+        DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+        user,
+        env,
+      );
+      if (!m) {
+        return undefined;
+      }
+      const p = videoVisionModelSelectionSchema.safeParse({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: m.id,
+      });
+      return p.success ? p.data : undefined;
+    };
+    const mkAudioVision = (): AudioVisionModelSelection | undefined => {
+      const m = SkillsRepositoryClient.getBestAudioVisionModel(
+        DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+        user,
+        env,
+      );
+      if (!m) {
+        return undefined;
+      }
+      const p = audioVisionModelSelectionSchema.safeParse({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: m.id,
+      });
+      return p.success ? p.data : undefined;
     };
     return {
-      tts: mk(["tts"]),
-      imageGen: mk(["image-gen"]),
-      musicGen: mk(["audio-gen"]),
-      videoGen: mk(["video-gen"]),
-      stt: mk(["stt"]),
-      llm: mk(["llm"]),
+      tts: mkVoice(),
+      imageGen: mkImageGen(),
+      musicGen: mkMusicGen(),
+      videoGen: mkVideoGen(),
+      stt: mkStt(),
+      imageVision: mkImageVision(),
+      videoVision: mkVideoVision(),
+      audioVision: mkAudioVision(),
     };
-  }, [env]);
+  }, [user, env]);
 }
 
 export function SkillViewContainer({
@@ -883,17 +1254,49 @@ export function SkillViewContainer({
         />
       </Div>
 
-      {/* Vision Bridge - View Only */}
+      {/* Image Vision - View Only */}
       <Div className="flex flex-col gap-1">
         <Span className="text-xs font-medium text-muted-foreground">
-          {t("patch.visionBridgeModel.label")}
+          {t("patch.imageVisionModel.label")}
         </Span>
         <ModelSelectorTrigger
-          modelSelection={field.value?.visionBridgeModelSelection ?? undefined}
+          modelSelection={field.value?.imageVisionModelSelection ?? undefined}
           allowedRoles={["llm"]}
           requiredInputs={["image"]}
-          defaultModelSelection={viewDefaults.llm}
-          placeholder={t("patch.visionBridgeModel.placeholder")}
+          defaultModelSelection={viewDefaults.imageVision}
+          placeholder={t("patch.imageVisionModel.placeholder")}
+          locale={locale}
+          user={user}
+        />
+      </Div>
+
+      {/* Video Vision - View Only */}
+      <Div className="flex flex-col gap-1">
+        <Span className="text-xs font-medium text-muted-foreground">
+          {t("patch.videoVisionModel.label")}
+        </Span>
+        <ModelSelectorTrigger
+          modelSelection={field.value?.videoVisionModelSelection ?? undefined}
+          allowedRoles={["llm"]}
+          requiredInputs={["video"]}
+          defaultModelSelection={viewDefaults.videoVision}
+          placeholder={t("patch.videoVisionModel.placeholder")}
+          locale={locale}
+          user={user}
+        />
+      </Div>
+
+      {/* Audio Vision - View Only */}
+      <Div className="flex flex-col gap-1">
+        <Span className="text-xs font-medium text-muted-foreground">
+          {t("patch.audioVisionModel.label")}
+        </Span>
+        <ModelSelectorTrigger
+          modelSelection={field.value?.audioVisionModelSelection ?? undefined}
+          allowedRoles={["llm"]}
+          requiredInputs={["audio"]}
+          defaultModelSelection={viewDefaults.audioVision}
+          placeholder={t("patch.audioVisionModel.placeholder")}
           locale={locale}
           user={user}
         />
@@ -952,9 +1355,10 @@ function VoiceDisplayName({
       return null;
     }
     if ("manualModelId" in voiceModelSelection) {
-      const all = getAllModelOptions();
       return (
-        all.find((m) => m.id === voiceModelSelection.manualModelId) ?? null
+        ttsModelOptions.find(
+          (m) => m.id === voiceModelSelection.manualModelId,
+        ) ?? null
       );
     }
     return null;
@@ -1106,6 +1510,13 @@ export function SkillCard({
             variant={isAddedToFav ? "default" : "outline"}
             size="sm"
           />
+          <ShareEarnButton
+            skillId={skillId}
+            locale={locale}
+            t={t}
+            user={user}
+            logger={logger}
+          />
           {isOwner ? (
             <>
               <Div className="flex-1" />
@@ -1139,6 +1550,255 @@ export function SkillCard({
                 size="sm"
               />
             </>
+          )}
+        </Div>
+      )}
+    </Div>
+  );
+}
+
+/**
+ * Share & Earn Button - generates referral-linked skill share URL
+ * Fetches user's referral codes, lets them pick one (or create one inline),
+ * then generates a trackable share link to the skill landing page.
+ */
+function ShareEarnButton({
+  skillId,
+  locale,
+  t,
+  user,
+  logger,
+}: {
+  skillId: string;
+  locale: CountryLanguage;
+  t: ReturnType<typeof useWidgetTranslation>;
+  user: ReturnType<typeof useWidgetContext>["user"];
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+}): React.JSX.Element {
+  const [open, setOpen] = useState(false);
+  const [codes, setCodes] = useState<Array<{
+    code: string;
+    label: string | null;
+  }> | null>(null);
+  const [selectedCode, setSelectedCode] = useState<string | null>(null);
+  const [newCode, setNewCode] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleOpen = async (): Promise<void> => {
+    if (open) {
+      setOpen(false);
+      return;
+    }
+    setOpen(true);
+
+    if (codes !== null) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { apiClient } =
+        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+      const codesListDef =
+        await import("@/app/api/[locale]/referral/codes/list/definition");
+      const result = await apiClient.fetch(
+        codesListDef.default.GET,
+        logger,
+        user,
+        {},
+        undefined,
+        locale,
+      );
+      if (result.success) {
+        const fetchedCodes = result.data.codes.map((c) => ({
+          code: c.code,
+          label: c.label,
+        }));
+        setCodes(fetchedCodes);
+        if (fetchedCodes.length > 0 && fetchedCodes[0]) {
+          setSelectedCode(fetchedCodes[0].code);
+        }
+      } else {
+        setCodes([]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreate = async (): Promise<void> => {
+    if (!newCode.trim() || newCode.trim().length < 3) {
+      return;
+    }
+    setCreating(true);
+    try {
+      const { apiClient } =
+        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+      const referralDef =
+        await import("@/app/api/[locale]/referral/definition");
+      const result = await apiClient.fetch(
+        referralDef.default.POST,
+        logger,
+        user,
+        { fieldsGrid: { code: newCode.trim() } },
+        undefined,
+        locale,
+      );
+      if (result.success) {
+        const createdCode = newCode.trim();
+        setCodes((prev) => [
+          { code: createdCode, label: null },
+          ...(prev ?? []),
+        ]);
+        setSelectedCode(createdCode);
+        setNewCode("");
+      }
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const shareUrl =
+    selectedCode && typeof window !== "undefined"
+      ? `${window.location.origin}/track?ref=${encodeURIComponent(selectedCode)}&url=${encodeURIComponent(`/${locale}/skill/${skillId}`)}`
+      : null;
+
+  const handleCopy = async (): Promise<void> => {
+    if (shareUrl && typeof window !== "undefined") {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <Div className="relative">
+      <Button
+        variant="outline"
+        size="sm"
+        className="gap-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
+        onClick={handleOpen}
+      >
+        <DollarSign className="h-3.5 w-3.5" />
+        {t("get.share.button")}
+      </Button>
+
+      {open && (
+        <Div className="absolute right-0 top-full mt-2 z-50 w-80 rounded-xl border bg-card shadow-lg p-4 flex flex-col gap-3">
+          <Div className="flex items-center justify-between">
+            <Div className="flex items-center gap-2">
+              <Share2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <Span className="font-semibold text-sm">
+                {t("get.share.title")}
+              </Span>
+            </Div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => setOpen(false)}
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </Div>
+
+          <Span className="text-xs text-muted-foreground">
+            {t("get.share.description")}
+          </Span>
+
+          {loading ? (
+            <Div className="flex items-center justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </Div>
+          ) : codes !== null && codes.length > 0 ? (
+            <>
+              <Div className="flex flex-col gap-1.5">
+                <Span className="text-xs font-medium text-muted-foreground">
+                  {t("get.share.selectCode")}
+                </Span>
+                {codes.map((c) => (
+                  <Button
+                    key={c.code}
+                    variant={selectedCode === c.code ? "default" : "outline"}
+                    size="sm"
+                    className="justify-start gap-2 font-mono text-xs"
+                    onClick={() => setSelectedCode(c.code)}
+                  >
+                    {c.code}
+                    {c.label && (
+                      <Span className="font-sans text-muted-foreground">
+                        {c.label}
+                      </Span>
+                    )}
+                  </Button>
+                ))}
+              </Div>
+
+              {shareUrl && (
+                <Div className="flex flex-col gap-1.5">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("get.share.linkReady")}
+                  </Span>
+                  <Div className="flex items-center gap-2">
+                    <Div className="flex-1 rounded-md border bg-muted/50 px-2.5 py-1.5 text-xs font-mono truncate">
+                      {shareUrl}
+                    </Div>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="gap-1 shrink-0"
+                      onClick={handleCopy}
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="h-3.5 w-3.5" />
+                          {t("get.share.copied")}
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3.5 w-3.5" />
+                          {t("get.share.copyLink")}
+                        </>
+                      )}
+                    </Button>
+                  </Div>
+                </Div>
+              )}
+            </>
+          ) : (
+            <Div className="flex flex-col gap-2">
+              <Span className="text-xs text-muted-foreground">
+                {t("get.share.noCodesYet")}
+              </Span>
+              <Div className="flex gap-2">
+                <Input
+                  value={newCode}
+                  onChange={(e) => setNewCode(e.target.value)}
+                  placeholder={t("get.share.codePlaceholder")}
+                  className="h-8 text-xs font-mono"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      void handleCreate();
+                    }
+                  }}
+                />
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleCreate}
+                  disabled={creating || newCode.trim().length < 3}
+                  className="shrink-0"
+                >
+                  {creating ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    t("get.share.createCode")
+                  )}
+                </Button>
+              </Div>
+            </Div>
           )}
         </Div>
       )}

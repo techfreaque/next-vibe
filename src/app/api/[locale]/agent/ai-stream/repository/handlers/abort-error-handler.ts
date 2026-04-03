@@ -10,10 +10,13 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 
+import {
+  getChatModelById,
+  type ChatModelId,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
-import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -150,7 +153,7 @@ export class AbortErrorHandler {
     threadId: string;
     isIncognito: boolean;
     userId: string | undefined;
-    model: ModelId;
+    model: ChatModelId;
     systemPrompt?: string;
     trailingSystemMessage?: string;
     messages?: ModelMessage[];
@@ -228,18 +231,14 @@ export class AbortErrorHandler {
               aiResponse: ctx.currentAssistantContent,
             });
 
-            const modelInfo = getModelById(model);
+            const modelInfo = getChatModelById(model);
             let modelCreditCost = 0;
             if (modelInfo) {
-              if (typeof modelInfo.creditCost === "function") {
-                modelCreditCost = modelInfo.creditCost(
-                  modelInfo,
-                  tokenEstimate.promptTokens,
-                  tokenEstimate.completionTokens,
-                );
-              } else if (typeof modelInfo.creditCost === "number") {
-                modelCreditCost = modelInfo.creditCost;
-              }
+              modelCreditCost = calculateCreditCost(
+                modelInfo,
+                tokenEstimate.promptTokens,
+                tokenEstimate.completionTokens,
+              );
             }
 
             totalCredits += modelCreditCost;

@@ -100,6 +100,27 @@ export const translations = {
     fr: "French",
     it: "Italian",
   },
+  models: {
+    descriptions: {
+      openaiAlloy:
+        "OpenAI Alloy - Balanced, neutral voice for professional content",
+      openaiNova:
+        "OpenAI Nova - Warm, friendly voice ideal for conversational applications",
+      openaiOnyx: "OpenAI Onyx - Deep, authoritative voice for formal content",
+      openaiEcho: "OpenAI Echo - Clear, articulate voice with natural rhythm",
+      openaiShimmer:
+        "OpenAI Shimmer - Expressive, dynamic voice for engaging content",
+      openaiFable: "OpenAI Fable - Expressive, story-telling voice",
+      elevenlabsRachel:
+        "ElevenLabs Rachel - Natural female voice with emotional range",
+      elevenlabsJosh:
+        "ElevenLabs Josh - Natural male voice with conversational tone",
+      elevenlabsBella:
+        "ElevenLabs Bella - Warm female voice with soft delivery",
+      elevenlabsAdam:
+        "ElevenLabs Adam - Professional male voice for content creation",
+    },
+  },
 };
 
 export default translations;

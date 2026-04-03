@@ -43,7 +43,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { leads } from "@/app/api/[locale]/leads/db";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
@@ -230,7 +230,7 @@ export interface MessageMetadata {
   // Pipeline steps for multi-step turns (STT → LLM → TTS, translation → image-gen, etc.)
   pipelineSteps?: Array<{
     type: "stt" | "tts" | "vision" | "translation" | "routing" | "gap-fill";
-    modelId: ModelId;
+    modelId: ChatModelId;
     creditCost: number;
     durationMs?: number;
   }>;
@@ -239,7 +239,7 @@ export interface MessageMetadata {
   variants?: Array<{
     modality: Modality;
     content: string; // text content or storage URL
-    modelId?: ModelId; // which bridge model produced this
+    modelId?: ChatModelId; // which bridge model produced this
     creditCost?: number;
     createdAt: string; // ISO timestamp
   }>;
@@ -382,7 +382,7 @@ export const chatThreads = pgTable(
       .default(ThreadStatusDB[0]),
 
     // Settings
-    defaultModel: text("default_model").$type<ModelId | null>(), // ModelId
+    defaultModel: text("default_model").$type<ChatModelId | null>(), // ModelId
     defaultSkill: text("default_tone"), // Skill ID (can be default character or custom UUID)
     systemPrompt: text("system_prompt"),
 
@@ -507,7 +507,7 @@ export const chatMessages = pgTable(
     isAI: boolean("is_ai").default(false).notNull(),
 
     // AI-specific fields
-    model: text("model").$type<ModelId | null>(), // ModelId if AI message
+    model: text("model").$type<ChatModelId | null>(), // ModelId if AI message
     skill: text("tone"),
 
     // Error information (for error messages)

@@ -35,6 +35,8 @@ export const { GET, tools } = endpointsHandler({
 
       return createFileResponse(result.buffer, result.contentType, {
         "Cache-Control": "public, max-age=31536000, immutable",
+        "Content-Length": String(result.buffer.length),
+        "Accept-Ranges": "bytes",
       });
     },
   },

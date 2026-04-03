@@ -1,4 +1,4 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import {
@@ -74,7 +74,7 @@ export const marketerSkill: Skill = {
       variantName: "skills.marketer.variants.snappy" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GPT_5_4_MINI,
+        manualModelId: ChatModelId.GPT_5_4_MINI,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -93,7 +93,7 @@ export const marketerSkill: Skill = {
       variantName: "skills.marketer.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GPT_5_4_NANO,
+        manualModelId: ChatModelId.GPT_5_4_NANO,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

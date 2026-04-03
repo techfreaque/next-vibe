@@ -19,26 +19,65 @@ import { H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { scopedTranslation } from "@/app/[locale]/subscription/i18n";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
+  ApiProvider,
   type ModelDefinition,
-  modelDefinitions,
+  getProviderPrice,
   modelProviders,
 } from "@/app/api/[locale]/agent/models/models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import { isProviderAvailable } from "@/app/api/[locale]/agent/models/widget/model-selector";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   FEATURE_COSTS,
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
-import { scopedTranslation } from "@/app/[locale]/subscription/i18n";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { chatModelDefinitions } from "@/app/api/[locale]/agent/ai-stream/models";
+import { imageGenModelDefinitions } from "@/app/api/[locale]/agent/image-generation/models";
+import { musicGenModelDefinitions } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelDefinitions } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { ttsModelDefinitions } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelDefinitions } from "@/app/api/[locale]/agent/video-generation/models";
 import { formatPrice } from "./types";
+
+function checkProviderAvailable(
+  apiProvider: ApiProvider,
+  envAvailability: AgentEnvAvailability | undefined,
+): boolean {
+  if (!envAvailability) {
+    return true;
+  }
+  switch (apiProvider) {
+    case ApiProvider.OPENROUTER:
+      return envAvailability.openRouter;
+    case ApiProvider.CLAUDE_CODE:
+      return envAvailability.claudeCode;
+    case ApiProvider.UNCENSORED_AI:
+      return envAvailability.uncensoredAI;
+    case ApiProvider.FREEDOMGPT:
+      return envAvailability.freedomGPT;
+    case ApiProvider.GAB_AI:
+      return envAvailability.gabAI;
+    case ApiProvider.VENICE_AI:
+      return envAvailability.veniceAI;
+    case ApiProvider.OPENAI_IMAGES:
+      return envAvailability.openAiImages;
+    case ApiProvider.REPLICATE:
+      return envAvailability.replicate;
+    case ApiProvider.FAL_AI:
+      return envAvailability.falAi;
+    case ApiProvider.MODELSLAB:
+      return envAvailability.modelsLab;
+    default:
+      return true;
+  }
+}
 
 interface OverviewTabProps {
   locale: CountryLanguage;
@@ -56,29 +95,7 @@ function getModelSortPrice(def: ModelDefinition): number {
   if (!p) {
     return 0;
   }
-  if ("creditCostPerImage" in p) {
-    return p.creditCostPerImage;
-  }
-  if ("creditCostPerClip" in p) {
-    return p.creditCostPerClip;
-  }
-  if ("creditCostPerSecond" in p) {
-    return p.creditCostPerSecond;
-  }
-  if ("creditCostPerCharacter" in p) {
-    return p.creditCostPerCharacter;
-  }
-  // Token-based: use a typical 16k input / 1.5k output scenario
-  if (
-    "inputTokenCost" in p &&
-    p.inputTokenCost !== undefined &&
-    p.outputTokenCost !== undefined
-  ) {
-    return p.inputTokenCost * 16000 + p.outputTokenCost * 1500;
-  }
-  return "creditCost" in p && typeof p.creditCost === "number"
-    ? p.creditCost
-    : 0;
+  return getProviderPrice(p);
 }
 
 export function OverviewTab({
@@ -226,25 +243,28 @@ export function OverviewTab({
               </Div>
               <Div className="flex flex-col gap-6">
                 {MODEL_TYPE_ORDER.map((modelType: ModelTypeKey) => {
-                  const typeModels = Object.values(modelDefinitions).filter(
-                    (def) => {
-                      if ((def.modelType ?? "text") !== modelType) {
-                        return false;
-                      }
-                      if (
-                        !showLegacyModels &&
-                        def.utilities.includes(ModelUtility.LEGACY)
-                      ) {
-                        return false;
-                      }
-                      return def.providers.some((p) =>
-                        isProviderAvailable(
-                          p as Parameters<typeof isProviderAvailable>[0],
-                          envAvailability,
-                        ),
-                      );
-                    },
-                  );
+                  const modelsByType: Record<ModelTypeKey, ModelDefinition[]> =
+                    {
+                      text: [
+                        ...Object.values(chatModelDefinitions),
+                        ...Object.values(ttsModelDefinitions),
+                        ...Object.values(sttModelDefinitions),
+                      ],
+                      image: Object.values(imageGenModelDefinitions),
+                      audio: Object.values(musicGenModelDefinitions),
+                      video: Object.values(videoGenModelDefinitions),
+                    };
+                  const typeModels = modelsByType[modelType].filter((def) => {
+                    if (
+                      !showLegacyModels &&
+                      def.utilities.includes(ModelUtility.LEGACY)
+                    ) {
+                      return false;
+                    }
+                    return def.providers.some((p) =>
+                      checkProviderAvailable(p.apiProvider, envAvailability),
+                    );
+                  });
                   if (typeModels.length === 0) {
                     return null;
                   }

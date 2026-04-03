@@ -17,8 +17,8 @@ import type Stripe from "stripe";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Countries, CountryLanguage } from "@/i18n/core/config";
 
-import { getAgentEnvAvailability } from "../../../agent/env-availability";
-import { getAvailableModelCount } from "../../../agent/models/models";
+import { agentEnvAvailability } from "../../../agent/env-availability";
+import { getAvailableModelCount } from "../../../agent/models/all-models";
 import { scopedTranslation as productsScopedTranslation } from "../../../products/i18n";
 import {
   type ProductIds,
@@ -74,7 +74,7 @@ export class StripePriceManager {
       const productName = t(product.name);
       const productDescription = t(product.description, {
         subCredits: product.credits,
-        modelCount: getAvailableModelCount(getAgentEnvAvailability(), false),
+        modelCount: getAvailableModelCount(agentEnvAvailability, false),
       });
 
       logger.info("Creating Stripe price with locale-adjusted pricing", {

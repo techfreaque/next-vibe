@@ -1466,7 +1466,7 @@ export class ViteCompiler {
             "react-joyride",
             "react-markdown",
             "react-syntax-highlighter",
-            "react-syntax-highlighter/dist/cjs/styles/prism",
+            "react-syntax-highlighter/dist/esm/styles/hljs",
             "remark-breaks",
             "remark-gfm",
             "sonner",

@@ -55,7 +55,7 @@
     "url": "https://github.com/techfreaque/next-vibe.git"
   },
   "bin": {
-    "vibe": "./dist/bin/vibe-runtime.js"
+    "vibe": "./.dist/bin/vibe-runtime.js"
   },
   "workspaces": [
     "src/app/api/*/system/guard",
@@ -75,8 +75,8 @@
   "main": "./.dist/bin/vibe-runtime.js",
   "exports": {
     ".": {
-      "import": "./dist/bin/vibe-runtime.js",
-      "default": "./dist/bin/vibe-runtime.js"
+      "import": "./.dist/bin/vibe-runtime.js",
+      "default": "./.dist/bin/vibe-runtime.js"
     },
     "./*": {
       "types": "./src/app/api/[locale]/*",

@@ -75,6 +75,7 @@ export function TanstackPage({
 }: ReferralDevelopersPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
   return (
     <Div className="min-h-screen bg-background">
@@ -84,7 +85,7 @@ export function TanstackPage({
           <Div className="flex items-center gap-3">
             <Code className="h-5 w-5 text-white/80" />
             <P className="text-white font-semibold text-sm font-mono">
-              {t("hero.brand")}
+              {t("hero.brand", { appName })}
               {t("hero.category")}
             </P>
           </Div>
@@ -126,7 +127,7 @@ export function TanstackPage({
             {t("useCase.p1")}
           </P>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-            {t("useCase.p2")}
+            {t("useCase.p2", { appName })}
           </P>
           <Div className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden">
             <Div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
@@ -135,10 +136,10 @@ export function TanstackPage({
             </Div>
             <Div className="p-4 space-y-3">
               {[
-                t("useCase.examples.0"),
-                t("useCase.examples.1"),
-                t("useCase.examples.2"),
-                t("useCase.examples.3"),
+                t("useCase.examples.0", { appName }),
+                t("useCase.examples.1", { appName }),
+                t("useCase.examples.2", { appName }),
+                t("useCase.examples.3", { appName }),
               ].map((example, i) => (
                 <P
                   key={i}
@@ -157,10 +158,10 @@ export function TanstackPage({
         <Div>
           <H2 className="text-2xl font-bold mb-6">{t("apiAngle.title")}</H2>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("apiAngle.p1")}
+            {t("apiAngle.p1", { appName })}
           </P>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("apiAngle.p2")}
+            {t("apiAngle.p2", { appName })}
           </P>
         </Div>
 
@@ -195,12 +196,12 @@ export function TanstackPage({
           </Div>
 
           <Div className="p-4 rounded-lg bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-800 text-sm text-cyan-800 dark:text-cyan-200 mb-4">
-            {t("math.note")}
+            {t("math.note", { appName })}
           </Div>
           <Div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 text-sm text-emerald-800 dark:text-emerald-200">
             <Div className="flex items-start gap-2">
               <TrendingUp className="h-4 w-4 mt-0.5 shrink-0" />
-              <Span>{t("math.growthNote")}</Span>
+              <Span>{t("math.growthNote", { appName })}</Span>
             </Div>
           </Div>
         </Div>
@@ -211,10 +212,10 @@ export function TanstackPage({
         <Div>
           <H2 className="text-2xl font-bold mb-6">{t("multilevel.title")}</H2>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("multilevel.p1")}
+            {t("multilevel.p1", { appName })}
           </P>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("multilevel.p2")}
+            {t("multilevel.p2", { appName })}
           </P>
         </Div>
 
@@ -227,7 +228,7 @@ export function TanstackPage({
             {t("crypto.p1")}
           </P>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("crypto.p2")}
+            {t("crypto.p2", { appName })}
           </P>
         </Div>
 

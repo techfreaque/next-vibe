@@ -12,6 +12,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { contactClientRepository } from "../../contact/repository-client";
 import { UserDetailLevel } from "../../user/enum";
 import { UserRepository } from "../../user/repository";
+import { DEV_SEED_DEMO_USER_EMAIL } from "../../users/seeds";
 import type { NewEmail } from "./db";
 import { MessageStatus, MessageType } from "./enum";
 import { EmailsRepository } from "./repository";
@@ -58,7 +59,7 @@ export async function dev(
     );
 
     const demoUserResponse = await UserRepository.getUserByEmail(
-      "demo@example.com",
+      DEV_SEED_DEMO_USER_EMAIL,
       UserDetailLevel.STANDARD,
       locale,
       logger,
@@ -71,7 +72,7 @@ export async function dev(
         subject: `Welcome to ${translations.appName}!`,
         senderEmail: contactClientRepository.getSupportEmail(locale),
         senderName: translations.appName,
-        recipientEmail: "demo@example.com",
+        recipientEmail: DEV_SEED_DEMO_USER_EMAIL,
         recipientName: "Demo User",
         bodyText:
           "Welcome to our platform! We're excited to help you grow your social media presence.",
@@ -130,7 +131,7 @@ export async function dev(
         subject: "Re: Question about AI chat features",
         senderEmail: translations.emails.support,
         senderName: `${translations.appName} Support`,
-        recipientEmail: "demo@example.com",
+        recipientEmail: DEV_SEED_DEMO_USER_EMAIL,
         recipientName: "Demo User",
         bodyText:
           "Thank you for your question about posting schedules. Here's how you can set up automated posting...",
@@ -160,7 +161,7 @@ export async function dev(
         subject: "AI Chat Tips & Updates - Weekly Newsletter",
         senderEmail: contactClientRepository.getSupportEmail(locale),
         senderName: `${translations.appName} Team`,
-        recipientEmail: "demo@example.com",
+        recipientEmail: DEV_SEED_DEMO_USER_EMAIL,
         recipientName: "Demo User",
         bodyText:
           "This week's top social media tips and trends to help grow your online presence.",

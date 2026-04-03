@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Kontakt",
   description:
-    "Wyślij wiadomość do zespołu – w sprawie pytań, opinii, wsparcia lub współpracy. Otrzymasz e-mail potwierdzający, a my odpowiemy w ciągu 24 godzin.",
+    "Wyślij wiadomość do zespołu - w sprawie pytań, opinii, wsparcia lub współpracy. Otrzymasz e-mail potwierdzający, a my odpowiemy w ciągu 24 godzin.",
   category: "System",
   summary: "Przetwarzaj przesłania formularzy kontaktowych z śledzeniem leadów",
   tags: {

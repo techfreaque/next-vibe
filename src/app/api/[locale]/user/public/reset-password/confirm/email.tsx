@@ -4,34 +4,33 @@
 
 import { Button, Section, Text } from "@react-email/components";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
+import {
+  createTrackingContext,
+  type TrackingContext,
+} from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
+import { env } from "@/config/env";
+import { configScopedTranslation } from "@/config/i18n";
 import { UserDetailLevel } from "../../../enum";
 import { UserRepository } from "../../../repository";
-import { scopedTranslation as confirmScopedTranslation } from "./i18n";
 import type {
   ResetPasswordConfirmPostRequestOutput,
   ResetPasswordConfirmPostResponseOutput,
 } from "./definition";
 import definition from "./definition";
-import {
-  createTrackingContext,
-  type TrackingContext,
-} from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
-import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
-import { configScopedTranslation } from "@/config/i18n";
-import { env } from "@/config/env";
+import { scopedTranslation as confirmScopedTranslation } from "./i18n";
 
 // ============================================================================
 // SCHEMA
@@ -220,7 +219,7 @@ export const passwordResetConfirmEmailTemplate: EmailTemplateDefinition<
     const templateProps: PasswordResetConfirmProps = {
       publicName: user.publicName,
       userId: user.id,
-      totalModelCount: getAvailableModelCount(getAgentEnvAvailability(), false),
+      totalModelCount: getAvailableModelCount(agentEnvAvailability, false),
     };
 
     return success({

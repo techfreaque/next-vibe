@@ -359,11 +359,49 @@ export class ReleaseExecutor implements IReleaseExecutor {
       // Process each package
       for (const pkg of packages) {
         const cwd = `${originalCwd}/${pkg.directory}`;
-        const packageJsonResult = packageService.getPackageJson(
+        let packageJsonResult = packageService.getPackageJson(
           cwd,
           logger,
           locale,
         );
+
+        // If package.json doesn't exist yet and a build command is configured,
+        // run the build first (it may generate the package.json, e.g. @next-vibe/checker)
+        if (!packageJsonResult.success && pkg.build && !skipBuild) {
+          logger.vibe(
+            formatProgress(
+              "package.json not found - running build first to generate it...",
+            ),
+          );
+          const buildCommand =
+            typeof pkg.build === "string" ? pkg.build : undefined;
+          const buildResult = qualityRunner.runBuild(
+            cwd,
+            packageManager,
+            logger,
+            dryRun,
+            locale,
+            buildCommand,
+          );
+          if (!buildResult.success) {
+            packagesProcessed.push({
+              name: pkg.directory,
+              directory: pkg.directory,
+              status: "failed",
+              message: buildResult.message ?? "Build failed",
+            });
+            if (!config.continueOnError) {
+              break;
+            }
+            continue;
+          }
+          // Re-read package.json after build
+          packageJsonResult = packageService.getPackageJson(
+            cwd,
+            logger,
+            locale,
+          );
+        }
 
         if (!packageJsonResult.success) {
           packagesProcessed.push({
@@ -945,6 +983,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
                 const ciResult = publisher.runCiReleaseCommand(
                   releaseConfig,
                   packageJson.name,
+                  cwd,
                   logger,
                   dryRun,
                   locale,

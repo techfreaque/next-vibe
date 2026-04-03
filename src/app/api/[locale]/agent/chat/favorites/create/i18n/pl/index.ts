@@ -37,7 +37,7 @@ export const translations: typeof enTranslations = {
       description:
         "Wariant umiejętności (np. brilliant, tani, nieocenzurowany)",
     },
-    customName: {
+    customVariantName: {
       label: "Nazwa niestandardowa",
       description: "Opcjonalna nazwa niestandardowa dla tego ulubionego",
     },
@@ -59,9 +59,19 @@ export const translations: typeof enTranslations = {
       description: "Model do rozpoznawania mowy",
       placeholder: "Dziedzicz ze skilla",
     },
-    visionBridgeModel: {
-      label: "Model wizji",
-      description: "Model do analizy obrazu",
+    imageVisionModel: {
+      label: "Model wizji obrazu",
+      description: "Model używany do analizy obrazów",
+      placeholder: "Dziedzicz ze skilla",
+    },
+    videoVisionModel: {
+      label: "Model wizji wideo",
+      description: "Model używany do analizy wideo",
+      placeholder: "Dziedzicz ze skilla",
+    },
+    audioVisionModel: {
+      label: "Model wizji audio",
+      description: "Model używany do analizy audio",
       placeholder: "Dziedzicz ze skilla",
     },
     translationModel: {

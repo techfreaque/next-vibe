@@ -14,6 +14,7 @@ import { Ul } from "next-vibe-ui/ui/ul";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -69,24 +70,26 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, jobId } = await params;
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   return metadataGenerator(locale, {
     path: `careers/${jobId}`,
-    title: t("meta.title"),
+    title: t("meta.title", { appName }),
     description: t("meta.description"),
     category: t("meta.category"),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/careers-hero.jpg`,
-    imageAlt: t("meta.imageAlt"),
-    keywords: [t("meta.keywords")],
+    imageAlt: t("meta.imageAlt", { appName }),
+    keywords: [t("meta.keywords", { appName })],
     additionalMetadata: {
       openGraph: {
-        title: t("meta.ogTitle"),
+        title: t("meta.ogTitle", { appName }),
         description: t("meta.ogDescription"),
         url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/careers/${jobId}`,
         type: "website",
       },
       twitter: {
         card: "summary_large_image",
-        title: t("meta.twitterTitle"),
+        title: t("meta.twitterTitle", { appName }),
         description: t("meta.twitterDescription"),
       },
     },

@@ -24,13 +24,9 @@ import type {
 } from "ai";
 import { generateText as aiGenerateText } from "ai";
 
+import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-import type {
-  ModelId,
-  ModelOption,
-} from "@/app/api/[locale]/agent/models/models";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
-import { IMAGE_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/image-generation/constants";
 import { AUDIO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/music-generation/constants";
 import { VIDEO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/video-generation/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -38,6 +34,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ChatMessage } from "../../../chat/db";
+import type { ChatModelOption } from "../../models";
 import type { MessageDbWriter } from "../core/message-db-writer";
 import {
   type BridgeContext,
@@ -57,7 +54,7 @@ export class GapFillExecutor {
     messages: ModelMessage[];
     /** Raw ChatMessage history (needed for attachment data + variant cache) */
     chatHistory: ChatMessage[];
-    activeModel: ModelOption;
+    activeModel: ChatModelOption;
     bridgeContext: BridgeContext;
     dbWriter: MessageDbWriter;
     abortSignal: AbortSignal;
@@ -100,7 +97,7 @@ export class GapFillExecutor {
         const hasFiles = parts.some(
           (p) =>
             p.type === "file" &&
-            !activeModel.inputs.includes("file" as Modality),
+            !activeModel.inputs.includes("text" as Modality),
         );
 
         if (!hasImages && !hasFiles) {
@@ -123,7 +120,7 @@ export class GapFillExecutor {
             if (
               (part.type === "image" || part.type === "file") &&
               !activeModel.inputs.includes(
-                (part.type === "image" ? "image" : "file") as Modality,
+                (part.type === "image" ? "image" : "text") as Modality,
               )
             ) {
               const variantText = await GapFillExecutor.bridgeAttachment({
@@ -167,7 +164,7 @@ export class GapFillExecutor {
     //   - text field is null/empty (shouldn't happen after FilePartHandler fix, but defensive)
     // → call vision bridge to generate a text description and substitute it in
     const MEDIA_TOOL_NAMES = [
-      IMAGE_GEN_TOOL_NAME,
+      IMAGE_GEN_ALIAS,
       VIDEO_GEN_TOOL_NAME,
       AUDIO_GEN_TOOL_NAME,
     ] as const;
@@ -224,7 +221,7 @@ export class GapFillExecutor {
 
             // Check if model can see this modality — if it can, it doesn't need text
             const modality: Modality =
-              p.toolName === IMAGE_GEN_TOOL_NAME
+              p.toolName === IMAGE_GEN_ALIAS
                 ? "image"
                 : p.toolName === VIDEO_GEN_TOOL_NAME
                   ? "video"
@@ -233,30 +230,18 @@ export class GapFillExecutor {
               return part;
             }
 
-            // Generate text description via vision bridge (images only for now;
-            // audio/video fall back to a generic placeholder since there's no audio-vision bridge)
-            if (modality !== "image") {
-              // For audio/video: substitute a generic description so model isn't confused
-              const genericText = `[generated ${modality} — no text description available]`;
-              return {
-                ...p,
-                output: {
-                  type: "json" as const,
-                  value: { ...outputValue, text: genericText },
-                },
-              };
-            }
-
             logger.info(
-              "[GapFill] Bridging null-text image_gen tool result via vision",
+              `[GapFill] Bridging null-text ${modality} tool result via vision`,
               {
                 fileUrl: fileUrl.slice(0, 80),
               },
             );
 
-            const description = await GapFillExecutor.bridgeImageUrl({
-              imageUrl: fileUrl,
+            const description = await GapFillExecutor.bridgeMediaUrl({
+              mediaUrl: fileUrl,
+              modality,
               bridgeContext,
+              dbWriter,
               abortSignal,
               logger,
               user,
@@ -308,7 +293,7 @@ export class GapFillExecutor {
     const bridgeType: "stt" | "vision" | "translation" | "tts" = isImage
       ? "vision"
       : "stt"; // file parts are audio/STT
-    const modality: Modality = isImage ? "image" : "file";
+    const modality: Modality = isImage ? "image" : "text";
 
     // Emit GAP_FILL_STARTED
     if (chatMessageId) {
@@ -367,12 +352,11 @@ export class GapFillExecutor {
       dbWriter,
       logger,
       user,
-      locale,
       modality,
       bridgeType,
     } = params;
 
-    const visionModel = ModalityResolver.resolveVisionBridgeModel(
+    const visionModel = ModalityResolver.resolveImageVisionModel(
       bridgeContext,
       user,
     );
@@ -381,7 +365,6 @@ export class GapFillExecutor {
     const visionProvider = ProviderFactory.getProviderForModel(
       visionModel,
       logger,
-      locale,
     );
 
     try {
@@ -421,13 +404,17 @@ export class GapFillExecutor {
       });
 
       const description = result.text.trim();
-      const creditCost = calculateCreditCost(visionModel, 0, 0, 0, 0);
+      const creditCost = calculateCreditCost(
+        visionModel,
+        result.usage.inputTokens ?? 0,
+        result.usage.outputTokens ?? 0,
+      );
 
       if (chatMessageId && description) {
         const variant = {
           modality: "text" as Modality,
           content: description,
-          modelId: visionModel.id as ModelId,
+          modelId: visionModel.id,
           creditCost,
           createdAt: new Date().toISOString(),
         };
@@ -438,6 +425,17 @@ export class GapFillExecutor {
           modality,
           variant,
         });
+
+        // Deduct credits for the vision bridge call
+        if (creditCost > 0) {
+          await dbWriter.deductAndEmitCredits({
+            user,
+            amount: creditCost,
+            feature: `vision-bridge:${visionModel.id}`,
+            type: "model",
+            model: visionModel.id,
+          });
+        }
       }
 
       return description || null;
@@ -554,7 +552,7 @@ export class GapFillExecutor {
         const variant = {
           modality: "text" as Modality,
           content: transcript,
-          modelId: sttModel.id as ModelId,
+          modelId: sttModel.id,
           creditCost,
           createdAt: new Date().toISOString(),
         };
@@ -579,29 +577,58 @@ export class GapFillExecutor {
   }
 
   /**
-   * Bridge an image URL to a text description via the vision bridge model.
-   * Used when a media tool result has a null text field and the active model can't see images.
+   * Bridge a media URL to a text description via the appropriate vision bridge model.
+   * Used when a media tool result has a null text field and the active model can't see that modality.
    */
-  private static async bridgeImageUrl(params: {
-    imageUrl: string;
+  private static async bridgeMediaUrl(params: {
+    mediaUrl: string;
+    modality: Modality;
     bridgeContext: BridgeContext;
+    dbWriter: MessageDbWriter;
     abortSignal: AbortSignal;
     logger: EndpointLogger;
     user: JwtPayloadType;
     locale: CountryLanguage;
   }): Promise<string | null> {
-    const { imageUrl, bridgeContext, abortSignal, logger, user, locale } =
-      params;
-
-    const visionModel = ModalityResolver.resolveVisionBridgeModel(
+    const {
+      mediaUrl,
+      modality,
       bridgeContext,
+      dbWriter,
+      abortSignal,
+      logger,
       user,
-    );
+    } = params;
+
+    // Pick the correct vision model resolver per modality
+    const visionModel =
+      modality === "video"
+        ? ModalityResolver.resolveVideoVisionModel(bridgeContext, user)
+        : modality === "audio"
+          ? ModalityResolver.resolveAudioVisionModel(bridgeContext, user)
+          : ModalityResolver.resolveImageVisionModel(bridgeContext, user);
+
     const visionProvider = ProviderFactory.getProviderForModel(
       visionModel,
       logger,
-      locale,
     );
+
+    const promptText =
+      modality === "image"
+        ? "Describe this generated image in detail. Include subject, style, colors, composition, and any notable elements. This description will be shown to another AI model that cannot see images."
+        : modality === "video"
+          ? "Describe this video in detail. Include the visual content, actions, scene, style, and any notable elements. This description will be shown to another AI model that cannot see video."
+          : "Describe this audio in detail. Include the content, instruments, mood, tempo, and any notable elements. This description will be shown to another AI model that cannot hear audio.";
+
+    // Build content parts per modality — separate paths for correct typing
+    const contentParts: ImagePart | FilePart =
+      modality === "image"
+        ? { type: "image" as const, image: new URL(mediaUrl) }
+        : {
+            type: "file" as const,
+            data: new URL(mediaUrl),
+            mediaType: modality === "video" ? "video/mp4" : "audio/mpeg",
+          };
 
     try {
       const result = await aiGenerateText({
@@ -611,22 +638,38 @@ export class GapFillExecutor {
           {
             role: "user" as const,
             content: [
-              { type: "image" as const, image: new URL(imageUrl) },
-              {
-                type: "text" as const,
-                text: "Describe this generated image in detail. Include subject, style, colors, composition, and any notable elements. This description will be shown to another AI model that cannot see images.",
-              },
+              contentParts,
+              { type: "text" as const, text: promptText },
             ],
           },
         ],
       });
 
+      // Deduct credits for the vision bridge call using actual token usage
+      const creditCost = calculateCreditCost(
+        visionModel,
+        result.usage.inputTokens ?? 0,
+        result.usage.outputTokens ?? 0,
+      );
+      if (creditCost > 0) {
+        await dbWriter.deductAndEmitCredits({
+          user,
+          amount: creditCost,
+          feature: `vision-bridge:${visionModel.id}`,
+          type: "model",
+          model: visionModel.id,
+        });
+      }
+
       return result.text.trim() || null;
     } catch (err) {
-      logger.warn("[GapFill] Vision bridge for tool result failed", {
-        error: err instanceof Error ? err.message : String(err),
-        imageUrl: imageUrl.slice(0, 80),
-      });
+      logger.warn(
+        `[GapFill] ${modality} vision bridge for tool result failed`,
+        {
+          error: err instanceof Error ? err.message : String(err),
+          mediaUrl: mediaUrl.slice(0, 80),
+        },
+      );
       return null;
     }
   }

@@ -1,14 +1,13 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
-import { notFound } from "next-vibe-ui/lib/not-found";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import {
   ProductIds,
   productsRepository,
@@ -18,7 +17,8 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
+
+import { configScopedTranslation } from "@/config/i18n";
 import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
@@ -44,22 +44,24 @@ export interface HelpPageData {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const { t } = pageT.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   return metadataGenerator(locale, {
     path: "contact",
-    title: t("meta.contact.title"),
-    description: t("meta.contact.description"),
+    title: t("meta.contact.title", { appName }),
+    description: t("meta.contact.description", { appName }),
     category: t("meta.contact.category"),
     image:
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&h=630&auto=format&fit=crop",
-    imageAlt: t("meta.contact.imageAlt"),
-    keywords: [t("meta.contact.keywords")],
+    imageAlt: t("meta.contact.imageAlt", { appName }),
+    keywords: [t("meta.contact.keywords", { appName })],
     additionalMetadata: {
       openGraph: {
-        title: t("meta.contact.ogTitle"),
+        title: t("meta.contact.ogTitle", { appName }),
         description: t("meta.contact.ogDescription"),
       },
       twitter: {
-        title: t("meta.contact.twitterTitle"),
+        title: t("meta.contact.twitterTitle", { appName }),
         description: t("meta.contact.twitterDescription"),
       },
     },
@@ -68,9 +70,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
   const { locale } = await params;
-  if (env.NEXT_PUBLIC_LOCAL_MODE) {
-    notFound();
-  }
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   const jwtUser = await AuthRepository.getAuthMinimalUser(
@@ -89,7 +88,7 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
   const currencySymbol = countryInfo.symbol;
 
   const isAdmin = !jwtUser.isPublic && jwtUser.roles.includes(UserRole.ADMIN);
-  const modelCount = getAvailableModelCount(getAgentEnvAvailability(), isAdmin);
+  const modelCount = getAvailableModelCount(agentEnvAvailability, isAdmin);
 
   return {
     locale,

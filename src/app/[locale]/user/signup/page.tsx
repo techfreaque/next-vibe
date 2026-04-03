@@ -11,8 +11,8 @@ import { ReferralRepository } from "@/app/api/[locale]/referral/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
@@ -35,19 +35,21 @@ export interface SignUpPageData {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const { t } = pageT.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   return metadataGenerator(locale, {
     path: "signup",
-    title: t("meta.title"),
-    description: t("meta.description"),
+    title: t("meta.title", { appName }),
+    description: t("meta.description", { appName }),
     category: t("meta.category"),
     image:
       "https://images.unsplash.com/photo-1579547945413-497e1b99dac0?q=80&w=1200&h=630&auto=format&fit=crop",
-    imageAlt: t("meta.imageAlt"),
-    keywords: [t("meta.keywords")],
+    imageAlt: t("meta.imageAlt", { appName }),
+    keywords: [t("meta.keywords", { appName })],
     additionalMetadata: {
       openGraph: {
-        title: t("meta.ogTitle"),
-        description: t("meta.ogDescription"),
+        title: t("meta.ogTitle", { appName }),
+        description: t("meta.ogDescription", { appName }),
         url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/user/signup`,
         type: "website",
         images: [
@@ -55,14 +57,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             url: "https://images.unsplash.com/photo-1579547945413-497e1b99dac0?q=80&w=1200&h=630&auto=format&fit=crop",
             width: 1200,
             height: 630,
-            alt: t("meta.imageAlt"),
+            alt: t("meta.imageAlt", { appName }),
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: t("meta.twitterTitle"),
-        description: t("meta.twitterDescription"),
+        title: t("meta.twitterTitle", { appName }),
+        description: t("meta.twitterDescription", { appName }),
         images: [
           "https://images.unsplash.com/photo-1579547945413-497e1b99dac0?q=80&w=1200&h=630&auto=format&fit=crop",
         ],
@@ -75,10 +77,6 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<SignUpPageData> {
   const { locale } = await params;
-  if (env.NEXT_PUBLIC_LOCAL_MODE) {
-    redirect(`/${locale}/user/login`);
-  }
-
   const logger = createEndpointLogger(false, Date.now(), locale);
   const user = await UserRepository.getUserByAuth({}, locale, logger);
 

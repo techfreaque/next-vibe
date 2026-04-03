@@ -1,0 +1,13 @@
+{
+  "url": "https://modelslab.com/api/v6/voice/music_gen",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "key": "t20x6N3haz5IAxDzfP0MBUSzQ5IpjZ5nMkd5AY9nKDuGR7svtN53lD31jsMa",
+    "prompt": "upbeat piano melody",
+    "duration": 30,
+    "output_format": "mp3"
+  }
+}

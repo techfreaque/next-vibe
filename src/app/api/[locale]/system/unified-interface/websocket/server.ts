@@ -148,15 +148,8 @@ function unsubscribeFromChannel(
 
 function unsubscribeFromAll(ws: ServerWebSocket<WsConnectionData>): void {
   for (const channel of ws.data.channels) {
-    const set = channels.get(channel);
-    if (set) {
-      set.delete(ws);
-      if (set.size === 0) {
-        channels.delete(channel);
-      }
-    }
+    unsubscribeFromChannel(ws, channel);
   }
-  ws.data.channels.clear();
 }
 
 // ============================================================================
@@ -692,21 +685,19 @@ export function startWebSocketServer(
           });
           return;
         }
-        // Normal /ws connection
-        for (const channel of ws.data.channels) {
-          let set = channels.get(channel);
-          if (!set) {
-            set = new Set();
-            channels.set(channel, set);
-          }
-          set.add(ws as ServerWebSocket<WsConnectionData>);
+        // Normal /ws connection - register initial channels from query param
+        const initialChannels = [...ws.data.channels];
+        // Clear first since subscribeToChannel() re-adds them
+        ws.data.channels.clear();
+        for (const channel of initialChannels) {
+          subscribeToChannel(ws, channel);
         }
         logger.debug(
-          `[WS] Connection opened (channels: ${[...ws.data.channels].join(", ") || "none"})`,
+          `[WS] Connection opened (channels: ${initialChannels.join(", ") || "none"})`,
         );
       },
 
-      message(ws, raw): void {
+      async message(ws, raw): Promise<void> {
         // Proxy connection - forward browser → upstream
         if (ws.data.proxyWs) {
           try {
@@ -734,6 +725,20 @@ export function startWebSocketServer(
               msg.channel,
             );
             logger.debug(`[WS] Unsubscribed from ${msg.channel}`);
+          } else if (msg.type === "tool-result") {
+            // Remote ws-provider client sending back a tool execution result.
+            // Lazy import to avoid loading AI stream code at WS server startup.
+            const { resolvePendingToolResult } =
+              await import("@/app/api/[locale]/agent/ai-stream/ws-provider/tool-result-store");
+            const resolved = resolvePendingToolResult(
+              msg.toolCallId,
+              msg.result,
+            );
+            if (!resolved) {
+              logger.warn("[WS] Tool result for unknown toolCallId", {
+                toolCallId: msg.toolCallId,
+              });
+            }
           }
         } catch {
           logger.warn("[WS] Invalid message received");

@@ -1,4 +1,4 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import { LEADS_LIST_ALIAS } from "@/app/api/[locale]/leads/list/constants";
 import { LEADS_STATS_ALIAS } from "@/app/api/[locale]/leads/stats/constants";
@@ -85,7 +85,7 @@ export const statsAnalystSkill: Skill = {
       variantName: "skills.statsAnalyst.variants.gemini" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
+        manualModelId: ChatModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -104,7 +104,7 @@ export const statsAnalystSkill: Skill = {
       variantName: "skills.statsAnalyst.variants.fast" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GEMINI_3_FLASH,
+        manualModelId: ChatModelId.GEMINI_3_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

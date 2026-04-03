@@ -19,10 +19,15 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { ModelRole } from "@/app/api/[locale]/agent/models/enum";
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
-import { getDefaultModelForRole } from "@/app/api/[locale]/agent/models/models";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import type {
+  ImageGenModelSelection,
+  SttModelSelection,
+  VoiceModelSelection,
+} from "@/app/api/[locale]/agent/models/types";
 import { scopedTranslation as charactersScopedTranslation } from "../../skills/i18n";
 import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
@@ -37,22 +42,41 @@ import type {
 } from "./definition";
 import type { FavoriteByIdT } from "./i18n";
 
-/**
- * Normalize a model selection: if it equals the platform default for the given roles,
- * return null so we don't store redundant data.
- */
-function normalizeModelSelection<T extends ModelSelectionSimple>(
-  sel: T | null | undefined,
-  roles: ModelRole[],
-): T | null {
+function isSelectionEqual<T>(a: T, b: T): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function normalizeTtsSelection(
+  sel: VoiceModelSelection | null,
+): VoiceModelSelection | null {
   if (!sel) {
     return null;
   }
-  if (sel.selectionType !== ModelSelectionType.MANUAL) {
-    return sel;
+  if (isSelectionEqual(sel, DEFAULT_TTS_MODEL_SELECTION)) {
+    return null;
   }
-  const def = getDefaultModelForRole(roles);
-  if (def && "manualModelId" in sel && sel.manualModelId === def.id) {
+  return sel;
+}
+
+function normalizeSttSelection(
+  sel: SttModelSelection | null,
+): SttModelSelection | null {
+  if (!sel) {
+    return null;
+  }
+  if (isSelectionEqual(sel, DEFAULT_STT_MODEL_SELECTION)) {
+    return null;
+  }
+  return sel;
+}
+
+function normalizeImageGenSelection(
+  sel: ImageGenModelSelection | null,
+): ImageGenModelSelection | null {
+  if (!sel) {
+    return null;
+  }
+  if (isSelectionEqual(sel, DEFAULT_IMAGE_GEN_MODEL_SELECTION)) {
     return null;
   }
   return sel;
@@ -152,6 +176,7 @@ export class SingleFavoriteRepository {
       return success<FavoriteGetResponseOutput>({
         skillId: favorite.skillId,
         variantId: favorite.variantId ?? null,
+        customVariantName: favorite.customVariantName ?? null,
         icon: displayIcon,
         name: character?.name ?? charactersT("skills.default.name"),
         tagline: character?.tagline ?? charactersT("skills.default.tagline"),
@@ -159,8 +184,12 @@ export class SingleFavoriteRepository {
           character?.description ?? charactersT("skills.default.description"),
         voiceModelSelection: favorite.voiceModelSelection ?? null,
         sttModelSelection: favorite.sttModelSelection ?? undefined,
-        visionBridgeModelSelection:
-          favorite.visionBridgeModelSelection ?? undefined,
+        imageVisionModelSelection:
+          favorite.imageVisionModelSelection ?? undefined,
+        videoVisionModelSelection:
+          favorite.videoVisionModelSelection ?? undefined,
+        audioVisionModelSelection:
+          favorite.audioVisionModelSelection ?? undefined,
         translationModelId: favorite.translationModelId ?? undefined,
         imageGenModelSelection:
           favorite.imageGenModelSelection ??
@@ -266,38 +295,43 @@ export class SingleFavoriteRepository {
 
       // Only store bridge models if different from character defaults (null = cascade to skill)
       // Also normalize against platform defaults: store null if value equals platform default
-      const voiceModelSelectionToStore = normalizeModelSelection(
+      const voiceModelSelectionToStore = normalizeTtsSelection(
         data.voiceModelSelection !== undefined
           ? data.voiceModelSelection
           : null,
-        ["tts"],
       );
-      const sttModelSelectionToStore = normalizeModelSelection(
+      const sttModelSelectionToStore = normalizeSttSelection(
         data.sttModelSelection !== undefined ? data.sttModelSelection : null,
-        ["stt"],
       );
-      const visionBridgeModelSelectionToStore =
-        data.visionBridgeModelSelection !== undefined
-          ? data.visionBridgeModelSelection
+      const imageVisionModelSelectionToStore =
+        data.imageVisionModelSelection !== undefined
+          ? data.imageVisionModelSelection
+          : null;
+      const videoVisionModelSelectionToStore =
+        data.videoVisionModelSelection !== undefined
+          ? data.videoVisionModelSelection
+          : null;
+      const audioVisionModelSelectionToStore =
+        data.audioVisionModelSelection !== undefined
+          ? data.audioVisionModelSelection
           : null;
       const translationModelIdToStore =
         character && data.translationModelId === character.translationModelId
           ? null
           : (data.translationModelId ?? null);
-      const imageGenModelSelectionToStore = normalizeModelSelection(
+      const imageGenModelSelectionToStore = normalizeImageGenSelection(
         data.imageGenModelSelection !== undefined
           ? data.imageGenModelSelection
           : null,
-        ["image-gen"],
       );
       const musicGenModelSelectionToStore =
         data.musicGenModelSelection !== undefined
           ? data.musicGenModelSelection
           : null;
+      const videoGenSel = data.videoGenModelSelection;
       const videoGenModelIdToStore =
-        data.videoGenModelSelection?.selectionType ===
-          ModelSelectionType.MANUAL && data.videoGenModelSelection.manualModelId
-          ? data.videoGenModelSelection.manualModelId
+        videoGenSel?.selectionType === ModelSelectionType.MANUAL
+          ? (videoGenSel.manualModelId ?? null)
           : null;
       const defaultChatModeToStore =
         character && data.defaultChatMode === character.defaultChatMode
@@ -311,10 +345,16 @@ export class SingleFavoriteRepository {
         .update(chatFavorites)
         .set({
           skillId: data.skillId,
+          customVariantName:
+            data.customVariantName !== undefined
+              ? data.customVariantName || null
+              : undefined,
           customIcon: customIconToStore,
           voiceModelSelection: voiceModelSelectionToStore,
           sttModelSelection: sttModelSelectionToStore,
-          visionBridgeModelSelection: visionBridgeModelSelectionToStore,
+          imageVisionModelSelection: imageVisionModelSelectionToStore,
+          videoVisionModelSelection: videoVisionModelSelectionToStore,
+          audioVisionModelSelection: audioVisionModelSelectionToStore,
           translationModelId: translationModelIdToStore,
           imageGenModelSelection: imageGenModelSelectionToStore,
           musicGenModelSelection: musicGenModelSelectionToStore,

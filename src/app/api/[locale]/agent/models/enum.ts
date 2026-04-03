@@ -103,10 +103,13 @@ export type ModelRole =
   | "image-gen"
   | "video-gen"
   | "audio-gen"
+  | "image-vision"
+  | "video-vision"
+  | "audio-vision"
   | "embedding"
   | "router";
 
-export type Modality = "text" | "audio" | "image" | "video" | "file";
+export type Modality = "text" | "audio" | "image" | "video";
 
 // ============================================
 // CHAT MODE

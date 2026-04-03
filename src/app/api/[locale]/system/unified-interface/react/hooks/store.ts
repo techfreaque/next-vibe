@@ -13,11 +13,11 @@ import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { executeQuery } from "./query-executor";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import type { ApiMutationOptions, ApiQueryOptions } from "./types";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 // Create a single QueryClient instance
 export const queryClient = new QueryClient({

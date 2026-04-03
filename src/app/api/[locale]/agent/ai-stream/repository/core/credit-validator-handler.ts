@@ -10,10 +10,8 @@ import {
   DEFAULT_INPUT_TOKENS,
   DEFAULT_OUTPUT_TOKENS,
 } from "@/app/api/[locale]/agent/models/constants";
-import {
-  calculateCreditCost,
-  type ModelOption,
-} from "@/app/api/[locale]/agent/models/models";
+import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
+import type { ChatModelOption } from "@/app/api/[locale]/agent/ai-stream/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { creditValidator } from "@/app/api/[locale]/credits/validator";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -26,7 +24,7 @@ export class CreditValidatorHandler {
     userId: string | undefined;
     leadId: string | undefined;
     ipAddress: string | undefined;
-    modelInfo: ModelOption;
+    modelInfo: ChatModelOption;
     locale: CountryLanguage;
     logger: EndpointLogger;
     t: AiStreamT;

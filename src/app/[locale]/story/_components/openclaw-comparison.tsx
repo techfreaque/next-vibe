@@ -10,6 +10,8 @@ import { useInView } from "react-intersection-observer";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { configScopedTranslation } from "@/config/i18n";
+
 import { scopedTranslation } from "./i18n";
 
 interface OpenClawComparisonProps {
@@ -83,6 +85,8 @@ export function OpenClawComparison({
   variant = "unbottled",
 }: OpenClawComparisonProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   const ns =
@@ -90,7 +94,7 @@ export function OpenClawComparison({
       ? ("home.comparisonNextvibe" as const)
       : ("home.comparison" as const);
 
-  const usLabel = t(`${ns}.usLabel`);
+  const usLabel = t(`${ns}.usLabel`, { appName });
 
   return (
     <Div className="relative overflow-hidden" ref={ref as never}>
@@ -105,7 +109,7 @@ export function OpenClawComparison({
               {t(`${ns}.title`)}
             </H2>
             <P className="mx-auto max-w-[600px] text-muted-foreground md:text-lg">
-              {t(`${ns}.subtitle`)}
+              {t(`${ns}.subtitle`, { appName })}
             </P>
           </Div>
 
@@ -115,7 +119,7 @@ export function OpenClawComparison({
               themLabel={t(`${ns}.cards.card1.themLabel`)}
               them={t(`${ns}.cards.card1.them`)}
               usLabel={usLabel}
-              us={t(`${ns}.cards.card1.us`)}
+              us={t(`${ns}.cards.card1.us`, { appName })}
               whyItMatters={t(`${ns}.cards.card1.whyItMatters`)}
               delay={0.1}
               inView={inView}

@@ -21,11 +21,10 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
-  DEFAULT_TTS_VOICE_ID,
-  ModelId,
-  TTS_MODEL_IDS,
+  TtsModelId,
   TtsModelIdOptions,
-} from "@/app/api/[locale]/agent/models/models";
+} from "@/app/api/[locale]/agent/text-to-speech/models";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -74,7 +73,7 @@ const { POST } = createEndpoint({
         description: "post.voice.description",
         columns: 12,
         options: TtsModelIdOptions,
-        schema: z.enum(TTS_MODEL_IDS).default(DEFAULT_TTS_VOICE_ID),
+        schema: z.enum(TtsModelId).default(DEFAULT_TTS_VOICE_ID),
       }),
 
       audioUrl: responseField(scopedTranslation, {
@@ -138,7 +137,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         text: "Hello, this is a test of the text to speech system.",
-        voiceId: ModelId.OPENAI_NOVA,
+        voiceId: TtsModelId.OPENAI_NOVA,
       },
     },
     responses: {

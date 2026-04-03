@@ -19,7 +19,7 @@ import type {
   ToolCall,
   ToolCallResult,
 } from "@/app/api/[locale]/agent/chat/db";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 export interface WakeUpPayload {
   toolMessageId: string;
@@ -28,7 +28,7 @@ export interface WakeUpPayload {
   originalToolCall: ToolCall;
   wakeUpResult: ToolCallResult | undefined;
   wakeUpStatus: string | undefined;
-  resolvedModel: ModelId;
+  resolvedModel: ChatModelId;
   resolvedSkill: string;
   leafMessageId: string | undefined;
   favoriteId: string | undefined;

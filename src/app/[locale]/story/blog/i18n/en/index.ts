@@ -2,15 +2,15 @@ export const translations = {
   page: {
     title: "The Build Log",
     subtitle:
-      "How unbottled.ai and next-vibe got built. The architecture decisions, the dead ends, the things that turned out to matter.",
+      "How {{appName}} and next-vibe got built. The architecture decisions, the dead ends, the things that turned out to matter.",
     meta: {
-      title: "Build Log - next-vibe & unbottled.ai",
+      title: "Build Log - next-vibe & {{appName}}",
       description:
-        "Engineering deep dives into the decisions behind next-vibe and unbottled.ai. Unified surfaces, TypeScript enforcement, Vibe Sense, and the story of building both.",
+        "Engineering deep dives into the decisions behind next-vibe and {{appName}}. Unified surfaces, TypeScript enforcement, Vibe Sense, and the story of building both.",
       category: "Blog",
-      imageAlt: "next-vibe & unbottled.ai Build Log",
+      imageAlt: "next-vibe & {{appName}} Build Log",
       keywords:
-        "next-vibe, unbottled.ai, blog, TypeScript, architecture, SaaS, AI, open-source, engineering",
+        "next-vibe, {{appName}}, blog, TypeScript, architecture, SaaS, AI, open-source, engineering",
     },
   },
   posts: {
@@ -42,11 +42,11 @@ export const translations = {
         "A federated widget engine I built at a job I no longer have. Now any next-vibe endpoint is embeddable anywhere in two script tags.",
       readTime: "11 min read",
     },
-    hackernews: {
-      title: "Show HN: next-vibe",
-      category: "Community",
+    oneEndpoint: {
+      title: "One endpoint. Every surface.",
+      category: "Architecture",
       excerpt:
-        "The post we're writing for Hacker News. TypeScript supremacy, unified surfaces, and a trading bot that can't trade.",
+        "Write one definition.ts per feature. It renders as a web form, CLI command, MCP tool, native screen, cron job - simultaneously.",
       readTime: "5 min read",
     },
     referralBeginners: {
@@ -72,6 +72,13 @@ export const translations = {
         "Your referral link is a revenue stream you haven't turned on yet. Blog posts, READMEs, tutorials - the math for technical audiences.",
       readTime: "5 min read",
     },
+    skillSharingEconomy: {
+      title: "Your AI skills are worth money. Here's how to cash in.",
+      category: "Skill Economy",
+      excerpt:
+        "Build custom AI skills, share them with your referral link, and earn 10% recurring commission from every user who signs up through your skill page.",
+      readTime: "6 min read",
+    },
   },
   labels: {
     readMore: "Read more",
@@ -82,18 +89,9 @@ export const translations = {
     referralSection: "Referral Program",
   },
   ui: {
-    heroTagline: "next-vibe · unbottled.ai",
+    heroTagline: "next-vibe · {{appName}}",
     featuredFileBar:
       "definition.ts → web · cli · mcp · native · cron · 10 more",
-    hnSiteName: "Hacker News",
-    hnNav: "new · past · comments · ask · show · jobs · submit",
-    hnPoints: "points:",
-    hnComments: "comments:",
-    hnAuthor: "author:",
-    hnTags: "> next-vibe · TypeScript · OSS · SaaS · AI",
-    hnDraftPoints: "— (not submitted)",
-    hnDraftComments: "— (not submitted)",
-    hnDraftStatus: "draft",
     vibeFrameEmbedCaption: "Any endpoint. Two script tags. On any site.",
   },
 };

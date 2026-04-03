@@ -4,15 +4,15 @@ export const translations: typeof enTranslations = {
   page: {
     title: "Blog next-vibe",
     subtitle:
-      "Dogłębne analizy architektury, decyzji i pomysłów stojących za next-vibe i unbottled.ai.",
+      "Dogłębne analizy architektury, decyzji i pomysłów stojących za next-vibe i {{appName}}.",
     meta: {
-      title: "Blog - next-vibe",
+      title: "Blog - next-vibe & {{appName}}",
       description:
-        "Głębokie nurkowania w inżynierię, decyzje architektoniczne i pomysły za next-vibe i unbottled.ai.",
+        "Głębokie nurkowania w inżynierię, decyzje architektoniczne i pomysły za next-vibe i {{appName}}.",
       category: "Blog",
-      imageAlt: "Blog next-vibe",
+      imageAlt: "next-vibe & {{appName}} Blog",
       keywords:
-        "next-vibe, blog, TypeScript, architektura, SaaS, AI, open-source, inżynieria",
+        "next-vibe, {{appName}}, blog, TypeScript, architektura, SaaS, AI, open-source, inżynieria",
     },
   },
   posts: {
@@ -46,11 +46,11 @@ export const translations: typeof enTranslations = {
         "Sfederowany silnik widżetów, który zbudowałem w pracy, której już nie mam. Teraz każdy endpoint next-vibe można osadzić wszędzie w dwóch tagach script.",
       readTime: "11 min czytania",
     },
-    hackernews: {
-      title: "Show HN: next-vibe",
-      category: "Społeczność",
+    oneEndpoint: {
+      title: "Jeden endpoint. Każda powierzchnia.",
+      category: "Architektura",
       excerpt:
-        "Post, który piszemy dla Hacker News. Supremacja TypeScript, zunifikowane powierzchnie i bot tradingowy, który nie może handlować.",
+        "Jeden plik definition.ts na funkcję. Renderuje się jako formularz web, polecenie CLI, narzędzie MCP, ekran natywny, zadanie cron - jednocześnie.",
       readTime: "5 min czytania",
     },
     referralBeginners: {
@@ -75,6 +75,13 @@ export const translations: typeof enTranslations = {
         "Twój link polecający to strumień przychodów, którego jeszcze nie uruchomiłeś. Posty na blogu, README, tutoriale - matematyka dla odbiorców technicznych.",
       readTime: "5 min czytania",
     },
+    skillSharingEconomy: {
+      title: "Twoje skille AI sa warte pieniedzy. Oto jak na nich zarobic.",
+      category: "Ekonomia Skilli",
+      excerpt:
+        "Twórz wlasne skille AI, udostepniaj je ze swoim linkiem polecajacym i zarabiaj 10% prowizji od kazdego nowego uzytkownika, który zarejestruje sie przez Twoja strone skilla.",
+      readTime: "6 min czytania",
+    },
   },
   labels: {
     readMore: "Czytaj więcej",
@@ -85,18 +92,9 @@ export const translations: typeof enTranslations = {
     referralSection: "Program poleceń",
   },
   ui: {
-    heroTagline: "next-vibe · unbottled.ai",
+    heroTagline: "next-vibe · {{appName}}",
     featuredFileBar:
       "definition.ts → web · cli · mcp · native · cron · 10 więcej",
-    hnSiteName: "Hacker News",
-    hnNav: "dodaj · zaloguj · nowe · pytaj · pokaż · praca",
-    hnPoints: "punkty:",
-    hnComments: "komentarze:",
-    hnAuthor: "autor:",
-    hnTags: "> next-vibe · TypeScript · OSS · SaaS · AI",
-    hnDraftPoints: "— (nie zgłoszono)",
-    hnDraftComments: "— (nie zgłoszono)",
-    hnDraftStatus: "szkic",
     vibeFrameEmbedCaption:
       "Dowolny endpoint. Dwa tagi script. Na każdej stronie.",
   },

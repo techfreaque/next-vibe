@@ -1,15 +1,14 @@
 export const translations = {
   meta: {
-    title: "Legal Notice - unbottled.ai",
+    title: "Legal Notice - {{appName}}",
     category: "Legal",
-    description: "Legal information and company details for unbottled.ai",
+    description: "Legal information and company details for {{appName}}",
     imageAlt: "Legal Notice",
-    keywords: "imprint, legal notice, company information, unbottled.ai legal",
-    ogTitle: "Legal Notice - unbottled.ai",
-    ogDescription: "Legal information and company details for unbottled.ai",
-    twitterTitle: "Legal Notice - unbottled.ai",
-    twitterDescription:
-      "Legal information and company details for unbottled.ai",
+    keywords: "imprint, legal notice, company information, {{appName}} legal",
+    ogTitle: "Legal Notice - {{appName}}",
+    ogDescription: "Legal information and company details for {{appName}}",
+    twitterTitle: "Legal Notice - {{appName}}",
+    twitterDescription: "Legal information and company details for {{appName}}",
   },
   printAriaLabel: "Print imprint",
   printButton: "Print",

@@ -21,9 +21,9 @@ import type {
   EndpointReadOptions,
 } from "../../endpoints/definition/create";
 import {
-  objectFieldNew,
+  objectField,
   requestUrlPathParamsField,
-} from "../../field/utils-new";
+} from "../../field/utils";
 import type {
   ExamplesList,
   ExtractInput,
@@ -70,7 +70,7 @@ const test1_4: Test1_4_TupleExtends = "PASS";
 // ============================================================================
 
 // Test 2.1: ApiEndpoint with literal type parameters
-const test2_1_field = objectFieldNew({
+const test2_1_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {},
@@ -125,7 +125,7 @@ const test2_3: Test2_3_WithVariance = "PASS"; // Passes with 'out' variance!
 // ============================================================================
 
 // Test 3.1: CreateApiEndpoint with literal type parameters
-const test3_1_field = objectFieldNew({
+const test3_1_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "urlPathParams", response: true },
   children: {
@@ -261,7 +261,7 @@ type Test3_8_Direct =
 const test3_8: Test3_8_Direct = "PASS"; // We WANT objectField to extend UnifiedField
 
 // Test 3.9: Test SimpleObjectField
-const simpleObjectFieldValue = objectFieldNew({
+const simpleObjectFieldValue = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {},

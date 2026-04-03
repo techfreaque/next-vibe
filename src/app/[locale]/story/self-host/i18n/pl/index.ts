@@ -2,20 +2,20 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Samodzielny hosting unbottled.ai - Twoja instancja, Twoje zasady",
+    title: "Samodzielny hosting {{appName}} - Twoja instancja, Twoje zasady",
     description:
-      "Uruchom pełny stos unbottled.ai na własnym serwerze. Własne klucze API, Thea jako admin AI, pełna kontrola. Bezpłatnie na zawsze.",
+      "Uruchom pełny stos {{appName}} na własnym serwerze. Własne klucze API, Thea jako admin AI, pełna kontrola. Bezpłatnie na zawsze.",
     category: "Self-Host",
-    imageAlt: "Samodzielny hosting unbottled.ai - szybki start",
+    imageAlt: "Samodzielny hosting {{appName}} - szybki start",
     keywords:
-      "self-host, next-vibe, unbottled.ai, open-source, AI, VPS, Docker, Kubernetes",
+      "self-host, next-vibe, {{appName}}, open-source, AI, VPS, Docker, Kubernetes",
   },
   hero: {
     badge: "Bezpłatnie na zawsze - MIT + GPL v3",
     title: "Uruchom samodzielnie.",
     titleHighlight: "Miej wszystko.",
     subtitle:
-      "Pełny stos unbottled.ai na własnym serwerze. Każdy model, każde narzędzie, każda funkcja - plus Thea jako admin AI monitorująca i naprawiająca instancję 24/7.",
+      "Pełny stos {{appName}} na własnym serwerze. Każdy model, każde narzędzie, każda funkcja - plus Thea jako admin AI monitorująca i naprawiająca instancję 24/7.",
     ctaQuickstart: "Przejdź do szybkiego startu",
     ctaGithub: "Gwiazdka na GitHub",
   },
@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
       thea: "Thea: admin AI monitorująca, naprawiająca i budująca narzędzia na polecenie",
       admin: "Panel admina, DB Studio, panel cron, monitoring stanu",
       ssh: "SSH, automatyzacja przeglądarki, klient email - narzędzia Thei",
-      sync: "Synchronizacja lokalnej instancji z chmurą unbottled.ai (beta)",
+      sync: "Synchronizacja lokalnej instancji z chmurą {{appName}} (beta)",
       free: "Bezpłatnie na zawsze - MIT + GPL v3, bez vendor lock-in",
     },
   },

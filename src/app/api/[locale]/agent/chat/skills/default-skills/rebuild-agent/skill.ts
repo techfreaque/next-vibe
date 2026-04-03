@@ -1,4 +1,4 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
@@ -83,7 +83,7 @@ export const rebuildAgentSkill: Skill = {
       variantName: "skills.rebuildAgent.variants.gemini" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
+        manualModelId: ChatModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -102,7 +102,7 @@ export const rebuildAgentSkill: Skill = {
       variantName: "skills.rebuildAgent.variants.fast" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GEMINI_3_FLASH,
+        manualModelId: ChatModelId.GEMINI_3_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

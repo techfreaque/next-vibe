@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -188,7 +188,7 @@ const { GET } = createEndpoint({
             model: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.messages.message.model.content" as const,
-              schema: z.enum(ModelId).nullable(),
+              schema: z.enum(ChatModelId).nullable(),
             }),
             skill: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

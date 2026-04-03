@@ -1,16 +1,16 @@
 "use client";
 
 import { Audio } from "next-vibe-ui/ui/audio";
-import { Video } from "next-vibe-ui/ui/video";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Image } from "next-vibe-ui/ui/image";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { Download } from "next-vibe-ui/ui/icons/Download";
+import { Image } from "next-vibe-ui/ui/image";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
+import { Video } from "next-vibe-ui/ui/video";
 import { cn } from "next-vibe/shared/utils";
 import {
   type JSX,
@@ -29,11 +29,8 @@ import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useSkill } from "@/app/api/[locale]/agent/chat/skills/[id]/hooks";
-import {
-  calculateCreditCost,
-  getModelById,
-  type TtsModelId,
-} from "@/app/api/[locale]/agent/models/models";
+import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
+import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import {
   processMessageGroupForCopy,
   processMessageGroupForTTS,
@@ -43,6 +40,7 @@ import type { Platform } from "@/app/api/[locale]/system/unified-interface/share
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { CollapseStateStore } from "../hooks/use-collapse-state";
 import { scopedTranslation } from "../i18n";
 import { AssistantMessageActions } from "./assistant-message-actions";
@@ -856,20 +854,28 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
 
   useEffect(() => {
     // Process for TTS (used by speech)
-    void processMessageGroupForTTS(allMessages, locale, logger).then(
+    void processMessageGroupForTTS(allMessages, locale, logger, user).then(
       setAllContent,
     );
 
     // Process for copying - markdown format (includes tool calls with formatting)
-    void processMessageGroupForCopy(allMessages, locale, true, logger).then(
-      setContentMarkdown,
-    );
+    void processMessageGroupForCopy(
+      allMessages,
+      locale,
+      true,
+      logger,
+      user,
+    ).then(setContentMarkdown);
 
     // Process for copying - plain text format (includes tool calls, strips markdown)
-    void processMessageGroupForCopy(allMessages, locale, false, logger).then(
-      setContentText,
-    );
-  }, [allMessages, locale, logger]);
+    void processMessageGroupForCopy(
+      allMessages,
+      locale,
+      false,
+      logger,
+      user,
+    ).then(setContentText);
+  }, [allMessages, locale, logger, user]);
 
   // Use server-computed credit cost when available (correctly accounts for cache pricing).
   // Fall back to client-side calculation for older persisted messages that pre-date this feature.
@@ -882,7 +888,7 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
     }
     try {
       return calculateCreditCost(
-        getModelById(model),
+        getChatModelById(model),
         promptTokens,
         completionTokens,
         cachedInputTokens ?? 0,
@@ -975,7 +981,7 @@ const MessageAuthorHeader = memo(function MessageAuthorHeader({
 
   // Get display name for assistant
   const displayName = primary.model
-    ? getModelById(primary.model).name
+    ? getChatModelById(primary.model).name
     : t("widget.messages.assistant");
 
   return (

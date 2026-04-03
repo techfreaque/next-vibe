@@ -40,7 +40,7 @@ export const translations: typeof enTranslations = {
       skillId: {
         content: "Postać: {{value}}",
       },
-      customName: {
+      customVariantName: {
         content: "Nazwa niestandardowa: {{value}}",
       },
       customIcon: {
@@ -199,8 +199,10 @@ export const translations: typeof enTranslations = {
     skillId: {
       label: "Postać",
     },
-    customName: {
-      label: "Nazwa niestandardowa",
+    customVariantName: {
+      label: "Nazwa wariantu",
+      description:
+        "Własna nazwa dla tego wariantu (pozostaw puste, aby użyć domyślnej)",
     },
     chatModel: {
       label: "Model czatu",
@@ -216,9 +218,19 @@ export const translations: typeof enTranslations = {
       description: "Model używany do rozpoznawania mowy",
       placeholder: "Dziedzicz z postaci",
     },
-    visionBridgeModel: {
-      label: "Model wizji",
+    imageVisionModel: {
+      label: "Model wizji obrazu",
       description: "Model używany do analizy obrazów",
+      placeholder: "Dziedzicz z postaci",
+    },
+    videoVisionModel: {
+      label: "Model wizji wideo",
+      description: "Model używany do analizy wideo",
+      placeholder: "Dziedzicz z postaci",
+    },
+    audioVisionModel: {
+      label: "Model wizji audio",
+      description: "Model używany do analizy audio",
       placeholder: "Dziedzicz z postaci",
     },
     translationModel: {
@@ -345,7 +357,7 @@ export const translations: typeof enTranslations = {
     deniedTools: {
       label: "Zablokowane narzędzia",
       description:
-        "Zablokuj określone narzędzia dla tego slotu – dodatkowo do listy blokad skilla. Te narzędzia nie mogą być wywoływane niezależnie od innych ustawień.",
+        "Zablokuj określone narzędzia dla tego slotu - dodatkowo do listy blokad skilla. Te narzędzia nie mogą być wywoływane niezależnie od innych ustawień.",
       clearAll: "Wyczyść wszystko",
       noToolsFound: "Nie znaleziono narzędzi",
       blockedNote:

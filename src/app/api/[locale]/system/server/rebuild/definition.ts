@@ -23,9 +23,9 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { ServerFramework, ServerFrameworkOptions } from "../enum";
 
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import { REBUILD_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 
 const RebuildWidget = lazyCliWidget(() =>
   import("./widget").then((m) => ({ default: m.RebuildWidget })),
@@ -63,7 +63,7 @@ const { POST } = createEndpoint({
         label: "post.fields.framework.title",
         description: "post.fields.framework.description",
         options: ServerFrameworkOptions,
-        schema: z.nativeEnum(ServerFramework).default(ServerFramework.NEXT),
+        schema: z.enum(ServerFramework).default(ServerFramework.NEXT),
       }),
 
       success: responseField(scopedTranslation, {

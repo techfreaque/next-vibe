@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "next-vibe Framework",
   description:
-    "Framework open-source SaaS napędzający unbottled.ai. Zdefiniuj raz, istnieje wszędzie.",
+    "Framework open-source SaaS napędzający {{appName}}. Zdefiniuj raz, istnieje wszędzie.",
   meta: {
     title: "next-vibe Framework",
     description:
@@ -159,7 +159,7 @@ export const translations: typeof enTranslations = {
   quickstart: {
     eyebrow: "Zacznij",
     title: "Sforkuj, zapytaj, wdróż.",
-    subtitle: "Od pierwszego dnia na poziomie unbottled.ai.",
+    subtitle: "Od pierwszego dnia na poziomie {{appName}}.",
     step1: {
       label: "Forkuj i klonuj",
       description: "Sforkuj na GitHub, potem sklonuj swój fork lokalnie.",
@@ -177,7 +177,7 @@ export const translations: typeof enTranslations = {
     step4: {
       label: "Zapytaj AI",
       description:
-        "Otwórz czat unbottled.ai lub Claude Code i opisz feature, który chcesz. AI napisze wszystkie pliki - definicję, route, widget, i18n - i automatycznie uruchomi vibe check.",
+        "Otwórz czat {{appName}} lub Claude Code i opisz feature, który chcesz. AI napisze wszystkie pliki - definicję, route, widget, i18n - i automatycznie uruchomi vibe check.",
     },
     step5: {
       label: "Wdróż",

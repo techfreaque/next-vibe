@@ -27,7 +27,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:1ec94414 | Posted:Mar 31, 19:44]",
+            "text": "[Context: ID:63e115af | Posted:Mar 31, 20:23]",
             "type": "text"
           }
         ],
@@ -40,7 +40,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:81114e92 | Model:kimi_k2_5 | Skill:default | Posted:Mar 31, 19:44]",
+            "text": "[Context: ID:dc2088e9 | Model:kimi_k2_5 | Skill:default | Posted:Mar 31, 20:23]",
             "type": "text"
           }
         ],
@@ -53,7 +53,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:fe726d23 | Posted:Mar 31, 19:44]",
+            "text": "[Context: ID:3fc21aed | Posted:Mar 31, 20:23]",
             "type": "text"
           }
         ],
@@ -66,7 +66,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:0afbd07a | Model:kimi_k2_5 | Skill:default | Posted:Mar 31, 19:44]",
+            "text": "[Context: ID:945ad837 | Model:kimi_k2_5 | Skill:default | Posted:Mar 31, 20:23]",
             "type": "text"
           }
         ],
@@ -79,7 +79,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:c107b8e9 | Posted:Mar 31, 19:44]",
+            "text": "[Context: ID:108b07fb | Posted:Mar 31, 20:23]",
             "type": "text"
           }
         ],
@@ -92,7 +92,7 @@
       {
         "content": [
           {
-            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## User Memories (0)\nNo memories yet - store useful facts immediately as you learn them.\n\n**Memory tools:** `memories-add` (new facts) · `memories-update id=N` (merge/fix, or hide with isArchived) · `memories-delete id=N` (remove) · `memories-list` (full detail) · `memories-search` (search)\n**Store proactively:** name, preferences, goals, expertise, ongoing projects, communication style. Don't wait to be asked.\n**Self-manage:** consolidate duplicates (>80% overlap → UPDATE highest-priority first, then DELETE or archive leftovers). Archive low-value memories with `isArchived=true` to hide them without losing them.\n\n## Favorites (3) - active: \"Thea – Smart\" ()\n- [68e81520-76ca-43cd-ad16-e41cb22d32fb] Thea – Smart [ACTIVE] | char:Thea – Smart (thea) | model:\n- [def19cca-91a0-462e-8acf-042ec4cea3cc] Thea – Brilliant | char:Thea – Brilliant (thea) | model:\n- [d2376eb9-f4e8-4929-bc62-83ab56210949] Thea – Uncensored | char:Thea – Uncensored (thea) | model:\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
+            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## User Memories (0)\nNo memories yet - store useful facts immediately as you learn them.\n\n**Memory tools:** `memories-add` (new facts) · `memories-update id=N` (merge/fix, or hide with isArchived) · `memories-delete id=N` (remove) · `memories-list` (full detail) · `memories-search` (search)\n**Store proactively:** name, preferences, goals, expertise, ongoing projects, communication style. Don't wait to be asked.\n**Self-manage:** consolidate duplicates (>80% overlap → UPDATE highest-priority first, then DELETE or archive leftovers). Archive low-value memories with `isArchived=true` to hide them without losing them.\n\n## Favorites (3) - active: \"Thea - Smart\" ()\n- [68e81520-76ca-43cd-ad16-e41cb22d32fb] Thea - Smart [ACTIVE] | char:Thea - Smart (thea) | model:\n- [def19cca-91a0-462e-8acf-042ec4cea3cc] Thea - Brilliant | char:Thea - Brilliant (thea) | model:\n- [d2376eb9-f4e8-4929-bc62-83ab56210949] Thea - Uncensored | char:Thea - Uncensored (thea) | model:\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
             "type": "text"
           }
         ],
@@ -105,7 +105,7 @@
         },
         "content": [
           {
-            "text": "[Context: ID:a1235c2e | Model:kimi_k2_5 | Skill:default | Posted:Mar 31, 19:44]",
+            "text": "[Context: ID:51b77589 | Model:kimi_k2_5 | Skill:default | Posted:Mar 31, 20:23]",
             "type": "text"
           }
         ],
@@ -859,56 +859,6 @@
                   "post.duration.short",
                   "post.duration.medium",
                   "post.duration.long"
-                ],
-                "type": "string"
-              },
-              "model": {
-                "default": "modelslab-wan-2-5-t2v",
-                "enum": [
-                  "modelslab-wan-2-5-t2v",
-                  "modelslab-wan-2-5-i2v",
-                  "modelslab-wan-2-6-t2v",
-                  "modelslab-wan-2-6-i2v",
-                  "modelslab-wan-2-6-i2v-flash",
-                  "modelslab-seedance-t2v",
-                  "modelslab-seedance-i2v",
-                  "modelslab-omnihuman",
-                  "modelslab-seedance-1-pro-i2v",
-                  "modelslab-seedance-1-pro-fast-i2v",
-                  "modelslab-seedance-1-pro-fast-t2v",
-                  "modelslab-omnihuman-1-5",
-                  "modelslab-seedance-1-5-pro",
-                  "modelslab-veo-2",
-                  "modelslab-veo-3",
-                  "modelslab-veo-3-fast",
-                  "modelslab-veo-3-fast-preview",
-                  "modelslab-veo-3-1",
-                  "modelslab-veo-3-1-fast",
-                  "modelslab-kling-v2-1-i2v",
-                  "modelslab-kling-v2-5-turbo-i2v",
-                  "modelslab-kling-v2-5-turbo-t2v",
-                  "modelslab-kling-v2-master-t2v",
-                  "modelslab-kling-v2-master-i2v",
-                  "modelslab-kling-v2-1-master-t2v",
-                  "modelslab-kling-v2-1-master-i2v",
-                  "modelslab-kling-v1-6-multi-i2v",
-                  "modelslab-kling-3-0-t2v",
-                  "modelslab-ltx-2-pro-t2v",
-                  "modelslab-ltx-2-pro-i2v",
-                  "modelslab-ltx-2-3-pro-i2v",
-                  "modelslab-hailuo-2-3-t2v",
-                  "modelslab-hailuo-02-t2v",
-                  "modelslab-hailuo-2-3-i2v",
-                  "modelslab-hailuo-2-3-fast-i2v",
-                  "modelslab-hailuo-02-i2v",
-                  "modelslab-hailuo-02-start-end",
-                  "modelslab-sora-2",
-                  "modelslab-sora-2-pro",
-                  "modelslab-gen4-t2i-turbo",
-                  "modelslab-gen4-aleph",
-                  "modelslab-lipsync-2",
-                  "modelslab-grok-t2v",
-                  "modelslab-grok-i2v"
                 ],
                 "type": "string"
               },

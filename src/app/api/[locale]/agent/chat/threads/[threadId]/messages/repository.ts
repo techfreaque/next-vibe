@@ -14,7 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -288,7 +288,7 @@ export class MessagesRepository {
     threadId: string;
     parentId: string | null;
     userId: string | undefined;
-    model: ModelId;
+    model: ChatModelId;
     skill: string | null | undefined;
     sequenceId: string | null;
     logger: EndpointLogger;
@@ -366,7 +366,7 @@ export class MessagesRepository {
     content: string;
     parentId: string | null;
     userId: string | undefined;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     sequenceId: string | null;
     logger: EndpointLogger;
@@ -431,7 +431,7 @@ export class MessagesRepository {
     parentId: string | null;
     userId: string | undefined;
     sequenceId: string | null;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     logger: EndpointLogger;
     locale: CountryLanguage;
@@ -816,7 +816,7 @@ export class MessagesRepository {
     userMessageId: string;
     assistantMessageId: string;
     prompt: string;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     generatedMedia: {
       type: "image" | "audio";

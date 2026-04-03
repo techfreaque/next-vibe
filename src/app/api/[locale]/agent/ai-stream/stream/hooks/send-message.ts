@@ -14,12 +14,14 @@ import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/defi
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import pathDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/definition";
 import threadsDefinition from "@/app/api/[locale]/agent/chat/threads/definition";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/models/types";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import type { ModelProviderEnvAvailability } from "@/app/api/[locale]/agent/models/types";
 
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";
@@ -52,14 +54,15 @@ export interface SendMessageDeps {
   leafMessageId: string | null;
   user: JwtPayloadType;
   settings: {
-    selectedModel: ModelId;
+    selectedModel: ChatModelId;
     selectedSkill: string;
     availableTools: ToolConfigItem[] | null;
     pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
-    voiceModelSelection: ModelSelectionSimple | null | undefined;
+    voiceModelSelection: VoiceModelSelection | null | undefined;
   };
   locale: CountryLanguage;
+  env: ModelProviderEnvAvailability;
 }
 
 export async function sendMessage(
@@ -81,6 +84,7 @@ export async function sendMessage(
     user,
     settings,
     locale,
+    env,
   } = deps;
   const { content } = params;
 
@@ -374,6 +378,7 @@ export async function sendMessage(
         user,
         settings,
         locale,
+        env,
       },
     );
 

@@ -4,6 +4,8 @@
  */
 
 import { execSync } from "node:child_process";
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -24,6 +26,7 @@ export class Publisher {
   runCiReleaseCommand(
     releaseConfig: ReleaseOptions,
     packageName: string,
+    cwd: string,
     logger: EndpointLogger,
     dryRun: boolean,
     locale: CountryLanguage,
@@ -69,9 +72,22 @@ export class Publisher {
       }
     }
 
+    // Write .npmrc with auth token so npm publish can authenticate
+    const npmToken = ciEnv["NPM_TOKEN"] ?? ciEnv["NODE_AUTH_TOKEN"];
+    if (npmToken) {
+      const npmrcPath = join(cwd, ".npmrc");
+      writeFileSync(
+        npmrcPath,
+        `//registry.npmjs.org/:_authToken=${npmToken}\n`,
+        "utf-8",
+      );
+      ciEnv["NODE_AUTH_TOKEN"] = npmToken;
+    }
+
     try {
       execSync(commandStr, {
         stdio: "inherit",
+        cwd,
         env: ciEnv as NodeJS.ProcessEnv,
       });
       logger.info(MESSAGES.CI_COMMAND_SUCCESS, { package: packageName });

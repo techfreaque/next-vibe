@@ -51,8 +51,8 @@ import type { ThreadListResponseOutput } from "@/app/api/[locale]/agent/chat/thr
 import { scopedTranslation as threadsScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/i18n";
 import { ThreadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { EnvAvailabilityProvider } from "@/app/api/[locale]/agent/env-availability-context";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { EnvAvailabilitySetter } from "@/app/api/[locale]/agent/env-availability-context";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
@@ -143,7 +143,7 @@ export async function tanstackLoader({
       initialSubFolderId: null,
       initialThreadId: null,
       rootFolderPermissions: { canCreateThread: false, canCreateFolder: false },
-      envAvailability: getAgentEnvAvailability(),
+      envAvailability: agentEnvAvailability,
       leafMessageId: null,
       initialFoldersData: null,
       initialThreadsData: null,
@@ -256,8 +256,6 @@ export async function tanstackLoader({
   ) {
     redirect(`/${locale}/threads/${initialRootFolderId}/${NEW_MESSAGE_ID}`);
   }
-
-  const envAvailability = getAgentEnvAvailability();
 
   // Prefetch initial sidebar + thread data server-side to avoid client-side fetch on mount.
   // Skip for incognito (localStorage-only).
@@ -450,7 +448,7 @@ export async function tanstackLoader({
     initialSubFolderId,
     initialThreadId,
     rootFolderPermissions,
-    envAvailability,
+    envAvailability: agentEnvAvailability,
     leafMessageId,
     initialFoldersData,
     initialThreadsData,
@@ -491,7 +489,8 @@ export function TanstackPage({
   }
 
   return (
-    <EnvAvailabilityProvider availability={envAvailability}>
+    <>
+      <EnvAvailabilitySetter env={envAvailability} />
       <ChatNavigationProvider
         activeThreadId={initialThreadId}
         currentRootFolderId={initialRootFolderId}
@@ -504,7 +503,6 @@ export function TanstackPage({
           currentSubFolderId={initialSubFolderId}
           initialCredits={creditsToUse}
           rootFolderPermissions={rootFolderPermissions}
-          envAvailability={envAvailability}
           initialFoldersData={initialFoldersData}
           initialThreadsData={initialThreadsData}
           initialMessagesData={initialMessagesData}
@@ -519,7 +517,7 @@ export function TanstackPage({
           <ChatInterface user={user} />
         </ChatBootProvider>
       </ChatNavigationProvider>
-    </EnvAvailabilityProvider>
+    </>
   );
 }
 

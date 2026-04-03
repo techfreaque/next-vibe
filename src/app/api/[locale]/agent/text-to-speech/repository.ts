@@ -15,10 +15,8 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
-import {
-  ApiProvider,
-  getModelById,
-} from "@/app/api/[locale]/agent/models/models";
+import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
+import { getTtsModelById } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -324,7 +322,7 @@ export class TextToSpeechRepository {
     logger: EndpointLogger,
     t: TextToSpeechT,
   ): Promise<ResponseType<TextToSpeechPostResponseOutput>> {
-    const modelOption = getModelById(data.voiceId);
+    const modelOption = getTtsModelById(data.voiceId);
     const language = TextToSpeechRepository.mapLocaleToLanguage(locale);
 
     logger.info("[TTS] Starting text-to-speech conversion", {

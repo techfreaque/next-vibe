@@ -82,8 +82,16 @@ export const translations = {
       label: "Speech-to-Text Model",
       placeholder: "System default",
     },
-    visionBridgeModel: {
-      label: "Vision Model",
+    imageVisionModel: {
+      label: "Image Vision Model",
+      placeholder: "System default",
+    },
+    videoVisionModel: {
+      label: "Video Vision Model",
+      placeholder: "System default",
+    },
+    audioVisionModel: {
+      label: "Audio Vision Model",
       placeholder: "System default",
     },
     translationModel: {

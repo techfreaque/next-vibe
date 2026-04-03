@@ -17,7 +17,14 @@ import { VideoGenerationRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger, t }) =>
-      VideoGenerationRepository.generateVideo(data, user, locale, logger, t),
+    handler: ({ data, user, locale, logger, t, streamContext }) =>
+      VideoGenerationRepository.generateVideo(
+        data,
+        user,
+        locale,
+        logger,
+        t,
+        streamContext,
+      ),
   },
 });

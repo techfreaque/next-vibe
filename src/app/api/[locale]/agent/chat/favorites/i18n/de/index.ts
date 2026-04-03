@@ -135,7 +135,7 @@ export const translations: typeof enTranslations = {
         variantId: {
           content: "Variante: {{value}}",
         },
-        customName: {
+        customVariantName: {
           content: "Benutzerdefinierter Name: {{value}}",
         },
         customIcon: {
@@ -280,9 +280,10 @@ export const translations: typeof enTranslations = {
       label: "Charakter",
       description: "Wählen Sie den Charakter für diesen Favoriten",
     },
-    customName: {
-      label: "Benutzerdefinierter Name",
-      description: "Optionaler benutzerdefinierter Name für diesen Favoriten",
+    customVariantName: {
+      label: "Variantenname",
+      description:
+        "Eigener Name für diese Variante (leer lassen für Skill-Standard)",
     },
     customIcon: {
       label: "Benutzerdefiniertes Symbol",

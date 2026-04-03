@@ -15,7 +15,9 @@ import { eq, sql } from "drizzle-orm";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { SttModelId } from "@/app/api/[locale]/agent/speech-to-text/models";
+import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -57,6 +59,8 @@ export class MessageDbWriter {
   lastAssistantMessageId: string | null = null;
   /** Tracks the final text content of the last assistant message - populated even in incognito */
   lastAssistantContent: string | null = null;
+  /** Tracks the URL of the last generated media (image/audio/video) — used by headless callers */
+  lastGeneratedMediaUrl: string | null = null;
 
   constructor(
     isIncognito: boolean,
@@ -84,7 +88,7 @@ export class MessageDbWriter {
     content: string;
     parentId: string | null;
     userId: string | undefined;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     sequenceId: string | null;
   }): Promise<void> {
@@ -229,14 +233,14 @@ export class MessageDbWriter {
           amount: number;
           feature: string;
           type: "model";
-          model: ModelId;
+          model: ChatModelId;
         }
       | {
           user: JwtPayloadType;
           amount: number;
           feature: string;
           type: "tool";
-          model: ModelId | undefined;
+          model: ChatModelId | undefined;
         },
   ): Promise<void> {
     if (params.amount <= 0) {
@@ -303,7 +307,7 @@ export class MessageDbWriter {
     threadId: string;
     parentId: string | null;
     userId: string | undefined;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     sequenceId: string | null;
   }): Promise<void> {
@@ -367,7 +371,7 @@ export class MessageDbWriter {
     threadId: string;
     parentId: string | null;
     userId: string | undefined;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     sequenceId: string | null;
     toolCall: ToolCall;
@@ -452,7 +456,7 @@ export class MessageDbWriter {
     threadId: string;
     parentId: string | null;
     userId: string | undefined;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     sequenceId: string | null;
     toolCall: ToolCall; // updated with result/error
@@ -671,7 +675,7 @@ export class MessageDbWriter {
     threadId: string;
     content: string;
     parentId: string | null;
-    model: ModelId;
+    model: ChatModelId;
     skill: string | null;
     metadata?: MessageMetadata;
   }): void {
@@ -698,7 +702,7 @@ export class MessageDbWriter {
     threadId: string;
     parentId: string | null;
     sequenceId: string;
-    model: ModelId;
+    model: ChatModelId;
     skill: string | null;
     userId: string | undefined;
     messagesToCompact: Array<{ createdAt: Date; id: string }>;
@@ -807,7 +811,7 @@ export class MessageDbWriter {
     outputTokens: number;
     totalTokens: number;
     uncachedInputTokens: number;
-    model: ModelId;
+    model: ChatModelId;
     messagesToCompact: Array<{ createdAt: Date; id: string }>;
     user: JwtPayloadType;
     creditCost: number;
@@ -953,7 +957,7 @@ export class MessageDbWriter {
     threadId: string;
     parentId: string | null;
     userId: string | undefined;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     sequenceId: string | null;
     generatedMedia: MessageMetadata["generatedMedia"];
@@ -969,6 +973,9 @@ export class MessageDbWriter {
     } = params;
 
     this.lastAssistantMessageId = messageId;
+    if (generatedMedia?.url) {
+      this.lastGeneratedMediaUrl = generatedMedia.url;
+    }
 
     // SSE: MESSAGE_CREATED with generatedMedia metadata
     // Also set top-level creditCost so AssistantMessageActions can display it
@@ -1030,6 +1037,9 @@ export class MessageDbWriter {
 
     if (!generatedMedia) {
       return;
+    }
+    if (generatedMedia.url) {
+      this.lastGeneratedMediaUrl = generatedMedia.url;
     }
 
     // SSE: GENERATED_MEDIA_ADDED - tells the frontend to attach media to existing message
@@ -1122,7 +1132,7 @@ export class MessageDbWriter {
     threadId: string;
     parentId: string | null;
     userId: string | undefined;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     sequenceId: string | null;
     toolCall: ToolCall;
@@ -1190,7 +1200,7 @@ export class MessageDbWriter {
     variant: {
       modality: Modality;
       content: string;
-      modelId: ModelId;
+      modelId: ChatModelId | SttModelId | TtsModelId;
       creditCost: number;
       createdAt: string;
     };

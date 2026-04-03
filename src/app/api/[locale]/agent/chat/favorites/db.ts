@@ -16,20 +16,20 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 import type { ChatMode } from "@/app/api/[locale]/agent/models/enum";
 import type {
-  LlmModelId,
-  VideoGenModelId,
-} from "@/app/api/[locale]/agent/models/models";
-import type {
+  AudioVisionModelSelection,
   ImageGenModelSelection,
+  ImageVisionModelSelection,
   MusicGenModelSelection,
   SttModelSelection,
-  VisionModelSelection,
+  VideoVisionModelSelection,
   VoiceModelSelection,
 } from "@/app/api/[locale]/agent/models/types";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 
+import type { ChatModelId } from "../../ai-stream/models";
+import type { VideoGenModelId } from "../../video-generation/models";
 import type { ToolConfigItem } from "../settings/definition";
 import type { FavoriteGetModelSelection } from "./[id]/definition";
 
@@ -54,8 +54,8 @@ export const chatFavorites = pgTable("chat_favorites", {
   // Variant reference - null means "no variant / skill default"
   variantId: text("variant_id"),
 
-  // Custom display name (DB column is just "name")
-  customName: text("name"),
+  // Custom variant display name (overrides skill variant's default name)
+  customVariantName: text("custom_variant_name"),
 
   // Custom icon (emoji or icon identifier)
   customIcon: text("custom_icon").$type<IconKey>(),
@@ -68,13 +68,19 @@ export const chatFavorites = pgTable("chat_favorites", {
   // STT model selection (null = cascade to user settings → system default)
   sttModelSelection: jsonb("stt_model_selection").$type<SttModelSelection>(),
 
-  // Vision bridge model selection (null = cascade to user settings → system default)
-  visionBridgeModelSelection: jsonb(
-    "vision_bridge_model_selection",
-  ).$type<VisionModelSelection>(),
+  // Vision model selections per modality (null = cascade to user settings → system default)
+  imageVisionModelSelection: jsonb(
+    "image_vision_model_selection",
+  ).$type<ImageVisionModelSelection>(),
+  videoVisionModelSelection: jsonb(
+    "video_vision_model_selection",
+  ).$type<VideoVisionModelSelection>(),
+  audioVisionModelSelection: jsonb(
+    "audio_vision_model_selection",
+  ).$type<AudioVisionModelSelection>(),
 
   // Translation model for pure generators (null = cascade)
-  translationModelId: text("translation_model_id").$type<LlmModelId>(),
+  translationModelId: text("translation_model_id").$type<ChatModelId>(),
 
   // Default chat mode for this favorite (null = cascade to skill → user settings → "text")
   defaultChatMode: text("default_chat_mode").$type<ChatMode>(),

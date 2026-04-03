@@ -26,12 +26,11 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../shared/types/common.schema";
-import {
-  DEFAULT_TTS_VOICE_ID,
-  ModelId,
-  TOTAL_MODEL_COUNT,
-} from "../../models/models";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import { TOTAL_MODEL_COUNT } from "../../models/all-models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import createFavoriteDefinitions from "../favorites/create/definition";
 import { NO_SKILL_ID, SKILLS_LIST_ALIAS } from "./constants";
 import {
@@ -43,7 +42,6 @@ import {
   SkillOwnershipTypeDB,
   SkillTrustLevelDB,
 } from "./enum";
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 
 import { scopedTranslation } from "./i18n";
 
@@ -329,7 +327,7 @@ const { GET } = createEndpoint({
                   modelId: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     hidden: true,
-                    schema: z.enum(ModelId),
+                    schema: z.enum(ChatModelId).nullable(),
                   }),
                   icon: responseField(scopedTranslation, {
                     type: WidgetType.ICON,
@@ -506,7 +504,7 @@ const { GET } = createEndpoint({
               {
                 id: "default",
                 icon: "robot-face",
-                modelId: ModelId.CLAUDE_SONNET_4_5,
+                modelId: ChatModelId.CLAUDE_SONNET_4_5,
                 category: SkillCategory.ASSISTANT,
                 name: "skills.thea.name",
                 tagline: "skills.thea.tagline",
@@ -532,7 +530,7 @@ const { GET } = createEndpoint({
               {
                 id: "550e8400-e29b-41d4-a716-446655440000",
                 icon: "direct-hit",
-                modelId: ModelId.GPT_5,
+                modelId: ChatModelId.GPT_5,
                 category: SkillCategory.CODING,
                 name: "skills.hermes.name",
                 tagline: "skills.hermes.tagline",

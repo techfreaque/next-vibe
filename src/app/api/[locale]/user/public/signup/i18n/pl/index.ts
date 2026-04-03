@@ -16,7 +16,7 @@ export const translations: typeof enTranslations = {
     privateName: {
       label: "Twoja prywatna nazwa",
       description:
-        "Jak AI będzie się do Ciebie zwracać w prywatnych rozmowach. To zostaje między Tobą a AI – całkowicie prywatne.",
+        "Jak AI będzie się do Ciebie zwracać w prywatnych rozmowach. To zostaje między Tobą a AI - całkowicie prywatne.",
       placeholder: "Wpisz swoje imię",
       validation: {
         required: "Prywatna nazwa jest wymagana",
@@ -27,7 +27,7 @@ export const translations: typeof enTranslations = {
     publicName: {
       label: "Twoja publiczna nazwa",
       description:
-        "Twoja tożsamość w publicznych czatach i na forach. Inni użytkownicy i AI zobaczą tę nazwę. Wybierz mądrze – ona reprezentuje Cię w społeczności.",
+        "Twoja tożsamość w publicznych czatach i na forach. Inni użytkownicy i AI zobaczą tę nazwę. Wybierz mądrze - ona reprezentuje Cię w społeczności.",
       placeholder: "Wpisz nazwę wyświetlaną",
       validation: {
         required: "Nazwa wyświetlana jest wymagana",
@@ -38,7 +38,7 @@ export const translations: typeof enTranslations = {
     email: {
       label: "Twój e-mail",
       description:
-        "Twoje dane logowania i metoda kontaktu. Pozostaje prywatny – nigdy nie będzie udostępniony innym użytkownikom ani AI.",
+        "Twoje dane logowania i metoda kontaktu. Pozostaje prywatny - nigdy nie będzie udostępniony innym użytkownikom ani AI.",
       placeholder: "Wpisz adres e-mail",
       help: "To będzie Twój e-mail do logowania i główna metoda kontaktu",
       validation: {
@@ -49,7 +49,7 @@ export const translations: typeof enTranslations = {
     password: {
       label: "Twoje hasło",
       description:
-        "Silne hasła chronią Twoje konto. Wkrótce wdrożymy szyfrowanie end-to-end – od tego momentu reset hasła usunie Twoją historię wiadomości, ponieważ tylko Ty posiadasz klucz deszyfrujący. Zapisz je w bezpiecznym miejscu.",
+        "Silne hasła chronią Twoje konto. Wkrótce wdrożymy szyfrowanie end-to-end - od tego momentu reset hasła usunie Twoją historię wiadomości, ponieważ tylko Ty posiadasz klucz deszyfrujący. Zapisz je w bezpiecznym miejscu.",
       placeholder: "Wpisz hasło",
       validation: {
         required: "Hasło jest wymagane",
@@ -97,7 +97,7 @@ export const translations: typeof enTranslations = {
   form: {
     title: "Witamy w Uncensored AI",
     description:
-      "Pomóż budować niecenzurowaną, prywatną i naprawdę niezależną AI. unbottled.ai to open source i projekt społecznościowy – Twoja rejestracja wspiera rozwój technologii AI, która szanuje Twoją wolność.",
+      "Pomóż budować niecenzurowaną, prywatną i naprawdę niezależną AI. unbottled.ai to open source i projekt społecznościowy - Twoja rejestracja wspiera rozwój technologii AI, która szanuje Twoją wolność.",
   },
   footer: {
     alreadyHaveAccount: "Masz już konto? Zaloguj się",
@@ -353,7 +353,7 @@ export const translations: typeof enTranslations = {
       cta: "Zobacz plan Unlimited",
     },
     signoff: "Miłych rozmów,\nZespół {{appName}}",
-    ps: "P.S. Użyj trybu Incognito, aby zachować rozmowy tylko na swoim urządzeniu – nigdy nie przechowujemy ich na naszych serwerach.",
+    ps: "P.S. Użyj trybu Incognito, aby zachować rozmowy tylko na swoim urządzeniu - nigdy nie przechowujemy ich na naszych serwerach.",
   },
   emailTemplates: {
     welcome: {

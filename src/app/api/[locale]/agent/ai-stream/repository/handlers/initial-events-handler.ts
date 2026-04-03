@@ -6,7 +6,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { ToolCall } from "../../../chat/db";
-import type { ModelId } from "../../../models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class InitialEventsHandler {
@@ -83,7 +83,7 @@ export class InitialEventsHandler {
     operation: "send" | "retry" | "edit" | "answer-as-ai" | "wakeup-resume";
     effectiveParentMessageId: string | null | undefined;
     effectiveContent: string;
-    model: ModelId;
+    model: ChatModelId;
     skill: string | null;
     user: JwtPayloadType;
     dbWriter: MessageDbWriter;

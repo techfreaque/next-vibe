@@ -8,8 +8,12 @@ import "server-only";
 import { and, eq, ne, or } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { ModelRole } from "@/app/api/[locale]/agent/models/enum";
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
+import type {
+  ChatModelSelection,
+  ImageGenModelSelection,
+  SttModelSelection,
+  VoiceModelSelection,
+} from "@/app/api/[locale]/agent/models/types";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -28,13 +32,14 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import {
-  defaultModel,
-  getDefaultModelForRole,
-  getModelDisplayName,
-  modelProviders,
-} from "../../models/models";
+import { getModelDisplayName } from "../../models/all-models";
+import { modelProviders } from "../../models/models";
 
 import type {
   SkillDeleteResponseOutput,
@@ -66,8 +71,6 @@ import {
   type SkillTrustLevelValue,
   CATEGORY_CONFIG,
   ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
   SkillOwnershipType,
 } from "./enum";
 import type { SkillsT } from "./i18n";
@@ -79,31 +82,41 @@ import { SkillsRepositoryClient } from "./repository-client";
  * All methods return ResponseType for consistent error handling
  */
 export class SkillsRepository {
-  /** Default model selection used when none is provided */
-  private static readonly DEFAULT_MODEL_SELECTION: ModelSelectionSimple = {
-    selectionType: ModelSelectionType.MANUAL,
-    manualModelId: defaultModel,
-    sortBy: ModelSortField.CONTENT,
-    sortDirection: ModelSortDirection.DESC,
-  };
+  private static isSelectionEqual<T>(a: T, b: T): boolean {
+    return JSON.stringify(a) === JSON.stringify(b);
+  }
 
-  /**
-   * Normalize a model selection: if it equals the platform default for the given roles,
-   * return null so we don't store redundant data. Defense-in-depth complement to the
-   * front-end "store null if same as default" logic.
-   */
-  private static normalizeModelSelection<T extends ModelSelectionSimple>(
-    sel: T | null | undefined,
-    roles: ModelRole[],
-  ): T | null {
+  private static normalizeTtsSelection(
+    sel: VoiceModelSelection | null,
+  ): VoiceModelSelection | null {
     if (!sel) {
       return null;
     }
-    if (sel.selectionType !== ModelSelectionType.MANUAL) {
-      return sel;
+    if (this.isSelectionEqual(sel, DEFAULT_TTS_MODEL_SELECTION)) {
+      return null;
     }
-    const def = getDefaultModelForRole(roles);
-    if (def && "manualModelId" in sel && sel.manualModelId === def.id) {
+    return sel;
+  }
+
+  private static normalizeSttSelection(
+    sel: SttModelSelection | null,
+  ): SttModelSelection | null {
+    if (!sel) {
+      return null;
+    }
+    if (this.isSelectionEqual(sel, DEFAULT_STT_MODEL_SELECTION)) {
+      return null;
+    }
+    return sel;
+  }
+
+  private static normalizeImageGenSelection(
+    sel: ImageGenModelSelection | null,
+  ): ImageGenModelSelection | null {
+    if (!sel) {
+      return null;
+    }
+    if (this.isSelectionEqual(sel, DEFAULT_IMAGE_GEN_MODEL_SELECTION)) {
       return null;
     }
     return sel;
@@ -472,10 +485,22 @@ export class SkillsRepository {
                 manualModelId: defaultSkill.sttModelId,
               }
             : null,
-          visionBridgeModelSelection: defaultSkill.visionBridgeModelId
+          imageVisionModelSelection: defaultSkill.imageVisionModelId
             ? {
                 selectionType: ModelSelectionType.MANUAL,
-                manualModelId: defaultSkill.visionBridgeModelId,
+                manualModelId: defaultSkill.imageVisionModelId,
+              }
+            : null,
+          videoVisionModelSelection: defaultSkill.videoVisionModelId
+            ? {
+                selectionType: ModelSelectionType.MANUAL,
+                manualModelId: defaultSkill.videoVisionModelId,
+              }
+            : null,
+          audioVisionModelSelection: defaultSkill.audioVisionModelId
+            ? {
+                selectionType: ModelSelectionType.MANUAL,
+                manualModelId: defaultSkill.audioVisionModelId,
               }
             : null,
           translationModelId: defaultSkill.translationModelId ?? null,
@@ -517,7 +542,9 @@ export class SkillsRepository {
               }
             : null,
           sttModelSelection: null,
-          visionBridgeModelSelection: null,
+          imageVisionModelSelection: null,
+          videoVisionModelSelection: null,
+          audioVisionModelSelection: null,
           translationModelId: null,
           imageGenModelSelection: null,
           musicGenModelSelection: null,
@@ -584,8 +611,12 @@ export class SkillsRepository {
         isPublic: customSkill.ownershipType === SkillOwnershipType.PUBLIC,
         voiceModelSelection: customSkill.voiceModelSelection ?? null,
         sttModelSelection: customSkill.sttModelSelection ?? null,
-        visionBridgeModelSelection:
-          customSkill.visionBridgeModelSelection ?? null,
+        imageVisionModelSelection:
+          customSkill.imageVisionModelSelection ?? null,
+        videoVisionModelSelection:
+          customSkill.videoVisionModelSelection ?? null,
+        audioVisionModelSelection:
+          customSkill.audioVisionModelSelection ?? null,
         translationModelId: customSkill.translationModelId ?? null,
         imageGenModelSelection: customSkill.imageGenModelSelection ?? null,
         musicGenModelSelection: customSkill.musicGenModelSelection ?? null,
@@ -690,19 +721,18 @@ export class SkillsRepository {
           icon: data.icon,
           systemPrompt: data.systemPrompt,
           category: data.category,
-          voiceModelSelection: SkillsRepository.normalizeModelSelection(
+          voiceModelSelection: SkillsRepository.normalizeTtsSelection(
             data.voiceModelSelection ?? null,
-            ["tts"],
           ),
-          sttModelSelection: SkillsRepository.normalizeModelSelection(
+          sttModelSelection: SkillsRepository.normalizeSttSelection(
             data.sttModelSelection ?? null,
-            ["stt"],
           ),
-          visionBridgeModelSelection: data.visionBridgeModelSelection ?? null,
+          imageVisionModelSelection: data.imageVisionModelSelection ?? null,
+          videoVisionModelSelection: data.videoVisionModelSelection ?? null,
+          audioVisionModelSelection: data.audioVisionModelSelection ?? null,
           translationModelId: data.translationModelId ?? null,
-          imageGenModelSelection: SkillsRepository.normalizeModelSelection(
+          imageGenModelSelection: SkillsRepository.normalizeImageGenSelection(
             data.imageGenModelSelection ?? null,
-            ["image-gen"],
           ),
           musicGenModelSelection: data.musicGenModelSelection ?? null,
           videoGenModelId:
@@ -712,8 +742,7 @@ export class SkillsRepository {
               ? (data.videoGenModelSelection.manualModelId ?? null)
               : null,
           defaultChatMode: data.defaultChatMode ?? null,
-          modelSelection:
-            data.modelSelection ?? SkillsRepository.DEFAULT_MODEL_SELECTION,
+          modelSelection: data.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
           ownershipType: data.isPublic
             ? SkillOwnershipType.PUBLIC
             : SkillOwnershipType.USER,
@@ -776,19 +805,18 @@ export class SkillsRepository {
             icon: data.icon,
             systemPrompt: data.systemPrompt,
             category: data.category,
-            voiceModelSelection: SkillsRepository.normalizeModelSelection(
+            voiceModelSelection: SkillsRepository.normalizeTtsSelection(
               data.voiceModelSelection ?? null,
-              ["tts"],
             ),
-            sttModelSelection: SkillsRepository.normalizeModelSelection(
+            sttModelSelection: SkillsRepository.normalizeSttSelection(
               data.sttModelSelection ?? null,
-              ["stt"],
             ),
-            visionBridgeModelSelection: data.visionBridgeModelSelection ?? null,
+            imageVisionModelSelection: data.imageVisionModelSelection ?? null,
+            videoVisionModelSelection: data.videoVisionModelSelection ?? null,
+            audioVisionModelSelection: data.audioVisionModelSelection ?? null,
             translationModelId: data.translationModelId ?? null,
-            imageGenModelSelection: SkillsRepository.normalizeModelSelection(
+            imageGenModelSelection: SkillsRepository.normalizeImageGenSelection(
               data.imageGenModelSelection ?? null,
-              ["image-gen"],
             ),
             musicGenModelSelection: data.musicGenModelSelection ?? null,
             videoGenModelId:
@@ -798,8 +826,7 @@ export class SkillsRepository {
                 ? data.videoGenModelSelection.manualModelId
                 : null,
             defaultChatMode: data.defaultChatMode ?? null,
-            modelSelection:
-              data.modelSelection ?? SkillsRepository.DEFAULT_MODEL_SELECTION,
+            modelSelection: data.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
             ownershipType: data.isPublic
               ? SkillOwnershipType.PUBLIC
               : SkillOwnershipType.USER,
@@ -864,17 +891,14 @@ export class SkillsRepository {
           ...dataWithoutVideoGen,
           icon: iconToUpdate,
           ownershipType,
-          voiceModelSelection: SkillsRepository.normalizeModelSelection(
+          voiceModelSelection: SkillsRepository.normalizeTtsSelection(
             data.voiceModelSelection ?? null,
-            ["tts"],
           ),
-          sttModelSelection: SkillsRepository.normalizeModelSelection(
+          sttModelSelection: SkillsRepository.normalizeSttSelection(
             data.sttModelSelection ?? null,
-            ["stt"],
           ),
-          imageGenModelSelection: SkillsRepository.normalizeModelSelection(
+          imageGenModelSelection: SkillsRepository.normalizeImageGenSelection(
             data.imageGenModelSelection ?? null,
-            ["image-gen"],
           ),
           videoGenModelId: videoGenModelIdToUpdate,
         }).filter(([, value]) => value !== undefined),
@@ -983,7 +1007,7 @@ export class SkillsRepository {
       tagline: string | null;
       description: string | null;
       category: typeof SkillCategoryValue;
-      modelSelection: ModelSelectionSimple;
+      modelSelection: ChatModelSelection;
       ownershipType: typeof SkillOwnershipTypeValue;
       voteCount: number | null;
       trustLevel: typeof SkillTrustLevelValue | null;
@@ -996,13 +1020,14 @@ export class SkillsRepository {
     isDefault?: boolean,
   ): SkillListItem {
     // Get best model from skill's modelSelection
+    const selection = char.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
     const bestModel = SkillsRepositoryClient.getBestModelForSkill(
-      char.modelSelection ?? SkillsRepository.DEFAULT_MODEL_SELECTION,
+      selection,
       user,
+      agentEnvAvailability,
     );
 
-    // Fallback if no model found (shouldn't happen with valid modelSelection)
-    const modelId = bestModel?.id ?? defaultModel;
+    const modelId = bestModel?.id ?? null;
     const isAdmin =
       !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
     const modelRow = bestModel

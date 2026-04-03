@@ -10,7 +10,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { handleTaskCompletion } from "@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler";
@@ -119,7 +119,7 @@ export class ToolResultHandler {
     /** Stream context - used to detect waitingForRemoteResult for escalated tools */
     streamContext?: ToolExecutionContext;
     threadId: string;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     sequenceId: string;
     isIncognito: boolean;

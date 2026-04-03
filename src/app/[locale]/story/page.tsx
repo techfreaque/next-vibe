@@ -5,11 +5,11 @@ import type { JSX } from "react";
 
 import { getMaxToolCountAllPlatforms } from "@/app/api/[locale]/agent/chat/default-tool-counts";
 import { getAvailableSkillCount } from "@/app/api/[locale]/agent/chat/skills/config";
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   getAvailableModelCount,
   getAvailableProviderCount,
-} from "@/app/api/[locale]/agent/models/models";
+} from "@/app/api/[locale]/agent/models/all-models";
 import {
   ProductIds,
   productsRepository,
@@ -20,6 +20,7 @@ import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
+import { configScopedTranslation } from "@/config/i18n";
 import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
@@ -42,13 +43,15 @@ export async function generateMetadata({
 }: HomePageProps): Promise<Metadata> {
   const { locale } = await params;
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   return metadataGenerator(locale, {
     path: "",
-    title: t("meta.title"),
+    title: t("meta.title", { appName }),
     category: t("meta.category"),
     description: t("meta.description"),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`,
-    imageAlt: t("meta.imageAlt"),
+    imageAlt: t("meta.imageAlt", { appName }),
     keywords: [t("meta.keywords")],
   });
 }
@@ -91,14 +94,16 @@ export async function tanstackLoader({
     ? !user.isPublic && user.roles.includes(UserRole.ADMIN)
     : false;
   const userRoles = user ? user.roles : [UserRole.PUBLIC];
-  const env = getAgentEnvAvailability();
 
   return {
     locale,
     totalToolCount,
     totalEndpointCount,
-    totalModelCount: getAvailableModelCount(env, isAdmin),
-    totalProviderCount: getAvailableProviderCount(env, isAdmin),
+    totalModelCount: getAvailableModelCount(agentEnvAvailability, isAdmin),
+    totalProviderCount: getAvailableProviderCount(
+      agentEnvAvailability,
+      isAdmin,
+    ),
     totalSkillCount: getAvailableSkillCount(userRoles),
     subPrice: products[ProductIds.SUBSCRIPTION].price,
     subCurrency: countryInfo.symbol,

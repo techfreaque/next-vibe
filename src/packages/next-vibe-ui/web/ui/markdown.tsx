@@ -6,8 +6,8 @@ import { ExternalLink as ExternalLinkComponent } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { atomOneDark as atomDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 

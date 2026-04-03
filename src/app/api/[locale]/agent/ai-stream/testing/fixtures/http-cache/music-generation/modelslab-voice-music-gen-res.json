@@ -1,0 +1,54 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v6/voice/music_gen",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "9e69152ccb9954eb-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Fri, 03 Apr 2026 15:24:55 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=PcMp464ksOlzVZI2p%2FzV4FT80zXec07F4RgIkJF5k%2B5hzgfoJ5qc4tJt7H1N5z%2BnBSKLd0smjklFXATzE%2Fe1T39yzHEWJV0oNzjEO2nfssqBw6698T8w8wpaOdtO8zU%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "4c1989c181b66dc706a5bed115618c3b",
+    "x-request-time": "2.442",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.000",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "processing",
+    "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise",
+    "eta": 10,
+    "message": "Request queued for processing. Try to fetch request after estimated seconds.",
+    "fetch_result": "https://modelslab.com/api/v6/voice/fetch/3877183",
+    "id": 3877183,
+    "output": [],
+    "future_links": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/e9657fd4-f4dd-4983-927a-074c20ab2613-0.mp3"
+    ],
+    "meta": {
+      "input_text": "upbeat piano melody",
+      "conditioning_melody": null,
+      "output_format": "mp3",
+      "bitrate": "320k",
+      "music_duration": 30,
+      "base64": "no",
+      "temp": "no",
+      "webhook": null,
+      "track_id": null,
+      "id": 3877183,
+      "file_prefix": "e9657fd4-f4dd-4983-927a-074c20ab2613",
+      "output": [
+        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/e9657fd4-f4dd-4983-927a-074c20ab2613-0.mp3"
+      ]
+    }
+  }
+}

@@ -9,7 +9,7 @@ import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { ModelId } from "../agent/models/models";
+import type { AnyModelId } from "../agent/models/models";
 import type { CreditsT } from "./i18n";
 import { CreditRepository } from "./repository";
 
@@ -29,7 +29,7 @@ export interface CreditValidationResult {
 export interface CreditValidatorInterface {
   validateUserCredits(
     userId: string,
-    modelId: string,
+    modelId: AnyModelId,
     modelCost: number,
     logger: EndpointLogger,
     t: CreditsT,
@@ -38,7 +38,7 @@ export interface CreditValidatorInterface {
 
   validateLeadCredits(
     leadId: string,
-    modelId: string,
+    modelId: AnyModelId,
     modelCost: number,
     logger: EndpointLogger,
     t: CreditsT,
@@ -47,7 +47,7 @@ export interface CreditValidatorInterface {
 
   validateLeadByIp(
     ipAddress: string,
-    modelId: string,
+    modelId: AnyModelId,
     modelCost: number,
     locale: string,
     logger: EndpointLogger,
@@ -66,7 +66,7 @@ export interface CreditValidatorInterface {
 class CreditValidator implements CreditValidatorInterface {
   async validateUserCredits(
     userId: string,
-    modelId: ModelId,
+    modelId: AnyModelId,
     modelCost: number,
     logger: EndpointLogger,
     t: CreditsT,
@@ -119,7 +119,7 @@ class CreditValidator implements CreditValidatorInterface {
 
   async validateLeadCredits(
     leadId: string,
-    modelId: ModelId,
+    modelId: AnyModelId,
     modelCost: number,
     logger: EndpointLogger,
     t: CreditsT,
@@ -171,7 +171,7 @@ class CreditValidator implements CreditValidatorInterface {
 
   async validateLeadByIp(
     ipAddress: string,
-    modelId: ModelId,
+    modelId: AnyModelId,
     modelCost: number,
     locale: CountryLanguage,
     logger: EndpointLogger,

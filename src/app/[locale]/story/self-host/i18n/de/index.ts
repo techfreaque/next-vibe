@@ -2,20 +2,20 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "unbottled.ai selbst hosten - Deine Instanz, Deine Regeln",
+    title: "{{appName}} selbst hosten - Deine Instanz, Deine Regeln",
     description:
-      "Betreibe den vollständigen unbottled.ai-Stack auf deinem eigenen Server. Eigene API-Keys, Thea als KI-Admin, volle Kontrolle. Für immer kostenlos.",
+      "Betreibe den vollständigen {{appName}}-Stack auf deinem eigenen Server. Eigene API-Keys, Thea als KI-Admin, volle Kontrolle. Für immer kostenlos.",
     category: "Self-Host",
-    imageAlt: "unbottled.ai selbst hosten Schnellstart",
+    imageAlt: "{{appName}} selbst hosten Schnellstart",
     keywords:
-      "self-host, next-vibe, unbottled.ai, open-source, KI, VPS, Docker, Kubernetes",
+      "self-host, next-vibe, {{appName}}, open-source, KI, VPS, Docker, Kubernetes",
   },
   hero: {
     badge: "Für immer kostenlos - MIT + GPL v3",
     title: "Selbst betreiben.",
     titleHighlight: "Alles besitzen.",
     subtitle:
-      "Der vollständige unbottled.ai-Stack auf deinem eigenen Server. Jedes Modell, jedes Tool, jede Funktion - plus Thea als KI-Admin, die deine Instanz rund um die Uhr überwacht und selbst repariert.",
+      "Der vollständige {{appName}}-Stack auf deinem eigenen Server. Jedes Modell, jedes Tool, jede Funktion - plus Thea als KI-Admin, die deine Instanz rund um die Uhr überwacht und selbst repariert.",
     ctaQuickstart: "Zum Schnellstart",
     ctaGithub: "Auf GitHub starten",
   },
@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
       thea: "Thea: KI-Admin, die überwacht, selbst repariert und Tools auf Befehl erstellt",
       admin: "Admin-Dashboard, DB-Studio, Cron-Dashboard, Systemüberwachung",
       ssh: "SSH, Browser-Automatisierung, E-Mail-Client - Theas Tools",
-      sync: "Lokale Instanz-Synchronisation mit unbottled.ai Cloud (Beta)",
+      sync: "Lokale Instanz-Synchronisation mit {{appName}} Cloud (Beta)",
       free: "Für immer kostenlos - MIT + GPL v3, kein Vendor-Lock-in",
     },
   },

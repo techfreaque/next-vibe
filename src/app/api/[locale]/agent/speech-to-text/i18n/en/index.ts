@@ -226,6 +226,14 @@ export const translations = {
     fr: "French",
     it: "Italian",
   },
+  models: {
+    descriptions: {
+      openaiWhisper:
+        "OpenAI Whisper - State-of-the-art speech recognition for 99 languages",
+      deepgramNova2:
+        "Deepgram Nova-2 - Fast and accurate speech-to-text with noise robustness",
+    },
+  },
 };
 
 export default translations;

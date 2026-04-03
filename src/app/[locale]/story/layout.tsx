@@ -1,14 +1,13 @@
 export const dynamic = "force-dynamic";
 
-import { notFound } from "next-vibe-ui/lib/not-found";
 import { Div } from "next-vibe-ui/ui/div";
 import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type { JSX, ReactNode } from "react";
 
 import Footer from "@/app/[locale]/story/_components/footer";
 import { Navbar } from "@/app/[locale]/story/_components/nav/navbar";
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -18,7 +17,6 @@ import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { StandardUserType } from "@/app/api/[locale]/user/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -38,9 +36,6 @@ export async function tanstackLoader({
 }: {
   params: Promise<{ locale: CountryLanguage }>;
 }): Promise<Omit<SiteLayoutData, "children">> {
-  if (env.NEXT_PUBLIC_LOCAL_MODE) {
-    notFound();
-  }
   const { locale } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
 
@@ -74,10 +69,7 @@ export async function tanstackLoader({
   }
 
   const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
-  const totalModelCount = getAvailableModelCount(
-    getAgentEnvAvailability(),
-    isAdmin,
-  );
+  const totalModelCount = getAvailableModelCount(agentEnvAvailability, isAdmin);
 
   return { locale, user, userProfile, hasSubscription, totalModelCount };
 }

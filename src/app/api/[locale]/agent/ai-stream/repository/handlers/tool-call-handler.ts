@@ -4,7 +4,7 @@
 
 import type { JSONValue } from "ai";
 
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   CallbackMode,
   CallbackModeDB,
@@ -33,7 +33,7 @@ export class ToolCallHandler {
     isInReasoningBlock: boolean;
     threadId: string;
     currentParentId: string | null;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     sequenceId: string;
     isIncognito: boolean;

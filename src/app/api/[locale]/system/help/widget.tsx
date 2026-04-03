@@ -7,6 +7,7 @@
 
 "use client";
 
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -146,11 +147,15 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   const onSubmit = useWidgetOnSubmit();
   const endpointMutations = useWidgetEndpointMutations();
 
+  const env = useEnvAvailability();
+
   // Use settings directly (no ChatProvider dependency)
   const settingsOps = useChatSettings(user, logger);
   const effectiveSettings = useMemo(
-    () => settingsOps.settings ?? ChatSettingsRepositoryClient.getDefaults(),
-    [settingsOps.settings],
+    () =>
+      settingsOps.settings ??
+      ChatSettingsRepositoryClient.getDefaults(user, env),
+    [settingsOps.settings, user, env],
   );
   const enabledTools = useMemo((): EnabledTool[] | null => {
     const { availableTools, pinnedTools } = effectiveSettings;

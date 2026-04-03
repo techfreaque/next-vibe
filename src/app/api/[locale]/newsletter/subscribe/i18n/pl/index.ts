@@ -173,7 +173,7 @@ export const translations: typeof enTranslations = {
       benefit_3: "Ekskluzywne oferty i wczesny dostęp do nowych funkcji",
       benefit_4: "Najciekawsze momenty społeczności i historie sukcesu",
       frequency:
-        "Będziemy wysyłać aktualizacje co kilka tygodni – nigdy spam, zawsze wartościowe treści.",
+        "Będziemy wysyłać aktualizacje co kilka tygodni - nigdy spam, zawsze wartościowe treści.",
       unsubscribe_text: "Nie chcesz otrzymywać tych wiadomości?",
       unsubscribe_link: "Wypisz się",
     },

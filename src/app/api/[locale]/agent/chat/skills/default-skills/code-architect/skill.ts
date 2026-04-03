@@ -2,13 +2,13 @@ import { CODING_AGENT_ALIAS } from "@/app/api/[locale]/agent/coding-agent/consta
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { envClient } from "@/config/env-client";
 import { MEMORY_UPDATE_ALIAS } from "../../../memories/[id]/constants";
 import { MEMORY_LIST_ALIAS } from "../../../memories/constants";
 import { MEMORY_ADD_ALIAS } from "../../../memories/create/constants";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
 import {
   ContentLevel,
@@ -74,7 +74,7 @@ export const codeArchitectSkill: Skill = {
       variantName: "skills.codeArchitect.variants.gemini" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
+        manualModelId: ChatModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -93,7 +93,7 @@ export const codeArchitectSkill: Skill = {
       variantName: "skills.codeArchitect.variants.claude" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.CLAUDE_SONNET_4_6,
+        manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

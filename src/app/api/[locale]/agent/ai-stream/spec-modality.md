@@ -23,7 +23,7 @@ type ModelRole =
 Models declare native capabilities:
 
 ```typescript
-type Modality = "text" | "audio" | "image" | "video" | "file";
+type Modality = "text" | "audio" | "image" | "video";
 
 interface ModelCapabilities {
   inputs: Modality[];

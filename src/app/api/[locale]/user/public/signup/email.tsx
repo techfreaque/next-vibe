@@ -13,11 +13,7 @@ import type { ReactElement } from "react";
 import React from "react";
 import { z } from "zod";
 
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import {
-  FEATURED_MODELS,
-  getAvailableModelCount,
-} from "@/app/api/[locale]/agent/models/models";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import type {
@@ -40,6 +36,8 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { configScopedTranslation } from "@/config/i18n";
+import { FEATURED_MODELS } from "../../../agent/ai-stream/models";
+import { agentEnvAvailability } from "../../../agent/env-availability";
 import { contactClientRepository } from "../../../contact/repository-client";
 import { EmailTemplate } from "../../../messenger/providers/email/smtp-client/components/template.email";
 import {
@@ -457,7 +455,7 @@ async function renderWelcomeEmailByEmail(
     privateName: user.privateName,
     userId: user.id,
     leadId: user.leadId,
-    totalModelCount: getAvailableModelCount(getAgentEnvAvailability(), false),
+    totalModelCount: getAvailableModelCount(agentEnvAvailability, false),
   };
   const { t: globalT } = configScopedTranslation.scopedT(locale);
 

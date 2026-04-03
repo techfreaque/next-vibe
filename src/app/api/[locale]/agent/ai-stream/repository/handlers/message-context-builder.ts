@@ -3,11 +3,6 @@ import "server-only";
 import type { ModelMessage, streamText } from "ai";
 import { asc, eq } from "drizzle-orm";
 
-import {
-  getModelById,
-  type ModelId,
-  type ModelOption,
-} from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { db } from "../../../../system/db";
@@ -16,6 +11,11 @@ import type { ChatMessage, MessageMetadata, ToolCall } from "../../../chat/db";
 import { chatMessages } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
+import {
+  getChatModelById,
+  type ChatModelId,
+  type ChatModelOption,
+} from "../../models";
 import { COMPACT_TRIGGER, COMPACT_TRIGGER_PERCENTAGE } from "../core/constants";
 import { formatAbsoluteTimestamp } from "../system-prompt/message-metadata";
 import { MessageConverter } from "./message-converter";
@@ -49,7 +49,7 @@ export class MessageContextBuilder {
    */
   static supportsAttachmentNatively(
     attachment: { mimeType: string },
-    model: ModelOption,
+    model: ChatModelOption,
   ): boolean {
     const mimeType = attachment.mimeType.toLowerCase();
 
@@ -65,10 +65,10 @@ export class MessageContextBuilder {
         return model.inputs.includes("audio");
       }
       if (mimeType.startsWith("application/pdf")) {
-        return model.inputs.includes("file");
+        return model.inputs.includes("text");
       }
       if (mimeType.startsWith("text/")) {
-        return model.inputs.includes("file");
+        return model.inputs.includes("text");
       }
       return false;
     }
@@ -78,7 +78,7 @@ export class MessageContextBuilder {
       return model.inputs?.includes("image") ?? false;
     }
     if (mimeType.startsWith("application/pdf")) {
-      return model.inputs?.includes("file") ?? false;
+      return model.inputs?.includes("text") ?? false;
     }
     return false;
   }
@@ -86,7 +86,7 @@ export class MessageContextBuilder {
   private static stripAttachmentsFromMessages(
     messages: ChatMessage[],
     modelName: string,
-    model?: ModelOption,
+    model?: ChatModelOption,
   ): {
     totalRemoved: number;
     formats: string[];
@@ -179,7 +179,7 @@ export class MessageContextBuilder {
     messageHistory?: ChatMessage[];
     logger: EndpointLogger;
     timezone: string;
-    upcomingResponseContext?: { model: ModelId; skill: string | null };
+    upcomingResponseContext?: { model: ChatModelId; skill: string | null };
     userMessageMetadata?: {
       attachments?: Array<{
         id: string;
@@ -199,7 +199,7 @@ export class MessageContextBuilder {
     userMessageId: string | null;
     upcomingAssistantMessageId: string;
     upcomingAssistantMessageCreatedAt: Date;
-    modelConfig: ModelOption;
+    modelConfig: ChatModelOption;
     /** Pre-built trailing system message string (STT + tasks + memories + favorites), built in builder.ts via generator.ts */
     trailingSystemMessage: string;
   }): Promise<ModelMessage[]> {
@@ -404,7 +404,7 @@ export class MessageContextBuilder {
     if (params.upcomingResponseContext?.model) {
       const modelConfig =
         params.modelConfig ??
-        getModelById(params.upcomingResponseContext.model);
+        getChatModelById(params.upcomingResponseContext.model);
 
       // Always run strip logic - it uses supportsAttachmentNatively per-attachment,
       // injects cached text variants, and keeps un-bridged attachments for GapFillExecutor.
@@ -688,7 +688,7 @@ export class MessageContextBuilder {
     messageHistory?: ChatMessage[]; // For incognito mode
     systemPrompt: string;
     tools: Parameters<typeof streamText>[0]["tools"];
-    model: ModelId;
+    model: ChatModelId;
     logger: EndpointLogger;
     /** Per-user compact trigger override (cascade resolved in stream-setup). Falls back to COMPACT_TRIGGER. */
     compactTrigger?: number;
@@ -709,40 +709,6 @@ export class MessageContextBuilder {
       logger,
       compactTrigger,
     } = params;
-
-    // Pure generator models (image-gen, video-gen, audio-gen) have no meaningful text
-    // context window - skip compacting entirely to avoid sending them to chat/completions.
-    const modelConfigEarly = getModelById(model);
-    if (
-      modelConfigEarly.modelRole === "image-gen" ||
-      modelConfigEarly.modelRole === "video-gen" ||
-      modelConfigEarly.modelRole === "audio-gen"
-    ) {
-      logger.debug(
-        "[Compacting] Skipping compacting for pure generator model",
-        { model, modelRole: modelConfigEarly.modelRole },
-      );
-      const branchMessagesEarly = await this.fetchBranchMessages({
-        threadId,
-        parentMessageId,
-        isIncognito,
-        messageHistory,
-        logger,
-      });
-      const currentUserMessage =
-        branchMessagesEarly.find((m) => m.id === currentUserMessageId) ?? null;
-      return {
-        shouldCompact: false,
-        isEmergencyCompact: false,
-        totalTokens: 0,
-        modelContextWindow: modelConfigEarly.contextWindow,
-        branchMessages: branchMessagesEarly,
-        messagesToCompact: [],
-        currentUserMessage,
-        lastCompactingMessage: null,
-        failedCompactingMessage: null,
-      };
-    }
 
     // Step 1: Get branch messages (server DB or incognito storage)
     const branchMessages = await this.fetchBranchMessages({
@@ -855,7 +821,7 @@ export class MessageContextBuilder {
     );
 
     // Calculate dynamic trigger based on model's context window
-    const modelConfig = getModelById(model);
+    const modelConfig = getChatModelById(model);
     const modelContextLimit = Math.floor(
       modelConfig.contextWindow * COMPACT_TRIGGER_PERCENTAGE,
     );
@@ -920,14 +886,14 @@ export class MessageContextBuilder {
     logger: EndpointLogger;
     upcomingAssistantMessageId: string;
     upcomingAssistantMessageCreatedAt: Date;
-    model: ModelId;
+    model: ChatModelId;
     skill: string | null;
     timezone: string;
     rootFolderId: DefaultFolderId;
     /** Pre-built trailing system message string, built in builder.ts via generator.ts */
     trailingSystemMessage: string;
     locale: CountryLanguage;
-    modelConfig?: ModelOption;
+    modelConfig?: ChatModelOption;
   }): Promise<ModelMessage[] | null> {
     const {
       compactedSummary,

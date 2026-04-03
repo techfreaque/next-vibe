@@ -135,7 +135,7 @@ export const translations: typeof enTranslations = {
         earnings: "Einnahmen",
         inactive: "Dieser Empfehlungscode ist inaktiv",
         conversionHint:
-          "Jeder {{examplePrice}}/Monat-Abonnent bringt Ihnen {{exampleEarning}}/Monat – wiederkehrend",
+          "Jeder {{examplePrice}}/Monat-Abonnent bringt Ihnen {{exampleEarning}}/Monat - wiederkehrend",
       },
     },
   },
@@ -156,7 +156,7 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       emptyMessage:
-        "Noch keine Aktivität – teilen Sie Ihren Empfehlungslink, um zu verdienen",
+        "Noch keine Aktivität - teilen Sie Ihren Empfehlungslink, um zu verdienen",
     },
     fields: {
       totalSignups: "Anmeldungen gesamt",
@@ -169,7 +169,7 @@ export const translations: typeof enTranslations = {
       availableBalance: "Verfügbares Guthaben",
       availableBalanceDescription: "Verfügbares Guthaben für Auszahlung",
       availableBalanceDescriptionLow:
-        "Für KI-Chats ausgeben – andere Credits werden zuerst verwendet. {{minPayout}} verdienen, um Abhebung freizuschalten.",
+        "Für KI-Chats ausgeben - andere Credits werden zuerst verwendet. {{minPayout}} verdienen, um Abhebung freizuschalten.",
       totalRevenueCredits: "Gesamtumsatz (Credits)",
       totalEarnedCredits: "Gesamt verdient (Credits)",
       totalPaidOutCredits: "Gesamt ausgezahlt (Credits)",
@@ -258,7 +258,7 @@ export const translations: typeof enTranslations = {
     updatedAt: "Aktualisiert am",
     referralCode: "Empfehlungscode",
     success:
-      "🎉 Ihr Empfehlungscode ist bereit! Kopieren Sie den Link unten und verdienen Sie {{directPct}} Provision auf jedes Abonnement – plus Bonuseinnahmen aus deren Empfehlungen.",
+      "🎉 Ihr Empfehlungscode ist bereit! Kopieren Sie den Link unten und verdienen Sie {{directPct}} Provision auf jedes Abonnement - plus Bonuseinnahmen aus deren Empfehlungen.",
     message: "Nachricht",
   },
 
@@ -345,7 +345,7 @@ export const translations: typeof enTranslations = {
       howItWorksTitle: "So funktioniert es",
       step1Title: "Empfehlungscodes erstellen",
       step1Body:
-        "Einzigartige Codes für verschiedene Zielgruppen generieren – Freunde, soziale Medien oder Kampagnen.",
+        "Einzigartige Codes für verschiedene Zielgruppen generieren - Freunde, soziale Medien oder Kampagnen.",
       step2Title: "Link teilen",
       step2Body:
         "Wenn jemand über Ihren Link anmeldet und abonniert, verdienen Sie Provision.",
@@ -412,7 +412,7 @@ export const translations: typeof enTranslations = {
     success: {
       creditsConverted: "Credits erfolgreich umgewandelt",
       payoutRequested:
-        "Auszahlungsanfrage eingereicht – Bearbeitung innerhalb von {{hours}} Stunden",
+        "Auszahlungsanfrage eingereicht - Bearbeitung innerhalb von {{hours}} Stunden",
     },
   },
 

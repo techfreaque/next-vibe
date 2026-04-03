@@ -213,16 +213,6 @@ export const ENV_KEYS = [
     onboardingGroup: "admin",
   },
   {
-    key: "VIBE_TEST_AI_MODEL",
-    module: "env",
-    comment:
-      "AI model to use in integration tests. Must be a valid ModelId enum value. Defaults to kimi_k2_5 (fast, cheap, good tool-calling).",
-    example: "kimi_k2_5",
-    sensitive: false,
-    fieldType: "text",
-    onboardingRequired: false,
-  },
-  {
     key: "VIBE_CLI_LOCALE",
     module: "env",
     comment: "CLI locale setting",
@@ -294,6 +284,16 @@ export const ENV_KEYS = [
     onboardingRequired: false,
     onboardingStep: 4,
     onboardingGroup: "ai",
+  },
+  {
+    key: "VIBE_TEST_AI_MODEL",
+    module: "agent",
+    comment:
+      "AI model to use in integration tests. Defaults to claude-code-haiku when CLAUDE_CODE_ENABLED resolves true, otherwise kimi_k2_5.",
+    example: "claude-code-haiku",
+    sensitive: false,
+    fieldType: "text",
+    onboardingRequired: false,
   },
   {
     key: "OPENROUTER_API_KEY",

@@ -56,6 +56,12 @@ import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interfac
 import type { CountryLanguage } from "@/i18n/core/config";
 import { scopedTranslation as runScopedTranslation } from "./i18n";
 
+import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { platform } from "@/config/env-client";
 import { DefaultFolderId } from "../../chat/config";
 import { ChatMessageRole } from "../../chat/enum";
 import {
@@ -65,13 +71,10 @@ import {
 import { useChatSettings } from "../../chat/settings/hooks";
 import { useSkill } from "../../chat/skills/[id]/hooks";
 import messagesDefinition from "../../chat/threads/[threadId]/messages/definition";
-import { defaultModel, type ModelId } from "../../models/models";
 import {
-  type ToolEntry,
   ToolsConfigEdit,
+  type ToolEntry,
 } from "../../tools/widget/tools-config-widget";
-import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
-import { platform } from "@/config/env-client";
 
 import cancelEndpoints from "../cancel/definition";
 import { WidgetChatInput } from "../stream/widget/chat-input";
@@ -371,6 +374,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   const form = useWidgetForm<typeof definition.POST>();
   const locale = useWidgetLocale();
   const { t } = runScopedTranslation.scopedT(locale);
+  const env = useEnvAvailability();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const onSubmit = useWidgetOnSubmit();
@@ -465,7 +469,13 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   );
 
   const promptValue = form.watch("prompt") ?? "";
-  const modelValue = form.watch("model") ?? defaultModel;
+  const modelValue: ChatModelId | undefined =
+    form.watch("model") ??
+    SkillsRepositoryClient.getBestModelForSkill(
+      DEFAULT_CHAT_MODEL_SELECTION,
+      user,
+      env,
+    )?.id;
   const skillValue = form.watch("skill") ?? "";
 
   const handleContentChange = useCallback(
@@ -473,7 +483,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
     [form],
   );
   const handleModelChange = useCallback(
-    (id: ModelId) => form.setValue("model", id, { shouldDirty: true }),
+    (id: ChatModelId) => form.setValue("model", id, { shouldDirty: true }),
     [form],
   );
   const handleSkillChange = useCallback(

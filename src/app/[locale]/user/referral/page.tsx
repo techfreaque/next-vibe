@@ -6,7 +6,6 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
-import { notFound } from "next-vibe-ui/lib/not-found";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -14,11 +13,11 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
+
 import { translations as configTranslations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation as pageT } from "./i18n";
+import { getReferralParams, scopedTranslation as pageT } from "./i18n";
 import { ReferralPageClient } from "./page-client";
 
 interface ReferralPageProps {
@@ -39,18 +38,19 @@ export async function generateMetadata({
   const { locale } = await params;
   const { t } = pageT.scopedT(locale);
 
+  const referralParams = getReferralParams();
   return {
     title: t("title", { appName: configTranslations.appName }),
-    description: t("description"),
+    description: t("description", {
+      appName: configTranslations.appName,
+      directPct: referralParams.directPct,
+    }),
   };
 }
 
 export async function tanstackLoader({
   params,
 }: ReferralPageProps): Promise<ReferralPageData> {
-  if (env.NEXT_PUBLIC_LOCAL_MODE) {
-    notFound();
-  }
   const { locale } = await params;
 
   // Check if user is authenticated (but don't redirect)

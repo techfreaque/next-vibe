@@ -1,11 +1,11 @@
 /**
  * Unified Model Credit Display Component
- * Single source of truth for displaying model credit costs
+ * Handles ALL model types: chat, image, video, music, TTS, STT
  *
  * This component:
- * - Takes only modelId as input
- * - Calculates credit costs on the frontend
- * - Shows detailed popover with cost ranges and examples
+ * - Takes any AnyModelId as input (chat, image, video, music, TTS, STT)
+ * - Calculates credit costs on the frontend using billing shape narrowing
+ * - Shows detailed popover with per-type cost breakdown
  * - Supports both Badge and inline text display modes
  */
 
@@ -27,25 +27,35 @@ import { useRef, useState } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
+import {
+  chatModelOptions,
+  type ChatModelOption,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import { imageGenModelOptions } from "@/app/api/[locale]/agent/image-generation/models";
+import { musicGenModelOptions } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelOptions } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { ttsModelOptions } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelOptions } from "@/app/api/[locale]/agent/video-generation/models";
 import { STANDARD_MARKUP_PERCENTAGE } from "../../../products/constants";
 import {
   COMPACT_TRIGGER,
   COMPACT_TRIGGER_PERCENTAGE,
 } from "../../ai-stream/repository/core/constants";
+import { getCreditCostFromModel, getModelPrice } from "../all-models";
 import { scopedTranslation } from "../i18n";
 import {
-  calculateCreditCost,
-  getCreditCostFromModel,
-  getModelById,
-  type ModelId,
+  type AnyModelId,
+  type AnyModelOption,
+  PRICE_REFERENCE_STT_SECONDS,
+  PRICE_REFERENCE_TTS_CHARS,
 } from "../models";
 
 /**
  * Props for ModelCreditDisplay component
  */
 export interface ModelCreditDisplayProps {
-  /** Model ID to display cost for */
-  modelId: ModelId;
+  /** Any model ID — chat, image, video, music, TTS, STT */
+  modelId: AnyModelId;
 
   /** Display variant - badge (default) or text */
   variant?: "badge" | "text";
@@ -61,10 +71,23 @@ export interface ModelCreditDisplayProps {
 }
 
 /**
- * Calculate cost range for different message sizes
- * All scenarios represent realistic usage patterns
+ * Find a model option by ID, checking all role-specific registries in order.
  */
-function calculateCostRanges(model: ReturnType<typeof getModelById>): {
+function findModel(id: AnyModelId): AnyModelOption | undefined {
+  return (
+    chatModelOptions.find((m) => m.id === id) ??
+    imageGenModelOptions.find((m) => m.id === id) ??
+    musicGenModelOptions.find((m) => m.id === id) ??
+    videoGenModelOptions.find((m) => m.id === id) ??
+    ttsModelOptions.find((m) => m.id === id) ??
+    sttModelOptions.find((m) => m.id === id)
+  );
+}
+
+/**
+ * Calculate cost range for different message sizes (chat token-based only)
+ */
+function calculateCostRanges(model: ChatModelOption): {
   ranges: Array<{
     name: string;
     input: number;
@@ -74,16 +97,15 @@ function calculateCostRanges(model: ReturnType<typeof getModelById>): {
   }>;
   effectiveTrigger: number;
 } {
+  if (!("contextWindow" in model)) {
+    return { ranges: [], effectiveTrigger: 0 };
+  }
   const modelContextLimit = Math.floor(
     model.contextWindow * COMPACT_TRIGGER_PERCENTAGE,
   );
   const effectiveTrigger = Math.min(COMPACT_TRIGGER, modelContextLimit);
 
-  const scenarios: Array<{
-    name: string;
-    input: number;
-    output: number;
-  }> = [
+  const scenarios: Array<{ name: string; input: number; output: number }> = [
     { name: "Short reply", input: 5_000, output: 500 },
     { name: "Normal chat", input: 16_000, output: 1_500 },
     { name: "Long conversation", input: effectiveTrigger, output: 2_000 },
@@ -99,16 +121,12 @@ function calculateCostRanges(model: ReturnType<typeof getModelById>): {
   };
 }
 
-/**
- * Format numbers with commas for readability
- */
+/** Format numbers with commas for readability */
 function formatNumber(num: number): string {
   return num.toLocaleString("en-US");
 }
 
-/**
- * Format token count for display (e.g., "32K" instead of "32,000")
- */
+/** Format token count for display (e.g., "32K" instead of "32,000") */
 function formatTokenThreshold(tokens: number): string {
   if (tokens >= 1000) {
     return `${Math.floor(tokens / 1000)}K`;
@@ -117,14 +135,19 @@ function formatTokenThreshold(tokens: number): string {
 }
 
 /**
- * Unified component for displaying model credit costs
+ * Unified component for displaying model credit costs across all model types.
  *
  * Usage:
  * ```tsx
  * <ModelCreditDisplay
- *   modelId={ModelId.CLAUDE_HAIKU_4_5}
+ *   modelId={ChatModelId.CLAUDE_HAIKU_4_5}
  *   variant="badge"
- *   t={t}
+ *   locale={locale}
+ * />
+ * <ModelCreditDisplay
+ *   modelId={ImageGenModelId.DALL_E_3}
+ *   variant="badge"
+ *   locale={locale}
  * />
  * ```
  */
@@ -136,7 +159,7 @@ export function ModelCreditDisplay({
   locale,
 }: ModelCreditDisplayProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const model = getModelById(modelId);
+  const model = findModel(modelId);
   const [isOpen, setIsOpen] = useState(false);
   const openTimeoutRef = useRef<number | null>(null);
   const closeTimeoutRef = useRef<number | null>(null);
@@ -146,80 +169,441 @@ export function ModelCreditDisplay({
   const currency = country === "DE" ? "EUR" : "USD";
   const creditValue = currency === "EUR" ? "0.01 EUR" : "$0.01 USD";
 
-  // Determine if token-based
-  const isTokenBased = typeof model.creditCost === "function";
+  // ─── Billing shape narrowing & cost text ────────────────────────────────────
 
-  // Media type detection
-  const isImage = "creditCostPerImage" in model;
-  const isClip = "creditCostPerClip" in model;
-  const isVideo =
-    "creditCostPerSecond" in model && "defaultDurationSeconds" in model;
-  const isStt =
-    "creditCostPerSecond" in model && !("defaultDurationSeconds" in model);
-
-  // Per-image or per-clip fixed cost - stored raw, apply markup for display
-  const rawMediaCost = isImage
-    ? (model as { creditCostPerImage: number }).creditCostPerImage
-    : isClip
-      ? (model as { creditCostPerClip: number }).creditCostPerClip
-      : null;
-  const fixedMediaCost =
-    rawMediaCost !== null
-      ? Math.round(rawMediaCost * (1 + STANDARD_MARKUP_PERCENTAGE) * 10000) /
-        10000
-      : null;
-
-  // Per-second cost (video or STT) - calculateCreditCost already applies markup
-  const isPerSecond = isVideo || isStt;
-  const computedPerSecondCost = isPerSecond
-    ? calculateCreditCost(model, 0, 0)
-    : null;
-  const defaultDuration = isVideo
-    ? (model as { defaultDurationSeconds: number }).defaultDurationSeconds
-    : null;
-
-  // Check if truly free (model.creditCost === 0, not rounded to 0)
-  const isTrulyFree =
-    !isTokenBased &&
-    fixedMediaCost === null &&
-    !isPerSecond &&
-    typeof model.creditCost === "number" &&
-    model.creditCost === 0;
-
-  // Calculate cost ranges
-  const costData = isTokenBased ? calculateCostRanges(model) : null;
-  const costRanges = costData?.ranges ?? [];
-  const effectiveTrigger = costData?.effectiveTrigger ?? 0;
-  const minCost = costRanges.length > 0 ? costRanges[0].cost : 0;
-  const maxCost =
-    costRanges.length > 0 ? costRanges[costRanges.length - 1].cost : 0;
-  const midCost =
-    costRanges.length > 1 ? costRanges[1].cost : (minCost + maxCost) / 2;
-
-  // Format cost text with proper unit per media type
   let costText: string;
-  if (isTrulyFree) {
+  let popoverContent: JSX.Element;
+
+  if (!model) {
+    // Unknown model — show free
     costText = t("selector.free");
-  } else if (isTokenBased) {
-    costText = `~${midCost} credits`;
-  } else if (fixedMediaCost !== null && isImage) {
-    costText = `${fixedMediaCost} ${t("creditDisplay.media.perImage")}`;
-  } else if (fixedMediaCost !== null && isClip) {
-    costText = `${fixedMediaCost} ${t("creditDisplay.media.perClip")}`;
-  } else if (computedPerSecondCost !== null && isVideo) {
-    costText = `${computedPerSecondCost} ${t("creditDisplay.media.perClipDuration", { duration: defaultDuration ?? 0 })}`;
-  } else if (computedPerSecondCost !== null && isStt) {
-    costText = `${computedPerSecondCost} ${t("creditDisplay.media.perSecond")}`;
+    popoverContent = (
+      <Div className="space-y-2">
+        <Span className="text-xs text-muted-foreground block">
+          {t("selector.free")}
+        </Span>
+      </Div>
+    );
+  } else if (model.creditCostPerImage) {
+    // Image generation (fixed cost per image)
+    const cost = getModelPrice(model);
+    costText = t("creditDisplay.badge.perImg", { cost });
+
+    popoverContent = (
+      <Div className="space-y-4">
+        <Div className="space-y-1.5">
+          <Span className="font-semibold text-sm block">{model.name}</Span>
+          <Span className="text-xs text-muted-foreground block leading-relaxed">
+            {t("creditDisplay.media.imageHeader")}
+          </Span>
+        </Div>
+        <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+          <Span className="text-xs font-medium text-muted-foreground">
+            {t("creditDisplay.media.costPerImage")}
+          </Span>
+          <Span className="text-sm font-bold">{costText}</Span>
+        </Div>
+        <Div className="space-y-2">
+          <Span className="text-xs text-muted-foreground block leading-relaxed">
+            {t("creditDisplay.media.imageDescription")}
+          </Span>
+        </Div>
+        <Div className="pt-3 border-t">
+          <Span className="text-[10px] text-muted-foreground block">
+            {t("creditDisplay.creditValue", { value: creditValue })}
+          </Span>
+        </Div>
+      </Div>
+    );
+  } else if ("creditCostPerClip" in model) {
+    // Music/audio generation (fixed cost per clip)
+    const cost = getModelPrice(model);
+    costText = t("creditDisplay.badge.perClip", { cost });
+
+    popoverContent = (
+      <Div className="space-y-4">
+        <Div className="space-y-1.5">
+          <Span className="font-semibold text-sm block">{model.name}</Span>
+          <Span className="text-xs text-muted-foreground block leading-relaxed">
+            {t("creditDisplay.media.musicHeader")}
+          </Span>
+        </Div>
+        <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+          <Span className="text-xs font-medium text-muted-foreground">
+            {t("creditDisplay.media.costPerClipMusic")}
+          </Span>
+          <Span className="text-sm font-bold">{costText}</Span>
+        </Div>
+        <Div className="space-y-2">
+          <Span className="text-xs text-muted-foreground block leading-relaxed">
+            {t("creditDisplay.media.clipDescription")}
+          </Span>
+        </Div>
+        <Div className="pt-3 border-t">
+          <Span className="text-[10px] text-muted-foreground block">
+            {t("creditDisplay.creditValue", { value: creditValue })}
+          </Span>
+        </Div>
+      </Div>
+    );
+  } else if (
+    "creditCostPerSecond" in model &&
+    "defaultDurationSeconds" in model
+  ) {
+    // Video generation (cost per second × default duration)
+    const duration = model.defaultDurationSeconds;
+    const totalCost = getModelPrice(model);
+    const displayCostPerSecond =
+      Math.round(
+        model.creditCostPerSecond * (1 + STANDARD_MARKUP_PERCENTAGE) * 10000,
+      ) / 10000;
+    costText = t("creditDisplay.badge.perClip", { cost: totalCost });
+
+    popoverContent = (
+      <Div className="space-y-4">
+        <Div className="space-y-1.5">
+          <Span className="font-semibold text-sm block">{model.name}</Span>
+          <Span className="text-xs text-muted-foreground block leading-relaxed">
+            {t("creditDisplay.media.videoHeader")}
+          </Span>
+        </Div>
+        <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+          <Span className="text-xs font-medium text-muted-foreground">
+            {t("creditDisplay.media.costPerClip")}
+          </Span>
+          <Span className="text-sm font-bold">{costText}</Span>
+        </Div>
+        <Div className="space-y-2">
+          <Span className="text-xs text-muted-foreground block leading-relaxed">
+            {t("creditDisplay.media.videoBreakdown", {
+              costPerSecond: displayCostPerSecond,
+              duration,
+              total: totalCost,
+            })}
+          </Span>
+          <Span className="text-xs text-muted-foreground block leading-relaxed">
+            {t("creditDisplay.media.videoDescription", { duration })}
+          </Span>
+        </Div>
+        <Div className="pt-3 border-t">
+          <Span className="text-[10px] text-muted-foreground block">
+            {t("creditDisplay.creditValue", { value: creditValue })}
+          </Span>
+        </Div>
+      </Div>
+    );
+  } else if ("creditCostPerCharacter" in model) {
+    // TTS (cost per character) — badge shows average cost like LLMs
+    const avgCost = getModelPrice(model); // average for ~600 chars
+    const costPerCharWithMarkup =
+      model.creditCostPerCharacter * (1 + STANDARD_MARKUP_PERCENTAGE);
+    const ttsScenarios = [
+      { name: "creditDisplay.media.ttsScenarios.short" as const, chars: 200 },
+      {
+        name: "creditDisplay.media.ttsScenarios.medium" as const,
+        chars: PRICE_REFERENCE_TTS_CHARS,
+      },
+      { name: "creditDisplay.media.ttsScenarios.long" as const, chars: 2000 },
+    ];
+    costText = t("creditDisplay.badge.approxPerMsg", { cost: avgCost });
+
+    popoverContent = (
+      <Div className="space-y-4">
+        <Div className="space-y-1.5">
+          <Span className="font-semibold text-sm block">{model.name}</Span>
+          <Span className="text-xs text-muted-foreground block leading-relaxed">
+            {t("creditDisplay.media.ttsHeader")}
+          </Span>
+        </Div>
+        <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+          <Span className="text-xs font-medium text-muted-foreground">
+            {t("creditDisplay.media.ttsPricing")}
+          </Span>
+          <Span className="text-sm font-bold">
+            {t("creditDisplay.badge.ratePerChar", {
+              rate: Math.round(costPerCharWithMarkup * 10000) / 10000,
+            })}
+          </Span>
+        </Div>
+        <Div className="space-y-2.5">
+          <Span className="text-xs font-medium text-muted-foreground block">
+            {t("creditDisplay.tokenBased.examplesLabel")}
+          </Span>
+          <Div className="space-y-2">
+            {ttsScenarios.map((scenario, idx) => {
+              const cost =
+                Math.round(scenario.chars * costPerCharWithMarkup * 10) / 10;
+              return (
+                <Div
+                  key={idx}
+                  className="flex items-start justify-between text-xs p-2 rounded-md hover:bg-muted/30 transition-colors"
+                >
+                  <Div className="flex-1 space-y-0.5">
+                    <Span className="font-medium">{t(scenario.name)}</Span>
+                    <Span className="text-muted-foreground block text-[10px] leading-tight">
+                      {t("creditDisplay.badge.approxChars", {
+                        count: formatNumber(scenario.chars),
+                      })}
+                    </Span>
+                  </Div>
+                  <Span className="font-mono font-semibold text-sm">
+                    {cost === 0 ? t("creditDisplay.badge.lessThanMin") : cost}
+                  </Span>
+                </Div>
+              );
+            })}
+          </Div>
+        </Div>
+        <Div className="pt-3 border-t space-y-2">
+          <Span className="text-[10px] text-muted-foreground block leading-relaxed">
+            {t("creditDisplay.media.ttsDescription")}
+          </Span>
+          <Span className="text-[10px] text-muted-foreground block">
+            {t("creditDisplay.creditValue", { value: creditValue })}
+          </Span>
+        </Div>
+      </Div>
+    );
+  } else if ("creditCostPerSecond" in model) {
+    // STT (cost per second — no defaultDurationSeconds) — badge shows average cost
+    const avgCost = getModelPrice(model); // average for ~30s
+    const costPerSecWithMarkup =
+      model.creditCostPerSecond * (1 + STANDARD_MARKUP_PERCENTAGE);
+    const sttScenarios = [
+      { name: "creditDisplay.media.sttScenarios.short" as const, seconds: 15 },
+      {
+        name: "creditDisplay.media.sttScenarios.medium" as const,
+        seconds: PRICE_REFERENCE_STT_SECONDS,
+      },
+      { name: "creditDisplay.media.sttScenarios.long" as const, seconds: 60 },
+    ];
+    costText = t("creditDisplay.badge.approxPerMsg", { cost: avgCost });
+
+    popoverContent = (
+      <Div className="space-y-4">
+        <Div className="space-y-1.5">
+          <Span className="font-semibold text-sm block">{model.name}</Span>
+          <Span className="text-xs text-muted-foreground block leading-relaxed">
+            {t("creditDisplay.media.sttHeader")}
+          </Span>
+        </Div>
+        <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+          <Span className="text-xs font-medium text-muted-foreground">
+            {t("creditDisplay.media.sttPricing")}
+          </Span>
+          <Span className="text-sm font-bold">
+            {t("creditDisplay.badge.ratePerSec", {
+              rate: Math.round(costPerSecWithMarkup * 10000) / 10000,
+            })}
+          </Span>
+        </Div>
+        <Div className="space-y-2.5">
+          <Span className="text-xs font-medium text-muted-foreground block">
+            {t("creditDisplay.tokenBased.examplesLabel")}
+          </Span>
+          <Div className="space-y-2">
+            {sttScenarios.map((scenario, idx) => {
+              const cost =
+                Math.round(scenario.seconds * costPerSecWithMarkup * 10) / 10;
+              return (
+                <Div
+                  key={idx}
+                  className="flex items-start justify-between text-xs p-2 rounded-md hover:bg-muted/30 transition-colors"
+                >
+                  <Div className="flex-1 space-y-0.5">
+                    <Span className="font-medium">{t(scenario.name)}</Span>
+                    <Span className="text-muted-foreground block text-[10px] leading-tight">
+                      {t("creditDisplay.badge.seconds", {
+                        count: scenario.seconds,
+                      })}
+                    </Span>
+                  </Div>
+                  <Span className="font-mono font-semibold text-sm">
+                    {cost === 0 ? t("creditDisplay.badge.lessThanMin") : cost}
+                  </Span>
+                </Div>
+              );
+            })}
+          </Div>
+        </Div>
+        <Div className="pt-3 border-t space-y-2">
+          <Span className="text-[10px] text-muted-foreground block leading-relaxed">
+            {t("creditDisplay.media.sttDescription")}
+          </Span>
+          <Span className="text-[10px] text-muted-foreground block">
+            {t("creditDisplay.creditValue", { value: creditValue })}
+          </Span>
+        </Div>
+      </Div>
+    );
+  } else if (
+    "contextWindow" in model &&
+    typeof model.creditCost === "function"
+  ) {
+    // Token-based chat model
+    const chatModel = model as ChatModelOption;
+    const costData = calculateCostRanges(chatModel);
+    const costRanges = costData.ranges;
+    const effectiveTrigger = costData.effectiveTrigger;
+    const minCost = costRanges.length > 0 ? costRanges[0].cost : 0;
+    const maxCost =
+      costRanges.length > 0 ? costRanges[costRanges.length - 1].cost : 0;
+    const midCost =
+      costRanges.length > 1 ? costRanges[1].cost : (minCost + maxCost) / 2;
+    costText = t("creditDisplay.badge.approxPerMsg", { cost: midCost });
+
+    popoverContent = (
+      <Div className="space-y-4">
+        {/* Header */}
+        <Div className="space-y-1.5">
+          <Span className="font-semibold text-sm block">{model.name}</Span>
+          <Span className="text-xs text-muted-foreground block leading-relaxed">
+            {t("creditDisplay.tokenBased.header")}
+          </Span>
+        </Div>
+
+        {/* Cost range highlight */}
+        <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+          <Span className="text-xs font-medium text-muted-foreground">
+            {t("creditDisplay.tokenBased.costRangeLabel")}
+          </Span>
+          <Span className="text-sm font-bold">
+            {t("creditDisplay.tokenBased.costRangeValue", {
+              min: minCost,
+              max: maxCost,
+            })}
+          </Span>
+        </Div>
+
+        {/* Example scenarios */}
+        <Div className="space-y-2.5">
+          <Span className="text-xs font-medium text-muted-foreground block">
+            {t("creditDisplay.tokenBased.examplesLabel")}
+          </Span>
+          <Div className="space-y-2">
+            {costRanges.map((scenario, idx) => {
+              const exampleKey =
+                idx === 0
+                  ? "creditDisplay.tokenBased.examples.short"
+                  : idx === 1
+                    ? "creditDisplay.tokenBased.examples.medium"
+                    : "creditDisplay.tokenBased.examples.long";
+
+              return (
+                <Div
+                  key={idx}
+                  className="flex items-start justify-between text-xs p-2 rounded-md hover:bg-muted/30 transition-colors"
+                >
+                  <Div className="flex-1 space-y-0.5">
+                    <Div className="flex items-center gap-1.5">
+                      <Span className="font-medium">{t(exampleKey)}</Span>
+                      {scenario.willCompact && (
+                        <Badge
+                          variant="outline"
+                          className="text-[9px] h-4 px-1 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20"
+                        >
+                          {t("creditDisplay.tokenBased.triggersCompacting")}
+                        </Badge>
+                      )}
+                    </Div>
+                    <Span className="text-muted-foreground block text-[10px] leading-tight">
+                      {t("creditDisplay.tokenBased.tokensCount", {
+                        count: formatNumber(scenario.input + scenario.output),
+                      })}
+                    </Span>
+                  </Div>
+                  <Span className="font-mono font-semibold text-sm">
+                    {scenario.cost}
+                  </Span>
+                </Div>
+              );
+            })}
+          </Div>
+        </Div>
+
+        {/* Footer explanation */}
+        <Div className="pt-3 border-t space-y-2.5">
+          <Span className="text-[10px] text-muted-foreground block leading-relaxed">
+            {t("creditDisplay.tokenBased.explanation")}
+          </Span>
+          <Span className="text-[10px] text-muted-foreground block leading-relaxed">
+            <Strong>{t("creditDisplay.tokenBased.compactingLabel")}</Strong>
+            {t("creditDisplay.tokenBased.compactingExplanation", {
+              threshold: formatTokenThreshold(effectiveTrigger),
+            })}
+          </Span>
+          <Span className="text-[10px] text-muted-foreground block">
+            {t("creditDisplay.creditValue", { value: creditValue })}
+          </Span>
+        </Div>
+      </Div>
+    );
   } else {
-    const cost = typeof model.creditCost === "number" ? model.creditCost : 0;
-    if (cost === 1) {
-      costText = t("credits.credit", { count: cost });
+    // Fixed-cost or free chat model
+    const creditCostRaw = getModelPrice(model);
+    const isTrulyFree = creditCostRaw === 0;
+
+    if (isTrulyFree) {
+      costText = t("selector.free");
     } else {
-      costText = t("credits.credits", { count: cost });
+      costText = t("creditDisplay.badge.exactPerMsg", { cost: creditCostRaw });
     }
+
+    const modelName = "name" in model ? model.name : "";
+
+    popoverContent = (
+      <Div className="space-y-4">
+        {/* Header */}
+        <Div className="space-y-1.5">
+          <Span className="font-semibold text-sm block">
+            {t("creditDisplay.fixed.title", { model: modelName })}
+          </Span>
+          <Span className="text-xs text-muted-foreground block leading-relaxed">
+            {isTrulyFree
+              ? t("creditDisplay.fixed.freeDescription")
+              : t("creditDisplay.fixed.fixedDescription")}
+          </Span>
+        </Div>
+
+        {/* Cost highlight */}
+        {!isTrulyFree && (
+          <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+            <Span className="text-xs font-medium text-muted-foreground">
+              {t("creditDisplay.fixed.costPerMessage")}
+            </Span>
+            <Span className="text-sm font-bold">{costText}</Span>
+          </Div>
+        )}
+
+        {/* Explanation */}
+        <Div className="space-y-2">
+          <Span className="text-xs text-muted-foreground block leading-relaxed">
+            {isTrulyFree ? (
+              <>
+                {t("creditDisplay.fixed.freeExplanation")}{" "}
+                <Strong>{t("creditDisplay.fixed.freeHighlight")}</Strong>
+              </>
+            ) : (
+              <>
+                <Strong>{t("creditDisplay.fixed.simpleLabel")}</Strong>
+                {t("creditDisplay.fixed.simpleExplanation")}
+              </>
+            )}
+          </Span>
+        </Div>
+
+        {/* Footer */}
+        <Div className="pt-3 border-t">
+          <Span className="text-[10px] text-muted-foreground block">
+            {t("creditDisplay.creditValue", { value: creditValue })}
+          </Span>
+        </Div>
+      </Div>
+    );
   }
 
-  // Base content without popover
+  // ─── Render ─────────────────────────────────────────────────────────────────
+
   const baseContent =
     variant === "badge" ? (
       <Badge variant={badgeVariant} className={className}>
@@ -230,32 +614,25 @@ export function ModelCreditDisplay({
     );
 
   const handleMouseEnter = (): void => {
-    // Clear any pending close timeout
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
     }
-
-    // Open with a 500ms delay
     openTimeoutRef.current = window.setTimeout(() => {
       setIsOpen(true);
     }, 500);
   };
 
   const handleMouseLeave = (): void => {
-    // Clear any pending open timeout
     if (openTimeoutRef.current) {
       clearTimeout(openTimeoutRef.current);
       openTimeoutRef.current = null;
     }
-
-    // Close with a short delay
     closeTimeoutRef.current = window.setTimeout(() => {
       setIsOpen(false);
     }, 150);
   };
 
-  // Render popover for both token-based and fixed-cost models
   return (
     <Div
       onMouseEnter={handleMouseEnter}
@@ -288,172 +665,7 @@ export function ModelCreditDisplay({
             e.preventDefault();
           }}
         >
-          {isTokenBased ? (
-            // Token-based model popover
-            <Div className="space-y-4">
-              {/* Header */}
-              <Div className="space-y-1.5">
-                <Span className="font-semibold text-sm block">
-                  {model.name}
-                </Span>
-                <Span className="text-xs text-muted-foreground block leading-relaxed">
-                  {t("creditDisplay.tokenBased.header")}
-                </Span>
-              </Div>
-
-              {/* Cost range highlight */}
-              <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                <Span className="text-xs font-medium text-muted-foreground">
-                  {t("creditDisplay.tokenBased.costRangeLabel")}
-                </Span>
-                <Span className="text-sm font-bold">
-                  {t("creditDisplay.tokenBased.costRangeValue", {
-                    min: minCost,
-                    max: maxCost,
-                  })}
-                </Span>
-              </Div>
-
-              {/* Example scenarios */}
-              <Div className="space-y-2.5">
-                <Span className="text-xs font-medium text-muted-foreground block">
-                  {t("creditDisplay.tokenBased.examplesLabel")}
-                </Span>
-                <Div className="space-y-2">
-                  {costRanges.map((scenario, idx) => {
-                    const exampleKey =
-                      idx === 0
-                        ? "creditDisplay.tokenBased.examples.short"
-                        : idx === 1
-                          ? "creditDisplay.tokenBased.examples.medium"
-                          : "creditDisplay.tokenBased.examples.long";
-
-                    return (
-                      <Div
-                        key={idx}
-                        className="flex items-start justify-between text-xs p-2 rounded-md hover:bg-muted/30 transition-colors"
-                      >
-                        <Div className="flex-1 space-y-0.5">
-                          <Div className="flex items-center gap-1.5">
-                            <Span className="font-medium">{t(exampleKey)}</Span>
-                            {scenario.willCompact && (
-                              <Badge
-                                variant="outline"
-                                className="text-[9px] h-4 px-1 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20"
-                              >
-                                {t(
-                                  "creditDisplay.tokenBased.triggersCompacting",
-                                )}
-                              </Badge>
-                            )}
-                          </Div>
-                          <Span className="text-muted-foreground block text-[10px] leading-tight">
-                            {t("creditDisplay.tokenBased.tokensCount", {
-                              count: formatNumber(
-                                scenario.input + scenario.output,
-                              ),
-                            })}
-                          </Span>
-                        </Div>
-                        <Span className="font-mono font-semibold text-sm">
-                          {scenario.cost}
-                        </Span>
-                      </Div>
-                    );
-                  })}
-                </Div>
-              </Div>
-
-              {/* Footer explanation */}
-              <Div className="pt-3 border-t space-y-2.5">
-                <Span className="text-[10px] text-muted-foreground block leading-relaxed">
-                  {t("creditDisplay.tokenBased.explanation")}
-                </Span>
-                <Span className="text-[10px] text-muted-foreground block leading-relaxed">
-                  <Strong>
-                    {t("creditDisplay.tokenBased.compactingLabel")}
-                  </Strong>
-                  {t("creditDisplay.tokenBased.compactingExplanation", {
-                    threshold: formatTokenThreshold(effectiveTrigger),
-                  })}
-                </Span>
-                <Span className="text-[10px] text-muted-foreground block">
-                  {t("creditDisplay.creditValue", {
-                    value: creditValue,
-                  })}
-                </Span>
-              </Div>
-            </Div>
-          ) : (
-            // Fixed-cost model popover
-            <Div className="space-y-4">
-              {/* Header */}
-              <Div className="space-y-1.5">
-                <Span className="font-semibold text-sm block">
-                  {t("creditDisplay.fixed.title", {
-                    model: model.name,
-                  })}
-                </Span>
-                <Span className="text-xs text-muted-foreground block leading-relaxed">
-                  {isTrulyFree
-                    ? t("creditDisplay.fixed.freeDescription")
-                    : isImage
-                      ? t("creditDisplay.media.imageDescription")
-                      : isClip
-                        ? t("creditDisplay.media.clipDescription")
-                        : isVideo
-                          ? t("creditDisplay.media.videoDescription", {
-                              duration: defaultDuration ?? 0,
-                            })
-                          : isStt
-                            ? t("creditDisplay.media.sttDescription")
-                            : t("creditDisplay.fixed.fixedDescription")}
-                </Span>
-              </Div>
-
-              {/* Cost highlight */}
-              {!isTrulyFree && (
-                <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {isImage
-                      ? t("creditDisplay.media.costPerImage")
-                      : isClip
-                        ? t("creditDisplay.media.costPerClip")
-                        : isVideo || isStt
-                          ? t("creditDisplay.media.costPerSecond")
-                          : t("creditDisplay.fixed.costPerMessage")}
-                  </Span>
-                  <Span className="text-sm font-bold">{costText}</Span>
-                </Div>
-              )}
-
-              {/* Explanation */}
-              <Div className="space-y-2">
-                <Span className="text-xs text-muted-foreground block leading-relaxed">
-                  {isTrulyFree ? (
-                    <>
-                      {t("creditDisplay.fixed.freeExplanation")}{" "}
-                      <Strong>{t("creditDisplay.fixed.freeHighlight")}</Strong>
-                    </>
-                  ) : (
-                    <>
-                      <Strong>{t("creditDisplay.fixed.simpleLabel")}</Strong>
-                      {t("creditDisplay.fixed.simpleExplanation")}
-                    </>
-                  )}
-                </Span>
-              </Div>
-
-              {/* Footer */}
-              <Div className="pt-3 border-t">
-                <Span className="text-[10px] text-muted-foreground block">
-                  {t("creditDisplay.creditValue", {
-                    value: creditValue,
-                  })}
-                </Span>
-              </Div>
-            </Div>
-          )}
+          {popoverContent}
         </PopoverContent>
       </Popover>
     </Div>

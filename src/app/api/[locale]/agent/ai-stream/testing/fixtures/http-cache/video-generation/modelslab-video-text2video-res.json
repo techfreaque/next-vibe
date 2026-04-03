@@ -1,0 +1,59 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v6/video/text2video",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "9e691587fc3a54eb-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Fri, 03 Apr 2026 15:25:09 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=XpWO7ufFNeqFvSl%2BCKpecoGY%2BS%2F1t6GbN8Ytxy8r5csgSagsAvxIIIJ2C%2BE4SXh2uIBZscmV4lLpDNvVmKO0b%2F5tm%2BNP5GUyh8mUNIqbA63qMe7jahTNpB3eB7omCN8%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "17796c404efdced5eec0705ab7e8d9e2",
+    "x-request-time": "2.595",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.000",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "processing",
+    "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise",
+    "eta": 80,
+    "message": "Request queued for processing. Try to fetch request after estimated seconds.",
+    "fetch_result": "https://modelslab.com/api/v6/video/fetch/173740680",
+    "id": 173740680,
+    "output": [],
+    "future_links": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/b07cf88c-2c94-4020-8d20-9caad88019c9-0.mp4"
+    ],
+    "meta": {
+      "model_id": "wan2.2",
+      "prompt": "spinning cube",
+      "seed": 846924,
+      "portrait": "no",
+      "negative_prompt": "low quality",
+      "num_frames": 25,
+      "num_inference_steps": 8,
+      "guidance_scale": 1,
+      "fps": 16,
+      "temp": "no",
+      "base64": "no",
+      "webhook": null,
+      "track_id": null,
+      "watermark": "no",
+      "id": 173740680,
+      "file_prefix": "b07cf88c-2c94-4020-8d20-9caad88019c9",
+      "output": [
+        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/b07cf88c-2c94-4020-8d20-9caad88019c9-0.mp4"
+      ]
+    }
+  }
+}

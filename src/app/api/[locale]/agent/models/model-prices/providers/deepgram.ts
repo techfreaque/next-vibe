@@ -17,7 +17,8 @@ import "server-only";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { ApiProvider, modelDefinitions } from "../../models";
+import { sttModelDefinitions } from "../../../speech-to-text/models";
+import { ApiProvider } from "../../models";
 import type { ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
 
@@ -101,7 +102,7 @@ export class DeepgramPriceFetcher extends PriceFetcher {
       };
     }
 
-    for (const def of Object.values(modelDefinitions)) {
+    for (const def of Object.values(sttModelDefinitions)) {
       for (const providerConfig of def.providers) {
         if (
           providerConfig.apiProvider !== ApiProvider.DEEPGRAM ||

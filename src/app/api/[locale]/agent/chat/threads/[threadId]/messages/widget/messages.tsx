@@ -39,11 +39,10 @@ import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import characterDefinitions from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import type { TtsModelId } from "@/app/api/[locale]/agent/models/models";
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/models/types";
+import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
-import { parseError } from "next-vibe/shared/utils";
-
 import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
@@ -54,7 +53,7 @@ import {
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { platform } from "@/config/env-client";
-
+import { parseError } from "next-vibe/shared/utils";
 import type { MessageMetadata } from "../../../../db";
 import { NEW_MESSAGE_ID, ViewMode } from "../../../../enum";
 import folderContentsDefinition from "../../../../folder-contents/[rootFolderId]/definition";
@@ -73,16 +72,15 @@ import { LinearMessageView } from "./linear-view/view";
 import { DebugLinearMessageView } from "./linear-view/view-debug";
 import { groupMessagesBySequence } from "./message-grouping";
 import { ThreadedMessage } from "./threaded-view/view";
-
 /**
- * Resolve a ModelSelectionSimple voice selection to a TtsModelId.
+ * Resolve a VoiceModelSelection voice selection to a TtsModelId.
  * Returns the manualModelId for MANUAL selections, undefined otherwise.
  */
 function resolveVoiceId(
-  sel: ModelSelectionSimple | null | undefined,
+  sel: VoiceModelSelection | null | undefined,
 ): TtsModelId | undefined {
   if (sel?.selectionType === ModelSelectionType.MANUAL) {
-    return sel.manualModelId as TtsModelId;
+    return sel.manualModelId;
   }
   return undefined;
 }
@@ -209,11 +207,13 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
 
   // Settings - pass SSR initialData so no client fetch on hydration
   const { settings } = useChatSettings(user, logger, initialSettingsData);
-  const defaults = ChatSettingsRepositoryClient.getDefaults();
+  const env = useEnvAvailability();
+  const defaults = ChatSettingsRepositoryClient.getDefaults(user, env);
   const effectiveSettings = settings ?? defaults;
   const viewMode = effectiveSettings.viewMode;
   const selectedSkill = effectiveSettings.selectedSkill;
-  const selectedModel = effectiveSettings.selectedModel;
+  const selectedModel =
+    effectiveSettings.selectedModel ?? defaults.selectedModel ?? null;
 
   // Pre-seed character React Query cache from SSR data so useSkill() callers
   // (grouped-assistant-message, threaded-view, flat-message) find it cached on mount.
@@ -269,7 +269,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     currentSubFolderId,
     leafMessageId,
     settings: {
-      selectedModel: effectiveSettings.selectedModel,
+      selectedModel,
       selectedSkill: effectiveSettings.selectedSkill,
       availableTools: effectiveSettings.availableTools,
       pinnedTools: effectiveSettings.pinnedTools,
@@ -1260,7 +1260,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                           editorAttachments={editorAttachments}
                           isLoadingRetryAttachments={isLoadingRetryAttachments}
                           selectedSkill={selectedSkill}
-                          selectedModel={selectedModel}
+                          selectedModel={selectedModel ?? null}
                           sendMessage={sendMessage}
                           deductCredits={deductCredits}
                           onLoadNewerHistory={loadNewerHistory}
@@ -1298,7 +1298,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                           editorAttachments={editorAttachments}
                           isLoadingRetryAttachments={isLoadingRetryAttachments}
                           selectedSkill={selectedSkill}
-                          selectedModel={selectedModel}
+                          selectedModel={selectedModel ?? null}
                           sendMessage={sendMessage}
                           deductCredits={deductCredits}
                           onLoadNewerHistory={loadNewerHistory}

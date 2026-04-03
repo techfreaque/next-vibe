@@ -29,7 +29,7 @@ const vibeCheck: CheckConfig["vibeCheck"] = {
   timeout: 3600,
   limit: 20000,
   mcpLimit: 20, // Compact limit for MCP platform
-  editorUriScheme: "vscode://file/", // URI scheme for clickable file links
+  editorUriScheme: "cursor://file/", // URI scheme for clickable file links
   // Extensive mode: when false (default), test and generated files are excluded.
   // use "vibe check --extensive" for release validation to catch issues in all files.
   extensive: false,
@@ -67,6 +67,10 @@ const nonExtensivePatterns = [
   "**/generated/**",
   "**/*.test.ts",
   "**/*.test.tsx",
+  "src/app-tanstack/routes/**",
+  "src/app-tanstack/routeTree.gen.ts",
+  "**/registry/generated.ts",
+  "**/registry/generated.client.ts",
 ];
 const {
   oxlintIgnores: oxlintNonExtensiveIgnores,
@@ -151,12 +155,12 @@ const oxlint: CheckConfig["oxlint"] = {
   ],
   jsPlugins: [
     ...(features.restrictedSyntax
-      ? ["@next-vibe/checker/oxlint-plugins/restricted-syntax.ts"]
+      ? ["@next-vibe/checker/oxlint-plugins/restricted-syntax.js"]
       : []),
     ...(features.jsxCapitalization
-      ? ["@next-vibe/checker/oxlint-plugins/jsx-capitalization.ts"]
+      ? ["@next-vibe/checker/oxlint-plugins/jsx-capitalization.js"]
       : []),
-    ...(features.i18n ? ["@next-vibe/checker/oxlint-plugins/i18n.ts"] : []),
+    ...(features.i18n ? ["@next-vibe/checker/oxlint-plugins/i18n.js"] : []),
   ],
   categories: {
     correctness: "error",
@@ -376,7 +380,7 @@ const oxlint: CheckConfig["oxlint"] = {
           "oxlint-plugin-jsx-capitalization/jsx-capitalization": [
             "error",
             {
-              excludedPaths: ["/src/packages/next-vibe-ui/web/"],
+              excludedPaths: ["/src/packages/next-vibe-ui/"],
               excludedFilePatterns: [
                 "/email.tsx",
                 ".email.tsx",

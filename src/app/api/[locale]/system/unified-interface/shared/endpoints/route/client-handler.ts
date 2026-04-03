@@ -4,9 +4,11 @@
  * Mirrors server route handler structure but runs in browser
  */
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 
@@ -23,6 +25,8 @@ export type ClientHandlerFunction<
   urlPathParams: TUrlVariablesOutput;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  user: JWTPublicPayloadType;
+  env: AgentEnvAvailability;
 }) => Promise<ResponseType<TResponseOutput>> | ResponseType<TResponseOutput>;
 
 /**

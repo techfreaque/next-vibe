@@ -13,17 +13,14 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import {
-  buildMissingKeyMessage,
-  getAgentEnvAvailability,
-  PROVIDER_SETUP_INSTRUCTIONS,
-} from "@/app/api/[locale]/agent/env-availability";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import {
-  ApiProvider,
-  getModelById,
-  ModelId,
-} from "@/app/api/[locale]/agent/models/models";
+  agentEnvAvailability,
+  buildMissingKeyMessage,
+  PROVIDER_SETUP_INSTRUCTIONS,
+} from "@/app/api/[locale]/agent/env-availability";
+import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
+import { getSttModelById } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -37,8 +34,10 @@ import {
   STT_MINIMUM_BALANCE,
 } from "../../products/repository-client";
 import type { JwtPayloadType } from "../../user/auth/types";
+import { DEFAULT_STT_MODEL_ID } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import type { SpeechToTextPostResponseOutput } from "./definition";
 import type { SpeechToTextT } from "./i18n";
+import type { SttModelId } from "./models";
 
 /**
  * Speech-to-Text Repository
@@ -56,10 +55,10 @@ export class SpeechToTextRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: SpeechToTextT,
-    sttModelId?: string,
+    sttModelId?: SttModelId,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
-    const resolvedModelId = (sttModelId ?? ModelId.OPENAI_WHISPER) as ModelId;
-    const modelOption = getModelById(resolvedModelId);
+    const resolvedModelId = sttModelId ?? DEFAULT_STT_MODEL_ID;
+    const modelOption = getSttModelById(resolvedModelId);
     const language = getLanguageFromLocale(locale);
 
     logger.debug("[STT] Starting audio transcription", {
@@ -360,8 +359,7 @@ export class SpeechToTextRepository {
       edenAiCostUsd: number | undefined;
     }>
   > {
-    const availability = getAgentEnvAvailability();
-    if (!availability.voice) {
+    if (!agentEnvAvailability.voice) {
       logger.error(
         "[STT] Eden AI not configured",
         buildMissingKeyMessage("voice"),

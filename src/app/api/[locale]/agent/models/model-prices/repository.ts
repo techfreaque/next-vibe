@@ -19,7 +19,9 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { modelDefinitions } from "../models";
+import type { ModelDefinition } from "@/app/api/[locale]/agent/models/models";
+
+import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 
 import type { ModelPricesGetResponseOutput } from "./definition";
 import type { ModelPricesT } from "./i18n";
@@ -35,6 +37,14 @@ import { OpenAiTtsPriceFetcher } from "./providers/openai-tts";
 import { OpenRouterImagePriceFetcher } from "./providers/openrouter-image";
 import { OpenRouterTokenPriceFetcher } from "./providers/openrouter-token";
 import { ReplicatePriceFetcher } from "./providers/replicate";
+import { FreedomGptPriceFetcher } from "./providers/freedomgpt";
+import { UncensoredAiPriceFetcher } from "./providers/uncensored-ai";
+import { chatModelDefinitions } from "../../ai-stream/models";
+import { imageGenModelDefinitions } from "../../image-generation/models";
+import { musicGenModelDefinitions } from "../../music-generation/models";
+import { videoGenModelDefinitions } from "../../video-generation/models";
+import { ttsModelDefinitions } from "../../text-to-speech/models";
+import { sttModelDefinitions } from "../../speech-to-text/models";
 
 export type { PriceFetcher, ProviderPriceResult };
 
@@ -50,6 +60,8 @@ const ALL_FETCHERS: PriceFetcher[] = [
   new DeepgramPriceFetcher(),
   new EdenAiPriceFetcher(),
   new ModelslabPriceFetcher(),
+  new UncensoredAiPriceFetcher(),
+  new FreedomGptPriceFetcher(),
 ];
 
 /** ISO date string YYYY-MM-DD */
@@ -72,6 +84,21 @@ function buildUpdateComment(source: string): string {
     // Not a URL - use as-is (e.g. "openrouter-api", "replicate-api")
   }
   return `// updated: ${today()} from ${shortSource}`;
+}
+
+/**
+ * Check if a price line already has the correct value and a valid update comment.
+ * Returns true if the line should be skipped (no update needed).
+ */
+function isAlreadyUpToDate(
+  line: string,
+  field: string,
+  newValue: number,
+): boolean {
+  const regex = new RegExp(
+    `${field}:\\s*${String(newValue).replace(/\./g, "\\.")}[,]?\\s*// updated: \\d{4}-\\d{2}-\\d{2} from `,
+  );
+  return regex.test(line);
 }
 
 /**
@@ -116,6 +143,10 @@ function applyPriceUpdate(
     blockRegex,
     // eslint-disable-next-line no-unused-vars
     (_: string, prefix: string, priceLine: string) => {
+      // Skip if value matches and line already has a valid update comment
+      if (isAlreadyUpToDate(priceLine, field, newValue)) {
+        return prefix + priceLine;
+      }
       const newLine = replaceValueAndComment(
         priceLine,
         field,
@@ -155,6 +186,10 @@ function applyCacheCostUpdate(
       updateRegex,
       // eslint-disable-next-line no-unused-vars
       (_: string, prefix: string, priceLine: string) => {
+        // Skip if value matches and line already has a valid update comment
+        if (isAlreadyUpToDate(priceLine, field, newValue)) {
+          return prefix + priceLine;
+        }
         const newLine = replaceValueAndComment(
           priceLine,
           field,
@@ -185,6 +220,112 @@ function applyCacheCostUpdate(
   return { content, changed: false };
 }
 
+/** Format a Modality[] as a TypeScript array literal, e.g. `["text", "image"]` */
+function formatModalityArray(modalities: Modality[]): string {
+  return `[${modalities.map((m) => `"${m}"`).join(", ")}]`;
+}
+
+/**
+ * Check if a modality line already has the correct value and a valid update comment.
+ */
+function isModalityUpToDate(
+  line: string,
+  field: string,
+  arrayStr: string,
+): boolean {
+  const escaped = arrayStr.replace(/[[\]]/g, "\\$&");
+  const regex = new RegExp(
+    `${field}:\\s*${escaped}[,]?\\s*// updated: \\d{4}-\\d{2}-\\d{2} from `,
+  );
+  return regex.test(line);
+}
+
+/**
+ * Apply a modality update to the file content.
+ * Handles two source patterns:
+ * 1. `...defaultLlmModality,` → replaced with explicit `inputs: [...], outputs: [...]`
+ * 2. Existing `inputs: [...]` / `outputs: [...]` lines → updated in place
+ *
+ * Adds `// updated: YYYY-MM-DD from <source>` comment to each modality line.
+ * Skips if value and comment are already correct.
+ */
+function applyModalityUpdate(
+  content: string,
+  enumPrefix: string,
+  enumKey: string,
+  inputs: Modality[],
+  outputs: Modality[],
+  source: string,
+): { content: string; changed: boolean } {
+  // Find the model definition block: [EnumPrefix.KEY]: {  ...  }
+  // We need to locate it and update within it
+  const blockStartRegex = new RegExp(
+    `\\[${enumPrefix}\\.${enumKey}\\]:\\s*\\{`,
+  );
+  const blockStartMatch = blockStartRegex.exec(content);
+  if (!blockStartMatch) {
+    return { content, changed: false };
+  }
+
+  const inputsStr = formatModalityArray(inputs);
+  const outputsStr = formatModalityArray(outputs);
+  const comment = buildUpdateComment(source);
+  let changed = false;
+
+  // Pattern 1: Replace `...defaultLlmModality,` with explicit inputs/outputs
+  const defaultModalityRegex = new RegExp(
+    `(\\[${enumPrefix}\\.${enumKey}\\]:\\s*\\{[\\s\\S]*?)(\\.\\.\\.defaultLlmModality,)`,
+  );
+  if (defaultModalityRegex.test(content)) {
+    const newContent = content.replace(
+      defaultModalityRegex,
+      `$1inputs: ${inputsStr}, ${comment}\n    outputs: ${outputsStr}, ${comment}`,
+    );
+    if (newContent !== content) {
+      return { content: newContent, changed: true };
+    }
+  }
+
+  // Pattern 2: Update existing inputs: [...] line (with optional trailing comment)
+  const inputsRegex = new RegExp(
+    `(\\[${enumPrefix}\\.${enumKey}\\]:\\s*\\{[\\s\\S]*?)(inputs:\\s*\\[[^\\]]*\\][,]?(?:\\s*//[^\n]*)?)`,
+  );
+  const inputsMatch = inputsRegex.exec(content);
+  if (inputsMatch) {
+    const existingLine = inputsMatch[2];
+    const upToDate = isModalityUpToDate(existingLine, "inputs", inputsStr);
+    if (!upToDate) {
+      const replacement = `inputs: ${inputsStr}, ${comment}`;
+      const newContent = content.replace(inputsRegex, `$1${replacement}`);
+      if (newContent !== content) {
+        content = newContent;
+        changed = true;
+      }
+    }
+  }
+
+  // Pattern 2b: Update existing outputs: [...] line (with optional trailing comment)
+  const outputsRegex = new RegExp(
+    `(\\[${enumPrefix}\\.${enumKey}\\]:\\s*\\{[\\s\\S]*?)(outputs:\\s*\\[[^\\]]*\\][,]?(?:\\s*//[^\n]*)?)`,
+  );
+  const outputsMatch = outputsRegex.exec(content);
+  if (outputsMatch) {
+    const existingLine = outputsMatch[2];
+    if (!isModalityUpToDate(existingLine, "outputs", outputsStr)) {
+      const newContent = content.replace(
+        outputsRegex,
+        `$1outputs: ${outputsStr}, ${comment}`,
+      );
+      if (newContent !== content) {
+        content = newContent;
+        changed = true;
+      }
+    }
+  }
+
+  return { content, changed };
+}
+
 export class ModelPricesRepository {
   static async fetchAndUpdate(
     logger: EndpointLogger,
@@ -196,26 +337,81 @@ export class ModelPricesRepository {
       );
 
       const allUpdates = providerResults.flatMap((r) => r.updates);
+      const allModalityUpdates = providerResults.flatMap(
+        (r) => r.modalityUpdates ?? [],
+      );
       const allFailures = providerResults.flatMap((r) => r.failures);
 
-      const modelsPath = join(
-        process.cwd(),
-        "src/app/api/[locale]/agent/models/models.ts",
-      );
-      let content = readFileSync(modelsPath, "utf-8");
+      const agentDir = join(process.cwd(), "src/app/api/[locale]/agent");
+      // Role file paths — model definitions live in modality-specific subdirs
+      const roleFilePaths: Record<string, string> = {
+        chat: join(agentDir, "ai-stream/models.ts"),
+        "image-gen": join(agentDir, "image-generation/models.ts"),
+        "music-gen": join(agentDir, "music-generation/models.ts"),
+        "video-gen": join(agentDir, "video-generation/models.ts"),
+        tts: join(agentDir, "text-to-speech/models.ts"),
+        stt: join(agentDir, "speech-to-text/models.ts"),
+      };
+      // Build a map of modelId → role for fast lookup
+      const modelIdToRole: Record<string, string> = {};
+      for (const id of Object.keys(chatModelDefinitions)) {
+        modelIdToRole[id] = "chat";
+      }
+      for (const id of Object.keys(imageGenModelDefinitions)) {
+        modelIdToRole[id] = "image-gen";
+      }
+      for (const id of Object.keys(musicGenModelDefinitions)) {
+        modelIdToRole[id] = "music-gen";
+      }
+      for (const id of Object.keys(videoGenModelDefinitions)) {
+        modelIdToRole[id] = "video-gen";
+      }
+      for (const id of Object.keys(ttsModelDefinitions)) {
+        modelIdToRole[id] = "tts";
+      }
+      for (const id of Object.keys(sttModelDefinitions)) {
+        modelIdToRole[id] = "stt";
+      }
+
+      // Load all role file contents
+      const roleFileContents: Record<string, string> = {};
+      for (const [role, path] of Object.entries(roleFilePaths)) {
+        roleFileContents[role] = readFileSync(path, "utf-8");
+      }
       let updatedCount = 0;
 
+      // Helper to get role-specific enum prefix for contextWindow regex
+      const enumPrefixForRole: Record<string, string> = {
+        chat: "ChatModelId",
+        "image-gen": "ImageGenModelId",
+        "music-gen": "MusicGenModelId",
+        "video-gen": "VideoGenModelId",
+        tts: "TtsModelId",
+        stt: "SttModelId",
+      };
+
       for (const update of allUpdates) {
+        const role = modelIdToRole[update.modelId];
+        if (!role) {
+          continue;
+        }
+        const content = roleFileContents[role];
+        if (!content) {
+          continue;
+        }
+
         // contextWindow uses enum key, not providerModel
         if (update.field === "contextWindow" && update.enumKey) {
+          const enumPrefix = enumPrefixForRole[role] ?? "ChatModelId";
           const regex = new RegExp(
-            `(\\[ModelId\\.${update.enumKey}\\]:\\s*\\{[^}]*?contextWindow:\\s*)\\d+`,
+            `(\\[${enumPrefix}\\.${update.enumKey}\\]:\\s*\\{[^}]*?contextWindow:\\s*)\\d+`,
             "s",
           );
           if (regex.test(content)) {
             const before = content;
-            content = content.replace(regex, `$1${update.value}`);
-            if (content !== before) {
+            const updated = content.replace(regex, `$1${update.value}`);
+            if (updated !== before) {
+              roleFileContents[role] = updated;
               updatedCount++;
             }
           }
@@ -240,7 +436,7 @@ export class ModelPricesRepository {
               ? "cacheReadTokenCost"
               : "outputTokenCost";
           const result = applyCacheCostUpdate(
-            content,
+            roleFileContents[role],
             escaped,
             update.field,
             update.value,
@@ -248,7 +444,7 @@ export class ModelPricesRepository {
             insertAfter,
           );
           if (result.changed) {
-            content = result.content;
+            roleFileContents[role] = result.content;
             updatedCount++;
           }
           continue;
@@ -256,74 +452,315 @@ export class ModelPricesRepository {
 
         // Standard field update with comment annotation
         const result = applyPriceUpdate(
-          content,
+          roleFileContents[role],
           escaped,
           update.field,
           update.value,
           update.source,
         );
         if (result.changed) {
-          content = result.content;
+          roleFileContents[role] = result.content;
           updatedCount++;
         } else if (
-          !new RegExp(`providerModel:\\s*"${escaped}"`).test(content)
+          !new RegExp(`providerModel:\\s*"${escaped}"`).test(
+            roleFileContents[role],
+          )
         ) {
-          logger.debug("Price pattern not found in models.ts", {
+          logger.debug("Price pattern not found in role file", {
             providerModel: update.providerModel,
             field: update.field,
+            role,
           });
         }
       }
 
-      // Add/replace TODO comments for failures next to the price field line
-      for (const failure of allFailures) {
-        const modelEntry = Object.values(modelDefinitions).find((def) =>
-          def.providers.some((p) => p.id === failure.modelId),
-        );
-        if (!modelEntry) {
-          continue;
-        }
+      // Apply modality updates (inputs/outputs from API architecture data)
+      // For chat models: use fetched modality data from OpenRouter
+      // Index modality updates by enumKey for dedup and cross-role lookup
+      const modalityByEnumKey = new Map<
+        string,
+        { inputs: Modality[]; outputs: Modality[]; source: string }
+      >();
+      for (const modUpdate of allModalityUpdates) {
+        modalityByEnumKey.set(modUpdate.enumKey, {
+          inputs: modUpdate.inputs,
+          outputs: modUpdate.outputs,
+          source: modUpdate.source,
+        });
+      }
 
-        const providerConfig = modelEntry.providers.find(
-          (p) => p.id === failure.modelId && p.apiProvider === failure.provider,
-        );
-        if (!providerConfig) {
-          continue;
-        }
-
-        const escaped = providerConfig.providerModel.replace(
-          /[.*+?^${}()|[\]\\]/g,
-          "\\$&",
-        );
-
-        const todoComment = `// TODO: price not found from ${failure.provider}: ${failure.reason}`;
-
-        // Find the providerModel line and add/replace TODO before it
-        const providerModelLine = new RegExp(
-          `([ \\t]*)(providerModel:\\s*"${escaped}")`,
-        );
-        const existingTodoBeforeModel = new RegExp(
-          `// TODO: price not found[^\n]*\n[ \\t]*providerModel:\\s*"${escaped}"`,
-        );
-
-        if (providerModelLine.test(content)) {
-          if (existingTodoBeforeModel.test(content)) {
-            // Replace existing TODO comment
-            content = content.replace(
-              existingTodoBeforeModel,
-              `${todoComment}\n        providerModel: "${providerConfig.providerModel}"`,
-            );
-          } else {
-            // Insert TODO before providerModel line
-            content = content.replace(
-              providerModelLine,
-              `$1${todoComment}\n$1$2`,
-            );
+      // Apply modality updates to ALL role files (handles models registered in multiple roles)
+      for (const [role, fileContent] of Object.entries(roleFileContents)) {
+        const enumPrefix = enumPrefixForRole[role] ?? role;
+        for (const [enumKey, modData] of modalityByEnumKey) {
+          // Check if this enum key exists in this role file
+          const blockRegex = new RegExp(
+            `\\[${enumPrefix}\\.${enumKey}\\]:\\s*\\{`,
+          );
+          if (!blockRegex.test(fileContent)) {
+            continue;
+          }
+          const result = applyModalityUpdate(
+            roleFileContents[role],
+            enumPrefix,
+            enumKey,
+            modData.inputs,
+            modData.outputs,
+            modData.source,
+          );
+          if (result.changed) {
+            roleFileContents[role] = result.content;
+            updatedCount++;
           }
         }
       }
 
-      writeFileSync(modelsPath, content, "utf-8");
+      // For non-chat models: apply deterministic modalities based on role
+      const roleModalityDefaults: Record<
+        string,
+        { inputs: Modality[]; outputs: Modality[] } | undefined
+      > = {
+        "image-gen": { inputs: ["text"], outputs: ["image"] },
+        "music-gen": { inputs: ["text"], outputs: ["audio"] },
+        "video-gen": { inputs: ["text"], outputs: ["video"] },
+        tts: { inputs: ["text"], outputs: ["audio"] },
+        stt: { inputs: ["audio"], outputs: ["text"] },
+      };
+      const allNonChatDefs: Record<string, Record<string, ModelDefinition>> = {
+        "image-gen": { ...imageGenModelDefinitions },
+        "music-gen": { ...musicGenModelDefinitions },
+        "video-gen": { ...videoGenModelDefinitions },
+        tts: { ...ttsModelDefinitions },
+        stt: { ...sttModelDefinitions },
+      };
+      for (const [role, defs] of Object.entries(allNonChatDefs)) {
+        const defaults = roleModalityDefaults[role];
+        if (!defaults || !roleFileContents[role]) {
+          continue;
+        }
+        const enumPrefix = enumPrefixForRole[role] ?? role;
+        const fileContent = roleFileContents[role];
+        for (const modelId of Object.keys(defs)) {
+          const escapedModelId = modelId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const enumKeyMatch = new RegExp(
+            `(\\w+)\\s*=\\s*"${escapedModelId}"`,
+          ).exec(fileContent);
+          const enumKey = enumKeyMatch?.[1];
+          if (!enumKey) {
+            continue;
+          }
+          const result = applyModalityUpdate(
+            roleFileContents[role],
+            enumPrefix,
+            enumKey,
+            defaults.inputs,
+            defaults.outputs,
+            `${role}-deterministic`,
+          );
+          if (result.changed) {
+            roleFileContents[role] = result.content;
+            updatedCount++;
+          }
+        }
+      }
+
+      // Track which model IDs had modality verification
+      const modelIdsWithModalityVerified = new Set(
+        allModalityUpdates.map((u) => u.modelId),
+      );
+      // Non-chat models always have deterministic modalities
+      for (const defs of Object.values(allNonChatDefs)) {
+        for (const modelId of Object.keys(defs)) {
+          modelIdsWithModalityVerified.add(modelId);
+        }
+      }
+      // Track which model IDs had price fetch successes
+      // A "primary" update is one of the core cost fields (not context window or cache fields)
+      const modelIdsWithPriceSuccess = new Set(
+        allUpdates
+          .filter(
+            (u) =>
+              u.field !== "contextWindow" &&
+              u.field !== "cacheReadTokenCost" &&
+              u.field !== "cacheWriteTokenCost",
+          )
+          .map((u) => u.modelId),
+      );
+
+      // Disable any model without verified price OR modality (unless enabledWithoutPrice)
+      const modelIdsToDisable = new Set(
+        Object.keys(modelIdToRole).filter(
+          (id) =>
+            !modelIdsWithPriceSuccess.has(id) ||
+            !modelIdsWithModalityVerified.has(id),
+        ),
+      );
+
+      // Update enabled: false / remove it based on price fetch results.
+      // We search each role file for the model's enum key block and toggle the flag.
+      const allModelDefsForEnabled: Record<
+        string,
+        Record<string, ModelDefinition>
+      > = {
+        chat: { ...chatModelDefinitions },
+        "image-gen": { ...imageGenModelDefinitions },
+        "music-gen": { ...musicGenModelDefinitions },
+        "video-gen": { ...videoGenModelDefinitions },
+        tts: { ...ttsModelDefinitions },
+        stt: { ...sttModelDefinitions },
+      };
+
+      for (const [role, defs] of Object.entries(allModelDefsForEnabled)) {
+        const enumPrefix = enumPrefixForRole[role] ?? "ChatModelId";
+        const fileContent = roleFileContents[role];
+        if (!fileContent) {
+          continue;
+        }
+
+        for (const [modelId, def] of Object.entries(defs)) {
+          if (modelIdToRole[modelId] !== role) {
+            continue;
+          }
+          // Never auto-disable models that have explicit price override
+          if (def.enabledWithoutPrice) {
+            continue;
+          }
+
+          // Find the enum key name for this model ID value in the file
+          const escapedModelId = modelId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const enumKeyMatch = new RegExp(
+            `(\\w+)\\s*=\\s*"${escapedModelId}"`,
+          ).exec(fileContent);
+          const enumKey = enumKeyMatch?.[1];
+          if (!enumKey) {
+            continue;
+          }
+
+          const blockStartPattern = new RegExp(
+            `(\\[${enumPrefix}\\.${enumKey}\\]:\\s*\\{)`,
+          );
+
+          if (modelIdsToDisable.has(modelId)) {
+            // Add enabled: false after the opening brace if not already present
+            const alreadyDisabled = new RegExp(
+              `\\[${enumPrefix}\\.${enumKey}\\]:\\s*\\{[\\s\\S]*?enabled:\\s*false`,
+            );
+            if (
+              !alreadyDisabled.test(roleFileContents[role]) &&
+              blockStartPattern.test(roleFileContents[role])
+            ) {
+              const hasPrice = modelIdsWithPriceSuccess.has(modelId);
+              const hasModality = modelIdsWithModalityVerified.has(modelId);
+              const reasons: string[] = [];
+              if (!hasPrice) {
+                reasons.push("price not verified");
+              }
+              if (!hasModality) {
+                reasons.push("modality not verified");
+              }
+              const disableReason = reasons.join(" + ");
+              roleFileContents[role] = roleFileContents[role].replace(
+                blockStartPattern,
+                `$1\n    enabled: false, // auto-disabled: ${disableReason}`,
+              );
+              updatedCount++;
+            }
+          } else if (
+            modelIdsWithPriceSuccess.has(modelId) &&
+            modelIdsWithModalityVerified.has(modelId)
+          ) {
+            // Remove enabled: false if present (price and modality both verified)
+            const enabledFalsePattern = new RegExp(
+              `(\\[${enumPrefix}\\.${enumKey}\\]:\\s*\\{)\\n    enabled:\\s*false[^\n]*\\n`,
+            );
+            if (enabledFalsePattern.test(roleFileContents[role])) {
+              roleFileContents[role] = roleFileContents[role].replace(
+                enabledFalsePattern,
+                "$1\n",
+              );
+              updatedCount++;
+            }
+          }
+        }
+      }
+
+      // Write updated role files back to disk
+      for (const [role, path] of Object.entries(roleFilePaths)) {
+        const originalContent = readFileSync(path, "utf-8");
+        if (roleFileContents[role] !== originalContent) {
+          writeFileSync(path, roleFileContents[role], "utf-8");
+        }
+      }
+
+      // Re-generate vision model enums from the (possibly updated) chat model definitions.
+      // We use runtime imports because model files have just been written back to disk
+      // and the in-memory defs reflect the latest modality data.
+      try {
+        const { generateVisionEnumFileContent } =
+          await import("../../ai-stream/vision-enum-generator");
+        const { ChatModelId: ChatModelIdEnum } =
+          await import("../../ai-stream/models");
+        const content = generateVisionEnumFileContent(
+          chatModelDefinitions,
+          Object.entries(ChatModelIdEnum) as Array<[string, string]>,
+        );
+        const visionGenPath = join(
+          agentDir,
+          "ai-stream/vision-models.generated.ts",
+        );
+        const existingVision = readFileSync(visionGenPath, "utf-8").toString();
+        if (content !== existingVision) {
+          writeFileSync(visionGenPath, content, "utf-8");
+          logger.info("Vision model enums regenerated");
+        }
+      } catch (visionErr) {
+        logger.warn(
+          `Vision enum generation failed: ${parseError(visionErr).message}`,
+        );
+      }
+
+      // Re-generate media-gen model enums from chat model output modalities
+      try {
+        const { updateMediaGenEnumFile } =
+          await import("../../ai-stream/media-gen-enum-generator");
+        const { ChatModelId: ChatModelIdEnum } =
+          await import("../../ai-stream/models");
+        const chatEnumEntries = Object.entries(ChatModelIdEnum) as Array<
+          [string, string]
+        >;
+
+        updateMediaGenEnumFile(
+          {
+            filePath: join(agentDir, "image-generation/models.ts"),
+            modality: "image",
+          },
+          chatModelDefinitions,
+          chatEnumEntries,
+          logger,
+        );
+        updateMediaGenEnumFile(
+          {
+            filePath: join(agentDir, "music-generation/models.ts"),
+            modality: "audio",
+          },
+          chatModelDefinitions,
+          chatEnumEntries,
+          logger,
+        );
+        updateMediaGenEnumFile(
+          {
+            filePath: join(agentDir, "video-generation/models.ts"),
+            modality: "video",
+          },
+          chatModelDefinitions,
+          chatEnumEntries,
+          logger,
+        );
+      } catch (mediaGenErr) {
+        logger.warn(
+          `Media-gen enum generation failed: ${parseError(mediaGenErr).message}`,
+        );
+      }
 
       logger.info("Unified model pricing update completed", {
         providers: ALL_FETCHERS.length,

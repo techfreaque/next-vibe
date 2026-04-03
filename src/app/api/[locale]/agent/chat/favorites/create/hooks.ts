@@ -16,7 +16,8 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { IconKey } from "../../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import type { ModelSelectionSimple } from "../../../models/types";
+import { useEnvAvailability } from "../../../env-availability-context";
+import type { VoiceModelSelection } from "../../../models/types";
 import characterSingleDefinitions from "../../skills/[id]/definition";
 import { ChatFavoritesRepositoryClient } from "../repository-client";
 import favoritesDefinition, {
@@ -67,8 +68,8 @@ export interface SkillDataForFavorite {
   name: string | null;
   tagline: string | null;
   description: string | null;
-  voiceModelSelection: ModelSelectionSimple | null;
-  modelSelection: ModelSelectionSimple | null;
+  voiceModelSelection: VoiceModelSelection | null;
+  modelSelection: null;
 }
 
 export interface UseAddToFavoritesOptions {
@@ -108,6 +109,7 @@ export function useAddToFavorites({
   onSuccess,
 }: UseAddToFavoritesOptions): UseAddToFavoritesReturn {
   const [isLoading, setIsLoading] = useState(false);
+  const envAvailability = useEnvAvailability();
 
   const addToFavorites = async (e?: ButtonMouseEvent): Promise<void> => {
     e?.stopPropagation();
@@ -229,6 +231,7 @@ export function useAddToFavorites({
               null,
               locale,
               user,
+              envAvailability,
             );
 
           return {

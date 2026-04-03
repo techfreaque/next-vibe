@@ -6,7 +6,7 @@
 /// <reference types="bun-types" />
 
 import { existsSync, mkdirSync, statSync } from "node:fs";
-import { basename, dirname, parse, resolve } from "node:path";
+import { dirname, parse, resolve } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -176,19 +176,24 @@ export class BunCompiler implements IBunCompiler {
           ? "external"
           : (profileSettings.sourcemap as "external" | "inline" | "none"));
 
+    // When output filename differs from input filename, use `outfile` (single
+    // entrypoint) instead of `outdir` + `naming` to avoid a Bun bug where
+    // `naming.entry` with a plain filename causes "Multiple files share the
+    // same output path" errors.
+    const needsRename =
+      !bunOptions?.naming &&
+      parse(fileConfig.output).name !== parse(entrypointPath).name;
+
     // Build with Bun
     const result = await Bun.build({
       entrypoints: [entrypointPath],
-      outdir: outDir,
+      ...(needsRename
+        ? { outfile: outfilePath }
+        : { outdir: outDir, naming: bunOptions?.naming }),
       target: bunOptions?.target || "bun",
       minify: bunOptions?.minify ?? profileSettings.minify,
       sourcemap,
       external: externals,
-      naming:
-        bunOptions?.naming ??
-        (parse(fileConfig.output).name !== parse(entrypointPath).name
-          ? { entry: basename(fileConfig.output) }
-          : undefined),
       define: Object.keys(define).length > 0 ? define : undefined,
       splitting: bunOptions?.splitting,
       format: bunOptions?.format,

@@ -23,12 +23,12 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { lazy } from "react";
+import { MusicGenModelIdOptions } from "@/app/api/[locale]/agent/music-generation/models";
+import { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
 import {
   DEFAULT_MUSIC_DURATION,
-  MUSIC_DURATION_VALUES,
-  MUSIC_MODEL_IDS,
+  MusicDuration,
   MusicDurationOptions,
-  MusicModelOptions,
 } from "./enum";
 
 import { MUSIC_GEN_ALIAS } from "./constants";
@@ -68,7 +68,6 @@ const { POST } = createEndpoint({
 
   defaultExpanded: true,
   dynamicCredits: ({ response }) => response?.creditCost,
-  streamContextPatch: (ctx) => ({ model: ctx.musicGenModelId }),
 
   fields: customWidgetObject({
     render: MusicGenerationContainer,
@@ -90,9 +89,12 @@ const { POST } = createEndpoint({
         label: "post.model.label",
         description: "post.model.description",
         columns: 6,
-        options: MusicModelOptions,
-        schema: z.enum(MUSIC_MODEL_IDS).default(MUSIC_MODEL_IDS[0]),
+        options: MusicGenModelIdOptions,
+        schema: z
+          .enum(MusicGenModelId)
+          .default(MusicGenModelId.MUSICGEN_STEREO),
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
+        serverDefault: (ctx) => ctx.streamContext?.musicGenModelId,
       }),
       duration: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -101,7 +103,7 @@ const { POST } = createEndpoint({
         description: "post.duration.description",
         columns: 6,
         options: MusicDurationOptions,
-        schema: z.enum(MUSIC_DURATION_VALUES).default(DEFAULT_MUSIC_DURATION),
+        schema: z.enum(MusicDuration).default(MusicDuration.SHORT),
       }),
       backButton: backButton(scopedTranslation, {
         label: "post.backButton.label" as const,
@@ -198,7 +200,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         prompt: "Upbeat electronic music with a catchy melody",
-        model: MUSIC_MODEL_IDS[0],
+        model: MusicGenModelId.MUSICGEN_STEREO,
         duration: DEFAULT_MUSIC_DURATION,
       },
     },

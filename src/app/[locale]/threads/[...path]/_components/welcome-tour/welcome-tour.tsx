@@ -7,12 +7,12 @@ import { ACTIONS, EVENTS, Joyride, STATUS } from "react-joyride";
 
 import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useSidebarCollapsed } from "../sidebar/use-sidebar-collapsed";

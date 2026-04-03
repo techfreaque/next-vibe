@@ -7,7 +7,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { CodeBlock } from "next-vibe-ui/ui/markdown";
 import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
-import { H2, H3, P } from "next-vibe-ui/ui/typography";
+import { H2, H3, H4, P } from "next-vibe-ui/ui/typography";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
@@ -172,7 +172,6 @@ const { threads, totalCount } = await res.json();`;
 
 function WebApiPanel(): JSX.Element {
   return (
-<<<<<<< HEAD
     <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
       <Div className="px-6 pt-6 pb-4">
         <P className="text-sm font-semibold text-teal-400 mb-2">
@@ -184,11 +183,6 @@ function WebApiPanel(): JSX.Element {
           . No routing code to write. No controllers. Any HTTP client — server,
           browser, mobile — can call it immediately.
         </P>
-=======
-    <Div className="font-mono text-xs bg-[#0d1117] min-h-[360px] px-5 py-5 leading-6">
-      <Div className="text-slate-500">
-        {"// fetch from anywhere - server or client"}
->>>>>>> ffa7090e2 (add multi modal support)
       </Div>
       <CodeBlock code={WEB_API_SNIPPET} language="typescript" />
       <Div className="px-6 pt-4 pb-5">
@@ -202,45 +196,12 @@ function WebApiPanel(): JSX.Element {
   );
 }
 
-<<<<<<< HEAD
-const REACT_UI_SNIPPET = `const { read } = useThreadsList(
-=======
 const STEP_READ = `// hooks.ts - typed, cached, refetch-aware
 const { read } = useThreadsList(
->>>>>>> ffa7090e2 (add multi modal support)
   { rootFolderId: "private" },
   user, logger,
 );
 <<<<<<< HEAD
-// read.data?.threads → Thread[]
-// read.isLoading     → boolean`;
-
-function ReactUiPanel(): JSX.Element {
-  return (
-    <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
-      <Div className="px-6 pt-6 pb-4">
-        <P className="text-sm font-semibold text-blue-400 mb-2">
-          One hook. Typed data, cache, and mutations included.
-        </P>
-        <P className="text-xs text-slate-400 leading-relaxed">
-          The definition generates a typed React hook. It handles caching,
-          refetch-on-focus, loading states — all wired automatically. Optimistic
-          updates let you mutate the cache instantly so the UI never flickers
-          while the server confirms.
-        </P>
-      </Div>
-      <CodeBlock code={REACT_UI_SNIPPET} language="typescript" />
-      <Div className="px-6 pt-4 pb-5">
-        <P className="text-xs text-slate-500 leading-relaxed">
-          Need a full form? Drop{" "}
-          <Span className="text-slate-300 font-mono">
-            {"<EndpointsPage />"}
-          </Span>{" "}
-          anywhere and pass the definitions object. It renders the complete
-          form, validation, and success state — no extra code.
-        </P>
-=======
-
 // read.data?.threads   →  Thread[]
 // read.isLoading       →  boolean
 // read.isError         →  boolean`;
@@ -306,7 +267,6 @@ function ReactUiPanel(): JSX.Element {
           </H4>
         </Div>
         <CodeBlock code={STEP_DIALOG} language="typescript" />
->>>>>>> ffa7090e2 (add multi modal support)
       </Div>
     </Div>
   );
@@ -694,7 +654,6 @@ function VibeBoardPanel(): JSX.Element {
 const PLATFORM_PANELS: Record<EndpointPlatformKey, () => JSX.Element> = {
   webApi: WebApiPanel,
   reactUi: ReactUiPanel,
-<<<<<<< HEAD
   cli: CliPanel,
   aiTool: AiToolPanel,
   mcpServer: McpServerPanel,
@@ -706,19 +665,6 @@ const PLATFORM_PANELS: Record<EndpointPlatformKey, () => JSX.Element> = {
   vibeFrame: VibeFramePanel,
   remoteSkill: RemoteSkillPanel,
   vibeBoard: VibeBoardPanel,
-=======
-  cli: () => <PlaceholderPanel label="cli - coming next" />,
-  aiTool: () => <PlaceholderPanel label="aiTool - coming next" />,
-  mcpServer: () => <PlaceholderPanel label="mcpServer - coming next" />,
-  reactNative: () => <PlaceholderPanel label="reactNative - coming next" />,
-  cron: () => <PlaceholderPanel label="cron - coming next" />,
-  websocket: () => <PlaceholderPanel label="websocket - coming next" />,
-  electron: () => <PlaceholderPanel label="electron - coming next" />,
-  adminPanel: () => <PlaceholderPanel label="adminPanel - coming next" />,
-  vibeFrame: () => <PlaceholderPanel label="vibeFrame - coming next" />,
-  remoteSkill: () => <PlaceholderPanel label="remoteSkill - coming next" />,
-  vibeBoard: () => <PlaceholderPanel label="vibeBoard - coming next" />,
->>>>>>> ffa7090e2 (add multi modal support)
 };
 
 // ─── Definition snippet (source box) ─────────────────────────────────────────

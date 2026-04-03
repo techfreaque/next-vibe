@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
     whatItDoes:
       "To AI, które faktycznie robi to, o co prosisz. Bez owijania w bawełnę, bez moralizowania, bez losowych odmów. Używam go do copywritingu, badań, analizy konkurencji, tworzenia rzeczy których nie chcę tłumaczyć ostrożnemu AI. Po prostu działa.",
     affiliateDisclosure:
-      "Pełna transparentność: jeśli zapiszesz się przez mój link, dostanę małą prowizję. To część powodu dla którego to piszę. Ale i tak bym to polecał – wysłałem link już trzem osobom w normalnych rozmowach.",
+      "Pełna transparentność: jeśli zapiszesz się przez mój link, dostanę małą prowizję. To część powodu dla którego to piszę. Ale i tak bym to polecał - wysłałem link już trzem osobom w normalnych rozmowach.",
     ctaText: "Wypróbuj unbottled.ai (mój link afiliacyjny)",
     signature: " -  Chris",
     postScript:
@@ -40,7 +40,7 @@ export const translations: typeof enTranslations = {
     specificExample:
       "Chciałem napisać copy dla marki suplementów, która robi odważne twierdzenia. Każde główne AI albo je rozmywało, albo po prostu odmawiało. Spędziłem może 45 minut kręcąc się w kółko. Przeszedłem na unbottled.ai, miałem copy w 8 minut. Klient zatwierdził go tego samego dnia.",
     comparison:
-      "Nie mówię, że ChatGPT jest zły. Do wielu rzeczy jest świetny. Ale jeśli pracujesz przy czymkolwiek związanym z marketingiem, tekstami sprzedażowymi, granicznymi przypadkami prawnymi lub po prostu czymś, co wymaga trochę bezpośredniości – w końcu trafisz na ścianę.",
+      "Nie mówię, że ChatGPT jest zły. Do wielu rzeczy jest świetny. Ale jeśli pracujesz przy czymkolwiek związanym z marketingiem, tekstami sprzedażowymi, granicznymi przypadkami prawnymi lub po prostu czymś, co wymaga trochę bezpośredniości - w końcu trafisz na ścianę.",
     nudge:
       "Jeśli brzmi to jak twój świat, warto poświęcić 5 minut na darmową wersję.",
     ctaText: "Wypróbuj za darmo",
@@ -53,7 +53,7 @@ export const translations: typeof enTranslations = {
     lastPitch:
       "Wysłałem kilka maili o unbottled.ai i po tym dam spokój. Jeśli to nie jest istotne dla tego co robisz, totalnie rozumiem.",
     honesty:
-      "Jeśli kiedyś będziesz się zmagać z AI które nie chce współpracować – pamiętaj, że to jest opcja. Link poniżej. Afiliacyjny, tak. Nadal szczery.",
+      "Jeśli kiedyś będziesz się zmagać z AI które nie chce współpracować - pamiętaj, że to jest opcja. Link poniżej. Afiliacyjny, tak. Nadal szczery.",
     ctaText: "unbottled.ai",
     signature: " -  Chris",
   },
@@ -73,7 +73,7 @@ export const translations: typeof enTranslations = {
     previewText: "dużo się zmieniło od kiedy pierwsza o tym wspomniałem",
     greeting: "Hej,",
     checkIn:
-      "Wiem, że minęło trochę czasu od kiedy ostatnio wspominałem o unbottled.ai. Nadal go używam i naprawdę stał się lepszy – szybsze odpowiedzi, więcej opcji modeli, i naprawili kilka chropowatych miejsc.",
+      "Wiem, że minęło trochę czasu od kiedy ostatnio wspominałem o unbottled.ai. Nadal go używam i naprawdę stał się lepszy - szybsze odpowiedzi, więcej opcji modeli, i naprawili kilka chropowatych miejsc.",
     update:
       "Jeśli patrzyłeś na to wcześniej i nie byłeś pod wrażeniem, może warto spojrzeć jeszcze raz. Jeśli nigdy nie próbowałeś, darmowy trial nadal jest dostępny. Ten sam link afiliacyjny, ta sama szczera rekomendacja.",
     ctaText: "Rzuć okiem jeszcze raz",

@@ -18,7 +18,7 @@ import { formatPostNumber } from "@/app/[locale]/chat/lib/utils/post-numbers";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
-import { getModelById } from "@/app/api/[locale]/agent/models/models";
+import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -317,7 +317,7 @@ export const FlatMessage = memo(function FlatMessage({
   // Get display names
   const modelData =
     message.role === "assistant" && message.model
-      ? getModelById(message.model)
+      ? getChatModelById(message.model)
       : null;
   const modelDisplayName =
     modelData?.name || t("widget.flatView.assistantFallback");

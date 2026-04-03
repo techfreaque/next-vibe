@@ -18,12 +18,15 @@ import type { z } from "zod";
 import { users } from "@/app/api/[locale]/user/db";
 
 import type { ChatMode } from "../../models/enum";
-import type { LlmModelId, ModelId, VideoGenModelId } from "../../models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
 import type {
+  AudioVisionModelSelection,
   ImageGenModelSelection,
+  ImageVisionModelSelection,
   MusicGenModelSelection,
   SttModelSelection,
-  VisionModelSelection,
+  VideoVisionModelSelection,
   VoiceModelSelection,
 } from "../../models/types";
 import type { ViewModeValue } from "../enum";
@@ -45,7 +48,7 @@ export const chatSettings = pgTable("chat_settings", {
     .references(() => users.id, { onDelete: "cascade" }),
 
   // Selected model and character - only store if different from default
-  selectedModel: jsonb("selected_model").$type<ModelId>(),
+  selectedModel: jsonb("selected_model").$type<ChatModelId>(),
   selectedSkill: jsonb("selected_character").$type<string>(),
   activeFavoriteId: jsonb("active_favorite_id").$type<string | null>(),
 
@@ -60,13 +63,19 @@ export const chatSettings = pgTable("chat_settings", {
   // STT model selection (null = system default)
   sttModelSelection: jsonb("stt_model_selection").$type<SttModelSelection>(),
 
-  // Vision bridge model selection (null = best vision model user has access to)
-  visionBridgeModelSelection: jsonb(
-    "vision_bridge_model_selection",
-  ).$type<VisionModelSelection>(),
+  // Vision model selections per modality (null = system default)
+  imageVisionModelSelection: jsonb(
+    "image_vision_model_selection",
+  ).$type<ImageVisionModelSelection>(),
+  videoVisionModelSelection: jsonb(
+    "video_vision_model_selection",
+  ).$type<VideoVisionModelSelection>(),
+  audioVisionModelSelection: jsonb(
+    "audio_vision_model_selection",
+  ).$type<AudioVisionModelSelection>(),
 
   // Translation model for pure generators (null = fast cheap LLM)
-  translationModelId: text("translation_model_id").$type<LlmModelId>(),
+  translationModelId: text("translation_model_id").$type<ChatModelId>(),
 
   // Default chat mode (null = "text")
   defaultChatMode: text("default_chat_mode").$type<ChatMode>(),

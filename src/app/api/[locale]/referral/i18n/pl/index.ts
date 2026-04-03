@@ -135,7 +135,7 @@ export const translations: typeof enTranslations = {
         earnings: "Zarobki",
         inactive: "Ten kod polecający jest nieaktywny",
         conversionHint:
-          "Każdy subskrybent za {{examplePrice}}/mies. przynosi Ci {{exampleEarning}}/mies. – cyklicznie",
+          "Każdy subskrybent za {{examplePrice}}/mies. przynosi Ci {{exampleEarning}}/mies. - cyklicznie",
       },
     },
   },
@@ -156,7 +156,7 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       emptyMessage:
-        "Brak aktywności – udostępnij link polecający, aby zacząć zarabiać",
+        "Brak aktywności - udostępnij link polecający, aby zacząć zarabiać",
     },
     fields: {
       totalSignups: "Łączne rejestracje",
@@ -259,7 +259,7 @@ export const translations: typeof enTranslations = {
     updatedAt: "Zaktualizowano",
     referralCode: "Kod polecający",
     success:
-      "🎉 Twój kod polecający jest gotowy! Skopiuj poniższy link i zacznij zarabiać {{directPct}} prowizji od każdej subskrypcji – plus bonusowe zarobki z ich poleceń.",
+      "🎉 Twój kod polecający jest gotowy! Skopiuj poniższy link i zacznij zarabiać {{directPct}} prowizji od każdej subskrypcji - plus bonusowe zarobki z ich poleceń.",
     message: "Wiadomość",
   },
 
@@ -346,7 +346,7 @@ export const translations: typeof enTranslations = {
       howItWorksTitle: "Jak to działa",
       step1Title: "Utwórz kody polecające",
       step1Body:
-        "Generuj unikalne kody dla różnych grup – znajomych, mediów społecznościowych lub kampanii.",
+        "Generuj unikalne kody dla różnych grup - znajomych, mediów społecznościowych lub kampanii.",
       step2Title: "Udostępnij swój link",
       step2Body:
         "Gdy ktoś zarejestruje się przez Twój link i zasubskrybuje, zarabiasz prowizję.",
@@ -409,7 +409,7 @@ export const translations: typeof enTranslations = {
     success: {
       creditsConverted: "Kredyty zostały pomyślnie przeliczone",
       payoutRequested:
-        "Żądanie wypłaty zostało złożone – przetwarzanie w ciągu {{hours}} godzin",
+        "Żądanie wypłaty zostało złożone - przetwarzanie w ciągu {{hours}} godzin",
     },
   },
 

@@ -14,6 +14,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { Architecture } from "./architecture";
 import CallToAction from "./call-to-action";
 import { CapabilityShowcase } from "./capability-showcase";
+import { configScopedTranslation } from "@/config/i18n";
+
 import { scopedTranslation } from "./i18n";
 import { NextVibeShowcase } from "./nextvibe-showcase";
 import { OpenClawComparison } from "./openclaw-comparison";
@@ -137,7 +139,7 @@ function TabCard({
       </Div>
       <P
         className={cn(
-          "text-xs leading-relaxed m-0 transition-colors duration-300 break-words",
+          "text-xs leading-relaxed m-0 transition-colors duration-300 break-words hidden md:block",
           active ? tab.activeDesc : tab.inactiveDesc,
         )}
       >
@@ -158,6 +160,8 @@ export function UniverseContent({
   onSideChange,
 }: UniverseContentProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   const [localActive, setLocalActive] = useState<TabId>("unbottled");
 
   const current: TabId =
@@ -177,7 +181,7 @@ export function UniverseContent({
   const tabs: TabConfig[] = [
     {
       id: "unbottled",
-      label: t("home.splitHero.tab.unbottled"),
+      label: t("home.splitHero.tab.unbottled", { appName }),
       sublabel: t("home.splitHero.tab.unbottledSub"),
       desc: t("home.splitHero.tab.unbottledDesc", {
         modelCount: String(totalModelCount),
@@ -235,7 +239,7 @@ export function UniverseContent({
       id: "nextvibe",
       label: t("home.splitHero.tab.nextvibe"),
       sublabel: t("home.splitHero.tab.nextvibeSub"),
-      desc: t("home.splitHero.tab.nextvibeDesc"),
+      desc: t("home.splitHero.tab.nextvibeDesc", { appName }),
       color: "cyan",
       dot: "bg-cyan-500 dark:bg-cyan-400",
       inactiveDot: "bg-cyan-400 dark:bg-cyan-700",

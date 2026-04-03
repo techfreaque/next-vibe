@@ -605,6 +605,86 @@ export const translations: typeof enTranslations = {
         "Wan 2.2 Ultra - Wysokiej jakości model tekst-na-wideo ModelsLab",
       modelsLabWan21:
         "Wan 2.1 Ultra - Model tekst-na-wideo ModelsLab z ulepszoną jakością",
+      modelsLabWan25T2V: "Wan 2.5 T2V - Model tekst-na-wideo Wan 2.5 ModelsLab",
+      modelsLabWan25I2V: "Wan 2.5 I2V - Model obraz-na-wideo Wan 2.5 ModelsLab",
+      modelsLabWan26T2V: "Wan 2.6 T2V - Model tekst-na-wideo Wan 2.6 ModelsLab",
+      modelsLabWan26I2V: "Wan 2.6 I2V - Model obraz-na-wideo Wan 2.6 ModelsLab",
+      modelsLabWan26I2VFlash:
+        "Wan 2.6 I2V Flash - Szybki model obraz-na-wideo Wan 2.6 ModelsLab",
+      modelsLabSeedanceT2V: "Seedance T2V - Model tekst-na-wideo BytePlus",
+      modelsLabSeedanceI2V: "Seedance I2V - Model obraz-na-wideo BytePlus",
+      modelsLabOmnihuman:
+        "Omnihuman - Model generowania wideo z ludźmi BytePlus",
+      modelsLabSeedance1ProI2V:
+        "Seedance 1.0 Pro I2V - Profesjonalny model obraz-na-wideo BytePlus",
+      modelsLabSeedance1ProFastI2V:
+        "Seedance 1.0 Pro Fast I2V - Szybki profesjonalny model obraz-na-wideo BytePlus",
+      modelsLabSeedance1ProFastT2V:
+        "Seedance 1.0 Pro Fast T2V - Szybki profesjonalny model tekst-na-wideo BytePlus",
+      modelsLabOmnihuman15:
+        "Omnihuman 1.5 - Ulepszony model generowania wideo z ludźmi BytePlus",
+      modelsLabSeedance15Pro:
+        "Seedance 1.5 Pro - Zaawansowany model generowania wideo BytePlus",
+      modelsLabVeo2:
+        "Veo 2 - Wysokiej jakości model generowania wideo Google via ModelsLab",
+      modelsLabVeo3:
+        "Veo 3 - Najnowszy model generowania wideo Google via ModelsLab",
+      modelsLabVeo3Fast:
+        "Veo 3 Fast - Szybki model generowania wideo Google via ModelsLab",
+      modelsLabVeo3FastPreview:
+        "Veo 3 Fast Preview - Szybki model generowania wideo preview Google via ModelsLab",
+      modelsLabVeo31:
+        "Veo 3.1 - Ulepszony model generowania wideo Veo 3 Google via ModelsLab",
+      modelsLabVeo31Fast:
+        "Veo 3.1 Fast - Szybki model generowania wideo Veo 3.1 Google via ModelsLab",
+      modelsLabKlingV21I2V:
+        "Kling V2.1 I2V - Model obraz-na-wideo Kling AI wersja 2.1",
+      modelsLabKlingV25TurboI2V:
+        "Kling V2.5 Turbo I2V - Turbo model obraz-na-wideo Kling AI wersja 2.5",
+      modelsLabKlingV25TurboT2V:
+        "Kling V2.5 Turbo T2V - Turbo model tekst-na-wideo Kling AI wersja 2.5",
+      modelsLabKlingV2MasterT2V:
+        "Kling V2 Master T2V - Model tekst-na-wideo najwyższej jakości Kling AI",
+      modelsLabKlingV2MasterI2V:
+        "Kling V2 Master I2V - Model obraz-na-wideo najwyższej jakości Kling AI",
+      modelsLabKlingV21MasterT2V:
+        "Kling V2.1 Master T2V - Model tekst-na-wideo najwyższej jakości Kling AI v2.1",
+      modelsLabKlingV21MasterI2V:
+        "Kling V2.1 Master I2V - Model obraz-na-wideo najwyższej jakości Kling AI v2.1",
+      modelsLabKlingV16MultiI2V:
+        "Kling V1.6 Multi I2V - Model multi-obraz-na-wideo Kling AI wersja 1.6",
+      modelsLabKling30T2V:
+        "Kling 3.0 T2V - Model tekst-na-wideo Kling AI wersja 3.0",
+      modelsLabLtx2ProT2V:
+        "LTX 2 PRO T2V - Profesjonalny model tekst-na-wideo LTX",
+      modelsLabLtx2ProI2V:
+        "LTX 2 PRO I2V - Profesjonalny model obraz-na-wideo LTX",
+      modelsLabLtx23ProI2V:
+        "LTX 2.3 Pro I2V - Ulepszony profesjonalny model obraz-na-wideo LTX",
+      modelsLabHailuo23T2V:
+        "Hailuo 2.3 T2V - Model tekst-na-wideo MiniMax wersja 2.3",
+      modelsLabHailuo02T2V: "Hailuo 02 T2V - Model tekst-na-wideo MiniMax 02",
+      modelsLabHailuo23I2V:
+        "Hailuo 2.3 I2V - Model obraz-na-wideo MiniMax wersja 2.3",
+      modelsLabHailuo23FastI2V:
+        "Hailuo 2.3 Fast I2V - Szybki model obraz-na-wideo MiniMax wersja 2.3",
+      modelsLabHailuo02I2V: "Hailuo 02 I2V - Model obraz-na-wideo MiniMax 02",
+      modelsLabHailuo02StartEnd:
+        "Hailuo 02 Start/End - Model generowania wideo z klatkami początkowymi/końcowymi MiniMax",
+      modelsLabSora2:
+        "Sora 2 - Model generowania wideo Sora 2 OpenAI via ModelsLab",
+      modelsLabSora2Pro:
+        "Sora 2 Pro - Model generowania wideo Sora 2 Pro OpenAI via ModelsLab",
+      modelsLabGen4Aleph:
+        "Gen4 Aleph - Model generowania wideo Gen4 Aleph Runway via ModelsLab",
+      modelsLabLipsync2:
+        "Lipsync 2 - Model synchronizacji ust Sync do generowania wideo",
+      modelsLabGrokT2V:
+        "Grok T2V - Model tekst-na-wideo Grok xAI via ModelsLab",
+      modelsLabGrokI2V:
+        "Grok I2V - Model obraz-na-wideo Grok xAI via ModelsLab",
+      modelsLabGen4T2ITurbo:
+        "Gen4 T2I Turbo - Szybki model tekst-na-obraz Runway via ModelsLab",
     },
   },
   modelUtilities: {

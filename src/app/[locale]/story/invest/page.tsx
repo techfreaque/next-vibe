@@ -6,6 +6,7 @@ import { Container } from "next-vibe-ui/ui/container";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
+import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -23,14 +24,16 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   return metadataGenerator(locale, {
     path: "story/invest",
-    title: t("meta.title"),
+    title: t("meta.title", { appName }),
     category: t("meta.category"),
     description: t("meta.description"),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`,
-    imageAlt: t("meta.imageAlt"),
-    keywords: [t("meta.keywords")],
+    imageAlt: t("meta.imageAlt", { appName }),
+    keywords: [t("meta.keywords", { appName })],
   });
 }
 

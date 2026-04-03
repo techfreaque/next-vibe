@@ -16,12 +16,14 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { collectServerDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolExecutionContext } from "../../../chat/config";
@@ -54,7 +56,7 @@ export class ToolErrorHandler {
         }
       | undefined;
     threadId: string;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     sequenceId: string;
     isIncognito: boolean;
@@ -346,12 +348,40 @@ export class ToolErrorHandler {
         { toolName },
       );
 
+      // Apply field-level serverDefault callbacks for hidden fields.
+      const endpoint = await getEndpoint(toolName);
+      const serverDefaultPatch: Record<string, JSONValue> = {};
+      if (endpoint) {
+        const permissionRoles = filterUserPermissionRoles(user.roles);
+        const serverDefaults = collectServerDefaults(
+          endpoint.fields,
+          permissionRoles,
+          Platform.AI,
+        );
+        for (const [key, resolver] of Object.entries(serverDefaults)) {
+          const resolved = resolver({
+            user,
+            locale,
+            platform: Platform.AI,
+            streamContext: params.streamContext,
+          });
+          if (resolved !== undefined) {
+            serverDefaultPatch[key] = resolved as JSONValue;
+          }
+        }
+      }
+
+      const patchedArgs = {
+        ...((args as Record<string, JSONValue>) ?? {}),
+        ...serverDefaultPatch,
+      };
+
       const { RouteExecutionExecutor } =
         await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
 
       const result = await RouteExecutionExecutor.executeGenericHandler({
         toolName,
-        data: (args ?? {}) as CliRequestData,
+        data: (patchedArgs ?? {}) as CliRequestData,
         user,
         locale,
         logger,
@@ -398,7 +428,7 @@ export class ToolErrorHandler {
       parentId: string | null;
     };
     threadId: string;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     sequenceId: string;
     isIncognito: boolean;

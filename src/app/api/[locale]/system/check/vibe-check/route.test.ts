@@ -249,15 +249,15 @@ describe("Config Creation Flow", () => {
     }
 
     expect(output).toContain("check.config.ts");
-    expect(output).toContain("--create-config");
+    expect(output).toContain("config-create");
     expect(existsSync(TEST_PROJECT_CONFIG)).toBe(false);
   });
 
-  it("Step 3: should create config with --create-config flag", () => {
+  it("Step 3: should create config with config-create command", () => {
     let output = "";
     try {
       output = execSync(
-        `cd "${TEST_PROJECT_PATH}" && bun "${resolve(ROOT_PATH, "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts")}" check --create-config --skip-lint --skip-typecheck 2>&1`,
+        `cd "${TEST_PROJECT_PATH}" && bun "${resolve(ROOT_PATH, "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts")}" config-create 2>&1`,
         { encoding: "utf-8", timeout: 30000 },
       );
     } catch (error) {
@@ -266,17 +266,18 @@ describe("Config Creation Flow", () => {
     }
 
     expect(existsSync(TEST_PROJECT_CONFIG)).toBe(true);
-    expect(output).toContain("Created check.config.ts");
+    expect(output).toContain("Created");
+    expect(output).toContain("check.config.ts");
   });
 
-  it("Step 4: should fail with --create-config when config already exists", () => {
+  it("Step 4: should fail with config-create when config already exists", () => {
     expect(existsSync(TEST_PROJECT_CONFIG)).toBe(true);
 
     let output = "";
     let exitCode = 0;
     try {
       output = execSync(
-        `cd "${TEST_PROJECT_PATH}" && bun "${resolve(ROOT_PATH, "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts")}" check --create-config --skip-lint --skip-typecheck 2>&1`,
+        `cd "${TEST_PROJECT_PATH}" && bun "${resolve(ROOT_PATH, "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts")}" config-create 2>&1`,
         { encoding: "utf-8", timeout: 30000 },
       );
     } catch (error) {
@@ -309,7 +310,7 @@ describe("Vibe Check Complete Test Suite", () => {
       if (!existsSync(TEST_PROJECT_CONFIG)) {
         try {
           execSync(
-            `cd "${TEST_PROJECT_PATH}" && bun "${resolve(ROOT_PATH, "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts")}" check --create-config --skip-lint --skip-typecheck 2>&1`,
+            `cd "${TEST_PROJECT_PATH}" && bun "${resolve(ROOT_PATH, "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts")}" config-create 2>&1`,
             { encoding: "utf-8", timeout: 30000 },
           );
         } catch {

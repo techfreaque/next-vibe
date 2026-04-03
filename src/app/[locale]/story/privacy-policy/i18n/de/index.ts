@@ -2,19 +2,19 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Datenschutzrichtlinie - unbottled.ai",
+    title: "Datenschutzrichtlinie - {{appName}}",
     category: "Rechtliches",
     description:
-      "Erfahren Sie, wie unbottled.ai Ihre Privatsphäre schützt und mit Ihren Daten umgeht",
+      "Erfahren Sie, wie {{appName}} Ihre Privatsphäre schützt und mit Ihren Daten umgeht",
     imageAlt: "Datenschutzrichtlinie",
     keywords:
-      "Datenschutzrichtlinie, Datenschutz, Benutzerdatenschutz, unbottled.ai Datenschutz",
-    ogTitle: "Datenschutzrichtlinie - unbottled.ai",
+      "Datenschutzrichtlinie, Datenschutz, Benutzerdatenschutz, {{appName}} Datenschutz",
+    ogTitle: "Datenschutzrichtlinie - {{appName}}",
     ogDescription:
-      "Erfahren Sie, wie unbottled.ai Ihre Privatsphäre schützt und mit Ihren Daten umgeht",
-    twitterTitle: "Datenschutzrichtlinie - unbottled.ai",
+      "Erfahren Sie, wie {{appName}} Ihre Privatsphäre schützt und mit Ihren Daten umgeht",
+    twitterTitle: "Datenschutzrichtlinie - {{appName}}",
     twitterDescription:
-      "Erfahren Sie, wie unbottled.ai Ihre Privatsphäre schützt und mit Ihren Daten umgeht",
+      "Erfahren Sie, wie {{appName}} Ihre Privatsphäre schützt und mit Ihren Daten umgeht",
   },
   printAriaLabel: "Datenschutzrichtlinie drucken",
   printButton: "Drucken",

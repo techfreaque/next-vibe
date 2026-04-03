@@ -2,19 +2,19 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Impressum - unbottled.ai",
+    title: "Impressum - {{appName}}",
     category: "Rechtliches",
     description:
-      "Rechtliche Informationen und Unternehmensdetails für unbottled.ai",
+      "Rechtliche Informationen und Unternehmensdetails für {{appName}}",
     imageAlt: "Impressum",
     keywords:
-      "Impressum, rechtlicher Hinweis, Unternehmensinformationen, unbottled.ai rechtlich",
-    ogTitle: "Impressum - unbottled.ai",
+      "Impressum, rechtlicher Hinweis, Unternehmensinformationen, {{appName}} rechtlich",
+    ogTitle: "Impressum - {{appName}}",
     ogDescription:
-      "Rechtliche Informationen und Unternehmensdetails für unbottled.ai",
-    twitterTitle: "Impressum - unbottled.ai",
+      "Rechtliche Informationen und Unternehmensdetails für {{appName}}",
+    twitterTitle: "Impressum - {{appName}}",
     twitterDescription:
-      "Rechtliche Informationen und Unternehmensdetails für unbottled.ai",
+      "Rechtliche Informationen und Unternehmensdetails für {{appName}}",
   },
   printAriaLabel: "Impressum drucken",
   printButton: "Drucken",

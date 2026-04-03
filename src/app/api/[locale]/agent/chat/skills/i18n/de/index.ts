@@ -1088,6 +1088,7 @@ export const translations: typeof enTranslations = {
     createButton: {
       label: "Eigenen Charakter Erstellen",
     },
+    openFullPage: "Vollständige Seite öffnen",
     browser: {
       advancedModelAccess: "Wähle deine KI-Erfahrung",
       configureFiltersText:
@@ -1415,9 +1416,19 @@ export const translations: typeof enTranslations = {
       description: "Modell für die Spracherkennung",
       placeholder: "Systemstandard",
     },
-    visionBridgeModel: {
-      label: "Vision-Modell",
-      description: "Modell für die Bildanalyse",
+    imageVisionModel: {
+      label: "Bild-Vision-Modell",
+      description: "Modell zur Bildanalyse",
+      placeholder: "Systemstandard",
+    },
+    videoVisionModel: {
+      label: "Video-Vision-Modell",
+      description: "Modell zur Videoanalyse",
+      placeholder: "Systemstandard",
+    },
+    audioVisionModel: {
+      label: "Audio-Vision-Modell",
+      description: "Modell zur Audioanalyse",
       placeholder: "Systemstandard",
     },
     translationModel: {

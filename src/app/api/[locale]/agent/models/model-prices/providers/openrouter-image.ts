@@ -17,7 +17,8 @@ import "server-only";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { ApiProvider, modelDefinitions } from "../../models";
+import { imageGenModelDefinitions } from "../../../image-generation/models";
+import { ApiProvider } from "../../models";
 import type { ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
 
@@ -106,7 +107,7 @@ export class OpenRouterImagePriceFetcher extends PriceFetcher {
       };
     }
 
-    for (const def of Object.values(modelDefinitions)) {
+    for (const def of Object.values(imageGenModelDefinitions)) {
       for (const providerConfig of def.providers) {
         if (
           providerConfig.apiProvider !== ApiProvider.OPENROUTER ||

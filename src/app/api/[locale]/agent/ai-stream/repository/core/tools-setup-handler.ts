@@ -1,4 +1,4 @@
-import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
+import type { ChatModelOption } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -32,7 +32,7 @@ export class ToolsSetupHandler {
    *                      but in availableTools, it's executed via fallback in tool-error-handler.
    */
   static async setupStreamingTools(params: {
-    modelConfig: ModelOption;
+    modelConfig: ChatModelOption;
     pinnedTools: ToolConfigItem[] | null | undefined;
     availableTools: ToolConfigItem[] | null | undefined;
     user: JwtPayloadType;

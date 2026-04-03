@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -25,10 +25,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazy } from "react";
 import { DefaultFolderId } from "../../../config";
 import type { MessageMetadata } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
-import { lazy } from "react";
 
 import { scopedTranslation } from "./i18n";
 
@@ -345,7 +345,7 @@ const { GET } = createEndpoint({
             }),
             model: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              schema: z.enum(ModelId).nullable(),
+              schema: z.enum(ChatModelId).nullable(),
             }),
             skill: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -443,7 +443,7 @@ const { GET } = createEndpoint({
             authorId: "770e8400-e29b-41d4-a716-446655440000",
             authorName: null,
             isAI: true,
-            model: ModelId.GPT_5,
+            model: ChatModelId.GPT_5,
             skill: null,
             sequenceId: null,
             metadata: null,
@@ -590,7 +590,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "post.model.label" as const,
         description: "post.model.description" as const,
-        schema: z.enum(ModelId).optional(),
+        schema: z.enum(ChatModelId).optional(),
       }),
       skill: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

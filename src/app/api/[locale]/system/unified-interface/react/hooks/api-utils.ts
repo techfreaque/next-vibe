@@ -240,6 +240,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         urlPathParams: pathParams,
         locale,
         logger,
+        user,
       });
     }
 

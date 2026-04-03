@@ -21,27 +21,29 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   return metadataGenerator(locale, {
-    title: t("meta.title"),
+    title: t("meta.title", { appName }),
     description: t("meta.description"),
     additionalMetadata: {
       openGraph: {
-        title: t("meta.ogTitle"),
+        title: t("meta.ogTitle", { appName }),
         description: t("meta.ogDescription"),
         url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/careers`,
         type: "website",
       },
       twitter: {
         card: "summary_large_image",
-        title: t("meta.twitterTitle"),
+        title: t("meta.twitterTitle", { appName }),
         description: t("meta.twitterDescription"),
       },
     },
     path: "careers",
     category: t("meta.category"),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/careers-hero.jpg`,
-    imageAlt: t("meta.imageAlt"),
-    keywords: [t("meta.keywords")],
+    imageAlt: t("meta.imageAlt", { appName }),
+    keywords: [t("meta.keywords", { appName })],
   });
 }
 

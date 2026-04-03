@@ -40,7 +40,7 @@ export const translations: typeof enTranslations = {
       skillId: {
         content: "Charakter: {{value}}",
       },
-      customName: {
+      customVariantName: {
         content: "Benutzerdefinierter Name: {{value}}",
       },
       customIcon: {
@@ -203,8 +203,10 @@ export const translations: typeof enTranslations = {
     skillId: {
       label: "Charakter",
     },
-    customName: {
-      label: "Benutzerdefinierter Name",
+    customVariantName: {
+      label: "Variantenname",
+      description:
+        "Eigener Name für diese Variante (leer lassen für Skill-Standard)",
     },
     chatModel: {
       label: "Chat-Modell",
@@ -220,9 +222,19 @@ export const translations: typeof enTranslations = {
       description: "Modell für die Spracherkennung",
       placeholder: "Vom Charakter erben",
     },
-    visionBridgeModel: {
-      label: "Vision-Modell",
+    imageVisionModel: {
+      label: "Bild-Vision-Modell",
       description: "Modell für die Bildanalyse",
+      placeholder: "Vom Charakter erben",
+    },
+    videoVisionModel: {
+      label: "Video-Vision-Modell",
+      description: "Modell für die Videoanalyse",
+      placeholder: "Vom Charakter erben",
+    },
+    audioVisionModel: {
+      label: "Audio-Vision-Modell",
+      description: "Modell für die Audioanalyse",
       placeholder: "Vom Charakter erben",
     },
     translationModel: {
@@ -352,7 +364,7 @@ export const translations: typeof enTranslations = {
     deniedTools: {
       label: "Gesperrte Tools",
       description:
-        "Bestimmte Tools für diesen Slot sperren – zusätzlich zur Liste des Skills. Diese Tools können unabhängig von anderen Einstellungen nicht aufgerufen werden.",
+        "Bestimmte Tools für diesen Slot sperren - zusätzlich zur Liste des Skills. Diese Tools können unabhängig von anderen Einstellungen nicht aufgerufen werden.",
       clearAll: "Alle löschen",
       noToolsFound: "Keine Tools gefunden",
       blockedNote:

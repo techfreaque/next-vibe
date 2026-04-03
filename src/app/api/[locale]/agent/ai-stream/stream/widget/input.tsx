@@ -37,6 +37,13 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
 import {
+  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+} from "@/app/api/[locale]/agent/ai-stream/constants";
+import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
+import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import {
   ImageQuality,
   ImageSize,
   MusicDuration,
@@ -52,8 +59,11 @@ import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
-import { useMessageOperations } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-operations";
-import { getModelById } from "@/app/api/[locale]/agent/models/models";
+import {
+  useMessageOperations,
+  type MessageOperationsDeps,
+} from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-operations";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
@@ -93,8 +103,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
 
   // Boot context
   const bootContext = useChatBootContext();
-  const { envAvailability, initialSettingsData, initialSkillData } =
-    bootContext;
+  const { initialSettingsData, initialSkillData } = bootContext;
+  const envAvailability = useEnvAvailability();
 
   // Input store
   const input = useChatInputStore((s) => s.input);
@@ -126,7 +136,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     logger,
     initialSettingsData,
   );
-  const defaults = ChatSettingsRepositoryClient.getDefaults();
+  const env = useEnvAvailability();
+  const defaults = ChatSettingsRepositoryClient.getDefaults(user, env);
   const effectiveSettings = settings ?? defaults;
   const ttsAutoplay = effectiveSettings.ttsAutoplay;
   const selectedSkill = effectiveSettings.selectedSkill;
@@ -235,15 +246,16 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const leafMessageId = useChatNavigationStore((s) => s.leafMessageId);
 
   // Memoize settings object to avoid new reference on every render
-  const messageOpSettings = useMemo(
-    () => ({
-      selectedModel: effectiveSettings.selectedModel,
-      selectedSkill: effectiveSettings.selectedSkill,
-      availableTools: effectiveSettings.availableTools,
-      pinnedTools: effectiveSettings.pinnedTools,
-      ttsAutoplay: effectiveSettings.ttsAutoplay,
-      voiceModelSelection: effectiveSettings.voiceModelSelection,
-    }),
+  const messageOpSettings: MessageOperationsDeps["settings"] = useMemo(
+    () =>
+      ({
+        selectedModel: effectiveSettings.selectedModel ?? null,
+        selectedSkill: effectiveSettings.selectedSkill,
+        availableTools: effectiveSettings.availableTools,
+        pinnedTools: effectiveSettings.pinnedTools,
+        ttsAutoplay: effectiveSettings.ttsAutoplay,
+        voiceModelSelection: effectiveSettings.voiceModelSelection,
+      }) satisfies MessageOperationsDeps["settings"],
     [
       effectiveSettings.selectedModel,
       effectiveSettings.selectedSkill,
@@ -263,7 +275,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       currentSubFolderId,
       leafMessageId,
       settings: messageOpSettings,
-    };
+    } satisfies MessageOperationsDeps;
   }, [
     aiStartStream,
     aiCancelStream,
@@ -313,18 +325,69 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const voiceRuntime = useVoiceRuntimeState();
   const voiceUnconfigured = !envAvailability.voice;
 
-  const currentModel = getModelById(selectedModel);
+  const currentModel = getChatModelById(selectedModel);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
   const isInputDisabled = isLoading || !canPost;
 
   // Model-type-aware UI
-  // isImageModel/isAudioModel: pure generator (modelType = primary UI mode)
-  const isImageModel = currentModel?.modelType === "image";
-  const isAudioModel = currentModel?.modelType === "audio";
+  // Chat stream pipeline only handles chat models; image/audio go through separate endpoints.
+  // Use outputs[] capability flags instead of the removed modelRole field.
+  const isImageModel =
+    currentModel?.outputs?.includes("image") === true &&
+    currentModel?.outputs?.includes("text") !== true;
+  // Audio-gen models never reach the chat stream pipeline — always false here.
+  const isAudioModel = false;
   // isGenerativeModel: pure generator - no streaming conversation, hides voice/call mode
   const isGenerativeModel = isImageModel || isAudioModel;
-  // Feature-flag driven UI: use capability flags instead of modelType for these
-  const hasImageOutputSettings = currentModel?.modelRole === "image-gen";
+  // Show image size/quality settings only for image-only output models
+  const hasImageOutputSettings =
+    currentModel?.outputs?.includes("image") === true &&
+    currentModel?.outputs?.includes("text") !== true;
+  // Determine which file types can be uploaded based on model capability OR bridge model availability.
+  // If the current model natively accepts the modality, allow upload directly.
+  // Otherwise, check if a bridge model (vision/STT) is available to convert the upload.
+  const canAcceptImages =
+    currentModel?.inputs?.includes("image") === true ||
+    !!SkillsRepositoryClient.getBestImageVisionModel(
+      effectiveSettings.imageVisionModelSelection ??
+        DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+      user,
+      env,
+    );
+  const canAcceptVideo =
+    currentModel?.inputs?.includes("video") === true ||
+    !!SkillsRepositoryClient.getBestVideoVisionModel(
+      effectiveSettings.videoVisionModelSelection ??
+        DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+      user,
+      env,
+    );
+  const canAcceptAudio =
+    currentModel?.inputs?.includes("audio") === true ||
+    !!SkillsRepositoryClient.getBestAudioVisionModel(
+      effectiveSettings.audioVisionModelSelection ??
+        DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+      user,
+      env,
+    );
+
+  // Build dynamic accept string: always include documents, conditionally include media
+  const acceptParts = useMemo(() => {
+    const parts: string[] = [];
+    if (canAcceptImages) {
+      parts.push("image/*");
+    }
+    if (canAcceptVideo) {
+      parts.push("video/*");
+    }
+    if (canAcceptAudio) {
+      parts.push("audio/*");
+    }
+    // Documents are always accepted (text modality)
+    parts.push("application/pdf", "text/*", ".doc", ".docx", ".xls", ".xlsx");
+    return parts.join(",");
+  }, [canAcceptImages, canAcceptVideo, canAcceptAudio]);
+
   const showFileUpload =
     !isGenerativeModel || currentModel?.inputs?.includes("image") === true;
 
@@ -679,6 +742,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
               attachments={attachments}
               onFilesSelected={setAttachments}
               onRemoveFile={handleRemoveFile}
+              accept={acceptParts}
             />
           )}
         </Div>

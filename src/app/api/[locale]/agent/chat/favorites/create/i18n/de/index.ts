@@ -36,9 +36,10 @@ export const translations: typeof enTranslations = {
       label: "Variante",
       description: "Skill-Variante (z.B. brilliant, günstig, unzensiert)",
     },
-    customName: {
+    customVariantName: {
       label: "Benutzerdefinierter Name",
-      description: "Optionaler benutzerdefinierter Name für diesen Favoriten",
+      description:
+        "Eigener Name für diese Variante (leer lassen für Skill-Standard)",
     },
     customIcon: {
       label: "Benutzerdefiniertes Symbol",
@@ -58,9 +59,19 @@ export const translations: typeof enTranslations = {
       description: "Modell zur Spracherkennung",
       placeholder: "Vom Skill erben",
     },
-    visionBridgeModel: {
-      label: "Vision-Modell",
-      description: "Modell zur Bildanalyse",
+    imageVisionModel: {
+      label: "Bild-Vision-Modell",
+      description: "Modell für die Bildanalyse",
+      placeholder: "Vom Skill erben",
+    },
+    videoVisionModel: {
+      label: "Video-Vision-Modell",
+      description: "Modell für die Videoanalyse",
+      placeholder: "Vom Skill erben",
+    },
+    audioVisionModel: {
+      label: "Audio-Vision-Modell",
+      description: "Modell für die Audioanalyse",
       placeholder: "Vom Skill erben",
     },
     translationModel: {

@@ -4,9 +4,11 @@
  */
 
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 
+import type { ChatModelId } from "../../../../ai-stream/models";
+import type { SttModelId } from "../../../../speech-to-text/models";
+import type { TtsModelId } from "../../../../text-to-speech/models";
 import type { MessageMetadata, ToolCall, ToolCallResult } from "../../../db";
 import type { ChatMessageRole } from "../../../enum";
 
@@ -61,7 +63,7 @@ export interface MessageCreatedEventData {
   role: ChatMessageRole;
   parentId: string | null;
   content: string | null;
-  model: ModelId | null;
+  model: ChatModelId | null;
   skill: string | null;
   sequenceId?: string | null; // Links messages in the same AI response sequence
   toolCall?: ToolCall; // Tool call for TOOL role messages (singular - each TOOL message has exactly one tool call)
@@ -350,7 +352,7 @@ export interface GapFillCompletedEventData {
   variant: {
     modality: Modality;
     content: string;
-    modelId: ModelId;
+    modelId: ChatModelId | SttModelId | TtsModelId;
     creditCost: number;
     createdAt: string;
   };

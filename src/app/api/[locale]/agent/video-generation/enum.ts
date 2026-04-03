@@ -4,7 +4,6 @@
 
 import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 
-import { VIDEO_GEN_MODEL_IDS } from "../models/models";
 import { scopedTranslation } from "./i18n";
 
 export const {
@@ -31,6 +30,3 @@ export const VIDEO_DURATION_SECONDS: Record<string, number> = {
   [VideoDuration.MEDIUM]: 10,
   [VideoDuration.LONG]: 15,
 };
-
-export { VIDEO_GEN_MODEL_IDS };
-export type VideoGenModelId = (typeof VIDEO_GEN_MODEL_IDS)[number];

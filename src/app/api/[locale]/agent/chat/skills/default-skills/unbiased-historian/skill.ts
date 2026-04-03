@@ -1,4 +1,4 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import {
@@ -45,7 +45,7 @@ export const unbiasedHistorianSkill: Skill = {
       variantName: "skills.unbiasedHistorian.variants.kimi" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2,
+        manualModelId: ChatModelId.KIMI_K2,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -64,7 +64,7 @@ export const unbiasedHistorianSkill: Skill = {
       variantName: "skills.unbiasedHistorian.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.DEEPSEEK_V32,
+        manualModelId: ChatModelId.DEEPSEEK_V32,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

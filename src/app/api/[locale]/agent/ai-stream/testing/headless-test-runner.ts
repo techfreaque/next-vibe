@@ -10,11 +10,6 @@ import { eq } from "drizzle-orm";
 
 import type { HeadlessAiStreamResult } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
 import { runHeadlessAiStream } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
-import type {
-  ImageGenModelId,
-  MusicGenModelId,
-  VideoGenModelId,
-} from "@/app/api/[locale]/agent/models/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type {
   MessageMetadata,
@@ -26,9 +21,9 @@ import type { ResponseType } from "@/app/api/[locale]/shared/types/response.sche
 import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { defaultLocale } from "@/i18n/core/config";
 import { scopedTranslation } from "../stream/i18n";
-import { TEST_AI_MODEL } from "./test-constants";
 
 export interface TestStreamParams {
   prompt: string;
@@ -36,12 +31,12 @@ export interface TestStreamParams {
   threadId?: string;
   threadMode?: "none" | "new" | "append";
   skill?: string;
-  /** Override resolved media gen models — bypasses user-settings cascade */
-  mediaModelOverrides?: {
-    musicGenModelId?: MusicGenModelId;
-    videoGenModelId?: VideoGenModelId;
-    imageGenModelId?: ImageGenModelId;
-  };
+  /**
+   * Explicit parent message ID for retry/branch tests.
+   * When set, the user message is created as a child of this message
+   * instead of the thread's most recent message.
+   */
+  explicitParentMessageId?: string;
 }
 
 /** Slim message shape — only fields we assert on */
@@ -51,11 +46,16 @@ export interface SlimMessage {
   parentId: string | null;
   sequenceId: string | null;
   content: string | null;
+  createdAt: Date;
+  model: string | null;
+  isAI: boolean;
   toolCall: {
     toolName?: string;
     result?: ToolCallResult;
   } | null;
   generatedMedia: { type: string; url?: string | null }[] | null;
+  /** True when this is a compacting summary message */
+  isCompacting: boolean;
 }
 
 export interface TestStreamResult {
@@ -89,6 +89,9 @@ function slimMessages(
     parentId: string | null;
     sequenceId: string | null;
     content: string | null;
+    createdAt: Date;
+    model: string | null;
+    isAI: boolean;
     metadata: MessageMetadata;
   }[],
 ): SlimMessage[] {
@@ -98,6 +101,9 @@ function slimMessages(
     parentId: r.parentId,
     sequenceId: r.sequenceId,
     content: r.content,
+    createdAt: r.createdAt,
+    model: r.model,
+    isAI: r.isAI,
     toolCall: r.metadata?.toolCall
       ? {
           toolName: r.metadata.toolCall.toolName,
@@ -112,6 +118,7 @@ function slimMessages(
           },
         ]
       : null,
+    isCompacting: r.metadata?.isCompacting === true,
   }));
 }
 
@@ -124,7 +131,7 @@ export async function runTestStream(
     threadId,
     threadMode = "new",
     skill = NO_SKILL_ID,
-    mediaModelOverrides,
+    explicitParentMessageId,
   } = params;
 
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -132,7 +139,7 @@ export async function runTestStream(
 
   const result = await runHeadlessAiStream({
     prompt,
-    model: TEST_AI_MODEL,
+    model: agentEnv.VIBE_TEST_AI_MODEL,
     skill,
     threadId,
     threadMode,
@@ -144,7 +151,7 @@ export async function runTestStream(
     locale: defaultLocale,
     logger,
     t,
-    mediaModelOverrides,
+    explicitParentMessageId,
   });
 
   let messages: SlimMessage[] = [];
@@ -157,13 +164,19 @@ export async function runTestStream(
         parentId: chatMessages.parentId,
         sequenceId: chatMessages.sequenceId,
         content: chatMessages.content,
+        createdAt: chatMessages.createdAt,
+        model: chatMessages.model,
+        isAI: chatMessages.isAI,
         metadata: chatMessages.metadata,
       })
       .from(chatMessages)
       .where(eq(chatMessages.threadId, result.data.threadId));
 
     messages = slimMessages(
-      rows.map((r) => ({ ...r, metadata: r.metadata ?? {} })),
+      rows.map((r) => ({
+        ...r,
+        metadata: r.metadata ?? {},
+      })),
     );
   }
 

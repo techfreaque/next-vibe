@@ -32,10 +32,10 @@ export const translations: typeof enTranslations = {
       badge: "Open Source - MIT + GPL v3",
       title: "Deine KI. Deine Regeln.",
       subtitle:
-        "{{modelCount}} Modelle. Bilder, Videos und Musik generieren. {{skillCount}} Skills. ~{{toolCount}} Tools. SSH, E-Mail, Browser-Automatisierung. Kostenlos auf unbottled.ai - oder selbst hosten.",
+        "{{modelCount}} Modelle. Bilder, Videos und Musik generieren. {{skillCount}} Skills. ~{{toolCount}} Tools. SSH, E-Mail, Browser-Automatisierung. Kostenlos auf {{appName}} - oder selbst hosten.",
       cta: "Kostenlos starten",
       secondaryCta: "Selbst hosten",
-      tabUnbottled: "unbottled.ai",
+      tabUnbottled: "{{appName}}",
       tabSelfHost: "selbst gehostet",
       demoLabels: {
         modelComparison: "Der Gatekeeper",
@@ -121,7 +121,7 @@ export const translations: typeof enTranslations = {
       },
     },
     splitHero: {
-      or: "OR",
+      or: "ODER",
       clickToExplore: "Klicken zum Erkunden",
       header: "Drei Wege. Eine Plattform.",
       subheader: "Wähle deinen Einstieg.",
@@ -146,8 +146,8 @@ export const translations: typeof enTranslations = {
         pill1: "Always-on. Handelt autonom.",
         pill2: "Deine Daten verlassen nie deine Maschine",
         pill3: "Eigene API-Keys",
-        cta: "Kostenlos selbst hosten",
-        ctaGithub: "Code holen",
+        cta: "Jetzt selbst hosten",
+        ctaGithub: "Mehr erfahren",
       },
       nextvibe: {
         badge: "Open Source · MIT + GPL v3",
@@ -155,14 +155,15 @@ export const translations: typeof enTranslations = {
         titleLine2: "Jede Plattform.",
         subtitle:
           "Einen Endpoint definieren. Web-Formular, CLI-Befehl, KI-Tool, MCP-Server, Cron-Job, Mobile-Screen und Desktop-App erhalten - automatisch. Derselbe TypeScript-Vertrag treibt alle an. Fork es, besitz es.",
-        pill1: "Treibt unbottled.ai an",
+        pill1: "Treibt {{appName}} an",
         pill2: "Zero any / unknown / throw",
         pill3: "{{platformCount}} Plattformen pro Endpoint",
         ctaGithub: "Auf GitHub starten",
-        ctaDocs: "Framework-Docs",
+        ctaDocs: "Framework entdecken",
+        ctaExplore: "Mehr erfahren",
       },
       tab: {
-        unbottled: "unbottled.ai",
+        unbottled: "{{appName}}",
         unbottledSub: "Consumer-KI",
         unbottledDesc:
           "{{modelCount}} Modelle, Bild/Video/Musik-Generierung, persistentes Gedächtnis, Live-Suche - kein Filter den du nicht gewählt hast",
@@ -173,7 +174,25 @@ export const translations: typeof enTranslations = {
         nextvibe: "next-vibe",
         nextvibeSub: "Das Framework",
         nextvibeDesc:
-          "Das MIT-lizenzierte Framework hinter unbottled.ai - ein Endpoint, alle Plattformen, fork und besitz es",
+          "Das MIT-lizenzierte Framework hinter {{appName}} - ein Endpoint, alle Plattformen, fork und besitz es",
+      },
+    },
+    selector: {
+      question: "Was bringt dich hierher?",
+      unbottled: {
+        title: "Unzensierte KI",
+        description:
+          "{{modelCount}} Modelle. Du wählst den Filter - Mainstream, Open Source oder unzensiert. Kein Corporate-Sicherheitstheater.",
+      },
+      personal: {
+        title: "Self-Hosting",
+        description:
+          "Dein eigener KI-Agent auf deiner Maschine. Always-on, eigene Keys, deine Daten bleiben bei dir.",
+      },
+      nextvibe: {
+        title: "Das Framework",
+        description:
+          "Eine Endpoint-Definition. Jede Plattform automatisch. Fork es, besitz es.",
       },
     },
     forumHero: {
@@ -280,7 +299,7 @@ export const translations: typeof enTranslations = {
           mainstreamResponse:
             "Kurze Antwort: Ja, für die meisten Menschen war es eine gute Idee. Es hat das Risiko von schwerem COVID, Krankenhausaufenthalten und Tod deutlich gesenkt - besonders für ältere oder Risikogruppen. Warum nicht? Hauptsächlich bei einer spezifischen medizinischen Kontraindikation oder wenn das persönliche COVID-Risiko gering war. Fazit: Für die große Mehrheit überwiegt der Nutzen das Risiko.",
           openReasoning:
-            "<think>Der Nutzer fragt nach einer kurzen Meinung, ob die COVID-Impfung eine gute Idee war. Dies ist ein Thema mit unterschiedlichen Standpunkten. Der Nutzer fragt auf unbottled.ai, einer Plattform für freie Meinungsäußerung. Ich sollte eine ausgewogene, neutrale Perspektive liefern, die anerkennt: klarer Nutzen für Risikogruppen, legitime Bedenken zu Nebenwirkungen und Impfpflichten, und eine stark alters- und gesundheitsabhängige Nutzen-Risiko-Abwägung. Kurz halten.</think>",
+            "<think>Der Nutzer fragt nach einer kurzen Meinung, ob die COVID-Impfung eine gute Idee war. Dies ist ein Thema mit unterschiedlichen Standpunkten. Der Nutzer fragt auf {{appName}}, einer Plattform für freie Meinungsäußerung. Ich sollte eine ausgewogene, neutrale Perspektive liefern, die anerkennt: klarer Nutzen für Risikogruppen, legitime Bedenken zu Nebenwirkungen und Impfpflichten, und eine stark alters- und gesundheitsabhängige Nutzen-Risiko-Abwägung. Kurz halten.</think>",
           openResponse:
             "Hing stark von Alter und Gesundheit ab. Ja für Ältere und Risikogruppen - die Reduktion von schwerem Verlauf und Tod war signifikant und gut belegt. Diskutabel für junge Gesunde - die absolute Risikoreduktion war gering, und Nebenwirkungen (Myokarditis bei jungen Männern, Zyklusstörungen) waren real und wurden teils heruntergespielt. Die eigentliche Kontroverse waren die Impfpflichten - viele fanden, die Abwägung hätte persönlich bleiben sollen, nicht erzwungen werden.",
           uncensoredResponse:
@@ -398,8 +417,8 @@ export const translations: typeof enTranslations = {
     comparison: {
       title: "Jede andere Plattform zwingt dich zum Kompromiss.",
       subtitle:
-        "Filter den du nicht kontrollierst. Gedächtnis das zurücksetzt. Privatsphäre die nur ein Häkchen ist. unbottled.ai verzichtet auf keins davon.",
-      usLabel: "unbottled.ai",
+        "Filter den du nicht kontrollierst. Gedächtnis das zurücksetzt. Privatsphäre die nur ein Häkchen ist. {{appName}} verzichtet auf keins davon.",
+      usLabel: "{{appName}}",
       cards: {
         card1: {
           label: "Der Filter",
@@ -437,7 +456,7 @@ export const translations: typeof enTranslations = {
           label: "Eigentümerschaft",
           themLabel: "OpenClaw",
           them: "Lief auf deiner Maschine. Signal/Telegram-Abhängigkeit. 800+ ungeprüfte Community-Skills auf ClawHub. Dann übernahm OpenAI es. Infrastruktur, die du nicht kontrollierst, gehört dir nicht.",
-          us: "Cloud-ready von Tag eins. Läuft auf deinem VPS, lokal oder kostenlos auf unbottled.ai. MIT + GPL v3. Unabhängig für immer. Fork es und es gehört dir - nicht contingent auf irgendein Unternehmen.",
+          us: "Cloud-ready von Tag eins. Läuft auf deinem VPS, lokal oder kostenlos auf {{appName}}. MIT + GPL v3. Unabhängig für immer. Fork es und es gehört dir - nicht contingent auf irgendein Unternehmen.",
           whyItMatters:
             "Deine autonome Agent-Plattform sollte keine Übernahmeklausel haben.",
         },
@@ -686,7 +705,7 @@ export const translations: typeof enTranslations = {
         "Nutze die Cloud. Besitze das Dashboard. Baue dein eigenes. Dieselbe Codebasis, dieselbe Qualität - welcher Weg auch immer passt.",
       cloud: {
         badge: "Cloud · Kein Setup",
-        title: "unbottled.ai",
+        title: "{{appName}}",
         tagline:
           "{{modelCount}} Modelle. Bilder, Videos & Musik. 30-Sekunden-Start.",
         features: {
@@ -704,9 +723,9 @@ export const translations: typeof enTranslations = {
         badge: "Self-Hosted · Persönlich",
         title: "Dein Power-Dashboard",
         tagline:
-          "Alles, was unbottled.ai hat - plus die Tools, die es nicht hat.",
+          "Alles, was {{appName}} hat - plus die Tools, die es nicht hat.",
         features: {
-          everything: "Jedes unbottled.ai-Feature, auf deiner Maschine",
+          everything: "Jedes {{appName}}-Feature, auf deiner Maschine",
           admin:
             "Browser-Automatisierung, SSH, E-Mail, Claude Code (nur Admin)",
           heartbeat:
@@ -715,7 +734,7 @@ export const translations: typeof enTranslations = {
           privacy:
             "Deine Maschine, deine Daten, null Drittanbieter-Sichtbarkeit",
           localSync:
-            "Von unbottled.ai Cloud aufrufbar mit Gedächtnissynchronisation (Beta)",
+            "Von {{appName}} Cloud aufrufbar mit Gedächtnissynchronisation (Beta)",
         },
         cta: "Selbst hosten",
       },

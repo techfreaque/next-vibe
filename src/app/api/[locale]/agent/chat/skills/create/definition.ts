@@ -9,20 +9,18 @@ import {
   CHAT_MODE_IDS,
   ChatModeOptions,
 } from "@/app/api/[locale]/agent/models/enum";
+import { ChatModelIdOptions } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
-  LLM_MODEL_IDS,
-  LlmModelIdOptions,
-  ModelId,
-} from "@/app/api/[locale]/agent/models/models";
-import {
+  audioVisionModelSelectionSchema,
+  chatModelSelectionSchema,
   imageGenModelSelectionSchema,
-  modelSelectionSchemaSimple,
-  type ModelSelectionSimple,
+  imageVisionModelSelectionSchema,
   musicGenModelSelectionSchema,
   sttModelSelectionSchema,
   videoGenModelSelectionSchema,
-  visionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
   voiceModelSelectionSchema,
+  type ChatModelSelection,
 } from "@/app/api/[locale]/agent/models/types";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -41,7 +39,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazy } from "react";
 import { iconSchema } from "../../../../shared/types/common.schema";
+import { ChatModelId } from "../../../ai-stream/models";
 import {
   CATEGORY_CONFIG,
   ContentLevel,
@@ -56,7 +56,6 @@ import { CategoryOptions, SkillCategory, SkillCategoryDB } from "../enum";
 import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "../i18n";
 import { SkillsRepositoryClient } from "../repository-client";
-import { lazy } from "react";
 
 const SkillCreateContainer = lazy(() =>
   import("./widget").then((m) => ({ default: m.SkillCreateContainer })),
@@ -92,6 +91,8 @@ const { POST } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async (data) => {
+        const { getEnvAvailability } =
+          await import("@/app/api/[locale]/agent/env-availability-context");
         const skillsDefinition = await import("../definition");
 
         // Optimistically add the new skill to the list
@@ -118,6 +119,7 @@ const { POST } = createEndpoint({
               ? SkillsRepositoryClient.getBestModelForSkill(
                   data.requestData.modelSelection,
                   data.user,
+                  getEnvAvailability(),
                 )
               : null;
 
@@ -320,12 +322,36 @@ const { POST } = createEndpoint({
           optionalColor: "transparent",
         },
       }),
-      visionBridgeModelSelection: requestField(scopedTranslation, {
-        schema: visionModelSelectionSchema.nullable().optional(),
+      imageVisionModelSelection: requestField(scopedTranslation, {
+        schema: imageVisionModelSelectionSchema.nullable().optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "post.visionBridgeModel.label" as const,
-        description: "post.visionBridgeModel.description" as const,
+        label: "post.imageVisionModel.label" as const,
+        description: "post.imageVisionModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      videoVisionModelSelection: requestField(scopedTranslation, {
+        schema: videoVisionModelSelectionSchema.nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.videoVisionModel.label" as const,
+        description: "post.videoVisionModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      audioVisionModelSelection: requestField(scopedTranslation, {
+        schema: audioVisionModelSelectionSchema.nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.audioVisionModel.label" as const,
+        description: "post.audioVisionModel.description" as const,
         columns: 6,
         theme: {
           descriptionStyle: "inline",
@@ -333,10 +359,10 @@ const { POST } = createEndpoint({
         },
       }),
       translationModelId: requestField(scopedTranslation, {
-        schema: z.enum(LLM_MODEL_IDS).nullable().optional(),
+        schema: z.enum(ChatModelId).nullable().optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        options: LlmModelIdOptions,
+        options: ChatModelIdOptions,
         label: "post.translationModel.label" as const,
         description: "post.translationModel.description" as const,
         columns: 6,
@@ -413,7 +439,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "post.modelSelection.label" as const,
         description: "post.modelSelection.description" as const,
-        schema: modelSelectionSchemaSimple.nullable(),
+        schema: chatModelSelectionSchema.nullable(),
       }),
 
       // Tool configuration - which tools this skill can use (null = use global settings default)
@@ -544,11 +570,13 @@ const { POST } = createEndpoint({
         isPublic: true,
         modelSelection: {
           selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ModelId.GPT_5,
+          manualModelId: ChatModelId.GPT_5,
         },
         voiceModelSelection: undefined,
         sttModelSelection: undefined,
-        visionBridgeModelSelection: undefined,
+        imageVisionModelSelection: undefined,
+        videoVisionModelSelection: undefined,
+        audioVisionModelSelection: undefined,
         imageGenModelSelection: undefined,
         musicGenModelSelection: undefined,
         videoGenModelSelection: undefined,
@@ -570,11 +598,13 @@ const { POST } = createEndpoint({
         isPublic: true,
         modelSelection: {
           selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ModelId.GPT_5,
+          manualModelId: ChatModelId.GPT_5,
         },
         voiceModelSelection: undefined,
         sttModelSelection: undefined,
-        visionBridgeModelSelection: undefined,
+        imageVisionModelSelection: undefined,
+        videoVisionModelSelection: undefined,
+        audioVisionModelSelection: undefined,
         imageGenModelSelection: undefined,
         musicGenModelSelection: undefined,
         videoGenModelSelection: undefined,
@@ -616,7 +646,9 @@ const { POST } = createEndpoint({
         },
         voiceModelSelection: undefined,
         sttModelSelection: undefined,
-        visionBridgeModelSelection: undefined,
+        imageVisionModelSelection: undefined,
+        videoVisionModelSelection: undefined,
+        audioVisionModelSelection: undefined,
         imageGenModelSelection: undefined,
         musicGenModelSelection: undefined,
         videoGenModelSelection: undefined,
@@ -649,27 +681,24 @@ export type SkillCreateRequestOutput = typeof POST.types.RequestOutput;
 export type SkillCreateResponseInput = typeof POST.types.ResponseInput;
 export type SkillCreateResponseOutput = typeof POST.types.ResponseOutput;
 
-// Skill field type aliases - anchored to ModelSelectionSimple for type identity
-export type SkillModelSelection = ModelSelectionSimple;
-
 // Type for filter-based model selection
 export type FiltersModelSelection = Extract<
-  SkillModelSelection,
+  ChatModelSelection,
   { selectionType: typeof ModelSelectionType.FILTERS }
 >;
 export type ManualModelSelection = Extract<
-  SkillModelSelection,
+  ChatModelSelection,
   { selectionType: typeof ModelSelectionType.MANUAL }
 >;
 
 export function isFiltersSelection(
-  sel: SkillModelSelection,
+  sel: ChatModelSelection,
 ): sel is FiltersModelSelection {
   return sel !== null && sel.selectionType === ModelSelectionType.FILTERS;
 }
 
 export function isManualSelection(
-  sel: SkillModelSelection,
+  sel: ChatModelSelection,
 ): sel is ManualModelSelection {
   return sel !== null && sel.selectionType === ModelSelectionType.MANUAL;
 }

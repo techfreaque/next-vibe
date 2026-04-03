@@ -17,14 +17,23 @@ import {
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
 import {
-  ApiProvider,
-  getModelById,
+  getChatModelById,
+  type ChatModelOption,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import {
+  getImageGenModelById,
   type ImageGenModelId,
-  type ModelOption,
+} from "@/app/api/[locale]/agent/image-generation/models";
+import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
+import {
+  getMusicGenModelById,
   type MusicGenModelId,
-  type TtsModelId,
+} from "@/app/api/[locale]/agent/music-generation/models";
+import {
+  getVideoGenModelById,
   type VideoGenModelId,
-} from "@/app/api/[locale]/agent/models/models";
+} from "@/app/api/[locale]/agent/video-generation/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -137,7 +146,7 @@ export interface StreamSetupResult {
     }>;
   }>;
   /** Model configuration */
-  modelConfig: ModelOption;
+  modelConfig: ChatModelOption;
   /** AI SDK tools configuration */
   tools: Record<string, CoreTool> | undefined;
   /** Tools metadata for confirmation checks */
@@ -290,7 +299,7 @@ export async function setupAiStream(params: {
       errorType: ErrorResponseTypes.AUTH_ERROR,
     });
   }
-  const modelConfig = getModelById(data.model);
+  const modelConfig = getChatModelById(data.model);
 
   // Guard: TTS/STT models are dispatched via their own handlers, not the LLM stream pipeline
   if (
@@ -781,7 +790,9 @@ export async function setupAiStream(params: {
           .select({
             voiceModelSelection: customSkills.voiceModelSelection,
             sttModelSelection: customSkills.sttModelSelection,
-            visionBridgeModelSelection: customSkills.visionBridgeModelSelection,
+            imageVisionModelSelection: customSkills.imageVisionModelSelection,
+            videoVisionModelSelection: customSkills.videoVisionModelSelection,
+            audioVisionModelSelection: customSkills.audioVisionModelSelection,
             translationModelId: customSkills.translationModelId,
             defaultChatMode: customSkills.defaultChatMode,
           })
@@ -794,7 +805,9 @@ export async function setupAiStream(params: {
           skillConfig = {
             voiceId: undefined,
             sttModelId: undefined,
-            visionBridgeModelId: undefined,
+            imageVisionModelId: undefined,
+            videoVisionModelId: undefined,
+            audioVisionModelId: undefined,
             translationModelId: customSkillRow.translationModelId ?? undefined,
             defaultChatMode: customSkillRow.defaultChatMode ?? undefined,
             imageGenModelId: undefined,
@@ -806,8 +819,12 @@ export async function setupAiStream(params: {
           favoriteConfig = {
             voiceModelSelection: customSkillRow.voiceModelSelection ?? null,
             sttModelSelection: customSkillRow.sttModelSelection ?? null,
-            visionBridgeModelSelection:
-              customSkillRow.visionBridgeModelSelection ?? null,
+            imageVisionModelSelection:
+              customSkillRow.imageVisionModelSelection ?? null,
+            videoVisionModelSelection:
+              customSkillRow.videoVisionModelSelection ?? null,
+            audioVisionModelSelection:
+              customSkillRow.audioVisionModelSelection ?? null,
             translationModelId: customSkillRow.translationModelId ?? null,
             defaultChatMode: customSkillRow.defaultChatMode ?? null,
             imageGenModelSelection: null,
@@ -830,7 +847,9 @@ export async function setupAiStream(params: {
           activeFavoriteId: chatSettings.activeFavoriteId,
           voiceModelSelection: chatSettings.voiceModelSelection,
           sttModelSelection: chatSettings.sttModelSelection,
-          visionBridgeModelSelection: chatSettings.visionBridgeModelSelection,
+          imageVisionModelSelection: chatSettings.imageVisionModelSelection,
+          videoVisionModelSelection: chatSettings.videoVisionModelSelection,
+          audioVisionModelSelection: chatSettings.audioVisionModelSelection,
           translationModelId: chatSettings.translationModelId,
           defaultChatMode: chatSettings.defaultChatMode,
           imageGenModelSelection: chatSettings.imageGenModelSelection,
@@ -883,29 +902,31 @@ export async function setupAiStream(params: {
     bridgeContext,
     user,
   );
-  const resolvedVideoGenModel =
-    ModalityResolver.resolveVideoGenModel(bridgeContext);
+  const resolvedVideoGenModel = ModalityResolver.resolveVideoGenModel(
+    bridgeContext,
+    user,
+  );
 
   // Apply test overrides — only set in integration tests to bypass user-settings cascade
   const effectiveImageGenModel = mediaModelOverrides?.imageGenModelId
-    ? getModelById(mediaModelOverrides.imageGenModelId)
+    ? getImageGenModelById(mediaModelOverrides.imageGenModelId)
     : resolvedImageGenModel;
   const effectiveMusicGenModel = mediaModelOverrides?.musicGenModelId
-    ? getModelById(mediaModelOverrides.musicGenModelId)
+    ? getMusicGenModelById(mediaModelOverrides.musicGenModelId)
     : resolvedMusicGenModel;
   const effectiveVideoGenModel = mediaModelOverrides?.videoGenModelId
-    ? getModelById(mediaModelOverrides.videoGenModelId)
+    ? getVideoGenModelById(mediaModelOverrides.videoGenModelId)
     : resolvedVideoGenModel;
 
   logger.debug("[Setup] Bridge models resolved via cascade", {
     ttsModelId: resolvedTtsModel.id,
     sttModelId: ModalityResolver.resolveSttModel(bridgeContext, user).id,
-    hasVisionBridge: !!ModalityResolver.resolveVisionBridgeModel(
+    imageVisionModelId: ModalityResolver.resolveImageVisionModel(
       bridgeContext,
       user,
-    ),
+    ).id,
     hasTranslation: !!ModalityResolver.resolveTranslationModel(bridgeContext),
-    imageGenModelId: effectiveImageGenModel.id,
+    imageGenModelId: effectiveImageGenModel?.id ?? null,
     musicGenModelId: effectiveMusicGenModel?.id ?? null,
     videoGenModelId: effectiveVideoGenModel?.id ?? null,
   });
@@ -929,7 +950,7 @@ export async function setupAiStream(params: {
       memoryLimit: resolvedToolConfig.memoryLimit,
       mediaCapabilities: {
         nativeOutputs: modelConfig.outputs ?? [],
-        imageGenModelName: effectiveImageGenModel.name,
+        imageGenModelName: effectiveImageGenModel?.name ?? null,
         musicGenModelName: effectiveMusicGenModel?.name ?? null,
         videoGenModelName: effectiveVideoGenModel?.name ?? null,
       },
@@ -959,7 +980,7 @@ export async function setupAiStream(params: {
     aiMessageId,
     skillId: data.skill,
     modelId: data.model,
-    imageGenModelId: effectiveImageGenModel.id,
+    imageGenModelId: effectiveImageGenModel?.id ?? undefined,
     musicGenModelId: effectiveMusicGenModel?.id ?? undefined,
     videoGenModelId: effectiveVideoGenModel?.id ?? undefined,
     headless: params.headless,
@@ -1034,7 +1055,7 @@ export async function setupAiStream(params: {
   };
 
   // Remove media generation tools when no model is configured for that modality.
-  // If music/video gen model is null, the tool would fail at runtime anyway —
+  // If the gen model is null, the tool would fail at runtime anyway —
   // removing it keeps the tool set honest and avoids confusing the LLM.
   const filterUnavailableMediaTools = <T extends { toolId: string }>(
     tools: T[] | null | undefined,
@@ -1043,6 +1064,9 @@ export async function setupAiStream(params: {
       return tools;
     }
     return tools.filter((t) => {
+      if (t.toolId === "generate_image" && !effectiveImageGenModel) {
+        return false;
+      }
       if (t.toolId === "generate_music" && !effectiveMusicGenModel) {
         return false;
       }
@@ -1081,7 +1105,6 @@ export async function setupAiStream(params: {
   const provider = ProviderFactoryClass.getProviderForModel(
     modelConfig,
     logger,
-    locale,
   );
 
   // Register tool executors for Agent SDK provider (uses CoreTool execute functions)

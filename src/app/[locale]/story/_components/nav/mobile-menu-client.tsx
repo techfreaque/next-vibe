@@ -11,7 +11,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -68,10 +68,30 @@ export function MobileMenuClient({
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
     {},
   );
+  const closeMenu = useCallback((): void => {
+    setIsMenuOpen(false);
+  }, []);
 
   const toggleMenu = (): void => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  useEffect(() => {
+    if (!isMenuOpen) {
+      return;
+    }
+
+    const handleEsc = (e: KeyboardEvent): void => {
+      if (e.key === "Escape") {
+        closeMenu();
+      }
+    };
+
+    document.addEventListener("keydown", handleEsc);
+    return (): void => {
+      document.removeEventListener("keydown", handleEsc);
+    };
+  }, [isMenuOpen, closeMenu]);
 
   const toggleDropdown = (itemTitle: string): void => {
     setExpandedItems((prev) => ({
@@ -92,10 +112,17 @@ export function MobileMenuClient({
         {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
       </Button>
 
+      {isMenuOpen && (
+        <Div
+          className="fixed inset-0 top-16 z-40 md:hidden"
+          onClick={closeMenu}
+        />
+      )}
+
       <AnimatePresence>
         {isMenuOpen && (
           <MotionDiv
-            className="fixed h-[80vh] inset-0 top-16 z-50 bg-background/98 backdrop-blur-sm md:hidden overflow-y-auto"
+            className="fixed inset-x-0 top-16 z-50 max-h-[calc(100vh-4rem)] bg-background md:hidden overflow-y-auto"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}

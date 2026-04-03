@@ -15,9 +15,8 @@ import {
 import {
   ApiProvider,
   calculateCreditCost,
-  getAllModelOptions,
-  type ModelOptionAudioBased,
 } from "@/app/api/[locale]/agent/models/models";
+import { getMusicGenModelById } from "@/app/api/[locale]/agent/music-generation/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -54,20 +53,9 @@ export class MusicGenerationRepository {
     t: MusicGenerationT,
     streamContext?: MediaGenStreamContext,
   ): Promise<ResponseType<MusicGenerationPostResponseOutput>> {
-    // model is already resolved via streamContextPatch in tools-loader (from ToolExecutionContext.musicGenModelId)
-    const selectedModel: string = data.model;
-    const modelConfig = getAllModelOptions().find(
-      (m) => m.id === selectedModel,
-    );
+    // model is resolved via serverDefault on the field definition (from ToolExecutionContext.musicGenModelId)
+    const audioModel = getMusicGenModelById(data.model);
 
-    if (!modelConfig || modelConfig.modelType !== "audio") {
-      return fail({
-        message: t("post.errors.notAnAudioModel"),
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-      });
-    }
-
-    const audioModel = modelConfig as ModelOptionAudioBased;
     const creditCost = calculateCreditCost(audioModel, 0, 0);
     const durationSeconds =
       MUSIC_DURATION_SECONDS[data.duration] ??

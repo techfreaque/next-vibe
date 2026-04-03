@@ -12,6 +12,7 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type {
   ChatMessage,
@@ -21,11 +22,12 @@ import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import { configScopedTranslation } from "@/config/i18n";
 
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
@@ -158,7 +160,7 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
     tid,
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_gpt",
     "ai-run",
     {
@@ -183,7 +185,7 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
     "mc-claude",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_claude",
     "ai-run",
     {
@@ -208,7 +210,7 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
     "mc-reason",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.modelComparison.reasoning"),
   );
 
@@ -216,7 +218,7 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
     "mc-venice",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_venice",
     "ai-run",
     {
@@ -241,7 +243,7 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
     "mc-response",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.modelComparison.agentResponse"),
     { promptTokens: 4200, completionTokens: 580 },
   );
@@ -279,7 +281,7 @@ function buildResearchDemo(t: ScopedT): DemoData {
     tid,
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_search",
     "brave-search",
     { query: "Portugal D7 visa freelancer 2026 tax NHR", maxResults: 5 },
@@ -302,7 +304,7 @@ function buildResearchDemo(t: ScopedT): DemoData {
     "res-mem",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_mem",
     "memories-list",
     {},
@@ -327,7 +329,7 @@ function buildResearchDemo(t: ScopedT): DemoData {
     "res-reason",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.research.searchReasoning"),
   );
 
@@ -335,7 +337,7 @@ function buildResearchDemo(t: ScopedT): DemoData {
     "res-fetch",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_fetch",
     "fetch-url-content",
     { url: "https://nomadlist.com/portugal" },
@@ -355,7 +357,7 @@ function buildResearchDemo(t: ScopedT): DemoData {
     "res-response",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.research.agentResponse"),
     { promptTokens: 3100, completionTokens: 420 },
   );
@@ -364,7 +366,7 @@ function buildResearchDemo(t: ScopedT): DemoData {
     "res-save",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_save",
     "memories-add",
     {
@@ -409,7 +411,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     tid,
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.featureShipped.reasoning"),
   );
 
@@ -417,7 +419,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     "feat-code",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_code",
     "claude-code",
     {
@@ -437,7 +439,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     "feat-rebuild",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_rebuild",
     "rebuild",
     {},
@@ -449,7 +451,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     "feat-help",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_help",
     "system_help_GET",
     { toolName: "hackernews-top" },
@@ -466,7 +468,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     "feat-reason2",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.featureShipped.reasoning2"),
   );
 
@@ -474,7 +476,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     "feat-char",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_char",
     "character-create",
     {
@@ -499,7 +501,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     "feat-reason3",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.featureShipped.reasoning3"),
   );
 
@@ -507,7 +509,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     "feat-cron",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_cron",
     "cron-create",
     {
@@ -543,7 +545,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     "feat-reason4",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.featureShipped.reasoning4"),
   );
 
@@ -551,7 +553,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     "feat-run",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_run",
     "ai-run",
     {
@@ -579,7 +581,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     "feat-response",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.featureShipped.agentResponse"),
     { promptTokens: 6400, completionTokens: 180 },
   );
@@ -628,7 +630,7 @@ function buildWeeklyReportDemo(t: ScopedT): DemoData {
     tid,
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.weeklyReport.reasoning"),
   );
 
@@ -636,7 +638,7 @@ function buildWeeklyReportDemo(t: ScopedT): DemoData {
     "rpt-fix",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_fix",
     "claude-code",
     {
@@ -656,7 +658,7 @@ function buildWeeklyReportDemo(t: ScopedT): DemoData {
     "rpt-reason2",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.weeklyReport.reasoning2"),
   );
 
@@ -664,7 +666,7 @@ function buildWeeklyReportDemo(t: ScopedT): DemoData {
     "rpt-rebuild",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_rebuild",
     "rebuild",
     {},
@@ -678,7 +680,7 @@ function buildWeeklyReportDemo(t: ScopedT): DemoData {
     "rpt-response",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.weeklyReport.agentResponse"),
     { promptTokens: 4800, completionTokens: 210 },
   );
@@ -687,7 +689,7 @@ function buildWeeklyReportDemo(t: ScopedT): DemoData {
     "rpt-email",
     tid,
     seq,
-    ModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_6,
     "toolu_email",
     "emails_send_POST",
     {
@@ -780,6 +782,8 @@ const Hero = ({
   totalSkillCount,
 }: HeroProps): JSX.Element => {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
   const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
@@ -834,6 +838,7 @@ const Hero = ({
               modelCount: totalModelCount,
               skillCount: totalSkillCount,
               toolCount: totalToolCount,
+              appName,
             })}
           </P>
 

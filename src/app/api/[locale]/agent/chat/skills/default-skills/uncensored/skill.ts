@@ -1,4 +1,4 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import {
@@ -33,7 +33,7 @@ export const uncensoredSkill: Skill = {
       variantName: "skills.uncensored.variants.farRight" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.UNCENSORED_LM_V1_2,
+        manualModelId: ChatModelId.UNCENSORED_LM_V1_2,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -52,7 +52,7 @@ export const uncensoredSkill: Skill = {
       variantName: "skills.uncensored.variants.conservative" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GAB_AI_ARYA,
+        manualModelId: ChatModelId.GAB_AI_ARYA,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -70,7 +70,7 @@ export const uncensoredSkill: Skill = {
       variantName: "skills.uncensored.variants.libertarian" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.FREEDOMGPT_LIBERTY,
+        manualModelId: ChatModelId.FREEDOMGPT_LIBERTY,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,
@@ -88,7 +88,7 @@ export const uncensoredSkill: Skill = {
       variantName: "skills.uncensored.variants.open" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.VENICE_UNCENSORED,
+        manualModelId: ChatModelId.VENICE_UNCENSORED,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

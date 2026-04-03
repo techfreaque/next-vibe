@@ -35,7 +35,10 @@ export const translations = {
   home: "Home",
   pricing: "Pricing",
   features: "Features",
-  framework: "Framework",
+  framework: {
+    title: "Framework",
+    description: "The open-source engine behind the platform",
+  },
   forum: "Forum",
   contact: "Contact",
   getStarted: "Get Started Free",

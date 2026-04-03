@@ -2,19 +2,19 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Polityka prywatności - unbottled.ai",
+    title: "Polityka prywatności - {{appName}}",
     category: "Prawne",
     description:
-      "Dowiedz się, jak unbottled.ai chroni Twoją prywatność i przetwarza Twoje dane",
+      "Dowiedz się, jak {{appName}} chroni Twoją prywatność i przetwarza Twoje dane",
     imageAlt: "Polityka prywatności",
     keywords:
-      "polityka prywatności, ochrona danych, prywatność użytkownika, unbottled.ai prywatność",
-    ogTitle: "Polityka prywatności - unbottled.ai",
+      "polityka prywatności, ochrona danych, prywatność użytkownika, {{appName}} prywatność",
+    ogTitle: "Polityka prywatności - {{appName}}",
     ogDescription:
-      "Dowiedz się, jak unbottled.ai chroni Twoją prywatność i przetwarza Twoje dane",
-    twitterTitle: "Polityka prywatności - unbottled.ai",
+      "Dowiedz się, jak {{appName}} chroni Twoją prywatność i przetwarza Twoje dane",
+    twitterTitle: "Polityka prywatności - {{appName}}",
     twitterDescription:
-      "Dowiedz się, jak unbottled.ai chroni Twoją prywatność i przetwarza Twoje dane",
+      "Dowiedz się, jak {{appName}} chroni Twoją prywatność i przetwarza Twoje dane",
   },
   printAriaLabel: "Drukuj politykę prywatności",
   printButton: "Drukuj",

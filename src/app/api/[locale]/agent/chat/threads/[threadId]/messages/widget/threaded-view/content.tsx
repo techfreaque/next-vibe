@@ -11,7 +11,7 @@ import React from "react";
 import { Logo } from "@/app/[locale]/_components/logo";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { getModelById } from "@/app/api/[locale]/agent/models/models";
+import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -112,7 +112,7 @@ export function ThreadedMessageContent({
               {/* Show model icon for AI messages */}
               {message.role === "assistant" && message.model && (
                 <Icon
-                  icon={getModelById(message.model).icon}
+                  icon={getChatModelById(message.model).icon}
                   className="h-3 w-3"
                 />
               )}
@@ -134,7 +134,7 @@ export function ThreadedMessageContent({
                     })()
                   : t("widget.threadedView.youLabel")
                 : message.role === "assistant" && message.model
-                  ? getModelById(message.model).name
+                  ? getChatModelById(message.model).name
                   : t("widget.threadedView.assistantFallback")}
             </Button>
           </Span>

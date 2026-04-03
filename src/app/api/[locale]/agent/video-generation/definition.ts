@@ -22,11 +22,11 @@ import {
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
 import { lazy } from "react";
 import {
   DEFAULT_VIDEO_DURATION,
   VIDEO_DURATION_VALUES,
-  VIDEO_GEN_MODEL_IDS,
   VideoDurationOptions,
 } from "./enum";
 
@@ -67,7 +67,6 @@ const { POST } = createEndpoint({
 
   defaultExpanded: true,
   dynamicCredits: ({ response }) => response?.creditCost,
-  streamContextPatch: (ctx) => ({ model: ctx.videoGenModelId }),
 
   fields: customWidgetObject({
     render: VideoGenerationContainer,
@@ -92,8 +91,9 @@ const { POST } = createEndpoint({
         options: [],
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
         schema: z
-          .enum(VIDEO_GEN_MODEL_IDS)
-          .default(VIDEO_GEN_MODEL_IDS[0] ?? ""),
+          .enum(VideoGenModelId)
+          .default(VideoGenModelId.MODELSLAB_WAN_2_5_T2V),
+        serverDefault: (ctx) => ctx.streamContext?.videoGenModelId,
       }),
       duration: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -193,7 +193,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         prompt: "A cinematic shot of a mountain lake at sunset",
-        model: VIDEO_GEN_MODEL_IDS[0] ?? "",
+        model: VideoGenModelId.MODELSLAB_WAN_2_5_T2V,
         duration: DEFAULT_VIDEO_DURATION,
       },
     },

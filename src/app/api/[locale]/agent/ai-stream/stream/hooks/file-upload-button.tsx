@@ -40,7 +40,11 @@ interface FileUploadButtonProps {
   attachments: File[];
   onFilesSelected: (files: File[] | ((prev: File[]) => File[])) => void;
   onRemoveFile: (index: number) => void;
+  /** Dynamic accept attribute based on model capabilities and env availability */
+  accept?: string;
 }
+
+const DEFAULT_ACCEPT = "image/*,application/pdf,text/*,.doc,.docx,.xls,.xlsx";
 
 export const FileUploadButton = memo(function FileUploadButton({
   disabled,
@@ -48,6 +52,7 @@ export const FileUploadButton = memo(function FileUploadButton({
   attachments,
   onFilesSelected,
   onRemoveFile,
+  accept = DEFAULT_ACCEPT,
 }: FileUploadButtonProps): JSX.Element {
   const { t } = aiStreamScopedTranslation.scopedT(locale);
   const fileInputRef = useRef<InputRefObject>(null);
@@ -104,7 +109,7 @@ export const FileUploadButton = memo(function FileUploadButton({
         type="file"
         multiple
         className="hidden"
-        accept="image/*,application/pdf,text/*,.doc,.docx,.xls,.xlsx"
+        accept={accept}
         onChange={handleFileSelect}
         disabled={disabled}
       />

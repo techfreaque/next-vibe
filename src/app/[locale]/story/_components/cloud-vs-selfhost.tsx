@@ -16,6 +16,8 @@ import { useInView } from "react-intersection-observer";
 import { FREE_CREDIT_POOL } from "@/app/api/[locale]/credits/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { configScopedTranslation } from "@/config/i18n";
+
 import { scopedTranslation } from "./i18n";
 
 interface CloudVsSelfHostProps {
@@ -36,6 +38,8 @@ export function CloudVsSelfHost({
   totalSkillCount,
 }: CloudVsSelfHostProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   const interpolation = {
@@ -45,6 +49,7 @@ export function CloudVsSelfHost({
     subCurrency,
     freeCredits: FREE_CREDIT_POOL,
     endpointCount: totalToolCount,
+    appName,
   };
 
   const cloudFeatures = [
@@ -110,7 +115,7 @@ export function CloudVsSelfHost({
                         {t("home.paths.cloud.badge")}
                       </P>
                       <H3 className="text-xl font-bold">
-                        {t("home.paths.cloud.title")}
+                        {t("home.paths.cloud.title", { appName })}
                       </H3>
                     </Div>
                   </Div>

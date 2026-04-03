@@ -3,34 +3,29 @@
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Image } from "next-vibe-ui/ui/image";
-import { ExternalLink } from "next-vibe-ui/ui/link";
-import { Textarea } from "next-vibe-ui/ui/textarea";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Download } from "next-vibe-ui/ui/icons/Download";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
+import { Image } from "next-vibe-ui/ui/image";
+import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
+import { Textarea } from "next-vibe-ui/ui/textarea";
 import { H3 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import {
-  getDefaultModelForRole,
-  getModelById,
-  type ModelId,
-} from "@/app/api/[locale]/agent/models/models";
-import type {
-  ModelSelectionSimple,
-  ManualModelSelection,
-} from "@/app/api/[locale]/agent/models/types";
+import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
+import { getImageGenModelById } from "@/app/api/[locale]/agent/image-generation/models";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/models/types";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
@@ -43,8 +38,9 @@ import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/
 
 import type definition from "./definition";
 import type { ImageGenerationPostResponseOutput } from "./definition";
-import { IMAGE_MODEL_IDS, ImageSize } from "./enum";
+import { ImageSize } from "./enum";
 import { scopedTranslation } from "./i18n";
+import { ImageGenModelId } from "./models";
 
 interface CustomWidgetProps {
   field: {
@@ -95,12 +91,12 @@ export function ImageGenerationContainer({
   const { t } = scopedTranslation.scopedT(locale);
   const [showModelSelector, setShowModelSelector] = useState(false);
 
-  const currentModelId = form?.watch("model") as ModelId | undefined;
+  const currentModelId = form?.watch("model");
   const currentSize = form?.watch("size") ?? ImageSize.SQUARE_1024;
   const currentQuality = form?.watch("quality") ?? "post.quality.standard";
 
-  const modelSelection = useMemo((): ModelSelectionSimple | undefined => {
-    // model is patched from stream context into request args (streamContextPatch)
+  const modelSelection = useMemo((): ImageGenModelSelection | undefined => {
+    // model is resolved via serverDefault on the field definition
     if (!currentModelId) {
       return undefined;
     }
@@ -111,27 +107,36 @@ export function ImageGenerationContainer({
   }, [currentModelId]);
 
   const defaultModelSelection = useMemo(():
-    | ModelSelectionSimple
+    | ImageGenModelSelection
     | undefined => {
-    const m = getDefaultModelForRole(["image-gen"], envAvailability);
+    const m = SkillsRepositoryClient.getBestImageGenModel(
+      DEFAULT_IMAGE_GEN_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const modelId = Object.values(ImageGenModelId).includes(m.id)
+      ? m.id
+      : undefined;
+    if (!modelId) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: modelId };
+  }, [user, envAvailability]);
 
   const resolvedModelId =
     currentModelId ??
     (defaultModelSelection?.selectionType === ModelSelectionType.MANUAL
-      ? defaultModelSelection.manualModelId
+      ? Object.values(ImageGenModelId).includes(
+          defaultModelSelection.manualModelId,
+        )
+        ? defaultModelSelection.manualModelId
+        : undefined
       : undefined);
-  const effectiveModelId =
-    resolvedModelId !== undefined &&
-    (IMAGE_MODEL_IDS as readonly string[]).includes(resolvedModelId)
-      ? (resolvedModelId as (typeof IMAGE_MODEL_IDS)[number])
-      : resolvedModelId;
-  const resolvedModel = effectiveModelId
-    ? getModelById(effectiveModelId)
+  const resolvedModel = resolvedModelId
+    ? getImageGenModelById(resolvedModelId)
     : undefined;
 
   const activeSize =
@@ -156,10 +161,12 @@ export function ImageGenerationContainer({
               sel !== null &&
               sel.selectionType === ModelSelectionType.MANUAL
             ) {
-              form?.setValue(
-                "model",
-                (sel as ManualModelSelection).manualModelId as never,
+              const selectedId = Object.values(ImageGenModelId).find(
+                (id) => id === sel.manualModelId,
               );
+              if (selectedId !== undefined) {
+                form?.setValue("model", selectedId);
+              }
             }
             setShowModelSelector(false);
           }}
@@ -255,9 +262,9 @@ export function ImageGenerationContainer({
             <Span className="text-xs font-medium text-muted-foreground">
               {t("post.model.label")}
             </Span>
-            {effectiveModelId && (
+            {resolvedModelId && (
               <ModelCreditDisplay
-                modelId={effectiveModelId}
+                modelId={resolvedModelId}
                 variant="badge"
                 badgeVariant="secondary"
                 className="text-[10px] h-5"

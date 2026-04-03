@@ -1,13 +1,14 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
 } from "../../enum";
 
 export const socialMediaManagerSkill: Skill = {
@@ -122,7 +123,7 @@ export const socialMediaManagerSkill: Skill = {
       variantName: "skills.socialMediaManager.variants.snappy" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GPT_5_4_MINI,
+        manualModelId: ChatModelId.GPT_5_4_MINI,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -141,7 +142,7 @@ export const socialMediaManagerSkill: Skill = {
       variantName: "skills.socialMediaManager.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GPT_5_4_NANO,
+        manualModelId: ChatModelId.GPT_5_4_NANO,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

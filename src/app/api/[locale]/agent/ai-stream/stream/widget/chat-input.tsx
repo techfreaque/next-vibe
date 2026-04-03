@@ -33,9 +33,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AGENT_MESSAGE_LENGTH } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import {
-  getModelById,
-  type ModelId,
-} from "@/app/api/[locale]/agent/models/models";
+  getChatModelById,
+  type ChatModelId,
+} from "@/app/api/[locale]/agent/ai-stream/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -50,9 +50,9 @@ import { ToolsButton } from "./tools-button";
 export interface WidgetChatInputProps {
   content: string;
   onContentChange: (value: string) => void;
-  modelId: ModelId;
+  modelId: ChatModelId | null | undefined;
   skillId: string;
-  onModelChange: (id: ModelId) => void;
+  onModelChange: (id: ChatModelId) => void;
   onSkillChange: (id: string) => void;
   locale: CountryLanguage;
   user: JwtPayloadType;
@@ -160,7 +160,7 @@ export function WidgetChatInput({
     [content, isInactive, onSubmit],
   );
 
-  const currentModel = getModelById(modelId);
+  const currentModel = getChatModelById(modelId);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
   const canSubmit = content.trim().length > 0 && !isInactive;
 

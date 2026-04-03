@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { agentEnv } from "../../env";
 import type { FileMetadata, StorageAdapter } from "./index";
+import { makeAbsoluteStorageUrl } from "./url-utils";
 
 export class LocalStorageAdapter implements StorageAdapter {
   async uploadFile(
@@ -91,7 +92,9 @@ export class LocalStorageAdapter implements StorageAdapter {
 
     // URL format: /api/{locale}/agent/chat/threads/files/{threadId}/{filename}
     // Use en-GLOBAL as default locale for file URLs
-    const url = `/api/en-GLOBAL/agent/chat/threads/files/${metadata.threadId}/${storedFilename}`;
+    const url = makeAbsoluteStorageUrl(
+      `/api/en-GLOBAL/agent/chat/threads/files/${metadata.threadId}/${storedFilename}`,
+    );
 
     return {
       url,
@@ -141,7 +144,9 @@ export class LocalStorageAdapter implements StorageAdapter {
       return "";
     }
 
-    return `/api/en-GLOBAL/agent/chat/threads/files/${metadata.threadId}/${metadata.filename}`;
+    return makeAbsoluteStorageUrl(
+      `/api/en-GLOBAL/agent/chat/threads/files/${metadata.threadId}/${metadata.filename}`,
+    );
   }
 
   async getFileMetadata(fileId: string): Promise<FileMetadata | null> {

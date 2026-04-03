@@ -10,7 +10,7 @@ export const translations: typeof enTranslations = {
     whatItDoesDifferently:
       "Krótko: to asystent AI, który nie odmawia zadań na podstawie mglistych zasad polityki. Przydatny jeśli robisz cokolwiek w marketingu, prawie, pisaniu kreatywnym, badaniach, lub tak naprawdę cokolwiek, gdzie główne narzędzia AI tend to get in the way of actual work.",
     affiliateNote:
-      "Poniżej jest link afiliacyjny – zarabiam małą prowizję jeśli się zapiszesz. Wspominam o tym, bo wolę być bezpośredni niż udawać, że go nie ma.",
+      "Poniżej jest link afiliacyjny - zarabiam małą prowizję jeśli się zapiszesz. Wspominam o tym, bo wolę być bezpośredni niż udawać, że go nie ma.",
     ctaText: "Rzuć okiem",
     signature: " -  Sam",
   },
@@ -51,7 +51,7 @@ export const translations: typeof enTranslations = {
     previewText: "warte wiedzenia jeśli szukasz",
     greeting: "Cześć,",
     update:
-      "unbottled.ai ostatnio dodał nowe opcje modeli. Jeśli patrzyłeś wcześniej i jakość wyników nie była tam, warto spróbować ponownie – nowsze modele są o krok lepsze. Link afiliacyjny nadal aktywny jeśli chcesz się zapisać.",
+      "unbottled.ai ostatnio dodał nowe opcje modeli. Jeśli patrzyłeś wcześniej i jakość wyników nie była tam, warto spróbować ponownie - nowsze modele są o krok lepsze. Link afiliacyjny nadal aktywny jeśli chcesz się zapisać.",
     ctaText: "Zobacz co nowego",
     signature: " -  Sam",
   },
@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
     previewText: "krótka notatka",
     greeting: "Cześć,",
     checkIn:
-      "Minęło trochę czasu. Po prostu sprawdzam – jeśli próbowałeś unbottled.ai, byłbym ciekaw co myślałeś. A jeśli nie, nadal istnieje, nadal ulepszone, darmowy trial nadal dostępny.",
+      "Minęło trochę czasu. Po prostu sprawdzam - jeśli próbowałeś unbottled.ai, byłbym ciekaw co myślałeś. A jeśli nie, nadal istnieje, nadal ulepszone, darmowy trial nadal dostępny.",
     whatChanged:
       "Dodali lepsze wsparcie dla długich form i szybsze czasy odpowiedzi od kiedy po raz pierwszy o tym wspomniałem. Link afiliacyjny poniżej.",
     ctaText: "Rzuć okiem",

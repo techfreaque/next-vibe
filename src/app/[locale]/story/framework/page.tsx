@@ -29,6 +29,7 @@ import {
   PLATFORM_COUNT,
 } from "@/config/constants";
 import { envClient } from "@/config/env-client";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
@@ -336,6 +337,8 @@ export function TanstackPage({
   aiCode,
 }: FrameworkPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
   const publicUser: JWTPublicPayloadType = {
     isPublic: true,
@@ -578,7 +581,7 @@ export function TanstackPage({
             {t("quickstart.title")}
           </H2>
           <P className="text-muted-foreground text-lg mb-12">
-            {t("quickstart.subtitle")}
+            {t("quickstart.subtitle", { appName })}
           </P>
 
           <Div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
@@ -605,7 +608,7 @@ export function TanstackPage({
                 {
                   num: 4,
                   label: t("quickstart.step4.label"),
-                  desc: t("quickstart.step4.description"),
+                  desc: t("quickstart.step4.description", { appName }),
                   code: aiCode,
                 },
               ] as const

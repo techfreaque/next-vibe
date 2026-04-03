@@ -1,18 +1,18 @@
 export const translations = {
   meta: {
-    title: "Privacy Policy - unbottled.ai",
+    title: "Privacy Policy - {{appName}}",
     category: "Legal",
     description:
-      "Learn how unbottled.ai protects your privacy and handles your data",
+      "Learn how {{appName}} protects your privacy and handles your data",
     imageAlt: "Privacy Policy",
     keywords:
-      "privacy policy, data protection, user privacy, unbottled.ai privacy",
-    ogTitle: "Privacy Policy - unbottled.ai",
+      "privacy policy, data protection, user privacy, {{appName}} privacy",
+    ogTitle: "Privacy Policy - {{appName}}",
     ogDescription:
-      "Learn how unbottled.ai protects your privacy and handles your data",
-    twitterTitle: "Privacy Policy - unbottled.ai",
+      "Learn how {{appName}} protects your privacy and handles your data",
+    twitterTitle: "Privacy Policy - {{appName}}",
     twitterDescription:
-      "Learn how unbottled.ai protects your privacy and handles your data",
+      "Learn how {{appName}} protects your privacy and handles your data",
   },
   printAriaLabel: "Print privacy policy",
   printButton: "Print",

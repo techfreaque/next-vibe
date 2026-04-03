@@ -1,4 +1,4 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import {
@@ -33,7 +33,7 @@ export const friendlySkill: Skill = {
       variantName: "skills.friendly.variants.fast" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GROK_4_FAST,
+        manualModelId: ChatModelId.GROK_4_FAST,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,
@@ -52,7 +52,7 @@ export const friendlySkill: Skill = {
       variantName: "skills.friendly.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GLM_4_7_FLASH,
+        manualModelId: ChatModelId.GLM_4_7_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

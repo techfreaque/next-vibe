@@ -9,9 +9,10 @@
 import "server-only";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { ApiProvider, modelDefinitions } from "../../models";
+import { ApiProvider } from "../../models";
 import type { ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
+import { imageGenModelDefinitions } from "../../../image-generation/models";
 
 // USD per image - standard quality 1024×1024
 const OPENAI_IMAGE_STATIC_PRICES: Record<string, number> = {
@@ -26,7 +27,7 @@ export class OpenAiImagePriceFetcher extends PriceFetcher {
     const updates: ProviderPriceResult["updates"] = [];
     const failures: ProviderPriceResult["failures"] = [];
 
-    for (const def of Object.values(modelDefinitions)) {
+    for (const def of Object.values(imageGenModelDefinitions)) {
       for (const providerConfig of def.providers) {
         if (
           providerConfig.apiProvider !== ApiProvider.OPENAI_IMAGES ||

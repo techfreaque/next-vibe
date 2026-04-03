@@ -12,9 +12,8 @@ import { Layers } from "next-vibe-ui/ui/icons/Layers";
 import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Link } from "next-vibe-ui/ui/link";
-import { Pre } from "next-vibe-ui/ui/pre";
+import { CodeBlock } from "next-vibe-ui/ui/markdown";
 import { Separator } from "next-vibe-ui/ui/separator";
-import { Span } from "next-vibe-ui/ui/span";
 import {
   BlockQuote,
   H1,
@@ -26,6 +25,7 @@ import {
 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
@@ -163,24 +163,6 @@ function DemoFlowStep({
   );
 }
 
-function CodeBlock({
-  children,
-  className,
-}: {
-  children: string;
-  className?: string;
-}): JSX.Element {
-  return (
-    <Div
-      className={`bg-gray-950 dark:bg-gray-900 rounded-xl p-6 overflow-x-auto border border-gray-800 ${className ?? ""}`}
-    >
-      <Pre className="text-green-400 font-mono text-sm leading-relaxed whitespace-pre">
-        {children}
-      </Pre>
-    </Div>
-  );
-}
-
 function CalloutBox({
   children,
   variant,
@@ -203,6 +185,8 @@ function CalloutBox({
 
 export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
   const platforms = [
     t("platformsSection.platforms.webApi.label"),
@@ -319,14 +303,14 @@ export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
       </Div>
 
       {/* ── ARTICLE BODY ─────────────────────────────────────────────────── */}
-      <Div className="container mx-auto px-4 max-w-3xl py-16">
+      <Div className="container mx-auto px-4 max-w-4xl py-16">
         {/* Opening hook */}
         <Div className="mb-16">
           <P className="text-2xl font-semibold text-gray-900 dark:text-white leading-snug mb-6">
             {t("intro.hook")}
           </P>
           <P className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("intro.para1")}
+            {t("intro.para1", { appName })}
           </P>
           <P className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
             {t("intro.para2")}
@@ -345,43 +329,17 @@ export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
           </P>
 
           {/* Decorated terminal block */}
-          <Div className="rounded-xl overflow-hidden border border-gray-800 shadow-2xl mb-6">
-            <Div className="bg-gray-800 px-4 py-2.5 flex items-center gap-2">
-              <Div className="w-3 h-3 rounded-full bg-red-500" />
-              <Div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <Div className="w-3 h-3 rounded-full bg-green-500" />
-              <Muted className="ml-2 text-xs text-gray-400 font-mono">
-                {t("hero.fileTreePath")}
-              </Muted>
-            </Div>
-            <Div className="bg-gray-950 p-6">
-              <Pre className="font-mono text-sm leading-relaxed">
-                <Span className="text-blue-400">
-                  {t("fileTreeSection.fileTree.line1")}
-                </Span>
-                {"\n"}
-                <Span className="text-green-400">
-                  {t("fileTreeSection.fileTree.line2")}
-                </Span>
-                {"\n"}
-                <Span className="text-green-400">
-                  {t("fileTreeSection.fileTree.line3")}
-                </Span>
-                {"\n"}
-                <Span className="text-yellow-400">
-                  {t("fileTreeSection.fileTree.line4")}
-                </Span>
-                {"\n"}
-                <Span className="text-purple-400">
-                  {t("fileTreeSection.fileTree.line5")}
-                </Span>
-                {"\n"}
-                <Span className="text-purple-400">
-                  {t("fileTreeSection.fileTree.line6")}
-                </Span>
-              </Pre>
-            </Div>
-          </Div>
+          <CodeBlock
+            language="bash"
+            code={[
+              t("fileTreeSection.fileTree.line1"),
+              t("fileTreeSection.fileTree.line2"),
+              t("fileTreeSection.fileTree.line3"),
+              t("fileTreeSection.fileTree.line4"),
+              t("fileTreeSection.fileTree.line5"),
+              t("fileTreeSection.fileTree.line6"),
+            ].join("\n")}
+          />
 
           <P className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
             {t("fileTreeSection.explanation")}
@@ -424,45 +382,18 @@ export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
             {t("platformMarkersSection.para1")}
           </P>
 
-          <Div className="rounded-xl overflow-hidden border border-gray-800 shadow-xl mb-6">
-            <Div className="bg-gray-800 px-4 py-2.5 flex items-center gap-2">
-              <Div className="w-3 h-3 rounded-full bg-red-500" />
-              <Div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <Div className="w-3 h-3 rounded-full bg-green-500" />
-              <Muted className="ml-2 text-xs text-gray-400 font-mono">
-                {t("hero.allowedRolesLabel")}
-              </Muted>
-            </Div>
-            <Div className="bg-gray-950 p-6">
-              <Pre className="font-mono text-sm leading-relaxed">
-                <Span className="text-gray-500">
-                  {t("platformMarkersSection.codeComment")}
-                </Span>
-                {"\n"}
-                <Span className="text-purple-300 whitespace-pre">
-                  {t("hero.codeBlockLabel")}
-                </Span>
-                {"\n"}
-                <Span className="text-gray-400">
-                  {t("platformMarkersSection.cliOff")}
-                </Span>
-                {"\n"}
-                <Span className="text-green-400">
-                  {t("platformMarkersSection.mcpVisible")}
-                </Span>
-                {"\n"}
-                <Span className="text-blue-400">
-                  {t("platformMarkersSection.remoteSkill")}
-                </Span>
-                {"\n"}
-                <Span className="text-red-400">
-                  {t("platformMarkersSection.productionOff")}
-                </Span>
-                {"\n"}
-                <Span className="text-white">{t("hero.closingBracket")}</Span>
-              </Pre>
-            </Div>
-          </Div>
+          <CodeBlock
+            language="typescript"
+            code={[
+              t("platformMarkersSection.codeComment"),
+              t("hero.codeBlockLabel"),
+              t("platformMarkersSection.cliOff"),
+              t("platformMarkersSection.mcpVisible"),
+              t("platformMarkersSection.remoteSkill"),
+              t("platformMarkersSection.productionOff"),
+              t("hero.closingBracket"),
+            ].join("\n")}
+          />
 
           <P className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
             {t("platformMarkersSection.para2")}
@@ -578,8 +509,9 @@ export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
             {t("underTheHoodSection.definitionPara")}
           </P>
 
-          <CodeBlock className="mb-6">
-            {`// definition.ts
+          <CodeBlock
+            language="typescript"
+            code={`// definition.ts
 const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [EXPLAIN_TO_MY_BOSS_ALIAS],
@@ -613,7 +545,7 @@ const { POST } = createEndpoint({
   successTypes: { title: "post.success.title", description: "post.success.description" },
   examples: { requests: { default: { decision: "Migrate to Bun" } }, responses: { default: { justification: "..." } } },
 });`}
-          </CodeBlock>
+          />
 
           {/* repository.ts */}
           <H3 className="text-xl font-bold mb-2 font-mono text-green-600 dark:text-green-400">
@@ -623,8 +555,9 @@ const { POST } = createEndpoint({
             {t("underTheHoodSection.repositoryPara")}
           </P>
 
-          <CodeBlock className="mb-6">
-            {`// repository.ts
+          <CodeBlock
+            language="typescript"
+            code={`// repository.ts
 ${t("underTheHoodSection.repositoryCodeComment")}
 export async function explainToMyBoss(
   data: { decision: string },
@@ -638,7 +571,7 @@ export async function explainToMyBoss(
   }
   return success({ justification: result.text });
 }`}
-          </CodeBlock>
+          />
 
           {/* route.ts */}
           <H3 className="text-xl font-bold mb-2 font-mono text-yellow-600 dark:text-yellow-400">
@@ -648,8 +581,9 @@ export async function explainToMyBoss(
             {t("underTheHoodSection.routePara")}
           </P>
 
-          <CodeBlock className="mb-8">
-            {`// route.ts
+          <CodeBlock
+            language="typescript"
+            code={`// route.ts
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import definitions from "./definition";
@@ -659,7 +593,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: { handler: ({ data, logger }) => explainToMyBoss(data, logger) },
 });`}
-          </CodeBlock>
+          />
 
           {/* Stats grid */}
           <H3 className="text-xl font-bold mb-4">

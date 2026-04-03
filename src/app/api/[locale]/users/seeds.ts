@@ -17,6 +17,8 @@ import type { UserCreateRequestOutput } from "./create/definition";
 import { scopedTranslation as createScopedTranslation } from "./create/i18n";
 import { UserCreateRepository } from "./create/repository";
 
+export const DEV_SEED_DEMO_USER_EMAIL = "demo@example.com";
+
 /**
  * Helper function to create user management seed data
  */

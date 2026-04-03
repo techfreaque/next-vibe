@@ -4,6 +4,7 @@
  * Located in threads/[threadId]/messages/ folder as per architectural standards
  */
 
+import { toast } from "next-vibe-ui/hooks/use-toast";
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useMemo } from "react";
 
@@ -13,8 +14,8 @@ import { retryMessage as retryMessageOp } from "@/app/api/[locale]/agent/ai-stre
 import { sendMessage as sendMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import messageIdDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition";
 import voteDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/models/types";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import {
@@ -22,6 +23,8 @@ import {
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import type { StartStreamFn } from "../../../../../ai-stream/stream/hooks/shared";
 import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
@@ -88,7 +91,7 @@ export interface MessageOperations {
 /**
  * Message operations dependencies
  */
-interface MessageOperationsDeps {
+export interface MessageOperationsDeps {
   startStream: StartStreamFn;
   cancelStream: CancelStreamFn;
   activeThreadId: string | null;
@@ -97,12 +100,12 @@ interface MessageOperationsDeps {
   /** leafMessageId - must be passed as prop, not read from nav store, to support nested AI streams */
   leafMessageId: string | null;
   settings: {
-    selectedModel: ModelId;
+    selectedModel: ChatModelId | null;
     selectedSkill: string;
     availableTools: ToolConfigItem[] | null;
     pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
-    voiceModelSelection: ModelSelectionSimple | null | undefined;
+    voiceModelSelection: VoiceModelSelection | null | undefined;
   };
 }
 
@@ -125,6 +128,7 @@ export function useMessageOperations(
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
+  const env = useEnvAvailability();
   const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
   const navSetAborting = useChatNavigationStore((s) => s.setAborting);
 
@@ -162,6 +166,15 @@ export function useMessageOperations(
         subFolderId: string | null,
       ) => void,
     ): Promise<{ success: boolean; createdThreadId: string | null }> => {
+      if (!settings.selectedModel) {
+        toast({
+          title: "No model selected",
+          description:
+            "Please select a model before sending a message. Check your API keys and model settings.",
+          variant: "destructive",
+        });
+        return { success: false, createdThreadId: null };
+      }
       return sendMessageOp(
         params,
         {
@@ -172,8 +185,9 @@ export function useMessageOperations(
           currentSubFolderId,
           leafMessageId,
           user,
-          settings,
+          settings: { ...settings, selectedModel: settings.selectedModel },
           locale,
+          env,
         },
         onThreadCreated,
       );
@@ -188,6 +202,7 @@ export function useMessageOperations(
       user,
       settings,
       locale,
+      env,
     ],
   );
 
@@ -196,6 +211,15 @@ export function useMessageOperations(
       messageId: string,
       attachments: File[] | undefined,
     ): Promise<void> => {
+      if (!settings.selectedModel) {
+        toast({
+          title: "No model selected",
+          description:
+            "Please select a model before retrying. Check your API keys and model settings.",
+          variant: "destructive",
+        });
+        return;
+      }
       await retryMessageOp(messageId, attachments, {
         logger,
         startStream,
@@ -203,9 +227,10 @@ export function useMessageOperations(
         currentSubFolderId,
         activeThreadId,
         user,
-        settings,
+        settings: { ...settings, selectedModel: settings.selectedModel },
         setLeafMessageId,
         locale,
+        env,
       });
     },
     [
@@ -218,6 +243,7 @@ export function useMessageOperations(
       settings,
       setLeafMessageId,
       locale,
+      env,
     ],
   );
 
@@ -228,6 +254,15 @@ export function useMessageOperations(
       audioInput: { file: File } | undefined,
       attachments: File[] | undefined,
     ): Promise<void> => {
+      if (!settings.selectedModel) {
+        toast({
+          title: "No model selected",
+          description:
+            "Please select a model before editing. Check your API keys and model settings.",
+          variant: "destructive",
+        });
+        return;
+      }
       await branchMessageOp(messageId, newContent, audioInput, attachments, {
         logger,
         startStream,
@@ -235,9 +270,10 @@ export function useMessageOperations(
         currentSubFolderId,
         activeThreadId,
         user,
-        settings,
+        settings: { ...settings, selectedModel: settings.selectedModel },
         setLeafMessageId,
         locale,
+        env,
       });
     },
     [
@@ -250,6 +286,7 @@ export function useMessageOperations(
       settings,
       setLeafMessageId,
       locale,
+      env,
     ],
   );
 
@@ -259,13 +296,22 @@ export function useMessageOperations(
       content: string,
       attachments: File[] | undefined,
     ): Promise<void> => {
+      if (!settings.selectedModel) {
+        toast({
+          title: "No model selected",
+          description:
+            "Please select a model before answering. Check your API keys and model settings.",
+          variant: "destructive",
+        });
+        return;
+      }
       await answerAsAIOp(messageId, content, attachments, {
         logger,
         startStream,
         currentRootFolderId,
         currentSubFolderId,
         activeThreadId,
-        settings,
+        settings: { ...settings, selectedModel: settings.selectedModel },
       });
     },
     [

@@ -7,7 +7,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { scopedTranslation as chatScopedTranslation } from "../i18n";
@@ -52,7 +52,7 @@ export interface UseIncognitoChatReturn {
     role: ChatMessageRole,
     content: string,
     parentId: string | null | undefined,
-    model: ModelId | null | undefined,
+    model: ChatModelId | null | undefined,
     character: string | null | undefined,
     userMessageId: string,
   ) => ChatMessage;
@@ -66,7 +66,7 @@ export interface UseIncognitoChatReturn {
   ) => void;
 
   // AI operations (client-side only - no server)
-  sendMessage: (content: string, model: ModelId) => Promise<void>;
+  sendMessage: (content: string, model: ChatModelId) => Promise<void>;
 }
 
 /**
@@ -241,7 +241,7 @@ export function useIncognitoChat(
       role: ChatMessage["role"],
       content: string,
       parentId: string | null = null,
-      model: ModelId | null = null,
+      model: ChatModelId | null = null,
       character: string | null = null,
       userMessageId: string,
     ): ChatMessage => {
@@ -357,7 +357,7 @@ export function useIncognitoChat(
 
   // AI operations (client-side only)
   const sendMessage = useCallback(
-    (content: string, model: ModelId): Promise<void> => {
+    (content: string, model: ChatModelId): Promise<void> => {
       logger.debug("Incognito: Sending message (client-side)", {
         content,
         model,

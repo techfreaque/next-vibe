@@ -14,15 +14,12 @@ import {
 import type { ReactElement } from "react";
 import { z } from "zod";
 
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import {
-  FEATURED_MODELS,
-  getAvailableModelCount,
-} from "@/app/api/[locale]/agent/models/models";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { configScopedTranslation } from "@/config/i18n";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
   ErrorResponseTypes,
@@ -35,6 +32,7 @@ import {
   type TrackingContext,
 } from "../messenger/providers/email/smtp-client/components/tracking_context.email";
 
+import { FEATURED_MODELS } from "../agent/ai-stream/models";
 import { contactClientRepository } from "../contact/repository-client";
 import {
   scopedTranslation as subscriptionScopedTranslation,
@@ -469,10 +467,7 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
         userId: requestData.user?.id ?? user.id,
         leadId: requestData.user?.leadId ?? user.leadId,
         planName: requestData.planName ?? "",
-        totalModelCount: getAvailableModelCount(
-          getAgentEnvAvailability(),
-          false,
-        ),
+        totalModelCount: getAvailableModelCount(agentEnvAvailability, false),
       };
       const tracking = createTrackingContext(
         locale,

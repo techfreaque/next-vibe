@@ -15,9 +15,9 @@ import "server-only";
 
 import type { GeneratedFile } from "ai";
 
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
-import { IMAGE_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/image-generation/constants";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
 import { AUDIO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/music-generation/constants";
 import { VIDEO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/video-generation/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -36,7 +36,7 @@ export class FilePartHandler {
     file: GeneratedFile;
     ctx: StreamContext;
     threadId: string;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     userId: string | undefined;
     isIncognito: boolean;
@@ -242,7 +242,7 @@ export class FilePartHandler {
     };
     const toolName =
       generatedType === "image"
-        ? IMAGE_GEN_TOOL_NAME
+        ? IMAGE_GEN_ALIAS
         : generatedType === "video"
           ? VIDEO_GEN_TOOL_NAME
           : AUDIO_GEN_TOOL_NAME;

@@ -285,7 +285,7 @@ export function LeadsSearchContainer({
     })();
   }, [navigate]);
 
-  // ── "Load more" – advances the offset field in the parent form ────────────
+  // ── "Load more" - advances the offset field in the parent form ────────────
 
   const handleLoadMore = useCallback((): void => {
     if (!form) {
@@ -465,7 +465,7 @@ export function LeadsSearchContainer({
 
                   {/* Info */}
                   <Div className="flex-1 min-w-0">
-                    {/* Row 1 – name + status badges */}
+                    {/* Row 1 - name + status badges */}
                     <Div className="flex items-center gap-2 flex-wrap">
                       <Span className="font-semibold text-sm truncate">
                         {lead.businessName ?? lead.email ?? "—"}
@@ -486,7 +486,7 @@ export function LeadsSearchContainer({
                         </Span>
                       )}
 
-                      {/* Converted badge – prominent green */}
+                      {/* Converted badge - prominent green */}
                       {lead.convertedUserId && (
                         <Span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-500 text-white dark:bg-green-600">
                           <Check className="h-3 w-3" />
@@ -502,7 +502,7 @@ export function LeadsSearchContainer({
                       )}
                     </Div>
 
-                    {/* Row 2 – email (copyable) + country + source */}
+                    {/* Row 2 - email (copyable) + country + source */}
                     <Div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                       {lead.email && (
                         <CopyEmail
@@ -514,7 +514,7 @@ export function LeadsSearchContainer({
                       {lead.source && <Span>{formatEnumKey(lead.source)}</Span>}
                     </Div>
 
-                    {/* Row 3 – created date */}
+                    {/* Row 3 - created date */}
                     {lead.createdAt && (
                       <Div className="text-xs text-muted-foreground mt-0.5">
                         {formatSimpleDate(lead.createdAt, locale)}

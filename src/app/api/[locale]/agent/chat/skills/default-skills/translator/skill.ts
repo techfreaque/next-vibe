@@ -1,4 +1,4 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import {
@@ -61,7 +61,7 @@ export const translatorSkill: Skill = {
       variantName: "skills.translator.variants.gemini" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GEMINI_3_FLASH,
+        manualModelId: ChatModelId.GEMINI_3_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -80,7 +80,7 @@ export const translatorSkill: Skill = {
       variantName: "skills.translator.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GLM_4_7_FLASH,
+        manualModelId: ChatModelId.GLM_4_7_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

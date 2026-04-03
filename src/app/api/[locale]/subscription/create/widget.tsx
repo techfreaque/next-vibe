@@ -33,12 +33,11 @@ import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import {
   PaymentProvider,
   type PaymentProviderValue,
 } from "@/app/api/[locale]/payment/enum";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   ProductIds,
   productsRepository,
@@ -56,6 +55,7 @@ import {
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 
 import FormAlertWidget from "../../system/unified-interface/unified-ui/widgets/interactive/form-alert/react";

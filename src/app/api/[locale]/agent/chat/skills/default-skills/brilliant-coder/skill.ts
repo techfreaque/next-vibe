@@ -1,4 +1,4 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import {
@@ -61,7 +61,7 @@ export const brilliantCoderSkill: Skill = {
       variantName: "skills.brilliantCoder.variants.claude" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.CLAUDE_OPUS_4_6,
+        manualModelId: ChatModelId.CLAUDE_OPUS_4_6,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -80,7 +80,7 @@ export const brilliantCoderSkill: Skill = {
       variantName: "skills.brilliantCoder.variants.kimi" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2_5,
+        manualModelId: ChatModelId.KIMI_K2_5,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,

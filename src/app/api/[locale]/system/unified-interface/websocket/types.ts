@@ -6,6 +6,8 @@
 
 import type { z } from "zod";
 
+import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
+
 // ============================================================================
 // EVENT TYPE INFERENCE
 // ============================================================================
@@ -61,9 +63,23 @@ export interface WsUnsubscribeMessage {
 }
 
 /**
+ * Client→server tool result message.
+ * Sent by remote ws-provider clients when a client-provided tool finishes execution.
+ * Resolves the pending Promise in tool-result-store.ts so the AI stream continues.
+ */
+export interface WsToolResultMessage {
+  readonly type: "tool-result";
+  readonly toolCallId: string;
+  readonly result: ToolCallResult;
+}
+
+/**
  * All possible client→server message types.
  */
-export type WsClientMessage = WsSubscribeMessage | WsUnsubscribeMessage;
+export type WsClientMessage =
+  | WsSubscribeMessage
+  | WsUnsubscribeMessage
+  | WsToolResultMessage;
 
 // ============================================================================
 // SERVER-SIDE TYPES

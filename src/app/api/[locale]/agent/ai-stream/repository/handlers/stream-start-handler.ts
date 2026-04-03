@@ -6,7 +6,7 @@ import "server-only";
 
 import type { ModelMessage, ToolResultPart } from "ai";
 
-import type { TtsModelId } from "@/app/api/[locale]/agent/models/models";
+import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";

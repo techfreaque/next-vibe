@@ -24,14 +24,16 @@ import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import {
-  FEATURED_MODELS,
-  ModelId,
-} from "@/app/api/[locale]/agent/models/models";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import {
+  ChatModelId,
+  FEATURED_MODELS,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import { configScopedTranslation } from "@/config/i18n";
 
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
@@ -141,7 +143,7 @@ function mkToolMsg(
     depth: 1,
     sequenceId: seq,
     isAI: true,
-    model: ModelId.CLAUDE_OPUS_4_6,
+    model: ChatModelId.CLAUDE_OPUS_4_6,
     metadata: {
       toolCall: { toolCallId, toolName, args, result, executionTime },
     },
@@ -165,7 +167,7 @@ function mkAssistantMsg(
     depth: 1,
     sequenceId: seq,
     isAI: true,
-    model: modelOverride ?? ModelId.CLAUDE_OPUS_4_6,
+    model: modelOverride ?? ChatModelId.CLAUDE_OPUS_4_6,
     metadata: { ...metaExtra },
   });
 }
@@ -690,15 +692,16 @@ type CensorDemoId = "mainstream" | "open" | "uncensored";
 function buildModelsDemoGroup(
   t: ScopedT,
   activeId: CensorDemoId,
+  appName: string,
 ): MessageGroup {
   const tid = `demo-models-${activeId}`;
   const seq = `models-${activeId}-seq`;
   const model =
     activeId === "mainstream"
-      ? ModelId.GPT_5_4
+      ? ChatModelId.GPT_5_4
       : activeId === "open"
-        ? ModelId.KIMI_K2_5
-        : ModelId.UNCENSORED_LM_V1_2;
+        ? ChatModelId.KIMI_K2_5
+        : ChatModelId.UNCENSORED_LM_V1_2;
   const content =
     activeId === "mainstream"
       ? t("home.capabilities.models.demo.mainstreamResponse")
@@ -711,7 +714,7 @@ function buildModelsDemoGroup(
       `models-open-reasoning`,
       tid,
       seq,
-      t("home.capabilities.models.demo.openReasoning"),
+      t("home.capabilities.models.demo.openReasoning", { appName }),
       { model },
     );
     const response = mkAssistantMsg(`models-open-response`, tid, seq, content, {
@@ -738,6 +741,8 @@ function buildModelsDemoGroup(
 
 function ModelsVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
     [locale],
@@ -798,7 +803,10 @@ function ModelsVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
     [activeId, t],
   );
 
-  const group = useMemo(() => buildModelsDemoGroup(t, activeId), [t, activeId]);
+  const group = useMemo(
+    () => buildModelsDemoGroup(t, activeId, appName),
+    [t, activeId, appName],
+  );
 
   return (
     <Div className="space-y-5">

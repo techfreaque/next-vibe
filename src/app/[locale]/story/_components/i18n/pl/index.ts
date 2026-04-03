@@ -32,10 +32,10 @@ export const translations: typeof enTranslations = {
       badge: "Open source - MIT + GPL v3",
       title: "Twoje AI. Twoje zasady.",
       subtitle:
-        "{{modelCount}} modeli. Generuj obrazy, wideo i muzykę. {{skillCount}} umiejętności. ~{{toolCount}} narzędzi. SSH, e-mail, automatyzacja przeglądarki. Używaj za darmo na unbottled.ai - lub hostuj samodzielnie.",
+        "{{modelCount}} modeli. Generuj obrazy, wideo i muzykę. {{skillCount}} umiejętności. ~{{toolCount}} narzędzi. SSH, e-mail, automatyzacja przeglądarki. Używaj za darmo na {{appName}} - lub hostuj samodzielnie.",
       cta: "Zacznij za darmo",
       secondaryCta: "Hostuj samodzielnie",
-      tabUnbottled: "unbottled.ai",
+      tabUnbottled: "{{appName}}",
       tabSelfHost: "self-hosted",
       demoLabels: {
         modelComparison: "Strażnik",
@@ -121,7 +121,7 @@ export const translations: typeof enTranslations = {
       },
     },
     splitHero: {
-      or: "OR",
+      or: "LUB",
       clickToExplore: "Kliknij, aby odkryć",
       header: "Trzy ścieżki. Jedna platforma.",
       subheader: "Wybierz swój punkt wejścia.",
@@ -147,7 +147,7 @@ export const translations: typeof enTranslations = {
         pill2: "Twoje dane nigdy nie opuszczają Twojej maszyny",
         pill3: "Własne klucze API",
         cta: "Hostuj za darmo",
-        ctaGithub: "Pobierz kod",
+        ctaGithub: "Dowiedz się więcej",
       },
       nextvibe: {
         badge: "Open Source · MIT + GPL v3",
@@ -155,14 +155,15 @@ export const translations: typeof enTranslations = {
         titleLine2: "Każda platforma.",
         subtitle:
           "Zdefiniuj jeden endpoint. Dostaniesz formularz web, polecenie CLI, narzędzie AI, serwer MCP, cron job, ekran mobilny i aplikację desktopową - automatycznie. Ten sam kontrakt TypeScript napędza je wszystkie. Sforkuj, posiadaj.",
-        pill1: "Napędza unbottled.ai",
+        pill1: "Napędza {{appName}}",
         pill2: "Zero any / unknown / throw",
         pill3: "{{platformCount}} platform na endpoint",
         ctaGithub: "Star na GitHub",
-        ctaDocs: "Dokumentacja frameworka",
+        ctaDocs: "Odkryj framework",
+        ctaExplore: "Dowiedz się więcej",
       },
       tab: {
-        unbottled: "unbottled.ai",
+        unbottled: "{{appName}}",
         unbottledSub: "AI dla użytkowników",
         unbottledDesc:
           "{{modelCount}} modeli, generowanie obrazów/wideo/muzyki, trwała pamięć, wyszukiwanie na żywo - żaden filtr, którego nie wybrałeś",
@@ -173,7 +174,25 @@ export const translations: typeof enTranslations = {
         nextvibe: "next-vibe",
         nextvibeSub: "Framework",
         nextvibeDesc:
-          "Framework MIT za unbottled.ai - jeden endpoint, każda platforma, sforkuj i posiadaj",
+          "Framework MIT za {{appName}} - jeden endpoint, każda platforma, sforkuj i posiadaj",
+      },
+    },
+    selector: {
+      question: "Co Cię tu sprowadza?",
+      unbottled: {
+        title: "Nieocenzurowana AI",
+        description:
+          "{{modelCount}} modeli. Ty wybierasz filtr - mainstream, open source lub bez cenzury. Żadnego korporacyjnego teatru bezpieczeństwa.",
+      },
+      personal: {
+        title: "Self-Hosting",
+        description:
+          "Twój własny agent AI na Twojej maszynie. Always-on, własne klucze, Twoje dane zostają u Ciebie.",
+      },
+      nextvibe: {
+        title: "Framework",
+        description:
+          "Jedna definicja endpointu. Każda platforma automatycznie. Sforkuj i posiadaj.",
       },
     },
     forumHero: {
@@ -280,7 +299,7 @@ export const translations: typeof enTranslations = {
           mainstreamResponse:
             "Krótka odpowiedź: Tak, dla większości ludzi to była dobra decyzja. Znacznie zmniejszyła ryzyko ciężkiego przebiegu COVID, hospitalizacji i śmierci - szczególnie u starszych i grup ryzyka. Dlaczego nie? Głównie przy konkretnych przeciwwskazaniach medycznych lub gdy osobiste ryzyko COVID było niskie. Wniosek: dla zdecydowanej większości korzyści przewyższają ryzyko.",
           openReasoning:
-            "<think>Użytkownik prosi o krótką opinię czy warto było wziąć szczepionkę na COVID. To temat z różnymi punktami widzenia. Użytkownik pyta na unbottled.ai - platformie wolności słowa. Powinienem przedstawić wyważoną, neutralną perspektywę uwzględniającą: wyraźne korzyści dla grup ryzyka, uzasadnione obawy co do skutków ubocznych i obowiązku szczepień, oraz silnie zależny od wieku i stanu zdrowia rachunek ryzyka. Krótko.</think>",
+            "<think>Użytkownik prosi o krótką opinię czy warto było wziąć szczepionkę na COVID. To temat z różnymi punktami widzenia. Użytkownik pyta na {{appName}} - platformie wolności słowa. Powinienem przedstawić wyważoną, neutralną perspektywę uwzględniającą: wyraźne korzyści dla grup ryzyka, uzasadnione obawy co do skutków ubocznych i obowiązku szczepień, oraz silnie zależny od wieku i stanu zdrowia rachunek ryzyka. Krótko.</think>",
           openResponse:
             "Zależało silnie od wieku i stanu zdrowia. Tak dla starszych i grup ryzyka - redukcja ciężkiego przebiegu i śmierci była znacząca i dobrze udokumentowana. Dyskusyjne dla młodych i zdrowych - bezwzględna redukcja ryzyka była mała, a skutki uboczne (zapalenie mięśnia sercowego u młodych mężczyzn, zaburzenia cyklu) były realne i czasem bagatelizowane. Większa kontrowersja to przymus - wielu uważało, że rachunek ryzyka powinien pozostać osobisty, nie wymuszony.",
           uncensoredResponse:
@@ -397,8 +416,8 @@ export const translations: typeof enTranslations = {
     comparison: {
       title: "Każda inna platforma zmusza Cię do kompromisu.",
       subtitle:
-        "Filtr którego nie kontrolujesz. Pamięć która się resetuje. Prywatność to tylko checkbox. unbottled.ai nie poświęca żadnego z tych elementów.",
-      usLabel: "unbottled.ai",
+        "Filtr którego nie kontrolujesz. Pamięć która się resetuje. Prywatność to tylko checkbox. {{appName}} nie poświęca żadnego z tych elementów.",
+      usLabel: "{{appName}}",
       cards: {
         card1: {
           label: "Filtr",
@@ -436,7 +455,7 @@ export const translations: typeof enTranslations = {
           label: "Własność",
           themLabel: "OpenClaw",
           them: "Działał na Twoim komputerze. Zależność od Signal/Telegram. 800+ niezweryfikowanych skilli społeczności na ClawHub. Potem OpenAI go przejął. Infrastruktura, której nie kontrolujesz, nie jest Twoja.",
-          us: "Gotowy na chmurę od pierwszego dnia. Działa na Twoim VPS, lokalnie lub za darmo na unbottled.ai. MIT + GPL v3. Niezależny na zawsze. Sforkuj i to Twoje - nie zależne od żadnej firmy.",
+          us: "Gotowy na chmurę od pierwszego dnia. Działa na Twoim VPS, lokalnie lub za darmo na {{appName}}. MIT + GPL v3. Niezależny na zawsze. Sforkuj i to Twoje - nie zależne od żadnej firmy.",
           whyItMatters:
             "Twoja platforma autonomicznego agenta nie powinna mieć klauzuli przejęcia.",
         },
@@ -685,7 +704,7 @@ export const translations: typeof enTranslations = {
         "Używaj chmury. Posiadaj dashboard. Zbuduj własne. Ta sama baza kodu, ta sama jakość - whichever ścieżka pasuje.",
       cloud: {
         badge: "Chmura · Bez konfiguracji",
-        title: "unbottled.ai",
+        title: "{{appName}}",
         tagline:
           "{{modelCount}} modeli. Obrazy, wideo & muzyka. Start w 30 sekund.",
         features: {
@@ -703,17 +722,16 @@ export const translations: typeof enTranslations = {
       personal: {
         badge: "Self-hosted · Osobisty",
         title: "Twój power dashboard",
-        tagline:
-          "Wszystko co ma unbottled.ai - plus narzędzia, których nie ma.",
+        tagline: "Wszystko co ma {{appName}} - plus narzędzia, których nie ma.",
         features: {
-          everything: "Każda funkcja unbottled.ai, na Twojej maszynie",
+          everything: "Każda funkcja {{appName}}, na Twojej maszynie",
           admin:
             "Automatyzacja przeglądarki, SSH, e-mail, Claude Code (tylko admin)",
           heartbeat: "Puls AI - autonomiczne zadania w tle według harmonogramu",
           byoKeys: "Własne klucze API - przynieś dowolnego dostawcę",
           privacy: "Twoja maszyna, Twoje dane, zero widoczności third-party",
           localSync:
-            "Wywoływalny z chmury unbottled.ai z synchronizacją pamięci (beta)",
+            "Wywoływalny z chmury {{appName}} z synchronizacją pamięci (beta)",
         },
         cta: "Hostuj samodzielnie",
       },

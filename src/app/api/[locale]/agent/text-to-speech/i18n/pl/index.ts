@@ -102,6 +102,20 @@ export const translations: typeof enTranslations = {
     fr: "Francuski",
     it: "Włoski",
   },
+  models: {
+    descriptions: {
+      openaiAlloy: "OpenAI Alloy",
+      openaiNova: "OpenAI Nova",
+      openaiOnyx: "OpenAI Onyx",
+      openaiEcho: "OpenAI Echo",
+      openaiShimmer: "OpenAI Shimmer",
+      openaiFable: "OpenAI Fable",
+      elevenlabsRachel: "ElevenLabs Rachel",
+      elevenlabsJosh: "ElevenLabs Josh",
+      elevenlabsBella: "ElevenLabs Bella",
+      elevenlabsAdam: "ElevenLabs Adam",
+    },
+  },
 };
 
 export default translations;

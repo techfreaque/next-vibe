@@ -8,6 +8,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React from "react";
 
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
@@ -41,7 +42,8 @@ export function ToolsButton({
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const { settings } = useChatSettings(user, logger);
-  const defaults = ChatSettingsRepositoryClient.getDefaults();
+  const env = useEnvAvailability();
+  const defaults = ChatSettingsRepositoryClient.getDefaults(user, env);
   const effectiveSettings = settings ?? defaults;
 
   // Compute enabledTools from settings (same logic as the old useChat hook)

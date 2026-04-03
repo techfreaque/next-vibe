@@ -36,12 +36,12 @@ import {
   responseArrayField,
 } from "../../field/utils";
 import {
-  objectFieldNew,
+  objectField,
   requestField,
   requestResponseField,
   requestUrlPathParamsField,
   responseField,
-} from "../../field/utils-new";
+} from "../../field/utils";
 import type { UnifiedField } from "../../types/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { Methods } from "../../types/enums";
@@ -53,7 +53,7 @@ import { FieldDataType, WidgetType } from "../../types/enums";
 
 // Test 1.1: PrimitiveField extends UnifiedField (checked via Test1_2)
 // Test 1.2: ObjectField with record children extends UnifiedField
-const test1_2_field = objectFieldNew({
+const test1_2_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {},
@@ -71,11 +71,11 @@ type Test1_2_Result =
 const test1_2: Test1_2_Result = "✓ PASS";
 
 // Test 1.3: ObjectField with specific children extends UnifiedField
-const test1_3_field = objectFieldNew({
+const test1_3_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    nested: objectFieldNew({
+    nested: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {},
@@ -95,11 +95,11 @@ type Test1_3_Result =
 const test1_3: Test1_3_Result = "✓ PASS";
 
 // Test 1.4: ObjectField with flexible usage extends UnifiedField
-const test1_4_field = objectFieldNew({
+const test1_4_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
-    nested: objectFieldNew({
+    nested: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data", response: true },
       children: {},
@@ -121,7 +121,7 @@ const test1_4: Test1_4_Result = "✓ PASS";
 // Test 1.5: ArrayField extends UnifiedField
 const test1_5_field = requestDataArrayField(
   { type: WidgetType.CONTAINER },
-  objectFieldNew({
+  objectField({
     type: WidgetType.CONTAINER,
     usage: { request: "data" },
     children: {
@@ -151,31 +151,31 @@ const test1_5: Test1_5_Result = "✓ PASS";
 // ============================================================================
 
 // Test 2.1: Nested ObjectField extends UnifiedField
-const test2_1_field = objectFieldNew({
+const test2_1_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    credentials: objectFieldNew({
+    credentials: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
-        email: objectFieldNew({
+        email: objectField({
           type: WidgetType.CONTAINER,
           usage: { request: "data" },
           children: {},
         }),
-        password: objectFieldNew({
+        password: objectField({
           type: WidgetType.CONTAINER,
           usage: { request: "data" },
           children: {},
         }),
       },
     }),
-    options: objectFieldNew({
+    options: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
-        rememberMe: objectFieldNew({
+        rememberMe: objectField({
           type: WidgetType.CONTAINER,
           usage: { request: "data" },
           children: {},
@@ -201,11 +201,11 @@ const test2_1: Test2_1_Result = "✓ PASS";
 // ============================================================================
 
 // Test 3.1: Can we create an ApiEndpoint with specific ObjectField?
-const test3_1_field = objectFieldNew({
+const test3_1_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    name: objectFieldNew({
+    name: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
@@ -309,11 +309,11 @@ type Test4_1_Result =
 const test4_1: Test4_1_Result = "✓ PASS";
 
 // Test 4.2: CreateApiEndpoint with nested ObjectField
-const test4_2_field = objectFieldNew({
+const test4_2_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    nested: objectFieldNew({
+    nested: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {},
@@ -345,7 +345,7 @@ const test4_2: Test4_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 5.1: Simple request-only field
-const test5_1_request_field = objectFieldNew({
+const test5_1_request_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
@@ -361,7 +361,7 @@ const test5_1_request_field = objectFieldNew({
 // Test 5.1b: Response-only array field
 const test5_1_response_field = responseArrayField(
   { type: WidgetType.CONTAINER },
-  objectFieldNew({
+  objectField({
     type: WidgetType.CONTAINER,
     usage: { response: true },
     children: {
@@ -377,7 +377,7 @@ const test5_1_response_field = responseArrayField(
 const test5_1_optional_field = arrayOptionalField(
   { response: true },
   { type: WidgetType.CONTAINER },
-  objectFieldNew({
+  objectField({
     type: WidgetType.CONTAINER,
     usage: { response: true },
     children: {
@@ -404,11 +404,11 @@ const test5_1_request_optional = objectOptionalField(
 );
 
 // Test 5.1e: Mixed request/response structure with nested fields
-const test5_1_field = objectFieldNew({
+const test5_1_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
-    login: objectFieldNew({
+    login: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
@@ -434,7 +434,7 @@ const test5_1_field = objectFieldNew({
     ),
     results: responseArrayField(
       { type: WidgetType.CONTAINER },
-      objectFieldNew({
+      objectField({
         type: WidgetType.CONTAINER,
         usage: { response: true },
         children: {
@@ -582,16 +582,16 @@ const test5_2d: Test5_2d_Result = "✓ PASS";
 // ============================================================================
 
 // Create a login fields structure for testing
-const test6_loginFields = objectFieldNew({
+const test6_loginFields = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
-    credentials: objectFieldNew({
+    credentials: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {},
     }),
-    options: objectFieldNew({
+    options: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {},
@@ -767,7 +767,7 @@ const test9_2: Test9_2_HasChildren = "✓ PASS";
 // Test 10.1: Array with nested object children with id and name fields
 const test10_1_field = requestDataArrayField(
   { type: WidgetType.CONTAINER },
-  objectFieldNew({
+  objectField({
     type: WidgetType.CONTAINER,
     usage: { request: "data" },
     children: {
@@ -799,15 +799,15 @@ type Test10_1_Result =
 const test10_1: Test10_1_Result = "✓ PASS";
 
 // Test 10.2: Deeply nested ObjectFields (3 levels)
-const test10_2_field = objectFieldNew({
+const test10_2_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    level1: objectFieldNew({
+    level1: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
-        level2: objectFieldNew({
+        level2: objectField({
           type: WidgetType.CONTAINER,
           usage: { request: "data" },
           children: {
@@ -836,7 +836,7 @@ type Test10_2_Result =
 const test10_2: Test10_2_Result = "✓ PASS";
 
 // Test 10.3: Mixed usage configurations
-const test10_3_field = objectFieldNew({
+const test10_3_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
@@ -906,7 +906,7 @@ const test10_4: Test10_4_Result = "✓ PASS";
 // Test 11.1: Record of endpoints with different methods
 
 // Create GET endpoint field for test 11
-const test11_1_getField = objectFieldNew({
+const test11_1_getField = objectField({
   type: WidgetType.CONTAINER,
   usage: { response: true },
   children: {},
@@ -956,7 +956,7 @@ const test11_2: Test11_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 12.1: Verify that removing constraints allows any field structure
-const test12_1_field = objectFieldNew({
+const test12_1_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
@@ -972,7 +972,7 @@ const test12_1_field = objectFieldNew({
       label: "Custom Prop 2",
       schema: z.number(),
     }),
-    nested: objectFieldNew({
+    nested: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
@@ -1023,7 +1023,7 @@ const test12_2: Test12_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 13.1: Optional fields in ObjectField
-const test13_1_field = objectFieldNew({
+const test13_1_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
@@ -1075,7 +1075,7 @@ const test13_2: Test13_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 14.1: GET endpoint with response-only fields
-const test14_1_field = objectFieldNew({
+const test14_1_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { response: true },
   children: {
@@ -1108,7 +1108,7 @@ type Test14_1_Result =
 const test14_1: Test14_1_Result = "✗ FAIL";
 
 // Test 14.2: DELETE endpoint
-const test14_2_field = objectFieldNew({
+const test14_2_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "urlPathParams" },
   children: {
@@ -1147,7 +1147,7 @@ const test14_2: Test14_2_Result = "✗ FAIL";
 // ============================================================================
 
 // Test 15.1: Pagination with filters
-const test15_1_field = objectFieldNew({
+const test15_1_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
@@ -1163,7 +1163,7 @@ const test15_1_field = objectFieldNew({
       label: "Page Size",
       schema: z.number(),
     }),
-    filters: objectFieldNew({
+    filters: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
@@ -1183,7 +1183,7 @@ const test15_1_field = objectFieldNew({
     }),
     results: responseArrayField(
       { type: WidgetType.CONTAINER },
-      objectFieldNew({
+      objectField({
         type: WidgetType.CONTAINER,
         usage: { response: true },
         children: {
@@ -1215,7 +1215,7 @@ type Test15_1_Result =
 const test15_1: Test15_1_Result = "✓ PASS";
 
 // Test 15.2: File upload with metadata
-const test15_2_field = objectFieldNew({
+const test15_2_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
@@ -1225,7 +1225,7 @@ const test15_2_field = objectFieldNew({
       label: "File",
       schema: z.any(),
     }),
-    metadata: objectFieldNew({
+    metadata: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
@@ -1249,7 +1249,7 @@ const test15_2_field = objectFieldNew({
         }),
       },
     }),
-    uploadResult: objectFieldNew({
+    uploadResult: objectField({
       type: WidgetType.CONTAINER,
       usage: { response: true },
       children: {
@@ -1309,7 +1309,7 @@ const test16_1: Test16_1_Result = "✗ FAIL";
 // Test 16.2: useEndpoint with Record of endpoints
 
 // Create a test record
-const test16_2_logoutField = objectFieldNew({
+const test16_2_logoutField = objectField({
   type: WidgetType.CONTAINER,
   usage: { response: true },
   children: {},
@@ -1386,7 +1386,7 @@ const test18_2: Test18_2_HasChildren = "✗ FAIL";
 // ============================================================================
 
 // Test 19.1: Empty object field
-const test19_1_field = objectFieldNew({
+const test19_1_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { response: true },
   children: {},
@@ -1435,7 +1435,7 @@ type Test19_2_Result =
 const test19_2: Test19_2_Result = "✓ PASS";
 
 // Test 19.3: Mixed usage configs
-const test19_3_field = objectFieldNew({
+const test19_3_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
@@ -1469,7 +1469,7 @@ const test19_3: Test19_3_Result = "✓ PASS";
 // ============================================================================
 
 // Test 20.1: Multiple endpoints in a record (like actual definition files)
-const test20_1_defaultField = objectFieldNew({
+const test20_1_defaultField = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
@@ -1482,7 +1482,7 @@ const test20_1_defaultField = objectFieldNew({
   },
 });
 
-const test20_1_verifyField = objectFieldNew({
+const test20_1_verifyField = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
@@ -1495,7 +1495,7 @@ const test20_1_verifyField = objectFieldNew({
   },
 });
 
-const test20_1_resendField = objectFieldNew({
+const test20_1_resendField = objectField({
   type: WidgetType.CONTAINER,
   usage: { response: true },
   children: {},

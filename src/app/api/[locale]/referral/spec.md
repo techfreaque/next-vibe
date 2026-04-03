@@ -1,11 +1,11 @@
-# Referral System – High-Level Spec
+# Referral System - High-Level Spec
 
 ## 1. Goals & Entry Points
 
 - Allow **any authenticated user** to create **N referral codes**, each unique globally in the DB.
 - Support **two main entry flows**:
-  1. **Marketing links via `/[locale]/track`** – URL includes a referral code (e.g. `?ref=CODE`); track route validates + stores it against the existing `leadId` cookie so later signup can use it.
-  2. **Signup form with prefilled referral code** – signup page reads referral code from track/URL/cookie and passes it to backend on signup.
+  1. **Marketing links via `/[locale]/track`** - URL includes a referral code (e.g. `?ref=CODE`); track route validates + stores it against the existing `leadId` cookie so later signup can use it.
+  2. **Signup form with prefilled referral code** - signup page reads referral code from track/URL/cookie and passes it to backend on signup.
 - On **payment success** (subscription or credit pack purchase) we:
   - Compute a **referral payout pool** (20% of transaction amount).
   - Distribute this pool across the **referrer chain (multi‑level)** according to a geometric decay rule.
@@ -33,7 +33,7 @@ Exact schema and ORM will follow existing patterns (Drizzle), but conceptually w
 
 1. **`referral_codes`** (unchanged)
    - `id` (UUID PK)
-   - `code` (string, **unique**) – human‑friendly token used in URLs and forms
+   - `code` (string, **unique**) - human‑friendly token used in URLs and forms
    - `ownerUserId` (FK → users)
    - `label` (optional, for user‑friendly naming)
    - `maxUses` (optional, nullable)
@@ -44,8 +44,8 @@ Exact schema and ORM will follow existing patterns (Drizzle), but conceptually w
 
 2. **`lead_referrals`** (temporary, pre-signup tracking)
    - `id` (UUID PK)
-   - `referralCodeId` (FK → referral_codes) – which code was used
-   - `leadId` (FK → leads) – which lead used the code
+   - `referralCodeId` (FK → referral_codes) - which code was used
+   - `leadId` (FK → leads) - which lead used the code
    - `createdAt`
    - Invariants:
      - A lead has **at most one referral code** (unique index on `leadId`).
@@ -54,9 +54,9 @@ Exact schema and ORM will follow existing patterns (Drizzle), but conceptually w
 
 3. **`user_referrals`** (permanent, post-signup tracking)
    - `id` (UUID PK)
-   - `referrerUserId` (FK → users) – who referred this user (owner of referral code)
-   - `referredUserId` (FK → users) – the user who was referred
-   - `referralCodeId` (FK → referral_codes) – which code was used
+   - `referrerUserId` (FK → users) - who referred this user (owner of referral code)
+   - `referredUserId` (FK → users) - the user who was referred
+   - `referralCodeId` (FK → referral_codes) - which code was used
    - `createdAt`
    - Invariants:
      - A user has **at most one referrer** (unique index on `referredUserId`).
@@ -65,14 +65,14 @@ Exact schema and ORM will follow existing patterns (Drizzle), but conceptually w
 
 4. **`referral_earnings`** (per‑transaction payouts per level)
    - `id` (UUID PK)
-   - `earnerUserId` (FK → users) – who receives the money
-   - `sourceUserId` (FK → users) – who made the purchase
+   - `earnerUserId` (FK → users) - who receives the money
+   - `sourceUserId` (FK → users) - who made the purchase
    - `transactionId` (FK → payments/transactions table)
-   - `referralCodeId` (FK → referral_codes) – which code was used
+   - `referralCodeId` (FK → referral_codes) - which code was used
    - `level` (int, 0 = direct, 1 = second level, ...)
    - `amountCents` (int)
    - `currency` (string, aligned with payments)
-   - `status` (enum: `pending`, `confirmed`, `voided`) – to handle refunds/chargebacks later
+   - `status` (enum: `pending`, `confirmed`, `voided`) - to handle refunds/chargebacks later
    - `createdAt`
 
 Balances and aggregates (e.g. total earned) can be computed via queries or a later aggregation table if needed.
@@ -112,19 +112,19 @@ Balances and aggregates (e.g. total earned) can be computed via queries or a lat
 Mirror the **login** feature structure (`definition.ts`, `repository.ts`, `hooks.ts`, `_components`, `i18n`, `route.ts`, tests):
 
 1. **Endpoints (initial set)**
-   - `POST /referral` – Authenticated
+   - `POST /referral` - Authenticated
      - Input: `code`, `label?`, optional constraints (maxUses, expiresAt).
      - Logic: generate unique code, insert into `referral_codes` with `ownerUserId` = current user.
      - Output: created code + basic stats.
-   - `GET /referral/codes/list` – Authenticated
+   - `GET /referral/codes/list` - Authenticated
      - Lists current user's codes with usage stats (signups, revenue, earnings).
-   - `GET /referral/stats` – Authenticated
+   - `GET /referral/stats` - Authenticated
      - Aggregated stats for the user: total referred users, active subscribers, total earnings, per‑level breakdown.
    - Internal/service entrypoint (can be same route or shared service):
-     - `validateReferralCode(code)` – used by `/[locale]/track` and signup.
-     - `linkReferralToLead({ leadId, referralCode })` – creates `lead_referrals` entry (happens BEFORE signup).
-     - `convertLeadReferralToUser({ userId, leadId })` – called during signup, copies `lead_referrals` → `user_referrals`.
-     - `applyReferralPayoutOnPayment({ transactionId })` – called on payment success, uses user-based chain resolution.
+     - `validateReferralCode(code)` - used by `/[locale]/track` and signup.
+     - `linkReferralToLead({ leadId, referralCode })` - creates `lead_referrals` entry (happens BEFORE signup).
+     - `convertLeadReferralToUser({ userId, leadId })` - called during signup, copies `lead_referrals` → `user_referrals`.
+     - `applyReferralPayoutOnPayment({ transactionId })` - called on payment success, uses user-based chain resolution.
 
 2. **Repository layer (`repository.ts`)**
    - Encapsulate all DB access: CRUD for `referral_codes`, `user_referrals`, `referral_earnings`, and tree traversal of upline chain.

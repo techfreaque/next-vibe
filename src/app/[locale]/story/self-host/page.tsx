@@ -13,6 +13,7 @@ import type { JSX } from "react";
 
 import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -42,14 +43,16 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   return metadataGenerator(locale, {
     path: "story/self-host",
-    title: t("meta.title"),
+    title: t("meta.title", { appName }),
     category: t("meta.category"),
-    description: t("meta.description"),
+    description: t("meta.description", { appName }),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`,
-    imageAlt: t("meta.imageAlt"),
-    keywords: [t("meta.keywords")],
+    imageAlt: t("meta.imageAlt", { appName }),
+    keywords: [t("meta.keywords", { appName })],
   });
 }
 
@@ -108,6 +111,8 @@ function SelfHostPageContent({
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
   const publicUser: JWTPublicPayloadType = {
     isPublic: true,
@@ -139,7 +144,7 @@ function SelfHostPageContent({
             </Span>
           </H1>
           <P className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            {t("hero.subtitle")}
+            {t("hero.subtitle", { appName })}
           </P>
           <Div className="flex flex-wrap justify-center gap-4">
             <Button
@@ -177,7 +182,7 @@ function SelfHostPageContent({
             <Div key={key} className="flex items-start gap-3">
               <Check className="h-5 w-5 text-emerald-500 mt-0.5 shrink-0" />
               <P className="text-sm text-muted-foreground">
-                {t(`includes.items.${key}`)}
+                {t(`includes.items.${key}`, { appName })}
               </P>
             </Div>
           ))}

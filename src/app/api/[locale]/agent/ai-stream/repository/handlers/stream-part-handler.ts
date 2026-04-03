@@ -11,7 +11,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolExecutionContext } from "../../../chat/config";
-import type { ModelId } from "../../../models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { AiStreamT } from "../../stream/i18n";
 import { AbortReason, StreamAbortError } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
@@ -32,7 +32,7 @@ export class StreamPartHandler {
     part: TextStreamPart<TOOLS>;
     ctx: StreamContext;
     threadId: string;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     isIncognito: boolean;
     userId: string | undefined;

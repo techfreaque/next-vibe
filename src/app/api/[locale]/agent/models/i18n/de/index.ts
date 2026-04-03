@@ -106,6 +106,17 @@ export const translations = {
     credits: "{{count}} Credits",
   },
   creditDisplay: {
+    badge: {
+      approxPerMsg: "~{{cost}} Credits/Msg",
+      exactPerMsg: "{{cost}} Credits/Msg",
+      perImg: "{{cost}} Credits/Bild",
+      perClip: "{{cost}} Credits/Clip",
+      ratePerChar: "{{rate}} Credits/Zeichen",
+      ratePerSec: "{{rate}} Credits/s",
+      approxChars: "~{{count}} Zeichen",
+      seconds: "{{count}}s",
+      lessThanMin: "<0,1",
+    },
     tokenBased: {
       header: "Kosten pro Nachricht",
       costRangeLabel: "Typischer Bereich:",
@@ -151,7 +162,33 @@ export const translations = {
       clipDescription: "Fixe Kosten pro generiertem Audio-Clip.",
       videoDescription:
         "Abrechnung pro Sekunde generiertem Video (Standard: {{duration}}s).",
+      ttsDescription:
+        "Abrechnung pro Zeichen, das in Sprache umgewandelt wird.",
+      ttsPricing: "Preis:",
+      ttsScenarios: {
+        short: "Kurzer Satz",
+        medium: "Typische Nachricht",
+        long: "Langer Artikel",
+      },
+      ttsExample:
+        "Eine 100-Wort-Nachricht (~600 Zeichen) kostet ~{{count}} Credits",
       sttDescription: "Abrechnung pro Sekunde transkribiertem Audio.",
+      sttPricing: "Preis:",
+      sttScenarios: {
+        short: "Kurze Sprachnotiz",
+        medium: "Sprachnachricht",
+        long: "Volle Minute",
+      },
+      sttExample: "Eine 1-Minuten-Aufnahme kostet ~{{count}} Credits",
+      costPerChar: "Kosten pro Zeichen:",
+      costPerClipMusic: "Kosten pro Clip:",
+      videoBreakdown:
+        "{{costPerSecond}} Credits/s × {{duration}}s = {{total}} Credits",
+      imageHeader: "Bildgenerierungskosten",
+      videoHeader: "Videogenerierungskosten",
+      musicHeader: "Musikgenerierungskosten",
+      ttsHeader: "Text-zu-Sprache-Kosten",
+      sttHeader: "Sprache-zu-Text-Kosten",
     },
     creditValue: "1 Credit = {{value}}",
   },

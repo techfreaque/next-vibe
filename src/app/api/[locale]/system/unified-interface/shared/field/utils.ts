@@ -29,6 +29,8 @@ import type { InferSchemaFromField, UnifiedField } from "../types/endpoint";
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
 import { FieldUsage, type SpacingSize, WidgetType } from "../types/enums";
 import type { Platform } from "../types/platform";
+import type { ServerDefaultContext } from "../types/server-default";
+import type { JsonValue } from "../../tasks/unified-runner/types";
 import type {
   ArrayWidgetConfig,
   DisplayOnlyWidgetConfig,
@@ -1041,6 +1043,89 @@ export function generateRoleFilteredRequestSchema<F>(
     userRoles,
     platform,
   );
+}
+
+/**
+ * Collect `serverDefault` callbacks from fields that are hidden by
+ * `hiddenForPlatforms` or `visibleFor` for the current request context.
+ *
+ * Returns a flat `Record<fieldKey, callback>` for top-level request data fields.
+ * The route handler calls each callback with `ServerDefaultContext` and merges
+ * the results into validated request data after schema validation.
+ */
+export function collectServerDefaults<F>(
+  fields: F,
+  userRoles?: readonly (typeof UserPermissionRoleValue)[],
+  platform?: Platform,
+): Record<string, (ctx: ServerDefaultContext) => JsonValue | undefined> {
+  const result: Record<
+    string,
+    (ctx: ServerDefaultContext) => JsonValue | undefined
+  > = {};
+
+  if (!fields || typeof fields !== "object") {
+    return result;
+  }
+
+  interface FieldLike {
+    schemaType?: string;
+    usage?: FieldUsageConfig;
+    children?: Record<string, FieldLike>;
+    visibleFor?: readonly (typeof UserPermissionRoleValue)[];
+    hiddenForPlatforms?: readonly Platform[];
+    serverDefault?: (ctx: ServerDefaultContext) => JsonValue | undefined;
+  }
+
+  const typed = fields as F & FieldLike;
+
+  // Walk into object/widget-object containers to reach leaf fields
+  if (
+    (typed.schemaType === "object" || typed.schemaType === "widget-object") &&
+    typed.children
+  ) {
+    for (const [key, child] of Object.entries(typed.children)) {
+      const isHidden = isFieldHidden(child, userRoles, platform);
+      if (isHidden && child.serverDefault) {
+        result[key] = child.serverDefault;
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Check whether a field is hidden for the given roles/platform combination.
+ * Reuses the same logic as `generateSchemaForUsage` visibility checks.
+ */
+function isFieldHidden(
+  field: {
+    visibleFor?: readonly (typeof UserPermissionRoleValue)[];
+    hiddenForPlatforms?: readonly Platform[];
+  },
+  userRoles?: readonly (typeof UserPermissionRoleValue)[],
+  platform?: Platform,
+): boolean {
+  // visibleFor check
+  if (field.visibleFor !== undefined) {
+    if (userRoles) {
+      if (field.visibleFor.length === 0) {
+        return true;
+      }
+      if (!field.visibleFor.some((role) => userRoles.includes(role))) {
+        return true;
+      }
+    }
+  }
+
+  // hiddenForPlatforms check
+  if (platform && field.hiddenForPlatforms) {
+    if (field.hiddenForPlatforms.includes(platform)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**

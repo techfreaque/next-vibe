@@ -226,7 +226,9 @@ export const translations = {
     subtitle:
       "One of the architectural decisions I'm most satisfied with: data sources live with their domain, not in some central vibe-sense/ directory.",
     leadsLabel: "Leads domain",
+    leadsCount: "... 15 data sources total",
     creditsLabel: "Credits domain",
+    creditsCount: "... 17 data sources total",
     explanation:
       "leads/data-sources/leads-created knows about the leads table. It imports from leads/db. It uses LeadStatus from leads/enum. If you delete the leads module, the data sources go with it. Nothing orphaned.",
     indicators: {
@@ -281,10 +283,10 @@ export const translations = {
           "Topological execution via graph walker. Multi-resolution support with automatic scale-up/down. Lookback-aware range extension.",
         versioning:
           "Versioning, backtest mode with full run history, signal persistence as audit trail.",
-        cli: "CLI access - vibe ema, vibe rsi, any indicator endpoint, callable standalone.",
+        cli: "CLI access - vibe vibe-sense-ema, vibe vibe-sense-rsi, any indicator endpoint, callable standalone.",
         mcp: "MCP registration - indicator endpoints show up in the tool list. Thea can call indicators directly.",
         seeds:
-          "Seed graphs: 4 lead domain graphs, 4 credits domain graphs, plus user growth graphs. All run out of the box on vibe dev.",
+          "Seed graphs: 29 graphs across 9 domains - leads, credits, users, subscriptions, referrals, newsletters, payments, messenger, AI chat, and system health. All run out of the box on vibe dev.",
       },
     },
     coming: {

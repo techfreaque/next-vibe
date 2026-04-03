@@ -14,6 +14,8 @@ import type { EndpointLogger } from "../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
 import type { WidgetType } from "../../../shared/types/enums";
 import type { Platform } from "../../../shared/types/platform";
+import type { ServerDefaultContext } from "../../../shared/types/server-default";
+import type { JsonValue } from "../../../tasks/unified-runner/types";
 import type {
   DisplayOnlyWidgetConfig,
   ObjectWidgetConfig,
@@ -244,6 +246,15 @@ export interface BaseWidgetConfig<
    * Use this to hide admin/web-only fields from AI, MCP, or CLI consumers.
    */
   hiddenForPlatforms?: readonly Platform[];
+  /**
+   * Server-side default value resolver for hidden fields.
+   * Called after validation when the field is stripped by `hiddenForPlatforms`
+   * or `visibleFor`. The returned value is merged into the validated request
+   * data so the repository receives it as if the client had sent it.
+   *
+   * Co-locates the "resolve value when hidden" logic directly on the field.
+   */
+  serverDefault?: (ctx: ServerDefaultContext) => JsonValue | undefined;
 }
 
 export interface BasePrimitiveWidgetConfig<

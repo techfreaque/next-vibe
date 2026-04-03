@@ -13,11 +13,6 @@
 
 import { z } from "zod";
 
-import {
-  CHAT_MODEL_IDS,
-  ChatModelIdOptions,
-  ModelId,
-} from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -33,6 +28,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { ChatModelId, ChatModelIdOptions } from "../models";
 import { scopedTranslation } from "../stream/i18n";
 
 const { POST } = createEndpoint({
@@ -83,7 +79,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.SELECT,
         columns: 6,
         options: ChatModelIdOptions,
-        schema: z.enum(CHAT_MODEL_IDS).optional(),
+        schema: z.enum(ChatModelId).optional(),
       }),
 
       skillId: requestField(scopedTranslation, {
@@ -225,7 +221,7 @@ const { POST } = createEndpoint({
       },
       withExplicit: {
         threadId: "550e8400-e29b-41d4-a716-446655440000",
-        modelId: ModelId["CLAUDE_HAIKU_4_5"],
+        modelId: ChatModelId.CLAUDE_HAIKU_4_5,
         skillId: "default",
       },
     },

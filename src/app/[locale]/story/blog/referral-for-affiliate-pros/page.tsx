@@ -139,6 +139,7 @@ export function TanstackPage({
 }: ReferralAffiliateProsPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
   return (
     <Div className="min-h-screen bg-background">
@@ -150,7 +151,7 @@ export function TanstackPage({
               {t("hero.icon")}
             </Div>
             <P className="text-white font-semibold text-sm">
-              {t("hero.brand")}
+              {t("hero.brand", { appName })}
               {t("hero.category")}
             </P>
           </Div>
@@ -194,7 +195,7 @@ export function TanstackPage({
             {t("recurringMath.p1")}
           </P>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-            {t("recurringMath.p2")}
+            {t("recurringMath.p2", { appName })}
           </P>
 
           <Div className="grid sm:grid-cols-2 gap-4 mb-6">
@@ -283,7 +284,9 @@ export function TanstackPage({
         {/* Audience */}
         <Div>
           <H2 className="text-2xl font-bold mb-3">{t("audience.title")}</H2>
-          <P className="text-muted-foreground mb-6">{t("audience.intro")}</P>
+          <P className="text-muted-foreground mb-6">
+            {t("audience.intro", { appName })}
+          </P>
           <Div className="grid sm:grid-cols-2 gap-4">
             <AudienceCard
               title={t("audience.group1Title")}
@@ -312,7 +315,7 @@ export function TanstackPage({
           <Div className="space-y-4">
             <AngleCard
               title={t("promotion.angle1Title")}
-              body={t("promotion.angle1Body")}
+              body={t("promotion.angle1Body", { appName })}
             />
             <AngleCard
               title={t("promotion.angle2Title")}
@@ -324,7 +327,7 @@ export function TanstackPage({
             />
             <AngleCard
               title={t("promotion.angle4Title")}
-              body={t("promotion.angle4Body")}
+              body={t("promotion.angle4Body", { appName })}
             />
           </Div>
         </Div>

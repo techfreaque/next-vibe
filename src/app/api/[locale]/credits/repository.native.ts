@@ -14,23 +14,23 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { ModelId } from "../agent/models/models";
+import type { ChatModelId } from "../agent/ai-stream/models";
 import type { CreditPackCheckoutSession } from "../payment/providers/types";
 import creditsDefinitions, {
   type CreditsGetResponseOutput,
 } from "./definition";
+import type { CreditTypeIdentifierValue } from "./enum";
+import type {
+  CreditsHistoryGetRequestOutput,
+  CreditsHistoryGetResponseOutput,
+} from "./history/definition";
+import type { CreditsT } from "./i18n";
 import type {
   CreditIdentifier,
   CreditPool,
   CreditRepositoryType,
   CreditTransactionOutput,
 } from "./repository";
-import type {
-  CreditsHistoryGetRequestOutput,
-  CreditsHistoryGetResponseOutput,
-} from "./history/definition";
-import type { CreditTypeIdentifierValue } from "./enum";
-import type { CreditsT } from "./i18n";
 /**
  * Native Credit Repository - Static class pattern
  */
@@ -79,7 +79,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     amount: number,
     // oxlint-disable-next-line no-unused-vars
-    modelId: ModelId | null,
+    modelId: ChatModelId | null,
     // oxlint-disable-next-line no-unused-vars
     messageId: string,
     // oxlint-disable-next-line no-unused-vars
@@ -280,7 +280,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _amount: number,
     // oxlint-disable-next-line no-unused-vars
-    _modelId: ModelId | null,
+    _modelId: ChatModelId | null,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
@@ -523,7 +523,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _cost: number,
     // oxlint-disable-next-line no-unused-vars
-    _model: ModelId,
+    _model: ChatModelId,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility

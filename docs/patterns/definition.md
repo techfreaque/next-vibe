@@ -801,7 +801,9 @@ import { scopedTranslation } from "./i18n";
 import { MyEnum, MyEnumOptions } from "./enum";
 // if using customWidgetObject — ALWAYS lazy, never static import:
 import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
-const MyWidget = lazyCliWidget(() => import("./widget").then((m) => ({ default: m.MyWidget })));
+const MyWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.MyWidget })),
+);
 ```
 
 **Rules:**

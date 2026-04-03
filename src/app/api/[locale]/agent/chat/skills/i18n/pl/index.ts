@@ -1090,6 +1090,7 @@ export const translations: typeof enTranslations = {
     createButton: {
       label: "Utwórz Własną Postać",
     },
+    openFullPage: "Otwórz pełną stronę",
     browser: {
       advancedModelAccess: "Wybierz swoje doświadczenie AI",
       configureFiltersText:
@@ -1410,9 +1411,19 @@ export const translations: typeof enTranslations = {
       description: "Model używany do rozpoznawania mowy",
       placeholder: "Domyślny systemowy",
     },
-    visionBridgeModel: {
-      label: "Model wizji",
-      description: "Model używany do analizy obrazów",
+    imageVisionModel: {
+      label: "Model wizji obrazów",
+      description: "Model do analizy obrazów",
+      placeholder: "Domyślny systemowy",
+    },
+    videoVisionModel: {
+      label: "Model wizji wideo",
+      description: "Model do analizy wideo",
+      placeholder: "Domyślny systemowy",
+    },
+    audioVisionModel: {
+      label: "Model wizji audio",
+      description: "Model do analizy audio",
       placeholder: "Domyślny systemowy",
     },
     translationModel: {

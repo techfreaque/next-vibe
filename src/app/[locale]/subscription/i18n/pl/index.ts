@@ -88,6 +88,8 @@ export const translations: typeof enTranslations = {
           cost: "{{count}} kredyty",
           showLegacy: "Pokaż starsze modele",
           hideLegacy: "Ukryj starsze modele",
+          free: "Bezpłatny",
+          approxCost: "~kredytów",
           legacyBadge: "Starszy",
           types: {
             text: "Czat",

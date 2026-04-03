@@ -5,9 +5,8 @@
 
 import "server-only";
 
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { desc, eq, sql } from "drizzle-orm";
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -51,6 +50,7 @@ import type {
   SubscriptionUpdatePutRequestOutput,
   SubscriptionUpdatePutResponseOutput,
 } from "./update/definition";
+import { getAvailableModelCount } from "../agent/models/all-models";
 
 interface SyncSubscriptionResult {
   message: string;
@@ -916,7 +916,7 @@ export class SubscriptionRepository {
                     leadId,
                     planName: subRecord.planId,
                     totalModelCount: getAvailableModelCount(
-                      getAgentEnvAvailability(),
+                      agentEnvAvailability,
                       false,
                     ),
                   },

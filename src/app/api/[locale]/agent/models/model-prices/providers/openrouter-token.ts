@@ -9,9 +9,45 @@ import "server-only";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { ApiProvider, ModelId, modelDefinitions } from "../../models";
-import type { ProviderPriceResult } from "./base";
+import { chatModelDefinitions, ChatModelId } from "../../../ai-stream/models";
+import {
+  imageGenModelDefinitions,
+  ImageGenModelId,
+} from "../../../image-generation/models";
+import type { Modality } from "../../enum";
+import { ApiProvider } from "../../models";
+import type { ModalityUpdate, ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
+
+/** Canonical ordering for modalities: text first, then image, video, audio */
+const MODALITY_ORDER: Record<Modality, number> = {
+  text: 0,
+  image: 1,
+  video: 2,
+  audio: 3,
+};
+
+function sortModalities(modalities: Modality[]): Modality[] {
+  return [...modalities].toSorted(
+    (a, b) => MODALITY_ORDER[a] - MODALITY_ORDER[b],
+  );
+}
+
+/** Map OpenRouter modality strings to our Modality type. Returns undefined for unknown values. */
+function mapOpenRouterModality(orModality: string): Modality | undefined {
+  switch (orModality) {
+    case "text":
+      return "text";
+    case "image":
+      return "image";
+    case "audio":
+      return "audio";
+    case "video":
+      return "video";
+    default:
+      return undefined;
+  }
+}
 
 interface OpenRouterModel {
   id: string;
@@ -23,6 +59,10 @@ interface OpenRouterModel {
     input_cache_read?: string;
     input_cache_write?: string;
   };
+  architecture?: {
+    input_modalities?: string[];
+    output_modalities?: string[];
+  };
 }
 
 export class OpenRouterTokenPriceFetcher extends PriceFetcher {
@@ -31,6 +71,7 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
 
   async fetch(logger: EndpointLogger): Promise<ProviderPriceResult> {
     const updates: ProviderPriceResult["updates"] = [];
+    const modalityUpdates: ModalityUpdate[] = [];
     const failures: ProviderPriceResult["failures"] = [];
 
     let rawModels: OpenRouterModel[] = [];
@@ -64,7 +105,10 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
 
     const modelMap = new Map(rawModels.map((m) => [m.id, m]));
 
-    for (const def of Object.values(modelDefinitions)) {
+    for (const def of [
+      ...Object.values(chatModelDefinitions),
+      ...Object.values(imageGenModelDefinitions),
+    ]) {
       for (const providerConfig of def.providers) {
         if (providerConfig.apiProvider !== ApiProvider.OPENROUTER) {
           continue;
@@ -99,11 +143,16 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
             ) / 100
           : undefined;
 
-        // Find enum key for contextWindow update
-        const enumEntry = Object.entries(ModelId).find(
-          // oxlint-disable-next-line no-unused-vars
-          ([_, value]) => value === providerConfig.id,
-        );
+        // Find enum key for contextWindow update (check both chat and image gen enums)
+        const enumEntry =
+          Object.entries(ChatModelId).find(
+            // oxlint-disable-next-line no-unused-vars
+            ([_, value]) => value === providerConfig.id,
+          ) ??
+          Object.entries(ImageGenModelId).find(
+            // oxlint-disable-next-line no-unused-vars
+            ([_, value]) => value === providerConfig.id,
+          );
         const enumKey = enumEntry?.[0];
 
         if (enumKey) {
@@ -161,6 +210,31 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
             providerModel: providerConfig.providerModel,
           });
         }
+
+        // Emit modality updates from architecture data
+        if (enumKey && raw.architecture) {
+          const apiInputs = raw.architecture.input_modalities;
+          const apiOutputs = raw.architecture.output_modalities;
+          if (apiInputs?.length && apiOutputs?.length) {
+            const inputs = apiInputs
+              .map(mapOpenRouterModality)
+              .filter((m): m is Modality => m !== undefined);
+            const outputs = apiOutputs
+              .map(mapOpenRouterModality)
+              .filter((m): m is Modality => m !== undefined);
+            if (inputs.length > 0 && outputs.length > 0) {
+              modalityUpdates.push({
+                modelId: providerConfig.id,
+                name: def.name,
+                provider: ApiProvider.OPENROUTER,
+                enumKey,
+                inputs: sortModalities(inputs),
+                outputs: sortModalities(outputs),
+                source: "openrouter-api",
+              });
+            }
+          }
+        }
       }
     }
 
@@ -169,6 +243,7 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
       modelsFound: rawModels.length,
       modelsUpdated: updates.filter((u) => u.field === "inputTokenCost").length,
       updates,
+      modalityUpdates,
       failures,
     };
   }

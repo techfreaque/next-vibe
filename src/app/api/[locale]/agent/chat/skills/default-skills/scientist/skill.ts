@@ -1,4 +1,4 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import {
@@ -83,7 +83,7 @@ export const scientistSkill: Skill = {
       variantName: "skills.scientist.variants.maverick" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GROK_4_20_BETA,
+        manualModelId: ChatModelId.GROK_4_20,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -102,7 +102,7 @@ export const scientistSkill: Skill = {
       variantName: "skills.scientist.variants.focused" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GLM_5,
+        manualModelId: ChatModelId.GLM_5,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -120,7 +120,7 @@ export const scientistSkill: Skill = {
       variantName: "skills.scientist.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GLM_5_TURBO,
+        manualModelId: ChatModelId.GLM_5_TURBO,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

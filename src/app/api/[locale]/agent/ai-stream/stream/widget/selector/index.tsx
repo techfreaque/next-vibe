@@ -27,9 +27,9 @@ import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/we
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import {
-  getModelById,
-  type ModelId,
-} from "@/app/api/[locale]/agent/models/models";
+  getChatModelById,
+  type ChatModelId,
+} from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   useWidgetLogger,
   useWidgetUser,
@@ -43,7 +43,7 @@ import { SelectorContent } from "./selector-content";
 
 interface SelectorProps {
   skillId: string;
-  modelId: ModelId;
+  modelId: ChatModelId | null | undefined;
   locale: CountryLanguage;
   buttonClassName?: string;
   open?: boolean;
@@ -91,7 +91,7 @@ export function Selector({
     initialSkillData,
   );
   const currentSkill = currentCharaterHook.read?.data ?? null;
-  const currentModel = useMemo(() => getModelById(modelId), [modelId]);
+  const currentModel = useMemo(() => getChatModelById(modelId), [modelId]);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
 
   return (

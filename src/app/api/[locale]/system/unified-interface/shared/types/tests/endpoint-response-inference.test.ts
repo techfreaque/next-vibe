@@ -15,7 +15,7 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectFieldNew,
+  objectField,
   requestField,
   responseArrayField,
   responseField,
@@ -113,8 +113,8 @@ type Field3_Output = z.output<Field3_Schema>;
 const _field3_output: AssertAssignable<Field3_Output, string> = "hello";
 const _field3_reverse: AssertAssignable<string, Field3_Output> = "world";
 
-// INCREMENTAL TEST: Test objectFieldNew with usage preservation
-const testNewUsageOnly = objectFieldNew({
+// INCREMENTAL TEST: Test objectField with usage preservation
+const testNewUsageOnly = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" } as const,
   children: {},
@@ -149,7 +149,7 @@ const _testNewAssign2: TestNewUsageOnly_Assignable2 = "YES";
 // >;
 
 // INCREMENTAL TEST: Test usage parameter preservation alone (OLD API)
-const testUsageOnly = objectFieldNew({
+const testUsageOnly = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" } as const,
   children: {},
@@ -199,7 +199,7 @@ const _debugAssignable2: TestUsageOnly_Assignable2 = "YES";
 // >;
 
 // INCREMENTAL TEST: Test request+response usage
-const testDualUsage = objectFieldNew({
+const testDualUsage = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true } as const,
   children: {},
@@ -226,7 +226,7 @@ const _testDualAssign2: TestDualUsage_IsAssignable2 = "YES";
 // >;
 
 // INCREMENTAL TEST: Test response-only usage
-const testResponseOnly = objectFieldNew({
+const testResponseOnly = objectField({
   type: WidgetType.CONTAINER,
   usage: { response: true } as const,
   children: {},
@@ -250,7 +250,7 @@ const _testResponseAssign2: TestResponseOnly_IsAssignable2 = "YES";
 // >;
 
 // Test Field 4: objectField with single request child
-const field4_objectWithRequestChild = objectFieldNew({
+const field4_objectWithRequestChild = objectField({
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.STACKED,
   usage: { request: "data" } as const,
@@ -446,7 +446,7 @@ const _field4_reverse: AssertAssignable<
 };
 
 // Test Field 5: objectField with multiple request children
-const field5_objectWithMultipleRequestChildren = objectFieldNew({
+const field5_objectWithMultipleRequestChildren = objectField({
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.STACKED,
   usage: { request: "data" },
@@ -473,7 +473,7 @@ const _field5_reverse: AssertAssignable<
 > = { planId: "test-plan", interval: "yearly" };
 
 // Test Field 6: objectField with response child
-const field6_objectWithResponseChild = objectFieldNew({
+const field6_objectWithResponseChild = objectField({
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.STACKED,
   usage: { response: true },
@@ -497,7 +497,7 @@ const _field6_reverse: AssertAssignable<{ message: string }, Field6_Output> = {
 };
 
 // Test Field 7: nested objectField like brave-search (request + response)
-const field7_nestedObjectLikeBraveSearch = objectFieldNew({
+const field7_nestedObjectLikeBraveSearch = objectField({
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.STACKED,
   usage: { request: "data", response: true },
@@ -512,7 +512,7 @@ const field7_nestedObjectLikeBraveSearch = objectFieldNew({
       {
         type: WidgetType.CONTAINER,
       },
-      objectFieldNew({
+      objectField({
         type: WidgetType.CONTAINER,
         layoutType: LayoutType.STACKED,
         usage: { response: true },
@@ -575,7 +575,7 @@ const testSingleRequestLiteral = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data" },
@@ -661,7 +661,7 @@ const testSingleRequestEnum = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data" },
@@ -747,7 +747,7 @@ const testSingleResponseString = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { response: true },
@@ -832,7 +832,7 @@ const testMultipleRequestFields = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data" },
@@ -934,7 +934,7 @@ const testPublicEndpoint = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { response: true },
@@ -1004,7 +1004,7 @@ const testAdminEndpoint = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { response: true },
@@ -1094,7 +1094,7 @@ const testResponseEndpoint = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { response: true },
@@ -1191,7 +1191,7 @@ const testRequestEndpoint = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data", response: true },

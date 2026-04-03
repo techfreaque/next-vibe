@@ -11,6 +11,7 @@ import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
+import { Maximize } from "next-vibe-ui/ui/icons/Maximize";
 import { MoreHorizontal } from "next-vibe-ui/ui/icons/MoreHorizontal";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
@@ -21,13 +22,14 @@ import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Input } from "next-vibe-ui/ui/input";
+import { Link } from "next-vibe-ui/ui/link";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
@@ -48,6 +50,7 @@ import { useTouchDevice } from "@/hooks/use-touch-device";
 import { cn } from "../../../shared/utils";
 import { Icon } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useSelectorOnboardingContext } from "../../ai-stream/stream/widget/selector/selector-onboarding/context";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import { useAddToFavorites } from "../favorites/create/hooks";
 import { useChatFavorites } from "../favorites/hooks/hooks";
@@ -79,6 +82,10 @@ export function SkillsListContainer({
   const t = useWidgetTranslation<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
   const isTouch = useTouchDevice();
+  const [isFullPage, setIsFullPage] = useState(false);
+  useEffect(() => {
+    setIsFullPage(window.location.pathname.includes("/skills"));
+  }, []);
   const isPublic = user.isPublic;
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const searchQuery = form.watch("query") ?? "";
@@ -258,19 +265,29 @@ export function SkillsListContainer({
   if (!field.value) {
     return (
       <Div className="flex flex-col gap-0 h-[min(800px,calc(100dvh-100px))]">
-        {/* Top Actions: Back + Create */}
+        {/* Top Actions: Back + Create + Fullscreen */}
         {!isOnboarding && (
           <Div className="flex flex-row gap-2 px-4 py-4 shrink-0">
             <NavigateButtonWidget field={children.backButton} />
-            <Button
-              type="button"
-              variant="outline"
-              size="default"
-              onClick={handleCreateCustomClick}
-              className="ml-auto"
-            >
-              {t("get.createButton.label")}
-            </Button>
+            <Div className="ml-auto flex items-center gap-2">
+              {!isFullPage && (
+                <Link
+                  href={`/${locale}/skills`}
+                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10"
+                  title={t("get.openFullPage")}
+                >
+                  <Maximize className="h-4 w-4" />
+                </Link>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="default"
+                onClick={handleCreateCustomClick}
+              >
+                {t("get.createButton.label")}
+              </Button>
+            </Div>
           </Div>
         )}
 
@@ -285,19 +302,29 @@ export function SkillsListContainer({
   // Both public and authenticated users see the same skill list
   return (
     <Div className="flex flex-col gap-0 h-[min(800px,calc(100dvh-100px))]">
-      {/* Top Actions: Back + Create */}
+      {/* Top Actions: Back + Create + Fullscreen */}
       {!isOnboarding && (
         <Div className="flex flex-row gap-2 px-4 py-4 shrink-0">
           <NavigateButtonWidget field={children.backButton} />
-          <Button
-            type="button"
-            variant="outline"
-            size="default"
-            onClick={handleCreateCustomClick}
-            className="ml-auto"
-          >
-            {t("get.createButton.label")}
-          </Button>
+          <Div className="ml-auto flex items-center gap-2">
+            {!isFullPage && (
+              <Link
+                href={`/${locale}/skills`}
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10"
+                title={t("get.openFullPage")}
+              >
+                <Maximize className="h-4 w-4" />
+              </Link>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              size="default"
+              onClick={handleCreateCustomClick}
+            >
+              {t("get.createButton.label")}
+            </Button>
+          </Div>
         </Div>
       )}
 
@@ -863,12 +890,14 @@ function VariantRow({
         />
 
         {/* Credits */}
-        <ModelCreditDisplay
-          modelId={char.modelId}
-          variant="text"
-          className="text-xs text-muted-foreground"
-          locale={locale}
-        />
+        {char.modelId && (
+          <ModelCreditDisplay
+            modelId={char.modelId}
+            variant="text"
+            className="text-xs text-muted-foreground"
+            locale={locale}
+          />
+        )}
 
         {/* Active indicator */}
         {isActive && (
@@ -1112,12 +1141,14 @@ function SkillCard({
               }
               fieldName={`sections.${idx}.skills.${char.id}.separator2`}
             />
-            <ModelCreditDisplay
-              modelId={char.modelId}
-              variant="text"
-              className="text-xs text-muted-foreground"
-              locale={locale}
-            />
+            {char.modelId && (
+              <ModelCreditDisplay
+                modelId={char.modelId}
+                variant="text"
+                className="text-xs text-muted-foreground"
+                locale={locale}
+              />
+            )}
             {char.ownershipType !== SkillOwnershipType.SYSTEM &&
               char.voteCount !== null &&
               char.voteCount > 0 && (
@@ -1428,6 +1459,7 @@ function SkillFavoriteActions({
 }): React.JSX.Element {
   const [isActivating, setIsActivating] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const env = useEnvAvailability();
   const isCurrentlyActive =
     activeFavoriteId !== null && favoriteIds.includes(activeFavoriteId);
 
@@ -1470,6 +1502,7 @@ function SkillFavoriteActions({
         favorite.modelSelection,
         favorite.characterModelSelection ?? undefined,
         user,
+        env,
       );
       const modelId = bestModel?.id || null;
 
@@ -1529,6 +1562,7 @@ function SkillFavoriteActions({
         favorite.modelSelection,
         favorite.characterModelSelection ?? undefined,
         user,
+        env,
       );
       const modelId = bestModel?.id || null;
 

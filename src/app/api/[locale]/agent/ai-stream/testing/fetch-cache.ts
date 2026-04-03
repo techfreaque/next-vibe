@@ -79,6 +79,13 @@ type ResFile =
       status: number;
       headers: Record<string, string>;
       body: string;
+    }
+  | {
+      type: "binary";
+      url: string;
+      status: number;
+      headers: Record<string, string>;
+      body: string; // base64-encoded
     };
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -260,6 +267,8 @@ function replayFromCache(cached: ResFile): Response {
     bytes = sseEventsToBytes(cached.events);
   } else if (cached.type === "json") {
     bytes = new TextEncoder().encode(JSON.stringify(cached.body));
+  } else if (cached.type === "binary") {
+    bytes = Uint8Array.from(Buffer.from(cached.body, "base64"));
   } else {
     bytes = new TextEncoder().encode(cached.body);
   }
@@ -271,6 +280,16 @@ function replayFromCache(cached: ResFile): Response {
 
 // ── Cache miss write ───────────────────────────────────────────────────────────
 
+/** Content types that must be stored as base64 to avoid binary corruption */
+function isBinaryContentType(contentType: string): boolean {
+  return (
+    contentType.startsWith("audio/") ||
+    contentType.startsWith("video/") ||
+    contentType.startsWith("image/") ||
+    contentType.includes("octet-stream")
+  );
+}
+
 function buildResFile(
   url: string,
   status: number,
@@ -281,6 +300,17 @@ function buildResFile(
   if (contentType.includes("event-stream")) {
     const text = new TextDecoder().decode(bytes);
     return { type: "sse", url, status, headers, events: parseSseEvents(text) };
+  }
+  // Binary content (audio, video, images) must be stored as base64
+  // to avoid corruption from TextDecoder replacing invalid UTF-8 with U+FFFD
+  if (isBinaryContentType(contentType)) {
+    return {
+      type: "binary",
+      url,
+      status,
+      headers,
+      body: Buffer.from(bytes).toString("base64"),
+    };
   }
   const text = new TextDecoder().decode(bytes);
   try {

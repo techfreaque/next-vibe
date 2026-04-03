@@ -31,10 +31,10 @@ export const translations = {
       badge: "Open source - MIT + GPL v3",
       title: "Your AI. Your Rules.",
       subtitle:
-        "{{modelCount}} models. Generate images, video, and music. {{skillCount}} skills. ~{{toolCount}} tools. SSH, email, browser automation. Run it free on unbottled.ai - or self-host your own.",
+        "{{modelCount}} models. Generate images, video, and music. {{skillCount}} skills. ~{{toolCount}} tools. SSH, email, browser automation. Run it free on {{appName}} - or self-host your own.",
       cta: "Start Free",
       secondaryCta: "Self-Host It",
-      tabUnbottled: "unbottled.ai",
+      tabUnbottled: "{{appName}}",
       tabSelfHost: "self-hosted",
       demoLabels: {
         modelComparison: "The Gatekeeper",
@@ -150,7 +150,7 @@ export const translations = {
         pill2: "Your data never leaves your machine",
         pill3: "BYO API keys",
         cta: "Self-Host Free",
-        ctaGithub: "Get the Code",
+        ctaGithub: "Learn More",
       },
       nextvibe: {
         badge: "Open source · MIT + GPL v3",
@@ -158,14 +158,15 @@ export const translations = {
         titleLine2: "Every platform.",
         subtitle:
           "Define one endpoint. Get a web form, CLI command, AI tool, MCP server, cron job, mobile screen, and desktop app - automatically. The same TypeScript contract powers all of them. Fork it, own it.",
-        pill1: "Powers unbottled.ai",
+        pill1: "Powers {{appName}}",
         pill2: "Zero any / unknown / throw",
         pill3: "{{platformCount}} platforms per endpoint",
         ctaGithub: "Star on GitHub",
         ctaDocs: "Framework Docs",
+        ctaExplore: "Learn More",
       },
       tab: {
-        unbottled: "unbottled.ai",
+        unbottled: "{{appName}}",
         unbottledSub: "Consumer AI",
         unbottledDesc:
           "{{modelCount}} models, image/video/music generation, persistent memory, live search - no filter you didn't choose",
@@ -176,7 +177,25 @@ export const translations = {
         nextvibe: "next-vibe",
         nextvibeSub: "The Framework",
         nextvibeDesc:
-          "The GPL v3 + MIT framework behind unbottled.ai - one endpoint, every platform, fork and own it",
+          "The GPL v3 + MIT framework behind {{appName}} - one endpoint, every platform, fork and own it",
+      },
+    },
+    selector: {
+      question: "What brings you here?",
+      unbottled: {
+        title: "Uncensored AI",
+        description:
+          "{{modelCount}} models. You choose the filter - mainstream, open, or uncensored. No corporate safety theater.",
+      },
+      personal: {
+        title: "Self-Host It",
+        description:
+          "Your own AI agent on your machine. Always-on, BYO keys, your data never leaves.",
+      },
+      nextvibe: {
+        title: "The Framework",
+        description:
+          "One endpoint definition. Every platform automatically. Fork it, own it.",
       },
     },
     forumHero: {
@@ -282,7 +301,7 @@ export const translations = {
           mainstreamResponse:
             "Short answer: Yes, for most people it was a good idea. It significantly reduced the risk of severe COVID, hospitalization, and death - especially in older or higher-risk people. Why not? Mainly if someone had a specific medical contraindication, or was weighing the small risk of side effects against their personal risk from COVID. Bottom line: for the vast majority, benefit > risk.",
           openReasoning:
-            "<think>The user is asking for a brief opinion on whether taking the COVID vaccine was a good idea. This is a topic with diverse viewpoints. The user is asking on unbottled.ai, which is a free speech platform where users set their own filtering levels. I should provide a balanced, neutral perspective that acknowledges the vaccines had clear benefits for high-risk populations, there were legitimate concerns about side effects and mandates, and risk-benefit varied significantly by age and health status. Keeping it very short as requested.</think>",
+            "<think>The user is asking for a brief opinion on whether taking the COVID vaccine was a good idea. This is a topic with diverse viewpoints. The user is asking on {{appName}}, which is a free speech platform where users set their own filtering levels. I should provide a balanced, neutral perspective that acknowledges the vaccines had clear benefits for high-risk populations, there were legitimate concerns about side effects and mandates, and risk-benefit varied significantly by age and health status. Keeping it very short as requested.</think>",
           openResponse:
             "Depended heavily on your age and health. Yes if you were elderly or high-risk - the reduction in severe illness/death was significant and well-documented. Debatable if you were young and healthy - the absolute risk reduction was small, and side effects (myocarditis in young men, menstrual disruptions) were real and sometimes downplayed. The bigger controversy was mandates - many felt the risk-benefit calculation should have remained personal, not coerced.",
           uncensoredResponse:
@@ -485,8 +504,8 @@ export const translations = {
     comparison: {
       title: "Every other platform makes you compromise.",
       subtitle:
-        "Filter you can't control. Memory that resets. Privacy that's just a checkbox. unbottled.ai doesn't trade any of it.",
-      usLabel: "unbottled.ai",
+        "Filter you can't control. Memory that resets. Privacy that's just a checkbox. {{appName}} doesn't trade any of it.",
+      usLabel: "{{appName}}",
       cards: {
         card1: {
           label: "The Filter",
@@ -524,7 +543,7 @@ export const translations = {
           label: "Ownership",
           themLabel: "OpenClaw",
           them: "Ran on your machine. Signal/Telegram dependency. 800+ unvetted community skills on ClawHub. Then OpenAI acquired it. Infrastructure you don't control isn't yours.",
-          us: "Cloud-ready from day one. Runs on your VPS, locally, or free on unbottled.ai. MIT + GPL v3. Independent forever. Fork it and it's yours - not contingent on any company.",
+          us: "Cloud-ready from day one. Runs on your VPS, locally, or free on {{appName}}. MIT + GPL v3. Independent forever. Fork it and it's yours - not contingent on any company.",
           whyItMatters:
             "Your autonomous agent platform should not have an acquisition clause.",
         },
@@ -656,7 +675,7 @@ export const translations = {
         "Use the cloud. Own the dashboard. Build your own. The same codebase, the same quality - whichever path fits.",
       cloud: {
         badge: "Cloud · No Setup",
-        title: "unbottled.ai",
+        title: "{{appName}}",
         tagline:
           "{{modelCount}} models. Images, video & music. 30-second start.",
         features: {
@@ -673,14 +692,14 @@ export const translations = {
       personal: {
         badge: "Self-Hosted · Personal",
         title: "Your power dashboard",
-        tagline: "Everything unbottled.ai has - plus the tools it doesn't.",
+        tagline: "Everything {{appName}} has - plus the tools it doesn't.",
         features: {
-          everything: "Every unbottled.ai feature, on your machine",
+          everything: "Every {{appName}} feature, on your machine",
           admin: "Browser automation, SSH, email, Claude Code (admin-only)",
           heartbeat: "AI heartbeat - autonomous background tasks on schedule",
           byoKeys: "Your own API keys - bring any provider",
           privacy: "Your machine, your data, zero third-party visibility",
-          localSync: "Callable from unbottled.ai cloud with memory sync (beta)",
+          localSync: "Callable from {{appName}} cloud with memory sync (beta)",
         },
         cta: "Self-Host It",
       },

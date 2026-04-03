@@ -6,23 +6,25 @@ import "server-only";
 
 import type { ModelMessage, ToolCallPart, ToolResultPart } from "ai";
 
+import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
+import type { Modality } from "@/app/api/[locale]/agent/models/enum";
+import { AUDIO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/music-generation/constants";
+import { VIDEO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/video-generation/constants";
 import type {
   ContentBlock,
   ErrorResponseType,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/shared/utils";
-import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
-import { IMAGE_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/image-generation/constants";
-import { AUDIO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/music-generation/constants";
-import { VIDEO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/video-generation/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage, ToolCallResult } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import { createMetadataSystemMessage } from "../system-prompt/message-metadata";
+import type { ChatModelOption } from "../../models";
 
 export class MessageConverter {
   /**
@@ -44,7 +46,7 @@ export class MessageConverter {
     message: ChatMessage | { role: ChatMessageRole; content: string },
     logger: EndpointLogger,
     locale: CountryLanguage,
-    modelConfig?: ModelOption,
+    modelConfig?: ChatModelOption,
   ): Promise<ModelMessage | ModelMessage[] | null> {
     switch (message.role) {
       case ChatMessageRole.USER: {
@@ -120,6 +122,40 @@ export class MessageConverter {
                 } catch (error) {
                   logger.error(
                     "[MessageConverter] Failed to decode attachment for AI context",
+                    parseError(error),
+                    {
+                      attachmentId: attachment.id,
+                      filename: attachment.filename,
+                    },
+                  );
+                }
+              } else if (isDocumentMimeType(attachment.mimeType)) {
+                // Documents (PDF, DOCX, XLSX): Extract text content
+                try {
+                  const docBuffer = Buffer.from(base64Data, "base64");
+                  const extracted = await extractDocumentText(
+                    docBuffer,
+                    attachment.mimeType,
+                    logger,
+                  );
+                  if (extracted) {
+                    contentParts.push({
+                      type: "text",
+                      text: `\n\n[File: ${attachment.filename}]\n${extracted}\n[End of file]`,
+                    });
+                  } else {
+                    logger.warn(
+                      "[MessageConverter] No text extracted from document",
+                      {
+                        attachmentId: attachment.id,
+                        filename: attachment.filename,
+                        mimeType: attachment.mimeType,
+                      },
+                    );
+                  }
+                } catch (error) {
+                  logger.error(
+                    "[MessageConverter] Failed to extract document text",
                     parseError(error),
                     {
                       attachmentId: attachment.id,
@@ -365,7 +401,7 @@ export class MessageConverter {
     timezone: string,
     rootFolderId: DefaultFolderId,
     locale: CountryLanguage,
-    modelConfig?: ModelOption,
+    modelConfig?: ChatModelOption,
   ): Promise<ModelMessage[]> {
     const result: ModelMessage[] = [];
 
@@ -738,7 +774,7 @@ export class MessageConverter {
   private static buildToolResultOutput(
     result: ToolCallResult | undefined,
     toolName?: string,
-    modelConfig?: ModelOption,
+    modelConfig?: ChatModelOption,
   ):
     | {
         type: "json";
@@ -788,7 +824,7 @@ export class MessageConverter {
     // The model should see the file only if it natively supports that modality;
     // otherwise it sees only the text description (gap-fill guarantees text is populated).
     const MEDIA_TOOL_NAMES = [
-      IMAGE_GEN_TOOL_NAME,
+      IMAGE_GEN_ALIAS,
       VIDEO_GEN_TOOL_NAME,
       AUDIO_GEN_TOOL_NAME,
     ] as const;
@@ -810,7 +846,7 @@ export class MessageConverter {
 
       // Determine which modality this tool produces
       const modality: Modality =
-        toolName === IMAGE_GEN_TOOL_NAME
+        toolName === IMAGE_GEN_ALIAS
           ? "image"
           : toolName === VIDEO_GEN_TOOL_NAME
             ? "video"

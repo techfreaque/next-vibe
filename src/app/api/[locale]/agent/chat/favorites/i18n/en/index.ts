@@ -133,8 +133,8 @@ export const translations = {
         variantId: {
           content: "Variant: {{value}}",
         },
-        customName: {
-          content: "Custom Name: {{value}}",
+        customVariantName: {
+          content: "Variant Name: {{value}}",
         },
         customIcon: {
           content: "Custom Icon: {{value}}",
@@ -275,9 +275,10 @@ export const translations = {
       label: "Skill",
       description: "Select the character for this favorite",
     },
-    customName: {
-      label: "Custom Name",
-      description: "Optional custom name for this favorite",
+    customVariantName: {
+      label: "Variant Name",
+      description:
+        "Custom name for this variant (leave empty to use skill default)",
     },
     customIcon: {
       label: "Custom Icon",

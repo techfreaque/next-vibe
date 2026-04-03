@@ -19,9 +19,9 @@ import type React from "react";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { FEATURED_MODELS } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { FEATURED_MODELS } from "@/app/api/[locale]/agent/ai-stream/models";
 import { scopedTranslation } from "./i18n";
 
 interface FeatureItem {

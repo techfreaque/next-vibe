@@ -10,10 +10,8 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
-import {
-  DEFAULT_TTS_VOICE_ID,
-  type ModelId,
-} from "@/app/api/[locale]/agent/models/models";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -27,7 +25,7 @@ export interface AnswerAsAIDeps {
   /** Active thread ID - needed to look up message in apiClient cache */
   activeThreadId: string | null;
   settings: {
-    selectedModel: ModelId;
+    selectedModel: ChatModelId;
     selectedSkill: string;
     availableTools: ToolConfigItem[] | null;
     pinnedTools: ToolConfigItem[] | null;

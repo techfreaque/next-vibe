@@ -10,16 +10,18 @@ import {
   ChatModeOptions,
 } from "@/app/api/[locale]/agent/models/enum";
 import {
-  LLM_MODEL_IDS,
-  LlmModelIdOptions,
-} from "@/app/api/[locale]/agent/models/models";
+  ChatModelId,
+  ChatModelIdOptions,
+} from "@/app/api/[locale]/agent/ai-stream/models";
 import {
+  chatModelSelectionSchema,
   imageGenModelSelectionSchema,
-  modelSelectionSchemaSimple,
   musicGenModelSelectionSchema,
   sttModelSelectionSchema,
   videoGenModelSelectionSchema,
-  visionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+  audioVisionModelSelectionSchema,
   voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/models/types";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -38,14 +40,15 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazy } from "react";
 import { iconSchema } from "../../../../shared/types/common.schema";
+import type { ChatModelSelection } from "@/app/api/[locale]/agent/models/types";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
 } from "../../skills/create/definition";
 import { IntelligenceLevel, ModelSelectionType } from "../../skills/enum";
 import { FAVORITE_CREATE_ALIAS } from "../constants";
-import { lazy } from "react";
 
 import { scopedTranslation } from "./i18n";
 
@@ -81,6 +84,9 @@ const { POST } = createEndpoint({
         locale,
         user,
       }) => {
+        const { getEnvAvailability } =
+          await import("../../../env-availability-context");
+        const env = getEnvAvailability();
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         const favoritesDefinition = await import("../definition");
@@ -101,10 +107,7 @@ const { POST } = createEndpoint({
         let characterName: string | null = null;
         let characterTagline: string | null = null;
         let characterDescription: string | null = null;
-        let characterModelSelection:
-          | FiltersModelSelection
-          | ManualModelSelection
-          | null = null;
+        let characterModelSelection: ChatModelSelection | null = null;
         if (character?.success) {
           characterName = character.data.name ?? null;
           characterTagline = character.data.tagline ?? null;
@@ -155,6 +158,7 @@ const { POST } = createEndpoint({
                 null,
                 locale,
                 user,
+                env,
               );
 
             return {
@@ -225,6 +229,14 @@ const { POST } = createEndpoint({
         schema: z.string().nullable().optional(),
       }),
 
+      customVariantName: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.customVariantName.label" as const,
+        description: "post.customVariantName.description" as const,
+        schema: z.string().nullable().optional(),
+      }),
+
       icon: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ICON,
@@ -252,18 +264,34 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: sttModelSelectionSchema.nullable().optional(),
       }),
-      visionBridgeModelSelection: requestField(scopedTranslation, {
+      imageVisionModelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "post.visionBridgeModel.label" as const,
-        description: "post.visionBridgeModel.description" as const,
+        label: "post.imageVisionModel.label" as const,
+        description: "post.imageVisionModel.description" as const,
         columns: 6,
-        schema: visionModelSelectionSchema.nullable().optional(),
+        schema: imageVisionModelSelectionSchema.nullable().optional(),
+      }),
+      videoVisionModelSelection: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.videoVisionModel.label" as const,
+        description: "post.videoVisionModel.description" as const,
+        columns: 6,
+        schema: videoVisionModelSelectionSchema.nullable().optional(),
+      }),
+      audioVisionModelSelection: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.audioVisionModel.label" as const,
+        description: "post.audioVisionModel.description" as const,
+        columns: 6,
+        schema: audioVisionModelSelectionSchema.nullable().optional(),
       }),
       translationModelId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        options: LlmModelIdOptions,
+        options: ChatModelIdOptions,
         label: "post.translationModel.label" as const,
         description: "post.translationModel.description" as const,
         columns: 6,
@@ -271,7 +299,7 @@ const { POST } = createEndpoint({
           descriptionStyle: "inline",
           optionalColor: "transparent",
         },
-        schema: z.enum(LLM_MODEL_IDS).nullable().optional(),
+        schema: z.enum(ChatModelId).nullable().optional(),
       }),
       imageGenModelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -316,7 +344,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "post.modelSelection.label" as const,
         description: "post.modelSelection.description" as const,
-        schema: modelSelectionSchemaSimple.nullable(),
+        schema: chatModelSelectionSchema.nullable(),
       }),
 
       // Auto-compacting token threshold (null = fall through to character/settings default)

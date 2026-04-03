@@ -2,17 +2,16 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Warunki korzystania z usługi - unbottled.ai",
+    title: "Warunki korzystania z usługi - {{appName}}",
     category: "Prawne",
-    description: "Przeczytaj warunki i zasady korzystania z unbottled.ai",
+    description: "Przeczytaj warunki i zasady korzystania z {{appName}}",
     imageAlt: "Warunki korzystania z usługi",
     keywords:
-      "warunki korzystania z usługi, regulamin, umowa użytkownika, warunki unbottled.ai",
-    ogTitle: "Warunki korzystania z usługi - unbottled.ai",
-    ogDescription: "Przeczytaj warunki i zasady korzystania z unbottled.ai",
-    twitterTitle: "Warunki korzystania z usługi - unbottled.ai",
-    twitterDescription:
-      "Przeczytaj warunki i zasady korzystania z unbottled.ai",
+      "warunki korzystania z usługi, regulamin, umowa użytkownika, warunki {{appName}}",
+    ogTitle: "Warunki korzystania z usługi - {{appName}}",
+    ogDescription: "Przeczytaj warunki i zasady korzystania z {{appName}}",
+    twitterTitle: "Warunki korzystania z usługi - {{appName}}",
+    twitterDescription: "Przeczytaj warunki i zasady korzystania z {{appName}}",
   },
   printAriaLabel: "Drukuj warunki korzystania z usługi",
   printButton: "Drukuj",

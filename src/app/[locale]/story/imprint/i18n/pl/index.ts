@@ -2,16 +2,16 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Stopka redakcyjna - unbottled.ai",
+    title: "Stopka redakcyjna - {{appName}}",
     category: "Prawne",
-    description: "Informacje prawne i dane firmy unbottled.ai",
+    description: "Informacje prawne i dane firmy {{appName}}",
     imageAlt: "Stopka redakcyjna",
     keywords:
-      "stopka redakcyjna, nota prawna, informacje o firmie, unbottled.ai prawne",
-    ogTitle: "Stopka redakcyjna - unbottled.ai",
-    ogDescription: "Informacje prawne i dane firmy unbottled.ai",
-    twitterTitle: "Stopka redakcyjna - unbottled.ai",
-    twitterDescription: "Informacje prawne i dane firmy unbottled.ai",
+      "stopka redakcyjna, nota prawna, informacje o firmie, {{appName}} prawne",
+    ogTitle: "Stopka redakcyjna - {{appName}}",
+    ogDescription: "Informacje prawne i dane firmy {{appName}}",
+    twitterTitle: "Stopka redakcyjna - {{appName}}",
+    twitterDescription: "Informacje prawne i dane firmy {{appName}}",
   },
   printAriaLabel: "Drukuj stopkę",
   printButton: "Drukuj",

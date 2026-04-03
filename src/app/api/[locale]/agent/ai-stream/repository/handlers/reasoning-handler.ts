@@ -2,7 +2,7 @@
  * ReasoningHandler - Handles reasoning blocks for o1-style models
  */
 
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { MessageDbWriter } from "../core/message-db-writer";
@@ -13,7 +13,7 @@ export class ReasoningHandler {
     currentAssistantContent: string;
     threadId: string;
     currentParentId: string | null;
-    model: ModelId;
+    model: ChatModelId;
     skill: string;
     sequenceId: string;
     userId: string | undefined;

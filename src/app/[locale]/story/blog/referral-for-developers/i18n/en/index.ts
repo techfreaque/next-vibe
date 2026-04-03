@@ -10,7 +10,7 @@ export const translations = {
   },
   hero: {
     backToBlog: "Back to Blog",
-    brand: "unbottled.ai - ",
+    brand: "{{appName}} - ",
     category: "For Developers",
     readTime: "5 min read",
     title: "You built something with AI. Now earn from sharing it.",
@@ -20,17 +20,17 @@ export const translations = {
   useCase: {
     title: "Where developers naturally refer people",
     p1: "You're already creating content that leads people to tools. A blog post about your workflow. A README that mentions the AI you used. A YouTube tutorial. A Discord answer where you recommend a platform. These all have referral potential that most developers leave untapped.",
-    p2: "The pattern is simple: anywhere you'd naturally mention unbottled.ai, add your referral code. People who click and subscribe earn you a recurring 10% commission. You don't need to change what you're saying - just add the link.",
+    p2: "The pattern is simple: anywhere you'd naturally mention {{appName}}, add your referral code. People who click and subscribe earn you a recurring 10% commission. You don't need to change what you're saying - just add the link.",
     examples: [
-      'GitHub README: "I built this with unbottled.ai\'s API. If you want to try it: [referral link]"',
-      'Blog post footer: "Tools I use: ...unbottled.ai for AI access [ref link]"',
-      "Discord/Slack: \"I've been using unbottled.ai - here's my referral if you want to try it\"",
-      'YouTube description: "AI tools used in this video: unbottled.ai [referral link]"',
+      'GitHub README: "I built this with {{appName}}\'s API. If you want to try it: [referral link]"',
+      'Blog post footer: "Tools I use: ...{{appName}} for AI access [ref link]"',
+      "Discord/Slack: \"I've been using {{appName}} - here's my referral if you want to try it\"",
+      'YouTube description: "AI tools used in this video: {{appName}} [referral link]"',
     ],
   },
   apiAngle: {
     title: "The API / next-vibe angle",
-    p1: "If you build on the unbottled.ai API or contribute to next-vibe, your users are natural referrals. Someone using a tool you built on top of the platform is already one step away from subscribing directly.",
+    p1: "If you build on the {{appName}} API or contribute to next-vibe, your users are natural referrals. Someone using a tool you built on top of the platform is already one step away from subscribing directly.",
     p2: "next-vibe itself is open source. If you write about it, contribute to it, or build something with it, you're already creating the exact kind of content that converts - your referral link belongs there.",
   },
   math: {
@@ -46,17 +46,17 @@ export const translations = {
     ],
     note: "One power-user referral = 12+ casual referrals in earnings. Developers already know this range - the average dev today runs a $200/mo Claude Code or Codex subscription without thinking twice. The developer audience you're writing for is exactly the high-ARPU end of this table.",
     growthNote:
-      "As unbottled.ai adds models and capabilities, ARPU trends up. Referrals you make today earn you more next year without any extra work.",
+      "As {{appName}} adds models and capabilities, ARPU trends up. Referrals you make today earn you more next year without any extra work.",
   },
   multilevel: {
     title: "Multi-level for open-source builders",
-    p1: "If you publish open-source tools or libraries that developers use, your users are themselves developers. Some of them will share unbottled.ai further. When they do, you earn a share of those referrals too - up to 5 levels deep.",
+    p1: "If you publish open-source tools or libraries that developers use, your users are themselves developers. Some of them will share {{appName}} further. When they do, you earn a share of those referrals too - up to 5 levels deep.",
     p2: "A popular open-source project can create a referral tree that earns passively long after you've moved on to the next thing. You don't need to manage it. You just need to have the link in the right place.",
   },
   crypto: {
     title: "Payout in crypto - no bank account needed",
     p1: "Earnings can be paid out in BTC or USDC. Processed within 48 hours after approval. Minimum payout is $40.",
-    p2: "Alternatively, convert earnings instantly to platform credits. If you're using unbottled.ai yourself (for coding assistance, prototyping, testing), your referral earnings offset your own usage costs.",
+    p2: "Alternatively, convert earnings instantly to platform credits. If you're using {{appName}} yourself (for coding assistance, prototyping, testing), your referral earnings offset your own usage costs.",
   },
   close: {
     title: "Turn on the stream",

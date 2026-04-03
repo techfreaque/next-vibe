@@ -436,6 +436,55 @@ This user has **no account** - they browse as a guest identified by a browser ID
   },
 };
 
+/**
+ * Build a media capability line for a single modality.
+ *
+ * Four cases:
+ * 1. Chat model IS the gen model → native, no tool mention
+ * 2. Gen model set, chat model also has native output → both (prefer tool)
+ * 3. Gen model set, no native output → tool only
+ * 4. No gen model, native output → native only
+ */
+function buildMediaLine(opts: {
+  label: string;
+  toolAlias: string;
+  modality: string;
+  nativeOutputs: string[];
+  genModelName: string | null;
+  isSameAsChatModel: boolean;
+}): string | null {
+  const {
+    label,
+    toolAlias,
+    modality,
+    nativeOutputs,
+    genModelName,
+    isSameAsChatModel,
+  } = opts;
+  const hasNative = nativeOutputs.includes(modality);
+
+  if (isSameAsChatModel) {
+    // Case 1: chat model = gen model → native, tool is omitted from pinned
+    return `- ${label}: native (you output ${modality} directly — no tool needed)`;
+  }
+
+  if (genModelName) {
+    if (hasNative) {
+      // Case 2: different gen model + native capability → mention both, prefer tool
+      return `- ${label}: You can produce ${modality} natively, but the user prefers ${genModelName} via ${toolAlias} tool. Use the tool by default; use native output only if explicitly asked.`;
+    }
+    // Case 3: different gen model, no native → tool only
+    return `- ${label}: ${genModelName} available via ${toolAlias} tool`;
+  }
+
+  if (hasNative) {
+    // Case 4: no gen model configured, but model can do it natively
+    return `- ${label}: native (model outputs ${modality} directly without a separate tool)`;
+  }
+
+  return null;
+}
+
 export const mediaCapabilitiesFragment: SystemPromptFragment<PromptContextData> =
   {
     id: "media-capabilities",
@@ -447,45 +496,37 @@ export const mediaCapabilitiesFragment: SystemPromptFragment<PromptContextData> 
       if (!mc) {
         return null;
       }
-      const {
-        nativeOutputs,
-        imageGenModelName,
-        musicGenModelName,
-        videoGenModelName,
-      } = mc;
-      const lines: string[] = [];
 
-      if (nativeOutputs.includes("image")) {
-        lines.push(
-          `- Images: native (model outputs images directly without a separate tool)`,
-        );
-      } else {
-        lines.push(
-          `- Images: ${imageGenModelName} available via generate_image tool`,
-        );
-      }
+      const lines = [
+        buildMediaLine({
+          label: "Images",
+          toolAlias: "generate_image",
+          modality: "image",
+          nativeOutputs: mc.nativeOutputs,
+          genModelName: mc.imageGenModelName,
+          isSameAsChatModel: mc.imageGenIsSameAsChatModel,
+        }),
+        buildMediaLine({
+          label: "Music/audio",
+          toolAlias: "generate_music",
+          modality: "audio",
+          nativeOutputs: mc.nativeOutputs,
+          genModelName: mc.musicGenModelName,
+          isSameAsChatModel: mc.musicGenIsSameAsChatModel,
+        }),
+        buildMediaLine({
+          label: "Video",
+          toolAlias: "generate_video",
+          modality: "video",
+          nativeOutputs: mc.nativeOutputs,
+          genModelName: mc.videoGenModelName,
+          isSameAsChatModel: mc.videoGenIsSameAsChatModel,
+        }),
+      ].filter((line): line is string => line !== null);
 
-      if (nativeOutputs.includes("audio")) {
-        lines.push(
-          `- Music/audio: native (model outputs audio directly without a separate tool)`,
-        );
-      } else if (musicGenModelName) {
-        lines.push(
-          `- Music/audio: ${musicGenModelName} available via generate_music tool`,
-        );
+      if (lines.length === 0) {
+        return null;
       }
-      // If musicGenModelName is null: tool is removed from the active set, omit from prompt
-
-      if (nativeOutputs.includes("video")) {
-        lines.push(
-          `- Video: native (model outputs video directly without a separate tool)`,
-        );
-      } else if (videoGenModelName) {
-        lines.push(
-          `- Video: ${videoGenModelName} available via generate_video tool`,
-        );
-      }
-      // If videoGenModelName is null: tool is removed from the active set, omit from prompt
 
       return `## Media capabilities\n${lines.join("\n")}`;
     },

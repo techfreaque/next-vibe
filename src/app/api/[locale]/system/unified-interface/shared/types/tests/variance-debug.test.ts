@@ -10,14 +10,14 @@ import type {
 } from "../../../unified-ui/widgets/_shared/types";
 import type { EventSchemas } from "../../../websocket/types";
 import type { CreateApiEndpoint } from "../../endpoints/definition/create";
-import { objectFieldNew, requestField } from "../../field/utils-new";
+import { objectField, requestField } from "../../field/utils";
 import type { UnifiedField } from "../../widgets/configs";
 import type { CreateApiEndpointAny } from "../endpoint-base";
 import type { Methods } from "../enums";
 import { FieldDataType, WidgetType } from "../enums";
 
 // Simulate the exact structure from retry/stop endpoints
-const testEndpoint_field = objectFieldNew({
+const testEndpoint_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
@@ -27,7 +27,7 @@ const testEndpoint_field = objectFieldNew({
       label: "Job ID",
       schema: z.string().uuid(),
     }),
-    result: objectFieldNew({
+    result: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {

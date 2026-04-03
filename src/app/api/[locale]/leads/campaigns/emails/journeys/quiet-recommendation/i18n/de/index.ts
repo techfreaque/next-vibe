@@ -10,7 +10,7 @@ export const translations: typeof enTranslations = {
     whatItDoesDifferently:
       "Die Kurzversion: Es ist ein KI-Assistent, der Aufgaben nicht aus vagen Richtlinien heraus verweigert. Nützlich wenn du irgendetwas in Marketing, Recht, kreatives Schreiben, Forschung machst, oder wirklich alles, wo gängige KI-Tools der eigentlichen Arbeit im Weg stehen.",
     affiliateNote:
-      "Es gibt einen Affiliate-Link unten – ich verdiene eine kleine Provision wenn du dich anmeldest. Ich erwähne es, weil ich lieber direkt bin, als so zu tun, als wäre er nicht da.",
+      "Es gibt einen Affiliate-Link unten - ich verdiene eine kleine Provision wenn du dich anmeldest. Ich erwähne es, weil ich lieber direkt bin, als so zu tun, als wäre er nicht da.",
     ctaText: "Nachschauen",
     signature: " -  Sam",
   },
@@ -51,7 +51,7 @@ export const translations: typeof enTranslations = {
     previewText: "erwähnenswert falls du auf der Suche bist",
     greeting: "Hallo,",
     update:
-      "unbottled.ai hat kürzlich neue Modell-Optionen hinzugefügt. Wenn du es vorher angeschaut hast und die Ausgabequalität nicht da war, lohnt sich ein weiterer Versuch – die neueren Modelle sind einen Schritt besser. Affiliate-Link noch aktiv wenn du dich anmelden möchtest.",
+      "unbottled.ai hat kürzlich neue Modell-Optionen hinzugefügt. Wenn du es vorher angeschaut hast und die Ausgabequalität nicht da war, lohnt sich ein weiterer Versuch - die neueren Modelle sind einen Schritt besser. Affiliate-Link noch aktiv wenn du dich anmelden möchtest.",
     ctaText: "Neuigkeiten sehen",
     signature: " -  Sam",
   },
@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
     previewText: "kurze Notiz",
     greeting: "Hallo,",
     checkIn:
-      "Es ist eine Weile her. Kurz nachfragen – wenn du unbottled.ai mal ausprobiert hast, würde mich interessieren was du dachtest. Und wenn nicht, es ist noch da, noch verbessert, kostenlose Testversion noch verfügbar.",
+      "Es ist eine Weile her. Kurz nachfragen - wenn du unbottled.ai mal ausprobiert hast, würde mich interessieren was du dachtest. Und wenn nicht, es ist noch da, noch verbessert, kostenlose Testversion noch verfügbar.",
     whatChanged:
       "Sie haben bessere Langform-Unterstützung und schnellere Antwortzeiten hinzugefügt seit ich es zuerst erwähnte. Affiliate-Link unten.",
     ctaText: "Nachschauen",

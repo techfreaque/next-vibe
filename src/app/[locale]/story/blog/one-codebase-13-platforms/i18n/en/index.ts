@@ -31,7 +31,7 @@ export const translations = {
   intro: {
     hook: "5,802 TypeScript files. ~2.1 million lines. Zero `any`. Zero runtime type errors. One pattern. Repeated 374 times.",
     para1:
-      "That's the codebase behind unbottled.ai - and the framework that powers it, next-vibe. The same architecture runs a web app, a mobile app, a CLI, an AI agent interface, an MCP server, a cron system, a websocket event bus, and a live dataflow engine.",
+      "That's the codebase behind {{appName}} - and the framework that powers it, next-vibe. The same architecture runs a web app, a mobile app, a CLI, an AI agent interface, an MCP server, a cron system, a websocket event bus, and a live dataflow engine.",
     para2:
       "The pattern is called the Unified Surface. Here's what it is, how it works, and why - once you see it - you'll find it hard to go back.",
   },

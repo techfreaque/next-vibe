@@ -132,10 +132,10 @@ export const translations = {
     title: "Co tu jest inaczej?",
     newTitle: "Nowy w programach poleceń?",
     newBody:
-      "Wielopoziomowy oznacza: zarabiasz nie tylko na bezpośrednich poleceniach, ale też na poleceniach Twoich poleceń – pasywnie. I inaczej niż przy jednorazowej sprzedaży, subskrypcje AI odnawiają się co miesiąc. Zarabiasz co miesiąc, na zawsze.",
+      "Wielopoziomowy oznacza: zarabiasz nie tylko na bezpośrednich poleceniach, ale też na poleceniach Twoich poleceń - pasywnie. I inaczej niż przy jednorazowej sprzedaży, subskrypcje AI odnawiają się co miesiąc. Zarabiasz co miesiąc, na zawsze.",
     proTitle: "Już działasz w marketingu afiliacyjnym?",
     proBody:
-      "Potencjał tu jest większy niż w większości programów. Zwykły użytkownik wydaje ~8$/mies. Power user łatwo 100-200$+/mies. – jeden taki użytkownik przynosi więcej niż tuzin zwykłych poleceń. A gdy platforma rośnie, rośnie też ARPU – Twoje istniejące polecenia zarabiają więcej bez dodatkowej pracy.",
+      "Potencjał tu jest większy niż w większości programów. Zwykły użytkownik wydaje ~8$/mies. Power user łatwo 100-200$+/mies. - jeden taki użytkownik przynosi więcej niż tuzin zwykłych poleceń. A gdy platforma rośnie, rośnie też ARPU - Twoje istniejące polecenia zarabiają więcej bez dodatkowej pracy.",
   },
   discord: {
     title: "Dołącz do społeczności",

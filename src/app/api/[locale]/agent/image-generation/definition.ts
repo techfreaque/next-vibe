@@ -22,12 +22,12 @@ import {
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazy } from "react";
-import { IMAGE_GEN_MODEL_IDS } from "@/app/api/[locale]/agent/models/models";
 import {
-  IMAGE_QUALITY_VALUES,
-  IMAGE_SIZE_VALUES,
-  ImageModelOptions,
+  ImageGenModelId,
+  ImageGenModelIdOptions,
+} from "@/app/api/[locale]/agent/image-generation/models";
+import { lazy } from "react";
+import {
   ImageQuality,
   ImageQualityOptions,
   ImageSize,
@@ -71,7 +71,6 @@ const { POST } = createEndpoint({
 
   defaultExpanded: true,
   dynamicCredits: ({ response }) => response?.creditCost,
-  streamContextPatch: (ctx) => ({ model: ctx.imageGenModelId }),
 
   fields: customWidgetObject({
     render: ImageGenerationContainer,
@@ -93,9 +92,12 @@ const { POST } = createEndpoint({
         label: "post.model.label",
         description: "post.model.description",
         columns: 6,
-        options: ImageModelOptions,
-        schema: z.enum(IMAGE_GEN_MODEL_IDS).default(IMAGE_GEN_MODEL_IDS[0]),
+        options: ImageGenModelIdOptions,
+        schema: z
+          .enum(ImageGenModelId)
+          .default(ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW),
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
+        serverDefault: (ctx) => ctx.streamContext?.imageGenModelId,
       }),
       size: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -104,7 +106,7 @@ const { POST } = createEndpoint({
         description: "post.size.description",
         columns: 6,
         options: ImageSizeOptions,
-        schema: z.enum(IMAGE_SIZE_VALUES).default(ImageSize.SQUARE_1024),
+        schema: z.enum(ImageSize).default(ImageSize.SQUARE_1024),
       }),
       quality: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -113,7 +115,7 @@ const { POST } = createEndpoint({
         description: "post.quality.description",
         columns: 6,
         options: ImageQualityOptions,
-        schema: z.enum(IMAGE_QUALITY_VALUES).default(ImageQuality.STANDARD),
+        schema: z.enum(ImageQuality).default(ImageQuality.STANDARD),
       }),
       backButton: backButton(scopedTranslation, {
         label: "post.backButton.label" as const,
@@ -205,7 +207,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         prompt: "A photorealistic sunset over a mountain lake",
-        model: IMAGE_GEN_MODEL_IDS[0],
+        model: ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
         size: ImageSize.SQUARE_1024,
         quality: ImageQuality.STANDARD,
       },

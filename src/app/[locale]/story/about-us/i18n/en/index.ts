@@ -1,21 +1,21 @@
 export const translations = {
   meta: {
-    title: "About Us - unbottled.ai",
+    title: "About Us - {{appName}}",
     category: "About",
     description:
-      "Learn about unbottled.ai's mission to provide uncensored AI conversations",
-    imageAlt: "About unbottled.ai",
-    keywords: "about unbottled.ai, uncensored AI, AI mission, AI values",
-    ogTitle: "About unbottled.ai - Uncensored AI Platform",
+      "Learn about {{appName}}'s mission to provide uncensored AI conversations",
+    imageAlt: "About {{appName}}",
+    keywords: "about {{appName}}, uncensored AI, AI mission, AI values",
+    ogTitle: "About {{appName}} - Uncensored AI Platform",
     ogDescription:
       "Discover our mission to democratize access to uncensored AI",
-    twitterTitle: "About unbottled.ai",
+    twitterTitle: "About {{appName}}",
     twitterDescription:
       "Learn about our mission for uncensored AI conversations",
   },
   hero: {
     subtitle:
-      "{{modelCount}} models. {{skillCount}} skills. ~{{toolCount}} tools. SSH, email, browser automation, scheduled tasks. Run it free on unbottled.ai - or self-host your own.",
+      "{{modelCount}} models. {{skillCount}} skills. ~{{toolCount}} tools. SSH, email, browser automation, scheduled tasks. Run it free on {{appName}} - or self-host your own.",
   },
   backToHome: "Back to Home",
   title: "About {{appName}}",

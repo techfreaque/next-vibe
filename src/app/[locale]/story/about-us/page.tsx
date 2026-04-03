@@ -14,8 +14,8 @@ import { Separator } from "next-vibe-ui/ui/separator";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -37,22 +37,24 @@ export const generateMetadata = async ({
 }: Props): Promise<Metadata> => {
   const { locale } = await params;
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   return metadataGenerator(locale, {
     path: "about-us",
-    title: t("meta.title"),
+    title: t("meta.title", { appName }),
     category: t("meta.category"),
-    description: t("meta.description"),
+    description: t("meta.description", { appName }),
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Building_perspective.jpg/1920px-Building_perspective.jpg",
-    imageAlt: t("meta.imageAlt"),
-    keywords: [t("meta.keywords")],
+    imageAlt: t("meta.imageAlt", { appName }),
+    keywords: [t("meta.keywords", { appName })],
     additionalMetadata: {
       openGraph: {
-        title: t("meta.ogTitle"),
+        title: t("meta.ogTitle", { appName }),
         description: t("meta.ogDescription"),
       },
       twitter: {
-        title: t("meta.twitterTitle"),
+        title: t("meta.twitterTitle", { appName }),
         description: t("meta.twitterDescription"),
       },
     },
@@ -95,10 +97,7 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<AboutUsPageData> {
   const { locale } = await params;
-  const totalModelCount = getAvailableModelCount(
-    getAgentEnvAvailability(),
-    false,
-  );
+  const totalModelCount = getAvailableModelCount(agentEnvAvailability, false);
   return { locale, totalModelCount };
 }
 
@@ -249,6 +248,7 @@ export function TanstackPage({
               <P className="text-lg opacity-90">
                 {t("hero.subtitle", {
                   modelCount: totalModelCount,
+                  appName: appName,
                 })}
               </P>
             </Div>

@@ -8,32 +8,42 @@ import type { ChatFavorite } from "@/app/api/[locale]/agent/chat/favorites/db";
 import type { ChatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
 import type { Skill } from "@/app/api/[locale]/agent/chat/skills/config";
 import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
-  DEFAULT_IMAGE_GEN_MODEL_ID,
-  DEFAULT_TTS_VOICE_ID,
-  getModelById,
-  type ImageGenModelOption,
-  type ModelId,
-  type ModelOption,
-  type MusicGenModelOption,
+  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+} from "@/app/api/[locale]/agent/ai-stream/constants";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
+import {
+  getChatModelById,
+  type ChatModelId,
+  type ChatModelOption,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import { type ImageGenModelOption } from "@/app/api/[locale]/agent/image-generation/models";
+import { type MusicGenModelOption } from "@/app/api/[locale]/agent/music-generation/models";
+import { type SttModelOption } from "@/app/api/[locale]/agent/speech-to-text/models";
+import {
   type TtsModelId,
-  type VideoGenModelId,
-  type VideoGenModelOption,
-} from "@/app/api/[locale]/agent/models/models";
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
+  type TtsModelOption,
+} from "@/app/api/[locale]/agent/text-to-speech/models";
+import { type VideoGenModelOption } from "@/app/api/[locale]/agent/video-generation/models";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-
-// System defaults
-const DEFAULT_STT_MODEL_ID = "openai-whisper" as ModelId;
-const DEFAULT_VISION_BRIDGE_MODEL_ID = "claude-haiku-4.5" as ModelId;
 
 /** Fields read from skill config for bridge model resolution (skill still uses scalar IDs) */
 export type BridgeSkill = Pick<
   Skill,
   | "voiceId"
   | "sttModelId"
-  | "visionBridgeModelId"
+  | "imageVisionModelId"
+  | "videoVisionModelId"
+  | "audioVisionModelId"
   | "translationModelId"
   | "defaultChatMode"
   | "imageGenModelId"
@@ -46,7 +56,9 @@ export type BridgeFavorite = Pick<
   ChatFavorite,
   | "voiceModelSelection"
   | "sttModelSelection"
-  | "visionBridgeModelSelection"
+  | "imageVisionModelSelection"
+  | "videoVisionModelSelection"
+  | "audioVisionModelSelection"
   | "translationModelId"
   | "defaultChatMode"
   | "imageGenModelSelection"
@@ -59,7 +71,9 @@ export type BridgeSettings = Pick<
   ChatSettings,
   | "voiceModelSelection"
   | "sttModelSelection"
-  | "visionBridgeModelSelection"
+  | "imageVisionModelSelection"
+  | "videoVisionModelSelection"
+  | "audioVisionModelSelection"
   | "translationModelId"
   | "defaultChatMode"
   | "imageGenModelSelection"
@@ -76,7 +90,7 @@ export interface BridgeContext {
 export interface MessageVariant {
   modality: Modality;
   content: string; // text content or storage URL
-  modelId?: ModelId;
+  modelId?: ChatModelId;
   creditCost?: number;
   createdAt: string; // ISO timestamp
 }
@@ -97,35 +111,6 @@ export type VariantResolution =
   | { useVariant: MessageVariant }
   | { needsGeneration: true; type: BridgeType };
 
-/** Resolve a ModelSelectionSimple to a model ID for a given role set */
-function resolveSelection(
-  selections: (ModelSelectionSimple | null | undefined)[],
-  roles: ["image-gen"],
-  user: JwtPayloadType,
-): ImageGenModelOption | null;
-function resolveSelection(
-  selections: (ModelSelectionSimple | null | undefined)[],
-  roles: ["audio-gen"],
-  user: JwtPayloadType,
-): MusicGenModelOption | null;
-function resolveSelection(
-  selections: (ModelSelectionSimple | null | undefined)[],
-  roles: Parameters<typeof SkillsRepositoryClient.getBestModelByRole>[1],
-  user: JwtPayloadType,
-): ModelOption | null;
-function resolveSelection(
-  selections: (ModelSelectionSimple | null | undefined)[],
-  roles: Parameters<typeof SkillsRepositoryClient.getBestModelByRole>[1],
-  user: JwtPayloadType,
-): ModelOption | null {
-  for (const sel of selections) {
-    if (sel) {
-      return SkillsRepositoryClient.getBestModelByRole(sel, roles, user);
-    }
-  }
-  return null;
-}
-
 export class ModalityResolver {
   /**
    * Resolve STT model via cascade: userSettings → favorite → skill → system default
@@ -133,18 +118,46 @@ export class ModalityResolver {
   static resolveSttModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
-  ): ModelOption {
-    // Favorite/settings use ModelSelectionSimple; skill uses scalar sttModelId
-    const fromSelection = resolveSelection(
-      [ctx.userSettings?.sttModelSelection, ctx.favorite?.sttModelSelection],
-      ["stt"],
-      user,
-    );
-    if (fromSelection) {
-      return fromSelection;
+  ): SttModelOption {
+    const env = agentEnvAvailability;
+    const fromUserSettings = ctx.userSettings?.sttModelSelection
+      ? SkillsRepositoryClient.getBestSttModel(
+          ctx.userSettings.sttModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromUserSettings) {
+      return fromUserSettings;
     }
-    const skillModelId: ModelId = ctx.skill?.sttModelId ?? DEFAULT_STT_MODEL_ID;
-    return getModelById(skillModelId);
+    const fromFavorite = ctx.favorite?.sttModelSelection
+      ? SkillsRepositoryClient.getBestSttModel(
+          ctx.favorite.sttModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromFavorite) {
+      return fromFavorite;
+    }
+    if (ctx.skill?.sttModelId) {
+      const fromSkill = SkillsRepositoryClient.getBestSttModel(
+        {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ctx.skill.sttModelId,
+        },
+        user,
+        env,
+      );
+      if (fromSkill) {
+        return fromSkill;
+      }
+    }
+    return SkillsRepositoryClient.getBestSttModel(
+      DEFAULT_STT_MODEL_SELECTION,
+      user,
+      env,
+    )!;
   }
 
   /**
@@ -153,20 +166,46 @@ export class ModalityResolver {
   static resolveTtsModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
-  ): ModelOption {
-    const fromSelection = resolveSelection(
-      [
-        ctx.userSettings?.voiceModelSelection,
-        ctx.favorite?.voiceModelSelection,
-      ],
-      ["tts"],
-      user,
-    );
-    if (fromSelection) {
-      return fromSelection;
+  ): TtsModelOption {
+    const env = agentEnvAvailability;
+    const fromUserSettings = ctx.userSettings?.voiceModelSelection
+      ? SkillsRepositoryClient.getBestTtsModel(
+          ctx.userSettings.voiceModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromUserSettings) {
+      return fromUserSettings;
     }
-    const voiceId: TtsModelId = ctx.skill?.voiceId ?? DEFAULT_TTS_VOICE_ID;
-    return getModelById(voiceId);
+    const fromFavorite = ctx.favorite?.voiceModelSelection
+      ? SkillsRepositoryClient.getBestTtsModel(
+          ctx.favorite.voiceModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromFavorite) {
+      return fromFavorite;
+    }
+    if (ctx.skill?.voiceId) {
+      const fromSkill = SkillsRepositoryClient.getBestTtsModel(
+        {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ctx.skill.voiceId,
+        },
+        user,
+        env,
+      );
+      if (fromSkill) {
+        return fromSkill;
+      }
+    }
+    return SkillsRepositoryClient.getBestTtsModel(
+      DEFAULT_TTS_MODEL_SELECTION,
+      user,
+      env,
+    )!;
   }
 
   /**
@@ -176,40 +215,158 @@ export class ModalityResolver {
     ctx: BridgeContext,
     user: JwtPayloadType,
   ): TtsModelId {
-    return (
-      (this.resolveTtsModel(ctx, user).id as TtsModelId) ?? DEFAULT_TTS_VOICE_ID
-    );
+    return this.resolveTtsModel(ctx, user).id;
   }
 
   /**
-   * Resolve vision bridge model via cascade: userSettings → favorite → skill → null
+   * Resolve image vision model via cascade: userSettings → favorite → skill → system default.
    */
-  static resolveVisionBridgeModel(
+  static resolveImageVisionModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
-  ): ModelOption {
-    const fromSelection = resolveSelection(
-      [
-        ctx.userSettings?.visionBridgeModelSelection,
-        ctx.favorite?.visionBridgeModelSelection,
-      ],
-      ["llm"],
-      user,
-    );
-    if (fromSelection) {
-      return fromSelection;
+  ): ChatModelOption {
+    const env = agentEnvAvailability;
+    const fromUserSettings = ctx.userSettings?.imageVisionModelSelection
+      ? SkillsRepositoryClient.getBestImageVisionModel(
+          ctx.userSettings.imageVisionModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromUserSettings) {
+      return fromUserSettings;
     }
-    const modelId: ModelId =
-      ctx.skill?.visionBridgeModelId ?? DEFAULT_VISION_BRIDGE_MODEL_ID;
-    return getModelById(modelId);
+    const fromFavorite = ctx.favorite?.imageVisionModelSelection
+      ? SkillsRepositoryClient.getBestImageVisionModel(
+          ctx.favorite.imageVisionModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromFavorite) {
+      return fromFavorite;
+    }
+    if (ctx.skill?.imageVisionModelId) {
+      const fromSkill = SkillsRepositoryClient.getBestImageVisionModel(
+        {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ctx.skill.imageVisionModelId,
+        },
+        user,
+        env,
+      );
+      if (fromSkill) {
+        return fromSkill;
+      }
+    }
+    return SkillsRepositoryClient.getBestImageVisionModel(
+      DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+      user,
+      env,
+    )!;
+  }
+
+  /**
+   * Resolve video vision model via cascade: userSettings → favorite → skill → system default.
+   */
+  static resolveVideoVisionModel(
+    ctx: BridgeContext,
+    user: JwtPayloadType,
+  ): ChatModelOption {
+    const env = agentEnvAvailability;
+    const fromUserSettings = ctx.userSettings?.videoVisionModelSelection
+      ? SkillsRepositoryClient.getBestVideoVisionModel(
+          ctx.userSettings.videoVisionModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromUserSettings) {
+      return fromUserSettings;
+    }
+    const fromFavorite = ctx.favorite?.videoVisionModelSelection
+      ? SkillsRepositoryClient.getBestVideoVisionModel(
+          ctx.favorite.videoVisionModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromFavorite) {
+      return fromFavorite;
+    }
+    if (ctx.skill?.videoVisionModelId) {
+      const fromSkill = SkillsRepositoryClient.getBestVideoVisionModel(
+        {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ctx.skill.videoVisionModelId,
+        },
+        user,
+        env,
+      );
+      if (fromSkill) {
+        return fromSkill;
+      }
+    }
+    return SkillsRepositoryClient.getBestVideoVisionModel(
+      DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+      user,
+      env,
+    )!;
+  }
+
+  /**
+   * Resolve audio vision model via cascade: userSettings → favorite → skill → system default.
+   */
+  static resolveAudioVisionModel(
+    ctx: BridgeContext,
+    user: JwtPayloadType,
+  ): ChatModelOption {
+    const env = agentEnvAvailability;
+    const fromUserSettings = ctx.userSettings?.audioVisionModelSelection
+      ? SkillsRepositoryClient.getBestAudioVisionModel(
+          ctx.userSettings.audioVisionModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromUserSettings) {
+      return fromUserSettings;
+    }
+    const fromFavorite = ctx.favorite?.audioVisionModelSelection
+      ? SkillsRepositoryClient.getBestAudioVisionModel(
+          ctx.favorite.audioVisionModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromFavorite) {
+      return fromFavorite;
+    }
+    if (ctx.skill?.audioVisionModelId) {
+      const fromSkill = SkillsRepositoryClient.getBestAudioVisionModel(
+        {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ctx.skill.audioVisionModelId,
+        },
+        user,
+        env,
+      );
+      if (fromSkill) {
+        return fromSkill;
+      }
+    }
+    return SkillsRepositoryClient.getBestAudioVisionModel(
+      DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+      user,
+      env,
+    )!;
   }
 
   /**
    * Resolve translation model via cascade: userSettings → favorite → skill → null
    */
-  static resolveTranslationModel(ctx: BridgeContext): ModelOption | null {
-    // translationModelId is still a plain text ID (not ModelSelectionSimple)
-    const modelId: ModelId | undefined =
+  static resolveTranslationModel(ctx: BridgeContext): ChatModelOption | null {
+    const modelId: ChatModelId | undefined =
       ctx.userSettings?.translationModelId ??
       ctx.favorite?.translationModelId ??
       ctx.skill?.translationModelId ??
@@ -217,7 +374,7 @@ export class ModalityResolver {
     if (!modelId) {
       return null;
     }
-    return getModelById(modelId);
+    return getChatModelById(modelId);
   }
 
   /**
@@ -238,58 +395,148 @@ export class ModalityResolver {
   static resolveImageGenModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
-  ): ImageGenModelOption {
+  ): ImageGenModelOption | null {
+    const env = agentEnvAvailability;
     if (ctx.skill?.imageGenModelId) {
-      return getModelById(ctx.skill.imageGenModelId);
+      const fromSkill = SkillsRepositoryClient.getBestImageGenModel(
+        {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ctx.skill.imageGenModelId,
+        },
+        user,
+        env,
+      );
+      if (fromSkill) {
+        return fromSkill;
+      }
     }
-    const fromSelection = resolveSelection(
-      [
-        ctx.favorite?.imageGenModelSelection,
-        ctx.userSettings?.imageGenModelSelection,
-      ],
-      ["image-gen"],
+    const fromFavorite = ctx.favorite?.imageGenModelSelection
+      ? SkillsRepositoryClient.getBestImageGenModel(
+          ctx.favorite.imageGenModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromFavorite) {
+      return fromFavorite;
+    }
+    const fromUserSettings = ctx.userSettings?.imageGenModelSelection
+      ? SkillsRepositoryClient.getBestImageGenModel(
+          ctx.userSettings.imageGenModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromUserSettings) {
+      return fromUserSettings;
+    }
+    return SkillsRepositoryClient.getBestImageGenModel(
+      DEFAULT_IMAGE_GEN_MODEL_SELECTION,
       user,
+      env,
     );
-    if (fromSelection) {
-      return fromSelection;
-    }
-    return getModelById(DEFAULT_IMAGE_GEN_MODEL_ID);
   }
 
   /**
-   * Resolve music/audio generation model via cascade: skill → favorite → userSettings → null
+   * Resolve music generation model via cascade: skill → favorite → userSettings → system default
    */
   static resolveMusicGenModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
   ): MusicGenModelOption | null {
+    const env = agentEnvAvailability;
     if (ctx.skill?.musicGenModelId) {
-      return getModelById(ctx.skill.musicGenModelId);
+      const fromSkill = SkillsRepositoryClient.getBestMusicGenModel(
+        {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ctx.skill.musicGenModelId,
+        },
+        user,
+        env,
+      );
+      if (fromSkill) {
+        return fromSkill;
+      }
     }
-    const fromSelection = resolveSelection(
-      [
-        ctx.favorite?.musicGenModelSelection,
-        ctx.userSettings?.musicGenModelSelection,
-      ],
-      ["audio-gen"],
+    const fromFavorite = ctx.favorite?.musicGenModelSelection
+      ? SkillsRepositoryClient.getBestMusicGenModel(
+          ctx.favorite.musicGenModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromFavorite) {
+      return fromFavorite;
+    }
+    const fromUserSettings = ctx.userSettings?.musicGenModelSelection
+      ? SkillsRepositoryClient.getBestMusicGenModel(
+          ctx.userSettings.musicGenModelSelection,
+          user,
+          env,
+        )
+      : null;
+    if (fromUserSettings) {
+      return fromUserSettings;
+    }
+    return SkillsRepositoryClient.getBestMusicGenModel(
+      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
       user,
+      env,
     );
-    return fromSelection ?? null;
   }
 
   /**
-   * Resolve video generation model via cascade: skill → favorite → userSettings → null
+   * Resolve video generation model via cascade: skill → favorite → userSettings → system default
    */
-  static resolveVideoGenModel(ctx: BridgeContext): VideoGenModelOption | null {
-    const modelId: VideoGenModelId | undefined =
-      ctx.skill?.videoGenModelId ??
-      ctx.favorite?.videoGenModelId ??
-      ctx.userSettings?.videoGenModelId ??
-      undefined;
-    if (!modelId) {
-      return null;
+  static resolveVideoGenModel(
+    ctx: BridgeContext,
+    user: JwtPayloadType,
+  ): VideoGenModelOption | null {
+    const env = agentEnvAvailability;
+    if (ctx.skill?.videoGenModelId) {
+      const fromSkill = SkillsRepositoryClient.getBestVideoGenModel(
+        {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ctx.skill.videoGenModelId,
+        },
+        user,
+        env,
+      );
+      if (fromSkill) {
+        return fromSkill;
+      }
     }
-    return getModelById(modelId);
+    const fromFavorite = ctx.favorite?.videoGenModelId
+      ? SkillsRepositoryClient.getBestVideoGenModel(
+          {
+            selectionType: ModelSelectionType.MANUAL,
+            manualModelId: ctx.favorite.videoGenModelId,
+          },
+          user,
+          env,
+        )
+      : null;
+    if (fromFavorite) {
+      return fromFavorite;
+    }
+    const fromUserSettings = ctx.userSettings?.videoGenModelId
+      ? SkillsRepositoryClient.getBestVideoGenModel(
+          {
+            selectionType: ModelSelectionType.MANUAL,
+            manualModelId: ctx.userSettings.videoGenModelId,
+          },
+          user,
+          env,
+        )
+      : null;
+    if (fromUserSettings) {
+      return fromUserSettings;
+    }
+    return SkillsRepositoryClient.getBestVideoGenModel(
+      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
+      user,
+      env,
+    );
   }
 
   /**
@@ -307,7 +554,7 @@ export class ModalityResolver {
       return "audio";
     }
     if (lower.startsWith("application/pdf") || lower.startsWith("text/")) {
-      return "file";
+      return "text";
     }
     return null;
   }
@@ -317,48 +564,93 @@ export class ModalityResolver {
    */
   static needsBridge(
     attachment: MessageAttachment,
-    activeModel: ModelOption,
+    activeModel: ChatModelOption,
   ): boolean {
     const modality = ModalityResolver.getMimeTypeModality(attachment.mimeType);
     if (!modality) {
       return false;
     }
-    // If model natively handles this modality, no bridge needed
     return !activeModel.inputs.includes(modality);
   }
 
   /**
+   * Check if a media modality can be handled — either natively by the model
+   * or via a bridge model (vision/STT). Returns the unsupported modalities.
+   */
+  static getUnsupportedMediaModalities(
+    attachmentMimeTypes: string[],
+    activeModel: ChatModelOption,
+    ctx: BridgeContext,
+    user: JwtPayloadType,
+  ): { modality: Modality; reason: string }[] {
+    const unsupported: { modality: Modality; reason: string }[] = [];
+    const checked = new Set<Modality>();
+
+    for (const mimeType of attachmentMimeTypes) {
+      const modality = ModalityResolver.getMimeTypeModality(mimeType);
+      if (!modality || modality === "text" || checked.has(modality)) {
+        continue;
+      }
+      checked.add(modality);
+
+      if (activeModel.inputs.includes(modality)) {
+        continue; // model supports natively
+      }
+
+      // Check if bridge is available
+      if (modality === "image") {
+        const visionModel = ModalityResolver.resolveImageVisionModel(ctx, user);
+        if (!visionModel) {
+          unsupported.push({
+            modality,
+            reason:
+              "No image vision model is configured. Enable an OpenRouter API key or select a model that supports image input.",
+          });
+        }
+      } else if (modality === "video") {
+        const visionModel = ModalityResolver.resolveVideoVisionModel(ctx, user);
+        if (!visionModel) {
+          unsupported.push({
+            modality,
+            reason:
+              "No video vision model is configured. Enable an OpenRouter API key or select a model that supports video input.",
+          });
+        }
+      } else if (modality === "audio") {
+        const sttModel = ModalityResolver.resolveSttModel(ctx, user);
+        if (!sttModel) {
+          unsupported.push({
+            modality,
+            reason:
+              "No speech-to-text model is configured. Enable voice providers or select a model that supports audio input.",
+          });
+        }
+      }
+    }
+
+    return unsupported;
+  }
+
+  /**
    * Resolve how to pass an attachment to the active model.
-   * Returns one of:
-   *   { useFile: true }           - pass raw file, model handles natively
-   *   { useVariant: v }           - use existing cached text variant
-   *   { needsGeneration: true, type } - no variant yet, run bridge now
    */
   static resolveVariant(
     attachment: MessageAttachment,
-    activeModel: ModelOption,
+    activeModel: ChatModelOption,
     variants: MessageVariant[],
   ): VariantResolution {
     const modality = ModalityResolver.getMimeTypeModality(attachment.mimeType);
 
-    // If model natively handles this modality, pass file directly
     if (!modality || activeModel.inputs.includes(modality)) {
       return { useFile: true };
     }
 
-    // Look for an existing text variant
     const textVariant = variants.find((v) => v.modality === "text");
     if (textVariant) {
       return { useVariant: textVariant };
     }
 
-    // No variant - need to generate one
-    const bridgeType: BridgeType =
-      modality === "audio"
-        ? "stt"
-        : modality === "image" || modality === "video" || modality === "file"
-          ? "vision"
-          : "vision";
+    const bridgeType: BridgeType = modality === "audio" ? "stt" : "vision";
 
     return { needsGeneration: true, type: bridgeType };
   }

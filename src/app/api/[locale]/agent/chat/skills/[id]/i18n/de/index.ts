@@ -149,6 +149,21 @@ export const translations: typeof enTranslations = {
       title: "Erfolg",
       description: "Charakter erfolgreich abgerufen",
     },
+    share: {
+      button: "Teilen & Verdienen",
+      title: "Teile diesen Skill & verdiene",
+      description:
+        "Teile diesen Skill mit deinem Empfehlungslink. Verdiene 10% wiederkehrende Provision von jedem neuen Nutzer.",
+      selectCode: "Empfehlungscode waehlen:",
+      noCodesYet: "Noch keine Empfehlungscodes",
+      createCode: "Code erstellen",
+      codePlaceholder: "z.B. MEINCODE",
+      creating: "Erstelle...",
+      linkReady: "Dein Teilen-Link:",
+      copied: "Kopiert!",
+      copyLink: "Link kopieren",
+      close: "Schliessen",
+    },
   },
   patch: {
     title: "Charakter aktualisieren",
@@ -249,9 +264,19 @@ export const translations: typeof enTranslations = {
       description: "Modell für die Spracherkennung",
       placeholder: "Systemstandard",
     },
-    visionBridgeModel: {
-      label: "Vision-Modell",
-      description: "Modell für die Bildanalyse",
+    imageVisionModel: {
+      label: "Bild-Vision-Modell",
+      description: "Modell zur Bildanalyse",
+      placeholder: "Systemstandard",
+    },
+    videoVisionModel: {
+      label: "Video-Vision-Modell",
+      description: "Modell zur Videoanalyse",
+      placeholder: "Systemstandard",
+    },
+    audioVisionModel: {
+      label: "Audio-Vision-Modell",
+      description: "Modell zur Audioanalyse",
       placeholder: "Systemstandard",
     },
     translationModel: {

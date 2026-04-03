@@ -17,7 +17,7 @@ import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import { success } from "next-vibe/shared/types/response.schema";
-import { type JSX, useCallback, useState } from "react";
+import { useCallback, useState, type JSX } from "react";
 
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
@@ -32,14 +32,9 @@ import {
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
 import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import {
-  ModelId,
-  getDefaultModelForRole,
-} from "@/app/api/[locale]/agent/models/models";
 import type {
-  ModelSelectionSimple,
+  ChatModelSelection,
   VoiceModelSelection,
 } from "@/app/api/[locale]/agent/models/types";
 import { cn } from "@/app/api/[locale]/shared/utils";
@@ -50,6 +45,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { ChatModelId } from "../../../../models";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../../../../constants";
 
 export type UseCase =
   | "coding"
@@ -104,7 +101,7 @@ interface SeededEntry {
   id: string;
   skillId: string;
   variantId: string | null;
-  modelSelection: ModelSelectionSimple | null;
+  modelSelection: ChatModelSelection | null;
 }
 
 interface SeedResult {
@@ -117,7 +114,6 @@ async function seedFavorites(
   selected: Set<UseCase>,
   addFavorite: ReturnType<typeof useFavoriteCreate>["addFavorite"],
   userRoles: readonly (typeof UserPermissionRoleValue)[],
-  env: AgentEnvAvailability,
 ): Promise<SeedResult> {
   const companion = COMPANION_SKILLS.find((c) => c.id === companionId);
   if (!companion) {
@@ -131,10 +127,7 @@ async function seedFavorites(
   const variants = companion.variants ?? [];
   for (const variant of variants) {
     const resolvedModelSelection = variant.modelSelection
-      ? SkillsRepositoryClient.resolveModelSelectionForEnv(
-          variant.modelSelection,
-          env,
-        )
+      ? variant.modelSelection
       : null;
     const id = await addFavorite({
       skillId: companionId,
@@ -196,10 +189,7 @@ async function seedFavorites(
       if (skillVariants.length > 0) {
         for (const variant of skillVariants) {
           const resolvedModelSelection = variant.modelSelection
-            ? SkillsRepositoryClient.resolveModelSelectionForEnv(
-                variant.modelSelection,
-                env,
-              )
+            ? variant.modelSelection
             : null;
           const id = await addFavorite({
             skillId,
@@ -317,6 +307,7 @@ export function UsecasesStep({
             : null,
           locale,
           user,
+          envAvailability,
         );
       });
       apiClient.updateEndpointData(
@@ -337,7 +328,7 @@ export function UsecasesStep({
         },
       );
     },
-    [logger, locale, user],
+    [logger, locale, user, envAvailability],
   );
 
   const handleStart = useCallback(async () => {
@@ -348,7 +339,6 @@ export function UsecasesStep({
         selected,
         addFavorite,
         userRoles,
-        envAvailability,
       );
       applyOptimisticFavorites(entries, firstCompanionId);
       onDone();
@@ -356,15 +346,29 @@ export function UsecasesStep({
         if (firstCompanionId) {
           const defaultEntry = entries.find((e) => e.id === firstCompanionId);
           const sel = defaultEntry?.modelSelection;
-          const activeModelId =
+          const resolvedAnyId =
             sel?.selectionType === ModelSelectionType.MANUAL
               ? sel.manualModelId
               : sel
-                ? (SkillsRepositoryClient.getBestModelForSkill(sel, user)?.id ??
-                  getDefaultModelForRole(["llm"], envAvailability)?.id ??
-                  ModelId.KIMI_K2_5)
-                : (getDefaultModelForRole(["llm"], envAvailability)?.id ??
-                  ModelId.KIMI_K2_5);
+                ? (SkillsRepositoryClient.getBestModelForSkill(
+                    sel,
+                    user,
+                    envAvailability,
+                  )?.id ??
+                  SkillsRepositoryClient.getBestModelForSkill(
+                    DEFAULT_CHAT_MODEL_SELECTION,
+                    user,
+                    envAvailability,
+                  )?.id)
+                : SkillsRepositoryClient.getBestModelForSkill(
+                    DEFAULT_CHAT_MODEL_SELECTION,
+                    user,
+                    envAvailability,
+                  )?.id;
+          const activeModelId: ChatModelId =
+            (resolvedAnyId !== undefined
+              ? Object.values(ChatModelId).find((id) => id === resolvedAnyId)
+              : undefined) ?? ChatModelId.KIMI_K2_5;
           const companion = COMPANION_SKILLS.find((c) => c.id === companionId);
           // Use stored voiceModelSelection from settings, or convert scalar voiceId from skill config
           const voiceSel: VoiceModelSelection | null =

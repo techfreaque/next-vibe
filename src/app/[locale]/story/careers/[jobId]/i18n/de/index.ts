@@ -2,16 +2,16 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Karriere - unbottled.ai",
+    title: "Karriere - {{appName}}",
     category: "Karriere",
     description:
       "Werden Sie Teil unseres Teams und helfen Sie, die Zukunft der unzensierten KI zu gestalten",
-    imageAlt: "Karriere bei unbottled.ai",
-    keywords: "Karriere, Jobs, KI-Jobs, Remote-Arbeit, unbottled.ai Karriere",
-    ogTitle: "Karriere - unbottled.ai",
+    imageAlt: "Karriere bei {{appName}}",
+    keywords: "Karriere, Jobs, KI-Jobs, Remote-Arbeit, {{appName}} Karriere",
+    ogTitle: "Karriere - {{appName}}",
     ogDescription:
       "Werden Sie Teil unseres Teams und helfen Sie, die Zukunft der unzensierten KI zu gestalten",
-    twitterTitle: "Karriere - unbottled.ai",
+    twitterTitle: "Karriere - {{appName}}",
     twitterDescription:
       "Werden Sie Teil unseres Teams und helfen Sie, die Zukunft der unzensierten KI zu gestalten",
   },

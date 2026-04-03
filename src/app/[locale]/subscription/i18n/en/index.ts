@@ -85,6 +85,8 @@ export const translations = {
           cost: "{{count}} credits",
           showLegacy: "Show Legacy Models",
           hideLegacy: "Hide Legacy Models",
+          free: "Free",
+          approxCost: "~credits",
           legacyBadge: "Legacy",
           types: {
             text: "Chat",

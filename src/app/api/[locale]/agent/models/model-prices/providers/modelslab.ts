@@ -20,7 +20,10 @@
 import "server-only";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { ApiProvider, modelDefinitions } from "../../models";
+import { imageGenModelDefinitions } from "../../../image-generation/models";
+import { musicGenModelDefinitions } from "../../../music-generation/models";
+import { videoGenModelDefinitions } from "../../../video-generation/models";
+import { ApiProvider } from "../../models";
 import type { ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
 
@@ -120,7 +123,11 @@ export class ModelslabPriceFetcher extends PriceFetcher {
       };
     }
 
-    for (const def of Object.values(modelDefinitions)) {
+    for (const def of [
+      ...Object.values(imageGenModelDefinitions),
+      ...Object.values(videoGenModelDefinitions),
+      ...Object.values(musicGenModelDefinitions),
+    ]) {
       for (const providerConfig of def.providers) {
         if (providerConfig.apiProvider !== ApiProvider.MODELSLAB) {
           continue;

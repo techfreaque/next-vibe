@@ -30,6 +30,7 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { RecordingInputArea } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/recording-input-area";
 import { useVoiceRecording } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-voice-recording";
 import { WidgetChatInput } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-input";
@@ -39,12 +40,10 @@ import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import type { ChatBootValue } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import {
   useWidgetContext,
   useWidgetDisabled,
@@ -55,6 +54,8 @@ import {
   useWidgetOnSubmit,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import type definition from "./definition";
 import type { RunResponseOutput } from "./definition";
@@ -68,8 +69,6 @@ interface WidgetProps {
 const FAKE_BOOT_VALUE: ChatBootValue = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialCredits: null as any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  envAvailability: null as any,
   rootFolderPermissions: { canCreateThread: false, canCreateFolder: false },
   initialFoldersData: null,
   initialThreadsData: null,
@@ -504,8 +503,8 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
           <WidgetChatInput
             content={promptValue}
             onContentChange={handleContentChange}
-            modelId={ModelId.CLAUDE_CODE_SONNET}
-            skillId=""
+            modelId={ChatModelId.CLAUDE_CODE_SONNET}
+            skillId={NO_SKILL_ID}
             onModelChange={() => undefined}
             onSkillChange={() => undefined}
             locale={locale}

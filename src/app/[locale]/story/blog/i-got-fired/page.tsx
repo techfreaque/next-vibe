@@ -9,8 +9,8 @@ import { Layers } from "next-vibe-ui/ui/icons/Layers";
 import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Link } from "next-vibe-ui/ui/link";
+import { CodeBlock } from "next-vibe-ui/ui/markdown";
 import { Separator } from "next-vibe-ui/ui/separator";
-import { Pre } from "next-vibe-ui/ui/pre";
 import {
   BlockQuote,
   H1,
@@ -22,6 +22,7 @@ import {
 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { embedCodeHtml, embedCodeTs, federatedCode } from "./code-examples";
 import { VibeFrameDemo } from "./demo";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -61,24 +62,6 @@ export async function tanstackLoader({
 }: Props): Promise<FiredPageData> {
   const { locale } = await params;
   return { locale };
-}
-
-function CodeBlock({
-  children,
-  className,
-}: {
-  children: string;
-  className?: string;
-}): JSX.Element {
-  return (
-    <Div
-      className={`bg-gray-950 dark:bg-gray-900 rounded-xl p-6 overflow-x-auto border border-gray-800 ${className ?? ""}`}
-    >
-      <Pre className="text-green-400 font-mono text-sm leading-relaxed whitespace-pre">
-        {children}
-      </Pre>
-    </Div>
-  );
 }
 
 function DisplayModeCard({
@@ -142,14 +125,6 @@ export function TanstackPage({ locale }: FiredPageData): JSX.Element {
     t("displayModes.triggers.hover"),
     t("displayModes.triggers.viewport"),
   ];
-
-  const activeToolsCode = `activeTools: [
-  tool(CLAUDE_CODE_ALIAS),
-  tool(EXECUTE_TOOL_ALIAS),
-  tool(TOOL_HELP_ALIAS),
-  tool(MEMORY_LIST_ALIAS),
-  tool(BRAVE_SEARCH_ALIAS),
-],`;
 
   return (
     <Div className="min-h-screen bg-gray-950 text-gray-100">
@@ -339,6 +314,19 @@ export function TanstackPage({ locale }: FiredPageData): JSX.Element {
             {t("embed.description")}
           </P>
 
+          <Muted className="text-sm text-gray-500 mb-3 block">
+            {t("embed.codeCaption", { appName: "unbottled.ai" })}
+          </Muted>
+          <Div className="mb-4">
+            <CodeBlock language="typescript" code={embedCodeTs} />
+          </Div>
+          <Muted className="text-sm text-gray-500 mb-3 block">
+            {t("embed.orScriptTag")}
+          </Muted>
+          <Div className="mb-8">
+            <CodeBlock language="html" code={embedCodeHtml} />
+          </Div>
+
           <VibeFrameDemo locale={locale} />
 
           <Div className="mt-6 bg-purple-950/30 border border-purple-700/50 rounded-xl p-5">
@@ -379,9 +367,12 @@ export function TanstackPage({ locale }: FiredPageData): JSX.Element {
             {t("federated.description")}
           </P>
 
-          <Muted className="text-sm text-gray-500 text-center mb-8">
+          <Muted className="text-sm text-gray-500 mb-3 block">
             {t("federated.codeCaption")}
           </Muted>
+          <Div className="mb-8">
+            <CodeBlock language="typescript" code={federatedCode} />
+          </Div>
 
           <Div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
             <P className="text-gray-200 font-semibold text-lg text-center">
@@ -392,16 +383,35 @@ export function TanstackPage({ locale }: FiredPageData): JSX.Element {
 
         <Separator className="border-gray-800 my-16" />
 
-        {/* Skills Section */}
+        {/* Tool Discovery & Invocation */}
         <Div className="mb-20">
           <H2 className="text-3xl font-bold mb-4 text-white">
             {t("skills.title")}
           </H2>
-          <P className="text-gray-300 text-lg leading-relaxed mb-10">
+          <P className="text-gray-300 text-lg leading-relaxed mb-6">
             {t("skills.intro")}
           </P>
+          <P className="text-gray-300 text-lg leading-relaxed mb-6">
+            {t("skills.discovery")}
+          </P>
+          <P className="text-gray-300 text-lg leading-relaxed mb-10">
+            {t("skills.control")}
+          </P>
 
-          {/* User vs AI perspective */}
+          <Div className="bg-gray-900 border border-gray-700 rounded-xl p-6 mb-10 text-center">
+            <P className="text-2xl font-bold text-white">
+              {t("skills.keyLine")}
+            </P>
+          </Div>
+
+          {/* Skills as persona layer */}
+          <H3 className="text-xl font-semibold mb-4 text-gray-200">
+            {t("skills.skillsTitle")}
+          </H3>
+          <P className="text-gray-300 text-lg leading-relaxed mb-6">
+            {t("skills.skillsDescription")}
+          </P>
+
           <Div className="grid md:grid-cols-2 gap-6 mb-10">
             <Card className="bg-blue-950/30 border-blue-700/50">
               <CardHeader>
@@ -438,45 +448,6 @@ export function TanstackPage({ locale }: FiredPageData): JSX.Element {
                 </P>
               </CardContent>
             </Card>
-          </Div>
-
-          <Div className="bg-gray-900 border border-gray-700 rounded-xl p-6 mb-10 text-center">
-            <P className="text-2xl font-bold text-white">
-              {t("skills.keyLine")}
-            </P>
-          </Div>
-
-          {/* activeTools code reveal */}
-          <H3 className="text-xl font-semibold mb-4 text-gray-200">
-            {t("skills.activeToolsTitle")}
-          </H3>
-          <P className="text-gray-300 leading-relaxed mb-6">
-            {t("skills.activeToolsDescription")}
-          </P>
-          <Div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 mb-10">
-            <Div className="flex items-center gap-2 mb-4">
-              <Div className="w-3 h-3 rounded-full bg-red-500" />
-              <Div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <Div className="w-3 h-3 rounded-full bg-green-500" />
-              <Muted className="text-xs text-gray-500 ml-2 font-mono">
-                vibe-coder.ts
-              </Muted>
-            </Div>
-            <CodeBlock>{activeToolsCode}</CodeBlock>
-          </Div>
-
-          {/* Tools can live anywhere */}
-          <H3 className="text-xl font-semibold mb-4 text-gray-200">
-            {t("skills.composableTitle")}
-          </H3>
-          <P className="text-gray-300 text-lg leading-relaxed mb-8">
-            {t("skills.composableDescription")}
-          </P>
-
-          <Div className="bg-gray-900 border border-gray-700 rounded-xl p-8 text-center">
-            <P className="text-3xl font-bold text-purple-400">
-              {t("skills.bothAtOnce")}
-            </P>
           </Div>
         </Div>
 
@@ -568,20 +539,15 @@ export function TanstackPage({ locale }: FiredPageData): JSX.Element {
           <H3 className="text-xl font-semibold mb-4 text-gray-200">
             {t("close.github")}
           </H3>
-          <Div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 mb-12">
-            <Div className="flex items-center gap-2 mb-4">
-              <Div className="w-3 h-3 rounded-full bg-red-500" />
-              <Div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <Div className="w-3 h-3 rounded-full bg-green-500" />
-              <Muted className="text-xs text-gray-500 ml-2 font-mono">
-                terminal
-              </Muted>
-            </Div>
-            <CodeBlock>{`${t("close.githubCode")}
+          <Div className="mb-12">
+            <CodeBlock
+              language="bash"
+              code={`${t("close.githubCode")}
 cd next-vibe
 cp .env.example .env
 bun install
-vibe dev`}</CodeBlock>
+vibe dev`}
+            />
           </Div>
 
           {/* Final line */}

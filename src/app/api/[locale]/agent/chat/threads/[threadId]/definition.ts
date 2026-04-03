@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -348,7 +348,7 @@ const { PATCH } = createEndpoint({
         label: "patch.defaultModel.label" as const,
         description: "patch.defaultModel.description" as const,
         columns: 6,
-        schema: z.enum(ModelId).nullable().optional(),
+        schema: z.enum(ChatModelId).nullable().optional(),
       }),
       defaultSkill: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

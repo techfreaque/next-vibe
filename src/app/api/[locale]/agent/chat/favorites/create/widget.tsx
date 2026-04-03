@@ -7,6 +7,8 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { Input } from "next-vibe-ui/ui/input";
+import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";
 import { useMemo, useState } from "react";
 
@@ -14,16 +16,37 @@ import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import {
-  getDefaultModelForRole,
-  type ModelId,
-} from "@/app/api/[locale]/agent/models/models";
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
+  DEFAULT_CHAT_MODEL_SELECTION,
+  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+} from "@/app/api/[locale]/agent/ai-stream/constants";
+import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
+import type {
+  ChatModelSelection,
+  ImageGenModelSelection,
+  MusicGenModelSelection,
+  SttModelSelection,
+  VideoGenModelSelection,
+  ImageVisionModelSelection,
+  VideoVisionModelSelection,
+  AudioVisionModelSelection,
+  VoiceModelSelection,
+} from "@/app/api/[locale]/agent/models/types";
 import {
+  chatManualModelSelectionSchema,
+  chatModelSelectionSchema,
   imageGenModelSelectionSchema,
   musicGenModelSelectionSchema,
   sttModelSelectionSchema,
   videoGenModelSelectionSchema,
-  visionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+  audioVisionModelSelectionSchema,
   voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/models/types";
 import {
@@ -45,11 +68,14 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
-import { ModelSelectionType } from "../../skills/enum";
-import { useSkill } from "../../skills/[id]/hooks";
 import { useChatSettings } from "../../settings/hooks";
+import { useSkill } from "../../skills/[id]/hooks";
+import { DEFAULT_SKILLS } from "../../skills/config";
+import { ModelSelectionType } from "../../skills/enum";
+import { scopedTranslation as skillsScopedTranslation } from "../../skills/i18n";
 import type definition from "./definition";
 import type { FavoriteCreateResponseOutput } from "./definition";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 /**
  * Props for custom widget
@@ -81,7 +107,9 @@ export function FavoriteCreateContainer({
     | "musicGen"
     | "videoGen"
     | "stt"
-    | "visionBridge"
+    | "imageVision"
+    | "videoVision"
+    | "audioVision"
     | null
   >(null);
 
@@ -89,59 +117,161 @@ export function FavoriteCreateContainer({
   const envAvailability = useEnvAvailability();
 
   // Platform-level default model selections (env-aware)
-  const platformTtsDefault = useMemo((): ModelSelectionSimple | undefined => {
-    const m = getDefaultModelForRole(["tts"], envAvailability);
+  const platformChatDefault = useMemo((): ChatModelSelection | undefined => {
+    const m = SkillsRepositoryClient.getBestModelForSkill(
+      DEFAULT_CHAT_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const parsed = chatModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
+
+  const platformTtsDefault = useMemo((): VoiceModelSelection | undefined => {
+    const m = SkillsRepositoryClient.getBestTtsModel(
+      DEFAULT_TTS_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const parsed = voiceModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
 
   const platformImageGenDefault = useMemo(():
-    | ModelSelectionSimple
+    | ImageGenModelSelection
     | undefined => {
-    const m = getDefaultModelForRole(["image-gen"], envAvailability);
+    const m = SkillsRepositoryClient.getBestImageGenModel(
+      DEFAULT_IMAGE_GEN_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const parsed = imageGenModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
 
   const platformMusicGenDefault = useMemo(():
-    | ModelSelectionSimple
+    | MusicGenModelSelection
     | undefined => {
-    const m = getDefaultModelForRole(["audio-gen"], envAvailability);
+    const m = SkillsRepositoryClient.getBestMusicGenModel(
+      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const parsed = musicGenModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
 
   const platformVideoGenDefault = useMemo(():
-    | ModelSelectionSimple
+    | VideoGenModelSelection
     | undefined => {
-    const m = getDefaultModelForRole(["video-gen"], envAvailability);
+    const m = SkillsRepositoryClient.getBestVideoGenModel(
+      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const parsed = videoGenModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
 
-  const platformSttDefault = useMemo((): ModelSelectionSimple | undefined => {
-    const m = getDefaultModelForRole(["stt"], envAvailability);
+  const platformSttDefault = useMemo((): SttModelSelection | undefined => {
+    const m = SkillsRepositoryClient.getBestSttModel(
+      DEFAULT_STT_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const parsed = sttModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
 
-  const platformLlmDefault = useMemo((): ModelSelectionSimple | undefined => {
-    const m = getDefaultModelForRole(["llm"], envAvailability, ["image"]);
+  const platformImageVisionDefault = useMemo(():
+    | ImageVisionModelSelection
+    | undefined => {
+    const m = SkillsRepositoryClient.getBestImageVisionModel(
+      DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const parsed = imageVisionModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
+
+  const platformVideoVisionDefault = useMemo(():
+    | VideoVisionModelSelection
+    | undefined => {
+    const m = SkillsRepositoryClient.getBestVideoVisionModel(
+      DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const parsed = videoVisionModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
+
+  const platformAudioVisionDefault = useMemo(():
+    | AudioVisionModelSelection
+    | undefined => {
+    const m = SkillsRepositoryClient.getBestAudioVisionModel(
+      DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const parsed = audioVisionModelSelectionSchema.safeParse({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: m.id,
+    });
+    return parsed.success ? parsed.data : undefined;
+  }, [user, envAvailability]);
 
   const skillId = form.watch("skillId");
   const voiceModelSelection = form.watch("voiceModelSelection");
@@ -149,10 +279,12 @@ export function FavoriteCreateContainer({
   const musicGenModelSelection = form.watch("musicGenModelSelection");
   const videoGenModelSelection = form.watch("videoGenModelSelection");
   const sttModelSelection = form.watch("sttModelSelection");
-  const visionBridgeModelSelection = form.watch("visionBridgeModelSelection");
+  const imageVisionModelSelection = form.watch("imageVisionModelSelection");
+  const videoVisionModelSelection = form.watch("videoVisionModelSelection");
+  const audioVisionModelSelection = form.watch("audioVisionModelSelection");
   const isNoSkill = skillId === NO_SKILL_ID;
 
-  const favoriteModelSelection: ModelSelectionSimple | undefined =
+  const favoriteModelSelection: ChatModelSelection | undefined =
     form.watch("modelSelection") ?? undefined;
   const variantId = form.watch("variantId");
 
@@ -176,15 +308,20 @@ export function FavoriteCreateContainer({
       const modelSelection =
         favoriteModelSelection ?? characterModelSelection ?? null;
 
-      let selectedModel: ModelId | undefined = undefined;
+      let selectedModel: ChatModelId | undefined = undefined;
 
       if (modelSelection) {
         // Resolve model selection to actual ModelId
         const bestModel = SkillsRepositoryClient.getBestModelForSkill(
           modelSelection,
           user,
+          envAvailability,
         );
-        selectedModel = bestModel?.id;
+        const parsed = chatManualModelSelectionSchema.safeParse({
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: bestModel?.id,
+        });
+        selectedModel = parsed.success ? parsed.data.manualModelId : undefined;
       }
 
       // Apply settings without creating a favorite (activeFavoriteId = null)
@@ -250,21 +387,26 @@ export function FavoriteCreateContainer({
           <ModelSelector
             modelSelection={favoriteModelSelection}
             onChange={(sel) => {
-              form.setValue("modelSelection", sel);
+              const parsed = chatModelSelectionSchema.nullable().safeParse(sel);
+              form.setValue(
+                "modelSelection",
+                parsed.success ? parsed.data : null,
+              );
             }}
             onSelect={(confirmed) => {
+              const parsed = chatModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
               const charSel = isNoSkill ? undefined : characterModelSelection;
               const isMatchingSkill =
-                confirmed !== null &&
-                confirmed.selectionType === ModelSelectionType.MANUAL &&
+                value !== null &&
+                value.selectionType === ModelSelectionType.MANUAL &&
                 charSel !== null &&
                 charSel !== undefined &&
                 charSel.selectionType === ModelSelectionType.MANUAL &&
-                charSel.manualModelId === confirmed.manualModelId;
-              form.setValue(
-                "modelSelection",
-                isMatchingSkill ? null : confirmed,
-              );
+                charSel.manualModelId === value.manualModelId;
+              form.setValue("modelSelection", isMatchingSkill ? null : value);
               setActiveSelector(null);
             }}
             characterModelSelection={
@@ -437,36 +579,113 @@ export function FavoriteCreateContainer({
             locale={locale}
             user={user}
           />
-        ) : activeSelector === "visionBridge" && form ? (
+        ) : activeSelector === "imageVision" && form ? (
           <ModelSelector
-            allowedRoles={["llm"]}
-            requiredInputs={["image"]}
-            modelSelection={visionBridgeModelSelection ?? undefined}
+            allowedRoles={["image-vision"]}
+            modelSelection={imageVisionModelSelection ?? undefined}
             characterModelSelection={
-              characterData?.visionBridgeModelSelection ?? platformLlmDefault
+              characterData?.imageVisionModelSelection ??
+              platformImageVisionDefault
             }
             onChange={(sel) => {
-              const parsed = visionModelSelectionSchema
+              const parsed = imageVisionModelSelectionSchema
                 .nullable()
                 .safeParse(sel);
               form.setValue(
-                "visionBridgeModelSelection",
+                "imageVisionModelSelection",
                 parsed.success ? parsed.data : null,
               );
             }}
             onSelect={(confirmed) => {
-              const parsed = visionModelSelectionSchema
+              const parsed = imageVisionModelSelectionSchema
                 .nullable()
                 .safeParse(confirmed);
               const value = parsed.success ? parsed.data : null;
               const isDefault =
                 value !== null &&
                 "manualModelId" in value &&
-                platformLlmDefault !== undefined &&
-                "manualModelId" in platformLlmDefault &&
-                platformLlmDefault.manualModelId === value.manualModelId;
+                platformImageVisionDefault !== undefined &&
+                "manualModelId" in platformImageVisionDefault &&
+                platformImageVisionDefault.manualModelId ===
+                  value.manualModelId;
               form.setValue(
-                "visionBridgeModelSelection",
+                "imageVisionModelSelection",
+                isDefault ? null : value,
+              );
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : activeSelector === "videoVision" && form ? (
+          <ModelSelector
+            allowedRoles={["video-vision"]}
+            modelSelection={videoVisionModelSelection ?? undefined}
+            characterModelSelection={
+              characterData?.videoVisionModelSelection ??
+              platformVideoVisionDefault
+            }
+            onChange={(sel) => {
+              const parsed = videoVisionModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "videoVisionModelSelection",
+                parsed.success ? parsed.data : null,
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = videoVisionModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformVideoVisionDefault !== undefined &&
+                "manualModelId" in platformVideoVisionDefault &&
+                platformVideoVisionDefault.manualModelId ===
+                  value.manualModelId;
+              form.setValue(
+                "videoVisionModelSelection",
+                isDefault ? null : value,
+              );
+              setActiveSelector(null);
+            }}
+            locale={locale}
+            user={user}
+          />
+        ) : activeSelector === "audioVision" && form ? (
+          <ModelSelector
+            allowedRoles={["audio-vision"]}
+            modelSelection={audioVisionModelSelection ?? undefined}
+            characterModelSelection={
+              characterData?.audioVisionModelSelection ??
+              platformAudioVisionDefault
+            }
+            onChange={(sel) => {
+              const parsed = audioVisionModelSelectionSchema
+                .nullable()
+                .safeParse(sel);
+              form.setValue(
+                "audioVisionModelSelection",
+                parsed.success ? parsed.data : null,
+              );
+            }}
+            onSelect={(confirmed) => {
+              const parsed = audioVisionModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              const value = parsed.success ? parsed.data : null;
+              const isDefault =
+                value !== null &&
+                "manualModelId" in value &&
+                platformAudioVisionDefault !== undefined &&
+                "manualModelId" in platformAudioVisionDefault &&
+                platformAudioVisionDefault.manualModelId ===
+                  value.manualModelId;
+              form.setValue(
+                "audioVisionModelSelection",
                 isDefault ? null : value,
               );
               setActiveSelector(null);
@@ -510,6 +729,46 @@ export function FavoriteCreateContainer({
                 </Div>
               )}
 
+              {/* Variant Name */}
+              {!isNoSkill && form && (
+                <Div className="flex flex-col gap-1">
+                  <Label className="text-xs font-medium text-muted-foreground">
+                    {t("post.customVariantName.label")}
+                  </Label>
+                  <Input
+                    value={form.watch("customVariantName") ?? ""}
+                    onChange={(e) =>
+                      form.setValue(
+                        "customVariantName",
+                        e.target.value || null,
+                        {
+                          shouldDirty: true,
+                        },
+                      )
+                    }
+                    placeholder={
+                      variantId
+                        ? (() => {
+                            const skill = DEFAULT_SKILLS.find(
+                              (s) => s.id === skillId,
+                            );
+                            const variant = skill?.variants?.find(
+                              (v) => v.id === variantId,
+                            );
+                            if (variant) {
+                              return skillsScopedTranslation
+                                .scopedT(locale)
+                                .t(variant.variantName);
+                            }
+                            return "";
+                          })()
+                        : ""
+                    }
+                    className="h-8 text-sm"
+                  />
+                </Div>
+              )}
+
               {/* Chat Model Selector */}
               {form && (
                 <Div className="flex flex-col gap-1">
@@ -521,6 +780,7 @@ export function FavoriteCreateContainer({
                     characterModelSelection={
                       isNoSkill ? undefined : characterModelSelection
                     }
+                    defaultModelSelection={platformChatDefault}
                     placeholder={t("post.chatModel.placeholder")}
                     onClick={() => setActiveSelector("chat")}
                     locale={locale}
@@ -637,23 +897,66 @@ export function FavoriteCreateContainer({
                 </Div>
               )}
 
-              {/* Vision Bridge Model Selector */}
+              {/* Image Vision Model Selector */}
               {form && (
                 <Div className="flex flex-col gap-1">
                   <Span className="text-xs font-medium text-muted-foreground">
-                    {t("post.visionBridgeModel.label")}
+                    {t("post.imageVisionModel.label")}
                   </Span>
                   <ModelSelectorTrigger
-                    modelSelection={visionBridgeModelSelection ?? null}
+                    modelSelection={imageVisionModelSelection ?? null}
                     characterModelSelection={
-                      characterData?.visionBridgeModelSelection ??
-                      platformLlmDefault
+                      characterData?.imageVisionModelSelection ??
+                      platformImageVisionDefault
                     }
-                    allowedRoles={["llm"]}
-                    requiredInputs={["image"]}
-                    defaultModelSelection={platformLlmDefault}
-                    placeholder={t("post.visionBridgeModel.placeholder")}
-                    onClick={() => setActiveSelector("visionBridge")}
+                    allowedRoles={["image-vision"]}
+                    defaultModelSelection={platformImageVisionDefault}
+                    placeholder={t("post.imageVisionModel.placeholder")}
+                    onClick={() => setActiveSelector("imageVision")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Video Vision Model Selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("post.videoVisionModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={videoVisionModelSelection ?? null}
+                    characterModelSelection={
+                      characterData?.videoVisionModelSelection ??
+                      platformVideoVisionDefault
+                    }
+                    allowedRoles={["video-vision"]}
+                    defaultModelSelection={platformVideoVisionDefault}
+                    placeholder={t("post.videoVisionModel.placeholder")}
+                    onClick={() => setActiveSelector("videoVision")}
+                    locale={locale}
+                    user={user}
+                  />
+                </Div>
+              )}
+
+              {/* Audio Vision Model Selector */}
+              {form && (
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs font-medium text-muted-foreground">
+                    {t("post.audioVisionModel.label")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={audioVisionModelSelection ?? null}
+                    characterModelSelection={
+                      characterData?.audioVisionModelSelection ??
+                      platformAudioVisionDefault
+                    }
+                    allowedRoles={["audio-vision"]}
+                    defaultModelSelection={platformAudioVisionDefault}
+                    placeholder={t("post.audioVisionModel.placeholder")}
+                    onClick={() => setActiveSelector("audioVision")}
                     locale={locale}
                     user={user}
                   />

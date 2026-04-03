@@ -12,7 +12,6 @@
 import type { JSX, ReactNode } from "react";
 import { createContext, useContext, useMemo } from "react";
 
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 
 import type { DefaultFolderId } from "../config";
@@ -38,7 +37,6 @@ export interface RootFolderPermissions {
  */
 export interface ChatBootValue {
   initialCredits: CreditsGetResponseOutput;
-  envAvailability: AgentEnvAvailability;
   rootFolderPermissions: RootFolderPermissions;
   /** Initial folders data fetched server-side - used as initialData for the sidebar */
   initialFoldersData: FolderListResponseOutput | null;
@@ -85,7 +83,6 @@ interface ChatBootProviderProps {
   currentSubFolderId: string | null;
   initialCredits: CreditsGetResponseOutput;
   rootFolderPermissions: RootFolderPermissions;
-  envAvailability: AgentEnvAvailability;
   /** Initial data fetched server-side to avoid client-side refetch on mount */
   initialFoldersData: FolderListResponseOutput | null;
   initialThreadsData: ThreadListResponseOutput | null;
@@ -109,7 +106,6 @@ export function ChatBootProvider({
   currentRootFolderId,
   initialCredits,
   rootFolderPermissions,
-  envAvailability,
   initialFoldersData = null,
   initialThreadsData = null,
   initialMessagesData = null,
@@ -124,7 +120,6 @@ export function ChatBootProvider({
   const value = useMemo(
     (): ChatBootValue => ({
       initialCredits,
-      envAvailability,
       rootFolderPermissions,
       initialFoldersData,
       initialThreadsData,
@@ -141,7 +136,6 @@ export function ChatBootProvider({
     }),
     [
       initialCredits,
-      envAvailability,
       rootFolderPermissions,
       initialFoldersData,
       initialThreadsData,

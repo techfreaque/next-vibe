@@ -229,6 +229,12 @@ export const translations: typeof enTranslations = {
     fr: "Francuski",
     it: "Włoski",
   },
+  models: {
+    descriptions: {
+      openaiWhisper: "OpenAI Whisper",
+      deepgramNova2: "Deepgram Nova-2",
+    },
+  },
 };
 
 export default translations;

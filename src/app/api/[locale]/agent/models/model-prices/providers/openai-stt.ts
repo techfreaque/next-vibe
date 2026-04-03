@@ -1,113 +1,66 @@
 /**
  * OpenAI STT price fetcher.
  *
- * Scrapes pricing from https://platform.openai.com/docs/pricing
+ * Uses Playwright headless browser to scrape pricing from
+ * https://developers.openai.com/api/docs/pricing
+ * (the page is JS-rendered by Astro and plain fetch returns no pricing data).
  *
- * Current pricing (as of 2025):
- *   whisper-1:             $0.006 per minute → $0.0001/sec
- *   gpt-4o-transcribe:     $0.006 per minute
- *   gpt-4o-mini-transcribe: $0.003 per minute
+ * After clicking "All models" buttons to expand all sections, extracts:
+ *   Whisper (whisper-1):              $0.006 / minute
+ *   gpt-4o-transcribe:               $0.006 / minute
+ *   gpt-4o-mini-transcribe:          $0.003 / minute
  */
 
 import "server-only";
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { ApiProvider, modelDefinitions } from "../../models";
+import { sttModelDefinitions } from "../../../speech-to-text/models";
+import { ApiProvider } from "../../models";
 import type { ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
+import { scrapeWithBrowser } from "./browser-scraper";
 
-const PRICING_URL = "https://platform.openai.com/docs/pricing";
+const PRICING_URL = "https://developers.openai.com/api/docs/pricing";
 
-/** USD per second = USD per minute / 60 */
-const KNOWN_FALLBACK_USD_PER_SECOND: Record<string, number> = {
-  "whisper-1": 0.006 / 60,
-  "gpt-4o-transcribe": 0.006 / 60,
-  "gpt-4o-mini-transcribe": 0.003 / 60,
+/** Map page label → providerModel id */
+const LABEL_TO_MODEL: Record<string, string> = {
+  whisper: "whisper-1",
+  "gpt-4o-transcribe": "gpt-4o-transcribe",
+  "gpt-4o-mini-transcribe": "gpt-4o-mini-transcribe",
+  "gpt-4o-transcribe-diarize": "gpt-4o-transcribe",
 };
 
-const MODEL_LABEL_PATTERNS: Record<string, RegExp> = {
-  "whisper-1": /whisper/i,
-  "gpt-4o-transcribe": /gpt-4o-transcribe(?!.*mini)/i,
-  "gpt-4o-mini-transcribe": /gpt-4o-mini-transcribe/i,
-};
-
-async function scrapePricing(
+/**
+ * Parse STT pricing from the full page text (line-by-line).
+ *
+ * The expanded pricing page renders lines like:
+ *   "Whisper\tTranscription\t-\t-\t$0.006 / minute"
+ *   "gpt-4o-transcribe\tTranscription\t$2.50\t$10.00\t$0.006 / minute"
+ */
+function parseSttPricing(
+  pageText: string,
   logger: EndpointLogger,
-): Promise<Map<string, number>> {
+): Map<string, number> {
   const priceMap = new Map<string, number>();
 
-  try {
-    const response = await fetch(PRICING_URL, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      },
-    });
-
-    if (response.ok) {
-      const html = await response.text();
-
-      for (const [modelId, labelRegex] of Object.entries(
-        MODEL_LABEL_PATTERNS,
-      )) {
-        // Match: model name ... $X.XXX/min or per minute
-        const match = html.match(
-          new RegExp(
-            `${labelRegex.source}[\\s\\S]{0,500}?\\$(\\d+\\.\\d+)\\s*(?:\\/|per)\\s*(?:min(?:ute)?)`,
-            "i",
-          ),
-        );
-        if (match) {
-          const usdPerMin = parseFloat(match[1]);
-          if (!isNaN(usdPerMin) && usdPerMin > 0) {
-            priceMap.set(modelId, usdPerMin / 60);
-            logger.debug("OpenAI STT: scraped price", { modelId, usdPerMin });
-            continue;
-          }
-        }
-        // Reverse: price before model name
-        const matchReverse = html.match(
-          new RegExp(
-            `\\$(\\d+\\.\\d+)\\s*(?:\\/|per)\\s*(?:min(?:ute)?)[\\s\\S]{0,500}?${labelRegex.source}`,
-            "i",
-          ),
-        );
-        if (matchReverse) {
-          const usdPerMin = parseFloat(matchReverse[1]);
-          if (!isNaN(usdPerMin) && usdPerMin > 0) {
-            priceMap.set(modelId, usdPerMin / 60);
-            logger.debug("OpenAI STT: scraped price (reverse)", {
-              modelId,
-              usdPerMin,
-            });
-          }
+  for (const line of pageText.split("\n")) {
+    // Match: line starting with a model label (up to first tab), containing $X.XXX / minute
+    const match = line.match(/^([^\t]+)\t.*\$(\d+(?:\.\d+)?)\s*\/\s*minute/i);
+    if (match) {
+      const label = match[1].toLowerCase().trim();
+      const modelId = LABEL_TO_MODEL[label];
+      if (modelId && !priceMap.has(modelId)) {
+        const usdPerMin = parseFloat(match[2]);
+        if (!isNaN(usdPerMin) && usdPerMin > 0) {
+          const usdPerSec = usdPerMin / 60;
+          priceMap.set(modelId, usdPerSec);
+          logger.debug("OpenAI STT: parsed price", {
+            label,
+            modelId,
+            usdPerMin,
+          });
         }
       }
-    } else {
-      logger.debug("OpenAI pricing page returned non-OK", {
-        status: response.status,
-      });
-    }
-  } catch (err) {
-    logger.debug("OpenAI STT pricing scrape failed", {
-      error: parseError(err).message,
-    });
-  }
-
-  // Fill fallbacks for any model not scraped
-  for (const [modelId, usdPerSec] of Object.entries(
-    KNOWN_FALLBACK_USD_PER_SECOND,
-  )) {
-    if (!priceMap.has(modelId)) {
-      priceMap.set(modelId, usdPerSec);
-      logger.debug("OpenAI STT: using known fallback price", {
-        modelId,
-        usdPerSec,
-      });
     }
   }
 
@@ -121,9 +74,15 @@ export class OpenAiSttPriceFetcher extends PriceFetcher {
     const updates: ProviderPriceResult["updates"] = [];
     const failures: ProviderPriceResult["failures"] = [];
 
-    const priceMap = await scrapePricing(logger);
+    const pageText = await scrapeWithBrowser(logger, {
+      url: PRICING_URL,
+      clickButtonTexts: ["All models"],
+      waitForText: "whisper",
+    });
 
-    for (const def of Object.values(modelDefinitions)) {
+    const priceMap = pageText ? parseSttPricing(pageText, logger) : new Map();
+
+    for (const def of Object.values(sttModelDefinitions)) {
       for (const providerConfig of def.providers) {
         if (
           providerConfig.apiProvider !== ApiProvider.OPENAI_STT ||
@@ -137,7 +96,7 @@ export class OpenAiSttPriceFetcher extends PriceFetcher {
           failures.push({
             modelId: providerConfig.id,
             provider: ApiProvider.OPENAI_STT,
-            reason: `Model "${providerConfig.providerModel}" not found - add to MODEL_LABEL_PATTERNS in openai-stt.ts`,
+            reason: `Model "${providerConfig.providerModel}" not found on pricing page - check ${PRICING_URL}`,
           });
           continue;
         }

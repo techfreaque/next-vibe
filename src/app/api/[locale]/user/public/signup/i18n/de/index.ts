@@ -16,7 +16,7 @@ export const translations: typeof enTranslations = {
     privateName: {
       label: "Dein privater Name",
       description:
-        "Wie die KI dich in privaten Gesprächen ansprechen wird. Das bleibt zwischen dir und der KI – komplett privat.",
+        "Wie die KI dich in privaten Gesprächen ansprechen wird. Das bleibt zwischen dir und der KI - komplett privat.",
       placeholder: "Gib deinen Namen ein",
       validation: {
         required: "Privater Name ist erforderlich",
@@ -27,7 +27,7 @@ export const translations: typeof enTranslations = {
     publicName: {
       label: "Dein öffentlicher Name",
       description:
-        "Deine Identität in öffentlichen Chats und Foren. Andere User und KIs werden diesen Namen sehen. Wähle weise – er repräsentiert dich in der Community.",
+        "Deine Identität in öffentlichen Chats und Foren. Andere User und KIs werden diesen Namen sehen. Wähle weise - er repräsentiert dich in der Community.",
       placeholder: "Gib deinen Anzeigenamen ein",
       validation: {
         required: "Anzeigename ist erforderlich",
@@ -38,7 +38,7 @@ export const translations: typeof enTranslations = {
     email: {
       label: "Deine E-Mail",
       description:
-        "Deine Login-Zugangsdaten und Kontaktmethode. Bleibt privat – wird niemals mit anderen Usern oder KIs geteilt.",
+        "Deine Login-Zugangsdaten und Kontaktmethode. Bleibt privat - wird niemals mit anderen Usern oder KIs geteilt.",
       placeholder: "E-Mail-Adresse eingeben",
       help: "Dies wird deine Login-E-Mail und primäre Kontaktmethode sein",
       validation: {
@@ -49,7 +49,7 @@ export const translations: typeof enTranslations = {
     password: {
       label: "Dein Passwort",
       description:
-        "Starke Passwörter schützen dein Konto. Wir implementieren bald Ende-zu-Ende-Verschlüsselung – ab diesem Zeitpunkt werden Passwort-Resets deinen Nachrichtenverlauf löschen, da nur du den Entschlüsselungsschlüssel besitzt. Speichere es also sicher ab.",
+        "Starke Passwörter schützen dein Konto. Wir implementieren bald Ende-zu-Ende-Verschlüsselung - ab diesem Zeitpunkt werden Passwort-Resets deinen Nachrichtenverlauf löschen, da nur du den Entschlüsselungsschlüssel besitzt. Speichere es also sicher ab.",
       placeholder: "Passwort eingeben",
       validation: {
         required: "Passwort ist erforderlich",
@@ -99,7 +99,7 @@ export const translations: typeof enTranslations = {
   form: {
     title: "Willkommen bei Uncensored AI",
     description:
-      "Hilf mit, unzensierte, privatsphäre-orientierte und wirklich unabhängige KI aufzubauen. unbottled.ai ist Open Source und Community-getrieben – deine Registrierung unterstützt die Entwicklung von KI-Technologie, die deine Freiheit respektiert.",
+      "Hilf mit, unzensierte, privatsphäre-orientierte und wirklich unabhängige KI aufzubauen. unbottled.ai ist Open Source und Community-getrieben - deine Registrierung unterstützt die Entwicklung von KI-Technologie, die deine Freiheit respektiert.",
   },
   footer: {
     alreadyHaveAccount: "Haben Sie bereits ein Konto? Anmelden",
@@ -357,7 +357,7 @@ export const translations: typeof enTranslations = {
       cta: "Auf Pro upgraden",
     },
     signoff: "Viel Spaß beim Chatten,\nDas {{appName}} Team",
-    ps: "P.S. Nutze den Inkognito-Modus, um Gespräche nur auf deinem Gerät zu behalten – wir speichern sie niemals auf unseren Servern.",
+    ps: "P.S. Nutze den Inkognito-Modus, um Gespräche nur auf deinem Gerät zu behalten - wir speichern sie niemals auf unseren Servern.",
   },
   emailTemplates: {
     welcome: {

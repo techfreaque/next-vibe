@@ -91,18 +91,19 @@ export const translations = {
     description:
       "Any endpoint becomes embeddable. The tool runs on its own server. The widget renders in a sandbox on your page. Full features, zero shared state.",
     twoScriptTags: "Two script tags. Done.",
-    codeCaption: "The complete embed code for a contact form from unbottled.ai",
+    codeCaption: "The complete embed code for a contact form from {{appName}}",
+    orScriptTag: "Or as a plain script tag for any website:",
     adminDescription:
       "The admin panel generates this for you. Pick endpoint, pick display mode, pick trigger. Copy. Paste anywhere.",
   },
   vibeSense: {
     title: "Not a side effect. The point.",
     paragraph1:
-      "When I ported VibeFrame into next-vibe, the first thing I embedded was not a contact form. It was a Vibe Sense graph - a live data visualization from the platform, rendering as a widget on an external page.",
+      "When I ported VibeFrame into next-vibe, the first real use was not embedding a contact form on some external page. It was remote tool execution within the platform itself - rendering any endpoint's full interactive widget UI inside a sandbox, so distributed tools feel like one system.",
     paragraph2:
-      "Real data. Live indicators. The graph reacts to what is happening on the remote server. This is not a screenshot or a static export. The tool is running on its server. VibeFrame renders its widget UI in a sandbox wherever you need it.",
+      "Real data. Live indicators. A Vibe Sense graph reacts to what is happening on the server. This is not a screenshot or a static export. The tool is running. VibeFrame renders its widget UI in a sandbox wherever you need it - inside the platform, on a dashboard, or on any other page.",
     paragraph3:
-      "That is when the architecture clicked. VibeFrame was not just a way to embed forms. It was the rendering half of remote tool execution - the missing piece that makes a distributed tool system feel like a single coherent platform.",
+      "That is when the architecture clicked. VibeFrame was not just a way to embed forms on third-party sites. It was the rendering half of remote tool execution - the missing piece that makes a distributed tool system feel like a single coherent platform.",
   },
   federated: {
     title: "Federated embedding",
@@ -114,32 +115,33 @@ export const translations = {
       "The definition travels with the widget. The server that owns the endpoint owns the render.",
   },
   skills: {
-    title: "Skills: the invocation half",
+    title: "The invocation half",
     intro:
-      "VibeFrame handles rendering. Skills handle invocation. A skill declares exactly which tools an AI has access to - specific endpoints in the registry, with Zod-validated inputs and typed outputs. The user picks a persona. The AI gets a bounded tool set.",
+      "VibeFrame handles rendering. The tool registry handles invocation. You connect remote next-vibe instances - each with a name like hermes, thea, or any custom alias. Their endpoints become available alongside your local tools. One unified tool set.",
+    discovery:
+      "The AI uses tool-help to discover every available endpoint - local and remote. It sees the full registry: names, descriptions, typed inputs, typed outputs. When it calls execute-tool, the platform routes to the right instance. The AI does not care where a tool lives.",
+    control:
+      "You stay in control. Pin the tools you want visible, opt out of any you do not need. Same management for local and remote endpoints - no difference in how you configure them.",
+    keyLine:
+      "Connect instances. The AI discovers the tools. You decide which ones to use.",
+    skillsTitle: "Skills: a persona layer",
+    skillsDescription:
+      "On top of this, skills add a persona. A skill is a preset - a name, a system prompt, a voice, a personality, and optionally a restricted tool set. The user picks a tutor, a coder, a storyteller. Under the hood, it is the same registry, the same endpoints, the same execute-tool calls.",
     userPerspective: "User perspective",
     aiPerspective: "AI perspective",
     userDescription:
-      "A skill is a persona. A tutor, a coder, a storyteller, an uncensored writer. Each skill has a name, a system prompt, a voice, a personality.",
+      "A skill is a persona. A tutor, a coder, a storyteller. Each has a name, a voice, a personality. You pick one and start talking.",
     aiDescription:
-      "A skill is a tool configuration. Each skill declares which endpoints it can call - including tools on remote instances. Zod-validated inputs. Typed outputs. No ambiguity.",
-    keyLine: "User sees a persona. The AI sees a tool configuration.",
-    activeToolsTitle: "The activeTools array",
-    activeToolsDescription:
-      "Not abstract capabilities described in prose. These are specific endpoints - callable via the same execute-tool interface, whether they run locally or on a remote next-vibe instance across the network.",
-    composableTitle: "Tools can live anywhere",
-    composableDescription:
-      "A tool call in next-vibe is not limited to the local server. The execute-tool system routes calls to whichever instance owns that endpoint. The calling AI does not need to know where it runs. It calls, the right server answers.",
-    bothAtOnce: "A skill is both at once.",
+      "A skill is a configuration preset. It can restrict which tools are visible, pin specific endpoints, or leave the full registry open. Same execute-tool interface, just scoped.",
   },
   remoteExecution: {
     title: "Remote tool execution",
     paragraph1:
       "Here is the thing that connects VibeFrame and the tool registry. When an AI calls execute-tool with a remote endpoint, next-vibe routes the call to the target instance. That instance executes the tool, returns the result. Standard enough.",
     paragraph2:
-      "But every endpoint in next-vibe also has a widget - a typed, fully-featured UI component that knows how to render that tool's inputs and outputs. VibeFrame can take that widget and render it in a sandboxed iframe on any page, communicating with the tool's server via postMessage.",
+      "But every endpoint in next-vibe also has a widget - a typed, fully-featured UI component that knows how to render that tool's inputs and outputs. If the remote instance is publicly accessible, VibeFrame renders the actual widget in a sandboxed iframe, communicating with the tool's server via postMessage. Full interactivity, live data, real UI.",
     paragraph3:
-      "Put those two together: you can call a tool on a remote server and render its full interactive UI in a sandbox on your page. The tool runs where it lives. The UI appears where you need it. No shared state. No security compromise. Full features.",
+      "If the instance is not public - behind a firewall, on a private network - the platform falls back to definition-driven UI. The endpoint definition carries enough metadata (field types, labels, validation rules) to render a functional interface locally, without ever reaching the remote server's frontend. Either way, the tool works. The UI adapts.",
     diagramAI: "AI Agent",
     diagramExecute: "execute-tool",
     diagramRemote: "Remote Instance",

@@ -10,14 +10,14 @@ import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constant
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
-import { upsertMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/update-messages";
-import {
-  DEFAULT_TTS_VOICE_ID,
-  type ModelId,
-  type TtsModelId,
-} from "@/app/api/[locale]/agent/models/models";
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
 import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import { upsertMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/update-messages";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type {
+  ModelProviderEnvAvailability,
+  VoiceModelSelection,
+} from "@/app/api/[locale]/agent/models/types";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -39,10 +39,10 @@ export interface CreateMessageParams {
     confirmed: boolean;
     updatedArgs?: Record<string, string | number | boolean | null>;
   }>;
-  /** Image generation settings (used when selectedModel.modelType === "image") */
+  /** Image generation settings (used when selectedModel.modelRole === "image-gen") */
   imageSize?: string;
   imageQuality?: string;
-  /** Music generation settings (used when selectedModel.modelType === "audio") */
+  /** Music generation settings (used when selectedModel.modelRole === "audio-gen") */
   musicDuration?: string;
 }
 
@@ -53,16 +53,17 @@ export interface MessageOperationDeps {
   currentSubFolderId: string | null;
   user: JwtPayloadType;
   settings: {
-    selectedModel: ModelId;
+    selectedModel: ChatModelId;
     selectedSkill: string;
     availableTools: ToolConfigItem[] | null;
     pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
-    voiceModelSelection: ModelSelectionSimple | null | undefined;
+    voiceModelSelection: VoiceModelSelection | null | undefined;
   };
   /** Called immediately after the optimistic user message is added - switches the visible branch */
   setLeafMessageId?: (messageId: string) => void;
   locale: CountryLanguage;
+  env: ModelProviderEnvAvailability;
 }
 
 /**
@@ -81,6 +82,7 @@ export async function createAndSendUserMessage(
     user,
     settings,
     setLeafMessageId,
+    env,
   } = deps;
 
   const {
@@ -226,15 +228,15 @@ export async function createAndSendUserMessage(
 
     // Voice mode settings - resolve TTS voice from selection or fall back to default
     const resolvedVoiceModel = settings.voiceModelSelection
-      ? SkillsRepositoryClient.getBestModelByRole(
+      ? SkillsRepositoryClient.getBestTtsModel(
           settings.voiceModelSelection,
-          ["tts"],
           user,
+          env,
         )
       : null;
     const effectiveVoiceMode = {
       enabled: settings.ttsAutoplay,
-      voice: (resolvedVoiceModel?.id ?? DEFAULT_TTS_VOICE_ID) as TtsModelId,
+      voice: resolvedVoiceModel?.id ?? DEFAULT_TTS_VOICE_ID,
     };
 
     // Get user's timezone from browser

@@ -229,7 +229,9 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Jedna z decyzji architektonicznych, z których jestem najbardziej zadowolony: źródła danych żyją ze swoją domeną, nie w jakimś centralnym katalogu vibe-sense/.",
     leadsLabel: "Domena leadów",
+    leadsCount: "... 15 źródeł danych łącznie",
     creditsLabel: "Domena kredytów",
+    creditsCount: "... 17 źródeł danych łącznie",
     explanation:
       "leads/data-sources/leads-created zna tabelę leads. Importuje z leads/db. Używa LeadStatus z leads/enum. Jeśli usuniesz moduł leads, źródła danych idą razem z nim. Nic nie pozostaje osierocone.",
     indicators: {
@@ -285,10 +287,10 @@ export const translations: typeof enTranslations = {
           "Topologiczne wykonanie przez graph walker. Obsługa wielu rozdzielczości z automatycznym skalowaniem. Rozszerzenie zakresu uwzględniające lookback.",
         versioning:
           "Wersjonowanie, tryb backtest z pełną historią uruchomień, trwałość sygnałów jako ślad audytu.",
-        cli: "Dostęp CLI - vibe ema, vibe rsi, dowolny endpoint wskaźnika, wywoływalny samodzielnie.",
+        cli: "Dostęp CLI - vibe vibe-sense-ema, vibe vibe-sense-rsi, dowolny endpoint wskaźnika, wywoływalny samodzielnie.",
         mcp: "Rejestracja MCP - endpointy wskaźników pojawiają się na liście narzędzi. Thea może bezpośrednio wywoływać wskaźniki.",
         seeds:
-          "Grafy seed: 4 grafy domeny leadów, 4 grafy domeny kredytów, plus grafy wzrostu użytkowników. Wszystkie działają od razu na vibe dev.",
+          "Grafy seed: 29 grafów w 9 domenach - leady, kredyty, użytkownicy, subskrypcje, polecenia, newslettery, płatności, messenger, czat AI i zdrowie systemu. Wszystkie działają od razu na vibe dev.",
       },
     },
     coming: {

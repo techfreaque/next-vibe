@@ -14,7 +14,7 @@ import { cn } from "next-vibe/shared/utils";
 import React from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { TtsModelId } from "@/app/api/[locale]/agent/models/models";
+import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import {
   prepareTextForTTS,
   stripThinkTags,

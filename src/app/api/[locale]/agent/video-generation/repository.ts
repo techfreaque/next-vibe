@@ -15,12 +15,13 @@ import {
 import {
   ApiProvider,
   calculateCreditCost,
-  getAllModelOptions,
-  type ModelOptionVideoBased,
 } from "@/app/api/[locale]/agent/models/models";
+import { getVideoGenModelById } from "@/app/api/[locale]/agent/video-generation/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
 
 import { generateVideoWithModelsLab } from "../ai-stream/providers/modelslab-video";
 import {
@@ -34,6 +35,10 @@ import type {
 import { VIDEO_DURATION_SECONDS } from "./enum";
 import type { VideoGenerationT } from "./i18n";
 
+interface MediaGenStreamContext {
+  threadId?: string | undefined;
+}
+
 export class VideoGenerationRepository {
   /**
    * Generate a video from a text prompt
@@ -44,21 +49,11 @@ export class VideoGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: VideoGenerationT,
+    streamContext: MediaGenStreamContext,
   ): Promise<ResponseType<VideoGenerationPostResponseOutput>> {
-    // model is already resolved via streamContextPatch in tools-loader (from ToolExecutionContext.videoGenModelId)
-    const selectedModel: string = data.model;
-    const modelConfig = getAllModelOptions().find(
-      (m) => m.id === selectedModel,
-    );
+    // model is resolved via serverDefault on the field definition (from ToolExecutionContext.videoGenModelId)
+    const videoModel = getVideoGenModelById(data.model);
 
-    if (!modelConfig || modelConfig.modelRole !== "video-gen") {
-      return fail({
-        message: t("post.errors.notAVideoModel"),
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-      });
-    }
-
-    const videoModel = modelConfig as ModelOptionVideoBased;
     const creditCost = calculateCreditCost(videoModel, 0, 0);
     const durationSeconds =
       VIDEO_DURATION_SECONDS[data.duration] ??
@@ -116,7 +111,34 @@ export class VideoGenerationRepository {
       });
     }
 
-    const { videoUrl } = generationResult.data;
+    let { videoUrl } = generationResult.data;
+
+    // Upload to our storage so the URL is persistent and access-controlled
+    if (streamContext?.threadId) {
+      try {
+        const storage = getStorageAdapter();
+        const arrayBuf = await fetch(videoUrl).then((r) => r.arrayBuffer());
+        const videoBuffer = Buffer.from(new Uint8Array(arrayBuf));
+        const ext = videoUrl.includes("webm") ? "webm" : "mp4";
+        const uploadResult = await storage.uploadFile(videoBuffer, {
+          filename: `generated-video-${Date.now()}.${ext}`,
+          mimeType: `video/${ext}`,
+          threadId: streamContext.threadId,
+          userId: user.id,
+        });
+        videoUrl = uploadResult.url;
+      } catch (uploadErr) {
+        logger.error(
+          "[VideoGen] Failed to upload to storage, using provider URL",
+          {
+            error:
+              uploadErr instanceof Error
+                ? uploadErr.message
+                : String(uploadErr),
+          },
+        );
+      }
+    }
 
     const deductResult = await deductMediaCredits(
       user,

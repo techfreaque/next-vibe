@@ -1,4 +1,4 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import {
@@ -44,7 +44,7 @@ export const technicalSkill: Skill = {
       variantName: "skills.technical.variants.kimi" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2_5,
+        manualModelId: ChatModelId.KIMI_K2_5,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -63,7 +63,7 @@ export const technicalSkill: Skill = {
       variantName: "skills.technical.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.DEEPSEEK_V32,
+        manualModelId: ChatModelId.DEEPSEEK_V32,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

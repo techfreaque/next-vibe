@@ -5,14 +5,15 @@
 
 import { z } from "zod";
 
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import {
-  CHAT_MODEL_IDS,
+  ChatModelId,
   ChatModelIdOptions,
-  DEFAULT_TTS_VOICE_ID,
-  ModelId,
-  TTS_MODEL_IDS,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  TtsModelId,
   TtsModelIdOptions,
-} from "@/app/api/[locale]/agent/models/models";
+} from "@/app/api/[locale]/agent/text-to-speech/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -35,9 +36,13 @@ import { DefaultFolderId } from "../../chat/config";
 import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
 import { type ChatMessage, selectChatMessageSchema } from "../../chat/db";
 import { ChatMessageRole, ChatMessageRoleOptions } from "../../chat/enum";
+import { lazy } from "react";
 import { AI_STREAM_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { AiStreamWidget } from "./widget/widget";
+
+const AiStreamWidget = lazy(() =>
+  import("./widget/widget").then((m) => ({ default: m.AiStreamWidget })),
+);
 
 /**
  * AI Stream Endpoint (POST)
@@ -202,7 +207,7 @@ const { POST } = createEndpoint({
         description: "post.model.description",
         options: ChatModelIdOptions,
         columns: 4,
-        schema: z.enum(CHAT_MODEL_IDS),
+        schema: z.enum(ChatModelId),
       }),
       skill: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -406,7 +411,7 @@ const { POST } = createEndpoint({
             label: "post.voiceMode.voice.label",
             description: "post.voiceMode.voice.description",
             columns: 6,
-            schema: z.enum(TTS_MODEL_IDS).default(DEFAULT_TTS_VOICE_ID),
+            schema: z.enum(TtsModelId).default(DEFAULT_TTS_VOICE_ID),
           }),
         },
       }),
@@ -574,7 +579,7 @@ const { POST } = createEndpoint({
         parentMessageId: null,
         content: "Hello, can you help me write a professional email?",
         role: ChatMessageRole.USER,
-        model: ModelId.GPT_5_MINI,
+        model: ChatModelId.GPT_5_MINI,
         skill: "default",
         availableTools: null,
         pinnedTools: null,
@@ -595,7 +600,7 @@ const { POST } = createEndpoint({
         parentMessageId: null,
         content: "Write a marketing email for our new product launch",
         role: ChatMessageRole.USER,
-        model: ModelId.GPT_5,
+        model: ChatModelId.GPT_5,
         skill: "professional",
         availableTools: null,
         pinnedTools: null,
@@ -616,7 +621,7 @@ const { POST } = createEndpoint({
         parentMessageId: "660e8400-e29b-41d4-a716-446655440001",
         content: "Can you try that again with more detail?",
         role: ChatMessageRole.USER,
-        model: ModelId.CLAUDE_SONNET_4_5,
+        model: ChatModelId.CLAUDE_SONNET_4_5,
         skill: "default",
         availableTools: null,
         pinnedTools: null,

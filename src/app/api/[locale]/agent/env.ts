@@ -11,6 +11,30 @@ import "server-only";
 import { z } from "zod";
 
 import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+
+// Resolved once at module load — used by both CLAUDE_CODE_ENABLED and VIBE_TEST_AI_MODEL
+function resolveClaudeCodeEnabled(): boolean {
+  const raw = process.env["CLAUDE_CODE_ENABLED"];
+  if (raw === "true") {
+    return true;
+  }
+  if (raw === "false") {
+    return false;
+  }
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { execSync } = require("node:child_process") as {
+      execSync: (cmd: string, opts: { stdio: string; timeout: number }) => void;
+    };
+    execSync("claude --version", { stdio: "ignore", timeout: 3000 });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const claudeCodeEnabled = resolveClaudeCodeEnabled();
 
 // Base fields shared by both storage types
 const baseFields = {
@@ -18,28 +42,7 @@ const baseFields = {
     schema: z
       .string()
       .optional()
-      .transform((v) => {
-        if (v === "true") {
-          return true;
-        }
-        if (v === "false") {
-          return false;
-        }
-        // Auto-detect: check if `claude` CLI is available
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { execSync } = require("node:child_process") as {
-            execSync: (
-              cmd: string,
-              opts: { stdio: string; timeout: number },
-            ) => void;
-          };
-          execSync("claude --version", { stdio: "ignore", timeout: 3000 });
-          return true;
-        } catch {
-          return false;
-        }
-      }),
+      .transform(() => claudeCodeEnabled),
     example: "true",
     comment:
       "Claude Code provider enabled - set true/false to override, or leave unset for auto-detection (checks if `claude` CLI is installed)",
@@ -47,6 +50,20 @@ const baseFields = {
     fieldType: "boolean" as const,
     onboardingStep: 4,
     onboardingGroup: "ai",
+  },
+  VIBE_TEST_AI_MODEL: {
+    schema: z
+      .enum(ChatModelId)
+      .optional()
+      .default(
+        claudeCodeEnabled
+          ? ChatModelId.CLAUDE_CODE_HAIKU
+          : ChatModelId.KIMI_K2_5,
+      ),
+    example: "claude-code-haiku",
+    comment:
+      "AI model to use in integration tests. Defaults to claude-code-haiku when CLAUDE_CODE_ENABLED resolves true, otherwise kimi_k2_5.",
+    commented: true,
   },
   OPENROUTER_API_KEY: {
     schema: z.string().optional(),

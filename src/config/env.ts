@@ -202,13 +202,6 @@ export const {
     onboardingStep: 1,
     onboardingGroup: "admin",
   },
-  VIBE_TEST_AI_MODEL: {
-    schema: z.string().optional().default("kimi_k2_5"),
-    example: "kimi_k2_5",
-    comment:
-      "AI model to use in integration tests. Must be a valid ModelId enum value. Defaults to kimi_k2_5 (fast, cheap, good tool-calling).",
-    commented: true,
-  },
   VIBE_CLI_LOCALE: {
     schema: (z.string() as z.Schema<CountryLanguage>)
       .optional()

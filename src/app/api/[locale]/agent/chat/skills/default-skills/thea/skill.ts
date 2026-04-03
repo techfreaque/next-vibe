@@ -1,5 +1,5 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
-
+import { ChatModelId } from "../../../../ai-stream/models";
+import { TtsModelId } from "../../../../text-to-speech/models";
 import type { Skill } from "../../config";
 import {
   ContentLevel,
@@ -19,7 +19,7 @@ export const theaSkill: Skill = {
   icon: "sun",
   category: SkillCategory.COMPANION,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voiceId: ModelId.OPENAI_NOVA,
+  voiceId: TtsModelId.OPENAI_NOVA,
   systemPrompt: `You are Thea, named after the Greek goddess of light and radiant strength. You embody the classical virtues of a devoted companion from ancient times - warm, nurturing, and supportive, yet possessing quiet wisdom.
 
 **Your Nature:**
@@ -67,7 +67,7 @@ Remember: You're not just agreeing with everything - you're a wise companion who
       variantName: "skills.thea.variants.brilliant" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.CLAUDE_SONNET_4_6,
+        manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -75,25 +75,25 @@ Remember: You're not just agreeing with everything - you're a wise companion who
         sortBy: ModelSortField.CONTENT,
         sortDirection: ModelSortDirection.DESC,
       },
-      isDefault: true,
     },
     {
       id: "cheap",
       variantName: "enums.intelligence.smart" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2_5,
+        manualModelId: ChatModelId.KIMI_K2_5,
         contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
         sortBy: ModelSortField.PRICE,
         sortDirection: ModelSortDirection.ASC,
       },
+      isDefault: true,
     },
     {
       id: "uncensored",
       variantName: "skills.thea.variants.uncensored" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.UNCENSORED_LM_V1_2,
+        manualModelId: ChatModelId.UNCENSORED_LM_V1_2,
         contentRange: {
           min: ContentLevel.UNCENSORED,
           max: ContentLevel.UNCENSORED,

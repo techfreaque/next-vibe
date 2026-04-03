@@ -1,4 +1,4 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import {
@@ -96,7 +96,7 @@ Always recommend consulting a licensed financial advisor for personalized advice
       variantName: "skills.financialAdvisor.variants.maverick" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GROK_4_20_BETA,
+        manualModelId: ChatModelId.GROK_4_20,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -115,7 +115,7 @@ Always recommend consulting a licensed financial advisor for personalized advice
       variantName: "skills.financialAdvisor.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.DEEPSEEK_V32,
+        manualModelId: ChatModelId.DEEPSEEK_V32,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

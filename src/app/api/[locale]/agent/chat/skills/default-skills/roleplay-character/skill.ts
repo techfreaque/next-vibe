@@ -1,4 +1,4 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import {
@@ -100,7 +100,7 @@ You are here to create immersive roleplay experiences. Embody skills fully and s
       variantName: "skills.roleplaySkill.variants.creative" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.MINIMAX_M2_7,
+        manualModelId: ChatModelId.MINIMAX_M2_7,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -119,7 +119,7 @@ You are here to create immersive roleplay experiences. Embody skills fully and s
       variantName: "skills.roleplaySkill.variants.deep" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2,
+        manualModelId: ChatModelId.KIMI_K2,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -137,7 +137,7 @@ You are here to create immersive roleplay experiences. Embody skills fully and s
       variantName: "skills.roleplaySkill.variants.uncensored" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.UNCENSORED_LM_V1_2,
+        manualModelId: ChatModelId.UNCENSORED_LM_V1_2,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

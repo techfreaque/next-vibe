@@ -3,7 +3,7 @@ export const translations = {
     title:
       "I've never done affiliate marketing. Can I actually earn money here?",
     description:
-      "A plain-language guide to the unbottled.ai referral program for people who have never done affiliate marketing before.",
+      "A plain-language guide to the {{appName}} referral program for people who have never done affiliate marketing before.",
     category: "Affiliate Program",
     imageAlt: "A person sharing a link and earning money passively",
     keywords:
@@ -11,7 +11,7 @@ export const translations = {
   },
   hero: {
     backToBlog: "Back to Blog",
-    brand: "unbottled.ai - ",
+    brand: "{{appName}} - ",
     icon: "🌱",
     category: "For Beginners",
     readTime: "5 min read",
@@ -25,11 +25,11 @@ export const translations = {
   intro: {
     title: "Let's start from zero",
     p1: "Referral marketing sounds complicated until someone explains it with a restaurant analogy. You go to a great new place for dinner. You tell three friends. One of them goes and loves it. The restaurant gives you a voucher for your next meal. That's it. That's referral marketing.",
-    p2: "The unbottled.ai referral program works the same way - except instead of a one-time dinner voucher, you get a percentage of every subscription payment your friends make. Every month. For as long as they stay subscribed.",
+    p2: "The {{appName}} referral program works the same way - except instead of a one-time dinner voucher, you get a percentage of every subscription payment your friends make. Every month. For as long as they stay subscribed.",
   },
   different: {
     title: "What makes this different from that restaurant voucher",
-    p1: "With a normal referral, you get something once and that's it. With an AI subscription, the money keeps flowing. If someone subscribes to unbottled.ai, you earn a cut of every payment they make - every single month they're subscribed. Not just the first month.",
+    p1: "With a normal referral, you get something once and that's it. With an AI subscription, the money keeps flowing. If someone subscribes to {{appName}}, you earn a cut of every payment they make - every single month they're subscribed. Not just the first month.",
     tableTitle: "One-time vs recurring referral income",
     tableHeaderType: "Type",
     tableHeaderYouEarn: "You earn",
@@ -49,7 +49,7 @@ export const translations = {
     title: "The multi-level part (don't let it scare you)",
     p1: "\"Multi-level\" sounds like it might be a pyramid scheme. It isn't. Here's the honest version:",
     explanation:
-      "You tell Alice about unbottled.ai. Alice signs up using your link. Alice loves it and tells Bob. Bob signs up using Alice's link. You earn a small bonus from Bob's subscription too - because you're the reason Alice is here, and Alice is the reason Bob is here.",
+      "You tell Alice about {{appName}}. Alice signs up using your link. Alice loves it and tells Bob. Bob signs up using Alice's link. You earn a small bonus from Bob's subscription too - because you're the reason Alice is here, and Alice is the reason Bob is here.",
     p2: "That's the whole thing. You earn 10% from the people you directly refer. And a smaller share of the earnings from people they refer. It goes up to 5 levels deep, but the amounts get smaller at each level. The direct referral is always the most valuable.",
     p3: "You don't need to think about the chain at all to get started. Create a link, share it, earn 10% from whoever signs up.",
   },
@@ -70,9 +70,11 @@ export const translations = {
     title: "Your first steps (takes 5 minutes)",
     step1Title: "Create an account",
     step1Body: "Sign up for free. You don't need a paid plan to refer people.",
-    step2Title: "Go to your referral page",
+    step2Title: "Go to the referral page",
     step2Body:
-      "Under your profile, find the referral section. Create a code - it can be anything memorable.",
+      "Open the referral page. Create a code - it can be anything memorable.",
+    step2Link: "Open the referral page.",
+    step2Suffix: " Create a code - it can be anything memorable.",
     step3Title: "Share your link once",
     step3Body:
       "Post it somewhere you'd naturally talk about AI tools: a Discord, a group chat, a blog comment, a tweet. See what happens.",

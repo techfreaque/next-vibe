@@ -3,6 +3,10 @@
  * Default folder definitions and utilities
  */
 
+import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { ImageGenModelId } from "@/app/api/[locale]/agent/image-generation/models";
+import type { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -10,12 +14,7 @@ import {
   type UserPermissionRoleValue,
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
-import type {
-  ImageGenModelId,
-  MusicGenModelId,
-  VideoGenModelId,
-} from "@/app/api/[locale]/agent/models/models";
+import type { VideoGenModelId } from "../video-generation/models";
 
 /**
  * Default folder IDs
@@ -102,8 +101,8 @@ export interface ToolExecutionContext {
   favoriteId: string | undefined;
   /** The character/persona driving the conversation */
   skillId: string | undefined;
-  /** The model being used (e.g. "claude-sonnet-4-6") */
-  modelId: string | undefined;
+  /** The model being used */
+  modelId: ChatModelId | undefined;
   /** Resolved image gen model ID from skill/favorite/settings cascade */
   imageGenModelId: ImageGenModelId | undefined;
   /** Resolved music gen model ID from skill/favorite/settings cascade */

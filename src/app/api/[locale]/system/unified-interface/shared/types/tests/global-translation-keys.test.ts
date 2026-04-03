@@ -19,10 +19,9 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { createEndpoint } from "../../endpoints/definition/create";
 import {
   objectField,
-  objectFieldNew,
   requestField,
   requestResponseField,
-} from "../../field/utils-new";
+} from "../../field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -183,7 +182,7 @@ const globalEndpointInvalidTitle = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -211,7 +210,7 @@ const globalEndpointInvalidDescription = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -239,7 +238,7 @@ const globalEndpointInvalidCategory = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -267,7 +266,7 @@ const globalEndpointInvalidTag = createEndpoint({
   // @ts-expect-error - Invalid global key in tags
   tags: ["invalid.tag.key"] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -294,7 +293,7 @@ const globalEndpointInvalidErrorTitle = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -328,7 +327,7 @@ const globalEndpointInvalidSuccessTitle = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -413,13 +412,13 @@ const test8c_requestResponseFieldStandalone = requestResponseField({
 });
 
 /**
- * Test 8D: Test objectFieldNew standalone with container title key
- * NOTE: objectFieldNew does NOT enforce TranslationKey validation on title at the
+ * Test 8D: Test objectField standalone with container title key
+ * NOTE: objectField does NOT enforce TranslationKey validation on title at the
  * standalone call site (TKey is inferred as string, not pinned to TranslationKey).
  * Key validation for object containers happens when assigned to createEndpoint's
  * fields parameter. This mirrors the behaviour documented for requestField in 8B.
  */
-const test8d_objectFieldStandalone = objectFieldNew({
+const test8d_objectFieldStandalone = objectField({
   type: WidgetType.CONTAINER,
   title: "invalid.container.title.key",
   layoutType: LayoutType.GRID,
@@ -429,13 +428,13 @@ const test8d_objectFieldStandalone = objectFieldNew({
 });
 
 /**
- * Tests 9A/9B/9C: Container title key - standalone objectFieldNew tests.
+ * Tests 9A/9B/9C: Container title key - standalone objectField tests.
  *
- * NOTE: objectFieldNew does NOT enforce global TranslationKey on title at the
+ * NOTE: objectField does NOT enforce global TranslationKey on title at the
  * standalone call site. Key validation happens when the result is assigned to
  * createEndpoint's fields parameter (TKey gets pinned to TranslationKey there).
  */
-const test9a_invalidContainerTitleStandalone = objectFieldNew({
+const test9a_invalidContainerTitleStandalone = objectField({
   type: WidgetType.CONTAINER,
   title: "invalid.container.title.key",
   layoutType: LayoutType.GRID,
@@ -444,7 +443,7 @@ const test9a_invalidContainerTitleStandalone = objectFieldNew({
   children: {},
 });
 
-const test9b_invalidContainerTitle = objectFieldNew({
+const test9b_invalidContainerTitle = objectField({
   type: WidgetType.CONTAINER,
   title: "invalid.container.title.key",
   layoutType: LayoutType.GRID,
@@ -453,7 +452,7 @@ const test9b_invalidContainerTitle = objectFieldNew({
   children: {},
 });
 
-const test9c_invalidContainerTitle = objectFieldNew({
+const test9c_invalidContainerTitle = objectField({
   type: WidgetType.CONTAINER,
   title: "invalid.container.title.key",
   layoutType: LayoutType.GRID,
@@ -479,7 +478,7 @@ const globalEndpointRejectsScopedKey = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,

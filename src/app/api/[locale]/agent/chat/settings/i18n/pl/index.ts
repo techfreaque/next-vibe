@@ -84,8 +84,16 @@ export const translations: typeof enTranslations = {
       label: "Model mowy na tekst",
       placeholder: "Domyślny systemu",
     },
-    visionBridgeModel: {
-      label: "Model wizji",
+    imageVisionModel: {
+      label: "Model wizji obrazu",
+      placeholder: "Domyślny systemu",
+    },
+    videoVisionModel: {
+      label: "Model wizji wideo",
+      placeholder: "Domyślny systemu",
+    },
+    audioVisionModel: {
+      label: "Model wizji audio",
       placeholder: "Domyślny systemu",
     },
     translationModel: {

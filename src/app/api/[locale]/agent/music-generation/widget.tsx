@@ -1,36 +1,29 @@
 "use client";
 
+import { Audio } from "next-vibe-ui/ui/audio";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Audio } from "next-vibe-ui/ui/audio";
-import { ExternalLink } from "next-vibe-ui/ui/link";
-import { Textarea } from "next-vibe-ui/ui/textarea";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Download } from "next-vibe-ui/ui/icons/Download";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Music } from "next-vibe-ui/ui/icons/Music";
+import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
+import { Textarea } from "next-vibe-ui/ui/textarea";
 import { H3 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import {
-  getDefaultModelForRole,
-  getModelById,
-  type ModelId,
-} from "@/app/api/[locale]/agent/models/models";
-import type {
-  ModelSelectionSimple,
-  ManualModelSelection,
-} from "@/app/api/[locale]/agent/models/types";
+import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/models/types";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
@@ -43,9 +36,10 @@ import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/
 
 import type definition from "./definition";
 import type { MusicGenerationPostResponseOutput } from "./definition";
-import { MUSIC_MODEL_IDS, MusicDuration } from "./enum";
-import type { MusicModelId } from "./enum";
+import { MusicDuration } from "./enum";
 import { scopedTranslation } from "./i18n";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "./constants";
+import { getMusicGenModelById, MusicGenModelId } from "./models";
 
 interface CustomWidgetProps {
   field: {
@@ -84,11 +78,11 @@ export function MusicGenerationContainer({
   const { t } = scopedTranslation.scopedT(locale);
   const [showModelSelector, setShowModelSelector] = useState(false);
 
-  const currentModelId = form?.watch("model") as ModelId | undefined;
+  const currentModelId = form?.watch("model");
   const currentDuration = form?.watch("duration") ?? MusicDuration.MEDIUM;
 
-  const modelSelection = useMemo((): ModelSelectionSimple | undefined => {
-    // model is patched from stream context into request args (streamContextPatch)
+  const modelSelection = useMemo((): MusicGenModelSelection | undefined => {
+    // model is resolved via serverDefault on the field definition
     if (!currentModelId) {
       return undefined;
     }
@@ -99,27 +93,36 @@ export function MusicGenerationContainer({
   }, [currentModelId]);
 
   const defaultModelSelection = useMemo(():
-    | ModelSelectionSimple
+    | MusicGenModelSelection
     | undefined => {
-    const m = getDefaultModelForRole(["audio-gen"], envAvailability);
+    const m = SkillsRepositoryClient.getBestMusicGenModel(
+      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const modelId = Object.values(MusicGenModelId).includes(m.id)
+      ? m.id
+      : undefined;
+    if (!modelId) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: modelId };
+  }, [user, envAvailability]);
 
   const resolvedModelId =
     currentModelId ??
     (defaultModelSelection?.selectionType === ModelSelectionType.MANUAL
-      ? defaultModelSelection.manualModelId
+      ? Object.values(MusicGenModelId).includes(
+          defaultModelSelection.manualModelId,
+        )
+        ? defaultModelSelection.manualModelId
+        : undefined
       : undefined);
-  const effectiveModelId =
-    resolvedModelId !== undefined &&
-    (MUSIC_MODEL_IDS as readonly string[]).includes(resolvedModelId)
-      ? (resolvedModelId as MusicModelId)
-      : resolvedModelId;
-  const resolvedModel = effectiveModelId
-    ? getModelById(effectiveModelId)
+  const resolvedModel = resolvedModelId
+    ? getMusicGenModelById(resolvedModelId)
     : undefined;
 
   const appendStyle = (style: string): void => {
@@ -147,10 +150,12 @@ export function MusicGenerationContainer({
               sel !== null &&
               sel.selectionType === ModelSelectionType.MANUAL
             ) {
-              form?.setValue(
-                "model",
-                (sel as ManualModelSelection).manualModelId as MusicModelId,
+              const modelId = Object.values(MusicGenModelId).find(
+                (id) => id === sel.manualModelId,
               );
+              if (modelId !== undefined) {
+                form?.setValue("model", modelId);
+              }
             }
             setShowModelSelector(false);
           }}
@@ -234,9 +239,9 @@ export function MusicGenerationContainer({
             <Span className="text-xs font-medium text-muted-foreground">
               {t("post.model.label")}
             </Span>
-            {effectiveModelId && (
+            {resolvedModelId && (
               <ModelCreditDisplay
-                modelId={effectiveModelId}
+                modelId={resolvedModelId}
                 variant="badge"
                 badgeVariant="secondary"
                 className="text-[10px] h-5"

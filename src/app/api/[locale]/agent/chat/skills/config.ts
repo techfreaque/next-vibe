@@ -13,17 +13,23 @@ import {
   type UserPermissionRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
+import {
+  COMPANION_SKILLS,
+  DEFAULT_SKILLS,
+} from "@/app/api/[locale]/system/generated/skills-index";
+import type { ChatModelId } from "../../ai-stream/models";
 import type {
-  ImageGenModelId,
-  LlmModelId,
-  MusicGenModelId,
-  SttModelId,
-  TtsModelId,
-  VideoGenModelId,
-  VisionModelId,
-} from "../../models/models";
-import type { ModelSelectionSimple } from "../../models/types";
+  AudioVisionModelId,
+  ImageVisionModelId,
+  VideoVisionModelId,
+} from "../../ai-stream/vision-models";
+import type { ImageGenModelId } from "../../image-generation/models";
 import type { ChatMode } from "../../models/enum";
+import type { ChatModelSelection } from "../../models/types";
+import type { MusicGenModelId } from "../../music-generation/models";
+import type { SttModelId } from "../../speech-to-text/models";
+import type { TtsModelId } from "../../text-to-speech/models";
+import type { VideoGenModelId } from "../../video-generation/models";
 import type { ToolConfigItem } from "../settings/definition";
 import { NO_SKILL_ID } from "./constants";
 import {
@@ -36,12 +42,7 @@ import {
   type SkillOwnershipTypeValue,
 } from "./enum";
 import type { SkillsTranslationKey } from "./i18n";
-import {
-  COMPANION_SKILLS,
-  DEFAULT_SKILLS,
-} from "@/app/api/[locale]/system/generated/skills-index";
 export { COMPANION_SKILLS, DEFAULT_SKILLS };
-export type VariantModelSelection = ModelSelectionSimple;
 
 /**
  * Returns how many default skills are accessible to a user with the given roles.
@@ -70,7 +71,7 @@ export interface SkillVariant {
   /** Localized sub-label shown under the skill name, e.g. "skills.thea.variants.brilliant" */
   variantName: SkillsTranslationKey;
   /** Model selection for this variant - required, drives model resolution */
-  modelSelection: VariantModelSelection;
+  modelSelection: ChatModelSelection;
   /** Which variant is the default when none is specified */
   isDefault?: boolean;
 }
@@ -96,8 +97,10 @@ export interface Skill {
   category: typeof SkillCategoryValue;
   voiceId?: TtsModelId;
   sttModelId?: SttModelId;
-  visionBridgeModelId?: VisionModelId;
-  translationModelId?: LlmModelId;
+  imageVisionModelId?: ImageVisionModelId;
+  videoVisionModelId?: VideoVisionModelId;
+  audioVisionModelId?: AudioVisionModelId;
+  translationModelId?: ChatModelId;
   defaultChatMode?: ChatMode;
   imageGenModelId?: ImageGenModelId;
   musicGenModelId?: MusicGenModelId;

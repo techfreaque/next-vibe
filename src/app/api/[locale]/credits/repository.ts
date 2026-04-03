@@ -70,7 +70,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
-import { getModelById, type ModelId } from "../agent/models/models";
+import { type ChatModelId, getChatModelById } from "../agent/ai-stream/models";
 import { ProductIds, productsRepository } from "../products/repository-client";
 import { payoutRequests } from "../referral/db";
 import { PayoutStatus } from "../referral/enum";
@@ -1287,7 +1287,7 @@ export class CreditRepository {
         },
       });
 
-      logger.info("Pool monthly free credits reset complete", {
+      logger.debug("Pool monthly free credits reset complete", {
         poolId: pool.poolId,
         oldestWalletId: oldestLeadWallet.id,
         totalWallets: allWallets.length,
@@ -1878,7 +1878,7 @@ export class CreditRepository {
   private static async deductCredits(
     identifier: CreditIdentifier,
     amount: number,
-    modelId: ModelId | undefined,
+    modelId: ChatModelId | undefined,
     feature: string | undefined,
     messageId: string,
     logger: EndpointLogger,
@@ -2617,10 +2617,10 @@ export class CreditRepository {
   }
 
   private static getFetaureLabel(
-    modelId: ModelId | null,
+    modelId: ChatModelId | null,
     featureName: string | null,
   ): string | null {
-    return modelId ? getModelById(modelId)?.name : featureName;
+    return modelId ? getChatModelById(modelId).name : featureName;
   }
 
   /**
@@ -3275,7 +3275,7 @@ export class CreditRepository {
   static async deductCreditsForModelUsage(
     user: JwtPayloadType,
     cost: number,
-    model: ModelId,
+    model: ChatModelId,
     logger: EndpointLogger,
     t: CreditsT,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native

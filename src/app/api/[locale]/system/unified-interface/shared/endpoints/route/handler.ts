@@ -38,7 +38,10 @@ import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
 import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
-import { generateRoleFilteredRequestSchema } from "../../field/utils";
+import {
+  collectServerDefaults,
+  generateRoleFilteredRequestSchema,
+} from "../../field/utils";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { Platform } from "../../types/platform";
@@ -414,6 +417,30 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
 
     if (!validationResult.success) {
       return validationResult;
+    }
+
+    // 3b. Apply field-level serverDefault callbacks for hidden fields.
+    // Fields stripped by hiddenForPlatforms/visibleFor can declare a serverDefault
+    // that resolves a trusted value using request context.
+    const serverDefaults = collectServerDefaults(
+      endpoint.fields,
+      permissionRoles,
+      platform,
+    );
+    if (Object.keys(serverDefaults).length > 0) {
+      const reqData = validationResult.data.requestData as Record<
+        string,
+        string | number | boolean | null | undefined
+      >;
+      const defaultCtx = { user, locale, platform, streamContext };
+      for (const [key, resolver] of Object.entries(serverDefaults)) {
+        if (reqData[key] === undefined) {
+          const resolved = resolver(defaultCtx);
+          if (resolved !== undefined) {
+            reqData[key] = resolved as string | number | boolean | null;
+          }
+        }
+      }
     }
 
     // 4. Check and deduct credits if endpoint has credit cost

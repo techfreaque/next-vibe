@@ -13,17 +13,14 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
-import {
-  calculateCreditCost,
-  getModelById,
-  type ModelId,
-} from "@/app/api/[locale]/agent/models/models";
+import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage } from "../../../chat/db";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
+import { getChatModelById, type ChatModelId } from "../../models";
 import type { StreamContext } from "../core/stream-context";
 import { MessageConverter } from "./message-converter";
 
@@ -75,7 +72,7 @@ export class CompactingHandler {
     isIncognito: boolean;
     userId: string | undefined;
     user: JwtPayloadType;
-    model: ModelId;
+    model: ChatModelId;
     skill: string | null;
     providerModel: Parameters<typeof streamText>[0]["model"];
     abortSignal: AbortSignal;
@@ -236,7 +233,7 @@ export class CompactingHandler {
             0;
           const uncachedInputTokens = inputTokens - cachedInputTokens;
 
-          const modelConfig = getModelById(model);
+          const modelConfig = getChatModelById(model);
           const creditCost = calculateCreditCost(
             modelConfig,
             uncachedInputTokens,

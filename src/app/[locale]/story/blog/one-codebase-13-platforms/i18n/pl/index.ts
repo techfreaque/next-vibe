@@ -33,7 +33,7 @@ export const translations: typeof enTranslations = {
   intro: {
     hook: "5 802 pliki TypeScript. ~2,1 miliona linii. Zero `any`. Zero błędów typów w czasie wykonania. Jeden wzorzec. Powtórzony 374 razy.",
     para1:
-      "To jest baza kodu stojąca za unbottled.ai - i framework, który ją napędza, next-vibe. Ta sama architektura obsługuje aplikację webową, mobilną, CLI, interfejs agenta AI, serwer MCP, system cron, magistralę zdarzeń WebSocket i silnik przepływu danych na żywo.",
+      "To jest baza kodu stojąca za {{appName}} - i framework, który ją napędza, next-vibe. Ta sama architektura obsługuje aplikację webową, mobilną, CLI, interfejs agenta AI, serwer MCP, system cron, magistralę zdarzeń WebSocket i silnik przepływu danych na żywo.",
     para2:
       "Wzorzec nazywa się Unified Surface. Oto czym jest, jak działa i dlaczego - gdy już go zobaczysz - trudno jest wrócić.",
   },

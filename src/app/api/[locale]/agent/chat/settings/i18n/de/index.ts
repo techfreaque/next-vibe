@@ -85,8 +85,16 @@ export const translations: typeof enTranslations = {
       label: "Sprache-zu-Text-Modell",
       placeholder: "Systemstandard",
     },
-    visionBridgeModel: {
-      label: "Vision-Modell",
+    imageVisionModel: {
+      label: "Bild-Vision-Modell",
+      placeholder: "Systemstandard",
+    },
+    videoVisionModel: {
+      label: "Video-Vision-Modell",
+      placeholder: "Systemstandard",
+    },
+    audioVisionModel: {
+      label: "Audio-Vision-Modell",
       placeholder: "Systemstandard",
     },
     translationModel: {

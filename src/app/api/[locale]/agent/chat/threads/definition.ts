@@ -5,14 +5,14 @@
 
 import { z } from "zod";
 
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  responseArrayOptionalField,
   objectField,
   requestField,
   responseArrayField,
+  responseArrayOptionalField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -24,10 +24,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazy } from "react";
 import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
 import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
-import { lazy } from "react";
 
 import { scopedTranslation } from "./i18n";
 
@@ -496,7 +496,7 @@ const { POST } = createEndpoint({
         label: "post.defaultModel.label" as const,
         description: "post.defaultModel.description" as const,
         columns: 6,
-        schema: z.enum(ModelId),
+        schema: z.enum(ChatModelId),
       }),
       character: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -590,7 +590,7 @@ const { POST } = createEndpoint({
         title: "New Chat",
         rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
-        model: ModelId.GPT_5_NANO,
+        model: ChatModelId.GPT_5_NANO,
         character: "default",
       },
     },

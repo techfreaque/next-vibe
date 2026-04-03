@@ -144,6 +144,21 @@ export const translations = {
       title: "Success",
       description: "skill retrieved successfully",
     },
+    share: {
+      button: "Share & Earn",
+      title: "Share this skill & earn",
+      description:
+        "Share this skill with your referral link. Earn 10% recurring commission from every user who signs up.",
+      selectCode: "Select referral code:",
+      noCodesYet: "No referral codes yet",
+      createCode: "Create a code",
+      codePlaceholder: "e.g. MYCODE",
+      creating: "Creating...",
+      linkReady: "Your share link:",
+      copied: "Copied!",
+      copyLink: "Copy Link",
+      close: "Close",
+    },
   },
   patch: {
     title: "Update skill",
@@ -235,9 +250,19 @@ export const translations = {
       description: "Model used for speech recognition",
       placeholder: "System default",
     },
-    visionBridgeModel: {
-      label: "Vision Model",
-      description: "Model used for image analysis",
+    imageVisionModel: {
+      label: "Image Vision Model",
+      description: "Model used for analyzing images",
+      placeholder: "System default",
+    },
+    videoVisionModel: {
+      label: "Video Vision Model",
+      description: "Model used for analyzing videos",
+      placeholder: "System default",
+    },
+    audioVisionModel: {
+      label: "Audio Vision Model",
+      description: "Model used for analyzing audio",
       placeholder: "System default",
     },
     translationModel: {

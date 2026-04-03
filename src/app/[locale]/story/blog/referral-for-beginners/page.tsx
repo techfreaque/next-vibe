@@ -29,11 +29,13 @@ export const generateMetadata = async ({
 }: Props): Promise<Metadata> => {
   const { locale } = await params;
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   return metadataGenerator(locale, {
     path: "story/blog/referral-for-beginners",
     title: t("meta.title"),
     category: t("meta.category"),
-    description: t("meta.description"),
+    description: t("meta.description", { appName }),
     image:
       "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=2071",
     imageAlt: t("meta.imageAlt"),
@@ -128,10 +130,12 @@ function StepCard({
   number,
   title,
   body,
+  children,
 }: {
   number: number;
   title: string;
   body: string;
+  children?: React.ReactNode;
 }): JSX.Element {
   return (
     <Div className="flex gap-4">
@@ -140,7 +144,7 @@ function StepCard({
       </Div>
       <Div>
         <Div className="font-semibold text-sm mb-1">{title}</Div>
-        <Div className="text-sm text-muted-foreground">{body}</Div>
+        <Div className="text-sm text-muted-foreground">{children ?? body}</Div>
       </Div>
     </Div>
   );
@@ -151,6 +155,7 @@ export function TanstackPage({
 }: ReferralBeginnersPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
   return (
     <Div className="min-h-screen bg-background">
@@ -162,7 +167,7 @@ export function TanstackPage({
               {t("hero.icon")}
             </Div>
             <P className="text-white font-semibold text-sm">
-              {t("hero.brand")}
+              {t("hero.brand", { appName })}
               {t("hero.category")}
             </P>
           </Div>
@@ -207,7 +212,7 @@ export function TanstackPage({
             {t("intro.p1")}
           </P>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("intro.p2")}
+            {t("intro.p2", { appName })}
           </P>
         </Div>
 
@@ -217,7 +222,7 @@ export function TanstackPage({
         <Div>
           <H2 className="text-2xl font-bold mb-6">{t("different.title")}</H2>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-            {t("different.p1")}
+            {t("different.p1", { appName })}
           </P>
 
           <Div className="overflow-hidden rounded-xl border mb-6">
@@ -261,12 +266,12 @@ export function TanstackPage({
             <Div className="flex items-start gap-3">
               <RefreshCw className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
               <P className="text-emerald-800 dark:text-emerald-200 leading-relaxed">
-                {t("multilevel.explanation")}
+                {t("multilevel.explanation", { appName })}
               </P>
             </Div>
           </Div>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("multilevel.p2")}
+            {t("multilevel.p2", { appName })}
           </P>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
             {t("multilevel.p3")}
@@ -316,7 +321,15 @@ export function TanstackPage({
               number={2}
               title={t("firststeps.step2Title")}
               body={t("firststeps.step2Body")}
-            />
+            >
+              <Link
+                href={`/${locale}/user/referral`}
+                className="text-emerald-600 dark:text-emerald-400 underline hover:text-emerald-700 dark:hover:text-emerald-300"
+              >
+                {t("firststeps.step2Link")}
+              </Link>
+              {t("firststeps.step2Suffix")}
+            </StepCard>
             <StepCard
               number={3}
               title={t("firststeps.step3Title")}

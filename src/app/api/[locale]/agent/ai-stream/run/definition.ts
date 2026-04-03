@@ -13,11 +13,10 @@
 import { z } from "zod";
 
 import {
-  CHAT_MODEL_IDS,
+  ChatModelId,
   ChatModelIdOptions,
-  getModelById,
-  ModelId,
-} from "@/app/api/[locale]/agent/models/models";
+  getChatModelById,
+} from "@/app/api/[locale]/agent/ai-stream/models";
 import { DEFAULT_SKILL_IDS } from "@/app/api/[locale]/system/generated/skills-index";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -64,7 +63,7 @@ const { POST } = createEndpoint({
           ? `${request.prompt.slice(0, 40)}...`
           : request.prompt;
       const modelName = request.model
-        ? getModelById(request.model).name
+        ? getChatModelById(request.model).name
         : undefined;
       const skill = request.skill ?? undefined;
       const suffix = [modelName, skill].filter(Boolean).join(" · ");
@@ -111,7 +110,7 @@ const { POST } = createEndpoint({
         description: "run.post.fields.model.description",
         options: ChatModelIdOptions,
         columns: 6,
-        schema: z.enum(CHAT_MODEL_IDS).optional(),
+        schema: z.enum(ChatModelId).optional(),
       }),
 
       skill: requestField(scopedTranslation, {
@@ -476,7 +475,7 @@ const { POST } = createEndpoint({
     requests: {
       // Simple: just prompt - no pre-calls, default skill
       simple: {
-        model: ModelId["CLAUDE_HAIKU_4_5"],
+        model: ChatModelId["CLAUDE_HAIKU_4_5"],
         prompt: "Write a 3-sentence summary of what unbottled.ai is.",
         instructions: "Be concise and friendly.",
         maxTurns: 1,
@@ -500,7 +499,7 @@ const { POST } = createEndpoint({
       },
       // Delegate: fetch data first via preCalls, then summarise
       withPreCall: {
-        model: ModelId["CLAUDE_HAIKU_4_5"],
+        model: ChatModelId["CLAUDE_HAIKU_4_5"],
         prompt:
           "Summarise the available skills. Which is most suitable for customer support?",
         instructions: "One paragraph max.",
@@ -509,7 +508,7 @@ const { POST } = createEndpoint({
       },
       // Agentic: give AI tools and let it reason across multiple turns
       agentic: {
-        model: ModelId["CLAUDE_SONNET_4_6"],
+        model: ChatModelId["CLAUDE_SONNET_4_6"],
         skill: "uuid-of-research-skill",
         prompt:
           "Search for the latest news about AI assistants and write a brief report.",
@@ -519,7 +518,7 @@ const { POST } = createEndpoint({
       },
       // Public bot: exclude memories so the bot doesn't inherit personal context
       publicBot: {
-        model: ModelId["CLAUDE_HAIKU_4_5"],
+        model: ChatModelId["CLAUDE_HAIKU_4_5"],
         skill: "uuid-of-public-bot-skill",
         prompt: "Answer this forum question concisely.",
         excludeMemories: true,
@@ -528,7 +527,7 @@ const { POST } = createEndpoint({
       },
       // Continue an existing thread
       continueThread: {
-        model: ModelId["CLAUDE_HAIKU_4_5"],
+        model: ChatModelId["CLAUDE_HAIKU_4_5"],
         prompt: "Follow up: what were the key action items from our last run?",
         appendThreadId: "550e8400-e29b-41d4-a716-446655440000",
         maxTurns: 1,

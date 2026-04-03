@@ -7,7 +7,7 @@ import "server-only";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { ModelId } from "../../../models/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { StreamContext } from "../core/stream-context";
 import { clearStreamingState } from "../core/stream-registry";
 import type { StreamingTTSHandler } from "../streaming-tts";
@@ -36,7 +36,7 @@ export class StreamCompletionHandler {
     ttsHandler: StreamingTTSHandler | null;
     user: JwtPayloadType;
     modelCost: number;
-    model: ModelId;
+    model: ChatModelId;
     threadId: string;
     logger: EndpointLogger;
   }): Promise<void> {

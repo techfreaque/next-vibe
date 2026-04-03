@@ -31,28 +31,30 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale } = await params;
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   const previousImages = (await parent).openGraph?.images || [];
 
   return metadataGenerator(locale, {
     path: "imprint",
-    title: t("meta.title"),
-    description: t("meta.description"),
+    title: t("meta.title", { appName }),
+    description: t("meta.description", { appName }),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/imprint-hero.jpg`,
     category: t("meta.category"),
     imageAlt: t("meta.imageAlt"),
-    keywords: [t("meta.keywords")],
+    keywords: [t("meta.keywords", { appName })],
     additionalMetadata: {
       openGraph: {
-        title: t("meta.ogTitle"),
-        description: t("meta.ogDescription"),
+        title: t("meta.ogTitle", { appName }),
+        description: t("meta.ogDescription", { appName }),
         url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/imprint`,
         type: "website",
         images: [...previousImages],
       },
       twitter: {
         card: "summary_large_image",
-        title: t("meta.twitterTitle"),
-        description: t("meta.twitterDescription"),
+        title: t("meta.twitterTitle", { appName }),
+        description: t("meta.twitterDescription", { appName }),
       },
     },
   });

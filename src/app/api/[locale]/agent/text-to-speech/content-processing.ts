@@ -14,6 +14,7 @@ import { getTranslatorFromEndpoint } from "@/app/api/[locale]/system/unified-int
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../shared/utils";
+import type { JwtPayloadType } from "../../user/auth/types";
 
 /**
  * Strip <think> tags from content
@@ -149,15 +150,11 @@ export async function extractToolCallText(
   toolName: string,
   locale: CountryLanguage,
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): Promise<string> {
   // Load the definition using the same loader as ToolCallRenderer
   // This ensures we get the exact same title that's displayed in the UI
   try {
-    const { createPublicUser } =
-      await import("@/app/api/[locale]/user/auth/helpers");
-
-    const user = createPublicUser(crypto.randomUUID());
-
     const result = await definitionLoader.load({
       identifier: toolName,
       platform: Platform.NEXT_PAGE,
@@ -202,11 +199,12 @@ export async function processMessageForTTS(
   message: ChatMessage,
   locale: CountryLanguage,
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): Promise<string> {
   // TOOL message - extract tool title
   if (message.role === "tool" && message.metadata?.toolCall) {
     const toolName = message.metadata.toolCall.toolName;
-    return await extractToolCallText(toolName, locale, logger);
+    return await extractToolCallText(toolName, locale, logger, user);
   }
 
   // Regular message - strip special tags (think, chat), then prepare for TTS
@@ -226,10 +224,11 @@ export async function processMessageGroupForTTS(
   messages: ChatMessage[],
   locale: CountryLanguage,
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): Promise<string> {
   // Process all messages in parallel
   const processedMessages = await Promise.all(
-    messages.map((msg) => processMessageForTTS(msg, locale, logger)),
+    messages.map((msg) => processMessageForTTS(msg, locale, logger, user)),
   );
 
   // Filter out empty messages
@@ -252,8 +251,9 @@ async function formatToolCallForCopy(
   locale: CountryLanguage,
   asMarkdown: boolean,
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): Promise<string> {
-  const toolTitle = await extractToolCallText(toolName, locale, logger);
+  const toolTitle = await extractToolCallText(toolName, locale, logger, user);
   const parts: string[] = [];
 
   if (asMarkdown) {
@@ -305,6 +305,7 @@ export async function processMessageGroupForCopy(
   locale: CountryLanguage,
   asMarkdown: boolean,
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): Promise<string> {
   const parts: string[] = [];
 
@@ -319,6 +320,7 @@ export async function processMessageGroupForCopy(
         locale,
         asMarkdown,
         logger,
+        user,
       );
       parts.push(formatted);
     } else if (message.content) {

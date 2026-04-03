@@ -135,10 +135,10 @@ export const translations = {
     title: "Was ist hier anders?",
     newTitle: "Neu bei Empfehlungsprogrammen?",
     newBody:
-      "Mehrstufig bedeutet: Sie verdienen nicht nur an direkten Empfehlungen, sondern auch an deren Empfehlungen – passiv. Und anders als bei einmaligen Verkäufen erneuern sich KI-Abonnements monatlich. Sie verdienen jeden Monat, für immer.",
+      "Mehrstufig bedeutet: Sie verdienen nicht nur an direkten Empfehlungen, sondern auch an deren Empfehlungen - passiv. Und anders als bei einmaligen Verkäufen erneuern sich KI-Abonnements monatlich. Sie verdienen jeden Monat, für immer.",
     proTitle: "Bereits im Affiliate-Marketing tätig?",
     proBody:
-      "Das Potenzial hier ist größer als bei den meisten Programmen. Ein normaler Nutzer gibt ~8$/Monat aus. Ein Power-User leicht 100-200$+/Monat – ein solcher Nutzer bringt mehr als ein Dutzend normale Empfehlungen. Und wenn die Plattform wächst, steigt auch der Umsatz pro Nutzer – Ihre bestehenden Empfehlungen bringen mehr, ohne zusätzliche Arbeit.",
+      "Das Potenzial hier ist größer als bei den meisten Programmen. Ein normaler Nutzer gibt ~8$/Monat aus. Ein Power-User leicht 100-200$+/Monat - ein solcher Nutzer bringt mehr als ein Dutzend normale Empfehlungen. Und wenn die Plattform wächst, steigt auch der Umsatz pro Nutzer - Ihre bestehenden Empfehlungen bringen mehr, ohne zusätzliche Arbeit.",
   },
   discord: {
     title: "Tritt der Community bei",

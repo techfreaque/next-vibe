@@ -22,6 +22,7 @@ export const translations = {
       label: "Modell",
       description: "Wähle ein Bildgenerierungsmodell",
     },
+    approxCost: "~Credits",
     size: {
       label: "Größe",
       description: "Wähle die Ausgabebildgröße",

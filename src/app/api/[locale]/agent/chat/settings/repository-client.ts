@@ -11,11 +11,14 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "../../../user/auth/types";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
+import type { ChatModelId } from "../../ai-stream/models";
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
-import { defaultModel, type ModelId } from "../../models/models";
 import type { ChatMode } from "../../models/enum";
+import type { ModelProviderEnvAvailability } from "../../models/models";
 
 import { ViewMode } from "../enum";
+import { SkillsRepositoryClient } from "../skills/repository-client";
 import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,
@@ -36,9 +39,11 @@ export class ChatSettingsRepositoryClient {
    */
   static async getSettings(
     logger: EndpointLogger,
+    user: JwtPayloadType,
+    env: ModelProviderEnvAvailability,
   ): Promise<ResponseType<ChatSettingsGetResponseOutput>> {
     try {
-      const settings = this.loadLocalSettings();
+      const settings = this.loadLocalSettings(user, env);
       logger.debug("Loaded settings from localStorage");
       return success(settings);
     } catch (error) {
@@ -46,7 +51,7 @@ export class ChatSettingsRepositoryClient {
         "Failed to load settings",
         error instanceof Error ? error : new Error(String(error)),
       );
-      return success(this.getDefaults());
+      return success(this.getDefaults(user, env));
     }
   }
 
@@ -56,9 +61,11 @@ export class ChatSettingsRepositoryClient {
   static async updateSettings(
     data: ChatSettingsUpdateRequestOutput,
     logger: EndpointLogger,
+    user: JwtPayloadType,
+    env: ModelProviderEnvAvailability,
   ): Promise<ResponseType<never>> {
     try {
-      this.updateLocalSettings(data);
+      this.updateLocalSettings(data, user, env);
       return success();
     } catch (error) {
       logger.error(
@@ -71,16 +78,27 @@ export class ChatSettingsRepositoryClient {
 
   /**
    * Get default values - shared between client and server
+   * Resolves selectedModel through DEFAULT_CHAT_MODEL_SELECTION with env filtering
    */
-  static getDefaults(): ChatSettingsGetResponseOutput {
+  static getDefaults(
+    user: JwtPayloadType,
+    env: ModelProviderEnvAvailability,
+  ): ChatSettingsGetResponseOutput {
+    const bestModel = SkillsRepositoryClient.getBestModelForSkill(
+      DEFAULT_CHAT_MODEL_SELECTION,
+      user,
+      env,
+    );
     return {
-      selectedModel: defaultModel,
+      selectedModel: bestModel?.id ?? null,
       selectedSkill: "thea",
       activeFavoriteId: null,
       ttsAutoplay: false,
       voiceModelSelection: null,
       sttModelSelection: undefined,
-      visionBridgeModelSelection: undefined,
+      imageVisionModelSelection: undefined,
+      videoVisionModelSelection: undefined,
+      audioVisionModelSelection: undefined,
       translationModelId: undefined,
       imageGenModelSelection: undefined,
       musicGenModelSelection: undefined,
@@ -97,19 +115,22 @@ export class ChatSettingsRepositoryClient {
   /**
    * Load settings from localStorage - merges stored overrides with defaults
    */
-  static loadLocalSettings(): ChatSettingsGetResponseOutput {
+  static loadLocalSettings(
+    user: JwtPayloadType,
+    env: ModelProviderEnvAvailability,
+  ): ChatSettingsGetResponseOutput {
     if (typeof window === "undefined") {
-      return this.getDefaults();
+      return this.getDefaults(user, env);
     }
 
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) {
-      return this.getDefaults();
+      return this.getDefaults(user, env);
     }
 
     try {
       const overrides = JSON.parse(stored);
-      const defaults = this.getDefaults();
+      const defaults = this.getDefaults(user, env);
 
       // Merge overrides with defaults
       // Use 'in' check for nullable fields to distinguish "explicitly set to null" from "not set"
@@ -125,9 +146,15 @@ export class ChatSettingsRepositoryClient {
           overrides.voiceModelSelection ?? defaults.voiceModelSelection,
         sttModelSelection:
           overrides.sttModelSelection ?? defaults.sttModelSelection,
-        visionBridgeModelSelection:
-          overrides.visionBridgeModelSelection ??
-          defaults.visionBridgeModelSelection,
+        imageVisionModelSelection:
+          overrides.imageVisionModelSelection ??
+          defaults.imageVisionModelSelection,
+        videoVisionModelSelection:
+          overrides.videoVisionModelSelection ??
+          defaults.videoVisionModelSelection,
+        audioVisionModelSelection:
+          overrides.audioVisionModelSelection ??
+          defaults.audioVisionModelSelection,
         translationModelId:
           overrides.translationModelId ?? defaults.translationModelId,
         defaultChatMode:
@@ -153,19 +180,23 @@ export class ChatSettingsRepositoryClient {
             : defaults.codingAgent,
       };
     } catch {
-      return this.getDefaults();
+      return this.getDefaults(user, env);
     }
   }
 
   /**
    * Save settings to localStorage - only stores values different from defaults
    */
-  static saveLocalSettings(settings: ChatSettingsGetResponseOutput): void {
+  static saveLocalSettings(
+    settings: ChatSettingsGetResponseOutput,
+    user: JwtPayloadType,
+    env: ModelProviderEnvAvailability,
+  ): void {
     if (typeof window === "undefined") {
       return;
     }
 
-    const defaults = this.getDefaults();
+    const defaults = this.getDefaults(user, env);
     const overrides: Partial<ChatSettingsGetResponseOutput> = {};
 
     // Only store values that differ from defaults
@@ -194,11 +225,22 @@ export class ChatSettingsRepositoryClient {
       overrides.sttModelSelection = settings.sttModelSelection;
     }
     if (
-      JSON.stringify(settings.visionBridgeModelSelection) !==
-      JSON.stringify(defaults.visionBridgeModelSelection)
+      JSON.stringify(settings.imageVisionModelSelection) !==
+      JSON.stringify(defaults.imageVisionModelSelection)
     ) {
-      overrides.visionBridgeModelSelection =
-        settings.visionBridgeModelSelection;
+      overrides.imageVisionModelSelection = settings.imageVisionModelSelection;
+    }
+    if (
+      JSON.stringify(settings.videoVisionModelSelection) !==
+      JSON.stringify(defaults.videoVisionModelSelection)
+    ) {
+      overrides.videoVisionModelSelection = settings.videoVisionModelSelection;
+    }
+    if (
+      JSON.stringify(settings.audioVisionModelSelection) !==
+      JSON.stringify(defaults.audioVisionModelSelection)
+    ) {
+      overrides.audioVisionModelSelection = settings.audioVisionModelSelection;
     }
     if (settings.translationModelId !== defaults.translationModelId) {
       overrides.translationModelId = settings.translationModelId;
@@ -243,8 +285,10 @@ export class ChatSettingsRepositoryClient {
    */
   static updateLocalSettings(
     updates: Partial<ChatSettingsUpdateRequestOutput>,
+    user: JwtPayloadType,
+    env: ModelProviderEnvAvailability,
   ): ChatSettingsGetResponseOutput {
-    const current = this.loadLocalSettings();
+    const current = this.loadLocalSettings(user, env);
     const updated: ChatSettingsGetResponseOutput = {
       selectedModel: updates.selectedModel ?? current.selectedModel,
       selectedSkill: updates.selectedSkill ?? current.selectedSkill,
@@ -259,9 +303,12 @@ export class ChatSettingsRepositoryClient {
       voiceModelSelection:
         updates.voiceModelSelection ?? current.voiceModelSelection,
       sttModelSelection: updates.sttModelSelection ?? current.sttModelSelection,
-      visionBridgeModelSelection:
-        updates.visionBridgeModelSelection ??
-        current.visionBridgeModelSelection,
+      imageVisionModelSelection:
+        updates.imageVisionModelSelection ?? current.imageVisionModelSelection,
+      videoVisionModelSelection:
+        updates.videoVisionModelSelection ?? current.videoVisionModelSelection,
+      audioVisionModelSelection:
+        updates.audioVisionModelSelection ?? current.audioVisionModelSelection,
       translationModelId:
         updates.translationModelId ?? current.translationModelId,
       defaultChatMode: updates.defaultChatMode ?? current.defaultChatMode,
@@ -288,7 +335,7 @@ export class ChatSettingsRepositoryClient {
           : current.codingAgent,
     };
 
-    this.saveLocalSettings(updated);
+    this.saveLocalSettings(updated, user, env);
     return updated;
   }
 
@@ -308,7 +355,7 @@ export class ChatSettingsRepositoryClient {
    */
   static async selectFavorite(params: {
     favoriteId: string;
-    modelId: ModelId | null;
+    modelId: ChatModelId | null;
     skillId: string | null;
     logger: EndpointLogger;
     locale: CountryLanguage;

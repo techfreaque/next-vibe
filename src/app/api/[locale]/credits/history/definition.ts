@@ -5,11 +5,10 @@
 
 import { z } from "zod";
 
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -23,6 +22,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { dateSchema } from "../../shared/types/common.schema";
 import { paginationField } from "../../system/unified-interface/unified-ui/widgets/containers/pagination/types";
 import { CreditTransactionType } from "../enum";
@@ -189,7 +189,7 @@ const { GET } = createEndpoint({
             id: "123e4567-e89b-12d3-a456-426614174000",
             amount: -5,
             balanceAfter: 1495,
-            type: `${CreditTransactionType.USAGE} (${ModelId.GPT_5_MINI})`,
+            type: `${CreditTransactionType.USAGE} (${ChatModelId.GPT_5_MINI})`,
             messageId: "msg-123e4567-e89b-12d3-a456-426614174000",
             createdAt: "2025-10-16T12:00:00.000Z",
           },

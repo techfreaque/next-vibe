@@ -16,20 +16,16 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import {
-  getDefaultModelForRole,
-  getModelById,
-} from "@/app/api/[locale]/agent/models/models";
-import type {
-  ManualModelSelection,
-  ModelSelectionSimple,
-} from "@/app/api/[locale]/agent/models/types";
+import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/models/types";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
+import { getVideoGenModelById } from "@/app/api/[locale]/agent/video-generation/models";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
@@ -40,11 +36,12 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
+import { objectValues } from "../../shared/utils";
 import type definition from "./definition";
 import type { VideoGenerationPostResponseOutput } from "./definition";
-import type { VideoGenModelId } from "./enum";
-import { VIDEO_GEN_MODEL_IDS, VideoDuration } from "./enum";
+import { VideoDuration } from "./enum";
 import { scopedTranslation } from "./i18n";
+import { VideoGenModelId } from "./models";
 
 interface CustomWidgetProps {
   field: {
@@ -77,8 +74,8 @@ export function VideoGenerationContainer({
   const result = field.value;
   const children = field.children;
   const prompt = form?.watch("prompt") ?? "";
-  const envAvailability = useEnvAvailability();
   const user = useWidgetUser();
+  const envAvailability = useEnvAvailability();
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const [showModelSelector, setShowModelSelector] = useState(false);
@@ -86,8 +83,8 @@ export function VideoGenerationContainer({
   const currentModelId = form?.watch("model");
   const currentDuration = form?.watch("duration") ?? VideoDuration.SHORT;
 
-  const modelSelection = useMemo((): ModelSelectionSimple | undefined => {
-    // model is patched from stream context into request args (streamContextPatch)
+  const modelSelection = useMemo((): VideoGenModelSelection | undefined => {
+    // model is resolved via serverDefault on the field definition
     if (!currentModelId) {
       return undefined;
     }
@@ -98,27 +95,36 @@ export function VideoGenerationContainer({
   }, [currentModelId]);
 
   const defaultModelSelection = useMemo(():
-    | ModelSelectionSimple
+    | VideoGenModelSelection
     | undefined => {
-    const m = getDefaultModelForRole(["video-gen"], envAvailability);
+    const m = SkillsRepositoryClient.getBestVideoGenModel(
+      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
+      user,
+      envAvailability,
+    );
     if (!m) {
       return undefined;
     }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [envAvailability]);
+    const modelId = objectValues(VideoGenModelId).includes(m.id)
+      ? m.id
+      : undefined;
+    if (!modelId) {
+      return undefined;
+    }
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: modelId };
+  }, [user, envAvailability]);
 
-  const resolvedModelId =
+  const resolvedModelId: VideoGenModelId | undefined =
     currentModelId ??
     (defaultModelSelection?.selectionType === ModelSelectionType.MANUAL
-      ? defaultModelSelection.manualModelId
+      ? objectValues(VideoGenModelId).includes(
+          defaultModelSelection.manualModelId,
+        )
+        ? defaultModelSelection.manualModelId
+        : undefined
       : undefined);
-  const effectiveModelId =
-    resolvedModelId !== undefined &&
-    VIDEO_GEN_MODEL_IDS.includes(resolvedModelId)
-      ? resolvedModelId
-      : resolvedModelId;
-  const resolvedModel = effectiveModelId
-    ? getModelById(effectiveModelId)
+  const resolvedModel = resolvedModelId
+    ? getVideoGenModelById(resolvedModelId)
     : undefined;
 
   const appendStyle = (style: string): void => {
@@ -146,10 +152,12 @@ export function VideoGenerationContainer({
               sel !== null &&
               sel.selectionType === ModelSelectionType.MANUAL
             ) {
-              form?.setValue(
-                "model",
-                (sel as ManualModelSelection).manualModelId as VideoGenModelId,
+              const modelId = Object.values(VideoGenModelId).find(
+                (id) => id === sel.manualModelId,
               );
+              if (modelId !== undefined) {
+                form?.setValue("model", modelId);
+              }
             }
             setShowModelSelector(false);
           }}
@@ -233,9 +241,9 @@ export function VideoGenerationContainer({
             <Span className="text-xs font-medium text-muted-foreground">
               {t("post.model.label")}
             </Span>
-            {effectiveModelId && (
+            {resolvedModelId && (
               <ModelCreditDisplay
-                modelId={effectiveModelId}
+                modelId={resolvedModelId}
                 variant="badge"
                 badgeVariant="secondary"
                 className="text-[10px] h-5"

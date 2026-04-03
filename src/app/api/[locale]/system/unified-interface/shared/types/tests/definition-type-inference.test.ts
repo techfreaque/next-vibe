@@ -19,7 +19,7 @@ import type { z } from "zod";
 import type imapAccountsListDefinition from "@/app/api/[locale]/messenger/accounts/list/definition";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import {
-  objectFieldNew,
+  objectField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type {
@@ -502,7 +502,7 @@ type Test12a_ExtractTKey =
 // What is TKey here? Should be "app.common.test" if const preserves it
 
 // Test 12b: Create an object field with children
-const containerField = objectFieldNew({
+const containerField = objectField({
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.GRID,
   columns: 12,
@@ -730,7 +730,7 @@ type Test14h_Method = typeof imapAccountsListDefinition.GET.method;
 // ============================================================================
 
 // Test 15a: Call objectField directly and check the return type
-const directObjectField = objectFieldNew({
+const directObjectField = objectField({
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.GRID,
   columns: 12,
@@ -762,7 +762,7 @@ type Test15e_ExtractTKey =
     : "no-match";
 
 // Test 15f: Create field with explicit string literals for translation keys
-const fieldWithLabels = objectFieldNew({
+const fieldWithLabels = objectField({
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.GRID,
   columns: 12,

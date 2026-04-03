@@ -2,25 +2,13 @@ import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import type { JSONValue } from "ai";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import {
-  ApiProvider,
-  isModelOptionAudioBased,
-  isModelOptionVideoBased,
-  type ModelOption,
-} from "@/app/api/[locale]/agent/models/models";
+import { type ChatModelOption } from "@/app/api/[locale]/agent/ai-stream/models";
+import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { createClaudeCode } from "../../providers/claude-code";
-import { createFalAiAudio } from "../../providers/fal-ai-audio";
-import { createFalAiImage } from "../../providers/fal-ai-image";
 import { createFreedomGPT } from "../../providers/freedomgpt";
 import { createGabAI } from "../../providers/gab-ai";
-import { createModelsLabAudio } from "../../providers/modelslab-audio";
-import { createModelsLabVideo } from "../../providers/modelslab-video";
-import { createOpenAIImages } from "../../providers/openai-images";
-import { createReplicateAudio } from "../../providers/replicate-audio";
-import { createReplicateImage } from "../../providers/replicate-image";
 import { logProviderRequest } from "../../providers/shared/debug-file-logger";
 import { createUncensoredAI } from "../../providers/uncensored-ai";
 import { createVeniceAI } from "../../providers/venice-ai";
@@ -73,9 +61,8 @@ function sortObjectKeys(obj: JSONValue): JSONValue {
 
 export class ProviderFactory {
   static getProviderForModel(
-    modelOption: ModelOption,
+    modelOption: ChatModelOption,
     logger: EndpointLogger,
-    locale: CountryLanguage,
   ): ReturnType<
     | typeof createOpenRouter
     | typeof createUncensoredAI
@@ -83,13 +70,6 @@ export class ProviderFactory {
     | typeof createGabAI
     | typeof createVeniceAI
     | typeof createClaudeCode
-    | typeof createOpenAIImages
-    | typeof createReplicateImage
-    | typeof createFalAiImage
-    | typeof createReplicateAudio
-    | typeof createFalAiAudio
-    | typeof createModelsLabAudio
-    | typeof createModelsLabVideo
   > {
     switch (modelOption.apiProvider) {
       case ApiProvider.CLAUDE_CODE:
@@ -106,42 +86,6 @@ export class ProviderFactory {
 
       case ApiProvider.VENICE_AI:
         return createVeniceAI(logger);
-
-      case ApiProvider.OPENAI_IMAGES:
-        return createOpenAIImages(logger, locale);
-
-      case ApiProvider.REPLICATE:
-        if (isModelOptionAudioBased(modelOption)) {
-          return createReplicateAudio(logger, modelOption, locale);
-        }
-        return createReplicateImage(logger, locale);
-
-      case ApiProvider.FAL_AI:
-        if (isModelOptionAudioBased(modelOption)) {
-          return createFalAiAudio(logger, modelOption, locale);
-        }
-        return createFalAiImage(logger, locale);
-
-      case ApiProvider.MODELSLAB: {
-        if (isModelOptionAudioBased(modelOption)) {
-          return createModelsLabAudio(logger, modelOption, locale);
-        }
-        // video-gen - MODELSLAB only has audio and video models; guard narrows to VideoBased
-        const videoModel = isModelOptionVideoBased(modelOption)
-          ? modelOption
-          : null;
-        if (videoModel) {
-          return createModelsLabVideo(logger, videoModel, locale);
-        }
-        logger.error(
-          "MODELSLAB provider received unsupported model role",
-          new Error(modelOption.modelRole),
-        );
-        // Unreachable in practice - MODELSLAB only registers audio/video models
-        return createOpenRouter({
-          apiKey: "",
-        });
-      }
 
       default: {
         // Custom fetch wrapper that normalizes request body for stable caching

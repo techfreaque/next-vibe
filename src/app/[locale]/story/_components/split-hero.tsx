@@ -26,6 +26,8 @@ import { useState } from "react";
 import { PLATFORM_COUNT } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { configScopedTranslation } from "@/config/i18n";
+
 import { scopedTranslation } from "./i18n";
 
 export type ActiveSide = "unbottled" | "personal" | "nextvibe" | null;
@@ -156,6 +158,8 @@ export function SplitHero({
   onSideChange,
 }: SplitHeroProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
   const [locked, setLocked] = useState<ActiveSide>(null);
   const orLabel = t("home.splitHero.or");
 
@@ -188,7 +192,7 @@ export function SplitHero({
   ];
 
   const nextvibePills: PillItem[] = [
-    { Icon: Layers, label: t("home.splitHero.nextvibe.pill1") },
+    { Icon: Layers, label: t("home.splitHero.nextvibe.pill1", { appName }) },
     { Icon: Code, label: t("home.splitHero.nextvibe.pill2") },
     {
       Icon: GitBranch,
@@ -233,7 +237,12 @@ export function SplitHero({
         grid={PERSONAL_GRID}
         onClick={() => handleClick("personal")}
       >
-        <PersonalContent locale={locale} pills={personalPills} t={t} />
+        <PersonalContent
+          locale={locale}
+          pills={personalPills}
+          t={t}
+          onSideChange={onSideChange}
+        />
       </Panel>
 
       <HorizontalDivider label={orLabel} />
@@ -250,6 +259,7 @@ export function SplitHero({
           totalToolCount={totalToolCount}
           pills={nextvibePills}
           t={t}
+          onSideChange={onSideChange}
         />
       </Panel>
     </Div>
@@ -384,7 +394,21 @@ function UnbottledContent({
   );
 }
 
-function PersonalContent({ locale, pills, t }: PanelContentProps): JSX.Element {
+function PersonalContent({
+  locale,
+  pills,
+  t,
+  onSideChange,
+}: PanelContentProps): JSX.Element {
+  function handleLearnMore(e: ButtonMouseEvent): void {
+    e.stopPropagation();
+    onSideChange?.("personal");
+    setTimeout(() => {
+      document
+        .getElementById("universe-content")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  }
   return (
     <PanelInner>
       <MotionDiv
@@ -462,13 +486,9 @@ function PersonalContent({ locale, pills, t }: PanelContentProps): JSX.Element {
           size="lg"
           variant="outline"
           className="bg-transparent border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/15 hover:text-emerald-200 hover:border-emerald-400 font-semibold"
-          asChild
-          onClick={(e) => e.stopPropagation()}
+          onClick={handleLearnMore}
         >
-          <Link href="https://github.com/techfreaque/next-vibe">
-            <GitBranch className="mr-2 h-4 w-4" />
-            {t("home.splitHero.personal.ctaGithub")}
-          </Link>
+          {t("home.splitHero.personal.ctaGithub")}
         </Button>
       </MotionDiv>
     </PanelInner>
@@ -484,7 +504,17 @@ function NextVibeContent({
   totalToolCount,
   pills,
   t,
+  onSideChange,
 }: NextVibeContentProps): JSX.Element {
+  function handleLearnMore(e: ButtonMouseEvent): void {
+    e.stopPropagation();
+    onSideChange?.("nextvibe");
+    setTimeout(() => {
+      document
+        .getElementById("universe-content")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  }
   return (
     <PanelInner>
       <MotionDiv
@@ -551,19 +581,7 @@ function NextVibeContent({
       >
         <Button
           size="lg"
-          variant="outline"
-          className="bg-transparent border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/15 hover:text-cyan-200 hover:border-cyan-400 font-semibold flex-1 min-w-[140px]"
-          asChild
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Link href="https://github.com/techfreaque/next-vibe">
-            <GitBranch className="mr-2 h-4 w-4" />
-            {t("home.splitHero.nextvibe.ctaGithub")}
-          </Link>
-        </Button>
-        <Button
-          size="lg"
-          className="bg-cyan-600 hover:bg-cyan-500 text-white border-0 font-semibold shadow-lg shadow-cyan-900/40 flex-1 min-w-[140px]"
+          className="bg-cyan-600 hover:bg-cyan-500 text-white border-0 font-semibold shadow-lg shadow-cyan-900/40"
           asChild
           onClick={(e) => e.stopPropagation()}
         >
@@ -571,6 +589,14 @@ function NextVibeContent({
             {t("home.splitHero.nextvibe.ctaDocs")}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
+        </Button>
+        <Button
+          size="lg"
+          variant="outline"
+          className="bg-transparent border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/15 hover:text-cyan-200 hover:border-cyan-400 font-semibold"
+          onClick={handleLearnMore}
+        >
+          {t("home.splitHero.nextvibe.ctaExplore")}
         </Button>
       </MotionDiv>
     </PanelInner>

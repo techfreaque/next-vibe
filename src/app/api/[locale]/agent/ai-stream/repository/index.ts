@@ -13,11 +13,6 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import type {
-  ImageGenModelId,
-  MusicGenModelId,
-  VideoGenModelId,
-} from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -31,14 +26,17 @@ import {
 } from "../../chat/threads/[threadId]/messages/emitter";
 import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
 import { MessagesRepository } from "../../chat/threads/[threadId]/messages/repository";
+import type { ImageGenModelId } from "../../image-generation/models";
+import type { MusicGenModelId } from "../../music-generation/models";
 import { scopedTranslation as sttScopedTranslation } from "../../speech-to-text/i18n";
+import type { VideoGenModelId } from "../../video-generation/models";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
 } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
-import { clearStreamingState } from "./core/stream-registry";
 import { ModalityResolver } from "./core/modality-resolver";
+import { clearStreamingState } from "./core/stream-registry";
 import {
   subscribeWakeUpSignal,
   type WakeUpPayload,
@@ -477,11 +475,7 @@ export class AiStreamRepository {
                   (typeof CompactingHandler)["executeCompacting"]
                 >["0"]["preFilledHistoryMessages"]
               | undefined;
-            const isPureMediaGenForCompacting =
-              modelConfig.modelRole === "image-gen" ||
-              modelConfig.modelRole === "video-gen" ||
-              modelConfig.modelRole === "audio-gen";
-            if (!isPureMediaGenForCompacting) {
+            {
               try {
                 const { MessageConverter } =
                   await import("./handlers/message-converter");
@@ -637,12 +631,8 @@ export class AiStreamRepository {
           }
 
           // Gap-fill: replace unsupported attachment parts with text variants
-          // via vision bridge / STT. Skip for pure media-generation models.
-          const isPureMediaGen =
-            modelConfig.modelRole === "image-gen" ||
-            modelConfig.modelRole === "video-gen" ||
-            modelConfig.modelRole === "audio-gen";
-          if (!isPureMediaGen) {
+          // via vision bridge / STT.
+          {
             const chatHistory = [
               ...compactingCheck.branchMessages,
               ...(compactingCheck.currentUserMessage

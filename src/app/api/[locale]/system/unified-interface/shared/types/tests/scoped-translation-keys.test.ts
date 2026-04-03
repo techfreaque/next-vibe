@@ -24,7 +24,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { ExtractScopedKeyType } from "@/i18n/core/static-types";
 
 import { createEndpoint } from "../../endpoints/definition/create";
-import { objectField, requestField } from "../../field/utils-new";
+import { objectField, requestField } from "../../field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -623,7 +623,7 @@ const globalEndpointInvalidTitle = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -683,7 +683,7 @@ const globalEndpointInvalidErrorTitle = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -792,7 +792,7 @@ const scopedEndpointInvalidTitle = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -818,7 +818,7 @@ const scopedEndpointGlobalKey = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -845,7 +845,7 @@ const scopedEndpointInvalidDescription = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -872,7 +872,7 @@ const scopedEndpointInvalidCategory = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -899,7 +899,7 @@ const scopedEndpointInvalidTags = createEndpoint({
   // @ts-expect-error - Invalid tag key in array
   tags: ["invalid.tag.key"] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -925,7 +925,7 @@ const scopedEndpointInvalidErrorTitle = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -989,7 +989,7 @@ const scopedEndpointInvalidSuccessTitle = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -1016,7 +1016,7 @@ const scopedEndpointInvalidSuccessDescription = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -1050,7 +1050,7 @@ const scopedEndpointInvalidTextFieldLabel = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -1083,7 +1083,7 @@ const scopedEndpointInvalidTextFieldLabelWithType = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -1430,7 +1430,7 @@ const scopedEndpointInvalidDateFieldLabel = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectFieldNew({
+  fields: objectField({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -1566,7 +1566,7 @@ const test6B_invalidField = requestField({
 // objectField uses global TranslationKey - container title must be a global key.
 // "form.label" is a scoped contact key, NOT a global key - use a global key here.
 // ---------------------------------------------------------------------------
-const test6C_validObject = objectFieldNew({
+const test6C_validObject = objectField({
   type: WidgetType.CONTAINER,
   title: "app.common.active", // Valid global key
   layoutType: LayoutType.GRID,
@@ -1585,7 +1585,7 @@ const test6C_validObject = objectFieldNew({
 
 // NOTE: requestField does NOT enforce key validation at the property level inside objectField either.
 // Child label keys in requestField are not validated - no @ts-expect-error needed.
-const test6C_invalidObject = objectFieldNew({
+const test6C_invalidObject = objectField({
   type: WidgetType.CONTAINER,
   title: "app.common.active", // Valid global key
   layoutType: LayoutType.GRID,

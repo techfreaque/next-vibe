@@ -1084,6 +1084,7 @@ export const translations = {
     createButton: {
       label: "Create Custom Skill",
     },
+    openFullPage: "Open full page",
     browser: {
       advancedModelAccess: "Choose Your AI Experience",
       configureFiltersText:
@@ -1294,9 +1295,19 @@ export const translations = {
       description: "Model used for speech recognition",
       placeholder: "System default",
     },
-    visionBridgeModel: {
-      label: "Vision Model",
-      description: "Model used for image analysis",
+    imageVisionModel: {
+      label: "Image Vision Model",
+      description: "Model used for analyzing images",
+      placeholder: "System default",
+    },
+    videoVisionModel: {
+      label: "Video Vision Model",
+      description: "Model used for analyzing videos",
+      placeholder: "System default",
+    },
+    audioVisionModel: {
+      label: "Audio Vision Model",
+      description: "Model used for analyzing audio",
       placeholder: "System default",
     },
     translationModel: {

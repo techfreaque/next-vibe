@@ -47,8 +47,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-
 import type { EventSchemas } from "../../../websocket/types";
 import type { EndpointLogger } from "../../logger/endpoint";
 
@@ -288,17 +286,6 @@ export interface ApiEndpoint<
     request?: Partial<InferRequestInput<TFields>>;
     response?: Partial<InferResponseInput<TFields>>;
   }) => number | undefined;
-
-  /**
-   * Optional function that patches stream context values onto request fields before execution.
-   * Called by tools-loader when the tool is invoked by the AI stream.
-   * Returned fields are merged into the request args, overriding any AI-supplied values.
-   * Use this to inject resolved model IDs, settings, or context-derived values as request fields
-   * so they appear in the tool call display and drive repository logic — not as opaque side-effects.
-   */
-  readonly streamContextPatch?: (
-    context: ToolExecutionContext,
-  ) => Partial<InferRequestInput<TFields>>;
 
   /**
    * Whether the tool call block starts expanded in the chat UI.
@@ -677,7 +664,6 @@ export function createEndpoint<
     cli: config.cli,
     credits: config.credits,
     dynamicCredits: config.dynamicCredits,
-    streamContextPatch: config.streamContextPatch,
     defaultExpanded: config.defaultExpanded,
     icon: config.icon,
     events: config.events,

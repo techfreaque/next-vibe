@@ -18,6 +18,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import { agentEnvAvailability } from "../../env-availability";
 import { ModelSelectionType } from "../skills/enum";
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
 import { getDefaultToolIdsForUser } from "../constants";
@@ -91,11 +92,16 @@ export class ChatSettingsRepository {
 
       if (settings.length === 0) {
         logger.debug("No settings found for user, returning defaults");
-        return success(ChatSettingsRepositoryClient.getDefaults());
+        return success(
+          ChatSettingsRepositoryClient.getDefaults(user, agentEnvAvailability),
+        );
       }
 
       const setting = settings[0];
-      const defaults = ChatSettingsRepositoryClient.getDefaults();
+      const defaults = ChatSettingsRepositoryClient.getDefaults(
+        user,
+        agentEnvAvailability,
+      );
       const result: ChatSettingsGetResponseOutput = {
         selectedModel: setting.selectedModel ?? defaults.selectedModel,
         selectedSkill: setting.selectedSkill ?? defaults.selectedSkill,
@@ -105,9 +111,15 @@ export class ChatSettingsRepository {
           setting.voiceModelSelection ?? defaults.voiceModelSelection,
         sttModelSelection:
           setting.sttModelSelection ?? defaults.sttModelSelection,
-        visionBridgeModelSelection:
-          setting.visionBridgeModelSelection ??
-          defaults.visionBridgeModelSelection,
+        imageVisionModelSelection:
+          setting.imageVisionModelSelection ??
+          defaults.imageVisionModelSelection,
+        videoVisionModelSelection:
+          setting.videoVisionModelSelection ??
+          defaults.videoVisionModelSelection,
+        audioVisionModelSelection:
+          setting.audioVisionModelSelection ??
+          defaults.audioVisionModelSelection,
         translationModelId:
           setting.translationModelId ?? defaults.translationModelId,
         imageGenModelSelection:
@@ -167,7 +179,10 @@ export class ChatSettingsRepository {
         .from(chatSettings)
         .where(eq(chatSettings.userId, userId));
 
-      const defaults = ChatSettingsRepositoryClient.getDefaults();
+      const defaults = ChatSettingsRepositoryClient.getDefaults(
+        user,
+        agentEnvAvailability,
+      );
 
       // Normalize tools - null passthrough means "all allowed"
       const availableToolsToStore =
@@ -230,9 +245,17 @@ export class ChatSettingsRepository {
               data.sttModelSelection !== undefined
                 ? (data.sttModelSelection ?? null)
                 : undefined,
-            visionBridgeModelSelection:
-              data.visionBridgeModelSelection !== undefined
-                ? (data.visionBridgeModelSelection ?? null)
+            imageVisionModelSelection:
+              data.imageVisionModelSelection !== undefined
+                ? (data.imageVisionModelSelection ?? null)
+                : undefined,
+            videoVisionModelSelection:
+              data.videoVisionModelSelection !== undefined
+                ? (data.videoVisionModelSelection ?? null)
+                : undefined,
+            audioVisionModelSelection:
+              data.audioVisionModelSelection !== undefined
+                ? (data.audioVisionModelSelection ?? null)
                 : undefined,
             translationModelId:
               data.translationModelId !== undefined
@@ -310,7 +333,9 @@ export class ChatSettingsRepository {
                 : null,
             voiceModelSelection: data.voiceModelSelection ?? null,
             sttModelSelection: data.sttModelSelection ?? null,
-            visionBridgeModelSelection: data.visionBridgeModelSelection ?? null,
+            imageVisionModelSelection: data.imageVisionModelSelection ?? null,
+            videoVisionModelSelection: data.videoVisionModelSelection ?? null,
+            audioVisionModelSelection: data.audioVisionModelSelection ?? null,
             translationModelId: data.translationModelId ?? null,
             imageGenModelSelection: data.imageGenModelSelection ?? null,
             musicGenModelSelection: data.musicGenModelSelection ?? null,

@@ -189,12 +189,20 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
       });
 
       // Handle file responses - return immediately
+      // Use native Response with ArrayBuffer body to ensure Content-Length is
+      // preserved (NextResponse + Blob/Uint8Array triggers chunked encoding,
+      // which breaks <audio>/<video> elements that need Content-Length for duration).
       if (isFileResponse(result)) {
         logger.debug("Returning file response");
-        const body = Buffer.isBuffer(result.buffer)
-          ? new Blob([new Uint8Array(result.buffer)])
-          : result.buffer;
-        return new NextResponse(body, {
+        const arrayBuffer = Buffer.isBuffer(result.buffer)
+          ? result.buffer.buffer.slice(
+              result.buffer.byteOffset,
+              result.buffer.byteOffset + result.buffer.byteLength,
+            )
+          : result.buffer instanceof Blob
+            ? await result.buffer.arrayBuffer()
+            : result.buffer;
+        return new Response(arrayBuffer, {
           status: 200,
           headers: {
             "Content-Type": result.contentType,

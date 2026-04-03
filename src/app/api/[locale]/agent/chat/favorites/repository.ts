@@ -23,6 +23,7 @@ import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { agentEnvAvailability } from "../../env-availability";
 import { DEFAULT_SKILLS } from "../skills/config";
 import { NO_SKILL_ID } from "../skills/constants";
 import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
@@ -125,6 +126,7 @@ export class ChatFavoritesRepository {
               id: favorite.id,
               skillId: favorite.skillId,
               variantId: favorite.variantId ?? null,
+              customVariantName: favorite.customVariantName ?? null,
               customIcon: favorite.customIcon,
               voiceModelSelection: favorite.voiceModelSelection ?? null,
               modelSelection: favorite.modelSelection,
@@ -139,6 +141,7 @@ export class ChatFavoritesRepository {
             characterVoice,
             locale,
             user,
+            agentEnvAvailability,
           );
         }),
       );
@@ -267,11 +270,11 @@ export class ChatFavoritesRepository {
           }
         }
         const characterName = variantLabel
-          ? `${baseName} – ${variantLabel}`
+          ? `${baseName} - ${variantLabel}`
           : baseName;
         return {
           id: row.id,
-          name: row.customName ?? characterName,
+          name: row.customVariantName ?? characterName,
           skillId: row.skillId,
           characterName,
           modelId: null as string | null, // model resolved client-side; not stored server-side
@@ -360,11 +363,11 @@ export class ChatFavoritesRepository {
         }
       }
       const characterName = variantLabel
-        ? `${baseName} – ${variantLabel}`
+        ? `${baseName} - ${variantLabel}`
         : baseName;
       return {
         id: row.id,
-        name: row.customName ?? characterName,
+        name: row.customVariantName ?? characterName,
         skillId: row.skillId,
         characterName,
         modelId: null,

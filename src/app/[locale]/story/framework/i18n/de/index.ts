@@ -3,11 +3,11 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "next-vibe Framework",
   description:
-    "Das Open-Source SaaS-Framework hinter unbottled.ai. Einmal definieren, überall vorhanden.",
+    "Das Open-Source SaaS-Framework hinter {{appName}}. Einmal definieren, überall vorhanden.",
   meta: {
     title: "next-vibe Framework",
     description:
-      "Open-Source KI-natives SaaS-Framework. Eine Endpoint-Definition, dreizehn Plattformn.",
+      "Open-Source KI-natives SaaS-Framework. Eine Endpoint-Definition, dreizehn Plattformen.",
     category: "Framework",
     imageAlt: "next-vibe Framework Dokumentation",
     keywords:
@@ -16,9 +16,9 @@ export const translations: typeof enTranslations = {
   hero: {
     eyebrow: "Open Source · MIT + GPL v3",
     title: "Eine Definition.",
-    titleAccent: "Dreizehn Plattformn.",
+    titleAccent: "Dreizehn Plattformen.",
     subtitle:
-      "next-vibe macht aus einer einzigen TypeScript-Definition dreizehn Plattformn gleichzeitig - Web-Formular, CLI-Befehl, MCP-Tool, Mobile-Screen, Cron-Job, WebSocket, Admin-Panel und mehr. Vollständig typsicher, ohne Drift, ohne Wiederholung.",
+      "next-vibe macht aus einer einzigen TypeScript-Definition dreizehn Plattformen gleichzeitig - Web-Formular, CLI-Befehl, MCP-Tool, Mobile-Screen, Cron-Job, WebSocket, Admin-Panel und mehr. Vollständig typsicher, ohne Drift, ohne Wiederholung.",
     ctaGithub: "Auf GitHub staren",
     ctaDocs: "Pattern-Dokumentation lesen",
     stat1Label: "typed endpoints",
@@ -54,7 +54,7 @@ export const translations: typeof enTranslations = {
   },
   surfaces: {
     eyebrow: "Every Platform",
-    title: "Eine Definition. Dreizehn Plattformn.",
+    title: "Eine Definition. Dreizehn Plattformen.",
     subtitle:
       "Wenn du ein Feature zu next-vibe hinzufügst, wird es nicht nur ein API-Endpoint. Es läuft überall auf einmal.",
     items: {
@@ -157,7 +157,7 @@ export const translations: typeof enTranslations = {
   quickstart: {
     eyebrow: "Loslegen",
     title: "Forken, fragen, deployen.",
-    subtitle: "Vom ersten Tag an auf unbottled.ai-Niveau.",
+    subtitle: "Vom ersten Tag an auf {{appName}}-Niveau.",
     step1: {
       label: "Forken & klonen",
       description: "Auf GitHub forken, dann den Fork lokal klonen.",
@@ -175,7 +175,7 @@ export const translations: typeof enTranslations = {
     step4: {
       label: "KI fragen",
       description:
-        "unbottled.ai-Chat oder Claude Code öffnen und das gewünschte Feature beschreiben. Die KI schreibt alle Dateien - Definition, Route, Widget, i18n - und führt vibe check automatisch aus.",
+        "{{appName}}-Chat oder Claude Code öffnen und das gewünschte Feature beschreiben. Die KI schreibt alle Dateien - Definition, Route, Widget, i18n - und führt vibe check automatisch aus.",
     },
     step5: {
       label: "Deployen",

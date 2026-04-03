@@ -9,13 +9,7 @@ import "server-only";
 
 import { and, desc, eq } from "drizzle-orm";
 
-import type {
-  ImageGenModelId,
-  ModelId,
-  MusicGenModelId,
-  VideoGenModelId,
-} from "@/app/api/[locale]/agent/models/models";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/models/models";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -38,10 +32,15 @@ import {
   isManualSelection,
 } from "../../chat/skills/create/definition";
 import { SkillsRepositoryClient } from "../../chat/skills/repository-client";
+import { agentEnvAvailability } from "../../env-availability";
 import { ThreadsRepository } from "../../chat/threads/repository";
+import type { ChatModelId } from "../models";
 import type { AiStreamPostRequestOutput } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
 import { AiStreamRepository } from "./index";
+import type { MusicGenModelId } from "../../music-generation/models";
+import type { VideoGenModelId } from "../../video-generation/models";
+import type { ImageGenModelId } from "../../image-generation/models";
 
 /** A pre-fetched tool call result to inject into the thread before the AI runs */
 export interface HeadlessPreCall {
@@ -64,7 +63,7 @@ export interface HeadlessAiStreamParams {
    * AI model to use. Required unless favoriteId is provided.
    * Overrides the model from the favorite when both are given.
    */
-  model?: ModelId;
+  model?: ChatModelId;
   /**
    * Skill/persona for system prompt. Required unless favoriteId is provided.
    * Overrides the skill from the favorite when both are given.
@@ -174,6 +173,8 @@ export interface HeadlessAiStreamResult {
   threadId?: string;
   /** Final text content - populated in memory even for incognito (no DB read needed) */
   lastAiMessageContent: string | null;
+  /** URL of the last generated media (image/audio/video) — set when native file parts are emitted */
+  lastGeneratedMediaUrl?: string | null;
 }
 
 /**
@@ -192,7 +193,7 @@ export async function resolveFavorite(
   user: JwtPayloadType,
   logger: EndpointLogger,
   locale: CountryLanguage,
-): Promise<{ model: ModelId; skill: string } | null> {
+): Promise<{ model: ChatModelId; skill: string } | null> {
   const [favorite] = await db
     .select()
     .from(chatFavorites)
@@ -212,14 +213,18 @@ export async function resolveFavorite(
   const sel = favorite.modelSelection;
   if (sel && isManualSelection(sel) && "manualModelId" in sel) {
     return {
-      model: sel.manualModelId as ModelId,
+      model: sel.manualModelId,
       skill,
     };
   }
   if (sel && isFiltersSelection(sel)) {
-    const best = SkillsRepositoryClient.getBestModelForSkill(sel, user);
+    const best = SkillsRepositoryClient.getBestModelForSkill(
+      sel,
+      user,
+      agentEnvAvailability,
+    );
     if (best) {
-      return { model: best.id as ModelId, skill };
+      return { model: best.id, skill };
     }
   }
 
@@ -241,9 +246,13 @@ export async function resolveFavorite(
         : null;
       const varSel = variant?.modelSelection;
       if (varSel && (isManualSelection(varSel) || isFiltersSelection(varSel))) {
-        const best = SkillsRepositoryClient.getBestModelForSkill(varSel, user);
+        const best = SkillsRepositoryClient.getBestModelForSkill(
+          varSel,
+          user,
+          agentEnvAvailability,
+        );
         if (best) {
-          return { model: best.id as ModelId, skill };
+          return { model: best.id, skill };
         }
       }
     }
@@ -337,6 +346,7 @@ export async function runHeadlessAiStream(
             const best = SkillsRepositoryClient.getBestModelForSkill(
               varSel,
               user,
+              agentEnvAvailability,
             );
             if (best) {
               model = best.id;
@@ -531,7 +541,12 @@ export async function runHeadlessAiStream(
       return result;
     }
 
-    const { threadId, lastAiMessageId, lastAiMessageContent } = result.data;
+    const {
+      threadId,
+      lastAiMessageId,
+      lastAiMessageContent,
+      lastGeneratedMediaUrl,
+    } = result.data;
 
     logger.info("[Headless AI] Execution complete", {
       model,
@@ -545,6 +560,7 @@ export async function runHeadlessAiStream(
       data: {
         lastAiMessageId,
         lastAiMessageContent,
+        lastGeneratedMediaUrl,
         threadId: threadMode !== "none" ? threadId : undefined,
       },
     };

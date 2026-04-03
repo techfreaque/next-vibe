@@ -10,6 +10,7 @@ import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type {
   ChatMessage,
@@ -19,7 +20,6 @@ import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -130,7 +130,7 @@ function mkToolMsg(
     depth: 1,
     sequenceId: seq,
     isAI: true,
-    model: ModelId.CLAUDE_OPUS_4_6,
+    model: ChatModelId.CLAUDE_OPUS_4_6,
     metadata: {
       toolCall: { toolCallId, toolName, args, result, executionTime },
     },
@@ -153,7 +153,7 @@ function mkAssistantMsg(
     depth: 1,
     sequenceId: seq,
     isAI: true,
-    model: ModelId.CLAUDE_OPUS_4_6,
+    model: ChatModelId.CLAUDE_OPUS_4_6,
     metadata: { ...meta },
   });
 }

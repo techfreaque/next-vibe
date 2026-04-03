@@ -35,10 +35,11 @@ import { RecordingInputArea } from "@/app/api/[locale]/agent/ai-stream/stream/ho
 import { useVoiceRecording } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-voice-recording";
 import { Selector } from "@/app/api/[locale]/agent/ai-stream/stream/widget/selector";
 import { ToolsButton } from "@/app/api/[locale]/agent/ai-stream/stream/widget/tools-button";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
-import { getModelById } from "@/app/api/[locale]/agent/models/models";
+import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -110,7 +111,8 @@ export function BaseMessageInput({
     logger,
     initialSettingsData,
   );
-  const defaults = ChatSettingsRepositoryClient.getDefaults();
+  const env = useEnvAvailability();
+  const defaults = ChatSettingsRepositoryClient.getDefaults(user, env);
   const selectedModel = settings?.selectedModel ?? defaults.selectedModel;
   const selectedSkill = settings?.selectedSkill ?? defaults.selectedSkill;
   const ttsAutoplay = settings?.ttsAutoplay ?? defaults.ttsAutoplay;
@@ -121,7 +123,7 @@ export function BaseMessageInput({
   const [selectorOpen, setSelectorOpen] = useState(false);
 
   // Check if current model supports tools
-  const currentModel = getModelById(selectedModel);
+  const currentModel = getChatModelById(selectedModel);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
 
   // Voice recording state

@@ -9,20 +9,18 @@ import {
   CHAT_MODE_IDS,
   ChatModeOptions,
 } from "@/app/api/[locale]/agent/models/enum";
+import { ChatModelIdOptions } from "@/app/api/[locale]/agent/ai-stream/models";
+import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
 import {
-  getModelDisplayName,
-  LLM_MODEL_IDS,
-  LlmModelIdOptions,
-  ModelId,
-} from "@/app/api/[locale]/agent/models/models";
-import {
+  audioVisionModelSelectionSchema,
+  chatModelSelectionSchema,
   imageGenModelSelectionSchema,
-  modelSelectionSchemaSimple,
+  imageVisionModelSelectionSchema,
   musicGenModelSelectionSchema,
   skillVariantSchema,
   sttModelSelectionSchema,
   videoGenModelSelectionSchema,
-  visionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
   voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/models/types";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
@@ -50,7 +48,10 @@ import {
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazy } from "react";
 import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
+import { ChatModelId } from "../../../ai-stream/models";
+import { TtsModelId } from "../../../text-to-speech/models";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -70,7 +71,6 @@ import type { SkillListResponseOutput } from "../definition";
 import { CategoryOptions, SkillCategory } from "../enum";
 import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "./i18n";
-import { lazy } from "react";
 
 const SkillEditContainer = lazy(() =>
   import("./widget").then((m) => ({ default: m.SkillEditContainer })),
@@ -312,6 +312,8 @@ const { PATCH } = createEndpoint({
         // Import apiClient, skills list GET endpoint, and repository client
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        const { getEnvAvailability } =
+          await import("../../../env-availability-context");
         const skillsDefinition = await import("../definition");
         const { SkillsRepositoryClient } = await import("../repository-client");
 
@@ -390,6 +392,7 @@ const { PATCH } = createEndpoint({
                       ? SkillsRepositoryClient.getBestModelForSkill(
                           modelSel,
                           data.user,
+                          getEnvAvailability(),
                         )
                       : null;
 
@@ -566,12 +569,36 @@ const { PATCH } = createEndpoint({
           optionalColor: "transparent",
         },
       }),
-      visionBridgeModelSelection: requestField(scopedTranslation, {
-        schema: visionModelSelectionSchema.nullable().optional(),
+      imageVisionModelSelection: requestField(scopedTranslation, {
+        schema: imageVisionModelSelectionSchema.nullable().optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "patch.visionBridgeModel.label" as const,
-        description: "patch.visionBridgeModel.description" as const,
+        label: "patch.imageVisionModel.label" as const,
+        description: "patch.imageVisionModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      videoVisionModelSelection: requestField(scopedTranslation, {
+        schema: videoVisionModelSelectionSchema.nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.videoVisionModel.label" as const,
+        description: "patch.videoVisionModel.description" as const,
+        columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
+      }),
+      audioVisionModelSelection: requestField(scopedTranslation, {
+        schema: audioVisionModelSelectionSchema.nullable().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.audioVisionModel.label" as const,
+        description: "patch.audioVisionModel.description" as const,
         columns: 6,
         theme: {
           descriptionStyle: "inline",
@@ -579,10 +606,10 @@ const { PATCH } = createEndpoint({
         },
       }),
       translationModelId: requestField(scopedTranslation, {
-        schema: z.enum(LLM_MODEL_IDS).nullable().optional(),
+        schema: z.enum(ChatModelId).nullable().optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        options: LlmModelIdOptions,
+        options: ChatModelIdOptions,
         label: "patch.translationModel.label" as const,
         description: "patch.translationModel.description" as const,
         columns: 6,
@@ -658,7 +685,7 @@ const { PATCH } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "patch.modelSelection.label" as const,
         description: "patch.modelSelection.description" as const,
-        schema: modelSelectionSchemaSimple.nullable(),
+        schema: chatModelSelectionSchema.nullable(),
       }),
 
       // Auto-compacting token threshold (null = use global/settings default)
@@ -777,7 +804,9 @@ const { PATCH } = createEndpoint({
         isPublic: true,
         voiceModelSelection: null,
         sttModelSelection: undefined,
-        visionBridgeModelSelection: undefined,
+        imageVisionModelSelection: undefined,
+        videoVisionModelSelection: undefined,
+        audioVisionModelSelection: undefined,
         imageGenModelSelection: undefined,
         musicGenModelSelection: undefined,
         videoGenModelSelection: undefined,
@@ -785,7 +814,7 @@ const { PATCH } = createEndpoint({
         defaultChatMode: undefined,
         modelSelection: {
           selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ModelId.GPT_5,
+          manualModelId: ChatModelId.GPT_5,
         },
         availableTools: [
           { toolId: "execute-tool", requiresConfirmation: false },
@@ -895,15 +924,25 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: sttModelSelectionSchema.nullable(),
       }),
-      visionBridgeModelSelection: responseField(scopedTranslation, {
+      imageVisionModelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: visionModelSelectionSchema.nullable(),
+        schema: imageVisionModelSelectionSchema.nullable(),
+      }),
+      videoVisionModelSelection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: videoVisionModelSelectionSchema.nullable(),
+      }),
+      audioVisionModelSelection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: audioVisionModelSelectionSchema.nullable(),
       }),
       translationModelId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.enum(LLM_MODEL_IDS).nullable().optional(),
+        schema: z.enum(ChatModelId).nullable().optional(),
       }),
       imageGenModelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -1040,7 +1079,9 @@ const { GET } = createEndpoint({
         skillOwnership: SkillOwnershipType.SYSTEM,
         voiceModelSelection: null,
         sttModelSelection: null,
-        visionBridgeModelSelection: null,
+        imageVisionModelSelection: null,
+        videoVisionModelSelection: null,
+        audioVisionModelSelection: null,
         imageGenModelSelection: null,
         musicGenModelSelection: null,
         videoGenModelSelection: null,
@@ -1076,10 +1117,12 @@ const { GET } = createEndpoint({
         skillOwnership: SkillOwnershipType.PUBLIC,
         voiceModelSelection: {
           selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ModelId.OPENAI_ONYX,
+          manualModelId: TtsModelId.OPENAI_ONYX,
         },
         sttModelSelection: null,
-        visionBridgeModelSelection: null,
+        imageVisionModelSelection: null,
+        videoVisionModelSelection: null,
+        audioVisionModelSelection: null,
         imageGenModelSelection: null,
         musicGenModelSelection: null,
         videoGenModelSelection: null,

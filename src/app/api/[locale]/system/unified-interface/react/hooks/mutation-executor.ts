@@ -11,8 +11,10 @@ import { z } from "zod";
 
 import { scopedTranslation as reactNativeScopedTranslation } from "@/app/api/[locale]/system/unified-interface/react-native/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { Methods as MethodsEnum } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { EndpointErrorTypes } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import {
+  EndpointErrorTypes,
+  Methods as MethodsEnum,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";

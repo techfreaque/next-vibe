@@ -11,7 +11,7 @@ export const translations = {
   },
   hero: {
     backToBlog: "Back to Blog",
-    brand: "unbottled.ai - ",
+    brand: "{{appName}} - ",
     icon: "📊",
     category: "For Affiliate Pros",
     readTime: "6 min read",
@@ -23,7 +23,7 @@ export const translations = {
   recurringMath: {
     title: "The recurring revenue math",
     p1: "Most affiliate programs pay you once. E-commerce: you get a cut of one sale. Software trials: you get a flat fee if someone upgrades. AI subscriptions are different - they renew monthly, and so does your commission.",
-    p2: "The baseline unbottled.ai user spends around $8/month on average. At 10% direct commission, that's $0.80/month per referral. Not exciting. But here's what changes the math:",
+    p2: "The baseline {{appName}} user spends around $8/month on average. At 10% direct commission, that's $0.80/month per referral. Not exciting. But here's what changes the math:",
     powerUserTitle: "The power-user multiplier",
     powerUserBody:
       "Developers and AI-heavy users spend $200+/month without thinking twice - the average dev today has a $200/mo Claude Code or Codex subscription as a baseline. One power user referral earns you $20+/month recurring. That's more than 12 casual referrals combined.",
@@ -56,7 +56,7 @@ export const translations = {
   audience: {
     title: "Who's the natural audience for this platform?",
     intro:
-      "unbottled.ai's positioning is specific: free speech AI with 50+ models, user-controlled content filtering, privacy-first. That resonates with:",
+      "{{appName}}'s positioning is specific: free speech AI with 50+ models, user-controlled content filtering, privacy-first. That resonates with:",
     group1Title: "Developers and technical users",
     group1Body:
       "People who want API access, hate restrictive AI policies, and are already paying for multiple AI subscriptions. High ARPU, high retention.",
@@ -74,7 +74,7 @@ export const translations = {
     title: "Promotion angles that work",
     angle1Title: '"I compared 10 AI tools so you don\'t have to"',
     angle1Body:
-      "Comparison content converts affiliate traffic well. Feature unbottled.ai's model variety, pricing, and free-speech positioning against single-model tools.",
+      "Comparison content converts affiliate traffic well. Feature {{appName}}'s model variety, pricing, and free-speech positioning against single-model tools.",
     angle2Title: "Developer community posts",
     angle2Body:
       "GitHub README sections, dev Discord servers, r/LocalLLaMA, Hacker News. Technical users have higher ARPU and recommend tools in their communities.",
@@ -83,7 +83,7 @@ export const translations = {
       "r/selfhosted, privacy forums, Mastodon instances. The platform's open-source nature and self-hosting option land well here.",
     angle4Title: "Tutorial content",
     angle4Body:
-      '"How to use AI for X" content with unbottled.ai as the tool. Specific use cases (coding assistant, writing, research) convert better than generic AI reviews.',
+      '"How to use AI for X" content with {{appName}} as the tool. Specific use cases (coding assistant, writing, research) convert better than generic AI reviews.',
   },
   payouts: {
     title: "Payout mechanics - no surprises",

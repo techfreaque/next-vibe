@@ -25,7 +25,8 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { ApiProvider, modelDefinitions } from "../../models";
+import { ttsModelDefinitions } from "../../../text-to-speech/models";
+import { ApiProvider } from "../../models";
 import type { ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
 
@@ -53,11 +54,13 @@ const TIER_USD_PER_CHAR: Record<string, number> = {
 /** Default fallback: Creator plan rate (most common entry tier) */
 const DEFAULT_USD_PER_CHAR = TIER_USD_PER_CHAR["creator"];
 
-async function fetchUsdPerChar(logger: EndpointLogger): Promise<number> {
+async function fetchUsdPerChar(
+  logger: EndpointLogger,
+): Promise<number | undefined> {
   const apiKey = agentEnv.ELEVENLABS_API_KEY;
   if (!apiKey) {
-    logger.debug("ElevenLabs: no API key - using Creator plan fallback rate");
-    return DEFAULT_USD_PER_CHAR;
+    logger.debug("ElevenLabs: no API key - cannot fetch subscription tier");
+    return undefined;
   }
 
   try {
@@ -68,7 +71,7 @@ async function fetchUsdPerChar(logger: EndpointLogger): Promise<number> {
       logger.debug("ElevenLabs subscription API error", {
         status: response.status,
       });
-      return DEFAULT_USD_PER_CHAR;
+      return undefined;
     }
 
     const data = (await response.json()) as ElevenLabsSubscription;
@@ -84,7 +87,7 @@ async function fetchUsdPerChar(logger: EndpointLogger): Promise<number> {
     logger.debug("ElevenLabs subscription fetch failed", {
       error: parseError(err).message,
     });
-    return DEFAULT_USD_PER_CHAR;
+    return undefined;
   }
 }
 
@@ -96,9 +99,8 @@ export class ElevenLabsPriceFetcher extends PriceFetcher {
     const failures: ProviderPriceResult["failures"] = [];
 
     const usdPerChar = await fetchUsdPerChar(logger);
-    const creditsPerChar = this.usdToCredits(usdPerChar);
 
-    for (const def of Object.values(modelDefinitions)) {
+    for (const def of Object.values(ttsModelDefinitions)) {
       for (const providerConfig of def.providers) {
         if (
           providerConfig.apiProvider !== ApiProvider.ELEVENLABS ||
@@ -107,12 +109,22 @@ export class ElevenLabsPriceFetcher extends PriceFetcher {
           continue;
         }
 
+        if (usdPerChar === undefined) {
+          failures.push({
+            modelId: providerConfig.id,
+            provider: ApiProvider.ELEVENLABS,
+            reason:
+              "ElevenLabs API key missing or subscription fetch failed - cannot verify price",
+          });
+          continue;
+        }
+
         updates.push({
           modelId: providerConfig.id,
           name: def.name,
           provider: ApiProvider.ELEVENLABS,
           field: "creditCostPerCharacter",
-          value: creditsPerChar,
+          value: this.usdToCredits(usdPerChar),
           source: SUBSCRIPTION_URL,
           providerModel: providerConfig.providerModel,
         });

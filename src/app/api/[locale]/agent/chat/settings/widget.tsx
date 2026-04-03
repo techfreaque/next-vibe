@@ -36,20 +36,40 @@ import type { JSX, ReactNode } from "react";
 import { useMemo, useState } from "react";
 
 import { COMPACT_TRIGGER } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
+import {
+  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+} from "@/app/api/[locale]/agent/ai-stream/constants";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import type { Modality, ModelRole } from "@/app/api/[locale]/agent/models/enum";
 import {
-  getDefaultModelForRole,
-  getModelById,
-  type ModelId,
-} from "@/app/api/[locale]/agent/models/models";
+  getChatModelById,
+  type ChatModelId,
+} from "@/app/api/[locale]/agent/ai-stream/models";
 import type {
-  FiltersModelSelection,
-  ManualModelSelection,
-  ModelSelectionSimple,
+  AnyRoleModelSelection,
+  ChatManualModelSelection,
+  ChatModelSelection,
 } from "@/app/api/[locale]/agent/models/types";
+import {
+  audioVisionModelSelectionSchema,
+  imageGenModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  musicGenModelSelectionSchema,
+  sttModelSelectionSchema,
+  videoGenModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+  voiceModelSelectionSchema,
+} from "@/app/api/[locale]/agent/models/types";
+
 import {
   ModelSelector,
   ModelSelectorTrigger,
@@ -62,10 +82,6 @@ import type {
   ChatSettingsUpdateRequestOutput,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 const MIN_VALUE = 1_000;
 const MAX_ABSOLUTE = 200_000;
@@ -86,27 +102,22 @@ function formatTokens(n: number): string {
  */
 function getModelContextWindow(
   user: JwtPayloadType,
-  modelSelection:
-    | FiltersModelSelection
-    | ManualModelSelection
-    | ModelSelectionSimple
-    | ModelId
-    | null
-    | undefined,
-  characterModelSelection?: FiltersModelSelection | ManualModelSelection | null,
+  env: ReturnType<typeof useEnvAvailability>,
+  modelSelection: ChatModelSelection | ChatModelId | null | undefined,
+  characterModelSelection?: ChatModelSelection | null,
 ): number {
   if (typeof modelSelection === "string") {
-    const model = getModelById(modelSelection);
+    const model = getChatModelById(modelSelection);
     return model.contextWindow;
   }
 
   // Use the same resolution logic as getBestModelForFavorite:
   // favorite override → character default → MAX_ABSOLUTE
   const best = SkillsRepositoryClient.getBestModelForFavorite(
-    (modelSelection as FiltersModelSelection | ManualModelSelection | null) ??
-      null,
+    modelSelection ?? null,
     characterModelSelection ?? undefined,
     user,
+    env,
   );
   return best?.contextWindow ?? MAX_ABSOLUTE;
 }
@@ -217,17 +228,12 @@ export interface CompactTriggerEditProps {
    * Favorite's own model selection override - used to cap the slider.
    * When null/undefined, falls back to characterModelSelection.
    */
-  modelSelection?:
-    | FiltersModelSelection
-    | ManualModelSelection
-    | ModelSelectionSimple
-    | ModelId
-    | null;
+  modelSelection?: ChatModelSelection | ChatModelId | null;
   /**
    * Skill's model selection - fallback when favoriteModelSelection is null.
    * Ensures the slider cap reflects the actual resolved model.
    */
-  characterModelSelection?: FiltersModelSelection | ManualModelSelection | null;
+  characterModelSelection?: ChatModelSelection | null;
   /** Optional sub-label shown in the header (e.g. "Override for this slot") */
   label?: ReactNode;
   className?: string;
@@ -248,13 +254,19 @@ export function CompactTriggerEdit({
   className,
   user,
 }: CompactTriggerEditProps): JSX.Element {
+  const env = useEnvAvailability();
   const modelCap = useMemo(
     () =>
       Math.min(
-        getModelContextWindow(user, modelSelection, characterModelSelection),
+        getModelContextWindow(
+          user,
+          env,
+          modelSelection,
+          characterModelSelection,
+        ),
         MAX_ABSOLUTE,
       ),
-    [modelSelection, characterModelSelection, user],
+    [modelSelection, characterModelSelection, user, env],
   );
 
   const effectiveValue = value ?? COMPACT_TRIGGER;
@@ -426,7 +438,9 @@ export type ActiveSelector =
   | "musicGen"
   | "videoGen"
   | "stt"
-  | "vision"
+  | "imageVision"
+  | "videoVision"
+  | "audioVision"
   | null;
 
 export interface SettingsModelSelectorsSectionProps {
@@ -446,7 +460,9 @@ interface SelectorConfig {
     | "musicGenModelSelection"
     | "videoGenModelSelection"
     | "sttModelSelection"
-    | "visionBridgeModelSelection"
+    | "imageVisionModelSelection"
+    | "videoVisionModelSelection"
+    | "audioVisionModelSelection"
   >;
   selectorKey: Exclude<ActiveSelector, "chat" | null>;
   labelKey: Parameters<ReturnType<typeof scopedTranslation.scopedT>["t"]>[0];
@@ -457,19 +473,139 @@ interface SelectorConfig {
   /** When set, only models with all these input modalities are shown (e.g. vision bridge: ["image"]) */
   requiredInputs?: Modality[];
   /** Platform-level default selection to display when no value is set */
-  defaultModelSelection?: ModelSelectionSimple;
+  defaultModelSelection?: AnyRoleModelSelection;
 }
 
 function makeDefaultSelection(
   roles: ModelRole[],
-  env?: ReturnType<typeof useEnvAvailability>,
-  requiredInputs?: Modality[],
-): ModelSelectionSimple | undefined {
-  const m = getDefaultModelForRole(roles, env, requiredInputs);
-  if (!m) {
-    return undefined;
+  user: JwtPayloadType,
+  env: ReturnType<typeof useEnvAvailability>,
+): AnyRoleModelSelection | undefined {
+  const role = roles[0];
+  const manual = {
+    selectionType: ModelSelectionType.MANUAL,
+  };
+  if (role === "tts") {
+    const m = SkillsRepositoryClient.getBestTtsModel(
+      DEFAULT_TTS_MODEL_SELECTION,
+      user,
+      env,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const r = voiceModelSelectionSchema.safeParse({
+      ...manual,
+      manualModelId: m.id,
+    });
+    return r.success ? r.data : undefined;
   }
-  return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
+  if (role === "stt") {
+    const m = SkillsRepositoryClient.getBestSttModel(
+      DEFAULT_STT_MODEL_SELECTION,
+      user,
+      env,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const r = sttModelSelectionSchema.safeParse({
+      ...manual,
+      manualModelId: m.id,
+    });
+    return r.success ? r.data : undefined;
+  }
+  if (role === "image-gen") {
+    const m = SkillsRepositoryClient.getBestImageGenModel(
+      DEFAULT_IMAGE_GEN_MODEL_SELECTION,
+      user,
+      env,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const r = imageGenModelSelectionSchema.safeParse({
+      ...manual,
+      manualModelId: m.id,
+    });
+    return r.success ? r.data : undefined;
+  }
+  if (role === "audio-gen") {
+    const m = SkillsRepositoryClient.getBestMusicGenModel(
+      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
+      user,
+      env,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const r = musicGenModelSelectionSchema.safeParse({
+      ...manual,
+      manualModelId: m.id,
+    });
+    return r.success ? r.data : undefined;
+  }
+  if (role === "video-gen") {
+    const m = SkillsRepositoryClient.getBestVideoGenModel(
+      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
+      user,
+      env,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const r = videoGenModelSelectionSchema.safeParse({
+      ...manual,
+      manualModelId: m.id,
+    });
+    return r.success ? r.data : undefined;
+  }
+  if (role === "image-vision") {
+    const m = SkillsRepositoryClient.getBestImageVisionModel(
+      DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+      user,
+      env,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const r = imageVisionModelSelectionSchema.safeParse({
+      ...manual,
+      manualModelId: m.id,
+    });
+    return r.success ? r.data : undefined;
+  }
+  if (role === "video-vision") {
+    const m = SkillsRepositoryClient.getBestVideoVisionModel(
+      DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+      user,
+      env,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const r = videoVisionModelSelectionSchema.safeParse({
+      ...manual,
+      manualModelId: m.id,
+    });
+    return r.success ? r.data : undefined;
+  }
+  if (role === "audio-vision") {
+    const m = SkillsRepositoryClient.getBestAudioVisionModel(
+      DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+      user,
+      env,
+    );
+    if (!m) {
+      return undefined;
+    }
+    const r = audioVisionModelSelectionSchema.safeParse({
+      ...manual,
+      manualModelId: m.id,
+    });
+    return r.success ? r.data : undefined;
+  }
+  return undefined;
 }
 
 // Static config (no defaults - computed inside component with env awareness)
@@ -510,44 +646,57 @@ const SELECTOR_CONFIGS: Omit<SelectorConfig, "defaultModelSelection">[] = [
     allowedRoles: ["stt"],
   },
   {
-    key: "visionBridgeModelSelection",
-    selectorKey: "vision",
-    labelKey: "post.visionBridgeModel.label",
-    placeholderKey: "post.visionBridgeModel.placeholder",
-    allowedRoles: ["llm"],
-    requiredInputs: ["image"] as Modality[],
+    key: "imageVisionModelSelection",
+    selectorKey: "imageVision",
+    labelKey: "post.imageVisionModel.label",
+    placeholderKey: "post.imageVisionModel.placeholder",
+    allowedRoles: ["image-vision"],
+  },
+  {
+    key: "videoVisionModelSelection",
+    selectorKey: "videoVision",
+    labelKey: "post.videoVisionModel.label",
+    placeholderKey: "post.videoVisionModel.placeholder",
+    allowedRoles: ["video-vision"],
+  },
+  {
+    key: "audioVisionModelSelection",
+    selectorKey: "audioVision",
+    labelKey: "post.audioVisionModel.label",
+    placeholderKey: "post.audioVisionModel.placeholder",
+    allowedRoles: ["audio-vision"],
   },
 ];
 
 function getModelSelectionFromSettings(
   settings: ChatSettingsGetResponseOutput | null,
   key: SelectorConfig["key"],
-): ModelSelectionSimple | null {
+): AnyRoleModelSelection | null {
   const raw = settings?.[key];
   if (raw === null || raw === undefined) {
     return null;
   }
-  // All five fields use schemas compatible with ModelSelectionSimple
-  // (voiceModelSelectionSchema, imageGenModelSelectionSchema, etc. extend the
-  // same union shape). We verify the required discriminant field exists.
+  // All role-specific selection fields share the same discriminant structure
+  // (selectionType: "manual" | "filters"). We verify the required discriminant
+  // field exists before returning.
   if (
     typeof raw === "object" &&
     "selectionType" in raw &&
     typeof raw.selectionType === "string"
   ) {
-    return raw as ModelSelectionSimple;
+    return raw as AnyRoleModelSelection;
   }
   return null;
 }
 
 function getChatModelSelection(
   settings: ChatSettingsGetResponseOutput | null,
-): ModelSelectionSimple | null {
+): ChatModelSelection | null {
   const modelId = settings?.selectedModel;
   if (modelId === null || modelId === undefined) {
     return null;
   }
-  const manualSelection: ManualModelSelection = {
+  const manualSelection: ChatManualModelSelection = {
     selectionType: ModelSelectionType.MANUAL,
     manualModelId: modelId,
   };
@@ -571,14 +720,10 @@ export function SettingsModelSelectorsSection({
       Object.fromEntries(
         SELECTOR_CONFIGS.map((c) => [
           c.key,
-          makeDefaultSelection(
-            c.allowedRoles,
-            envAvailability,
-            c.requiredInputs,
-          ),
+          makeDefaultSelection(c.allowedRoles, user, envAvailability),
         ]),
-      ) as Record<SelectorConfig["key"], ModelSelectionSimple | undefined>,
-    [envAvailability],
+      ),
+    [user, envAvailability],
   );
 
   // ── Full-panel takeover: chat model ──────────────────────────────────────
@@ -602,7 +747,7 @@ export function SettingsModelSelectorsSection({
               sel.selectionType === ModelSelectionType.MANUAL
             ) {
               await updateSettings({
-                selectedModel: (sel as ManualModelSelection).manualModelId,
+                selectedModel: sel.manualModelId as ChatModelId,
               });
             }
           }}

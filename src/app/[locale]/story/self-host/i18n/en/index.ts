@@ -1,19 +1,19 @@
 export const translations = {
   meta: {
-    title: "Self-Host unbottled.ai - Your Instance, Your Rules",
+    title: "Self-Host {{appName}} - Your Instance, Your Rules",
     description:
-      "Run the full unbottled.ai stack on your own server. BYO API keys, Thea as your AI admin, full control. Free forever.",
+      "Run the full {{appName}} stack on your own server. BYO API keys, Thea as your AI admin, full control. Free forever.",
     category: "Self-Host",
-    imageAlt: "Self-host unbottled.ai quickstart",
+    imageAlt: "Self-host {{appName}} quickstart",
     keywords:
-      "self-host, next-vibe, unbottled.ai, open-source, AI, VPS, Docker, Kubernetes",
+      "self-host, next-vibe, {{appName}}, open-source, AI, VPS, Docker, Kubernetes",
   },
   hero: {
     badge: "Free forever - MIT + GPL v3",
     title: "Run it yourself.",
     titleHighlight: "Own everything.",
     subtitle:
-      "The full unbottled.ai stack on your own server. Every model, every tool, every feature - plus Thea as your AI admin who monitors and self-heals your instance 24/7.",
+      "The full {{appName}} stack on your own server. Every model, every tool, every feature - plus Thea as your AI admin who monitors and self-heals your instance 24/7.",
     ctaQuickstart: "Jump to Quickstart",
     ctaGithub: "Star on GitHub",
   },
@@ -26,7 +26,7 @@ export const translations = {
       thea: "Thea: AI admin who monitors, self-heals, and builds tools on command",
       admin: "Admin dashboard, DB studio, cron dashboard, health monitoring",
       ssh: "SSH, browser automation, email client - Thea's tools",
-      sync: "Local instance sync with unbottled.ai cloud (beta)",
+      sync: "Local instance sync with {{appName}} cloud (beta)",
       free: "Free forever - MIT + GPL v3, no vendor lock-in",
     },
   },

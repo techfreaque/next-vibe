@@ -42,6 +42,10 @@ import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import {
+  ChatModelId,
+  chatModelOptions,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import {
   CONTENT_DISPLAY,
   INTELLIGENCE_DISPLAY,
   ModelSelectionType,
@@ -54,32 +58,389 @@ import {
 import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import {
+  ImageGenModelId,
+  imageGenModelOptions,
+} from "@/app/api/[locale]/agent/image-generation/models";
 import type { Modality, ModelRole } from "@/app/api/[locale]/agent/models/enum";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
+import { getModelPrice } from "@/app/api/[locale]/agent/models/all-models";
 import {
   ApiProvider,
   apiProviderDisplayNames,
-  getAllModelOptions,
-  getCreditCostFromModel,
-  getModelById,
   isModelProviderAvailable,
   modelProviders,
-  type ModelId,
-  type ModelOption,
+  type AnyModelId,
+  type AnyModelOption,
   type ModelType,
 } from "@/app/api/[locale]/agent/models/models";
+import {
+  MusicGenModelId,
+  musicGenModelOptions,
+} from "@/app/api/[locale]/agent/music-generation/models";
+import {
+  SttModelId,
+  sttModelOptions,
+} from "@/app/api/[locale]/agent/speech-to-text/models";
+import {
+  TtsModelId,
+  ttsModelOptions,
+} from "@/app/api/[locale]/agent/text-to-speech/models";
+import {
+  VideoGenModelId,
+  videoGenModelOptions,
+} from "@/app/api/[locale]/agent/video-generation/models";
+import {
+  isAudioVisionModel,
+  isImageVisionModel,
+  isVideoVisionModel,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { DEFAULT_INPUT_TOKENS, DEFAULT_OUTPUT_TOKENS } from "../constants";
 import { scopedTranslation } from "../i18n";
-import type { FiltersModelSelection, ModelSelectionSimple } from "../types";
+import type {
+  AudioVisionModelSelection,
+  ChatModelSelection,
+  FiltersModelSelection,
+  ImageGenModelSelection,
+  ImageVisionModelSelection,
+  MusicGenModelSelection,
+  SttModelSelection,
+  VideoGenModelSelection,
+  VideoVisionModelSelection,
+  VoiceModelSelection,
+} from "../types";
 import { ModelCreditDisplay } from "./model-credit-display";
 
+/** Combine all role-specific model options into a single flat array. */
+function getAllModelOptions(): AnyModelOption[] {
+  return [
+    ...chatModelOptions,
+    ...ttsModelOptions,
+    ...sttModelOptions,
+    ...imageGenModelOptions,
+    ...musicGenModelOptions,
+    ...videoGenModelOptions,
+  ];
+}
+
+/**
+ * Look up a model option by ID across all roles.
+ * Local implementation — avoids importing cross-role utility from models.ts.
+ */
+function lookupModelById(id: AnyModelId): AnyModelOption | undefined {
+  return (
+    chatModelOptions.find((m) => m.id === id) ??
+    imageGenModelOptions.find((m) => m.id === id) ??
+    musicGenModelOptions.find((m) => m.id === id) ??
+    videoGenModelOptions.find((m) => m.id === id) ??
+    ttsModelOptions.find((m) => m.id === id) ??
+    sttModelOptions.find((m) => m.id === id)
+  );
+}
+
+/**
+ * Returns true when a ModelOption belongs to the given ModelRole.
+ * Local implementation — avoids importing cross-role utility from models.ts.
+ * Uses enum membership for correctness (multimodal models share structural fields).
+ */
+function modelMatchesRoleLocal(m: AnyModelOption, role: ModelRole): boolean {
+  switch (role) {
+    case "image-gen":
+      return Object.values(ImageGenModelId).some((v) => v === m.id);
+    case "video-gen":
+      return Object.values(VideoGenModelId).some((v) => v === m.id);
+    case "audio-gen":
+      return Object.values(MusicGenModelId).some((v) => v === m.id);
+    case "tts":
+      return Object.values(TtsModelId).some((v) => v === m.id);
+    case "stt":
+      return Object.values(SttModelId).some((v) => v === m.id);
+    case "llm":
+      return Object.values(ChatModelId).some((v) => v === m.id);
+    case "image-vision":
+      return isImageVisionModel(m.id);
+    case "video-vision":
+      return isVideoVisionModel(m.id);
+    case "audio-vision":
+      return isAudioVisionModel(m.id);
+    default:
+      return false;
+  }
+}
+
+/**
+ * Returns all UI tab types a model should appear in.
+ * Local implementation — avoids importing cross-role utility from models.ts.
+ * Image-gen models that also output text (multimodal, e.g. Gemini) appear in both text and image tabs.
+ */
+function modelOptionToTypes(m: AnyModelOption): ModelType[] {
+  if (Object.values(ImageGenModelId).some((v) => v === m.id)) {
+    // Image-gen models that also output text appear in the text tab too
+    if (m.outputs.includes("text")) {
+      return ["text", "image"];
+    }
+    return ["image"];
+  }
+  if (
+    Object.values(MusicGenModelId).some((v) => v === m.id) ||
+    Object.values(TtsModelId).some((v) => v === m.id) ||
+    Object.values(SttModelId).some((v) => v === m.id)
+  ) {
+    return ["audio"];
+  }
+  if (Object.values(VideoGenModelId).some((v) => v === m.id)) {
+    return ["video"];
+  }
+  return ["text"]; // chat/llm
+}
+
+/**
+ * Generic manual selection used internally by the widget when the model role is not yet
+ * known or when a cross-role model ID (AnyModelId) is being stored.
+ * All role-specific discriminated union members are included so typed callers still benefit
+ * from the narrower overloads; this variant handles the generic/untyped case.
+ */
+interface GenericManualModelSelection {
+  selectionType: typeof ModelSelectionType.MANUAL;
+  manualModelId: AnyModelId;
+  intelligenceRange?: FiltersModelSelection["intelligenceRange"];
+  priceRange?: FiltersModelSelection["priceRange"];
+  contentRange?: FiltersModelSelection["contentRange"];
+  speedRange?: FiltersModelSelection["speedRange"];
+  sortBy?: FiltersModelSelection["sortBy"];
+  sortDirection?: FiltersModelSelection["sortDirection"];
+  sortBy2?: FiltersModelSelection["sortBy2"];
+  sortDirection2?: FiltersModelSelection["sortDirection2"];
+}
+
+type AnyRoleModelSelection =
+  | ChatModelSelection
+  | VoiceModelSelection
+  | SttModelSelection
+  | ImageGenModelSelection
+  | MusicGenModelSelection
+  | VideoGenModelSelection
+  | ImageVisionModelSelection
+  | VideoVisionModelSelection
+  | AudioVisionModelSelection
+  | FiltersModelSelection
+  | GenericManualModelSelection;
+
+type AnyRoleSelection = AnyRoleModelSelection;
+
+/** Dispatch to role-specific filtered model getter based on allowedRoles. */
+function getFilteredModelsByRoleDispatch(
+  selection: FiltersModelSelection | null,
+  roles: ModelRole[],
+  user: JwtPayloadType,
+  env: AgentEnvAvailability,
+): AnyModelOption[] {
+  const results: AnyModelOption[] = [];
+  for (const role of roles) {
+    switch (role) {
+      case "tts":
+        results.push(
+          ...SkillsRepositoryClient.getFilteredTtsModels(selection, user, env),
+        );
+        break;
+      case "stt":
+        results.push(
+          ...SkillsRepositoryClient.getFilteredSttModels(selection, user, env),
+        );
+        break;
+      case "image-gen":
+        results.push(
+          ...SkillsRepositoryClient.getFilteredImageGenModels(
+            selection,
+            user,
+            env,
+          ),
+        );
+        break;
+      case "audio-gen":
+        results.push(
+          ...SkillsRepositoryClient.getFilteredMusicGenModels(
+            selection,
+            user,
+            env,
+          ),
+        );
+        break;
+      case "video-gen":
+        results.push(
+          ...SkillsRepositoryClient.getFilteredVideoGenModels(
+            selection,
+            user,
+            env,
+          ),
+        );
+        break;
+      case "llm":
+        results.push(
+          ...SkillsRepositoryClient.getFilteredModelsForSkill(
+            { selectionType: ModelSelectionType.FILTERS, ...selection },
+            user,
+            env,
+          ),
+        );
+        break;
+      case "image-vision":
+        results.push(
+          ...SkillsRepositoryClient.getFilteredImageVisionModels(
+            selection,
+            user,
+            env,
+          ),
+        );
+        break;
+      case "video-vision":
+        results.push(
+          ...SkillsRepositoryClient.getFilteredVideoVisionModels(
+            selection,
+            user,
+            env,
+          ),
+        );
+        break;
+      case "audio-vision":
+        results.push(
+          ...SkillsRepositoryClient.getFilteredAudioVisionModels(
+            selection,
+            user,
+            env,
+          ),
+        );
+        break;
+      default:
+        break;
+    }
+  }
+  return results;
+}
+
+/** Dispatch to role-specific best model getter based on allowedRoles (first role wins). */
+function getBestModelByRoleDispatch(
+  selection: AnyRoleModelSelection,
+  roles: ModelRole[],
+  user: JwtPayloadType,
+  env: AgentEnvAvailability,
+): AnyModelOption | null {
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+
+  // MANUAL selections: resolve by model ID first, only fall through to filters
+  // if the specific model can't be found or is unavailable
+  if (
+    selection.selectionType === ModelSelectionType.MANUAL &&
+    "manualModelId" in selection &&
+    selection.manualModelId
+  ) {
+    const model = lookupModelById(selection.manualModelId);
+    if (
+      model &&
+      (!model.adminOnly || isAdmin) &&
+      isModelProviderAvailable(model, env) &&
+      roles.some((role) => modelMatchesRoleLocal(model, role))
+    ) {
+      return model;
+    }
+    // Manual model not resolvable — fall through to filter-based resolution below
+  }
+
+  // Extract filter props as a FiltersModelSelection for role-specific getters
+  const filtersSelection: FiltersModelSelection = {
+    selectionType: ModelSelectionType.FILTERS,
+    intelligenceRange: selection.intelligenceRange,
+    priceRange: selection.priceRange,
+    contentRange: selection.contentRange,
+    speedRange: selection.speedRange,
+    sortBy: selection.sortBy,
+    sortDirection: selection.sortDirection,
+    sortBy2: selection.sortBy2,
+    sortDirection2: selection.sortDirection2,
+  };
+  for (const role of roles) {
+    let result: AnyModelOption | null = null;
+    switch (role) {
+      case "tts":
+        result = SkillsRepositoryClient.getBestTtsModel(
+          filtersSelection,
+          user,
+          env,
+        );
+        break;
+      case "stt":
+        result = SkillsRepositoryClient.getBestSttModel(
+          filtersSelection,
+          user,
+          env,
+        );
+        break;
+      case "image-gen":
+        result = SkillsRepositoryClient.getBestImageGenModel(
+          filtersSelection,
+          user,
+          env,
+        );
+        break;
+      case "audio-gen":
+        result = SkillsRepositoryClient.getBestMusicGenModel(
+          filtersSelection,
+          user,
+          env,
+        );
+        break;
+      case "video-gen":
+        result = SkillsRepositoryClient.getBestVideoGenModel(
+          filtersSelection,
+          user,
+          env,
+        );
+        break;
+      case "llm":
+        result = SkillsRepositoryClient.getBestModelForSkill(
+          filtersSelection,
+          user,
+          env,
+        );
+        break;
+      case "image-vision":
+        result = SkillsRepositoryClient.getBestImageVisionModel(
+          filtersSelection,
+          user,
+          env,
+        );
+        break;
+      case "video-vision":
+        result = SkillsRepositoryClient.getBestVideoVisionModel(
+          filtersSelection,
+          user,
+          env,
+        );
+        break;
+      case "audio-vision":
+        result = SkillsRepositoryClient.getBestAudioVisionModel(
+          filtersSelection,
+          user,
+          env,
+        );
+        break;
+      default:
+        break;
+    }
+    if (result) {
+      return result;
+    }
+  }
+  return null;
+}
+
 interface ModelCardProps {
-  model: ModelOption;
+  model: AnyModelOption;
   isBest: boolean;
   selected: boolean;
   onClick: () => void;
@@ -271,19 +632,21 @@ function buildFilterChips({
   sortDirection:
     | (typeof ModelSortDirection)[keyof typeof ModelSortDirection]
     | undefined;
-  sortBy2: (typeof ModelSortField)[keyof typeof ModelSortField] | undefined;
+  sortBy2: ReturnType<typeof scopedTranslation.scopedT>["t"] extends never
+    ? never
+    : (typeof ModelSortField)[keyof typeof ModelSortField] | undefined;
   sortDirection2:
     | (typeof ModelSortDirection)[keyof typeof ModelSortDirection]
     | undefined;
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
   mode: string;
-  manualModelId: ModelId | undefined;
+  manualModelId: AnyModelId | undefined;
   handleIntelligenceChange: (min: number, max: number) => void;
   handleContentChange: (min: number, max: number) => void;
   handleSpeedChange: (min: number, max: number) => void;
   handlePriceChange: (min: number, max: number) => void;
   setUseSkillBased: (v: boolean) => void;
-  updateValue: (s: ModelSelectionSimple | null) => void;
+  updateValue: (s: AnyRoleModelSelection | null) => void;
 }): FilterChip[] {
   const chips: FilterChip[] = [];
 
@@ -333,17 +696,10 @@ function buildFilterChips({
     const dir = sortDirection === ModelSortDirection.ASC ? "↑" : "↓";
     chips.push({
       key: "sort",
-      label: `${dir} ${t(sortBy as Parameters<typeof t>[0])}`,
+      label: `${dir} ${t(sortBy)}`,
       onRemove: () => {
         setUseSkillBased(false);
-        updateValue({
-          selectionType:
-            mode === ModelSelectionType.MANUAL
-              ? ModelSelectionType.MANUAL
-              : ModelSelectionType.FILTERS,
-          ...(mode === ModelSelectionType.MANUAL && manualModelId
-            ? { manualModelId }
-            : {}),
+        const rangeProps = {
           intelligenceRange: getRangeFromIndices(
             intelligenceIndices,
             INTELLIGENCE_DISPLAY,
@@ -355,7 +711,19 @@ function buildFilterChips({
           sortDirection: undefined,
           sortBy2: undefined,
           sortDirection2: undefined,
-        } as ModelSelectionSimple);
+        };
+        if (mode === ModelSelectionType.MANUAL && manualModelId) {
+          updateValue({
+            selectionType: ModelSelectionType.MANUAL,
+            manualModelId,
+            ...rangeProps,
+          });
+        } else {
+          updateValue({
+            selectionType: ModelSelectionType.FILTERS,
+            ...rangeProps,
+          });
+        }
       },
     });
   }
@@ -363,17 +731,10 @@ function buildFilterChips({
     const dir2 = sortDirection2 === ModelSortDirection.ASC ? "↑" : "↓";
     chips.push({
       key: "sort2",
-      label: `then ${dir2} ${t(sortBy2 as Parameters<typeof t>[0])}`,
+      label: `then ${dir2} ${t(sortBy2)}`,
       onRemove: () => {
         setUseSkillBased(false);
-        updateValue({
-          selectionType:
-            mode === ModelSelectionType.MANUAL
-              ? ModelSelectionType.MANUAL
-              : ModelSelectionType.FILTERS,
-          ...(mode === ModelSelectionType.MANUAL && manualModelId
-            ? { manualModelId }
-            : {}),
+        const filterProps = {
           intelligenceRange: getRangeFromIndices(
             intelligenceIndices,
             INTELLIGENCE_DISPLAY,
@@ -385,7 +746,20 @@ function buildFilterChips({
           sortDirection,
           sortBy2: undefined,
           sortDirection2: undefined,
-        } as ModelSelectionSimple);
+        } as const;
+        if (mode === ModelSelectionType.MANUAL && manualModelId) {
+          updateValue({
+            selectionType: ModelSelectionType.MANUAL,
+            manualModelId,
+            ...filterProps,
+          });
+        } else {
+          const newSel: FiltersModelSelection = {
+            selectionType: ModelSelectionType.FILTERS,
+            ...filterProps,
+          };
+          updateValue(newSel);
+        }
       },
     });
   }
@@ -399,24 +773,27 @@ export interface ModelSelectorProps {
   /**
    * Current model selection
    */
-  modelSelection: ModelSelectionSimple | undefined;
+  modelSelection: AnyRoleModelSelection | undefined;
 
   /**
    * Callback when selection changes (optional for read-only mode)
    */
-  onChange?: (selection: ModelSelectionSimple | null) => void;
+  onChange?: (selection: AnyRoleModelSelection | null) => void;
 
   /**
    * Callback fired only when the user explicitly clicks a model row to confirm selection.
    * Receives the confirmed value so callers can apply isDefault checks and close the panel.
    * Unlike onChange which fires on every tab/filter change.
    */
-  onSelect?: (value: ModelSelectionSimple | null) => void | Promise<void>;
+  onSelect?: (value: AnyRoleModelSelection | null) => void | Promise<void>;
 
   /**
    * Skill's model selection (optional, for CHARACTER_BASED mode)
    */
-  characterModelSelection?: ModelSelectionSimple | undefined;
+  characterModelSelection?:
+    | AnyRoleSelection
+    | AnyRoleModelSelection
+    | undefined;
 
   /**
    * Read-only mode - disables all interactions
@@ -466,7 +843,7 @@ export interface ModelSelectorProps {
 
 /** Returns true if the model's provider is available given current env */
 export function isProviderAvailable(
-  model: ModelOption,
+  model: AnyModelOption,
   envAvailability: AgentEnvAvailability | undefined,
 ): boolean {
   if (!envAvailability) {
@@ -477,7 +854,7 @@ export function isProviderAvailable(
 
 /** Map ApiProvider to the availability key */
 function getSetupRequiredMessage(
-  model: ModelOption,
+  model: AnyModelOption,
   envAvailability: AgentEnvAvailability | undefined,
   locale: CountryLanguage,
 ): string | null {
@@ -663,13 +1040,26 @@ export function ModelSelector({
     [sliderSource],
   );
 
-  const manualModelId =
-    currentSelection.selectionType === ModelSelectionType.MANUAL
-      ? currentSelection.manualModelId
-      : undefined;
+  const manualModelId: AnyModelId | undefined = (() => {
+    if (
+      modelSelection &&
+      "manualModelId" in modelSelection &&
+      typeof modelSelection.manualModelId === "string"
+    ) {
+      return modelSelection.manualModelId;
+    }
+    if (
+      useSkillBased &&
+      characterModelSelection &&
+      characterModelSelection.selectionType === ModelSelectionType.MANUAL
+    ) {
+      return characterModelSelection.manualModelId;
+    }
+    return undefined;
+  })();
 
   // Helper to update value
-  const updateValue = (newSelection: ModelSelectionSimple | null): void => {
+  const updateValue = (newSelection: AnyRoleModelSelection | null): void => {
     if (readOnly || !onChange) {
       return;
     }
@@ -893,10 +1283,10 @@ export function ModelSelector({
     }
   };
 
-  const handleModelSelect = (modelId: ModelId): void => {
+  const handleModelSelect = (modelId: AnyModelId): void => {
     // When selecting a model, preserve current filter/sort settings
     setUseSkillBased(false);
-    const selected: ModelSelectionSimple = {
+    const selected: AnyRoleModelSelection = {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: modelId,
       intelligenceRange: getRangeFromIndices(
@@ -923,7 +1313,7 @@ export function ModelSelector({
       setUseSkillBased(false);
       const first = getAllModelOptions().find(
         (m) =>
-          m.modelTypes.includes(newType) &&
+          modelOptionToTypes(m).includes(newType) &&
           isProviderAvailable(m, envAvailability),
       );
       if (first) {
@@ -1150,20 +1540,37 @@ export function ModelSelector({
   const filteredModels = useMemo(() => {
     if (allowedRoles) {
       // Media model selector: bypass LLM hard-filter, use role-based filtering
-      const base = SkillsRepositoryClient.getFilteredModelsByRole(
+      // Extract only the shared filter props (not manualModelId) so the
+      // AnyManualModelSelection union is narrowed to FiltersModelSelection.
+      const selectionForRole: FiltersModelSelection | null =
         activeSelection.selectionType === ModelSelectionType.FILTERS ||
-          activeSelection.selectionType === ModelSelectionType.MANUAL
-          ? activeSelection
-          : null,
+        activeSelection.selectionType === ModelSelectionType.MANUAL
+          ? {
+              selectionType: ModelSelectionType.FILTERS,
+              intelligenceRange: activeSelection.intelligenceRange,
+              priceRange: activeSelection.priceRange,
+              contentRange: activeSelection.contentRange,
+              speedRange: activeSelection.speedRange,
+              sortBy: activeSelection.sortBy,
+              sortDirection: activeSelection.sortDirection,
+              sortBy2: activeSelection.sortBy2,
+              sortDirection2: activeSelection.sortDirection2,
+            }
+          : null;
+      const base = getFilteredModelsByRoleDispatch(
+        selectionForRole,
         allowedRoles,
         user,
+        envAvailability,
       );
       const withInputFilter = requiredInputs
         ? base.filter((m) =>
             requiredInputs.every((mod) => m.inputs.includes(mod)),
           )
         : base;
-      return withInputFilter.filter((m) => m.modelTypes.includes(modelTypeTab));
+      return withInputFilter.filter((m) =>
+        modelOptionToTypes(m).includes(modelTypeTab),
+      );
     }
     const filtersModelSelection: FiltersModelSelection = {
       selectionType: ModelSelectionType.FILTERS,
@@ -1179,8 +1586,9 @@ export function ModelSelector({
     const base = SkillsRepositoryClient.getFilteredModelsForSkill(
       filtersModelSelection,
       user,
+      envAvailability,
     );
-    return base.filter((m) => m.modelTypes.includes(modelTypeTab));
+    return base.filter((m) => modelOptionToTypes(m).includes(modelTypeTab));
   }, [
     allowedRoles,
     requiredInputs,
@@ -1194,6 +1602,7 @@ export function ModelSelector({
     sortBy2,
     sortDirection2,
     user,
+    envAvailability,
     modelTypeTab,
   ]);
 
@@ -1203,46 +1612,73 @@ export function ModelSelector({
 
   const bestModel = useMemo(() => {
     if (mode === ModelSelectionType.MANUAL && manualModelId) {
-      return getModelById(manualModelId) ?? null;
+      return lookupModelById(manualModelId) ?? null;
     } else if (mode === ModelSelectionType.CHARACTER_BASED) {
       if (characterModelSelection) {
-        return SkillsRepositoryClient.getBestModelForSkill(
+        return getBestModelByRoleDispatch(
           characterModelSelection,
+          allowedRoles ?? ["llm"],
           user,
+          envAvailability,
         );
       }
       return null;
     } else {
       return bestFilteredModel;
     }
-  }, [mode, manualModelId, bestFilteredModel, characterModelSelection, user]);
+  }, [
+    mode,
+    manualModelId,
+    bestFilteredModel,
+    characterModelSelection,
+    user,
+    allowedRoles,
+    envAvailability,
+  ]);
 
   // For non-admins: hide models whose provider is unavailable (admins see them with setup-required styling)
   const isAdmin =
     !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-  const filterUnavailableProviders = (models: ModelOption[]): ModelOption[] => {
-    if (isAdmin) {
-      return models;
-    }
-    return models.filter((m) => isProviderAvailable(m, envAvailability));
-  };
+  // Get models to show (filtered or all), always constrained by type tab.
+  // For admins: append env-unavailable models (grayed out with setup info).
+  const modelsToShow = useMemo(() => {
+    const typeFilter = (m: AnyModelOption): boolean =>
+      modelOptionToTypes(m).includes(modelTypeTab) &&
+      (modelTypeTab !== "text" ||
+        (!modelMatchesRoleLocal(m, "image-gen") &&
+          !modelMatchesRoleLocal(m, "video-gen") &&
+          !modelMatchesRoleLocal(m, "audio-gen") &&
+          !modelMatchesRoleLocal(m, "tts") &&
+          !modelMatchesRoleLocal(m, "stt")));
 
-  // Get models to show (filtered or all), always constrained by type tab
-  const modelsToShow = filterUnavailableProviders(
-    showUnfilteredModels
-      ? getAllModelOptions().filter(
-          (m) =>
-            m.modelTypes.includes(modelTypeTab) &&
-            (modelTypeTab !== "text" ||
-              (m.modelRole !== "image-gen" &&
-                m.modelRole !== "video-gen" &&
-                m.modelRole !== "audio-gen" &&
-                m.modelRole !== "tts" &&
-                m.modelRole !== "stt" &&
-                m.modelRole !== "embedding")),
-        )
-      : filteredModels,
-  );
+    if (showUnfilteredModels) {
+      const all = getAllModelOptions().filter(typeFilter);
+      return isAdmin
+        ? all
+        : all.filter((m) => isProviderAvailable(m, envAvailability));
+    }
+
+    if (!isAdmin) {
+      // Non-admins: filteredModels is already env-available only
+      return filteredModels;
+    }
+
+    // Admin: filteredModels has env-available models; append env-unavailable ones
+    const filteredIds = new Set(filteredModels.map((m) => m.id));
+    const adminExtras = getAllModelOptions().filter(
+      (m) =>
+        typeFilter(m) &&
+        !filteredIds.has(m.id) &&
+        !isProviderAvailable(m, envAvailability),
+    );
+    return [...filteredModels, ...adminExtras];
+  }, [
+    showUnfilteredModels,
+    filteredModels,
+    isAdmin,
+    envAvailability,
+    modelTypeTab,
+  ]);
 
   // Compute which model names appear with multiple providers (need provider suffix)
   const duplicateModelNames = useMemo(() => {
@@ -1273,12 +1709,21 @@ export function ModelSelector({
   // Sort and group models
   const sortedAndGroupedModels = useMemo(() => {
     if (!sortBy) {
-      return { ungrouped: searchFilteredModels };
+      // Default sort: env-available first, then by price ascending
+      const sorted = [...searchFilteredModels].toSorted((a, b) => {
+        const aAvail = isProviderAvailable(a, envAvailability) ? 0 : 1;
+        const bAvail = isProviderAvailable(b, envAvailability) ? 0 : 1;
+        if (aAvail !== bAvail) {
+          return aAvail - bAvail;
+        }
+        return getModelPrice(a) - getModelPrice(b);
+      });
+      return { ungrouped: sorted };
     }
 
     // Get sort value and label based on field
     const getSortInfo = (
-      model: ModelOption,
+      model: AnyModelOption,
     ): { value: number; label: string } => {
       switch (sortBy) {
         case ModelSortField.INTELLIGENCE: {
@@ -1298,11 +1743,7 @@ export function ModelSelector({
           };
         }
         case ModelSortField.PRICE: {
-          const cost = getCreditCostFromModel(
-            model,
-            DEFAULT_INPUT_TOKENS,
-            DEFAULT_OUTPUT_TOKENS,
-          );
+          const cost = getModelPrice(model);
           return {
             value: cost,
             label:
@@ -1328,7 +1769,7 @@ export function ModelSelector({
     };
 
     // searchFilteredModels is already sorted; just group by primary sort label
-    const grouped: Record<string, ModelOption[]> = {};
+    const grouped: Record<string, AnyModelOption[]> = {};
     for (const model of searchFilteredModels) {
       const { label } = getSortInfo(model);
       if (!grouped[label]) {
@@ -1338,7 +1779,7 @@ export function ModelSelector({
     }
 
     return grouped;
-  }, [searchFilteredModels, sortBy, t]);
+  }, [searchFilteredModels, sortBy, t, envAvailability]);
 
   // Get display models (limited or all)
   const displayModels = useMemo(() => {
@@ -1381,8 +1822,8 @@ export function ModelSelector({
     if (allowedRoles) {
       const hasRoleType = allModels.some(
         (m) =>
-          allowedRoles.includes(m.modelRole as ModelRole) &&
-          m.modelTypes.includes(defaultModelTypeTab) &&
+          allowedRoles.some((r) => modelMatchesRoleLocal(m, r)) &&
+          modelOptionToTypes(m).includes(defaultModelTypeTab) &&
           (isAdmin || isProviderAvailable(m, envAvailability)),
       );
       return hasRoleType ? [defaultModelTypeTab] : [];
@@ -1390,12 +1831,12 @@ export function ModelSelector({
     const types: ModelType[] = ["text"];
     const hasImage = allModels.some(
       (m) =>
-        m.modelTypes.includes("image") &&
+        modelOptionToTypes(m).includes("image") &&
         (isAdmin || isProviderAvailable(m, envAvailability)),
     );
     const hasAudio = allModels.some(
       (m) =>
-        m.modelTypes.includes("audio") &&
+        modelOptionToTypes(m).includes("audio") &&
         (isAdmin || isProviderAvailable(m, envAvailability)),
     );
     if (hasImage) {
@@ -1835,10 +2276,12 @@ export function ModelSelector({
             // Ungrouped list
             displayModels.length > 0 ? (
               <Div className="flex flex-col gap-2">
-                {displayModels.map((model: ModelOption) => {
+                {displayModels.map((model: AnyModelOption) => {
                   const isOutsideFilter =
                     showUnfilteredModels &&
-                    !filteredModels.some((m: ModelOption) => m.id === model.id);
+                    !filteredModels.some(
+                      (m: AnyModelOption) => m.id === model.id,
+                    );
                   const setupRequired = getSetupRequiredMessage(
                     model,
                     envAvailability,
@@ -1907,7 +2350,7 @@ export function ModelSelector({
             <Div className="flex flex-col gap-4">
               {Object.entries(displayModels).map(
                 ([groupLabel, groupModels]) => {
-                  const models = groupModels as ModelOption[];
+                  const models = groupModels;
 
                   // Separate legacy and non-legacy models
                   const nonLegacyModels = models.filter(
@@ -1936,7 +2379,7 @@ export function ModelSelector({
                           const isOutsideFilter =
                             showUnfilteredModels &&
                             !filteredModels.some(
-                              (m: ModelOption) => m.id === model.id,
+                              (m: AnyModelOption) => m.id === model.id,
                             );
                           const setupRequired = getSetupRequiredMessage(
                             model,
@@ -2001,9 +2444,9 @@ export function ModelSelector({
 
 export interface ModelSelectorTriggerProps {
   /** Current model selection (the chosen value) */
-  modelSelection: ModelSelectionSimple | null | undefined;
+  modelSelection: AnyRoleSelection | AnyRoleModelSelection | null | undefined;
   /** Character/skill's model selection (for CHARACTER_BASED fallback display) */
-  characterModelSelection?: ModelSelectionSimple;
+  characterModelSelection?: AnyRoleSelection | AnyRoleModelSelection;
   /** When set, resolve best model from this role set instead of LLM models */
   allowedRoles?: ModelRole[];
   /**
@@ -2017,7 +2460,7 @@ export interface ModelSelectorTriggerProps {
    * When `modelSelection` is null and this is provided, shows the default model
    * with a "Default" badge instead of showing `placeholder`.
    */
-  defaultModelSelection?: ModelSelectionSimple;
+  defaultModelSelection?: AnyRoleSelection | AnyRoleModelSelection;
   /** Placeholder text shown when no model is selected (e.g. "Inherit from skill", "System default") */
   placeholder: string;
   /** Click handler - opens the inline panel. Omit for read-only. */
@@ -2045,7 +2488,7 @@ export function ModelSelectorTrigger({
   const envAvailability = useEnvAvailability();
 
   // Resolve the best model to display
-  const resolvedModel = useMemo((): ModelOption | null => {
+  const resolvedModel = useMemo((): AnyModelOption | null => {
     const effectiveSelection =
       modelSelection ??
       characterModelSelection ??
@@ -2054,16 +2497,12 @@ export function ModelSelectorTrigger({
     if (!effectiveSelection) {
       return null;
     }
-    if (allowedRoles) {
-      return SkillsRepositoryClient.getBestModelByRole(
-        effectiveSelection,
-        allowedRoles,
-        user,
-      );
-    }
-    return SkillsRepositoryClient.getBestModelForSkill(
+    const roles: ModelRole[] = allowedRoles ?? ["llm"];
+    return getBestModelByRoleDispatch(
       effectiveSelection,
+      roles,
       user,
+      envAvailability,
     );
   }, [
     modelSelection,
@@ -2071,6 +2510,7 @@ export function ModelSelectorTrigger({
     defaultModelSelection,
     allowedRoles,
     user,
+    envAvailability,
   ]);
 
   const isClickable = !!onClick;

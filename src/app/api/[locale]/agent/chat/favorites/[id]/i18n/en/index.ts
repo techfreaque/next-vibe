@@ -38,8 +38,8 @@ export const translations = {
       skillId: {
         content: "Skill: {{value}}",
       },
-      customName: {
-        content: "Custom Name: {{value}}",
+      customVariantName: {
+        content: "Variant Name: {{value}}",
       },
       customIcon: {
         content: "Custom Icon: {{value}}",
@@ -197,8 +197,10 @@ export const translations = {
     skillId: {
       label: "Skill",
     },
-    customName: {
-      label: "Custom Name",
+    customVariantName: {
+      label: "Variant Name",
+      description:
+        "Custom name for this variant (leave empty to use skill default)",
     },
     chatModel: {
       label: "Chat Model",
@@ -214,9 +216,19 @@ export const translations = {
       description: "Model used for speech recognition",
       placeholder: "Inherit from skill",
     },
-    visionBridgeModel: {
-      label: "Vision Model",
-      description: "Model used for image analysis",
+    imageVisionModel: {
+      label: "Image Vision Model",
+      description: "Model used for analyzing images",
+      placeholder: "Inherit from skill",
+    },
+    videoVisionModel: {
+      label: "Video Vision Model",
+      description: "Model used for analyzing videos",
+      placeholder: "Inherit from skill",
+    },
+    audioVisionModel: {
+      label: "Audio Vision Model",
+      description: "Model used for analyzing audio",
       placeholder: "Inherit from skill",
     },
     translationModel: {

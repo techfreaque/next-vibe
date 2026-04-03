@@ -21,7 +21,7 @@ import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Link } from "next-vibe-ui/ui/link";
-import { Pre } from "next-vibe-ui/ui/pre";
+import { CodeBlock } from "next-vibe-ui/ui/markdown";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
@@ -118,37 +118,6 @@ function ArchNode({
 }
 
 /**
- * A styled code block for terminal/code snippets - uses Pre and Span from next-vibe-ui
- */
-function CodeBlock({
-  children,
-  terminalLabel,
-}: {
-  children: string;
-  terminalLabel?: string;
-}): JSX.Element {
-  return (
-    <Div className="rounded-xl overflow-hidden border border-gray-700 bg-gray-950 shadow-2xl">
-      {terminalLabel ? (
-        <Div className="flex items-center gap-2 px-4 py-2 bg-gray-900 border-b border-gray-700">
-          <Div className="w-3 h-3 rounded-full bg-red-500" />
-          <Div className="w-3 h-3 rounded-full bg-yellow-500" />
-          <Div className="w-3 h-3 rounded-full bg-green-500" />
-          <Span className="ml-2 text-xs text-gray-400 font-mono">
-            {terminalLabel}
-          </Span>
-        </Div>
-      ) : null}
-      <Div className="p-4 overflow-x-auto">
-        <Pre className="text-sm text-green-400 font-mono whitespace-pre leading-relaxed">
-          {children}
-        </Pre>
-      </Div>
-    </Div>
-  );
-}
-
-/**
  * A file tree node - indentation via className padding levels
  */
 function FileTreeItem({
@@ -216,7 +185,7 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
         <Div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(0,255,128,0.15)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,128,0.15)_1px,transparent_1px)] bg-[size:48px_48px]" />
         <Div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <Div className="container mx-auto px-4 py-24 relative z-10">
+        <Div className="container mx-auto px-4 py-24 relative z-10 max-w-4xl">
           <Link
             href={`/${locale}/story/blog`}
             className="inline-flex items-center text-sm text-emerald-400/80 hover:text-emerald-400 mb-10 transition-colors"
@@ -225,28 +194,26 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
             {t(`backToBlog`)}
           </Link>
 
-          <Div className="max-w-4xl">
-            <Badge className="mb-6 bg-emerald-500/20 text-emerald-400 border-emerald-500/30 font-mono text-xs tracking-wider uppercase">
-              {t(`hero.eyebrow`)}
-            </Badge>
+          <Badge className="mb-6 bg-emerald-500/20 text-emerald-400 border-emerald-500/30 font-mono text-xs tracking-wider uppercase">
+            {t(`hero.eyebrow`)}
+          </Badge>
 
-            <H1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white">
-              {t(`hero.title`)}
-            </H1>
+          <H1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white">
+            {t(`hero.title`)}
+          </H1>
 
-            <P className="text-xl text-gray-300 mb-8 max-w-2xl leading-relaxed">
-              {t(`hero.subtitle`)}
-            </P>
+          <P className="text-xl text-gray-300 mb-8 max-w-2xl leading-relaxed">
+            {t(`hero.subtitle`)}
+          </P>
 
-            <Div className="flex items-center gap-6 text-sm text-gray-500">
-              <Div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-emerald-500" />
-                {t(`hero.readTime`)}
-              </Div>
-              <Div className="flex items-center gap-2">
-                <Layers className="h-4 w-4 text-emerald-500" />
-                {t(`hero.date`)}
-              </Div>
+          <Div className="flex items-center gap-6 text-sm text-gray-500">
+            <Div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-emerald-500" />
+              {t(`hero.readTime`)}
+            </Div>
+            <Div className="flex items-center gap-2">
+              <Layers className="h-4 w-4 text-emerald-500" />
+              {t(`hero.date`)}
             </Div>
           </Div>
         </Div>
@@ -466,8 +433,9 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
 
           {/* CLI demo */}
           <Div className="mb-6">
-            <CodeBlock terminalLabel="terminal">
-              {`$ vibe ema --period=7
+            <CodeBlock
+              language="bash"
+              code={`$ vibe vibe-sense-ema --period=7
 
   ┌─────────────────────────────────────────┐
   │  analytics/indicators/ema               │
@@ -477,7 +445,7 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
   │  points   365 input → 365 output        │
   │  result   [ { timestamp, value }, ... ] │
   └─────────────────────────────────────────┘`}
-            </CodeBlock>
+            />
             <P className="text-xs text-gray-500 mt-2 text-center">
               {t(`unified.cliCaption`)}
             </P>
@@ -648,22 +616,27 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
               <P className="text-gray-400 leading-relaxed mb-6">
                 {t(`unified.cliCaption`)}
               </P>
-              <CodeBlock terminalLabel="analytics/indicators/ema/definition.ts">
-                {`const { POST } = createEndpoint({
+              <CodeBlock
+                language="typescript"
+                code={`// analytics/indicators/ema/definition.ts
+const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [EMA_ALIAS],
   method: Methods.POST,
-  path: ["analytics", "indicators", "ema"],
+  path: ["system", "unified-interface", "vibe-sense", "indicators", "ema"],
   title: "post.title",
   description: "post.description",
   icon: "activity",
-  category: "endpointCategories.analytics",
+  category: "endpointCategories.analyticsIndicators",
   tags: ["tags.vibeSense"],
   allowedRoles: [UserRole.ADMIN],
   fields: objectField(scopedTranslation, {
     usage: { request: "data", response: true },
     children: {
       source: timeSeriesRequestField(scopedTranslation, { ... }),
+      resolution: resolutionRequestField(scopedTranslation, { ... }),
+      range: rangeRequestField(scopedTranslation, { ... }),
+      lookback: lookbackRequestField(scopedTranslation, { ... }),
       period: requestField(scopedTranslation, {
         fieldType: FieldDataType.NUMBER,
         schema: z.number().int().min(1).max(500),
@@ -671,13 +644,14 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
         description: "post.fields.period.description",
       }),
       result: timeSeriesResponseField(scopedTranslation, { ... }),
+      meta: nodeMetaResponseField(scopedTranslation, { ... }),
     },
   }),
   errorTypes: { /* all 9 required */ },
-  successTypes: { title: "post.success.title", description: "post.success.description" },
-  examples: { requests: { default: { period: 7 } }, responses: { default: { result: [] } } },
+  successTypes: { title: "post.success.title", ... },
+  examples: { requests: { default: { source: [...], period: 3 } }, ... },
 });`}
-              </CodeBlock>
+              />
             </Div>
 
             <Div>
@@ -687,23 +661,30 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
               <P className="text-gray-400 text-sm mb-4">
                 {t(`unified.insight`)}
               </P>
-              <CodeBlock terminalLabel="analytics/indicators/ema/repository.ts">
-                {`// Returns ResponseType<T> - never throws
-export async function computeEmaHandler(
-  data: { source: TimeSeries; period: number },
-): Promise<ResponseType<{ result: TimeSeries }>> {
-  const k = 2 / (data.period + 1);
-  let ema: number | undefined;
-  const result = data.source.map((p) => {
-    ema = ema === undefined ? p.value : p.value * k + ema * (1 - k);
-    return { timestamp: p.timestamp, value: ema };
-  });
-  return success({ result });
+              <CodeBlock
+                language="typescript"
+                code={`// analytics/indicators/ema/repository.ts
+// Pure computation. No DB access.
+export class EmaIndicatorRepository {
+  static computeEma(points: TimeSeries, period: number): TimeSeries {
+    if (points.length === 0) return [];
+    const k = 2 / (period + 1);
+    const result: TimeSeries = [];
+    let ema: number | undefined;
+    for (const p of points) {
+      ema = ema === undefined ? p.value : p.value * k + ema * (1 - k);
+      result.push({ timestamp: p.timestamp, value: ema });
+    }
+    return result;
+  }
 }
 
-// route.ts wires it in one line:
-// [Methods.POST]: { handler: ({ data }) => computeEmaHandler(data) }`}
-              </CodeBlock>
+// route.ts wires it:
+// handler: ({ data }) => {
+//   const result = EmaIndicatorRepository.computeEma(data.source, data.period);
+//   return success({ result, meta: { ... } });
+// }`}
+              />
             </Div>
           </Div>
         </Div>
@@ -733,19 +714,30 @@ export async function computeEmaHandler(
               />
               <FileTreeItem name="leads-created/" isDir paddingClass="pl-4" />
               <FileTreeItem
+                name="constants.ts"
+                isDir={false}
+                paddingClass="pl-8"
+              />
+              <FileTreeItem
                 name="definition.ts"
                 isDir={false}
                 paddingClass="pl-8"
               />
+              <FileTreeItem name="i18n/" isDir paddingClass="pl-8" />
               <FileTreeItem
                 name="repository.ts"
                 isDir={false}
                 paddingClass="pl-8"
               />
-              <FileTreeItem name="query.ts" isDir={false} paddingClass="pl-8" />
+              <FileTreeItem name="route.ts" isDir={false} paddingClass="pl-8" />
               <FileTreeItem name="leads-converted/" isDir paddingClass="pl-4" />
               <FileTreeItem name="leads-bounced/" isDir paddingClass="pl-4" />
               <FileTreeItem name="leads-active/" isDir paddingClass="pl-4" />
+              <FileTreeItem
+                name="leads-campaign-running/"
+                isDir
+                paddingClass="pl-4"
+              />
               <FileTreeItem
                 name="leads-email-opens/"
                 isDir
@@ -756,6 +748,24 @@ export async function computeEmaHandler(
                 isDir
                 paddingClass="pl-4"
               />
+              <FileTreeItem
+                name="leads-engagements/"
+                isDir
+                paddingClass="pl-4"
+              />
+              <FileTreeItem
+                name="leads-form-submits/"
+                isDir
+                paddingClass="pl-4"
+              />
+              <FileTreeItem
+                name="leads-website-visits/"
+                isDir
+                paddingClass="pl-4"
+              />
+              <Span className="pl-4 text-xs text-gray-600 font-mono">
+                {t(`domainOwned.leadsCount`)}
+              </Span>
             </Div>
 
             <Div className="bg-gray-950 rounded-xl border border-gray-800 p-5">
@@ -776,16 +786,22 @@ export async function computeEmaHandler(
                 paddingClass="pl-4"
               />
               <FileTreeItem
+                name="constants.ts"
+                isDir={false}
+                paddingClass="pl-8"
+              />
+              <FileTreeItem
                 name="definition.ts"
                 isDir={false}
                 paddingClass="pl-8"
               />
+              <FileTreeItem name="i18n/" isDir paddingClass="pl-8" />
               <FileTreeItem
                 name="repository.ts"
                 isDir={false}
                 paddingClass="pl-8"
               />
-              <FileTreeItem name="query.ts" isDir={false} paddingClass="pl-8" />
+              <FileTreeItem name="route.ts" isDir={false} paddingClass="pl-8" />
               <FileTreeItem
                 name="credits-purchased/"
                 isDir
@@ -802,6 +818,24 @@ export async function computeEmaHandler(
                 isDir
                 paddingClass="pl-4"
               />
+              <FileTreeItem
+                name="credits-subscription-revenue/"
+                isDir
+                paddingClass="pl-4"
+              />
+              <FileTreeItem
+                name="credits-transactions-count/"
+                isDir
+                paddingClass="pl-4"
+              />
+              <FileTreeItem
+                name="credits-wallets-total/"
+                isDir
+                paddingClass="pl-4"
+              />
+              <Span className="pl-4 text-xs text-gray-600 font-mono">
+                {t(`domainOwned.creditsCount`)}
+              </Span>
             </Div>
           </Div>
 
@@ -991,13 +1025,14 @@ export async function computeEmaHandler(
                 {t(`vision.quickstart.label`)}
               </Span>
             </Div>
-            <CodeBlock terminalLabel="terminal">
-              {`git clone https://github.com/techfreaque/next-vibe
+            <CodeBlock
+              language="bash"
+              code={`git clone https://github.com/techfreaque/next-vibe
 cd next-vibe
 cp .env.example .env
 bun install
 vibe dev`}
-            </CodeBlock>
+            />
             <P className="text-sm text-gray-500 mt-3">
               {t(`vision.quickstart.description`)}
             </P>

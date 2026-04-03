@@ -37,7 +37,10 @@ export const translations: typeof enTranslations = {
   home: "Strona główna",
   pricing: "Cennik",
   features: "Funkcje",
-  framework: "Framework",
+  framework: {
+    title: "Framework",
+    description: "Silnik open-source stojący za platformą",
+  },
   forum: "Forum",
   contact: "Kontakt",
   getStarted: "Zacznij za darmo",

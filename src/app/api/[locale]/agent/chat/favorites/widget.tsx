@@ -61,6 +61,7 @@ import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/w
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { getTtsModelById } from "../../text-to-speech/models";
 import { cn } from "../../../shared/utils";
 import BadgeWidget from "../../../system/unified-interface/unified-ui/widgets/display-only/badge/react";
 import {
@@ -107,18 +108,21 @@ const GROUP_PREFIX = "group-";
 
 /**
  * Resolve the localized variant label for a favorite card.
+ * Checks customVariantName first, then falls back to skill config.
  * Returns null for non-variant favorites or unknown variants.
  */
 function getVariantLabel(
-  variantId: string | null,
-  skillId: string,
+  item: FavoriteCard,
   locale: CountryLanguage,
 ): string | null {
-  if (!variantId) {
+  if (item.customVariantName) {
+    return item.customVariantName;
+  }
+  if (!item.variantId) {
     return null;
   }
-  const skill = DEFAULT_SKILLS.find((s) => s.id === skillId);
-  const variant = skill?.variants?.find((v) => v.id === variantId);
+  const skill = DEFAULT_SKILLS.find((s) => s.id === item.skillId);
+  const variant = skill?.variants?.find((v) => v.id === item.variantId);
   if (!variant) {
     return null;
   }
@@ -227,7 +231,7 @@ const FullCard = React.memo(function FullCard({
   user: ReturnType<typeof useWidgetContext>["user"];
 }): React.JSX.Element {
   const isActive = Boolean(item.activeBadge);
-  const variantLabel = getVariantLabel(item.variantId, item.skillId, locale);
+  const variantLabel = getVariantLabel(item, locale);
 
   return (
     <Div
@@ -412,7 +416,7 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
   locale: CountryLanguage;
   isTouch: boolean;
 }): React.JSX.Element {
-  const variantLabel = getVariantLabel(item.variantId, item.skillId, locale);
+  const variantLabel = getVariantLabel(item, locale);
   const {
     attributes,
     listeners,
@@ -529,7 +533,9 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
                     "separator2",
                   )}
                 />
-                <Span className="opacity-60">{item.voiceId}</Span>
+                <Span className="opacity-60">
+                  {getTtsModelById(item.voiceId).name}
+                </Span>
               </>
             ) : null}
           </Div>

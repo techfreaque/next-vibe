@@ -43,10 +43,10 @@ export interface AgentEnvAvailability {
 }
 
 /**
- * Returns which AI provider integrations are currently configured.
- * A key is "available" if it is non-empty.
+ * Server-side singleton for env availability.
+ * Evaluated once at module load time — import and use directly on server.
  */
-export function getAgentEnvAvailability(): AgentEnvAvailability {
+export const agentEnvAvailability: AgentEnvAvailability = (() => {
   const braveSearch = Boolean(agentEnv.BRAVE_SEARCH_API_KEY);
   const kagiSearch = Boolean(agentEnv.KAGI_API_KEY);
 
@@ -67,7 +67,7 @@ export function getAgentEnvAvailability(): AgentEnvAvailability {
     falAi: Boolean(agentEnv.FAL_AI_API_KEY),
     modelsLab: Boolean(agentEnv.MODELSLAB_API_KEY),
   };
-}
+})();
 
 /**
  * Setup instructions per provider.

@@ -135,7 +135,7 @@ export const translations: typeof enTranslations = {
         variantId: {
           content: "Wariant: {{value}}",
         },
-        customName: {
+        customVariantName: {
           content: "Nazwa niestandardowa: {{value}}",
         },
         customIcon: {
@@ -277,9 +277,10 @@ export const translations: typeof enTranslations = {
       label: "Postać",
       description: "Wybierz postać dla tego ulubionego",
     },
-    customName: {
-      label: "Nazwa niestandardowa",
-      description: "Opcjonalna nazwa niestandardowa dla tego ulubionego",
+    customVariantName: {
+      label: "Nazwa wariantu",
+      description:
+        "Własna nazwa dla tego wariantu (pozostaw puste, aby użyć domyślnej)",
     },
     customIcon: {
       label: "Ikona niestandardowa",

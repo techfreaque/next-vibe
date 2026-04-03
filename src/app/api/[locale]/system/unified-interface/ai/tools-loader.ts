@@ -12,7 +12,10 @@ import { z } from "zod";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import {
+  collectServerDefaults,
+  generateSchemaForUsage,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -156,23 +159,34 @@ function createToolFromEndpoint(
           ? { ...strippedParams, callbackMode: callbackModeParam }
           : strippedParams;
 
-      // Apply streamContextPatch if the endpoint declares one.
-      // This injects resolved values (e.g. imageGenModelId) into request args
-      // so they appear in the tool call display and drive repository logic.
-      // Erased call type — TFields=any in CreateApiEndpointAny, so return is Record<string,JsonValue>
-      type StreamContextPatchFn = (
-        ctx: ToolExecutionContext,
-      ) => Record<string, JsonValue>;
-      const patchFn = endpoint.streamContextPatch as
-        | StreamContextPatchFn
-        | undefined;
-      const contextPatch =
-        context.streamContext && patchFn
-          ? patchFn(context.streamContext)
-          : undefined;
-      const restParams = contextPatch
-        ? { ...baseParams, ...contextPatch }
-        : baseParams;
+      // Apply field-level serverDefault callbacks for hidden fields.
+      // Fields with hiddenForPlatforms are stripped from the AI tool schema,
+      // but serverDefault resolves trusted values from request context.
+      const serverDefaults = collectServerDefaults(
+        endpoint.fields,
+        permissionRoles,
+        Platform.AI,
+      );
+      const serverDefaultPatch: Record<string, JsonValue> = {};
+      if (Object.keys(serverDefaults).length > 0) {
+        const ctx = {
+          user: context.user,
+          locale: context.locale,
+          platform: Platform.AI as Platform,
+          streamContext: context.streamContext,
+        };
+        for (const [key, resolver] of Object.entries(serverDefaults)) {
+          const resolved = resolver(ctx);
+          if (resolved !== undefined) {
+            serverDefaultPatch[key] = resolved as JsonValue;
+          }
+        }
+      }
+
+      const restParams = {
+        ...baseParams,
+        ...serverDefaultPatch,
+      };
 
       const { CallbackMode: CM } =
         await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");

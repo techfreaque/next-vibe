@@ -11,7 +11,7 @@ export const journeysTranslations = {
       whatItDoes:
         "To AI, które faktycznie robi to, o co prosisz. Bez owijania w bawełnę, bez moralizowania, bez losowych odmów. Używam go do copywritingu, badań, analizy konkurencji, tworzenia rzeczy których nie chcę tłumaczyć ostrożnemu AI. Po prostu działa.",
       affiliateDisclosure:
-        "Pełna transparentność: jeśli zapiszesz się przez mój link, dostanę małą prowizję. To część powodu dla którego to piszę. Ale i tak bym to polecał – wysłałem link już trzem osobom w normalnych rozmowach.",
+        "Pełna transparentność: jeśli zapiszesz się przez mój link, dostanę małą prowizję. To część powodu dla którego to piszę. Ale i tak bym to polecał - wysłałem link już trzem osobom w normalnych rozmowach.",
       ctaText: "Wypróbuj unbottled.ai (mój link afiliacyjny)",
       signature: " -  Chris",
       postScript:
@@ -39,7 +39,7 @@ export const journeysTranslations = {
       specificExample:
         "Chciałem napisać copy dla marki suplementów, która robi odważne twierdzenia. Każde główne AI albo je rozmywało, albo po prostu odmawiało. Spędziłem może 45 minut kręcąc się w kółko. Przeszedłem na unbottled.ai, miałem copy w 8 minut. Klient zatwierdził go tego samego dnia.",
       comparison:
-        "Nie mówię, że ChatGPT jest zły. Do wielu rzeczy jest świetny. Ale jeśli pracujesz przy czymkolwiek związanym z marketingiem, tekstami sprzedażowymi, granicznymi przypadkami prawnymi lub po prostu czymś, co wymaga trochę bezpośredniości – w końcu trafisz na ścianę.",
+        "Nie mówię, że ChatGPT jest zły. Do wielu rzeczy jest świetny. Ale jeśli pracujesz przy czymkolwiek związanym z marketingiem, tekstami sprzedażowymi, granicznymi przypadkami prawnymi lub po prostu czymś, co wymaga trochę bezpośredniości - w końcu trafisz na ścianę.",
       nudge:
         "Jeśli brzmi to jak twój świat, warto poświęcić 5 minut na darmową wersję.",
       ctaText: "Wypróbuj za darmo",
@@ -52,7 +52,7 @@ export const journeysTranslations = {
       lastPitch:
         "Wysłałem kilka maili o unbottled.ai i po tym dam spokój. Jeśli to nie jest istotne dla tego co robisz, totalnie rozumiem.",
       honesty:
-        "Jeśli kiedyś będziesz się zmagać z AI które nie chce współpracować – pamiętaj, że to jest opcja. Link poniżej. Afiliacyjny, tak. Nadal szczery.",
+        "Jeśli kiedyś będziesz się zmagać z AI które nie chce współpracować - pamiętaj, że to jest opcja. Link poniżej. Afiliacyjny, tak. Nadal szczery.",
       ctaText: "unbottled.ai",
       signature: " -  Chris",
     },
@@ -72,7 +72,7 @@ export const journeysTranslations = {
       previewText: "dużo się zmieniło od kiedy pierwsza o tym wspomniałem",
       greeting: "Hej,",
       checkIn:
-        "Wiem, że minęło trochę czasu od kiedy ostatnio wspominałem o unbottled.ai. Nadal go używam i naprawdę stał się lepszy – szybsze odpowiedzi, więcej opcji modeli, i naprawili kilka chropowatych miejsc.",
+        "Wiem, że minęło trochę czasu od kiedy ostatnio wspominałem o unbottled.ai. Nadal go używam i naprawdę stał się lepszy - szybsze odpowiedzi, więcej opcji modeli, i naprawili kilka chropowatych miejsc.",
       update:
         "Jeśli patrzyłeś na to wcześniej i nie byłeś pod wrażeniem, może warto spojrzeć jeszcze raz. Jeśli nigdy nie próbowałeś, darmowy trial nadal jest dostępny. Ten sam link afiliacyjny, ta sama szczera rekomendacja.",
       ctaText: "Rzuć okiem jeszcze raz",
@@ -82,14 +82,14 @@ export const journeysTranslations = {
   sideHustle: {
     initial: {
       subject: "Jestem afiliantem dla tego. Oto dlaczego to ma znaczenie.",
-      previewText: "transparentny od początku – zarabiam jeśli się zapiszesz",
+      previewText: "transparentny od początku - zarabiam jeśli się zapiszesz",
       greeting: "Hej,",
       opening:
-        "Chcę być szczery przed powiedzeniem czegokolwiek innego: jestem afiliantem unbottled.ai, co oznacza, że zarabiam prowizję jeśli zapiszesz się przez mój link. Mówię ci to, bo współpracuję afiliacyjnie tylko z rzeczami, których faktycznie używam – i myślę, że ta różnica ma znaczenie.",
+        "Chcę być szczery przed powiedzeniem czegokolwiek innego: jestem afiliantem unbottled.ai, co oznacza, że zarabiam prowizję jeśli zapiszesz się przez mój link. Mówię ci to, bo współpracuję afiliacyjnie tylko z rzeczami, których faktycznie używam - i myślę, że ta różnica ma znaczenie.",
       myStory:
         "Zacząłem używać unbottled.ai około 4 miesiące temu do pisania tekstów dla moich klientów freelance. Wcześniej używałem kombinacji ChatGPT i ręcznej edycji, żeby ominąć filtry treści. unbottled.ai skrócił ten proces mniej więcej o połowę, bo nie walczy ze mną. Zacząłem polecać go klientom jako część mojego procesu. Potem zdałem sobie sprawę, że mogę zarabiać pasywnie po prostu będąc o tym otwarty.",
       affiliateHonesty:
-        "Więc tak – są w tym pieniądze dla mnie. Ale naprawdę używam go co tydzień do faktycznej płatnej pracy. Gdyby przestał być dobry, przestałbym go polecać. Nie przestał być dobry.",
+        "Więc tak - są w tym pieniądze dla mnie. Ale naprawdę używam go co tydzień do faktycznej płatnej pracy. Gdyby przestał być dobry, przestałbym go polecać. Nie przestał być dobry.",
       proof:
         "Użyłem go w tym tygodniu do: napisania 3 opisów produktów dla klienta e-commerce, opracowania maila ofertowego do własnej akwizycji (meta, wiem), skondensowania 40-stronicowego PDF do 1-stronicowego briefu. Wszystko bez walki z filtrami czy przepisywania promptów.",
       ctaText: "Wypróbuj unbottled.ai (link afiliacyjny)",
@@ -104,9 +104,9 @@ export const journeysTranslations = {
       thisWeek:
         "Krótka aktualizacja. W tym tygodniu użyłem unbottled.ai do napisania maili onboardingowych dla nowego przepływu użytkownika klienta SaaS. Sześć maili, dwa warianty każdego, kompletnie z opcjami tematów. Moim starym procesem zajęłoby to prawie cały dzień. Zajęło około 90 minut.",
       clientWork:
-        "Klient nie wiedział, że użyłem AI. Zatwierdził copy z małymi zmianami. Na tym polega sedno – nie w tym, że AI robi kreatywną pracę, ale w tym, że przyspiesza rusztowanie, żebym mógł skupić się na robieniu tego naprawdę dobrego.",
+        "Klient nie wiedział, że użyłem AI. Zatwierdził copy z małymi zmianami. Na tym polega sedno - nie w tym, że AI robi kreatywną pracę, ale w tym, że przyspiesza rusztowanie, żebym mógł skupić się na robieniu tego naprawdę dobrego.",
       howYouCanToo:
-        "Jeśli robisz jakikolwiek rodzaj pisania – copy, content, komunikacja, cokolwiek – warto spróbować. Link afiliacyjny oznacza, że zarabiam jeśli się zapiszesz, ale dzielę się tym, bo to naprawdę część mojego sposobu pracy.",
+        "Jeśli robisz jakikolwiek rodzaj pisania - copy, content, komunikacja, cokolwiek - warto spróbować. Link afiliacyjny oznacza, że zarabiam jeśli się zapiszesz, ale dzielę się tym, bo to naprawdę część mojego sposobu pracy.",
       ctaText: "Sprawdź",
       signature: " -  Jordan",
     },
@@ -116,9 +116,9 @@ export const journeysTranslations = {
         "jak pasywny dochód z narzędzia, którego używasz, faktycznie działa",
       greeting: "Hej,",
       anotherUseCase:
-        "Kolejny tydzień, kolejny prawdziwy przypadek użycia: użyłem unbottled.ai do napisania maili akwizycyjnych, które teraz wysyłam – w tym tego, co jest trochę okrężne, ale też trochę dowodzi sensu.",
+        "Kolejny tydzień, kolejny prawdziwy przypadek użycia: użyłem unbottled.ai do napisania maili akwizycyjnych, które teraz wysyłam - w tym tego, co jest trochę okrężne, ale też trochę dowodzi sensu.",
       passiveIncome:
-        "Po stronie afiliacyjnej: zarabiam małe, ale stałe miesięczne dochody po prostu polecając to w normalnych rozmowach i przez newsletter. To nie są pieniądze zmieniające życie, ale są prawdziwe i się kumulują. Model jest prosty – ludzie się zapisują, zarabiam procent ich subskrypcji dopóki są klientami.",
+        "Po stronie afiliacyjnej: zarabiam małe, ale stałe miesięczne dochody po prostu polecając to w normalnych rozmowach i przez newsletter. To nie są pieniądze zmieniające życie, ale są prawdziwe i się kumulują. Model jest prosty - ludzie się zapisują, zarabiam procent ich subskrypcji dopóki są klientami.",
       callToAction:
         "Jeśli prowadzisz jakiś content, freelancing czy marketing, afiliacja może mieć sens też dla ciebie. Albo po prostu używaj jako narzędzia. Oba są OK. Link poniżej tak czy inaczej.",
       ctaText: "Wypróbuj unbottled.ai",
@@ -133,7 +133,7 @@ export const journeysTranslations = {
       monthlyEarnings:
         "Będę krótki. W zeszłym miesiącu zarobiłem 147€ prowizji afiliacyjnej z unbottled.ai tylko od ludzi, którym o tym wspomniałem mimochodem. To nie jest biznes, ale to miły bonus za polecanie czegoś, z czego i tak korzystam.",
       noHardSell:
-        "Nie będę cię dalej mailować w tej sprawie. Jeśli do tej pory nie kliknęło, pewnie już nie kliknie. Ale jeśli kiedyś będziesz chciał wypróbować zdolne, niecenzurowane AI do pracy z treściami – lub po prostu program afiliacyjny – link poniżej. Bez presji, naprawdę.",
+        "Nie będę cię dalej mailować w tej sprawie. Jeśli do tej pory nie kliknęło, pewnie już nie kliknie. Ale jeśli kiedyś będziesz chciał wypróbować zdolne, niecenzurowane AI do pracy z treściami - lub po prostu program afiliacyjny - link poniżej. Bez presji, naprawdę.",
       ctaText: "unbottled.ai",
       signature: " -  Jordan",
     },
@@ -143,7 +143,7 @@ export const journeysTranslations = {
       greeting: "Hej,",
       tip: 'Szybki trik, którego używam: kiedy muszę napisać coś w konkretnym głosie marki, wklejam 3 przykłady istniejących treści i piszę "napisz w tym stylu" przed właściwą prośbą. unbottled.ai jest szczególnie dobry w uchwyceniu tego, bo nie dodaje własnego owijania w bawełnę czy łagodzenia na wierzchu.',
       freeValue:
-        "Tym razem bez pchania afiliacyjnego – po prostu coś, co działa. Jeśli jeszcze nie próbowałeś unbottled.ai i chcesz, link nadal jest tu.",
+        "Tym razem bez pchania afiliacyjnego - po prostu coś, co działa. Jeśli jeszcze nie próbowałeś unbottled.ai i chcesz, link nadal jest tu.",
       ctaText: "unbottled.ai",
       signature: " -  Jordan",
     },
@@ -169,7 +169,7 @@ export const journeysTranslations = {
       whatItDoesDifferently:
         "Krótko: to asystent AI, który nie odmawia zadań na podstawie mglistych zasad polityki. Przydatny jeśli robisz cokolwiek w marketingu, prawie, pisaniu kreatywnym, badaniach, lub tak naprawdę cokolwiek, gdzie główne narzędzia AI tend to get in the way of actual work.",
       affiliateNote:
-        "Poniżej jest link afiliacyjny – zarabiam małą prowizję jeśli się zapiszesz. Wspominam o tym, bo wolę być bezpośredni niż udawać, że go nie ma.",
+        "Poniżej jest link afiliacyjny - zarabiam małą prowizję jeśli się zapiszesz. Wspominam o tym, bo wolę być bezpośredni niż udawać, że go nie ma.",
       ctaText: "Rzuć okiem",
       signature: " -  Sam",
     },
@@ -210,7 +210,7 @@ export const journeysTranslations = {
       previewText: "warte wiedzenia jeśli szukasz",
       greeting: "Cześć,",
       update:
-        "unbottled.ai ostatnio dodał nowe opcje modeli. Jeśli patrzyłeś wcześniej i jakość wyników nie była tam, warto spróbować ponownie – nowsze modele są o krok lepsze. Link afiliacyjny nadal aktywny jeśli chcesz się zapisać.",
+        "unbottled.ai ostatnio dodał nowe opcje modeli. Jeśli patrzyłeś wcześniej i jakość wyników nie była tam, warto spróbować ponownie - nowsze modele są o krok lepsze. Link afiliacyjny nadal aktywny jeśli chcesz się zapisać.",
       ctaText: "Zobacz co nowego",
       signature: " -  Sam",
     },
@@ -219,7 +219,7 @@ export const journeysTranslations = {
       previewText: "krótka notatka",
       greeting: "Cześć,",
       checkIn:
-        "Minęło trochę czasu. Po prostu sprawdzam – jeśli próbowałeś unbottled.ai, byłbym ciekaw co myślałeś. A jeśli nie, nadal istnieje, nadal ulepszone, darmowy trial nadal dostępny.",
+        "Minęło trochę czasu. Po prostu sprawdzam - jeśli próbowałeś unbottled.ai, byłbym ciekaw co myślałeś. A jeśli nie, nadal istnieje, nadal ulepszone, darmowy trial nadal dostępny.",
       whatChanged:
         "Dodali lepsze wsparcie dla długich form i szybsze czasy odpowiedzi od kiedy po raz pierwszy o tym wspomniałem. Link afiliacyjny poniżej.",
       ctaText: "Rzuć okiem",

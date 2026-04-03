@@ -14,7 +14,7 @@ import type {
 } from "../../../unified-ui/widgets/_shared/types";
 import type { EventSchemas } from "../../../websocket/types";
 import type { CreateApiEndpoint } from "../../endpoints/definition/create";
-import { objectFieldNew } from "../../field/utils-new";
+import { objectField } from "../../field/utils";
 import type { UnifiedField } from "../../types/endpoint";
 import { WidgetType } from "../../types/enums";
 import type { RequestResponseWidgetConfig } from "../../widgets/configs";
@@ -69,7 +69,7 @@ const test3_1: Test3_1_PrimitiveFieldVariance = "PASS";
 
 // Test 4.1: ObjectField with specific TKey extends UnifiedField<string, z.ZodTypeAny>
 // Tests that an objectField with specific literal TKey extends generic UnifiedField
-const test4_1_field = objectFieldNew({
+const test4_1_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {},
@@ -88,11 +88,11 @@ const test4_1: Test4_1_ObjectFieldVariance = "PASS";
 
 // Test 4.2: ObjectField with children extends UnifiedField<string, z.ZodTypeAny>
 // Tests that an objectField containing nested fields extends the generic UnifiedField constraint
-const test4_2_field = objectFieldNew({
+const test4_2_field = objectField({
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    nested: objectFieldNew({
+    nested: objectField({
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {},

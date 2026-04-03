@@ -2,14 +2,12 @@ import "server-only";
 
 import { count, eq } from "drizzle-orm";
 
+import { FEATURED_MODELS } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 import { memories as memoriesTable } from "@/app/api/[locale]/agent/chat/memories/db";
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import {
-  FEATURED_MODELS,
-  getAvailableModelCount,
-} from "@/app/api/[locale]/agent/models/models";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import {
   ProductIds,
   productsRepository,
@@ -129,7 +127,7 @@ export async function loadPromptContextData(
     subLabel,
     packLabel,
     uncensoredNames: FEATURED_MODELS.uncensored.join(", "),
-    totalModelCount: getAvailableModelCount(getAgentEnvAvailability(), isAdmin),
+    totalModelCount: getAvailableModelCount(agentEnvAvailability, isAdmin),
     isExposedFolder,
     privateName,
     publicName,

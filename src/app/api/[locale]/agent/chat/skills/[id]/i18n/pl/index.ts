@@ -146,6 +146,21 @@ export const translations: typeof enTranslations = {
       title: "Sukces",
       description: "Postać pobrana pomyślnie",
     },
+    share: {
+      button: "Udostepnij i zarabiaj",
+      title: "Udostepnij ten skill i zarabiaj",
+      description:
+        "Udostepnij ten skill ze swoim linkiem polecajacym. Zarabiaj 10% prowizji od kazdego nowego uzytkownika.",
+      selectCode: "Wybierz kod polecajacy:",
+      noCodesYet: "Brak kodow polecajacych",
+      createCode: "Stworz kod",
+      codePlaceholder: "np. MOJKOD",
+      creating: "Tworzenie...",
+      linkReady: "Twoj link do udostepnienia:",
+      copied: "Skopiowano!",
+      copyLink: "Kopiuj link",
+      close: "Zamknij",
+    },
   },
   patch: {
     title: "Aktualizuj postacię",
@@ -245,9 +260,19 @@ export const translations: typeof enTranslations = {
       description: "Model używany do rozpoznawania mowy",
       placeholder: "Domyślny systemu",
     },
-    visionBridgeModel: {
-      label: "Model wizji",
-      description: "Model używany do analizy obrazów",
+    imageVisionModel: {
+      label: "Model wizji obrazów",
+      description: "Model do analizy obrazów",
+      placeholder: "Domyślny systemu",
+    },
+    videoVisionModel: {
+      label: "Model wizji wideo",
+      description: "Model do analizy wideo",
+      placeholder: "Domyślny systemu",
+    },
+    audioVisionModel: {
+      label: "Model wizji audio",
+      description: "Model do analizy audio",
       placeholder: "Domyślny systemu",
     },
     translationModel: {

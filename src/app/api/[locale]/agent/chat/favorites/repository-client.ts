@@ -16,25 +16,25 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { parseError } from "../../../shared/utils";
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { getModelDisplayName } from "../../models/all-models";
 import {
-  DEFAULT_TTS_VOICE_ID,
-  type TtsModelId,
-  getModelDisplayName,
   modelProviders,
+  type ModelProviderEnvAvailability,
 } from "../../models/models";
 import type {
-  FiltersModelSelection,
-  ManualModelSelection,
+  ChatModelSelection,
   VoiceModelSelection,
 } from "../../models/types";
 
+import type { TtsModelId } from "../../text-to-speech/models";
 import { STORAGE_KEYS } from "../constants";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
-import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
 import { ModelSelectionType } from "../skills/enum";
+import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
 import { SkillsRepositoryClient } from "../skills/repository-client";
 import type {
   FavoriteGetModelSelection,
@@ -58,6 +58,7 @@ interface StoredLocalFavorite {
   id: string;
   skillId: string;
   variantId: string | null;
+  customVariantName?: string | null;
   customIcon: IconKey | null;
   voiceModelSelection: VoiceModelSelection | null;
   modelSelection: FavoriteGetModelSelection | null;
@@ -76,10 +77,14 @@ export class ChatFavoritesRepositoryClient {
     logger: EndpointLogger,
     locale: CountryLanguage,
     user: JwtPayloadType,
+    env: ModelProviderEnvAvailability,
   ): Promise<ResponseType<FavoritesListResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const settings = ChatSettingsRepositoryClient.loadLocalSettings();
+      const settings = ChatSettingsRepositoryClient.loadLocalSettings(
+        user,
+        env,
+      );
       const activeFavoriteId = settings.activeFavoriteId;
 
       // Load stored minimal configs
@@ -103,6 +108,7 @@ export class ChatFavoritesRepositoryClient {
           null,
           locale,
           user,
+          env,
         );
       });
 
@@ -312,11 +318,7 @@ export class ChatFavoritesRepositoryClient {
    */
   static computeFavoriteDisplayFields(
     stored: StoredLocalFavorite,
-    characterModelSelection:
-      | FiltersModelSelection
-      | ManualModelSelection
-      | undefined
-      | null,
+    characterModelSelection: ChatModelSelection | undefined | null,
     characterIcon: IconKey | null,
     characterName: string | null,
     characterTagline: string | null,
@@ -325,12 +327,14 @@ export class ChatFavoritesRepositoryClient {
     characterVoiceSelection: VoiceModelSelection | null,
     locale: CountryLanguage,
     user: JwtPayloadType,
+    env: ModelProviderEnvAvailability,
   ): FavoriteCard {
     const { t } = scopedTranslation.scopedT(locale);
     const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
       stored.modelSelection,
       characterModelSelection ?? undefined,
       user,
+      env,
     );
     const hasSkill = stored.skillId !== "default";
 
@@ -356,6 +360,7 @@ export class ChatFavoritesRepositoryClient {
       id: stored.id,
       skillId: stored.skillId,
       variantId: stored.variantId ?? null,
+      customVariantName: stored.customVariantName ?? null,
       modelId: bestModel?.id ?? null,
       voiceId: resolvedVoiceId,
       position: stored.position,
@@ -400,6 +405,7 @@ export class ChatFavoritesRepositoryClient {
       return {
         skillId: stored.skillId,
         variantId: stored.variantId ?? null,
+        customVariantName: stored.customVariantName ?? null,
         icon: "user" as const,
         name: t("fallbacks.unknownSkill"),
         tagline: t("fallbacks.noTagline"),
@@ -426,6 +432,7 @@ export class ChatFavoritesRepositoryClient {
     return {
       skillId: stored.skillId,
       variantId: stored.variantId ?? null,
+      customVariantName: stored.customVariantName ?? null,
       icon: stored.customIcon ?? character.icon,
       name: character.name ? tChar(character.name) : t("fallbacks.unknown"),
       tagline: character.tagline ? tChar(character.tagline) : "",

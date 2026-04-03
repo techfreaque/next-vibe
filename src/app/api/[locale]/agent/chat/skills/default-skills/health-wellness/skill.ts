@@ -1,5 +1,5 @@
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { Skill } from "../../config";
-import { ModelId } from "../../../../models/models";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -79,7 +79,7 @@ Always recommend consulting healthcare professionals for medical concerns.
       variantName: "skills.healthWellness.variants.claude" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.CLAUDE_SONNET_4_6,
+        manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -98,7 +98,7 @@ Always recommend consulting healthcare professionals for medical concerns.
       variantName: "skills.healthWellness.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.CLAUDE_HAIKU_4_5,
+        manualModelId: ChatModelId.CLAUDE_HAIKU_4_5,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

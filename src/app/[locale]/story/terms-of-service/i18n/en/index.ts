@@ -1,15 +1,15 @@
 export const translations = {
   meta: {
-    title: "Terms of Service - unbottled.ai",
+    title: "Terms of Service - {{appName}}",
     category: "Legal",
-    description: "Read the terms and conditions for using unbottled.ai",
+    description: "Read the terms and conditions for using {{appName}}",
     imageAlt: "Terms of Service",
     keywords:
-      "terms of service, terms and conditions, user agreement, unbottled.ai terms",
-    ogTitle: "Terms of Service - unbottled.ai",
-    ogDescription: "Read the terms and conditions for using unbottled.ai",
-    twitterTitle: "Terms of Service - unbottled.ai",
-    twitterDescription: "Read the terms and conditions for using unbottled.ai",
+      "terms of service, terms and conditions, user agreement, {{appName}} terms",
+    ogTitle: "Terms of Service - {{appName}}",
+    ogDescription: "Read the terms and conditions for using {{appName}}",
+    twitterTitle: "Terms of Service - {{appName}}",
+    twitterDescription: "Read the terms and conditions for using {{appName}}",
   },
   printAriaLabel: "Print terms of service",
   printButton: "Print",

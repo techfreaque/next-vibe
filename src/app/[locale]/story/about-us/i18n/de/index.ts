@@ -2,22 +2,22 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Über uns - unbottled.ai",
+    title: "Über uns - {{appName}}",
     category: "Über uns",
     description:
-      "Erfahren Sie mehr über die Mission von unbottled.ai für unzensierte KI-Gespräche",
-    imageAlt: "Über unbottled.ai",
-    keywords: "über unbottled.ai, unzensierte KI, KI-Mission, KI-Werte",
-    ogTitle: "Über unbottled.ai - Unzensierte KI-Plattform",
+      "Erfahren Sie mehr über die Mission von {{appName}} für unzensierte KI-Gespräche",
+    imageAlt: "Über {{appName}}",
+    keywords: "über {{appName}}, unzensierte KI, KI-Mission, KI-Werte",
+    ogTitle: "Über {{appName}} - Unzensierte KI-Plattform",
     ogDescription:
       "Entdecken Sie unsere Mission, den Zugang zu unzensierter KI zu demokratisieren",
-    twitterTitle: "Über unbottled.ai",
+    twitterTitle: "Über {{appName}}",
     twitterDescription:
       "Erfahren Sie mehr über unsere Mission für unzensierte KI-Gespräche",
   },
   hero: {
     subtitle:
-      "{{modelCount}} Modelle. {{skillCount}} Skills. ~{{toolCount}} Tools. SSH, E-Mail, Browser-Automatisierung, geplante Aufgaben. Kostenlos auf unbottled.ai - oder selbst hosten.",
+      "{{modelCount}} Modelle. {{skillCount}} Skills. ~{{toolCount}} Tools. SSH, E-Mail, Browser-Automatisierung, geplante Aufgaben. Kostenlos auf {{appName}} - oder selbst hosten.",
   },
   backToHome: "Zurück zur Startseite",
   title: "Über {{appName}}",

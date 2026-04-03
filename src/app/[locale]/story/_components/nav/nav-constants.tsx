@@ -77,9 +77,9 @@ export const navItems: NavItemType[] = [
     href: "/threads",
   },
   {
-    icon: <Code className="h-4 w-4" />,
-    title: "nav.framework",
-    href: "/story/framework",
+    icon: <BookOpen className="h-4 w-4" />,
+    title: "nav.blog.title",
+    href: "/story/blog",
   },
   {
     icon: <Tag className="h-4 w-4" />,
@@ -109,10 +109,10 @@ export const navItems: NavItemType[] = [
         href: "/story/invest",
       },
       {
-        icon: <BookOpen className="h-4 w-4" />,
-        title: "nav.blog.title",
-        description: "nav.blog.description",
-        href: "/story/blog",
+        icon: <Code className="h-4 w-4" />,
+        title: "nav.framework.title",
+        description: "nav.framework.description",
+        href: "/story/framework",
       },
     ],
   },

@@ -4,27 +4,28 @@
 
 import { Button, Section, Text } from "@react-email/components";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
+import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
+import {
+  createTrackingContext,
+  type TrackingContext,
+} from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
 import { RESET_TOKEN_EXPIRY } from "@/config/constants";
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/models";
+import { env } from "@/config/env";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { UserDetailLevel } from "../../../enum";
 import { UserRepository } from "../../../repository";
-import {
-  scopedTranslation as requestScopedTranslation,
-  type ResetPasswordRequestT,
-} from "./i18n";
 import { scopedTranslation as resetPasswordScopedTranslation } from "../i18n";
 import { PasswordRepository } from "../repository";
 import type {
@@ -33,11 +34,9 @@ import type {
 } from "./definition";
 import definition from "./definition";
 import {
-  createTrackingContext,
-  type TrackingContext,
-} from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
-import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
-import { configScopedTranslation } from "@/config/i18n";
+  scopedTranslation as requestScopedTranslation,
+  type ResetPasswordRequestT,
+} from "./i18n";
 
 // ============================================================================
 // SCHEMA
@@ -269,7 +268,7 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
         publicName: user.publicName,
         userId: user.id,
         passwordResetUrl,
-        totalModelCount: getAvailableModelCount(getAgentEnvAvailability(), false),
+        totalModelCount: getAvailableModelCount(agentEnvAvailability, false),
       };
 
       return success({

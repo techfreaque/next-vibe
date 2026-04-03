@@ -10,7 +10,7 @@ import { redirect } from "next-vibe-ui/lib/redirect";
 import type { JSX } from "react";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import type { CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
@@ -168,7 +168,7 @@ export async function tanstackLoader({
     initialHistory,
     hasPaymentProvider,
     isAdmin,
-    envAvailability: getAgentEnvAvailability(),
+    envAvailability: agentEnvAvailability,
   };
 }
 

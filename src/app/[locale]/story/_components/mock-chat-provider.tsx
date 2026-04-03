@@ -16,6 +16,7 @@ import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { UseNavigationStackReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
+import { EnvAvailabilitySetter } from "@/app/api/[locale]/agent/env-availability-context";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { WidgetContextStoreContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { WidgetContextStoreType } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/widget-context-store";
@@ -84,7 +85,6 @@ export function MockChatProvider({
   const mockValue = useMemo(
     (): ChatBootValue => ({
       initialCredits: MOCK_CREDITS,
-      envAvailability: MOCK_ENV,
       rootFolderPermissions: { canCreateThread: false, canCreateFolder: false },
       initialFoldersData: null,
       initialThreadsData: null,
@@ -104,6 +104,7 @@ export function MockChatProvider({
 
   return (
     <WidgetContextStoreContext.Provider value={widgetStoreRef.current}>
+      <EnvAvailabilitySetter env={MOCK_ENV} />
       <ChatBootContext.Provider value={mockValue}>
         <NavigationStackProvider>
           <ChatNavigationProvider

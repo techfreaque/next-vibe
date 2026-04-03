@@ -4,9 +4,6 @@
 
 import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 
-import type { AgentEnvAvailability } from "../env-availability";
-import { getAllModelOptions, ModelId } from "../models/models";
-import { isProviderAvailable } from "../models/widget/model-selector";
 import { scopedTranslation } from "./i18n";
 
 export const {
@@ -19,12 +16,6 @@ export const {
   PORTRAIT_1792: "post.size.portrait1792",
 });
 
-export const IMAGE_SIZE_VALUES = [
-  "post.size.square1024",
-  "post.size.landscape1792",
-  "post.size.portrait1792",
-] as const;
-
 export const {
   enum: ImageQuality,
   options: ImageQualityOptions,
@@ -33,58 +24,3 @@ export const {
   STANDARD: "post.quality.standard",
   HD: "post.quality.hd",
 });
-
-export const IMAGE_QUALITY_VALUES = [
-  "post.quality.standard",
-  "post.quality.hd",
-] as const;
-
-/** Valid image model IDs - subset of ModelId for image generation */
-export const IMAGE_MODEL_IDS = [
-  ModelId.DALL_E_3,
-  ModelId.GPT_IMAGE_1,
-  ModelId.FLUX_SCHNELL,
-  ModelId.FLUX_PRO,
-  ModelId.SDXL,
-  ModelId.FLUX_2_MAX,
-  ModelId.FLUX_2_KLEIN_4B,
-  ModelId.RIVERFLOW_V2_PRO,
-  ModelId.RIVERFLOW_V2_FAST,
-  ModelId.RIVERFLOW_V2_MAX_PREVIEW,
-  ModelId.RIVERFLOW_V2_STANDARD_PREVIEW,
-  ModelId.RIVERFLOW_V2_FAST_PREVIEW,
-  ModelId.FLUX_2_FLEX,
-  ModelId.FLUX_2_PRO,
-  ModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
-  ModelId.GPT_5_IMAGE_MINI,
-  ModelId.GPT_5_IMAGE,
-  ModelId.SEEDREAM_4_5,
-] as const;
-
-export type ImageModelId = (typeof IMAGE_MODEL_IDS)[number];
-
-/** Static options array (all models, no availability filtering) */
-export const ImageModelOptions = getAllModelOptions()
-  .filter((m) => (IMAGE_MODEL_IDS as readonly string[]).includes(m.id))
-  // eslint-disable-next-line i18next/no-literal-string
-  .map((m) => ({ value: m.id, label: m.name }));
-
-/**
- * Dynamic model options that respect provider availability.
- * - Admins: all models shown, unavailable ones are disabled.
- * - Non-admins: unavailable models are hidden.
- */
-export function getImageModelOptions(
-  envAvailability: AgentEnvAvailability | undefined,
-  isAdmin: boolean,
-): { value: string; label: string; disabled?: boolean }[] {
-  return getAllModelOptions()
-    .filter((m) => (IMAGE_MODEL_IDS as readonly string[]).includes(m.id))
-    .flatMap((m) => {
-      const available = isProviderAvailable(m, envAvailability);
-      if (!available && !isAdmin) {
-        return [];
-      }
-      return [{ value: m.id, label: m.name, disabled: !available }];
-    });
-}

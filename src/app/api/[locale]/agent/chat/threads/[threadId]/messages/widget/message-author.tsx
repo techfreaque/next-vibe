@@ -8,13 +8,11 @@ import { useEffect, useState } from "react";
 
 import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import {
-  getModelById,
-  type ModelId,
-} from "@/app/api/[locale]/agent/models/models";
+import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { scopedTranslation } from "../i18n";
 
 function RelativeTimestamp({
@@ -40,7 +38,7 @@ interface MessageAuthorProps {
   authorId: string | null;
   currentUserId: string | undefined;
   isAI: boolean;
-  model: ModelId | null;
+  model: ChatModelId | null;
   timestamp: Date;
   edited?: boolean;
   compact?: boolean;
@@ -101,7 +99,7 @@ export function MessageAuthorInfo({
           {/* Show model icon for AI messages */}
           {isAI && model && (
             <Icon
-              icon={getModelById(model).icon}
+              icon={getChatModelById(model).icon}
               className={cn(compact ? "h-3 w-3" : "h-3.5 w-3.5")}
             />
           )}
