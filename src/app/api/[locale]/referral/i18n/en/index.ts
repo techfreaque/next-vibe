@@ -134,6 +134,12 @@ export const translations = {
         inactive: "This referral code is inactive",
         conversionHint:
           "Every {{examplePrice}}/mo subscriber earns you {{exampleEarning}}/mo - recurring",
+        linkGen: "Custom Link",
+        linkGenPlaceholder: "Paste any page URL...",
+        linkGenHint:
+          "Paste any unbottled page URL to create a tracked referral link",
+        linkGenCopy: "Copy",
+        linkGenCopied: "Copied!",
       },
     },
   },

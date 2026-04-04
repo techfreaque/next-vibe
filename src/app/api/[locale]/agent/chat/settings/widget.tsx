@@ -42,7 +42,17 @@ import {
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
 } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import {
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
+  getBestAudioVisionModel,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
+import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
+import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
+import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
@@ -53,22 +63,20 @@ import type { Modality, ModelRole } from "@/app/api/[locale]/agent/models/enum";
 import {
   getChatModelById,
   type ChatModelId,
+  type ChatManualModelSelection,
+  type ChatModelSelection,
 } from "@/app/api/[locale]/agent/ai-stream/models";
-import type {
-  AnyRoleModelSelection,
-  ChatManualModelSelection,
-  ChatModelSelection,
-} from "@/app/api/[locale]/agent/models/types";
 import {
   audioVisionModelSelectionSchema,
-  imageGenModelSelectionSchema,
   imageVisionModelSelectionSchema,
-  musicGenModelSelectionSchema,
-  sttModelSelectionSchema,
-  videoGenModelSelectionSchema,
   videoVisionModelSelectionSchema,
-  voiceModelSelectionSchema,
-} from "@/app/api/[locale]/agent/models/types";
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
+import type { AnyRoleModelSelection } from "@/app/api/[locale]/agent/models/selection";
 
 import {
   ModelSelector,
@@ -113,7 +121,7 @@ function getModelContextWindow(
 
   // Use the same resolution logic as getBestModelForFavorite:
   // favorite override → character default → MAX_ABSOLUTE
-  const best = SkillsRepositoryClient.getBestModelForFavorite(
+  const best = getBestChatModelForFavorite(
     modelSelection ?? null,
     characterModelSelection ?? undefined,
     user,
@@ -486,11 +494,7 @@ function makeDefaultSelection(
     selectionType: ModelSelectionType.MANUAL,
   };
   if (role === "tts") {
-    const m = SkillsRepositoryClient.getBestTtsModel(
-      DEFAULT_TTS_MODEL_SELECTION,
-      user,
-      env,
-    );
+    const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user, env);
     if (!m) {
       return undefined;
     }
@@ -501,11 +505,7 @@ function makeDefaultSelection(
     return r.success ? r.data : undefined;
   }
   if (role === "stt") {
-    const m = SkillsRepositoryClient.getBestSttModel(
-      DEFAULT_STT_MODEL_SELECTION,
-      user,
-      env,
-    );
+    const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user, env);
     if (!m) {
       return undefined;
     }
@@ -516,7 +516,7 @@ function makeDefaultSelection(
     return r.success ? r.data : undefined;
   }
   if (role === "image-gen") {
-    const m = SkillsRepositoryClient.getBestImageGenModel(
+    const m = getBestImageGenModel(
       DEFAULT_IMAGE_GEN_MODEL_SELECTION,
       user,
       env,
@@ -531,7 +531,7 @@ function makeDefaultSelection(
     return r.success ? r.data : undefined;
   }
   if (role === "audio-gen") {
-    const m = SkillsRepositoryClient.getBestMusicGenModel(
+    const m = getBestMusicGenModel(
       DEFAULT_MUSIC_GEN_MODEL_SELECTION,
       user,
       env,
@@ -546,7 +546,7 @@ function makeDefaultSelection(
     return r.success ? r.data : undefined;
   }
   if (role === "video-gen") {
-    const m = SkillsRepositoryClient.getBestVideoGenModel(
+    const m = getBestVideoGenModel(
       DEFAULT_VIDEO_GEN_MODEL_SELECTION,
       user,
       env,
@@ -561,7 +561,7 @@ function makeDefaultSelection(
     return r.success ? r.data : undefined;
   }
   if (role === "image-vision") {
-    const m = SkillsRepositoryClient.getBestImageVisionModel(
+    const m = getBestImageVisionModel(
       DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       user,
       env,
@@ -576,7 +576,7 @@ function makeDefaultSelection(
     return r.success ? r.data : undefined;
   }
   if (role === "video-vision") {
-    const m = SkillsRepositoryClient.getBestVideoVisionModel(
+    const m = getBestVideoVisionModel(
       DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       user,
       env,
@@ -591,7 +591,7 @@ function makeDefaultSelection(
     return r.success ? r.data : undefined;
   }
   if (role === "audio-vision") {
-    const m = SkillsRepositoryClient.getBestAudioVisionModel(
+    const m = getBestAudioVisionModel(
       DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       user,
       env,

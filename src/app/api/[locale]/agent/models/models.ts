@@ -8,7 +8,13 @@ import type {
 } from "../ai-stream/vision-models";
 import {
   type ContentLevelValue,
+  ContentLevelDB,
+  IntelligenceLevelDB,
   type IntelligenceLevelValue,
+  ModelSelectionType,
+  PriceLevel,
+  PriceLevelDB,
+  SpeedLevelDB,
   type SpeedLevelValue,
 } from "../chat/skills/enum";
 import type { AgentTranslationKey } from "../i18n";
@@ -26,6 +32,9 @@ import type {
   VideoGenModelId,
   VideoGenModelOption,
 } from "../video-generation/models";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { SkillsT } from "../chat/skills/i18n";
 import { type Modality, type ModelUtilityValue } from "./enum";
 
 // ============================================
@@ -82,6 +91,7 @@ export enum ApiProvider {
   EDEN_AI_TTS = "eden-ai-tts",
   EDEN_AI_STT = "eden-ai-stt",
   MODELSLAB = "modelslab",
+  UNBOTTLED = "unbottled",
 }
 
 // eslint-disable-next-line i18next/no-literal-string -- API provider names are technical identifiers
@@ -102,6 +112,7 @@ export const apiProviderDisplayNames: Record<ApiProvider, string> = {
   [ApiProvider.EDEN_AI_TTS]: "Eden AI TTS",
   [ApiProvider.EDEN_AI_STT]: "Eden AI STT",
   [ApiProvider.MODELSLAB]: "ModelsLab",
+  [ApiProvider.UNBOTTLED]: "Unbottled AI",
 };
 
 // ============================================
@@ -112,7 +123,7 @@ export const apiProviderDisplayNames: Record<ApiProvider, string> = {
  * Provider-specific config for a model variant
  */
 export interface ModelProviderConfigTokenBased {
-  id: ChatModelId | ImageGenModelId;
+  id: ChatModelId | ImageGenModelId | VideoGenModelId | MusicGenModelId;
   apiProvider: ApiProvider;
   providerModel: string;
   creditCost: typeof calculateCreditCost;
@@ -121,39 +132,82 @@ export interface ModelProviderConfigTokenBased {
   cacheReadTokenCost?: number;
   cacheWriteTokenCost?: number;
   adminOnly?: boolean;
+  creditCostPerImage?: never;
+  creditCostPerSecond?: never;
+  creditCostPerClip?: never;
+  creditCostPerCharacter?: never;
+  defaultDurationSeconds?: never;
 }
 export interface ModelProviderConfigCreditBased {
-  id: ChatModelId;
+  id: ChatModelId | ImageGenModelId | VideoGenModelId | MusicGenModelId;
   apiProvider: ApiProvider;
   providerModel: string;
   creditCost: number;
   inputTokenCost?: never;
   outputTokenCost?: never;
   adminOnly?: boolean;
+  creditCostPerImage?: never;
+  creditCostPerSecond?: never;
+  creditCostPerClip?: never;
+  creditCostPerCharacter?: never;
+  defaultDurationSeconds?: never;
 }
 export interface ModelProviderConfigImageBased {
   id: ImageGenModelId;
   apiProvider: ApiProvider;
   providerModel: string;
-  /** Fixed credits per generated image */
+  /** Fixed credits per generated image (base price) */
   creditCostPerImage: number;
+  /** Which image sizes this model supports (empty = no size option; undefined = all sizes) */
+  supportedSizes?: readonly string[];
+  /** Which quality options this model supports (empty/undefined = no quality option) */
+  supportedQualities?: readonly string[];
+  /** Override creditCostPerImage per size (key = ImageSize value) */
+  pricingBySize?: Partial<Record<string, number>>;
+  /** Override creditCostPerImage per quality (key = ImageQuality value) */
+  pricingByQuality?: Partial<Record<string, number>>;
+  /** Override creditCostPerImage per resolution (key = resolution string e.g. "1024px") */
+  pricingByResolution?: Partial<Record<string, number>>;
+  /** Which resolution options this model supports (e.g. ["1024px", "2048px"]) */
+  supportedResolutions?: readonly string[];
+  /** Which aspect ratios this model supports (e.g. ["16:9", "9:16", "1:1"]) */
+  supportedAspectRatios?: readonly string[];
   creditCost?: never;
   inputTokenCost?: never;
   outputTokenCost?: never;
   adminOnly?: boolean;
+  creditCostPerSecond?: never;
+  creditCostPerClip?: never;
+  creditCostPerCharacter?: never;
+  defaultDurationSeconds?: never;
 }
 export interface ModelProviderConfigVideoBased {
   id: VideoGenModelId;
   apiProvider: ApiProvider;
   providerModel: string;
-  /** Credits per second of generated video */
+  /** Credits per second of generated video (base/lowest resolution price) */
   creditCostPerSecond: number;
   /** Default duration for upfront balance check */
   defaultDurationSeconds: number;
+  /** Which duration options this model supports (undefined = all) */
+  supportedDurations?: readonly string[];
+  /** Maximum duration in seconds this model supports */
+  maxDurationSeconds?: number;
+  /** Minimum duration in seconds this model supports */
+  minDurationSeconds?: number;
+  /** Which resolution options this model supports (e.g. ["720p","1080p"]) */
+  supportedResolutions?: readonly string[];
+  /** Which aspect ratios this model supports (e.g. ["16:9","9:16"]) */
+  supportedAspectRatios?: readonly string[];
+  /** Override creditCostPerSecond per resolution (e.g. { "1080p": 15 }) */
+  pricingByResolution?: Partial<Record<string, number>>;
   creditCost?: never;
   inputTokenCost?: never;
   outputTokenCost?: never;
   adminOnly?: boolean;
+  creditCostPerImage?: never;
+  creditCostPerClip?: never;
+  creditCostPerCharacter?: never;
 }
 export interface ModelProviderConfigAudioBased {
   id: MusicGenModelId;
@@ -163,10 +217,17 @@ export interface ModelProviderConfigAudioBased {
   creditCostPerClip: number;
   /** Default duration in seconds for upfront balance check */
   defaultDurationSeconds: number;
+  /** Which duration options this model supports (undefined = all) */
+  supportedDurations?: readonly string[];
+  /** Minimum duration in seconds this model supports (e.g. 30 for ModelsLab) */
+  minDurationSeconds?: number;
   creditCost?: never;
   inputTokenCost?: never;
   outputTokenCost?: never;
   adminOnly?: boolean;
+  creditCostPerImage?: never;
+  creditCostPerSecond?: never;
+  creditCostPerCharacter?: never;
 }
 export interface ModelProviderConfigTtsBased {
   id: TtsModelId;
@@ -174,6 +235,13 @@ export interface ModelProviderConfigTtsBased {
   providerModel: string;
   creditCostPerCharacter: number;
   adminOnly?: boolean;
+  creditCost?: never;
+  inputTokenCost?: never;
+  outputTokenCost?: never;
+  creditCostPerImage?: never;
+  creditCostPerSecond?: never;
+  creditCostPerClip?: never;
+  defaultDurationSeconds?: never;
 }
 export interface ModelProviderConfigSttBased {
   id: SttModelId;
@@ -181,6 +249,13 @@ export interface ModelProviderConfigSttBased {
   providerModel: string;
   creditCostPerSecond: number;
   adminOnly?: boolean;
+  creditCost?: never;
+  inputTokenCost?: never;
+  outputTokenCost?: never;
+  creditCostPerImage?: never;
+  creditCostPerClip?: never;
+  creditCostPerCharacter?: never;
+  defaultDurationSeconds?: never;
 }
 export type ModelProviderConfig =
   | ModelProviderConfigTokenBased
@@ -292,13 +367,18 @@ export interface ModelOptionBase {
   voiceMeta?: TtsVoiceMeta;
 }
 export interface ModelOptionTokenBased extends ModelOptionBase {
-  id: ChatModelId | ImageGenModelId;
   creditCost: typeof calculateCreditCost;
   inputTokenCost: number;
   outputTokenCost: number;
   cacheReadTokenCost?: number;
   cacheWriteTokenCost?: number;
+  /** Estimated output tokens per generated image, for price display on image-gen LLM models */
+  estimatedImageOutputTokens?: number;
   creditCostPerImage?: never;
+  creditCostPerSecond?: never;
+  creditCostPerClip?: never;
+  creditCostPerCharacter?: never;
+  defaultDurationSeconds?: never;
 }
 export interface ModelOptionCreditBased extends ModelOptionBase {
   id: ChatModelId;
@@ -306,32 +386,91 @@ export interface ModelOptionCreditBased extends ModelOptionBase {
   inputTokenCost?: never;
   outputTokenCost?: never;
   creditCostPerImage?: never;
+  creditCostPerSecond?: never;
+  creditCostPerClip?: never;
+  creditCostPerCharacter?: never;
+  defaultDurationSeconds?: never;
+}
+/** Union of all billing-shape interfaces — used for type-safe guard discrimination. */
+type AnyModelOptionShape =
+  | ModelOptionTokenBased
+  | ModelOptionCreditBased
+  | ModelOptionImageBased
+  | ModelOptionVideoBased
+  | ModelOptionAudioBased
+  | ModelOptionTtsBased
+  | ModelOptionSttBased;
+
+export function isModelOptionTokenBased(
+  opt: AnyModelOptionShape,
+): opt is ModelOptionTokenBased {
+  return typeof opt.creditCost === "function";
+}
+export function isModelOptionImageBased(
+  opt: AnyModelOptionShape,
+): opt is ModelOptionImageBased {
+  return opt.creditCostPerImage !== undefined;
 }
 export interface ModelOptionImageBased extends ModelOptionBase {
-  id: ImageGenModelId;
   creditCostPerImage: number;
+  /** Which image sizes this model supports (empty = no size option; undefined = all sizes) */
+  supportedSizes?: readonly string[];
+  /** Which quality options this model supports (empty/undefined = no quality option) */
+  supportedQualities?: readonly string[];
+  /** Override creditCostPerImage per size */
+  pricingBySize?: Partial<Record<string, number>>;
+  /** Override creditCostPerImage per quality */
+  pricingByQuality?: Partial<Record<string, number>>;
+  /** Override creditCostPerImage per resolution */
+  pricingByResolution?: Partial<Record<string, number>>;
+  /** Which resolution options this model supports */
+  supportedResolutions?: readonly string[];
+  /** Which aspect ratios this model supports */
+  supportedAspectRatios?: readonly string[];
   creditCost?: never;
   inputTokenCost?: never;
   outputTokenCost?: never;
+  creditCostPerSecond?: never;
+  creditCostPerClip?: never;
+  creditCostPerCharacter?: never;
+  defaultDurationSeconds?: never;
 }
 export interface ModelOptionVideoBased extends ModelOptionBase {
-  id: VideoGenModelId;
   creditCostPerSecond: number;
   defaultDurationSeconds: number;
+  /** Which duration options this model supports (undefined = all) */
+  supportedDurations?: readonly string[];
+  /** Maximum duration in seconds */
+  maxDurationSeconds?: number;
+  /** Minimum duration in seconds */
+  minDurationSeconds?: number;
+  /** Which resolution options this model supports */
+  supportedResolutions?: readonly string[];
+  /** Which aspect ratios this model supports */
+  supportedAspectRatios?: readonly string[];
+  /** Override creditCostPerSecond per resolution */
+  pricingByResolution?: Partial<Record<string, number>>;
   creditCost?: never;
   inputTokenCost?: never;
   outputTokenCost?: never;
   creditCostPerImage?: never;
+  creditCostPerClip?: never;
+  creditCostPerCharacter?: never;
 }
 
 export interface ModelOptionAudioBased extends ModelOptionBase {
-  id: MusicGenModelId;
   creditCostPerClip: number;
   defaultDurationSeconds: number;
+  /** Which duration options this model supports (undefined = all) */
+  supportedDurations?: readonly string[];
+  /** Minimum duration in seconds (e.g. 30 for ModelsLab) */
+  minDurationSeconds?: number;
   creditCost?: never;
   inputTokenCost?: never;
   outputTokenCost?: never;
   creditCostPerImage?: never;
+  creditCostPerSecond?: never;
+  creditCostPerCharacter?: never;
 }
 
 export interface ModelOptionTtsBased extends ModelOptionBase {
@@ -341,15 +480,21 @@ export interface ModelOptionTtsBased extends ModelOptionBase {
   inputTokenCost?: never;
   outputTokenCost?: never;
   creditCostPerImage?: never;
+  creditCostPerSecond?: never;
+  creditCostPerClip?: never;
+  defaultDurationSeconds?: never;
 }
 
 export interface ModelOptionSttBased extends ModelOptionBase {
   id: SttModelId;
   creditCostPerSecond: number;
+  defaultDurationSeconds?: never;
   creditCost?: never;
   inputTokenCost?: never;
   outputTokenCost?: never;
   creditCostPerImage?: never;
+  creditCostPerClip?: never;
+  creditCostPerCharacter?: never;
 }
 
 /** Union of all role-specific model options across all modalities. */
@@ -542,6 +687,7 @@ export interface ModelProviderEnvAvailability {
   replicate: boolean;
   falAi: boolean;
   modelsLab: boolean;
+  unbottled: boolean;
 }
 
 /**
@@ -574,6 +720,8 @@ export function isModelProviderAvailable(
       return env.falAi;
     case ApiProvider.MODELSLAB:
       return env.modelsLab;
+    case ApiProvider.UNBOTTLED:
+      return env.unbottled;
     default:
       return true;
   }
@@ -771,5 +919,113 @@ export function getProviderPrice(p: ModelProviderConfig): number {
   return 0;
 }
 
-// Cross-domain aggregates (getModelDisplayName, TOTAL_MODEL_COUNT, etc.)
+// Cross-domain aggregates (getModelDisplayName, getAvailableModelCount, etc.)
 // live in ./all-models.ts to break the circular dependency with domain models files.
+
+// ============================================================
+// GENERIC ROLE FILTER UTIL
+// ============================================================
+
+function getModelPriceLevel(creditCost: number): string {
+  if (creditCost <= 3) {
+    return PriceLevel.CHEAP;
+  }
+  if (creditCost <= 9) {
+    return PriceLevel.STANDARD;
+  }
+  return PriceLevel.PREMIUM;
+}
+
+export function meetsRangeConstraint<T>(
+  modelValue: T,
+  range: { min?: T; max?: T } | undefined,
+  order: readonly T[],
+): boolean {
+  if (!range) {
+    return true;
+  }
+  const modelIndex = order.indexOf(modelValue);
+  if (range.min !== undefined && modelIndex < order.indexOf(range.min)) {
+    return false;
+  }
+  if (range.max !== undefined && modelIndex > order.indexOf(range.max)) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Generic pool filter for any model role.
+ * Handles: null → all available, MANUAL → lookup by id (fallback to FILTERS on unavailable), FILTERS → range constraints.
+ */
+export function filterRoleModels<
+  TOption extends ModelOptionBase,
+  TSelection extends {
+    selectionType: string;
+    manualModelId?: string;
+    intelligenceRange?: { min?: string; max?: string };
+    contentRange?: { min?: string; max?: string };
+    speedRange?: { min?: string; max?: string };
+    priceRange?: { min?: string; max?: string };
+  },
+>(
+  pool: TOption[],
+  selection: TSelection | null | undefined,
+  user: JwtPayloadType,
+  env: ModelProviderEnvAvailability,
+): TOption[] {
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+  if (!selection) {
+    return pool.filter(
+      (m) => (!m.adminOnly || isAdmin) && isModelProviderAvailable(m, env),
+    );
+  }
+  if (selection.selectionType === ModelSelectionType.MANUAL) {
+    const model = selection.manualModelId
+      ? pool.find((m) => m.id === selection.manualModelId)
+      : undefined;
+    if (model?.adminOnly && !isAdmin) {
+      return [];
+    }
+    if (model && isModelProviderAvailable(model, env)) {
+      return [model];
+    }
+    // Fall through to filter fallback
+  }
+  return pool.filter((m) => {
+    if (m.adminOnly && !isAdmin) {
+      return false;
+    }
+    if (!isModelProviderAvailable(m, env)) {
+      return false;
+    }
+    const modelPrice = getModelPriceLevel(getModelPrice(m));
+    return (
+      meetsRangeConstraint(
+        m.intelligence,
+        selection.intelligenceRange,
+        IntelligenceLevelDB,
+      ) &&
+      meetsRangeConstraint(m.content, selection.contentRange, ContentLevelDB) &&
+      meetsRangeConstraint(modelPrice, selection.priceRange, PriceLevelDB) &&
+      meetsRangeConstraint(m.speed, selection.speedRange, SpeedLevelDB)
+    );
+  });
+}
+
+/** Format credit cost for display */
+export function formatCreditCost(
+  cost: number,
+  t: SkillsT,
+  isTokenBased = false,
+): string {
+  const prefix = isTokenBased ? "~" : "";
+  if (cost === 0) {
+    return t("selector.free");
+  }
+  if (cost === 1) {
+    return `${prefix}${t("credits.credit", { count: cost })}`;
+  }
+  return `${prefix}${t("credits.credits", { count: cost })}`;
+}

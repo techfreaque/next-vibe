@@ -207,6 +207,15 @@ const nextConfig: NextConfig = {
     "module",
     // ssh2 uses native crypto bindings incompatible with ESM bundling
     "ssh2",
+    // Node builtins used by SSH file operations - prevents NFT tracer from
+    // tracing path.join/path.resolve/fs.readFile calls across the whole project
+    "node:child_process",
+    "node:crypto",
+    "node:fs",
+    "node:fs/promises",
+    "node:os",
+    "node:path",
+    "node:util",
     // argon2 uses native .node binary - webpack minifier crashes on it
     "argon2",
   ],

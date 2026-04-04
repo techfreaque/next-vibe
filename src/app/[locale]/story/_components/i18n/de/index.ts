@@ -131,9 +131,9 @@ export const translations: typeof enTranslations = {
         titleLine2: "Deine Regeln.",
         subtitle:
           "{{modelCount}} Modelle in drei Stufen. Du wählst den Filter - mainstream, offen oder unzensiert.",
-        pill1: "{{modelCount}}+ Modelle",
-        pill2: "Mainstream, offen & unzensiert",
-        pill3: "{{skillCount}}+ Agent-Skills",
+        pill1: "{{modelCount}} Modelle - du wählst den Filter",
+        pill2: "Bilder, Video & Musik generieren",
+        pill3: "{{skillCount}}+ Skills mit Gedächtnis & Suche",
         cta: "Kostenlos testen",
         ctaExplore: "Mehr erfahren",
       },
@@ -142,10 +142,10 @@ export const translations: typeof enTranslations = {
         titleLine1: "Dein Agent.",
         titleLine2: "Deine Maschine.",
         subtitle:
-          "Ein always-on KI-Agent der auf deiner Maschine läuft, deine Aufgaben erledigt und nie nach Hause telefoniert. SSH, Browser, eigene Keys - deine Daten bleiben bei dir.",
-        pill1: "Always-on. Handelt autonom.",
-        pill2: "Deine Daten verlassen nie deine Maschine",
-        pill3: "Eigene API-Keys",
+          "Alle {{modelCount}} Modelle auf deiner Hardware. Surft, codet, bedient Terminals, erledigt Aufgaben während du schläfst. Eigene Keys oder dein {{appName}}-Konto.",
+        pill1: "Browser, Terminal & SSH eingebaut",
+        pill2: "Läuft 24/7 im Hintergrund",
+        pill3: "Eigene Keys oder {{appName}}-Konto",
         cta: "Jetzt selbst hosten",
         ctaGithub: "Mehr erfahren",
       },
@@ -170,7 +170,7 @@ export const translations: typeof enTranslations = {
         personal: "Self-Host",
         personalSub: "Dein KI-Agent",
         personalDesc:
-          "Always-on KI-Agent auf deiner Maschine - handelt autonom, deine Daten verlassen nie deine Maschine, eigene Keys, SSH, Browser",
+          "Alle Modelle auf deiner Hardware - surft, codet, bedient Terminals 24/7. Eigene Keys oder {{appName}}-Konto.",
         nextvibe: "next-vibe",
         nextvibeSub: "Das Framework",
         nextvibeDesc:
@@ -288,6 +288,7 @@ export const translations: typeof enTranslations = {
         title: "{{modelCount}} Modelle. Du kontrollierst den Filter.",
         description:
           "Mainstream für Alltag. Open-Weight wenn du mehr willst. Unzensiert wenn du die volle Antwort brauchst - das ist unser Vorteil. Modell mitten im Chat wechseln. Dieselbe Frage, drei verschiedene Antworten - jetzt kannst du alle vergleichen.",
+        andMore: "+ {{count}} weitere",
         imageAlt: "Modell-Auswahl mit Inhaltstufen-Badges",
         demo: {
           question: "Gleiche Frage. Verschiedene Stufe.",

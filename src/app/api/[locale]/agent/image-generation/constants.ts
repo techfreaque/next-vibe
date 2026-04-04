@@ -5,8 +5,8 @@ import {
   ModelSortDirection,
   ModelSortField,
 } from "../chat/skills/enum";
-import type { ImageGenModelSelection } from "../models/types";
 import { ImageGenModelId } from "./models";
+import type { ImageGenModelSelection } from "../image-generation/models";
 
 /**
  * Default image generation model selection — MANUAL preferred model with 2-level sort fallback.

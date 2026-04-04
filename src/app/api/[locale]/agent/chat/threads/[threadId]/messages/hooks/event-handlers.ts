@@ -172,6 +172,21 @@ function handleMessageCreated(
     ...(isUserRole && e.content ? { isTranscribing: false } : {}),
   };
 
+  // Preserve optimistic attachment previews (local blob URLs) until the real
+  // FILES_UPLOADED event replaces them with server URLs. The server MESSAGE_CREATED
+  // arrives with isUploadingAttachments=true but no attachments array.
+  if (
+    isUserRole &&
+    serverMetadata.isUploadingAttachments &&
+    !serverMetadata.attachments
+  ) {
+    const cached = getCachedMessages(e.threadId, rootFolderId, logger);
+    const optimistic = cached.find((m) => m.id === e.messageId);
+    if (optimistic?.metadata?.attachments) {
+      serverMetadata.attachments = optimistic.metadata.attachments;
+    }
+  }
+
   // For server-emitted error messages: de-duplicate + revert optimistic messages.
   if (isErrorRole) {
     const msgs = getCachedMessages(e.threadId, rootFolderId, logger);
@@ -636,7 +651,7 @@ function handleGapFillStarted(
   rootFolderId: DefaultFolderId,
   logger: EndpointLogger,
 ): void {
-  // Mark the message as having a gap-fill in progress
+  // Mark the message as having a gap-fill in progress + store labeled status
   updateMessages(threadId, rootFolderId, logger, (msgs) =>
     msgs.map((m) => {
       if (m.id !== e.messageId) {
@@ -647,6 +662,10 @@ function handleGapFillStarted(
         metadata: {
           ...m.metadata,
           isStreaming: true,
+          gapFillStatus: {
+            bridgeType: e.bridgeType,
+            modality: e.modality,
+          },
         },
         updatedAt: new Date(),
       };
@@ -671,6 +690,7 @@ function handleGapFillCompleted(
         metadata: {
           ...m.metadata,
           isStreaming: false,
+          gapFillStatus: null,
           variants: [
             ...existingVariants.filter(
               (v) => v.modality !== e.variant.modality,

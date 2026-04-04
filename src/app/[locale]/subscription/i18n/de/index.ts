@@ -93,6 +93,8 @@ export const translations: typeof enTranslations = {
           legacyBadge: "Legacy",
           types: {
             text: "Chat",
+            tts: "Text zu Sprache",
+            stt: "Sprache zu Text",
             image: "Bildgenerierung",
             audio: "Musikgenerierung",
             video: "Videogenerierung",
@@ -100,10 +102,9 @@ export const translations: typeof enTranslations = {
         },
         features: {
           title: "Funktionen",
-          searchLabel: "Brave-Suche (pro Suche)",
+          braveSearchLabel: "Brave-Suche (pro Suche)",
+          kagiSearchLabel: "Kagi-Suche (pro Suche)",
           fetchUrlLabel: "Website als Text (pro Abruf)",
-          ttsLabel: "Text-zu-Sprache (pro 1000 Zeichen)",
-          sttLabel: "Sprache-zu-Text (pro Minute)",
           costFormat: "{{value}} {{unit}}",
           creditsUnit: "Credits",
         },
@@ -269,12 +270,12 @@ export const translations: typeof enTranslations = {
     overview: {
       title: "Abonnement-Übersicht - Unbottled AI",
       description:
-        "Sehen Sie Ihren Credit-Kontostand, Abonnementstatus und erfahren Sie, wie Credits funktionieren. Chatten Sie mit {{modelCount}}+ zensurierten KI-Modellen.",
+        "Sehen Sie Ihren Credit-Kontostand, Abonnementstatus und erfahren Sie, wie Credits funktionieren. Chatten Sie mit {{modelCount}} zensurierten KI-Modellen.",
     },
     buyCredits: {
       title: "Credits kaufen - Unbottled AI",
       description:
-        "Abonnieren Sie für {{subCredits}} monatliche Credits oder kaufen Sie zusätzliche Credit-Pakete. Zugriff auf {{modelCount}}+ zensurierte KI-Modelle.",
+        "Abonnieren Sie für {{subCredits}} monatliche Credits oder kaufen Sie zusätzliche Credit-Pakete. Zugriff auf {{modelCount}} zensurierte KI-Modelle.",
     },
     history: {
       title: "Transaktionsverlauf - Unbottled AI",

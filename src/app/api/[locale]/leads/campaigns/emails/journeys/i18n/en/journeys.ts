@@ -234,7 +234,7 @@ export const journeysTranslations = {
       firstSteps:
         "Start by trying a task you've been avoiding because other AI tools kept refusing it. No guardrails, no lectures - just results.",
       modelChoice:
-        "You have access to 42+ models. If you're not sure where to start, try the default model. You can switch anytime.",
+        "You have access to {{modelCount}} models. If you're not sure where to start, try the default model. You can switch anytime.",
       signature: "The unbottled.ai team",
     },
     followup1: {
@@ -297,7 +297,7 @@ export const journeysTranslations = {
       thankYou:
         "Thank you for subscribing to unbottled.ai. Your support directly funds development and keeps us independent.",
       valueSummary:
-        "As a subscriber, you have priority access to all 42+ models, higher usage limits, and first access to new features.",
+        "As a subscriber, you have priority access to all {{modelCount}} models, higher usage limits, and first access to new features.",
       whatIsNext:
         "We'll check in from time to time with tips, new feature highlights, and updates. Nothing excessive - just the stuff that's actually worth your time.",
       signature: "The unbottled.ai team",

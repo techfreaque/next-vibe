@@ -99,13 +99,13 @@ export const translations: typeof enTranslations = {
       welcome: {
         title: "Witaj w {{appName}}!",
         description:
-          "Twoja platforma AI zorientowana na prywatność z ponad 40 modelami, kontrolą treści przez użytkownika i zasadami wolności słowa.",
+          "Twoja platforma AI zorientowana na prywatność z ponad {{modelCount}} modelami, kontrolą treści przez użytkownika i zasadami wolności słowa.",
         subtitle: "Zrób szybką wycieczkę, aby zacząć.",
       },
       aiCompanion: {
         title: "Wybierz swojego towarzysza AI",
         description:
-          "Wybieraj spośród ponad 40 modeli AI, w tym głównonurtowych, open-source i bez cenzury.",
+          "Wybieraj spośród ponad {{modelCount}} modeli AI, w tym głównonurtowych, open-source i bez cenzury.",
         tip: "Kliknij, aby otworzyć selektor modeli i wybrać towarzysza.",
       },
       rootFolders: {
@@ -598,6 +598,12 @@ export const translations: typeof enTranslations = {
         "Udio v2 - Wysokiej jakości generowanie muzyki AI z wokalem i pełną jakością produkcji",
       modelsLabMusicGen:
         "ModelsLab Music Gen - Generowanie muzyki AI z opisów tekstowych, obsługuje MP3/WAV/FLAC",
+      modelsLabElevenlabsMusic:
+        "ElevenLabs Music - Wysokiej jakości generowanie muzyki z ElevenLabs przez ModelsLab",
+      modelsLabSonautoSong:
+        "Sonauto Song - Pełne generowanie piosenek z wokalem, różne gatunki do 4:45 min",
+      modelsLabLyria3:
+        "Lyria 3 - Zaawansowany model Google do generowania oryginalnych 30-sekundowych utworów z tekstu",
       modelsLabCogVideoX:
         "CogVideoX - Model tekst-na-wideo ModelsLab do generowania krótkich klipów",
       modelsLabWanx: "Wanx - Model generowania wideo z tekstu ModelsLab",
@@ -607,6 +613,8 @@ export const translations: typeof enTranslations = {
         "Wan 2.1 Ultra - Model tekst-na-wideo ModelsLab z ulepszoną jakością",
       modelsLabWan25T2V: "Wan 2.5 T2V - Model tekst-na-wideo Wan 2.5 ModelsLab",
       modelsLabWan25I2V: "Wan 2.5 I2V - Model obraz-na-wideo Wan 2.5 ModelsLab",
+      modelsLabWan27T2V:
+        "Wan 2.7 T2V - Najnowszy model tekst-na-wideo Wan 2.7 od Alibaba z elastycznymi proporcjami i wyjściem 1080p",
       modelsLabWan26T2V: "Wan 2.6 T2V - Model tekst-na-wideo Wan 2.6 ModelsLab",
       modelsLabWan26I2V: "Wan 2.6 I2V - Model obraz-na-wideo Wan 2.6 ModelsLab",
       modelsLabWan26I2VFlash:
@@ -685,6 +693,48 @@ export const translations: typeof enTranslations = {
         "Grok I2V - Model obraz-na-wideo Grok xAI via ModelsLab",
       modelsLabGen4T2ITurbo:
         "Gen4 T2I Turbo - Szybki model tekst-na-obraz Runway via ModelsLab",
+      modelsLabGen4Image:
+        "Gen4 Image - Model tekst-na-obraz Runway Gen4 via ModelsLab",
+      modelsLabWan27T2I:
+        "Wan 2.7 T2I - Model tekst-na-obraz Alibaba Wan 2.7 via ModelsLab",
+      modelsLabGrokT2I:
+        "Grok Imagine T2I - Model tekst-na-obraz xAI Grok via ModelsLab",
+      modelsLabZImageBase:
+        "Z Image Base - Szybki i tani model tekst-na-obraz ModelsLab",
+      modelsLabZImageTurbo:
+        "Z Image Turbo - Ultraszybki model tekst-na-obraz ModelsLab",
+      modelsLabFlux2MaxT2I:
+        "Flux 2 Max T2I - Black Forest Labs Flux 2 Max tekst-na-obraz via ModelsLab",
+      modelsLabFluxPro11Ultra:
+        "Flux Pro 1.1 Ultra - Black Forest Labs Flux Pro Ultra via ModelsLab",
+      modelsLabFluxPro11:
+        "Flux Pro 1.1 - Black Forest Labs Flux Pro 1.1 tekst-na-obraz via ModelsLab",
+      modelsLabFlux2ProT2I:
+        "Flux 2 Pro T2I - Black Forest Labs Flux 2 Pro tekst-na-obraz via ModelsLab",
+      modelsLabFlux2DevT2I:
+        "Flux 2 Dev T2I - Black Forest Labs Flux 2 Dev tekst-na-obraz via ModelsLab",
+      modelsLabFluxT2I:
+        "Flux T2I - Black Forest Labs Flux tekst-na-obraz via ModelsLab",
+      modelsLabSeedream45T2I:
+        "Seedream 4.5 T2I - ByteDance Seedream 4.5 tekst-na-obraz via ModelsLab",
+      modelsLabSeedream40T2I:
+        "Seedream 4.0 T2I - ByteDance Seedream 4.0 tekst-na-obraz via ModelsLab",
+      modelsLabSeedreamT2I:
+        "Seedream T2I - ByteDance Seedream tekst-na-obraz via ModelsLab",
+      modelsLabImagen4Ultra:
+        "Imagen 4 Ultra - Najwyższa jakość generowania obrazów Google via ModelsLab",
+      modelsLabImagen4:
+        "Imagen 4 - Google Imagen 4 tekst-na-obraz via ModelsLab",
+      modelsLabImagen4Fast:
+        "Imagen 4 Fast - Szybki Google Imagen 4 tekst-na-obraz via ModelsLab",
+      modelsLabImagen3:
+        "Imagen 3 - Google Imagen 3 tekst-na-obraz via ModelsLab",
+      modelsLabNanoBananaPro:
+        "Nano Banana Pro - Wysokiej jakości generowanie obrazów via ModelsLab",
+      modelsLabNanoBanana: "Nano Banana - Generowanie obrazów via ModelsLab",
+      modelsLabQwenT2I: "Qwen T2I - Alibaba Qwen tekst-na-obraz via ModelsLab",
+      modelsLabRealtimeT2I:
+        "Realtime T2I - Ultraszybki model tekst-na-obraz ModelsLab w czasie rzeczywistym",
     },
   },
   modelUtilities: {

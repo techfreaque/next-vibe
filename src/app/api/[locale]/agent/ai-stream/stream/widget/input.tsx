@@ -42,7 +42,11 @@ import {
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
 } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
-import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import {
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
+  getBestAudioVisionModel,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import {
   ImageQuality,
   ImageSize,
@@ -348,7 +352,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   // Otherwise, check if a bridge model (vision/STT) is available to convert the upload.
   const canAcceptImages =
     currentModel?.inputs?.includes("image") === true ||
-    !!SkillsRepositoryClient.getBestImageVisionModel(
+    !!getBestImageVisionModel(
       effectiveSettings.imageVisionModelSelection ??
         DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       user,
@@ -356,7 +360,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     );
   const canAcceptVideo =
     currentModel?.inputs?.includes("video") === true ||
-    !!SkillsRepositoryClient.getBestVideoVisionModel(
+    !!getBestVideoVisionModel(
       effectiveSettings.videoVisionModelSelection ??
         DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       user,
@@ -364,7 +368,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     );
   const canAcceptAudio =
     currentModel?.inputs?.includes("audio") === true ||
-    !!SkillsRepositoryClient.getBestAudioVisionModel(
+    !!getBestAudioVisionModel(
       effectiveSettings.audioVisionModelSelection ??
         DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       user,

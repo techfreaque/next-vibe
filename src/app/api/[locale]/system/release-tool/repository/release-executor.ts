@@ -219,8 +219,8 @@ export class ReleaseExecutor implements IReleaseExecutor {
       }
       trackTime("validation", startTime);
 
-      // Ask user if they want to update dependencies (unless forceUpdate explicitly set or CI)
-      if (!forceUpdateExplicitlySet && !isCI) {
+      // Ask user if they want to update dependencies (unless forceUpdate explicitly set, CI, or versionIncrement passed)
+      if (!forceUpdateExplicitlySet && !isCI && !data.versionIncrement) {
         const shouldUpdate = await confirm({
           message: "Update dependencies before release?",
           default: false,
@@ -803,8 +803,8 @@ export class ReleaseExecutor implements IReleaseExecutor {
             }
           }
 
-          // Update version (skip in CI mode - version should already be set)
-          if (!isCI) {
+          // Update version (skip in CI mode unless versionIncrement explicitly passed)
+          if (!isCI || data.versionIncrement) {
             const updateResult = packageService.updatePackageVersion(
               pkg,
               versionInfo.newVersion,

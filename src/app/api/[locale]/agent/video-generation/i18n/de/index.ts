@@ -30,6 +30,14 @@ export const translations = {
       medium: "Mittel (~10 Sek.)",
       long: "Lang (~15 Sek.)",
     },
+    aspectRatio: {
+      label: "Seitenverhältnis",
+      description: "Seitenverhältnis des Ausgabevideos",
+    },
+    resolution: {
+      label: "Auflösung",
+      description: "Auflösung des Ausgabevideos",
+    },
     download: "Herunterladen",
     generatingNote: "Videogenerierung kann 1–3 Minuten dauern",
     backButton: {
@@ -91,6 +99,12 @@ export const translations = {
       insufficientCredits:
         "Nicht genug Credits. Guthaben: {{balance}}, erforderlich: {{minimum}}",
       balanceCheckFailed: "Kontostand konnte nicht geprüft werden",
+      unsupportedDuration:
+        "Modell {{model}} unterstützt die Dauer {{duration}} nicht. Unterstützte Dauern: {{supported}}",
+      unsupportedAspectRatio:
+        "Modell {{model}} unterstützt das Seitenverhältnis {{aspectRatio}} nicht. Unterstützte Verhältnisse: {{supported}}",
+      unsupportedResolution:
+        "Modell {{model}} unterstützt die Auflösung {{resolution}} nicht. Unterstützte Auflösungen: {{supported}}",
       generationFailed: "Videogenerierung fehlgeschlagen: {{error}}",
       providerError: "Anbieter-Fehler: {{error}}",
       noVideoUrl: "Kein Video-URL vom Anbieter zurückgegeben",

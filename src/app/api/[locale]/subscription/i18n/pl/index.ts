@@ -551,7 +551,7 @@ export const translations: typeof enTranslations = {
       buttonAlreadySubscribed: "Masz już aktywną subskrypcję",
       features: {
         credits: "{{count}} creditów miesięcznie",
-        expiry: "Dostęp do {{modelCount}}+ modeli AI",
+        expiry: "Dostęp do {{modelCount}} modeli AI",
         bestFor: "Najlepszy do regularnego użycia",
       },
     },

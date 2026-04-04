@@ -11,7 +11,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ChatMessageRole } from "../../../chat/enum";
-import type { SpeechToTextT } from "../../../speech-to-text/i18n";
 import { SpeechToTextRepository } from "../../../speech-to-text/repository";
 import type { AiStreamPostRequestOutput } from "../../stream/definition";
 
@@ -25,7 +24,6 @@ export class OperationHandler {
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
-    sttT: SpeechToTextT;
   }): Promise<
     ResponseType<{
       threadId: string;
@@ -40,7 +38,7 @@ export class OperationHandler {
       } | null;
     }>
   > {
-    const { operation, data, user, locale, logger, sttT } = params;
+    const { operation, data, user, locale, logger } = params;
 
     let voiceTranscription: {
       wasTranscribed: boolean;
@@ -74,7 +72,6 @@ export class OperationHandler {
               user,
               locale,
               logger,
-              sttT,
             );
 
           if (!transcriptionResult.success) {

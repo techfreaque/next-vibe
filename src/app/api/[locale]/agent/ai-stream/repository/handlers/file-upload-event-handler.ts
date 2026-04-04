@@ -37,7 +37,7 @@ export class FileUploadEventHandler {
       void fileUploadPromise
         .then((result) => {
           if (result.success && result.attachments) {
-            logger.info(
+            logger.debug(
               "[File Processing] File upload completed - emitting FILES_UPLOADED event",
               {
                 messageId: result.userMessageId,
@@ -50,7 +50,7 @@ export class FileUploadEventHandler {
               attachments: result.attachments,
             });
 
-            logger.info("[File Processing] FILES_UPLOADED event emitted", {
+            logger.debug("[File Processing] FILES_UPLOADED event emitted", {
               messageId: result.userMessageId,
               attachmentCount: result.attachments.length,
             });

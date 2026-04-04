@@ -4,6 +4,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import type { ModelCountsByContentLevel } from "@/app/api/[locale]/agent/models/all-models";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ActiveSide } from "./split-hero";
@@ -17,6 +18,7 @@ interface HomeClientProps {
   totalModelCount: number;
   totalProviderCount: number;
   totalSkillCount: number;
+  modelCountsByTier: ModelCountsByContentLevel;
   subPrice: number;
   subCurrency: string;
 }
@@ -28,6 +30,7 @@ export function HomeClient({
   totalModelCount,
   totalProviderCount,
   totalSkillCount,
+  modelCountsByTier,
   subPrice,
   subCurrency,
 }: HomeClientProps): JSX.Element {
@@ -61,6 +64,7 @@ export function HomeClient({
         totalModelCount={totalModelCount}
         totalProviderCount={totalProviderCount}
         totalSkillCount={totalSkillCount}
+        modelCountsByTier={modelCountsByTier}
         activeSide={activeSide}
         onSideChange={setActiveSide}
       />

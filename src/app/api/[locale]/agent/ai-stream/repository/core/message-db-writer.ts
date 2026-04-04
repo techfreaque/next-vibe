@@ -14,10 +14,14 @@ import "server-only";
 import { eq, sql } from "drizzle-orm";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 
-import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { SttModelId } from "@/app/api/[locale]/agent/speech-to-text/models";
-import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import type {
+  AudioVisionModelId,
+  ImageVisionModelId,
+  VideoVisionModelId,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import type { MessageVariant } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
+import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -61,6 +65,8 @@ export class MessageDbWriter {
   lastAssistantContent: string | null = null;
   /** Tracks the URL of the last generated media (image/audio/video) — used by headless callers */
   lastGeneratedMediaUrl: string | null = null;
+  /** Running total of credits deducted during this stream — used by headless callers to report cost */
+  totalCreditsDeducted = 0;
 
   constructor(
     isIncognito: boolean,
@@ -233,7 +239,11 @@ export class MessageDbWriter {
           amount: number;
           feature: string;
           type: "model";
-          model: ChatModelId;
+          model:
+            | ChatModelId
+            | ImageVisionModelId
+            | VideoVisionModelId
+            | AudioVisionModelId;
         }
       | {
           user: JwtPayloadType;
@@ -269,6 +279,7 @@ export class MessageDbWriter {
           );
 
     if (deductResult.success) {
+      this.totalCreditsDeducted += params.amount;
       const creditEvent = createStreamEvent.creditsDeducted({
         amount: params.amount,
         feature: params.feature,
@@ -1177,6 +1188,19 @@ export class MessageDbWriter {
   }
 
   /**
+   * Emit STREAMING_STATE_CHANGED SSE event.
+   * Used to mark the thread as "streaming" before gap-fill begins so the UI
+   * shows an activity indicator during potentially long bridge calls.
+   */
+  emitStreamingStateChanged(params: {
+    threadId: string;
+    state: "idle" | "streaming" | "aborting" | "waiting";
+  }): void {
+    const event = createStreamEvent.streamingStateChanged(params);
+    this.enqueue(event);
+  }
+
+  /**
    * Emit GAP_FILL_STARTED SSE event.
    * Called when a modality bridge begins running on a message attachment.
    */
@@ -1197,13 +1221,7 @@ export class MessageDbWriter {
     messageId: string;
     bridgeType: "stt" | "vision" | "translation" | "tts";
     modality: Modality;
-    variant: {
-      modality: Modality;
-      content: string;
-      modelId: ChatModelId | SttModelId | TtsModelId;
-      creditCost: number;
-      createdAt: string;
-    };
+    variant: MessageVariant;
   }): Promise<void> {
     const event = createStreamEvent.gapFillCompleted(params);
     this.enqueue(event);

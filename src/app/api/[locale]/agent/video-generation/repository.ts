@@ -12,10 +12,8 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import {
-  ApiProvider,
-  calculateCreditCost,
-} from "@/app/api/[locale]/agent/models/models";
+import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
+import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
 import { getVideoGenModelById } from "@/app/api/[locale]/agent/video-generation/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -23,7 +21,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
 
-import { generateVideoWithModelsLab } from "../ai-stream/providers/modelslab-video";
+import { generateVideoWithModelsLab } from "./providers/modelslab";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -32,7 +30,6 @@ import type {
   VideoGenerationPostRequestOutput,
   VideoGenerationPostResponseOutput,
 } from "./definition";
-import { VIDEO_DURATION_SECONDS } from "./enum";
 import type { VideoGenerationT } from "./i18n";
 
 interface MediaGenStreamContext {
@@ -54,10 +51,84 @@ export class VideoGenerationRepository {
     // model is resolved via serverDefault on the field definition (from ToolExecutionContext.videoGenModelId)
     const videoModel = getVideoGenModelById(data.model);
 
-    const creditCost = calculateCreditCost(videoModel, 0, 0);
-    const durationSeconds =
-      VIDEO_DURATION_SECONDS[data.duration] ??
-      videoModel.defaultDurationSeconds;
+    if (!videoModel) {
+      return fail({
+        message: t("post.errors.not_found.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    // duration is now raw seconds from the widget
+    const rawDuration = data.duration ?? videoModel.defaultDurationSeconds;
+
+    // Clamp to model's supported duration range first
+    const clampedDuration = Math.min(
+      Math.max(rawDuration, videoModel.minDurationSeconds ?? 0),
+      videoModel.maxDurationSeconds ?? Infinity,
+    );
+
+    // If model has a specific list of allowed durations, snap to the closest one
+    let durationSeconds = clampedDuration;
+    if (
+      videoModel.supportedDurations &&
+      videoModel.supportedDurations.length > 0
+    ) {
+      if (!videoModel.supportedDurations.includes(String(clampedDuration))) {
+        // Snap to the nearest supported duration
+        const supported = videoModel.supportedDurations.map(Number);
+        const nearest = supported.reduce((prev, curr) =>
+          Math.abs(curr - clampedDuration) < Math.abs(prev - clampedDuration)
+            ? curr
+            : prev,
+        );
+        durationSeconds = nearest;
+      }
+    }
+
+    // Validate aspect ratio
+    if (
+      data.aspectRatio &&
+      videoModel.supportedAspectRatios &&
+      videoModel.supportedAspectRatios.length > 0 &&
+      !videoModel.supportedAspectRatios.includes(data.aspectRatio)
+    ) {
+      return fail({
+        message: t("post.errors.unsupportedAspectRatio", {
+          model: data.model,
+          aspectRatio: data.aspectRatio,
+          supported: videoModel.supportedAspectRatios.join(", "),
+        }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    // Validate resolution
+    if (
+      data.resolution &&
+      videoModel.supportedResolutions &&
+      videoModel.supportedResolutions.length > 0 &&
+      !videoModel.supportedResolutions.includes(data.resolution)
+    ) {
+      return fail({
+        message: t("post.errors.unsupportedResolution", {
+          model: data.model,
+          resolution: data.resolution,
+          supported: videoModel.supportedResolutions.join(", "),
+        }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    // Calculate credit cost — use pricingByResolution override when resolution is selected
+    const perSecondCost =
+      (data.resolution
+        ? videoModel.pricingByResolution?.[data.resolution]
+        : undefined) ?? videoModel.creditCostPerSecond;
+
+    const rawCost =
+      perSecondCost * durationSeconds * (1 + STANDARD_MARKUP_PERCENTAGE);
+    const rounded = Math.round(rawCost * 10) / 10;
+    const creditCost = rounded % 1 === 0 ? Math.round(rounded) : rounded;
 
     logger.info("[VideoGen] Starting video generation", {
       model: data.model,
@@ -86,6 +157,8 @@ export class VideoGenerationRepository {
           providerModel: videoModel.providerModel,
           prompt: data.prompt,
           durationSeconds,
+          aspectRatio: data.aspectRatio,
+          resolution: data.resolution,
           logger,
           locale,
         });

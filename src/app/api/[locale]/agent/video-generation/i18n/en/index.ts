@@ -29,6 +29,14 @@ export const translations = {
       medium: "Medium (~10s)",
       long: "Long (~15s)",
     },
+    aspectRatio: {
+      label: "Aspect Ratio",
+      description: "Output video aspect ratio",
+    },
+    resolution: {
+      label: "Resolution",
+      description: "Output video resolution",
+    },
     download: "Download",
     generatingNote: "Video generation can take 1–3 minutes",
     backButton: {
@@ -89,6 +97,12 @@ export const translations = {
       insufficientCredits:
         "Insufficient credits. Balance: {{balance}}, required: {{minimum}}",
       balanceCheckFailed: "Failed to check your credit balance",
+      unsupportedDuration:
+        "Model {{model}} does not support duration {{duration}}. Supported durations: {{supported}}",
+      unsupportedAspectRatio:
+        "Model {{model}} does not support aspect ratio {{aspectRatio}}. Supported ratios: {{supported}}",
+      unsupportedResolution:
+        "Model {{model}} does not support resolution {{resolution}}. Supported resolutions: {{supported}}",
       generationFailed: "Video generation failed: {{error}}",
       providerError: "Video provider error: {{error}}",
       noVideoUrl: "No video URL returned from provider",

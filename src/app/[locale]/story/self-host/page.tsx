@@ -13,6 +13,8 @@ import type { JSX } from "react";
 
 import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -113,6 +115,7 @@ function SelfHostPageContent({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const modelCount = getAvailableModelCount(agentEnvAvailability, false);
 
   const publicUser: JWTPublicPayloadType = {
     isPublic: true,
@@ -182,7 +185,7 @@ function SelfHostPageContent({
             <Div key={key} className="flex items-start gap-3">
               <Check className="h-5 w-5 text-emerald-500 mt-0.5 shrink-0" />
               <P className="text-sm text-muted-foreground">
-                {t(`includes.items.${key}`, { appName })}
+                {t(`includes.items.${key}`, { appName, modelCount })}
               </P>
             </Div>
           ))}

@@ -36,7 +36,10 @@ import {
 import type { JwtPayloadType } from "../../user/auth/types";
 import { DEFAULT_STT_MODEL_ID } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import type { SpeechToTextPostResponseOutput } from "./definition";
-import type { SpeechToTextT } from "./i18n";
+import {
+  scopedTranslation as sttScopedTranslation,
+  type SpeechToTextT,
+} from "./i18n";
 import type { SttModelId } from "./models";
 
 /**
@@ -54,9 +57,9 @@ export class SpeechToTextRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: SpeechToTextT,
     sttModelId?: SttModelId,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
+    const t = sttScopedTranslation.scopedT(locale).t;
     const resolvedModelId = sttModelId ?? DEFAULT_STT_MODEL_ID;
     const modelOption = getSttModelById(resolvedModelId);
     const language = getLanguageFromLocale(locale);

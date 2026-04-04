@@ -140,14 +140,29 @@ export function TranslationProvider({
 
   // Function to change both country and language at once
   const changeLocale = async (newCountry: Countries): Promise<void> => {
-    await setCountry(newCountry);
-    const countryInfo = languageConfig.countryInfo[newCountry];
-    await setLanguage(countryInfo.language as Languages);
-    const newLocale = `${countryInfo.language}-${newCountry}`;
-    await setCookie(LOCALE_COOKIE_NAME, newLocale);
-    await storage.setItem(LOCALE_COOKIE_NAME, newLocale);
+    if (!mounted) {
+      return;
+    }
 
-    router.push(`/${newLocale}${pathname.replace(`/${currentLocale}`, "")}`);
+    const countryInfo = languageConfig.countryInfo[newCountry];
+    const newLocale = `${countryInfo.language}-${newCountry}`;
+
+    // Save to storage (single write, no intermediate states)
+    await storage.setItem(LOCALE_COOKIE_NAME, newLocale);
+    await setCookie(LOCALE_COOKIE_NAME, newLocale);
+
+    // Single navigation — replace the locale segment in the path
+    if (pathname) {
+      const pathSegments = pathname.split("/");
+      if (pathSegments.length > 1 && pathSegments[1]) {
+        const currentLocaleInPath = pathSegments[1];
+        const newPath = pathname.replace(
+          `/${currentLocaleInPath}`,
+          `/${newLocale}`,
+        ) as Route<RouteType>;
+        router.push(newPath);
+      }
+    }
   };
 
   // Simple mount effect - only save current locale if none exists

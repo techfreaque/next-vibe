@@ -165,12 +165,19 @@ function parseCookieValue(
   return match?.[1];
 }
 
-/** Verify JWT from cookie and return userId + leadId */
+/**
+ * Verify JWT and extract userId + leadId from the connection request.
+ *
+ * Sources (checked in order):
+ *   1. httpOnly cookies (browser clients)
+ *   2. URL query params ?token=...&leadId=... (server-to-server, e.g. self-hosted relay)
+ */
 async function authenticateFromCookies(
   req: Request,
   logger: EndpointLogger,
 ): Promise<{ userId: string | null; leadId: string | null }> {
   const cookieHeader = req.headers.get("cookie") ?? "";
+
   const token = parseCookieValue(cookieHeader, AUTH_TOKEN_COOKIE_NAME);
   const leadId = parseCookieValue(cookieHeader, LEAD_ID_COOKIE_NAME) ?? null;
 
@@ -725,20 +732,6 @@ export function startWebSocketServer(
               msg.channel,
             );
             logger.debug(`[WS] Unsubscribed from ${msg.channel}`);
-          } else if (msg.type === "tool-result") {
-            // Remote ws-provider client sending back a tool execution result.
-            // Lazy import to avoid loading AI stream code at WS server startup.
-            const { resolvePendingToolResult } =
-              await import("@/app/api/[locale]/agent/ai-stream/ws-provider/tool-result-store");
-            const resolved = resolvePendingToolResult(
-              msg.toolCallId,
-              msg.result,
-            );
-            if (!resolved) {
-              logger.warn("[WS] Tool result for unknown toolCallId", {
-                toolCallId: msg.toolCallId,
-              });
-            }
           }
         } catch {
           logger.warn("[WS] Invalid message received");

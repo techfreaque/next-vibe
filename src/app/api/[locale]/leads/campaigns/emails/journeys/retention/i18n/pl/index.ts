@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
     thankYou:
       "Dziękujemy za subskrypcję unbottled.ai. Twoje wsparcie bezpośrednio finansuje rozwój i utrzymuje naszą niezależność.",
     valueSummary:
-      "Jako subskrybent masz priorytetowy dostęp do wszystkich 42+ modeli, wyższe limity użytkowania i pierwszeństwo dostępu do nowych funkcji.",
+      "Jako subskrybent masz priorytetowy dostęp do wszystkich {{modelCount}} modeli, wyższe limity użytkowania i pierwszeństwo dostępu do nowych funkcji.",
     whatIsNext:
       "Będziemy kontaktować się od czasu do czasu z poradami, nowymi funkcjami i aktualizacjami. Nic przesadnego - tylko rzeczy naprawdę warte twojego czasu.",
     signature: "Zespół unbottled.ai",

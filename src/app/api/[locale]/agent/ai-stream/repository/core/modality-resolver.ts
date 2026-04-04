@@ -7,8 +7,17 @@ import "server-only";
 import type { ChatFavorite } from "@/app/api/[locale]/agent/chat/favorites/db";
 import type { ChatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
 import type { Skill } from "@/app/api/[locale]/agent/chat/skills/config";
-import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import {
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
+  getBestAudioVisionModel,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
+import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
+import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
@@ -26,9 +35,20 @@ import {
   type ChatModelId,
   type ChatModelOption,
 } from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  type AudioVisionModelId,
+  type AudioVisionModelOption,
+  type ImageVisionModelId,
+  type ImageVisionModelOption,
+  type VideoVisionModelId,
+  type VideoVisionModelOption,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { type ImageGenModelOption } from "@/app/api/[locale]/agent/image-generation/models";
 import { type MusicGenModelOption } from "@/app/api/[locale]/agent/music-generation/models";
-import { type SttModelOption } from "@/app/api/[locale]/agent/speech-to-text/models";
+import {
+  type SttModelId,
+  type SttModelOption,
+} from "@/app/api/[locale]/agent/speech-to-text/models";
 import {
   type TtsModelId,
   type TtsModelOption,
@@ -63,7 +83,7 @@ export type BridgeFavorite = Pick<
   | "defaultChatMode"
   | "imageGenModelSelection"
   | "musicGenModelSelection"
-  | "videoGenModelId"
+  | "videoGenModelSelection"
 >;
 
 /** Fields read from settings DB row for bridge model resolution (DB uses ModelSelectionSimple JSONB) */
@@ -78,7 +98,7 @@ export type BridgeSettings = Pick<
   | "defaultChatMode"
   | "imageGenModelSelection"
   | "musicGenModelSelection"
-  | "videoGenModelId"
+  | "videoGenModelSelection"
 >;
 
 export interface BridgeContext {
@@ -90,7 +110,13 @@ export interface BridgeContext {
 export interface MessageVariant {
   modality: Modality;
   content: string; // text content or storage URL
-  modelId?: ChatModelId;
+  modelId:
+    | ChatModelId
+    | SttModelId
+    | TtsModelId
+    | ImageVisionModelId
+    | VideoVisionModelId
+    | AudioVisionModelId;
   creditCost?: number;
   createdAt: string; // ISO timestamp
 }
@@ -113,253 +139,175 @@ export type VariantResolution =
 
 export class ModalityResolver {
   /**
-   * Resolve STT model via cascade: userSettings → favorite → skill → system default
+   * Cascade: userSettings → favorite → skill (scalar id) → system default
+   * Used by bridge models (STT, TTS, vision) — user preference overrides skill config.
    */
+  private static cascadeBridgeModel<TSelection, TOption>(
+    userSettingsSelection: TSelection | null | undefined,
+    favoriteSelection: TSelection | null | undefined,
+    skillModelId: string | null | undefined,
+    defaultSelection: TSelection,
+    getBest: (sel: TSelection, user: JwtPayloadType) => TOption | null,
+    user: JwtPayloadType,
+  ): TOption | null {
+    const fromUserSettings = userSettingsSelection
+      ? getBest(userSettingsSelection, user)
+      : null;
+    if (fromUserSettings) {
+      return fromUserSettings;
+    }
+
+    const fromFavorite = favoriteSelection
+      ? getBest(favoriteSelection, user)
+      : null;
+    if (fromFavorite) {
+      return fromFavorite;
+    }
+
+    if (skillModelId) {
+      const fromSkill = getBest(
+        {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: skillModelId,
+        } as TSelection,
+        user,
+      );
+      if (fromSkill) {
+        return fromSkill;
+      }
+    }
+
+    return getBest(defaultSelection, user);
+  }
+
+  /**
+   * Cascade: skill (scalar id) → favorite → userSettings → system default
+   * Used by media gen models (image/music/video) — skill config has highest priority.
+   */
+  private static cascadeMediaGenModel<TSelection, TOption>(
+    skillModelId: string | null | undefined,
+    favoriteSelection: TSelection | null | undefined,
+    userSettingsSelection: TSelection | null | undefined,
+    defaultSelection: TSelection,
+    getBest: (sel: TSelection, user: JwtPayloadType) => TOption | null,
+    user: JwtPayloadType,
+  ): TOption | null {
+    if (skillModelId) {
+      const fromSkill = getBest(
+        {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: skillModelId,
+        } as TSelection,
+        user,
+      );
+      if (fromSkill) {
+        return fromSkill;
+      }
+    }
+
+    const fromFavorite = favoriteSelection
+      ? getBest(favoriteSelection, user)
+      : null;
+    if (fromFavorite) {
+      return fromFavorite;
+    }
+
+    const fromUserSettings = userSettingsSelection
+      ? getBest(userSettingsSelection, user)
+      : null;
+    if (fromUserSettings) {
+      return fromUserSettings;
+    }
+
+    return getBest(defaultSelection, user);
+  }
+
+  /** Resolve STT model: userSettings → favorite → skill → system default */
   static resolveSttModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
-  ): SttModelOption {
+  ): SttModelOption | null {
     const env = agentEnvAvailability;
-    const fromUserSettings = ctx.userSettings?.sttModelSelection
-      ? SkillsRepositoryClient.getBestSttModel(
-          ctx.userSettings.sttModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromUserSettings) {
-      return fromUserSettings;
-    }
-    const fromFavorite = ctx.favorite?.sttModelSelection
-      ? SkillsRepositoryClient.getBestSttModel(
-          ctx.favorite.sttModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromFavorite) {
-      return fromFavorite;
-    }
-    if (ctx.skill?.sttModelId) {
-      const fromSkill = SkillsRepositoryClient.getBestSttModel(
-        {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ctx.skill.sttModelId,
-        },
-        user,
-        env,
-      );
-      if (fromSkill) {
-        return fromSkill;
-      }
-    }
-    return SkillsRepositoryClient.getBestSttModel(
+    return this.cascadeBridgeModel(
+      ctx.userSettings?.sttModelSelection,
+      ctx.favorite?.sttModelSelection,
+      ctx.skill?.sttModelId,
       DEFAULT_STT_MODEL_SELECTION,
+      (sel, u) => getBestSttModel(sel, u, env),
       user,
-      env,
-    )!;
+    );
   }
 
-  /**
-   * Resolve TTS voice model via cascade: userSettings → favorite → skill → system default
-   */
+  /** Resolve TTS voice model: userSettings → favorite → skill → system default */
   static resolveTtsModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
-  ): TtsModelOption {
+  ): TtsModelOption | null {
     const env = agentEnvAvailability;
-    const fromUserSettings = ctx.userSettings?.voiceModelSelection
-      ? SkillsRepositoryClient.getBestTtsModel(
-          ctx.userSettings.voiceModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromUserSettings) {
-      return fromUserSettings;
-    }
-    const fromFavorite = ctx.favorite?.voiceModelSelection
-      ? SkillsRepositoryClient.getBestTtsModel(
-          ctx.favorite.voiceModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromFavorite) {
-      return fromFavorite;
-    }
-    if (ctx.skill?.voiceId) {
-      const fromSkill = SkillsRepositoryClient.getBestTtsModel(
-        {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ctx.skill.voiceId,
-        },
-        user,
-        env,
-      );
-      if (fromSkill) {
-        return fromSkill;
-      }
-    }
-    return SkillsRepositoryClient.getBestTtsModel(
+    return this.cascadeBridgeModel(
+      ctx.userSettings?.voiceModelSelection,
+      ctx.favorite?.voiceModelSelection,
+      ctx.skill?.voiceId,
       DEFAULT_TTS_MODEL_SELECTION,
+      (sel, u) => getBestTtsModel(sel, u, env),
       user,
-      env,
-    )!;
+    );
   }
 
-  /**
-   * Resolve TTS voice ID via cascade: userSettings → favorite → skill → system default
-   */
+  /** Resolve TTS voice ID: userSettings → favorite → skill → system default */
   static resolveTtsVoiceId(
     ctx: BridgeContext,
     user: JwtPayloadType,
-  ): TtsModelId {
-    return this.resolveTtsModel(ctx, user).id;
+  ): TtsModelId | null {
+    return this.resolveTtsModel(ctx, user)?.id ?? null;
   }
 
-  /**
-   * Resolve image vision model via cascade: userSettings → favorite → skill → system default.
-   */
+  /** Resolve image vision model: userSettings → favorite → skill → system default */
   static resolveImageVisionModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
-  ): ChatModelOption {
+  ): ImageVisionModelOption | null {
     const env = agentEnvAvailability;
-    const fromUserSettings = ctx.userSettings?.imageVisionModelSelection
-      ? SkillsRepositoryClient.getBestImageVisionModel(
-          ctx.userSettings.imageVisionModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromUserSettings) {
-      return fromUserSettings;
-    }
-    const fromFavorite = ctx.favorite?.imageVisionModelSelection
-      ? SkillsRepositoryClient.getBestImageVisionModel(
-          ctx.favorite.imageVisionModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromFavorite) {
-      return fromFavorite;
-    }
-    if (ctx.skill?.imageVisionModelId) {
-      const fromSkill = SkillsRepositoryClient.getBestImageVisionModel(
-        {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ctx.skill.imageVisionModelId,
-        },
-        user,
-        env,
-      );
-      if (fromSkill) {
-        return fromSkill;
-      }
-    }
-    return SkillsRepositoryClient.getBestImageVisionModel(
+    return this.cascadeBridgeModel(
+      ctx.userSettings?.imageVisionModelSelection,
+      ctx.favorite?.imageVisionModelSelection,
+      ctx.skill?.imageVisionModelId,
       DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+      (sel, u) => getBestImageVisionModel(sel, u, env),
       user,
-      env,
-    )!;
+    );
   }
 
-  /**
-   * Resolve video vision model via cascade: userSettings → favorite → skill → system default.
-   */
+  /** Resolve video vision model: userSettings → favorite → skill → system default */
   static resolveVideoVisionModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
-  ): ChatModelOption {
+  ): VideoVisionModelOption | null {
     const env = agentEnvAvailability;
-    const fromUserSettings = ctx.userSettings?.videoVisionModelSelection
-      ? SkillsRepositoryClient.getBestVideoVisionModel(
-          ctx.userSettings.videoVisionModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromUserSettings) {
-      return fromUserSettings;
-    }
-    const fromFavorite = ctx.favorite?.videoVisionModelSelection
-      ? SkillsRepositoryClient.getBestVideoVisionModel(
-          ctx.favorite.videoVisionModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromFavorite) {
-      return fromFavorite;
-    }
-    if (ctx.skill?.videoVisionModelId) {
-      const fromSkill = SkillsRepositoryClient.getBestVideoVisionModel(
-        {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ctx.skill.videoVisionModelId,
-        },
-        user,
-        env,
-      );
-      if (fromSkill) {
-        return fromSkill;
-      }
-    }
-    return SkillsRepositoryClient.getBestVideoVisionModel(
+    return this.cascadeBridgeModel(
+      ctx.userSettings?.videoVisionModelSelection,
+      ctx.favorite?.videoVisionModelSelection,
+      ctx.skill?.videoVisionModelId,
       DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+      (sel, u) => getBestVideoVisionModel(sel, u, env),
       user,
-      env,
-    )!;
+    );
   }
 
-  /**
-   * Resolve audio vision model via cascade: userSettings → favorite → skill → system default.
-   */
+  /** Resolve audio vision model: userSettings → favorite → skill → system default */
   static resolveAudioVisionModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
-  ): ChatModelOption {
+  ): AudioVisionModelOption | null {
     const env = agentEnvAvailability;
-    const fromUserSettings = ctx.userSettings?.audioVisionModelSelection
-      ? SkillsRepositoryClient.getBestAudioVisionModel(
-          ctx.userSettings.audioVisionModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromUserSettings) {
-      return fromUserSettings;
-    }
-    const fromFavorite = ctx.favorite?.audioVisionModelSelection
-      ? SkillsRepositoryClient.getBestAudioVisionModel(
-          ctx.favorite.audioVisionModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromFavorite) {
-      return fromFavorite;
-    }
-    if (ctx.skill?.audioVisionModelId) {
-      const fromSkill = SkillsRepositoryClient.getBestAudioVisionModel(
-        {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ctx.skill.audioVisionModelId,
-        },
-        user,
-        env,
-      );
-      if (fromSkill) {
-        return fromSkill;
-      }
-    }
-    return SkillsRepositoryClient.getBestAudioVisionModel(
+    return this.cascadeBridgeModel(
+      ctx.userSettings?.audioVisionModelSelection,
+      ctx.favorite?.audioVisionModelSelection,
+      ctx.skill?.audioVisionModelId,
       DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+      (sel, u) => getBestAudioVisionModel(sel, u, env),
       user,
-      env,
-    )!;
+    );
   }
 
   /**
@@ -389,153 +337,51 @@ export class ModalityResolver {
     );
   }
 
-  /**
-   * Resolve image generation model via cascade: skill → favorite → userSettings → system default
-   */
+  /** Resolve image gen model: skill → favorite → userSettings → system default */
   static resolveImageGenModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
   ): ImageGenModelOption | null {
     const env = agentEnvAvailability;
-    if (ctx.skill?.imageGenModelId) {
-      const fromSkill = SkillsRepositoryClient.getBestImageGenModel(
-        {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ctx.skill.imageGenModelId,
-        },
-        user,
-        env,
-      );
-      if (fromSkill) {
-        return fromSkill;
-      }
-    }
-    const fromFavorite = ctx.favorite?.imageGenModelSelection
-      ? SkillsRepositoryClient.getBestImageGenModel(
-          ctx.favorite.imageGenModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromFavorite) {
-      return fromFavorite;
-    }
-    const fromUserSettings = ctx.userSettings?.imageGenModelSelection
-      ? SkillsRepositoryClient.getBestImageGenModel(
-          ctx.userSettings.imageGenModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromUserSettings) {
-      return fromUserSettings;
-    }
-    return SkillsRepositoryClient.getBestImageGenModel(
+    return this.cascadeMediaGenModel(
+      ctx.skill?.imageGenModelId,
+      ctx.favorite?.imageGenModelSelection,
+      ctx.userSettings?.imageGenModelSelection,
       DEFAULT_IMAGE_GEN_MODEL_SELECTION,
+      (sel, u) => getBestImageGenModel(sel, u, env),
       user,
-      env,
     );
   }
 
-  /**
-   * Resolve music generation model via cascade: skill → favorite → userSettings → system default
-   */
+  /** Resolve music gen model: skill → favorite → userSettings → system default */
   static resolveMusicGenModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
   ): MusicGenModelOption | null {
     const env = agentEnvAvailability;
-    if (ctx.skill?.musicGenModelId) {
-      const fromSkill = SkillsRepositoryClient.getBestMusicGenModel(
-        {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ctx.skill.musicGenModelId,
-        },
-        user,
-        env,
-      );
-      if (fromSkill) {
-        return fromSkill;
-      }
-    }
-    const fromFavorite = ctx.favorite?.musicGenModelSelection
-      ? SkillsRepositoryClient.getBestMusicGenModel(
-          ctx.favorite.musicGenModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromFavorite) {
-      return fromFavorite;
-    }
-    const fromUserSettings = ctx.userSettings?.musicGenModelSelection
-      ? SkillsRepositoryClient.getBestMusicGenModel(
-          ctx.userSettings.musicGenModelSelection,
-          user,
-          env,
-        )
-      : null;
-    if (fromUserSettings) {
-      return fromUserSettings;
-    }
-    return SkillsRepositoryClient.getBestMusicGenModel(
+    return this.cascadeMediaGenModel(
+      ctx.skill?.musicGenModelId,
+      ctx.favorite?.musicGenModelSelection,
+      ctx.userSettings?.musicGenModelSelection,
       DEFAULT_MUSIC_GEN_MODEL_SELECTION,
+      (sel, u) => getBestMusicGenModel(sel, u, env),
       user,
-      env,
     );
   }
 
-  /**
-   * Resolve video generation model via cascade: skill → favorite → userSettings → system default
-   */
+  /** Resolve video gen model: skill → favorite → userSettings → system default */
   static resolveVideoGenModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
   ): VideoGenModelOption | null {
     const env = agentEnvAvailability;
-    if (ctx.skill?.videoGenModelId) {
-      const fromSkill = SkillsRepositoryClient.getBestVideoGenModel(
-        {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ctx.skill.videoGenModelId,
-        },
-        user,
-        env,
-      );
-      if (fromSkill) {
-        return fromSkill;
-      }
-    }
-    const fromFavorite = ctx.favorite?.videoGenModelId
-      ? SkillsRepositoryClient.getBestVideoGenModel(
-          {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: ctx.favorite.videoGenModelId,
-          },
-          user,
-          env,
-        )
-      : null;
-    if (fromFavorite) {
-      return fromFavorite;
-    }
-    const fromUserSettings = ctx.userSettings?.videoGenModelId
-      ? SkillsRepositoryClient.getBestVideoGenModel(
-          {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: ctx.userSettings.videoGenModelId,
-          },
-          user,
-          env,
-        )
-      : null;
-    if (fromUserSettings) {
-      return fromUserSettings;
-    }
-    return SkillsRepositoryClient.getBestVideoGenModel(
+    return this.cascadeMediaGenModel(
+      ctx.skill?.videoGenModelId,
+      ctx.favorite?.videoGenModelSelection,
+      ctx.userSettings?.videoGenModelSelection,
       DEFAULT_VIDEO_GEN_MODEL_SELECTION,
+      (sel, u) => getBestVideoGenModel(sel, u, env),
       user,
-      env,
     );
   }
 

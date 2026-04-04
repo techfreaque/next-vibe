@@ -102,7 +102,7 @@ export class ToolCallHandler {
         sequenceId,
       });
 
-      logger.info("[AI Stream] Created placeholder ASSISTANT message", {
+      logger.debug("[AI Stream] Created placeholder ASSISTANT message", {
         messageId: currentAssistantMessageId,
         threadId,
       });

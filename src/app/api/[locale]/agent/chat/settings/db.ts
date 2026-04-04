@@ -19,16 +19,16 @@ import { users } from "@/app/api/[locale]/user/db";
 
 import type { ChatMode } from "../../models/enum";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
 import type {
   AudioVisionModelSelection,
-  ImageGenModelSelection,
   ImageVisionModelSelection,
-  MusicGenModelSelection,
-  SttModelSelection,
   VideoVisionModelSelection,
-  VoiceModelSelection,
-} from "../../models/types";
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
+import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import type { ViewModeValue } from "../enum";
 import type { ToolConfigItem } from "./definition";
 
@@ -87,7 +87,9 @@ export const chatSettings = pgTable("chat_settings", {
   musicGenModelSelection: jsonb(
     "music_gen_model_selection",
   ).$type<MusicGenModelSelection>(),
-  videoGenModelId: text("video_gen_model_id").$type<VideoGenModelId>(),
+  videoGenModelSelection: jsonb(
+    "video_gen_model_selection",
+  ).$type<VideoGenModelSelection>(),
 
   // UI preferences - only store if different from default
   viewMode: jsonb("view_mode").$type<typeof ViewModeValue>(),

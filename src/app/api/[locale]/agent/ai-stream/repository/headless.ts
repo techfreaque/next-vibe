@@ -21,6 +21,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "../../chat/config";
 import type { MessageMetadata, ToolCallResult } from "../../chat/db";
 import { chatMessages } from "../../chat/db";
@@ -31,16 +32,15 @@ import {
   isFiltersSelection,
   isManualSelection,
 } from "../../chat/skills/create/definition";
-import { SkillsRepositoryClient } from "../../chat/skills/repository-client";
-import { agentEnvAvailability } from "../../env-availability";
 import { ThreadsRepository } from "../../chat/threads/repository";
+import { agentEnvAvailability } from "../../env-availability";
+import type { ImageGenModelId } from "../../image-generation/models";
+import type { MusicGenModelId } from "../../music-generation/models";
+import type { VideoGenModelId } from "../../video-generation/models";
 import type { ChatModelId } from "../models";
 import type { AiStreamPostRequestOutput } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
 import { AiStreamRepository } from "./index";
-import type { MusicGenModelId } from "../../music-generation/models";
-import type { VideoGenModelId } from "../../video-generation/models";
-import type { ImageGenModelId } from "../../image-generation/models";
 
 /** A pre-fetched tool call result to inject into the thread before the AI runs */
 export interface HeadlessPreCall {
@@ -156,6 +156,18 @@ export interface HeadlessAiStreamParams {
     videoGenModelId?: VideoGenModelId;
     imageGenModelId?: ImageGenModelId;
   };
+  /** File attachments to include with the user message (images, audio, PDFs, video) */
+  attachments?: File[];
+  /**
+   * Tool confirmations to process before the AI stream starts.
+   * Each entry confirms or rejects a pending tool call by its message ID.
+   * Used to simulate user approval in integration tests for approve-mode tools.
+   */
+  toolConfirmations?: Array<{
+    messageId: string;
+    confirmed: boolean;
+    updatedArgs?: Record<string, string | number | boolean | null>;
+  }> | null;
   /** System user context for execution */
   user: JwtPayloadType;
   /** Locale for i18n */
@@ -175,6 +187,8 @@ export interface HeadlessAiStreamResult {
   lastAiMessageContent: string | null;
   /** URL of the last generated media (image/audio/video) — set when native file parts are emitted */
   lastGeneratedMediaUrl?: string | null;
+  /** Total credits deducted during this stream (model + tools) — for cost display in callers */
+  totalCreditsDeducted?: number;
 }
 
 /**
@@ -218,11 +232,7 @@ export async function resolveFavorite(
     };
   }
   if (sel && isFiltersSelection(sel)) {
-    const best = SkillsRepositoryClient.getBestModelForSkill(
-      sel,
-      user,
-      agentEnvAvailability,
-    );
+    const best = getBestChatModel(sel, user, agentEnvAvailability);
     if (best) {
       return { model: best.id, skill };
     }
@@ -246,11 +256,7 @@ export async function resolveFavorite(
         : null;
       const varSel = variant?.modelSelection;
       if (varSel && (isManualSelection(varSel) || isFiltersSelection(varSel))) {
-        const best = SkillsRepositoryClient.getBestModelForSkill(
-          varSel,
-          user,
-          agentEnvAvailability,
-        );
+        const best = getBestChatModel(varSel, user, agentEnvAvailability);
         if (best) {
           return { model: best.id, skill };
         }
@@ -290,6 +296,8 @@ export async function runHeadlessAiStream(
     explicitParentMessageId,
     sequenceIdOverride,
     mediaModelOverrides,
+    attachments: headlessAttachments,
+    toolConfirmations: headlessToolConfirmations,
     user,
     locale,
     logger,
@@ -343,11 +351,7 @@ export async function runHeadlessAiStream(
           if (isManualSelection(varSel) && "manualModelId" in varSel) {
             model = varSel.manualModelId;
           } else if (isFiltersSelection(varSel)) {
-            const best = SkillsRepositoryClient.getBestModelForSkill(
-              varSel,
-              user,
-              agentEnvAvailability,
-            );
+            const best = getBestChatModel(varSel, user, agentEnvAvailability);
             if (best) {
               model = best.id;
             }
@@ -396,13 +400,25 @@ export async function runHeadlessAiStream(
         return ensureResult;
       }
 
+      // For append mode, find the current last message so user msg chains correctly
+      let preCallUserParentId: string | null = null;
+      if (threadMode === "append" && existingThreadId) {
+        const [lastMsg] = await db
+          .select({ id: chatMessages.id })
+          .from(chatMessages)
+          .where(eq(chatMessages.threadId, existingThreadId))
+          .orderBy(desc(chatMessages.createdAt))
+          .limit(1);
+        preCallUserParentId = lastMsg?.id ?? null;
+      }
+
       // Write the user message first
       await db.insert(chatMessages).values({
         id: userMessageId,
         threadId: effectiveThreadId,
         role: ChatMessageRole.USER,
         content: prompt,
-        parentId: null,
+        parentId: preCallUserParentId,
         authorId: userId ?? null,
         sequenceId: null,
         isAI: false,
@@ -500,12 +516,20 @@ export async function runHeadlessAiStream(
       existingThreadId,
     });
 
+    // When preCalls are used, the user message was already written manually above.
+    // Override to "answer-as-ai" so stream-setup doesn't re-insert the same userMessageId.
+    const effectiveOperation =
+      preCalls && preCalls.length > 0 && parentMessageIdForAi
+        ? "answer-as-ai"
+        : operation;
+
     const syntheticData: AiStreamPostRequestOutput = {
-      operation,
+      operation: effectiveOperation,
       rootFolderId,
       subFolderId: subFolderId ?? null,
       threadId: effectiveThreadId,
-      userMessageId: operation !== "answer-as-ai" ? userMessageId : null,
+      userMessageId:
+        effectiveOperation !== "answer-as-ai" ? userMessageId : null,
       parentMessageId: parentMessageIdForAi,
       content: prompt,
       role: ChatMessageRole.USER,
@@ -513,13 +537,13 @@ export async function runHeadlessAiStream(
       skill: skill,
       availableTools: availableTools ?? null,
       pinnedTools: pinnedTools ?? null,
-      toolConfirmations: null,
+      toolConfirmations: headlessToolConfirmations ?? null,
       messageHistory: [] as AiStreamPostRequestOutput["messageHistory"],
       voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
       audioInput: { file: null },
       resumeToken: null,
       timezone: "UTC",
-      attachments: null,
+      attachments: headlessAttachments ?? null,
     };
 
     const result = await AiStreamRepository.createAiStream({
@@ -546,9 +570,10 @@ export async function runHeadlessAiStream(
       lastAiMessageId,
       lastAiMessageContent,
       lastGeneratedMediaUrl,
+      totalCreditsDeducted,
     } = result.data;
 
-    logger.info("[Headless AI] Execution complete", {
+    logger.debug("[Headless AI] Execution complete", {
       model,
       threadId,
       lastAiMessageId,
@@ -561,6 +586,7 @@ export async function runHeadlessAiStream(
         lastAiMessageId,
         lastAiMessageContent,
         lastGeneratedMediaUrl,
+        totalCreditsDeducted,
         threadId: threadMode !== "none" ? threadId : undefined,
       },
     };

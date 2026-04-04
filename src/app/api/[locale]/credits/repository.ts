@@ -70,7 +70,15 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
-import { type ChatModelId, getChatModelById } from "../agent/ai-stream/models";
+import {
+  chatModelOptionsIndex,
+  type ChatModelId,
+} from "../agent/ai-stream/models";
+import type {
+  AudioVisionModelId,
+  ImageVisionModelId,
+  VideoVisionModelId,
+} from "../agent/ai-stream/vision-models";
 import { ProductIds, productsRepository } from "../products/repository-client";
 import { payoutRequests } from "../referral/db";
 import { PayoutStatus } from "../referral/enum";
@@ -1878,7 +1886,12 @@ export class CreditRepository {
   private static async deductCredits(
     identifier: CreditIdentifier,
     amount: number,
-    modelId: ChatModelId | undefined,
+    modelId:
+      | ChatModelId
+      | ImageVisionModelId
+      | VideoVisionModelId
+      | AudioVisionModelId
+      | undefined,
     feature: string | undefined,
     messageId: string,
     logger: EndpointLogger,
@@ -2617,10 +2630,19 @@ export class CreditRepository {
   }
 
   private static getFetaureLabel(
-    modelId: ChatModelId | null,
+    modelId:
+      | ChatModelId
+      | ImageVisionModelId
+      | VideoVisionModelId
+      | AudioVisionModelId
+      | null,
     featureName: string | null,
   ): string | null {
-    return modelId ? getChatModelById(modelId).name : featureName;
+    // Vision model IDs are a subset of ChatModelId string values,
+    // so chatModelOptionsIndex covers all cases (chat + vision).
+    return modelId
+      ? (chatModelOptionsIndex[modelId]?.name ?? featureName)
+      : featureName;
   }
 
   /**
@@ -3275,7 +3297,11 @@ export class CreditRepository {
   static async deductCreditsForModelUsage(
     user: JwtPayloadType,
     cost: number,
-    model: ChatModelId,
+    model:
+      | ChatModelId
+      | ImageVisionModelId
+      | VideoVisionModelId
+      | AudioVisionModelId,
     logger: EndpointLogger,
     t: CreditsT,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native

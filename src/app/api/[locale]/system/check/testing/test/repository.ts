@@ -82,8 +82,35 @@ export class TestRepository {
       return success(response);
     } catch (error) {
       const duration = Date.now() - startTime;
-      const parsedError = parseError(error);
 
+      // exec throws on non-zero exit code — this is normal for failing tests
+      const execError = error as {
+        stdout?: string;
+        stderr?: string;
+        code?: number;
+      };
+      const hasTestOutput = execError.stdout || execError.stderr;
+
+      if (hasTestOutput) {
+        // Test failures: return as valid response with success=false
+        const fullOutput = (execError.stdout ?? "") + (execError.stderr ?? "");
+        output += fullOutput;
+
+        logger.info("system.check.testing.test.execute.error", {
+          output: fullOutput.slice(0, 200),
+        });
+
+        const response: TestResponseOutput = {
+          success: false,
+          output: output.trim(),
+          duration,
+        };
+
+        return success(response);
+      }
+
+      // Actual infrastructure errors (command not found, timeout, etc.)
+      const parsedError = parseError(error);
       logger.error(
         "system.check.testing.test.execute.error",
         parseError(error),

@@ -58,7 +58,7 @@ export const translations: typeof enTranslations = {
     },
     aiModels: {
       title: "KI-Modelle",
-      description: "40+ unzensierte KI-Modelle",
+      description: "{{modelCount}} unzensierte KI-Modelle",
     },
     folders: {
       title: "Privatsphäre-Level",

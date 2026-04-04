@@ -166,6 +166,47 @@ export class RouteExecuteRepository {
           data = { ...data, callbackMode: CallbackMode.WAKE_UP };
         }
       }
+      // Folder-type restrictions: block remote tools and async callback modes
+      // for incognito/public folders (defense in depth — tools-loader also blocks these).
+      const { FOLDER_ALLOWS_REMOTE_TOOLS, FOLDER_BLOCKED_CALLBACK_MODES } =
+        await import("@/app/api/[locale]/agent/chat/config");
+
+      if (
+        instanceId &&
+        FOLDER_ALLOWS_REMOTE_TOOLS[streamContext?.rootFolderId] === false
+      ) {
+        logger.warn(
+          "[RouteExecute] Remote tool blocked for restricted folder",
+          {
+            toolName,
+            instanceId,
+            rootFolderId: streamContext?.rootFolderId,
+          },
+        );
+        return fail({
+          message: t("executeTool.post.errors.validation.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
+      const effectiveCallbackMode = data.callbackMode ?? CallbackMode.WAIT;
+      const folderBlockedModes =
+        FOLDER_BLOCKED_CALLBACK_MODES[streamContext?.rootFolderId] ?? [];
+      if (folderBlockedModes.includes(effectiveCallbackMode)) {
+        logger.warn(
+          "[RouteExecute] Blocked callbackMode for restricted folder",
+          {
+            toolName,
+            callbackMode: effectiveCallbackMode,
+            rootFolderId: streamContext?.rootFolderId,
+          },
+        );
+        return fail({
+          message: t("executeTool.post.errors.validation.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
       if (instanceId && !user.isPublic) {
         // Strip instanceId from input - the remote instance executes the tool locally.
         // If we leave it in, endpoints like tool-help interpret it as "proxy to another

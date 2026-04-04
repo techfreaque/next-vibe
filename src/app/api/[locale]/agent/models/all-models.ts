@@ -7,7 +7,7 @@
  * models/models.ts exports base types & utilities (ApiProvider, calculateCreditCost, …).
  * Each domain's models.ts (ai-stream, image-generation, …) imports those base types.
  * This file imports the built option lists from every domain and re-exports
- * aggregate helpers (getModelCost, TOTAL_MODEL_COUNT, …).
+ * aggregate helpers (getModelCost, getAvailableModelCount, …).
  */
 
 import {
@@ -15,6 +15,12 @@ import {
   chatModelDefinitions,
   chatModelOptions,
 } from "../ai-stream/models";
+import {
+  type AudioVisionModelOption,
+  type ImageVisionModelOption,
+  type VideoVisionModelOption,
+} from "../ai-stream/vision-models";
+import { ContentLevel } from "../chat/skills/enum";
 import {
   type ImageGenModelOption,
   imageGenModelDefinitions,
@@ -56,14 +62,31 @@ import {
 
 export { getModelPrice };
 
+/**
+ * Full union of all model option types, including vision bridge models.
+ * Vision types live in ai-stream/vision-models.ts which imports from models/models.ts,
+ * so they cannot be included in AnyModelOption there without a circular dependency.
+ * Use this type when vision models may appear alongside generation/TTS/STT models.
+ */
+export type AnyModelOptionWithVision =
+  | AnyModelOption
+  | ImageVisionModelOption
+  | VideoVisionModelOption
+  | AudioVisionModelOption;
+
 // Re-export aggregate option types for consumers that need them
 export type {
+  AnyModelId,
+  AnyModelOption,
+  AudioVisionModelOption,
   ChatModelOption,
   ImageGenModelOption,
+  ImageVisionModelOption,
   MusicGenModelOption,
   SttModelOption,
   TtsModelOption,
   VideoGenModelOption,
+  VideoVisionModelOption,
 };
 
 // ============================================
@@ -79,7 +102,7 @@ const allModelOptions: AnyModelOption[] = [
   ...sttModelOptions,
 ];
 
-const allModelDefinitions: ModelDefinition[] = [
+export const allModelDefinitions: ModelDefinition[] = [
   ...Object.values(chatModelDefinitions),
   ...Object.values(imageGenModelDefinitions),
   ...Object.values(musicGenModelDefinitions),
@@ -143,16 +166,6 @@ export function getModelCost(
   );
 }
 
-// ============================================
-// MODEL COUNT UTILITIES
-// ============================================
-
-export const TOTAL_MODEL_COUNT = allModelDefinitions.filter((def) =>
-  def.providers.some((p) => !p.adminOnly),
-).length;
-
-export const TOTAL_PROVIDER_COUNT = Object.keys(modelProviders).length;
-
 export function getAvailableModelCount(
   env: ModelProviderEnvAvailability,
   isAdmin: boolean,
@@ -193,6 +206,51 @@ export function getAvailableProviderCount(
     }
   }
   return availableProviderIds.size;
+}
+
+export interface ModelCountsByContentLevel {
+  mainstream: number;
+  open: number;
+  uncensored: number;
+}
+
+export function getAvailableModelCountsByContentLevel(
+  env: ModelProviderEnvAvailability,
+  isAdmin: boolean,
+): ModelCountsByContentLevel {
+  const counts: ModelCountsByContentLevel = {
+    mainstream: 0,
+    open: 0,
+    uncensored: 0,
+  };
+
+  for (const def of allModelDefinitions) {
+    const visibleProviders = isAdmin
+      ? def.providers
+      : def.providers.filter((p) => !p.adminOnly);
+    if (visibleProviders.length === 0) {
+      continue;
+    }
+    if (
+      !isAdmin &&
+      !visibleProviders.some((p) => {
+        const option = allModelOptions.find((m) => m.id === p.id);
+        return option ? isModelProviderAvailable(option, env) : false;
+      })
+    ) {
+      continue;
+    }
+
+    if (def.content === ContentLevel.MAINSTREAM) {
+      counts.mainstream++;
+    } else if (def.content === ContentLevel.OPEN) {
+      counts.open++;
+    } else if (def.content === ContentLevel.UNCENSORED) {
+      counts.uncensored++;
+    }
+  }
+
+  return counts;
 }
 
 export const TOTAL_CHARACTER_COUNT = 52;

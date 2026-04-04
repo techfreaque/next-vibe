@@ -12,7 +12,6 @@
 
 import {
   chatModelOptions,
-  chatModelOptionsIndex,
   getChatModelById,
   type ChatModelOption,
 } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -20,10 +19,16 @@ import {
   audioVisionModelOptions,
   imageVisionModelOptions,
   videoVisionModelOptions,
+  type AudioVisionModelOption,
+  type ImageVisionModelOption,
+  type VideoVisionModelOption,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import type {
+  ModelOptionBase,
+  ModelOptionTokenBased,
+} from "@/app/api/[locale]/agent/models/models";
 import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import {
-  getImageGenModelById,
   imageGenModelOptions,
   type ImageGenModelOption,
 } from "@/app/api/[locale]/agent/image-generation/models";
@@ -32,35 +37,30 @@ import {
   isModelProviderAvailable,
   type ModelProviderEnvAvailability,
 } from "@/app/api/[locale]/agent/models/models";
+import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
 import type {
   AudioVisionModelSelection,
-  ChatModelSelection,
-  FiltersModelSelection,
-  ImageGenModelSelection,
   ImageVisionModelSelection,
-  MusicGenModelSelection,
-  SttModelSelection,
-  VideoGenModelSelection,
   VideoVisionModelSelection,
-  VoiceModelSelection,
-} from "@/app/api/[locale]/agent/models/types";
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
+import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import {
-  getMusicGenModelById,
   musicGenModelOptions,
   type MusicGenModelOption,
 } from "@/app/api/[locale]/agent/music-generation/models";
 import {
-  getSttModelById,
   sttModelOptions,
   type SttModelOption,
 } from "@/app/api/[locale]/agent/speech-to-text/models";
 import {
-  getTtsModelById,
   ttsModelOptions,
   type TtsModelOption,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
 import {
-  getVideoGenModelById,
   videoGenModelOptions,
   type VideoGenModelOption,
 } from "@/app/api/[locale]/agent/video-generation/models";
@@ -169,7 +169,7 @@ export class SkillsRepositoryClient {
    * Apply hard filter constraints to models (range checks only) and sort
    */
   private static applyHardFilters(
-    filters: FiltersModelSelection,
+    filters: ChatModelSelection,
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
   ): ChatModelOption[] {
@@ -317,50 +317,7 @@ export class SkillsRepositoryClient {
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
   ): TtsModelOption[] {
-    const isAdmin =
-      !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-    if (!selection) {
-      return ttsModelOptions.filter(
-        (m) => (!m.adminOnly || isAdmin) && isModelProviderAvailable(m, env),
-      );
-    }
-    if (selection.selectionType === ModelSelectionType.MANUAL) {
-      const model = getTtsModelById(selection.manualModelId);
-      if (model?.adminOnly && !isAdmin) {
-        return [];
-      }
-      if (model && isModelProviderAvailable(model, env)) {
-        return [model];
-      }
-      // Fall through to filter fallback
-    }
-    return ttsModelOptions.filter((m) => {
-      if (m.adminOnly && !isAdmin) {
-        return false;
-      }
-      if (!isModelProviderAvailable(m, env)) {
-        return false;
-      }
-      const modelPrice = this.getModelPriceLevel(getModelPrice(m));
-      return (
-        this.meetsRangeConstraint(
-          m.intelligence,
-          selection.intelligenceRange,
-          IntelligenceLevelDB,
-        ) &&
-        this.meetsRangeConstraint(
-          m.content,
-          selection.contentRange,
-          ContentLevelDB,
-        ) &&
-        this.meetsRangeConstraint(
-          modelPrice,
-          selection.priceRange,
-          PriceLevelDB,
-        ) &&
-        this.meetsRangeConstraint(m.speed, selection.speedRange, SpeedLevelDB)
-      );
-    });
+    return this.filterRoleModels(ttsModelOptions, selection, user, env);
   }
 
   static getBestTtsModel(
@@ -376,50 +333,7 @@ export class SkillsRepositoryClient {
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
   ): SttModelOption[] {
-    const isAdmin =
-      !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-    if (!selection) {
-      return sttModelOptions.filter(
-        (m) => (!m.adminOnly || isAdmin) && isModelProviderAvailable(m, env),
-      );
-    }
-    if (selection.selectionType === ModelSelectionType.MANUAL) {
-      const model = getSttModelById(selection.manualModelId);
-      if (model?.adminOnly && !isAdmin) {
-        return [];
-      }
-      if (model && isModelProviderAvailable(model, env)) {
-        return [model];
-      }
-      // Fall through to filter fallback
-    }
-    return sttModelOptions.filter((m) => {
-      if (m.adminOnly && !isAdmin) {
-        return false;
-      }
-      if (!isModelProviderAvailable(m, env)) {
-        return false;
-      }
-      const modelPrice = this.getModelPriceLevel(getModelPrice(m));
-      return (
-        this.meetsRangeConstraint(
-          m.intelligence,
-          selection.intelligenceRange,
-          IntelligenceLevelDB,
-        ) &&
-        this.meetsRangeConstraint(
-          m.content,
-          selection.contentRange,
-          ContentLevelDB,
-        ) &&
-        this.meetsRangeConstraint(
-          modelPrice,
-          selection.priceRange,
-          PriceLevelDB,
-        ) &&
-        this.meetsRangeConstraint(m.speed, selection.speedRange, SpeedLevelDB)
-      );
-    });
+    return this.filterRoleModels(sttModelOptions, selection, user, env);
   }
 
   static getBestSttModel(
@@ -435,50 +349,7 @@ export class SkillsRepositoryClient {
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
   ): ImageGenModelOption[] {
-    const isAdmin =
-      !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-    if (!selection) {
-      return imageGenModelOptions.filter(
-        (m) => (!m.adminOnly || isAdmin) && isModelProviderAvailable(m, env),
-      );
-    }
-    if (selection.selectionType === ModelSelectionType.MANUAL) {
-      const model = getImageGenModelById(selection.manualModelId);
-      if (model?.adminOnly && !isAdmin) {
-        return [];
-      }
-      if (model && isModelProviderAvailable(model, env)) {
-        return [model];
-      }
-      // Fall through to filter fallback
-    }
-    return imageGenModelOptions.filter((m) => {
-      if (m.adminOnly && !isAdmin) {
-        return false;
-      }
-      if (!isModelProviderAvailable(m, env)) {
-        return false;
-      }
-      const modelPrice = this.getModelPriceLevel(getModelPrice(m));
-      return (
-        this.meetsRangeConstraint(
-          m.intelligence,
-          selection.intelligenceRange,
-          IntelligenceLevelDB,
-        ) &&
-        this.meetsRangeConstraint(
-          m.content,
-          selection.contentRange,
-          ContentLevelDB,
-        ) &&
-        this.meetsRangeConstraint(
-          modelPrice,
-          selection.priceRange,
-          PriceLevelDB,
-        ) &&
-        this.meetsRangeConstraint(m.speed, selection.speedRange, SpeedLevelDB)
-      );
-    });
+    return this.filterRoleModels(imageGenModelOptions, selection, user, env);
   }
 
   static getBestImageGenModel(
@@ -494,50 +365,7 @@ export class SkillsRepositoryClient {
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
   ): MusicGenModelOption[] {
-    const isAdmin =
-      !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-    if (!selection) {
-      return musicGenModelOptions.filter(
-        (m) => (!m.adminOnly || isAdmin) && isModelProviderAvailable(m, env),
-      );
-    }
-    if (selection.selectionType === ModelSelectionType.MANUAL) {
-      const model = getMusicGenModelById(selection.manualModelId);
-      if (model?.adminOnly && !isAdmin) {
-        return [];
-      }
-      if (model && isModelProviderAvailable(model, env)) {
-        return [model];
-      }
-      // Fall through to filter fallback
-    }
-    return musicGenModelOptions.filter((m) => {
-      if (m.adminOnly && !isAdmin) {
-        return false;
-      }
-      if (!isModelProviderAvailable(m, env)) {
-        return false;
-      }
-      const modelPrice = this.getModelPriceLevel(getModelPrice(m));
-      return (
-        this.meetsRangeConstraint(
-          m.intelligence,
-          selection.intelligenceRange,
-          IntelligenceLevelDB,
-        ) &&
-        this.meetsRangeConstraint(
-          m.content,
-          selection.contentRange,
-          ContentLevelDB,
-        ) &&
-        this.meetsRangeConstraint(
-          modelPrice,
-          selection.priceRange,
-          PriceLevelDB,
-        ) &&
-        this.meetsRangeConstraint(m.speed, selection.speedRange, SpeedLevelDB)
-      );
-    });
+    return this.filterRoleModels(musicGenModelOptions, selection, user, env);
   }
 
   static getBestMusicGenModel(
@@ -553,50 +381,7 @@ export class SkillsRepositoryClient {
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
   ): VideoGenModelOption[] {
-    const isAdmin =
-      !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-    if (!selection) {
-      return videoGenModelOptions.filter(
-        (m) => (!m.adminOnly || isAdmin) && isModelProviderAvailable(m, env),
-      );
-    }
-    if (selection.selectionType === ModelSelectionType.MANUAL) {
-      const model = getVideoGenModelById(selection.manualModelId);
-      if (model?.adminOnly && !isAdmin) {
-        return [];
-      }
-      if (model && isModelProviderAvailable(model, env)) {
-        return [model];
-      }
-      // Fall through to filter fallback
-    }
-    return videoGenModelOptions.filter((m) => {
-      if (m.adminOnly && !isAdmin) {
-        return false;
-      }
-      if (!isModelProviderAvailable(m, env)) {
-        return false;
-      }
-      const modelPrice = this.getModelPriceLevel(getModelPrice(m));
-      return (
-        this.meetsRangeConstraint(
-          m.intelligence,
-          selection.intelligenceRange,
-          IntelligenceLevelDB,
-        ) &&
-        this.meetsRangeConstraint(
-          m.content,
-          selection.contentRange,
-          ContentLevelDB,
-        ) &&
-        this.meetsRangeConstraint(
-          modelPrice,
-          selection.priceRange,
-          PriceLevelDB,
-        ) &&
-        this.meetsRangeConstraint(m.speed, selection.speedRange, SpeedLevelDB)
-      );
-    });
+    return this.filterRoleModels(videoGenModelOptions, selection, user, env);
   }
 
   static getBestVideoGenModel(
@@ -611,17 +396,28 @@ export class SkillsRepositoryClient {
   // Vision model methods (per-modality: image, video, audio)
   // ---------------------------------------------------------------------------
 
-  private static getFilteredVisionModelsForPool(
-    pool: ChatModelOption[],
-    selection:
-      | ImageVisionModelSelection
-      | VideoVisionModelSelection
-      | AudioVisionModelSelection
-      | null
-      | undefined,
+  /**
+   * Shared filter logic for any role with its own strictly-typed model pool.
+   * Handles: null → all available, MANUAL → lookup by id, fall-through to FILTERS on unavailable,
+   * FILTERS → range constraints.
+   * Each role's public method is a one-liner wrapper that provides the pool and getById.
+   */
+  private static filterRoleModels<
+    TOption extends ModelOptionBase,
+    TSelection extends {
+      selectionType: string;
+      manualModelId?: string;
+      intelligenceRange?: { min?: string; max?: string };
+      contentRange?: { min?: string; max?: string };
+      speedRange?: { min?: string; max?: string };
+      priceRange?: { min?: string; max?: string };
+    },
+  >(
+    pool: TOption[],
+    selection: TSelection | null | undefined,
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
-  ): ChatModelOption[] {
+  ): TOption[] {
     const isAdmin =
       !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
     if (!selection) {
@@ -630,8 +426,9 @@ export class SkillsRepositoryClient {
       );
     }
     if (selection.selectionType === ModelSelectionType.MANUAL) {
-      // manualModelId is a vision enum member — string-index into chatModelOptionsIndex
-      const model = chatModelOptionsIndex[selection.manualModelId];
+      const model = selection.manualModelId
+        ? pool.find((m) => m.id === selection.manualModelId)
+        : undefined;
       if (model?.adminOnly && !isAdmin) {
         return [];
       }
@@ -669,24 +466,33 @@ export class SkillsRepositoryClient {
     });
   }
 
+  private static filterVisionPool<T extends ModelOptionTokenBased>(
+    pool: T[],
+    selection:
+      | ImageVisionModelSelection
+      | VideoVisionModelSelection
+      | AudioVisionModelSelection
+      | null
+      | undefined,
+    user: JwtPayloadType,
+    env: ModelProviderEnvAvailability,
+  ): T[] {
+    return this.filterRoleModels(pool, selection, user, env);
+  }
+
   static getFilteredImageVisionModels(
     selection: ImageVisionModelSelection | null | undefined,
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
-  ): ChatModelOption[] {
-    return this.getFilteredVisionModelsForPool(
-      imageVisionModelOptions,
-      selection,
-      user,
-      env,
-    );
+  ): ImageVisionModelOption[] {
+    return this.filterVisionPool(imageVisionModelOptions, selection, user, env);
   }
 
   static getBestImageVisionModel(
     selection: ImageVisionModelSelection,
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
-  ): ChatModelOption | null {
+  ): ImageVisionModelOption | null {
     return this.getFilteredImageVisionModels(selection, user, env)[0] ?? null;
   }
 
@@ -694,20 +500,15 @@ export class SkillsRepositoryClient {
     selection: VideoVisionModelSelection | null | undefined,
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
-  ): ChatModelOption[] {
-    return this.getFilteredVisionModelsForPool(
-      videoVisionModelOptions,
-      selection,
-      user,
-      env,
-    );
+  ): VideoVisionModelOption[] {
+    return this.filterVisionPool(videoVisionModelOptions, selection, user, env);
   }
 
   static getBestVideoVisionModel(
     selection: VideoVisionModelSelection,
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
-  ): ChatModelOption | null {
+  ): VideoVisionModelOption | null {
     return this.getFilteredVideoVisionModels(selection, user, env)[0] ?? null;
   }
 
@@ -715,20 +516,15 @@ export class SkillsRepositoryClient {
     selection: AudioVisionModelSelection | null | undefined,
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
-  ): ChatModelOption[] {
-    return this.getFilteredVisionModelsForPool(
-      audioVisionModelOptions,
-      selection,
-      user,
-      env,
-    );
+  ): AudioVisionModelOption[] {
+    return this.filterVisionPool(audioVisionModelOptions, selection, user, env);
   }
 
   static getBestAudioVisionModel(
     selection: AudioVisionModelSelection,
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
-  ): ChatModelOption | null {
+  ): AudioVisionModelOption | null {
     return this.getFilteredAudioVisionModels(selection, user, env)[0] ?? null;
   }
 }

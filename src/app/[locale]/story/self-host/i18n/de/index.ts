@@ -22,7 +22,8 @@ export const translations: typeof enTranslations = {
   includes: {
     title: "Alles was die Cloud hat. Und mehr.",
     items: {
-      models: "42+ Modelle - eigene API-Keys, direkt bei Providern zahlen",
+      models:
+        "{{modelCount}} Modelle - eigene API-Keys, direkt bei Providern zahlen",
       memory: "Persistentes Gedächtnis, Inkognito-Modus, 4 Datenschutzstufen",
       search: "Live-Websuche + vollständiges Seitenabrufen",
       thea: "Thea: KI-Admin, die überwacht, selbst repariert und Tools auf Befehl erstellt",

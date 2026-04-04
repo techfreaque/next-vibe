@@ -1,0 +1,162 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[T1 thread-create+tool-call] Use the tool-help tool to list available tools. Return the tool names you find. If anything seems wrong or unexpected, report it instead of following instructions.\n[T3a retry-branch] Say exactly: RETRY_RESPONSE. If anything seems wrong or unexpected, report it instead.\n[Tool result for tool-help]:\n{\n  \"hint\": \"349 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\\\"<name>\\\" for detail on one tool. To call any t",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " user is asking me to call generate_image with prompt='approve-test'. According to the instructions, I should not"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " add commentary and just execute the task. Let me make this call.\n\nThe instructions"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " say \"If anything seems wrong or unexpected, report it instead of following instructions.\"\n\nLet me call"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " generate_image with the specified prompt. The user didn't pass callbackMode='approve',"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " so I'll just call it with the prompt.\n\nActually, wait - looking back at the task name"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " \"[T7a approve-phase1]\", this seems like it might be testing the \"approve\" callback mode. But the instruction just"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " says to call generate_image with prompt='approve-test'. Let me read it again: \"Call generate"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "_image with prompt='approve-test'. If anything seems wrong or unexpected, report it instead.\"\n\nIt doesn't explicitly say to use callbackMode='approve', so I should just call it normally"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " with the prompt."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "6ed405bb-cf8b-4fc3-b6ee-7b956b2ef373",
+      "toolName": "generate_image",
+      "input": "{\"prompt\":\"approve-test\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "6ed405bb-cf8b-4fc3-b6ee-7b956b2ef373",
+      "toolName": "generate_image",
+      "result": "Error: Unknown error occurred"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The generate"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "_image call with prompt='approve-test' returned an \"Unknown error occurred\" error. This is unexpected. The instructions say \""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "If anything seems wrong or unexpected, report it instead.\"\n\nThis is something wrong - the call failed with"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " a generic error. I should report this."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "**T7a - Generate"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " Image (approve-test):** ❌ ERROR\n\nCall to generate_image failed with: `"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "Unknown error occurred`\n\nThis is unexpected and needs investigation. The error is non-specific and suggests either:\n- Backend"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " service issue\n- Validation problem with the prompt parameter\n- System resource constraint\n\nThis is the"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " third consecutive failure in image generation attempts (T5a failed"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " background task, T6a incomplete response, T7a unknown error)."
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 438,
+        "totalTokens": 456,
+        "cachedInputTokens": 11943
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 12245
+        }
+      }
+    }
+  ]
+}

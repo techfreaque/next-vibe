@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
       title: "KI-Agent ausführen",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
-        "Einen headless KI-Agenten ausführen und die vollständige Textantwort erhalten. Verwende dies, um Aufgaben zu delegieren, Tool-Ergebnisse zusammenzufassen, Inhalte zu generieren oder Tools zu einer einzigen KI-Antwort zu verketten. Credits werden je nach Modell verbraucht. SCHNELLSTART: Übergib favoriteId, um Charakter + Modell + Tool-Konfiguration aus einem gespeicherten Favoriten zu laden. Überschreibe jedes Feld (model, skill, tools, availableTools) durch explizite Angabe. EINRICHTUNG: Vor der Ausführung den richtigen Charakter + Favoriten einrichten. Charaktere definieren Persona und System-Prompt (erstellen mit agent_chat_skills_create_POST). Favoriten bündeln Charakter mit Modellüberschreibung und Tool-Konfiguration (erstellen mit agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} oder {selectionType:'FILTERS',...}). Workflow: 1) Favoriten (agent_chat_favorites_GET) oder Charaktere (agent_chat_skills_GET) auflisten. 2) Falls keiner passt, Charakter erstellen, dann Favorit dafür anlegen. 3) favoriteId an diesen Aufruf übergeben. TOOL-ZUGRIFF: Standard-Setup: availableTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] - execute-tool führt jeden Endpunkt aus, system_help_GET ermöglicht Tool-Entdeckung.",
+        "Einen headless KI-Agenten ausführen und die finale Textantwort erhalten. Setze model + prompt für einen einfachen Einmal-Aufruf, oder übergib favoriteId um ein gespeichertes Skill + Modell + Tools Preset zu laden. Credits je nach Modell.",
       container: {
         title: "KI-Agent-Ausführung",
         description:
@@ -28,18 +28,18 @@ export const translations: typeof enTranslations = {
         favoriteId: {
           label: "Favoriten-ID",
           description:
-            "UUID eines gespeicherten Favoriten zum Laden von Charakter, Modell und Tool-Konfiguration. Charakter, Modell (aus modelSelection) und Tool-Konfiguration (availableTools/pinnedTools) des Favoriten werden als Standardwerte verwendet. Explizite Felder in dieser Anfrage überschreiben die Favoriten-Werte. Verwende agent_chat_favorites_GET zum Auflisten.",
+            "UUID eines gespeicherten Favoriten. Lädt Skill, Modell und Tool-Konfiguration als Standardwerte. Explizite Felder überschreiben Favoriten-Werte.",
           placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         model: {
           label: "Modell",
           description:
-            "KI-Modell. Optional wenn favoriteId oder skill gesetzt (aus deren modelSelection aufgelöst). Schnell & günstig: claude-haiku-4.5, gemini-2.5-flash. Ausgewogen: claude-sonnet-4.6, gpt-5. Leistungsstark: claude-opus-4.6, gpt-5-pro. Kostenlos: qwen3_235b-free, gpt-oss-120b-free. Überschreibt das Modell aus favoriteId/skill.",
+            "LLM für Text-Reasoning. Optional wenn favoriteId oder skill gesetzt. Schnell: claude-haiku-4.5, gemini-2.5-flash. Ausgewogen: claude-sonnet-4.6, gpt-5. Leistungsstark: claude-opus-4.6. Kostenlos: qwen3_235b-free. Nicht für Bild-/Audio-/Video-Generierung.",
         },
         skill: {
           label: "Skill",
           description:
-            "Skill-ID (UUID) oder 'default'. Optional wenn favoriteId gesetzt (aus dem Favoriten aufgelöst). Skills definieren KI-Persona, System-Prompt und Standard-Modell. Überschreibt den Skill aus favoriteId. Verwende agent_chat_skills_GET zum Auflisten.",
+            "Skill-ID oder 'default'. Definiert KI-Persona und System-Prompt. Optional wenn favoriteId gesetzt. Überschreibt den Skill des Favoriten.",
           placeholder: "default",
         },
         prompt: {
@@ -57,11 +57,11 @@ export const translations: typeof enTranslations = {
         preCalls: {
           label: "Vorausrufe",
           description:
-            "Tool-Aufrufe, die vor dem Prompt ausgeführt werden. Ergebnisse werden als Kontext injiziert. Verwende system_help_GET um verfügbare Tools und deren Argumente zu entdecken.",
+            "Tool-Aufrufe vor dem Prompt. Ergebnisse werden als Kontext injiziert. Verwende tool-help um verfügbare Tools zu entdecken.",
           routeId: {
             label: "Tool-ID",
             description:
-              "Alias oder vollständiger Tool-Name (z.B. 'web-search', 'agent_chat_skills_GET'). Verwende system_help_GET zur Tool-Entdeckung.",
+              "Alias oder vollständiger Tool-Name (z.B. 'web-search', 'agent_chat_skills_GET'). Verwende tool-help zur Tool-Entdeckung.",
             placeholder: "web-search",
           },
           args: {
@@ -71,28 +71,26 @@ export const translations: typeof enTranslations = {
           },
         },
         availableTools: {
-          label: "Ausführbar (Berechtigungsschicht)",
+          label: "Ausführbar",
           description:
-            "Ausführungs-Berechtigungsschicht - kontrolliert welche Tools die KI tatsächlich ausführen darf. null = alle Tools erlaubt. Array = nur aufgelistete Tools (andere werden mit 'vom Benutzer deaktiviert' blockiert). Standard-Agent-Setup: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] - execute-tool dispatcht jeden registrierten Endpunkt, system_help_GET ermöglicht Tool-Entdeckung. Tools aus dem tools-Feld müssen nicht wiederholt werden.",
+            "Welche Tools die KI ausführen darf. null = alle erlaubt. Array = nur aufgelistete Tools. Standard: [{toolId:'execute-tool'},{toolId:'tool-help'}].",
           toolId: {
             label: "Tool-ID",
             description:
-              "Alias oder vollständiger Name des erlaubten Tools (z.B. 'execute-tool', 'system_help_GET', 'web-search')",
+              "Tool-Alias oder vollständiger Name (z.B. 'execute-tool', 'tool-help', 'web-search')",
           },
           requiresConfirmation: {
             label: "Bestätigung erforderlich",
-            description:
-              "Bei true wartet die Ausführung auf Benutzerbestätigung. Für destruktive oder kostenintensive Aktionen verwenden.",
+            description: "Vor Ausführung auf Benutzerbestätigung warten",
           },
         },
         pinnedTools: {
           label: "Im Kontext (KI sieht diese)",
           description:
-            "Tools im Kontextfenster des Modells - was die KI kennt und worüber sie nachdenken kann. null = Standard-Tool-Set des Benutzers (empfohlen). Array nur für fokussierten, minimalen Kontext. Hinweis: availableTools kontrolliert die tatsächliche Ausführung - dieses Feld beeinflusst nur, was das Modell sieht.",
+            "Tools im Modell-Kontext geladen. null = Standard-Set des Benutzers. Beeinflusst nur was das Modell sieht, nicht was es ausführen kann.",
           toolId: {
             label: "Tool-ID",
-            description:
-              "Alias oder vollständiger Name des Tools im Kontext (z.B. 'execute-tool', 'system_help_GET')",
+            description: "Tool-Alias oder vollständiger Name für den Kontext",
           },
           requiresConfirmation: {
             label: "Bestätigung erforderlich",
@@ -132,7 +130,7 @@ export const translations: typeof enTranslations = {
         excludeMemories: {
           label: "Erinnerungen ausschließen",
           description:
-            "Wenn true, sieht die KI keine gespeicherten Erinnerungen im Kontext. Verwende dies für öffentliche Bots und isolierte Aufgaben, die keinen persönlichen Kontext erben sollen. Standard: false (Erinnerungen eingeschlossen).",
+            "Gespeicherte Erinnerungen nicht in den Kontext laden. Für öffentliche Bots oder isolierte Aufgaben. Standard: false.",
         },
       },
       response: {

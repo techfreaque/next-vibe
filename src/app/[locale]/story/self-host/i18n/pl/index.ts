@@ -22,7 +22,8 @@ export const translations: typeof enTranslations = {
   includes: {
     title: "Wszystko co ma chmura. I więcej.",
     items: {
-      models: "42+ modeli - własne klucze API, płać bezpośrednio providerom",
+      models:
+        "{{modelCount}} modeli - własne klucze API, płać bezpośrednio providerom",
       memory: "Trwała pamięć, tryb incognito, 4 poziomy prywatności",
       search: "Wyszukiwanie na żywo + pobieranie całych stron",
       thea: "Thea: admin AI monitorująca, naprawiająca i budująca narzędzia na polecenie",

@@ -1049,6 +1049,23 @@ export const translations = {
         fast: "Fast",
       },
     },
+    qualityTester: {
+      name: "Quality Tester",
+      description:
+        "Test user that tries platform features naturally. Stops and reports clearly when something breaks instead of retrying.",
+      tagline: "Find Bugs",
+      shortDesc: "Platform testing persona",
+      suggestedPrompts: {
+        0: "Make me a picture of a sunset",
+        1: "What tools do you have?",
+        2: "Generate some music, something chill",
+        3: "Make a short video of a cat",
+      },
+      variants: {
+        kimi: "Kimi",
+        budget: "Budget",
+      },
+    },
   },
   get: {
     title: "List Skills",

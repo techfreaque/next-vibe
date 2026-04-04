@@ -13,6 +13,7 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
+import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -27,8 +28,8 @@ import {
 import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
 import { MessagesRepository } from "../../chat/threads/[threadId]/messages/repository";
 import type { ImageGenModelId } from "../../image-generation/models";
+import { ApiProvider } from "../../models/models";
 import type { MusicGenModelId } from "../../music-generation/models";
-import { scopedTranslation as sttScopedTranslation } from "../../speech-to-text/i18n";
 import type { VideoGenModelId } from "../../video-generation/models";
 import type {
   AiStreamPostRequestOutput,
@@ -121,6 +122,8 @@ export class AiStreamRepository {
     extraInstructions?: string;
     excludeMemories?: boolean;
     sequenceIdOverride?: string;
+    /** Override tools entirely (for API provider client-provided tools) */
+    toolsOverride?: Record<string, CoreTool>;
   }): Promise<ResponseType<AiStreamPostResponseOutput>>;
 
   static async createAiStream({
@@ -136,6 +139,7 @@ export class AiStreamRepository {
     favoriteIdOverride,
     sequenceIdOverride,
     mediaModelOverrides,
+    toolsOverride,
   }: {
     data: AiStreamPostRequestOutput;
     locale: CountryLanguage;
@@ -153,14 +157,13 @@ export class AiStreamRepository {
       videoGenModelId?: VideoGenModelId;
       imageGenModelId?: ImageGenModelId;
     };
+    toolsOverride?: Record<string, CoreTool>;
   }): Promise<
     | ResponseType<AiStreamPostResponseOutput>
     | ResponseType<HeadlessAiStreamResult>
   > {
     const { userId, leadId, ipAddress } =
       AiStreamRepository.extractUserIdentifiers(user, request, headless);
-
-    const sttT = sttScopedTranslation.scopedT(locale).t;
 
     const setupResult = await setupAiStream({
       data,
@@ -171,7 +174,6 @@ export class AiStreamRepository {
       leadId,
       ipAddress,
       aiStreamT,
-      sttT,
       maxDuration: AiStreamRepository.maxDuration,
       request,
       headless,
@@ -179,12 +181,14 @@ export class AiStreamRepository {
       excludeMemories,
       favoriteIdOverride,
       mediaModelOverrides,
+      toolsOverride,
     });
 
     if (!setupResult.success) {
       // Emit error to chat thread if we have a threadId - setup failures (e.g. insufficient
       // credits, bad model) should appear as error bubbles in the thread, not silently fail.
       const threadId = data.threadId;
+      const isIncognito = data.rootFolderId === "incognito";
       if (threadId && !user.isPublic && "id" in user) {
         try {
           const errorMessageId = crypto.randomUUID();
@@ -192,16 +196,20 @@ export class AiStreamRepository {
           const errorType = setupResult.errorType
             ? `${setupResult.errorType.errorCode}`
             : "SETUP_ERROR";
-          await MessagesRepository.createErrorMessage({
-            messageId: errorMessageId,
-            threadId,
-            content: errorContent,
-            errorType,
-            parentId: data.parentMessageId ?? null,
-            userId: user.id,
-            sequenceId: null,
-            logger,
-          });
+          // Persist error message to DB only for non-incognito threads (incognito has no DB row)
+          if (!isIncognito) {
+            await MessagesRepository.createErrorMessage({
+              messageId: errorMessageId,
+              threadId,
+              content: errorContent,
+              errorType,
+              parentId: data.parentMessageId ?? null,
+              userId: user.id,
+              sequenceId: null,
+              logger,
+            });
+          }
+          // Always emit via WS so the frontend can display the error (incognito stores it client-side)
           publishWsEvent(
             {
               channel: buildMessagesChannel(threadId),
@@ -278,6 +286,8 @@ export class AiStreamRepository {
     // Captured refs so headless path can read lastAiMessageId + content after runStream completes
     let capturedLastAiMessageId: string = aiMessageId;
     let capturedLastAiMessageContent: string | null = null;
+    let capturedLastGeneratedMediaUrl: string | null = null;
+    let capturedTotalCreditsDeducted = 0;
     // Captured wakeUp payloads - queue written by the signal handler, processed in finally for deferred insertion + revival.
     // Array supports parallel wakeUp tools: each completion pushes its payload; all are processed sequentially.
     const capturedWakeUpPayloads: WakeUpPayload[] = [];
@@ -343,7 +353,7 @@ export class AiStreamRepository {
       });
     };
 
-    // Create emitter on the messages channel - events are owned by messages endpoint
+    // Create emitter on the messages channel - events are owned by messages endpoint.
     const wsEmit: WsEmitCallback = createMessagesEmitter(
       threadResultThreadId,
       logger,
@@ -630,6 +640,15 @@ export class AiStreamRepository {
             messages.push(...truncated);
           }
 
+          // Mark thread as streaming before gap-fill so the UI shows activity
+          // during potentially long vision/STT bridge calls.
+          if (threadResultThreadId) {
+            ctx.dbWriter.emitStreamingStateChanged({
+              threadId: threadResultThreadId,
+              state: "streaming",
+            });
+          }
+
           // Gap-fill: replace unsupported attachment parts with text variants
           // via vision bridge / STT.
           {
@@ -664,36 +683,86 @@ export class AiStreamRepository {
             },
           );
 
-          // Execute main AI stream
-          await StreamExecutionHandler.executeStream({
-            provider,
-            modelConfig,
-            messages,
-            streamAbortController,
-            systemPrompt,
-            trailingSystemMessage,
-            tools,
-            toolsConfig,
-            activeToolNames,
-            ctx,
-            threadId: threadResultThreadId,
-            model: data.model,
-            skill: data.skill,
-            isIncognito,
-            userId,
-            emittedToolResultIds,
-            ttsHandler,
-            user,
-            locale,
-            logger,
-            t: aiStreamT,
-            streamContext,
-            imageSize: data.imageSize ?? undefined,
-            imageQuality: data.imageQuality ?? undefined,
-            musicDuration: data.musicDuration ?? undefined,
-            translationModel:
-              ModalityResolver.resolveTranslationModel(bridgeContext),
-          });
+          // Execute main AI stream — UNBOTTLED models bypass local AI SDK
+          // and relay through unbottled.ai cloud instead.
+          if (modelConfig.apiProvider === ApiProvider.UNBOTTLED) {
+            const { executeUnbottledStream } =
+              await import("./handlers/unbottled-stream-handler");
+            const { parseUnbottledCredentials, agentEnv } =
+              await import("@/app/api/[locale]/agent/env");
+            const unbottledSession = parseUnbottledCredentials(
+              agentEnv.UNBOTTLED_CLOUD_CREDENTIALS,
+            );
+            if (!unbottledSession) {
+              ctx.dbWriter.emitError(
+                fail({
+                  message: aiStreamT("route.errors.streamCreationFailed"),
+                  errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                }),
+              );
+            } else {
+              await executeUnbottledStream({
+                session: unbottledSession,
+                modelConfig,
+                content: effectiveContent,
+                threadId: threadResultThreadId,
+                aiMessageId,
+                userMessageId: userMessageId ?? "",
+                parentMessageId: effectiveParentMessageId ?? null,
+                model: data.model,
+                skill: data.skill,
+                sequenceId: sequenceIdOverride ?? null,
+                userId,
+                user,
+                isIncognito,
+                streamAbortController,
+                logger,
+                timezone: data.timezone,
+                locale,
+                t: aiStreamT,
+                dbWriter: ctx.dbWriter,
+                wsEmit,
+              });
+              // Capture dbWriter state for headless callers
+              if (ctx.dbWriter.lastAssistantMessageId) {
+                capturedLastAiMessageId = ctx.dbWriter.lastAssistantMessageId;
+              }
+              capturedLastAiMessageContent = ctx.dbWriter.lastAssistantContent;
+              capturedLastGeneratedMediaUrl =
+                ctx.dbWriter.lastGeneratedMediaUrl;
+              capturedTotalCreditsDeducted += ctx.dbWriter.totalCreditsDeducted;
+            }
+          } else {
+            await StreamExecutionHandler.executeStream({
+              provider,
+              modelConfig,
+              messages,
+              streamAbortController,
+              systemPrompt,
+              trailingSystemMessage,
+              tools,
+              toolsConfig,
+              activeToolNames,
+              ctx,
+              threadId: threadResultThreadId,
+              model: data.model,
+              skill: data.skill,
+              isIncognito,
+              userId,
+              emittedToolResultIds,
+              ttsHandler,
+              user,
+              locale,
+              logger,
+              t: aiStreamT,
+              streamContext,
+              imageSize: data.imageSize ?? undefined,
+              imageQuality: data.imageQuality ?? undefined,
+              musicDuration: data.musicDuration ?? undefined,
+              translationModel:
+                ModalityResolver.resolveTranslationModel(bridgeContext),
+            });
+          }
 
           // After stream completes, capture the last assistant message ID from the writer.
           // In a tool loop there can be multiple assistant messages; lastAssistantMessageId
@@ -701,6 +770,8 @@ export class AiStreamRepository {
           if (ctx.dbWriter.lastAssistantMessageId) {
             capturedLastAiMessageId = ctx.dbWriter.lastAssistantMessageId;
             capturedLastAiMessageContent = ctx.dbWriter.lastAssistantContent;
+            capturedLastGeneratedMediaUrl = ctx.dbWriter.lastGeneratedMediaUrl;
+            capturedTotalCreditsDeducted = ctx.dbWriter.totalCreditsDeducted;
           } else if (headless) {
             // No assistant message was written - stream may have errored before first emit.
             // capturedLastAiMessageId falls back to the pre-generated aiMessageId UUID,
@@ -777,7 +848,7 @@ export class AiStreamRepository {
           }
         }
 
-        logger.info("[AI Stream] Headless execution complete", {
+        logger.debug("[AI Stream] Headless execution complete", {
           threadId: threadResultThreadId,
           lastAiMessageId: capturedLastAiMessageId,
         });
@@ -788,6 +859,8 @@ export class AiStreamRepository {
             threadId: threadResultThreadId,
             lastAiMessageId: capturedLastAiMessageId,
             lastAiMessageContent: capturedLastAiMessageContent,
+            lastGeneratedMediaUrl: capturedLastGeneratedMediaUrl,
+            totalCreditsDeducted: capturedTotalCreditsDeducted,
           },
         } satisfies ResponseType<HeadlessAiStreamResult>;
       }

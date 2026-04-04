@@ -25,7 +25,12 @@ import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 
 import type { ModelPricesGetResponseOutput } from "./definition";
 import type { ModelPricesT } from "./i18n";
-import type { PriceFetcher, ProviderPriceResult } from "./providers/base";
+import type {
+  PriceFetcher,
+  ProviderEntryOperation,
+  ProviderPriceResult,
+  SettingsUpdate,
+} from "./providers/base";
 import { DeepgramPriceFetcher } from "./providers/deepgram";
 import { EdenAiPriceFetcher } from "./providers/eden-ai";
 import { ElevenLabsPriceFetcher } from "./providers/elevenlabs";
@@ -38,6 +43,7 @@ import { OpenRouterImagePriceFetcher } from "./providers/openrouter-image";
 import { OpenRouterTokenPriceFetcher } from "./providers/openrouter-token";
 import { ReplicatePriceFetcher } from "./providers/replicate";
 import { FreedomGptPriceFetcher } from "./providers/freedomgpt";
+import { UnbottledPriceFetcher } from "./providers/unbottled";
 import { UncensoredAiPriceFetcher } from "./providers/uncensored-ai";
 import { chatModelDefinitions } from "../../ai-stream/models";
 import { imageGenModelDefinitions } from "../../image-generation/models";
@@ -62,6 +68,7 @@ const ALL_FETCHERS: PriceFetcher[] = [
   new ModelslabPriceFetcher(),
   new UncensoredAiPriceFetcher(),
   new FreedomGptPriceFetcher(),
+  new UnbottledPriceFetcher(),
 ];
 
 /** ISO date string YYYY-MM-DD */
@@ -89,6 +96,8 @@ function buildUpdateComment(source: string): string {
 /**
  * Check if a price line already has the correct value and a valid update comment.
  * Returns true if the line should be skipped (no update needed).
+ * Only updates the timestamp when the actual value changes — preserves the
+ * original date so you can see when a price last *actually* changed.
  */
 function isAlreadyUpToDate(
   line: string,
@@ -220,6 +229,58 @@ function applyCacheCostUpdate(
   return { content, changed: false };
 }
 
+/**
+ * Apply a settings update (array/object field) to the file content.
+ * Inserts the field if missing, updates if present.
+ * Placed right after creditCostPerSecond (or similar cost field) in the provider block.
+ */
+function applySettingsUpdate(
+  content: string,
+  update: SettingsUpdate,
+): { content: string; changed: boolean } {
+  const escaped = update.providerModel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const comment = buildUpdateComment(update.source);
+
+  // Try to update existing field (handles arrays [...], objects {...}, or plain values like numbers)
+  const existingRegex = new RegExp(
+    `(providerModel:\\s*"${escaped}"[\\s\\S]*?)(${update.field}:\\s*(?:\\[[^\\]]*\\]|\\{[^}]*\\}|[\\d.]+)[,]?(?:\\s*//[^\n]*)?)`,
+  );
+  if (existingRegex.test(content)) {
+    let changed = false;
+    const updated = content.replace(
+      existingRegex,
+      // eslint-disable-next-line no-unused-vars
+      (_: string, prefix: string, fieldLine: string) => {
+        const newLine = `${update.field}: ${update.tsLiteral}, ${comment}`;
+        // Check if already up to date (same value)
+        if (
+          fieldLine.includes(update.tsLiteral) &&
+          fieldLine.includes("updated:")
+        ) {
+          return prefix + fieldLine;
+        }
+        changed = true;
+        return prefix + newLine;
+      },
+    );
+    return { content: updated, changed };
+  }
+
+  // Insert after the cost field (creditCostPerSecond, creditCostPerImage, creditCostPerClip)
+  const insertRegex = new RegExp(
+    `(providerModel:\\s*"${escaped}"[\\s\\S]*?(?:creditCostPerSecond|creditCostPerImage|creditCostPerClip):\\s*[\\d.]+[,]?(?:\\s*//[^\n]*)?)(\\n)`,
+  );
+  if (insertRegex.test(content)) {
+    const updated = content.replace(
+      insertRegex,
+      `$1\n        ${update.field}: ${update.tsLiteral}, ${comment}$2`,
+    );
+    return { content: updated, changed: true };
+  }
+
+  return { content, changed: false };
+}
+
 /** Format a Modality[] as a TypeScript array literal, e.g. `["text", "image"]` */
 function formatModalityArray(modalities: Modality[]): string {
   return `[${modalities.map((m) => `"${m}"`).join(", ")}]`;
@@ -326,6 +387,211 @@ function applyModalityUpdate(
   return { content, changed };
 }
 
+// ============================================
+// PROVIDER ENTRY OPERATIONS (add/remove)
+// ============================================
+
+/** Role → model definition file path */
+export function getRoleFilePaths(): Record<string, string> {
+  const agentDir = join(process.cwd(), "src/app/api/[locale]/agent");
+  return {
+    chat: join(agentDir, "ai-stream/models.ts"),
+    "image-gen": join(agentDir, "image-generation/models.ts"),
+    "music-gen": join(agentDir, "music-generation/models.ts"),
+    "video-gen": join(agentDir, "video-generation/models.ts"),
+    tts: join(agentDir, "text-to-speech/models.ts"),
+    stt: join(agentDir, "speech-to-text/models.ts"),
+  };
+}
+
+/** Enum prefix by role for model definition blocks */
+const ENUM_PREFIX_BY_ROLE: Record<string, string> = {
+  chat: "ChatModelId",
+  "image-gen": "ImageGenModelId",
+  "music-gen": "MusicGenModelId",
+  "video-gen": "VideoGenModelId",
+  tts: "TtsModelId",
+  stt: "SttModelId",
+};
+
+/**
+ * Add an UNBOTTLED provider entry to a model's `providers: [...]` array.
+ * Inserts before the closing `]` of the providers array.
+ */
+export function addProviderEntry(
+  content: string,
+  op: ProviderEntryOperation,
+): { content: string; changed: boolean } {
+  const enumPrefix = ENUM_PREFIX_BY_ROLE[op.role];
+  if (!enumPrefix) {
+    return { content, changed: false };
+  }
+
+  const comment = buildUpdateComment(op.source);
+
+  // Find the model definition block, then locate the providers array closing bracket
+  // Pattern: [EnumPrefix.KEY]: { ... providers: [ ... ], ... }
+  // We need to insert before the last `],` or `]` in the providers array
+  const blockStart = new RegExp(`\\[${enumPrefix}\\.${op.enumKey}\\]:\\s*\\{`);
+  const blockMatch = blockStart.exec(content);
+  if (!blockMatch) {
+    return { content, changed: false };
+  }
+
+  // Check if UNBOTTLED entry already exists for this model
+  const existingCheck = new RegExp(
+    `\\[${enumPrefix}\\.${op.enumKey}\\]:\\s*\\{[\\s\\S]*?apiProvider:\\s*ApiProvider\\.UNBOTTLED`,
+  );
+  if (existingCheck.test(content)) {
+    return { content, changed: false };
+  }
+
+  // Find the providers array for this specific model block.
+  // We search from the block start and find the `providers: [` opening,
+  // then count brackets to find the matching closing `]`.
+  const blockStartIdx = blockMatch.index;
+  const providersOpenRegex = /providers:\s*\[/g;
+  providersOpenRegex.lastIndex = blockStartIdx;
+  const providersMatch = providersOpenRegex.exec(content);
+  if (!providersMatch) {
+    return { content, changed: false };
+  }
+
+  // Walk from the opening `[` to find the matching `]`
+  const openIdx = providersMatch.index + providersMatch[0].length - 1; // index of `[`
+  let depth = 1;
+  let closeIdx = -1;
+  for (let i = openIdx + 1; i < content.length; i++) {
+    if (content[i] === "[") {
+      depth++;
+    }
+    if (content[i] === "]") {
+      depth--;
+    }
+    if (depth === 0) {
+      closeIdx = i;
+      break;
+    }
+  }
+  if (closeIdx === -1) {
+    return { content, changed: false };
+  }
+
+  // Build the new provider entry
+  const creditCost = op.creditCost ?? 0;
+  const entry = `      {\n        id: ${enumPrefix}.${op.enumKey},\n        apiProvider: ApiProvider.UNBOTTLED,\n        providerModel: "${op.providerModel}",\n        creditCost: ${creditCost}, ${comment}\n      },\n    `;
+
+  // Insert before the closing `]`
+  const updated = content.slice(0, closeIdx) + entry + content.slice(closeIdx);
+
+  return { content: updated, changed: true };
+}
+
+/**
+ * Remove an UNBOTTLED provider entry from a model's `providers: [...]` array.
+ * Finds and deletes the entire `{ ... apiProvider: ApiProvider.UNBOTTLED ... }` block.
+ */
+export function removeProviderEntry(
+  content: string,
+  op: ProviderEntryOperation,
+): { content: string; changed: boolean } {
+  const enumPrefix = ENUM_PREFIX_BY_ROLE[op.role];
+  if (!enumPrefix) {
+    return { content, changed: false };
+  }
+
+  // Find the model block start
+  const blockStart = new RegExp(`\\[${enumPrefix}\\.${op.enumKey}\\]:\\s*\\{`);
+  const blockMatch = blockStart.exec(content);
+  if (!blockMatch) {
+    return { content, changed: false };
+  }
+
+  // Find the providers array
+  const blockStartIdx = blockMatch.index;
+  const providersOpenRegex = /providers:\s*\[/g;
+  providersOpenRegex.lastIndex = blockStartIdx;
+  const providersMatch = providersOpenRegex.exec(content);
+  if (!providersMatch) {
+    return { content, changed: false };
+  }
+
+  const openIdx = providersMatch.index + providersMatch[0].length - 1;
+  let depth = 1;
+  let closeIdx = -1;
+  for (let i = openIdx + 1; i < content.length; i++) {
+    if (content[i] === "[") {
+      depth++;
+    }
+    if (content[i] === "]") {
+      depth--;
+    }
+    if (depth === 0) {
+      closeIdx = i;
+      break;
+    }
+  }
+  if (closeIdx === -1) {
+    return { content, changed: false };
+  }
+
+  // Within the providers array, find the UNBOTTLED entry object
+  const providersContent = content.slice(openIdx + 1, closeIdx);
+
+  // Find a `{` ... `apiProvider: ApiProvider.UNBOTTLED` ... `}` block
+  // We scan for each top-level object in the array
+  let entryStart = -1;
+  let entryEnd = -1;
+  let objDepth = 0;
+  let currentObjStart = -1;
+
+  for (let i = 0; i < providersContent.length; i++) {
+    if (providersContent[i] === "{") {
+      if (objDepth === 0) {
+        currentObjStart = i;
+      }
+      objDepth++;
+    }
+    if (providersContent[i] === "}") {
+      objDepth--;
+      if (objDepth === 0 && currentObjStart !== -1) {
+        const objText = providersContent.slice(currentObjStart, i + 1);
+        if (objText.includes("ApiProvider.UNBOTTLED")) {
+          entryStart = openIdx + 1 + currentObjStart;
+          entryEnd = openIdx + 1 + i + 1;
+          break;
+        }
+        currentObjStart = -1;
+      }
+    }
+  }
+
+  if (entryStart === -1 || entryEnd === -1) {
+    return { content, changed: false };
+  }
+
+  // Expand range to include leading whitespace and trailing comma+newline
+  let removeStart = entryStart;
+  while (
+    removeStart > 0 &&
+    (content[removeStart - 1] === " " || content[removeStart - 1] === "\n")
+  ) {
+    removeStart--;
+  }
+  let removeEnd = entryEnd;
+  // Skip trailing comma
+  if (content[removeEnd] === ",") {
+    removeEnd++;
+  }
+  // Skip trailing newline
+  if (content[removeEnd] === "\n") {
+    removeEnd++;
+  }
+
+  const updated = content.slice(0, removeStart) + content.slice(removeEnd);
+  return { content: updated, changed: true };
+}
+
 export class ModelPricesRepository {
   static async fetchAndUpdate(
     logger: EndpointLogger,
@@ -339,6 +605,12 @@ export class ModelPricesRepository {
       const allUpdates = providerResults.flatMap((r) => r.updates);
       const allModalityUpdates = providerResults.flatMap(
         (r) => r.modalityUpdates ?? [],
+      );
+      const allSettingsUpdates = providerResults.flatMap(
+        (r) => r.settingsUpdates ?? [],
+      );
+      const allProviderEntryOps = providerResults.flatMap(
+        (r) => r.providerEntryOps ?? [],
       );
       const allFailures = providerResults.flatMap((r) => r.failures);
 
@@ -471,6 +743,53 @@ export class ModelPricesRepository {
             field: update.field,
             role,
           });
+        }
+      }
+
+      // Apply provider entry operations (add/remove UNBOTTLED entries)
+      // Must run BEFORE price updates so newly added entries can receive their prices.
+      // Removals run first, then additions.
+      const removals = allProviderEntryOps.filter(
+        (op) => op.action === "remove",
+      );
+      const additions = allProviderEntryOps.filter((op) => op.action === "add");
+      for (const op of [...removals, ...additions]) {
+        const roleContent = roleFileContents[op.role];
+        if (!roleContent) {
+          continue;
+        }
+        const result =
+          op.action === "add"
+            ? addProviderEntry(roleContent, op)
+            : removeProviderEntry(roleContent, op);
+        if (result.changed) {
+          roleFileContents[op.role] = result.content;
+          updatedCount++;
+          logger.info(
+            `[Unbottled] ${op.action === "add" ? "Added" : "Removed"} provider entry for ${op.modelId}`,
+          );
+        }
+      }
+
+      // Apply settings updates (arrays/objects like supportedDurations, pricingByResolution)
+      for (const settingsUpdate of allSettingsUpdates) {
+        // Find which role file contains this providerModel
+        for (const [role, fileContent] of Object.entries(roleFileContents)) {
+          const escaped = settingsUpdate.providerModel.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&",
+          );
+          if (!new RegExp(`providerModel:\\s*"${escaped}"`).test(fileContent)) {
+            continue;
+          }
+          const result = applySettingsUpdate(
+            roleFileContents[role],
+            settingsUpdate,
+          );
+          if (result.changed) {
+            roleFileContents[role] = result.content;
+            updatedCount++;
+          }
         }
       }
 
@@ -719,9 +1038,9 @@ export class ModelPricesRepository {
         );
       }
 
-      // Re-generate media-gen model enums from chat model output modalities
+      // Re-generate LLM-derived entries inline in ImageGenModelId / VideoGenModelId / MusicGenModelId
       try {
-        const { updateMediaGenEnumFile } =
+        const { updateMediaGenInlineEnum } =
           await import("../../ai-stream/media-gen-enum-generator");
         const { ChatModelId: ChatModelIdEnum } =
           await import("../../ai-stream/models");
@@ -729,29 +1048,23 @@ export class ModelPricesRepository {
           [string, string]
         >;
 
-        updateMediaGenEnumFile(
-          {
-            filePath: join(agentDir, "image-generation/models.ts"),
-            modality: "image",
-          },
+        updateMediaGenInlineEnum(
+          join(agentDir, "image-generation/models.ts"),
+          "image",
           chatModelDefinitions,
           chatEnumEntries,
           logger,
         );
-        updateMediaGenEnumFile(
-          {
-            filePath: join(agentDir, "music-generation/models.ts"),
-            modality: "audio",
-          },
+        updateMediaGenInlineEnum(
+          join(agentDir, "video-generation/models.ts"),
+          "video",
           chatModelDefinitions,
           chatEnumEntries,
           logger,
         );
-        updateMediaGenEnumFile(
-          {
-            filePath: join(agentDir, "video-generation/models.ts"),
-            modality: "video",
-          },
+        updateMediaGenInlineEnum(
+          join(agentDir, "music-generation/models.ts"),
+          "audio",
           chatModelDefinitions,
           chatEnumEntries,
           logger,

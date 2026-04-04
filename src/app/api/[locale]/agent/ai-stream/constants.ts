@@ -4,12 +4,12 @@ import {
   ImageVisionModelId,
   VideoVisionModelId,
 } from "./vision-models";
+import type { ChatModelSelection } from "./models";
 import type {
   AudioVisionModelSelection,
-  ChatModelSelection,
   ImageVisionModelSelection,
   VideoVisionModelSelection,
-} from "../models/types";
+} from "./vision-models";
 import {
   ContentLevel,
   IntelligenceLevel,

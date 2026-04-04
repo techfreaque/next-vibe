@@ -39,6 +39,7 @@ const MOCK_ENV: AgentEnvAvailability = {
   replicate: false,
   falAi: false,
   modelsLab: false,
+  unbottled: false,
 };
 
 const MOCK_CREDITS: ChatBootValue["initialCredits"] = {

@@ -1,19 +1,33 @@
+import { z } from "zod";
+
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   ContentLevel,
+  ContentLevelDB,
   IntelligenceLevel,
+  IntelligenceLevelDB,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+  PriceLevel,
+  PriceLevelDB,
   SpeedLevel,
+  SpeedLevelDB,
 } from "../chat/skills/enum";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
   calculateCreditCost,
   defaultFeatures,
+  getModelPrice,
   getProviderPrice,
+  isModelProviderAvailable,
+  meetsRangeConstraint,
   type ModelDefinition,
   type ModelOptionCreditBased,
   type ModelOptionTokenBased,
-  type ModelProviderConfigCreditBased,
-  type ModelProviderConfigTokenBased,
+  type ModelProviderEnvAvailability,
 } from "../models/models";
 
 export enum ChatModelId {
@@ -729,7 +743,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.25, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 10, // updated: 2026-03-31 from openrouter-api
-        cacheReadTokenCost: 0.13, // updated: 2026-04-03 from openrouter-api
+        cacheReadTokenCost: 0.13, // updated: 2026-04-04 from openrouter-api
       },
     ],
 
@@ -965,7 +979,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.75, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 14, // updated: 2026-03-31 from openrouter-api
-        cacheReadTokenCost: 0.18, // updated: 2026-04-03 from openrouter-api
+        cacheReadTokenCost: 0.18, // updated: 2026-04-04 from openrouter-api
       },
     ],
 
@@ -1373,7 +1387,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.39, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 1.75, // updated: 2026-03-31 from openrouter-api
-        cacheReadTokenCost: 0.2, // updated: 2026-04-03 from openrouter-api
+        cacheReadTokenCost: 0.2, // updated: 2026-04-04 from openrouter-api
       },
     ],
 
@@ -1586,7 +1600,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.1, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 0.4, // updated: 2026-03-31 from openrouter-api
-        cacheReadTokenCost: 0.01, // updated: 2026-04-03 from openrouter-api
+        cacheReadTokenCost: 0.01, // updated: 2026-04-04 from openrouter-api
         cacheWriteTokenCost: 0.08, // updated: 2026-03-31 from openrouter-api
       },
     ],
@@ -1703,7 +1717,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
   },
   // eslint-disable-next-line i18next/no-literal-string
   [ChatModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW]: {
-    name: "Gemini 3.1 Flash Image Preview",
+    name: "Nano Banana",
     by: "google",
     description: "chat.models.descriptions.gemini31FlashImagePreview",
     parameterCount: undefined,
@@ -1887,7 +1901,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.45, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 2.15, // updated: 2026-03-31 from openrouter-api
-        cacheReadTokenCost: 0.22, // updated: 2026-04-03 from openrouter-api
+        cacheReadTokenCost: 0.22, // updated: 2026-04-04 from openrouter-api
       },
     ],
 
@@ -2101,7 +2115,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
   // Multimodal image+chat models — also in imageGenModelDefinitions
   // eslint-disable-next-line i18next/no-literal-string
   [ChatModelId.GEMINI_3_PRO_IMAGE_PREVIEW]: {
-    name: "Gemini 3 Pro Image Preview",
+    name: "Nano Banana Pro",
     by: "google",
     description: "chat.models.descriptions.gemini3ProImagePreview",
     parameterCount: undefined,
@@ -2199,6 +2213,13 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
 };
 
 /**
+ * String-keyed lookup for chat model definitions.
+ * Use this in media-gen files to avoid importing ChatModelId.
+ */
+export const chatModelDefinitionsByString: Record<string, ModelDefinition> =
+  chatModelDefinitions;
+
+/**
  * Featured models by category for use in marketing content, emails, etc.
  */
 export const FEATURED_MODELS = {
@@ -2226,17 +2247,18 @@ export type ChatModelOption =
   | (ModelOptionTokenBased & { id: ChatModelId })
   | (ModelOptionCreditBased & { id: ChatModelId });
 
-function buildChatModelOptions(): Record<string, ChatModelOption> {
-  const result: Record<string, ChatModelOption> = {};
-  for (const [modelId, def] of Object.entries(chatModelDefinitions)) {
+function buildChatModelOptions(): Record<ChatModelId, ChatModelOption> {
+  const result = {} as Record<ChatModelId, ChatModelOption>;
+  for (const modelId of Object.values(ChatModelId)) {
+    const def = chatModelDefinitions[modelId];
     const sortedProviders = [...def.providers].toSorted(
       (a, b) => getProviderPrice(a) - getProviderPrice(b),
     );
     for (const provider of sortedProviders) {
       if (
-        "creditCostPerClip" in provider ||
-        "creditCostPerSecond" in provider ||
-        "creditCostPerCharacter" in provider
+        provider.creditCostPerClip !== undefined ||
+        provider.creditCostPerSecond !== undefined ||
+        provider.creditCostPerCharacter !== undefined
       ) {
         continue;
       }
@@ -2245,14 +2267,9 @@ function buildChatModelOptions(): Record<string, ChatModelOption> {
       if (result[modelId]) {
         continue;
       }
-      if (
-        "creditCost" in provider &&
-        typeof (provider as ModelProviderConfigCreditBased).creditCost ===
-          "number"
-      ) {
-        const p = provider as ModelProviderConfigCreditBased;
+      if (typeof provider.creditCost === "number") {
         result[modelId] = {
-          id: modelId as ChatModelId,
+          id: modelId,
           name: def.name,
           provider: def.by,
           apiProvider: provider.apiProvider,
@@ -2272,12 +2289,11 @@ function buildChatModelOptions(): Record<string, ChatModelOption> {
           inputs: def.inputs,
           outputs: def.outputs,
           voiceMeta: def.voiceMeta,
-          creditCost: p.creditCost as number,
+          creditCost: provider.creditCost,
         } satisfies ModelOptionCreditBased & { id: ChatModelId };
-      } else {
-        const p = provider as ModelProviderConfigTokenBased;
+      } else if (typeof provider.inputTokenCost === "number") {
         result[modelId] = {
-          id: modelId as ChatModelId,
+          id: modelId,
           name: def.name,
           provider: def.by,
           apiProvider: provider.apiProvider,
@@ -2297,11 +2313,11 @@ function buildChatModelOptions(): Record<string, ChatModelOption> {
           inputs: def.inputs,
           outputs: def.outputs,
           voiceMeta: def.voiceMeta,
-          creditCost: p.creditCost,
-          inputTokenCost: p.inputTokenCost,
-          outputTokenCost: p.outputTokenCost,
-          cacheReadTokenCost: p.cacheReadTokenCost,
-          cacheWriteTokenCost: p.cacheWriteTokenCost,
+          creditCost: provider.creditCost,
+          inputTokenCost: provider.inputTokenCost,
+          outputTokenCost: provider.outputTokenCost,
+          cacheReadTokenCost: provider.cacheReadTokenCost,
+          cacheWriteTokenCost: provider.cacheWriteTokenCost,
         } satisfies ModelOptionTokenBased & { id: ChatModelId };
       }
     }
@@ -2335,4 +2351,206 @@ export function getChatModelById(
     chatModelOptionsIndex[modelId] ??
     chatModelOptionsIndex[ChatModelId.KIMI_K2]!
   );
+}
+
+// ============================================================
+// CHAT MODEL SELECTION SCHEMA
+// ============================================================
+
+const sharedFilterPropsSchema = z.object({
+  intelligenceRange: z
+    .object({
+      min: z.enum(IntelligenceLevel).optional(),
+      max: z.enum(IntelligenceLevel).optional(),
+    })
+    .optional(),
+  priceRange: z
+    .object({
+      min: z.enum(PriceLevel).optional(),
+      max: z.enum(PriceLevel).optional(),
+    })
+    .optional(),
+  contentRange: z
+    .object({
+      min: z.enum(ContentLevel).optional(),
+      max: z.enum(ContentLevel).optional(),
+    })
+    .optional(),
+  speedRange: z
+    .object({
+      min: z.enum(SpeedLevel).optional(),
+      max: z.enum(SpeedLevel).optional(),
+    })
+    .optional(),
+  sortBy: z.enum(ModelSortField).optional(),
+  sortDirection: z.enum(ModelSortDirection).optional(),
+  sortBy2: z.enum(ModelSortField).optional(),
+  sortDirection2: z.enum(ModelSortDirection).optional(),
+});
+
+const filtersSelectionSchema = z
+  .object({ selectionType: z.literal(ModelSelectionType.FILTERS) })
+  .merge(sharedFilterPropsSchema);
+
+export const chatManualModelSelectionSchema = z
+  .object({
+    selectionType: z.literal(ModelSelectionType.MANUAL),
+    manualModelId: z.enum(ChatModelId),
+  })
+  .merge(sharedFilterPropsSchema);
+export type ChatManualModelSelection = z.infer<
+  typeof chatManualModelSelectionSchema
+>;
+
+export const chatModelSelectionSchema = z.discriminatedUnion("selectionType", [
+  chatManualModelSelectionSchema,
+  filtersSelectionSchema,
+]);
+export type ChatModelSelection = z.infer<typeof chatModelSelectionSchema>;
+
+// ============================================================
+// CHAT MODEL RESOLUTION
+// ============================================================
+
+/**
+ * Structural shape for internal filter functions.
+ * ChatModelSelection is assignable to this shape.
+ * Used internally so applyHardFilters can accept spread objects.
+ */
+interface ChatSelectionShape {
+  selectionType: string;
+  manualModelId?: ChatModelId;
+  intelligenceRange?: { min?: string; max?: string };
+  contentRange?: { min?: string; max?: string };
+  speedRange?: { min?: string; max?: string };
+  priceRange?: { min?: string; max?: string };
+  sortBy?: string;
+  sortDirection?: string;
+  sortBy2?: string;
+  sortDirection2?: string;
+}
+
+function getChatModelPriceLevel(creditCost: number): string {
+  if (creditCost <= 3) {
+    return PriceLevel.CHEAP;
+  }
+  if (creditCost <= 9) {
+    return PriceLevel.STANDARD;
+  }
+  return PriceLevel.PREMIUM;
+}
+
+function getSortValue(
+  model: ChatModelOption,
+  sortBy: string | undefined,
+): number {
+  if (!sortBy) {
+    return 0;
+  }
+  switch (sortBy) {
+    case ModelSortField.INTELLIGENCE: {
+      const idx = IntelligenceLevelDB.indexOf(model.intelligence);
+      return idx === -1 ? 0 : idx;
+    }
+    case ModelSortField.SPEED: {
+      const idx = SpeedLevelDB.indexOf(model.speed);
+      return idx === -1 ? 0 : idx;
+    }
+    case ModelSortField.PRICE:
+      return getModelPrice(model);
+    case ModelSortField.CONTENT: {
+      const idx = ContentLevelDB.indexOf(model.content);
+      return idx === -1 ? 0 : idx;
+    }
+    default:
+      return 0;
+  }
+}
+
+function applyHardFilters(
+  filters: ChatSelectionShape,
+  user: JwtPayloadType,
+  env: ModelProviderEnvAvailability,
+): ChatModelOption[] {
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+  const filtered = chatModelOptions.filter((model) => {
+    if (model.adminOnly && !isAdmin) {
+      return false;
+    }
+    if (!isModelProviderAvailable(model, env)) {
+      return false;
+    }
+    const modelPrice = getChatModelPriceLevel(getModelPrice(model));
+    return (
+      meetsRangeConstraint(
+        model.intelligence,
+        filters.intelligenceRange,
+        IntelligenceLevelDB,
+      ) &&
+      meetsRangeConstraint(
+        model.content,
+        filters.contentRange,
+        ContentLevelDB,
+      ) &&
+      meetsRangeConstraint(modelPrice, filters.priceRange, PriceLevelDB) &&
+      meetsRangeConstraint(model.speed, filters.speedRange, SpeedLevelDB)
+    );
+  });
+
+  if (filters.sortBy) {
+    return filtered.toSorted((a, b) => {
+      const dir1 = filters.sortDirection ?? ModelSortDirection.DESC;
+      const v1a = getSortValue(a, filters.sortBy);
+      const v1b = getSortValue(b, filters.sortBy);
+      const primary = dir1 === ModelSortDirection.ASC ? v1a - v1b : v1b - v1a;
+      if (primary !== 0) {
+        return primary;
+      }
+      if (filters.sortBy2) {
+        const dir2 = filters.sortDirection2 ?? ModelSortDirection.DESC;
+        const v2a = getSortValue(a, filters.sortBy2);
+        const v2b = getSortValue(b, filters.sortBy2);
+        return dir2 === ModelSortDirection.ASC ? v2a - v2b : v2b - v2a;
+      }
+      return 0;
+    });
+  }
+  return filtered;
+}
+
+/** Get all chat models matching a selection (MANUAL falls back to FILTERS if unavailable). */
+export function filterChatModels(
+  selection: ChatModelSelection,
+  user: JwtPayloadType,
+  env: ModelProviderEnvAvailability,
+): ChatModelOption[] {
+  if (selection.selectionType === ModelSelectionType.MANUAL) {
+    const model = selection.manualModelId
+      ? getChatModelById(selection.manualModelId)
+      : null;
+    const isAdmin =
+      !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+    if (model?.adminOnly && !isAdmin) {
+      return [];
+    }
+    if (model && isModelProviderAvailable(model, env)) {
+      return [model];
+    }
+    return applyHardFilters(
+      { ...selection, selectionType: ModelSelectionType.FILTERS },
+      user,
+      env,
+    );
+  }
+  return applyHardFilters(selection, user, env);
+}
+
+/** Get best chat model from a selection. */
+export function getBestChatModel(
+  selection: ChatModelSelection,
+  user: JwtPayloadType,
+  env: ModelProviderEnvAvailability,
+): ChatModelOption | null {
+  return filterChatModels(selection, user, env)[0] ?? null;
 }

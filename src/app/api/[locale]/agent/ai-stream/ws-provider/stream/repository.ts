@@ -1,15 +1,13 @@
 /**
  * WS Provider Stream Repository
  *
- * Builds CoreTool records from client-provided tool definitions,
- * then delegates to AiStreamRepository.createAiStream() in interactive mode.
- * Client-provided tools use createPendingToolResult() to await results.
+ * Delegates to AiStreamRepository.createAiStream() to run the AI stream.
+ * The cloud side executes all tools server-side — the client only observes
+ * events via WebSocket (subscribe + unsubscribe, no tool-result messages).
  */
 
 import "server-only";
 
-import { jsonSchema, tool } from "ai";
-import type { JSONSchema7 } from "ai";
 import type { NextRequest } from "next-vibe-ui/lib/request";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -22,7 +20,6 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -30,46 +27,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { AiStreamRepository } from "../../repository";
 import type { AiStreamPostRequestOutput } from "../../stream/definition";
 import type { AiStreamT } from "../../stream/i18n";
-import { createPendingToolResult } from "../tool-result-store";
 import type {
   WsProviderStreamPostRequestOutput,
   WsProviderStreamPostResponseOutput,
 } from "./definition";
-
-/** Tool definition shape from the validated request */
-type ClientToolDef = NonNullable<
-  WsProviderStreamPostRequestOutput["tools"]
->[number];
-
-/**
- * Build a CoreTool that delegates execution to the remote client
- * via createPendingToolResult(). When the AI calls this tool, it blocks
- * until the client posts back a result via the tool-result endpoint.
- */
-function buildClientTool(
-  toolDef: ClientToolDef,
-  logger: EndpointLogger,
-): CoreTool {
-  const parametersSchema = jsonSchema(toolDef.parameters as JSONSchema7, {
-    validate: (value) => ({
-      success: true,
-      value,
-    }),
-  });
-
-  // AI SDK tool() with inputSchema — same pattern as tools-loader.ts
-  return tool({
-    description: toolDef.description,
-    inputSchema: parametersSchema,
-    execute: async (params, options) => {
-      void params;
-      logger.info(`[WsProviderStream] Client tool called: ${toolDef.name}`, {
-        toolCallId: options.toolCallId,
-      });
-      return createPendingToolResult(options.toolCallId);
-    },
-  }) as CoreTool;
-}
 
 export class WsProviderStreamRepository {
   static async stream({
@@ -91,20 +52,10 @@ export class WsProviderStreamRepository {
     const t: AiStreamT = aiStreamI18n.scopedT(locale).t;
 
     try {
-      // 1. Build CoreTool records from client-provided tool definitions
-      let toolsOverride: Record<string, CoreTool> | undefined;
-
-      if (data.tools && data.tools.length > 0) {
-        toolsOverride = {};
-        for (const toolDef of data.tools) {
-          toolsOverride[toolDef.name] = buildClientTool(toolDef, logger);
-        }
-      }
-
-      // 2. Resolve threadId - use existing or generate new
+      // 1. Resolve threadId - use existing or generate new
       const threadId = data.threadId ?? crypto.randomUUID();
 
-      // 3. Build AiStream-compatible data object
+      // 2. Build AiStream-compatible data object
       const aiStreamData: AiStreamPostRequestOutput = {
         operation: "send",
         rootFolderId: DefaultFolderId.PRIVATE,
@@ -131,7 +82,7 @@ export class WsProviderStreamRepository {
         musicDuration: undefined,
       };
 
-      // 4. Call AiStreamRepository.createAiStream() in interactive mode
+      // 3. Call AiStreamRepository.createAiStream() — cloud executes all tools server-side
       const result = await AiStreamRepository.createAiStream({
         data: aiStreamData,
         locale,
@@ -141,7 +92,6 @@ export class WsProviderStreamRepository {
         headless: false,
         t,
         extraInstructions: data.systemPrompt,
-        toolsOverride,
       });
 
       if (!result.success) {
@@ -151,7 +101,7 @@ export class WsProviderStreamRepository {
         });
       }
 
-      // 4. Extract threadId and messageId from the response
+      // 4. Return threadId and messageId
       return success({
         responseThreadId: result.data.responseThreadId ?? threadId,
         messageId: result.data.messageId,

@@ -10,7 +10,7 @@ export const translations: typeof enTranslations = {
     firstSteps:
       "Fang damit an, eine Aufgabe auszuprobieren, die du vermieden hast, weil andere KI-Tools sie ständig verweigert haben. Keine Guardrails, keine Vorträge - nur Ergebnisse.",
     modelChoice:
-      "Du hast Zugang zu 42+ Modellen. Wenn du nicht weißt, wo du anfangen sollst, probier das Standard-Modell. Du kannst jederzeit wechseln.",
+      "Du hast Zugang zu {{modelCount}} Modellen. Wenn du nicht weißt, wo du anfangen sollst, probier das Standard-Modell. Du kannst jederzeit wechseln.",
     signature: "Das unbottled.ai-Team",
   },
   followup1: {

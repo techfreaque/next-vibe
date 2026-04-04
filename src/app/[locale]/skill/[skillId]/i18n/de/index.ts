@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Probiere diesen AI Skill auf {{appName}}",
     description:
-      "Entdecke und nutze diesen AI Skill auf {{appName}} - die Redefreiheit-AI-Plattform mit 50+ Modellen. Zur Sammlung hinzufuegen und loschatten.",
+      "Entdecke und nutze diesen AI Skill auf {{appName}} - die Redefreiheit-AI-Plattform mit {{modelCount}} Modellen. Zur Sammlung hinzufuegen und loschatten.",
     category: "AI Skills",
     imageAlt: "Ein AI Skill bereit zur Nutzung auf {{appName}}",
     keywords: "AI Skill, {{appName}}, AI Assistent, eigener Skill, AI Chat",

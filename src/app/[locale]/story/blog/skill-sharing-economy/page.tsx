@@ -14,6 +14,8 @@ import { Separator } from "next-vibe-ui/ui/separator";
 import { H1, H2, Muted, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -47,13 +49,17 @@ export const generateMetadata = async ({
 
 export interface SkillSharingEconomyPageData {
   locale: CountryLanguage;
+  modelCount: number;
 }
 
 export async function tanstackLoader({
   params,
 }: Props): Promise<SkillSharingEconomyPageData> {
   const { locale } = await params;
-  return { locale };
+  return {
+    locale,
+    modelCount: getAvailableModelCount(agentEnvAvailability, false),
+  };
 }
 
 function ScenarioCard({
@@ -122,6 +128,7 @@ function ExampleCard({
 
 export function TanstackPage({
   locale,
+  modelCount,
 }: SkillSharingEconomyPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -184,7 +191,7 @@ export function TanstackPage({
             {t("whatAreSkills.p1")}
           </P>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("whatAreSkills.p2")}
+            {t("whatAreSkills.p2", { modelCount })}
           </P>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
             {t("whatAreSkills.p3")}

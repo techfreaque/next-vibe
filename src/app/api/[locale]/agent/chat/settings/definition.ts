@@ -11,14 +11,14 @@ import {
 } from "@/app/api/[locale]/agent/models/enum";
 import {
   audioVisionModelSelectionSchema,
-  imageGenModelSelectionSchema,
   imageVisionModelSelectionSchema,
-  musicGenModelSelectionSchema,
-  sttModelSelectionSchema,
-  videoGenModelSelectionSchema,
   videoVisionModelSelectionSchema,
-  voiceModelSelectionSchema,
-} from "@/app/api/[locale]/agent/models/types";
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,

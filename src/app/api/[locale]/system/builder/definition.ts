@@ -10,6 +10,8 @@
 import type { BunPlugin } from "bun";
 import { z } from "zod";
 
+import type { PackageManifest } from "../packages/types";
+
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -1578,4 +1580,14 @@ export interface BuildConfig extends Omit<
   };
   env?: Record<string, string>;
   profiles?: Partial<Record<BuildProfile, Partial<BuildConfig>>>;
+  /**
+   * Package manifest — when set, the builder automatically:
+   *  - Runs PackageEndpointGeneratorRepository.generate() as a preBuild step
+   *  - Injects scoped-generated, endpoints-meta, widget-stub, and native-stub
+   *    Bun plugins into every EXECUTABLE filesToCompile entry
+   *  - Injects VIBE_PACKAGE_NAME and VIBE_PACKAGE_DEFAULT_ENDPOINT defines
+   *
+   * The generated files are written to `.dist/<outputDir>/generated/`.
+   */
+  manifest?: PackageManifest;
 }

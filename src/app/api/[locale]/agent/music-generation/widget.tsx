@@ -16,9 +16,9 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/models/types";
+import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
@@ -95,7 +95,7 @@ export function MusicGenerationContainer({
   const defaultModelSelection = useMemo(():
     | MusicGenModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestMusicGenModel(
+    const m = getBestMusicGenModel(
       DEFAULT_MUSIC_GEN_MODEL_SELECTION,
       user,
       envAvailability,
@@ -103,27 +103,25 @@ export function MusicGenerationContainer({
     if (!m) {
       return undefined;
     }
-    const modelId = Object.values(MusicGenModelId).includes(m.id)
-      ? m.id
-      : undefined;
-    if (!modelId) {
-      return undefined;
-    }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: modelId };
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
   }, [user, envAvailability]);
 
   const resolvedModelId =
     currentModelId ??
     (defaultModelSelection?.selectionType === ModelSelectionType.MANUAL
-      ? Object.values(MusicGenModelId).includes(
-          defaultModelSelection.manualModelId,
-        )
-        ? defaultModelSelection.manualModelId
-        : undefined
+      ? defaultModelSelection.manualModelId
       : undefined);
   const resolvedModel = resolvedModelId
     ? getMusicGenModelById(resolvedModelId)
     : undefined;
+  const resolvedAudioBased = resolvedModel;
+
+  // Filter duration presets to only show supported durations
+  const availableDurationPresets = DURATION_PRESETS.filter(
+    (p) =>
+      !resolvedAudioBased?.supportedDurations ||
+      resolvedAudioBased.supportedDurations.includes(p.value),
+  );
 
   const appendStyle = (style: string): void => {
     const current = form?.getValues("prompt") ?? "";
@@ -213,7 +211,7 @@ export function MusicGenerationContainer({
             {t("post.duration.label")}
           </Span>
           <Div className="flex gap-2">
-            {DURATION_PRESETS.map((preset) => (
+            {availableDurationPresets.map((preset) => (
               <Button
                 key={preset.value}
                 type="button"

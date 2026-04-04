@@ -20,12 +20,9 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import type {
-  ImageGenModelSelection,
-  SttModelSelection,
-  VoiceModelSelection,
-} from "@/app/api/[locale]/agent/models/types";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { SkillsRepository } from "../../skills/repository";
@@ -152,11 +149,7 @@ export class FavoritesCreateRepository {
         data.imageGenModelSelection ?? null,
       );
       const musicGenModelSelectionToStore = data.musicGenModelSelection ?? null;
-      const videoGenSel = data.videoGenModelSelection;
-      const videoGenModelIdToStore =
-        videoGenSel?.selectionType === ModelSelectionType.MANUAL
-          ? (videoGenSel.manualModelId ?? null)
-          : null;
+      const videoGenModelSelectionToStore = data.videoGenModelSelection ?? null;
       const defaultChatModeToStore =
         character && data.defaultChatMode === character.defaultChatMode
           ? null
@@ -206,7 +199,7 @@ export class FavoritesCreateRepository {
           translationModelId: translationModelIdToStore,
           imageGenModelSelection: imageGenModelSelectionToStore,
           musicGenModelSelection: musicGenModelSelectionToStore,
-          videoGenModelId: videoGenModelIdToStore,
+          videoGenModelSelection: videoGenModelSelectionToStore,
           defaultChatMode: defaultChatModeToStore,
           modelSelection: modelSelectionToStore,
           compactTrigger: data.compactTrigger ?? null,

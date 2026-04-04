@@ -25,7 +25,7 @@ import type {
 } from "../../ai-stream/vision-models";
 import type { ImageGenModelId } from "../../image-generation/models";
 import type { ChatMode } from "../../models/enum";
-import type { ChatModelSelection } from "../../models/types";
+import type { ChatModelSelection } from "../../ai-stream/models";
 import type { MusicGenModelId } from "../../music-generation/models";
 import type { SttModelId } from "../../speech-to-text/models";
 import type { TtsModelId } from "../../text-to-speech/models";

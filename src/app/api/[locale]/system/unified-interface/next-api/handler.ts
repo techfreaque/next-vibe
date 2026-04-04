@@ -194,15 +194,12 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
       // which breaks <audio>/<video> elements that need Content-Length for duration).
       if (isFileResponse(result)) {
         logger.debug("Returning file response");
-        const arrayBuffer = Buffer.isBuffer(result.buffer)
-          ? result.buffer.buffer.slice(
-              result.buffer.byteOffset,
-              result.buffer.byteOffset + result.buffer.byteLength,
-            )
+        const body = Buffer.isBuffer(result.buffer)
+          ? Uint8Array.from(result.buffer)
           : result.buffer instanceof Blob
             ? await result.buffer.arrayBuffer()
             : result.buffer;
-        return new Response(arrayBuffer, {
+        return new Response(body, {
           status: 200,
           headers: {
             "Content-Type": result.contentType,

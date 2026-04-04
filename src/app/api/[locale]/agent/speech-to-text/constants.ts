@@ -5,8 +5,11 @@ import {
   ModelSortDirection,
   ModelSortField,
 } from "../chat/skills/enum";
-import type { SttModelSelection } from "../models/types";
+import type { SttModelSelection } from "../speech-to-text/models";
 import { SttModelId } from "./models";
+
+/** Alias used when this endpoint is called as an AI tool */
+export const TRANSCRIBE_AUDIO_ALIAS = "transcribe_audio" as const;
 
 /** Default speech-to-text model */
 export const DEFAULT_STT_MODEL_ID: SttModelId = SttModelId.OPENAI_WHISPER;

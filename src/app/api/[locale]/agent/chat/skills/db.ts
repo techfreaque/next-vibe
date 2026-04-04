@@ -14,18 +14,30 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 import type { ChatMode } from "@/app/api/[locale]/agent/models/enum";
+import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import type {
   AudioVisionModelSelection,
-  ChatModelSelection,
-  ImageGenModelSelection,
   ImageVisionModelSelection,
-  MusicGenModelSelection,
-  SttModelSelection,
   VideoVisionModelSelection,
-  VoiceModelSelection,
-} from "@/app/api/[locale]/agent/models/types";
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
+import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
@@ -267,3 +279,24 @@ export type CustomSkill = typeof customSkills.$inferSelect;
  * Type for new custom skill model - uses Drizzle's $inferInsert to respect .$type annotations
  */
 export type NewCustomSkill = typeof customSkills.$inferInsert;
+
+// ============================================================
+// SKILL VARIANT SCHEMA
+// Cross-domain aggregate: all model selections for one skill variant
+// ============================================================
+
+export const skillVariantSchema = z.object({
+  id: z.string(),
+  modelSelection: chatModelSelectionSchema,
+  imageGenModelSelection: imageGenModelSelectionSchema.optional(),
+  musicGenModelSelection: musicGenModelSelectionSchema.optional(),
+  videoGenModelSelection: videoGenModelSelectionSchema.optional(),
+  voiceModelSelection: voiceModelSelectionSchema.optional(),
+  sttModelSelection: sttModelSelectionSchema.optional(),
+  imageVisionModelSelection: imageVisionModelSelectionSchema.optional(),
+  videoVisionModelSelection: videoVisionModelSelectionSchema.optional(),
+  audioVisionModelSelection: audioVisionModelSelectionSchema.optional(),
+  isDefault: z.boolean().optional(),
+});
+
+export type SkillVariantData = z.infer<typeof skillVariantSchema>;

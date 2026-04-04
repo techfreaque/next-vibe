@@ -44,7 +44,8 @@ interface FileUploadButtonProps {
   accept?: string;
 }
 
-const DEFAULT_ACCEPT = "image/*,application/pdf,text/*,.doc,.docx,.xls,.xlsx";
+const DEFAULT_ACCEPT =
+  "image/*,audio/*,video/*,application/pdf,text/*,.doc,.docx,.xls,.xlsx";
 
 export const FileUploadButton = memo(function FileUploadButton({
   disabled,

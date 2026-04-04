@@ -94,6 +94,7 @@ export function SubscriptionPageClient({
           locale={locale}
           envAvailability={envAvailability}
           totalModelCount={getAvailableModelCount(envAvailability, isAdmin)}
+          isAdmin={isAdmin}
           onSwitchTab={() => {
             // Navigation handled by SubscriptionTabsNav links
           }}

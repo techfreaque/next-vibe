@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
       title: "Uruchom agenta AI",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
-        "Uruchom headless agenta AI i otrzymaj pełną odpowiedź tekstową. Użyj do delegowania zadań, podsumowywania wyników narzędzi, generowania treści lub łączenia narzędzi w jedną odpowiedź AI. Kredyty są pobierane w zależności od modelu. SZYBKI START: Przekaż favoriteId, aby załadować postać + model + konfigurację narzędzi z zapisanego ulubionego. Nadpisz dowolne pole (model, skill, tools, availableTools) przekazując je jawnie. KONFIGURACJA: Przed uruchomieniem skonfiguruj odpowiednią postać + ulubiony. Postacie definiują personę i prompt systemowy (utwórz za pomocą agent_chat_skills_create_POST). Ulubione łączą postać z nadpisaniem modelu i konfiguracją narzędzi (utwórz za pomocą agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} lub {selectionType:'FILTERS',...}). Workflow: 1) Listuj ulubione (agent_chat_favorites_GET) lub postacie (agent_chat_skills_GET). 2) Jeśli żaden nie pasuje, utwórz postać, potem ulubiony. 3) Przekaż favoriteId. DOSTĘP DO NARZĘDZI: Standardowe ustawienie: availableTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] - execute-tool uruchamia dowolny endpoint, system_help_GET pozwala odkrywać narzędzia.",
+        "Uruchom headless agenta AI i otrzymaj finalną odpowiedź tekstową. Ustaw model + prompt dla prostego wywołania, lub przekaż favoriteId aby załadować zapisany preset skill + model + narzędzia. Kredyty w zależności od modelu.",
       container: {
         title: "Uruchomienie agenta AI",
         description:
@@ -28,18 +28,18 @@ export const translations: typeof enTranslations = {
         favoriteId: {
           label: "ID ulubionego",
           description:
-            "UUID zapisanego ulubionego do załadowania postaci, modelu i konfiguracji narzędzi. Postać, model (z modelSelection) i konfiguracja narzędzi (availableTools/pinnedTools) ulubionego są używane jako wartości domyślne. Jawne pola w tym żądaniu nadpisują wartości ulubionego. Użyj agent_chat_favorites_GET do listowania.",
+            "UUID zapisanego ulubionego. Ładuje skill, model i konfigurację narzędzi jako wartości domyślne. Jawne pola nadpisują wartości ulubionego.",
           placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         model: {
           label: "Model",
           description:
-            "Model AI. Opcjonalny gdy ustawiono favoriteId lub skill (rozwiązywany z ich modelSelection). Szybki & tani: claude-haiku-4.5, gemini-2.5-flash. Zbalansowany: claude-sonnet-4.6, gpt-5. Potężny: claude-opus-4.6, gpt-5-pro. Darmowy: qwen3_235b-free, gpt-oss-120b-free. Nadpisuje model z favoriteId/skill.",
+            "LLM do rozumowania tekstowego. Opcjonalny gdy ustawiono favoriteId lub skill. Szybki: claude-haiku-4.5, gemini-2.5-flash. Zbalansowany: claude-sonnet-4.6, gpt-5. Potężny: claude-opus-4.6. Darmowy: qwen3_235b-free. Nie do generowania obrazów/audio/wideo.",
         },
         skill: {
           label: "Umiejętność",
           description:
-            "ID umiejętności (UUID) lub 'default'. Opcjonalny gdy ustawiono favoriteId (rozwiązywany z ulubionego). Umiejętności definiują personę AI, prompt systemowy i domyślny model. Nadpisuje umiejętność z favoriteId. Użyj agent_chat_skills_GET do listowania.",
+            "ID umiejętności lub 'default'. Definiuje personę AI i prompt systemowy. Opcjonalny gdy ustawiono favoriteId. Nadpisuje umiejętność ulubionego.",
           placeholder: "default",
         },
         prompt: {
@@ -57,11 +57,11 @@ export const translations: typeof enTranslations = {
         preCalls: {
           label: "Wywołania wstępne",
           description:
-            "Wywołania narzędzi do wykonania przed promptem. Wyniki są wstrzykiwane jako kontekst. Użyj system_help_GET do odkrywania dostępnych narzędzi i ich argumentów.",
+            "Wywołania narzędzi do wykonania przed promptem. Wyniki są wstrzykiwane jako kontekst. Użyj tool-help do odkrywania dostępnych narzędzi i ich argumentów.",
           routeId: {
             label: "ID narzędzia",
             description:
-              "Alias lub pełna nazwa narzędzia do wywołania (np. 'web-search', 'agent_chat_skills_GET'). Użyj system_help_GET do odkrywania.",
+              "Alias lub pełna nazwa narzędzia do wywołania (np. 'web-search', 'agent_chat_skills_GET'). Użyj tool-help do odkrywania.",
             placeholder: "web-search",
           },
           args: {
@@ -71,28 +71,27 @@ export const translations: typeof enTranslations = {
           },
         },
         availableTools: {
-          label: "Może wykonywać (warstwa uprawnień)",
+          label: "Może wykonywać",
           description:
-            "Brama uprawnień do wykonania - kontroluje które narzędzia AI faktycznie może uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione narzędzia (inne blokowane z 'wyłączone przez użytkownika'). Standardowe ustawienie: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] - execute-tool dispatchuje dowolny zarejestrowany endpoint, system_help_GET pozwala odkrywać narzędzia. Nie trzeba powtarzać narzędzi z pola tools.",
+            "Które narzędzia AI może uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione. Standard: [{toolId:'execute-tool'},{toolId:'tool-help'}].",
           toolId: {
             label: "ID narzędzia",
             description:
-              "Alias lub pełna nazwa narzędzia, które AI może wykonać (np. 'execute-tool', 'system_help_GET', 'web-search')",
+              "Alias lub pełna nazwa narzędzia (np. 'execute-tool', 'tool-help', 'web-search')",
           },
           requiresConfirmation: {
             label: "Wymaga potwierdzenia",
             description:
-              "Jeśli true, wykonanie zatrzymuje się i czeka na potwierdzenie użytkownika. Używaj dla destrukcyjnych lub kosztownych akcji.",
+              "Wstrzymaj wykonanie do potwierdzenia przez użytkownika",
           },
         },
         pinnedTools: {
           label: "W kontekście (AI to widzi)",
           description:
-            "Narzędzia załadowane do okna kontekstu modelu - co AI zna i nad czym może rozumować. null = domyślny zestaw narzędzi użytkownika (zalecane). Podaj tablicę tylko dla skupionego, minimalnego kontekstu. Uwaga: availableTools kontroluje co faktycznie się wykonuje - to pole wpływa tylko na to, co model widzi.",
+            "Narzędzia załadowane do kontekstu modelu. null = domyślny zestaw użytkownika. Wpływa tylko na to co model widzi, nie na to co może wykonać.",
           toolId: {
             label: "ID narzędzia",
-            description:
-              "Alias lub pełna nazwa narzędzia w kontekście (np. 'execute-tool', 'system_help_GET')",
+            description: "Alias lub pełna nazwa narzędzia do kontekstu",
           },
           requiresConfirmation: {
             label: "Wymaga potwierdzenia",
@@ -132,7 +131,7 @@ export const translations: typeof enTranslations = {
         excludeMemories: {
           label: "Wyklucz wspomnienia",
           description:
-            "Gdy true, AI nie zobaczy zapisanych wspomnień użytkownika w kontekście. Użyj dla publicznych botów i izolowanych zadań, które nie powinny dziedziczyć osobistego kontekstu. Domyślnie: false (wspomnienia włączone).",
+            "Pomiń ładowanie wspomnień do kontekstu. Dla publicznych botów lub izolowanych zadań. Domyślnie: false.",
         },
       },
       response: {

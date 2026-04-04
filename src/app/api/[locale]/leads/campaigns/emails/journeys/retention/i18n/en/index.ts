@@ -6,7 +6,7 @@ export const translations = {
     thankYou:
       "Thank you for subscribing to unbottled.ai. Your support directly funds development and keeps us independent.",
     valueSummary:
-      "As a subscriber, you have priority access to all 42+ models, higher usage limits, and first access to new features.",
+      "As a subscriber, you have priority access to all {{modelCount}} models, higher usage limits, and first access to new features.",
     whatIsNext:
       "We'll check in from time to time with tips, new feature highlights, and updates. Nothing excessive - just the stuff that's actually worth your time.",
     signature: "The unbottled.ai team",

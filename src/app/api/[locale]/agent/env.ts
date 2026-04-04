@@ -82,8 +82,6 @@ const baseFields = {
     comment: "Uncensored AI API key",
     commented: true,
     sensitive: true,
-    onboardingStep: 4,
-    onboardingGroup: "ai",
   },
   FREEDOMGPT_API_KEY: {
     schema: z.string().optional(),
@@ -91,8 +89,6 @@ const baseFields = {
     comment: "FreedomGPT API key",
     commented: true,
     sensitive: true,
-    onboardingStep: 4,
-    onboardingGroup: "ai",
   },
   GAB_AI_API_KEY: {
     schema: z.string().optional(),
@@ -100,8 +96,6 @@ const baseFields = {
     comment: "Gab AI API key",
     commented: true,
     sensitive: true,
-    onboardingStep: 4,
-    onboardingGroup: "ai",
   },
   VENICE_AI_API_KEY: {
     schema: z.string().optional(),
@@ -109,8 +103,6 @@ const baseFields = {
     comment: "Venice AI API key - get yours at https://venice.ai",
     commented: true,
     sensitive: true,
-    onboardingStep: 4,
-    onboardingGroup: "ai",
   },
   EDEN_AI_API_KEY: {
     schema: z.string().optional(),
@@ -145,8 +137,6 @@ const baseFields = {
       "OpenAI API key for DALL-E and gpt-image models - get yours at https://platform.openai.com/api-keys",
     commented: true,
     sensitive: true,
-    onboardingStep: 4,
-    onboardingGroup: "ai",
   },
   REPLICATE_API_TOKEN: {
     schema: z.string().optional(),
@@ -155,8 +145,6 @@ const baseFields = {
       "Replicate API token for Flux Pro, SDXL, and video generation models - get yours at https://replicate.com/account/api-tokens",
     commented: true,
     sensitive: true,
-    onboardingStep: 4,
-    onboardingGroup: "ai",
   },
   FAL_AI_API_KEY: {
     schema: z.string().optional(),
@@ -165,8 +153,6 @@ const baseFields = {
       "Fal.ai API key for fast image and video generation - get yours at https://fal.ai/dashboard/keys",
     commented: true,
     sensitive: true,
-    onboardingStep: 4,
-    onboardingGroup: "ai",
   },
   ELEVENLABS_API_KEY: {
     schema: z.string().optional(),
@@ -175,8 +161,6 @@ const baseFields = {
       "ElevenLabs API key for high-quality TTS voices - get yours at https://elevenlabs.io/app/settings/api-keys",
     commented: true,
     sensitive: true,
-    onboardingStep: 4,
-    onboardingGroup: "ai",
   },
   DEEPGRAM_API_KEY: {
     schema: z.string().optional(),
@@ -185,14 +169,20 @@ const baseFields = {
       "Deepgram API key for fast, accurate STT - get yours at https://console.deepgram.com",
     commented: true,
     sensitive: true,
-    onboardingStep: 4,
-    onboardingGroup: "ai",
   },
   MODELSLAB_API_KEY: {
     schema: z.string().optional(),
     example: "your-modelslab-key",
     comment:
       "ModelsLab API key for music generation and text-to-video - get yours at https://modelslab.com/account/api",
+    commented: true,
+    sensitive: true,
+  },
+  UNBOTTLED_CLOUD_CREDENTIALS: {
+    schema: z.string().optional(),
+    example: "leadId:token:https://unbottled.ai",
+    comment:
+      "Unbottled AI cloud credentials (leadId:token:remoteUrl) - set automatically when signing in to unbottled.ai",
     commented: true,
     sensitive: true,
     onboardingStep: 4,
@@ -316,3 +306,45 @@ export const {
     s3: { ...baseFields, ...s3Fields },
   },
 });
+
+export interface UnbottledCloudSession {
+  leadId: string;
+  token: string;
+  remoteUrl: string;
+}
+
+/**
+ * Parse UNBOTTLED_CLOUD_CREDENTIALS env var.
+ * Format: "leadId:token:https://unbottled.ai"
+ * leadId = UUID (no colons), token = JWT (may contain dots but no ://), remoteUrl = URL at end
+ */
+export function parseUnbottledCredentials(
+  creds: string | undefined,
+): UnbottledCloudSession | null {
+  if (!creds) {
+    return null;
+  }
+
+  const firstColon = creds.indexOf(":");
+  if (firstColon === -1) {
+    return null;
+  }
+
+  const leadId = creds.slice(0, firstColon);
+  const rest = creds.slice(firstColon + 1);
+
+  // URL is at the end, starting with http:// or https://
+  const urlMatch = rest.match(/(https?:\/\/.+)$/);
+  if (!urlMatch) {
+    return null;
+  }
+
+  const remoteUrl = urlMatch[1];
+  const token = rest.slice(0, rest.length - remoteUrl.length - 1);
+
+  if (!leadId || !token || !remoteUrl) {
+    return null;
+  }
+
+  return { leadId, token, remoteUrl };
+}

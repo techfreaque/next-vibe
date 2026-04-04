@@ -1,6 +1,6 @@
 {
   "type": "json",
-  "url": "https://modelslab.com/api/v6/voice/music_gen",
+  "url": "https://modelslab.com/api/v7/voice/music-gen",
   "status": 200,
   "headers": {
     "access-control-allow-methods": "GET, POST",
@@ -8,47 +8,34 @@
     "alt-svc": "h3=\":443\"; ma=86400",
     "cache-control": "no-cache, private",
     "cf-cache-status": "DYNAMIC",
-    "cf-ray": "9e69152ccb9954eb-FRA",
+    "cf-ray": "9e732f7b99e3bc01-FRA",
     "connection": "keep-alive",
     "content-encoding": "br",
     "content-type": "application/json",
-    "date": "Fri, 03 Apr 2026 15:24:55 GMT",
+    "date": "Sat, 04 Apr 2026 20:50:40 GMT",
     "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
-    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=PcMp464ksOlzVZI2p%2FzV4FT80zXec07F4RgIkJF5k%2B5hzgfoJ5qc4tJt7H1N5z%2BnBSKLd0smjklFXATzE%2Fe1T39yzHEWJV0oNzjEO2nfssqBw6698T8w8wpaOdtO8zU%3D\"}]}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=U0MeLIC1%2FlfFfFwuguM1QWVZYcS%2BCg0a6mZGML9nz01NCW4YdQ5MFGk%2FNZou16I0DLOj2Uj8iQ5RBLC6NgOVCMSfBq52hvn0DtyJa5GotxXA9KddGnfoHkBovlU4ciE%3D\"}]}",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
-    "x-cloud-trace-context": "4c1989c181b66dc706a5bed115618c3b",
-    "x-request-time": "2.442",
+    "x-cloud-trace-context": "7e5c27589f237953e25f20ceaf8740e8",
+    "x-request-time": "12.209",
     "x-served-by": "octane-api",
     "x-upstream-connect": "0.000",
     "x-upstream-time": "-"
   },
   "body": {
-    "status": "processing",
-    "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise",
-    "eta": 10,
-    "message": "Request queued for processing. Try to fetch request after estimated seconds.",
-    "fetch_result": "https://modelslab.com/api/v6/voice/fetch/3877183",
-    "id": 3877183,
-    "output": [],
-    "future_links": [
-      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/e9657fd4-f4dd-4983-927a-074c20ab2613-0.mp3"
+    "status": "success",
+    "generationTime": 12,
+    "id": 3882146,
+    "output": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/aeed015c-5fcb-45df-bc76-34a1d6185ba5.mp3"
+    ],
+    "proxy_links": [
+      "https://cdn2.stablediffusionapi.com/generations/aeed015c-5fcb-45df-bc76-34a1d6185ba5.mp3"
     ],
     "meta": {
-      "input_text": "upbeat piano melody",
-      "conditioning_melody": null,
-      "output_format": "mp3",
-      "bitrate": "320k",
-      "music_duration": 30,
-      "base64": "no",
-      "temp": "no",
-      "webhook": null,
-      "track_id": null,
-      "id": 3877183,
-      "file_prefix": "e9657fd4-f4dd-4983-927a-074c20ab2613",
-      "output": [
-        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/e9657fd4-f4dd-4983-927a-074c20ab2613-0.mp3"
-      ]
+      "prompt": "upbeat piano melody",
+      "model_id": "lyria-3"
     }
   }
 }

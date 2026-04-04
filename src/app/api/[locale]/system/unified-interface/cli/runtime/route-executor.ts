@@ -226,7 +226,9 @@ export class RouteDelegationHandler {
       logger.debug(`[ROUTE] endpoint loaded (${endpointLoadMs}ms)`);
 
       // Get CLI user for authentication if not provided.
-      // If the endpoint has CLI_AUTH_BYPASS, skip DB entirely and use a synthetic admin.
+      // If the endpoint has CLI_AUTH_BYPASS, try to load the real admin user from env/session.
+      // Fall back to a synthetic admin only if the real user can't be loaded, or for
+      // performance-critical routes (vibe check / vibe c) that run on every keystroke.
       let cliUser: JwtPayloadType;
       const isCliAuthBypass =
         peekedEndpoint !== null &&
@@ -235,13 +237,33 @@ export class RouteDelegationHandler {
           PlatformMarker.CLI_AUTH_BYPASS,
         );
 
+      // vibe check (c / check) skips DB for performance — it runs constantly during dev
+      const isVibeCheckRoute =
+        resolvedCommand.startsWith("c ") ||
+        resolvedCommand === "c" ||
+        resolvedCommand.startsWith("check ") ||
+        resolvedCommand === "check";
+
       if (
+        isCliAuthBypass &&
+        isVibeCheckRoute &&
+        options.platform !== Platform.MCP &&
+        options.cliTarget !== CliTarget.REMOTE
+      ) {
+        // Performance path: vibe check never touches the DB
+        cliUser = createCliBypassUser();
+      } else if (
         isCliAuthBypass &&
         options.platform !== Platform.MCP &&
         options.cliTarget !== CliTarget.REMOTE
       ) {
-        // CLI / CLI_PACKAGE with CLI_AUTH_BYPASS: never touch the DB
-        cliUser = createCliBypassUser();
+        // CLI / CLI_PACKAGE with CLI_AUTH_BYPASS: try real admin user, fall back to bypass
+        const cliUserResult = await (
+          await loadGetCliUser()
+        )(logger, options.locale);
+        cliUser = cliUserResult.success
+          ? cliUserResult.data
+          : createCliBypassUser();
       } else if (
         isCliAuthBypass &&
         options.platform === Platform.MCP &&

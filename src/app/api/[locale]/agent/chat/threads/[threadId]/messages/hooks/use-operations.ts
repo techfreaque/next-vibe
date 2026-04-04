@@ -15,7 +15,7 @@ import { sendMessage as sendMessageOp } from "@/app/api/[locale]/agent/ai-stream
 import messageIdDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition";
 import voteDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/models/types";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import {

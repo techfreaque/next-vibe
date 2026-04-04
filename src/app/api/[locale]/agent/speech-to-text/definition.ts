@@ -20,6 +20,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { TRANSCRIBE_AUDIO_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -30,6 +31,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["agent", "speech-to-text"],
+  aliases: [TRANSCRIBE_AUDIO_ALIAS],
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.CUSTOMER,

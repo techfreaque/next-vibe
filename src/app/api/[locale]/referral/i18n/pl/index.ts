@@ -136,6 +136,12 @@ export const translations: typeof enTranslations = {
         inactive: "Ten kod polecający jest nieaktywny",
         conversionHint:
           "Każdy subskrybent za {{examplePrice}}/mies. przynosi Ci {{exampleEarning}}/mies. - cyklicznie",
+        linkGen: "Własny link",
+        linkGenPlaceholder: "Wklej dowolny URL strony...",
+        linkGenHint:
+          "Wklej dowolny URL strony unbottled, aby utworzyć śledzony link polecający",
+        linkGenCopy: "Kopiuj",
+        linkGenCopied: "Skopiowano!",
       },
     },
   },

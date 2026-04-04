@@ -59,43 +59,11 @@ export class ConfigRepositoryImpl {
 
       if (extension === "ts") {
         // Local development: .ts -> source files
-        const sourcePath = resolve(
-          process.cwd(),
-          "src",
-          "app",
-          "api",
-          "[locale]",
-          "system",
-          "check",
-          "oxlint",
-          "plugins",
-          baseName,
-          "src",
-          "index.ts",
-        );
-        if (existsSync(sourcePath)) {
-          return sourcePath;
-        }
-      } else {
-        // Installed package: .js -> compiled files
-        const compiledPath = resolve(
-          process.cwd(),
-          "node_modules",
-          "@next-vibe",
-          "checker",
-          ".dist",
-          "oxlint-plugins",
-          fileName,
-        );
-        if (existsSync(compiledPath)) {
-          return compiledPath;
-        }
-      }
-
-      // Fallback: return expected path
-      return extension === "ts"
-        ? resolve(
-            process.cwd(),
+        // Walk up from cwd to find the project root containing the plugin sources
+        let searchDir = process.cwd();
+        for (let i = 0; i < 10; i++) {
+          const sourcePath = resolve(
+            searchDir,
             "src",
             "app",
             "api",
@@ -107,16 +75,86 @@ export class ConfigRepositoryImpl {
             baseName,
             "src",
             "index.ts",
-          )
-        : resolve(
-            process.cwd(),
-            "node_modules",
-            "@next-vibe",
-            "checker",
-            ".dist",
-            "oxlint-plugins",
-            fileName,
           );
+          if (existsSync(sourcePath)) {
+            return sourcePath;
+          }
+          const parent = dirname(searchDir);
+          if (parent === searchDir) {
+            break;
+          }
+          searchDir = parent;
+        }
+      } else {
+        // Installed package: .js -> look for .ts in installed package first (package ships .ts sources)
+        const installedTsPath = resolve(
+          process.cwd(),
+          "node_modules",
+          "@next-vibe",
+          "checker",
+          "oxlint-plugins",
+          `${baseName}.ts`,
+        );
+        if (existsSync(installedTsPath)) {
+          return installedTsPath;
+        }
+
+        // Also try compiled .js (future: if package ships compiled files)
+        const compiledPath = resolve(
+          process.cwd(),
+          "node_modules",
+          "@next-vibe",
+          "checker",
+          "oxlint-plugins",
+          fileName,
+        );
+        if (existsSync(compiledPath)) {
+          return compiledPath;
+        }
+
+        // Fallback for .js: try finding .ts source files (dev environment / monorepo)
+        let searchDir = process.cwd();
+        for (let i = 0; i < 10; i++) {
+          const sourcePath = resolve(
+            searchDir,
+            "src",
+            "app",
+            "api",
+            "[locale]",
+            "system",
+            "check",
+            "oxlint",
+            "plugins",
+            baseName,
+            "src",
+            "index.ts",
+          );
+          if (existsSync(sourcePath)) {
+            return sourcePath;
+          }
+          const parent = dirname(searchDir);
+          if (parent === searchDir) {
+            break;
+          }
+          searchDir = parent;
+        }
+      }
+
+      // Fallback: return expected path from cwd
+      return resolve(
+        process.cwd(),
+        "src",
+        "app",
+        "api",
+        "[locale]",
+        "system",
+        "check",
+        "oxlint",
+        "plugins",
+        baseName,
+        "src",
+        "index.ts",
+      );
     }
 
     // If no prefix matched, return absolute path if it exists, otherwise as-is
@@ -835,6 +873,33 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
       for (const stat of results) {
         if (!stat || configMtimeMs > stat.mtimeMs) {
+          return { needsRegeneration: true };
+        }
+      }
+
+      // Also check that all resolved jsPlugin paths actually exist on disk.
+      // This catches stale configs where the package was updated and plugin
+      // paths changed (e.g. from .dist/oxlint-plugins/ to oxlint-plugins/).
+      if (config.oxlint.enabled && config.oxlint.jsPlugins?.length) {
+        const oxlintConfigPath = `${process.cwd()}/${config.oxlint.configPath}`;
+        try {
+          const rawConfig = await fs.readFile(oxlintConfigPath, "utf8");
+          const parsed = JSON.parse(rawConfig) as {
+            jsPlugins?: string[];
+          };
+          if (parsed.jsPlugins?.length) {
+            for (const pluginPath of parsed.jsPlugins) {
+              if (!existsSync(pluginPath)) {
+                logger.debug(
+                  "Stale jsPlugin path detected, forcing regeneration",
+                  { path: pluginPath },
+                );
+                return { needsRegeneration: true };
+              }
+            }
+          }
+        } catch {
+          // If we can't read/parse the config, regenerate to be safe
           return { needsRegeneration: true };
         }
       }

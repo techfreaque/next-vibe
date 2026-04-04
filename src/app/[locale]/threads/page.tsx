@@ -24,7 +24,10 @@ export interface ThreadsRootPageData {
   locale: CountryLanguage;
 }
 
-async function getDefaultFolder(locale: CountryLanguage): Promise<string> {
+export async function tanstackLoader({
+  params,
+}: ThreadsRootPageProps): Promise<never> {
+  const { locale } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
   const userResponse = await UserRepository.getUserByAuth(
     {
@@ -35,14 +38,7 @@ async function getDefaultFolder(locale: CountryLanguage): Promise<string> {
     logger,
   );
   const user = userResponse.success ? userResponse.data : undefined;
-  return user?.isPublic ? "incognito" : "private";
-}
-
-export async function tanstackLoader({
-  params,
-}: ThreadsRootPageProps): Promise<ThreadsRootPageData> {
-  const { locale } = await params;
-  const folder = await getDefaultFolder(locale);
+  const folder = user?.isPublic ? "incognito" : "private";
   redirect(`/${locale}/threads/${folder}`);
 }
 
@@ -53,7 +49,5 @@ export function TanstackPage(): JSX.Element {
 export default async function ThreadsRootPage({
   params,
 }: ThreadsRootPageProps): Promise<never> {
-  const { locale } = await params;
-  const folder = await getDefaultFolder(locale);
-  redirect(`/${locale}/threads/${folder}`);
+  return tanstackLoader({ params });
 }

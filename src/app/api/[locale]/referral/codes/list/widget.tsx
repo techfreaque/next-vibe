@@ -14,20 +14,128 @@ import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Users } from "next-vibe-ui/ui/icons/Users";
+import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
 import { REFERRAL_CONFIG } from "../../config";
 import type definition from "./definition";
 import type { CodesListGetResponseOutput } from "./definition";
+
+/**
+ * Matches all valid CountryLanguage locale path prefixes.
+ * Built from LanguagesArr × CountriesArr so it stays in sync with config.
+ * e.g. /en-US/, /de-DE/, /pl-GLOBAL/ etc. Also matches bare language /en/, /de/
+ */
+const ALL_LOCALES = LanguagesArr.flatMap((lang) =>
+  CountriesArr.map((country) => `${lang}-${country}`),
+);
+const LOCALE_PREFIX_RE = new RegExp(
+  `^/(${[...ALL_LOCALES, ...LanguagesArr].join("|")})(/|$)`,
+);
 
 function formatDollars(cents: number): string {
   const dollars = cents / 100;
   return dollars % 1 === 0
     ? `$${dollars.toFixed(0)}`
     : `$${dollars.toFixed(2)}`;
+}
+
+/**
+ * Extract a locale-free path from a pasted URL.
+ * Handles: full URLs (https://unbottled.ai/en-US/threads),
+ * paths with locale (/de-DE/skill/123), bare paths (/threads),
+ * and plain text (threads). Strips domain + locale prefix.
+ */
+function extractPath(input: string): string {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    return "";
+  }
+
+  let pathname: string;
+  try {
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+      const url = new URL(trimmed);
+      pathname = url.pathname + url.search + url.hash;
+    } else {
+      pathname = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+    }
+  } catch {
+    pathname = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  }
+
+  // Strip locale prefix (e.g. /en-US/threads → /threads, /de/skill → /skill)
+  const stripped = pathname.replace(LOCALE_PREFIX_RE, "/");
+  // Normalise to always start with /
+  return stripped.startsWith("/") ? stripped : `/${stripped}`;
+}
+
+/**
+ * Inline link generator for a single referral code
+ */
+function LinkGenerator({
+  code,
+  t,
+}: {
+  code: string;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+}): React.JSX.Element {
+  const [urlInput, setUrlInput] = useState("");
+  const [copiedLinkGen, setCopiedLinkGen] = useState(false);
+
+  const generatedPath = extractPath(urlInput);
+  const hasInput = generatedPath.length > 0;
+
+  const handleCopyGenerated = useCallback(async () => {
+    if (typeof window === "undefined" || !hasInput) {
+      return;
+    }
+    const trackUrl = `${window.location.origin}/track?ref=${code}&url=${encodeURIComponent(generatedPath)}`;
+    await navigator.clipboard.writeText(trackUrl);
+    setCopiedLinkGen(true);
+    setTimeout(() => {
+      setCopiedLinkGen(false);
+    }, 2000);
+  }, [code, generatedPath, hasInput]);
+
+  return (
+    <Div className="flex items-center gap-2">
+      <Div className="relative flex-1">
+        <Input
+          type="text"
+          value={urlInput}
+          onChange={(e) => {
+            setUrlInput(e.target.value);
+          }}
+          placeholder={t("codes.list.widget.linkGenPlaceholder")}
+          className="h-8 text-xs pr-2 font-mono"
+        />
+      </Div>
+      <Button
+        variant="outline"
+        size="sm"
+        className="h-8 shrink-0 text-xs"
+        disabled={!hasInput}
+        onClick={handleCopyGenerated}
+      >
+        {copiedLinkGen ? (
+          <>
+            <Check className="h-3 w-3 mr-1.5 text-emerald-500" />
+            {t("codes.list.widget.linkGenCopied")}
+          </>
+        ) : (
+          <>
+            <Copy className="h-3 w-3 mr-1.5" />
+            {t("codes.list.widget.linkGenCopy")}
+          </>
+        )}
+      </Button>
+    </Div>
+  );
 }
 
 /**
@@ -121,6 +229,20 @@ export function ReferralCodesListContainer({
                   {`/track?ref=${code.code}`}
                 </Div>
               </Div>
+            </Div>
+
+            {/* Link Generator */}
+            <Div className="px-4 py-3 border-b bg-muted/10">
+              <Div className="flex items-center gap-2 mb-2">
+                <Link2 className="h-3.5 w-3.5 text-muted-foreground" />
+                <Span className="text-xs font-medium text-muted-foreground">
+                  {t("codes.list.widget.linkGen")}
+                </Span>
+                <Span className="text-xs text-muted-foreground/50">
+                  — {t("codes.list.widget.linkGenHint")}
+                </Span>
+              </Div>
+              <LinkGenerator code={code.code} t={t} />
             </Div>
 
             {/* Stats Grid */}

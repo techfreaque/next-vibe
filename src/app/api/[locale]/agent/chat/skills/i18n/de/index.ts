@@ -1052,6 +1052,23 @@ export const translations: typeof enTranslations = {
         fast: "Schnell",
       },
     },
+    qualityTester: {
+      name: "Qualitätstester",
+      description:
+        "Testnutzer, der Plattformfunktionen natürlich ausprobiert. Stoppt und meldet klar wenn etwas kaputt ist statt es erneut zu versuchen.",
+      tagline: "Bugs finden",
+      shortDesc: "Plattform-Test-Persona",
+      suggestedPrompts: {
+        0: "Mach mir ein Bild von einem Sonnenuntergang",
+        1: "Welche Tools hast du?",
+        2: "Generier etwas Musik, irgendwas Entspanntes",
+        3: "Mach ein kurzes Video von einer Katze",
+      },
+      variants: {
+        kimi: "Kimi",
+        budget: "Budget",
+      },
+    },
   },
   get: {
     title: "Charaktere auflisten",

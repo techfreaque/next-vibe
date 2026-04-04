@@ -106,6 +106,7 @@ const { POST } = createEndpoint({
         description: "post.size.description",
         columns: 6,
         options: ImageSizeOptions,
+        hiddenForPlatforms: [Platform.AI, Platform.MCP],
         schema: z.enum(ImageSize).default(ImageSize.SQUARE_1024),
       }),
       quality: requestField(scopedTranslation, {
@@ -115,7 +116,18 @@ const { POST } = createEndpoint({
         description: "post.quality.description",
         columns: 6,
         options: ImageQualityOptions,
+        hiddenForPlatforms: [Platform.AI, Platform.MCP],
         schema: z.enum(ImageQuality).default(ImageQuality.STANDARD),
+      }),
+      aspectRatio: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.aspectRatio.label",
+        description: "post.aspectRatio.description",
+        columns: 6,
+        options: [],
+        hiddenForPlatforms: [Platform.AI, Platform.MCP],
+        schema: z.string().optional(),
       }),
       backButton: backButton(scopedTranslation, {
         label: "post.backButton.label" as const,

@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
-  aliases: ["config-create", "create-config", "cc"],
+  aliases: ["config", "config-create", "create-config", "cc"],
 
   fields: customWidgetObject({
     render: ConfigCreateWidget,

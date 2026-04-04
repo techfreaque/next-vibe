@@ -23,6 +23,20 @@ const ALLOWED_MIME_TYPES = [
   "image/gif",
   "image/webp",
   "image/svg+xml",
+  // Audio
+  "audio/mpeg",
+  "audio/mp3",
+  "audio/wav",
+  "audio/x-wav",
+  "audio/ogg",
+  "audio/webm",
+  "audio/mp4",
+  "audio/flac",
+  // Video
+  "video/mp4",
+  "video/webm",
+  "video/ogg",
+  "video/quicktime",
   // Documents
   "application/pdf",
   "text/plain",

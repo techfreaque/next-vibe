@@ -1,18 +1,13 @@
 /**
- * Media-Gen Model Enum Generator
+ * Media-Gen Inline Enum Generator
  *
- * Shared utility used by both:
- * - Price updater (after updating modalities in source files)
- * - `vibe gen` (for immediate dev use)
+ * Splices LLM-derived model IDs into the `// BEGIN:llm-generated` / `// END:llm-generated`
+ * markers inside ImageGenModelId, VideoGenModelId, and MusicGenModelId enums.
  *
- * Scans chat model definitions for output modalities and splices
- * auto-generated enum entries into the media-gen model files using
- * marker comments. Only generates enum entries — model option objects
- * are built at runtime by merging chatModelOptions into the media-gen
- * options list.
- *
- * Pattern mirrors vision-enum-generator.ts but operates on outputs
- * instead of inputs.
+ * Called by the price updater after updating chat model output modalities.
+ * Models with outputs containing "image" → ImageGenModelId
+ * Models with outputs containing "video" → VideoGenModelId
+ * Models with outputs containing "audio" → MusicGenModelId
  */
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -20,18 +15,15 @@ import { readFileSync, writeFileSync } from "node:fs";
 import type { Modality } from "../models/enum";
 import type { ModelDefinition } from "../models/models";
 
+const BEGIN_MARKER =
+  "  // BEGIN:llm-generated — do not edit manually, updated by price updater";
+const END_MARKER = "  // END:llm-generated";
+
 interface EnumEntry {
   key: string;
   value: string;
 }
 
-const ENUM_START_MARKER =
-  "  // --- AUTO-GENERATED from chat models with matching output modality ---";
-const ENUM_END_MARKER = "  // --- END AUTO-GENERATED ---";
-
-/**
- * Build enum entries for chat models that output a given modality.
- */
 function collectEntriesForModality(
   modality: Modality,
   chatDefs: Record<string, ModelDefinition>,
@@ -43,80 +35,49 @@ function collectEntriesForModality(
     if (!def || def.enabled === false) {
       continue;
     }
-    const outputs: Modality[] = def.outputs;
-    if (outputs.includes(modality)) {
+    if (def.outputs.includes(modality)) {
       entries.push({ key, value });
     }
   }
   return entries;
 }
 
-/**
- * Splice auto-generated content between marker comments in a file.
- * Returns the updated file content, or null if markers are missing.
- */
-function spliceMarkers(
-  content: string,
-  startMarker: string,
-  endMarker: string,
-  replacement: string,
-): string | null {
-  const startIdx = content.indexOf(startMarker);
-  const endIdx = content.indexOf(endMarker);
-  if (startIdx === -1 || endIdx === -1) {
-    return null;
+function spliceEnumEntries(source: string, entries: EnumEntry[]): string {
+  const beginIdx = source.indexOf(BEGIN_MARKER);
+  const endIdx = source.indexOf(END_MARKER);
+  if (beginIdx === -1 || endIdx === -1) {
+    // Return source unchanged — caller handles missing markers gracefully
+    return source;
   }
-  const before = content.slice(0, startIdx + startMarker.length);
-  const after = content.slice(endIdx);
-  return `${before}\n${replacement}${after}`;
-}
-
-export interface MediaGenEnumUpdate {
-  filePath: string;
-  modality: Modality;
+  const before = source.slice(0, beginIdx + BEGIN_MARKER.length);
+  const after = source.slice(endIdx);
+  const lines = entries.map((e) => `  ${e.key} = "${e.value}",`);
+  const middle = lines.length > 0 ? `\n${lines.join("\n")}\n` : "\n";
+  return before + middle + after;
 }
 
 /**
- * Update a media-gen model file's enum with auto-generated entries from chat models.
- *
- * The file must contain ENUM_START_MARKER and ENUM_END_MARKER comments.
+ * Update the llm-generated section of a media-gen enum file.
  * Returns true if the file was modified.
  */
-export function updateMediaGenEnumFile(
-  update: MediaGenEnumUpdate,
+export function updateMediaGenInlineEnum(
+  filePath: string,
+  modality: Modality,
   chatDefs: Record<string, ModelDefinition>,
   chatEnumEntries: Array<[string, string]>,
   logger?: { info: (msg: string) => void; warn: (msg: string) => void },
 ): boolean {
   const entries = collectEntriesForModality(
-    update.modality,
+    modality,
     chatDefs,
     chatEnumEntries,
   );
-
-  const original = readFileSync(update.filePath, "utf-8");
-  const enumLines =
-    entries.length > 0
-      ? `${entries.map((e) => `  ${e.key} = "${e.value}",`).join("\n")}\n`
-      : "";
-
-  const result = spliceMarkers(
-    original,
-    ENUM_START_MARKER,
-    ENUM_END_MARKER,
-    enumLines,
-  );
-  if (!result) {
-    logger?.warn(`Missing enum markers in ${update.filePath} — skipping`);
+  const existing = readFileSync(filePath, "utf-8");
+  const updated = spliceEnumEntries(existing, entries);
+  if (updated === existing) {
     return false;
   }
-
-  if (result !== original) {
-    writeFileSync(update.filePath, result, "utf-8");
-    logger?.info(
-      `Media-gen enum regenerated in ${update.filePath} (${entries.length} chat model entries)`,
-    );
-    return true;
-  }
-  return false;
+  writeFileSync(filePath, updated, "utf-8");
+  logger?.info(`Media-gen ${modality} enum updated in ${filePath}`);
+  return true;
 }

@@ -16,6 +16,8 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -34,12 +36,13 @@ export const generateMetadata = async ({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const modelCount = getAvailableModelCount(agentEnvAvailability, false);
 
   return metadataGenerator(locale, {
     path: `skill/${skillId}`,
     title: t("meta.title", { appName }),
     category: t("meta.category"),
-    description: t("meta.description", { appName }),
+    description: t("meta.description", { appName, modelCount }),
     image:
       "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?q=80&w=2070",
     imageAlt: t("meta.imageAlt", { appName }),

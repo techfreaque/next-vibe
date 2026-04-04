@@ -33,6 +33,7 @@ import {
   ChatModelId,
   FEATURED_MODELS,
 } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { ModelCountsByContentLevel } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
 
 import { scopedTranslation } from "./i18n";
@@ -45,6 +46,7 @@ interface CapabilityShowcaseProps {
   totalToolCount: number;
   totalModelCount: number;
   totalProviderCount: number;
+  modelCountsByTier: ModelCountsByContentLevel;
 }
 
 interface CapabilityBlockProps {
@@ -739,7 +741,13 @@ function buildModelsDemoGroup(
   return { primary: response, continuations: [], sequenceId: seq };
 }
 
-function ModelsVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
+function ModelsVisual({
+  locale,
+  modelCountsByTier,
+}: {
+  locale: CountryLanguage;
+  modelCountsByTier: ModelCountsByContentLevel;
+}): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
@@ -753,12 +761,17 @@ function ModelsVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
     setActiveId(id);
   }, []);
 
+  const mainstreamMore =
+    modelCountsByTier.mainstream - FEATURED_MODELS.mainstream.length;
+  const openMore = modelCountsByTier.open - FEATURED_MODELS.open.length;
+
   const tiers: {
     id: CensorDemoId;
     name: string;
     className: string;
     activeRingClass: string;
     models: string;
+    totalCount: number;
   }[] = [
     {
       id: "mainstream",
@@ -766,7 +779,11 @@ function ModelsVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
       className:
         "bg-indigo-50 dark:bg-indigo-500/15 text-indigo-800 dark:text-indigo-200 border-indigo-200 dark:border-indigo-500/30",
       activeRingClass: "ring-2 ring-indigo-500",
-      models: FEATURED_MODELS.mainstream.join(", "),
+      models:
+        mainstreamMore > 0
+          ? `${FEATURED_MODELS.mainstream.join(", ")} ${t("home.capabilities.models.andMore", { count: mainstreamMore })}`
+          : FEATURED_MODELS.mainstream.join(", "),
+      totalCount: modelCountsByTier.mainstream,
     },
     {
       id: "open",
@@ -774,7 +791,11 @@ function ModelsVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
       className:
         "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-500/30",
       activeRingClass: "ring-2 ring-emerald-500",
-      models: FEATURED_MODELS.open.join(", "),
+      models:
+        openMore > 0
+          ? `${FEATURED_MODELS.open.join(", ")} ${t("home.capabilities.models.andMore", { count: openMore })}`
+          : FEATURED_MODELS.open.join(", "),
+      totalCount: modelCountsByTier.open,
     },
     {
       id: "uncensored",
@@ -783,6 +804,7 @@ function ModelsVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
         "bg-rose-50 dark:bg-rose-500/15 text-rose-800 dark:text-rose-200 border-rose-200 dark:border-rose-500/30",
       activeRingClass: "ring-2 ring-rose-500",
       models: FEATURED_MODELS.uncensored.join(", "),
+      totalCount: modelCountsByTier.uncensored,
     },
   ];
 
@@ -1137,6 +1159,7 @@ export function CapabilityShowcase({
   locale,
   totalModelCount,
   totalProviderCount,
+  modelCountsByTier,
 }: CapabilityShowcaseProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const [ref] = useInView({ triggerOnce: true, threshold: 0.05 });
@@ -1153,7 +1176,12 @@ export function CapabilityShowcase({
           label={t("home.capabilities.models.label")}
           title={t("home.capabilities.models.title", interpolation)}
           description={t("home.capabilities.models.description", interpolation)}
-          visual={<ModelsVisual locale={locale} />}
+          visual={
+            <ModelsVisual
+              locale={locale}
+              modelCountsByTier={modelCountsByTier}
+            />
+          }
           reversed={false}
           delay={0}
         />

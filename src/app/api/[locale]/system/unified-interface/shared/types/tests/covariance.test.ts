@@ -30,10 +30,10 @@ import type {
   CreateApiEndpoint,
 } from "../../endpoints/definition/create";
 import {
-  arrayOptionalField,
   objectOptionalField,
   requestDataArrayField,
   responseArrayField,
+  responseArrayOptionalField,
 } from "../../field/utils";
 import {
   objectField,
@@ -374,8 +374,7 @@ const test5_1_response_field = responseArrayField(
 );
 
 // Test 5.1c: Optional login history
-const test5_1_optional_field = arrayOptionalField(
-  { response: true },
+const test5_1_optional_field = responseArrayOptionalField(
   { type: WidgetType.CONTAINER },
   objectField({
     type: WidgetType.CONTAINER,

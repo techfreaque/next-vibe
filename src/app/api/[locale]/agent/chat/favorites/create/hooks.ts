@@ -17,7 +17,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { IconKey } from "../../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useEnvAvailability } from "../../../env-availability-context";
-import type { VoiceModelSelection } from "../../../models/types";
+import type { VoiceModelSelection } from "../../../text-to-speech/models";
 import characterSingleDefinitions from "../../skills/[id]/definition";
 import { ChatFavoritesRepositoryClient } from "../repository-client";
 import favoritesDefinition, {

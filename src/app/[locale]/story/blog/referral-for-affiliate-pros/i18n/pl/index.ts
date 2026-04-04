@@ -56,7 +56,7 @@ export const translations: typeof enTranslations = {
   audience: {
     title: "Kto jest naturalną grupą docelową tej platformy?",
     intro:
-      "{{appName}} ma konkretne pozycjonowanie: AI z wolnością słowa i 50+ modelami, filtrowanie treści kontrolowane przez użytkownika, privacy-first. To przemawia do:",
+      "{{appName}} ma konkretne pozycjonowanie: AI z wolnością słowa i {{modelCount}} modelami, filtrowanie treści kontrolowane przez użytkownika, privacy-first. To przemawia do:",
     group1Title: "Deweloperów i użytkowników technicznych",
     group1Body:
       "Osób, które chcą dostępu do API, nienawidzą restrykcyjnych polityk AI i już płacą za wiele subskrypcji AI. Wysoki ARPU, wysoka retencja.",
@@ -68,7 +68,7 @@ export const translations: typeof enTranslations = {
       "Pisarzy, YouTuberów i blogerów, którzy używają AI do szkiców, badań i burzy mózgów. Korzystają z nieobjętych cenzurą modeli do fikcji, treści dla dorosłych lub kontrowersyjnych tematów.",
     group4Title: "Nie-techników ciekawych AI",
     group4Body:
-      "Osób śledzących trend AI, ale przytłoczonych opcjami. Wybór 50+ modeli i prosty interfejs dobrze konwertują z treści tutorialowych.",
+      "Osób śledzących trend AI, ale przytłoczonych opcjami. Wybór {{modelCount}} modeli i prosty interfejs dobrze konwertują z treści tutorialowych.",
   },
   promotion: {
     title: "Skuteczne kąty promocji",

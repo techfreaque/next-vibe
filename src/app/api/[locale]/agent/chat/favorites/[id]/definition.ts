@@ -11,15 +11,22 @@ import {
 } from "@/app/api/[locale]/agent/models/enum";
 import {
   chatModelSelectionSchema,
-  imageGenModelSelectionSchema,
-  musicGenModelSelectionSchema,
-  sttModelSelectionSchema,
-  videoGenModelSelectionSchema,
+  filterChatModels,
+  type ChatModelSelection,
+  type getBestChatModel,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
-  audioVisionModelSelectionSchema,
-  voiceModelSelectionSchema,
-} from "@/app/api/[locale]/agent/models/types";
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
+import type { ModelProviderEnvAvailability } from "@/app/api/[locale]/agent/models/models";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   dateSchema,
   iconSchema,
@@ -156,7 +163,7 @@ const { DELETE } = createEndpoint({
                   ...oldData.data,
                   sections: oldData.data.sections.map((section) => ({
                     ...section,
-                    characters: section.skills.map((char) =>
+                    skills: section.skills.map((char) =>
                       char.id === deletedSkillId
                         ? { ...char, addedToFav: false }
                         : char,
@@ -347,9 +354,7 @@ const { PATCH } = createEndpoint({
         if (isActiveFavorite && settingsData?.success) {
           let modelId = settingsData.data.selectedModel ?? undefined;
           if (requestData.modelSelection) {
-            const { SkillsRepositoryClient } =
-              await import("../../skills/repository-client");
-            const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
+            const bestModel = getBestChatModelForFavorite(
               requestData.modelSelection,
               undefined,
               user,
@@ -481,6 +486,9 @@ const { PATCH } = createEndpoint({
                         id: pathParams.id,
                         skillId: fav.skillId,
                         variantId: fav.variantId ?? null,
+                        customVariantName:
+                          requestData.customVariantName ??
+                          fav.customVariantName,
                         customIcon: requestData.icon ?? null,
                         voiceModelSelection:
                           requestData.voiceModelSelection ?? null,
@@ -1336,3 +1344,38 @@ const _test2: ManualModelSelection = {} as FavoriteManualModelSelection;
 const _test3: {
   selectionType: typeof ModelSelectionType.CHARACTER_BASED;
 } = {} as FavoriteSkillBasedModelSelection;
+
+// ============================================================
+// CHAT FAVORITE RESOLUTION
+// ============================================================
+
+/** Get all chat models for a favorite (favorite overrides skill selection). */
+export function filterChatModelsForFavorite(
+  favoriteModelSelection: FavoriteGetModelSelection | null,
+  skillModelSelection: ChatModelSelection | undefined,
+  user: JwtPayloadType,
+  env: ModelProviderEnvAvailability,
+): ReturnType<typeof filterChatModels> {
+  const selectionToUse = favoriteModelSelection ?? skillModelSelection;
+  if (!selectionToUse) {
+    return [];
+  }
+  return filterChatModels(selectionToUse, user, env);
+}
+
+/** Get best chat model for a favorite. */
+export function getBestChatModelForFavorite(
+  favoriteModelSelection: FavoriteGetModelSelection | null,
+  skillModelSelection: ChatModelSelection | undefined,
+  user: JwtPayloadType,
+  env: ModelProviderEnvAvailability,
+): ReturnType<typeof getBestChatModel> {
+  return (
+    filterChatModelsForFavorite(
+      favoriteModelSelection,
+      skillModelSelection,
+      user,
+      env,
+    )[0] ?? null
+  );
+}

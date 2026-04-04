@@ -21,7 +21,7 @@ export const translations = {
     paragraph1:
       "Every feature needed a web form, a CLI command, an MCP tool for AI agents, sometimes a mobile screen. Same Zod validation, same i18n, same error handling - just dressed differently. So I built next-vibe: a framework where you write one definition.ts per feature and it renders as all of them simultaneously.",
     paragraph2:
-      "It also powers {{appName}} - 50+ AI models, user-controlled censorship. The same codebase runs as a Next.js web app, a TanStack/Vite dev server, a React Native mobile app, a CLI, an MCP server, a cron system, and a WebSocket event bus. One endpoint definition. No duplication.",
+      "It also powers {{appName}} - {{modelCount}} AI models, user-controlled censorship. The same codebase runs as a Next.js web app, a TanStack/Vite dev server, a React Native mobile app, a CLI, an MCP server, a cron system, and a WebSocket event bus. One endpoint definition. No duplication.",
   },
   typeRules: {
     title: "Types must align. No exceptions.",

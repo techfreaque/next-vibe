@@ -237,6 +237,21 @@ export const translations: typeof enTranslations = {
       openRouterDescription:
         "Dostęp do 200+ modeli AI. Działa razem z Claude Code lub samodzielnie.",
       openRouterHint: "Pobierz darmowy klucz API na openrouter.ai/keys",
+      unbottledTitle: "Unbottled AI Cloud",
+      unbottledDescription:
+        "Zaloguj się do unbottled.ai, aby uzyskać dostęp do wszystkich modeli AI bez zarządzania kluczami API. Twoja instancja przekazuje przez chmurę.",
+      unbottledConnected: "Połączono z {{url}}",
+      unbottledDisconnected: "Nie połączono",
+      unbottledSignIn: "Zaloguj się",
+      unbottledSigningIn: "Logowanie...",
+      unbottledDisconnect: "Rozłącz",
+      unbottledEmail: "E-mail",
+      unbottledPassword: "Hasło",
+      unbottledRemoteUrl: "URL chmury",
+      unbottledLoginFailed:
+        "Logowanie nie powiodło się - sprawdź e-mail i hasło.",
+      unbottledConnectionError:
+        "Nie można połączyć z serwerem. Sprawdź adres URL.",
     },
   },
 

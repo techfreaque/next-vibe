@@ -28,7 +28,11 @@ import { Switch } from "next-vibe-ui/ui/switch";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
+import { Cloud } from "next-vibe-ui/ui/icons/Cloud";
+import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
+
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -219,21 +223,237 @@ function OpenRouterHint({ t }: { t: (k: string) => string }): JSX.Element {
   );
 }
 
+function UnbottledLoginField({
+  setting,
+  onEdit,
+  t,
+  locale,
+}: {
+  setting: Setting;
+  onEdit: (key: string, value: string) => void;
+  t: (k: string, params?: Record<string, string>) => string;
+  locale: string;
+}): JSX.Element {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  // eslint-disable-next-line i18next/no-literal-string
+  const [remoteUrl, setRemoteUrl] = useState("https://unbottled.ai");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Parse existing credential to show connected state
+  const isConnected = setting.health === "connected";
+  const isConfiguredButUnhealthy = setting.isConfigured && !isConnected;
+  const connectedUrl = setting.isConfigured
+    ? (setting.value?.match(/https?:\/\/.+$/)?.[0] ?? "")
+    : "";
+
+  const handleSignIn = useCallback(async (): Promise<void> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Step 1: Ping remote to get lead_id cookie
+      const normalizedUrl = remoteUrl.replace(/\/+$/, "");
+      let remotePingLeadId: string | undefined;
+      try {
+        const pingResponse = await fetch(`${normalizedUrl}/${locale}`, {
+          method: "GET",
+          redirect: "follow",
+          signal: AbortSignal.timeout(10_000),
+        });
+        const setCookie = pingResponse.headers.get("set-cookie") ?? "";
+        const match = setCookie.match(
+          new RegExp(`${LEAD_ID_COOKIE_NAME}=([^;]+)`),
+        );
+        remotePingLeadId = match?.[1];
+      } catch {
+        setError(t("wizard.ai.unbottledConnectionError"));
+        setLoading(false);
+        return;
+      }
+
+      // Step 2: POST login with email/password
+      const loginUrl = `${normalizedUrl}/api/${locale}/user/public/login`;
+      const loginResponse = await fetch(loginUrl, {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          "Content-Type": "application/json",
+          ...(remotePingLeadId && {
+            Cookie: `${LEAD_ID_COOKIE_NAME}=${remotePingLeadId}`,
+          }),
+        },
+        body: JSON.stringify({ email, password, rememberMe: true }),
+        signal: AbortSignal.timeout(15_000),
+      });
+
+      if (!loginResponse.ok) {
+        setError(t("wizard.ai.unbottledLoginFailed"));
+        setLoading(false);
+        return;
+      }
+
+      const loginBody = (await loginResponse.json()) as {
+        success?: boolean;
+        data?: { token?: string; leadId?: string };
+      };
+
+      if (!loginBody.success || !loginBody.data?.token) {
+        setError(t("wizard.ai.unbottledLoginFailed"));
+        setLoading(false);
+        return;
+      }
+
+      const token = loginBody.data.token;
+      const effectiveLeadId = loginBody.data.leadId ?? remotePingLeadId ?? "";
+
+      // Step 3: Format credential string and pass to save
+      // eslint-disable-next-line i18next/no-literal-string
+      const credential = `${effectiveLeadId}:${token}:${normalizedUrl}`;
+      onEdit("UNBOTTLED_CLOUD_CREDENTIALS", credential);
+    } catch {
+      setError(t("wizard.ai.unbottledConnectionError"));
+    } finally {
+      setLoading(false);
+    }
+  }, [email, password, remoteUrl, locale, onEdit, t]);
+
+  const handleDisconnect = useCallback((): void => {
+    onEdit("UNBOTTLED_CLOUD_CREDENTIALS", "");
+  }, [onEdit]);
+
+  return (
+    <Div className="flex flex-col gap-3 mb-4">
+      <Div className="flex items-center gap-1.5">
+        <Cloud className="h-4 w-4 text-primary shrink-0" />
+        <Span className="text-sm font-medium">
+          {t("wizard.ai.unbottledTitle")}
+        </Span>
+      </Div>
+      <Span className="text-xs text-muted-foreground">
+        {t("wizard.ai.unbottledDescription")}
+      </Span>
+
+      {isConnected ? (
+        <Div className="flex flex-col gap-2">
+          <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 text-xs text-green-800 dark:text-green-300">
+            <Check className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+            <Span>
+              {t("wizard.ai.unbottledConnected", { url: connectedUrl })}
+            </Span>
+          </Div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-fit text-xs h-7"
+            onClick={handleDisconnect}
+          >
+            {t("wizard.ai.unbottledDisconnect")}
+          </Button>
+        </Div>
+      ) : isConfiguredButUnhealthy ? (
+        <Div className="flex flex-col gap-2">
+          <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300">
+            <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+            <Span>{t("wizard.ai.unbottledDisconnected")}</Span>
+          </Div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-fit text-xs h-7"
+            onClick={handleDisconnect}
+          >
+            {t("wizard.ai.unbottledDisconnect")}
+          </Button>
+        </Div>
+      ) : (
+        <Div className="flex flex-col gap-2">
+          <Input
+            className="h-9 text-sm"
+            placeholder={t("wizard.ai.unbottledEmail")}
+            type="email"
+            value={email}
+            onChange={(e: InputChangeEvent<"email">): void =>
+              setEmail(String(e.target.value ?? ""))
+            }
+          />
+          <Input
+            className="h-9 text-sm"
+            placeholder={t("wizard.ai.unbottledPassword")}
+            type="password"
+            value={password}
+            onChange={(e: InputChangeEvent<"password">): void =>
+              setPassword(String(e.target.value ?? ""))
+            }
+          />
+          <Input
+            className="h-9 text-sm font-mono"
+            placeholder={t("wizard.ai.unbottledRemoteUrl")}
+            value={remoteUrl}
+            onChange={(e: InputChangeEvent): void =>
+              setRemoteUrl(String(e.target.value ?? ""))
+            }
+          />
+
+          {error && (
+            <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-xs text-red-800 dark:text-red-300">
+              <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+              <Span>{error}</Span>
+            </Div>
+          )}
+
+          <Button
+            size="sm"
+            className="w-fit"
+            disabled={loading || !email || !password}
+            onClick={handleSignIn}
+          >
+            {loading ? (
+              <>
+                <RefreshCw className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                {t("wizard.ai.unbottledSigningIn")}
+              </>
+            ) : (
+              <>
+                <LogIn className="h-3.5 w-3.5 mr-1.5" />
+                {t("wizard.ai.unbottledSignIn")}
+              </>
+            )}
+          </Button>
+        </Div>
+      )}
+    </Div>
+  );
+}
+
 function WizardField({
   setting,
   editedValue,
   onEdit,
   onGenerate,
+  locale,
   t,
 }: {
   setting: Setting;
   editedValue: string | undefined;
   onEdit: (key: string, value: string) => void;
   onGenerate?: (key: string) => Promise<void>;
+  locale: string;
   t: (k: string) => string;
 }): JSX.Element {
   if (setting.key === "CLAUDE_CODE_ENABLED") {
     return <ClaudeCodeField setting={setting} t={t} />;
+  }
+  if (setting.key === "UNBOTTLED_CLOUD_CREDENTIALS") {
+    return (
+      <UnbottledLoginField
+        setting={setting}
+        onEdit={onEdit}
+        t={t}
+        locale={locale}
+      />
+    );
   }
   const autoGen = isAutoGenerated(setting.key);
   const displayValue =
@@ -536,6 +756,7 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
             onGenerate={
               isAutoGenerated(setting.key) ? handleGenerate : undefined
             }
+            locale={locale}
             t={t}
           />
         ))}

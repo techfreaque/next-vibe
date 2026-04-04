@@ -90,10 +90,18 @@ export const translations = {
       insufficientCredits:
         "Niewystarczające kredyty. Saldo: {{balance}}, wymagane: {{minimum}}",
       balanceCheckFailed: "Nie udało się sprawdzić salda kredytów",
-      generationFailed: "Generowanie muzyki nie powiodło się: {{error}}",
+      unsupportedDuration:
+        "Model {{model}} nie obsługuje czasu trwania {{duration}}. Obsługiwane czasy: {{supported}}",
+      generationFailed: "Generowanie muzyki nie powiodło się",
       providerError: "Błąd dostawcy: {{error}}",
       noAudioUrl: "Dostawca nie zwrócił URL audio",
       creditsFailed: "Nie udało się odjąć kredytów za generowanie muzyki",
+      apiKeyNotConfigured: "Klucz API nie jest skonfigurowany",
+      externalServiceError: "Błąd zewnętrznej usługi: {{message}}",
+      requestAborted: "Żądanie zostało przerwane",
+      requestTimedOut: "Przekroczono czas oczekiwania na generowanie muzyki",
+      requestFailed: "Żądanie nie powiodło się: {{message}}",
+      pollFailed: "Odpytywanie nie powiodło się ze statusem {{status}}",
     },
     success: {
       title: "Muzyka wygenerowana",

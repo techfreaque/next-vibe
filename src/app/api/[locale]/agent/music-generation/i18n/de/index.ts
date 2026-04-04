@@ -92,11 +92,19 @@ export const translations = {
       insufficientCredits:
         "Nicht genug Credits. Guthaben: {{balance}}, erforderlich: {{minimum}}",
       balanceCheckFailed: "Kontostand konnte nicht geprüft werden",
-      generationFailed: "Musikgenerierung fehlgeschlagen: {{error}}",
+      unsupportedDuration:
+        "Modell {{model}} unterstützt die Dauer {{duration}} nicht. Unterstützte Dauern: {{supported}}",
+      generationFailed: "Musikgenerierung fehlgeschlagen",
       providerError: "Anbieter-Fehler: {{error}}",
       noAudioUrl: "Kein Audio-URL vom Anbieter zurückgegeben",
       creditsFailed:
         "Credits für Musikgenerierung konnten nicht abgezogen werden",
+      apiKeyNotConfigured: "API-Schlüssel nicht konfiguriert",
+      externalServiceError: "Externer Dienst-Fehler: {{message}}",
+      requestAborted: "Anfrage wurde abgebrochen",
+      requestTimedOut: "Zeitüberschreitung bei der Musikgenerierung",
+      requestFailed: "Anfrage fehlgeschlagen: {{message}}",
+      pollFailed: "Abfrage fehlgeschlagen mit Status {{status}}",
     },
     success: {
       title: "Musik generiert",

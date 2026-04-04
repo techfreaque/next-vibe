@@ -1,16 +1,26 @@
+import { z } from "zod";
+
+import { objectEntries } from "../../shared/utils";
 import {
   ContentLevel,
   IntelligenceLevel,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+  PriceLevel,
   SpeedLevel,
 } from "../chat/skills/enum";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
   defaultFeatures,
+  filterRoleModels,
   getProviderPrice,
   type ModelDefinition,
   type ModelOptionTtsBased,
+  type ModelProviderEnvAvailability,
 } from "../models/models";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 export enum TtsModelId {
   OPENAI_ALLOY = "openai-alloy",
@@ -344,15 +354,18 @@ export type TtsModelOption = ModelOptionTtsBased & { id: TtsModelId };
 
 function buildTtsModelOptions(): Record<string, TtsModelOption> {
   const result: Record<string, TtsModelOption> = {};
-  for (const [modelId, def] of Object.entries(ttsModelDefinitions)) {
+  for (const [modelId, def] of objectEntries(ttsModelDefinitions)) {
     const sortedProviders = [...def.providers].toSorted(
       (a, b) => getProviderPrice(a) - getProviderPrice(b),
     );
     for (const provider of sortedProviders) {
       if ("creditCostPerCharacter" in provider) {
         const p = provider;
+        if (!p.creditCostPerCharacter) {
+          continue;
+        }
         result[modelId] = {
-          id: modelId as TtsModelId,
+          id: modelId,
           name: def.name,
           provider: def.by,
           apiProvider: provider.apiProvider,
@@ -372,7 +385,7 @@ function buildTtsModelOptions(): Record<string, TtsModelOption> {
           inputs: def.inputs,
           outputs: def.outputs,
           voiceMeta: def.voiceMeta,
-          creditCostPerCharacter: p.creditCostPerCharacter,
+          creditCostPerCharacter: p.creditCostPerCharacter ?? 0,
         };
       }
     }
@@ -394,4 +407,74 @@ export const TtsModelIdOptions = Object.values(TtsModelId).map((id) => ({
 
 export function getTtsModelById(modelId: TtsModelId): TtsModelOption {
   return ttsModelOptionsIndex[modelId];
+}
+
+// ============================================================
+// TTS MODEL SELECTION SCHEMA
+// ============================================================
+
+const sharedFilterPropsSchema = z.object({
+  intelligenceRange: z
+    .object({
+      min: z.enum(IntelligenceLevel).optional(),
+      max: z.enum(IntelligenceLevel).optional(),
+    })
+    .optional(),
+  priceRange: z
+    .object({
+      min: z.enum(PriceLevel).optional(),
+      max: z.enum(PriceLevel).optional(),
+    })
+    .optional(),
+  contentRange: z
+    .object({
+      min: z.enum(ContentLevel).optional(),
+      max: z.enum(ContentLevel).optional(),
+    })
+    .optional(),
+  speedRange: z
+    .object({
+      min: z.enum(SpeedLevel).optional(),
+      max: z.enum(SpeedLevel).optional(),
+    })
+    .optional(),
+  sortBy: z.enum(ModelSortField).optional(),
+  sortDirection: z.enum(ModelSortDirection).optional(),
+  sortBy2: z.enum(ModelSortField).optional(),
+  sortDirection2: z.enum(ModelSortDirection).optional(),
+});
+
+const filtersSelectionSchema = z
+  .object({ selectionType: z.literal(ModelSelectionType.FILTERS) })
+  .merge(sharedFilterPropsSchema);
+
+export const voiceModelSelectionSchema = z.discriminatedUnion("selectionType", [
+  z
+    .object({
+      selectionType: z.literal(ModelSelectionType.MANUAL),
+      manualModelId: z.enum(TtsModelId),
+    })
+    .merge(sharedFilterPropsSchema),
+  filtersSelectionSchema,
+]);
+export type VoiceModelSelection = z.infer<typeof voiceModelSelectionSchema>;
+
+// ============================================================
+// TTS MODEL RESOLUTION
+// ============================================================
+
+export function filterTtsModels(
+  selection: VoiceModelSelection | null | undefined,
+  user: JwtPayloadType,
+  env: ModelProviderEnvAvailability,
+): TtsModelOption[] {
+  return filterRoleModels(ttsModelOptions, selection, user, env);
+}
+
+export function getBestTtsModel(
+  selection: VoiceModelSelection,
+  user: JwtPayloadType,
+  env: ModelProviderEnvAvailability,
+): TtsModelOption | null {
+  return filterTtsModels(selection, user, env)[0] ?? null;
 }

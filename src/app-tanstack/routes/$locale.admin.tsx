@@ -12,7 +12,7 @@ const loadData = createServerFn({ method: "GET" })
   });
 
 export const Route = createFileRoute("/$locale/admin")({
-  staleTime: Infinity,
+  staleTime: 0,
   loader: ({ params }) => loadData({ data: params as Record<string, string> }),
   component: () => <Layout {...Route.useLoaderData()}><Outlet /></Layout>,
 });

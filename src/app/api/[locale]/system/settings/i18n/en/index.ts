@@ -235,6 +235,19 @@ export const translations = {
         "Access 200+ AI models (GPT-4, Claude, Llama, and more). Works alongside Claude Code or on its own.",
       openRouterHint:
         "Get your free API key at openrouter.ai/keys - no credit card required for free models.",
+      unbottledTitle: "Unbottled AI Cloud",
+      unbottledDescription:
+        "Sign in to unbottled.ai to access all AI models without managing API keys. Your self-hosted instance relays through the cloud.",
+      unbottledConnected: "Connected to {{url}}",
+      unbottledDisconnected: "Not connected",
+      unbottledSignIn: "Sign In",
+      unbottledSigningIn: "Signing in...",
+      unbottledDisconnect: "Disconnect",
+      unbottledEmail: "Email",
+      unbottledPassword: "Password",
+      unbottledRemoteUrl: "Cloud URL",
+      unbottledLoginFailed: "Login failed - check your email and password.",
+      unbottledConnectionError: "Could not reach the server. Check the URL.",
     },
   },
 

@@ -13,18 +13,18 @@ import { Textarea } from "next-vibe-ui/ui/textarea";
 import { H3 } from "next-vibe-ui/ui/typography";
 import { Video } from "next-vibe-ui/ui/video";
 import type { JSX } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/models/types";
-import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
+import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import { getVideoGenModelById } from "@/app/api/[locale]/agent/video-generation/models";
 import {
   useWidgetForm,
@@ -39,7 +39,6 @@ import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/
 import { objectValues } from "../../shared/utils";
 import type definition from "./definition";
 import type { VideoGenerationPostResponseOutput } from "./definition";
-import { VideoDuration } from "./enum";
 import { scopedTranslation } from "./i18n";
 import { VideoGenModelId } from "./models";
 
@@ -49,10 +48,11 @@ interface CustomWidgetProps {
   } & (typeof definition.POST)["fields"];
 }
 
-const DURATION_PRESETS = [
-  { label: "Short", sublabel: "~5s", value: VideoDuration.SHORT },
-  { label: "Medium", sublabel: "~10s", value: VideoDuration.MEDIUM },
-  { label: "Long", sublabel: "~15s", value: VideoDuration.LONG },
+/** Default duration presets when model has no supportedDurations */
+const DEFAULT_DURATION_PRESETS = [
+  { label: "Short", sublabel: "~5s", seconds: 5 },
+  { label: "Medium", sublabel: "~10s", seconds: 10 },
+  { label: "Long", sublabel: "~15s", seconds: 15 },
 ] as const;
 
 const STYLE_CHIPS = [
@@ -65,6 +65,45 @@ const STYLE_CHIPS = [
   "Abstract",
   "Documentary",
 ];
+
+/** Build duration presets from model's supportedDurations (seconds as strings) */
+function buildDurationPresets(
+  supportedDurations: readonly string[] | undefined,
+): Array<{ label: string; sublabel: string; seconds: number }> {
+  if (!supportedDurations || supportedDurations.length === 0) {
+    return [...DEFAULT_DURATION_PRESETS];
+  }
+  const sorted = [...supportedDurations]
+    .map((s) => parseInt(s, 10))
+    .filter((n) => !isNaN(n) && n > 0)
+    .toSorted((a, b) => a - b);
+
+  if (sorted.length === 0) {
+    return [...DEFAULT_DURATION_PRESETS];
+  }
+
+  // Label: Short = first, Long = last, Medium = middle (if 3+), otherwise numbered
+  return sorted.map((seconds, i) => {
+    let label: string;
+    if (sorted.length === 1) {
+      label = `${String(seconds)}s`;
+    } else if (sorted.length === 2) {
+      label = i === 0 ? "Short" : "Long";
+    } else if (sorted.length === 3) {
+      label = i === 0 ? "Short" : i === 1 ? "Medium" : "Long";
+    } else {
+      // 4+ options: label first/last specially, number the rest
+      if (i === 0) {
+        label = "Short";
+      } else if (i === sorted.length - 1) {
+        label = "Long";
+      } else {
+        label = `${String(seconds)}s`;
+      }
+    }
+    return { label, sublabel: `~${String(seconds)}s`, seconds };
+  });
+}
 
 export function VideoGenerationContainer({
   field,
@@ -81,10 +120,11 @@ export function VideoGenerationContainer({
   const [showModelSelector, setShowModelSelector] = useState(false);
 
   const currentModelId = form?.watch("model");
-  const currentDuration = form?.watch("duration") ?? VideoDuration.SHORT;
+  const currentDuration = form?.watch("duration") ?? 5;
+  const currentAspectRatio = form?.watch("aspectRatio");
+  const currentResolution = form?.watch("resolution");
 
   const modelSelection = useMemo((): VideoGenModelSelection | undefined => {
-    // model is resolved via serverDefault on the field definition
     if (!currentModelId) {
       return undefined;
     }
@@ -97,7 +137,7 @@ export function VideoGenerationContainer({
   const defaultModelSelection = useMemo(():
     | VideoGenModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestVideoGenModel(
+    const m = getBestVideoGenModel(
       DEFAULT_VIDEO_GEN_MODEL_SELECTION,
       user,
       envAvailability,
@@ -117,15 +157,65 @@ export function VideoGenerationContainer({
   const resolvedModelId: VideoGenModelId | undefined =
     currentModelId ??
     (defaultModelSelection?.selectionType === ModelSelectionType.MANUAL
-      ? objectValues(VideoGenModelId).includes(
-          defaultModelSelection.manualModelId,
-        )
-        ? defaultModelSelection.manualModelId
-        : undefined
+      ? defaultModelSelection.manualModelId
       : undefined);
   const resolvedModel = resolvedModelId
     ? getVideoGenModelById(resolvedModelId)
     : undefined;
+  const resolvedVideoBased = resolvedModel;
+
+  // Build dynamic duration presets from model capabilities
+  const durationPresets = useMemo(
+    () => buildDurationPresets(resolvedVideoBased?.supportedDurations),
+    [resolvedVideoBased?.supportedDurations],
+  );
+
+  // Aspect ratio options from model capabilities — memoized to avoid stale deps in useEffect
+  const aspectRatioOptions = useMemo(
+    () => resolvedVideoBased?.supportedAspectRatios || [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [resolvedModelId],
+  );
+  const resolutionOptions = useMemo(
+    () => resolvedVideoBased?.supportedResolutions ?? [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [resolvedModelId],
+  );
+
+  // When model changes, reset duration/aspectRatio/resolution to valid defaults
+  useEffect(() => {
+    if (!resolvedModel) {
+      return;
+    }
+    const validDurations = durationPresets.map((p) => p.seconds);
+    if (!validDurations.includes(currentDuration)) {
+      form?.setValue("duration", validDurations[0] ?? 5);
+    }
+    if (
+      aspectRatioOptions.length > 0 &&
+      currentAspectRatio &&
+      !aspectRatioOptions.includes(currentAspectRatio)
+    ) {
+      form?.setValue("aspectRatio", aspectRatioOptions[0]);
+    }
+    if (
+      resolutionOptions.length > 0 &&
+      currentResolution &&
+      !resolutionOptions.includes(currentResolution)
+    ) {
+      form?.setValue("resolution", resolutionOptions[0]);
+    }
+  }, [
+    resolvedModelId,
+    durationPresets,
+    aspectRatioOptions,
+    resolutionOptions,
+    currentDuration,
+    currentAspectRatio,
+    currentResolution,
+    form,
+    resolvedModel,
+  ]);
 
   const appendStyle = (style: string): void => {
     const current = form?.getValues("prompt") ?? "";
@@ -209,22 +299,22 @@ export function VideoGenerationContainer({
           </Div>
         </Div>
 
-        {/* Duration presets */}
+        {/* Duration presets — dynamic per model */}
         <Div className="flex flex-col gap-1.5">
           <Span className="text-xs font-medium text-muted-foreground">
             {t("post.duration.label")}
           </Span>
           <Div className="flex gap-2">
-            {DURATION_PRESETS.map((preset) => (
+            {durationPresets.map((preset) => (
               <Button
-                key={preset.value}
+                key={preset.seconds}
                 type="button"
                 variant={
-                  currentDuration === preset.value ? "default" : "outline"
+                  currentDuration === preset.seconds ? "default" : "outline"
                 }
                 size="sm"
                 className="flex-1 h-auto py-2 flex flex-col gap-0.5"
-                onClick={() => form?.setValue("duration", preset.value)}
+                onClick={() => form?.setValue("duration", preset.seconds)}
               >
                 <Span className="text-xs font-medium">{preset.label}</Span>
                 <Span className="text-[10px] opacity-70">
@@ -234,6 +324,52 @@ export function VideoGenerationContainer({
             ))}
           </Div>
         </Div>
+
+        {/* Aspect ratio — only shown when model supports multiple ratios */}
+        {aspectRatioOptions.length > 1 && (
+          <Div className="flex flex-col gap-1.5">
+            <Span className="text-xs font-medium text-muted-foreground">
+              {t("post.aspectRatio.label")}
+            </Span>
+            <Div className="flex flex-wrap gap-1.5">
+              {aspectRatioOptions.map((ratio) => (
+                <Button
+                  key={ratio}
+                  type="button"
+                  variant={currentAspectRatio === ratio ? "default" : "outline"}
+                  size="sm"
+                  className="h-7 px-3 text-xs"
+                  onClick={() => form?.setValue("aspectRatio", ratio)}
+                >
+                  {ratio}
+                </Button>
+              ))}
+            </Div>
+          </Div>
+        )}
+
+        {/* Resolution — only shown when model supports multiple resolutions */}
+        {resolutionOptions.length > 1 && (
+          <Div className="flex flex-col gap-1.5">
+            <Span className="text-xs font-medium text-muted-foreground">
+              {t("post.resolution.label")}
+            </Span>
+            <Div className="flex flex-wrap gap-1.5">
+              {resolutionOptions.map((res) => (
+                <Button
+                  key={res}
+                  type="button"
+                  variant={currentResolution === res ? "default" : "outline"}
+                  size="sm"
+                  className="h-7 px-3 text-xs"
+                  onClick={() => form?.setValue("resolution", res)}
+                >
+                  {res}
+                </Button>
+              ))}
+            </Div>
+          </Div>
+        )}
 
         {/* Model selector */}
         <Div className="flex flex-col gap-1.5">
@@ -331,6 +467,16 @@ export function VideoGenerationContainer({
               {result.durationSeconds !== undefined && (
                 <Badge variant="outline" className="text-[10px]">
                   {result.durationSeconds}s
+                </Badge>
+              )}
+              {currentAspectRatio && (
+                <Badge variant="outline" className="text-[10px]">
+                  {currentAspectRatio}
+                </Badge>
+              )}
+              {currentResolution && (
+                <Badge variant="outline" className="text-[10px]">
+                  {currentResolution}
                 </Badge>
               )}
               {result.creditCost !== undefined && (

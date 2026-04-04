@@ -11,6 +11,8 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, Muted, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { configScopedTranslation } from "@/config/i18n";
@@ -42,13 +44,17 @@ export const generateMetadata = async ({
 
 export interface ReferralAffiliateProsPageData {
   locale: CountryLanguage;
+  modelCount: number;
 }
 
 export async function tanstackLoader({
   params,
 }: Props): Promise<ReferralAffiliateProsPageData> {
   const { locale } = await params;
-  return { locale };
+  return {
+    locale,
+    modelCount: getAvailableModelCount(agentEnvAvailability, false),
+  };
 }
 
 function CommissionRow({
@@ -136,6 +142,7 @@ function AngleCard({
 
 export function TanstackPage({
   locale,
+  modelCount,
 }: ReferralAffiliateProsPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -285,7 +292,7 @@ export function TanstackPage({
         <Div>
           <H2 className="text-2xl font-bold mb-3">{t("audience.title")}</H2>
           <P className="text-muted-foreground mb-6">
-            {t("audience.intro", { appName })}
+            {t("audience.intro", { appName, modelCount })}
           </P>
           <Div className="grid sm:grid-cols-2 gap-4">
             <AudienceCard
@@ -302,7 +309,7 @@ export function TanstackPage({
             />
             <AudienceCard
               title={t("audience.group4Title")}
-              body={t("audience.group4Body")}
+              body={t("audience.group4Body", { modelCount })}
             />
           </Div>
         </Div>

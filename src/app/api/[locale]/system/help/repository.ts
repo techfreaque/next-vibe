@@ -147,6 +147,11 @@ export class HelpRepository {
     userRoles: string[],
     isPublic: boolean,
   ): boolean {
+    // CLI_AUTH_BYPASS means the endpoint opted into CLI access without auth —
+    // it should be visible to any CLI user regardless of their roles.
+    if (roles.includes(PlatformMarker.CLI_AUTH_BYPASS)) {
+      return true;
+    }
     const permRoles = roles.filter(
       (r) =>
         !r.endsWith("Off") &&
@@ -735,11 +740,15 @@ export class HelpRepository {
     if (platformFilter) {
       const mapped = HelpRepository.mapFilterToPlatform(platformFilter);
       discoveryPlatform = mapped === "all" ? Platform.CLI : mapped;
-    } else if (!isCompact) {
+    } else if (
+      !isCompact &&
+      platform !== Platform.CLI &&
+      platform !== Platform.CLI_PACKAGE
+    ) {
       // Web (all roles): default to AI tool set - admin can override with platformFilter
       discoveryPlatform = Platform.AI;
     } else {
-      // Compact platforms (AI/MCP/CRON/CLI): use actual calling platform
+      // Compact platforms (AI/MCP/CRON), CLI, and CLI_PACKAGE: use actual calling platform
       discoveryPlatform = platform;
     }
 

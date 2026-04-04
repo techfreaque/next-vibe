@@ -116,7 +116,7 @@ interface CliOptions {
   remote?: boolean;
 }
 
-const CLI_VERSION = "3.0.0" as const;
+const CLI_VERSION = "3.0.7" as const;
 const DEFAULT_OUTPUT = "pretty" as const;
 
 export interface RunCliOptions {
@@ -186,9 +186,24 @@ export function runCli({
         options: CliOptions,
         cmd: Record<string, string | number | boolean>,
       ) => {
-        // If no command and a default endpoint is configured, route there directly
+        // If no command and a default endpoint is configured, route there directly.
+        // Also: if a defaultEndpoint is set and the first positional arg doesn't
+        // match any known tool/alias (e.g. `vibe-check src/`), treat it as an
+        // argument to the default endpoint rather than an unknown command.
         let command = rawCommand;
         if (!command && defaultEndpoint) {
+          command = defaultEndpoint;
+        } else if (
+          command &&
+          defaultEndpoint &&
+          getEndpoint &&
+          command !== "mcp" &&
+          command !== "help" &&
+          command !== "h" &&
+          !(await getEndpoint(command))
+        ) {
+          // rawCommand is not a known tool — treat it as the first path arg
+          args = [command, ...args];
           command = defaultEndpoint;
         }
 

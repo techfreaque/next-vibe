@@ -7,20 +7,24 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 
 import { UserRole } from "../../../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
+
+const TestResultWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.TestResultWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -44,13 +48,9 @@ const { POST } = createEndpoint({
     firstCliArgKey: "path",
   },
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "container.title",
-    description: "container.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: TestResultWidget,
+    usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
       path: requestField(scopedTranslation, {

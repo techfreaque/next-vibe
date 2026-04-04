@@ -28,7 +28,7 @@ const releaseConfig: ReleaseFileConfig = {
 
   // Global version for synchronized releases (optional)
   // When set, all packages will use this version
-  globalVersion: "3.0.0",
+  globalVersion: "3.0.7",
 
   // Branch configuration
   branch: {
@@ -98,7 +98,7 @@ const releaseConfig: ReleaseFileConfig = {
         versionBumper: [
           {
             filePath:
-              "./src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
+              "./src/app/api/[locale]/system/unified-interface/cli/run-cli.ts",
             varName: "CLI_VERSION",
           },
         ],

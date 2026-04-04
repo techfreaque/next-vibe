@@ -8,7 +8,7 @@ export const translations = {
     firstSteps:
       "Start by trying a task you've been avoiding because other AI tools kept refusing it. No guardrails, no lectures - just results.",
     modelChoice:
-      "You have access to 42+ models. If you're not sure where to start, try the default model. You can switch anytime.",
+      "You have access to {{modelCount}} models. If you're not sure where to start, try the default model. You can switch anytime.",
     signature: "The unbottled.ai team",
   },
   followup1: {

@@ -58,7 +58,7 @@ export const translations: typeof enTranslations = {
     },
     aiModels: {
       title: "Modele AI",
-      description: "40+ niecenzurowanych modeli AI",
+      description: "{{modelCount}} niecenzurowanych modeli AI",
     },
     folders: {
       title: "Poziomy prywatności",

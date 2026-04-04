@@ -36,6 +36,10 @@ export const translations = {
       standard: "Standard",
       hd: "HD",
     },
+    aspectRatio: {
+      label: "Seitenverhältnis",
+      description: "Seitenverhältnis des Ausgabebildes",
+    },
     download: "Herunterladen",
     dimensionSeparator: "×",
     backButton: {
@@ -97,11 +101,23 @@ export const translations = {
       insufficientCredits:
         "Nicht genug Credits. Guthaben: {{balance}}, erforderlich: {{minimum}}",
       balanceCheckFailed: "Kontostand konnte nicht geprüft werden",
-      generationFailed: "Bildgenerierung fehlgeschlagen: {{error}}",
+      unsupportedSize:
+        "Modell {{model}} unterstützt die Größe {{size}} nicht. Unterstützte Größen: {{supported}}",
+      unsupportedQuality:
+        "Modell {{model}} unterstützt die Qualität {{quality}} nicht. Unterstützte Qualitäten: {{supported}}",
+      unsupportedAspectRatio:
+        "Modell {{model}} unterstützt das Seitenverhältnis {{aspectRatio}} nicht. Unterstützte Verhältnisse: {{supported}}",
+      generationFailed: "Bildgenerierung fehlgeschlagen",
       providerError: "Anbieter-Fehler: {{error}}",
       noImageUrl: "Kein Bild-URL vom Anbieter zurückgegeben",
       creditsFailed:
         "Credits für Bildgenerierung konnten nicht abgezogen werden",
+      apiKeyNotConfigured: "API-Schlüssel nicht konfiguriert",
+      externalServiceError: "Externer Dienst-Fehler: {{message}}",
+      requestAborted: "Anfrage wurde abgebrochen",
+      requestTimedOut: "Zeitüberschreitung bei der Bildgenerierung",
+      requestFailed: "Anfrage fehlgeschlagen: {{message}}",
+      pollFailed: "Abfrage fehlgeschlagen mit Status {{status}}",
     },
     success: {
       title: "Bild generiert",

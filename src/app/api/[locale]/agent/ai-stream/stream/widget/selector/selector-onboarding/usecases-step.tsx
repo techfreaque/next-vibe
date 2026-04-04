@@ -31,12 +31,12 @@ import {
 } from "@/app/api/[locale]/agent/chat/skills/config";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
-import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import {
+  getBestChatModel,
+  type ChatModelSelection,
+} from "@/app/api/[locale]/agent/ai-stream/models";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type {
-  ChatModelSelection,
-  VoiceModelSelection,
-} from "@/app/api/[locale]/agent/models/types";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
@@ -251,6 +251,7 @@ export function UsecasesStep({
   const noProviderAvailable =
     !envAvailability.claudeCode &&
     !envAvailability.openRouter &&
+    !envAvailability.unbottled &&
     !envAvailability.uncensoredAI &&
     !envAvailability.freedomGPT &&
     !envAvailability.gabAI &&
@@ -350,17 +351,13 @@ export function UsecasesStep({
             sel?.selectionType === ModelSelectionType.MANUAL
               ? sel.manualModelId
               : sel
-                ? (SkillsRepositoryClient.getBestModelForSkill(
-                    sel,
-                    user,
-                    envAvailability,
-                  )?.id ??
-                  SkillsRepositoryClient.getBestModelForSkill(
+                ? (getBestChatModel(sel, user, envAvailability)?.id ??
+                  getBestChatModel(
                     DEFAULT_CHAT_MODEL_SELECTION,
                     user,
                     envAvailability,
                   )?.id)
-                : SkillsRepositoryClient.getBestModelForSkill(
+                : getBestChatModel(
                     DEFAULT_CHAT_MODEL_SELECTION,
                     user,
                     envAvailability,

@@ -55,6 +55,9 @@ const STEP_LABELS = {
   // eslint-disable-next-line i18next/no-literal-string
   updatePackageJson: "Update package.json scripts (check, lint, typecheck)?",
   // eslint-disable-next-line i18next/no-literal-string
+  enableEslint:
+    "Enable ESLint? (import sorting, React hooks — slower but catches more)",
+  // eslint-disable-next-line i18next/no-literal-string
   enableReactRules: "Enable React-specific linting rules?",
   // eslint-disable-next-line i18next/no-literal-string
   enableNextjsRules: "Enable Next.js-specific linting rules?",
@@ -82,6 +85,11 @@ const WIZARD_STEPS: WizardStep[] = [
   {
     key: "updatePackageJson",
     label: STEP_LABELS.updatePackageJson,
+    defaultValue: true,
+  },
+  {
+    key: "enableEslint",
+    label: STEP_LABELS.enableEslint,
     defaultValue: true,
   },
   {

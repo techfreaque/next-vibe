@@ -38,6 +38,7 @@ interface PackageEndpointGeneratorInput {
 interface PackageEndpointGeneratorResult {
   endpointFile: string;
   aliasMapFile: string;
+  routeHandlersFile: string;
   endpointCount: number;
 }
 
@@ -146,20 +147,38 @@ export class PackageEndpointGeneratorRepository {
     return `@/app/api/[locale]/${segment}/definition`;
   }
 
+  // Build route.ts import path from definition file path
+  private static toRouteImportPath(defFile: string): string {
+    const marker = "[locale]/";
+    const idx = defFile.indexOf(marker);
+    if (idx === -1) {
+      return defFile;
+    }
+    const after = defFile.slice(idx + marker.length);
+    const segment = after.replace(/\/definition\.ts$/, "");
+    return `@/app/api/[locale]/${segment}/route`;
+  }
+
   private static async generateContent(
     filteredDefinitionFiles: string[],
   ): Promise<{
     endpointContent: string;
     aliasMapContent: string;
+    routeHandlersContent: string;
     endpointCount: number;
   }> {
-    const pathMap: Record<string, { importPath: string; method: string }> = {};
+    const pathMap: Record<
+      string,
+      { importPath: string; routeImportPath: string; method: string }
+    > = {};
     const allPaths: string[] = [];
     let endpointCount = 0;
 
     for (const defFile of filteredDefinitionFiles) {
       const importPath =
         PackageEndpointGeneratorRepository.toImportPath(defFile);
+      const routeImportPath =
+        PackageEndpointGeneratorRepository.toRouteImportPath(defFile);
 
       let definition;
       try {
@@ -201,7 +220,7 @@ export class PackageEndpointGeneratorRepository {
         const toolName = endpointToToolName(endpoint);
 
         if (!pathMap[toolName]) {
-          pathMap[toolName] = { importPath, method };
+          pathMap[toolName] = { importPath, routeImportPath, method };
           allPaths.push(toolName);
           endpointCount++;
         }
@@ -209,7 +228,7 @@ export class PackageEndpointGeneratorRepository {
         if (endpoint.aliases && Array.isArray(endpoint.aliases)) {
           for (const alias of endpoint.aliases) {
             if (!pathMap[alias]) {
-              pathMap[alias] = { importPath, method };
+              pathMap[alias] = { importPath, routeImportPath, method };
               allPaths.push(alias);
             }
           }
@@ -262,8 +281,9 @@ export class PackageEndpointGeneratorRepository {
 
     // Generate switch cases
     const cases: string[] = [];
+    const routeCases: string[] = [];
     for (const path of allPaths) {
-      const { importPath, method } = pathMap[path];
+      const { importPath, routeImportPath, method } = pathMap[path];
       const fullLine = `      return (await import("${importPath}")).default.${method};`;
       const returnWithDefault = `      return (await import("${importPath}")).default`;
       const returnWithParen = `      return (await import("${importPath}"))`;
@@ -288,6 +308,26 @@ export class PackageEndpointGeneratorRepository {
       return (
         await import("${importPath}")
       ).default.${method};`);
+      }
+
+      // Route handler case: maps alias → route.ts handler
+      const routeFullLine = `      return (await import("${routeImportPath}")).tools.${method} as GenericHandlerBase;`;
+      const routeWithParen = `      return (await import("${routeImportPath}"))`;
+      if (routeFullLine.length <= 80) {
+        // eslint-disable-next-line i18next/no-literal-string
+        routeCases.push(`    case "${path}":
+      return (await import("${routeImportPath}")).tools.${method} as GenericHandlerBase;`);
+      } else if (routeWithParen.length <= 80) {
+        // eslint-disable-next-line i18next/no-literal-string
+        routeCases.push(`    case "${path}":
+      return (await import("${routeImportPath}"))
+        .tools.${method} as GenericHandlerBase;`);
+      } else {
+        // eslint-disable-next-line i18next/no-literal-string
+        routeCases.push(`    case "${path}":
+      return (
+        await import("${routeImportPath}")
+      ).tools.${method} as GenericHandlerBase;`);
       }
     }
 
@@ -350,7 +390,33 @@ ${cases.join("\n")}
 }
 `;
 
-    return { endpointContent, aliasMapContent, endpointCount };
+    // eslint-disable-next-line i18next/no-literal-string
+    const routeHandlersContent = `${header}
+
+/* eslint-disable prettier/prettier */
+
+import type { GenericHandlerBase } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
+
+/**
+ * Dynamically import route handler by path (scoped to this package).
+ */
+export async function getRouteHandler(
+  path: string,
+): Promise<GenericHandlerBase | null> {
+  switch (path) {
+${routeCases.join("\n")}
+    default:
+      return null;
+  }
+}
+`;
+
+    return {
+      endpointContent,
+      aliasMapContent,
+      routeHandlersContent,
+      endpointCount,
+    };
   }
 
   // ============================================================================
@@ -399,17 +465,23 @@ ${cases.join("\n")}
       }
     }
 
-    const { endpointContent, aliasMapContent, endpointCount } =
-      await PackageEndpointGeneratorRepository.generateContent(
-        filteredDefinitionFiles,
-      );
+    const {
+      endpointContent,
+      aliasMapContent,
+      routeHandlersContent,
+      endpointCount,
+    } = await PackageEndpointGeneratorRepository.generateContent(
+      filteredDefinitionFiles,
+    );
 
     const endpointFile = join(outputDir, "endpoint.ts");
     const aliasMapFile = join(outputDir, "alias-map.ts");
+    const routeHandlersFile = join(outputDir, "route-handlers.ts");
 
     await writeGeneratedFile(endpointFile, endpointContent, dryRun);
     await writeGeneratedFile(aliasMapFile, aliasMapContent, dryRun);
+    await writeGeneratedFile(routeHandlersFile, routeHandlersContent, dryRun);
 
-    return { endpointFile, aliasMapFile, endpointCount };
+    return { endpointFile, aliasMapFile, routeHandlersFile, endpointCount };
   }
 }

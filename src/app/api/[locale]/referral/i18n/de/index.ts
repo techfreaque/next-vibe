@@ -136,6 +136,12 @@ export const translations: typeof enTranslations = {
         inactive: "Dieser Empfehlungscode ist inaktiv",
         conversionHint:
           "Jeder {{examplePrice}}/Monat-Abonnent bringt Ihnen {{exampleEarning}}/Monat - wiederkehrend",
+        linkGen: "Eigener Link",
+        linkGenPlaceholder: "Beliebige Seiten-URL einfügen...",
+        linkGenHint:
+          "Beliebige unbottled-Seiten-URL einfügen, um einen nachverfolgbaren Empfehlungslink zu erstellen",
+        linkGenCopy: "Kopieren",
+        linkGenCopied: "Kopiert!",
       },
     },
   },

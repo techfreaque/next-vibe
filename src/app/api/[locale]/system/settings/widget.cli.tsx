@@ -525,6 +525,153 @@ function buildSettingsMap(modules: Module[]): Map<string, Setting> {
   return map;
 }
 
+// ── Unbottled CLI Login ─────────────────────────────────────────────────
+
+function UnbottledCliLoginField({
+  currentField,
+  locale,
+  t,
+  onCredential,
+}: {
+  currentField: Setting;
+  locale: string;
+  t: (k: string) => string;
+  onCredential: (credential: string) => void;
+}): JSX.Element {
+  const [phase, setPhase] = useState<
+    "email" | "password" | "url" | "signing-in" | "done" | "error"
+  >(currentField.isConfigured ? "done" : "email");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  // eslint-disable-next-line i18next/no-literal-string
+  const [remoteUrl, setRemoteUrl] = useState("https://unbottled.ai");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const doLogin = useCallback(async (): Promise<void> => {
+    setPhase("signing-in");
+    try {
+      const { LEAD_ID_COOKIE_NAME } = await import("@/config/constants");
+      const normalizedUrl = remoteUrl.replace(/\/+$/, "");
+
+      // Ping for lead_id
+      let remotePingLeadId: string | undefined;
+      try {
+        const pingResponse = await fetch(`${normalizedUrl}/${locale}`, {
+          method: "GET",
+          redirect: "follow",
+          signal: AbortSignal.timeout(10_000),
+        });
+        const setCookie = pingResponse.headers.get("set-cookie") ?? "";
+        const match = setCookie.match(
+          new RegExp(`${LEAD_ID_COOKIE_NAME}=([^;]+)`),
+        );
+        remotePingLeadId = match?.[1];
+      } catch {
+        setErrorMsg(t("wizard.ai.unbottledConnectionError"));
+        setPhase("error");
+        return;
+      }
+
+      // Login
+      // eslint-disable-next-line i18next/no-literal-string
+      const loginUrl = `${normalizedUrl}/api/${locale}/user/public/login`;
+      const loginResponse = await fetch(loginUrl, {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          "Content-Type": "application/json",
+          ...(remotePingLeadId && {
+            Cookie: `${LEAD_ID_COOKIE_NAME}=${remotePingLeadId}`,
+          }),
+        },
+        body: JSON.stringify({ email, password, rememberMe: true }),
+        signal: AbortSignal.timeout(15_000),
+      });
+
+      if (!loginResponse.ok) {
+        setErrorMsg(t("wizard.ai.unbottledLoginFailed"));
+        setPhase("error");
+        return;
+      }
+
+      const loginBody = (await loginResponse.json()) as {
+        success?: boolean;
+        data?: { token?: string; leadId?: string };
+      };
+
+      if (!loginBody.success || !loginBody.data?.token) {
+        setErrorMsg(t("wizard.ai.unbottledLoginFailed"));
+        setPhase("error");
+        return;
+      }
+
+      const token = loginBody.data.token;
+      const effectiveLeadId = loginBody.data.leadId ?? remotePingLeadId ?? "";
+
+      // eslint-disable-next-line i18next/no-literal-string
+      onCredential(`${effectiveLeadId}:${token}:${normalizedUrl}`);
+      setPhase("done");
+    } catch {
+      setErrorMsg(t("wizard.ai.unbottledConnectionError"));
+      setPhase("error");
+    }
+  }, [email, password, remoteUrl, locale, t, onCredential]);
+
+  return (
+    <Box flexDirection="column" gap={1}>
+      <Text bold color="cyan">
+        {t("wizard.ai.unbottledTitle")}
+      </Text>
+      <Text dimColor>{t("wizard.ai.unbottledDescription")}</Text>
+
+      {phase === "done" ? (
+        <Text color="green">
+          {t("wizard.ai.unbottledConnected").replace("{{url}}", remoteUrl)}
+        </Text>
+      ) : phase === "signing-in" ? (
+        <Text color="yellow">{t("wizard.ai.unbottledSigningIn")}</Text>
+      ) : phase === "error" ? (
+        <Box flexDirection="column">
+          <Text color="red">{errorMsg}</Text>
+          <Text dimColor>{`[Enter] ${t("wizard.next")}`}</Text>
+        </Box>
+      ) : phase === "email" ? (
+        <Box>
+          <Text dimColor>{`${t("wizard.ai.unbottledEmail")}: `}</Text>
+          <TextInput
+            value={email}
+            placeholder="you@example.com"
+            onChange={setEmail}
+            onSubmit={(): void => setPhase("password")}
+          />
+        </Box>
+      ) : phase === "password" ? (
+        <Box>
+          <Text dimColor>{`${t("wizard.ai.unbottledPassword")}: `}</Text>
+          <TextInput
+            value={password}
+            mask="*"
+            onChange={setPassword}
+            onSubmit={(): void => setPhase("url")}
+          />
+        </Box>
+      ) : (
+        <Box>
+          <Text dimColor>{`${t("wizard.ai.unbottledRemoteUrl")}: `}</Text>
+          <TextInput
+            value={remoteUrl}
+            placeholder="https://unbottled.ai"
+            onChange={setRemoteUrl}
+            onSubmit={(): void => {
+              void doLogin();
+            }}
+          />
+        </Box>
+      )}
+    </Box>
+  );
+}
+
 interface WizardProps {
   value: SystemSettingsGetResponseOutput;
   onDone: () => void;
@@ -747,6 +894,19 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
               )}
               <Text dimColor>{`[${t("wizard.next")}] continue`}</Text>
             </Box>
+          ) : currentField.key === "UNBOTTLED_CLOUD_CREDENTIALS" ? (
+            /* Special unbottled login - prompt email, password, url then sign in */
+            <UnbottledCliLoginField
+              currentField={currentField}
+              locale={locale}
+              t={t}
+              onCredential={(credential): void => {
+                setEdits((prev) => ({
+                  ...prev,
+                  [currentField.key]: credential,
+                }));
+              }}
+            />
           ) : currentField.key === "OPENROUTER_API_KEY" ? (
             /* OpenRouter with extra hints */
             <Box flexDirection="column" gap={1}>

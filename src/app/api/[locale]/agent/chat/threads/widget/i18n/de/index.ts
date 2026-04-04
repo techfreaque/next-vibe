@@ -93,13 +93,13 @@ export const translations: typeof enTranslations = {
       welcome: {
         title: "Willkommen bei {{appName}}!",
         description:
-          "Ihre datenschutzorientierte KI-Plattform mit {{modelCount}}+ Modellen, benutzergesteuerter Inhaltsfilterung und freier Meinungsfreiheit.",
+          "Ihre datenschutzorientierte KI-Plattform mit {{modelCount}} Modellen, benutzergesteuerter Inhaltsfilterung und freier Meinungsfreiheit.",
         subtitle: "Machen Sie eine kurze Tour, um loszulegen.",
       },
       aiCompanion: {
         title: "Wählen Sie Ihren KI-Begleiter",
         description:
-          "Wählen Sie aus {{modelCount}}+ KI-Modellen, darunter Mainstream, Open-Source und zensurfreie Optionen.",
+          "Wählen Sie aus {{modelCount}} KI-Modellen, darunter Mainstream, Open-Source und zensurfreie Optionen.",
         tip: "Klicken Sie, um den Modellselektor zu öffnen und Ihren Begleiter auszuwählen.",
       },
       companionVariants: {

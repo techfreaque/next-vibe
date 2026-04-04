@@ -30,6 +30,14 @@ export const translations = {
       medium: "Średni (~10 sek.)",
       long: "Długi (~15 sek.)",
     },
+    aspectRatio: {
+      label: "Proporcje obrazu",
+      description: "Proporcje wyjściowego wideo",
+    },
+    resolution: {
+      label: "Rozdzielczość",
+      description: "Rozdzielczość wyjściowego wideo",
+    },
     download: "Pobierz",
     generatingNote: "Generowanie wideo może zająć 1–3 minuty",
     backButton: {
@@ -90,6 +98,12 @@ export const translations = {
       insufficientCredits:
         "Niewystarczające kredyty. Saldo: {{balance}}, wymagane: {{minimum}}",
       balanceCheckFailed: "Nie udało się sprawdzić salda kredytów",
+      unsupportedDuration:
+        "Model {{model}} nie obsługuje czasu trwania {{duration}}. Obsługiwane czasy: {{supported}}",
+      unsupportedAspectRatio:
+        "Model {{model}} nie obsługuje proporcji {{aspectRatio}}. Obsługiwane proporcje: {{supported}}",
+      unsupportedResolution:
+        "Model {{model}} nie obsługuje rozdzielczości {{resolution}}. Obsługiwane rozdzielczości: {{supported}}",
       generationFailed: "Generowanie wideo nie powiodło się: {{error}}",
       providerError: "Błąd dostawcy: {{error}}",
       noVideoUrl: "Dostawca nie zwrócił URL wideo",

@@ -1054,6 +1054,23 @@ export const translations: typeof enTranslations = {
         fast: "Szybki",
       },
     },
+    qualityTester: {
+      name: "Tester Jakości",
+      description:
+        "Testowy użytkownik, który naturalnie wypróbowuje funkcje platformy. Zatrzymuje się i jasno raportuje gdy coś się zepsuje zamiast próbować ponownie.",
+      tagline: "Znajdź bugi",
+      shortDesc: "Persona testowa platformy",
+      suggestedPrompts: {
+        0: "Zrób mi zdjęcie zachodu słońca",
+        1: "Jakie masz narzędzia?",
+        2: "Wygeneruj muzykę, coś relaksującego",
+        3: "Zrób krótki film z kotem",
+      },
+      variants: {
+        kimi: "Kimi",
+        budget: "Budżetowy",
+      },
+    },
   },
   get: {
     title: "Lista postaci",

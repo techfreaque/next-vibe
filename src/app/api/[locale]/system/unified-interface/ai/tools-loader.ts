@@ -10,7 +10,11 @@ import { jsonSchema, type JSONSchema7, tool } from "ai";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+import {
+  FOLDER_ALLOWS_REMOTE_TOOLS,
+  FOLDER_BLOCKED_CALLBACK_MODES,
+  type ToolExecutionContext,
+} from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import {
   collectServerDefaults,
@@ -94,20 +98,29 @@ function createToolFromEndpoint(
     properties?: Record<string, JSONSchema7>;
   };
   if (toolName !== "wait-for-task" && toolName !== "execute-tool") {
+    // Filter out callback modes blocked for this folder type
+    const blockedModes = new Set(
+      FOLDER_BLOCKED_CALLBACK_MODES[context.streamContext.rootFolderId] ?? [],
+    );
+    const allowedModes = allCallbackModes.filter((m) => !blockedModes.has(m));
+
     if (!schemaObj.properties) {
       schemaObj.properties = {};
     }
-    schemaObj.properties.callbackMode = {
-      type: "string",
-      enum: ["detach", "wakeUp", "endLoop", "approve"],
-      description:
-        "Optional. Controls post-execution behavior. " +
-        "'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. " +
-        "'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. " +
-        "'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. " +
-        "'approve': require user confirmation before executing. " +
-        "Omit for default synchronous execution.",
-    };
+    // Only inject callbackMode property if at least one mode is available
+    if (allowedModes.length > 0) {
+      schemaObj.properties.callbackMode = {
+        type: "string",
+        enum: allowedModes,
+        description:
+          "Optional. Controls post-execution behavior. " +
+          "'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. " +
+          "'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. " +
+          "'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. " +
+          "'approve': require user confirmation before executing. " +
+          "Omit for default synchronous execution.",
+      };
+    }
   }
 
   // Wrap JSON Schema in AI SDK's jsonSchema() function
@@ -203,6 +216,26 @@ function createToolFromEndpoint(
         aiMessageId: context.streamContext?.aiMessageId,
         streamContextRef: !!context.streamContext,
       });
+
+      // Defense in depth: reject callback modes blocked for this folder type
+      // even if the AI bypassed the schema enum restriction.
+      const folderBlockedModes =
+        FOLDER_BLOCKED_CALLBACK_MODES[context.streamContext.rootFolderId] ?? [];
+      if (callbackMode && folderBlockedModes.includes(callbackMode)) {
+        context.logger.warn(
+          "[ToolsLoader] Blocked callbackMode for restricted folder",
+          {
+            toolName,
+            callbackMode,
+            rootFolderId: context.streamContext.rootFolderId,
+          },
+        );
+        return {
+          error:
+            "This callback mode is not available in this conversation type.",
+          hint: "Use synchronous execution (omit callbackMode) instead.",
+        };
+      }
 
       // Race tool execution against the abort signal so cancellation
       // kills even long-running tool calls immediately.
@@ -397,6 +430,8 @@ function createToolFromEndpoint(
     },
   });
 }
+
+const allCallbackModes = ["detach", "wakeUp", "endLoop", "approve"];
 
 /**
  * Generate Zod input schema from endpoint fields
@@ -668,7 +703,11 @@ export async function loadTools(params: {
     }
 
     // ── Remote tools ─────────────────────────────────────────────────────────
-    if (remoteToolNames.length > 0 && !params.user.isPublic) {
+    if (
+      remoteToolNames.length > 0 &&
+      !params.user.isPublic &&
+      FOLDER_ALLOWS_REMOTE_TOOLS[params.streamContext.rootFolderId] !== false
+    ) {
       // Group by instanceId so we fetch capabilities once per instance
       const byInstance = new Map<string, string[]>();
       for (const n of remoteToolNames) {

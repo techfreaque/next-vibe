@@ -338,6 +338,10 @@ export class GenerateTanstackRoutesRepository {
     const isClientComponent =
       GenerateTanstackRoutesRepository.hasUseClientDirective(srcFile) ||
       GenerateTanstackRoutesRepository.hasSyncDefaultExport(srcFile);
+    // Respect Next.js `export const dynamic = "force-dynamic"` — disable caching
+    const isForceDynamic =
+      GenerateTanstackRoutesRepository.hasForceDynamic(srcFile);
+    const staleTime = isForceDynamic ? "0" : "Infinity";
 
     let content: string;
     if (hasTanstackLoader) {
@@ -390,7 +394,7 @@ export class GenerateTanstackRoutesRepository {
       if (hasSearch) {
         layoutLines.push(
           `export const Route = createFileRoute("${routePath}")({`,
-          `  staleTime: Infinity,`,
+          `  staleTime: ${staleTime},`,
           `  validateSearch: (search: Record<string, string>) => search,`,
           `  loaderDeps: ({ search }) => ({ search }),`,
           `  loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),`,
@@ -401,7 +405,7 @@ export class GenerateTanstackRoutesRepository {
       } else if (hasParams) {
         layoutLines.push(
           `export const Route = createFileRoute("${routePath}")({`,
-          `  staleTime: Infinity,`,
+          `  staleTime: ${staleTime},`,
           `  loader: ({ params }) => loadData({ data: params as Record<string, string> }),`,
           `  component: () => <Layout {...Route.useLoaderData()}><Outlet /></Layout>,`,
           `});`,
@@ -410,7 +414,7 @@ export class GenerateTanstackRoutesRepository {
       } else {
         layoutLines.push(
           `export const Route = createFileRoute("${routePath}")({`,
-          `  staleTime: Infinity,`,
+          `  staleTime: ${staleTime},`,
           `  loader: () => loadData(),`,
           `  component: () => <Layout {...Route.useLoaderData()}><Outlet /></Layout>,`,
           `});`,
@@ -931,6 +935,25 @@ export class GenerateTanstackRoutesRepository {
           const t = line.trim();
           return t === '"use client"' || t === "'use client'";
         });
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Returns true if the source file exports `dynamic = "force-dynamic"`.
+   * When present, the route should use `staleTime: 0` to refetch on every navigation,
+   * mirroring Next.js behaviour where force-dynamic disables caching.
+   */
+  private static hasForceDynamic(filePath: string): boolean {
+    if (!existsSync(filePath)) {
+      return false;
+    }
+    try {
+      const content = readFileSync(filePath, "utf-8");
+      return /\bexport\s+const\s+dynamic\s*=\s*["']force-dynamic["']/.test(
+        content,
+      );
     } catch {
       return false;
     }

@@ -7,8 +7,7 @@ import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 
 import type { ChatModelId } from "../../../../ai-stream/models";
-import type { SttModelId } from "../../../../speech-to-text/models";
-import type { TtsModelId } from "../../../../text-to-speech/models";
+import type { MessageVariant } from "../../../../ai-stream/repository/core/modality-resolver";
 import type { MessageMetadata, ToolCall, ToolCallResult } from "../../../db";
 import type { ChatMessageRole } from "../../../enum";
 
@@ -349,13 +348,7 @@ export interface GapFillCompletedEventData {
   /** The attachment modality that was converted */
   modality: Modality;
   /** The produced text variant */
-  variant: {
-    modality: Modality;
-    content: string;
-    modelId: ChatModelId | SttModelId | TtsModelId;
-    creditCost: number;
-    createdAt: string;
-  };
+  variant: MessageVariant;
 }
 
 /**

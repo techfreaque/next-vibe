@@ -94,11 +94,17 @@ export class GapFillExecutor {
             p.type === "image" &&
             !activeModel.inputs.includes("image" as Modality),
         );
-        const hasFiles = parts.some(
-          (p) =>
-            p.type === "file" &&
-            !activeModel.inputs.includes("text" as Modality),
-        );
+        const hasFiles = parts.some((p) => {
+          if (p.type !== "file") {
+            return false;
+          }
+          const mime =
+            "mimeType" in p && typeof p.mimeType === "string" ? p.mimeType : "";
+          const modality: Modality = mime.startsWith("video/")
+            ? "video"
+            : "audio";
+          return !activeModel.inputs.includes(modality);
+        });
 
         if (!hasImages && !hasFiles) {
           return msg;
@@ -117,12 +123,10 @@ export class GapFillExecutor {
         // Replace each unsupported attachment part with text variant - in parallel
         const newParts = await Promise.all(
           parts.map(async (part) => {
-            if (
-              (part.type === "image" || part.type === "file") &&
-              !activeModel.inputs.includes(
-                (part.type === "image" ? "image" : "text") as Modality,
-              )
-            ) {
+            if (part.type === "image") {
+              if (activeModel.inputs.includes("image")) {
+                return part;
+              }
               const variantText = await GapFillExecutor.bridgeAttachment({
                 part,
                 chatMessageId: chatMsg?.id ?? null,
@@ -133,20 +137,43 @@ export class GapFillExecutor {
                 user,
                 locale,
               });
-
-              if (variantText) {
-                // Replace image/file part with a text part
-                return { type: "text" as const, text: variantText };
-              }
-              // Bridge failed or not configured - replace with a placeholder so
-              // the model knows an attachment existed but couldn't be processed.
-              const attachmentType =
-                part.type === "image" ? "image" : "audio/file";
-              return {
-                type: "text" as const,
-                text: `[${attachmentType} attachment: could not be processed - no vision/STT bridge model configured for this conversation. If the user references this attachment, inform them that you cannot access it with the current model configuration and suggest configuring a vision bridge model in the favorite settings.]`,
-              };
+              return variantText
+                ? { type: "text" as const, text: variantText }
+                : {
+                    type: "text" as const,
+                    text: `[image attachment: could not be processed - no vision bridge model configured. Inform the user they can add one in favorite settings.]`,
+                  };
             }
+
+            if (part.type === "file") {
+              const mime =
+                "mimeType" in part && typeof part.mimeType === "string"
+                  ? part.mimeType
+                  : "";
+              const modality: Modality = mime.startsWith("video/")
+                ? "video"
+                : "audio";
+              if (activeModel.inputs.includes(modality)) {
+                return part;
+              }
+              const variantText = await GapFillExecutor.bridgeAttachment({
+                part,
+                chatMessageId: chatMsg?.id ?? null,
+                bridgeContext,
+                dbWriter,
+                abortSignal,
+                logger,
+                user,
+                locale,
+              });
+              return variantText
+                ? { type: "text" as const, text: variantText }
+                : {
+                    type: "text" as const,
+                    text: `[${modality} attachment: could not be processed - no ${modality === "video" ? "video vision" : "STT"} bridge model configured. Inform the user they can add one in favorite settings.]`,
+                  };
+            }
+
             return part;
           }),
         );
@@ -169,6 +196,15 @@ export class GapFillExecutor {
       AUDIO_GEN_TOOL_NAME,
     ] as const;
     type MediaToolName = (typeof MEDIA_TOOL_NAMES)[number];
+
+    // Build a lookup from toolCallId → ChatMessage.id for event emission
+    const toolCallIdToChatMessageId = new Map<string, string>();
+    for (const chatMsg of chatHistory) {
+      const tc = chatMsg.metadata?.toolCall;
+      if (tc && "toolCallId" in tc && typeof tc.toolCallId === "string") {
+        toolCallIdToChatMessageId.set(tc.toolCallId, chatMsg.id);
+      }
+    }
 
     const updatedWithToolResults = await Promise.all(
       updated.map(async (msg): Promise<ModelMessage> => {
@@ -230,16 +266,24 @@ export class GapFillExecutor {
               return part;
             }
 
+            // Resolve chatMessageId for event emission
+            const chatMessageId =
+              "toolCallId" in p && typeof p.toolCallId === "string"
+                ? (toolCallIdToChatMessageId.get(p.toolCallId) ?? null)
+                : null;
+
             logger.info(
               `[GapFill] Bridging null-text ${modality} tool result via vision`,
               {
                 fileUrl: fileUrl.slice(0, 80),
+                chatMessageId,
               },
             );
 
             const description = await GapFillExecutor.bridgeMediaUrl({
               mediaUrl: fileUrl,
               modality,
+              chatMessageId,
               bridgeContext,
               dbWriter,
               abortSignal,
@@ -290,10 +334,18 @@ export class GapFillExecutor {
     } = params;
 
     const isImage = part.type === "image";
+    const mime =
+      !isImage && "mimeType" in part && typeof part.mimeType === "string"
+        ? part.mimeType
+        : "";
+    const isVideo = !isImage && mime.startsWith("video/");
+
     const bridgeType: "stt" | "vision" | "translation" | "tts" = isImage
       ? "vision"
-      : "stt"; // file parts are audio/STT
-    const modality: Modality = isImage ? "image" : "text";
+      : isVideo
+        ? "vision"
+        : "stt";
+    const modality: Modality = isImage ? "image" : isVideo ? "video" : "audio";
 
     // Emit GAP_FILL_STARTED
     if (chatMessageId) {
@@ -319,12 +371,29 @@ export class GapFillExecutor {
       });
     }
 
+    if (isVideo) {
+      // Video file → video vision bridge
+      return GapFillExecutor.bridgeVideoFilePart({
+        part: part as FilePart,
+        chatMessageId,
+        bridgeContext,
+        dbWriter,
+        abortSignal: params.abortSignal,
+        logger,
+        user,
+        locale,
+        modality,
+        bridgeType,
+      });
+    }
+
     // Audio file → STT bridge
     return GapFillExecutor.bridgeStt({
       part: part as FilePart,
       chatMessageId,
       bridgeContext,
       dbWriter,
+      abortSignal: params.abortSignal,
       logger,
       user,
       locale,
@@ -360,6 +429,14 @@ export class GapFillExecutor {
       bridgeContext,
       user,
     );
+
+    if (!visionModel) {
+      logger.warn(
+        "[GapFill] No image vision model configured, skipping image bridge",
+        { modality },
+      );
+      return null;
+    }
 
     // Get the correct provider for the vision model (not the active model's provider)
     const visionProvider = ProviderFactory.getProviderForModel(
@@ -454,6 +531,7 @@ export class GapFillExecutor {
     chatMessageId: string | null;
     bridgeContext: BridgeContext;
     dbWriter: MessageDbWriter;
+    abortSignal: AbortSignal;
     logger: EndpointLogger;
     user: JwtPayloadType;
     locale: CountryLanguage;
@@ -473,86 +551,176 @@ export class GapFillExecutor {
     } = params;
 
     const sttModel = ModalityResolver.resolveSttModel(bridgeContext, user);
-    if (!sttModel) {
-      logger.warn("[GapFill] No STT bridge model configured, skipping", {
-        modality,
-      });
+
+    // Path 1: dedicated STT model (Whisper, Deepgram, etc.)
+    if (sttModel) {
+      try {
+        // Reconstruct a File from the FilePart's base64 data
+        const mimeType =
+          "mimeType" in part && part.mimeType
+            ? String(part.mimeType)
+            : "audio/webm";
+
+        let audioBytes: Uint8Array;
+        if ("data" in part && part.data) {
+          const data = part.data;
+          if (typeof data === "string") {
+            audioBytes = Buffer.from(data, "base64");
+          } else if (data instanceof ArrayBuffer) {
+            audioBytes = new Uint8Array(data);
+          } else {
+            // Uint8Array or Buffer (Buffer extends Uint8Array)
+            audioBytes = new Uint8Array(
+              (data as Uint8Array).buffer,
+              (data as Uint8Array).byteOffset,
+              (data as Uint8Array).byteLength,
+            );
+          }
+        } else if ("url" in part && part.url) {
+          // URL-based file - fetch the bytes
+          const response = await fetch(String(part.url));
+          const arrayBuffer = await response.arrayBuffer();
+          audioBytes = new Uint8Array(arrayBuffer);
+        } else {
+          logger.warn("[GapFill] FilePart has no data or url, skipping STT");
+          return null;
+        }
+
+        const ext = mimeType.split("/")[1]?.split(";")[0] ?? "webm";
+        const audioFile = new File(
+          [audioBytes.buffer as ArrayBuffer],
+          `audio.${ext}`,
+          {
+            type: mimeType,
+          },
+        );
+
+        const { SpeechToTextRepository } =
+          await import("../../../speech-to-text/repository");
+
+        const result = await SpeechToTextRepository.transcribeAudio(
+          audioFile,
+          user,
+          locale,
+          logger,
+          sttModel.id,
+        );
+
+        if (result.success) {
+          const transcript = result.data.response.text;
+          const creditCost = result.data.creditCost ?? 0;
+
+          if (chatMessageId && transcript) {
+            const variant = {
+              modality: "text" as Modality,
+              content: transcript,
+              modelId: sttModel.id,
+              creditCost,
+              createdAt: new Date().toISOString(),
+            };
+
+            await dbWriter.emitGapFillCompleted({
+              messageId: chatMessageId,
+              bridgeType,
+              modality,
+              variant,
+            });
+          }
+
+          return transcript || null;
+        }
+
+        logger.warn(
+          "[GapFill] Dedicated STT failed, trying audio-vision LLM fallback",
+          { error: result.message, modality },
+        );
+      } catch (err) {
+        logger.warn(
+          "[GapFill] Dedicated STT threw, trying audio-vision LLM fallback",
+          {
+            error: err instanceof Error ? err.message : String(err),
+            bridgeType,
+          },
+        );
+      }
+    }
+
+    // Path 2: audio-input LLM fallback (e.g. Gemini via AudioVisionModelId pool)
+    // Used when no dedicated STT is configured, or when dedicated STT fails.
+    const audioVisionModel = ModalityResolver.resolveAudioVisionModel(
+      bridgeContext,
+      user,
+    );
+    if (!audioVisionModel) {
+      logger.warn(
+        "[GapFill] No STT or audio-vision model configured, skipping audio bridge",
+        { modality },
+      );
       return null;
     }
 
+    const audioVisionProvider = ProviderFactory.getProviderForModel(
+      audioVisionModel,
+      logger,
+    );
+
     try {
-      // Reconstruct a File from the FilePart's base64 data
       const mimeType =
         "mimeType" in part && part.mimeType
           ? String(part.mimeType)
           : "audio/webm";
 
-      let audioBytes: Uint8Array;
+      let fileData: FilePart;
       if ("data" in part && part.data) {
-        const data = part.data;
-        if (typeof data === "string") {
-          audioBytes = Buffer.from(data, "base64");
-        } else if (data instanceof ArrayBuffer) {
-          audioBytes = new Uint8Array(data);
-        } else {
-          // Uint8Array or Buffer (Buffer extends Uint8Array)
-          audioBytes = new Uint8Array(
-            (data as Uint8Array).buffer,
-            (data as Uint8Array).byteOffset,
-            (data as Uint8Array).byteLength,
-          );
-        }
+        fileData = {
+          type: "file" as const,
+          data: part.data,
+          mediaType: mimeType as `audio/${string}`,
+        };
       } else if ("url" in part && part.url) {
-        // URL-based file - fetch the bytes
-        const response = await fetch(String(part.url));
-        const arrayBuffer = await response.arrayBuffer();
-        audioBytes = new Uint8Array(arrayBuffer);
+        fileData = {
+          type: "file" as const,
+          data: new URL(String(part.url)),
+          mediaType: mimeType as `audio/${string}`,
+        };
       } else {
-        logger.warn("[GapFill] FilePart has no data or url, skipping STT");
+        logger.warn(
+          "[GapFill] Audio FilePart has no data or url, skipping audio-vision bridge",
+        );
         return null;
       }
 
-      const ext = mimeType.split("/")[1]?.split(";")[0] ?? "webm";
-      const audioFile = new File(
-        [audioBytes.buffer as ArrayBuffer],
-        `audio.${ext}`,
-        {
-          type: mimeType,
-        },
+      const result = await aiGenerateText({
+        model: audioVisionProvider.chat(
+          audioVisionModel.providerModel,
+        ) as LanguageModel,
+        abortSignal: params.abortSignal,
+        messages: [
+          {
+            role: "user" as const,
+            content: [
+              fileData,
+              {
+                type: "text" as const,
+                text: "Transcribe the speech in this audio file. Output only the transcribed text with no additional commentary. If there is no speech, describe what you hear briefly.",
+              },
+            ],
+          },
+        ],
+      });
+
+      const transcript = result.text.trim();
+      const creditCost = calculateCreditCost(
+        audioVisionModel,
+        result.usage.inputTokens ?? 0,
+        result.usage.outputTokens ?? 0,
       );
-
-      const { scopedTranslation: sttScopedTranslation } =
-        await import("../../../speech-to-text/i18n");
-      const sttT = sttScopedTranslation.scopedT(locale).t;
-
-      const { SpeechToTextRepository } =
-        await import("../../../speech-to-text/repository");
-
-      const result = await SpeechToTextRepository.transcribeAudio(
-        audioFile,
-        user,
-        locale,
-        logger,
-        sttT,
-        sttModel.id,
-      );
-
-      if (!result.success) {
-        logger.warn("[GapFill] STT bridge call failed", {
-          error: result.message,
-          modality,
-        });
-        return null;
-      }
-
-      const transcript = result.data.response.text;
-      const creditCost = result.data.creditCost ?? 0;
 
       if (chatMessageId && transcript) {
         const variant = {
           modality: "text" as Modality,
           content: transcript,
-          modelId: sttModel.id,
+          modelId: audioVisionModel.id,
           creditCost,
           createdAt: new Date().toISOString(),
         };
@@ -563,11 +731,156 @@ export class GapFillExecutor {
           modality,
           variant,
         });
+
+        if (creditCost > 0) {
+          await dbWriter.deductAndEmitCredits({
+            user,
+            amount: creditCost,
+            feature: `audio-vision-bridge:${audioVisionModel.id}`,
+            type: "model",
+            model: audioVisionModel.id,
+          });
+        }
       }
 
       return transcript || null;
     } catch (err) {
-      logger.warn("[GapFill] STT bridge call failed", {
+      logger.warn("[GapFill] Audio-vision LLM bridge call failed", {
+        error: err instanceof Error ? err.message : String(err),
+        modality,
+        bridgeType,
+      });
+      return null;
+    }
+  }
+
+  /**
+   * Bridge a raw video file part to a text description via the video vision model.
+   * Used when a user uploads a video file and the active model can't see video.
+   */
+  private static async bridgeVideoFilePart(params: {
+    part: FilePart;
+    chatMessageId: string | null;
+    bridgeContext: BridgeContext;
+    dbWriter: MessageDbWriter;
+    abortSignal: AbortSignal;
+    logger: EndpointLogger;
+    user: JwtPayloadType;
+    locale: CountryLanguage;
+    modality: Modality;
+    bridgeType: "stt" | "vision" | "translation" | "tts";
+  }): Promise<string | null> {
+    const {
+      part,
+      chatMessageId,
+      bridgeContext,
+      dbWriter,
+      logger,
+      user,
+      modality,
+      bridgeType,
+    } = params;
+
+    const videoVisionModel = ModalityResolver.resolveVideoVisionModel(
+      bridgeContext,
+      user,
+    );
+
+    if (!videoVisionModel) {
+      logger.warn(
+        "[GapFill] No video vision model configured, skipping video bridge",
+        { modality },
+      );
+      return null;
+    }
+
+    const videoVisionProvider = ProviderFactory.getProviderForModel(
+      videoVisionModel,
+      logger,
+    );
+
+    try {
+      // Build file part — pass data or URL depending on what's available
+      let fileData: FilePart;
+      if ("data" in part && part.data) {
+        fileData = {
+          type: "file" as const,
+          data: part.data,
+          mediaType:
+            "mimeType" in part && part.mimeType
+              ? (part.mimeType as `video/${string}`)
+              : "video/mp4",
+        };
+      } else if ("url" in part && part.url) {
+        fileData = {
+          type: "file" as const,
+          data: new URL(String(part.url)),
+          mediaType:
+            "mimeType" in part && part.mimeType
+              ? (part.mimeType as `video/${string}`)
+              : "video/mp4",
+        };
+      } else {
+        logger.warn("[GapFill] Video FilePart has no data or url, skipping");
+        return null;
+      }
+
+      const result = await aiGenerateText({
+        model: videoVisionProvider.chat(
+          videoVisionModel.providerModel,
+        ) as LanguageModel,
+        abortSignal: params.abortSignal,
+        messages: [
+          {
+            role: "user" as const,
+            content: [
+              fileData,
+              {
+                type: "text" as const,
+                text: "Describe this video in detail. Include the visual content, actions, scene, style, any text visible, and any notable elements. This description will be used by another AI model that cannot see video.",
+              },
+            ],
+          },
+        ],
+      });
+
+      const description = result.text.trim();
+      const creditCost = calculateCreditCost(
+        videoVisionModel,
+        result.usage.inputTokens ?? 0,
+        result.usage.outputTokens ?? 0,
+      );
+
+      if (chatMessageId && description) {
+        const variant = {
+          modality: "text" as Modality,
+          content: description,
+          modelId: videoVisionModel.id,
+          creditCost,
+          createdAt: new Date().toISOString(),
+        };
+
+        await dbWriter.emitGapFillCompleted({
+          messageId: chatMessageId,
+          bridgeType,
+          modality,
+          variant,
+        });
+
+        if (creditCost > 0) {
+          await dbWriter.deductAndEmitCredits({
+            user,
+            amount: creditCost,
+            feature: `video-vision-bridge:${videoVisionModel.id}`,
+            type: "model",
+            model: videoVisionModel.id,
+          });
+        }
+      }
+
+      return description || null;
+    } catch (err) {
+      logger.warn("[GapFill] Video vision bridge call failed", {
         error: err instanceof Error ? err.message : String(err),
         modality,
         bridgeType,
@@ -583,6 +896,7 @@ export class GapFillExecutor {
   private static async bridgeMediaUrl(params: {
     mediaUrl: string;
     modality: Modality;
+    chatMessageId: string | null;
     bridgeContext: BridgeContext;
     dbWriter: MessageDbWriter;
     abortSignal: AbortSignal;
@@ -593,6 +907,7 @@ export class GapFillExecutor {
     const {
       mediaUrl,
       modality,
+      chatMessageId,
       bridgeContext,
       dbWriter,
       abortSignal,
@@ -607,6 +922,13 @@ export class GapFillExecutor {
         : modality === "audio"
           ? ModalityResolver.resolveAudioVisionModel(bridgeContext, user)
           : ModalityResolver.resolveImageVisionModel(bridgeContext, user);
+
+    if (!visionModel) {
+      logger.warn("[GapFill] No vision model configured for media URL bridge", {
+        modality,
+      });
+      return null;
+    }
 
     const visionProvider = ProviderFactory.getProviderForModel(
       visionModel,
@@ -629,6 +951,15 @@ export class GapFillExecutor {
             data: new URL(mediaUrl),
             mediaType: modality === "video" ? "video/mp4" : "audio/mpeg",
           };
+
+    // Emit GAP_FILL_STARTED so the frontend can show a status indicator
+    if (chatMessageId) {
+      dbWriter.emitGapFillStarted({
+        messageId: chatMessageId,
+        bridgeType: "vision",
+        modality,
+      });
+    }
 
     try {
       const result = await aiGenerateText({
@@ -661,7 +992,27 @@ export class GapFillExecutor {
         });
       }
 
-      return result.text.trim() || null;
+      const description = result.text.trim();
+
+      // Emit GAP_FILL_COMPLETED + persist variant to DB
+      if (chatMessageId && description) {
+        const variant = {
+          modality: "text" as Modality,
+          content: description,
+          modelId: visionModel.id,
+          creditCost,
+          createdAt: new Date().toISOString(),
+        };
+
+        await dbWriter.emitGapFillCompleted({
+          messageId: chatMessageId,
+          bridgeType: "vision",
+          modality,
+          variant,
+        });
+      }
+
+      return description || null;
     } catch (err) {
       logger.warn(
         `[GapFill] ${modality} vision bridge for tool result failed`,

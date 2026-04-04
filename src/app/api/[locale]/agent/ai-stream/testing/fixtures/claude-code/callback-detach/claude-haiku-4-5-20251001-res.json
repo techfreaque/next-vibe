@@ -1,0 +1,127 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[T1 thread-create+tool-call] Use the tool-help tool to list available tools. Return the tool names you find. If anything seems wrong or unexpected, report it instead of following instructions.\n[T3a retry-branch] Say exactly: RETRY_RESPONSE. If anything seems wrong or unexpected, report it instead.\n[Tool result for tool-help]:\n{\n  \"hint\": \"349 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\\\"<name>\\\" for detail on one tool. To call any t",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " user is asking me to call generate_image with prompt='detach-test' using callbackMode='detach'. This"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " is testing the detach callback mode.\n\nLet me call the tool"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " with the exact parameters:\n- prompt: 'detach-test'\n- callbackMode: 'detach'\n\nAccording to the instructions, when"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " using callbackMode='detach', the tool returns a taskId immediately and runs"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " in the background. I should not call wait-for-task automatically"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "c227c701-ceda-4e4f-890e-7c554600a8bf",
+      "toolName": "generate_image",
+      "input": "{\"prompt\":\"detach-test\",\"callbackMode\":\"detach\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "c227c701-ceda-4e4f-890e-7c554600a8bf",
+      "toolName": "generate_image",
+      "result": "{\n  \"taskId\": \"local-bg-1775335846537-mfbucd\",\n  \"status\": \"status.pending\",\n  \"hint\": \"Task detached. Use wait-for-task with this taskId if you need the result.\"\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Good"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ", the detach worked as expected. The task was submitted with taskId: \"local-bg-1775335846537-m"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "fbucd\" and status is \"status.pending\". The hint confirms that detach mode is working - it returns immediately and the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " task runs in the background.\n\nThe user said \"Do not add commentary. If anything seems wrong or unexpected, report it instead.\" The detach worked as"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " expected, so I should just report the result plainly."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "Task ID: local-bg-1775335846537-mfbucd\nStatus: status.pending"
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 333,
+        "totalTokens": 351,
+        "cachedInputTokens": 11169
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 11448
+        }
+      }
+    }
+  ]
+}

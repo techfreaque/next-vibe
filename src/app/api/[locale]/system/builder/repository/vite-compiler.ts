@@ -39,6 +39,115 @@ import { outputFormatter } from "./output-formatter";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
+/**
+ * Vite plugin that resolves `import "server-only"` with full importer tracing.
+ *
+ * - **SSR**: resolves to the shim file (no-op in SSR, throws otherwise).
+ * - **Client**: resolves to a virtual module that throws with the importer
+ *   file path baked into the error message, so the developer immediately
+ *   knows which file leaked server-only code into the client bundle.
+ *
+ * Must be placed BEFORE the SSR resolver so it intercepts `"server-only"`
+ * before anything else resolves it.
+ */
+/**
+ * Vite plugin that intercepts the resolved `server-only` shim on the client
+ * and replaces it with a virtual module whose error message includes the
+ * importing file path.
+ *
+ * - **SSR**: the shim resolves normally via `resolve.alias` + the SSR resolver
+ *   plugin — no-op in SSR, throws otherwise.
+ * - **Client**: this plugin's `load` hook detects the shim path, looks up
+ *   which file imported it, and returns a throw with the source file baked in.
+ *
+ * Uses `load` (not `resolveId`) so it works even when `resolve.alias`
+ * pre-resolves the bare `"server-only"` specifier before plugins run.
+ */
+function serverOnlyTracePlugin(
+  moduleAliases: Record<string, string>,
+  rootDir: string,
+): Plugin {
+  const shimRel = moduleAliases["server-only"];
+  const shimAbsolute = shimRel
+    ? resolve(rootDir, shimRel).replace(/\\/g, "/")
+    : null;
+
+  // Collect importer→resolved edges so we know who imported the shim.
+  const importersByResolved = new Map<string, Set<string>>();
+
+  return {
+    name: "server-only-trace",
+    enforce: "pre",
+
+    resolveId(source: string, importer: string | undefined): undefined {
+      // Only record edges for the client environment — SSR imports are fine.
+      const envName = (this.environment as { name?: string } | undefined)?.name;
+      if (envName === "ssr") {
+        return undefined;
+      }
+      // Record which client-env files import server-only.
+      if (
+        importer &&
+        shimAbsolute &&
+        (source === "server-only" ||
+          source.replace(/\\/g, "/").endsWith("server-only.ts"))
+      ) {
+        let set = importersByResolved.get(shimAbsolute);
+        if (!set) {
+          set = new Set();
+          importersByResolved.set(shimAbsolute, set);
+        }
+        set.add(importer);
+      }
+      return undefined;
+    },
+
+    load(id: string): string | null {
+      if (!shimAbsolute) {
+        return null;
+      }
+
+      const normalized = id.replace(/\\/g, "/").replace(/\?.*$/, "");
+      if (normalized !== shimAbsolute) {
+        return null;
+      }
+
+      // SSR: let the real shim file load (no-op on server)
+      const envName = (this.environment as { name?: string } | undefined)?.name;
+      if (envName === "ssr") {
+        return null;
+      }
+
+      // Client: find who imported this shim
+      const importers = importersByResolved.get(shimAbsolute);
+      const importerList = importers ? [...importers] : [];
+      const relImporters = importerList.map((p) =>
+        p.replace(`${rootDir}/`, "").replace(/\?.*$/, ""),
+      );
+
+      const sourceInfo =
+        relImporters.length > 0
+          ? relImporters.join("\\n  ")
+          : "unknown (check the import chain)";
+
+      // Log server-side so it appears in the dev log
+      if (relImporters.length > 0) {
+        for (const rel of relImporters) {
+          // eslint-disable-next-line no-console -- intentional diagnostic for server-only violations
+          console.error(`[server-only] client import detected in: ${rel}`);
+        }
+      }
+
+      return [
+        `// server-only shim — this module should never run in the client bundle`,
+        `if (!import.meta.env.SSR) {`,
+        `  throw new Error("[server-only] imported in client bundle\\n\\n  Source: ${sourceInfo}\\n\\n  This file imports \\"server-only\\" and must not be included in the client bundle.\\n  Move server-only code into a .server.ts file or use createServerFn().\\n");`,
+        `}`,
+      ].join("\n");
+    },
+  };
+}
+
 export class ViteCompiler {
   async compileFile(
     fileConfig: FileToCompile,
@@ -488,6 +597,10 @@ export class ViteCompiler {
       tanstackStart: (opts: {
         srcDirectory: string;
         importProtection?: {
+          behavior?:
+            | "error"
+            | "mock"
+            | { dev?: "error" | "mock"; build?: "error" | "mock" };
           client?: { specifiers?: string[] };
         };
       }) => PluginOption;
@@ -542,9 +655,8 @@ export class ViteCompiler {
         tailwindVite(),
         tanstackStart({
           srcDirectory,
-          importProtection: {
-            client: { specifiers: ["server-only"] },
-          },
+          // server-only is handled by our server-only-trace plugin (not TanStack's importProtection)
+          // so we get importer info in the error message instead of a generic proxy mock.
         }),
         react(),
         nitro({
@@ -582,6 +694,9 @@ export class ViteCompiler {
             return null;
           },
         } satisfies PluginOption,
+        // Resolve `server-only` with importer tracing: SSR gets the shim,
+        // client gets a virtual module whose error message names the source file.
+        serverOnlyTracePlugin(moduleAliases, ROOT_DIR),
         // Strip server-only exports from layout/page files for the client bundle.
         // Same as the dev server plugin - required for production builds too.
         {
@@ -605,14 +720,23 @@ export class ViteCompiler {
               return undefined;
             }
             let result = code;
+            // Remove default export (Next.js server component)
             result = result.replace(
               /\nexport default async function\s+\w+[\s\S]*?(?=\nexport |\nfunction |\nconst |\nclass |\ninterface |\ntype |\n\/\/|$)/,
               "\n",
             );
+            // Remove tanstackLoader (server-side data loader)
             result = result.replace(
               /\nexport async function tanstackLoader[\s\S]*?(?=\nexport |\nfunction |\nconst |\nclass |\ninterface |\ntype |\n\/\/|$)/,
               "\n",
             );
+            // Remove Next.js-only server exports that may pull in server-only imports:
+            // generateMetadata, viewport
+            result = result.replace(
+              /\nexport async function generateMetadata[\s\S]*?(?=\nexport |\nfunction |\nconst |\nclass |\ninterface |\ntype |\n\/\/|$)/,
+              "\n",
+            );
+            result = result.replace(/\nexport const viewport[\s\S]*?;\n/, "\n");
             // Remove imports whose bindings are no longer referenced.
             const lines = result.split("\n");
             const nonImportCode = lines
@@ -923,13 +1047,8 @@ export class ViteCompiler {
           tailwindVite(),
           tanstackStart({
             srcDirectory,
-            // Mark `server-only` as denied on the client env.
-            // The import-protection plugin replaces it with a Proxy mock that
-            // console.errors on access - matching TanStack's own pattern for
-            // mixed server/client files (e.g. start-basic-auth).
-            importProtection: {
-              client: { specifiers: ["server-only"] },
-            },
+            // server-only is handled by our server-only-trace plugin (not TanStack's importProtection)
+            // so we get importer info in the error message instead of a generic proxy mock.
           }),
           react(),
           nitro(),
@@ -1009,6 +1128,9 @@ export class ViteCompiler {
               } as never);
             },
           } as Plugin,
+          // Resolve `server-only` with importer tracing: SSR gets the shim,
+          // client gets a virtual module whose error message names the source file.
+          serverOnlyTracePlugin(moduleAliases, ROOT_DIR),
           // Strip server-only exports (tanstackLoader, default) and their exclusive
           // imports from layout.tsx / page.tsx files when serving to the client.
           // This allows lazy(() => import("layout.tsx").then(m => m.TanstackPage))
@@ -1052,6 +1174,16 @@ export class ViteCompiler {
               // Remove export async function tanstackLoader
               result = result.replace(
                 /\nexport async function tanstackLoader[\s\S]*?(?=\nexport |\nfunction |\nconst |\nclass |\ninterface |\ntype |\n\/\/|$)/,
+                "\n",
+              );
+              // Remove Next.js-only server exports that may pull in server-only imports:
+              // generateMetadata, viewport
+              result = result.replace(
+                /\nexport async function generateMetadata[\s\S]*?(?=\nexport |\nfunction |\nconst |\nclass |\ninterface |\ntype |\n\/\/|$)/,
+                "\n",
+              );
+              result = result.replace(
+                /\nexport const viewport[\s\S]*?;\n/,
                 "\n",
               );
               // Remove import lines whose bindings are no longer referenced.
@@ -1218,7 +1350,8 @@ export class ViteCompiler {
               // Force-resolve moduleAliases via plugin so SSR module runner
               // always gets our shims - resolve.alias alone can be bypassed by
               // pre-bundled deps or the CJS require polyfill.
-              if (id in moduleAliases) {
+              // server-only handled by server-only-trace plugin
+              if (id !== "server-only" && id in moduleAliases) {
                 const rel = moduleAliases[id];
                 if (rel) {
                   return resolve(ROOT_DIR, rel);
@@ -1281,22 +1414,48 @@ export class ViteCompiler {
               if (srcModules.length === 0) {
                 return;
               }
-              // Invalidate only the changed src/ modules in the SSR runner cache,
-              // rather than clearing the entire cache. Clearing the whole cache can
-              // race with in-flight module evaluations (e.g. fetchModule for env.ts),
-              // causing the module runner to throw "mistakenly invalidated during
-              // fetch phase" and leaving the transport in a hung state.
+              // Invalidate changed src/ modules AND their importers in the SSR runner
+              // evaluated-module cache. The runner's invalidateModule() only clears a
+              // single node (no recursive importer walk), so parent modules keep stale
+              // `__vite_ssr_import_XX__` bindings that hit TDZ errors on the first SSR
+              // request after HMR. We walk importers ourselves to fix this.
               const ssrEnv = viteServer.environments?.["ssr"];
               if (ssrEnv && isRunnableDevEnvironment(ssrEnv)) {
+                const evalMods = ssrEnv.runner.evaluatedModules;
+                const seen = new Set<string>();
+                const invalidateWithImporters = (moduleId: string): void => {
+                  if (seen.has(moduleId)) {
+                    return;
+                  }
+                  seen.add(moduleId);
+                  const ssrMod = evalMods.getModuleById(moduleId);
+                  if (!ssrMod) {
+                    return;
+                  }
+                  // Snapshot importers before invalidation clears them
+                  const importerIds = [...ssrMod.importers];
+                  evalMods.invalidateModule(ssrMod);
+                  // Recursively invalidate all modules that imported this one
+                  for (const importerId of importerIds) {
+                    invalidateWithImporters(importerId);
+                  }
+                };
+                for (const mod of srcModules) {
+                  if (mod.id) {
+                    invalidateWithImporters(mod.id);
+                  }
+                }
+              }
+              // Also invalidate the SSR environment module graph so Vite
+              // re-transforms modules on the next SSR request.
+              if (ssrEnv) {
                 for (const mod of srcModules) {
                   if (!mod.id) {
                     continue;
                   }
-                  const ssrMod = ssrEnv.runner.evaluatedModules.getModuleById(
-                    mod.id,
-                  );
-                  if (ssrMod) {
-                    ssrEnv.runner.evaluatedModules.invalidateModule(ssrMod);
+                  const ssrGraphMod = ssrEnv.moduleGraph.getModuleById(mod.id);
+                  if (ssrGraphMod) {
+                    ssrEnv.moduleGraph.invalidateModule(ssrGraphMod);
                   }
                 }
               }
@@ -1323,7 +1482,6 @@ export class ViteCompiler {
             { find: /^@\//, replacement: `${srcDir}/` },
             { find: /^next-vibe\//, replacement: `${nextVibeDir}/` },
             // moduleAliases from build.config.ts viteOptions.moduleAliases.
-            // Resolved via resolve.alias so they apply to both client and SSR module runner.
             ...Object.entries(moduleAliases).map(
               ([specifier, relativePath]) => ({
                 find: specifier,
@@ -1363,6 +1521,11 @@ export class ViteCompiler {
               "**/messenger/registry/generated.ts",
               "**/app-native/**",
               "**/test-files/**",
+              "**/testing/fixtures/**",
+              "**/*.test.ts",
+              "**/*.test.tsx",
+              "**/*.spec.ts",
+              "**/*.spec.tsx",
             ],
             // usePolling is required for paths with square brackets (e.g. [locale]).
             // Chokidar treats brackets as glob patterns and won't watch those paths via inotify.

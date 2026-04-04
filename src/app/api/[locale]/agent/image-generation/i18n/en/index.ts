@@ -36,6 +36,10 @@ export const translations = {
       standard: "Standard",
       hd: "HD",
     },
+    aspectRatio: {
+      label: "Aspect Ratio",
+      description: "Output image aspect ratio",
+    },
     download: "Download",
     dimensionSeparator: "×",
     backButton: {
@@ -96,10 +100,22 @@ export const translations = {
       insufficientCredits:
         "Insufficient credits. Balance: {{balance}}, required: {{minimum}}",
       balanceCheckFailed: "Failed to check your credit balance",
-      generationFailed: "Image generation failed: {{error}}",
+      unsupportedSize:
+        "Model {{model}} does not support size {{size}}. Supported sizes: {{supported}}",
+      unsupportedQuality:
+        "Model {{model}} does not support quality {{quality}}. Supported qualities: {{supported}}",
+      unsupportedAspectRatio:
+        "Model {{model}} does not support aspect ratio {{aspectRatio}}. Supported ratios: {{supported}}",
+      generationFailed: "Image generation failed",
       providerError: "Image provider error: {{error}}",
       noImageUrl: "No image URL returned from provider",
       creditsFailed: "Failed to deduct credits for image generation",
+      apiKeyNotConfigured: "API key not configured",
+      externalServiceError: "External service error: {{message}}",
+      requestAborted: "Request was aborted",
+      requestTimedOut: "Request timed out waiting for image generation",
+      requestFailed: "Request failed: {{message}}",
+      pollFailed: "Poll request failed with status {{status}}",
     },
     success: {
       title: "Image Generated",

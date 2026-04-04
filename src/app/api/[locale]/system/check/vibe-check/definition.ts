@@ -24,6 +24,7 @@ import {
 
 import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import { envClient } from "@/config/env-client";
+import { Environment } from "../../../shared/utils";
 import { UserRole } from "../../../user/user-roles/enum";
 import { VIBE_CHECK_ALIAS, VIBE_CHECK_ALIAS_SHORT } from "./constants";
 import { scopedTranslation } from "./i18n";
@@ -45,7 +46,9 @@ const { POST } = createEndpoint({
     UserRole.ADMIN,
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
-    ...(envClient.NODE_ENV !== "production" ? [UserRole.MCP_VISIBLE] : []),
+    ...(envClient.NODE_ENV !== Environment.PRODUCTION
+      ? [UserRole.MCP_VISIBLE]
+      : []),
     UserRole.CLI_AUTH_BYPASS,
   ],
   aliases: [VIBE_CHECK_ALIAS, VIBE_CHECK_ALIAS_SHORT],

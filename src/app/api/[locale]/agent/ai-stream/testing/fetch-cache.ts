@@ -32,6 +32,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/shared/utils/error-types";
+import { setClaudeCodeFixtureContext } from "./claude-code-fixture-store";
 
 const HTTP_CACHE_DIR = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -42,11 +43,23 @@ const HTTP_CACHE_DIR = join(
 // ── Context ────────────────────────────────────────────────────────────────────
 
 let currentTestCase = "unknown";
+let strictMode = false;
 
 /** Call this at the top of each test to scope cache files to that test. */
 export function setFetchCacheContext(testCase: string): void {
   currentTestCase = slugify(testCase);
   callCounters.clear();
+  // Keep Claude Code fixture store in sync — it doesn't use fetch so needs its own context
+  setClaudeCodeFixtureContext(testCase);
+}
+
+/**
+ * When strict mode is enabled, any external fetch that has no cached fixture
+ * will throw instead of making a real network request. Use this to prove
+ * that a test suite runs entirely from fixtures with zero network access.
+ */
+export function setFetchCacheStrictMode(strict: boolean): void {
+  strictMode = strict;
 }
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -377,7 +390,15 @@ export function installFetchCache(): void {
       return replayFromCache(cached);
     }
 
-    // ── Cache miss — real request ────────────────────────────────────────────
+    // ── Cache miss ────────────────────────────────────────────────────────────
+    if (strictMode) {
+      // oxlint-disable-next-line restricted-syntax -- intentional throw to fail test on uncached fetch
+      throw new Error(
+        // eslint-disable-next-line i18next/no-literal-string
+        `[FetchCache STRICT] No fixture for external URL: ${url} (context: ${currentTestCase})`,
+      );
+    }
+
     const real = await originalFetch(input, init);
     const responseHeaders = headersToRecord(real.headers);
 

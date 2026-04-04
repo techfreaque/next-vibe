@@ -28,6 +28,7 @@ import type {
 import type { BetaRawMessageStreamEvent } from "@anthropic-ai/sdk/resources/beta/messages/messages.mjs";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { withClaudeCodeFixture } from "../testing/claude-code-fixture-store";
 
 import { AgentToolExecutorRegistry } from "./anthropic-agent-tool-bridge";
 import { logProviderRequest } from "./shared/debug-file-logger";
@@ -273,228 +274,239 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
 
     const modelId = this.modelId;
 
-    // Create a ReadableStream that maps Agent SDK events to LanguageModelV2StreamPart
-    const stream = new ReadableStream<LanguageModelV2StreamPart>({
-      async start(controller): Promise<void> {
-        // Expose controller to MCP handlers so they can emit tool events in real-time
-        streamController = controller;
-        // Log full prompt in verbose mode so we can diagnose what the AI actually received.
-        // Placed here (inside start()) so it fires when the stream is actually consumed,
-        // not just when doStream() returns the stream object (which may be lazy in the AI SDK).
-        logProviderRequest(
-          "claude-code",
-          JSON.stringify(
-            {
-              systemPrompt,
-              userPrompt,
-              tools: mcpTools.map((t) => t.name),
-            },
-            null,
-            2,
-          ),
-        );
+    // Wrap the real Agent SDK stream with fixture-based replay in test mode.
+    // In test mode:  first run writes fixture, subsequent runs replay it.
+    // In production: producer runs directly, no caching overhead.
+    const stream = await withClaudeCodeFixture(modelId, userPrompt, () =>
+      Promise.resolve(
+        // Create a ReadableStream that maps Agent SDK events to LanguageModelV2StreamPart
+        new ReadableStream<LanguageModelV2StreamPart>({
+          async start(controller): Promise<void> {
+            // Expose controller to MCP handlers so they can emit tool events in real-time
+            streamController = controller;
+            // Log full prompt in verbose mode so we can diagnose what the AI actually received.
+            // Placed here (inside start()) so it fires when the stream is actually consumed,
+            // not just when doStream() returns the stream object (which may be lazy in the AI SDK).
+            logProviderRequest(
+              "claude-code",
+              JSON.stringify(
+                {
+                  systemPrompt,
+                  userPrompt,
+                  tools: mcpTools.map((t) => t.name),
+                },
+                null,
+                2,
+              ),
+            );
 
-        let totalInputTokens = 0;
-        let totalOutputTokens = 0;
-        let totalCachedTokens = 0;
-        let totalCacheWriteTokens = 0;
-        let finishReason: LanguageModelV2FinishReason = "other";
-        let textBlockId = 0;
-        let hasStartedText = false;
-        /** Current text block id - stable across deltas within the same block */
-        let currentTextId = "";
-        /** Track current reasoning block id for emitting reasoning-end */
-        let currentReasoningId = "";
-        let isInReasoningBlock = false;
+            let totalInputTokens = 0;
+            let totalOutputTokens = 0;
+            let totalCachedTokens = 0;
+            let totalCacheWriteTokens = 0;
+            let finishReason: LanguageModelV2FinishReason = "other";
+            let textBlockId = 0;
+            let hasStartedText = false;
+            /** Current text block id - stable across deltas within the same block */
+            let currentTextId = "";
+            /** Track current reasoning block id for emitting reasoning-end */
+            let currentReasoningId = "";
+            let isInReasoningBlock = false;
 
-        // Build env without CLAUDECODE / CLAUDE_CODE_ENTRYPOINT so the nested-session
-        // guard doesn't fire when running inside a Claude Code session.
-        // Must omit keys entirely - setting to undefined is ignored by the SDK merge.
-        const { CLAUDECODE, CLAUDE_CODE_ENTRYPOINT, ...agentEnv } = process.env;
-        void CLAUDECODE;
-        void CLAUDE_CODE_ENTRYPOINT;
+            // Build env without CLAUDECODE / CLAUDE_CODE_ENTRYPOINT so the nested-session
+            // guard doesn't fire when running inside a Claude Code session.
+            // Must omit keys entirely - setting to undefined is ignored by the SDK merge.
+            const { CLAUDECODE, CLAUDE_CODE_ENTRYPOINT, ...agentEnv } =
+              process.env;
+            void CLAUDECODE;
+            void CLAUDE_CODE_ENTRYPOINT;
 
-        try {
-          const agentQuery = query({
-            prompt: userPrompt,
-            options: {
-              abortController: agentAbortController,
-              model: modelId,
-              systemPrompt,
-              tools: [],
-              mcpServers: {
-                // eslint-disable-next-line i18next/no-literal-string -- MCP server name
-                "vibe-tools": vibeServer,
-              },
-              allowedTools: allowedToolNames,
-              permissionMode: "bypassPermissions",
-              allowDangerouslySkipPermissions: true,
-              persistSession: false,
-              settingSources: [],
-              thinking: { type: "adaptive" },
-              includePartialMessages: true,
-              stderr: (data: string) => {
-                logger.warn("[AnthropicAgent] stderr", { data });
-              },
-              env: agentEnv,
-            },
-          });
+            try {
+              const agentQuery = query({
+                prompt: userPrompt,
+                options: {
+                  abortController: agentAbortController,
+                  model: modelId,
+                  systemPrompt,
+                  tools: [],
+                  mcpServers: {
+                    // eslint-disable-next-line i18next/no-literal-string -- MCP server name
+                    "vibe-tools": vibeServer,
+                  },
+                  allowedTools: allowedToolNames,
+                  permissionMode: "bypassPermissions",
+                  allowDangerouslySkipPermissions: true,
+                  persistSession: false,
+                  settingSources: [],
+                  thinking: { type: "adaptive" },
+                  includePartialMessages: true,
+                  stderr: (data: string) => {
+                    logger.warn("[AnthropicAgent] stderr", { data });
+                  },
+                  env: agentEnv,
+                },
+              });
 
-          // Emit stream-start
-          controller.enqueue({
-            type: "stream-start",
-            warnings: [],
-          });
+              // Emit stream-start
+              controller.enqueue({
+                type: "stream-start",
+                warnings: [],
+              });
 
-          for await (const message of agentQuery) {
-            if (agentAbortController.signal.aborted) {
-              break;
-            }
+              for await (const message of agentQuery) {
+                if (agentAbortController.signal.aborted) {
+                  break;
+                }
 
-            switch (message.type) {
-              case "stream_event": {
-                const event = message.event;
+                switch (message.type) {
+                  case "stream_event": {
+                    const event = message.event;
 
-                // Handle content_block_start - track block type and allocate ids
-                if (event.type === "content_block_start") {
-                  if (event.content_block.type === "text") {
-                    currentTextId = `text-${textBlockId++}`;
-                    hasStartedText = true;
-                  } else if (event.content_block.type === "thinking") {
-                    currentReasoningId = `reasoning-${event.index}`;
-                    isInReasoningBlock = true;
+                    // Handle content_block_start - track block type and allocate ids
+                    if (event.type === "content_block_start") {
+                      if (event.content_block.type === "text") {
+                        currentTextId = `text-${textBlockId++}`;
+                        hasStartedText = true;
+                      } else if (event.content_block.type === "thinking") {
+                        currentReasoningId = `reasoning-${event.index}`;
+                        isInReasoningBlock = true;
+                      }
+                    }
+
+                    // Handle content_block_stop - emit reasoning-end / text-end
+                    if (event.type === "content_block_stop") {
+                      if (isInReasoningBlock) {
+                        controller.enqueue({
+                          type: "reasoning-end",
+                          id: currentReasoningId,
+                        });
+                        isInReasoningBlock = false;
+                      }
+                      // text-end is emitted in the "assistant" case below
+                    }
+
+                    // Map BetaRawMessageStreamEvent to LanguageModelV2StreamPart
+                    // Pass the stable currentTextId so all deltas in a block share the same id
+                    const parts = mapStreamEvent(
+                      event,
+                      currentTextId,
+                      currentReasoningId,
+                    );
+                    for (const part of parts) {
+                      controller.enqueue(part);
+                    }
+                    break;
                   }
-                }
 
-                // Handle content_block_stop - emit reasoning-end / text-end
-                if (event.type === "content_block_stop") {
-                  if (isInReasoningBlock) {
-                    controller.enqueue({
-                      type: "reasoning-end",
-                      id: currentReasoningId,
-                    });
-                    isInReasoningBlock = false;
+                  case "assistant": {
+                    // Accumulate usage from complete messages
+                    const msg = message.message;
+                    // Count tool_use blocks so the registry knows batch size before
+                    // any MCP handlers fire - needed for isLastInBatch accuracy.
+                    const toolUseCount = msg.content.filter(
+                      (b) => b.type === "tool_use",
+                    ).length;
+                    if (toolUseCount > 0) {
+                      toolExecutors.setBatchSize(toolUseCount);
+                    }
+                    if (msg.usage) {
+                      totalInputTokens += msg.usage.input_tokens;
+                      totalOutputTokens += msg.usage.output_tokens;
+                      const extUsage = msg.usage as typeof msg.usage & {
+                        cache_read_input_tokens?: number;
+                        cache_creation_input_tokens?: number;
+                      };
+                      totalCachedTokens +=
+                        extUsage.cache_read_input_tokens ?? 0;
+                      totalCacheWriteTokens +=
+                        extUsage.cache_creation_input_tokens ?? 0;
+                    }
+                    finishReason =
+                      msg.stop_reason === "tool_use" ? "tool-calls" : "stop";
+
+                    // End any open text block from streaming
+                    if (hasStartedText) {
+                      controller.enqueue({
+                        type: "text-end",
+                        id: currentTextId,
+                      });
+                      hasStartedText = false;
+                    }
+                    break;
                   }
-                  // text-end is emitted in the "assistant" case below
-                }
 
-                // Map BetaRawMessageStreamEvent to LanguageModelV2StreamPart
-                // Pass the stable currentTextId so all deltas in a block share the same id
-                const parts = mapStreamEvent(
-                  event,
-                  currentTextId,
-                  currentReasoningId,
-                );
-                for (const part of parts) {
-                  controller.enqueue(part);
+                  case "result": {
+                    // Final result - override totals
+                    if (message.usage) {
+                      totalInputTokens = message.usage.input_tokens;
+                      totalOutputTokens = message.usage.output_tokens;
+                      totalCachedTokens =
+                        message.usage.cache_read_input_tokens ?? 0;
+                      totalCacheWriteTokens =
+                        message.usage.cache_creation_input_tokens ?? 0;
+                    }
+                    finishReason =
+                      message.subtype === "success" ? "stop" : "error";
+                    break;
+                  }
+
+                  default:
+                    // Ignore system, tool_progress, auth_status, etc.
+                    break;
                 }
-                break;
               }
 
-              case "assistant": {
-                // Accumulate usage from complete messages
-                const msg = message.message;
-                // Count tool_use blocks so the registry knows batch size before
-                // any MCP handlers fire - needed for isLastInBatch accuracy.
-                const toolUseCount = msg.content.filter(
-                  (b) => b.type === "tool_use",
-                ).length;
-                if (toolUseCount > 0) {
-                  toolExecutors.setBatchSize(toolUseCount);
-                }
-                if (msg.usage) {
-                  totalInputTokens += msg.usage.input_tokens;
-                  totalOutputTokens += msg.usage.output_tokens;
-                  const extUsage = msg.usage as typeof msg.usage & {
-                    cache_read_input_tokens?: number;
-                    cache_creation_input_tokens?: number;
-                  };
-                  totalCachedTokens += extUsage.cache_read_input_tokens ?? 0;
-                  totalCacheWriteTokens +=
-                    extUsage.cache_creation_input_tokens ?? 0;
-                }
-                finishReason =
-                  msg.stop_reason === "tool_use" ? "tool-calls" : "stop";
-
-                // End any open text block from streaming
-                if (hasStartedText) {
-                  controller.enqueue({
-                    type: "text-end",
-                    id: currentTextId,
-                  });
-                  hasStartedText = false;
-                }
-                break;
+              // Emit finish - include cache write tokens in providerMetadata
+              // since LanguageModelV2Usage doesn't have inputTokenDetails
+              controller.enqueue({
+                type: "finish",
+                usage: {
+                  inputTokens: totalInputTokens,
+                  outputTokens: totalOutputTokens,
+                  totalTokens: totalInputTokens + totalOutputTokens,
+                  cachedInputTokens: totalCachedTokens,
+                },
+                finishReason,
+                providerMetadata: {
+                  "claude-code": { cacheWriteTokens: totalCacheWriteTokens },
+                },
+              });
+            } catch (error) {
+              if (
+                error instanceof Error &&
+                (error.name === "AbortError" ||
+                  error.message.includes("aborted"))
+              ) {
+                // Normal abort
+                controller.enqueue({
+                  type: "finish",
+                  usage: {
+                    inputTokens: totalInputTokens,
+                    outputTokens: totalOutputTokens,
+                    totalTokens: totalInputTokens + totalOutputTokens,
+                    cachedInputTokens: totalCachedTokens,
+                  },
+                  finishReason: "other",
+                  providerMetadata: {
+                    "claude-code": { cacheWriteTokens: totalCacheWriteTokens },
+                  },
+                });
+              } else {
+                logger.error("[AnthropicAgent] Stream error", {
+                  error: error instanceof Error ? error.message : String(error),
+                });
+                controller.enqueue({
+                  type: "error",
+                  error,
+                });
               }
-
-              case "result": {
-                // Final result - override totals
-                if (message.usage) {
-                  totalInputTokens = message.usage.input_tokens;
-                  totalOutputTokens = message.usage.output_tokens;
-                  totalCachedTokens =
-                    message.usage.cache_read_input_tokens ?? 0;
-                  totalCacheWriteTokens =
-                    message.usage.cache_creation_input_tokens ?? 0;
-                }
-                finishReason = message.subtype === "success" ? "stop" : "error";
-                break;
-              }
-
-              default:
-                // Ignore system, tool_progress, auth_status, etc.
-                break;
+            } finally {
+              controller.close();
             }
-          }
-
-          // Emit finish - include cache write tokens in providerMetadata
-          // since LanguageModelV2Usage doesn't have inputTokenDetails
-          controller.enqueue({
-            type: "finish",
-            usage: {
-              inputTokens: totalInputTokens,
-              outputTokens: totalOutputTokens,
-              totalTokens: totalInputTokens + totalOutputTokens,
-              cachedInputTokens: totalCachedTokens,
-            },
-            finishReason,
-            providerMetadata: {
-              "claude-code": { cacheWriteTokens: totalCacheWriteTokens },
-            },
-          });
-        } catch (error) {
-          if (
-            error instanceof Error &&
-            (error.name === "AbortError" || error.message.includes("aborted"))
-          ) {
-            // Normal abort
-            controller.enqueue({
-              type: "finish",
-              usage: {
-                inputTokens: totalInputTokens,
-                outputTokens: totalOutputTokens,
-                totalTokens: totalInputTokens + totalOutputTokens,
-                cachedInputTokens: totalCachedTokens,
-              },
-              finishReason: "other",
-              providerMetadata: {
-                "claude-code": { cacheWriteTokens: totalCacheWriteTokens },
-              },
-            });
-          } else {
-            logger.error("[AnthropicAgent] Stream error", {
-              error: error instanceof Error ? error.message : String(error),
-            });
-            controller.enqueue({
-              type: "error",
-              error,
-            });
-          }
-        } finally {
-          controller.close();
-        }
-      },
-    });
+          },
+        }),
+      ),
+    );
 
     return { stream };
   }

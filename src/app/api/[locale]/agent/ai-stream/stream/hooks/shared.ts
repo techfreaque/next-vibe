@@ -10,14 +10,12 @@ import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constant
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
-import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { upsertMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/update-messages";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type {
-  ModelProviderEnvAvailability,
-  VoiceModelSelection,
-} from "@/app/api/[locale]/agent/models/types";
+import type { ModelProviderEnvAvailability } from "@/app/api/[locale]/agent/models/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -146,7 +144,19 @@ export async function createAndSendUserMessage(
       if (audioInput) {
         messageMetadata = { isTranscribing: true };
       } else if (attachments && attachments.length > 0) {
-        messageMetadata = { isUploadingAttachments: true };
+        // Build optimistic attachment previews with local blob URLs so the UI
+        // renders file thumbnails immediately, before the server upload completes.
+        const optimisticAttachments = attachments.map((file) => ({
+          id: crypto.randomUUID(),
+          url: URL.createObjectURL(file),
+          filename: file.name,
+          mimeType: file.type,
+          size: file.size,
+        }));
+        messageMetadata = {
+          isUploadingAttachments: true,
+          attachments: optimisticAttachments,
+        };
       }
 
       const optimisticUserMessage: ChatMessage = {
@@ -228,11 +238,7 @@ export async function createAndSendUserMessage(
 
     // Voice mode settings - resolve TTS voice from selection or fall back to default
     const resolvedVoiceModel = settings.voiceModelSelection
-      ? SkillsRepositoryClient.getBestTtsModel(
-          settings.voiceModelSelection,
-          user,
-          env,
-        )
+      ? getBestTtsModel(settings.voiceModelSelection, user, env)
       : null;
     const effectiveVoiceMode = {
       enabled: settings.ttsAutoplay,

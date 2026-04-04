@@ -11,18 +11,18 @@ import {
 } from "@/app/api/[locale]/agent/models/enum";
 import { ChatModelIdOptions } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
+import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
-  chatModelSelectionSchema,
-  imageGenModelSelectionSchema,
   imageVisionModelSelectionSchema,
-  musicGenModelSelectionSchema,
-  skillVariantSchema,
-  sttModelSelectionSchema,
-  videoGenModelSelectionSchema,
   videoVisionModelSelectionSchema,
-  voiceModelSelectionSchema,
-} from "@/app/api/[locale]/agent/models/types";
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
+import { skillVariantSchema } from "@/app/api/[locale]/agent/chat/skills/db";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -71,6 +71,7 @@ import type { SkillListResponseOutput } from "../definition";
 import { CategoryOptions, SkillCategory } from "../enum";
 import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "./i18n";
+import { getBestChatModel } from "../../../ai-stream/models";
 
 const SkillEditContainer = lazy(() =>
   import("./widget").then((m) => ({ default: m.SkillEditContainer })),
@@ -132,6 +133,28 @@ const { DELETE } = createEndpoint({
                 ),
               })),
             });
+          },
+        );
+
+        // Optimistically remove favorites referencing the deleted skill
+        const favoritesDefinition = await import("../../favorites/definition");
+        apiClient.updateEndpointData(
+          favoritesDefinition.default.GET,
+          data.logger,
+          (oldData) => {
+            if (!oldData?.success) {
+              return oldData;
+            }
+
+            return {
+              success: true,
+              data: {
+                ...oldData.data,
+                favorites: oldData.data.favorites.filter(
+                  (fav) => fav.skillId !== data.pathParams.id,
+                ),
+              },
+            };
           },
         );
 
@@ -315,8 +338,6 @@ const { PATCH } = createEndpoint({
         const { getEnvAvailability } =
           await import("../../../env-availability-context");
         const skillsDefinition = await import("../definition");
-        const { SkillsRepositoryClient } = await import("../repository-client");
-
         const skillSingleDefinitions = await import("./definition");
 
         // Optimistically update the skill GET endpoint cache
@@ -389,7 +410,7 @@ const { PATCH } = createEndpoint({
                     // Recalculate model info if modelSelection changed
                     const modelSel = data.requestData.modelSelection;
                     const bestModel = modelSel
-                      ? SkillsRepositoryClient.getBestModelForSkill(
+                      ? getBestChatModel(
                           modelSel,
                           data.user,
                           getEnvAvailability(),
@@ -421,6 +442,38 @@ const { PATCH } = createEndpoint({
                     };
                   }),
                 })),
+              },
+            };
+          },
+        );
+
+        // Optimistically update favorites list to reflect changed skill data
+        const favoritesDefinition = await import("../../favorites/definition");
+        apiClient.updateEndpointData(
+          favoritesDefinition.default.GET,
+          data.logger,
+          (oldData) => {
+            if (!oldData?.success) {
+              return oldData;
+            }
+
+            return {
+              success: true,
+              data: {
+                ...oldData.data,
+                favorites: oldData.data.favorites.map((fav) => {
+                  if (fav.skillId !== data.pathParams.id) {
+                    return fav;
+                  }
+                  return {
+                    ...fav,
+                    icon: data.requestData.icon ?? fav.icon,
+                    name: data.requestData.name ?? fav.name,
+                    tagline: data.requestData.tagline ?? fav.tagline,
+                    description:
+                      data.requestData.description ?? fav.description,
+                  };
+                }),
               },
             };
           },

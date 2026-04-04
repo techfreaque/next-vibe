@@ -84,9 +84,17 @@ interface OverviewTabProps {
   onSwitchTab: () => void;
   envAvailability: AgentEnvAvailability;
   totalModelCount: number;
+  isAdmin: boolean;
 }
 
-const MODEL_TYPE_ORDER = ["text", "image", "audio", "video"] as const;
+const MODEL_TYPE_ORDER = [
+  "text",
+  "tts",
+  "stt",
+  "image",
+  "audio",
+  "video",
+] as const;
 type ModelTypeKey = (typeof MODEL_TYPE_ORDER)[number];
 
 /** Returns a representative price for sorting (ascending = cheapest first). */
@@ -103,6 +111,7 @@ export function OverviewTab({
   onSwitchTab,
   envAvailability,
   totalModelCount,
+  isAdmin,
 }: OverviewTabProps): JSX.Element {
   const { locale: currentLocale } = useTranslation();
   const { t } = scopedTranslation.scopedT(currentLocale);
@@ -245,11 +254,9 @@ export function OverviewTab({
                 {MODEL_TYPE_ORDER.map((modelType: ModelTypeKey) => {
                   const modelsByType: Record<ModelTypeKey, ModelDefinition[]> =
                     {
-                      text: [
-                        ...Object.values(chatModelDefinitions),
-                        ...Object.values(ttsModelDefinitions),
-                        ...Object.values(sttModelDefinitions),
-                      ],
+                      text: Object.values(chatModelDefinitions),
+                      tts: Object.values(ttsModelDefinitions),
+                      stt: Object.values(sttModelDefinitions),
                       image: Object.values(imageGenModelDefinitions),
                       audio: Object.values(musicGenModelDefinitions),
                       video: Object.values(videoGenModelDefinitions),
@@ -261,7 +268,10 @@ export function OverviewTab({
                     ) {
                       return false;
                     }
-                    return def.providers.some((p) =>
+                    const visibleProviders = isAdmin
+                      ? def.providers
+                      : def.providers.filter((p) => !p.adminOnly);
+                    return visibleProviders.some((p) =>
                       checkProviderAvailable(p.apiProvider, envAvailability),
                     );
                   });
@@ -348,11 +358,24 @@ export function OverviewTab({
               <Div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                 <Div className="flex items-center gap-3 p-2 rounded bg-accent">
                   <Span>
-                    {t("subscription.overview.costs.features.searchLabel")}
+                    {t("subscription.overview.costs.features.braveSearchLabel")}
                   </Span>
                   <Span className="font-mono">
                     {t("subscription.overview.costs.features.costFormat", {
                       value: FEATURE_COSTS.BRAVE_SEARCH,
+                      unit: t(
+                        "subscription.overview.costs.features.creditsUnit",
+                      ),
+                    })}
+                  </Span>
+                </Div>
+                <Div className="flex items-center gap-3 p-2 rounded bg-accent">
+                  <Span>
+                    {t("subscription.overview.costs.features.kagiSearchLabel")}
+                  </Span>
+                  <Span className="font-mono">
+                    {t("subscription.overview.costs.features.costFormat", {
+                      value: FEATURE_COSTS.KAGI_SEARCH,
                       unit: t(
                         "subscription.overview.costs.features.creditsUnit",
                       ),
@@ -366,32 +389,6 @@ export function OverviewTab({
                   <Span className="font-mono">
                     {t("subscription.overview.costs.features.costFormat", {
                       value: FEATURE_COSTS.FETCH_URL_CONTENT,
-                      unit: t(
-                        "subscription.overview.costs.features.creditsUnit",
-                      ),
-                    })}
-                  </Span>
-                </Div>
-                <Div className="flex items-center gap-3 p-2 rounded bg-accent">
-                  <Span>
-                    {t("subscription.overview.costs.features.ttsLabel")}
-                  </Span>
-                  <Span className="font-mono">
-                    {t("subscription.overview.costs.features.costFormat", {
-                      value: (FEATURE_COSTS.TTS * 1000).toFixed(2),
-                      unit: t(
-                        "subscription.overview.costs.features.creditsUnit",
-                      ),
-                    })}
-                  </Span>
-                </Div>
-                <Div className="flex items-center gap-3 p-2 rounded bg-accent">
-                  <Span>
-                    {t("subscription.overview.costs.features.sttLabel")}
-                  </Span>
-                  <Span className="font-mono">
-                    {t("subscription.overview.costs.features.costFormat", {
-                      value: (FEATURE_COSTS.STT * 60).toFixed(2),
                       unit: t(
                         "subscription.overview.costs.features.creditsUnit",
                       ),

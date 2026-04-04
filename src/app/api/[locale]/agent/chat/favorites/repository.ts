@@ -6,7 +6,7 @@
 import "server-only";
 
 import { asc, eq, inArray } from "drizzle-orm";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/models/types";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,

@@ -13,6 +13,8 @@ import { Scripts } from "next-vibe-ui/ui/scripts";
 import type { JSX, ReactNode } from "react";
 import { cookies } from "next-vibe-ui/lib/headers";
 
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -44,7 +46,9 @@ export async function generateMetadata({
     path: "",
     title: t("meta.defaultTitle"),
     category: t("meta.category"),
-    description: t("meta.description"),
+    description: t("meta.description", {
+      modelCount: getAvailableModelCount(agentEnvAvailability, false),
+    }),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/og-image.jpg`,
     imageAlt: t("meta.imageAlt"),
     keywords: [t("meta.keywords")],

@@ -215,7 +215,7 @@ export function ModelCreditDisplay({
         </Div>
       </Div>
     );
-  } else if ("creditCostPerClip" in model) {
+  } else if (model.creditCostPerClip !== undefined) {
     // Music/audio generation (fixed cost per clip)
     const cost = getModelPrice(model);
     costText = t("creditDisplay.badge.perClip", { cost });
@@ -247,8 +247,8 @@ export function ModelCreditDisplay({
       </Div>
     );
   } else if (
-    "creditCostPerSecond" in model &&
-    "defaultDurationSeconds" in model
+    model.creditCostPerSecond !== undefined &&
+    model.defaultDurationSeconds !== undefined
   ) {
     // Video generation (cost per second × default duration)
     const duration = model.defaultDurationSeconds;
@@ -292,7 +292,7 @@ export function ModelCreditDisplay({
         </Div>
       </Div>
     );
-  } else if ("creditCostPerCharacter" in model) {
+  } else if (model.creditCostPerCharacter !== undefined) {
     // TTS (cost per character) — badge shows average cost like LLMs
     const avgCost = getModelPrice(model); // average for ~600 chars
     const costPerCharWithMarkup =
@@ -364,7 +364,10 @@ export function ModelCreditDisplay({
         </Div>
       </Div>
     );
-  } else if ("creditCostPerSecond" in model) {
+  } else if (
+    model.creditCostPerSecond !== undefined &&
+    model.defaultDurationSeconds === undefined
+  ) {
     // STT (cost per second — no defaultDurationSeconds) — badge shows average cost
     const avgCost = getModelPrice(model); // average for ~30s
     const costPerSecWithMarkup =
@@ -436,10 +439,7 @@ export function ModelCreditDisplay({
         </Div>
       </Div>
     );
-  } else if (
-    "contextWindow" in model &&
-    typeof model.creditCost === "function"
-  ) {
+  } else if (typeof model.creditCost === "function") {
     // Token-based chat model
     const chatModel = model as ChatModelOption;
     const costData = calculateCostRanges(chatModel);
@@ -549,7 +549,7 @@ export function ModelCreditDisplay({
       costText = t("creditDisplay.badge.exactPerMsg", { cost: creditCostRaw });
     }
 
-    const modelName = "name" in model ? model.name : "";
+    const modelName = model.name;
 
     popoverContent = (
       <Div className="space-y-4">

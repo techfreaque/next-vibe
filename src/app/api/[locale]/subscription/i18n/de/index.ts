@@ -572,7 +572,7 @@ export const translations: typeof enTranslations = {
       buttonAlreadySubscribed: "Sie haben bereits ein aktives Abonnement",
       features: {
         credits: "{{count}} Credits pro Monat",
-        expiry: "Zugriff auf {{modelCount}}+ KI-Modelle",
+        expiry: "Zugriff auf {{modelCount}} KI-Modelle",
         bestFor: "Am besten für regelmäßige Nutzung",
       },
     },

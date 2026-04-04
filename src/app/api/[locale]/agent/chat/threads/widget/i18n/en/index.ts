@@ -91,13 +91,13 @@ export const translations = {
       welcome: {
         title: "Welcome to {{appName}}!",
         description:
-          "Your privacy-first AI platform with {{modelCount}}+ models, user-controlled content filtering, and free speech principles.",
+          "Your privacy-first AI platform with {{modelCount}} models, user-controlled content filtering, and free speech principles.",
         subtitle: "Let's take a quick tour to get you started.",
       },
       aiCompanion: {
         title: "Choose Your AI Companion",
         description:
-          "Select from {{modelCount}}+ AI models including mainstream, open-source, and uncensored options.",
+          "Select from {{modelCount}} AI models including mainstream, open-source, and uncensored options.",
         tip: "Click to open the model selector and pick your companion.",
       },
       companionVariants: {

@@ -59,6 +59,9 @@ export const DEFAULT_CLI_EXTERNALS = [
   "@oxc-parser/napi-linux-x64-musl",
   "@oxc-parser/napi-win32-arm64-msvc",
   "@oxc-parser/napi-win32-x64-msvc",
+  // Browser automation (native binary, dynamic import only)
+  "playwright",
+  "playwright-core",
 ] as const;
 
 // ============================================================================

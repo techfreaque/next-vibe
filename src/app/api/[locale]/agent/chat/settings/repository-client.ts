@@ -18,7 +18,7 @@ import type { ChatMode } from "../../models/enum";
 import type { ModelProviderEnvAvailability } from "../../models/models";
 
 import { ViewMode } from "../enum";
-import { SkillsRepositoryClient } from "../skills/repository-client";
+import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,
@@ -84,11 +84,7 @@ export class ChatSettingsRepositoryClient {
     user: JwtPayloadType,
     env: ModelProviderEnvAvailability,
   ): ChatSettingsGetResponseOutput {
-    const bestModel = SkillsRepositoryClient.getBestModelForSkill(
-      DEFAULT_CHAT_MODEL_SELECTION,
-      user,
-      env,
-    );
+    const bestModel = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user, env);
     return {
       selectedModel: bestModel?.id ?? null,
       selectedSkill: "thea",

@@ -5,7 +5,7 @@ import {
   ModelSortDirection,
   ModelSortField,
 } from "../chat/skills/enum";
-import type { VoiceModelSelection } from "../models/types";
+import type { VoiceModelSelection } from "../text-to-speech/models";
 import { TtsModelId } from "./models";
 
 /** System default TTS voice ID */

@@ -46,6 +46,11 @@ import {
   chatModelOptions,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
+  AudioVisionModelId,
+  ImageVisionModelId,
+  VideoVisionModelId,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import {
   CONTENT_DISPLAY,
   INTELLIGENCE_DISPLAY,
   ModelSelectionType,
@@ -55,16 +60,50 @@ import {
   PRICE_DISPLAY,
   SPEED_DISPLAY,
 } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import {
+  filterChatModels,
+  getBestChatModel,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  filterImageVisionModels,
+  getBestImageVisionModel,
+  filterVideoVisionModels,
+  getBestVideoVisionModel,
+  filterAudioVisionModels,
+  getBestAudioVisionModel,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import {
+  filterImageGenModels,
+  getBestImageGenModel,
+} from "@/app/api/[locale]/agent/image-generation/models";
+import {
+  filterMusicGenModels,
+  getBestMusicGenModel,
+} from "@/app/api/[locale]/agent/music-generation/models";
+import {
+  filterSttModels,
+  getBestSttModel,
+} from "@/app/api/[locale]/agent/speech-to-text/models";
+import {
+  filterTtsModels,
+  getBestTtsModel,
+} from "@/app/api/[locale]/agent/text-to-speech/models";
+import {
+  filterVideoGenModels,
+  getBestVideoGenModel,
+} from "@/app/api/[locale]/agent/video-generation/models";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import {
   ImageGenModelId,
   imageGenModelOptions,
 } from "@/app/api/[locale]/agent/image-generation/models";
+import {
+  getModelPrice,
+  type AnyModelOptionWithVision,
+} from "@/app/api/[locale]/agent/models/all-models";
 import type { Modality, ModelRole } from "@/app/api/[locale]/agent/models/enum";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
-import { getModelPrice } from "@/app/api/[locale]/agent/models/all-models";
 import {
   ApiProvider,
   apiProviderDisplayNames,
@@ -90,11 +129,6 @@ import {
   VideoGenModelId,
   videoGenModelOptions,
 } from "@/app/api/[locale]/agent/video-generation/models";
-import {
-  isAudioVisionModel,
-  isImageVisionModel,
-  isVideoVisionModel,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -102,17 +136,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
 import type {
-  AudioVisionModelSelection,
-  ChatModelSelection,
+  AnyRoleModelSelection,
   FiltersModelSelection,
-  ImageGenModelSelection,
-  ImageVisionModelSelection,
-  MusicGenModelSelection,
-  SttModelSelection,
-  VideoGenModelSelection,
-  VideoVisionModelSelection,
-  VoiceModelSelection,
-} from "../types";
+} from "../selection";
 import { ModelCreditDisplay } from "./model-credit-display";
 
 /** Combine all role-specific model options into a single flat array. */
@@ -147,7 +173,10 @@ function lookupModelById(id: AnyModelId): AnyModelOption | undefined {
  * Local implementation — avoids importing cross-role utility from models.ts.
  * Uses enum membership for correctness (multimodal models share structural fields).
  */
-function modelMatchesRoleLocal(m: AnyModelOption, role: ModelRole): boolean {
+function modelMatchesRoleLocal(
+  m: AnyModelOptionWithVision,
+  role: ModelRole,
+): boolean {
   switch (role) {
     case "image-gen":
       return Object.values(ImageGenModelId).some((v) => v === m.id);
@@ -162,11 +191,11 @@ function modelMatchesRoleLocal(m: AnyModelOption, role: ModelRole): boolean {
     case "llm":
       return Object.values(ChatModelId).some((v) => v === m.id);
     case "image-vision":
-      return isImageVisionModel(m.id);
+      return Object.values(ImageVisionModelId).some((v) => v === m.id);
     case "video-vision":
-      return isVideoVisionModel(m.id);
+      return Object.values(VideoVisionModelId).some((v) => v === m.id);
     case "audio-vision":
-      return isAudioVisionModel(m.id);
+      return Object.values(AudioVisionModelId).some((v) => v === m.id);
     default:
       return false;
   }
@@ -177,7 +206,7 @@ function modelMatchesRoleLocal(m: AnyModelOption, role: ModelRole): boolean {
  * Local implementation — avoids importing cross-role utility from models.ts.
  * Image-gen models that also output text (multimodal, e.g. Gemini) appear in both text and image tabs.
  */
-function modelOptionToTypes(m: AnyModelOption): ModelType[] {
+function modelOptionToTypes(m: AnyModelOptionWithVision): ModelType[] {
   if (Object.values(ImageGenModelId).some((v) => v === m.id)) {
     // Image-gen models that also output text appear in the text tab too
     if (m.outputs.includes("text")) {
@@ -198,122 +227,65 @@ function modelOptionToTypes(m: AnyModelOption): ModelType[] {
   return ["text"]; // chat/llm
 }
 
-/**
- * Generic manual selection used internally by the widget when the model role is not yet
- * known or when a cross-role model ID (AnyModelId) is being stored.
- * All role-specific discriminated union members are included so typed callers still benefit
- * from the narrower overloads; this variant handles the generic/untyped case.
- */
-interface GenericManualModelSelection {
-  selectionType: typeof ModelSelectionType.MANUAL;
-  manualModelId: AnyModelId;
-  intelligenceRange?: FiltersModelSelection["intelligenceRange"];
-  priceRange?: FiltersModelSelection["priceRange"];
-  contentRange?: FiltersModelSelection["contentRange"];
-  speedRange?: FiltersModelSelection["speedRange"];
-  sortBy?: FiltersModelSelection["sortBy"];
-  sortDirection?: FiltersModelSelection["sortDirection"];
-  sortBy2?: FiltersModelSelection["sortBy2"];
-  sortDirection2?: FiltersModelSelection["sortDirection2"];
-}
-
-type AnyRoleModelSelection =
-  | ChatModelSelection
-  | VoiceModelSelection
-  | SttModelSelection
-  | ImageGenModelSelection
-  | MusicGenModelSelection
-  | VideoGenModelSelection
-  | ImageVisionModelSelection
-  | VideoVisionModelSelection
-  | AudioVisionModelSelection
-  | FiltersModelSelection
-  | GenericManualModelSelection;
-
 type AnyRoleSelection = AnyRoleModelSelection;
 
 /** Dispatch to role-specific filtered model getter based on allowedRoles. */
 function getFilteredModelsByRoleDispatch(
-  selection: FiltersModelSelection | null,
+  selection: AnyRoleModelSelection | null,
   roles: ModelRole[],
   user: JwtPayloadType,
   env: AgentEnvAvailability,
-): AnyModelOption[] {
-  const results: AnyModelOption[] = [];
+): AnyModelOptionWithVision[] {
+  // Extract shared filter props — valid for all role getters regardless of manual ID
+  const filters: FiltersModelSelection | null = selection
+    ? {
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: selection.intelligenceRange,
+        priceRange: selection.priceRange,
+        contentRange: selection.contentRange,
+        speedRange: selection.speedRange,
+        sortBy: selection.sortBy,
+        sortDirection: selection.sortDirection,
+        sortBy2: selection.sortBy2,
+        sortDirection2: selection.sortDirection2,
+      }
+    : null;
+
+  const results: AnyModelOptionWithVision[] = [];
   for (const role of roles) {
     switch (role) {
       case "tts":
-        results.push(
-          ...SkillsRepositoryClient.getFilteredTtsModels(selection, user, env),
-        );
+        results.push(...filterTtsModels(filters, user, env));
         break;
       case "stt":
-        results.push(
-          ...SkillsRepositoryClient.getFilteredSttModels(selection, user, env),
-        );
+        results.push(...filterSttModels(filters, user, env));
         break;
       case "image-gen":
-        results.push(
-          ...SkillsRepositoryClient.getFilteredImageGenModels(
-            selection,
-            user,
-            env,
-          ),
-        );
+        results.push(...filterImageGenModels(filters, user, env));
         break;
       case "audio-gen":
-        results.push(
-          ...SkillsRepositoryClient.getFilteredMusicGenModels(
-            selection,
-            user,
-            env,
-          ),
-        );
+        results.push(...filterMusicGenModels(filters, user, env));
         break;
       case "video-gen":
-        results.push(
-          ...SkillsRepositoryClient.getFilteredVideoGenModels(
-            selection,
-            user,
-            env,
-          ),
-        );
+        results.push(...filterVideoGenModels(filters, user, env));
         break;
       case "llm":
         results.push(
-          ...SkillsRepositoryClient.getFilteredModelsForSkill(
-            { selectionType: ModelSelectionType.FILTERS, ...selection },
+          ...filterChatModels(
+            filters ?? { selectionType: ModelSelectionType.FILTERS },
             user,
             env,
           ),
         );
         break;
       case "image-vision":
-        results.push(
-          ...SkillsRepositoryClient.getFilteredImageVisionModels(
-            selection,
-            user,
-            env,
-          ),
-        );
+        results.push(...filterImageVisionModels(filters, user, env));
         break;
       case "video-vision":
-        results.push(
-          ...SkillsRepositoryClient.getFilteredVideoVisionModels(
-            selection,
-            user,
-            env,
-          ),
-        );
+        results.push(...filterVideoVisionModels(filters, user, env));
         break;
       case "audio-vision":
-        results.push(
-          ...SkillsRepositoryClient.getFilteredAudioVisionModels(
-            selection,
-            user,
-            env,
-          ),
-        );
+        results.push(...filterAudioVisionModels(filters, user, env));
         break;
       default:
         break;
@@ -328,7 +300,7 @@ function getBestModelByRoleDispatch(
   roles: ModelRole[],
   user: JwtPayloadType,
   env: AgentEnvAvailability,
-): AnyModelOption | null {
+): AnyModelOptionWithVision | null {
   const isAdmin =
     !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
 
@@ -364,70 +336,34 @@ function getBestModelByRoleDispatch(
     sortDirection2: selection.sortDirection2,
   };
   for (const role of roles) {
-    let result: AnyModelOption | null = null;
+    let result: AnyModelOptionWithVision | null = null;
     switch (role) {
       case "tts":
-        result = SkillsRepositoryClient.getBestTtsModel(
-          filtersSelection,
-          user,
-          env,
-        );
+        result = getBestTtsModel(filtersSelection, user, env);
         break;
       case "stt":
-        result = SkillsRepositoryClient.getBestSttModel(
-          filtersSelection,
-          user,
-          env,
-        );
+        result = getBestSttModel(filtersSelection, user, env);
         break;
       case "image-gen":
-        result = SkillsRepositoryClient.getBestImageGenModel(
-          filtersSelection,
-          user,
-          env,
-        );
+        result = getBestImageGenModel(filtersSelection, user, env);
         break;
       case "audio-gen":
-        result = SkillsRepositoryClient.getBestMusicGenModel(
-          filtersSelection,
-          user,
-          env,
-        );
+        result = getBestMusicGenModel(filtersSelection, user, env);
         break;
       case "video-gen":
-        result = SkillsRepositoryClient.getBestVideoGenModel(
-          filtersSelection,
-          user,
-          env,
-        );
+        result = getBestVideoGenModel(filtersSelection, user, env);
         break;
       case "llm":
-        result = SkillsRepositoryClient.getBestModelForSkill(
-          filtersSelection,
-          user,
-          env,
-        );
+        result = getBestChatModel(filtersSelection, user, env);
         break;
       case "image-vision":
-        result = SkillsRepositoryClient.getBestImageVisionModel(
-          filtersSelection,
-          user,
-          env,
-        );
+        result = getBestImageVisionModel(filtersSelection, user, env);
         break;
       case "video-vision":
-        result = SkillsRepositoryClient.getBestVideoVisionModel(
-          filtersSelection,
-          user,
-          env,
-        );
+        result = getBestVideoVisionModel(filtersSelection, user, env);
         break;
       case "audio-vision":
-        result = SkillsRepositoryClient.getBestAudioVisionModel(
-          filtersSelection,
-          user,
-          env,
-        );
+        result = getBestAudioVisionModel(filtersSelection, user, env);
         break;
       default:
         break;
@@ -440,7 +376,7 @@ function getBestModelByRoleDispatch(
 }
 
 interface ModelCardProps {
-  model: AnyModelOption;
+  model: AnyModelOptionWithVision;
   isBest: boolean;
   selected: boolean;
   onClick: () => void;
@@ -621,6 +557,7 @@ function buildFilterChips({
   handlePriceChange,
   setUseSkillBased,
   updateValue,
+  buildManualSelection,
 }: {
   intelligenceIndices: RangeIndices;
   contentIndices: RangeIndices;
@@ -647,6 +584,10 @@ function buildFilterChips({
   handlePriceChange: (min: number, max: number) => void;
   setUseSkillBased: (v: boolean) => void;
   updateValue: (s: AnyRoleModelSelection | null) => void;
+  buildManualSelection: (
+    modelId: AnyModelId,
+    overrides?: Partial<Omit<FiltersModelSelection, "selectionType">>,
+  ) => AnyRoleModelSelection;
 }): FilterChip[] {
   const chips: FilterChip[] = [];
 
@@ -713,11 +654,14 @@ function buildFilterChips({
           sortDirection2: undefined,
         };
         if (mode === ModelSelectionType.MANUAL && manualModelId) {
-          updateValue({
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId,
-            ...rangeProps,
-          });
+          updateValue(
+            buildManualSelection(manualModelId, {
+              sortBy: undefined,
+              sortDirection: undefined,
+              sortBy2: undefined,
+              sortDirection2: undefined,
+            }),
+          );
         } else {
           updateValue({
             selectionType: ModelSelectionType.FILTERS,
@@ -748,11 +692,12 @@ function buildFilterChips({
           sortDirection2: undefined,
         } as const;
         if (mode === ModelSelectionType.MANUAL && manualModelId) {
-          updateValue({
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId,
-            ...filterProps,
-          });
+          updateValue(
+            buildManualSelection(manualModelId, {
+              sortBy2: undefined,
+              sortDirection2: undefined,
+            }),
+          );
         } else {
           const newSel: FiltersModelSelection = {
             selectionType: ModelSelectionType.FILTERS,
@@ -843,7 +788,7 @@ export interface ModelSelectorProps {
 
 /** Returns true if the model's provider is available given current env */
 export function isProviderAvailable(
-  model: AnyModelOption,
+  model: AnyModelOptionWithVision,
   envAvailability: AgentEnvAvailability | undefined,
 ): boolean {
   if (!envAvailability) {
@@ -854,7 +799,7 @@ export function isProviderAvailable(
 
 /** Map ApiProvider to the availability key */
 function getSetupRequiredMessage(
-  model: AnyModelOption,
+  model: AnyModelOptionWithVision,
   envAvailability: AgentEnvAvailability | undefined,
   locale: CountryLanguage,
 ): string | null {
@@ -1104,11 +1049,9 @@ export function ModelSelector({
           firstAvailable?.id ??
           filteredModels[0]?.id ??
           getAllModelOptions()[0]?.id;
-        updateValue({
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: currentModel,
-          ...baseProps,
-        });
+        if (currentModel) {
+          updateValue(buildManualSelection(currentModel, baseProps));
+        }
       } else {
         updateValue({
           selectionType: ModelSelectionType.FILTERS,
@@ -1126,37 +1069,16 @@ export function ModelSelector({
         ? ModelSelectionType.MANUAL
         : ModelSelectionType.FILTERS;
 
+    const override = {
+      intelligenceRange: getRangeFromIndices(
+        { min, max },
+        INTELLIGENCE_DISPLAY,
+      ),
+    };
     if (newType === ModelSelectionType.MANUAL && manualModelId) {
-      updateValue({
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId,
-        intelligenceRange: getRangeFromIndices(
-          { min, max },
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-        sortBy2,
-        sortDirection2,
-      });
+      updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({
-        selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: getRangeFromIndices(
-          { min, max },
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-        sortBy2,
-        sortDirection2,
-      });
+      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
     }
   };
 
@@ -1166,38 +1088,13 @@ export function ModelSelector({
       mode === ModelSelectionType.MANUAL
         ? ModelSelectionType.MANUAL
         : ModelSelectionType.FILTERS;
-
+    const override = {
+      contentRange: getRangeFromIndices({ min, max }, CONTENT_DISPLAY),
+    };
     if (newType === ModelSelectionType.MANUAL && manualModelId) {
-      updateValue({
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices({ min, max }, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-        sortBy2,
-        sortDirection2,
-      });
+      updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({
-        selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices({ min, max }, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-        sortBy2,
-        sortDirection2,
-      });
+      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
     }
   };
 
@@ -1207,38 +1104,13 @@ export function ModelSelector({
       mode === ModelSelectionType.MANUAL
         ? ModelSelectionType.MANUAL
         : ModelSelectionType.FILTERS;
-
+    const override = {
+      speedRange: getRangeFromIndices({ min, max }, SPEED_DISPLAY),
+    };
     if (newType === ModelSelectionType.MANUAL && manualModelId) {
-      updateValue({
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices({ min, max }, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-        sortBy2,
-        sortDirection2,
-      });
+      updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({
-        selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices({ min, max }, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-        sortBy2,
-        sortDirection2,
-      });
+      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
     }
   };
 
@@ -1248,57 +1120,130 @@ export function ModelSelector({
       mode === ModelSelectionType.MANUAL
         ? ModelSelectionType.MANUAL
         : ModelSelectionType.FILTERS;
-
+    const override = {
+      priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
+    };
     if (newType === ModelSelectionType.MANUAL && manualModelId) {
-      updateValue({
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-        sortBy2,
-        sortDirection2,
-      });
+      updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({
-        selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-        sortBy2,
-        sortDirection2,
-      });
+      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
     }
   };
 
-  const handleModelSelect = (modelId: AnyModelId): void => {
-    // When selecting a model, preserve current filter/sort settings
-    setUseSkillBased(false);
-    const selected: AnyRoleModelSelection = {
-      selectionType: ModelSelectionType.MANUAL,
-      manualModelId: modelId,
-      intelligenceRange: getRangeFromIndices(
-        intelligenceIndices,
-        INTELLIGENCE_DISPLAY,
-      ),
-      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-      sortBy,
-      sortDirection,
+  const buildManualSelection = (
+    modelId: AnyModelId,
+    overrides?: Partial<Omit<FiltersModelSelection, "selectionType">>,
+  ): AnyRoleModelSelection => {
+    const filterProps: Omit<FiltersModelSelection, "selectionType"> = {
+      intelligenceRange:
+        overrides?.intelligenceRange ??
+        getRangeFromIndices(intelligenceIndices, INTELLIGENCE_DISPLAY),
+      priceRange:
+        overrides?.priceRange ??
+        getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+      contentRange:
+        overrides?.contentRange ??
+        getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+      speedRange:
+        overrides?.speedRange ??
+        getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+      sortBy: "sortBy" in (overrides ?? {}) ? overrides?.sortBy : sortBy,
+      sortDirection:
+        "sortDirection" in (overrides ?? {})
+          ? overrides?.sortDirection
+          : sortDirection,
+      sortBy2: "sortBy2" in (overrides ?? {}) ? overrides?.sortBy2 : sortBy2,
+      sortDirection2:
+        "sortDirection2" in (overrides ?? {})
+          ? overrides?.sortDirection2
+          : sortDirection2,
     };
+    const imgId = Object.values(ImageGenModelId).find((v) => v === modelId);
+    if (imgId !== undefined) {
+      return {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: imgId,
+        ...filterProps,
+      };
+    }
+    const musicId = Object.values(MusicGenModelId).find((v) => v === modelId);
+    if (musicId !== undefined) {
+      return {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: musicId,
+        ...filterProps,
+      };
+    }
+    const videoId = Object.values(VideoGenModelId).find((v) => v === modelId);
+    if (videoId !== undefined) {
+      return {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: videoId,
+        ...filterProps,
+      };
+    }
+    const ttsId = Object.values(TtsModelId).find((v) => v === modelId);
+    if (ttsId !== undefined) {
+      return {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ttsId,
+        ...filterProps,
+      };
+    }
+    const sttId = Object.values(SttModelId).find((v) => v === modelId);
+    if (sttId !== undefined) {
+      return {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: sttId,
+        ...filterProps,
+      };
+    }
+    const imgVisionId = Object.values(ImageVisionModelId).find(
+      (v) => v === modelId,
+    );
+    if (imgVisionId !== undefined) {
+      return {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: imgVisionId,
+        ...filterProps,
+      };
+    }
+    const videoVisionId = Object.values(VideoVisionModelId).find(
+      (v) => v === modelId,
+    );
+    if (videoVisionId !== undefined) {
+      return {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: videoVisionId,
+        ...filterProps,
+      };
+    }
+    const audioVisionId = Object.values(AudioVisionModelId).find(
+      (v) => v === modelId,
+    );
+    if (audioVisionId !== undefined) {
+      return {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: audioVisionId,
+        ...filterProps,
+      };
+    }
+    // Default: chat model
+    const chatId = Object.values(ChatModelId).find((v) => v === modelId);
+    if (chatId !== undefined) {
+      return {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: chatId,
+        ...filterProps,
+      };
+    }
+    // Fallback to filters if model ID not found in any enum
+    return { selectionType: ModelSelectionType.FILTERS, ...filterProps };
+  };
+
+  const handleModelSelect = (modelId: AnyModelId): void => {
+    setUseSkillBased(false);
+    const selected = buildManualSelection(modelId);
     updateValue(selected);
     onSelect?.(selected);
   };
@@ -1317,10 +1262,7 @@ export function ModelSelector({
           isProviderAvailable(m, envAvailability),
       );
       if (first) {
-        updateValue({
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: first.id,
-        });
+        updateValue(buildManualSelection(first.id));
       }
     }
   };
@@ -1363,37 +1305,11 @@ export function ModelSelector({
         ? ModelSelectionType.MANUAL
         : ModelSelectionType.FILTERS;
 
+    const override = { sortBy: field, sortDirection: defaultDirection };
     if (newType === ModelSelectionType.MANUAL && manualModelId) {
-      updateValue({
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy: field,
-        sortDirection: defaultDirection,
-        sortBy2,
-        sortDirection2,
-      });
+      updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({
-        selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy: field,
-        sortDirection: defaultDirection,
-        sortBy2,
-        sortDirection2,
-      });
+      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
     }
   };
 
@@ -1409,37 +1325,14 @@ export function ModelSelector({
         ? ModelSelectionType.MANUAL
         : ModelSelectionType.FILTERS;
 
+    const override = {
+      sortBy: sortBy ?? ModelSortField.INTELLIGENCE,
+      sortDirection: newDirection,
+    };
     if (newType === ModelSelectionType.MANUAL && manualModelId) {
-      updateValue({
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy: sortBy ?? ModelSortField.INTELLIGENCE,
-        sortDirection: newDirection,
-        sortBy2,
-        sortDirection2,
-      });
+      updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({
-        selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy: sortBy ?? ModelSortField.INTELLIGENCE,
-        sortDirection: newDirection,
-        sortBy2,
-        sortDirection2,
-      });
+      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
     }
   };
 
@@ -1452,35 +1345,14 @@ export function ModelSelector({
         ? ModelSelectionType.MANUAL
         : ModelSelectionType.FILTERS;
 
-    const baseProps = {
-      intelligenceRange: getRangeFromIndices(
-        intelligenceIndices,
-        INTELLIGENCE_DISPLAY,
-      ),
-      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+    const override = {
+      sortBy2: field,
+      sortDirection2: ModelSortDirection.DESC,
     };
-
     if (newType === ModelSelectionType.MANUAL && manualModelId) {
-      updateValue({
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId,
-        ...baseProps,
-        sortBy,
-        sortDirection,
-        sortBy2: field,
-        sortDirection2: ModelSortDirection.DESC,
-      });
+      updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({
-        selectionType: ModelSelectionType.FILTERS,
-        ...baseProps,
-        sortBy,
-        sortDirection,
-        sortBy2: field,
-        sortDirection2: ModelSortDirection.DESC,
-      });
+      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
     }
   };
 
@@ -1496,35 +1368,14 @@ export function ModelSelector({
         ? ModelSelectionType.MANUAL
         : ModelSelectionType.FILTERS;
 
-    const baseProps = {
-      intelligenceRange: getRangeFromIndices(
-        intelligenceIndices,
-        INTELLIGENCE_DISPLAY,
-      ),
-      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+    const override = {
+      sortBy2: sortBy2 ?? ModelSortField.PRICE,
+      sortDirection2: newDirection,
     };
-
     if (newType === ModelSelectionType.MANUAL && manualModelId) {
-      updateValue({
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId,
-        ...baseProps,
-        sortBy,
-        sortDirection,
-        sortBy2: sortBy2 ?? ModelSortField.PRICE,
-        sortDirection2: newDirection,
-      });
+      updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({
-        selectionType: ModelSelectionType.FILTERS,
-        ...baseProps,
-        sortBy,
-        sortDirection,
-        sortBy2: sortBy2 ?? ModelSortField.PRICE,
-        sortDirection2: newDirection,
-      });
+      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
     }
   };
 
@@ -1583,11 +1434,7 @@ export function ModelSelector({
       sortBy2,
       sortDirection2,
     };
-    const base = SkillsRepositoryClient.getFilteredModelsForSkill(
-      filtersModelSelection,
-      user,
-      envAvailability,
-    );
+    const base = filterChatModels(filtersModelSelection, user, envAvailability);
     return base.filter((m) => modelOptionToTypes(m).includes(modelTypeTab));
   }, [
     allowedRoles,
@@ -1642,7 +1489,7 @@ export function ModelSelector({
   // Get models to show (filtered or all), always constrained by type tab.
   // For admins: append env-unavailable models (grayed out with setup info).
   const modelsToShow = useMemo(() => {
-    const typeFilter = (m: AnyModelOption): boolean =>
+    const typeFilter = (m: AnyModelOptionWithVision): boolean =>
       modelOptionToTypes(m).includes(modelTypeTab) &&
       (modelTypeTab !== "text" ||
         (!modelMatchesRoleLocal(m, "image-gen") &&
@@ -1723,7 +1570,7 @@ export function ModelSelector({
 
     // Get sort value and label based on field
     const getSortInfo = (
-      model: AnyModelOption,
+      model: AnyModelOptionWithVision,
     ): { value: number; label: string } => {
       switch (sortBy) {
         case ModelSortField.INTELLIGENCE: {
@@ -1769,7 +1616,7 @@ export function ModelSelector({
     };
 
     // searchFilteredModels is already sorted; just group by primary sort label
-    const grouped: Record<string, AnyModelOption[]> = {};
+    const grouped: Record<string, AnyModelOptionWithVision[]> = {};
     for (const model of searchFilteredModels) {
       const { label } = getSortInfo(model);
       if (!grouped[label]) {
@@ -1873,6 +1720,7 @@ export function ModelSelector({
     handlePriceChange,
     setUseSkillBased,
     updateValue,
+    buildManualSelection,
   });
 
   return (
@@ -2276,11 +2124,11 @@ export function ModelSelector({
             // Ungrouped list
             displayModels.length > 0 ? (
               <Div className="flex flex-col gap-2">
-                {displayModels.map((model: AnyModelOption) => {
+                {displayModels.map((model: AnyModelOptionWithVision) => {
                   const isOutsideFilter =
                     showUnfilteredModels &&
                     !filteredModels.some(
-                      (m: AnyModelOption) => m.id === model.id,
+                      (m: AnyModelOptionWithVision) => m.id === model.id,
                     );
                   const setupRequired = getSetupRequiredMessage(
                     model,
@@ -2379,7 +2227,8 @@ export function ModelSelector({
                           const isOutsideFilter =
                             showUnfilteredModels &&
                             !filteredModels.some(
-                              (m: AnyModelOption) => m.id === model.id,
+                              (m: AnyModelOptionWithVision) =>
+                                m.id === model.id,
                             );
                           const setupRequired = getSetupRequiredMessage(
                             model,
@@ -2488,7 +2337,7 @@ export function ModelSelectorTrigger({
   const envAvailability = useEnvAvailability();
 
   // Resolve the best model to display
-  const resolvedModel = useMemo((): AnyModelOption | null => {
+  const resolvedModel = useMemo((): AnyModelOptionWithVision | null => {
     const effectiveSelection =
       modelSelection ??
       characterModelSelection ??

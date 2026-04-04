@@ -11,9 +11,10 @@ import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { Key } from "next-vibe-ui/ui/icons/Key";
 import { Layers } from "next-vibe-ui/ui/icons/Layers";
 import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
-import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Server } from "next-vibe-ui/ui/icons/Server";
-import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
+import { Palette } from "next-vibe-ui/ui/icons/Palette";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Link } from "next-vibe-ui/ui/link";
@@ -176,7 +177,7 @@ export function SplitHero({
         modelCount: String(totalModelCount),
       }),
     },
-    { Icon: Shield, label: t("home.splitHero.unbottled.pill2") },
+    { Icon: Palette, label: t("home.splitHero.unbottled.pill2") },
     {
       Icon: Zap,
       label: t("home.splitHero.unbottled.pill3", {
@@ -186,9 +187,12 @@ export function SplitHero({
   ];
 
   const personalPills: PillItem[] = [
-    { Icon: Server, label: t("home.splitHero.personal.pill1") },
-    { Icon: Key, label: t("home.splitHero.personal.pill2") },
-    { Icon: RefreshCw, label: t("home.splitHero.personal.pill3") },
+    { Icon: Terminal, label: t("home.splitHero.personal.pill1") },
+    { Icon: Clock, label: t("home.splitHero.personal.pill2") },
+    {
+      Icon: Key,
+      label: t("home.splitHero.personal.pill3", { appName }),
+    },
   ];
 
   const nextvibePills: PillItem[] = [
@@ -242,6 +246,8 @@ export function SplitHero({
           pills={personalPills}
           t={t}
           onSideChange={onSideChange}
+          appName={appName}
+          totalModelCount={totalModelCount}
         />
       </Panel>
 
@@ -279,6 +285,11 @@ interface PanelContentProps {
   t: ScopedT;
   onSideChange?: (side: ActiveSide) => void;
   totalModelCount?: number;
+}
+
+interface PersonalContentProps extends PanelContentProps {
+  appName: string;
+  totalModelCount: number;
 }
 
 /** Shared inner content layout - always centered within its panel */
@@ -399,7 +410,9 @@ function PersonalContent({
   pills,
   t,
   onSideChange,
-}: PanelContentProps): JSX.Element {
+  appName,
+  totalModelCount,
+}: PersonalContentProps): JSX.Element {
   function handleLearnMore(e: ButtonMouseEvent): void {
     e.stopPropagation();
     onSideChange?.("personal");
@@ -444,7 +457,10 @@ function PersonalContent({
         transition={{ delay: 0.35 }}
       >
         <P className="text-emerald-200/60 text-sm md:text-sm lg:text-base leading-relaxed mb-6">
-          {t("home.splitHero.personal.subtitle")}
+          {t("home.splitHero.personal.subtitle", {
+            appName,
+            modelCount: String(totalModelCount),
+          })}
         </P>
       </MotionDiv>
 

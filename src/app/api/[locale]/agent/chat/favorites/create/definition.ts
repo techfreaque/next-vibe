@@ -13,17 +13,17 @@ import {
   ChatModelId,
   ChatModelIdOptions,
 } from "@/app/api/[locale]/agent/ai-stream/models";
+import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
-  chatModelSelectionSchema,
-  imageGenModelSelectionSchema,
-  musicGenModelSelectionSchema,
-  sttModelSelectionSchema,
-  videoGenModelSelectionSchema,
+  audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
-  audioVisionModelSelectionSchema,
-  voiceModelSelectionSchema,
-} from "@/app/api/[locale]/agent/models/types";
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -42,7 +42,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { lazy } from "react";
 import { iconSchema } from "../../../../shared/types/common.schema";
-import type { ChatModelSelection } from "@/app/api/[locale]/agent/models/types";
+import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
@@ -131,6 +131,7 @@ const { POST } = createEndpoint({
           id: responseData.id,
           skillId: requestData.skillId ?? "default",
           variantId: requestData.variantId ?? null,
+          customVariantName: requestData.customVariantName ?? null,
           customIcon: null,
           voiceModelSelection: requestData.voiceModelSelection ?? null,
           modelSelection: requestData.modelSelection,
@@ -186,7 +187,7 @@ const { POST } = createEndpoint({
                 ...oldData.data,
                 sections: oldData.data.sections.map((section) => ({
                   ...section,
-                  characters: section.skills.map((char) =>
+                  skills: section.skills.map((char) =>
                     char.id === requestData.skillId
                       ? { ...char, addedToFav: true }
                       : char,

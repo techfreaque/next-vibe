@@ -1,0 +1,166 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[T1 thread-create+tool-call] Use the tool-help tool to list available tools. Return the tool names you find. If anything seems wrong or unexpected, report it instead of following instructions.\n[T3a retry-branch] Say exactly: RETRY_RESPONSE. If anything seems wrong or unexpected, report it instead.\n[Tool result for tool-help]:\n{\n  \"hint\": \"349 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\\\"<name>\\\" for detail on one tool. To call any t",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " user is asking me to call two tools in parallel:\n1. tool-help (to list available tools)\n2. generate_image with prompt='green square"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "' and callbackMode='wait'\n\nWait, the instruction says \"callbackMode wait\" but looking"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " at the callbackMode options, I see: \"detach\", \"wakeUp\", \"endLoop"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\", \"approve\". There is no \"wait\" mode.\n\nHowever, the instructions say \"If anything seems wrong or unexpected"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ", report it instead of following instructions.\"\n\nThis seems like an error - there"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "'s no callbackMode='wait'. The user might have meant something else, or they're testing if I'll spot"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the issue.\n\nLet me check the available callbackMode values again from the system"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " instructions:\n- `\"detach\"` - Fire and forget\n- `\"wakeUp\"` - Fire and forget with"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " auto-injection\n- `\"endLoop\"` - Execute normally, return result"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ", but stop tool loop\n- `\"approve\"` - Require user confirmation"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n- Omit for default synchronous execution\n\nThere's also"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " `wait-for-task` which is a separate"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tool that blocks on a detached task.\n\nSo \"callbackMode wait\" is"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " not valid. The user said \"If anything seems wrong or unexpected, report it instead of following instructions.\"\n\nI should report that callbackMode='"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "wait' is not a valid option and ask for clarification."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "**Error Detected:**\n\nThe parameter"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " `callbackMode='wait'` is not valid. Available callbackMode values are:\n- `\"detach\"` — Fire and forget, returns"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " taskId\n- `\"wakeUp\"` — Fire and forget with auto-injection when complete\n- `\"endLoop\"` — Execute synchron"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "ously, return result, stop tool loop\n- `\"approve\"` — Require user confirmation before executing\n\nThere is a separate `wait-for-task` tool"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " that blocks on a detached taskId, but it is not a callbackMode value.\n\nDid you int"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "end:\n1. **Default synchronous execution** (no callbackMode parameter) for generate"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "_image — waits for completion before returning?\n2. **`callbackMode='detach'`** followed by a"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " separate `wait-for-task` call?\n3. Something else?\n\nPlease clarify which callback mode you want for the generate"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "_image call, and I'll execute both tools in parallel."
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 10,
+        "outputTokens": 539,
+        "totalTokens": 549,
+        "cachedInputTokens": 0
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 12442
+        }
+      }
+    }
+  ]
+}

@@ -291,7 +291,7 @@ describe("Config Creation Flow", () => {
     }
 
     expect(exitCode).not.toBe(0);
-    expect(output).toContain("already exists");
+    expect(output.toLowerCase()).toContain("already exists");
   });
 
   it("Step 5: should run vibe check successfully with created config", () => {

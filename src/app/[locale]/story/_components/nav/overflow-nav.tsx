@@ -31,6 +31,7 @@ import type { NavChildItem, NavItemType } from "./nav-constants";
 interface OverflowNavProps {
   navigationItems: NavItemType[];
   locale: CountryLanguage;
+  totalModelCount: number;
 }
 
 // Renders a single top-level nav item as a dropdown-menu item (for overflow)
@@ -105,10 +106,12 @@ function InlineNavItem({
   item,
   locale,
   t,
+  totalModelCount,
 }: {
   item: NavItemType;
   locale: CountryLanguage;
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
+  totalModelCount: number;
 }): JSX.Element {
   if (item.children) {
     return (
@@ -151,7 +154,7 @@ function InlineNavItem({
                   <Div>
                     <P className="text-sm">{t(child.title)}</P>
                     <P className="text-xs text-gray-500 dark:text-gray-400">
-                      {t(child.description)}
+                      {t(child.description, { modelCount: totalModelCount })}
                     </P>
                   </Div>
                 </DropdownMenuItem>
@@ -181,6 +184,7 @@ const MORE_BTN_WIDTH = 44; // width of the "..." button incl gap
 export function OverflowNav({
   navigationItems,
   locale,
+  totalModelCount,
 }: OverflowNavProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -263,7 +267,12 @@ export function OverflowNav({
           }}
           className={cn("shrink-0", i >= visibleCount && "invisible absolute")}
         >
-          <InlineNavItem item={item} locale={locale} t={t} />
+          <InlineNavItem
+            item={item}
+            locale={locale}
+            t={t}
+            totalModelCount={totalModelCount}
+          />
         </Div>
       ))}
 

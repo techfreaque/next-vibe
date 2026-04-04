@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import type { JSX } from "react";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import type {
   DefaultValues,
   Path,
@@ -285,11 +285,13 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
       : undefined;
 
     const rootWidget = CustomRender ? (
-      <CustomRender
-        fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}
-        field={withValueNonStrict(endpoint.fields, data, null)}
-        inlineButtonInfo={inlineButtonInfo}
-      />
+      <Suspense fallback={null}>
+        <CustomRender
+          fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}
+          field={withValueNonStrict(endpoint.fields, data, null)}
+          inlineButtonInfo={inlineButtonInfo}
+        />
+      </Suspense>
     ) : (
       <LazyWidgetRenderer
         fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}

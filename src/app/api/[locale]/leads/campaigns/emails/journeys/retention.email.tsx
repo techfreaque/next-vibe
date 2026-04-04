@@ -9,6 +9,8 @@ import React from "react";
 import { CampaignEmailLayout } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
 import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_cta_button.email";
 import { HumanText } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_text.email";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
 
 import { EmailCampaignStage } from "../../../enum";
@@ -41,7 +43,11 @@ export const retentionInitialEmail: EmailTemplateFunction = ({
 
       <HumanText variant="body">{t("initial.thankYou")}</HumanText>
 
-      <HumanText variant="body">{t("initial.valueSummary")}</HumanText>
+      <HumanText variant="body">
+        {t("initial.valueSummary", {
+          modelCount: getAvailableModelCount(agentEnvAvailability, false),
+        })}
+      </HumanText>
 
       <HumanText variant="body">{t("initial.whatIsNext")}</HumanText>
 

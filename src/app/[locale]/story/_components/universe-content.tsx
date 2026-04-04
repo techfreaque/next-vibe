@@ -9,6 +9,7 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import type { ModelCountsByContentLevel } from "@/app/api/[locale]/agent/models/all-models";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { Architecture } from "./architecture";
@@ -36,6 +37,7 @@ interface UniverseContentProps {
   totalModelCount: number;
   totalProviderCount: number;
   totalSkillCount: number;
+  modelCountsByTier: ModelCountsByContentLevel;
   activeSide: ActiveSide;
   onSideChange: (side: ActiveSide) => void;
 }
@@ -156,6 +158,7 @@ export function UniverseContent({
   totalModelCount,
   totalProviderCount,
   totalSkillCount,
+  modelCountsByTier,
   activeSide,
   onSideChange,
 }: UniverseContentProps): JSX.Element {
@@ -212,7 +215,7 @@ export function UniverseContent({
       id: "personal",
       label: t("home.splitHero.tab.personal"),
       sublabel: t("home.splitHero.tab.personalSub"),
-      desc: t("home.splitHero.tab.personalDesc"),
+      desc: t("home.splitHero.tab.personalDesc", { appName }),
       color: "sky",
       dot: "bg-emerald-500 dark:bg-emerald-400",
       inactiveDot: "bg-emerald-400 dark:bg-emerald-700",
@@ -298,6 +301,7 @@ export function UniverseContent({
               totalToolCount={totalToolCount}
               totalModelCount={totalModelCount}
               totalProviderCount={totalProviderCount}
+              modelCountsByTier={modelCountsByTier}
             />
             <OpenClawComparison
               locale={locale}

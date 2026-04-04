@@ -24,11 +24,6 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
 import { lazy } from "react";
-import {
-  DEFAULT_VIDEO_DURATION,
-  VIDEO_DURATION_VALUES,
-  VideoDurationOptions,
-} from "./enum";
 
 import { VIDEO_GEN_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
@@ -90,9 +85,7 @@ const { POST } = createEndpoint({
         columns: 12,
         options: [],
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
-        schema: z
-          .enum(VideoGenModelId)
-          .default(VideoGenModelId.MODELSLAB_WAN_2_5_T2V),
+        schema: z.enum(VideoGenModelId).default(VideoGenModelId.WAN_2_7_T2V),
         serverDefault: (ctx) => ctx.streamContext?.videoGenModelId,
       }),
       duration: requestField(scopedTranslation, {
@@ -101,8 +94,29 @@ const { POST } = createEndpoint({
         label: "post.duration.label",
         description: "post.duration.description",
         columns: 12,
-        options: VideoDurationOptions,
-        schema: z.enum(VIDEO_DURATION_VALUES).default(DEFAULT_VIDEO_DURATION),
+        options: [],
+        hiddenForPlatforms: [Platform.AI, Platform.MCP],
+        schema: z.number().int().min(1).max(120).default(5),
+      }),
+      aspectRatio: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.aspectRatio.label",
+        description: "post.aspectRatio.description",
+        columns: 12,
+        options: [],
+        hiddenForPlatforms: [Platform.AI, Platform.MCP],
+        schema: z.string().optional(),
+      }),
+      resolution: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.resolution.label",
+        description: "post.resolution.description",
+        columns: 12,
+        options: [],
+        hiddenForPlatforms: [Platform.AI, Platform.MCP],
+        schema: z.string().optional(),
       }),
       backButton: backButton(scopedTranslation, {
         label: "post.backButton.label" as const,
@@ -193,8 +207,8 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         prompt: "A cinematic shot of a mountain lake at sunset",
-        model: VideoGenModelId.MODELSLAB_WAN_2_5_T2V,
-        duration: DEFAULT_VIDEO_DURATION,
+        model: VideoGenModelId.WAN_2_7_T2V,
+        duration: 5,
       },
     },
     responses: {

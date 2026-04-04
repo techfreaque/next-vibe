@@ -52,7 +52,18 @@ import {
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
 } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
+  getBestAudioVisionModel,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
+import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
+import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
@@ -61,29 +72,39 @@ import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/musi
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import helpDefinitions from "@/app/api/[locale]/system/help/definition";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type {
-  ChatModelSelection,
-  ImageGenModelSelection,
-  MusicGenModelSelection,
-  SttModelSelection,
-  VideoGenModelSelection,
-  ImageVisionModelSelection,
-  VideoVisionModelSelection,
-  AudioVisionModelSelection,
-  VoiceModelSelection,
-} from "../../../models/types";
 import {
   chatManualModelSelectionSchema,
   chatModelSelectionSchema,
-  imageGenModelSelectionSchema,
-  musicGenModelSelectionSchema,
-  sttModelSelectionSchema,
-  videoGenModelSelectionSchema,
+  type ChatModelSelection,
+} from "../../../ai-stream/models";
+import {
+  audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
-  audioVisionModelSelectionSchema,
+  type AudioVisionModelSelection,
+  type ImageVisionModelSelection,
+  type VideoVisionModelSelection,
+} from "../../../ai-stream/vision-models";
+import {
+  imageGenModelSelectionSchema,
+  type ImageGenModelSelection,
+} from "../../../image-generation/models";
+import {
+  musicGenModelSelectionSchema,
+  type MusicGenModelSelection,
+} from "../../../music-generation/models";
+import {
+  sttModelSelectionSchema,
+  type SttModelSelection,
+} from "../../../speech-to-text/models";
+import {
   voiceModelSelectionSchema,
-} from "../../../models/types";
+  type VoiceModelSelection,
+} from "../../../text-to-speech/models";
+import {
+  videoGenModelSelectionSchema,
+  type VideoGenModelSelection,
+} from "../../../video-generation/models";
 import {
   ToolsConfigEdit,
   type ToolEntry,
@@ -193,7 +214,7 @@ export function FavoriteEditContainer({
 
   // Platform-level default model selections (env-aware)
   const platformChatDefault = useMemo((): ChatModelSelection | undefined => {
-    const m = SkillsRepositoryClient.getBestModelForSkill(
+    const m = getBestChatModel(
       DEFAULT_CHAT_MODEL_SELECTION,
       user,
       envAvailability,
@@ -209,7 +230,7 @@ export function FavoriteEditContainer({
   }, [user, envAvailability]);
 
   const platformTtsDefault = useMemo((): VoiceModelSelection | undefined => {
-    const m = SkillsRepositoryClient.getBestTtsModel(
+    const m = getBestTtsModel(
       DEFAULT_TTS_MODEL_SELECTION,
       user,
       envAvailability,
@@ -227,7 +248,7 @@ export function FavoriteEditContainer({
   const platformImageGenDefault = useMemo(():
     | ImageGenModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestImageGenModel(
+    const m = getBestImageGenModel(
       DEFAULT_IMAGE_GEN_MODEL_SELECTION,
       user,
       envAvailability,
@@ -245,7 +266,7 @@ export function FavoriteEditContainer({
   const platformMusicGenDefault = useMemo(():
     | MusicGenModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestMusicGenModel(
+    const m = getBestMusicGenModel(
       DEFAULT_MUSIC_GEN_MODEL_SELECTION,
       user,
       envAvailability,
@@ -263,7 +284,7 @@ export function FavoriteEditContainer({
   const platformVideoGenDefault = useMemo(():
     | VideoGenModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestVideoGenModel(
+    const m = getBestVideoGenModel(
       DEFAULT_VIDEO_GEN_MODEL_SELECTION,
       user,
       envAvailability,
@@ -279,7 +300,7 @@ export function FavoriteEditContainer({
   }, [user, envAvailability]);
 
   const platformSttDefault = useMemo((): SttModelSelection | undefined => {
-    const m = SkillsRepositoryClient.getBestSttModel(
+    const m = getBestSttModel(
       DEFAULT_STT_MODEL_SELECTION,
       user,
       envAvailability,
@@ -297,7 +318,7 @@ export function FavoriteEditContainer({
   const platformImageVisionDefault = useMemo(():
     | ImageVisionModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestImageVisionModel(
+    const m = getBestImageVisionModel(
       DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       user,
       envAvailability,
@@ -315,7 +336,7 @@ export function FavoriteEditContainer({
   const platformVideoVisionDefault = useMemo(():
     | VideoVisionModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestVideoVisionModel(
+    const m = getBestVideoVisionModel(
       DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       user,
       envAvailability,
@@ -333,7 +354,7 @@ export function FavoriteEditContainer({
   const platformAudioVisionDefault = useMemo(():
     | AudioVisionModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestAudioVisionModel(
+    const m = getBestAudioVisionModel(
       DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       user,
       envAvailability,
@@ -1518,7 +1539,7 @@ function SaveAndUseButton({
         // Determine the model to use
         let modelId: ChatModelId | null = null;
         if (favoriteData.modelSelection) {
-          const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
+          const bestModel = getBestChatModelForFavorite(
             favoriteData.modelSelection,
             undefined,
             user,

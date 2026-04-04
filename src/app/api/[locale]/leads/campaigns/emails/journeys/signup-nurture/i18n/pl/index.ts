@@ -10,7 +10,7 @@ export const translations: typeof enTranslations = {
     firstSteps:
       "Zacznij od zadania, którego unikałeś, bo inne narzędzia AI ciągle je odrzucały. Żadnych guardrails, żadnych wykładów - tylko wyniki.",
     modelChoice:
-      "Masz dostęp do 42+ modeli. Jeśli nie wiesz od czego zacząć, wypróbuj domyślny model. Możesz go zmienić w dowolnym momencie.",
+      "Masz dostęp do {{modelCount}} modeli. Jeśli nie wiesz od czego zacząć, wypróbuj domyślny model. Możesz go zmienić w dowolnym momencie.",
     signature: "Zespół unbottled.ai",
   },
   followup1: {

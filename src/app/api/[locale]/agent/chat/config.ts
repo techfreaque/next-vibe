@@ -39,6 +39,60 @@ export enum DefaultFolderId {
 }
 
 /**
+ * Tool IDs denied per folder type. Stacked onto deniedToolIds in stream-setup.
+ * Uses plain string aliases (not imports) to avoid circular deps — config.ts is foundational.
+ * Admin-only tools (campaign-starter, leads-import, etc.) are already gated by allowedRoles
+ * and don't need explicit denial here.
+ */
+export const FOLDER_DENIED_TOOL_IDS: Partial<
+  Record<DefaultFolderId, readonly string[]>
+> = {
+  [DefaultFolderId.INCOGNITO]: [
+    // Task infrastructure — results can't route back to localStorage-only threads
+    "coding-agent", // escalateToTask + spawns OS processes
+    "ssh-exec", // escalates long commands to cron tasks
+    "execute-tool", // creates remote cron tasks (PUBLIC-accessible)
+    "wait-for-task", // monitors tasks (useless without detach/wakeUp)
+    "complete-task", // forges task completion
+    "cron-create", // direct task creation
+    "execute-task", // runs stored tasks
+    "task-sync", // syncs remote instance tasks
+  ],
+  [DefaultFolderId.PUBLIC]: [
+    "coding-agent",
+    "ssh-exec",
+    "execute-tool",
+    "wait-for-task",
+    "complete-task",
+    "cron-create",
+    "execute-task",
+    "task-sync",
+  ],
+};
+
+/**
+ * Callback modes blocked per folder type. Enforced at schema injection
+ * (AI never sees them) and execution time (defense in depth).
+ */
+export const FOLDER_BLOCKED_CALLBACK_MODES: Partial<
+  Record<DefaultFolderId, readonly string[]>
+> = {
+  [DefaultFolderId.INCOGNITO]: ["detach", "wakeUp"],
+  [DefaultFolderId.PUBLIC]: ["detach", "wakeUp"],
+};
+
+/**
+ * Whether remote tools (instanceId__toolName) are allowed for this folder type.
+ * Explicit false = blocked. Absent = allowed (default).
+ */
+export const FOLDER_ALLOWS_REMOTE_TOOLS: Partial<
+  Record<DefaultFolderId, false>
+> = {
+  [DefaultFolderId.INCOGNITO]: false,
+  [DefaultFolderId.PUBLIC]: false,
+};
+
+/**
  * Stream Context - rich context passed to tool executions during AI streaming.
  * Replaces the old single `rootFolderId` parameter with a structured object
  * so handlers know which thread/message/model they're operating in.

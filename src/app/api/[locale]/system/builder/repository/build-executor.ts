@@ -3,6 +3,8 @@
  * Main orchestrator that coordinates all build services
  */
 
+import { resolve } from "node:path";
+
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -11,9 +13,11 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { PackageEndpointGeneratorRepository } from "@/app/api/[locale]/system/generators/package-endpoints/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type {
+  BuildConfig,
   BuilderRequest,
   BuilderResponse,
   BuildProfile,
@@ -23,6 +27,7 @@ import type {
   FileToCompileWithPlugins,
 } from "../definition";
 import { isBunBuildType } from "../definition";
+import { BunBuildTypeEnum } from "../enum";
 import { BuildProfileEnum, StepStatusEnum } from "../enum";
 import type { scopedTranslation } from "../i18n";
 import { bunCompiler } from "./bun-compiler";
@@ -34,6 +39,7 @@ import { fileCopier } from "./file-copier";
 import { folderCleaner } from "./folder-cleaner";
 import { npmPackageGenerator } from "./npm-package-generator";
 import { outputFormatter } from "./output-formatter";
+import { createPackagePlugins } from "./package-plugins";
 import { profileService } from "./profile-service";
 import { reportGenerator } from "./report-generator";
 import { viteCompiler } from "./vite-compiler";
@@ -125,6 +131,12 @@ export class BuildExecutor {
       // Dry run notice
       if (dryRun) {
         output.push(outputFormatter.formatWarning(t("messages.dryRunMode")));
+      }
+
+      // Manifest-driven package build: auto-generate scoped endpoint registry
+      // and inject standard package plugins into every EXECUTABLE entry.
+      if (buildConfig.manifest) {
+        buildConfig = await this.applyManifest(buildConfig, logger);
       }
 
       // Execute pre-build hook
@@ -497,6 +509,66 @@ export class BuildExecutor {
       verbose,
       profile,
     );
+  }
+
+  /**
+   * Apply manifest-driven defaults:
+   *  1. Generate scoped endpoint registry into .dist/<package>/generated/
+   *  2. Inject standard package plugins into every EXECUTABLE filesToCompile entry
+   *  3. Inject VIBE_PACKAGE_NAME + VIBE_PACKAGE_DEFAULT_ENDPOINT defines
+   */
+  private async applyManifest(
+    buildConfig: BuildConfig,
+    logger: EndpointLogger,
+  ): Promise<BuildConfig> {
+    const manifest = buildConfig.manifest;
+    if (!manifest) {
+      return buildConfig;
+    }
+
+    // Derive output dir from first foldersToClean entry (e.g. ".dist/checker/bin" → ".dist/checker")
+    const firstClean = buildConfig.foldersToClean?.[0] ?? ".dist/package";
+    // Strip the last path segment to get the package root
+    const packageRoot = firstClean.replace(/\/[^/]+$/, "");
+    const generatedDir = resolve(process.cwd(), `${packageRoot}/generated`);
+
+    // Generate scoped endpoint registry
+    logger.info(
+      `Generating scoped endpoint registry for ${manifest.name} → ${generatedDir}`,
+    );
+    const genResult = await PackageEndpointGeneratorRepository.generate({
+      manifest,
+      outputDir: generatedDir,
+    });
+    logger.info(
+      `Generated ${genResult.endpointCount} endpoints → ${genResult.endpointFile}`,
+    );
+
+    // Build the standard plugin set
+    const packagePlugins = createPackagePlugins(manifest, generatedDir);
+
+    // Inject plugins and defines into every EXECUTABLE entry
+    const filesToCompile = (buildConfig.filesToCompile ?? []).map((entry) => {
+      if (entry.type !== BunBuildTypeEnum.EXECUTABLE) {
+        return entry;
+      }
+      return {
+        ...entry,
+        bunOptions: {
+          ...entry.bunOptions,
+          plugins: [...packagePlugins, ...(entry.bunOptions?.plugins ?? [])],
+          define: {
+            VIBE_PACKAGE_NAME: JSON.stringify(manifest.bin ?? "vibe-check"),
+            VIBE_PACKAGE_DEFAULT_ENDPOINT: JSON.stringify(
+              manifest.defaultEndpoint ?? "",
+            ),
+            ...entry.bunOptions?.define,
+          },
+        },
+      };
+    });
+
+    return { ...buildConfig, filesToCompile };
   }
 
   /**

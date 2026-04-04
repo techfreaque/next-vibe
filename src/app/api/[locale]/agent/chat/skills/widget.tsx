@@ -59,6 +59,7 @@ import { COMPANION_SKILLS } from "./config";
 import type definition from "./definition";
 import type { SkillListItem, SkillListResponseOutput } from "./definition";
 import { SkillOwnershipType, SkillTrustLevel } from "./enum";
+import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 
 /**
  * Props for custom widget
@@ -1497,8 +1498,7 @@ function SkillFavoriteActions({
       const favorite = favoriteResponse.data;
 
       // Determine the model to use (favorite override → variant → skill default)
-      const { SkillsRepositoryClient } = await import("./repository-client");
-      const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
+      const bestModel = getBestChatModelForFavorite(
         favorite.modelSelection,
         favorite.characterModelSelection ?? undefined,
         user,
@@ -1557,8 +1557,7 @@ function SkillFavoriteActions({
       const favorite = favoriteResponse.data;
 
       // Determine the model to use (favorite override → variant → skill default)
-      const { SkillsRepositoryClient } = await import("./repository-client");
-      const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
+      const bestModel = getBestChatModelForFavorite(
         favorite.modelSelection,
         favorite.characterModelSelection ?? undefined,
         user,

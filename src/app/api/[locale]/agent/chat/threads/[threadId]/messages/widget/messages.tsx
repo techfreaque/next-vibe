@@ -40,7 +40,7 @@ import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/sett
 import characterDefinitions from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/models/types";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";

@@ -56,7 +56,7 @@ export const translations = {
     },
     aiModels: {
       title: "AI Models",
-      description: "40+ uncensored AI models",
+      description: "{{modelCount}} uncensored AI models",
     },
     folders: {
       title: "Privacy Levels",

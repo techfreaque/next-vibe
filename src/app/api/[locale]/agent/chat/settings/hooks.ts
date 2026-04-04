@@ -9,7 +9,7 @@ import { useCallback, useMemo } from "react";
 
 import type { ViewModeValue } from "@/app/api/[locale]/agent/chat/enum";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/models/types";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";

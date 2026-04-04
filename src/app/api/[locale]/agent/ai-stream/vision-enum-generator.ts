@@ -19,6 +19,14 @@ interface EnumEntry {
   value: string;
 }
 
+/**
+ * Build a TypeScript enum block.
+ *
+ * Example output:
+ *   export enum ImageVisionModelId {
+ *     GPT_5_4 = "gpt-54",
+ *   }
+ */
 function buildEnumBlock(name: string, entries: EnumEntry[]): string {
   if (entries.length === 0) {
     return `export enum ${name} {}\n`;

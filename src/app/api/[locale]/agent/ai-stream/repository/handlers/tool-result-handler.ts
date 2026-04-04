@@ -231,11 +231,18 @@ export class ToolResultHandler {
     //    own output shape doesn't signal pending.
     // 2. Output shape {status: "status.pending"} - set by execute-tool for remote queue WAIT/wakeUp.
     //    tools-loader unwraps success().data, so output is {status: "status.pending"} directly.
+    // NOTE: detach mode also returns {taskId, status: "status.pending"} but that IS the final result
+    // (the task was detached successfully). Do NOT treat detach as isWaitingForRemote - its result
+    // must be written to DB so handleTaskCompletion can attach the deferred result later.
+    const isDetach = toolCallData.toolCall.callbackMode === "detach";
     let isWaitingForRemote =
-      !effectiveIsError && streamContext?.waitingForRemoteResult === true;
+      !effectiveIsError &&
+      !isDetach &&
+      streamContext?.waitingForRemoteResult === true;
     if (
       !isWaitingForRemote &&
       !effectiveIsError &&
+      !isDetach &&
       output !== null &&
       output !== undefined
     ) {

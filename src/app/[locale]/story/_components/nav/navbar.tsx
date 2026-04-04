@@ -20,6 +20,7 @@ interface NavbarProps {
   locale: CountryLanguage;
   hasSubscription: boolean;
   navigationItems: NavItemType[];
+  totalModelCount: number;
 }
 
 export function Navbar({
@@ -28,6 +29,7 @@ export function Navbar({
   locale,
   hasSubscription,
   navigationItems,
+  totalModelCount,
 }: NavbarProps): JSX.Element {
   return (
     <Div className="sticky top-0 z-50 w-full transition-all duration-300 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md shadow-sm">
@@ -39,7 +41,11 @@ export function Navbar({
 
         {/* Desktop Navigation - overflow-aware, hidden on mobile */}
         <Div role="navigation" className="hidden md:flex flex-1 min-w-0 mx-4">
-          <OverflowNav navigationItems={navigationItems} locale={locale} />
+          <OverflowNav
+            navigationItems={navigationItems}
+            locale={locale}
+            totalModelCount={totalModelCount}
+          />
         </Div>
 
         {/* Right side controls */}

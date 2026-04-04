@@ -19,7 +19,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { agentEnvAvailability } from "../../env-availability";
-import { ModelSelectionType } from "../skills/enum";
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
 import { getDefaultToolIdsForUser } from "../constants";
 import { chatSettings } from "./db";
@@ -126,12 +125,7 @@ export class ChatSettingsRepository {
           setting.imageGenModelSelection ?? defaults.imageGenModelSelection,
         musicGenModelSelection:
           setting.musicGenModelSelection ?? defaults.musicGenModelSelection,
-        videoGenModelSelection: setting.videoGenModelId
-          ? {
-              selectionType: ModelSelectionType.MANUAL,
-              manualModelId: setting.videoGenModelId,
-            }
-          : undefined,
+        videoGenModelSelection: setting.videoGenModelSelection ?? undefined,
         defaultChatMode: setting.defaultChatMode ?? defaults.defaultChatMode,
         viewMode: setting.viewMode ?? defaults.viewMode,
         availableTools:
@@ -269,13 +263,9 @@ export class ChatSettingsRepository {
               data.musicGenModelSelection !== undefined
                 ? (data.musicGenModelSelection ?? null)
                 : undefined,
-            videoGenModelId:
+            videoGenModelSelection:
               data.videoGenModelSelection !== undefined
-                ? data.videoGenModelSelection?.selectionType ===
-                    ModelSelectionType.MANUAL &&
-                  data.videoGenModelSelection.manualModelId
-                  ? data.videoGenModelSelection.manualModelId
-                  : null
+                ? (data.videoGenModelSelection ?? null)
                 : undefined,
             defaultChatMode:
               data.defaultChatMode !== undefined
@@ -339,12 +329,7 @@ export class ChatSettingsRepository {
             translationModelId: data.translationModelId ?? null,
             imageGenModelSelection: data.imageGenModelSelection ?? null,
             musicGenModelSelection: data.musicGenModelSelection ?? null,
-            videoGenModelId:
-              data.videoGenModelSelection?.selectionType ===
-                ModelSelectionType.MANUAL &&
-              data.videoGenModelSelection.manualModelId
-                ? data.videoGenModelSelection.manualModelId
-                : null,
+            videoGenModelSelection: data.videoGenModelSelection ?? null,
             defaultChatMode: data.defaultChatMode ?? null,
             viewMode:
               data.viewMode && data.viewMode !== defaults.viewMode

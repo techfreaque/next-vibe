@@ -56,7 +56,7 @@ export const translations = {
   audience: {
     title: "Who's the natural audience for this platform?",
     intro:
-      "{{appName}}'s positioning is specific: free speech AI with 50+ models, user-controlled content filtering, privacy-first. That resonates with:",
+      "{{appName}}'s positioning is specific: free speech AI with {{modelCount}} models, user-controlled content filtering, privacy-first. That resonates with:",
     group1Title: "Developers and technical users",
     group1Body:
       "People who want API access, hate restrictive AI policies, and are already paying for multiple AI subscriptions. High ARPU, high retention.",
@@ -68,7 +68,7 @@ export const translations = {
       "Writers, YouTubers, and bloggers who use AI for drafts, research, and brainstorming. They benefit from uncensored models for fiction, adult content, or controversial topics.",
     group4Title: "AI-curious non-techies",
     group4Body:
-      "People following the AI wave but overwhelmed by the options. The 50+ model selection and simple interface converts well from tutorial content.",
+      "People following the AI wave but overwhelmed by the options. The {{modelCount}}-model selection and simple interface converts well from tutorial content.",
   },
   promotion: {
     title: "Promotion angles that work",

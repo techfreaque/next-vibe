@@ -59,7 +59,7 @@ import { scopedTranslation as runScopedTranslation } from "./i18n";
 import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { platform } from "@/config/env-client";
 import { DefaultFolderId } from "../../chat/config";
@@ -471,11 +471,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   const promptValue = form.watch("prompt") ?? "";
   const modelValue: ChatModelId | undefined =
     form.watch("model") ??
-    SkillsRepositoryClient.getBestModelForSkill(
-      DEFAULT_CHAT_MODEL_SELECTION,
-      user,
-      env,
-    )?.id;
+    getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user, env)?.id;
   const skillValue = form.watch("skill") ?? "";
 
   const handleContentChange = useCallback(

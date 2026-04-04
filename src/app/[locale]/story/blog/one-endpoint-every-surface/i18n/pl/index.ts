@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     paragraph1:
       "Każda funkcja potrzebowała formularza web, polecenia CLI, narzędzia MCP dla agentów AI, czasem ekranu mobilnego. Ta sama walidacja Zod, to samo i18n, ta sama obsługa błędów - tylko inaczej ubrana. Więc zbudowałem next-vibe: framework, w którym piszesz jeden plik definition.ts na funkcję i renderuje się jako wszystkie jednocześnie.",
     paragraph2:
-      "Zasila też {{appName}} - 50+ modeli AI, kontrolowana przez użytkownika cenzura. Ta sama baza kodu działa jako aplikacja web Next.js, serwer dev TanStack/Vite, aplikacja mobilna React Native, CLI, serwer MCP, system cron i magistrala zdarzeń WebSocket. Jedna definicja endpointu. Bez duplikacji.",
+      "Zasila też {{appName}} - {{modelCount}} modeli AI, kontrolowana przez użytkownika cenzura. Ta sama baza kodu działa jako aplikacja web Next.js, serwer dev TanStack/Vite, aplikacja mobilna React Native, CLI, serwer MCP, system cron i magistrala zdarzeń WebSocket. Jedna definicja endpointu. Bez duplikacji.",
   },
   typeRules: {
     title: "Typy muszą się zgadzać. Bez wyjątków.",

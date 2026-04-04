@@ -1,17 +1,26 @@
+import { z } from "zod";
+
 import {
   ContentLevel,
   IntelligenceLevel,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+  PriceLevel,
   SpeedLevel,
 } from "../chat/skills/enum";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
   defaultFeatures,
+  filterRoleModels,
   type ModelDefinition,
   type ModelOptionSttBased,
   type ModelProviderConfigSttBased,
+  type ModelProviderEnvAvailability,
   getProviderPrice,
 } from "../models/models";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 export enum SttModelId {
   OPENAI_WHISPER = "openai-whisper",
@@ -143,4 +152,74 @@ export function getSttModelById(modelId: SttModelId): SttModelOption {
     sttModelOptionsIndex[modelId] ??
     sttModelOptionsIndex[SttModelId.OPENAI_WHISPER]!
   );
+}
+
+// ============================================================
+// STT MODEL SELECTION SCHEMA
+// ============================================================
+
+const sharedFilterPropsSchema = z.object({
+  intelligenceRange: z
+    .object({
+      min: z.enum(IntelligenceLevel).optional(),
+      max: z.enum(IntelligenceLevel).optional(),
+    })
+    .optional(),
+  priceRange: z
+    .object({
+      min: z.enum(PriceLevel).optional(),
+      max: z.enum(PriceLevel).optional(),
+    })
+    .optional(),
+  contentRange: z
+    .object({
+      min: z.enum(ContentLevel).optional(),
+      max: z.enum(ContentLevel).optional(),
+    })
+    .optional(),
+  speedRange: z
+    .object({
+      min: z.enum(SpeedLevel).optional(),
+      max: z.enum(SpeedLevel).optional(),
+    })
+    .optional(),
+  sortBy: z.enum(ModelSortField).optional(),
+  sortDirection: z.enum(ModelSortDirection).optional(),
+  sortBy2: z.enum(ModelSortField).optional(),
+  sortDirection2: z.enum(ModelSortDirection).optional(),
+});
+
+const filtersSelectionSchema = z
+  .object({ selectionType: z.literal(ModelSelectionType.FILTERS) })
+  .merge(sharedFilterPropsSchema);
+
+export const sttModelSelectionSchema = z.discriminatedUnion("selectionType", [
+  z
+    .object({
+      selectionType: z.literal(ModelSelectionType.MANUAL),
+      manualModelId: z.enum(SttModelId),
+    })
+    .merge(sharedFilterPropsSchema),
+  filtersSelectionSchema,
+]);
+export type SttModelSelection = z.infer<typeof sttModelSelectionSchema>;
+
+// ============================================================
+// STT MODEL RESOLUTION
+// ============================================================
+
+export function filterSttModels(
+  selection: SttModelSelection | null | undefined,
+  user: JwtPayloadType,
+  env: ModelProviderEnvAvailability,
+): SttModelOption[] {
+  return filterRoleModels(sttModelOptions, selection, user, env);
+}
+
+export function getBestSttModel(
+  selection: SttModelSelection,
+  user: JwtPayloadType,
+  env: ModelProviderEnvAvailability,
+): SttModelOption | null {
+  return filterSttModels(selection, user, env)[0] ?? null;
 }

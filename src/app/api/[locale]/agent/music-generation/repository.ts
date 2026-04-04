@@ -23,9 +23,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
 
-import { generateMusicWithFalAi } from "../ai-stream/providers/fal-ai-audio";
-import { generateMusicWithModelsLab } from "../ai-stream/providers/modelslab-audio";
-import { generateMusicWithReplicate } from "../ai-stream/providers/replicate-audio";
+import { generateMusicWithModelsLab } from "./providers/modelslab";
+import { generateMusicWithReplicate } from "./providers/replicate";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -56,10 +55,44 @@ export class MusicGenerationRepository {
     // model is resolved via serverDefault on the field definition (from ToolExecutionContext.musicGenModelId)
     const audioModel = getMusicGenModelById(data.model);
 
+    if (!audioModel) {
+      return fail({
+        message: t("post.errors.not_found.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
     const creditCost = calculateCreditCost(audioModel, 0, 0);
-    const durationSeconds =
+    const requestedDuration =
       MUSIC_DURATION_SECONDS[data.duration] ??
       audioModel.defaultDurationSeconds;
+
+    // Clamp to model's minimum duration first
+    const clampedDuration = Math.max(
+      requestedDuration,
+      audioModel.minDurationSeconds ?? 0,
+    );
+
+    // If model has a specific list of allowed durations, snap to the closest supported one.
+    // supportedDurations may hold enum keys (e.g. "post.duration.long") or seconds as strings.
+    let durationSeconds = clampedDuration;
+    if (
+      audioModel.supportedDurations &&
+      audioModel.supportedDurations.length > 0 &&
+      !audioModel.supportedDurations.includes(data.duration) &&
+      !audioModel.supportedDurations.includes(String(clampedDuration))
+    ) {
+      // Map each supported entry to seconds (resolve enum keys, fall back to numeric parse)
+      const supportedSeconds = audioModel.supportedDurations.map(
+        (d) => MUSIC_DURATION_SECONDS[d] ?? Number(d),
+      );
+      const nearest = supportedSeconds.reduce((prev, curr) =>
+        Math.abs(curr - clampedDuration) < Math.abs(prev - clampedDuration)
+          ? curr
+          : prev,
+      );
+      durationSeconds = nearest;
+    }
 
     logger.info("[MusicGen] Starting music generation", {
       model: data.model,
@@ -93,18 +126,9 @@ export class MusicGenerationRepository {
         });
         break;
 
-      case ApiProvider.FAL_AI:
-        generationResult = await generateMusicWithFalAi({
-          providerModel: audioModel.providerModel,
-          prompt: data.prompt,
-          durationSeconds,
-          logger,
-          locale,
-        });
-        break;
-
       case ApiProvider.MODELSLAB:
         generationResult = await generateMusicWithModelsLab({
+          providerModel: audioModel.providerModel,
           prompt: data.prompt,
           durationSeconds,
           logger,

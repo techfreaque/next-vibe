@@ -23,7 +23,7 @@ export const translations = {
   whatAreSkills: {
     title: "What are skills on {{appName}}?",
     p1: "A skill is a pre-configured AI setup. System prompt, model selection, voice, image generation settings - everything that makes an AI conversation useful for a specific purpose. Think of it like a recipe: you figure out the right ingredients once, then anyone can use it.",
-    p2: "You can build a skill for anything. A coding assistant that follows your team's conventions. A creative writer with a specific tone. An uncensored debate partner. A language tutor that speaks like a native. The platform has 50+ models - mainstream, open, uncensored - and your skill configures which ones to use and how.",
+    p2: "You can build a skill for anything. A coding assistant that follows your team's conventions. A creative writer with a specific tone. An uncensored debate partner. A language tutor that speaks like a native. The platform has {{modelCount}} models - mainstream, open, uncensored - and your skill configures which ones to use and how.",
     p3: "Skills are free to create. You don't need a paid subscription. You don't need to be a developer. If you can describe what you want an AI to do, you can build a skill.",
   },
   shareLink: {

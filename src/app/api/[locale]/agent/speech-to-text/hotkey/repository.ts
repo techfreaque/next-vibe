@@ -16,7 +16,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { AgentT } from "@/app/api/[locale]/agent/i18n";
-import { scopedTranslation as sttScopedTranslation } from "@/app/api/[locale]/agent/speech-to-text/i18n";
 import { SpeechToTextRepository } from "@/app/api/[locale]/agent/speech-to-text/repository";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { STT_COST_PER_SECOND } from "@/app/api/[locale]/products/repository-client";
@@ -199,14 +198,11 @@ export class SttHotkeyRepository {
         type: "audio/wav",
       });
 
-      // Call existing STT repository (use stt-scoped t for correct key types)
-      const { t: sttT } = sttScopedTranslation.scopedT(locale);
       const result = await SpeechToTextRepository.transcribeAudio(
         audioFile,
         user,
         locale,
         logger,
-        sttT,
       );
 
       if (!result.success) {

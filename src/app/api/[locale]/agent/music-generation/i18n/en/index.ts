@@ -90,10 +90,18 @@ export const translations = {
       insufficientCredits:
         "Insufficient credits. Balance: {{balance}}, required: {{minimum}}",
       balanceCheckFailed: "Failed to check your credit balance",
-      generationFailed: "Music generation failed: {{error}}",
+      unsupportedDuration:
+        "Model {{model}} does not support duration {{duration}}. Supported durations: {{supported}}",
+      generationFailed: "Music generation failed",
       providerError: "Music provider error: {{error}}",
       noAudioUrl: "No audio URL returned from provider",
       creditsFailed: "Failed to deduct credits for music generation",
+      apiKeyNotConfigured: "API key not configured",
+      externalServiceError: "External service error: {{message}}",
+      requestAborted: "Request was aborted",
+      requestTimedOut: "Request timed out waiting for music generation",
+      requestFailed: "Request failed: {{message}}",
+      pollFailed: "Poll request failed with status {{status}}",
     },
     success: {
       title: "Music Generated",

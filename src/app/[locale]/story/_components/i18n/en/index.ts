@@ -134,9 +134,9 @@ export const translations = {
         titleLine2: "Your Rules.",
         subtitle:
           "{{modelCount}} models across three tiers. You choose the filter - mainstream, open, or uncensored.",
-        pill1: "{{modelCount}}+ models",
-        pill2: "Mainstream, open & uncensored",
-        pill3: "{{skillCount}}+ agent skills",
+        pill1: "{{modelCount}} models - you pick the filter",
+        pill2: "Generate images, video & music",
+        pill3: "{{skillCount}}+ skills with memory & search",
         cta: "Try Free",
         ctaExplore: "Learn More",
       },
@@ -145,10 +145,10 @@ export const translations = {
         titleLine1: "Your Agent.",
         titleLine2: "Your Machine.",
         subtitle:
-          "An always-on AI that runs on your machine, acts on your tasks, and never phones home. SSH, browser, BYO keys - your data stays with you.",
-        pill1: "Always-on. Acts autonomously.",
-        pill2: "Your data never leaves your machine",
-        pill3: "BYO API keys",
+          "All {{modelCount}} models on your hardware. Browses the web, writes code, runs terminals, handles tasks while you sleep. Bring your own keys or connect your {{appName}} account.",
+        pill1: "Browser, terminal & SSH built in",
+        pill2: "Runs 24/7 in the background",
+        pill3: "Your keys or {{appName}} account",
         cta: "Self-Host Free",
         ctaGithub: "Learn More",
       },
@@ -173,7 +173,7 @@ export const translations = {
         personal: "Self-Host",
         personalSub: "Your AI Agent",
         personalDesc:
-          "Always-on AI agent on your machine - acts autonomously, your data never leaves, BYO keys, SSH, browser",
+          "All models on your hardware - browses, codes, runs terminals 24/7. Your keys or {{appName}} account.",
         nextvibe: "next-vibe",
         nextvibeSub: "The Framework",
         nextvibeDesc:
@@ -290,6 +290,7 @@ export const translations = {
         title: "{{modelCount}} models. You control the filter.",
         description:
           "Mainstream for everyday tasks. Open-weight when you want more. Uncensored when you need the full answer - that's our edge. Switch models mid-chat. The same question, three different answers - now you can compare all of them.",
+        andMore: "+ {{count}} more",
         imageAlt: "Model picker showing content tier badges",
         demo: {
           question: "Same question. Different tier.",

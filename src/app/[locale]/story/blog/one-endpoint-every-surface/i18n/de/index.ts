@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     paragraph1:
       "Jede Funktion brauchte ein Webformular, einen CLI-Befehl, ein MCP-Tool für KI-Agenten, manchmal einen mobilen Screen. Selbe Zod-Validierung, selbe i18n, selbe Fehlerbehandlung - nur anders verpackt. Also hab ich next-vibe gebaut: ein Framework, bei dem du eine definition.ts pro Funktion schreibst und es gleichzeitig als alles rendert.",
     paragraph2:
-      "Es betreibt auch {{appName}} - 50+ KI-Modelle, nutzergesteuerte Zensur. Dieselbe Codebase läuft als Next.js Web-App, TanStack/Vite Dev-Server, React Native Mobile-App, CLI, MCP-Server, Cron-System und WebSocket-Event-Bus. Eine Endpoint-Definition. Keine Duplikation.",
+      "Es betreibt auch {{appName}} - {{modelCount}} KI-Modelle, nutzergesteuerte Zensur. Dieselbe Codebase läuft als Next.js Web-App, TanStack/Vite Dev-Server, React Native Mobile-App, CLI, MCP-Server, Cron-System und WebSocket-Event-Bus. Eine Endpoint-Definition. Keine Duplikation.",
   },
   typeRules: {
     title: "Typen müssen stimmen. Keine Ausnahmen.",

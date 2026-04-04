@@ -550,7 +550,7 @@ export const translations = {
       buttonAlreadySubscribed: "You already have an active subscription",
       features: {
         credits: "{{count}} credits per month",
-        expiry: "Access to {{modelCount}}+ AI models",
+        expiry: "Access to {{modelCount}} AI models",
         bestFor: "Best for regular use",
       },
     },

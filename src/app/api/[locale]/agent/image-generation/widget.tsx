@@ -16,11 +16,11 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import { getImageGenModelById } from "@/app/api/[locale]/agent/image-generation/models";
-import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/models/types";
+import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
@@ -94,6 +94,7 @@ export function ImageGenerationContainer({
   const currentModelId = form?.watch("model");
   const currentSize = form?.watch("size") ?? ImageSize.SQUARE_1024;
   const currentQuality = form?.watch("quality") ?? "post.quality.standard";
+  const currentAspectRatio = form?.watch("aspectRatio");
 
   const modelSelection = useMemo((): ImageGenModelSelection | undefined => {
     // model is resolved via serverDefault on the field definition
@@ -109,7 +110,7 @@ export function ImageGenerationContainer({
   const defaultModelSelection = useMemo(():
     | ImageGenModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestImageGenModel(
+    const m = getBestImageGenModel(
       DEFAULT_IMAGE_GEN_MODEL_SELECTION,
       user,
       envAvailability,
@@ -117,27 +118,54 @@ export function ImageGenerationContainer({
     if (!m) {
       return undefined;
     }
-    const modelId = Object.values(ImageGenModelId).includes(m.id)
-      ? m.id
-      : undefined;
-    if (!modelId) {
-      return undefined;
-    }
-    return { selectionType: ModelSelectionType.MANUAL, manualModelId: modelId };
+    return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
   }, [user, envAvailability]);
 
   const resolvedModelId =
     currentModelId ??
     (defaultModelSelection?.selectionType === ModelSelectionType.MANUAL
-      ? Object.values(ImageGenModelId).includes(
-          defaultModelSelection.manualModelId,
-        )
-        ? defaultModelSelection.manualModelId
-        : undefined
+      ? defaultModelSelection.manualModelId
       : undefined);
   const resolvedModel = resolvedModelId
     ? getImageGenModelById(resolvedModelId)
     : undefined;
+
+  // Determine which options the selected model supports
+  const supportedSizes =
+    resolvedModel && "supportedSizes" in resolvedModel
+      ? resolvedModel.supportedSizes
+      : undefined;
+  const supportedQualities =
+    resolvedModel && "supportedQualities" in resolvedModel
+      ? resolvedModel.supportedQualities
+      : undefined;
+  const supportedAspectRatios =
+    resolvedModel && "supportedAspectRatios" in resolvedModel
+      ? resolvedModel.supportedAspectRatios
+      : undefined;
+
+  const showSizeOptions =
+    supportedSizes === undefined || supportedSizes.length > 0;
+  const showQualityOptions =
+    supportedQualities !== undefined && supportedQualities.length > 0;
+  const showAspectRatioOptions =
+    supportedAspectRatios !== undefined && supportedAspectRatios.length > 1;
+
+  // Filter size presets to only show supported sizes
+  const availableSizePresets = showSizeOptions
+    ? SIZE_PRESETS.filter(
+        (p) => supportedSizes === undefined || supportedSizes.includes(p.value),
+      )
+    : [];
+
+  // Filter quality options to only show supported qualities
+  const availableQualityOptions = showQualityOptions
+    ? QUALITY_OPTIONS.filter(
+        (q) =>
+          supportedQualities === undefined ||
+          supportedQualities.includes(q.value),
+      )
+    : [];
 
   const activeSize =
     SIZE_PRESETS.find((p) => p.value === currentSize) ?? SIZE_PRESETS[0];
@@ -203,58 +231,84 @@ export function ImageGenerationContainer({
           />
         </Div>
 
-        {/* Size presets */}
-        <Div className="flex flex-col gap-1.5">
-          <Span className="text-xs font-medium text-muted-foreground">
-            {t("post.size.label")}
-          </Span>
-          <Div className="flex gap-2">
-            {SIZE_PRESETS.map((preset) => (
-              <Button
-                key={preset.value}
-                type="button"
-                variant={currentSize === preset.value ? "default" : "outline"}
-                size="sm"
-                className="flex-1 h-auto py-2 flex flex-col gap-1"
-                onClick={() => form?.setValue("size", preset.value)}
-              >
-                <Div
-                  className={`w-6 border-2 rounded-sm ${currentSize === preset.value ? "border-primary-foreground/70" : "border-current opacity-60"} ${preset.aspect}`}
-                />
-                <Span className="text-[10px]">{preset.label}</Span>
-                <Span className="text-[9px] opacity-60">
-                  {preset.w}
-                  {t("post.dimensionSeparator")}
-                  {preset.h}
-                </Span>
-              </Button>
-            ))}
-          </Div>
-        </Div>
-
-        {/* Quality + Model row */}
-        <Div className="flex gap-3">
-          {/* Quality toggle */}
-          <Div className="flex flex-col gap-1.5 flex-1">
+        {/* Size presets — hidden when model doesn't support size selection */}
+        {availableSizePresets.length > 0 && (
+          <Div className="flex flex-col gap-1.5">
             <Span className="text-xs font-medium text-muted-foreground">
-              {t("post.quality.label")}
+              {t("post.size.label")}
             </Span>
-            <Div className="flex gap-1.5">
-              {QUALITY_OPTIONS.map((q) => (
+            <Div className="flex gap-2">
+              {availableSizePresets.map((preset) => (
                 <Button
-                  key={q.value}
+                  key={preset.value}
                   type="button"
-                  variant={currentQuality === q.value ? "default" : "outline"}
+                  variant={currentSize === preset.value ? "default" : "outline"}
                   size="sm"
-                  className="flex-1 h-8 text-xs"
-                  onClick={() => form?.setValue("quality", q.value)}
+                  className="flex-1 h-auto py-2 flex flex-col gap-1"
+                  onClick={() => form?.setValue("size", preset.value)}
                 >
-                  {q.label}
+                  <Div
+                    className={`w-6 border-2 rounded-sm ${currentSize === preset.value ? "border-primary-foreground/70" : "border-current opacity-60"} ${preset.aspect}`}
+                  />
+                  <Span className="text-[10px]">{preset.label}</Span>
+                  <Span className="text-[9px] opacity-60">
+                    {preset.w}
+                    {t("post.dimensionSeparator")}
+                    {preset.h}
+                  </Span>
                 </Button>
               ))}
             </Div>
           </Div>
-        </Div>
+        )}
+
+        {/* Quality — only shown when model supports quality selection (e.g. OpenAI) */}
+        {availableQualityOptions.length > 0 && (
+          <Div className="flex gap-3">
+            <Div className="flex flex-col gap-1.5 flex-1">
+              <Span className="text-xs font-medium text-muted-foreground">
+                {t("post.quality.label")}
+              </Span>
+              <Div className="flex gap-1.5">
+                {availableQualityOptions.map((q) => (
+                  <Button
+                    key={q.value}
+                    type="button"
+                    variant={currentQuality === q.value ? "default" : "outline"}
+                    size="sm"
+                    className="flex-1 h-8 text-xs"
+                    onClick={() => form?.setValue("quality", q.value)}
+                  >
+                    {q.label}
+                  </Button>
+                ))}
+              </Div>
+            </Div>
+          </Div>
+        )}
+
+        {/* Aspect ratio — only shown when model supports multiple ratios */}
+        {showAspectRatioOptions && supportedAspectRatios && (
+          <Div className="flex flex-col gap-1.5">
+            <Span className="text-xs font-medium text-muted-foreground">
+              {t("post.aspectRatio.label")}
+            </Span>
+            <Div className="flex flex-wrap gap-1.5">
+              {supportedAspectRatios.map((ratio) => (
+                <Button
+                  key={ratio}
+                  type="button"
+                  variant={currentAspectRatio === ratio ? "default" : "outline"}
+                  size="sm"
+                  className="h-7 px-3 text-xs"
+                  onClick={() => form?.setValue("aspectRatio", ratio)}
+                >
+                  {ratio}
+                </Button>
+              ))}
+            </Div>
+          </Div>
+        )}
 
         {/* Model selector */}
         <Div className="flex flex-col gap-1.5">

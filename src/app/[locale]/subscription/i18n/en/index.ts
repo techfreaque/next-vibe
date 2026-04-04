@@ -90,6 +90,8 @@ export const translations = {
           legacyBadge: "Legacy",
           types: {
             text: "Chat",
+            tts: "Text to Voice",
+            stt: "Voice to Text",
             image: "Image Generation",
             audio: "Music Generation",
             video: "Video Generation",
@@ -97,10 +99,9 @@ export const translations = {
         },
         features: {
           title: "Features",
-          searchLabel: "Brave Search (per search)",
+          braveSearchLabel: "Brave Search (per search)",
+          kagiSearchLabel: "Kagi Search (per search)",
           fetchUrlLabel: "Get Website as Text (per fetch)",
-          ttsLabel: "Text-to-Speech (per 1000 characters)",
-          sttLabel: "Speech-to-Text (per minute)",
           costFormat: "{{value}} {{unit}}",
           creditsUnit: "credits",
         },
@@ -252,7 +253,7 @@ export const translations = {
     subscription: {
       title: "Credits & Subscription - Unbottled AI",
       description:
-        "Subscribe for {{subCredits}} monthly credits and buy extra packs when needed. Chat with {{modelCount}}+ uncensored AI models.",
+        "Subscribe for {{subCredits}} monthly credits and buy extra packs when needed. Chat with {{modelCount}} uncensored AI models.",
       category: "Account",
       imageAlt: "Credits and subscription management for uncensored AI chat",
       keywords: {
@@ -265,12 +266,12 @@ export const translations = {
     overview: {
       title: "Subscription Overview - Unbottled AI",
       description:
-        "View your credit balance, subscription status, and learn how credits work. Chat with {{modelCount}}+ uncensored AI models.",
+        "View your credit balance, subscription status, and learn how credits work. Chat with {{modelCount}} uncensored AI models.",
     },
     buyCredits: {
       title: "Buy Credits - Unbottled AI",
       description:
-        "Subscribe for {{subCredits}} monthly credits or buy extra credit packs. Access {{modelCount}}+ uncensored AI models.",
+        "Subscribe for {{subCredits}} monthly credits or buy extra credit packs. Access {{modelCount}} uncensored AI models.",
     },
     history: {
       title: "Transaction History - Unbottled AI",
@@ -282,7 +283,7 @@ export const translations = {
     success: {
       title: "Payment Successful",
       subscription:
-        "Your monthly subscription has been activated! You now get {{subCredits}} credits per month with all {{modelCount}}+ models.",
+        "Your monthly subscription has been activated! You now get {{subCredits}} credits per month with all {{modelCount}} models.",
       credits:
         "Your credit pack purchase was successful! Credits never expire.",
     },

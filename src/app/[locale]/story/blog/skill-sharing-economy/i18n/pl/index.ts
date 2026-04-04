@@ -24,7 +24,7 @@ export const translations = {
   whatAreSkills: {
     title: "Czym sa skille na {{appName}}?",
     p1: "Skill to wstepnie skonfigurowany setup AI. Prompt systemowy, wybor modelu, glos, generowanie obrazow - wszystko co sprawia ze rozmowa z AI jest przydatna do konkretnego celu.",
-    p2: "Mozesz stworzyc skill do wszystkiego. Platforma ma 50+ modeli - mainstreamowych, otwartych, niecenzurowanych - a Twoj skill konfiguruje ktore i jak.",
+    p2: "Mozesz stworzyc skill do wszystkiego. Platforma ma {{modelCount}} modeli - mainstreamowych, otwartych, niecenzurowanych - a Twoj skill konfiguruje ktore i jak.",
     p3: "Tworzenie skilli jest bezplatne. Nie potrzebujesz platnej subskrypcji ani nie musisz byc programista.",
   },
   shareLink: {

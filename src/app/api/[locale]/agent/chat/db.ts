@@ -243,6 +243,13 @@ export interface MessageMetadata {
     creditCost?: number;
     createdAt: string; // ISO timestamp
   }>;
+
+  // Real-time gap-fill status — set on GAP_FILL_STARTED, cleared on GAP_FILL_COMPLETED.
+  // Used to show labeled status chips ("Transcribing audio…", "Analyzing image…", etc.)
+  gapFillStatus?: {
+    bridgeType: "stt" | "vision" | "translation" | "tts";
+    modality: Modality;
+  } | null;
 }
 
 /**

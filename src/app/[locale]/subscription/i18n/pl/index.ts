@@ -93,6 +93,8 @@ export const translations: typeof enTranslations = {
           legacyBadge: "Starszy",
           types: {
             text: "Czat",
+            tts: "Tekst na mowę",
+            stt: "Mowa na tekst",
             image: "Generowanie obrazów",
             audio: "Generowanie muzyki",
             video: "Generowanie wideo",
@@ -100,11 +102,10 @@ export const translations: typeof enTranslations = {
         },
         features: {
           title: "Funkcje",
-          searchLabel: "Wyszukiwanie Brave (na wyszukiwanie)",
+          braveSearchLabel: "Wyszukiwanie Brave (na wyszukiwanie)",
+          kagiSearchLabel: "Wyszukiwanie Kagi (na wyszukiwanie)",
           fetchUrlLabel:
             "Pobierz stronę internetową jako tekst (na pobieranie)",
-          ttsLabel: "Tekst na mowę (na 1000 znaków)",
-          sttLabel: "Mowa na tekst (na minutę)",
           costFormat: "{{value}} {{unit}}",
           creditsUnit: "kredytów",
         },
@@ -271,12 +272,12 @@ export const translations: typeof enTranslations = {
     overview: {
       title: "Przegląd subskrypcji - Unbottled AI",
       description:
-        "Zobacz swój stan kredytów, status subskrypcji i dowiedz się, jak działają kredyty. Czatuj z {{modelCount}}+ niecenzurowanymi modelami AI.",
+        "Zobacz swój stan kredytów, status subskrypcji i dowiedz się, jak działają kredyty. Czatuj z {{modelCount}} niecenzurowanymi modelami AI.",
     },
     buyCredits: {
       title: "Kup kredyty - Unbottled AI",
       description:
-        "Subskrybuj za {{subCredits}} miesięcznych kredytów lub kup dodatkowe pakiety kredytów. Dostęp do {{modelCount}}+ niecenzurowanych modeli AI.",
+        "Subskrybuj za {{subCredits}} miesięcznych kredytów lub kup dodatkowe pakiety kredytów. Dostęp do {{modelCount}} niecenzurowanych modeli AI.",
     },
     history: {
       title: "Historia transakcji - Unbottled AI",

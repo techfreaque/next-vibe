@@ -17,19 +17,19 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { ChatMode } from "@/app/api/[locale]/agent/models/enum";
 import type {
   AudioVisionModelSelection,
-  ImageGenModelSelection,
   ImageVisionModelSelection,
-  MusicGenModelSelection,
-  SttModelSelection,
   VideoVisionModelSelection,
-  VoiceModelSelection,
-} from "@/app/api/[locale]/agent/models/types";
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
+import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 
 import type { ChatModelId } from "../../ai-stream/models";
-import type { VideoGenModelId } from "../../video-generation/models";
 import type { ToolConfigItem } from "../settings/definition";
 import type { FavoriteGetModelSelection } from "./[id]/definition";
 
@@ -92,7 +92,9 @@ export const chatFavorites = pgTable("chat_favorites", {
   musicGenModelSelection: jsonb(
     "music_gen_model_selection",
   ).$type<MusicGenModelSelection>(),
-  videoGenModelId: text("video_gen_model_id").$type<VideoGenModelId>(),
+  videoGenModelSelection: jsonb(
+    "video_gen_model_selection",
+  ).$type<VideoGenModelSelection>(),
 
   // Model selection (stores only MANUAL or FILTERS, null means use character defaults)
   modelSelection: jsonb("model_selection").$type<FavoriteGetModelSelection>(),

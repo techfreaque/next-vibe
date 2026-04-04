@@ -112,6 +112,7 @@ const settingEntrySchema = z.object({
   fieldType: z.string().optional(),
   options: z.array(z.string()).optional(),
   autoGenerate: z.enum(["hex32", "hex64"]).optional(),
+  health: z.enum(["connected", "disconnected", "error"]).optional(),
 });
 
 const wizardStepSchema = z.object({

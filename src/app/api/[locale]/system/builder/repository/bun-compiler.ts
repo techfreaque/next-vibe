@@ -5,7 +5,7 @@
 
 /// <reference types="bun-types" />
 
-import { existsSync, mkdirSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, renameSync, statSync } from "node:fs";
 import { dirname, parse, resolve } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -49,6 +49,9 @@ const DEFAULT_EXTERNALS = [
   "rollup",
   "esbuild",
   "lightningcss",
+  // Browser automation (native binary, dynamic import only)
+  "playwright",
+  "playwright-core",
 ] as const;
 
 // ============================================================================
@@ -176,20 +179,18 @@ export class BunCompiler implements IBunCompiler {
           ? "external"
           : (profileSettings.sourcemap as "external" | "inline" | "none"));
 
-    // When output filename differs from input filename, use `outfile` (single
-    // entrypoint) instead of `outdir` + `naming` to avoid a Bun bug where
-    // `naming.entry` with a plain filename causes "Multiple files share the
-    // same output path" errors.
-    const needsRename =
-      !bunOptions?.naming &&
-      parse(fileConfig.output).name !== parse(entrypointPath).name;
+    // When output filename differs from input filename, build to outdir first
+    // then rename. Bun's `outfile` and `naming.entry` with a plain filename
+    // both trigger "Multiple files share the same output path" errors.
+    const inputBaseName = parse(entrypointPath).name;
+    const outputBaseName = parse(fileConfig.output).name;
+    const needsRename = !bunOptions?.naming && outputBaseName !== inputBaseName;
 
     // Build with Bun
     const result = await Bun.build({
       entrypoints: [entrypointPath],
-      ...(needsRename
-        ? { outfile: outfilePath }
-        : { outdir: outDir, naming: bunOptions?.naming }),
+      outdir: outDir,
+      naming: bunOptions?.naming,
       target: bunOptions?.target || "bun",
       minify: bunOptions?.minify ?? profileSettings.minify,
       sourcemap,
@@ -208,22 +209,43 @@ export class BunCompiler implements IBunCompiler {
       plugins: bunOptions?.plugins ?? undefined,
     });
 
-    if (!result.success) {
-      const errorMessages = result.logs
-        .filter((log): log is BuildMessage => log.level === "error")
-        .map((log) => log.message)
-        .join("\n");
+    // Collect error logs regardless of success flag (Bun can return success=true with error logs)
+    const errorLogs = result.logs
+      .filter((log): log is BuildMessage => log.level === "error")
+      .map((log) => log.message);
+
+    if (!result.success || errorLogs.length > 0) {
       return fail({
         message: t("messages.bundleFailed"),
         messageParams: {
-          error: errorMessages || "Unknown error",
+          error: errorLogs.join("\n") || "Unknown error",
         },
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
 
+    // Rename output file if the desired output name differs from input base name.
+    // Bun always names the output after the entrypoint — rename to the desired name.
+    if (needsRename) {
+      const builtPath = resolve(outDir, `${inputBaseName}.js`);
+      if (existsSync(builtPath) && builtPath !== outfilePath) {
+        renameSync(builtPath, outfilePath);
+      }
+    }
+
     // Get file size and check thresholds
     const size = existsSync(outfilePath) ? statSync(outfilePath).size : 0;
+
+    // Detect silent build failure: file missing or empty after reported success
+    if (size === 0) {
+      return fail({
+        message: t("messages.bundleFailed"),
+        messageParams: {
+          error: `Output file missing or empty: ${fileConfig.output}`,
+        },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
 
     if (size > SIZE_THRESHOLDS.CRITICAL) {
       warnings.push(

@@ -8,7 +8,7 @@
  * - Prettier (code formatting)
  * - TypeScript (type checking)
  * - Testing (vitest)
- * - VSCode integration
+ * - VSCode/Cursor integration
  */
 
 import type {

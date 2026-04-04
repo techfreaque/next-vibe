@@ -8,6 +8,8 @@ import { Separator } from "next-vibe-ui/ui/separator";
 import { H1, H2, Muted, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -39,13 +41,17 @@ export const generateMetadata = async ({
 
 export interface OneEndpointPageData {
   locale: CountryLanguage;
+  modelCount: number;
 }
 
 export async function tanstackLoader({
   params,
 }: Props): Promise<OneEndpointPageData> {
   const { locale } = await params;
-  return { locale };
+  return {
+    locale,
+    modelCount: getAvailableModelCount(agentEnvAvailability, false),
+  };
 }
 
 function TypeRuleRow({
@@ -67,7 +73,10 @@ function TypeRuleRow({
   );
 }
 
-export function TanstackPage({ locale }: OneEndpointPageData): JSX.Element {
+export function TanstackPage({
+  locale,
+  modelCount,
+}: OneEndpointPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
@@ -142,7 +151,7 @@ export function TanstackPage({ locale }: OneEndpointPageData): JSX.Element {
             {t("intro.paragraph1")}
           </P>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
-            {t("intro.paragraph2", { appName })}
+            {t("intro.paragraph2", { appName, modelCount })}
           </P>
         </Div>
 

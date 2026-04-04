@@ -40,6 +40,8 @@ export interface AgentEnvAvailability {
   falAi: boolean;
   /** ModelsLab (music generation, text-to-video) */
   modelsLab: boolean;
+  /** Unbottled AI provider (remote cloud instance) */
+  unbottled: boolean;
 }
 
 /**
@@ -66,6 +68,7 @@ export const agentEnvAvailability: AgentEnvAvailability = (() => {
     replicate: Boolean(agentEnv.REPLICATE_API_TOKEN),
     falAi: Boolean(agentEnv.FAL_AI_API_KEY),
     modelsLab: Boolean(agentEnv.MODELSLAB_API_KEY),
+    unbottled: Boolean(agentEnv.UNBOTTLED_CLOUD_CREDENTIALS),
   };
 })();
 
@@ -143,6 +146,11 @@ export const PROVIDER_SETUP_INSTRUCTIONS = {
     envKey: "MODELSLAB_API_KEY",
     url: "https://modelslab.com/account/api",
     label: "ModelsLab",
+  },
+  unbottled: {
+    envKey: "UNBOTTLED_CLOUD_CREDENTIALS",
+    url: "https://unbottled.ai",
+    label: "Unbottled AI",
   },
 } as const satisfies Record<
   Exclude<keyof AgentEnvAvailability, "anySearch">,

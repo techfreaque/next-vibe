@@ -13,12 +13,18 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getImageGenModelById } from "@/app/api/[locale]/agent/image-generation/models";
+import {
+  getImageGenModelById,
+  type ImageGenModelId,
+} from "@/app/api/[locale]/agent/image-generation/models";
 import {
   ApiProvider,
-  calculateCreditCost,
+  isModelOptionImageBased,
   isModelProviderAvailable,
+  type ModelOptionImageBased,
+  type ModelOptionTokenBased,
 } from "@/app/api/[locale]/agent/models/models";
+import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -28,13 +34,14 @@ import { parseStorageUrl } from "@/app/api/[locale]/agent/chat/storage/url-utils
 
 import { DefaultFolderId } from "../chat/config";
 import { NO_SKILL_ID } from "../chat/skills/constants";
-import { generateWithFalAi } from "../ai-stream/providers/fal-ai-image";
-import { generateWithOpenAI } from "../ai-stream/providers/openai-images";
-import { generateWithOpenRouter } from "../ai-stream/providers/openrouter-image";
-import { generateWithReplicate } from "../ai-stream/providers/replicate-image";
+import { generateWithFalAi } from "./providers/fal-ai";
+import { generateImageWithModelsLab } from "./providers/modelslab";
+import { generateWithOpenAI } from "./providers/openai";
+import { generateWithOpenRouter } from "./providers/openrouter";
+import { generateWithReplicate } from "./providers/replicate";
 import { runHeadlessAiStream } from "../ai-stream/repository/headless";
 import { scopedTranslation as aiStreamScopedTranslation } from "../ai-stream/stream/i18n";
-import type { ChatModelId } from "../ai-stream/models";
+import { chatModelOptionsIndex } from "../ai-stream/models";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -48,6 +55,37 @@ import type { ImageGenerationT } from "./i18n";
 interface MediaGenStreamContext {
   threadId?: string | undefined;
   aiMessageId?: string | undefined;
+}
+
+/**
+ * Calculate image generation credit cost with option-aware pricing.
+ * Uses pricingBySize/pricingByQuality overrides when available,
+ * falls back to base creditCostPerImage.
+ */
+function calculateImageCreditCost(
+  model: ModelOptionImageBased,
+  size: string,
+  quality: string,
+): number {
+  // Check for size-specific pricing override
+  const baseCost =
+    model.pricingBySize?.[size] ??
+    model.pricingByQuality?.[quality] ??
+    model.creditCostPerImage;
+
+  // If both size and quality have overrides, use the size price as base
+  // and apply quality as a multiplier or override
+  let finalCost = baseCost;
+  if (
+    model.pricingBySize?.[size] !== undefined &&
+    model.pricingByQuality?.[quality] !== undefined
+  ) {
+    finalCost = model.pricingByQuality[quality] ?? baseCost;
+  }
+
+  const withMarkup = finalCost * (1 + STANDARD_MARKUP_PERCENTAGE);
+  const rounded = Math.round(withMarkup * 10) / 10;
+  return rounded % 1 === 0 ? Math.round(rounded) : rounded;
 }
 
 export class ImageGenerationRepository {
@@ -65,11 +103,19 @@ export class ImageGenerationRepository {
     // model is resolved via serverDefault on the field definition (from ToolExecutionContext.imageGenModelId)
     const modelConfig = getImageGenModelById(data.model);
 
+    if (!modelConfig) {
+      return fail({
+        message: t("post.errors.not_found.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
     // Token-based multimodal model → use headless AI runner as polyfill
     // Credits are deducted by the AI stream itself (per-token pricing).
-    if (!modelConfig.creditCostPerImage) {
+    if (!isModelOptionImageBased(modelConfig)) {
       return ImageGenerationRepository.generateViaHeadless(
         data,
+        modelConfig,
         user,
         locale,
         logger,
@@ -79,7 +125,61 @@ export class ImageGenerationRepository {
     }
 
     const imageModel = modelConfig;
-    const creditCost = calculateCreditCost(imageModel, 0, 0);
+
+    // Validate size against model capabilities
+    if (
+      imageModel.supportedSizes &&
+      imageModel.supportedSizes.length > 0 &&
+      !imageModel.supportedSizes.includes(data.size)
+    ) {
+      return fail({
+        message: t("post.errors.unsupportedSize", {
+          model: data.model,
+          size: data.size,
+          supported: imageModel.supportedSizes.join(", "),
+        }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    // Validate quality against model capabilities
+    if (
+      imageModel.supportedQualities &&
+      imageModel.supportedQualities.length > 0 &&
+      !imageModel.supportedQualities.includes(data.quality)
+    ) {
+      return fail({
+        message: t("post.errors.unsupportedQuality", {
+          model: data.model,
+          quality: data.quality,
+          supported: imageModel.supportedQualities.join(", "),
+        }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    // Validate aspect ratio against model capabilities
+    if (
+      data.aspectRatio &&
+      imageModel.supportedAspectRatios &&
+      imageModel.supportedAspectRatios.length > 0 &&
+      !imageModel.supportedAspectRatios.includes(data.aspectRatio)
+    ) {
+      return fail({
+        message: t("post.errors.unsupportedAspectRatio", {
+          model: data.model,
+          aspectRatio: data.aspectRatio,
+          supported: imageModel.supportedAspectRatios.join(", "),
+        }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    const creditCost = calculateImageCreditCost(
+      imageModel,
+      data.size,
+      data.quality,
+    );
 
     // Check provider availability before attempting generation
     if (!isModelProviderAvailable(imageModel, agentEnvAvailability)) {
@@ -114,6 +214,36 @@ export class ImageGenerationRepository {
     let generationResult: ResponseType<{ imageUrl: string }>;
 
     switch (imageModel.apiProvider) {
+      case ApiProvider.MODELSLAB:
+        generationResult = await generateImageWithModelsLab({
+          providerModel: imageModel.providerModel,
+          prompt: data.prompt,
+          aspectRatio: data.aspectRatio,
+          logger,
+          locale,
+        });
+        break;
+
+      case ApiProvider.OPENROUTER:
+        // OpenRouter image models don't support aspect ratio or quality — silently drop them
+        generationResult = await generateWithOpenRouter({
+          providerModel: imageModel.providerModel,
+          prompt: data.prompt,
+          logger,
+          locale,
+        });
+        break;
+
+      case ApiProvider.FAL_AI:
+        generationResult = await generateWithFalAi({
+          providerModel: imageModel.providerModel,
+          prompt: data.prompt,
+          size: data.size,
+          logger,
+          locale,
+        });
+        break;
+
       case ApiProvider.OPENAI_IMAGES:
         generationResult = await generateWithOpenAI({
           providerModel: imageModel.providerModel,
@@ -130,25 +260,6 @@ export class ImageGenerationRepository {
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
           size: data.size,
-          logger,
-          locale,
-        });
-        break;
-
-      case ApiProvider.FAL_AI:
-        generationResult = await generateWithFalAi({
-          providerModel: imageModel.providerModel,
-          prompt: data.prompt,
-          size: data.size,
-          logger,
-          locale,
-        });
-        break;
-
-      case ApiProvider.OPENROUTER:
-        generationResult = await generateWithOpenRouter({
-          providerModel: imageModel.providerModel,
-          prompt: data.prompt,
           logger,
           locale,
         });
@@ -230,6 +341,7 @@ export class ImageGenerationRepository {
    */
   private static async generateViaHeadless(
     data: ImageGenerationPostRequestOutput,
+    modelConfig: ModelOptionTokenBased & { id: ImageGenModelId },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -246,11 +358,9 @@ export class ImageGenerationRepository {
     const sizeHint = data.size ? ` Output size: ${data.size}.` : "";
     const qualityHint = data.quality ? ` Quality: ${data.quality}.` : "";
 
-    // ImageGenModelId and ChatModelId share string values for multimodal models
-    const chatModelId = data.model as string as ChatModelId;
-
+    const chatModel = chatModelOptionsIndex[modelConfig.id];
     const result = await runHeadlessAiStream({
-      model: chatModelId,
+      model: chatModel?.id,
       skill: NO_SKILL_ID,
       prompt: `Generate an image: ${data.prompt}${sizeHint}${qualityHint}`,
       pinnedTools: [],
@@ -338,7 +448,9 @@ export class ImageGenerationRepository {
       }
     }
 
-    // Credit cost is 0 here — already deducted per-token by the AI stream
-    return success({ imageUrl, creditCost: 0 });
+    // Credits already deducted per-token by the headless AI stream — report the
+    // actual cost so the UI displays it the same way as fixed-price image gen models.
+    const creditCost = result.data.totalCreditsDeducted ?? 0;
+    return success({ imageUrl, creditCost });
   }
 }

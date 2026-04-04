@@ -34,7 +34,17 @@ import { Span } from "next-vibe-ui/ui/span";
 import { useCallback, useMemo, useState } from "react";
 
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
+import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
+  getBestAudioVisionModel,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
+import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
+import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
 import {
   DEFAULT_CHAT_MODEL_SELECTION,
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
@@ -46,28 +56,38 @@ import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
-import type {
-  AudioVisionModelSelection,
-  ChatModelSelection,
-  ImageGenModelSelection,
-  ImageVisionModelSelection,
-  MusicGenModelSelection,
-  SttModelSelection,
-  VideoGenModelSelection,
-  VideoVisionModelSelection,
-  VoiceModelSelection,
-} from "@/app/api/[locale]/agent/models/types";
+import {
+  chatModelSelectionSchema,
+  type ChatModelSelection,
+} from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
-  chatModelSelectionSchema,
-  imageGenModelSelectionSchema,
   imageVisionModelSelectionSchema,
-  musicGenModelSelectionSchema,
-  sttModelSelectionSchema,
-  videoGenModelSelectionSchema,
   videoVisionModelSelectionSchema,
+  type AudioVisionModelSelection,
+  type ImageVisionModelSelection,
+  type VideoVisionModelSelection,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import {
+  imageGenModelSelectionSchema,
+  type ImageGenModelSelection,
+} from "@/app/api/[locale]/agent/image-generation/models";
+import {
+  musicGenModelSelectionSchema,
+  type MusicGenModelSelection,
+} from "@/app/api/[locale]/agent/music-generation/models";
+import {
+  sttModelSelectionSchema,
+  type SttModelSelection,
+} from "@/app/api/[locale]/agent/speech-to-text/models";
+import {
   voiceModelSelectionSchema,
-} from "@/app/api/[locale]/agent/models/types";
+  type VoiceModelSelection,
+} from "@/app/api/[locale]/agent/text-to-speech/models";
+import {
+  videoGenModelSelectionSchema,
+  type VideoGenModelSelection,
+} from "@/app/api/[locale]/agent/video-generation/models";
 import {
   ModelSelector,
   ModelSelectorTrigger,
@@ -172,7 +192,7 @@ export function SkillEditContainer({
 
   // Platform-level default model selections (env-aware)
   const platformChatDefault = useMemo((): ChatModelSelection | undefined => {
-    const m = SkillsRepositoryClient.getBestModelForSkill(
+    const m = getBestChatModel(
       DEFAULT_CHAT_MODEL_SELECTION,
       user,
       envAvailability,
@@ -188,7 +208,7 @@ export function SkillEditContainer({
   }, [user, envAvailability]);
 
   const platformTtsDefault = useMemo((): VoiceModelSelection | undefined => {
-    const m = SkillsRepositoryClient.getBestTtsModel(
+    const m = getBestTtsModel(
       DEFAULT_TTS_MODEL_SELECTION,
       user,
       envAvailability,
@@ -206,7 +226,7 @@ export function SkillEditContainer({
   const platformImageGenDefault = useMemo(():
     | ImageGenModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestImageGenModel(
+    const m = getBestImageGenModel(
       DEFAULT_IMAGE_GEN_MODEL_SELECTION,
       user,
       envAvailability,
@@ -224,7 +244,7 @@ export function SkillEditContainer({
   const platformMusicGenDefault = useMemo(():
     | MusicGenModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestMusicGenModel(
+    const m = getBestMusicGenModel(
       DEFAULT_MUSIC_GEN_MODEL_SELECTION,
       user,
       envAvailability,
@@ -242,7 +262,7 @@ export function SkillEditContainer({
   const platformVideoGenDefault = useMemo(():
     | VideoGenModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestVideoGenModel(
+    const m = getBestVideoGenModel(
       DEFAULT_VIDEO_GEN_MODEL_SELECTION,
       user,
       envAvailability,
@@ -258,7 +278,7 @@ export function SkillEditContainer({
   }, [user, envAvailability]);
 
   const platformSttDefault = useMemo((): SttModelSelection | undefined => {
-    const m = SkillsRepositoryClient.getBestSttModel(
+    const m = getBestSttModel(
       DEFAULT_STT_MODEL_SELECTION,
       user,
       envAvailability,
@@ -276,7 +296,7 @@ export function SkillEditContainer({
   const platformImageVisionDefault = useMemo(():
     | ImageVisionModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestImageVisionModel(
+    const m = getBestImageVisionModel(
       DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       user,
       envAvailability,
@@ -294,7 +314,7 @@ export function SkillEditContainer({
   const platformVideoVisionDefault = useMemo(():
     | VideoVisionModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestVideoVisionModel(
+    const m = getBestVideoVisionModel(
       DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       user,
       envAvailability,
@@ -312,7 +332,7 @@ export function SkillEditContainer({
   const platformAudioVisionDefault = useMemo(():
     | AudioVisionModelSelection
     | undefined => {
-    const m = SkillsRepositoryClient.getBestAudioVisionModel(
+    const m = getBestAudioVisionModel(
       DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       user,
       envAvailability,
@@ -595,8 +615,7 @@ export function SkillEditContainer({
           />
         ) : activeSelector === "imageVision" ? (
           <ModelSelector
-            allowedRoles={["llm"]}
-            requiredInputs={["image"]}
+            allowedRoles={["image-vision"]}
             modelSelection={
               form.watch("imageVisionModelSelection") ?? undefined
             }
@@ -634,8 +653,7 @@ export function SkillEditContainer({
           />
         ) : activeSelector === "videoVision" ? (
           <ModelSelector
-            allowedRoles={["llm"]}
-            requiredInputs={["video"]}
+            allowedRoles={["video-vision"]}
             modelSelection={
               form.watch("videoVisionModelSelection") ?? undefined
             }
@@ -673,8 +691,7 @@ export function SkillEditContainer({
           />
         ) : activeSelector === "audioVision" ? (
           <ModelSelector
-            allowedRoles={["llm"]}
-            requiredInputs={["audio"]}
+            allowedRoles={["audio-vision"]}
             modelSelection={
               form.watch("audioVisionModelSelection") ?? undefined
             }
@@ -861,8 +878,7 @@ export function SkillEditContainer({
                   </Span>
                   <ModelSelectorTrigger
                     modelSelection={form.watch("imageVisionModelSelection")}
-                    allowedRoles={["llm"]}
-                    requiredInputs={["image"]}
+                    allowedRoles={["image-vision"]}
                     defaultModelSelection={platformImageVisionDefault}
                     placeholder={t("patch.imageVisionModel.placeholder")}
                     onClick={() => setActiveSelector("imageVision")}
@@ -880,8 +896,7 @@ export function SkillEditContainer({
                   </Span>
                   <ModelSelectorTrigger
                     modelSelection={form.watch("videoVisionModelSelection")}
-                    allowedRoles={["llm"]}
-                    requiredInputs={["video"]}
+                    allowedRoles={["video-vision"]}
                     defaultModelSelection={platformVideoVisionDefault}
                     placeholder={t("patch.videoVisionModel.placeholder")}
                     onClick={() => setActiveSelector("videoVision")}
@@ -899,8 +914,7 @@ export function SkillEditContainer({
                   </Span>
                   <ModelSelectorTrigger
                     modelSelection={form.watch("audioVisionModelSelection")}
-                    allowedRoles={["llm"]}
-                    requiredInputs={["audio"]}
+                    allowedRoles={["audio-vision"]}
                     defaultModelSelection={platformAudioVisionDefault}
                     placeholder={t("patch.audioVisionModel.placeholder")}
                     onClick={() => setActiveSelector("audioVision")}
@@ -940,6 +954,7 @@ export function SkillEditContainer({
 }
 
 function useViewDefaults(): {
+  chat: ChatModelSelection | undefined;
   tts: VoiceModelSelection | undefined;
   imageGen: ImageGenModelSelection | undefined;
   musicGen: MusicGenModelSelection | undefined;
@@ -952,12 +967,19 @@ function useViewDefaults(): {
   const env = useEnvAvailability();
   const user = useWidgetUser();
   return useMemo(() => {
+    const mkChat = (): ChatModelSelection | undefined => {
+      const m = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user, env);
+      if (!m) {
+        return undefined;
+      }
+      const p = chatModelSelectionSchema.safeParse({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: m.id,
+      });
+      return p.success ? p.data : undefined;
+    };
     const mkVoice = (): VoiceModelSelection | undefined => {
-      const m = SkillsRepositoryClient.getBestTtsModel(
-        DEFAULT_TTS_MODEL_SELECTION,
-        user,
-        env,
-      );
+      const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user, env);
       if (!m) {
         return undefined;
       }
@@ -968,7 +990,7 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkImageGen = (): ImageGenModelSelection | undefined => {
-      const m = SkillsRepositoryClient.getBestImageGenModel(
+      const m = getBestImageGenModel(
         DEFAULT_IMAGE_GEN_MODEL_SELECTION,
         user,
         env,
@@ -983,7 +1005,7 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkMusicGen = (): MusicGenModelSelection | undefined => {
-      const m = SkillsRepositoryClient.getBestMusicGenModel(
+      const m = getBestMusicGenModel(
         DEFAULT_MUSIC_GEN_MODEL_SELECTION,
         user,
         env,
@@ -998,7 +1020,7 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkVideoGen = (): VideoGenModelSelection | undefined => {
-      const m = SkillsRepositoryClient.getBestVideoGenModel(
+      const m = getBestVideoGenModel(
         DEFAULT_VIDEO_GEN_MODEL_SELECTION,
         user,
         env,
@@ -1013,11 +1035,7 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkStt = (): SttModelSelection | undefined => {
-      const m = SkillsRepositoryClient.getBestSttModel(
-        DEFAULT_STT_MODEL_SELECTION,
-        user,
-        env,
-      );
+      const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user, env);
       if (!m) {
         return undefined;
       }
@@ -1028,7 +1046,7 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkImageVision = (): ImageVisionModelSelection | undefined => {
-      const m = SkillsRepositoryClient.getBestImageVisionModel(
+      const m = getBestImageVisionModel(
         DEFAULT_IMAGE_VISION_MODEL_SELECTION,
         user,
         env,
@@ -1043,7 +1061,7 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkVideoVision = (): VideoVisionModelSelection | undefined => {
-      const m = SkillsRepositoryClient.getBestVideoVisionModel(
+      const m = getBestVideoVisionModel(
         DEFAULT_VIDEO_VISION_MODEL_SELECTION,
         user,
         env,
@@ -1058,7 +1076,7 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkAudioVision = (): AudioVisionModelSelection | undefined => {
-      const m = SkillsRepositoryClient.getBestAudioVisionModel(
+      const m = getBestAudioVisionModel(
         DEFAULT_AUDIO_VISION_MODEL_SELECTION,
         user,
         env,
@@ -1073,6 +1091,7 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     return {
+      chat: mkChat(),
       tts: mkVoice(),
       imageGen: mkImageGen(),
       musicGen: mkMusicGen(),
@@ -1170,14 +1189,19 @@ export function SkillViewContainer({
         </Collapsible>
       )}
 
-      {/* Model Selection - View Only */}
-      <ModelSelector
-        modelSelection={modelSelection}
-        readOnly={true}
-        locale={locale}
-        user={user}
-        chatOnly
-      />
+      {/* Chat Model - View Only */}
+      <Div className="flex flex-col gap-1">
+        <Span className="text-xs font-medium text-muted-foreground">
+          {t("patch.chatModel.label")}
+        </Span>
+        <ModelSelectorTrigger
+          modelSelection={modelSelection ?? undefined}
+          defaultModelSelection={viewDefaults.chat}
+          placeholder={t("patch.chatModel.placeholder")}
+          locale={locale}
+          user={user}
+        />
+      </Div>
 
       {/* Voice (TTS) - View Only */}
       <Div className="flex flex-col gap-1">
@@ -1261,8 +1285,7 @@ export function SkillViewContainer({
         </Span>
         <ModelSelectorTrigger
           modelSelection={field.value?.imageVisionModelSelection ?? undefined}
-          allowedRoles={["llm"]}
-          requiredInputs={["image"]}
+          allowedRoles={["image-vision"]}
           defaultModelSelection={viewDefaults.imageVision}
           placeholder={t("patch.imageVisionModel.placeholder")}
           locale={locale}
@@ -1277,8 +1300,7 @@ export function SkillViewContainer({
         </Span>
         <ModelSelectorTrigger
           modelSelection={field.value?.videoVisionModelSelection ?? undefined}
-          allowedRoles={["llm"]}
-          requiredInputs={["video"]}
+          allowedRoles={["video-vision"]}
           defaultModelSelection={viewDefaults.videoVision}
           placeholder={t("patch.videoVisionModel.placeholder")}
           locale={locale}
@@ -1293,8 +1315,7 @@ export function SkillViewContainer({
         </Span>
         <ModelSelectorTrigger
           modelSelection={field.value?.audioVisionModelSelection ?? undefined}
-          allowedRoles={["llm"]}
-          requiredInputs={["audio"]}
+          allowedRoles={["audio-vision"]}
           defaultModelSelection={viewDefaults.audioVision}
           placeholder={t("patch.audioVisionModel.placeholder")}
           locale={locale}

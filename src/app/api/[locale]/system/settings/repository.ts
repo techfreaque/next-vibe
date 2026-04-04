@@ -193,6 +193,7 @@ export class SystemSettingsRepository {
                 ? [...exampleDef.options]
                 : undefined,
               autoGenerate: exampleDef?.autoGenerate,
+              health: undefined,
             };
           });
 
@@ -253,6 +254,9 @@ export class SystemSettingsRepository {
       const wizardSteps = [...stepMap.values()].toSorted(
         (a, b) => a.step - b.step,
       );
+
+      // Health check for UNBOTTLED_CLOUD_CREDENTIALS
+      await SystemSettingsRepository.checkUnbottledHealth(modules, logger);
 
       const writable = await SystemSettingsRepository.checkWritable();
       const devMode = SystemSettingsRepository.isDevMode();
@@ -564,5 +568,63 @@ export class SystemSettingsRepository {
     parts.push(valuePart);
 
     return parts.join("\n");
+  }
+
+  /**
+   * Check unbottled cloud credential health by pinging the remote.
+   * Mutates the setting.health field in-place.
+   */
+  private static async checkUnbottledHealth(
+    modules: {
+      settings: {
+        key: string;
+        isConfigured: boolean;
+        health?: "connected" | "disconnected" | "error";
+      }[];
+    }[],
+    logger: EndpointLogger,
+  ): Promise<void> {
+    for (const mod of modules) {
+      const setting = mod.settings.find(
+        (s) => s.key === "UNBOTTLED_CLOUD_CREDENTIALS",
+      );
+      if (!setting || !setting.isConfigured) {
+        if (setting) {
+          setting.health = "disconnected";
+        }
+        continue;
+      }
+
+      try {
+        const { parseUnbottledCredentials } =
+          await import("@/app/api/[locale]/agent/env");
+        const { agentEnv } = await import("@/app/api/[locale]/agent/env");
+        const session = parseUnbottledCredentials(
+          agentEnv.UNBOTTLED_CLOUD_CREDENTIALS,
+        );
+        if (!session) {
+          setting.health = "disconnected";
+          continue;
+        }
+
+        const { LEAD_ID_COOKIE_NAME } = await import("@/config/constants");
+        const healthUrl = `${session.remoteUrl}/api/en-US/agent/ai-stream/ws-provider/models`;
+        const resp = await fetch(healthUrl, {
+          method: "GET",
+          headers: {
+            // eslint-disable-next-line i18next/no-literal-string
+            Authorization: `Bearer ${session.token}`,
+            Cookie: `${LEAD_ID_COOKIE_NAME}=${session.leadId}`,
+          },
+          signal: AbortSignal.timeout(5_000),
+        });
+        setting.health = resp.ok ? "connected" : "disconnected";
+      } catch (err) {
+        logger.debug("[Settings] Unbottled health check failed", {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        setting.health = "error";
+      }
+    }
   }
 }

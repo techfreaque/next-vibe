@@ -6,6 +6,8 @@
 
 import { NextResponse } from "next/server";
 
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
@@ -47,7 +49,9 @@ export async function GET(
   const manifest = {
     name: configT("appName"),
     short_name: configT("appName"),
-    description: configT("appDescription"),
+    description: configT("appDescription", {
+      modelCount: getAvailableModelCount(agentEnvAvailability, false),
+    }),
     start_url: `/${locale}/`,
     display: MANIFEST_CONSTANTS.DISPLAY,
     background_color: MANIFEST_CONSTANTS.BACKGROUND_COLOR,

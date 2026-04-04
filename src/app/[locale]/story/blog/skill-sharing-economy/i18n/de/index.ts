@@ -23,7 +23,7 @@ export const translations = {
   whatAreSkills: {
     title: "Was sind Skills auf unbottled.ai?",
     p1: "Ein Skill ist ein vorkonfiguriertes AI-Setup. System-Prompt, Modellauswahl, Stimme, Bildgenerierung - alles, was eine KI-Konversation für einen bestimmten Zweck nützlich macht.",
-    p2: "Du kannst ein Skill für alles erstellen. Die Plattform hat 50+ Modelle - Mainstream, Open Source, unzensiert - und dein Skill konfiguriert, welche und wie.",
+    p2: "Du kannst ein Skill für alles erstellen. Die Plattform hat {{modelCount}} Modelle - Mainstream, Open Source, unzensiert - und dein Skill konfiguriert, welche und wie.",
     p3: "Skills sind kostenlos zu erstellen. Du brauchst kein bezahltes Abo und musst kein Entwickler sein.",
   },
   shareLink: {

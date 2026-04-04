@@ -27,7 +27,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../shared/types/common.schema";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { TOTAL_MODEL_COUNT } from "../../models/all-models";
+import { allModelDefinitions } from "../../models/all-models";
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
@@ -172,7 +172,11 @@ const { GET } = createEndpoint({
         size: "xs",
         variant: "muted",
         content: "get.browser.advancedChooseText" as const,
-        contentParams: { count: TOTAL_MODEL_COUNT },
+        contentParams: {
+          count: allModelDefinitions.filter((def) =>
+            def.providers.some((p) => !p.adminOnly),
+          ).length,
+        },
         usage: { response: true },
       }),
       selectButton: navigateButtonField(scopedTranslation, {

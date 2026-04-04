@@ -29,6 +29,7 @@ const ALL_PROVIDERS_AVAILABLE: AgentEnvAvailability = {
   replicate: true,
   falAi: true,
   modelsLab: true,
+  unbottled: true,
 };
 
 interface EnvAvailabilityState {

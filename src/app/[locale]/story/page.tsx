@@ -7,7 +7,9 @@ import { getMaxToolCountAllPlatforms } from "@/app/api/[locale]/agent/chat/defau
 import { getAvailableSkillCount } from "@/app/api/[locale]/agent/chat/skills/config";
 import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
+  type ModelCountsByContentLevel,
   getAvailableModelCount,
+  getAvailableModelCountsByContentLevel,
   getAvailableProviderCount,
 } from "@/app/api/[locale]/agent/models/all-models";
 import {
@@ -63,6 +65,7 @@ interface StoryPageData {
   totalModelCount: number;
   totalProviderCount: number;
   totalSkillCount: number;
+  modelCountsByTier: ModelCountsByContentLevel;
   subPrice: number;
   subCurrency: string;
   hasUser: boolean;
@@ -104,6 +107,10 @@ export async function tanstackLoader({
       agentEnvAvailability,
       isAdmin,
     ),
+    modelCountsByTier: getAvailableModelCountsByContentLevel(
+      agentEnvAvailability,
+      isAdmin,
+    ),
     totalSkillCount: getAvailableSkillCount(userRoles),
     subPrice: products[ProductIds.SUBSCRIPTION].price,
     subCurrency: countryInfo.symbol,
@@ -118,6 +125,7 @@ export function TanstackPage({
   totalModelCount,
   totalProviderCount,
   totalSkillCount,
+  modelCountsByTier,
   subPrice,
   subCurrency,
   hasUser,
@@ -148,6 +156,7 @@ export function TanstackPage({
       totalModelCount={totalModelCount}
       totalProviderCount={totalProviderCount}
       totalSkillCount={totalSkillCount}
+      modelCountsByTier={modelCountsByTier}
       subPrice={subPrice}
       subCurrency={subCurrency}
     />

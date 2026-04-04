@@ -36,6 +36,10 @@ export const translations = {
       standard: "Standardowa",
       hd: "HD",
     },
+    aspectRatio: {
+      label: "Proporcje obrazu",
+      description: "Proporcje wyjściowego obrazu",
+    },
     download: "Pobierz",
     dimensionSeparator: "×",
     backButton: {
@@ -96,10 +100,22 @@ export const translations = {
       insufficientCredits:
         "Niewystarczające kredyty. Saldo: {{balance}}, wymagane: {{minimum}}",
       balanceCheckFailed: "Nie udało się sprawdzić salda kredytów",
-      generationFailed: "Generowanie obrazu nie powiodło się: {{error}}",
+      unsupportedSize:
+        "Model {{model}} nie obsługuje rozmiaru {{size}}. Obsługiwane rozmiary: {{supported}}",
+      unsupportedQuality:
+        "Model {{model}} nie obsługuje jakości {{quality}}. Obsługiwane jakości: {{supported}}",
+      unsupportedAspectRatio:
+        "Model {{model}} nie obsługuje proporcji {{aspectRatio}}. Obsługiwane proporcje: {{supported}}",
+      generationFailed: "Generowanie obrazu nie powiodło się",
       providerError: "Błąd dostawcy: {{error}}",
       noImageUrl: "Dostawca nie zwrócił URL obrazu",
       creditsFailed: "Nie udało się odjąć kredytów za generowanie obrazu",
+      apiKeyNotConfigured: "Klucz API nie jest skonfigurowany",
+      externalServiceError: "Błąd zewnętrznej usługi: {{message}}",
+      requestAborted: "Żądanie zostało przerwane",
+      requestTimedOut: "Przekroczono czas oczekiwania na generowanie obrazu",
+      requestFailed: "Żądanie nie powiodło się: {{message}}",
+      pollFailed: "Odpytywanie nie powiodło się ze statusem {{status}}",
     },
     success: {
       title: "Obraz wygenerowany",

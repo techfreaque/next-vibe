@@ -24,10 +24,8 @@ import {
   modelProviders,
   type ModelProviderEnvAvailability,
 } from "../../models/models";
-import type {
-  ChatModelSelection,
-  VoiceModelSelection,
-} from "../../models/types";
+import type { ChatModelSelection } from "../../ai-stream/models";
+import type { VoiceModelSelection } from "../../text-to-speech/models";
 
 import type { TtsModelId } from "../../text-to-speech/models";
 import { STORAGE_KEYS } from "../constants";
@@ -35,7 +33,7 @@ import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
 import { ModelSelectionType } from "../skills/enum";
 import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
-import { SkillsRepositoryClient } from "../skills/repository-client";
+import { getBestChatModelForFavorite } from "./[id]/definition";
 import type {
   FavoriteGetModelSelection,
   FavoriteGetResponseOutput,
@@ -330,7 +328,7 @@ export class ChatFavoritesRepositoryClient {
     env: ModelProviderEnvAvailability,
   ): FavoriteCard {
     const { t } = scopedTranslation.scopedT(locale);
-    const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
+    const bestModel = getBestChatModelForFavorite(
       stored.modelSelection,
       characterModelSelection ?? undefined,
       user,

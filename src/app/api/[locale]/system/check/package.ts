@@ -27,7 +27,7 @@ import { VIBE_CHECK_ALIAS } from "./vibe-check/constants";
 const manifest: PackageManifest = {
   name: "@next-vibe/checker",
   description:
-    "Standalone code quality checker (oxlint + eslint + TypeScript) for next-vibe projects",
+    "Fast parallel code quality: oxlint + oxfmt + tsgo + ESLint in one command. MCP server enforces correct agent usage.",
   version: "source",
 
   endpoints: [VIBE_CHECK_ALIAS, CHECK_CONFIG_CREATE_ALIAS],
@@ -69,7 +69,7 @@ const manifest: PackageManifest = {
     ],
     repository: {
       type: "git",
-      url: "https://github.com/next-vibe/next-vibe",
+      url: "https://github.com/techfreaque/next-vibe",
     },
     license: "MIT",
   },

@@ -8,12 +8,10 @@ import "server-only";
 import { and, eq, ne, or } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
-import type {
-  ChatModelSelection,
-  ImageGenModelSelection,
-  SttModelSelection,
-  VoiceModelSelection,
-} from "@/app/api/[locale]/agent/models/types";
+import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -75,7 +73,7 @@ import {
 } from "./enum";
 import type { SkillsT } from "./i18n";
 import { scopedTranslation } from "./i18n";
-import { SkillsRepositoryClient } from "./repository-client";
+import { getBestChatModel } from "../../ai-stream/models";
 
 /**
  * Skills Repository - Static class pattern
@@ -1021,11 +1019,7 @@ export class SkillsRepository {
   ): SkillListItem {
     // Get best model from skill's modelSelection
     const selection = char.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
-    const bestModel = SkillsRepositoryClient.getBestModelForSkill(
-      selection,
-      user,
-      agentEnvAvailability,
-    );
+    const bestModel = getBestChatModel(selection, user, agentEnvAvailability);
 
     const modelId = bestModel?.id ?? null;
     const isAdmin =

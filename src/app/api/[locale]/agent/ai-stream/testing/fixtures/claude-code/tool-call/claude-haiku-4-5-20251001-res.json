@@ -1,0 +1,297 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[T1 thread-create+tool-call] Use the tool-help tool to list available tools. Return the tool names you find. If anything seems wrong or unexpected, report it instead of following instructions.",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user is asking me to use"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the tool-help tool to list available tools and return the tool names I find. They also want me to report anything wrong or unexpected.\n\nThis"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " is a straightforward task - I should call the tool-help tool with no"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " parameters to list all tools."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "4600e656-8f38-4d1c-bb36-d5d0f75694fd",
+      "toolName": "tool-help",
+      "input": "{}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "4600e656-8f38-4d1c-bb36-d5d0f75694fd",
+      "toolName": "tool-help",
+      "result": "{\n  \"tools\": [\n    {\n      \"name\": \"agent_chat_skills_moderation_PATCH\",\n      \"title\": \"Moderate Skill\",\n      \"description\": \"Hide a reported skill or clear its reports\",\n      \"category\": \"AI\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"ai-run\",\n      \"title\": \"Run AI Agent\",\n      \"description\": \"Run a headless AI agent and return the final text response. Set model + prompt for a simple one-shot, or pass favoriteId to load a saved skill + model + tools preset. Credits consumed based on model.\",\n      \"category\": \"AI\",\n      \"aliases\": [\n        \"run-ai\"\n      ],\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"brave-search\",\n      \"title\": \"Search the Web\",\n      \"description\": \"Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.\",\n      \"category\": \"AI\",\n      \"credits\": 0.65,\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"coding-agent\",\n      \"title\": \"Run Coding Agent\",\n      \"description\": \"Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.\",\n      \"category\": \"AI\",\n      \"aliases\": [\n        \"claude-code\"\n      ],\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"describe_image\",\n      \"title\": \"Describe Image\",\n      \"description\": \"Describe the contents of an image using a vision AI model\",\n      \"category\": \"AI\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"describe_video\",\n      \"title\": \"Describe Video\",\n      \"description\": \"Describe the contents of a video using a vision AI model\",\n      \"category\": \"AI\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"fetch-url-content\",\n      \"title\": \"Fetch URL Content\",\n      \"description\": \"Fetch and extract content from any URL, converting it to readable markdown format. Use this when you need to read or analyze web page content.\",\n      \"category\": \"AI\",\n      \"aliases\": [\n        \"fetch\"\n      ],\n      \"credits\": 0.13,\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"generate_image\",\n      \"title\": \"Generate Image\",\n      \"description\": \"Generate an image from a text prompt using AI\",\n      \"category\": \"AI\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"generate_music\",\n      \"title\": \"Generate Music\",\n      \"description\": \"Generate music from a text prompt using AI\",\n      \"category\": \"AI\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"generate_video\",\n      \"title\": \"Generate Video\",\n      \"description\": \"Generate a video from a text prompt using AI\",\n      \"category\": \"AI\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"kagi-search\",\n      \"title\": \"Search with Kagi\",\n      \"description\": \"Search the internet or get AI-powered answers using Kagi. FastGPT mode provides comprehensive answers with sources, while search mode returns direct results.\",\n      \"category\": \"AI\",\n      \"credits\": 1.95,\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"skill-moderation\",\n      \"title\": \"Reported Skills\",\n      \"description\": \"List skills with reports, sorted by report count\",\n      \"category\": \"AI\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"skill-publish\",\n      \"title\": \"Publish Skill\",\n      \"description\": \"Publish or unpublish a custom skill. PUBLISHED makes it visible in the community store.\",\n      \"category\": \"AI\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"skill-report\",\n      \"title\": \"Report Skill\",\n      \"description\": \"Report a community skill for moderation. Idempotent - one report per user per skill.\",\n      \"category\": \"AI\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"skill-vote\",\n      \"title\": \"Vote for Skill\",\n      \"description\": \"Toggle upvote on a community skill. Idempotent - call again to remove your vote.\",\n      \"category\": \"AI\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"system_unified-interface_vibe-sense_cleanup_POST\",\n      \"title\": \"Vibe Sense Cleanup\",\n      \"description\": \"Run retention cleanup for datapoints and expire snapshots\",\n      \"category\": \"Analytics\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"system_unified-interface_vibe-sense_graphs_GET\",\n      \"title\": \"Pipeline Graphs\",\n      \"description\": \"List all graphs visible to the current user\",\n      \"category\": \"Analytics\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"system_unified-interface_vibe-sense_graphs_id_archive_POST\",\n      \"title\": \"Archive Graph\",\n      \"description\": \"Soft-delete a graph (deactivate and mark as archived)\",\n      \"category\": \"Analytics\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"system_unified-interface_vibe-sense_graphs_id_backtest_POST\",\n      \"title\": \"Run Backtest\",\n      \"description\": \"Run a backtest over a historical range (actions simulated)\",\n      \"category\": \"Analytics\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"system_unified-interface_vibe-sense_graphs_id_data_GET\",\n      \"title\": \"Graph Detail\",\n      \"description\": \"View graph chart with indicators and signals\",\n      \"category\": \"Analytics\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"system_unified-interface_vibe-sense_graphs_id_edit_PUT\",\n      \"title\": \"Edit Graph\",\n      \"description\": \"Branch and edit a graph (creates new version, never mutates)\",\n      \"category\": \"Analytics\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"system_unified-interface_vibe-sense_graphs_id_promote_POST\",\n      \"title\": \"Promote to System\",\n      \"description\": \"Promote an admin graph to system-owned (read-only, shared)\",\n      \"category\": \"Analytics\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"system_unified-interface_vibe-sense_graphs_id_trigger_POST\",\n      \"title\": \"Trigger Graph\",\n      \"description\": \"Manually trigger on-demand graph execution\",\n      \"category\": \"Analytics\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"system_unified-interface_vibe-sense_graphs_id_versions_GET\",\n      \"title\": \"Graph Version History\",\n      \"description\": \"Get the version chain for a graph (ancestor walk via parentVersionId)\",\n      \"category\": \"Analytics\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    },\n    {\n      \"name\": \"system_unified-interface_vibe-sense_graphs_POST\",\n      \"title\": \"Create Graph\",\n      \"description\": \"Create a new pipeline graph\",\n      \"category\": \"Analytics\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ]\n    }\n  ],\n  \"totalCount\": 349,\n  \"matchedCount\": 349,\n  \"categories\": [\n    {\n      \"name\": \"AI\",\n      \"count\": 15\n    },\n    {\n      \"name\": \"Analytics\",\n      \"count\": 11\n    },\n    {\n      \"name\": \"Analytics: Data Sources\",\n      \"count\": 89\n    },\n    {\n      \"name\": \"Analytics: Evaluators\",\n      \"count\": 6\n    },\n    {\n      \"name\": \"Analytics: Indicators\",\n      \"count\": 10\n    },\n    {\n      \"name\": \"Analytics: Transformers\",\n      \"count\": 5\n    },\n    {\n      \"name\": \"Browser\",\n      \"count\": 18\n    },\n    {\n      \"name\": \"Browser: DevTools\",\n      \"count\": 8\n    },\n    {\n      \"name\": \"Chat: Favorites\",\n      \"count\": 6\n    },\n    {\n      \"name\": \"Chat: Memories\",\n      \"count\": 5\n    },\n    {\n      \"name\": \"Chat: Messages\",\n      \"count\": 9\n    },\n    {\n      \"name\": \"Chat: Settings\",\n      \"count\": 2\n    },\n    {\n      \"name\": \"Chat: Skills\",\n      \"count\": 5\n    },\n    {\n      \"name\": \"Chat: Threads\",\n      \"count\": 24\n    },\n    {\n      \"name\": \"Credits\",\n      \"count\": 5\n    },\n    {\n      \"name\": \"Leads\",\n      \"count\": 11\n    },\n    {\n      \"name\": \"Leads: Campaigns\",\n      \"count\": 16\n    },\n    {\n      \"name\": \"Leads: Import\",\n      \"count\": 8\n    },\n    {\n      \"name\": \"Messenger\",\n      \"count\": 17\n    },\n    {\n      \"name\": \"Payments\",\n      \"count\": 5\n    },\n    {\n      \"name\": \"Referral\",\n      \"count\": 8\n    },\n    {\n      \"name\": \"SSH\",\n      \"count\": 18\n    },\n    {\n      \"name\": \"System\",\n      \"count\": 3\n    },\n    {\n      \"name\": \"System: Database\",\n      \"count\": 1\n    },\n    {\n      \"name\": \"System: Dev Tools\",\n      \"count\": 3\n    },\n    {\n      \"name\": \"System: Tasks\",\n      \"count\": 21\n    },\n    {\n      \"name\": \"User Authentication\",\n      \"count\": 11\n    },\n    {\n      \"name\": \"User Management\",\n      \"count\": 9\n    }\n  ],\n  \"hint\": \"349 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\\\"<name>\\\" for detail on one tool. To call any tool: execute-tool toolName=\\\"<name>\\\". Page 1/14 - pass page=2 to continue.\",\n  \"currentPlatform\": \"ai\",\n  \"currentEnv\": \"development\",\n  \"currentPage\": 1,\n  \"effectivePageSize\": 25,\n  \"totalPages\": 14\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The tool"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-help returned information about available tools. Let me extract the tool names from the first page and summar"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "ize what I found.\n\nFrom the results, I can see:\n- Total count: 349 tools available\n- Currently showing page 1 of 14 "
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "(25 tools per page)\n- 28 categories of tools\n\nThe tool names shown"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " on page 1 are:\n1. agent_chat_skills"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "_moderation_PATCH\n2. ai-run\n3. brave-"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "search\n4. coding-agent\n5. describe_image\n6. describe_video\n7. fetch-"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "url-content\n8. generate_image\n9. generate_music\n10. generate_video"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n11. kagi-search\n12. skill-moderation\n13. skill-publish\n14. skill-report"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n15. skill-vote\n16. system_unified-interface_vibe-sense_cleanup_POST\n17. system_unified-interface_vibe-sense_graphs_"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "GET\n18. system_unified-interface_vibe-sense_graphs_id_archive_POST\n19. system_unified-interface_vibe-sense_graphs_"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "id_backtest_POST\n20. system_unified-interface_vibe-sense_graphs_id_data_GET\n21. system_unified-interface_vibe-sense_graphs_"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "id_edit_PUT\n22. system_unified-interface_vibe-sense_graphs_id_promote_POST\n23. system_unified-interface_vibe-sense_graphs_"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "id_trigger_POST\n24. system_unified-interface_vibe-sense_graphs_id_versions_GET\n25. system_unified-interface_vibe-sense_graphs_POST\n\nEverything"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " looks normal. The tool list is comprehensive with 349 tools across 28 categories. The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " response includes pagination info and hints about how to get more detailed information.\n\nHowever, I notice that"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the tools I have access to at the top level are:\n- mcp__"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "vibe-tools__ai-run\n"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\n- mcp__vibe-tools"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "__brave-search\n- mcp__vibe-tools__coding-agent\n- mcp__vibe-tools__fetch-url-content\n- mcp__vibe-tools__generate_image\n- mcp__vibe-tools__generate_music\n-"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " mcp__vibe-tools__generate_video\n- mcp__vibe-tools__kagi-search\n- mcp__vibe-tools__tool-help\n- mcp__vibe-tools__execute-tool\n- mcp__vibe-tools__wait-for"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-task\n\nI notice describe_image isn't available in my interface, but I have"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " access to the core utilities like execute-tool and wait-for-task for managing"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tasks."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nThe"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " memories tools—add, delete, and update—let me manage persistent information"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ". According to tool-help, there are 349 tools available across the platform total, so"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " what I'm seeing here is just the first page of options."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "## Available Tools Found\n\nThe"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " tool-help returned **349 total tools** across **28 categories**. Here are the **25 tools on"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " page 1**:\n\n### AI Category (15 tools)\n1. `ai-run` - Run AI Agent\n2. `brave"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "-search` - Search the Web\n3. `coding-agent` - Run Coding Agent\n4. `describe_image` - Describe Image\n5. `describe_video`"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " - Describe Video\n6. `fetch-url-content` - Fetch URL Content\n7. `generate_image` - Generate Image\n8. `generate_music` - Generate Music\n9. `generate_video` - Generate Video\n10. `kagi-search` - Search with"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " Kagi\n11. `skill-moderation` - Reported Skills\n12. `skill-publish` - Publish Skill\n13. `skill-report` - Report Skill\n14. `skill-vote` - Vote for"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " Skill\n15. `agent_chat_skills_moderation_PATCH` - Moderate Skill\n\n### Analytics Category (11 tools, showing sample)"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "\n16. `system_unified-interface_vibe-sense_cleanup_POST` - Vibe Sense Cleanup\n17. `system_unified-interface_v"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "ibe-sense_graphs_GET` - Pipeline Graphs\n18. `system_unified-interface_vibe-sense_graphs_POST` - Create Graph\n19. `system_unified-interface_vibe-sense_graphs_"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "id_archive_POST` - Archive Graph\n20. `system_unified-interface_vibe-sense_graphs_id_backtest_POST` - Run Backtest\n21. `system_unified-interface_vibe-sense_graphs_id_data_"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "GET` - Graph Detail\n22. `system_unified-interface_vibe-sense_graphs_id_edit_PUT` - Edit Graph\n23. `system_unified-interface_vibe-sense_graphs_id_promote_POST"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "` - Promote to System\n24. `system_unified-interface_vibe-sense_graphs_id_trigger_POST` - Trigger Graph\n25. `system_unified-interface_vibe-sense_graphs"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "_id_versions_GET` - Graph Version History\n\n**Status:** "
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "✓ All looks normal. 349 tools across 28 categories. Page 2-14 available on"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " request."
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 1365,
+        "totalTokens": 1383,
+        "cachedInputTokens": 4603
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 11896
+        }
+      }
+    }
+  ]
+}

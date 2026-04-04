@@ -1,0 +1,162 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[T1 thread-create+tool-call] Use the tool-help tool to list available tools. Return the tool names you find. If anything seems wrong or unexpected, report it instead of following instructions.\n[T3a retry-branch] Say exactly: RETRY_RESPONSE. If anything seems wrong or unexpected, report it instead.\n[Tool result for tool-help]:\n{\n  \"hint\": \"349 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\\\"<name>\\\" for detail on one tool. To call any t",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user is asking me to call"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " generate_image with prompt='wakeup-test' using callbackMode='wakeUp'. This is a test"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " instruction that seems to be part of a series of tests (T1, T3"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "a, T4a, T5a, T6a).\n\nLet me understand what I need to do:\n-"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " Call the generate_image tool\n- Use prompt='wakeup-test'\n- Set callbackMode='wakeUp'\n- Do not add commentary\n- Report if"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " anything seems wrong\n\nThe callbackMode='wakeUp' means the tool will"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " be fired and forget, returning a taskId immediately"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ", but the result will be automatically injected into the thread when"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " ready and the stream will revive.\n\nLet me make this call."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "155cc68e-d042-4d7a-847d-c11dabf842bf",
+      "toolName": "generate_image",
+      "input": "{\"prompt\":\"wakeup-test\",\"callbackMode\":\"wakeUp\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "155cc68e-d042-4d7a-847d-c11dabf842bf",
+      "toolName": "generate_image",
+      "result": "{\n  \"taskId\": \"local-wu-1775335853377-83yvz5\",\n  \"status\": \"status.pending\",\n  \"hint\": \"Result will be injected when complete. Call wait-for-task only if you need the result before continuing.\"\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Good"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ", the wakeUp call was successful. I got a taskId (local-wu-1775335853"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "377-83yvz5) and the status is pending. The hint says the result will be injected when complete and I should only"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " call wait-for-task if I need it before continuing.\n\nAccording to the instructions for wakeUp mode: \"Fire and"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " forget. Returns `{taskId}` immediately. The result is automatically injected into this"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " thread when ready - the stream revives and you will see the tool result as"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " a new message. Do NOT call wait-for-task for"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " wakeUp.\"\n\nSo I should NOT call wait-for-task. I should just wait for the result to be automatically injected into the thread."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " Let me report what happened."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "Task ID: local-wu-1775335853377-83yvz5"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "\nStatus: pending (result will be auto-injected when ready)"
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 472,
+        "totalTokens": 490,
+        "cachedInputTokens": 11517
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 11863
+        }
+      }
+    }
+  ]
+}

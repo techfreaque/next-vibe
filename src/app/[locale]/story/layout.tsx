@@ -91,6 +91,7 @@ export function TanstackPage({
           locale={locale}
           hasSubscription={hasSubscription}
           navigationItems={navItems}
+          totalModelCount={totalModelCount}
         />
         {children}
         <Footer locale={locale} totalModelCount={totalModelCount} />

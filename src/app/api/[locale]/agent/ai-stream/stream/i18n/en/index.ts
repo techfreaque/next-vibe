@@ -16,7 +16,7 @@ export const translations = {
       title: "Run AI Agent",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
-        "Run a headless AI agent and get back the full text response. Pass favoriteId to load skill + model + tools in one shot (recommended), or set model + skill + availableTools explicitly. For tool access, add availableTools: [{toolId:'execute-tool'},{toolId:'tool-help'}]. Use tool-help to discover available tools. Credits consumed based on model.",
+        "Run a headless AI agent and return the final text response. Set model + prompt for a simple one-shot, or pass favoriteId to load a saved skill + model + tools preset. Credits consumed based on model.",
       container: {
         title: "AI Agent Run",
         description: "Configure pre-calls and prompt for headless AI execution",
@@ -25,18 +25,18 @@ export const translations = {
         favoriteId: {
           label: "Favorite ID",
           description:
-            "UUID of a saved favorite to load skill, model, and tool configuration from. When set, the favorite's skill, model (from modelSelection), and tool config (availableTools/pinnedTools) are used as defaults. Explicit skill, model, tools, or availableTools fields in this request override the favorite's values. Use agent_chat_favorites_GET to list available favorites.",
+            "UUID of a saved favorite. Loads skill, model, and tool config as defaults. Explicit fields in this request override favorite values.",
           placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         model: {
           label: "Model",
           description:
-            "Chat/language model (LLM) to use for text reasoning and conversation. Optional when favoriteId or skill is provided. Fast & cheap: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.6, gpt-5-pro. Free: qwen3_235b-free, gpt-oss-120b-free. NOTE: This is NOT for image/audio/video generation - use generate_image, generate_music, or generate_video tools instead.",
+            "LLM for text reasoning. Optional when favoriteId or skill is set. Fast: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.6. Free: qwen3_235b-free. Not for image/audio/video generation.",
         },
         skill: {
           label: "Skill",
           description:
-            "Skill ID (UUID) or 'default'. Optional when favoriteId is provided (resolved from the favorite). Skills define the AI persona, system prompt, and default model. Overrides the skill from favoriteId when set. Use agent_chat_skills_GET to list available skills.",
+            "Skill ID or 'default'. Defines the AI persona and system prompt. Optional when favoriteId is set. Overrides the favorite's skill.",
           placeholder: "default",
         },
         prompt: {
@@ -70,26 +70,24 @@ export const translations = {
         availableTools: {
           label: "Allowed to Execute",
           description:
-            "Execution permission gate - controls which tools the AI is actually allowed to run. null = all tools permitted. Array = restrict to listed tools only (any other call is blocked with 'disabled by user'). Standard agentic setup: [{toolId:'execute-tool'},{toolId:'tool-help'}] - execute-tool dispatches any registered endpoint, tool-help lets the agent discover available tools. No need to repeat tools already listed in the tools field.",
+            "Which tools the AI may run. null = all permitted. Array = restrict to listed tools only. Standard: [{toolId:'execute-tool'},{toolId:'tool-help'}].",
           toolId: {
             label: "Tool ID",
             description:
-              "Alias or full tool name the AI is permitted to execute (e.g. 'execute-tool', 'tool-help', 'web-search')",
+              "Tool alias or full name (e.g. 'execute-tool', 'tool-help', 'web-search')",
           },
           requiresConfirmation: {
             label: "Requires Confirmation",
-            description:
-              "If true, execution pauses and waits for user confirmation before running this tool. Use for destructive or expensive actions.",
+            description: "Pause for user confirmation before running this tool",
           },
         },
         pinnedTools: {
           label: "In Context (model sees these)",
           description:
-            "Tools loaded into the model's context window - what the AI knows about and can reason over. null = use the user's default tool set (recommended). Provide an array only if you need a focused, minimal context. Note: availableTools controls what can actually execute - this field only affects what the model sees.",
+            "Tools loaded into model context. null = user's default set. Only affects what the model sees, not what it can execute.",
           toolId: {
             label: "Tool ID",
-            description:
-              "Alias or full tool name to load into the model's context (e.g. 'execute-tool', 'tool-help')",
+            description: "Tool alias or full name to load into context",
           },
           requiresConfirmation: {
             label: "Requires Confirmation",
@@ -129,7 +127,7 @@ export const translations = {
         excludeMemories: {
           label: "Exclude Memories",
           description:
-            "When true, the AI will not see the user's stored memories in its context. Use this for public bots and isolated tasks that should not inherit personal context. Default: false (memories included).",
+            "Skip injecting stored memories into context. Use for public bots or isolated tasks. Default: false.",
         },
       },
       response: {
@@ -221,7 +219,7 @@ export const translations = {
   post: {
     title: "AI Stream Chat",
     description:
-      "Stream AI-powered chat responses using 40+ models (Claude, GPT, Gemini, Llama, and more). Supports text, voice, file attachments, and agentic tool use.",
+      "Stream AI-powered chat responses using {{modelCount}} models (Claude, GPT, Gemini, Llama, and more). Supports text, voice, file attachments, and agentic tool use.",
     form: {
       title: "AI Chat Configuration",
       description: "Configure AI chat parameters and messages",

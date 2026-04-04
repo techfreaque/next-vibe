@@ -14,22 +14,25 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
 import {
   getChatModelById,
   type ChatModelOption,
 } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { agentEnv } from "@/app/api/[locale]/agent/env";
+import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
 import {
   getImageGenModelById,
   type ImageGenModelId,
 } from "@/app/api/[locale]/agent/image-generation/models";
-import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
+import {
+  ApiProvider,
+  isModelOptionImageBased,
+} from "@/app/api/[locale]/agent/models/models";
 import {
   getMusicGenModelById,
   type MusicGenModelId,
 } from "@/app/api/[locale]/agent/music-generation/models";
+import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import {
   getVideoGenModelById,
   type VideoGenModelId,
@@ -41,11 +44,13 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { SpeechToTextT } from "../../speech-to-text/i18n";
 import type { AiStreamT } from "../stream/i18n";
 
 import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
-import type { ToolExecutionContext } from "../../chat/config";
+import {
+  FOLDER_DENIED_TOOL_IDS,
+  type ToolExecutionContext,
+} from "../../chat/config";
 import { chatThreads, type ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
 import { chatFavorites } from "../../chat/favorites/db";
@@ -57,7 +62,7 @@ import { type AiStreamPostRequestOutput } from "../stream/definition";
 import { AbortControllerSetup } from "./core/abort-controller-setup";
 import { AbortReason, COMPACT_TRIGGER, isStreamAbort } from "./core/constants";
 import { CreditValidatorHandler } from "./core/credit-validator-handler";
-import { type BridgeContext, ModalityResolver } from "./core/modality-resolver";
+import { ModalityResolver, type BridgeContext } from "./core/modality-resolver";
 import { ProviderFactory as ProviderFactoryClass } from "./core/provider-factory";
 import { StreamRegistry } from "./core/stream-registry";
 import { ToolsSetupHandler } from "./core/tools-setup-handler";
@@ -179,7 +184,6 @@ export async function setupAiStream(params: {
   leadId: string | undefined;
   ipAddress: string | undefined;
   aiStreamT: AiStreamT;
-  sttT: SpeechToTextT;
   maxDuration: number;
   request: NextRequest | undefined;
   extraInstructions: string | undefined;
@@ -193,6 +197,8 @@ export async function setupAiStream(params: {
     videoGenModelId?: VideoGenModelId;
     imageGenModelId?: ImageGenModelId;
   };
+  /** Override tools entirely — used by API provider for client-provided tools only */
+  toolsOverride?: Record<string, CoreTool>;
 }): Promise<ResponseType<StreamSetupResult>> {
   const {
     data,
@@ -203,7 +209,6 @@ export async function setupAiStream(params: {
     leadId,
     ipAddress,
     aiStreamT,
-    sttT,
     mediaModelOverrides,
   } = params;
   const isIncognito = data.rootFolderId === "incognito";
@@ -248,6 +253,65 @@ export async function setupAiStream(params: {
   }> = [];
 
   if (data.toolConfirmations && data.toolConfirmations.length > 0) {
+    // Resolve media model IDs early for the confirmation context.
+    // The full bridge context is built later (after thread/credits), but confirmations
+    // need media model IDs NOW so tool serverDefaults (e.g. image gen model) resolve correctly.
+    const confirmMediaModels = await (async (): Promise<{
+      imageGenModelId: ImageGenModelId | undefined;
+      musicGenModelId: MusicGenModelId | undefined;
+      videoGenModelId: VideoGenModelId | undefined;
+    }> => {
+      // 1. Explicit overrides (legacy path, still honoured if provided)
+      if (mediaModelOverrides) {
+        return {
+          imageGenModelId: mediaModelOverrides.imageGenModelId,
+          musicGenModelId: mediaModelOverrides.musicGenModelId,
+          videoGenModelId: mediaModelOverrides.videoGenModelId,
+        };
+      }
+      // 2. Resolve from favorite via ModalityResolver cascade
+      const effectiveFavoriteId = params.favoriteIdOverride;
+      if (effectiveFavoriteId && userId) {
+        const [favRow] = await db
+          .select()
+          .from(chatFavorites)
+          .where(eq(chatFavorites.id, effectiveFavoriteId))
+          .limit(1);
+        if (favRow) {
+          const miniBridgeCtx: BridgeContext = {
+            skill: null,
+            favorite: favRow,
+            userSettings: null,
+          };
+          const imgModel = ModalityResolver.resolveImageGenModel(
+            miniBridgeCtx,
+            user,
+          );
+          const musModel = ModalityResolver.resolveMusicGenModel(
+            miniBridgeCtx,
+            user,
+          );
+          const vidModel = ModalityResolver.resolveVideoGenModel(
+            miniBridgeCtx,
+            user,
+          );
+          return {
+            imageGenModelId:
+              imgModel && isModelOptionImageBased(imgModel)
+                ? imgModel.id
+                : undefined,
+            musicGenModelId: musModel?.id,
+            videoGenModelId: vidModel?.id,
+          };
+        }
+      }
+      return {
+        imageGenModelId: undefined,
+        musicGenModelId: undefined,
+        videoGenModelId: undefined,
+      };
+    })();
+
     const confirmationResult = await ToolConfirmationProcessor.processAll({
       toolConfirmations: data.toolConfirmations,
       messageHistory: data.messageHistory ?? undefined,
@@ -269,9 +333,9 @@ export async function setupAiStream(params: {
         leafMessageId: data.leafMessageId ?? undefined,
         skillId: data.skill,
         modelId: data.model,
-        imageGenModelId: undefined,
-        musicGenModelId: undefined,
-        videoGenModelId: undefined,
+        imageGenModelId: confirmMediaModels.imageGenModelId,
+        musicGenModelId: confirmMediaModels.musicGenModelId,
+        videoGenModelId: confirmMediaModels.videoGenModelId,
         favoriteId: params.favoriteIdOverride,
         headless: params.headless,
         waitingForRemoteResult: undefined,
@@ -406,7 +470,6 @@ export async function setupAiStream(params: {
     user,
     locale,
     logger,
-    sttT,
   });
 
   if (!operationResult.success) {
@@ -773,6 +836,12 @@ export async function setupAiStream(params: {
     };
   })();
 
+  // Inject folder-type denied tools — applies regardless of skill/favorite cascade.
+  // Works for incognito (userId=null) because the IIFE returns an empty deniedToolIds set.
+  for (const toolId of FOLDER_DENIED_TOOL_IDS[data.rootFolderId] ?? []) {
+    resolvedToolConfig.deniedToolIds.add(toolId);
+  }
+
   // Resolve bridge models via cascade: skill → favorite → userSettings → system default
   // This wires the ModalityResolver into the stream pipeline so all downstream
   // handlers (STT, TTS, vision bridge, translation) use the correct models.
@@ -829,7 +898,7 @@ export async function setupAiStream(params: {
             defaultChatMode: customSkillRow.defaultChatMode ?? null,
             imageGenModelSelection: null,
             musicGenModelSelection: null,
-            videoGenModelId: null,
+            videoGenModelSelection: null,
           };
         }
       } else {
@@ -840,7 +909,8 @@ export async function setupAiStream(params: {
       }
     }
 
-    // Resolve favorite: use activeFavoriteId from settings
+    // Resolve favorite: explicit favoriteIdOverride takes priority,
+    // then activeFavoriteId from user settings, then nothing.
     if (userId) {
       const [userSettingsRow] = await db
         .select({
@@ -854,7 +924,7 @@ export async function setupAiStream(params: {
           defaultChatMode: chatSettings.defaultChatMode,
           imageGenModelSelection: chatSettings.imageGenModelSelection,
           musicGenModelSelection: chatSettings.musicGenModelSelection,
-          videoGenModelId: chatSettings.videoGenModelId,
+          videoGenModelSelection: chatSettings.videoGenModelSelection,
         })
         .from(chatSettings)
         .where(eq(chatSettings.userId, userId))
@@ -862,16 +932,19 @@ export async function setupAiStream(params: {
 
       if (userSettingsRow) {
         userSettingsConfig = userSettingsRow;
+      }
 
-        if (userSettingsRow.activeFavoriteId) {
-          const [favRow] = await db
-            .select()
-            .from(chatFavorites)
-            .where(eq(chatFavorites.id, userSettingsRow.activeFavoriteId))
-            .limit(1);
-          if (favRow) {
-            favoriteConfig = favRow;
-          }
+      // Explicit favoriteId from request → use that favorite for bridge context
+      const effectiveFavoriteId =
+        params.favoriteIdOverride ?? userSettingsRow?.activeFavoriteId;
+      if (effectiveFavoriteId) {
+        const [favRow] = await db
+          .select()
+          .from(chatFavorites)
+          .where(eq(chatFavorites.id, effectiveFavoriteId))
+          .limit(1);
+        if (favRow) {
+          favoriteConfig = favRow;
         }
       }
     }
@@ -919,12 +992,11 @@ export async function setupAiStream(params: {
     : resolvedVideoGenModel;
 
   logger.debug("[Setup] Bridge models resolved via cascade", {
-    ttsModelId: resolvedTtsModel.id,
-    sttModelId: ModalityResolver.resolveSttModel(bridgeContext, user).id,
-    imageVisionModelId: ModalityResolver.resolveImageVisionModel(
-      bridgeContext,
-      user,
-    ).id,
+    ttsModelId: resolvedTtsModel?.id ?? null,
+    sttModelId:
+      ModalityResolver.resolveSttModel(bridgeContext, user)?.id ?? null,
+    imageVisionModelId:
+      ModalityResolver.resolveImageVisionModel(bridgeContext, user)?.id ?? null,
     hasTranslation: !!ModalityResolver.resolveTranslationModel(bridgeContext),
     imageGenModelId: effectiveImageGenModel?.id ?? null,
     musicGenModelId: effectiveMusicGenModel?.id ?? null,
@@ -953,6 +1025,12 @@ export async function setupAiStream(params: {
         imageGenModelName: effectiveImageGenModel?.name ?? null,
         musicGenModelName: effectiveMusicGenModel?.name ?? null,
         videoGenModelName: effectiveVideoGenModel?.name ?? null,
+        imageGenIsSameAsChatModel:
+          !!effectiveImageGenModel && modelConfig.outputs.includes("image"),
+        musicGenIsSameAsChatModel:
+          !!effectiveMusicGenModel && modelConfig.outputs.includes("audio"),
+        videoGenIsSameAsChatModel:
+          !!effectiveVideoGenModel && modelConfig.outputs.includes("video"),
       },
       threadId: threadResult.data.threadId,
       voiceTranscription: voiceTranscription
@@ -980,7 +1058,10 @@ export async function setupAiStream(params: {
     aiMessageId,
     skillId: data.skill,
     modelId: data.model,
-    imageGenModelId: effectiveImageGenModel?.id ?? undefined,
+    imageGenModelId:
+      effectiveImageGenModel && isModelOptionImageBased(effectiveImageGenModel)
+        ? effectiveImageGenModel.id
+        : undefined,
     musicGenModelId: effectiveMusicGenModel?.id ?? undefined,
     videoGenModelId: effectiveVideoGenModel?.id ?? undefined,
     headless: params.headless,
@@ -1054,53 +1135,92 @@ export async function setupAiStream(params: {
     return tools.filter((t) => !resolvedToolConfig.deniedToolIds.has(t.toolId));
   };
 
-  // Remove media generation tools when no model is configured for that modality.
-  // If the gen model is null, the tool would fail at runtime anyway —
-  // removing it keeps the tool set honest and avoids confusing the LLM.
+  // Remove media generation tools when:
+  // 1. No model is configured for that modality (tool would fail at runtime)
+  // 2. The active chat model IS the configured gen model — native output is better,
+  //    the tool would just be a slower detour through the same model.
+  //    Note: if a different specialized gen model is configured (e.g. Flux when using Gemini),
+  //    the tool stays — the user explicitly picked a different model for generation.
   const filterUnavailableMediaTools = <T extends { toolId: string }>(
     tools: T[] | null | undefined,
   ): T[] | null | undefined => {
     if (!tools) {
       return tools;
     }
+    // Extract chatModelId as plain string for cross-enum comparison.
+    // ImageGenModelId / MusicGenModelId / VideoGenModelId are separate enums whose
+    // LLM-generated values happen to match ChatModelId strings at runtime, but
+    // TypeScript treats them as disjoint. Widening to string is the type-safe way.
+    const chatModelIdStr: string = data.model;
     return tools.filter((t) => {
-      if (t.toolId === "generate_image" && !effectiveImageGenModel) {
-        return false;
+      if (t.toolId === "generate_image") {
+        if (!effectiveImageGenModel) {
+          return false;
+        }
+        const imageGenIdStr: string = effectiveImageGenModel.id;
+        if (imageGenIdStr === chatModelIdStr) {
+          return false; // active model IS the image gen model — use native output
+        }
       }
-      if (t.toolId === "generate_music" && !effectiveMusicGenModel) {
-        return false;
+      if (t.toolId === "generate_music") {
+        if (!effectiveMusicGenModel) {
+          return false;
+        }
+        const musicGenIdStr: string = effectiveMusicGenModel.id;
+        if (musicGenIdStr === chatModelIdStr) {
+          return false; // active model IS the music gen model — use native output
+        }
       }
-      if (t.toolId === "generate_video" && !effectiveVideoGenModel) {
-        return false;
+      if (t.toolId === "generate_video") {
+        if (!effectiveVideoGenModel) {
+          return false;
+        }
+        const videoGenIdStr: string = effectiveVideoGenModel.id;
+        if (videoGenIdStr === chatModelIdStr) {
+          return false; // active model IS the video gen model — use native output
+        }
       }
       return true;
     });
   };
 
+  // When toolsOverride is provided (API provider mode), skip server-side tool loading
+  // entirely and use only the client-provided tools. This ensures zero server tools
+  // leak to API consumers.
   const {
     tools,
     toolsConfig,
     activeToolNames,
     systemPrompt: updatedSystemPrompt,
-  } = await ToolsSetupHandler.setupStreamingTools({
-    modelConfig,
-    // Tool config cascade: cascade-resolved (favorite/skill) takes precedence over client-provided.
-    // deniedTools are stripped from both sets before reaching the AI SDK.
-    pinnedTools: filterUnavailableMediaTools(
-      applyDeniedFilter(resolvedToolConfig.pinnedTools ?? data.pinnedTools),
-    ),
-    availableTools: filterUnavailableMediaTools(
-      applyDeniedFilter(
-        resolvedToolConfig.availableTools ?? data.availableTools,
-      ),
-    ),
-    user,
-    locale,
-    logger,
-    systemPrompt: builtSystemPrompt,
-    toolConfirmationResults,
-    streamContext,
-  });
+  } = params.toolsOverride
+    ? {
+        tools: params.toolsOverride,
+        toolsConfig: new Map<
+          string,
+          { requiresConfirmation: boolean; credits: number }
+        >(),
+        activeToolNames: new Set<string>(Object.keys(params.toolsOverride)),
+        systemPrompt: builtSystemPrompt,
+      }
+    : await ToolsSetupHandler.setupStreamingTools({
+        modelConfig,
+        // Tool config cascade: cascade-resolved (favorite/skill) takes precedence over client-provided.
+        // deniedTools are stripped from both sets before reaching the AI SDK.
+        pinnedTools: filterUnavailableMediaTools(
+          applyDeniedFilter(resolvedToolConfig.pinnedTools ?? data.pinnedTools),
+        ),
+        availableTools: filterUnavailableMediaTools(
+          applyDeniedFilter(
+            resolvedToolConfig.availableTools ?? data.availableTools,
+          ),
+        ),
+        user,
+        locale,
+        logger,
+        systemPrompt: builtSystemPrompt,
+        toolConfirmationResults,
+        streamContext,
+      });
 
   const provider = ProviderFactoryClass.getProviderForModel(
     modelConfig,
@@ -1397,12 +1517,13 @@ export async function setupAiStream(params: {
       skipAiTurn:
         (data.toolConfirmations?.length ?? 0) > 0 &&
         toolConfirmationResults.length === 0,
-      voiceMode: data.voiceMode
-        ? {
-            enabled: data.voiceMode.enabled ?? false,
-            voiceId: resolvedTtsVoiceId,
-          }
-        : null,
+      voiceMode:
+        data.voiceMode && resolvedTtsVoiceId
+          ? {
+              enabled: data.voiceMode.enabled ?? false,
+              voiceId: resolvedTtsVoiceId,
+            }
+          : null,
       voiceTranscription,
       userMessageMetadata,
       fileUploadPromise,

@@ -48,12 +48,49 @@ export interface PriceFailure {
   reason: string;
 }
 
+/** Update for array/object settings fields on provider configs (e.g. supportedDurations, pricingByResolution) */
+export interface SettingsUpdate {
+  /** The providerModel string to locate the block in models.ts */
+  providerModel: string;
+  /** Field name to insert/update (e.g. "supportedDurations", "pricingByResolution") */
+  field: string;
+  /** TypeScript literal value to write (e.g. '["5", "10"]' or '{ "720p": 10, "1080p": 15 }') */
+  tsLiteral: string;
+  source: string;
+}
+
+/**
+ * Add or remove a provider entry in a model's `providers[]` array.
+ * Used by the Unbottled fetcher to dynamically manage UNBOTTLED entries.
+ */
+export interface ProviderEntryOperation {
+  /** "add" inserts a new entry; "remove" deletes an existing entry */
+  action: "add" | "remove";
+  /** The role/category this model belongs to (chat, image-gen, etc.) */
+  role: string;
+  /** Enum key of the model definition (e.g. "GPT_5_4") */
+  enumKey: string;
+  /** The model ID value (e.g. "gpt-54") */
+  modelId: string;
+  /** API provider for the entry */
+  provider: ApiProvider;
+  /** Provider model string for the entry (used as providerModel in source) */
+  providerModel: string;
+  /** Credit cost for the entry (for add operations) */
+  creditCost?: number;
+  /** Source for the update comment */
+  source: string;
+}
+
 export interface ProviderPriceResult {
   provider: string;
   modelsFound: number;
   modelsUpdated: number;
   updates: PriceUpdate[];
   modalityUpdates?: ModalityUpdate[];
+  settingsUpdates?: SettingsUpdate[];
+  /** Operations to add/remove provider entries in model definitions */
+  providerEntryOps?: ProviderEntryOperation[];
   failures: PriceFailure[];
   error?: string;
 }

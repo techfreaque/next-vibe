@@ -57,7 +57,7 @@ export const translations: typeof enTranslations = {
   audience: {
     title: "Wer ist die natürliche Zielgruppe dieser Plattform?",
     intro:
-      "unbottled.ai hat eine klare Positionierung: KI mit freier Meinungsäußerung und 50+ Modellen, nutzergesteuerter Inhaltsfilterung, Privacy-First. Das spricht an:",
+      "unbottled.ai hat eine klare Positionierung: KI mit freier Meinungsäußerung und {{modelCount}} Modellen, nutzergesteuerter Inhaltsfilterung, Privacy-First. Das spricht an:",
     group1Title: "Entwickler und technische Nutzer",
     group1Body:
       "Leute, die API-Zugang wollen, restriktive KI-Richtlinien hassen und schon für mehrere KI-Abos zahlen. Geben viel aus, bleiben lange.",
@@ -69,7 +69,7 @@ export const translations: typeof enTranslations = {
       "Autoren, YouTuber und Blogger, die KI für Entwürfe, Recherche und Brainstorming nutzen. Sie profitieren von unzensierten Modellen für Fiction, Adult-Content oder kontroverse Themen.",
     group4Title: "KI-neugierige Einsteiger",
     group4Body:
-      "Leute, die dem KI-Trend folgen, aber von den Optionen überfordert sind. Die 50+-Modellauswahl und die einfache Oberfläche konvertieren gut über Tutorial-Content.",
+      "Leute, die dem KI-Trend folgen, aber von den Optionen überfordert sind. Die {{modelCount}}-Modellauswahl und die einfache Oberfläche konvertieren gut über Tutorial-Content.",
   },
   promotion: {
     title: "Promotion-Ansätze, die funktionieren",

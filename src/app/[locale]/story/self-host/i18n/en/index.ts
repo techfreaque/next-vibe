@@ -20,7 +20,8 @@ export const translations = {
   includes: {
     title: "Everything the cloud has. Plus more.",
     items: {
-      models: "42+ models - use your own API keys, pay providers directly",
+      models:
+        "{{modelCount}} models - use your own API keys, pay providers directly",
       memory: "Persistent memory, incognito mode, 4 privacy levels",
       search: "Live web search + full page fetch",
       thea: "Thea: AI admin who monitors, self-heals, and builds tools on command",

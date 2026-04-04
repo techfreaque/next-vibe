@@ -8,15 +8,15 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type {
   JwtPayloadType,
+  JwtPrivatePayloadType,
   JWTPublicPayloadType,
 } from "@/app/api/[locale]/user/auth/types";
 import {
   UserPermissionRole,
-  type UserRoleValue,
+  type UserPermissionRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -40,14 +40,13 @@ export function getCliUserEmail(): string | null {
  * Create a default CLI user payload for auth bypass scenarios
  * Used for commands that don't require authenticated user (e.g., seed, dev)
  */
-export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<
-  readonly UserRoleValue[]
-> {
+export function createDefaultCliUser(): JwtPrivatePayloadType {
   return {
     isPublic: false,
     id: DEFAULT_CLI_USER_ID,
     leadId: DEFAULT_CLI_USER_ID,
-  } as InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
+    roles: [],
+  };
 }
 
 /**
@@ -68,14 +67,14 @@ export function createPublicCliUser(): JWTPublicPayloadType {
 function createCliUserFromDb(
   userId: string,
   leadId: string,
-  roles: UserRoleValue[],
-): InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> {
+  roles: (typeof UserPermissionRoleValue)[],
+): JwtPrivatePayloadType {
   return {
     isPublic: false,
     id: userId,
     leadId,
     roles,
-  } as InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
+  };
 }
 
 /**
@@ -140,14 +139,24 @@ export async function getCliUser(
             );
           }
 
-          return {
-            success: true,
-            data: createCliUserFromDb(
-              dbValid.id,
-              dbValid.leadId,
-              dbValid.roles,
-            ),
-          };
+          // If VIBE_ADMIN_USER_EMAIL is set and the session user isn't ADMIN,
+          // prefer the env admin user so CLI tools requiring ADMIN are accessible.
+          const sessionUser = createCliUserFromDb(
+            dbValid.id,
+            dbValid.leadId,
+            dbValid.roles,
+          );
+          const isSessionAdmin = sessionUser.roles.includes(
+            UserPermissionRole.ADMIN,
+          );
+          if (!isSessionAdmin && getCliUserEmail()) {
+            logger.debug(
+              "[CLI AUTH] Session user is not ADMIN and VIBE_ADMIN_USER_EMAIL is set — falling through to env admin",
+            );
+            // fall through to Step 2
+          } else {
+            return { success: true, data: sessionUser };
+          }
         }
       }
     }
