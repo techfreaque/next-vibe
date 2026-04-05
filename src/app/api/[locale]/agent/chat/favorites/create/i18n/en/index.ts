@@ -32,7 +32,8 @@ export const translations = {
     },
     variantId: {
       label: "Variant",
-      description: "Skill variant (e.g. brilliant, cheap, uncensored)",
+      description:
+        "Select a skill variant by ID. Variants are named model configurations for the same skill personality (e.g. 'brilliant' for deep reasoning, 'budget' for cheap/fast). null = use default variant. Fetch skill first to see available variants.",
     },
     customVariantName: {
       label: "Variant Name",
@@ -49,27 +50,32 @@ export const translations = {
     },
     voice: {
       label: "Voice",
-      description: "Text-to-speech voice preference",
+      description:
+        "TTS voice override for this favorite. null = your global voice setting wins (bridge model: user setting takes priority). Set to give this specific favorite a different voice.",
       placeholder: "Inherit from skill",
     },
     sttModel: {
       label: "Speech-to-Text Model",
-      description: "Model used for speech recognition",
+      description:
+        "STT model override. null = your global STT preference wins (bridge model). Set only for specialized transcription needs.",
       placeholder: "Inherit from skill",
     },
     imageVisionModel: {
       label: "Image Vision Model",
-      description: "Model used for analyzing images",
+      description:
+        "Image vision LLM override. null = user global preference wins (bridge model).",
       placeholder: "Inherit from skill",
     },
     videoVisionModel: {
       label: "Video Vision Model",
-      description: "Model used for analyzing videos",
+      description:
+        "Video vision LLM override. null = user global preference wins (bridge model).",
       placeholder: "Inherit from skill",
     },
     audioVisionModel: {
       label: "Audio Vision Model",
-      description: "Model used for analyzing audio",
+      description:
+        "Audio vision LLM override. null = user global preference wins (bridge model).",
       placeholder: "Inherit from skill",
     },
     translationModel: {
@@ -78,17 +84,20 @@ export const translations = {
     },
     imageGenModel: {
       label: "Image Generation Model",
-      description: "Model used for generating images",
+      description:
+        "Image generator override. null = skill's imageGenModelSelection wins (media gen: skill takes priority). Set to use a different generator than the skill specifies.",
       placeholder: "Inherit from skill",
     },
     musicGenModel: {
       label: "Music Generation Model",
-      description: "Model used for generating music",
+      description:
+        "Music generator override. null = skill's musicGenModelSelection wins (media gen: skill takes priority).",
       placeholder: "Inherit from skill",
     },
     videoGenModel: {
       label: "Video Generation Model",
-      description: "Model used for generating videos",
+      description:
+        "Video generator override. null = skill's videoGenModelSelection wins (media gen: skill takes priority).",
       placeholder: "Inherit from skill",
     },
     defaultChatMode: {

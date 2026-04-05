@@ -14,6 +14,13 @@ export const translations = {
     },
   },
   posts: {
+    whatsNewApril2026: {
+      title: "123 models. Any modality. One companion.",
+      category: "Product Update",
+      excerpt:
+        "True multimodal across 123 models, real AI companions with actual character, a skill economy, and a complete rework of everything that was rough. Here's what changed.",
+      readTime: "7 min read",
+    },
     oneCodebase: {
       title: "One codebase. 13 platforms. Zero compromises.",
       category: "Architecture",
@@ -73,11 +80,11 @@ export const translations = {
       readTime: "5 min read",
     },
     skillSharingEconomy: {
-      title: "Your AI skills are worth money. Here's how to cash in.",
+      title: "Build a skill. Share the link. Earn every month.",
       category: "Skill Economy",
       excerpt:
-        "Build custom AI skills, share them with your referral link, and earn 10% recurring commission from every user who signs up through your skill page.",
-      readTime: "6 min read",
+        "Skills are pre-configured AI setups you craft once and share anywhere. The referral link in the share URL earns you 10% recurring from every signup. Here's how.",
+      readTime: "7 min read",
     },
   },
   labels: {

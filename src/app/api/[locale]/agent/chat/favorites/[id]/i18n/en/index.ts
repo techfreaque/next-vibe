@@ -208,27 +208,32 @@ export const translations = {
     },
     voice: {
       label: "AI Voice",
-      description: "Choose the voice for your AI assistant",
+      description:
+        "Override TTS voice for this favorite. null = your global voice setting wins (bridge model: user setting takes priority). Set here to give this specific favorite a different voice.",
       placeholder: "Inherit from skill",
     },
     sttModel: {
       label: "Speech-to-Text Model",
-      description: "Model used for speech recognition",
+      description:
+        "Override STT model for this favorite. null = your global STT preference wins (bridge model). Set only for specialized transcription needs.",
       placeholder: "Inherit from skill",
     },
     imageVisionModel: {
       label: "Image Vision Model",
-      description: "Model used for analyzing images",
+      description:
+        "Override image vision LLM for this favorite. null = user global preference wins (bridge model). Set to force a specific vision model.",
       placeholder: "Inherit from skill",
     },
     videoVisionModel: {
       label: "Video Vision Model",
-      description: "Model used for analyzing videos",
+      description:
+        "Override video vision LLM for this favorite. null = user global preference wins (bridge model).",
       placeholder: "Inherit from skill",
     },
     audioVisionModel: {
       label: "Audio Vision Model",
-      description: "Model used for analyzing audio",
+      description:
+        "Override audio vision LLM for this favorite. null = user global preference wins (bridge model).",
       placeholder: "Inherit from skill",
     },
     translationModel: {
@@ -237,17 +242,20 @@ export const translations = {
     },
     imageGenModel: {
       label: "Image Generation Model",
-      description: "Model used for generating images",
+      description:
+        "Override image generator for this favorite. null = skill's imageGenModelSelection wins (media gen: skill takes priority). Set here to use a different generator than what the skill specifies.",
       placeholder: "Inherit from skill",
     },
     musicGenModel: {
       label: "Music Generation Model",
-      description: "Model used for generating music",
+      description:
+        "Override music generator for this favorite. null = skill's musicGenModelSelection wins (media gen: skill takes priority).",
       placeholder: "Inherit from skill",
     },
     videoGenModel: {
       label: "Video Generation Model",
-      description: "Model used for generating videos",
+      description:
+        "Override video generator for this favorite. null = skill's videoGenModelSelection wins (media gen: skill takes priority).",
       placeholder: "Inherit from skill",
     },
     defaultChatMode: {
@@ -363,8 +371,8 @@ export const translations = {
     promptAppend: {
       label: "Prompt Append",
       description:
-        "Extra instructions appended to the skill's system prompt for this slot only. Use this to personalise the AI's behavior without changing the shared skill.",
-      placeholder: "e.g. Always reply in a friendly, casual tone.",
+        "Extra instructions appended to the skill's system prompt for this slot only. Use this to personalise without changing the shared skill. AI agents: populate with user's name, language preference, technical level, domain context (e.g. 'My name is Max. I prefer TypeScript and bun. Reply in English.').",
+      placeholder: "e.g. My name is Alex. I prefer concise answers in English.",
     },
     compactTrigger: {
       label: "Compact Trigger (tokens)",

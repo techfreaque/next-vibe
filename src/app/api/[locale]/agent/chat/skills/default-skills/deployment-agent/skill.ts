@@ -75,8 +75,8 @@ export const deploymentAgentSkill: Skill = {
   ],
   variants: [
     {
-      id: "claude",
-      variantName: "skills.deploymentAgent.variants.claude" as const,
+      id: "tech-bro",
+      variantName: "skills.deploymentAgent.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_4_6,

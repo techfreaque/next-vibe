@@ -100,6 +100,10 @@ src/app/api/[locale]/<category>/<feature>/
 
 **Ask vs Do:** Stop for architectural tradeoffs, irreversible/high-blast-radius actions, genuinely ambiguous requirements. Never ask "Should I check X?", "Would Y work?", "Is this the right file?" - just do it.
 
+**Never `rm`** . Always `mv` to `./.tmp/todelete/<goodname>/<originalname>`. The past is preserved, not destroyed.
+
+**Git:** Don't use git unless the user explicitly asks. Never reset, checkout, or revert — the present state is what matters. Git history is irrelevant to the work.
+
 **Proactive by default:** If you encounter anything that smells wrong - type errors, inconsistent patterns, broken imports, dead code, misnamed files, half-implemented features - add it to the task list and fix it. Don't wait to be asked. The only exception is large architectural changes or out-of-scope refactors that could break things; those get flagged, not silently done.
 
 ## Testing

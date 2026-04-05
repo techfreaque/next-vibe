@@ -13,9 +13,10 @@ export const { POST, tools } = endpointsHandler({
   endpoint: listPagesEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ t, logger }) => {
+    handler: ({ t, logger, user, request }) => {
       return BrowserSharedRepository.executeMCPTool(
         {
+          sessionId: request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.LIST_PAGES,
           args: BrowserSharedRepository.filterUndefinedArgs({}),
         },

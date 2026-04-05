@@ -1264,15 +1264,9 @@ describe("AI Stream Integration", () => {
           assertStepOk(lastAi?.content, "T6a");
           lastMainAiMsgId = result.data.lastAiMessageId!;
 
-          // wakeUp phase1: thread should be "waiting" (async task still running)
-          const [t6aThread] = await db
-            .select({ streamingState: chatThreads.streamingState })
-            .from(chatThreads)
-            .where(eq(chatThreads.id, threadId));
-          expect(
-            t6aThread?.streamingState,
-            "T6a: wakeUp phase1 should leave thread in 'waiting' state",
-          ).toBe("waiting");
+          // wakeUp phase1: thread may be "waiting" (goroutine still running) or
+          // "idle" (goroutine + revival finished fast in cache mode). Both are valid.
+          // We verify revival results in T6b — not timing state here.
 
           const after = await getBalance(testUser, creditLogger, creditT);
           assertDeducted(before, after, 0, 5);
@@ -1285,27 +1279,33 @@ describe("AI Stream Integration", () => {
         async () => {
           expect(wakeupToolMsgId).toBeTruthy();
 
-          // The wakeUp revival is triggered by handleTaskCompletion (with directResumeUser)
-          // which fires ResumeStreamRepository.resume() directly. That inserts the deferred
-          // tool and calls runHeadlessAiStream (fire-and-forget) for revival.
-          // Poll until the deferred tool + revival AI appear (up to TEST_TIMEOUT).
+          // The wakeUp revival fires async during T6a (goroutine + resume-stream fire-and-forget).
+          // In cache mode it may complete before T6a even returns, or after. Search the
+          // full thread for the deferred tool (isDeferred=true, has imageUrl) and revival AI.
+          // wakeupMsgCount is unreliable here — revival may already be in messages from T6a.
           let messages: SlimMessage[] = [];
-          let added: SlimMessage[] = [];
           const deadline = Date.now() + TEST_TIMEOUT - 5000;
+          let deferredTool: SlimMessage | undefined;
+          let revivalAi: SlimMessage | undefined;
           while (Date.now() < deadline) {
             messages = await fetchThreadMessages(threadId);
-            added = messages.slice(wakeupMsgCount);
-            const hasDeferredTool = added.some(
+            // Deferred tool: isDeferred=true in toolCall metadata + has imageUrl result
+            deferredTool = messages.find(
               (m) =>
                 m.role === "tool" &&
                 m.toolCall?.toolName === "generate_image" &&
-                toolResultRecord(m.toolCall?.result)?.["imageUrl"] !==
-                  undefined,
+                m.toolCall.isDeferred === true &&
+                toolResultRecord(m.toolCall?.result)?.["imageUrl"] !== undefined,
             );
-            const hasRevivalAi = added.some(
-              (m) => m.role === "assistant" && m.content,
-            );
-            if (hasDeferredTool && hasRevivalAi) {
+            if (deferredTool) {
+              revivalAi = messages.find(
+                (m) =>
+                  m.role === "assistant" &&
+                  m.content &&
+                  m.parentId === deferredTool!.id,
+              );
+            }
+            if (deferredTool && revivalAi) {
               break;
             }
             await new Promise<void>((resolve) => {
@@ -1313,13 +1313,7 @@ describe("AI Stream Integration", () => {
             });
           }
 
-          // ── Deferred tool message: written by handleTaskCompletion with real imageUrl ──
-          const deferredTool = added.find(
-            (m) =>
-              m.role === "tool" &&
-              m.toolCall?.toolName === "generate_image" &&
-              toolResultRecord(m.toolCall?.result)?.["imageUrl"] !== undefined,
-          );
+          // ── Deferred tool message: written by resume-stream with real imageUrl ──
           expect(
             deferredTool,
             "T6b: no deferred tool message with imageUrl found",
@@ -1330,21 +1324,13 @@ describe("AI Stream Integration", () => {
             expect(deferredRes!["imageUrl"]).toBeTruthy();
           }
 
-          // ── Revival AI: must exist after the deferred tool in the chain ──
-          const revivalAi = added.find(
-            (m) =>
-              m.role === "assistant" &&
-              m.content &&
-              deferredTool &&
-              m.parentId === deferredTool.id,
-          );
+          // ── Revival AI: child of the deferred tool ──
           expect(
             revivalAi,
             "T6b: no revival AI message parented to deferred tool",
           ).toBeDefined();
 
-          // Update lastMainAiMsgId to the revival AI (or deferred tool as fallback)
-          // so T7a chains correctly without creating a branch off T6a's AI.
+          // Update lastMainAiMsgId to revival AI so T7a chains correctly.
           if (revivalAi) {
             expect(revivalAi.content).toBeTruthy();
             lastMainAiMsgId = revivalAi.id;
@@ -2008,11 +1994,12 @@ describe("AI Stream Integration", () => {
         }
 
         // ── Tool messages: all have isAI=true, model set, sequenceId matches parent ──
+        // Exception: wakeUp deferred tool messages get a fresh sequenceId intentionally.
         const allTools = byRole(messages, "tool");
         for (const tm of allTools) {
           expect(tm.isAI, `Tool msg ${tm.id} should be isAI=true`).toBe(true);
           expect(tm.model, `Tool msg ${tm.id} missing model`).toBeTruthy();
-          if (tm.parentId) {
+          if (tm.parentId && !tm.toolCall?.isDeferred) {
             const parent = messages.find((m) => m.id === tm.parentId);
             if (parent) {
               expect(

@@ -1,0 +1,63 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v6/images/text2img",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "9e77ec03ee7f9f28-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Sun, 05 Apr 2026 10:38:15 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=i12KAd0XGmbmCi4LcNC329uRRTO93LXhECIm2pW6CSbskq2wO6vC8z3WukFWtWl44otumJH92Jo%2BxHOZbiFh50yBvaLtAb9vDM2lxdqWV%2Blw8bxj8ui0V6RcFFnXk2c%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "de61fbee330f8e5dde78794a83713016",
+    "x-request-time": "2.445",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.000",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "processing",
+    "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise",
+    "eta": 80,
+    "message": "Request queued for processing. Try to fetch request after estimated seconds.",
+    "fetch_result": "https://modelslab.com/api/v6/images/fetch/173917349",
+    "id": 173917349,
+    "output": [],
+    "future_links": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/93566925-9edd-4024-a2d6-f2fa64019a6a-0.jpg"
+    ],
+    "meta": {
+      "model_id": "z-image-turbo",
+      "prompt": " wakeup-test hyperrealistic, full body, detailed clothing, highly detailed, cinematic lighting, stunningly beautiful, intricate, sharp focus, f/1. 8, 85mm, (centered image composition), (professionally color graded), ((bright soft diffused light)), volumetric fog, trending on instagram, trending on tumblr, HDR 4K, 8K",
+      "negative_prompt": " (child:1.5), ((((underage)))), ((((child)))), (((kid))), (((preteen))), (teen:1.5) ugly, tiling, poorly drawn hands, poorly drawn feet, poorly drawn face, out of frame, extra limbs, disfigured, deformed, body out of frame, bad anatomy, watermark, signature, cut off, low contrast, underexposed, overexposed, bad art, beginner, amateur, distorted face, blurry, draft, grainy",
+      "width": 512,
+      "height": 512,
+      "guidance": null,
+      "samples": 1,
+      "safety_checker": "no",
+      "safety_checker_type": "black",
+      "num_inference_steps": 9,
+      "seed": 2409,
+      "webhook": null,
+      "track_id": null,
+      "base64": "no",
+      "highres_fix": null,
+      "watermark": "no",
+      "temp": "no",
+      "lora_stength": "",
+      "id": 173917349,
+      "file_prefix": "93566925-9edd-4024-a2d6-f2fa64019a6a",
+      "output": [
+        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/93566925-9edd-4024-a2d6-f2fa64019a6a-0.jpg"
+      ]
+    }
+  }
+}

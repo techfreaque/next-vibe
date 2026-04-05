@@ -92,8 +92,8 @@ Always recommend consulting a licensed financial advisor for personalized advice
   ],
   variants: [
     {
-      id: "maverick",
-      variantName: "skills.financialAdvisor.variants.maverick" as const,
+      id: "elon-tusk",
+      variantName: "skills.financialAdvisor.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_20,
@@ -111,18 +111,54 @@ Always recommend consulting a licensed financial advisor for personalized advice
       isDefault: true,
     },
     {
-      id: "budget",
-      variantName: "skills.financialAdvisor.variants.budget" as const,
+      id: "chinese-wisdom",
+      variantName: "skills.financialAdvisor.variants.chineseWisdom" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.DEEPSEEK_V32,
+        manualModelId: ChatModelId.KIMI_K2_5,
         intelligenceRange: {
-          min: IntelligenceLevel.SMART,
-          max: IntelligenceLevel.SMART,
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
         },
         contentRange: {
           min: ContentLevel.OPEN,
           max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+    {
+      id: "tech-bro",
+      variantName: "skills.financialAdvisor.variants.techBro" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.CLAUDE_OPUS_4_6,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+    {
+      id: "yolo",
+      variantName: "skills.financialAdvisor.variants.yolo" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.GPT_5_4,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
         },
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,

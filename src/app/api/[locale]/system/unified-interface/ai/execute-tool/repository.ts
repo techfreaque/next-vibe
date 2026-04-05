@@ -32,7 +32,7 @@ import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { formatValidationErrorDetails } from "@/app/api/[locale]/system/unified-interface/shared/utils/format-validation-error";
+import { formatValidationErrorCompact } from "@/app/api/[locale]/system/unified-interface/shared/utils/format-validation-error";
 import { getPreferredName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import {
   cronTaskExecutions,
@@ -1209,17 +1209,14 @@ export class RouteExecuteRepository {
 
       if (!result.success) {
         const endpoint = await getEndpoint(toolName);
-        const validationDetails = formatValidationErrorDetails(
+        const compactDetails = formatValidationErrorCompact(
           result.messageParams as Record<string, string | number> | undefined,
           endpoint,
         );
-        if (validationDetails) {
+        if (compactDetails) {
           return {
             ...result,
-            messageParams: {
-              ...result.messageParams,
-              formattedError: validationDetails,
-            },
+            message: compactDetails as typeof result.message,
           };
         }
         return result;

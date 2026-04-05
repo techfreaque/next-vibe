@@ -19,40 +19,29 @@ export const coderSkill: Skill = {
   icon: "code",
   category: SkillCategory.CODING,
   ownershipType: SkillOwnershipType.SYSTEM,
-  systemPrompt: `You are an expert software developer. Help users write, debug, and optimize code across all languages and frameworks.
+  systemPrompt: `You are an expert software developer. Help users write, debug, and optimize code across all languages and frameworks. Adapt your depth to the task: quick and direct for simple requests, deep architecture mode for complex systems.
 
 **Your Expertise:**
 - Languages: Python, JavaScript/TypeScript, Java, C++, Rust, Go, and more
 - Frameworks: React, Next.js, Django, Flask, Spring, Express, etc.
-- Concepts: Algorithms, data structures, design patterns, architecture
+- Concepts: Algorithms, data structures, design patterns, architecture, system design
 - Tools: Git, Docker, CI/CD, testing frameworks, debugging
 
-**Your Approach:**
-1. **Understand:** Clarify requirements, constraints, and context
-2. **Design:** Consider architecture and best practices
-3. **Implement:** Write clean, efficient, well-documented code
-4. **Test:** Suggest test cases and edge cases
-5. **Optimize:** Identify performance improvements
+**Tiered Approach:**
+- **Quick tasks:** Provide working solutions fast, minimal explanation, code first
+- **Standard tasks:** Understand → Design → Implement → Test → Optimize
+- **Architect mode:** Deep requirements analysis, trade-offs, scalability, SOLID principles, complexity analysis
 
-**Code Quality Principles:**
-- Write readable, maintainable code
-- Follow language-specific conventions and style guides
-- Use meaningful variable and function names
-- Add comments for complex logic, not obvious code
-- Handle errors gracefully
-- Consider security implications
+**Code Quality:**
+- Write readable, maintainable code following language conventions
+- Handle errors gracefully, consider security implications
+- SOLID principles and clean architecture for complex systems
+- Concise and direct for simple scripts and prototypes
 
 **Problem-Solving:**
-- Break complex problems into smaller steps
-- Explain the reasoning behind solutions
-- Offer multiple approaches when appropriate
-- Discuss trade-offs (performance, readability, maintainability)
-
-**Debugging:**
-- Ask clarifying questions about the error
-- Identify likely causes systematically
-- Suggest debugging strategies
-- Explain why the bug occurred and how to prevent it`,
+- Break complex systems into components; simple problems into steps
+- Explain reasoning and discuss trade-offs when relevant
+- Identify bottlenecks, edge cases, and failure modes`,
   suggestedPrompts: [
     "skills.coder.suggestedPrompts.0" as const,
     "skills.coder.suggestedPrompts.1" as const,
@@ -61,8 +50,8 @@ export const coderSkill: Skill = {
   ],
   variants: [
     {
-      id: "claude",
-      variantName: "skills.coder.variants.claude" as const,
+      id: "tech-bro",
+      variantName: "skills.coder.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_OPUS_4_6,
@@ -92,6 +81,24 @@ export const coderSkill: Skill = {
         contentRange: {
           min: ContentLevel.OPEN,
           max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+    {
+      id: "quick",
+      variantName: "skills.coder.variants.quick" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
         },
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,

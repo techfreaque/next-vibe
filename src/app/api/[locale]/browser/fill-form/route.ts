@@ -13,9 +13,10 @@ export const { POST, tools } = endpointsHandler({
   endpoint: fillFormEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
+    handler: ({ data, t, logger, user, request }) =>
       BrowserSharedRepository.executeFillForm(
         {
+          sessionId: request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.FILL_FORM,
           args: BrowserSharedRepository.filterUndefinedArgs({
             elements: data.elements,

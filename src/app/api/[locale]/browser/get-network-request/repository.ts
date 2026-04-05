@@ -26,12 +26,14 @@ import type {
 export class GetNetworkRequestRepository {
   static async getNetworkRequest(
     data: GetNetworkRequestRequestOutput,
+    sessionId: string,
     t: BrowserT,
     logger: EndpointLogger,
   ): Promise<ResponseType<GetNetworkRequestResponseOutput> | ContentResponse> {
     const result =
       await BrowserSharedRepository.executeGetNetworkRequest<GetNetworkRequestResponseOutput>(
         {
+          sessionId,
           toolName: BrowserTool.GET_NETWORK_REQUEST,
           args: BrowserSharedRepository.filterUndefinedArgs({
             reqid: data.reqid,

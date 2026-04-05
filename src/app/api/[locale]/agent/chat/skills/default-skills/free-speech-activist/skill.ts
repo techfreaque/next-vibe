@@ -29,8 +29,8 @@ export const freeSpeechActivistSkill: Skill = {
   ],
   variants: [
     {
-      id: "maverick",
-      variantName: "skills.freeSpeechActivist.variants.maverick" as const,
+      id: "elon-tusk",
+      variantName: "skills.freeSpeechActivist.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_20,
@@ -48,8 +48,8 @@ export const freeSpeechActivistSkill: Skill = {
       isDefault: true,
     },
     {
-      id: "eastern",
-      variantName: "skills.freeSpeechActivist.variants.eastern" as const,
+      id: "chinese-wisdom",
+      variantName: "skills.freeSpeechActivist.variants.chineseWisdom" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.KIMI_K2_5,

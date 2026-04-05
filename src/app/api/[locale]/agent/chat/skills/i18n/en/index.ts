@@ -186,8 +186,8 @@ export const translations = {
         3: "Explore intellectual freedom in academia",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Eastern",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
         techBro: "Tech Bro",
       },
     },
@@ -203,8 +203,8 @@ export const translations = {
         3: "Provide counterarguments to my view",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Eastern",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
       },
     },
     technical: {
@@ -236,8 +236,8 @@ export const translations = {
         3: "What is the best way to save the world?",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Eastern",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
       },
     },
     unbiasedHistorian: {
@@ -268,8 +268,8 @@ export const translations = {
         3: "Challenge my worldview",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Eastern",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
       },
     },
     professional: {
@@ -465,7 +465,7 @@ export const translations = {
       },
       variants: {
         western: "Western",
-        eastern: "Eastern",
+        chineseWisdom: "Chinese Wisdom",
         budget: "Budget",
       },
     },
@@ -499,7 +499,7 @@ export const translations = {
         3: "Help me structure a literature review",
       },
       variants: {
-        maverick: "Maverick",
+        elonTusk: "Elon Tusk",
         fast: "Fast",
         budget: "Budget",
       },
@@ -516,7 +516,7 @@ export const translations = {
         3: "Create a basic function that...",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         budget: "Budget",
       },
     },
@@ -532,8 +532,9 @@ export const translations = {
         3: "Review my code for improvements",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         kimi: "Kimi",
+        quick: "Quick",
         budget: "Budget",
       },
     },
@@ -549,7 +550,7 @@ export const translations = {
         3: "Solve this complex algorithmic problem",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         kimi: "Kimi",
       },
     },
@@ -566,7 +567,7 @@ export const translations = {
       },
       variants: {
         wildcard: "Wildcard",
-        eastern: "Eastern",
+        chineseWisdom: "Chinese Wisdom",
       },
     },
     editor: {
@@ -581,7 +582,7 @@ export const translations = {
         3: "Check this for grammar and style",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         deep: "Deep",
       },
     },
@@ -646,7 +647,7 @@ export const translations = {
         3: "Analyze this scientific claim",
       },
       variants: {
-        maverick: "Maverick",
+        elonTusk: "Elon Tusk",
         focused: "Focused",
         budget: "Budget",
       },
@@ -663,7 +664,7 @@ export const translations = {
         3: "Help me with statistical analysis",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         fast: "Fast",
         budget: "Budget",
       },
@@ -696,8 +697,9 @@ export const translations = {
         3: "Review my go-to-market plan",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Eastern",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
+        techBro: "Tech Bro",
       },
     },
     careerCoach: {
@@ -712,8 +714,8 @@ export const translations = {
         3: "Plan my career transition",
       },
       variants: {
-        claude: "Claude",
-        budget: "Budget",
+        headhunter: "Headhunter",
+        intern: "Intern",
       },
     },
     healthWellness: {
@@ -728,7 +730,7 @@ export const translations = {
         3: "Improve my sleep habits",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         budget: "Budget",
       },
     },
@@ -760,7 +762,7 @@ export const translations = {
         3: "Explain the process of...",
       },
       variants: {
-        maverick: "Maverick",
+        elonTusk: "Elon Tusk",
         budget: "Budget",
       },
     },
@@ -776,8 +778,10 @@ export const translations = {
         3: "Plan for retirement savings",
       },
       variants: {
-        maverick: "Maverick",
-        budget: "Budget",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
+        techBro: "Tech Bro",
+        yolo: "YOLO Investor",
       },
     },
     socialMediaManager: {
@@ -808,7 +812,7 @@ export const translations = {
         3: "Develop a product roadmap",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         fast: "Fast",
       },
     },
@@ -824,8 +828,8 @@ export const translations = {
         3: "Analyze different political ideologies",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Eastern",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
         techBro: "Tech Bro",
       },
     },
@@ -841,8 +845,8 @@ export const translations = {
         3: "What makes a life meaningful?",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Eastern",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
         techBro: "Tech Bro",
       },
     },
@@ -978,7 +982,7 @@ export const translations = {
       },
       variants: {
         gemini: "Gemini",
-        claude: "Claude",
+        techBro: "Tech Bro",
       },
     },
     deploymentAgent: {
@@ -994,7 +998,7 @@ export const translations = {
         3: "Show me the current server status",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         budget: "Budget",
       },
     },
@@ -1275,7 +1279,7 @@ export const translations = {
     icon: {
       label: "Skill Icon",
       description:
-        "Pick an emoji that represents your skill. This icon appears whenever the skill is displayed.",
+        "Icon name for this skill (e.g. 'brain', 'technologist', 'zap'). Use vibe help --toolName=icon-list to browse available names.",
     },
     skillDescription: {
       label: "Skill Description",
@@ -1302,29 +1306,33 @@ export const translations = {
       placeholder: "System default",
     },
     voice: {
-      label: "Voice",
+      label: "Voice (TTS)",
       description:
-        "Select a text-to-speech voice for audio responses. Each skill can have their own unique voice.",
+        "Text-to-speech voice for this skill. null = user's global voice preference wins (bridge model: user setting takes priority over skill). Set only when this skill has a signature voice (e.g., a narrator persona).",
       placeholder: "System default",
     },
     sttModel: {
       label: "Speech-to-Text Model",
-      description: "Model used for speech recognition",
+      description:
+        "Speech recognition model. null = user preference wins (bridge model). Set only if this skill requires specific accuracy (e.g., medical transcription).",
       placeholder: "System default",
     },
     imageVisionModel: {
       label: "Image Vision Model",
-      description: "Model used for analyzing images",
+      description:
+        "Multimodal LLM for analyzing image inputs. null = user preference wins (bridge model). Set when this skill specifically needs a particular vision model's capabilities.",
       placeholder: "System default",
     },
     videoVisionModel: {
       label: "Video Vision Model",
-      description: "Model used for analyzing videos",
+      description:
+        "Multimodal LLM for analyzing video inputs. null = user preference wins (bridge model). Set when this skill requires video understanding.",
       placeholder: "System default",
     },
     audioVisionModel: {
       label: "Audio Vision Model",
-      description: "Model used for analyzing audio",
+      description:
+        "Multimodal LLM for analyzing audio inputs. null = user preference wins (bridge model). Set when this skill requires audio understanding.",
       placeholder: "System default",
     },
     translationModel: {
@@ -1333,17 +1341,20 @@ export const translations = {
     },
     imageGenModel: {
       label: "Image Generation Model",
-      description: "Model used for generating images",
+      description:
+        "Image generation model. Takes priority over user settings when set (media gen: skill intent wins). Set when this skill IS an image generator (e.g., 'Flux Artist'). null = use user's global image gen preference.",
       placeholder: "System default",
     },
     musicGenModel: {
       label: "Music Generation Model",
-      description: "Model used for generating music",
+      description:
+        "Music generation model. Takes priority over user settings when set (media gen: skill intent wins). Set when this skill IS a music composer. null = use user's global music gen preference.",
       placeholder: "System default",
     },
     videoGenModel: {
       label: "Video Generation Model",
-      description: "Model used for generating videos",
+      description:
+        "Video generation model. Takes priority over user settings when set (media gen: skill intent wins). Set when this skill IS a video creator. null = use user's global video gen preference.",
       placeholder: "System default",
     },
     defaultChatMode: {
@@ -1364,7 +1375,7 @@ export const translations = {
       title: "Model Selection",
       label: "Model Selection",
       description:
-        "Choose how to select the AI model for this skill - either pick a specific model or let the system choose based on filters",
+        "Chat model for this skill. FILTERS (recommended): set intelligenceRange/priceRange/contentRange/speedRange — system picks best available. Use MANUAL only when you need a specific model's unique capabilities (reasoning models, specific uncensored model). null = platform default. See MODEL-RESOLUTION.md for full priority rules.",
     },
     availableTools: {
       label: "Allowed Tools",

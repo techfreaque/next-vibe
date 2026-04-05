@@ -62,8 +62,8 @@ export const careerCoachSkill: Skill = {
   ],
   variants: [
     {
-      id: "claude",
-      variantName: "skills.careerCoach.variants.claude" as const,
+      id: "headhunter",
+      variantName: "skills.careerCoach.variants.headhunter" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
@@ -81,8 +81,8 @@ export const careerCoachSkill: Skill = {
       isDefault: true,
     },
     {
-      id: "budget",
-      variantName: "skills.careerCoach.variants.budget" as const,
+      id: "intern",
+      variantName: "skills.careerCoach.variants.intern" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_HAIKU_4_5,

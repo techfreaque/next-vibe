@@ -13,9 +13,10 @@ export const { POST, tools } = endpointsHandler({
   endpoint: takeSnapshotEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
+    handler: ({ data, t, logger, user, request }) =>
       BrowserSharedRepository.executeTakeSnapshot(
         {
+          sessionId: request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.TAKE_SNAPSHOT,
           args: BrowserSharedRepository.filterUndefinedArgs({
             verbose: data.verbose,

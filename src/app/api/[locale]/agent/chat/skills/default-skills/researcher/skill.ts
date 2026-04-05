@@ -62,8 +62,8 @@ export const researcherSkill: Skill = {
   ],
   variants: [
     {
-      id: "maverick",
-      variantName: "skills.researcher.variants.maverick" as const,
+      id: "elon-tusk",
+      variantName: "skills.researcher.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_20,

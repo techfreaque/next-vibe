@@ -29,7 +29,7 @@ import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
 import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
-import { formatValidationErrorDetails } from "../shared/utils/format-validation-error";
+import { formatValidationErrorCompact } from "../shared/utils/format-validation-error";
 import { scopedTranslation as mcpScopedTranslation } from "./i18n";
 import type {
   MCPExecutionContext,
@@ -511,26 +511,24 @@ export class MCPRegistry {
     }
 
     // Error response
-    const baseMessage = result.message
-      ? result.message
-      : t("registry.toolExecutionFailed");
-
-    const validationDetails = formatValidationErrorDetails(
+    const compactDetails = formatValidationErrorCompact(
       result.messageParams as Record<string, string | number> | undefined,
       endpoint,
     );
 
-    const errorMessage = validationDetails
-      ? `${baseMessage}\n\n${validationDetails}`
-      : baseMessage;
+    const isValidationError = compactDetails !== null;
+    const errorMessage =
+      compactDetails ??
+      (result.message ? result.message : t("registry.toolExecutionFailed"));
 
     return this.fail({
       error: errorMessage,
-      code: MCPErrorCode.TOOL_EXECUTION_FAILED,
-      details: {
-        tool: toolName,
-        error: result,
-      },
+      code: isValidationError
+        ? MCPErrorCode.INVALID_PARAMS
+        : MCPErrorCode.TOOL_EXECUTION_FAILED,
+      details: isValidationError
+        ? { tool: toolName }
+        : { tool: toolName, error: result },
     });
   }
 

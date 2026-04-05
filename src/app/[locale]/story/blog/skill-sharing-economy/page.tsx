@@ -193,9 +193,46 @@ export function TanstackPage({
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
             {t("whatAreSkills.p2", { modelCount })}
           </P>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
+          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-8">
             {t("whatAreSkills.p3")}
           </P>
+
+          <Div className="font-semibold text-sm mb-4">
+            {t("whatAreSkills.buildTitle")}
+          </Div>
+          <Div className="space-y-4">
+            {(
+              [
+                {
+                  num: 1,
+                  title: t("whatAreSkills.build1Title"),
+                  body: t("whatAreSkills.build1Body"),
+                },
+                {
+                  num: 2,
+                  title: t("whatAreSkills.build2Title"),
+                  body: t("whatAreSkills.build2Body"),
+                },
+                {
+                  num: 3,
+                  title: t("whatAreSkills.build3Title"),
+                  body: t("whatAreSkills.build3Body"),
+                },
+              ] as const
+            ).map(({ num, title, body }) => (
+              <Div key={num} className="flex gap-4">
+                <Div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-sm font-bold">
+                  {num}
+                </Div>
+                <Div>
+                  <Div className="font-semibold text-sm mb-1">{title}</Div>
+                  <Div className="text-sm text-muted-foreground leading-relaxed">
+                    {body}
+                  </Div>
+                </Div>
+              </Div>
+            ))}
+          </Div>
         </Div>
 
         <Separator />

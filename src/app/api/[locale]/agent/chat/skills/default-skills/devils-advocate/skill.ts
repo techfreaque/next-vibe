@@ -43,8 +43,8 @@ export const devilsAdvocateSkill: Skill = {
   ],
   variants: [
     {
-      id: "maverick",
-      variantName: "skills.devilsAdvocate.variants.maverick" as const,
+      id: "elon-tusk",
+      variantName: "skills.devilsAdvocate.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_20,
@@ -62,8 +62,8 @@ export const devilsAdvocateSkill: Skill = {
       isDefault: true,
     },
     {
-      id: "eastern",
-      variantName: "skills.devilsAdvocate.variants.eastern" as const,
+      id: "chinese-wisdom",
+      variantName: "skills.devilsAdvocate.variants.chineseWisdom" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.KIMI_K2,

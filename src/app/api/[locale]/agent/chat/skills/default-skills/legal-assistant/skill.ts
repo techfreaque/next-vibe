@@ -83,8 +83,8 @@ Always recommend consulting a licensed attorney for legal advice.
   ],
   variants: [
     {
-      id: "maverick",
-      variantName: "skills.legalAssistant.variants.maverick" as const,
+      id: "elon-tusk",
+      variantName: "skills.legalAssistant.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_20,

@@ -43,8 +43,8 @@ export const socraticQuestionerSkill: Skill = {
   ],
   variants: [
     {
-      id: "maverick",
-      variantName: "skills.socraticQuestioner.variants.maverick" as const,
+      id: "elon-tusk",
+      variantName: "skills.socraticQuestioner.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_20,
@@ -62,8 +62,8 @@ export const socraticQuestionerSkill: Skill = {
       isDefault: true,
     },
     {
-      id: "eastern",
-      variantName: "skills.socraticQuestioner.variants.eastern" as const,
+      id: "chinese-wisdom",
+      variantName: "skills.socraticQuestioner.variants.chineseWisdom" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.KIMI_K2,

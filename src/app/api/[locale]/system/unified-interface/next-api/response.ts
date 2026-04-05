@@ -21,6 +21,8 @@ import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { Platform } from "../shared/types/platform";
+import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
+import { formatValidationErrorCompact } from "../shared/utils/format-validation-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 
@@ -72,13 +74,23 @@ function buildErrorChain(error: ErrorResponseType): {
 
 /**
  * Wraps an error response in NextResponse
- * Properly translates errors and builds clean error chains
+ * Properly translates errors and builds clean error chains.
+ * When endpoint is provided, validation errors get a compact field-level message.
  */
 export function wrapErrorResponse(
   error: ErrorResponseType,
   locale: CountryLanguage,
   logger: EndpointLogger,
+  endpoint?: CreateApiEndpointAny | null,
 ): NextResponse<ErrorResponseType> {
+  // Enrich validation errors with compact field-level details for external callers
+  const compactDetails = formatValidationErrorCompact(
+    error.messageParams as Record<string, string | number> | undefined,
+    endpoint,
+  );
+  if (compactDetails) {
+    error = { ...error, message: compactDetails as typeof error.message };
+  }
   // Build clean error chain
   const { logChain } = buildErrorChain(error);
 

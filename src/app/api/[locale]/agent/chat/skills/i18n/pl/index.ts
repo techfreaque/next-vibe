@@ -187,8 +187,8 @@ export const translations: typeof enTranslations = {
         3: "Zbadaj wolność intelektualną w świecie akademickim",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Wschodni",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
         techBro: "Tech Bro",
       },
     },
@@ -204,8 +204,8 @@ export const translations: typeof enTranslations = {
         3: "Przedstaw kontrargumenty do mojego poglądu",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Wschodni",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
       },
     },
     technical: {
@@ -237,8 +237,8 @@ export const translations: typeof enTranslations = {
         3: "Jaki jest najlepszy sposób na uratowanie świata?",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Wschodni",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
       },
     },
     unbiasedHistorian: {
@@ -270,8 +270,8 @@ export const translations: typeof enTranslations = {
         3: "Zakwestionuj mój światopogląd",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Wschodni",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
       },
     },
     professional: {
@@ -467,7 +467,7 @@ export const translations: typeof enTranslations = {
       },
       variants: {
         western: "Zachodni",
-        eastern: "Wschodni",
+        chineseWisdom: "Chinese Wisdom",
         budget: "Budżet",
       },
     },
@@ -501,7 +501,7 @@ export const translations: typeof enTranslations = {
         3: "Pomóż mi ustrukturyzować przegląd literatury",
       },
       variants: {
-        maverick: "Maverick",
+        elonTusk: "Elon Tusk",
         fast: "Szybki",
         budget: "Budżet",
       },
@@ -518,7 +518,7 @@ export const translations: typeof enTranslations = {
         3: "Stwórz podstawową funkcję, która...",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         budget: "Budżet",
       },
     },
@@ -534,8 +534,9 @@ export const translations: typeof enTranslations = {
         3: "Przejrzyj mój kod pod kątem ulepszeń",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         kimi: "Kimi",
+        quick: "Quick",
         budget: "Budżet",
       },
     },
@@ -551,7 +552,7 @@ export const translations: typeof enTranslations = {
         3: "Rozwiąż ten złożony problem algorytmiczny",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         kimi: "Kimi",
       },
     },
@@ -569,7 +570,7 @@ export const translations: typeof enTranslations = {
       },
       variants: {
         wildcard: "Wildcard",
-        eastern: "Wschodni",
+        chineseWisdom: "Chinese Wisdom",
       },
     },
     editor: {
@@ -585,7 +586,7 @@ export const translations: typeof enTranslations = {
         3: "Sprawdź to pod kątem gramatyki i stylu",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         deep: "Głęboki",
       },
     },
@@ -650,7 +651,7 @@ export const translations: typeof enTranslations = {
         3: "Przeanalizuj to twierdzenie naukowe",
       },
       variants: {
-        maverick: "Maverick",
+        elonTusk: "Elon Tusk",
         focused: "Skupiony",
         budget: "Budżet",
       },
@@ -667,7 +668,7 @@ export const translations: typeof enTranslations = {
         3: "Pomóż mi z analizą statystyczną",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         fast: "Szybki",
         budget: "Budżet",
       },
@@ -700,8 +701,9 @@ export const translations: typeof enTranslations = {
         3: "Przejrzyj mój plan wejścia na rynek",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Wschodni",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
+        techBro: "Tech Bro",
       },
     },
     careerCoach: {
@@ -717,8 +719,8 @@ export const translations: typeof enTranslations = {
         3: "Zaplanuj moją zmianę kariery",
       },
       variants: {
-        claude: "Claude",
-        budget: "Budżet",
+        headhunter: "Headhunter",
+        intern: "Stażysta",
       },
     },
     healthWellness: {
@@ -733,7 +735,7 @@ export const translations: typeof enTranslations = {
         3: "Popraw moje nawyki senne",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         budget: "Budżet",
       },
     },
@@ -765,7 +767,7 @@ export const translations: typeof enTranslations = {
         3: "Wyjaśnij proces...",
       },
       variants: {
-        maverick: "Maverick",
+        elonTusk: "Elon Tusk",
         budget: "Budżet",
       },
     },
@@ -781,8 +783,10 @@ export const translations: typeof enTranslations = {
         3: "Zaplanuj oszczędności emerytalne",
       },
       variants: {
-        maverick: "Maverick",
-        budget: "Budżet",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
+        techBro: "Tech Bro",
+        yolo: "YOLO Investor",
       },
     },
     socialMediaManager: {
@@ -813,7 +817,7 @@ export const translations: typeof enTranslations = {
         3: "Opracuj mapę drogową produktu",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         fast: "Szybki",
       },
     },
@@ -829,8 +833,8 @@ export const translations: typeof enTranslations = {
         3: "Przeanalizuj różne ideologie polityczne",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Wschodni",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
         techBro: "Tech Bro",
       },
     },
@@ -846,8 +850,8 @@ export const translations: typeof enTranslations = {
         3: "Co nadaje życiu sens?",
       },
       variants: {
-        maverick: "Maverick",
-        eastern: "Wschodni",
+        elonTusk: "Elon Tusk",
+        chineseWisdom: "Chinese Wisdom",
         techBro: "Tech Bro",
       },
     },
@@ -983,7 +987,7 @@ export const translations: typeof enTranslations = {
       },
       variants: {
         gemini: "Gemini",
-        claude: "Claude",
+        techBro: "Tech Bro",
       },
     },
     deploymentAgent: {
@@ -999,7 +1003,7 @@ export const translations: typeof enTranslations = {
         3: "Pokaż mi aktualny status serwera",
       },
       variants: {
-        claude: "Claude",
+        techBro: "Tech Bro",
         budget: "Budżet",
       },
     },

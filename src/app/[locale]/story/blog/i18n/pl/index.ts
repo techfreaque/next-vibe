@@ -16,6 +16,13 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    whatsNewApril2026: {
+      title: "unbottled wróciło. I jest teraz naprawdę dobre.",
+      category: "Aktualizacja produktu",
+      excerpt:
+        "Nowe modele, generowanie obrazów/wideo/muzyki i całkowicie przeprojektowany onboarding. Jeśli odszedłeś wcześnie — chcemy, żebyś spróbował jeszcze raz.",
+      readTime: "5 min czytania",
+    },
     oneCodebase: {
       title: "Jedna baza kodu. 13 platform. Zero kompromisów.",
       category: "Architektura",

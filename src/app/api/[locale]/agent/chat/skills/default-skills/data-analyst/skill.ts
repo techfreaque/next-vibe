@@ -54,8 +54,8 @@ export const dataAnalystSkill: Skill = {
   ],
   variants: [
     {
-      id: "claude",
-      variantName: "skills.dataAnalyst.variants.claude" as const,
+      id: "tech-bro",
+      variantName: "skills.dataAnalyst.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_4_6,

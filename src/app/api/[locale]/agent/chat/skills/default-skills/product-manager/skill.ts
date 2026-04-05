@@ -104,8 +104,8 @@ Format: "As a [user type], I want to [action] so that [benefit]"
   ],
   variants: [
     {
-      id: "claude",
-      variantName: "skills.productManager.variants.claude" as const,
+      id: "tech-bro",
+      variantName: "skills.productManager.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_4_6,

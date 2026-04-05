@@ -22,7 +22,10 @@ import {
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
+import {
+  TtsModelId,
+  voiceModelSelectionSchema,
+} from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -463,10 +466,9 @@ const { POST } = createEndpoint({
 
   examples: {
     requests: {
+      // Basic: link a skill using filter-based model selection
       create: {
         skillId: "thea",
-        icon: "female" as const,
-        voiceModelSelection: null,
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
           intelligenceRange: {
@@ -474,15 +476,32 @@ const { POST } = createEndpoint({
             max: IntelligenceLevel.BRILLIANT,
           },
         },
-        compactTrigger: null,
-        availableTools: null,
-        pinnedTools: null,
+      },
+      // With personal overrides: custom voice + boost to brilliant
+      createWithVoice: {
+        skillId: "technical",
+        customVariantName: "My Technical",
+        voiceModelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: TtsModelId.OPENAI_ONYX,
+        },
+        modelSelection: {
+          selectionType: ModelSelectionType.FILTERS,
+          intelligenceRange: {
+            min: IntelligenceLevel.BRILLIANT,
+            max: IntelligenceLevel.BRILLIANT,
+          },
+        },
       },
     },
     responses: {
       create: {
         success: "success.title",
         id: "550e8400-e29b-41d4-a716-446655440000",
+      },
+      createWithVoice: {
+        success: "success.title",
+        id: "550e8400-e29b-41d4-a716-446655440001",
       },
     },
   },

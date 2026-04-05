@@ -77,8 +77,8 @@ export const writerSkill: Skill = {
       isDefault: true,
     },
     {
-      id: "eastern",
-      variantName: "skills.writer.variants.eastern" as const,
+      id: "chinese-wisdom",
+      variantName: "skills.writer.variants.chineseWisdom" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.MINIMAX_M2_7,

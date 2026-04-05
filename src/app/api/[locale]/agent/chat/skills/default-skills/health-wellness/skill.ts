@@ -75,8 +75,8 @@ Always recommend consulting healthcare professionals for medical concerns.
   ],
   variants: [
     {
-      id: "claude",
-      variantName: "skills.healthWellness.variants.claude" as const,
+      id: "tech-bro",
+      variantName: "skills.healthWellness.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_4_6,

@@ -19,27 +19,29 @@ export interface ChromeMCPConfig {
 }
 
 /**
- * Default Chrome DevTools MCP configuration
- * Optimized for headless Chromium with Wayland support
+ * Port Chrome listens on for remote debugging.
+ * All chrome-devtools-mcp instances connect to this shared Chrome process.
+ */
+export const CHROME_REMOTE_DEBUG_PORT = 9222;
+
+/**
+ * Default Chrome DevTools MCP configuration.
+ * Connects to a shared Chrome instance via --browserUrl instead of launching
+ * its own Chrome — this allows multiple Bun processes (hermes, hermes-dev,
+ * Claude Code) to share one Chrome without profile-lock conflicts.
  */
 export const chromeMCPConfig: ChromeMCPConfig = {
   command: "bunx",
   args: [
     "chrome-devtools-mcp@latest",
-    "--executablePath=/usr/bin/chromium",
-    "--isolated=false",
-    // "--user-data-dir",
-    "--chromeArg=--enable-features=UseOzonePlatform",
-    "--chromeArg=--ozone-platform=wayland",
-    "--chromeArg=--no-sandbox",
-    "--chromeArg=--disable-setuid-sandbox",
-    "--chromeArg=--disable-dev-shm-usage",
+    `--browserUrl=http://127.0.0.1:${CHROME_REMOTE_DEBUG_PORT}`,
+    "--experimentalPageIdRouting",
   ],
   env: {
     XDG_RUNTIME_DIR: "/run/user/1000",
     WAYLAND_DISPLAY: "wayland-0",
   },
-  timeout: 30000,
+  timeout: 120000,
   debug: false,
 };
 

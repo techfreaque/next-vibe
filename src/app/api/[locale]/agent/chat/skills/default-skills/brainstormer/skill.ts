@@ -81,8 +81,8 @@ export const brainstormerSkill: Skill = {
       isDefault: true,
     },
     {
-      id: "eastern",
-      variantName: "skills.brainstormer.variants.eastern" as const,
+      id: "chinese-wisdom",
+      variantName: "skills.brainstormer.variants.chineseWisdom" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.KIMI_K2,

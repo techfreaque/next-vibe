@@ -436,10 +436,20 @@ export function SkillEditContainer({
               form.setValue(
                 "modelSelection",
                 parsed.success ? parsed.data : null,
-                { shouldDirty: true },
+                { shouldDirty: true, shouldValidate: true },
               );
             }}
-            onSelect={() => setActiveSelector(null)}
+            onSelect={(confirmed) => {
+              const parsed = chatModelSelectionSchema
+                .nullable()
+                .safeParse(confirmed);
+              form.setValue(
+                "modelSelection",
+                parsed.success ? parsed.data : null,
+                { shouldDirty: true, shouldValidate: true },
+              );
+              setActiveSelector(null);
+            }}
             locale={locale}
             user={user}
             chatOnly
@@ -471,6 +481,7 @@ export function SkillEditContainer({
                 platformTtsDefault.manualModelId === value.manualModelId;
               form.setValue("voiceModelSelection", isDefault ? null : value, {
                 shouldDirty: true,
+                shouldValidate: true,
               });
               setActiveSelector(null);
             }}
@@ -505,7 +516,7 @@ export function SkillEditContainer({
               form.setValue(
                 "imageGenModelSelection",
                 isDefault ? null : value,
-                { shouldDirty: true },
+                { shouldDirty: true, shouldValidate: true },
               );
               setActiveSelector(null);
             }}
@@ -540,7 +551,7 @@ export function SkillEditContainer({
               form.setValue(
                 "musicGenModelSelection",
                 isDefault ? null : value,
-                { shouldDirty: true },
+                { shouldDirty: true, shouldValidate: true },
               );
               setActiveSelector(null);
             }}
@@ -575,7 +586,7 @@ export function SkillEditContainer({
               form.setValue(
                 "videoGenModelSelection",
                 isDefault ? null : value,
-                { shouldDirty: true },
+                { shouldDirty: true, shouldValidate: true },
               );
               setActiveSelector(null);
             }}
@@ -607,6 +618,7 @@ export function SkillEditContainer({
                 platformSttDefault.manualModelId === value.manualModelId;
               form.setValue("sttModelSelection", isDefault ? null : value, {
                 shouldDirty: true,
+                shouldValidate: true,
               });
               setActiveSelector(null);
             }}
@@ -644,7 +656,7 @@ export function SkillEditContainer({
               form.setValue(
                 "imageVisionModelSelection",
                 isDefault ? null : value,
-                { shouldDirty: true },
+                { shouldDirty: true, shouldValidate: true },
               );
               setActiveSelector(null);
             }}
@@ -682,7 +694,7 @@ export function SkillEditContainer({
               form.setValue(
                 "videoVisionModelSelection",
                 isDefault ? null : value,
-                { shouldDirty: true },
+                { shouldDirty: true, shouldValidate: true },
               );
               setActiveSelector(null);
             }}
@@ -720,7 +732,7 @@ export function SkillEditContainer({
               form.setValue(
                 "audioVisionModelSelection",
                 isDefault ? null : value,
-                { shouldDirty: true },
+                { shouldDirty: true, shouldValidate: true },
               );
               setActiveSelector(null);
             }}
@@ -777,6 +789,11 @@ export function SkillEditContainer({
                     locale={locale}
                     user={user}
                   />
+                  {form.formState.errors.modelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.modelSelection.message}
+                    </Span>
+                  )}
                 </Div>
               )}
 
@@ -795,6 +812,11 @@ export function SkillEditContainer({
                     locale={locale}
                     user={user}
                   />
+                  {form.formState.errors.voiceModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.voiceModelSelection.message}
+                    </Span>
+                  )}
                 </Div>
               )}
 
@@ -813,6 +835,11 @@ export function SkillEditContainer({
                     locale={locale}
                     user={user}
                   />
+                  {form.formState.errors.imageGenModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.imageGenModelSelection.message}
+                    </Span>
+                  )}
                 </Div>
               )}
 
@@ -831,6 +858,11 @@ export function SkillEditContainer({
                     locale={locale}
                     user={user}
                   />
+                  {form.formState.errors.musicGenModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.musicGenModelSelection.message}
+                    </Span>
+                  )}
                 </Div>
               )}
 
@@ -849,6 +881,11 @@ export function SkillEditContainer({
                     locale={locale}
                     user={user}
                   />
+                  {form.formState.errors.videoGenModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.videoGenModelSelection.message}
+                    </Span>
+                  )}
                 </Div>
               )}
 
@@ -867,6 +904,11 @@ export function SkillEditContainer({
                     locale={locale}
                     user={user}
                   />
+                  {form.formState.errors.sttModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.sttModelSelection.message}
+                    </Span>
+                  )}
                 </Div>
               )}
 
@@ -885,6 +927,11 @@ export function SkillEditContainer({
                     locale={locale}
                     user={user}
                   />
+                  {form.formState.errors.imageVisionModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.imageVisionModelSelection.message}
+                    </Span>
+                  )}
                 </Div>
               )}
 
@@ -903,6 +950,11 @@ export function SkillEditContainer({
                     locale={locale}
                     user={user}
                   />
+                  {form.formState.errors.videoVisionModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.videoVisionModelSelection.message}
+                    </Span>
+                  )}
                 </Div>
               )}
 
@@ -921,6 +973,11 @@ export function SkillEditContainer({
                     locale={locale}
                     user={user}
                   />
+                  {form.formState.errors.audioVisionModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.audioVisionModelSelection.message}
+                    </Span>
+                  )}
                 </Div>
               )}
 

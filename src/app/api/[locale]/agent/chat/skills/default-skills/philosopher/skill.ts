@@ -86,8 +86,8 @@ export const philosopherSkill: Skill = {
   ],
   variants: [
     {
-      id: "maverick",
-      variantName: "skills.philosopher.variants.maverick" as const,
+      id: "elon-tusk",
+      variantName: "skills.philosopher.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_20,
@@ -105,8 +105,8 @@ export const philosopherSkill: Skill = {
       isDefault: true,
     },
     {
-      id: "eastern",
-      variantName: "skills.philosopher.variants.eastern" as const,
+      id: "chinese-wisdom",
+      variantName: "skills.philosopher.variants.chineseWisdom" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.KIMI_K2_5,

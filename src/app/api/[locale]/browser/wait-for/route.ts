@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: waitForEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
-      WaitForRepository.waitFor(data, t, logger),
+    handler: ({ data, t, logger, user, request }) =>
+      WaitForRepository.waitFor(data, request?.headers.get("authorization") ?? user.id ?? user.leadId, t, logger),
   },
 });

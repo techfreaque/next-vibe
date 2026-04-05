@@ -13,9 +13,10 @@ export const { POST, tools } = endpointsHandler({
   endpoint: uploadFileEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
+    handler: ({ data, t, logger, user, request }) =>
       BrowserSharedRepository.executeUploadFile(
         {
+          sessionId: request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.UPLOAD_FILE,
           args: BrowserSharedRepository.filterUndefinedArgs({
             uid: data.uid,

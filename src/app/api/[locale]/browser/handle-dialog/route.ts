@@ -13,9 +13,10 @@ export const { POST, tools } = endpointsHandler({
   endpoint: handleDialogEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
+    handler: ({ data, t, logger, user, request }) =>
       BrowserSharedRepository.executeMCPTool(
         {
+          sessionId: request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.HANDLE_DIALOG,
           args: BrowserSharedRepository.filterUndefinedArgs({
             action: data.action,

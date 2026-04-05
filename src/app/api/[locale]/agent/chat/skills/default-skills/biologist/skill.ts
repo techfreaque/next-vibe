@@ -40,8 +40,8 @@ export const biologistSkill: Skill = {
   ],
   variants: [
     {
-      id: "maverick",
-      variantName: "skills.biologist.variants.maverick" as const,
+      id: "elon-tusk",
+      variantName: "skills.biologist.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_20,
@@ -59,8 +59,8 @@ export const biologistSkill: Skill = {
       isDefault: true,
     },
     {
-      id: "eastern",
-      variantName: "skills.biologist.variants.eastern" as const,
+      id: "chinese-wisdom",
+      variantName: "skills.biologist.variants.chineseWisdom" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.KIMI_K2,

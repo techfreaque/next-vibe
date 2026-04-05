@@ -560,77 +560,40 @@ const { POST } = createEndpoint({
 
   examples: {
     requests: {
-      // Example with manual model selection
-      create: {
-        name: "Code Reviewer",
-        description: "Expert at reviewing code and suggesting improvements",
-        tagline: "Expert at reviewing code and suggesting improvements",
-        icon: "technologist",
-        systemPrompt:
-          "You are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
-        category: SkillCategory.CODING,
-        isPublic: true,
-        modelSelection: {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ChatModelId.GPT_5,
-        },
-        voiceModelSelection: undefined,
-        sttModelSelection: undefined,
-        imageVisionModelSelection: undefined,
-        videoVisionModelSelection: undefined,
-        audioVisionModelSelection: undefined,
-        imageGenModelSelection: undefined,
-        musicGenModelSelection: undefined,
-        videoGenModelSelection: undefined,
-        translationModelId: undefined,
-        defaultChatMode: undefined,
-        availableTools: [
-          { toolId: "execute-tool", requiresConfirmation: false },
-        ],
-        pinnedTools: null,
-      },
+      // Pin a specific model: use MANUAL when you need exact model behavior
       createManual: {
         name: "Code Reviewer",
-        description: "Expert at reviewing code and suggesting improvements",
-        tagline: "Expert at reviewing code and suggesting improvements",
+        tagline: "Expert code review and suggestions",
+        description:
+          "Reviews code for bugs, performance issues, and best practices",
         icon: "technologist",
         systemPrompt:
           "You are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
         category: SkillCategory.CODING,
-        isPublic: true,
+        isPublic: false,
         modelSelection: {
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: ChatModelId.GPT_5,
         },
-        voiceModelSelection: undefined,
-        sttModelSelection: undefined,
-        imageVisionModelSelection: undefined,
-        videoVisionModelSelection: undefined,
-        audioVisionModelSelection: undefined,
-        imageGenModelSelection: undefined,
-        musicGenModelSelection: undefined,
-        videoGenModelSelection: undefined,
-        translationModelId: undefined,
-        defaultChatMode: undefined,
         availableTools: [
           { toolId: "execute-tool", requiresConfirmation: false },
         ],
-        pinnedTools: null,
       },
-      // Example with filter-based model selection
+      // Filter-based: system picks best available model matching constraints
       createFilters: {
         name: "Creative Writer",
-        description: "Helps with creative writing and storytelling",
-        tagline: "Helps with creative writing and storytelling",
+        tagline: "Compelling stories and narratives",
+        description:
+          "Helps with creative writing, storytelling, and imaginative content",
         icon: "pen-tool",
         systemPrompt:
-          "You are a creative writing assistant. Help users craft compelling stories, skills, and narratives.",
+          "You are a creative writing assistant. Help users craft compelling stories and narratives.",
         category: SkillCategory.CREATIVE,
-        isPublic: true,
+        isPublic: false,
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
           intelligenceRange: {
-            min: IntelligenceLevel.BRILLIANT,
+            min: IntelligenceLevel.SMART,
             max: IntelligenceLevel.BRILLIANT,
           },
           priceRange: {
@@ -643,35 +606,19 @@ const { POST } = createEndpoint({
           },
           speedRange: {
             min: SpeedLevel.FAST,
-            max: SpeedLevel.THOROUGH,
+            max: SpeedLevel.BALANCED,
           },
         },
-        voiceModelSelection: undefined,
-        sttModelSelection: undefined,
-        imageVisionModelSelection: undefined,
-        videoVisionModelSelection: undefined,
-        audioVisionModelSelection: undefined,
-        imageGenModelSelection: undefined,
-        musicGenModelSelection: undefined,
-        videoGenModelSelection: undefined,
-        translationModelId: undefined,
-        defaultChatMode: undefined,
-        availableTools: null,
-        pinnedTools: null,
       },
     },
     responses: {
-      create: {
+      createManual: {
         success: "post.success.title",
         id: "550e8400-e29b-41d4-a716-446655440000",
       },
-      createManual: {
-        success: "post.success.title",
-        id: "550e8400-e29b-41d4-a716-446655440001",
-      },
       createFilters: {
         success: "post.success.title",
-        id: "550e8400-e29b-41d4-a716-446655440002",
+        id: "550e8400-e29b-41d4-a716-446655440001",
       },
     },
   },

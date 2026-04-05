@@ -50,6 +50,7 @@ type MCPArgValue =
 interface MCPToolParams {
   toolName: string;
   args: Record<string, MCPArgValue>;
+  sessionId: string;
 }
 
 export class BrowserSharedRepository {
@@ -78,9 +79,14 @@ export class BrowserSharedRepository {
   ): Promise<ResponseType<T> | ContentResponse> {
     try {
       // Prepare request data for main browser repository
-      const requestData: { tool: string; arguments?: string } = {
+      const requestData: {
+        tool: string;
+        arguments?: string;
+        sessionId: string;
+      } = {
         tool: params.toolName as (typeof BrowserTool)[keyof typeof BrowserTool],
         arguments: JSON.stringify(params.args),
+        sessionId: params.sessionId,
       };
 
       // Call main browser repository

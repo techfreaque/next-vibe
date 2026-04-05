@@ -20,7 +20,7 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { getChromeMCPConfig } from "./config";
+import { CHROME_REMOTE_DEBUG_PORT, getChromeMCPConfig } from "./config";
 import { BrowserTool, BrowserToolStatus } from "./enum";
 import type { BrowserT } from "./i18n";
 
@@ -69,6 +69,23 @@ interface MCPResponse {
 }
 
 /**
+ * Per-session MCP connection — one chrome-devtools-mcp process per session.
+ * Each connects to the shared Chrome via --browserUrl, so they share tabs
+ * without sharing a request queue.
+ */
+interface SessionMCP {
+  process: ChildProcess;
+  nextRequestId: number;
+  pendingRequests: Map<
+    number,
+    { resolve: (value: MCPResponse) => void; reject: (error: Error) => void }
+  >;
+  /** chrome-devtools-mcp pageId for this session's dedicated tab. */
+  pageId: number | null;
+  initialized: boolean;
+}
+
+/**
  * Browser repository
  */
 export class BrowserRepository {
@@ -104,24 +121,8 @@ export class BrowserRepository {
     [BrowserTool.TAKE_SNAPSHOT]: "take_snapshot",
   };
 
-  private static mcpProcess: ChildProcess | null = null;
-  private static nextRequestId = 1;
-  private static pendingRequests = new Map<
-    number,
-    { resolve: (value: MCPResponse) => void; reject: (error: Error) => void }
-  >();
-  private static isInitialized = false;
-
   /**
-   * The browser page index owned by this process.
-   * Allocated once on startup via new_page. Every tool call (except the
-   * page-management ones) auto-selects this page first so multiple concurrent
-   * MCP processes don't step on each other's tabs.
-   */
-  private static processPageIndex: number | null = null;
-
-  /**
-   * Tools that manage pages themselves - skip the auto-select-page prefix.
+   * Tools that manage pages — skip pageId injection for these.
    */
   private static readonly PAGE_MGMT_TOOLS = new Set([
     "new_page",
@@ -130,11 +131,22 @@ export class BrowserRepository {
     "select_page",
   ]);
 
+  /** Chrome process launched by this Bun instance (if we started it). */
+  private static chromeProcess: ChildProcess | null = null;
+
+  /**
+   * Per-session MCP connections.
+   * Key: sessionId (auth token / user.id / user.leadId).
+   * Each session gets its own chrome-devtools-mcp process so tool calls
+   * run in parallel without a shared request queue.
+   */
+  private static sessions = new Map<string, SessionMCP>();
+
   /**
    * Execute a Chrome DevTools MCP tool
    */
   static async executeTool(
-    data: { tool: string; arguments?: string },
+    data: { tool: string; arguments?: string; sessionId: string },
     t: BrowserT,
     logger: EndpointLogger,
   ): Promise<ResponseType<MCPBridgeResponse> | ContentResponse> {
@@ -144,16 +156,17 @@ export class BrowserRepository {
     });
 
     try {
-      // Ensure MCP server is running
-      const serverReady = await BrowserRepository.ensureMCPServer(logger);
-      if (!serverReady) {
+      const session = await BrowserRepository.ensureSession(
+        data.sessionId,
+        logger,
+      );
+      if (!session) {
         return fail({
           message: t("repository.mcp.connect.failedToInitialize"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
 
-      // Map translation key to MCP tool name
       const mcpToolName =
         BrowserRepository.TOOL_NAME_MAP[data.tool] || data.tool;
 
@@ -162,7 +175,6 @@ export class BrowserRepository {
         mcpToolName,
       });
 
-      // Parse arguments
       let parsedArgs: Record<string, JsonValue> = {};
       if (data.arguments) {
         try {
@@ -182,8 +194,8 @@ export class BrowserRepository {
         }
       }
 
-      // Execute the tool with mapped name
       const result = await BrowserRepository.callTool(
+        session,
         mcpToolName,
         parsedArgs,
         logger,
@@ -191,7 +203,6 @@ export class BrowserRepository {
 
       const executionId = `exec_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
-      // Check for MCP tool-level errors (isError flag in content response)
       const mcpResult = result.result as
         | {
             content?: Array<{
@@ -213,18 +224,14 @@ export class BrowserRepository {
         executionId,
       });
 
-      // Extract content from MCP response
       const content = mcpResult?.content ?? [];
 
-      // On error, wrap the error message into a content block
       const resultContent = toolSuccess
         ? content
         : result.error
           ? [{ type: "text" as const, text: result.error }]
           : content;
 
-      // If result contains image blocks, return as ContentResponse
-      // so MCP clients and AI models can render/see images natively
       const hasImages = resultContent.some((block) => block.type === "image");
       if (hasImages && toolSuccess) {
         const contentBlocks: ContentBlock[] = [];
@@ -267,216 +274,297 @@ export class BrowserRepository {
   }
 
   /**
-   * Ensure the MCP server is running and initialized
+   * Ensure Chrome is running with remote debugging on CHROME_REMOTE_DEBUG_PORT.
    */
-  private static async ensureMCPServer(
-    logger: EndpointLogger,
-  ): Promise<boolean> {
-    if (BrowserRepository.isInitialized && BrowserRepository.mcpProcess) {
-      return true;
+  private static async ensureChrome(logger: EndpointLogger): Promise<void> {
+    const isReady = await BrowserRepository.isChromeReady();
+    if (isReady) {
+      logger.info("[Browser Repository] Chrome already running on debug port", {
+        port: CHROME_REMOTE_DEBUG_PORT,
+      });
+      return;
     }
 
-    try {
-      await BrowserRepository.startMCPServer(logger);
-      const initialized = await BrowserRepository.initializeMCP(logger);
-      if (!initialized) {
-        return false;
-      }
-      // Claim a dedicated page for this process so multiple concurrent MCP
-      // processes each operate on their own tab within the shared Chrome.
-      await BrowserRepository.claimProcessPage(logger);
-      return true;
-    } catch (error) {
-      logger.error("[Browser Repository] Failed to ensure MCP server", {
-        error: error instanceof Error ? error.message : String(error),
+    logger.info("[Browser Repository] Launching Chrome with remote debugging", {
+      port: CHROME_REMOTE_DEBUG_PORT,
+    });
+
+    const chromeArgs = [
+      `--remote-debugging-port=${CHROME_REMOTE_DEBUG_PORT}`,
+      "--no-first-run",
+      "--no-default-browser-check",
+      "--disable-background-networking",
+      "--disable-sync",
+      "--disable-translate",
+      "--disable-extensions",
+      "--disable-crash-reporter",
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--enable-features=UseOzonePlatform",
+      "--ozone-platform=wayland",
+      `--user-data-dir=${process.env["HOME"] ?? "/root"}/.cache/chrome-devtools-mcp/chrome-profile`,
+      "about:blank",
+    ];
+
+    BrowserRepository.chromeProcess = spawn(
+      process.env["CHROME_EXECUTABLE_PATH"] ?? "/usr/bin/chromium",
+      chromeArgs,
+      {
+        stdio: "ignore",
+        detached: false,
+        env: {
+          ...process.env,
+          XDG_RUNTIME_DIR: process.env["XDG_RUNTIME_DIR"] ?? "/run/user/1000",
+          WAYLAND_DISPLAY: process.env["WAYLAND_DISPLAY"] ?? "wayland-0",
+        },
+      },
+    );
+
+    BrowserRepository.chromeProcess.on("exit", (code) => {
+      logger.warn("[Browser Repository] Chrome process exited", { code });
+      BrowserRepository.chromeProcess = null;
+    });
+
+    for (let i = 0; i < 20; i++) {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 500);
       });
+      if (await BrowserRepository.isChromeReady()) {
+        logger.info("[Browser Repository] Chrome is ready", {
+          port: CHROME_REMOTE_DEBUG_PORT,
+        });
+        return;
+      }
+    }
+    logger.warn("[Browser Repository] Chrome did not become ready in time");
+  }
+
+  private static async isChromeReady(): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:${CHROME_REMOTE_DEBUG_PORT}/json/version`,
+        { signal: AbortSignal.timeout(1000) },
+      );
+      return response.ok;
+    } catch {
       return false;
     }
   }
 
   /**
-   * Allocate a new browser page for this process and store its index.
+   * Get or create the session MCP connection for a caller.
+   * Each session gets its own chrome-devtools-mcp process and dedicated tab.
    */
-  private static async claimProcessPage(logger: EndpointLogger): Promise<void> {
+  private static async ensureSession(
+    sessionId: string,
+    logger: EndpointLogger,
+  ): Promise<SessionMCP | null> {
+    await BrowserRepository.ensureChrome(logger);
+
+    let session = BrowserRepository.sessions.get(sessionId);
+
+    // (Re)create if missing or dead.
+    if (!session || !session.initialized || !session.process.pid) {
+      const newSession = await BrowserRepository.createSession(
+        sessionId,
+        logger,
+      );
+      if (!newSession) {
+        return null;
+      }
+      session = newSession;
+    }
+
+    // Claim a dedicated tab if not yet done.
+    if (session.pageId === null) {
+      await BrowserRepository.claimSessionPage(session, sessionId, logger);
+    }
+
+    return session;
+  }
+
+  /**
+   * Spawn a new chrome-devtools-mcp process for a session and initialize it.
+   */
+  private static async createSession(
+    sessionId: string,
+    logger: EndpointLogger,
+  ): Promise<SessionMCP | null> {
+    logger.info("[Browser Repository] Creating session MCP process", {
+      sessionId,
+    });
+
+    const config = getChromeMCPConfig();
+    const proc = spawn(config.command, config.args, {
+      stdio: ["pipe", "pipe", "pipe"],
+      env: { ...process.env, ...config.env },
+    });
+
+    const session: SessionMCP = {
+      process: proc,
+      nextRequestId: 1,
+      pendingRequests: new Map(),
+      pageId: null,
+      initialized: false,
+    };
+
+    BrowserRepository.sessions.set(sessionId, session);
+    BrowserRepository.setupSessionMessageHandling(session, logger);
+
+    proc.on("error", (error) => {
+      logger.error("[Browser Repository] Session MCP process error", {
+        sessionId,
+        error: error.message,
+      });
+      session.initialized = false;
+    });
+
+    proc.on("exit", (code) => {
+      logger.warn("[Browser Repository] Session MCP process exited", {
+        sessionId,
+        code,
+      });
+      session.initialized = false;
+      // Remove so next call recreates it.
+      if (BrowserRepository.sessions.get(sessionId) === session) {
+        BrowserRepository.sessions.delete(sessionId);
+      }
+    });
+
+    // Give the process time to start.
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 3000);
+    });
+
+    // Initialize MCP protocol.
+    const initRequest: MCPRequest = {
+      jsonrpc: "2.0",
+      id: session.nextRequestId++,
+      method: "initialize",
+      params: {
+        protocolVersion: "2024-11-05",
+        capabilities: { tools: { listChanged: true } },
+        clientInfo: { name: "next-vibe-browser-api", version: "1.0.0" },
+      },
+    };
+
     try {
-      const result = await BrowserRepository.callTool("new_page", {}, logger);
+      const response = await BrowserRepository.sendRequest(
+        session,
+        initRequest,
+        logger,
+      );
+      if (response.error) {
+        logger.error("[Browser Repository] Session MCP init failed", {
+          sessionId,
+          error: response.error.message,
+        });
+        return null;
+      }
+      session.initialized = true;
+      logger.info("[Browser Repository] Session MCP initialized", {
+        sessionId,
+      });
+      return session;
+    } catch (error) {
+      logger.error("[Browser Repository] Session MCP init error", {
+        sessionId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return null;
+    }
+  }
+
+  /**
+   * Allocate a dedicated browser tab for this session.
+   * Parses the pageId from new_page response and stores it on the session.
+   */
+  private static async claimSessionPage(
+    session: SessionMCP,
+    sessionId: string,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      const result = await BrowserRepository.callTool(
+        session,
+        "new_page",
+        { url: "about:blank" },
+        logger,
+        true, // skip pageId injection — no tab yet
+      );
       if (!result.success) {
         logger.warn(
           "[Browser Repository] new_page failed, using page 1 as fallback",
-          {
-            error: result.error,
-          },
+          { error: result.error, sessionId },
         );
-        BrowserRepository.processPageIndex = 1;
+        session.pageId = 1;
         return;
       }
-      // Response text looks like: "Page created.\n## Pages\n1: about:blank\n2: about:blank [selected]"
-      // Extract the [selected] page index.
+      // Response: "## Pages\n1: about:blank\n2: about:blank [selected]"
       const mcpResult = result.result as
         | { content?: Array<{ type: string; text?: string }> }
         | undefined;
       const text =
         mcpResult?.content?.find((b) => b.type === "text")?.text ?? "";
       const match = /^(\d+):[^\n]*\[selected\]/m.exec(text);
-      const pageIndex = match ? parseInt(match[1], 10) : null;
-      BrowserRepository.processPageIndex = pageIndex;
-      logger.info(
-        "[Browser Repository] Claimed browser page for this process",
-        {
-          pageIndex,
-          pid: process.pid,
-        },
-      );
+      session.pageId = match ? parseInt(match[1], 10) : 1;
+      logger.info("[Browser Repository] Claimed browser tab for session", {
+        sessionId,
+        pageId: session.pageId,
+      });
     } catch (error) {
-      logger.warn("[Browser Repository] Could not claim process page", {
+      logger.warn("[Browser Repository] Could not claim session tab", {
+        sessionId,
         error: error instanceof Error ? error.message : String(error),
       });
+      session.pageId = 1;
     }
   }
 
   /**
-   * Start the chrome-devtools-mcp server process
-   */
-  private static async startMCPServer(logger: EndpointLogger): Promise<void> {
-    if (BrowserRepository.mcpProcess) {
-      BrowserRepository.mcpProcess.kill();
-    }
-
-    logger.info("[Browser Repository] Starting chrome-devtools-mcp server");
-
-    const config = getChromeMCPConfig();
-
-    BrowserRepository.mcpProcess = spawn(config.command, config.args, {
-      stdio: ["pipe", "pipe", "pipe"],
-      env: { ...process.env, ...config.env },
-    });
-
-    // Set up message handling
-    BrowserRepository.setupMessageHandling(logger);
-
-    // Handle process lifecycle
-    BrowserRepository.mcpProcess.on("error", (error) => {
-      logger.error("[Browser Repository] MCP process error", {
-        error: error.message,
-      });
-      BrowserRepository.isInitialized = false;
-    });
-
-    BrowserRepository.mcpProcess.on("exit", (code) => {
-      logger.warn("[Browser Repository] MCP process exited", { code });
-      BrowserRepository.isInitialized = false;
-    });
-
-    // Wait for process to start
-    await new Promise((resolve) => {
-      setTimeout(resolve, 3000);
-    });
-  }
-
-  /**
-   * Initialize MCP connection
-   */
-  private static async initializeMCP(logger: EndpointLogger): Promise<boolean> {
-    const initRequest: MCPRequest = {
-      jsonrpc: "2.0",
-      id: BrowserRepository.nextRequestId++,
-      method: "initialize",
-      params: {
-        protocolVersion: "2024-11-05",
-        capabilities: {
-          tools: { listChanged: true },
-        },
-        clientInfo: {
-          name: "next-vibe-browser-api",
-          version: "1.0.0",
-        },
-      },
-    };
-
-    try {
-      const response = await BrowserRepository.sendRequest(initRequest, logger);
-
-      if (response.error) {
-        logger.error("[Browser Repository] MCP initialization failed", {
-          error: response.error.message,
-        });
-        return false;
-      }
-
-      BrowserRepository.isInitialized = true;
-      logger.info("[Browser Repository] MCP server initialized");
-      return true;
-    } catch (error) {
-      logger.error("[Browser Repository] MCP initialization error", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      return false;
-    }
-  }
-
-  /**
-   * Call a tool via MCP.
-   * For page-scoped tools, auto-selects this process's page first so concurrent
-   * MCP processes don't interfere with each other's tabs.
+   * Call a tool on the session's own MCP process.
+   * Injects pageId so chrome-devtools-mcp targets the session's tab directly.
+   * Since each session has its own process with its own queue, calls across
+   * sessions run fully in parallel.
    */
   private static async callTool(
+    session: SessionMCP,
     toolName: string,
     args: Record<string, JsonValue>,
     logger: EndpointLogger,
+    skipPageId = false,
   ): Promise<{ success: boolean; result?: JsonValue; error?: string }> {
-    // Auto-select this process's page before any page-scoped operation.
-    if (
+    // Inject pageId for page-scoped tools.
+    const toolArgs =
+      !skipPageId &&
       !BrowserRepository.PAGE_MGMT_TOOLS.has(toolName) &&
-      BrowserRepository.processPageIndex !== null
-    ) {
-      const selectRequest: MCPRequest = {
-        jsonrpc: "2.0",
-        id: BrowserRepository.nextRequestId++,
-        method: "tools/call",
-        params: {
-          name: "select_page",
-          arguments: { index: BrowserRepository.processPageIndex },
-        },
-      };
-      try {
-        await BrowserRepository.sendRequest(selectRequest, logger);
-      } catch (err) {
-        logger.warn("[Browser Repository] Auto select_page failed", {
-          pageIndex: BrowserRepository.processPageIndex,
-          error: err instanceof Error ? err.message : String(err),
-        });
-      }
-    }
+      session.pageId !== null
+        ? { ...args, pageId: session.pageId }
+        : args;
 
-    // If the caller is explicitly selecting a page, update our tracked index.
+    // If the caller explicitly selects a page, track it.
     if (toolName === "select_page" && typeof args.index === "number") {
-      BrowserRepository.processPageIndex = args.index;
+      session.pageId = args.index;
     }
 
     const toolRequest: MCPRequest = {
       jsonrpc: "2.0",
-      id: BrowserRepository.nextRequestId++,
+      id: session.nextRequestId++,
       method: "tools/call",
-      params: {
-        name: toolName,
-        arguments: args,
-      },
+      params: { name: toolName, arguments: toolArgs },
     };
 
     try {
-      const response = await BrowserRepository.sendRequest(toolRequest, logger);
-
+      const response = await BrowserRepository.sendRequest(
+        session,
+        toolRequest,
+        logger,
+      );
       if (response.error) {
-        return {
-          success: false,
-          error: response.error.message,
-        };
+        return { success: false, error: response.error.message };
       }
-
-      return {
-        success: true,
-        result: response.result,
-      };
+      return { success: true, result: response.result };
     } catch (error) {
       return {
         success: false,
@@ -486,20 +574,21 @@ export class BrowserRepository {
   }
 
   /**
-   * Send a request to the MCP server
+   * Send a JSON-RPC request to the session's MCP process.
    */
   private static sendRequest(
+    session: SessionMCP,
     request: MCPRequest,
     logger: EndpointLogger,
   ): Promise<MCPResponse> {
     return new Promise((resolve, reject) => {
-      if (!BrowserRepository.mcpProcess) {
-        reject(new Error("MCP process not running"));
+      if (!session.process.stdin) {
+        reject(new Error("Session MCP process has no stdin"));
         return;
       }
 
       const id = request.id;
-      BrowserRepository.pendingRequests.set(id, { resolve, reject });
+      session.pendingRequests.set(id, { resolve, reject });
 
       const message = `${JSON.stringify(request)}\n`;
       logger.debug("[Browser Repository] Sending MCP request", {
@@ -507,82 +596,81 @@ export class BrowserRepository {
         id,
       });
 
-      BrowserRepository.mcpProcess.stdin?.write(message);
+      session.process.stdin.write(message);
 
-      // Timeout after 30 seconds
       setTimeout(() => {
-        if (BrowserRepository.pendingRequests.has(id)) {
-          BrowserRepository.pendingRequests.delete(id);
+        if (session.pendingRequests.has(id)) {
+          session.pendingRequests.delete(id);
           reject(new Error(`Request timeout for ${request.method}`));
         }
-      }, 30000);
+      }, 120000);
     });
   }
 
   /**
-   * Set up message handling from MCP server
+   * Wire stdout/stderr listeners for a session's MCP process.
    */
-  private static setupMessageHandling(logger: EndpointLogger): void {
-    if (!BrowserRepository.mcpProcess) {
-      return;
-    }
-
+  private static setupSessionMessageHandling(
+    session: SessionMCP,
+    logger: EndpointLogger,
+  ): void {
     let buffer = "";
 
-    BrowserRepository.mcpProcess.stdout?.on("data", (data) => {
+    session.process.stdout?.on("data", (data) => {
       buffer += data.toString();
       const lines = buffer.split("\n");
-
-      // Keep the last incomplete line in buffer
-      buffer = lines.pop() || "";
+      buffer = lines.pop() ?? "";
 
       for (const line of lines) {
-        if (line.trim()) {
-          try {
-            const response: MCPResponse = JSON.parse(line);
-            logger.debug("[Browser Repository] Received MCP response", {
-              id: response.id,
-              hasResult: !!response.result,
-              hasError: !!response.error,
-            });
+        if (!line.trim()) {
+          continue;
+        }
+        try {
+          const response: MCPResponse = JSON.parse(line);
+          logger.debug("[Browser Repository] Received MCP response", {
+            id: response.id,
+            hasResult: !!response.result,
+            hasError: !!response.error,
+          });
 
-            const pending = BrowserRepository.pendingRequests.get(response.id);
-            if (pending) {
-              BrowserRepository.pendingRequests.delete(response.id);
-              if (response.error) {
-                pending.reject(new Error(response.error.message));
-              } else {
-                pending.resolve(response);
-              }
+          const pending = session.pendingRequests.get(response.id);
+          if (pending) {
+            session.pendingRequests.delete(response.id);
+            if (response.error) {
+              pending.reject(new Error(response.error.message));
+            } else {
+              pending.resolve(response);
             }
-          } catch (error) {
-            logger.warn("[Browser Repository] Failed to parse MCP response", {
-              line,
-              error: error instanceof Error ? error.message : String(error),
-            });
           }
+        } catch (error) {
+          logger.warn("[Browser Repository] Failed to parse MCP response", {
+            line,
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
       }
     });
 
-    BrowserRepository.mcpProcess.stderr?.on("data", (data) => {
-      logger.warn("[Browser Repository] MCP stderr", {
+    session.process.stderr?.on("data", (data) => {
+      logger.warn("[Browser Repository] Session MCP stderr", {
         data: data.toString().trim(),
       });
     });
   }
 
   /**
-   * Clean up resources
+   * Clean up all resources.
    */
   static cleanup(): void {
-    if (BrowserRepository.mcpProcess) {
-      BrowserRepository.mcpProcess.kill();
-      BrowserRepository.mcpProcess = null;
-      BrowserRepository.isInitialized = false;
+    for (const session of BrowserRepository.sessions.values()) {
+      session.process.kill();
     }
-    BrowserRepository.processPageIndex = null;
-    BrowserRepository.pendingRequests.clear();
+    BrowserRepository.sessions.clear();
+
+    if (BrowserRepository.chromeProcess) {
+      BrowserRepository.chromeProcess.kill();
+      BrowserRepository.chromeProcess = null;
+    }
   }
 }
 
@@ -594,7 +682,6 @@ if (typeof process !== "undefined") {
 
   process.on("SIGINT", () => {
     BrowserRepository.cleanup();
-    // Don't call process.exit() - let other handlers (like dev server) manage exit
   });
 
   process.on("SIGTERM", () => {

@@ -225,7 +225,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
 
       // Handle errors - wrap in NextResponse
       if (!result.success) {
-        return wrapErrorResponse(result, locale, logger);
+        return wrapErrorResponse(result, locale, logger, endpoint);
       }
 
       // Wrap validated success result in NextResponse

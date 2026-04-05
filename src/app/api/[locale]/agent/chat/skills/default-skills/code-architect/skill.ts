@@ -89,8 +89,8 @@ export const codeArchitectSkill: Skill = {
       isDefault: true,
     },
     {
-      id: "claude",
-      variantName: "skills.codeArchitect.variants.claude" as const,
+      id: "tech-bro",
+      variantName: "skills.codeArchitect.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_4_6,

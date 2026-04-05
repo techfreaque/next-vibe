@@ -100,6 +100,19 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
   // Posts ordered to mix technical and referral content
   const ALL_POSTS: BlogPost[] = [
     {
+      slug: "whats-new-april-2026",
+      titleKey: "posts.whatsNewApril2026.title",
+      categoryKey: "posts.whatsNewApril2026.category",
+      excerptKey: "posts.whatsNewApril2026.excerpt",
+      readTimeKey: "posts.whatsNewApril2026.readTime",
+      emoji: "🧭",
+      accentColor: "text-purple-600 dark:text-purple-400",
+      accentBg: "bg-purple-50 dark:bg-purple-950/30",
+      accentBorder: "border-purple-200 dark:border-purple-800/50",
+      badgeColor:
+        "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-800/50",
+    },
+    {
       slug: "one-codebase-13-platforms",
       titleKey: "posts.oneCodebase.title",
       categoryKey: "posts.oneCodebase.category",

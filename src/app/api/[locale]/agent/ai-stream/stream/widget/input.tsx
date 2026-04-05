@@ -876,7 +876,12 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                     type="submit"
                     size="icon"
                     variant="default"
-                    disabled={!canPost || !input.trim()}
+                    disabled={
+                      !canPost ||
+                      !input.trim() ||
+                      voice.isRecording ||
+                      voice.isProcessing
+                    }
                     className="h-8 w-8 @sm:h-9 @sm:w-9"
                   >
                     <Send className="h-4 w-4" />

@@ -63,8 +63,8 @@ export const editorSkill: Skill = {
   ],
   variants: [
     {
-      id: "claude",
-      variantName: "skills.editor.variants.claude" as const,
+      id: "tech-bro",
+      variantName: "skills.editor.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_4_6,

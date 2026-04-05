@@ -64,8 +64,8 @@ export const businessAdvisorSkill: Skill = {
   ],
   variants: [
     {
-      id: "maverick",
-      variantName: "skills.businessAdvisor.variants.maverick" as const,
+      id: "elon-tusk",
+      variantName: "skills.businessAdvisor.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_20,
@@ -83,8 +83,8 @@ export const businessAdvisorSkill: Skill = {
       isDefault: true,
     },
     {
-      id: "eastern",
-      variantName: "skills.businessAdvisor.variants.eastern" as const,
+      id: "chinese-wisdom",
+      variantName: "skills.businessAdvisor.variants.chineseWisdom" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.KIMI_K2,
@@ -95,6 +95,24 @@ export const businessAdvisorSkill: Skill = {
         contentRange: {
           min: ContentLevel.OPEN,
           max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+    {
+      id: "tech-bro",
+      variantName: "skills.businessAdvisor.variants.techBro" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
         },
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,

@@ -13,9 +13,10 @@ export const { POST, tools } = endpointsHandler({
   endpoint: pressKeyEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
+    handler: ({ data, t, logger, user, request }) =>
       BrowserSharedRepository.executePressKey(
         {
+          sessionId: request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.PRESS_KEY,
           args: BrowserSharedRepository.filterUndefinedArgs({
             key: data.key,

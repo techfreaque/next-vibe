@@ -26,10 +26,17 @@ import type {
 
 type HelpToolItem = HelpToolMetadataSerialized;
 
-/** JSON Schema property shape for parameter display */
+/** JSON Schema property — may have nested properties, enum values, anyOf etc. */
 interface JsonSchemaProperty {
-  type?: string;
+  type?: string | string[];
   description?: string;
+  properties?: Record<string, JsonSchemaProperty>;
+  required?: string[];
+  enum?: string[];
+  const?: string;
+  anyOf?: JsonSchemaProperty[];
+  oneOf?: JsonSchemaProperty[];
+  items?: JsonSchemaProperty;
 }
 
 /** JSON Schema object shape for tool parameters */
@@ -57,24 +64,294 @@ function formatCredits(credits: number | undefined): string {
 // ── Shared example serialization ─────────────────────────────────────────
 
 /**
+ * Flatten a nested value into dot-notation flag strings.
+ * Skips undefined and null values. Arrays are JSON-encoded.
+ * e.g. { intelligenceRange: { min: "quick", max: "smart" } }
+ *   → ['--key.intelligenceRange.min="quick"', '--key.intelligenceRange.max="smart"']
+ */
+type CliValue = CliRequestData[string];
+
+function flattenValue(
+  keyPath: string,
+  value: CliValue,
+  prefix: string,
+): string[] {
+  if (value === undefined || value === null) {
+    return [];
+  }
+  if (Array.isArray(value)) {
+    return [`${prefix}${keyPath}=${JSON.stringify(value)}`];
+  }
+  if (typeof value === "object") {
+    const results: string[] = [];
+    for (const [sk, sv] of Object.entries(value as CliRequestData)) {
+      results.push(...flattenValue(`${keyPath}.${sk}`, sv, prefix));
+    }
+    return results;
+  }
+  // Strip i18n enum prefix for readability: "enums.category.coding" → "coding"
+  const display =
+    typeof value === "string" && value.startsWith("enums.")
+      ? (value.split(".").pop() ?? value)
+      : value;
+  const formatted =
+    typeof display === "string" ? `"${display}"` : String(display);
+  return [`${prefix}${keyPath}=${formatted}`];
+}
+
+/**
  * Serialize one example entry into dot-notation flags.
- * Objects expand as --key.subkey="value"; primitives as --key="value".
+ * Objects expand recursively as --key.sub.subkey="value".
+ * Undefined and null values are omitted.
  */
 function serializeExampleArgs(exData: CliRequestData, prefix = "--"): string {
-  return Object.entries(exData)
-    .map(([k, v]) => {
-      if (v !== null && typeof v === "object" && !Array.isArray(v)) {
-        const entries = Object.entries(v);
-        if (entries.length === 0) {
-          return `${prefix}${k}.KEY="value"`;
+  const flags: string[] = [];
+  for (const [k, v] of Object.entries(exData)) {
+    flags.push(...flattenValue(k, v, prefix));
+  }
+  return flags.join(" ");
+}
+
+// ── Parameter schema helpers ──────────────────────────────────────────────
+
+/**
+ * Collapse anyOf/oneOf into the most informative single schema.
+ * Strips null-only branches; if multiple object branches remain, merges their properties.
+ */
+function isNullBranch(v: JsonSchemaProperty): boolean {
+  if (v.type === "null") {
+    return true;
+  }
+  if (Array.isArray(v.type) && v.type.every((t) => t === "null")) {
+    return true;
+  }
+  return false;
+}
+
+function resolveSchema(prop: JsonSchemaProperty): JsonSchemaProperty {
+  const variants = prop.anyOf ?? prop.oneOf;
+  if (!variants) {
+    return prop;
+  }
+  const nonNull = variants.filter((v) => !isNullBranch(v));
+  if (nonNull.length === 0) {
+    return prop;
+  }
+  if (nonNull.length === 1) {
+    const inner = resolveSchema(nonNull[0]);
+    return { ...inner, description: prop.description ?? inner.description };
+  }
+  // Discriminated union — merge all object branches' properties
+  const merged: JsonSchemaProperty = {
+    description: prop.description,
+    properties: {},
+    required: [],
+  };
+  for (const branch of nonNull) {
+    const r = resolveSchema(branch);
+    if (r.properties) {
+      for (const [pk, pv] of Object.entries(r.properties)) {
+        if (!merged.properties![pk]) {
+          merged.properties![pk] = pv;
+        } else {
+          const existing = merged.properties![pk];
+          // Both branches have a const (discriminator) — merge into enum
+          if (pv.const !== undefined || existing.const !== undefined) {
+            const base =
+              existing.enum ??
+              (existing.const !== undefined ? [existing.const] : []);
+            const add = pv.const !== undefined ? [pv.const] : (pv.enum ?? []);
+            const merged2: JsonSchemaProperty = {
+              type: "string",
+              enum: [...base, ...add],
+            };
+            // Remove const from merged to avoid conflict
+            merged.properties![pk] = merged2;
+          }
         }
-        return entries
-          .map(([sk, sv]) => `${prefix}${k}.${sk}="${String(sv)}"`)
-          .join(" ");
       }
-      return `${prefix}${k}=${typeof v === "string" ? `"${v}"` : String(v)}`;
-    })
-    .join(" ");
+    }
+    if (r.required) {
+      for (const req of r.required) {
+        if (!merged.required!.includes(req)) {
+          merged.required!.push(req);
+        }
+      }
+    }
+    if (r.enum) {
+      merged.enum = [...(merged.enum ?? []), ...r.enum];
+    }
+  }
+  return merged;
+}
+
+function isNullable(prop: JsonSchemaProperty): boolean {
+  const variants = prop.anyOf ?? prop.oneOf;
+  if (variants) {
+    return variants.some(isNullBranch);
+  }
+  if (Array.isArray(prop.type)) {
+    return prop.type.includes("null");
+  }
+  return false;
+}
+
+/** Strip i18n prefix: "enums.category.coding" → "coding" */
+function stripEnumPrefix(v: string): string {
+  return v.split(".").pop() ?? v;
+}
+
+/** Inline object shape: {key1,key2,...} — max 5 keys to stay readable */
+function inlineObjectShape(
+  properties: Record<string, JsonSchemaProperty>,
+): string {
+  const keys = Object.keys(properties).slice(0, 5);
+  const suffix = Object.keys(properties).length > 5 ? ",…" : "";
+  return `{${keys.join(",")}${suffix}}`;
+}
+
+/** Human-readable type label for a schema property. */
+function typeLabel(prop: JsonSchemaProperty): string {
+  const resolved = resolveSchema(prop);
+  const nullable = isNullable(prop) ? "|null" : "";
+
+  // Single const value (literal)
+  if (resolved.const !== undefined) {
+    return `"${stripEnumPrefix(resolved.const)}"${nullable}`;
+  }
+
+  if (resolved.enum && resolved.enum.length > 0) {
+    // Truncate huge enum lists (e.g. all model IDs) to avoid noise
+    if (resolved.enum.length > 10) {
+      return `string${nullable}`;
+    }
+    return resolved.enum.map(stripEnumPrefix).join("|") + nullable;
+  }
+
+  // Array — show item shape if available
+  const rawType = Array.isArray(resolved.type)
+    ? resolved.type.filter((x) => x !== "null").join("|")
+    : (resolved.type ?? "");
+  if (rawType === "array") {
+    if (resolved.items) {
+      const itemResolved = resolveSchema(resolved.items);
+      if (
+        itemResolved.properties &&
+        Object.keys(itemResolved.properties).length > 0
+      ) {
+        return `${inlineObjectShape(itemResolved.properties)}[]${nullable}`;
+      }
+      if (itemResolved.enum && itemResolved.enum.length > 0) {
+        if (itemResolved.enum.length > 10) {
+          return `string[]${nullable}`;
+        }
+        return `(${itemResolved.enum.map(stripEnumPrefix).join("|")})[]${nullable}`;
+      }
+      const itemType = Array.isArray(itemResolved.type)
+        ? itemResolved.type.filter((x) => x !== "null").join("|")
+        : (itemResolved.type ?? "any");
+      return `${itemType}[]${nullable}`;
+    }
+    return `any[]${nullable}`;
+  }
+
+  // Object — show inline shape instead of bare "object"
+  if (resolved.properties && Object.keys(resolved.properties).length > 0) {
+    return `${inlineObjectShape(resolved.properties)}${nullable}`;
+  }
+
+  return rawType ? rawType + nullable : `any${nullable}`;
+}
+
+/**
+ * Collect flat parameter rows for display.
+ *
+ * Expansion rules:
+ * - Only expand `modelSelection` at the top level (the primary chat model param).
+ *   Auxiliary model selections (voiceModelSelection, imageGenModelSelection etc.)
+ *   stay collapsed — their usage is covered by the description.
+ * - At depth 1, only show selectionType + manualModelId; skip filter-range noise
+ *   (intelligenceRange, priceRange, contentRange, speedRange, sortBy*, sortDirection*).
+ */
+interface ParamRow {
+  key: string;
+  indent: number;
+  required: boolean;
+  typeStr: string;
+  description: string;
+}
+
+const FILTER_NOISE_KEYS = new Set([
+  "intelligenceRange",
+  "priceRange",
+  "contentRange",
+  "speedRange",
+  "sortBy",
+  "sortBy2",
+  "sortDirection",
+  "sortDirection2",
+]);
+
+// All top-level object params are expanded — no whitelist needed.
+// typeLabel() always shows inline shapes; collectParamRows expands any object.
+
+function collectParamRows(
+  props: Record<string, JsonSchemaProperty>,
+  required: string[],
+  prefix = "",
+  indent = 0,
+  depth = 0,
+  parentRequired = true,
+): ParamRow[] {
+  const rows: ParamRow[] = [];
+  for (const [key, rawProp] of Object.entries(props)) {
+    if (depth >= 1 && FILTER_NOISE_KEYS.has(key)) {
+      continue;
+    }
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+    const resolved = resolveSchema(rawProp);
+    const isReq = parentRequired && required.includes(key);
+    const hasSubFields =
+      !resolved.enum &&
+      resolved.properties &&
+      Object.keys(resolved.properties).length > 0;
+    // At depth 0: expand object params into sub-field rows (skip the parent row).
+    // Sub-fields are optional when parent is nullable (isNullable check).
+    if (depth === 0 && hasSubFields) {
+      const subParentRequired = isReq && !isNullable(rawProp);
+      rows.push(
+        ...collectParamRows(
+          resolved.properties!,
+          resolved.required ?? [],
+          fullKey,
+          indent,
+          depth + 1,
+          subParentRequired,
+        ),
+      );
+    } else {
+      rows.push({
+        key: fullKey,
+        indent,
+        required: isReq,
+        typeStr: typeLabel(rawProp),
+        description: rawProp.description ?? "",
+      });
+    }
+  }
+  return rows;
+}
+
+/**
+ * Wrap a long example command into multiple lines with \ continuation.
+ * Each flag goes on its own indented line for readability.
+ */
+function wrapExampleCli(cmd: string, flags: string[]): string {
+  if (flags.length === 0) {
+    return cmd;
+  }
+  const indent = "    ";
+  return [cmd, ...flags.map((f) => `${indent}${f}`)].join(" \\\n");
 }
 
 // ── Detail Mode (single tool) ────────────────────────────────────────────
@@ -116,29 +393,59 @@ function renderDetailCli(tool: HelpToolItem): string {
     if (props && Object.keys(props).length > 0) {
       lines.push("");
       lines.push(chalk.bold("Parameters"));
-      for (const [key, prop] of Object.entries(props)) {
-        const isRequired = required.includes(key);
-        const typeStr = prop.type ?? "any";
-        const reqLabel = isRequired ? chalk.red("*") : " ";
-        const desc = prop.description
-          ? chalk.dim(` - ${prop.description}`)
-          : "";
-        lines.push(
-          `  ${reqLabel} ${chalk.blue(key)} ${chalk.dim(typeStr)}${desc}`,
-        );
+      const rows = collectParamRows(props, required);
+      // Cap key column at 28 chars — avoids blowout from long sub-keys
+      const KEY_COL = Math.min(
+        Math.max(...rows.map((r) => r.key.length + r.indent * 2), 4),
+        28,
+      );
+      for (const row of rows) {
+        const pad = " ".repeat(row.indent * 2);
+        const reqLabel = row.required ? chalk.red("*") : " ";
+        const rawKey = pad + row.key;
+        const keyPadded = rawKey.padEnd(KEY_COL + 1);
+        // Trim description to first sentence, max 80 chars
+        let desc = row.description;
+        if (desc) {
+          const sentenceEnd = desc.search(/\.\s+[A-Z]/);
+          if (sentenceEnd > 0) {
+            desc = desc.slice(0, sentenceEnd + 1);
+          }
+          if (desc.length > 80) {
+            desc = `${desc.slice(0, 77)}...`;
+          }
+        }
+        const descStr = desc ? chalk.dim(` - ${desc}`) : "";
+        // Long enum types go on their own indented line to keep key column tight
+        if (row.typeStr.length > 30) {
+          lines.push(`  ${reqLabel} ${chalk.blue(keyPadded)}`);
+          lines.push(`       ${chalk.dim(row.typeStr)}${descStr}`);
+        } else {
+          lines.push(
+            `  ${reqLabel} ${chalk.blue(keyPadded)} ${chalk.dim(row.typeStr)}${descStr}`,
+          );
+        }
       }
     }
   }
 
-  // Examples
+  // Examples — one flag per line for readability
   if (tool.examples?.inputs) {
     const exampleEntries = Object.entries(tool.examples.inputs);
     if (exampleEntries.length > 0) {
       lines.push("");
       lines.push(chalk.bold("Examples"));
       for (const [exName, exData] of exampleEntries) {
-        const args = serializeExampleArgs(exData);
-        lines.push(`  ${chalk.dim(`${exName}:`)} vibe ${tool.name} ${args}`);
+        const flags: string[] = [];
+        for (const [k, v] of Object.entries(exData)) {
+          for (const flag of flattenValue(k, v, "--")) {
+            flags.push(flag);
+          }
+        }
+        const cmd = `vibe ${tool.name}`;
+        lines.push(chalk.dim(`  ${exName}:`));
+        lines.push(`  ${wrapExampleCli(cmd, flags)}`);
+        lines.push("");
       }
     }
   }
@@ -170,13 +477,12 @@ function renderDetailMcp(tool: HelpToolItem): string {
     if (props && Object.keys(props).length > 0) {
       lines.push("");
       lines.push("Parameters:");
-      for (const [key, prop] of Object.entries(props)) {
-        const isRequired = required.includes(key);
-        const typeStr = prop.type ?? "any";
-        const desc = prop.description ? ` - ${prop.description}` : "";
-        lines.push(
-          `  ${key} (${typeStr}${isRequired ? ", required" : ""})${desc}`,
-        );
+      const rows = collectParamRows(props, required);
+      for (const row of rows) {
+        const pad = " ".repeat(row.indent * 2);
+        const req = row.required ? ", required" : "";
+        const desc = row.description ? ` - ${row.description}` : "";
+        lines.push(`  ${pad}${row.key} (${row.typeStr}${req})${desc}`);
       }
     }
   }

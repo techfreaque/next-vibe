@@ -94,6 +94,7 @@ export interface SlimMessage {
   toolCall: {
     toolName?: string;
     result?: ToolCallResult;
+    isDeferred?: boolean;
   } | null;
   generatedMedia: { type: string; url?: string | null }[] | null;
   /** True when this is a compacting summary message */
@@ -159,6 +160,7 @@ function slimMessages(
       ? {
           toolName: r.metadata.toolCall.toolName,
           result: r.metadata.toolCall.result,
+          isDeferred: r.metadata.toolCall.isDeferred === true,
         }
       : null,
     generatedMedia: r.metadata?.generatedMedia

@@ -71,8 +71,8 @@ export const debaterSkill: Skill = {
   ],
   variants: [
     {
-      id: "maverick",
-      variantName: "skills.debater.variants.maverick" as const,
+      id: "elon-tusk",
+      variantName: "skills.debater.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_20,
@@ -90,8 +90,8 @@ export const debaterSkill: Skill = {
       isDefault: true,
     },
     {
-      id: "eastern",
-      variantName: "skills.debater.variants.eastern" as const,
+      id: "chinese-wisdom",
+      variantName: "skills.debater.variants.chineseWisdom" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.KIMI_K2_5,

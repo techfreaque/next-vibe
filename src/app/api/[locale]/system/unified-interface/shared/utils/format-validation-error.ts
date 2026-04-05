@@ -1,6 +1,6 @@
 /**
- * Shared validation error formatter
- * Used by CLI, MCP, and AI tool responses to produce human-readable error text
+ * Shared validation error parser and formatters
+ * parseValidationError extracts structured data - each platform formats it.
  */
 
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
@@ -36,7 +36,7 @@ function serializeFlag(key: string, value: JsonValue): string {
  * Parse a comma-joined validation error string into field/message pairs
  * Input: "name: msg, email: msg2"
  */
-function parseValidationErrors(
+function parseFieldErrors(
   errorStr: string,
 ): Array<{ field: string; message: string }> {
   const parts = errorStr.split(/,\s*(?=\w[\w.]*:\s)/);
@@ -50,6 +50,73 @@ function parseValidationErrors(
       message: part.slice(colonIdx + 1).trim(),
     };
   });
+}
+
+/**
+ * Structured data extracted from a validation error response.
+ * Each platform uses this to build its own formatted message.
+ */
+export interface ValidationErrorData {
+  /** Number of validation errors */
+  count: number;
+  /** Per-field errors with CLI flag name pre-computed */
+  fields: Array<{ field: string; flagName: string; message: string }>;
+  /** Endpoint alias for example commands (null if no endpoint) */
+  alias: string | null;
+  /** Raw example values from endpoint definition */
+  exampleValues: Record<string, JsonValue>;
+  /** Already-provided input values (for --interactive pre-fill) */
+  inputData: Record<string, string>;
+}
+
+/**
+ * Extract structured validation error data from messageParams.
+ * Returns null if messageParams don't match the validation error shape.
+ */
+export function parseValidationError(
+  messageParams: Record<string, string | number> | undefined,
+  endpoint?: CreateApiEndpointAny | null,
+  inputData?: Record<string, string>,
+): ValidationErrorData | null {
+  if (
+    !messageParams ||
+    !("error" in messageParams) ||
+    !("errorCount" in messageParams)
+  ) {
+    return null;
+  }
+
+  const rawErrors = String(messageParams.error);
+  const count = Number(messageParams.errorCount);
+  const parsed = parseFieldErrors(rawErrors);
+
+  const fields = parsed.map(({ field, message }) => ({
+    field,
+    flagName: field ? camelToKebab(field) : "",
+    message,
+  }));
+
+  const alias = endpoint
+    ? endpoint.aliases && endpoint.aliases.length > 0
+      ? endpoint.aliases[0]
+      : endpoint.path.join("-")
+    : null;
+
+  const exampleValues =
+    endpoint?.examples?.requests &&
+    typeof endpoint.examples.requests === "object"
+      ? ((Object.values(
+          endpoint.examples.requests as Record<string, Record<string, string>>,
+        )[0] ?? {}) as Record<string, JsonValue>)
+      : {};
+
+  return {
+    count,
+    fields,
+    alias,
+    exampleValues,
+    inputData: inputData ?? {},
+  };
 }
 
 /**
@@ -85,11 +152,8 @@ export function buildExampleCommand(
 }
 
 /**
- * Format validation error messageParams into readable text.
- * Detects the { error: "field: msg, ...", errorCount: N } shape from validateData()
- * and returns a multi-line string with bullet points and an optional example command.
- *
- * Returns null if the params don't match the validation error shape.
+ * Format validation error for CLI output.
+ * Bullets per field + vibe example command + --interactive hint + vibe help.
  */
 export function formatValidationErrorDetails(
   messageParams: Record<string, string | number> | undefined,
@@ -97,49 +161,27 @@ export function formatValidationErrorDetails(
   /** Already-provided input values - used to pre-fill the --interactive hint */
   inputData?: Record<string, string> | undefined,
 ): string | null {
-  if (
-    !messageParams ||
-    !("error" in messageParams) ||
-    !("errorCount" in messageParams)
-  ) {
+  const data = parseValidationError(messageParams, endpoint, inputData);
+  if (!data) {
     return null;
   }
 
-  const rawErrors = String(messageParams.error);
-  const count = Number(messageParams.errorCount);
-  const parsed = parseValidationErrors(rawErrors);
+  const { count, fields, alias, exampleValues, inputData: input } = data;
 
   // eslint-disable-next-line i18next/no-literal-string
   let out = `Missing required fields (${count}):`;
-  for (const { field, message } of parsed) {
+  for (const { flagName, field, message } of fields) {
     if (field) {
       // eslint-disable-next-line i18next/no-literal-string
-      out += `\n  • --${camelToKebab(field)}: ${message}`;
+      out += `\n  • --${flagName}: ${message}`;
     } else {
       // eslint-disable-next-line i18next/no-literal-string
       out += `\n  • ${message}`;
     }
   }
 
-  if (endpoint) {
-    const alias =
-      endpoint.aliases && endpoint.aliases.length > 0
-        ? endpoint.aliases[0]
-        : endpoint.path.join("-");
-
-    const exampleValues =
-      endpoint.examples?.requests &&
-      typeof endpoint.examples.requests === "object"
-        ? (Object.values(
-            endpoint.examples.requests as Record<
-              string,
-              Record<string, string>
-            >,
-          )[0] ?? {})
-        : {};
-
-    // Merge: user-provided values take precedence over example values
-    const merged = { ...exampleValues, ...inputData };
+  if (alias) {
+    const merged = { ...exampleValues, ...input };
 
     if (Object.keys(merged).length > 0) {
       const flags = Object.entries(merged)
@@ -149,10 +191,9 @@ export function formatValidationErrorDetails(
       out += `\n\nExample:\n  vibe ${alias} ${flags}`;
     }
 
-    // Interactive hint with already-provided flags pre-filled
     const existingFlags =
-      inputData && Object.keys(inputData).length > 0
-        ? `${Object.entries(inputData)
+      Object.keys(input).length > 0
+        ? `${Object.entries(input)
             .filter(([, v]) => v !== undefined && v !== "")
             .map(([k, v]) => serializeFlag(k, v))
             .join(" ")} `
@@ -163,6 +204,36 @@ export function formatValidationErrorDetails(
 
     // eslint-disable-next-line i18next/no-literal-string
     out += `\n\nMore info:\n  vibe help ${alias}`;
+  }
+
+  return out;
+}
+
+/**
+ * Format validation error for API/MCP/AI output.
+ * Compact field list only - no vibe CLI hints.
+ */
+export function formatValidationErrorCompact(
+  messageParams: Record<string, string | number> | undefined,
+  endpoint?: CreateApiEndpointAny | null,
+): string | null {
+  const data = parseValidationError(messageParams, endpoint);
+  if (!data) {
+    return null;
+  }
+
+  const { count, fields } = data;
+
+  // eslint-disable-next-line i18next/no-literal-string
+  let out = `Validation failed (${count} error${count === 1 ? "" : "s"}):`;
+  for (const { field, message } of fields) {
+    if (field) {
+      // eslint-disable-next-line i18next/no-literal-string
+      out += `\n  • ${field}: ${message}`;
+    } else {
+      // eslint-disable-next-line i18next/no-literal-string
+      out += `\n  • ${message}`;
+    }
   }
 
   return out;

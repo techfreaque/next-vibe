@@ -317,6 +317,7 @@ export function SkillCreateContainer({
                 platformTtsDefault.manualModelId === value.manualModelId;
               form.setValue("voiceModelSelection", isDefault ? null : value, {
                 shouldDirty: true,
+                shouldValidate: true,
               });
               setActiveSelector(null);
             }}
@@ -351,7 +352,7 @@ export function SkillCreateContainer({
               form.setValue(
                 "imageGenModelSelection",
                 isDefault ? null : value,
-                { shouldDirty: true },
+                { shouldDirty: true, shouldValidate: true },
               );
               setActiveSelector(null);
             }}
@@ -386,7 +387,7 @@ export function SkillCreateContainer({
               form.setValue(
                 "musicGenModelSelection",
                 isDefault ? null : value,
-                { shouldDirty: true },
+                { shouldDirty: true, shouldValidate: true },
               );
               setActiveSelector(null);
             }}
@@ -421,7 +422,7 @@ export function SkillCreateContainer({
               form.setValue(
                 "videoGenModelSelection",
                 isDefault ? null : value,
-                { shouldDirty: true },
+                { shouldDirty: true, shouldValidate: true },
               );
               setActiveSelector(null);
             }}
@@ -453,6 +454,7 @@ export function SkillCreateContainer({
                 platformSttDefault.manualModelId === value.manualModelId;
               form.setValue("sttModelSelection", isDefault ? null : value, {
                 shouldDirty: true,
+                shouldValidate: true,
               });
               setActiveSelector(null);
             }}
@@ -490,7 +492,7 @@ export function SkillCreateContainer({
               form.setValue(
                 "imageVisionModelSelection",
                 isDefault ? null : value,
-                { shouldDirty: true },
+                { shouldDirty: true, shouldValidate: true },
               );
               setActiveSelector(null);
             }}
@@ -528,7 +530,7 @@ export function SkillCreateContainer({
               form.setValue(
                 "videoVisionModelSelection",
                 isDefault ? null : value,
-                { shouldDirty: true },
+                { shouldDirty: true, shouldValidate: true },
               );
               setActiveSelector(null);
             }}
@@ -566,7 +568,7 @@ export function SkillCreateContainer({
               form.setValue(
                 "audioVisionModelSelection",
                 isDefault ? null : value,
-                { shouldDirty: true },
+                { shouldDirty: true, shouldValidate: true },
               );
               setActiveSelector(null);
             }}
@@ -619,6 +621,11 @@ export function SkillCreateContainer({
                   locale={locale}
                   user={user}
                 />
+                {form.formState.errors.modelSelection && (
+                  <Span className="text-xs text-destructive">
+                    {form.formState.errors.modelSelection.message}
+                  </Span>
+                )}
               </Div>
 
               {/* Voice (TTS) model selector */}
@@ -635,6 +642,11 @@ export function SkillCreateContainer({
                   locale={locale}
                   user={user}
                 />
+                {form.formState.errors.voiceModelSelection && (
+                  <Span className="text-xs text-destructive">
+                    {form.formState.errors.voiceModelSelection.message}
+                  </Span>
+                )}
               </Div>
 
               {/* Image Generation model selector */}
@@ -651,6 +663,11 @@ export function SkillCreateContainer({
                   locale={locale}
                   user={user}
                 />
+                {form.formState.errors.imageGenModelSelection && (
+                  <Span className="text-xs text-destructive">
+                    {form.formState.errors.imageGenModelSelection.message}
+                  </Span>
+                )}
               </Div>
 
               {/* Music Generation model selector */}
@@ -667,6 +684,11 @@ export function SkillCreateContainer({
                   locale={locale}
                   user={user}
                 />
+                {form.formState.errors.musicGenModelSelection && (
+                  <Span className="text-xs text-destructive">
+                    {form.formState.errors.musicGenModelSelection.message}
+                  </Span>
+                )}
               </Div>
 
               {/* Video Generation model selector */}
@@ -683,6 +705,11 @@ export function SkillCreateContainer({
                   locale={locale}
                   user={user}
                 />
+                {form.formState.errors.videoGenModelSelection && (
+                  <Span className="text-xs text-destructive">
+                    {form.formState.errors.videoGenModelSelection.message}
+                  </Span>
+                )}
               </Div>
 
               {/* STT model selector */}
@@ -699,6 +726,11 @@ export function SkillCreateContainer({
                   locale={locale}
                   user={user}
                 />
+                {form.formState.errors.sttModelSelection && (
+                  <Span className="text-xs text-destructive">
+                    {form.formState.errors.sttModelSelection.message}
+                  </Span>
+                )}
               </Div>
 
               {/* Image Vision model selector */}
@@ -715,6 +747,11 @@ export function SkillCreateContainer({
                   locale={locale}
                   user={user}
                 />
+                {form.formState.errors.imageVisionModelSelection && (
+                  <Span className="text-xs text-destructive">
+                    {form.formState.errors.imageVisionModelSelection.message}
+                  </Span>
+                )}
               </Div>
 
               {/* Video Vision model selector */}
@@ -731,6 +768,11 @@ export function SkillCreateContainer({
                   locale={locale}
                   user={user}
                 />
+                {form.formState.errors.videoVisionModelSelection && (
+                  <Span className="text-xs text-destructive">
+                    {form.formState.errors.videoVisionModelSelection.message}
+                  </Span>
+                )}
               </Div>
 
               {/* Audio Vision model selector */}
@@ -747,6 +789,11 @@ export function SkillCreateContainer({
                   locale={locale}
                   user={user}
                 />
+                {form.formState.errors.audioVisionModelSelection && (
+                  <Span className="text-xs text-destructive">
+                    {form.formState.errors.audioVisionModelSelection.message}
+                  </Span>
+                )}
               </Div>
             </Div>
           </>
@@ -770,7 +817,10 @@ function ModelSelectorWrapper({
   const onChange = useCallback(
     (selection: AnyRoleModelSelection | null) => {
       const parsed = chatModelSelectionSchema.nullable().safeParse(selection);
-      form.setValue("modelSelection", parsed.success ? parsed.data : null);
+      form.setValue("modelSelection", parsed.success ? parsed.data : null, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
     },
     [form],
   );

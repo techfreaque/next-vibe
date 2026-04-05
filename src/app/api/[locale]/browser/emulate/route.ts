@@ -13,9 +13,10 @@ export const { POST, tools } = endpointsHandler({
   endpoint: emulateEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
+    handler: ({ data, t, logger, user, request }) =>
       BrowserSharedRepository.executeEmulate(
         {
+          sessionId: request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.EMULATE,
           args: BrowserSharedRepository.filterUndefinedArgs({
             networkConditions: data.networkConditions,
