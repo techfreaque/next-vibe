@@ -91,8 +91,8 @@ export class UnifiedTaskRunnerRepository {
     isPublic: false,
     roles: [UserPermissionRole.ADMIN],
   };
-  static name = "unified-task-runner" as const;
-  static description = "description" as const;
+  static runnerName = "unified-task-runner" as const;
+  static runnerDescription = "description" as const;
   static environment: "development" | "production" | "serverless" =
     "development";
 
