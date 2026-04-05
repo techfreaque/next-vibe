@@ -245,16 +245,13 @@ function createToolFromEndpoint(
         // Route through RouteExecuteRepository which handles both modes.
         // execute-tool always routes through RouteExecuteRepository directly
         // so callerToolCallId (options.toolCallId) is available for deduplication.
-        // If this tool requires confirmation, do NOT fire wakeUp/detach goroutines.
+        // If this tool requires confirmation, do NOT execute it.
         // The stream layer sets stepHasToolsAwaitingConfirmation=true and aborts at finish-step.
         // Confirmation UI shows, user confirms, then tool-confirmation-handler executes.
         // Return a placeholder so the AI SDK has a result and the stream ends cleanly.
-        if (
-          context.requiresConfirmation &&
-          (callbackMode === CM.WAKE_UP || callbackMode === CM.DETACH)
-        ) {
+        if (context.requiresConfirmation) {
           context.logger.info(
-            "[ToolsLoader] tool requires confirmation - blocking wakeUp/detach, returning placeholder",
+            "[ToolsLoader] tool requires confirmation - returning placeholder without executing",
             { toolName, callbackMode },
           );
           return {

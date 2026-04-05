@@ -201,7 +201,7 @@ export function useMessagesSubscription(
             void import("@/app/api/[locale]/agent/ai-stream/stream/hooks/audio-queue").then(
               ({ getAudioQueue }) => {
                 const aq = getAudioQueue();
-                aq.enqueue(e.audioData, e.chunkIndex);
+                aq.enqueue(e.audioData, e.chunkIndex, logger);
                 return undefined;
               },
             );

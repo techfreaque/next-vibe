@@ -720,19 +720,34 @@ export class RouteExecuteRepository {
             const finalResult =
               result.success && result.data !== undefined ? result.data : null;
 
-            await db.insert(cronTaskExecutions).values({
-              taskId,
-              taskName: toolName,
-              executionId,
-              status: finalStatus,
-              priority: CronTaskPriority.HIGH,
-              startedAt,
-              completedAt,
-              durationMs: completedAt.getTime() - startedAt.getTime(),
-              result: finalResult ?? undefined,
-              triggeredBy: "detach",
-              config: {},
-            });
+            try {
+              await db.insert(cronTaskExecutions).values({
+                taskId,
+                taskName: toolName,
+                executionId,
+                status: finalStatus,
+                priority: CronTaskPriority.HIGH,
+                startedAt,
+                completedAt,
+                durationMs: completedAt.getTime() - startedAt.getTime(),
+                result: finalResult ?? undefined,
+                triggeredBy: "detach",
+                config: {},
+              });
+            } catch (execInsertErr) {
+              // Parent cron_tasks row may have been deleted (e.g. test teardown cancelThreadTasks).
+              // This is non-fatal — execution history is best-effort for detach tasks.
+              logger.warn(
+                "[execute-tool detach] Failed to insert execution history (parent deleted?)",
+                {
+                  taskId,
+                  error:
+                    execInsertErr instanceof Error
+                      ? execInsertErr.message
+                      : String(execInsertErr),
+                },
+              );
+            }
 
             // detach: result stays in task history only - never injected into thread.
             // Keep the task row (disabled + completed) so wait-for-task can find the result
@@ -781,7 +796,7 @@ export class RouteExecuteRepository {
                 callbackMode:
                   upgradedCallbackMode === CallbackMode.WAKE_UP
                     ? CallbackMode.WAKE_UP
-                    : null,
+                    : CallbackMode.DETACH,
                 status: finalStatus,
                 output:
                   upgradedCallbackMode === CallbackMode.WAKE_UP

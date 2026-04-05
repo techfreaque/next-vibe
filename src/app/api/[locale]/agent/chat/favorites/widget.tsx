@@ -811,6 +811,7 @@ export function FavoritesListContainer({
         favoriteId: item.id,
         modelId: item.modelId,
         skillId: item.skillId,
+        voiceId: item.voiceId,
         logger,
         locale,
         user,

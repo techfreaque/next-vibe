@@ -7,7 +7,7 @@
   "body": {
     "key": "t20x6N3haz5IAxDzfP0MBUSzQ5IpjZ5nMkd5AY9nKDuGR7svtN53lD31jsMa",
     "model_id": "z-image-turbo",
-    "prompt": "approve-test",
+    "prompt": "wakeup-test",
     "num_inference_steps": 30,
     "samples": 1
   }

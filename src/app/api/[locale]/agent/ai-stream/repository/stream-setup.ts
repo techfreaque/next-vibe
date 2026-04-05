@@ -1517,13 +1517,18 @@ export async function setupAiStream(params: {
       skipAiTurn:
         (data.toolConfirmations?.length ?? 0) > 0 &&
         toolConfirmationResults.length === 0,
-      voiceMode:
-        data.voiceMode && resolvedTtsVoiceId
+      voiceMode: (() => {
+        const vm = data.voiceMode
           ? {
               enabled: data.voiceMode.enabled ?? false,
-              voiceId: resolvedTtsVoiceId,
+              voiceId:
+                !bridgeContext.userSettings && data.voiceMode.voice
+                  ? data.voiceMode.voice
+                  : (resolvedTtsVoiceId ?? data.voiceMode.voice),
             }
-          : null,
+          : null;
+        return vm;
+      })(),
       voiceTranscription,
       userMessageMetadata,
       fileUploadPromise,

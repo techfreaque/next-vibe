@@ -245,7 +245,9 @@ export function BaseMessageInput({
                     type="button"
                     size="icon"
                     variant={ttsAutoplay ? "default" : "ghost"}
-                    onClick={() => setTTSAutoplay(!ttsAutoplay)}
+                    onClick={() => {
+                      setTTSAutoplay(!ttsAutoplay);
+                    }}
                     className={cn(
                       "h-8 w-8 @sm:h-9 @sm:w-9",
                       ttsAutoplay &&

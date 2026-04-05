@@ -36,7 +36,6 @@ export interface TestStreamParams {
   prompt: string;
   user: JwtPayloadType;
   threadId?: string;
-  threadMode?: "none" | "new" | "append";
   skill?: string;
   /**
    * Explicit parent message ID for retry/branch tests.
@@ -226,7 +225,6 @@ export async function runTestStream(
     prompt,
     user,
     threadId,
-    threadMode = "new",
     skill,
     explicitParentMessageId,
     attachments,
@@ -251,12 +249,9 @@ export async function runTestStream(
     // favorite's resolved skill win.
     skill: skill ?? (favoriteId ? undefined : NO_SKILL_ID),
     threadId,
-    threadMode,
-    // For test "append" turns, use "send" so the prompt is treated as a new
-    // user message (not answer-as-ai which silences the user's text).
+    // For append turns, use "send" so the prompt is treated as a new user message.
     // wakeUpRevival overrides this — it needs the wakeup-resume operation.
-    operationOverride:
-      threadMode === "append" && !wakeUpRevival ? "send" : undefined,
+    operationOverride: threadId && !wakeUpRevival ? "send" : undefined,
     rootFolderId: DefaultFolderId.CRON,
     user,
     locale: defaultLocale,

@@ -1,0 +1,882 @@
+{
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "method": "POST",
+  "headers": {
+    "authorization": "[redacted]",
+    "content-type": "application/json",
+    "http-referer": "https://unbottled.ai",
+    "user-agent": "ai-sdk/openrouter/2.3.3 ai-sdk/provider-utils/4.0.1 runtime/bun/1.3.10",
+    "x-openrouter-categories": "general-chat,roleplay,personal-agent",
+    "x-title": "Unbottled AI"
+  },
+  "body": {
+    "messages": [
+      {
+        "content": [
+          {
+            "cache_control": {
+              "ttl": "1h",
+              "type": "ephemeral"
+            },
+            "text": "# unbottled.ai - Automated Agent\n\n**Current Date:** 2026-04-05\n\nYou are an automated AI agent running on unbottled.ai. No human is present - you are executing a programmatic task. Complete the task fully, then emit your final response and stop. Only your last non-tool-call message is returned to the requester; anything sent alongside a tool call is discarded.\n\n## About unbottled.ai\n\n- **Platform:** Free speech AI - 123 models from Claude and GPT to UncensoredLM v1.2, FreedomGPT Liberty, Gab AI Arya, Venice Uncensored 1.1. Users set their own filtering level.\n- **Credits:** 1 credit = $0.01. Cost varies by model.\n- **Free tier:** 20 credits/month via browser ID - no account needed.\n- **Subscription:** $8/month → 800 credits. **Credit packs:** $5 → 500 permanent credits.\n- **Folders:** public (open), incognito (browser-only), private (account), shared (invite), cron (system tasks).\n\n## Automated Execution Context\n\nYou are running as a headless background agent - no user is watching in real time. Your final response is stored and reviewed programmatically or by an admin later.\n\nThis thread lives in the **cron** folder - standard home for scheduled agent tasks.\n**Rules:**\n- Complete the task with the information provided. Do not ask follow-up questions.\n- Do not add pleasantries, sign-offs, or AI commentary.\n- If the task fails or cannot be completed, state clearly why.\n- Your **last message** (with no tool call) is the result. Everything before it is ignored by the requester.\n\n## Output Language\n\nRespond in English (en) unless the task explicitly specifies otherwise.\n\n## Current Context\n\n- **Folder:** cron - Cron task conversations - system-scheduled AI agent executions, visible to admins only.\n\n## Tool Execution Control\n\nEvery tool accepts an optional `callbackMode` parameter:\n\n- **`\"detach\"`** - Fire and forget. Returns `{taskId}` immediately. Tool runs in background. Use `wait-for-task` with that taskId later if you need the result.\n- **`\"wakeUp\"`** - Fire and forget. Returns `{taskId}` immediately. The result is automatically injected into this thread when ready - the stream revives and you will see the tool result as a new message. Do NOT call wait-for-task for wakeUp.\n- **`\"endLoop\"`** - Execute normally, return result, but stop the tool loop. No more tool calls this turn.\n- **`\"approve\"`** - Require user confirmation before executing.\n- Omit for default synchronous execution.\n\n**`wait-for-task`** - Call with a taskId from a detached tool. Stops the stream and blocks until the task completes. The stream resumes automatically with the result - zero extra messages. Never pass callbackMode on wait-for-task.\n\n## Media capabilities\n- Images: Z Image Turbo available via generate_image tool\n- Music/audio: Lyria 3 available via generate_music tool\n- Video: LTX 2 PRO T2V available via generate_video tool\n\n## Output Format\n\nUse plain, structured text. Markdown is fine for readability; avoid decorative formatting. Be concise and complete.\n\n## Your Role\n\nYou are an AI assistant on a platform where users pay credits per interaction. Do what the user asks.\n\nWhile doing it, pay attention to everything you encounter: tool descriptions, parameter names, error messages, result formats, credit costs. You are the last line of defense before a real user sees this.\n\nHARD STOP — if any of these happen, stop and report instead of retrying or working around it:\n- A tool returns an error, empty result, or nonsensical output\n- Same failure happens twice\n- A generated result (image/music/video) is missing, broken URL, or clearly wrong\n- Credit cost seems unreasonable for what was done\n- You see raw IDs, internal field names, JSON blobs, or stack traces in anything user-facing\n- A tool name, description, or parameter is confusing or misleading\n- An error message doesn't tell the user what to do about it\n- You hit a dead end with no path forward\n\nFailure report format:\n1. What the user asked for\n2. What actually happened\n3. Exact error text, tool name, or result\n4. Severity: BLOCKER (unusable) | MAJOR (works but wrong) | MINOR (cosmetic/confusing)\n\nIf everything works, respond normally to the user. Only flag issues — don't narrate the process.\n\n## System Context\n\n- **Instance:** Cloud production (unbottled.ai)\n- **URL:** http://localhost:3000\n- **Instance ID:** hermes-dev\n- **Environment:** development (NODE_ENV=development)\n- **Models available:** 123\n- **Note:** Dev mode - hot reload active, DB may contain test data, errors are verbose.\n\n**Your role:** You are the local dev companion on this machine. Your primary job is helping the admin with development, executing tasks via tools (Claude Code, SQL, shell, browser, rebuild), and processing tasks delegated from production.\n\n**Operational context:**\n- Built/production server: http://localhost:3000 - this is where you run\n- Dev server (hot-reload): also running - use for testing UI changes\n- **Claude Code** is your primary tool for code execution - use it to make codebase changes\n- Check the **cron dashboard** for tasks delegated from production\n\n**Task routing:** Tasks with `targetInstance` matching `hermes-dev` run here.",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:d1286d7e | Posted:Apr 5, 08:26]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "[T1 thread-create+tool-call] Use the tool-help tool to list available tools. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if everything worked, or FAILED: <reason> if anything was wrong.",
+        "role": "user"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:92c9ad39 | Model:kimi_k2_5 | Skill:quality-tester | Posted:Apr 5, 08:26]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "",
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{}",
+              "name": "tool-help"
+            },
+            "id": "functions.tool-help:0",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "{\"categories\":[{\"count\":15,\"name\":\"AI\"},{\"count\":11,\"name\":\"Analytics\"},{\"count\":89,\"name\":\"Analytics: Data Sources\"},{\"count\":6,\"name\":\"Analytics: Evaluators\"},{\"count\":10,\"name\":\"Analytics: Indicators\"},{\"count\":5,\"name\":\"Analytics: Transformers\"},{\"count\":18,\"name\":\"Browser\"},{\"count\":8,\"name\":\"Browser: DevTools\"},{\"count\":6,\"name\":\"Chat: Favorites\"},{\"count\":5,\"name\":\"Chat: Memories\"},{\"count\":9,\"name\":\"Chat: Messages\"},{\"count\":2,\"name\":\"Chat: Settings\"},{\"count\":5,\"name\":\"Chat: Skills\"},{\"count\":24,\"name\":\"Chat: Threads\"},{\"count\":5,\"name\":\"Credits\"},{\"count\":11,\"name\":\"Leads\"},{\"count\":16,\"name\":\"Leads: Campaigns\"},{\"count\":8,\"name\":\"Leads: Import\"},{\"count\":17,\"name\":\"Messenger\"},{\"count\":5,\"name\":\"Payments\"},{\"count\":8,\"name\":\"Referral\"},{\"count\":18,\"name\":\"SSH\"},{\"count\":3,\"name\":\"System\"},{\"count\":1,\"name\":\"System: Database\"},{\"count\":3,\"name\":\"System: Dev Tools\"},{\"count\":21,\"name\":\"System: Tasks\"},{\"count\":11,\"name\":\"User Authentication\"},{\"count\":9,\"name\":\"User Management\"}],\"currentEnv\":\"development\",\"currentPage\":1,\"currentPlatform\":\"ai\",\"effectivePageSize\":25,\"hint\":\"349 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\\\"<name>\\\" for detail on one tool. To call any tool: execute-tool toolName=\\\"<name>\\\". Page 1/14 - pass page=2 to continue.\",\"matchedCount\":349,\"tools\":[{\"category\":\"AI\",\"description\":\"Hide a reported skill or clear its reports\",\"name\":\"agent_chat_skills_moderation_PATCH\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Moderate Skill\"},{\"aliases\":[\"run-ai\"],\"category\":\"AI\",\"description\":\"Run a headless AI agent and return the final text response. Set model + prompt for a simple one-shot, or pass favoriteId to load a saved skill + model + tools preset. Credits consumed based on model.\",\"name\":\"ai-run\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Run AI Agent\"},{\"category\":\"AI\",\"credits\":0.65,\"description\":\"Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.\",\"name\":\"brave-search\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Search the Web\"},{\"aliases\":[\"claude-code\"],\"category\":\"AI\",\"description\":\"Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.\",\"name\":\"coding-agent\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Run Coding Agent\"},{\"category\":\"AI\",\"description\":\"Describe the contents of an image using a vision AI model\",\"name\":\"describe_image\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Describe Image\"},{\"category\":\"AI\",\"description\":\"Describe the contents of a video using a vision AI model\",\"name\":\"describe_video\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Describe Video\"},{\"aliases\":[\"fetch\"],\"category\":\"AI\",\"credits\":0.13,\"description\":\"Fetch and extract content from any URL, converting it to readable markdown format. Use this when you need to read or analyze web page content.\",\"name\":\"fetch-url-content\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Fetch URL Content\"},{\"category\":\"AI\",\"description\":\"Generate an image from a text prompt using AI\",\"name\":\"generate_image\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Generate Image\"},{\"category\":\"AI\",\"description\":\"Generate music from a text prompt using AI\",\"name\":\"generate_music\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Generate Music\"},{\"category\":\"AI\",\"description\":\"Generate a video from a text prompt using AI\",\"name\":\"generate_video\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Generate Video\"},{\"category\":\"AI\",\"credits\":1.95,\"description\":\"Search the internet or get AI-powered answers using Kagi. FastGPT mode provides comprehensive answers with sources, while search mode returns direct results.\",\"name\":\"kagi-search\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Search with Kagi\"},{\"category\":\"AI\",\"description\":\"List skills with reports, sorted by report count\",\"name\":\"skill-moderation\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Reported Skills\"},{\"category\":\"AI\",\"description\":\"Publish or unpublish a custom skill. PUBLISHED makes it visible in the community store.\",\"name\":\"skill-publish\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Publish Skill\"},{\"category\":\"AI\",\"description\":\"Report a community skill for moderation. Idempotent - one report per user per skill.\",\"name\":\"skill-report\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Report Skill\"},{\"category\":\"AI\",\"description\":\"Toggle upvote on a community skill. Idempotent - call again to remove your vote.\",\"name\":\"skill-vote\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Vote for Skill\"},{\"category\":\"Analytics\",\"description\":\"Run retention cleanup for datapoints and expire snapshots\",\"name\":\"system_unified-interface_vibe-sense_cleanup_POST\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Vibe Sense Cleanup\"},{\"category\":\"Analytics\",\"description\":\"List all graphs visible to the current user\",\"name\":\"system_unified-interface_vibe-sense_graphs_GET\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Pipeline Graphs\"},{\"category\":\"Analytics\",\"description\":\"Soft-delete a graph (deactivate and mark as archived)\",\"name\":\"system_unified-interface_vibe-sense_graphs_id_archive_POST\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Archive Graph\"},{\"category\":\"Analytics\",\"description\":\"Run a backtest over a historical range (actions simulated)\",\"name\":\"system_unified-interface_vibe-sense_graphs_id_backtest_POST\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Run Backtest\"},{\"category\":\"Analytics\",\"description\":\"View graph chart with indicators and signals\",\"name\":\"system_unified-interface_vibe-sense_graphs_id_data_GET\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Graph Detail\"},{\"category\":\"Analytics\",\"description\":\"Branch and edit a graph (creates new version, never mutates)\",\"name\":\"system_unified-interface_vibe-sense_graphs_id_edit_PUT\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Edit Graph\"},{\"category\":\"Analytics\",\"description\":\"Promote an admin graph to system-owned (read-only, shared)\",\"name\":\"system_unified-interface_vibe-sense_graphs_id_promote_POST\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Promote to System\"},{\"category\":\"Analytics\",\"description\":\"Manually trigger on-demand graph execution\",\"name\":\"system_unified-interface_vibe-sense_graphs_id_trigger_POST\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Trigger Graph\"},{\"category\":\"Analytics\",\"description\":\"Get the version chain for a graph (ancestor walk via parentVersionId)\",\"name\":\"system_unified-interface_vibe-sense_graphs_id_versions_GET\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Graph Version History\"},{\"category\":\"Analytics\",\"description\":\"Create a new pipeline graph\",\"name\":\"system_unified-interface_vibe-sense_graphs_POST\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Create Graph\"}],\"totalCount\":349,\"totalPages\":14}",
+        "role": "tool",
+        "tool_call_id": "functions.tool-help:0"
+      },
+      {
+        "content": "Tool names found (page 1 of 14, 25 of 349 total tools):\n\n**AI Category:**\n- agent_chat_skills_moderation_PATCH\n- ai-run\n- brave-search\n- coding-agent\n- describe_image\n- describe_video\n- fetch-url-content\n- generate_image\n- generate_music\n- generate_video\n- kagi-search\n- skill-moderation\n- skill-publish\n- skill-report\n- skill-vote\n\n**Analytics Category:**\n- system_unified-interface_vibe-sense_cleanup_POST\n- system_unified-interface_vibe-sense_graphs_GET\n- system_unified-interface_vibe-sense_graphs_id_archive_POST\n- system_unified-interface_vibe-sense_graphs_id_backtest_POST\n- system_unified-interface_vibe-sense_graphs_id_data_GET\n- system_unified-interface_vibe-sense_graphs_id_edit_PUT\n- system_unified-interface_vibe-sense_graphs_id_promote_POST\n- system_unified-interface_vibe-sense_graphs_id_trigger_POST\n- system_unified-interface_vibe-sense_graphs_id_versions_GET\n- system_unified-interface_vibe-sense_graphs_POST\n\nAll tools returned with proper metadata (description, category, platforms). No issues detected.\n\nSTEP_OK",
+        "role": "assistant"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:1f96b84b | Posted:Apr 5, 08:26]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "[T1b tool-help-detail] Call tool-help with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.",
+        "role": "user"
+      },
+      {
+        "content": [
+          {
+            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## User Memories (0)\nNo memories yet - store useful facts immediately as you learn them.\n\n**Memory tools:** `memories-add` (new facts) · `memories-update id=N` (merge/fix, or hide with isArchived) · `memories-delete id=N` (remove) · `memories-list` (full detail) · `memories-search` (search)\n**Store proactively:** name, preferences, goals, expertise, ongoing projects, communication style. Don't wait to be asked.\n**Self-manage:** consolidate duplicates (>80% overlap → UPDATE highest-priority first, then DELETE or archive leftovers). Archive low-value memories with `isArchived=true` to hide them without losing them.\n\n## Favorites (4) - active: \"Thea - Smart\" ()\n- [b7b34fd4-35bf-492f-941e-8993a6d3643e] Thea - Smart [ACTIVE] | char:Thea - Smart (thea) | model:\n- [5aa82118-577f-498e-8673-10ef2589885e] Thea - Brilliant | char:Thea - Brilliant (thea) | model:\n- [8aadff5c-a03f-4dd9-abf8-858494873987] Thea - Uncensored | char:Thea - Uncensored (thea) | model:\n- [00000000-0000-4001-a000-000000000001] Quality Tester - Kimi | char:Quality Tester - Kimi (quality-tester) | model:\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:988a400c | Model:kimi_k2_5 | Skill:quality-tester | Posted:Apr 5, 08:26]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "",
+        "reasoning": "The user wants me to call tool-help with toolName='generate_image' and check that the result contains:\n1. name\n2. description\n3. parameters schema\n\nI'll make this call and verify the response.",
+        "reasoning_details": [
+          {
+            "format": "unknown",
+            "index": 0,
+            "text": "The user wants me to call tool-help with toolName='generate_image' and check that the result contains:\n1. name\n2. description\n3. parameters schema\n\nI'll make this call and verify the response.",
+            "type": "reasoning.text"
+          }
+        ],
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"toolName\":\"generate_image\"}",
+              "name": "tool-help"
+            },
+            "id": "tool_help_1",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "content": "{\"currentEnv\":\"development\",\"currentPlatform\":\"ai\",\"hint\":\"Call as: execute-tool toolName=\\\"generate_image\\\". CLI: vibe generate_image [--field=value].\",\"matchedCount\":1,\"tools\":[{\"category\":\"AI\",\"description\":\"Generate an image from a text prompt using AI\",\"examples\":{\"inputs\":{\"default\":{\"model\":\"gemini-3-pro-image-preview\",\"prompt\":\"A photorealistic sunset over a mountain lake\",\"quality\":\"post.quality.standard\",\"size\":\"post.size.square1024\"}},\"responses\":{\"default\":{\"creditCost\":4,\"imageUrl\":\"https://example.com/generated-image.png\"}}},\"name\":\"generate_image\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"properties\":{\"aspectRatio\":{\"description\":\"Output image aspect ratio\",\"type\":\"string\"},\"model\":{\"default\":\"gemini-3-pro-image-preview\",\"description\":\"Select an image generation model\",\"enum\":[\"flux-pro\",\"flux-2-max\",\"flux-2-klein-4b\",\"riverflow-v2-pro\",\"riverflow-v2-fast\",\"riverflow-v2-max-preview\",\"riverflow-v2-standard-preview\",\"riverflow-v2-fast-preview\",\"flux-2-flex\",\"flux-2-pro\",\"seedream-4.5\",\"gen4-t2i-turbo\",\"gen4-image\",\"wan-2.7-t2i\",\"grok-t2i\",\"z-image-base\",\"z-image-turbo\",\"flux-pro-1.1-ultra\",\"imagen-4-ultra\",\"imagen-4\",\"imagen-4-fast\",\"qwen-t2i\",\"realtime-t2i\",\"gemini-3.1-flash-image-preview\",\"gemini-3-pro-image-preview\",\"gpt-5-image-mini\",\"gpt-5-image\"],\"type\":\"string\"},\"prompt\":{\"description\":\"Describe the image you want to generate\",\"maxLength\":2000,\"minLength\":1,\"type\":\"string\"},\"quality\":{\"default\":\"post.quality.standard\",\"description\":\"Select output image quality\",\"enum\":[\"post.quality.standard\",\"post.quality.hd\"],\"type\":\"string\"},\"size\":{\"default\":\"post.size.square1024\",\"description\":\"Select output image dimensions\",\"enum\":[\"post.size.square1024\",\"post.size.landscape1792\",\"post.size.portrait1792\"],\"type\":\"string\"}},\"required\":[\"prompt\"],\"type\":\"object\"},\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"title\":\"Generate Image\"}],\"totalCount\":349}",
+        "role": "tool",
+        "tool_call_id": "tool_help_1"
+      }
+    ],
+    "model": "moonshotai/kimi-k2.5",
+    "stream": true,
+    "temperature": 0.7,
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "function": {
+          "description": "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.",
+          "name": "tool-help",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "instanceId": {
+                "type": "string"
+              },
+              "page": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pageSize": {
+                "maximum": 500,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "query": {
+                "type": "string"
+              },
+              "toolName": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
+          "name": "execute-tool",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "definitions": {
+              "__schema0": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "items": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  }
+                ]
+              }
+            },
+            "properties": {
+              "callbackMode": {
+                "default": "wait",
+                "enum": ["wait", "detach", "endLoop", "wakeUp", "approve"],
+                "type": "string"
+              },
+              "input": {
+                "additionalProperties": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "default": {},
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "instanceId": {
+                "type": "string"
+              },
+              "toolName": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["toolName"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Wait on a pending background task. Returns the result immediately if already completed, or pauses the AI stream until the task finishes (wakeUp mechanism).",
+          "name": "wait-for-task",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "taskId": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["taskId"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.",
+          "name": "brave-search",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "freshness": {
+                "enum": ["past_day", "past_week", "past_month", "past_year"],
+                "type": "string"
+              },
+              "includeNews": {
+                "default": false,
+                "type": "boolean"
+              },
+              "maxResults": {
+                "default": 5,
+                "maximum": 10,
+                "minimum": 1,
+                "type": "number"
+              },
+              "query": {
+                "maxLength": 400,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["query"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Search the internet or get AI-powered answers using Kagi. FastGPT mode provides comprehensive answers with sources, while search mode returns direct results.",
+          "name": "kagi-search",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "query": {
+                "maxLength": 400,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["query"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Fetch and extract content from any URL, converting it to readable markdown format. Use this when you need to read or analyze web page content.",
+          "name": "fetch-url-content",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "query": {
+                "type": "string"
+              },
+              "url": {
+                "format": "uri",
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["url"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Creates a new memory for the current user",
+          "name": "memories-add",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "content": {
+                "maxLength": 5000,
+                "minLength": 1,
+                "type": "string"
+              },
+              "isPublic": {
+                "default": false,
+                "type": "boolean"
+              },
+              "isShared": {
+                "default": false,
+                "type": "boolean"
+              },
+              "priority": {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "number"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": ["content"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Update an existing memory. All fields are optional - omit any field to keep its current value. To update only tags or priority, simply omit content. IMPORTANT: never pass an empty string for content - it will be ignored and the existing content preserved. To remove a memory entirely, use the delete endpoint instead.",
+          "name": "memories-update",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "content": {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              "id": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "isArchived": {
+                "type": "boolean"
+              },
+              "isPublic": {
+                "type": "boolean"
+              },
+              "isShared": {
+                "type": "boolean"
+              },
+              "priority": {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "number"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": ["id"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Removes a memory by ID",
+          "name": "memories-delete",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "id": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": ["id"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.",
+          "name": "coding-agent",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "interactiveMode": {
+                "default": false,
+                "type": "boolean"
+              },
+              "model": {
+                "type": "string"
+              },
+              "prompt": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "provider": {
+                "default": "claude-code",
+                "enum": ["claude-code", "open-code"],
+                "type": "string"
+              },
+              "taskTitle": {
+                "type": "string"
+              }
+            },
+            "required": ["prompt"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Run a headless AI agent and return the final text response. Set model + prompt for a simple one-shot, or pass favoriteId to load a saved skill + model + tools preset. Credits consumed based on model.",
+          "name": "ai-run",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "appendThreadId": {
+                "anyOf": [
+                  {
+                    "const": "",
+                    "type": "string"
+                  },
+                  {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  }
+                ]
+              },
+              "availableTools": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "properties": {
+                        "requiresConfirmation": {
+                          "default": false,
+                          "type": "boolean"
+                        },
+                        "toolId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["toolId"],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "callbackMode": {
+                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "excludeMemories": {
+                "default": false,
+                "type": "boolean"
+              },
+              "favoriteId": {
+                "anyOf": [
+                  {
+                    "const": "",
+                    "type": "string"
+                  },
+                  {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  }
+                ]
+              },
+              "instructions": {
+                "type": "string"
+              },
+              "maxTurns": {
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer"
+              },
+              "model": {
+                "enum": [
+                  "gpt-54",
+                  "gpt-54-pro",
+                  "gpt-5.4-mini",
+                  "gpt-5.4-nano",
+                  "gpt-53-codex",
+                  "gpt-53-chat",
+                  "gpt-52",
+                  "gpt-52-chat",
+                  "gpt-52-pro",
+                  "gpt-51",
+                  "gpt-51-codex",
+                  "gpt-5-pro",
+                  "gpt-5-codex",
+                  "gpt-5",
+                  "gpt-5-mini",
+                  "gpt-5-nano",
+                  "gemini-3.1-pro-preview-customtools",
+                  "gemini-3.1-flash-lite-preview",
+                  "gemini-3-flash",
+                  "gemini-2.5-pro",
+                  "gemini-2.5-flash",
+                  "gemini-2.5-flash-lite",
+                  "kimi_k2_5",
+                  "grok-4-fast",
+                  "grok-4",
+                  "grok-4.20",
+                  "claude-haiku-4.5",
+                  "claude-sonnet-4.5",
+                  "claude-sonnet-4.6",
+                  "claude-opus-4.5",
+                  "claude-opus-4.6",
+                  "glm-4.5v",
+                  "kimi-k2",
+                  "kimi-k2-thinking",
+                  "deepseek-v3.2",
+                  "deepseek-v3.1",
+                  "deepseek-r1",
+                  "qwen3_235b-free",
+                  "deepseek-r1-distill",
+                  "qwen-2-5-7b",
+                  "claude-code-haiku",
+                  "claude-code-sonnet",
+                  "claude-code-opus",
+                  "gpt-oss-120b-free",
+                  "freedomgpt-liberty",
+                  "gab-ai-arya",
+                  "uncensored-lm-v1.2",
+                  "glm-5",
+                  "glm-5-turbo",
+                  "glm-4.7",
+                  "glm-4.7-flash",
+                  "glm-4.6",
+                  "glm-4.5-air",
+                  "venice-uncensored",
+                  "minimax-m2.7",
+                  "mimo-v2-pro",
+                  "gemini-3.1-flash-image-preview",
+                  "gemini-3-pro-image-preview",
+                  "gpt-5-image-mini",
+                  "gpt-5-image"
+                ],
+                "type": "string"
+              },
+              "pinnedTools": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "properties": {
+                        "requiresConfirmation": {
+                          "default": false,
+                          "type": "boolean"
+                        },
+                        "toolId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["toolId"],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "preCalls": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "properties": {
+                        "args": {
+                          "additionalProperties": {},
+                          "default": {},
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "routeId": {
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": ["routeId"],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "prompt": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "rootFolderId": {
+                "default": "cron",
+                "enum": ["private", "shared", "public", "incognito", "cron"],
+                "type": "string"
+              },
+              "skill": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "thea",
+                      "hermes",
+                      "4chan",
+                      "biologist",
+                      "brainstormer",
+                      "brilliant-coder",
+                      "business-advisor",
+                      "career-coach",
+                      "code-architect",
+                      "coder",
+                      "creative",
+                      "cron-manager",
+                      "data-analyst",
+                      "debater",
+                      "deployment-agent",
+                      "devil",
+                      "editor",
+                      "financial-advisor",
+                      "freeSpeechActivist",
+                      "friendly",
+                      "health-wellness",
+                      "legal-assistant",
+                      "marketer",
+                      "master-writer",
+                      "neet",
+                      "philosopher",
+                      "product-manager",
+                      "professional",
+                      "public-curator",
+                      "quality-tester",
+                      "quick-coder",
+                      "quick-writer",
+                      "rebuild-agent",
+                      "research-agent",
+                      "researcher",
+                      "roleplay-skill",
+                      "scientist",
+                      "skill-creator",
+                      "social-media-manager",
+                      "socraticQuestioner",
+                      "stats-analyst",
+                      "storyteller",
+                      "system-monitor",
+                      "teacher",
+                      "technical",
+                      "translator",
+                      "travel-planner",
+                      "tutor",
+                      "unbiasedHistorian",
+                      "uncensored",
+                      "uncensored-writer",
+                      "vibe-coder",
+                      "writer"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  }
+                ]
+              },
+              "subFolderId": {
+                "anyOf": [
+                  {
+                    "const": "",
+                    "type": "string"
+                  },
+                  {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "required": ["prompt"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Generate an image from a text prompt using AI",
+          "name": "generate_image",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "prompt": {
+                "maxLength": 2000,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["prompt"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Generate music from a text prompt using AI",
+          "name": "generate_music",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "duration": {
+                "default": "post.duration.short",
+                "enum": [
+                  "post.duration.short",
+                  "post.duration.medium",
+                  "post.duration.long"
+                ],
+                "type": "string"
+              },
+              "prompt": {
+                "maxLength": 2000,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["prompt"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "function": {
+          "description": "Generate a video from a text prompt using AI",
+          "name": "generate_video",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "prompt": {
+                "maxLength": 2000,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["prompt"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      }
+    ]
+  }
+}

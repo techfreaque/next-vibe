@@ -7,6 +7,8 @@
  * primed for instant playback - eliminating gaps between chunks.
  */
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
 /** How many seconds before the current chunk ends to start preloading the next */
 const PREFETCH_LEAD_TIME_S = 5;
 
@@ -47,7 +49,7 @@ export class AudioQueueManager {
   /**
    * Add audio chunk to queue
    */
-  enqueue(audioData: string, chunkIndex: number): void {
+  enqueue(audioData: string, chunkIndex: number, logger: EndpointLogger): void {
     this.queue.push({ audioData, chunkIndex });
     // Sort by chunk index to ensure correct order
     this.queue.sort((a, b) => a.chunkIndex - b.chunkIndex);
@@ -55,7 +57,7 @@ export class AudioQueueManager {
     // Start preloading this audio immediately
     void this.preloadAudio(audioData, chunkIndex);
 
-    void this.processQueue();
+    void this.processQueue(logger);
   }
 
   /**
@@ -108,7 +110,7 @@ export class AudioQueueManager {
   /**
    * Process queue - play next audio if not already playing
    */
-  private async processQueue(): Promise<void> {
+  private async processQueue(logger: EndpointLogger): Promise<void> {
     if (this.isPlaying || this.queue.length === 0) {
       return;
     }
@@ -125,7 +127,7 @@ export class AudioQueueManager {
     }
 
     try {
-      await this.playAudio(next.audioData, next.chunkIndex);
+      await this.playAudio(next.audioData, next.chunkIndex, logger);
       this.nextExpectedChunk = next.chunkIndex + 1;
     } catch {
       // Playback failed - continue with next chunk
@@ -140,7 +142,7 @@ export class AudioQueueManager {
     } else {
       this.isPlaying = false;
       // Process next in queue
-      void this.processQueue();
+      void this.processQueue(logger);
     }
   }
 
@@ -249,7 +251,11 @@ export class AudioQueueManager {
    * Play a single audio chunk
    * Uses preloaded audio if available, otherwise loads and plays
    */
-  private playAudio(audioData: string, chunkIndex: number): Promise<void> {
+  private playAudio(
+    audioData: string,
+    chunkIndex: number,
+    logger: EndpointLogger,
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
       // Check if we have a preloaded audio element
       let audio = this.preloadedAudio.get(chunkIndex);
@@ -293,11 +299,18 @@ export class AudioQueueManager {
       // If audio is already loaded (preloaded case), play immediately
       // Otherwise wait for canplaythrough before playing
       if (audio.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
-        audio.play().catch(reject);
+        audio.play().catch((e) => {
+          logger.error("[TTS-PLAY] play() failed", e);
+          reject(e);
+        });
       } else {
         const onCanPlay = (): void => {
           audio.removeEventListener("canplaythrough", onCanPlay);
-          audio.play().catch(reject);
+
+          audio.play().catch((e) => {
+            logger.error("[TTS-PLAY] play() failed", e);
+            reject(e);
+          });
         };
         audio.addEventListener("canplaythrough", onCanPlay);
         // Start loading if not already

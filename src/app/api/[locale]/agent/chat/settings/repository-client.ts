@@ -11,18 +11,21 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "../../../user/auth/types";
-import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
-import type { ChatModelId } from "../../ai-stream/models";
+import { getBestChatModel, type ChatModelId } from "../../ai-stream/models";
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
 import type { ChatMode } from "../../models/enum";
 import type { ModelProviderEnvAvailability } from "../../models/models";
 
 import { ViewMode } from "../enum";
-import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
+import type {
+  TtsModelId,
+  VoiceModelSelection,
+} from "../../text-to-speech/models";
 import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,
 } from "./definition";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
 
 /**
  * Storage key for chat settings
@@ -353,16 +356,26 @@ export class ChatSettingsRepositoryClient {
     favoriteId: string;
     modelId: ChatModelId | null;
     skillId: string | null;
+    voiceId: TtsModelId | null;
     logger: EndpointLogger;
     locale: CountryLanguage;
     user: JwtPayloadType;
   }): Promise<void> {
-    const { favoriteId, modelId, skillId, logger, locale, user } = params;
+    const { favoriteId, modelId, skillId, voiceId, logger, locale, user } =
+      params;
 
     const { apiClient } =
       await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
     const settingsDefinition = await import("./definition");
     const favoritesDefinition = await import("../favorites/definition");
+
+    // Build voiceModelSelection from the favorite's resolved voiceId
+    const voiceModelSelection: VoiceModelSelection | null = voiceId
+      ? {
+          selectionType: "enums.selectionType.manual" as const,
+          manualModelId: voiceId,
+        }
+      : null;
 
     // Optimistic update 1: Update settings
     apiClient.updateEndpointData(
@@ -373,21 +386,15 @@ export class ChatSettingsRepositoryClient {
           return oldData;
         }
 
-        const updatedData = {
-          ...oldData.data,
-          activeFavoriteId: favoriteId,
-        };
-
-        if (modelId) {
-          updatedData.selectedModel = modelId;
-        }
-        if (skillId) {
-          updatedData.selectedSkill = skillId;
-        }
-
         return {
           success: true,
-          data: updatedData,
+          data: {
+            ...oldData.data,
+            activeFavoriteId: favoriteId,
+            ...(modelId && { selectedModel: modelId }),
+            ...(skillId && { selectedSkill: skillId }),
+            ...(voiceModelSelection && { voiceModelSelection }),
+          },
         };
       },
     );
@@ -421,6 +428,7 @@ export class ChatSettingsRepositoryClient {
           activeFavoriteId: favoriteId,
           ...(modelId && { selectedModel: modelId }),
           ...(skillId && { selectedSkill: skillId }),
+          ...(voiceModelSelection && { voiceModelSelection }),
         },
         undefined,
         locale,

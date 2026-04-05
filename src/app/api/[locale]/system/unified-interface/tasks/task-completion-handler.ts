@@ -175,8 +175,14 @@ export async function handleTaskCompletion(params: {
         // wakeUp: do NOT backfill here. resume-stream checks the leaf sequenceId:
         //   - same sequenceId → backfill the original tool message directly
         //   - different sequenceId → insert a deferred TOOL message after the new leaf
+        // detach: do NOT backfill either. The initial {taskId, status, hint} written by
+        //   ToolResultHandler.processToolResult is the correct final state. The real result
+        //   lives only in cron_task_executions (task history), not in the thread.
         // All other modes: always backfill the original tool message.
-        if (callbackMode !== CallbackMode.WAKE_UP) {
+        if (
+          callbackMode !== CallbackMode.WAKE_UP &&
+          callbackMode !== CallbackMode.DETACH
+        ) {
           await db
             .update(chatMessages)
             .set({

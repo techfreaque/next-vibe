@@ -635,7 +635,6 @@ async function executeSelfRelay(params: UnbottledStreamParams): Promise<void> {
     content,
     aiMessageId,
     userMessageId,
-    parentMessageId,
     model,
     skill,
     sequenceId,
@@ -694,7 +693,6 @@ async function executeSelfRelay(params: UnbottledStreamParams): Promise<void> {
       model: underlyingModel,
       skill: skill || NO_SKILL_ID,
       prompt: content,
-      threadMode: "none",
       rootFolderId: DefaultFolderId.INCOGNITO,
       user,
       locale,
@@ -731,13 +729,15 @@ async function executeSelfRelay(params: UnbottledStreamParams): Promise<void> {
   const responseContent = result.data.lastAiMessageContent ?? "";
   const creditsDeducted = result.data.totalCreditsDeducted ?? 0;
 
-  // Create the local assistant message
+  // Create the local assistant message.
+  // The AI message is always parented to the user message (not the previous
+  // turn's AI message — that is the user message's parent).
   if (!isIncognito) {
     await dbWriter.emitMessageCreated({
       messageId: aiMessageId,
       threadId: params.threadId,
       content: "",
-      parentId: parentMessageId ?? userMessageId,
+      parentId: userMessageId,
       userId,
       model,
       skill,
@@ -750,7 +750,7 @@ async function executeSelfRelay(params: UnbottledStreamParams): Promise<void> {
         threadId: params.threadId,
         role: ChatMessageRole.ASSISTANT,
         content: "",
-        parentId: parentMessageId ?? userMessageId,
+        parentId: userMessageId,
         sequenceId,
         model,
         skill,

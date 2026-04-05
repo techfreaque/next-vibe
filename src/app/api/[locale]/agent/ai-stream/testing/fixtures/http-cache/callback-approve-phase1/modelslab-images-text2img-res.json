@@ -1,63 +1,18 @@
 {
-  "type": "json",
+  "type": "text",
   "url": "https://modelslab.com/api/v6/images/text2img",
-  "status": 200,
+  "status": 500,
   "headers": {
-    "access-control-allow-methods": "GET, POST",
-    "access-control-allow-origin": "*",
     "alt-svc": "h3=\":443\"; ma=86400",
-    "cache-control": "no-cache, private",
     "cf-cache-status": "DYNAMIC",
-    "cf-ray": "9e73ab302eec9f52-FRA",
+    "cf-ray": "9e7798ca7f7b3617-FRA",
     "connection": "keep-alive",
-    "content-encoding": "br",
-    "content-type": "application/json",
-    "date": "Sat, 04 Apr 2026 22:14:57 GMT",
+    "content-type": "text/html; charset=UTF-8",
+    "date": "Sun, 05 Apr 2026 09:41:24 GMT",
     "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
-    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=poHEV2%2BXLPdJdwRHIUtCbyYmxsdmcdCg4G2Ateu4fx2TOLGGY3D%2F%2Fqywp9yjxUAQpysPi03DuGVznRUA3oMHmLiRcCU9ORHtSI5YEN9VZnDq%2BGPsvCK2t8MLyYmkipk%3D\"}]}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=rmfj%2B2BLzOsGLd%2FxAzDsHC0Ctlh%2BwURKnteU8r3lteBzN2k5k6bsE2oRnHpEWOazLIHNq91RlvOhJXah8glGU44tJmqNsfcCHtxMRm2t2mgWCZGiTxfQuyxldYz%2BIM0%3D\"}]}",
     "server": "cloudflare",
-    "transfer-encoding": "chunked",
-    "x-cloud-trace-context": "762dea2aa593608add94d8372f4abfbc",
-    "x-request-time": "2.416",
-    "x-served-by": "octane-api",
-    "x-upstream-connect": "0.000",
-    "x-upstream-time": "-"
+    "transfer-encoding": "chunked"
   },
-  "body": {
-    "status": "processing",
-    "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise",
-    "eta": 80,
-    "message": "Request queued for processing. Try to fetch request after estimated seconds.",
-    "fetch_result": "https://modelslab.com/api/v6/images/fetch/173867711",
-    "id": 173867711,
-    "output": [],
-    "future_links": [
-      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/1ddfa3ba-643a-4acb-940d-f2be21bacde1-0.jpg"
-    ],
-    "meta": {
-      "model_id": "z-image-turbo",
-      "prompt": " approve-test hyperrealistic, full body, detailed clothing, highly detailed, cinematic lighting, stunningly beautiful, intricate, sharp focus, f/1. 8, 85mm, (centered image composition), (professionally color graded), ((bright soft diffused light)), volumetric fog, trending on instagram, trending on tumblr, HDR 4K, 8K",
-      "negative_prompt": " (child:1.5), ((((underage)))), ((((child)))), (((kid))), (((preteen))), (teen:1.5) ugly, tiling, poorly drawn hands, poorly drawn feet, poorly drawn face, out of frame, extra limbs, disfigured, deformed, body out of frame, bad anatomy, watermark, signature, cut off, low contrast, underexposed, overexposed, bad art, beginner, amateur, distorted face, blurry, draft, grainy",
-      "width": 512,
-      "height": 512,
-      "guidance": null,
-      "samples": 1,
-      "safety_checker": "no",
-      "safety_checker_type": "black",
-      "num_inference_steps": 9,
-      "seed": 5054,
-      "webhook": null,
-      "track_id": null,
-      "base64": "no",
-      "highres_fix": null,
-      "watermark": "no",
-      "temp": "no",
-      "lora_stength": "",
-      "id": 173867711,
-      "file_prefix": "1ddfa3ba-643a-4acb-940d-f2be21bacde1",
-      "output": [
-        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/1ddfa3ba-643a-4acb-940d-f2be21bacde1-0.jpg"
-      ]
-    }
-  }
+  "body": "\n<html><head>\n<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">\n<title>500 Server Error</title>\n</head>\n<body text=#000000 bgcolor=#ffffff>\n<h1>Error: Server Error</h1>\n<h2>The server encountered an error and could not complete your request.<p>Please try again in 30 seconds.</h2>\n<h2></h2>\n</body></html>\n"
 }

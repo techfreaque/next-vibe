@@ -1413,6 +1413,21 @@ function AddToFavoritesButton({
     logger,
     user,
     locale,
+    characterData: {
+      id: char.id,
+      icon: char.icon,
+      name: char.name,
+      tagline: char.tagline,
+      description: char.description,
+      voiceModelSelection: null,
+      modelSelection: null,
+      preComputedModel: {
+        modelId: char.modelId,
+        modelIcon: char.modelIcon,
+        modelInfo: char.modelInfo,
+        modelProvider: char.modelProvider,
+      },
+    },
   });
 
   return (
@@ -1511,6 +1526,7 @@ function SkillFavoriteActions({
         favoriteId: favoriteIds[0],
         modelId,
         skillId: char.id,
+        voiceId: null,
         logger,
         locale,
         user,
@@ -1570,6 +1586,7 @@ function SkillFavoriteActions({
         favoriteId,
         modelId,
         skillId: char.id,
+        voiceId: null,
         logger,
         locale,
         user,

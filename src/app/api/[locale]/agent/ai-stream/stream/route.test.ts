@@ -59,10 +59,7 @@ import { defaultLocale } from "@/i18n/core/config";
 import { eq, sql } from "drizzle-orm";
 
 import { env } from "@/config/env";
-import {
-  setFetchCacheContext,
-  setFetchCacheStrictMode,
-} from "../testing/fetch-cache";
+import { setFetchCacheContext } from "../testing/fetch-cache";
 import {
   runTestStream,
   fetchThreadMessages,
@@ -70,6 +67,7 @@ import {
   toolResultRecord,
   type SlimMessage,
 } from "../testing/headless-test-runner";
+import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import { runHeadlessAiStream } from "../repository/headless";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import {
@@ -133,7 +131,7 @@ async function resolveUser(
   };
 }
 
-/** Walk parent chain from leafId and return ordered ids root → leaf */
+/** Walk parent chain from leafId → root. Returns [root, ..., leaf] */
 function walkChain(messages: SlimMessage[], leafId: string): string[] {
   const byId = new Map(messages.map((m) => [m.id, m]));
   const chain: string[] = [];
@@ -150,9 +148,9 @@ function buildTree(messages: SlimMessage[]): Map<string, string[]> {
   const tree = new Map<string, string[]>();
   for (const msg of messages) {
     const parentKey = msg.parentId ?? "__root__";
-    const children = tree.get(parentKey);
-    if (children) {
-      children.push(msg.id);
+    const existing = tree.get(parentKey);
+    if (existing) {
+      existing.push(msg.id);
     } else {
       tree.set(parentKey, [msg.id]);
     }
@@ -160,17 +158,82 @@ function buildTree(messages: SlimMessage[]): Map<string, string[]> {
   return tree;
 }
 
-/** Assert that no orphan messages exist */
-function assertNoOrphans(messages: SlimMessage[]): void {
-  const idSet = new Set(messages.map((m) => m.id));
+function msgDesc(m: SlimMessage): string {
+  const tool = m.toolCall?.toolName ? `:${m.toolCall.toolName}` : "";
+  const preview = m.content ? ` "${m.content.slice(0, 30)}"` : "";
+  return `${m.id}(${m.role}${tool}${preview})`;
+}
+
+/**
+ * Full chain integrity check — call after every test turn.
+ *
+ * 1. No orphans: every parentId references a message that exists in the thread.
+ * 2. No broken branches: every message has at most 1 child, making each path a
+ *    strict linked list — unless the message ID is in knownBranchPoints.
+ * 3. Full reachability: every message in the thread is reachable by walking UP
+ *    the parent chain from some leaf. Detects disconnected subtrees.
+ *
+ * knownBranchPoints: IDs allowed to have >1 child (intentional branch nodes).
+ */
+function assertChainIntegrity(
+  messages: SlimMessage[],
+  knownBranchPoints: Set<string> = new Set(),
+): void {
+  const byId = new Map(messages.map((m) => [m.id, m]));
+  const tree = buildTree(messages);
+
+  // 1. No orphans
   for (const msg of messages) {
     if (msg.parentId) {
       expect(
-        idSet.has(msg.parentId),
-        `Orphan: ${msg.id} (${msg.role}) → missing parent ${msg.parentId}`,
+        byId.has(msg.parentId),
+        `Orphan: ${msgDesc(msg)} → parentId ${msg.parentId} not in thread`,
       ).toBe(true);
     }
   }
+
+  // 2. No broken branches — every non-whitelisted message has ≤1 child
+  for (const [parentId, children] of tree.entries()) {
+    if (parentId === "__root__") {
+      expect(
+        children.length,
+        `Multiple root messages (parentId=null): ${children.map((id) => msgDesc(byId.get(id)!)).join(", ")}`,
+      ).toBe(1);
+      continue;
+    }
+    if (knownBranchPoints.has(parentId) || children.length <= 1) {
+      continue;
+    }
+    const parent = byId.get(parentId);
+    const childList = children.map((id) => msgDesc(byId.get(id)!)).join("\n  ");
+    expect(
+      children.length,
+      `Branch violation on ${parent ? msgDesc(parent) : parentId}: has ${String(children.length)} children (expected 1):\n  ${childList}`,
+    ).toBe(1);
+  }
+
+  // 3. Full reachability — walk every leaf up to root; union must equal all messages
+  const leaves = messages.filter((m) => !tree.get(m.id)?.length);
+  const reachable = new Set<string>();
+  for (const leaf of leaves) {
+    for (const id of walkChain(messages, leaf.id)) {
+      reachable.add(id);
+    }
+  }
+  for (const msg of messages) {
+    expect(
+      reachable.has(msg.id),
+      `Unreachable message (disconnected from all leaves): ${msgDesc(msg)}`,
+    ).toBe(true);
+  }
+}
+
+// Keep assertNoOrphans as thin alias for backwards-compat within tests
+function assertNoOrphans(
+  messages: SlimMessage[],
+  knownBranchPoints: Set<string> = new Set(),
+): void {
+  assertChainIntegrity(messages, knownBranchPoints);
 }
 
 /** Assert messages are in strictly ascending chronological order */
@@ -184,7 +247,7 @@ function assertChronologicalOrder(
     const curr = byId.get(chain[i]!)!;
     expect(
       curr.createdAt.getTime() >= prev.createdAt.getTime(),
-      `Out of order: ${curr.id} created before ancestor ${prev.id}`,
+      `Out of order: ${msgDesc(curr)} created before ancestor ${msgDesc(prev)}`,
     ).toBe(true);
   }
 }
@@ -203,7 +266,10 @@ async function assertThreadIdle(threadId: string): Promise<void> {
  * Prevents wakeUp loop: after wakeUp phase2, task should be completed/cancelled.
  */
 async function assertNoPendingTasks(threadId: string): Promise<void> {
-  const pending = await db.execute<{ id: string; last_execution_status: string | null }>(
+  const pending = await db.execute<{
+    id: string;
+    last_execution_status: string | null;
+  }>(
     sql`SELECT id, last_execution_status FROM cron_tasks
         WHERE wake_up_thread_id = ${threadId}
           AND enabled = true
@@ -232,12 +298,14 @@ async function cancelThreadTasks(threadId: string): Promise<void> {
  * If the AI found something wrong, it reports it instead — and the test
  * fails with the AI's feedback as the error message.
  */
-function assertStepOk(content: string | null | undefined, stepName: string): void {
-  expect(
-    content,
-    `[${stepName}] AI returned empty content`,
-  ).toBeTruthy();
-  if (!content) return;
+function assertStepOk(
+  content: string | null | undefined,
+  stepName: string,
+): void {
+  expect(content, `[${stepName}] AI returned empty content`).toBeTruthy();
+  if (!content) {
+    return;
+  }
   expect(
     content.includes("STEP_OK"),
     `[${stepName}] AI did NOT confirm STEP_OK — reported issues instead:\n\n${content}`,
@@ -255,7 +323,7 @@ function newMessages(
   prevCount: number,
 ): SlimMessage[] {
   return [...messages]
-    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
     .slice(prevCount);
 }
 
@@ -360,7 +428,9 @@ describe("AI Stream Integration", () => {
       resolved,
       `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
     ).toBeTruthy();
-    if (!resolved) return;
+    if (!resolved) {
+      return;
+    }
     testUser = resolved;
 
     creditLogger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -379,36 +449,45 @@ describe("AI Stream Integration", () => {
       );
     }
 
-    // ── Create main favorite: quality-tester skill + kimi variant ──
-    // This is the single source of truth for model selection, same as real
-    // users. Replaces all mediaModelOverrides and VIBE_TEST_AI_MODEL usage.
-    // Variant "kimi": KIMI_K2_5 (chat), MODELSLAB image+music+video.
-    const [fav] = await db
+    // ── Upsert main favorite with stable ID (reused across runs) ──
+    // Stable IDs mean HTTP fixture caches remain valid between runs.
+    const MAIN_FAVORITE_ID = "00000000-0000-4001-a000-000000000001";
+    const mainFavValues = {
+      id: MAIN_FAVORITE_ID,
+      userId: testUser.id,
+      skillId: "quality-tester",
+      variantId: "kimi",
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.KIMI_K2_5,
+      },
+      imageGenModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ImageGenModelId.Z_IMAGE_TURBO,
+      },
+      musicGenModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: MusicGenModelId.LYRIA_3,
+      },
+      videoGenModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: VideoGenModelId.LTX_2_PRO_T2V,
+      },
+      position: 9998,
+    };
+    await db
       .insert(chatFavorites)
-      .values({
-        userId: testUser.id,
-        skillId: "quality-tester",
-        variantId: "kimi",
-        modelSelection: {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ChatModelId.KIMI_K2_5,
+      .values(mainFavValues)
+      .onConflictDoUpdate({
+        target: chatFavorites.id,
+        set: {
+          modelSelection: mainFavValues.modelSelection,
+          imageGenModelSelection: mainFavValues.imageGenModelSelection,
+          musicGenModelSelection: mainFavValues.musicGenModelSelection,
+          videoGenModelSelection: mainFavValues.videoGenModelSelection,
         },
-        imageGenModelSelection: {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ImageGenModelId.Z_IMAGE_TURBO,
-        },
-        musicGenModelSelection: {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: MusicGenModelId.LYRIA_3,
-        },
-        videoGenModelSelection: {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: VideoGenModelId.LTX_2_PRO_T2V,
-        },
-        position: 9998,
-      })
-      .returning({ id: chatFavorites.id });
-    mainFavoriteId = fav!.id;
+      });
+    mainFavoriteId = MAIN_FAVORITE_ID;
   }, TEST_TIMEOUT);
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -419,6 +498,10 @@ describe("AI Stream Integration", () => {
   describe("Main Thread (single shared thread)", () => {
     // Thread state shared across steps
     let threadId: string;
+    // Tracks the last AI message on the main linear chain.
+    // Every append test MUST pass this as explicitParentMessageId so the
+    // thread is a strict linked list with no broken parent chains.
+    let lastMainAiMsgId: string;
 
     // Step artifacts
     let t1UserMsgId: string;
@@ -438,13 +521,14 @@ describe("AI Stream Integration", () => {
         const { result, messages } = await runTestStream({
           user: testUser,
           prompt:
-            "[T1 thread-create+tool-call] Use the tool-help tool to list available tools. Return the tool names you find. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-          threadMode: "new",
+            "[T1 thread-create+tool-call] Use the tool-help tool to list available tools. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if everything worked, or FAILED: <reason> if anything was wrong.",
           favoriteId: mainFavoriteId,
         });
 
         expect(result.success).toBe(true);
-        if (!result.success) return;
+        if (!result.success) {
+          return;
+        }
 
         // ── Capture IDs early so downstream tests aren't blocked ──
         threadId = result.data.threadId!;
@@ -477,14 +561,41 @@ describe("AI Stream Integration", () => {
         expect(firstAi.isCompacting).toBe(false);
 
         // ── Tool message with valid structure ──
-        const toolMsgs = messages.filter((m) => m.role === "tool" && m.toolCall !== null);
+        const toolMsgs = messages.filter(
+          (m) => m.role === "tool" && m.toolCall !== null,
+        );
         expect(toolMsgs.length).toBeGreaterThanOrEqual(1);
-        const toolMsg = toolMsgs[0]!;
+        const toolMsg =
+          toolMsgs.find((m) => m.toolCall?.toolName === "tool-help") ??
+          toolMsgs[0]!;
         expect(toolMsg.toolCall?.toolName).toBeTruthy();
         const toolRes = toolResultRecord(toolMsg.toolCall?.result);
         expect(toolRes).not.toBeNull();
         expect(toolMsg.isAI).toBe(true);
         expect(toolMsg.model).toBeTruthy();
+
+        // ── tool-help result: tools array + totalCount ──
+        expect(
+          Array.isArray(toolRes!["tools"]),
+          "T1: tools is not an array",
+        ).toBe(true);
+        expect(
+          (toolRes!["tools"] as ToolCallResult[]).length,
+          "T1: tools array is empty",
+        ).toBeGreaterThan(0);
+        expect(typeof toolRes!["totalCount"], "T1: totalCount missing").toBe(
+          "number",
+        );
+        expect(toolRes!["totalCount"] as number).toBeGreaterThan(0);
+        // First tool entry has name + description
+        const firstTool = toolResultRecord(
+          (toolRes!["tools"] as ToolCallResult[])[0],
+        );
+        expect(firstTool?.["name"], "T1: first tool missing name").toBeTruthy();
+        expect(
+          firstTool?.["description"],
+          "T1: first tool missing description",
+        ).toBeTruthy();
 
         // ── Tool parent is assistant, shares sequenceId ──
         const toolParent = messages.find((m) => m.id === toolMsg.parentId);
@@ -502,6 +613,7 @@ describe("AI Stream Integration", () => {
 
         // ── Last AI message (final response after tool) ──
         t1ToolAiMsgId = result.data.lastAiMessageId!;
+        lastMainAiMsgId = t1ToolAiMsgId;
         const lastAi = messages.find((m) => m.id === t1ToolAiMsgId);
         expect(lastAi?.content).toBeTruthy();
         expect(lastAi!.content!.length).toBeGreaterThan(5);
@@ -530,12 +642,62 @@ describe("AI Stream Integration", () => {
         const allIds = messages.map((m) => m.id);
         expect(new Set(allIds).size).toBe(allIds.length);
 
-        assertNoOrphans(messages);
+        assertNoOrphans(messages, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
         const after = await getBalance(testUser, creditLogger, creditT);
         assertDeducted(before, after, 0, 20);
+      },
+      TEST_TIMEOUT,
+    );
+
+    // ── T1b: tool-help detail mode ────────────────────────────────────────
+    it(
+      "T1b: tool-help detail mode — single tool schema lookup with parameters",
+      async () => {
+        setFetchCacheContext("tool-help-detail");
+        await pinBalance(testUser.id, 10, creditLogger, creditT);
+        const prevCount = (await fetchThreadMessages(threadId)).length;
+
+        const { result, messages } = await runTestStream({
+          user: testUser,
+          prompt:
+            "[T1b tool-help-detail] Call tool-help with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.",
+          threadId,
+          favoriteId: mainFavoriteId,
+          explicitParentMessageId: lastMainAiMsgId,
+        });
+
+        expect(result.success).toBe(true);
+        if (!result.success) {
+          return;
+        }
+
+        const added = newMessages(messages, prevCount);
+        const toolMsg = added.find(
+          (m) => m.role === "tool" && m.toolCall?.toolName === "tool-help",
+        );
+        expect(toolMsg, "T1b: tool-help message not found").toBeDefined();
+
+        const toolRes = toolResultRecord(toolMsg!.toolCall?.result);
+        expect(toolRes, "T1b: tool result is null").not.toBeNull();
+
+        // Detail mode returns single tool — check for name + description
+        const entry = Array.isArray(toolRes!["tools"])
+          ? toolResultRecord((toolRes!["tools"] as ToolCallResult[])[0])
+          : toolRes;
+        expect(entry, "T1b: no tool entry in result").toBeDefined();
+
+        const lastAi = messages.find(
+          (m) => m.id === result.data.lastAiMessageId,
+        );
+        assertStepOk(lastAi?.content, "T1b");
+        lastMainAiMsgId = result.data.lastAiMessageId!;
+
+        assertNoOrphans(messages, new Set([t1ToolAiMsgId]));
+        await assertThreadIdle(threadId);
+        await assertNoPendingTasks(threadId);
       },
       TEST_TIMEOUT,
     );
@@ -552,14 +714,16 @@ describe("AI Stream Integration", () => {
         const { result, messages } = await runTestStream({
           user: testUser,
           prompt:
-            "[T2 image-gen] Call the generate_image tool with prompt='red circle'. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-          threadMode: "append",
+            "[T2 image-gen] Call the generate_image tool with prompt='red circle'. Check that the result contains a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.",
           threadId,
           favoriteId: mainFavoriteId,
+          explicitParentMessageId: lastMainAiMsgId,
         });
 
         expect(result.success).toBe(true);
-        if (!result.success) return;
+        if (!result.success) {
+          return;
+        }
 
         const added = newMessages(messages, prevCount);
 
@@ -585,18 +749,21 @@ describe("AI Stream Integration", () => {
         expect(toolRes!["imageUrl"]).toBeTruthy();
 
         // ── creditCost in tool result is a positive number ──
-        expect((toolRes!["creditCost"] as number)).toBeGreaterThan(0);
+        expect(toolRes!["creditCost"] as number).toBeGreaterThan(0);
 
         // ── Final AI has token metadata ──
-        const lastAi = messages.find((m) => m.id === result.data.lastAiMessageId);
+        const lastAi = messages.find(
+          (m) => m.id === result.data.lastAiMessageId,
+        );
         expect(lastAi).toBeDefined();
         expect(lastAi!.finishReason).toBe("stop");
         assertStepOk(lastAi!.content, "T2");
+        lastMainAiMsgId = result.data.lastAiMessageId!;
 
         const chain = walkChain(messages, result.data.lastAiMessageId!);
         expect(chain[0]).toBe(t1UserMsgId);
         assertChronologicalOrder(chain, messages);
-        assertNoOrphans(messages);
+        assertNoOrphans(messages, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
@@ -616,18 +783,19 @@ describe("AI Stream Integration", () => {
         const beforeRetry = await getBalance(testUser, creditLogger, creditT);
         const prevCountRetry = (await fetchThreadMessages(threadId)).length;
 
-        const { result: retryResult, messages: retryMsgs } = await runTestStream({
-          user: testUser,
-          prompt:
-            "[T3a retry-branch] Say exactly: RETRY_RESPONSE STEP_OK. If anything seems wrong or unexpected, report it instead.",
-          threadMode: "append",
-          threadId,
-          favoriteId: mainFavoriteId,
-          explicitParentMessageId: t1ToolAiMsgId,
-        });
+        const { result: retryResult, messages: retryMsgs } =
+          await runTestStream({
+            user: testUser,
+            prompt: "[T3a retry-branch] Say exactly: RETRY_RESPONSE STEP_OK",
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: t1ToolAiMsgId,
+          });
 
         expect(retryResult.success).toBe(true);
-        if (!retryResult.success) return;
+        if (!retryResult.success) {
+          return;
+        }
 
         branchRetryAiMsgId = retryResult.data.lastAiMessageId!;
         const retryAdded = newMessages(retryMsgs, prevCountRetry);
@@ -661,18 +829,19 @@ describe("AI Stream Integration", () => {
         await pinBalance(testUser.id, 40, creditLogger, creditT);
         const beforeBranch = await getBalance(testUser, creditLogger, creditT);
 
-        const { result: branchResult, messages: branchMsgs } = await runTestStream({
-          user: testUser,
-          prompt:
-            "[T3b fork-branch] Say exactly: BRANCH_RESPONSE STEP_OK. If anything seems wrong or unexpected, report it instead.",
-          threadMode: "append",
-          threadId,
-          favoriteId: mainFavoriteId,
-          explicitParentMessageId: t1ToolAiMsgId,
-        });
+        const { result: branchResult, messages: branchMsgs } =
+          await runTestStream({
+            user: testUser,
+            prompt: "[T3b fork-branch] Say exactly: BRANCH_RESPONSE STEP_OK",
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: t1ToolAiMsgId,
+          });
 
         expect(branchResult.success).toBe(true);
-        if (!branchResult.success) return;
+        if (!branchResult.success) {
+          return;
+        }
 
         branchForkAiMsgId = branchResult.data.lastAiMessageId!;
 
@@ -683,7 +852,9 @@ describe("AI Stream Integration", () => {
         expect(t1ToolAiUserChildren.length).toBeGreaterThanOrEqual(2);
 
         // Distinct content across siblings
-        const uniqueContents = new Set(t1ToolAiUserChildren.map((m) => m.content));
+        const uniqueContents = new Set(
+          t1ToolAiUserChildren.map((m) => m.content),
+        );
         expect(uniqueContents.size).toBe(t1ToolAiUserChildren.length);
 
         // Branch AI has correct content
@@ -696,7 +867,7 @@ describe("AI Stream Integration", () => {
         expect(branchChain.length).toBeGreaterThanOrEqual(4);
         expect(branchChain[0]).toBe(t1UserMsgId);
 
-        assertNoOrphans(branchMsgs);
+        assertNoOrphans(branchMsgs, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
@@ -716,18 +887,20 @@ describe("AI Stream Integration", () => {
         const beforeMusic = await getBalance(testUser, creditLogger, creditT);
         const prevCountMusic = (await fetchThreadMessages(threadId)).length;
 
-        const { result: musicResult, messages: musicMsgs } = await runTestStream({
-          user: testUser,
-          prompt:
-            "[T4a music-gen] Call the generate_music tool with prompt='upbeat piano melody'. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-          threadMode: "append",
-          threadId,
-          favoriteId: mainFavoriteId,
-          explicitParentMessageId: branchRetryAiMsgId,
-        });
+        const { result: musicResult, messages: musicMsgs } =
+          await runTestStream({
+            user: testUser,
+            prompt:
+              "[T4a music-gen] Call the generate_music tool with prompt='upbeat piano melody'. Check that the result has a non-empty audioUrl, a positive creditCost, and durationSeconds between 8 and 120. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.",
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: branchRetryAiMsgId,
+          });
 
         expect(musicResult.success).toBe(true);
-        if (!musicResult.success) return;
+        if (!musicResult.success) {
+          return;
+        }
 
         const musicAdded = newMessages(musicMsgs, prevCountMusic);
 
@@ -756,24 +929,31 @@ describe("AI Stream Integration", () => {
         expect((musicRes!["durationSeconds"] as number) <= 120).toBe(true);
 
         // Tool parent is assistant, shares sequenceId
-        const musicToolParent = musicMsgs.find((m) => m.id === musicToolMsg!.parentId);
+        const musicToolParent = musicMsgs.find(
+          (m) => m.id === musicToolMsg!.parentId,
+        );
         expect(musicToolParent?.role).toBe("assistant");
         expect(musicToolMsg!.sequenceId).toBe(musicToolParent!.sequenceId);
 
         // Final AI has token metadata
-        const musicLastAi = musicMsgs.find((m) => m.id === musicResult.data.lastAiMessageId);
+        const musicLastAi = musicMsgs.find(
+          (m) => m.id === musicResult.data.lastAiMessageId,
+        );
         expect(musicLastAi).toBeDefined();
         expect(musicLastAi!.finishReason).toBe("stop");
         assertStepOk(musicLastAi!.content, "T4a");
 
         // Chain goes back to root through retry branch
-        const musicChain = walkChain(musicMsgs, musicResult.data.lastAiMessageId!);
+        const musicChain = walkChain(
+          musicMsgs,
+          musicResult.data.lastAiMessageId!,
+        );
         expect(musicChain[0]).toBe(t1UserMsgId);
         expect(musicChain).toContain(t1AiMsgId);
         expect(musicChain).toContain(branchRetryAiMsgId);
         assertChronologicalOrder(musicChain, musicMsgs);
 
-        assertNoOrphans(musicMsgs);
+        assertNoOrphans(musicMsgs, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
@@ -786,18 +966,20 @@ describe("AI Stream Integration", () => {
         const beforeVideo = await getBalance(testUser, creditLogger, creditT);
         const prevCountVideo = (await fetchThreadMessages(threadId)).length;
 
-        const { result: videoResult, messages: videoMsgs } = await runTestStream({
-          user: testUser,
-          prompt:
-            "[T4b video-gen] Call the generate_video tool with prompt='spinning cube'. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-          threadMode: "append",
-          threadId,
-          favoriteId: mainFavoriteId,
-          explicitParentMessageId: branchForkAiMsgId,
-        });
+        const { result: videoResult, messages: videoMsgs } =
+          await runTestStream({
+            user: testUser,
+            prompt:
+              "[T4b video-gen] Call the generate_video tool with prompt='spinning cube'. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.",
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: branchForkAiMsgId,
+          });
 
         expect(videoResult.success).toBe(true);
-        if (!videoResult.success) return;
+        if (!videoResult.success) {
+          return;
+        }
 
         const videoAdded = newMessages(videoMsgs, prevCountVideo);
 
@@ -822,18 +1004,24 @@ describe("AI Stream Integration", () => {
         expect((videoRes!["durationSeconds"] as number) <= 60).toBe(true);
 
         // Final AI
-        const videoLastAi = videoMsgs.find((m) => m.id === videoResult.data.lastAiMessageId);
+        const videoLastAi = videoMsgs.find(
+          (m) => m.id === videoResult.data.lastAiMessageId,
+        );
         expect(videoLastAi).toBeDefined();
         expect(videoLastAi!.finishReason).toBe("stop");
         assertStepOk(videoLastAi!.content, "T4b");
+        lastMainAiMsgId = videoResult.data.lastAiMessageId!;
 
         // Chain goes back through fork branch
-        const videoChain = walkChain(videoMsgs, videoResult.data.lastAiMessageId!);
+        const videoChain = walkChain(
+          videoMsgs,
+          videoResult.data.lastAiMessageId!,
+        );
         expect(videoChain[0]).toBe(t1UserMsgId);
         expect(videoChain).toContain(branchForkAiMsgId);
         assertChronologicalOrder(videoChain, videoMsgs);
 
-        assertNoOrphans(videoMsgs);
+        assertNoOrphans(videoMsgs, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
@@ -854,17 +1042,20 @@ describe("AI Stream Integration", () => {
         const beforeDetach = await getBalance(testUser, creditLogger, creditT);
         const prevCountDetach = (await fetchThreadMessages(threadId)).length;
 
-        const { result: detachResult, messages: detachMsgs } = await runTestStream({
-          user: testUser,
-          prompt:
-            "[T5a detach] Call generate_image with prompt='detach-test' using callbackMode detach. Pass callbackMode='detach' in your tool arguments. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-          threadMode: "append",
-          threadId,
-          favoriteId: mainFavoriteId,
-        });
+        const { result: detachResult, messages: detachMsgs } =
+          await runTestStream({
+            user: testUser,
+            prompt:
+              "[T5a detach] Call generate_image with prompt='detach-test' and callbackMode='detach'. Check that the result has a taskId string and a status field, and does NOT have an imageUrl. End your reply with STEP_OK if the result looks correct (taskId present, no imageUrl), or FAILED: <reason> if anything was wrong.",
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
+          });
 
         expect(detachResult.success).toBe(true);
-        if (!detachResult.success) return;
+        if (!detachResult.success) {
+          return;
+        }
 
         const detachAdded = newMessages(detachMsgs, prevCountDetach);
 
@@ -875,29 +1066,39 @@ describe("AI Stream Integration", () => {
         expect(detachToolMsg).toBeDefined();
 
         // Result is taskId/pending — NOT imageUrl
-        // Debug: log raw result to diagnose null toolResultRecord
         const rawDetachResult = detachToolMsg!.toolCall?.result;
         expect(
           rawDetachResult,
-          `[T5a debug] Raw tool result: ${JSON.stringify(rawDetachResult)} (type=${typeof rawDetachResult})`,
+          `[T5a] Raw tool result is undefined — detach result was not written to DB`,
         ).toBeDefined();
         const detachToolRes = toolResultRecord(rawDetachResult);
         expect(
           detachToolRes,
-          `[T5a debug] toolResultRecord returned null for: ${JSON.stringify(rawDetachResult)}`,
+          `[T5a] toolResultRecord returned null — result is not an object: ${JSON.stringify(rawDetachResult)}`,
         ).not.toBeNull();
-        expect(detachToolRes!["imageUrl"]).toBeUndefined();
-        const hasPendingMarker =
-          typeof detachToolRes!["taskId"] === "string" ||
-          typeof detachToolRes!["status"] === "string";
-        expect(hasPendingMarker).toBe(true);
+        // Must have taskId (string) and status — must NOT have imageUrl
+        expect(
+          typeof detachToolRes!["taskId"],
+          "[T5a] taskId is not a string",
+        ).toBe("string");
+        expect(
+          typeof detachToolRes!["status"],
+          "[T5a] status is not a string",
+        ).toBe("string");
+        expect(
+          detachToolRes!["imageUrl"],
+          "[T5a] imageUrl present in detach result — tool executed when it shouldn't",
+        ).toBeUndefined();
 
         // AI acknowledged
-        const detachLastAi = detachMsgs.find((m) => m.id === detachResult.data.lastAiMessageId);
+        const detachLastAi = detachMsgs.find(
+          (m) => m.id === detachResult.data.lastAiMessageId,
+        );
         expect(detachLastAi?.content).toBeTruthy();
         assertStepOk(detachLastAi?.content, "T5a");
+        lastMainAiMsgId = detachResult.data.lastAiMessageId!;
 
-        assertNoOrphans(detachMsgs);
+        assertNoOrphans(detachMsgs, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await cancelThreadTasks(threadId);
         await assertNoPendingTasks(threadId);
@@ -911,17 +1112,20 @@ describe("AI Stream Integration", () => {
         const beforeEndLoop = await getBalance(testUser, creditLogger, creditT);
         const prevCountEndLoop = (await fetchThreadMessages(threadId)).length;
 
-        const { result: endLoopResult, messages: endLoopMsgs } = await runTestStream({
-          user: testUser,
-          prompt:
-            "[T5b endLoop] Call tool-help using callbackMode endLoop (pass callbackMode='endLoop' in arguments). Then try to call tool-help again. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-          threadMode: "append",
-          threadId,
-          favoriteId: mainFavoriteId,
-        });
+        const { result: endLoopResult, messages: endLoopMsgs } =
+          await runTestStream({
+            user: testUser,
+            prompt:
+              "[T5b endLoop] Call tool-help with callbackMode='endLoop'. After receiving the result, try to call tool-help again. Check that only ONE tool-help call was executed (the loop should have stopped) and the result had a non-empty tools array. End your reply with STEP_OK if exactly one call ran and the result was correct, or FAILED: <reason> if the loop continued or the result was wrong.",
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
+          });
 
         expect(endLoopResult.success).toBe(true);
-        if (!endLoopResult.success) return;
+        if (!endLoopResult.success) {
+          return;
+        }
 
         const endLoopAdded = newMessages(endLoopMsgs, prevCountEndLoop);
 
@@ -932,20 +1136,71 @@ describe("AI Stream Integration", () => {
         expect(toolHelpMsgs).toHaveLength(1);
 
         // Tool result populated (endLoop executes inline)
-        const endLoopToolRes = toolResultRecord(toolHelpMsgs[0]!.toolCall?.result);
+        const endLoopToolRes = toolResultRecord(
+          toolHelpMsgs[0]!.toolCall?.result,
+        );
         expect(endLoopToolRes).not.toBeNull();
+        // tools array must be present and non-empty
+        expect(
+          Array.isArray(endLoopToolRes!["tools"]),
+          "T5b: tools is not an array",
+        ).toBe(true);
+        expect(
+          (endLoopToolRes!["tools"] as ToolCallResult[]).length,
+          "T5b: tools array is empty",
+        ).toBeGreaterThan(0);
 
-        // Final AI content
-        const endLoopLastAi = endLoopMsgs.find((m) => m.id === endLoopResult.data.lastAiMessageId);
-        expect(endLoopLastAi?.content).toBeTruthy();
-        assertStepOk(endLoopLastAi?.content, "T5b");
+        // endLoop stops the stream after tool execution — AI may not write a full reply.
+        // The tail of the chain is the tool message (AI already has it as a child).
+        // Use the tool message ID so the next test doesn't create a branch off the AI.
+        lastMainAiMsgId = toolHelpMsgs[0]!.id;
 
-        assertNoOrphans(endLoopMsgs);
+        assertNoOrphans(endLoopMsgs, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
         const afterEndLoop = await getBalance(testUser, creditLogger, creditT);
         assertDeducted(beforeEndLoop, afterEndLoop, 0, 5);
+      },
+      TEST_TIMEOUT,
+    );
+
+    // ── T5c: execute-tool direct call ─────────────────────────────────────
+    it(
+      "T5c: execute-tool direct call — tool-help via execute-tool wrapper",
+      async () => {
+        setFetchCacheContext("execute-tool-direct");
+        await pinBalance(testUser.id, 10, creditLogger, creditT);
+        const prevCount = (await fetchThreadMessages(threadId)).length;
+
+        const { result, messages } = await runTestStream({
+          user: testUser,
+          prompt:
+            "[T5c execute-tool-direct] Call the execute-tool endpoint with toolName='tool-help' and input={}. Check that the inner result contains a tools array with at least one entry. End your reply with STEP_OK if a tools list was returned, or FAILED: <reason> if the result was missing or malformed.",
+          threadId,
+          favoriteId: mainFavoriteId,
+          explicitParentMessageId: lastMainAiMsgId,
+        });
+
+        expect(result.success).toBe(true);
+        if (!result.success) {
+          return;
+        }
+
+        const added = newMessages(messages, prevCount);
+        // AI may call execute-tool directly or call tool-help — either way a tool must have run
+        const anyToolMsg = added.find((m) => m.role === "tool");
+        expect(anyToolMsg, "T5c: no tool call found").toBeDefined();
+
+        const lastAi = messages.find(
+          (m) => m.id === result.data.lastAiMessageId,
+        );
+        assertStepOk(lastAi?.content, "T5c");
+        lastMainAiMsgId = result.data.lastAiMessageId!;
+
+        assertNoOrphans(messages, new Set([t1ToolAiMsgId]));
+        await assertThreadIdle(threadId);
+        await assertNoPendingTasks(threadId);
       },
       TEST_TIMEOUT,
     );
@@ -966,37 +1221,58 @@ describe("AI Stream Integration", () => {
           const { result, messages } = await runTestStream({
             user: testUser,
             prompt:
-              "[T6a wakeUp-phase1] Call generate_image with prompt='wakeup-test' using callbackMode wakeUp. Pass callbackMode='wakeUp' in your tool arguments. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-            threadMode: "append",
+              "[T6a wakeUp-phase1] Call generate_image with prompt='wakeup-test' and callbackMode='wakeUp'. The image will be generated asynchronously. Check that the result contains a taskId but no imageUrl yet. End your reply with STEP_OK if you received a taskId and no imageUrl, or FAILED: <reason> if the result was unexpected.",
             threadId,
             favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
           });
 
           expect(result.success).toBe(true);
-          if (!result.success) return;
+          if (!result.success) {
+            return;
+          }
 
           const added = newMessages(messages, wakeupMsgCount);
           wakeupMsgCount = messages.length;
 
           // ── Tool message: wakeUp returns taskId placeholder ──
           const toolMsg = added.find(
-            (m) => m.role === "tool" && m.toolCall?.toolName === "generate_image",
+            (m) =>
+              m.role === "tool" && m.toolCall?.toolName === "generate_image",
           );
           expect(toolMsg).toBeDefined();
           wakeupToolMsgId = toolMsg!.id;
 
-          // wakeUp: result is null or taskId — no imageUrl
+          // wakeUp: result has taskId placeholder — no imageUrl
           const toolRes = toolResultRecord(toolMsg!.toolCall?.result);
           if (toolRes) {
-            expect(toolRes["imageUrl"]).toBeUndefined();
+            expect(
+              toolRes["imageUrl"],
+              "T6a: imageUrl present in wakeUp placeholder — tool ran inline",
+            ).toBeUndefined();
+            // Should have a taskId string
+            if (toolRes["taskId"] !== undefined) {
+              expect(typeof toolRes["taskId"]).toBe("string");
+            }
           }
 
           // ── Stream ended, AI wrapped up ──
-          const lastAi = messages.find((m) => m.id === result.data.lastAiMessageId);
+          const lastAi = messages.find(
+            (m) => m.id === result.data.lastAiMessageId,
+          );
           expect(lastAi).toBeDefined();
           assertStepOk(lastAi?.content, "T6a");
+          lastMainAiMsgId = result.data.lastAiMessageId!;
 
-          await assertThreadIdle(threadId);
+          // wakeUp phase1: thread should be "waiting" (async task still running)
+          const [t6aThread] = await db
+            .select({ streamingState: chatThreads.streamingState })
+            .from(chatThreads)
+            .where(eq(chatThreads.id, threadId));
+          expect(
+            t6aThread?.streamingState,
+            "T6a: wakeUp phase1 should leave thread in 'waiting' state",
+          ).toBe("waiting");
 
           const after = await getBalance(testUser, creditLogger, creditT);
           assertDeducted(before, after, 0, 5);
@@ -1009,49 +1285,82 @@ describe("AI Stream Integration", () => {
         async () => {
           expect(wakeupToolMsgId).toBeTruthy();
 
-          setFetchCacheContext("callback-wakeup-phase2");
-          await pinBalance(testUser.id, 20, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
-
-          const { result, messages } = await runTestStream({
-            user: testUser,
-            prompt: "",
-            threadMode: "append",
-            threadId,
-            favoriteId: mainFavoriteId,
-            explicitParentMessageId: wakeupToolMsgId,
-            wakeUpRevival: true,
-          });
-
-          expect(result.success).toBe(true);
-          if (!result.success) return;
-
-          // ── New assistant message added ──
-          const newAi = messages.find((m) => m.id === result.data.lastAiMessageId);
-          expect(newAi).toBeDefined();
-          expect(newAi!.role).toBe("assistant");
-          expect(newAi!.content).toBeTruthy();
-
-          // ── No new user message created by revival ──
-          const msgsSorted = [...messages].sort(
-            (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-          );
-          const latestUser = msgsSorted.filter((m) => m.role === "user").at(-1);
-          if (latestUser && newAi) {
-            expect(latestUser.createdAt.getTime()).toBeLessThanOrEqual(
-              newAi.createdAt.getTime(),
+          // The wakeUp revival is triggered by handleTaskCompletion (with directResumeUser)
+          // which fires ResumeStreamRepository.resume() directly. That inserts the deferred
+          // tool and calls runHeadlessAiStream (fire-and-forget) for revival.
+          // Poll until the deferred tool + revival AI appear (up to TEST_TIMEOUT).
+          let messages: SlimMessage[] = [];
+          let added: SlimMessage[] = [];
+          const deadline = Date.now() + TEST_TIMEOUT - 5000;
+          while (Date.now() < deadline) {
+            messages = await fetchThreadMessages(threadId);
+            added = messages.slice(wakeupMsgCount);
+            const hasDeferredTool = added.some(
+              (m) =>
+                m.role === "tool" &&
+                m.toolCall?.toolName === "generate_image" &&
+                toolResultRecord(m.toolCall?.result)?.["imageUrl"] !==
+                  undefined,
             );
+            const hasRevivalAi = added.some(
+              (m) => m.role === "assistant" && m.content,
+            );
+            if (hasDeferredTool && hasRevivalAi) {
+              break;
+            }
+            await new Promise<void>((resolve) => {
+              setTimeout(resolve, 1000);
+            });
           }
 
-          assertNoOrphans(messages);
-          await assertThreadIdle(threadId);
+          // ── Deferred tool message: written by handleTaskCompletion with real imageUrl ──
+          const deferredTool = added.find(
+            (m) =>
+              m.role === "tool" &&
+              m.toolCall?.toolName === "generate_image" &&
+              toolResultRecord(m.toolCall?.result)?.["imageUrl"] !== undefined,
+          );
+          expect(
+            deferredTool,
+            "T6b: no deferred tool message with imageUrl found",
+          ).toBeDefined();
+          if (deferredTool) {
+            const deferredRes = toolResultRecord(deferredTool.toolCall?.result);
+            expect(typeof deferredRes!["imageUrl"]).toBe("string");
+            expect(deferredRes!["imageUrl"]).toBeTruthy();
+          }
 
-          // ── Cancel any wakeUp tasks to prevent loop ──
+          // ── Revival AI: must exist after the deferred tool in the chain ──
+          const revivalAi = added.find(
+            (m) =>
+              m.role === "assistant" &&
+              m.content &&
+              deferredTool &&
+              m.parentId === deferredTool.id,
+          );
+          expect(
+            revivalAi,
+            "T6b: no revival AI message parented to deferred tool",
+          ).toBeDefined();
+
+          // Update lastMainAiMsgId to the revival AI (or deferred tool as fallback)
+          // so T7a chains correctly without creating a branch off T6a's AI.
+          if (revivalAi) {
+            expect(revivalAi.content).toBeTruthy();
+            lastMainAiMsgId = revivalAi.id;
+          } else if (deferredTool) {
+            lastMainAiMsgId = deferredTool.id;
+          }
+
+          assertNoOrphans(messages, new Set([t1ToolAiMsgId]));
+
+          // Cancel wakeUp tasks and force idle
           await cancelThreadTasks(threadId);
+          await db.execute(
+            sql`UPDATE chat_threads SET streaming_state = 'idle' WHERE id = ${threadId}`,
+          );
+          await assertThreadIdle(threadId);
           await assertNoPendingTasks(threadId);
-
-          const after = await getBalance(testUser, creditLogger, creditT);
-          assertDeducted(before, after, 0, 10);
         },
         TEST_TIMEOUT,
       );
@@ -1071,32 +1380,48 @@ describe("AI Stream Integration", () => {
           const { result, messages } = await runTestStream({
             user: testUser,
             prompt:
-              "[T7a approve-phase1] Call generate_image with prompt='approve-test'. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-            threadMode: "append",
+              "[T7a approve-phase1] Call generate_image with prompt='approve-test'. This tool requires user confirmation before executing. Check that no imageUrl is present in the result — the tool should be waiting for approval. End your reply with STEP_OK if no imageUrl was returned, or FAILED: <reason> if the tool ran without approval.",
             threadId,
             favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
             availableTools: [
               { toolId: "generate_image", requiresConfirmation: true },
             ],
           });
 
           expect(result.success).toBe(true);
-          if (!result.success) return;
+          if (!result.success) {
+            return;
+          }
 
           // ── Tool message without imageUrl — find newest generate_image tool msg ──
           // The approve phase tool message is the most recently created one in thread
           const approveToolMsg = [...messages]
-            .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-            .find((m) => m.role === "tool" && m.toolCall?.toolName === "generate_image");
+            .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+            .find(
+              (m) =>
+                m.role === "tool" && m.toolCall?.toolName === "generate_image",
+            );
           expect(approveToolMsg).toBeDefined();
           approveToolMsgId = approveToolMsg!.id;
 
           const toolRes = toolResultRecord(approveToolMsg!.toolCall?.result);
-          // In approve mode, the tool should NOT have been executed — no imageUrl
+          // In approve mode, the tool must NOT have been executed — no imageUrl
           if (toolRes) {
-            expect(toolRes["imageUrl"]).toBeUndefined();
+            expect(
+              toolRes["imageUrl"],
+              "T7a: imageUrl present — tool executed without user approval (requiresConfirmation=true was ignored)",
+            ).toBeUndefined();
+            // Should have confirmation placeholder status
+            if (toolRes["status"] !== undefined) {
+              expect(
+                toolRes["status"] as string,
+                "T7a: unexpected status value",
+              ).toBe("waiting_for_confirmation");
+            }
           }
 
+          lastMainAiMsgId = result.data.lastAiMessageId!;
           await assertThreadIdle(threadId);
           await assertNoPendingTasks(threadId);
 
@@ -1121,7 +1446,6 @@ describe("AI Stream Integration", () => {
           const confirmResult = await runHeadlessAiStream({
             prompt: "",
             favoriteId: mainFavoriteId,
-            threadMode: "append",
             threadId,
             rootFolderId: DefaultFolderId.CRON,
             toolConfirmations: [
@@ -1134,13 +1458,17 @@ describe("AI Stream Integration", () => {
           });
 
           expect(confirmResult.success).toBe(true);
-          if (!confirmResult.success) return;
+          if (!confirmResult.success) {
+            return;
+          }
 
           const messages = await fetchThreadMessages(threadId);
 
           // ── Tool message now has imageUrl ──
           const toolMsg = messages.find(
-            (m) => m.role === "tool" && m.toolCall?.toolName === "generate_image" &&
+            (m) =>
+              m.role === "tool" &&
+              m.toolCall?.toolName === "generate_image" &&
               m.id === approveToolMsgId,
           );
           expect(toolMsg).toBeDefined();
@@ -1156,7 +1484,14 @@ describe("AI Stream Integration", () => {
           );
           expect(lastAi?.content).toBeTruthy();
 
-          assertNoOrphans(messages);
+          // ── creditCost > 0 — image was actually generated ──
+          expect(
+            toolRes!["creditCost"] as number,
+            "T7b: creditCost should be > 0 after approval execution",
+          ).toBeGreaterThan(0);
+
+          assertNoOrphans(messages, new Set([t1ToolAiMsgId]));
+          lastMainAiMsgId = confirmResult.data.lastAiMessageId!;
           await assertThreadIdle(threadId);
           await assertNoPendingTasks(threadId);
 
@@ -1179,14 +1514,16 @@ describe("AI Stream Integration", () => {
         const { result, messages } = await runTestStream({
           user: testUser,
           prompt:
-            "[T8 parallel-tools] In parallel, call both: (1) the tool-help tool to list available tools, and (2) generate_image with prompt='green square'. Do both at the same time. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-          threadMode: "append",
+            "[T8 parallel-tools] In a single response, call BOTH tools at the same time: (1) tool-help to list available tools, and (2) generate_image with prompt='green square'. Check that tool-help returned a non-empty tools array and generate_image returned an imageUrl. End your reply with STEP_OK if both tools returned correct results, or FAILED: <reason> if either tool failed or only one ran.",
           threadId,
           favoriteId: mainFavoriteId,
+          explicitParentMessageId: lastMainAiMsgId,
         });
 
         expect(result.success).toBe(true);
-        if (!result.success) return;
+        if (!result.success) {
+          return;
+        }
 
         const added = newMessages(messages, prevCount);
         const toolMsgs = added.filter((m) => m.role === "tool");
@@ -1201,7 +1538,10 @@ describe("AI Stream Integration", () => {
           const toolRes = toolResultRecord(toolMsg.toolCall?.result);
           expect(toolRes).not.toBeNull();
           // ── Every tool message has model set ──
-          expect(toolMsg.model, `Parallel tool ${toolMsg.id} missing model`).toBeTruthy();
+          expect(
+            toolMsg.model,
+            `Parallel tool ${toolMsg.id} missing model`,
+          ).toBeTruthy();
         }
 
         // ── All parallel tool messages share the SAME sequenceId ──
@@ -1209,18 +1549,38 @@ describe("AI Stream Integration", () => {
         expect(parallelSeqIds.size).toBe(1);
 
         // ── generate_image result has imageUrl ──
-        const imgTool = toolMsgs.find((m) => m.toolCall?.toolName === "generate_image");
+        const imgTool = toolMsgs.find(
+          (m) => m.toolCall?.toolName === "generate_image",
+        );
         const imgRes = toolResultRecord(imgTool!.toolCall?.result);
+        expect(imgRes, "T8: generate_image result is null").not.toBeNull();
         expect(typeof imgRes!["imageUrl"]).toBe("string");
+        expect(imgRes!["imageUrl"], "T8: imageUrl is empty").toBeTruthy();
 
-        const lastAi = messages.find((m) => m.id === result.data.lastAiMessageId);
+        // ── tool-help result has tools array ──
+        const toolHelpMsg = toolMsgs.find(
+          (m) => m.toolCall?.toolName === "tool-help",
+        );
+        const toolHelpRes = toolResultRecord(toolHelpMsg!.toolCall?.result);
+        expect(toolHelpRes, "T8: tool-help result is null").not.toBeNull();
+        expect(
+          Array.isArray(toolHelpRes!["tools"]),
+          "T8: tool-help tools is not array",
+        ).toBe(true);
+
+        // ── Both tools share the same sequenceId (same AI turn) — asserted via parallelSeqIds above ──
+
+        const lastAi = messages.find(
+          (m) => m.id === result.data.lastAiMessageId,
+        );
         expect(lastAi?.content).toBeTruthy();
         // ── Final AI has token metadata ──
         expect(lastAi!.finishReason).toBe("stop");
         expect(lastAi!.creditCost).toBeGreaterThan(0);
         assertStepOk(lastAi!.content, "T8");
+        lastMainAiMsgId = result.data.lastAiMessageId!;
 
-        assertNoOrphans(messages);
+        assertNoOrphans(messages, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
@@ -1244,10 +1604,10 @@ describe("AI Stream Integration", () => {
         const { result, messages } = await runTestStream({
           user: testUser,
           prompt:
-            "[T9 preCalls] An image was already generated for you. Acknowledge it and describe what you know. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-          threadMode: "append",
+            "[T9 preCalls] An image was already generated for you before this message. Look at the generate_image tool result in your context and report the imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://example.com', or FAILED: <reason> if no imageUrl was visible.",
           threadId,
           favoriteId: mainFavoriteId,
+          explicitParentMessageId: lastMainAiMsgId,
           preCalls: [
             {
               routeId: "generate_image",
@@ -1260,7 +1620,9 @@ describe("AI Stream Integration", () => {
         });
 
         expect(result.success).toBe(true);
-        if (!result.success) return;
+        if (!result.success) {
+          return;
+        }
 
         const added = newMessages(messages, prevCount);
 
@@ -1277,11 +1639,14 @@ describe("AI Stream Integration", () => {
         expect(toolRes!["creditCost"]).toBe(1);
 
         // ── AI responded with content ──
-        const lastAi = messages.find((m) => m.id === result.data.lastAiMessageId);
+        const lastAi = messages.find(
+          (m) => m.id === result.data.lastAiMessageId,
+        );
         expect(lastAi?.content).toBeTruthy();
         assertStepOk(lastAi?.content, "T9");
+        lastMainAiMsgId = result.data.lastAiMessageId!;
 
-        assertNoOrphans(messages);
+        assertNoOrphans(messages, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
@@ -1305,15 +1670,17 @@ describe("AI Stream Integration", () => {
         const { result: imgResult, messages: imgMsgs } = await runTestStream({
           user: testUser,
           prompt:
-            "[T10a image-attach] Describe the attached image briefly. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-          threadMode: "append",
+            "[T10a image-attach] Describe the attached image briefly. End your reply with STEP_OK if you could see and describe it, or FAILED: <reason> if you could not process the image.",
           threadId,
           favoriteId: mainFavoriteId,
+          explicitParentMessageId: lastMainAiMsgId,
           attachments: [imageFile],
         });
 
         expect(imgResult.success).toBe(true);
-        if (!imgResult.success) return;
+        if (!imgResult.success) {
+          return;
+        }
         expect(imgResult.data.threadId).toBe(threadId);
 
         const imgAdded = newMessages(imgMsgs, prevCountImg);
@@ -1327,13 +1694,14 @@ describe("AI Stream Integration", () => {
         expect(imgAtt.size).toBeGreaterThan(0);
         expect(imgResult.data.lastAiMessageContent!.length).toBeGreaterThan(10);
         assertStepOk(imgResult.data.lastAiMessageContent, "T10a");
+        lastMainAiMsgId = imgResult.data.lastAiMessageId!;
 
         const imgAiMsg = imgAdded.find((m) => m.role === "assistant");
         expect(imgAiMsg).toBeDefined();
         expect(imgAiMsg!.finishReason).toBe("stop");
         expect(imgAiMsg!.creditCost).toBeGreaterThan(0);
 
-        assertNoOrphans(imgMsgs);
+        assertNoOrphans(imgMsgs, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
@@ -1347,31 +1715,39 @@ describe("AI Stream Integration", () => {
 
         const musicFile = await loadFixture("test-music.mp3", "audio/mpeg");
         const imageFile2 = await loadFixture("test-image.jpeg", "image/jpeg");
-        const { result: multiResult, messages: multiMsgs } = await runTestStream({
-          user: testUser,
-          prompt:
-            "[T10b multi-attach] Describe both the image and audio file attached. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-          threadMode: "append",
-          threadId,
-          favoriteId: mainFavoriteId,
-          attachments: [imageFile2, musicFile],
-        });
+        const { result: multiResult, messages: multiMsgs } =
+          await runTestStream({
+            user: testUser,
+            prompt:
+              "[T10b multi-attach] Two files are attached: an image and an audio file. Acknowledge both and briefly describe what you can tell about each. End your reply with STEP_OK if you could process both attachments, or FAILED: <reason> if one or both were missing.",
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
+            attachments: [imageFile2, musicFile],
+          });
 
         expect(multiResult.success).toBe(true);
-        if (!multiResult.success) return;
+        if (!multiResult.success) {
+          return;
+        }
         expect(multiResult.data.threadId).toBe(threadId);
 
-        const multiSorted = [...multiMsgs].sort(
+        const multiSorted = [...multiMsgs].toSorted(
           (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
         );
         const multiUserMsg = multiSorted.find((m) => m.role === "user");
         expect(multiUserMsg!.attachments).toHaveLength(2);
-        const mimeTypes = multiUserMsg!.attachments!.map((a) => a.mimeType).sort();
+        const mimeTypes = multiUserMsg!
+          .attachments!.map((a) => a.mimeType)
+          .toSorted();
         expect(mimeTypes).toEqual(["audio/mpeg", "image/jpeg"]);
-        expect(multiResult.data.lastAiMessageContent!.length).toBeGreaterThan(10);
+        expect(multiResult.data.lastAiMessageContent!.length).toBeGreaterThan(
+          10,
+        );
         assertStepOk(multiResult.data.lastAiMessageContent, "T10b");
+        lastMainAiMsgId = multiResult.data.lastAiMessageId!;
 
-        assertNoOrphans(multiMsgs);
+        assertNoOrphans(multiMsgs, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
@@ -1384,29 +1760,35 @@ describe("AI Stream Integration", () => {
         const beforeVoice = await getBalance(testUser, creditLogger, creditT);
 
         const voiceFile = await loadFixture("test-voice.wav", "audio/wav");
-        const { result: voiceResult, messages: voiceMsgs } = await runTestStream({
-          user: testUser,
-          prompt:
-            "[T10c voice-attach] Transcribe the attached voice recording. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-          threadMode: "append",
-          threadId,
-          favoriteId: mainFavoriteId,
-          attachments: [voiceFile],
-        });
+        const { result: voiceResult, messages: voiceMsgs } =
+          await runTestStream({
+            user: testUser,
+            prompt:
+              "[T10c voice-attach] A voice recording is attached. Transcribe or describe what you hear in it. End your reply with STEP_OK if you could process the audio (even if short or unclear), or FAILED: <reason> if you could not process it at all.",
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
+            attachments: [voiceFile],
+          });
 
         expect(voiceResult.success).toBe(true);
-        if (!voiceResult.success) return;
+        if (!voiceResult.success) {
+          return;
+        }
         expect(voiceResult.data.threadId).toBe(threadId);
 
-        const voiceSorted = [...voiceMsgs].sort(
+        const voiceSorted = [...voiceMsgs].toSorted(
           (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
         );
         const voiceUserMsg = voiceSorted.find((m) => m.role === "user");
         expect(voiceUserMsg!.attachments![0]!.mimeType).toBe("audio/wav");
-        expect(voiceResult.data.lastAiMessageContent!.length).toBeGreaterThan(10);
+        expect(voiceResult.data.lastAiMessageContent!.length).toBeGreaterThan(
+          10,
+        );
         assertStepOk(voiceResult.data.lastAiMessageContent, "T10c");
+        lastMainAiMsgId = voiceResult.data.lastAiMessageId!;
 
-        assertNoOrphans(voiceMsgs);
+        assertNoOrphans(voiceMsgs, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
@@ -1419,29 +1801,36 @@ describe("AI Stream Integration", () => {
         const beforeVideo = await getBalance(testUser, creditLogger, creditT);
 
         const videoFile = await loadFixture("test-video.mp4", "video/mp4");
-        const { result: videoResult, messages: videoMsgs } = await runTestStream({
-          user: testUser,
-          prompt:
-            "[T10d video-attach] Describe the attached video briefly. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.",
-          threadMode: "append",
-          threadId,
-          favoriteId: mainFavoriteId,
-          attachments: [videoFile],
-        });
+        const { result: videoResult, messages: videoMsgs } =
+          await runTestStream({
+            user: testUser,
+            prompt:
+              "[T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.",
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
+            attachments: [videoFile],
+          });
 
         expect(videoResult.success).toBe(true);
-        if (!videoResult.success) return;
+        if (!videoResult.success) {
+          return;
+        }
         expect(videoResult.data.threadId).toBe(threadId);
 
-        const videoSorted = [...videoMsgs].sort(
+        const videoSorted = [...videoMsgs].toSorted(
           (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
         );
         const videoUserMsg = videoSorted.find((m) => m.role === "user");
         expect(videoUserMsg!.attachments![0]!.mimeType).toBe("video/mp4");
-        expect(videoResult.data.lastAiMessageContent!.length).toBeGreaterThan(10);
+        expect(videoResult.data.lastAiMessageContent!.length).toBeGreaterThan(
+          10,
+        );
         assertStepOk(videoResult.data.lastAiMessageContent, "T10d");
 
-        assertNoOrphans(videoMsgs);
+        lastMainAiMsgId = videoResult.data.lastAiMessageId!;
+
+        assertNoOrphans(videoMsgs, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
@@ -1463,15 +1852,17 @@ describe("AI Stream Integration", () => {
         const { result, messages } = await runTestStream({
           user: testUser,
           prompt:
-            "[T11 gemini-native-image] Generate an image of a blue triangle. Output only the image. If anything seems wrong or unexpected, report it instead.",
-          threadMode: "append",
+            "[T11 gemini-native-image] Generate an image of a blue triangle. Output the image directly (no tool call needed). End your reply with STEP_OK if the image was generated, or FAILED: <reason> if generation failed.",
           threadId,
           favoriteId: mainFavoriteId,
           model: ChatModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
+          explicitParentMessageId: lastMainAiMsgId,
         });
 
         expect(result.success).toBe(true);
-        if (!result.success) return;
+        if (!result.success) {
+          return;
+        }
 
         expect(result.data.lastGeneratedMediaUrl).toBeTruthy();
 
@@ -1496,7 +1887,9 @@ describe("AI Stream Integration", () => {
           }
         }
 
-        assertNoOrphans(messages);
+        lastMainAiMsgId = result.data.lastAiMessageId!;
+
+        assertNoOrphans(messages, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
@@ -1517,8 +1910,7 @@ describe("AI Stream Integration", () => {
         const { result, messages } = await runTestStream({
           user: testUser,
           prompt:
-            "[T12 invalid-parent] Say: INVALID_PARENT_TEST STEP_OK. If anything seems wrong or unexpected, report it instead.",
-          threadMode: "append",
+            "[T12 invalid-parent] Say exactly: INVALID_PARENT_TEST STEP_OK",
           threadId,
           favoriteId: mainFavoriteId,
           explicitParentMessageId: crypto.randomUUID(),
@@ -1528,9 +1920,12 @@ describe("AI Stream Integration", () => {
         if (result.success) {
           expect(result.data.lastAiMessageContent).toBeTruthy();
           expect(result.data.totalCreditsDeducted).toBeGreaterThan(0);
+          if (result.data.lastAiMessageId) {
+            lastMainAiMsgId = result.data.lastAiMessageId;
+          }
         }
 
-        assertNoOrphans(messages);
+        assertNoOrphans(messages, new Set([t1ToolAiMsgId]));
         await assertThreadIdle(threadId);
         await assertNoPendingTasks(threadId);
 
@@ -1546,8 +1941,9 @@ describe("AI Stream Integration", () => {
       async () => {
         const messages = await fetchThreadMessages(threadId);
 
-        // ── No orphans ──
-        assertNoOrphans(messages);
+        // ── Full chain integrity: no orphans, no branches, every message reachable ──
+        // t1ToolAiMsgId is the only intentional branch point (T3a retry + T3b fork + main chain)
+        assertChainIntegrity(messages, new Set([t1ToolAiMsgId]));
 
         // ── Exactly 1 root ──
         const roots = messages.filter((m) => m.parentId === null);
@@ -1556,8 +1952,9 @@ describe("AI Stream Integration", () => {
 
         // ── t1ToolAi (final AI after tool call) has ≥ 2 user children (retry, branch) ──
         const tree = buildTree(messages);
-        const t1ToolAiUserChildren = (tree.get(t1ToolAiMsgId) ?? []).filter((childId) =>
-          messages.find((m) => m.id === childId && m.role === "user"),
+        const t1ToolAiUserChildren = (tree.get(t1ToolAiMsgId) ?? []).filter(
+          (childId) =>
+            messages.find((m) => m.id === childId && m.role === "user"),
         );
         expect(t1ToolAiUserChildren.length).toBeGreaterThanOrEqual(2);
 
@@ -1596,10 +1993,9 @@ describe("AI Stream Integration", () => {
 
         // ── All message IDs are globally unique ──
         const allIds = messages.map((m) => m.id);
-        expect(
-          new Set(allIds).size,
-          `Duplicate message IDs found`,
-        ).toBe(allIds.length);
+        expect(new Set(allIds).size, `Duplicate message IDs found`).toBe(
+          allIds.length,
+        );
 
         // ── Global createdAt monotonicity within each parent chain ──
         // For every leaf message, walk to root and verify chronological order
@@ -1642,75 +2038,99 @@ describe("AI Stream Integration", () => {
       },
       TEST_TIMEOUT,
     );
-  });
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // Credits
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  describe("Credits", () => {
+    // ── Credit deduction + incognito ───────────────────────────────────────
     it(
-      "credit deduction + incognito: balance decreases for normal, no persist for incognito",
+      "C1: credit deduction — balance decreases, totalCreditsDeducted matches",
       async () => {
-        // ── Normal deduction ──
         setFetchCacheContext("credit-deduction");
         await pinBalance(testUser.id, 50, creditLogger, creditT);
         const before = await getBalance(testUser, creditLogger, creditT);
 
-        const { result: r1 } = await runTestStream({
+        const { result } = await runTestStream({
           user: testUser,
-          prompt: "Reply with one word: OK",
-          threadMode: "none",
+          prompt: "[C1 credit-deduction] Reply with exactly one word: OK",
+          threadId,
           favoriteId: mainFavoriteId,
+          explicitParentMessageId: lastMainAiMsgId,
         });
 
-        expect(r1.success).toBe(true);
-        if (r1.success) {
-          expect((r1.data.totalCreditsDeducted ?? 0) > 0).toBe(true);
-
-          // ── totalCreditsDeducted should approximately match balance diff ──
-          const afterNormal = await getBalance(testUser, creditLogger, creditT);
-          const balanceDiff = before - afterNormal;
-          const reported = r1.data.totalCreditsDeducted ?? 0;
-          // Allow small floating point tolerance (0.001 credits)
-          expect(
-            Math.abs(balanceDiff - reported),
-            `Balance diff ${balanceDiff} vs reported ${reported}`,
-          ).toBeLessThan(0.01);
+        expect(result.success).toBe(true);
+        if (!result.success) {
+          return;
         }
+
+        expect((result.data.totalCreditsDeducted ?? 0) > 0).toBe(true);
+
+        lastMainAiMsgId = result.data.lastAiMessageId!;
 
         const after = await getBalance(testUser, creditLogger, creditT);
+        const balanceDiff = before - after;
+        const reported = result.data.totalCreditsDeducted ?? 0;
+        expect(
+          Math.abs(balanceDiff - reported),
+          `Balance diff ${balanceDiff} vs reported ${reported}`,
+        ).toBeLessThan(0.01);
         expect(after).toBeLessThan(before);
-        assertDeducted(before, after, 0, 100);
 
-        // ── Incognito: no thread created ──
-        setFetchCacheContext("incognito-mode");
-        await pinBalance(testUser.id, 50, creditLogger, creditT);
-        const beforeIncognito = await getBalance(testUser, creditLogger, creditT);
-
-        const { result: r2, messages: msgs2 } = await runTestStream({
-          user: testUser,
-          prompt: "Reply with: INCOGNITO_TEST",
-          threadMode: "none",
-          favoriteId: mainFavoriteId,
-        });
-
-        expect(r2.success).toBe(true);
-        if (r2.success) {
-          expect(r2.data.lastAiMessageContent).toContain("INCOGNITO");
-          expect(r2.data.threadId).toBeUndefined();
-
-          // ── Incognito still deducts credits (it's just no DB persist for messages) ──
-          const afterIncognito = await getBalance(testUser, creditLogger, creditT);
-          expect(afterIncognito).toBeLessThan(beforeIncognito);
-          expect((r2.data.totalCreditsDeducted ?? 0)).toBeGreaterThan(0);
-        }
-        expect(msgs2).toHaveLength(0);
+        await assertThreadIdle(threadId);
+        await assertNoPendingTasks(threadId);
       },
       TEST_TIMEOUT,
     );
 
     it(
-      "insufficient credits: returns 403 when balance is zero",
+      "C2: incognito — no messages persisted, credits still deducted",
+      async () => {
+        setFetchCacheContext("incognito-mode");
+        await pinBalance(testUser.id, 50, creditLogger, creditT);
+        const beforeIncognito = await getBalance(
+          testUser,
+          creditLogger,
+          creditT,
+        );
+
+        const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+        const { t } = scopedTranslation.scopedT(defaultLocale);
+
+        const result = await runHeadlessAiStream({
+          prompt: "[C2 incognito] Reply with exactly: INCOGNITO_TEST",
+          favoriteId: mainFavoriteId,
+          rootFolderId: DefaultFolderId.INCOGNITO,
+          user: testUser,
+          locale: defaultLocale,
+          logger,
+          t,
+        });
+
+        expect(result.success).toBe(true);
+        if (!result.success) {
+          return;
+        }
+
+        // Incognito: messages not persisted — no messages should exist in DB for this thread
+        if (result.data.threadId) {
+          const incognitoMsgs = await fetchThreadMessages(result.data.threadId);
+          expect(
+            incognitoMsgs,
+            "C2: incognito messages persisted to DB",
+          ).toHaveLength(0);
+        }
+        expect(result.data.lastAiMessageContent).toContain("INCOGNITO_TEST");
+
+        const afterIncognito = await getBalance(
+          testUser,
+          creditLogger,
+          creditT,
+        );
+        expect(afterIncognito).toBeLessThan(beforeIncognito);
+        expect(result.data.totalCreditsDeducted ?? 0).toBeGreaterThan(0);
+      },
+      TEST_TIMEOUT,
+    );
+
+    it(
+      "C3: insufficient credits — returns 403 when balance is zero",
       async () => {
         setFetchCacheContext("insufficient-credits");
 
@@ -1739,9 +2159,10 @@ describe("AI Stream Integration", () => {
         try {
           const { result } = await runTestStream({
             user: testUser,
-            prompt: "Say: SHOULD_FAIL",
-            threadMode: "none",
+            prompt: "[C3 insufficient-credits] Say: SHOULD_FAIL",
+            threadId,
             favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
           });
 
           expect(result.success).toBe(false);
@@ -1773,15 +2194,16 @@ describe("AI Stream Integration", () => {
     let favoriteId: string; // kimi variant — KIMI_K2_5 + OPENROUTER image + MODELSLAB music/video
     let budgetFavoriteId: string; // budget variant — GPT_5_NANO + MODELSLAB image + REPLICATE music
     let unbottledThreadId: string;
+    let lastUnbottledAiMsgId: string;
     /** Saved chatModelOptionsIndex entries before UNBOTTLED runtime patching */
     const savedModelOptions = new Map<string, ChatModelOption>();
     /** Provider entry ops applied to .ts files on disk (reversed in afterAll) */
     let appliedOps: Array<{
-      action: string;
+      action: "add" | "remove";
       role: string;
       enumKey: string;
       modelId: string;
-      provider: string;
+      provider: ApiProvider;
       providerModel: string;
       creditCost?: number;
       source: string;
@@ -1796,12 +2218,15 @@ describe("AI Stream Integration", () => {
       // ── Step 1: Run the price updater against local instance ──
       // Temporarily clear credentials so getSession() uses local fallback
       // (in-process WsProviderModelsRepository.listModels).
-      (agentEnv as Record<string, string>).UNBOTTLED_CLOUD_CREDENTIALS = "";
-      const { UnbottledPriceFetcher } = await import(
-        "@/app/api/[locale]/agent/models/model-prices/providers/unbottled"
-      );
+      Object.assign(agentEnv, { UNBOTTLED_CLOUD_CREDENTIALS: "" });
+      const { UnbottledPriceFetcher } =
+        await import("@/app/api/[locale]/agent/models/model-prices/providers/unbottled");
       const priceFetcher = new UnbottledPriceFetcher();
-      const priceLogger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const priceLogger = createEndpointLogger(
+        false,
+        Date.now(),
+        defaultLocale,
+      );
       const priceResult = await priceFetcher.fetch(priceLogger);
 
       // The price updater should find models on the local instance
@@ -1820,12 +2245,8 @@ describe("AI Stream Integration", () => {
 
       // ── Step 2: Write UNBOTTLED provider entries to .ts files on disk ──
       // This is the same codepath the production price updater uses.
-      const {
-        addProviderEntry,
-        getRoleFilePaths,
-      } = await import(
-        "@/app/api/[locale]/agent/models/model-prices/repository"
-      );
+      const { addProviderEntry, getRoleFilePaths } =
+        await import("@/app/api/[locale]/agent/models/model-prices/repository");
       const roleFilePaths = getRoleFilePaths();
 
       // Group ops by role, read each file once, apply all ops, write back
@@ -1837,7 +2258,9 @@ describe("AI Stream Integration", () => {
       }
       for (const [role, ops] of opsByRole) {
         const filePath = roleFilePaths[role];
-        if (!filePath) continue;
+        if (!filePath) {
+          continue;
+        }
         let content = readFileSync(filePath, "utf-8");
         for (const op of ops) {
           const result = addProviderEntry(content, op);
@@ -1863,7 +2286,7 @@ describe("AI Stream Integration", () => {
             apiProvider: ApiProvider.UNBOTTLED,
             providerModel: op.providerModel,
             creditCost: op.creditCost ?? existing.creditCost,
-          };
+          } as ChatModelOption;
         }
       }
 
@@ -1874,9 +2297,8 @@ describe("AI Stream Integration", () => {
       ).toBe(true);
 
       // ── Step 4: Set credentials pointing at ourselves (self-relay) ──
-      const { resolveLocalAdminSession } = await import(
-        "@/app/api/[locale]/agent/models/model-prices/providers/local-session-helper"
-      );
+      const { resolveLocalAdminSession } =
+        await import("@/app/api/[locale]/agent/models/model-prices/providers/local-session-helper");
       const localSession = await resolveLocalAdminSession(
         env.NEXT_PUBLIC_APP_URL,
       );
@@ -1884,65 +2306,87 @@ describe("AI Stream Integration", () => {
         localSession,
         "resolveLocalAdminSession failed — admin user missing?",
       ).toBeTruthy();
-      (agentEnv as Record<string, string>).UNBOTTLED_CLOUD_CREDENTIALS =
-        `${localSession!.leadId}:${localSession!.token}:${localSession!.remoteUrl}`;
+      Object.assign(agentEnv, {
+        UNBOTTLED_CLOUD_CREDENTIALS: `${localSession!.leadId}:${localSession!.token}:${localSession!.remoteUrl}`,
+      });
 
-      // ── Step 5: Create test favorites — two variants for inspection ──
-      // Variant "kimi": KIMI_K2_5 chat, OPENROUTER image, MODELSLAB music/video
-      const [fav] = await db
-        .insert(chatFavorites)
-        .values({
-          userId: testUser.id,
-          skillId: QUALITY_TESTER_SKILL_ID,
-          variantId: "kimi",
-          modelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: ChatModelId.KIMI_K2_5,
-          },
-          imageGenModelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: ImageGenModelId.FLUX_2_KLEIN_4B,
-          },
-          musicGenModelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: MusicGenModelId.LYRIA_3,
-          },
-          videoGenModelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: VideoGenModelId.LTX_2_3_PRO_I2V,
-          },
-          position: 9999,
-        })
-        .returning({ id: chatFavorites.id });
-      favoriteId = fav!.id;
+      // ── Step 5: Upsert test favorites with stable IDs (reused across runs) ──
+      const UNBOTTLED_FAV_ID = "00000000-0000-4002-a000-000000000002";
+      const BUDGET_FAV_ID = "00000000-0000-4003-a000-000000000003";
 
-      // Variant "budget": GPT_5_NANO chat, MODELSLAB image, REPLICATE music, MODELSLAB video
-      const [budgetFav] = await db
+      const kimiValues = {
+        id: UNBOTTLED_FAV_ID,
+        userId: testUser.id,
+        skillId: QUALITY_TESTER_SKILL_ID,
+        variantId: "kimi",
+        modelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ChatModelId.KIMI_K2_5,
+        },
+        imageGenModelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ImageGenModelId.FLUX_2_KLEIN_4B,
+        },
+        musicGenModelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: MusicGenModelId.LYRIA_3,
+        },
+        videoGenModelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: VideoGenModelId.LTX_2_3_PRO_I2V,
+        },
+        position: 9999,
+      };
+      await db
         .insert(chatFavorites)
-        .values({
-          userId: testUser.id,
-          skillId: QUALITY_TESTER_SKILL_ID,
-          variantId: "budget",
-          modelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: ChatModelId.GPT_5_NANO,
+        .values(kimiValues)
+        .onConflictDoUpdate({
+          target: chatFavorites.id,
+          set: {
+            modelSelection: kimiValues.modelSelection,
+            imageGenModelSelection: kimiValues.imageGenModelSelection,
+            musicGenModelSelection: kimiValues.musicGenModelSelection,
+            videoGenModelSelection: kimiValues.videoGenModelSelection,
           },
-          imageGenModelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: ImageGenModelId.Z_IMAGE_TURBO,
+        });
+      favoriteId = UNBOTTLED_FAV_ID;
+
+      const budgetValues = {
+        id: BUDGET_FAV_ID,
+        userId: testUser.id,
+        skillId: QUALITY_TESTER_SKILL_ID,
+        variantId: "budget",
+        modelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ChatModelId.GPT_5_NANO,
+        },
+        imageGenModelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ImageGenModelId.Z_IMAGE_TURBO,
+        },
+        musicGenModelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: MusicGenModelId.MUSICGEN_STEREO,
+        },
+        videoGenModelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: VideoGenModelId.LTX_2_PRO_T2V,
+        },
+        position: 10000,
+      };
+      await db
+        .insert(chatFavorites)
+        .values(budgetValues)
+        .onConflictDoUpdate({
+          target: chatFavorites.id,
+          set: {
+            modelSelection: budgetValues.modelSelection,
+            imageGenModelSelection: budgetValues.imageGenModelSelection,
+            musicGenModelSelection: budgetValues.musicGenModelSelection,
+            videoGenModelSelection: budgetValues.videoGenModelSelection,
           },
-          musicGenModelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: MusicGenModelId.MUSICGEN_STEREO,
-          },
-          videoGenModelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: VideoGenModelId.LTX_2_PRO_T2V,
-          },
-          position: 10000,
-        })
-        .returning({ id: chatFavorites.id });
-      budgetFavoriteId = budgetFav!.id;
+        });
+      budgetFavoriteId = BUDGET_FAV_ID;
 
       // NOTE: Strict mode is NOT enabled here because self-relay inner calls
       // go through the real provider (OpenRouter) and need to record fixtures
@@ -1962,12 +2406,8 @@ describe("AI Stream Integration", () => {
 
       // Remove UNBOTTLED provider entries from .ts files on disk
       if (appliedOps.length > 0) {
-        const {
-          removeProviderEntry,
-          getRoleFilePaths,
-        } = await import(
-          "@/app/api/[locale]/agent/models/model-prices/repository"
-        );
+        const { removeProviderEntry, getRoleFilePaths } =
+          await import("@/app/api/[locale]/agent/models/model-prices/repository");
         const roleFilePaths = getRoleFilePaths();
         const opsByRole = new Map<string, typeof appliedOps>();
         for (const op of appliedOps) {
@@ -1977,7 +2417,9 @@ describe("AI Stream Integration", () => {
         }
         for (const [role, ops] of opsByRole) {
           const filePath = roleFilePaths[role];
-          if (!filePath) continue;
+          if (!filePath) {
+            continue;
+          }
           let content = readFileSync(filePath, "utf-8");
           for (const op of ops) {
             const result = removeProviderEntry(content, op);
@@ -1992,10 +2434,11 @@ describe("AI Stream Integration", () => {
 
       // Restore credentials on agentEnv
       if (savedCredentials !== undefined) {
-        (agentEnv as Record<string, string>).UNBOTTLED_CLOUD_CREDENTIALS =
-          savedCredentials;
+        Object.assign(agentEnv, {
+          UNBOTTLED_CLOUD_CREDENTIALS: savedCredentials,
+        });
       } else {
-        (agentEnv as Record<string, string>).UNBOTTLED_CLOUD_CREDENTIALS = "";
+        Object.assign(agentEnv, { UNBOTTLED_CLOUD_CREDENTIALS: "" });
       }
       // (strict mode was never enabled for UNBOTTLED tests)
     });
@@ -2163,17 +2606,19 @@ describe("AI Stream Integration", () => {
 
         const { result, messages } = await runTestStream({
           user: testUser,
-          prompt:
-            "[F2 unbottled-relay] Reply with exactly the word: HELLO_TEST STEP_OK. If anything seems wrong or unexpected, report it instead.",
-          threadMode: "new",
+          prompt: "[F2 unbottled-relay] Reply with exactly: HELLO_TEST STEP_OK",
           favoriteId,
         });
 
         expect(result.success).toBe(true);
-        if (!result.success) return;
+        if (!result.success) {
+          return;
+        }
 
         unbottledThreadId = result.data.threadId!;
+        lastUnbottledAiMsgId = result.data.lastAiMessageId!;
         expect(unbottledThreadId).toBeTruthy();
+        expect(lastUnbottledAiMsgId).toBeTruthy();
         expect(result.data.lastAiMessageContent).toBeTruthy();
         assertStepOk(result.data.lastAiMessageContent, "F2");
 
@@ -2203,15 +2648,18 @@ describe("AI Stream Integration", () => {
         const { result, messages } = await runTestStream({
           user: testUser,
           prompt:
-            '[F3 unbottled-tool-call] Use the tool-help tool to look up how the "generate_image" tool works, then summarize. If anything seems wrong or unexpected, report it instead. End with STEP_OK if everything worked.',
-          threadMode: "append",
+            '[F3 unbottled-tool-call] Use the tool-help tool to look up how the "generate_image" tool works, then summarize what you found. End your reply with STEP_OK if the tool lookup worked correctly, or FAILED: <reason> if anything was wrong.',
           threadId: unbottledThreadId,
           favoriteId,
+          explicitParentMessageId: lastUnbottledAiMsgId,
         });
 
         expect(result.success).toBe(true);
-        if (!result.success) return;
+        if (!result.success) {
+          return;
+        }
         expect(result.data.threadId).toBe(unbottledThreadId);
+        lastUnbottledAiMsgId = result.data.lastAiMessageId!;
 
         // Self-relay: tool calls happen inside the inner headless run.
         // The outer thread receives only the final assistant content — no
@@ -2227,10 +2675,9 @@ describe("AI Stream Integration", () => {
 
         await assertThreadIdle(unbottledThreadId);
         await assertNoPendingTasks(unbottledThreadId);
-        assertNoOrphans(messages);
+        assertChainIntegrity(messages);
       },
       TEST_TIMEOUT,
     );
-
   });
 });

@@ -338,7 +338,6 @@ export class AiStreamRepository {
         wakeUpRevival: true,
         explicitParentMessageId: lastDeferredId,
         sequenceIdOverride: batchSequenceId,
-        threadMode: "append",
         threadId: threadResultThreadId,
         rootFolderId: data.rootFolderId,
         user,

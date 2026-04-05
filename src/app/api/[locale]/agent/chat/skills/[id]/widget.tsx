@@ -1123,11 +1123,24 @@ export function SkillViewContainer({
     | string
     | undefined;
 
+  const skillData = field.value;
   const { addToFavorites } = useAddToFavorites({
     skillId: skillId ?? "",
     logger,
     user,
     locale,
+    characterData:
+      skillId && skillData
+        ? {
+            id: skillId,
+            icon: skillData.icon ?? null,
+            name: skillData.name ?? null,
+            tagline: skillData.tagline ?? null,
+            description: skillData.description ?? null,
+            voiceModelSelection: skillData.voiceModelSelection ?? null,
+            modelSelection: modelSelection ?? null,
+          }
+        : undefined,
   });
 
   // Check if skill is in favorites by fetching favorites list

@@ -11,9 +11,7 @@ import {
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { handleTaskCompletion } from "@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { parseError } from "../../../../shared/utils";
@@ -322,64 +320,10 @@ export class ToolResultHandler {
       isIncognito,
     });
 
-    // For local background calls: tool message is now persisted, so we can
-    // insert the deferred result message and emit TASK_COMPLETED WS event.
-    // The taskId is in the tool result output (set by execute-tool/repository.ts).
-    if (
-      isBackground &&
-      userId &&
-      typeof output === "object" &&
-      output !== null &&
-      !Array.isArray(output) &&
-      "taskId" in output &&
-      typeof output.taskId === "string"
-    ) {
-      const bgTaskId = output.taskId;
-      // Fire-and-forget - don't block the stream response
-      void (async (): Promise<void> => {
-        try {
-          const { db } = await import("@/app/api/[locale]/system/db");
-          const { eq, desc } = await import("drizzle-orm");
-          const { cronTaskExecutions } =
-            await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
-          const { CronTaskStatus } =
-            await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
-
-          const [execution] = await db
-            .select({
-              result: cronTaskExecutions.result,
-              status: cronTaskExecutions.status,
-            })
-            .from(cronTaskExecutions)
-            .where(eq(cronTaskExecutions.taskId, bgTaskId))
-            .orderBy(desc(cronTaskExecutions.completedAt))
-            .limit(1);
-
-          const bgStatus = execution?.status ?? CronTaskStatus.COMPLETED;
-          const bgResult = execution?.result ?? null;
-
-          await handleTaskCompletion({
-            toolMessageId,
-            threadId,
-            callbackMode: CallbackMode.DETACH,
-            status: bgStatus,
-            output: bgResult,
-            taskId: bgTaskId,
-            userId,
-            logger,
-          });
-        } catch (err) {
-          logger.error(
-            "[AI Stream] Failed to call handleTaskCompletion for background task",
-            {
-              toolMessageId,
-              bgTaskId,
-              error: parseError(err).message,
-            },
-          );
-        }
-      })();
-    }
+    // Note: for detach tasks, the execute-tool goroutine handles its own
+    // handleTaskCompletion call (WS event, optional wakeUp revival). Do NOT
+    // call handleTaskCompletion here — it would race with the goroutine and
+    // overwrite the initial { taskId, status, hint } result with null.
 
     return {
       currentParentId: toolMessageId,

@@ -368,7 +368,6 @@ export class ImageGenerationRepository {
       // Always "none" — the outer AI stream persists the tool result.
       // Using "append" with the same threadId would re-register in StreamRegistry,
       // aborting the outer stream (superseded).
-      threadMode: "none",
       // Do NOT pass outer threadId — using the same threadId would re-register
       // in StreamRegistry, aborting the outer stream. FilePartHandler uploads to
       // an ephemeral thread; we re-upload to the real thread below.

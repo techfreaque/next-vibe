@@ -98,8 +98,6 @@ export interface HeadlessAiStreamParams {
   headlessInstructions?: string;
   /** Max tool call rounds before stopping */
   maxTurns?: number;
-  /** Thread mode: "none" = no persistence, "new" = new thread, "append" = continue thread */
-  threadMode: "none" | "new" | "append";
   /** Thread ID to continue (for "append" mode) */
   threadId?: string;
   /** Subfolder for thread placement */
@@ -285,7 +283,6 @@ export async function runHeadlessAiStream(
     pinnedTools,
     availableTools,
     headlessInstructions,
-    threadMode,
     threadId: existingThreadId,
     subFolderId,
     rootFolderId: rootFolderIdOverride,
@@ -366,11 +363,7 @@ export async function runHeadlessAiStream(
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
-    const rootFolderId =
-      rootFolderIdOverride ??
-      (threadMode === "none"
-        ? DefaultFolderId.INCOGNITO
-        : DefaultFolderId.CRON);
+    const rootFolderId = rootFolderIdOverride;
     const effectiveThreadId = existingThreadId ?? crypto.randomUUID();
     const isIncognito = rootFolderId === DefaultFolderId.INCOGNITO;
 
@@ -402,7 +395,7 @@ export async function runHeadlessAiStream(
 
       // For append mode, find the current last message so user msg chains correctly
       let preCallUserParentId: string | null = null;
-      if (threadMode === "append" && existingThreadId) {
+      if (existingThreadId) {
         const [lastMsg] = await db
           .select({ id: chatMessages.id })
           .from(chatMessages)
@@ -481,7 +474,7 @@ export async function runHeadlessAiStream(
     // explicitParentMessageId takes priority - critical for WAIT mode resume where
     // the tool message with its backfilled result must be the history root, not
     // whatever message was created most recently by timestamp.
-    if (threadMode === "append" && !parentMessageIdForAi && existingThreadId) {
+    if (existingThreadId && !parentMessageIdForAi) {
       if (explicitParentMessageId) {
         parentMessageIdForAi = explicitParentMessageId;
       } else {
@@ -577,7 +570,7 @@ export async function runHeadlessAiStream(
       model,
       threadId,
       lastAiMessageId,
-      threadMode,
+      isIncognito,
     });
 
     return {
@@ -587,7 +580,7 @@ export async function runHeadlessAiStream(
         lastAiMessageContent,
         lastGeneratedMediaUrl,
         totalCreditsDeducted,
-        threadId: threadMode !== "none" ? threadId : undefined,
+        threadId: isIncognito ? undefined : threadId,
       },
     };
   } catch (error) {

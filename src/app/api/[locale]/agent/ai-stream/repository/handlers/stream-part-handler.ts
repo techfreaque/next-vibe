@@ -10,8 +10,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { ToolExecutionContext } from "../../../chat/config";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { ToolExecutionContext } from "../../../chat/config";
 import type { AiStreamT } from "../../stream/i18n";
 import { AbortReason, StreamAbortError } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
@@ -171,6 +171,13 @@ export class StreamPartHandler {
       if (result.wasCreated) {
         ctx.currentParentId = result.currentAssistantMessageId;
         ctx.lastParentId = result.currentAssistantMessageId;
+        // Notify TTS handler of the new message ID so subsequent text-deltas
+        // can be processed. Reasoning content is inside <think> tags and will
+        // be automatically skipped by ttsHandler.addDelta(), but the messageId
+        // must be set so text-deltas that follow reasoning are not silently dropped.
+        if (ttsHandler) {
+          ttsHandler.setMessageId(result.currentAssistantMessageId);
+        }
       }
 
       return { shouldAbort: false };

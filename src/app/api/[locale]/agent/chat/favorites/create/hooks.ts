@@ -15,6 +15,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type {
+  ChatModelId,
+  ChatModelSelection,
+} from "../../../ai-stream/models";
 import type { IconKey } from "../../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useEnvAvailability } from "../../../env-availability-context";
 import type { VoiceModelSelection } from "../../../text-to-speech/models";
@@ -69,7 +73,15 @@ export interface SkillDataForFavorite {
   tagline: string | null;
   description: string | null;
   voiceModelSelection: VoiceModelSelection | null;
-  modelSelection: null;
+  /** Skill/variant model selection for best-model computation in optimistic update */
+  modelSelection: ChatModelSelection | null;
+  /** Pre-computed model display fields - when present, used directly in optimistic update */
+  preComputedModel?: {
+    modelId: ChatModelId | null;
+    modelIcon: IconKey;
+    modelInfo: string;
+    modelProvider: string;
+  } | null;
 }
 
 export interface UseAddToFavoritesOptions {
@@ -222,7 +234,7 @@ export function useAddToFavorites({
           const newFavorite =
             ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
               newFavoriteConfig,
-              null,
+              charData.modelSelection,
               charData.icon,
               charData.name,
               charData.tagline,
@@ -233,6 +245,16 @@ export function useAddToFavorites({
               user,
               envAvailability,
             );
+
+          // Override model fields with pre-computed values when available
+          // (e.g. from skills list which already has server-computed model info)
+          const pre = charData.preComputedModel;
+          if (pre) {
+            newFavorite.modelId = pre.modelId;
+            newFavorite.modelIcon = pre.modelIcon;
+            newFavorite.modelInfo = pre.modelInfo;
+            newFavorite.modelProvider = pre.modelProvider;
+          }
 
           return {
             success: true,

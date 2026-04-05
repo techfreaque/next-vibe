@@ -26,8 +26,6 @@ import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hoo
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { DefaultFolderId, isDefaultFolderId } from "../config";
-import folderContentsDefinition from "../folder-contents/[rootFolderId]/definition";
-import threadsDefinition from "../threads/definition";
 
 /**
  * Navigation state shape
@@ -84,6 +82,7 @@ type ChatNavigationStore = StoreApi<ChatNavigationState>;
  * Patches both the threads cache and folder-contents cache for a given thread's
  * streamingState. Must patch both because the sidebar uses folder-contents while
  * some views use threads.
+ * Uses dynamic imports to avoid circular dependency through definition → models → skills/enum → icons.
  */
 function patchThreadStreamingState(
   threadId: string,
@@ -92,51 +91,60 @@ function patchThreadStreamingState(
   currentSubFolderId: string | null,
   logger: EndpointLogger,
 ): void {
-  // Patch threads endpoint cache (used by some views)
-  apiClient.updateEndpointData(
-    threadsDefinition.GET,
-    logger,
-    (old) => {
-      if (!old?.success) {
-        return old;
-      }
-      return success({
-        ...old.data,
-        threads: old.data.threads.map((t) =>
-          t.id === threadId ? { ...t, streamingState: state } : t,
-        ),
-      });
-    },
-    {
-      requestData: {
-        rootFolderId: currentRootFolderId,
-        subFolderId: currentSubFolderId,
-      },
-    },
-  );
+  void Promise.all([
+    import("../threads/definition"),
+    import("../folder-contents/[rootFolderId]/definition"),
+  ]).then(([threadsDefModule, folderContentsDefModule]) => {
+    const threadsDefinition = threadsDefModule.default;
+    const folderContentsDefinition = folderContentsDefModule.default;
 
-  // Patch folder-contents endpoint cache (used by sidebar)
-  apiClient.updateEndpointData(
-    folderContentsDefinition.GET,
-    logger,
-    (old) => {
-      if (!old?.success) {
-        return old;
-      }
-      return success({
-        ...old.data,
-        items: old.data.items.map((item) =>
-          item.type === "thread" && item.id === threadId
-            ? { ...item, streamingState: state }
-            : item,
-        ),
-      });
-    },
-    {
-      urlPathParams: { rootFolderId: currentRootFolderId },
-      requestData: { subFolderId: currentSubFolderId },
-    },
-  );
+    // Patch threads endpoint cache (used by some views)
+    apiClient.updateEndpointData(
+      threadsDefinition.GET,
+      logger,
+      (old) => {
+        if (!old?.success) {
+          return old;
+        }
+        return success({
+          ...old.data,
+          threads: old.data.threads.map((t) =>
+            t.id === threadId ? { ...t, streamingState: state } : t,
+          ),
+        });
+      },
+      {
+        requestData: {
+          rootFolderId: currentRootFolderId,
+          subFolderId: currentSubFolderId,
+        },
+      },
+    );
+
+    // Patch folder-contents endpoint cache (used by sidebar)
+    apiClient.updateEndpointData(
+      folderContentsDefinition.GET,
+      logger,
+      (old) => {
+        if (!old?.success) {
+          return old;
+        }
+        return success({
+          ...old.data,
+          items: old.data.items.map((item) =>
+            item.type === "thread" && item.id === threadId
+              ? { ...item, streamingState: state }
+              : item,
+          ),
+        });
+      },
+      {
+        urlPathParams: { rootFolderId: currentRootFolderId },
+        requestData: { subFolderId: currentSubFolderId },
+      },
+    );
+    return undefined;
+  });
 }
 
 /**

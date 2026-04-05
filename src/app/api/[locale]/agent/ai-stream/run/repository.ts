@@ -317,10 +317,9 @@ export class AiStreamRunRepository {
         availableTools: resolvedAvailableTools ?? null, // null = all tools permitted
         headlessInstructions: effectiveInstructions,
         maxTurns: maxTurns ?? 1,
-        threadMode: headlessThreadMode,
         threadId: appendThreadId,
         subFolderId,
-        rootFolderId: rootFolderId as DefaultFolderId,
+        rootFolderId,
         preCalls: headlessPreCalls.length > 0 ? headlessPreCalls : undefined,
         excludeMemories: excludeMemories ?? false,
         user,

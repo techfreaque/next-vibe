@@ -8,17 +8,17 @@
     "alt-svc": "h3=\":443\"; ma=86400",
     "cache-control": "no-cache, private",
     "cf-cache-status": "DYNAMIC",
-    "cf-ray": "9e73a8e1bec69f52-FRA",
+    "cf-ray": "9e772c62c9aa1a7d-FRA",
     "connection": "keep-alive",
     "content-encoding": "br",
     "content-type": "application/json",
-    "date": "Sat, 04 Apr 2026 22:13:22 GMT",
+    "date": "Sun, 05 Apr 2026 08:27:26 GMT",
     "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
-    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=LZQn9YHEee9AfE476FkoXwqrA2psq%2FgkiR8pFjH8CWtcjB7aJMm4iQ8r8D0Pmx662NkfR%2FYiQ2RD8%2FRDw6CSC06%2FBt%2FUIzIrE6yME49rXvd4az2UOuw4aHF0t2U4WlU%3D\"}]}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=xACw7mbOv7vrTldVV7F%2FAw9kjlZThAaPl1LNd7nG0wREn4%2FYu%2B9x1JJXVxFA%2Fa6nVWKFtnLulH6%2FVe669P%2F9fgDLNo4vlBdCRCBpAX08m3GvEi4nFV1Xe7gVN7bRX68%3D\"}]}",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
-    "x-cloud-trace-context": "7a6f8744114e24e42c1eae7aabf8d83f",
-    "x-request-time": "2.466",
+    "x-cloud-trace-context": "5c912da7f06a235a97a1fa574fe18e22",
+    "x-request-time": "2.488",
     "x-served-by": "octane-api",
     "x-upstream-connect": "0.000",
     "x-upstream-time": "-"
@@ -28,11 +28,11 @@
     "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise",
     "eta": 80,
     "message": "Request queued for processing. Try to fetch request after estimated seconds.",
-    "fetch_result": "https://modelslab.com/api/v6/images/fetch/173867593",
-    "id": 173867593,
+    "fetch_result": "https://modelslab.com/api/v6/images/fetch/173908440",
+    "id": 173908440,
     "output": [],
     "future_links": [
-      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/aed1dbc5-c185-41e2-86c3-6c25993a9a73-0.jpg"
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/bdca3f0a-1688-48f4-8e3b-b3817fe3a1ed-0.jpg"
     ],
     "meta": {
       "model_id": "z-image-turbo",
@@ -45,7 +45,7 @@
       "safety_checker": "no",
       "safety_checker_type": "black",
       "num_inference_steps": 9,
-      "seed": 3377,
+      "seed": 4536,
       "webhook": null,
       "track_id": null,
       "base64": "no",
@@ -53,10 +53,10 @@
       "watermark": "no",
       "temp": "no",
       "lora_stength": "",
-      "id": 173867593,
-      "file_prefix": "aed1dbc5-c185-41e2-86c3-6c25993a9a73",
+      "id": 173908440,
+      "file_prefix": "bdca3f0a-1688-48f4-8e3b-b3817fe3a1ed",
       "output": [
-        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/aed1dbc5-c185-41e2-86c3-6c25993a9a73-0.jpg"
+        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/bdca3f0a-1688-48f4-8e3b-b3817fe3a1ed-0.jpg"
       ]
     }
   }

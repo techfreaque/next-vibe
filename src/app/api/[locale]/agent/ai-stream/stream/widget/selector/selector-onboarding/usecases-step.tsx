@@ -376,14 +376,12 @@ export function UsecasesStep({
                   manualModelId: companion.voiceId,
                 }
               : null);
-          if (voiceSel) {
-            setActiveFavorite(
-              firstCompanionId,
-              companionId,
-              activeModelId,
-              voiceSel,
-            );
-          }
+          setActiveFavorite(
+            firstCompanionId,
+            companionId,
+            activeModelId,
+            voiceSel,
+          );
         }
       } catch (e) {
         logger.error(
