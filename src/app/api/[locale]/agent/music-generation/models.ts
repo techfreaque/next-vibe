@@ -253,6 +253,40 @@ export type MusicGenModelOption = ModelOptionAudioBased & {
   id: MusicGenModelId;
 };
 
+function buildMusicGenOption(
+  modelId: MusicGenModelId,
+  def: ModelDefinition,
+  provider: ModelProviderConfigAudioBased,
+): MusicGenModelOption {
+  const p = provider satisfies ModelProviderConfigAudioBased;
+  return {
+    id: modelId,
+    name: def.name,
+    provider: def.by,
+    apiProvider: provider.apiProvider,
+    description: def.description,
+    parameterCount: def.parameterCount,
+    contextWindow: def.contextWindow,
+    icon: def.icon,
+    providerModel: provider.providerModel,
+    utilities: def.utilities,
+    supportsTools: def.supportsTools,
+    intelligence: def.intelligence,
+    speed: def.speed,
+    content: def.content,
+    features: def.features,
+    weaknesses: def.weaknesses,
+    adminOnly: provider.adminOnly,
+    inputs: def.inputs,
+    outputs: def.outputs,
+    voiceMeta: def.voiceMeta,
+    creditCostPerClip: p.creditCostPerClip,
+    defaultDurationSeconds: p.defaultDurationSeconds,
+    supportedDurations: p.supportedDurations,
+    minDurationSeconds: p.minDurationSeconds,
+  };
+}
+
 function buildMusicGenModelOptions(): Record<
   MusicGenModelId,
   MusicGenModelOption
@@ -266,33 +300,11 @@ function buildMusicGenModelOptions(): Record<
     );
     for (const provider of sortedProviders) {
       if (provider.creditCostPerClip !== undefined) {
-        const p = provider satisfies ModelProviderConfigAudioBased;
-        result[modelId] = {
-          id: modelId,
-          name: def.name,
-          provider: def.by,
-          apiProvider: provider.apiProvider,
-          description: def.description,
-          parameterCount: def.parameterCount,
-          contextWindow: def.contextWindow,
-          icon: def.icon,
-          providerModel: provider.providerModel,
-          utilities: def.utilities,
-          supportsTools: def.supportsTools,
-          intelligence: def.intelligence,
-          speed: def.speed,
-          content: def.content,
-          features: def.features,
-          weaknesses: def.weaknesses,
-          adminOnly: provider.adminOnly,
-          inputs: def.inputs,
-          outputs: def.outputs,
-          voiceMeta: def.voiceMeta,
-          creditCostPerClip: p.creditCostPerClip,
-          defaultDurationSeconds: p.defaultDurationSeconds,
-          supportedDurations: p.supportedDurations,
-          minDurationSeconds: p.minDurationSeconds,
-        };
+        result[modelId] = buildMusicGenOption(
+          modelId,
+          def,
+          provider satisfies ModelProviderConfigAudioBased,
+        );
         break; // use cheapest provider only
       }
     }

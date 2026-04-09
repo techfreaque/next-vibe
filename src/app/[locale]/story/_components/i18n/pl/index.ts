@@ -121,60 +121,29 @@ export const translations: typeof enTranslations = {
       },
     },
     splitHero: {
-      or: "LUB",
-      clickToExplore: "Kliknij, aby odkryć",
-      header: "Trzy ścieżki. Jedna platforma.",
-      subheader: "Wybierz swój punkt wejścia.",
       unbottled: {
-        badge: "AI bez cenzury",
-        titleLine1: "Twoje AI.",
-        titleLine2: "Twoje zasady.",
+        badge: "Wolne AI",
+        title: "Zapytaj o wszystko. Dostań prawdziwą odpowiedź.",
         subtitle:
-          "{{modelCount}} modeli w trzech poziomach. Ty wybierasz filtr - mainstream, otwarty lub bez cenzury.",
-        pill1: "{{modelCount}} modeli - Ty wybierasz filtr",
-        pill2: "Generuj obrazy, wideo i muzykę",
-        pill3: "{{skillCount}}+ skilli z pamięcią i wyszukiwarką",
-        cta: "Wypróbuj za darmo",
-        ctaExplore: "Dowiedz się więcej",
+          "{{modelCount}} modeli. Żadnego działu bezpieczeństwa między tobą a prawdą.",
       },
       personal: {
-        badge: "Self-hosted agent AI",
-        titleLine1: "Twój Agent.",
-        titleLine2: "Twoja Maszyna.",
+        badge: "Self-hosted",
+        title: "Twoje AI. Na twoim sprzęcie.",
         subtitle:
-          "Wszystkie {{modelCount}} modeli na Twoim sprzęcie. Przegląda strony, pisze kod, obsługuje terminale, ogarnia zadania gdy śpisz. Własne klucze albo konto {{appName}}.",
-        pill1: "Przeglądarka, terminal i SSH w zestawie",
-        pill2: "Działa 24/7 w tle",
-        pill3: "Własne klucze lub konto {{appName}}",
-        cta: "Hostuj za darmo",
-        ctaGithub: "Dowiedz się więcej",
+          "Pełna kontrola. Twoje dane zostają u ciebie. Działa 24/7 bez ciebie.",
       },
       nextvibe: {
-        badge: "Open Source · MIT + GPL v3",
-        titleLine1: "Jedna definicja.",
-        titleLine2: "Każda platforma.",
+        badge: "Open source",
+        title: "Zbuduj własną platformę AI.",
         subtitle:
-          "Zdefiniuj jeden endpoint. Dostaniesz formularz web, polecenie CLI, narzędzie AI, serwer MCP, cron job, ekran mobilny i aplikację desktopową - automatycznie. Ten sam kontrakt TypeScript napędza je wszystkie. Sforkuj, posiadaj.",
-        pill1: "Napędza {{appName}}",
-        pill2: "Zero any / unknown / throw",
-        pill3: "{{platformCount}} platform na endpoint",
-        ctaGithub: "Star na GitHub",
-        ctaDocs: "Odkryj framework",
-        ctaExplore: "Dowiedz się więcej",
+          "Jeden kod. Web, mobile, CLI, API - automatycznie. Sforkuj, posiadaj.",
       },
-      tab: {
-        unbottled: "{{appName}}",
-        unbottledSub: "AI dla użytkowników",
-        unbottledDesc:
-          "{{modelCount}} modeli, generowanie obrazów/wideo/muzyki, trwała pamięć, wyszukiwanie na żywo - żaden filtr, którego nie wybrałeś",
-        personal: "Self-Host",
-        personalSub: "Twój Agent AI",
-        personalDesc:
-          "Wszystkie modele na Twoim sprzęcie - przegląda, koduje, terminale 24/7. Własne klucze lub konto {{appName}}.",
-        nextvibe: "next-vibe",
-        nextvibeSub: "Framework",
-        nextvibeDesc:
-          "Framework MIT za {{appName}} - jeden endpoint, każda platforma, sforkuj i posiadaj",
+      creators: {
+        badge: "Twórcy",
+        title: "Zamień wiedzę w dochód.",
+        subtitle:
+          "Stwórz stronę skilla AI. Zarabiaj {{commission}}% od każdego planu twoich fanów.",
       },
     },
     selector: {

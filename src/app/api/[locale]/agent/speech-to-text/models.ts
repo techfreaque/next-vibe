@@ -107,6 +107,36 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
 
 export type SttModelOption = ModelOptionSttBased & { id: SttModelId };
 
+function buildSttOption(
+  modelId: SttModelId,
+  def: ModelDefinition,
+  provider: ModelProviderConfigSttBased,
+): SttModelOption {
+  return {
+    id: modelId,
+    name: def.name,
+    provider: def.by,
+    apiProvider: provider.apiProvider,
+    description: def.description,
+    parameterCount: def.parameterCount,
+    contextWindow: def.contextWindow,
+    icon: def.icon,
+    providerModel: provider.providerModel,
+    utilities: def.utilities,
+    supportsTools: def.supportsTools,
+    intelligence: def.intelligence,
+    speed: def.speed,
+    content: def.content,
+    features: def.features,
+    weaknesses: def.weaknesses,
+    adminOnly: provider.adminOnly,
+    inputs: def.inputs,
+    outputs: def.outputs,
+    voiceMeta: def.voiceMeta,
+    creditCostPerSecond: provider.creditCostPerSecond,
+  };
+}
+
 function buildSttModelOptions(): SttModelOption[] {
   const result: SttModelOption[] = [];
   for (const [modelId, def] of Object.entries(sttModelDefinitions)) {
@@ -118,30 +148,13 @@ function buildSttModelOptions(): SttModelOption[] {
         "creditCostPerSecond" in provider &&
         !("defaultDurationSeconds" in provider)
       ) {
-        const p = provider as ModelProviderConfigSttBased;
-        result.push({
-          id: modelId as SttModelId,
-          name: def.name,
-          provider: def.by,
-          apiProvider: provider.apiProvider,
-          description: def.description,
-          parameterCount: def.parameterCount,
-          contextWindow: def.contextWindow,
-          icon: def.icon,
-          providerModel: provider.providerModel,
-          utilities: def.utilities,
-          supportsTools: def.supportsTools,
-          intelligence: def.intelligence,
-          speed: def.speed,
-          content: def.content,
-          features: def.features,
-          weaknesses: def.weaknesses,
-          adminOnly: provider.adminOnly,
-          inputs: def.inputs,
-          outputs: def.outputs,
-          voiceMeta: def.voiceMeta,
-          creditCostPerSecond: p.creditCostPerSecond,
-        });
+        result.push(
+          buildSttOption(
+            modelId as SttModelId,
+            def,
+            provider as ModelProviderConfigSttBased,
+          ),
+        );
       }
     }
   }

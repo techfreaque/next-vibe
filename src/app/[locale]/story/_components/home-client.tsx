@@ -50,9 +50,8 @@ export function HomeClient({
     <Div role="main" className="flex min-h-screen flex-col w-full">
       <SplitHero
         locale={locale}
-        totalToolCount={totalToolCount}
         totalModelCount={totalModelCount}
-        totalSkillCount={totalSkillCount}
+        activeSide={activeSide}
         onSideChange={handleSideChange}
       />
       <UniverseContent

@@ -1217,6 +1217,56 @@ type ImageGenModelOptionRecord = Record<
   ImageGenModelOption
 >;
 
+function buildImageGenOption(
+  modelId: DedicatedImageGenModelId,
+  def: ModelDefinition,
+  provider: ModelProviderConfigImageBased | ModelProviderConfigTokenBased,
+): (ModelOptionImageBased | ModelOptionTokenBased) & { id: ImageGenModelId } {
+  const base = {
+    id: modelId,
+    name: def.name,
+    provider: def.by,
+    apiProvider: provider.apiProvider,
+    description: def.description,
+    parameterCount: def.parameterCount,
+    contextWindow: def.contextWindow,
+    icon: def.icon,
+    providerModel: provider.providerModel,
+    utilities: def.utilities,
+    supportsTools: def.supportsTools,
+    intelligence: def.intelligence,
+    speed: def.speed,
+    content: def.content,
+    features: def.features,
+    weaknesses: def.weaknesses,
+    adminOnly: provider.adminOnly,
+    inputs: def.inputs,
+    outputs: def.outputs,
+    voiceMeta: def.voiceMeta,
+  } as const;
+  if (provider.creditCostPerImage !== undefined) {
+    const p = provider satisfies ModelProviderConfigImageBased;
+    return {
+      ...base,
+      creditCostPerImage: p.creditCostPerImage,
+      supportedSizes: p.supportedSizes,
+      supportedQualities: p.supportedQualities,
+      pricingBySize: p.pricingBySize,
+      pricingByQuality: p.pricingByQuality,
+      supportedAspectRatios: p.supportedAspectRatios,
+    } satisfies ModelOptionImageBased & { id: ImageGenModelId };
+  }
+  const p = provider satisfies ModelProviderConfigTokenBased;
+  return {
+    ...base,
+    creditCost: p.creditCost,
+    inputTokenCost: p.inputTokenCost,
+    outputTokenCost: p.outputTokenCost,
+    cacheReadTokenCost: p.cacheReadTokenCost,
+    cacheWriteTokenCost: p.cacheWriteTokenCost,
+  } satisfies ModelOptionTokenBased & { id: ImageGenModelId };
+}
+
 function buildImageGenModelOptions(): ImageGenModelOptionRecord {
   const result = {} as ImageGenModelOptionRecord;
 
@@ -1231,63 +1281,10 @@ function buildImageGenModelOptions(): ImageGenModelOptionRecord {
     // Pick cheapest provider; prefer per-image (dedicated) over token-based (LLM)
     for (const provider of sortedProviders) {
       if (provider.creditCostPerImage !== undefined) {
-        result[modelId] = {
-          id: modelId,
-          name: def.name,
-          provider: def.by,
-          apiProvider: provider.apiProvider,
-          description: def.description,
-          parameterCount: def.parameterCount,
-          contextWindow: def.contextWindow,
-          icon: def.icon,
-          providerModel: provider.providerModel,
-          utilities: def.utilities,
-          supportsTools: def.supportsTools,
-          intelligence: def.intelligence,
-          speed: def.speed,
-          content: def.content,
-          features: def.features,
-          weaknesses: def.weaknesses,
-          adminOnly: provider.adminOnly,
-          inputs: def.inputs,
-          outputs: def.outputs,
-          voiceMeta: def.voiceMeta,
-          creditCostPerImage: provider.creditCostPerImage,
-          supportedSizes: provider.supportedSizes,
-          supportedQualities: provider.supportedQualities,
-          pricingBySize: provider.pricingBySize,
-          pricingByQuality: provider.pricingByQuality,
-          supportedAspectRatios: provider.supportedAspectRatios,
-        } satisfies ModelOptionImageBased & { id: ImageGenModelId };
+        result[modelId] = buildImageGenOption(modelId, def, provider);
         break; // use cheapest image-based provider
       } else if (typeof provider.creditCost === "function") {
-        result[modelId] = {
-          id: modelId,
-          name: def.name,
-          provider: def.by,
-          apiProvider: provider.apiProvider,
-          description: def.description,
-          parameterCount: def.parameterCount,
-          contextWindow: def.contextWindow,
-          icon: def.icon,
-          providerModel: provider.providerModel,
-          utilities: def.utilities,
-          supportsTools: def.supportsTools,
-          intelligence: def.intelligence,
-          speed: def.speed,
-          content: def.content,
-          features: def.features,
-          weaknesses: def.weaknesses,
-          adminOnly: provider.adminOnly,
-          inputs: def.inputs,
-          outputs: def.outputs,
-          voiceMeta: def.voiceMeta,
-          creditCost: provider.creditCost,
-          inputTokenCost: provider.inputTokenCost,
-          outputTokenCost: provider.outputTokenCost,
-          cacheReadTokenCost: provider.cacheReadTokenCost,
-          cacheWriteTokenCost: provider.cacheWriteTokenCost,
-        } satisfies ModelOptionTokenBased & { id: ImageGenModelId };
+        result[modelId] = buildImageGenOption(modelId, def, provider);
         break;
       }
     }

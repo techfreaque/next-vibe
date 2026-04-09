@@ -2,13 +2,13 @@
 
 ## Core Principle
 
-Every model supports every input and output format from the user's perspective. The pipeline silently bridges gaps. Storage and LLM context are fully decoupled — same stored data, different view depending on the active model's capabilities.
+Every model supports every input and output format from the user's perspective. The pipeline silently bridges gaps. Storage and LLM context are fully decoupled - same stored data, different view depending on the active model's capabilities.
 
 ---
 
 ## Model Capabilities
 
-Every model definition declares native I/O modalities — no separate role field:
+Every model definition declares native I/O modalities - no separate role field:
 
 ```typescript
 type Modality = "text" | "audio" | "image" | "video";
@@ -16,7 +16,7 @@ inputs: Modality[];   // what this model accepts
 outputs: Modality[];  // what this model produces
 ```
 
-`ModelRole` (`"llm"`, `"image-gen"`, `"image-vision"`, …) is a derived UI classification, not stored. A model's role is determined by which auto-generated enum its ID appears in — rebuilt by `vibe gen` / the price updater from `inputs`/`outputs`.
+`ModelRole` (`"llm"`, `"image-gen"`, `"image-vision"`, …) is a derived UI classification, not stored. A model's role is determined by which auto-generated enum its ID appears in - rebuilt by `vibe gen` / the price updater from `inputs`/`outputs`.
 
 | Pool enum                   | Criterion                        | Used for                             |
 | --------------------------- | -------------------------------- | ------------------------------------ |
@@ -59,7 +59,7 @@ Cascade: `skill → favorite → user settings → "text"`.
 
 ## All Modality Operations Are Tools
 
-Every media operation — generation and bridging — is a tool call with a `definition.ts` and `widget.tsx` owning its rendering lifecycle.
+Every media operation - generation and bridging - is a tool call with a `definition.ts` and `widget.tsx` owning its rendering lifecycle.
 
 | Tool                | input → output | Tool ID            | Pinned | Triggered by                         |
 | ------------------- | -------------- | ------------------ | ------ | ------------------------------------ |
@@ -70,7 +70,7 @@ Every media operation — generation and bridging — is a tool call with a `def
 | Video description   | video → text   | `describe_video`   | no     | System (gap-fill) or LLM (on demand) |
 | Audio transcription | audio → text   | `transcribe_audio` | no     | System (gap-fill) or LLM (on demand) |
 
-\*Pinned only when the active chat model is not also the gen model. Bridge tools are discoverable via `tool-help` / `execute-tool` but not injected per-request.
+\*Pinned only when the active chat model is not also the gen model. Bridge tools are discoverable via `tool-help` `execute-tool` but not injected per-request.
 
 > `video_gen` / `audio_gen` are internal synthetic names used by `GapFillExecutor` when injecting prior media tool results as native LLM file parts. The registered aliases are `generate_video` / `generate_music`.
 
@@ -78,7 +78,7 @@ TTS remains a call-mode side-effect, not a tool.
 
 ### Tool Filtering
 
-When the chat model and gen model are the same (e.g. Gemini Flash Image), the corresponding gen tool is removed from the tool list — routing through the tool would be a detour.
+When the chat model and gen model are the same (e.g. Gemini Flash Image), the corresponding gen tool is removed from the tool list - routing through the tool would be a detour.
 
 ### Tool Schema
 
@@ -116,7 +116,7 @@ The system emits tool calls on its own behalf for gap-fill and native file part 
 
 - Marked `isAI: true`; role `ChatMessageRole.TOOL`; `toolCall` in `metadata.toolCall`
 - Appears after the user message, before the assistant response
-- Rendered via the tool's `widget.tsx` — same as LLM-initiated calls
+- Rendered via the tool's `widget.tsx` - same as LLM-initiated calls
 - Gap-fill emits `GAP_FILL_STARTED` / `GAP_FILL_COMPLETED` SSE. Completed event appends a `MessageVariant` to `metadata.variants[]` on the source message.
 
 ### LLM Context: What the Model Sees
@@ -151,7 +151,6 @@ Gen (image/video/music):  skill → favorite → user settings → system defaul
 | Vision (image → text) | `imageVisionModelSelection`   | best available LLM |
 | Vision (video → text) | `videoVisionModelSelection`   | best available LLM |
 | Vision (audio → text) | `audioVisionModelSelection`   | best available LLM |
-| Translation (prompt)  | `translationModelId`          | fast cheap LLM     |
 
 ### Input Gaps
 
@@ -161,7 +160,7 @@ Gen (image/video/music):  skill → favorite → user settings → system defaul
 | Audio (music/other) | `transcribe_audio` | AudioVision pool                            |
 | Image               | `describe_image`   | ImageVision pool                            |
 | Video               | `describe_video`   | VideoVision pool                            |
-| PDF                 | Text extraction    | —                                           |
+| PDF                 | Text extraction    | -                                           |
 
 ### Output Gaps
 
@@ -177,7 +176,7 @@ When passing prior media tool results to the LLM in subsequent turns:
 
 | Model supports modality? | `text` populated? | Action                                       |
 | ------------------------ | ----------------- | -------------------------------------------- |
-| Yes                      | —                 | Pass `file` URL directly                     |
+| Yes                      | -                 | Pass `file` URL directly                     |
 | No                       | Yes               | Pass `{ text }` only                         |
 | No                       | No                | Gap-fill → populate `text` → pass `{ text }` |
 
@@ -207,23 +206,23 @@ gapFillStatus?: { bridgeType: BridgeType; modality: Modality } | null;
 | User voice            | yes  | STT transcript (at send time)                        |
 | User image attachment | yes  | vision description (lazy)                            |
 | AI media tool result  | yes  | refined prompt (at gen) or bridge description (lazy) |
-| AI text response      | —    | the text itself                                      |
+| AI text response      | -    | the text itself                                      |
 | AI TTS audio          | yes  | LLM source text                                      |
 
 ### Attachment Rendering
 
 User attachments are message content, not tool calls. Each media type has its own endpoint + `widget.tsx`:
 
-- **Image** — preview, lightbox, gap-fill status, description toggle
-- **Video** — player, gap-fill status, transcript toggle
-- **Audio** — player, transcription status, transcript toggle
-- **File** — icon, download, text extraction status
+- **Image** - preview, lightbox, gap-fill status, description toggle
+- **Video** - player, gap-fill status, transcript toggle
+- **Audio** - player, transcription status, transcript toggle
+- **File** - icon, download, text extraction status
 
 ---
 
 ## Compaction
 
-Same context builder as normal turns — same native passthrough / gap fill logic. Extra instruction: _"Preserve all file reference URLs exactly as-is."_ Missing `text` variant → gap fill forced before compaction call. `containsMediaReferences: boolean` on compact summary metadata.
+Same context builder as normal turns - same native passthrough / gap fill logic. Extra instruction: _"Preserve all file reference URLs exactly as-is."_ Missing `text` variant → gap fill forced before compaction call. `containsMediaReferences: boolean` on compact summary metadata.
 
 ---
 
@@ -246,9 +245,9 @@ Credits deduct per step as completed. Failed steps not charged. Pipeline steps s
 
 ## Design Decisions
 
-1. **img2img**: `inputRef` is a response field on `MediaGenResult` — the LLM sees it in tool result context and can pass it back in a follow-up `generate_image` call. UI offers an "Edit" shortcut (pre-fills prompt + inputRef). Same pipeline either way.
+1. **img2img**: `inputRef` is a response field on `MediaGenResult` - the LLM sees it in tool result context and can pass it back in a follow-up `generate_image` call. UI offers an "Edit" shortcut (pre-fills prompt + inputRef). Same pipeline either way.
 2. **Streaming media**: No partial previews. Spinner during generation, full result on complete.
 3. **Direct triggers**: Image/video/music tab = direct tool call, no LLM wrapper. Chat tab = LLM calls tool. Same tool, same schema.
 4. **Video gen latency**: Async job. Result starts as `{ status: "pending", jobId }`. `TOOL_RESULT_UPDATED` SSE when complete.
-5. **Gap fill cost**: Lazy — runs at start of next send, attributed to that turn as a `gap-fill` pipeline step.
+5. **Gap fill cost**: Lazy - runs at start of next send, attributed to that turn as a `gap-fill` pipeline step.
 6. **Multi-modal output ordering**: LLM emits text before file → media attached to text message. File-only → standalone tool message.

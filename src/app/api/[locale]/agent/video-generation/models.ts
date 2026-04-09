@@ -1050,6 +1050,44 @@ export type VideoGenModelOption = ModelOptionVideoBased & {
   id: VideoGenModelId;
 };
 
+function buildVideoGenOption(
+  modelId: VideoGenModelId,
+  def: ModelDefinition,
+  provider: ModelProviderConfigVideoBased,
+): VideoGenModelOption {
+  const p = provider satisfies ModelProviderConfigVideoBased;
+  return {
+    id: modelId,
+    name: def.name,
+    provider: def.by,
+    apiProvider: provider.apiProvider,
+    description: def.description,
+    parameterCount: def.parameterCount,
+    contextWindow: def.contextWindow,
+    icon: def.icon,
+    providerModel: provider.providerModel,
+    utilities: def.utilities,
+    supportsTools: def.supportsTools,
+    intelligence: def.intelligence,
+    speed: def.speed,
+    content: def.content,
+    features: def.features,
+    weaknesses: def.weaknesses,
+    adminOnly: provider.adminOnly,
+    inputs: def.inputs,
+    outputs: def.outputs,
+    voiceMeta: def.voiceMeta,
+    creditCostPerSecond: p.creditCostPerSecond,
+    defaultDurationSeconds: p.defaultDurationSeconds,
+    supportedDurations: p.supportedDurations,
+    maxDurationSeconds: p.maxDurationSeconds,
+    minDurationSeconds: p.minDurationSeconds,
+    supportedResolutions: p.supportedResolutions,
+    supportedAspectRatios: p.supportedAspectRatios,
+    pricingByResolution: p.pricingByResolution,
+  };
+}
+
 function buildVideoGenModelOptions(): Record<
   VideoGenModelId,
   VideoGenModelOption
@@ -1066,37 +1104,11 @@ function buildVideoGenModelOptions(): Record<
         provider.creditCostPerSecond !== undefined &&
         provider.defaultDurationSeconds !== undefined
       ) {
-        const p = provider satisfies ModelProviderConfigVideoBased;
-        result[modelId] = {
-          id: modelId,
-          name: def.name,
-          provider: def.by,
-          apiProvider: provider.apiProvider,
-          description: def.description,
-          parameterCount: def.parameterCount,
-          contextWindow: def.contextWindow,
-          icon: def.icon,
-          providerModel: provider.providerModel,
-          utilities: def.utilities,
-          supportsTools: def.supportsTools,
-          intelligence: def.intelligence,
-          speed: def.speed,
-          content: def.content,
-          features: def.features,
-          weaknesses: def.weaknesses,
-          adminOnly: provider.adminOnly,
-          inputs: def.inputs,
-          outputs: def.outputs,
-          voiceMeta: def.voiceMeta,
-          creditCostPerSecond: p.creditCostPerSecond,
-          defaultDurationSeconds: p.defaultDurationSeconds,
-          supportedDurations: p.supportedDurations,
-          maxDurationSeconds: p.maxDurationSeconds,
-          minDurationSeconds: p.minDurationSeconds,
-          supportedResolutions: p.supportedResolutions,
-          supportedAspectRatios: p.supportedAspectRatios,
-          pricingByResolution: p.pricingByResolution,
-        };
+        result[modelId] = buildVideoGenOption(
+          modelId,
+          def,
+          provider satisfies ModelProviderConfigVideoBased,
+        );
         break; // use cheapest provider only
       }
     }

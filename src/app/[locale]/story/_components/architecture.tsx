@@ -180,8 +180,8 @@ function WebApiPanel(): JSX.Element {
         <P className="text-xs text-slate-400 leading-relaxed">
           The moment you add a path and schema, the endpoint is live at{" "}
           <Span className="text-slate-300 font-mono">/api/[locale]/[path]</Span>
-          . No routing code to write. No controllers. Any HTTP client — server,
-          browser, mobile — can call it immediately.
+          . No routing code to write. No controllers. Any HTTP client - server,
+          browser, mobile - can call it immediately.
         </P>
       </Div>
       <CodeBlock code={WEB_API_SNIPPET} language="typescript" />
@@ -301,7 +301,7 @@ function CliPanel(): JSX.Element {
       <CodeBlock code={CLI_SNIPPET} language="bash" />
       <Div className="px-6 pt-4 pb-5">
         <P className="text-xs text-slate-500 leading-relaxed">
-          Useful for scripting, debugging, and automation — the entire platform
+          Useful for scripting, debugging, and automation - the entire platform
           is scriptable from day one without any extra effort.
         </P>
       </Div>
@@ -320,7 +320,7 @@ function AiToolPanel(): JSX.Element {
     <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
       <Div className="px-6 pt-6 pb-4">
         <P className="text-sm font-semibold text-purple-400 mb-2">
-          Claude can call any endpoint as a tool — no integration code.
+          Claude can call any endpoint as a tool - no integration code.
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
           Every endpoint is automatically available to AI agents via{" "}
@@ -328,7 +328,7 @@ function AiToolPanel(): JSX.Element {
           discovers what exists, inspects the schema, and calls it with typed
           parameters. Use{" "}
           <Span className="text-slate-300 font-mono">wakeUp</Span> mode for
-          long-running tasks — the agent suspends and resumes when the result is
+          long-running tasks - the agent suspends and resumes when the result is
           ready.
         </P>
       </Div>
@@ -336,7 +336,7 @@ function AiToolPanel(): JSX.Element {
       <Div className="px-6 pt-4 pb-5">
         <P className="text-xs text-slate-500 leading-relaxed">
           Pass <Span className="text-slate-300 font-mono">--instanceId</Span> to
-          delegate the call to a remote instance — Claude on your laptop can
+          delegate the call to a remote instance - Claude on your laptop can
           trigger work on the production server.
         </P>
       </Div>
@@ -355,13 +355,13 @@ function McpServerPanel(): JSX.Element {
     <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
       <Div className="px-6 pt-6 pb-4">
         <P className="text-sm font-semibold text-orange-400 mb-2">
-          One config line — Claude Desktop gets 419 tools.
+          One config line - Claude Desktop gets 419 tools.
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
           Point Claude at the MCP server and every endpoint becomes a callable
           tool. The server is context-efficient by design:{" "}
           <Span className="text-slate-300 font-mono">tool-help</Span> returns
-          names and descriptions only — full schemas expand only when you query
+          names and descriptions only - full schemas expand only when you query
           5 or fewer tools. Claude browses fast, digs in only when needed.
         </P>
       </Div>
@@ -397,7 +397,7 @@ function ReactNativePanel(): JSX.Element {
         <P className="text-xs text-slate-400 leading-relaxed">
           The same <Span className="text-slate-300 font-mono">widget.tsx</Span>{" "}
           serves both React on web and React Native on iOS and Android. A single
-          platform check splits the render path — rich shadcn UI on web, native
+          platform check splits the render path - rich shadcn UI on web, native
           primitives on mobile. Auth, types, and API calls are shared.
         </P>
       </Div>
@@ -430,7 +430,7 @@ function CronPanel(): JSX.Element {
         <P className="text-xs text-slate-400 leading-relaxed">
           Wrap an existing endpoint with{" "}
           <Span className="text-slate-300 font-mono">createCronTask</Span> and
-          it runs on a schedule. No new logic, no separate worker process — the
+          it runs on a schedule. No new logic, no separate worker process - the
           same <Span className="text-slate-300 font-mono">definition.ts</Span>{" "}
           and <Span className="text-slate-300 font-mono">route.ts</Span> you
           already wrote. The scheduler picks it up automatically on startup.
@@ -447,7 +447,7 @@ function CronPanel(): JSX.Element {
   );
 }
 
-const WEBSOCKET_SNIPPET = `// server — push from any repository
+const WEBSOCKET_SNIPPET = `// server - push from any repository
 broadcastLocal("thread:abc123", "message:new", {
   threadId, content,
 });`;
@@ -471,7 +471,7 @@ function WebSocketPanel(): JSX.Element {
       <Div className="px-6 pt-4 pb-5">
         <P className="text-xs text-slate-500 leading-relaxed">
           The AI streaming interface uses this to push tokens to the browser in
-          real time. The same mechanism works for any live data — notifications,
+          real time. The same mechanism works for any live data - notifications,
           presence, progress updates.
         </P>
       </Div>
@@ -479,10 +479,10 @@ function WebSocketPanel(): JSX.Element {
   );
 }
 
-const ELECTRON_SNIPPET = `# dev — compiles main.js, spawns server, opens window
+const ELECTRON_SNIPPET = `# dev - compiles main.js, spawns server, opens window
 $ vibe electron --vibeStart=true
 
-# ship — produces .AppImage · .exe · .dmg
+# ship - produces .AppImage · .exe · .dmg
 $ vibe electron:build --platform=all`;
 
 function ElectronPanel(): JSX.Element {
@@ -497,14 +497,14 @@ function ElectronPanel(): JSX.Element {
           inside an Electron{" "}
           <Span className="text-slate-300 font-mono">BrowserWindow</Span>. Vibe
           compiles the Electron main process, starts the server, and opens the
-          window — all in one step.
+          window - all in one step.
         </P>
       </Div>
       <CodeBlock code={ELECTRON_SNIPPET} language="bash" />
       <Div className="px-6 pt-4 pb-5">
         <P className="text-xs text-slate-500 leading-relaxed">
           The build command packages for all platforms via electron-builder.
-          Everything that works in the browser — auth, AI, real-time — works
+          Everything that works in the browser - auth, AI, real-time - works
           identically in the desktop app.
         </P>
       </Div>
@@ -527,14 +527,14 @@ function AdminPanelPanel(): JSX.Element {
     <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
       <Div className="px-6 pt-6 pb-4">
         <P className="text-sm font-semibold text-indigo-400 mb-2">
-          Admin pages write themselves — guard, render, done.
+          Admin pages write themselves - guard, render, done.
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
           Set{" "}
           <Span className="text-slate-300 font-mono">
             allowedRoles: [UserRole.ADMIN]
           </Span>{" "}
-          in the definition and the endpoint is locked down everywhere — API,
+          in the definition and the endpoint is locked down everywhere - API,
           CLI, MCP, and UI. On the page, one guard call and one{" "}
           <Span className="text-slate-300 font-mono">EndpointsPage</Span>{" "}
           renders the complete admin interface with zero additional markup.
@@ -543,7 +543,7 @@ function AdminPanelPanel(): JSX.Element {
       <CodeBlock code={ADMIN_SNIPPET} language="typescript" />
       <Div className="px-6 pt-4 pb-5">
         <P className="text-xs text-slate-500 leading-relaxed">
-          Every admin page in the platform is built this way — cron queue, user
+          Every admin page in the platform is built this way - cron queue, user
           management, task runner, settings. All consistent, all role-protected,
           zero boilerplate.
         </P>
@@ -569,7 +569,7 @@ function VibeFramePanel(): JSX.Element {
           Embed any endpoint into any website with a script tag.
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          Drop the Vibe Frame script onto any existing site — WordPress,
+          Drop the Vibe Frame script onto any existing site - WordPress,
           Webflow, plain HTML. Declare which endpoint to render and where to
           mount it. The full form, validation, and submission flow appears
           inside the host page, communicating back over a postMessage bridge.
@@ -605,7 +605,7 @@ function RemoteSkillPanel(): JSX.Element {
           Every public endpoint is included in a generated markdown skill file
           that external AI agents can fetch and learn from. Two files are
           served: one for anonymous users, one for authenticated users. Each
-          endpoint opts in by default — add{" "}
+          endpoint opts in by default - add{" "}
           <Span className="text-slate-300 font-mono">SKILL_OFF</Span> to exclude
           it.
         </P>
@@ -614,14 +614,14 @@ function RemoteSkillPanel(): JSX.Element {
       <Div className="px-6 pt-4 pb-5">
         <P className="text-xs text-slate-500 leading-relaxed">
           An external AI fetches the manifest once, then knows exactly what your
-          platform can do and how to call it — no manual API docs to maintain.
+          platform can do and how to call it - no manual API docs to maintain.
         </P>
       </Div>
     </Div>
   );
 }
 
-const VIBE_BOARD_SNIPPET = `# Vibe Sense — the data layer, live today
+const VIBE_BOARD_SNIPPET = `# Vibe Sense - the data layer, live today
 $ vibe system_unified-interface_vibe-sense_graphs_GET
 $ vibe system_unified-interface_vibe-sense_graphs_POST`;
 
@@ -633,7 +633,7 @@ function VibeBoardPanel(): JSX.Element {
           Every endpoint becomes a live dashboard tile.
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          Vibe Board is the next surface for next-vibe — a drag-and-drop
+          Vibe Board is the next surface for next-vibe - a drag-and-drop
           analytics dashboard where any endpoint can be pinned as a tile. The
           data layer, Vibe Sense, is already live: define a graph pipeline today
           and it will render automatically when Vibe Board ships.
@@ -643,7 +643,7 @@ function VibeBoardPanel(): JSX.Element {
       <Div className="px-6 pt-4 pb-5">
         <P className="text-xs text-slate-500 leading-relaxed">
           No extra instrumentation. The same definition that drives the REST
-          API, CLI, and MCP tool will power the dashboard widget — zero
+          API, CLI, and MCP tool will power the dashboard widget - zero
           additional code required.
         </P>
       </Div>

@@ -124,60 +124,29 @@ export const translations = {
       },
     },
     splitHero: {
-      or: "OR",
-      clickToExplore: "Click to explore",
-      header: "Three paths. One platform.",
-      subheader: "Pick your entry point.",
       unbottled: {
-        badge: "Free speech AI",
-        titleLine1: "Your AI.",
-        titleLine2: "Your Rules.",
+        badge: "Free AI",
+        title: "Ask anything. Get a real answer.",
         subtitle:
-          "{{modelCount}} models across three tiers. You choose the filter - mainstream, open, or uncensored.",
-        pill1: "{{modelCount}} models - you pick the filter",
-        pill2: "Generate images, video & music",
-        pill3: "{{skillCount}}+ skills with memory & search",
-        cta: "Try Free",
-        ctaExplore: "Learn More",
+          "{{modelCount}} models. No corporate safety team between you and the truth.",
       },
       personal: {
-        badge: "Self-hosted AI agent",
-        titleLine1: "Your Agent.",
-        titleLine2: "Your Machine.",
+        badge: "Self-hosted",
+        title: "Your AI. On your machine.",
         subtitle:
-          "All {{modelCount}} models on your hardware. Browses the web, writes code, runs terminals, handles tasks while you sleep. Bring your own keys or connect your {{appName}} account.",
-        pill1: "Browser, terminal & SSH built in",
-        pill2: "Runs 24/7 in the background",
-        pill3: "Your keys or {{appName}} account",
-        cta: "Self-Host Free",
-        ctaGithub: "Learn More",
+          "Full control. Your data never leaves. Runs 24/7 without you.",
       },
       nextvibe: {
-        badge: "Open source · MIT + GPL v3",
-        titleLine1: "One definition.",
-        titleLine2: "Every platform.",
+        badge: "Open source",
+        title: "Ship your own AI platform.",
         subtitle:
-          "Define one endpoint. Get a web form, CLI command, AI tool, MCP server, cron job, mobile screen, and desktop app - automatically. The same TypeScript contract powers all of them. Fork it, own it.",
-        pill1: "Powers {{appName}}",
-        pill2: "Zero any / unknown / throw",
-        pill3: "{{platformCount}} platforms per endpoint",
-        ctaGithub: "Star on GitHub",
-        ctaDocs: "Framework Docs",
-        ctaExplore: "Learn More",
+          "One codebase. Web, mobile, CLI, API - all automatic. Fork it, own it.",
       },
-      tab: {
-        unbottled: "{{appName}}",
-        unbottledSub: "Consumer AI",
-        unbottledDesc:
-          "{{modelCount}} models, image/video/music generation, persistent memory, live search - no filter you didn't choose",
-        personal: "Self-Host",
-        personalSub: "Your AI Agent",
-        personalDesc:
-          "All models on your hardware - browses, codes, runs terminals 24/7. Your keys or {{appName}} account.",
-        nextvibe: "next-vibe",
-        nextvibeSub: "The Framework",
-        nextvibeDesc:
-          "The GPL v3 + MIT framework behind {{appName}} - one endpoint, every platform, fork and own it",
+      creators: {
+        badge: "Creators",
+        title: "Turn your knowledge into income.",
+        subtitle:
+          "Build an AI skill page. Earn {{commission}}% recurring on every plan your audience buys.",
       },
     },
     selector: {

@@ -121,60 +121,29 @@ export const translations: typeof enTranslations = {
       },
     },
     splitHero: {
-      or: "ODER",
-      clickToExplore: "Klicken zum Erkunden",
-      header: "Drei Wege. Eine Plattform.",
-      subheader: "Wähle deinen Einstieg.",
       unbottled: {
-        badge: "KI ohne Zensur",
-        titleLine1: "Deine KI.",
-        titleLine2: "Deine Regeln.",
+        badge: "Freie KI",
+        title: "Frag alles. Bekomm eine echte Antwort.",
         subtitle:
-          "{{modelCount}} Modelle in drei Stufen. Du wählst den Filter - mainstream, offen oder unzensiert.",
-        pill1: "{{modelCount}} Modelle - du wählst den Filter",
-        pill2: "Bilder, Video & Musik generieren",
-        pill3: "{{skillCount}}+ Skills mit Gedächtnis & Suche",
-        cta: "Kostenlos testen",
-        ctaExplore: "Mehr erfahren",
+          "{{modelCount}} Modelle. Kein Safety-Team zwischen dir und der Wahrheit.",
       },
       personal: {
-        badge: "Self-hosted KI-Agent",
-        titleLine1: "Dein Agent.",
-        titleLine2: "Deine Maschine.",
+        badge: "Self-hosted",
+        title: "Deine KI. Auf deiner Maschine.",
         subtitle:
-          "Alle {{modelCount}} Modelle auf deiner Hardware. Surft, codet, bedient Terminals, erledigt Aufgaben während du schläfst. Eigene Keys oder dein {{appName}}-Konto.",
-        pill1: "Browser, Terminal & SSH eingebaut",
-        pill2: "Läuft 24/7 im Hintergrund",
-        pill3: "Eigene Keys oder {{appName}}-Konto",
-        cta: "Jetzt selbst hosten",
-        ctaGithub: "Mehr erfahren",
+          "Volle Kontrolle. Deine Daten bleiben bei dir. Läuft 24/7 ohne dich.",
       },
       nextvibe: {
-        badge: "Open Source · MIT + GPL v3",
-        titleLine1: "Eine Definition.",
-        titleLine2: "Jede Plattform.",
+        badge: "Open Source",
+        title: "Bau deine eigene KI-Plattform.",
         subtitle:
-          "Einen Endpoint definieren. Web-Formular, CLI-Befehl, KI-Tool, MCP-Server, Cron-Job, Mobile-Screen und Desktop-App erhalten - automatisch. Derselbe TypeScript-Vertrag treibt alle an. Fork es, besitz es.",
-        pill1: "Treibt {{appName}} an",
-        pill2: "Zero any / unknown / throw",
-        pill3: "{{platformCount}} Plattformen pro Endpoint",
-        ctaGithub: "Auf GitHub starten",
-        ctaDocs: "Framework entdecken",
-        ctaExplore: "Mehr erfahren",
+          "Eine Codebase. Web, Mobile, CLI, API - automatisch. Fork es, besitz es.",
       },
-      tab: {
-        unbottled: "{{appName}}",
-        unbottledSub: "Consumer-KI",
-        unbottledDesc:
-          "{{modelCount}} Modelle, Bild/Video/Musik-Generierung, persistentes Gedächtnis, Live-Suche - kein Filter den du nicht gewählt hast",
-        personal: "Self-Host",
-        personalSub: "Dein KI-Agent",
-        personalDesc:
-          "Alle Modelle auf deiner Hardware - surft, codet, bedient Terminals 24/7. Eigene Keys oder {{appName}}-Konto.",
-        nextvibe: "next-vibe",
-        nextvibeSub: "Das Framework",
-        nextvibeDesc:
-          "Das MIT-lizenzierte Framework hinter {{appName}} - ein Endpoint, alle Plattformen, fork und besitz es",
+      creators: {
+        badge: "Creators",
+        title: "Mach dein Wissen zu Einkommen.",
+        subtitle:
+          "Erstelle eine KI-Skill-Seite. Verdiene {{commission}}% auf jeden Plan deiner Fans.",
       },
     },
     selector: {
