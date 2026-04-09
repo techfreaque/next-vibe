@@ -74,10 +74,6 @@ export const translations: typeof enTranslations = {
       description: "Modell für die Audioanalyse",
       placeholder: "Vom Skill erben",
     },
-    translationModel: {
-      label: "Übersetzungsmodell",
-      description: "Modell zur Textübersetzung",
-    },
     imageGenModel: {
       label: "Bildgenerierungsmodell",
       description: "Modell zur Bilderstellung",

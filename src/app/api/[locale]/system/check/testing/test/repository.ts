@@ -83,7 +83,7 @@ export class TestRepository {
     } catch (error) {
       const duration = Date.now() - startTime;
 
-      // exec throws on non-zero exit code — this is normal for failing tests
+      // exec throws on non-zero exit code - this is normal for failing tests
       const execError = error as {
         stdout?: string;
         stderr?: string;

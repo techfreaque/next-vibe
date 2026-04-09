@@ -10,9 +10,8 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Coins } from "next-vibe-ui/ui/icons/Coins";
-import { Handshake } from "next-vibe-ui/ui/icons/Handshake";
+import { Globe } from "next-vibe-ui/ui/icons/Globe";
 import { HelpCircle } from "next-vibe-ui/ui/icons/HelpCircle";
-import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { ShoppingCart } from "next-vibe-ui/ui/icons/ShoppingCart";
 import { User } from "next-vibe-ui/ui/icons/User";
@@ -119,7 +118,6 @@ export function SidebarFooter({
           suppressHydrationWarning
         >
           <Div className="px-2 py-2 flex flex-col gap-2 bg-muted/20 border-t border-border/50">
-            {/* Account Section */}
             <Div className="flex flex-col gap-0.5">
               {/* Login/Signup - shown when logged out (hidden in local mode: no self-signup) */}
               {!isLoggedIn && !envClient.NEXT_PUBLIC_LOCAL_MODE && (
@@ -152,34 +150,62 @@ export function SidebarFooter({
                 </Div>
               )}
 
-              {/* Subscription (hidden in local mode: payment disabled) */}
-              <Link href={`/${locale}/subscription`}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-full justify-start"
-                  aria-label="Manage subscription"
-                  data-tour={TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON}
-                >
-                  <ShoppingCart className="h-3.5 w-3.5 mr-2" />
-                  {t("components.navigation.subscription")}
-                </Button>
-              </Link>
-
-              {/* Referral (hidden in local mode) */}
-              {!envClient.NEXT_PUBLIC_LOCAL_MODE && (
-                <Link href={`/${locale}/user/referral`}>
+              {/* Account Settings */}
+              {isLoggedIn && (
+                <Link href={`/${locale}/user/settings`}>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="w-full justify-start "
-                    aria-label="Referral program"
+                    className="w-full justify-start"
+                    aria-label="Account settings"
                   >
-                    <Handshake className="h-3.5 w-3.5 mr-2" />
-                    {t("components.navigation.referral")}
+                    <Settings className="h-3.5 w-3.5 mr-2" />
+                    {t("components.navigation.settings")}
                   </Button>
                 </Link>
               )}
+
+              {/* Subscription (hidden in local mode: payment disabled) */}
+              {!envClient.NEXT_PUBLIC_LOCAL_MODE && (
+                <Link href={`/${locale}/subscription/overview`}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-full justify-start"
+                    aria-label="Manage subscription"
+                    data-tour={TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON}
+                  >
+                    <ShoppingCart className="h-3.5 w-3.5 mr-2" />
+                    {t("components.navigation.subscription")}
+                  </Button>
+                </Link>
+              )}
+
+              {/* Feedback & Help */}
+              <Link href={`/${locale}/help`}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start"
+                  aria-label="Feedback and help"
+                >
+                  <HelpCircle className="h-3.5 w-3.5 mr-2" />
+                  {t("components.navigation.help")}
+                </Button>
+              </Link>
+
+              {/* Website & Blog */}
+              <Link href={`/${locale}/story`}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start"
+                  aria-label="Website and blog"
+                >
+                  <Globe className="h-3.5 w-3.5 mr-2" />
+                  {t("components.navigation.websiteBlog")}
+                </Button>
+              </Link>
 
               {/* Admin Dashboard */}
               {isLoggedIn && user.roles?.includes(UserRole.ADMIN) && (
@@ -196,31 +222,6 @@ export function SidebarFooter({
                 </Link>
               )}
 
-              {/* Help */}
-              <Link href={`/${locale}/help`}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start"
-                  aria-label="Get help"
-                >
-                  <HelpCircle className="h-3.5 w-3.5 mr-2" />
-                  {t("components.navigation.help")}
-                </Button>
-              </Link>
-
-              {/* About */}
-              <Link href={`/${locale}/story`}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start"
-                  aria-label="About us"
-                >
-                  <Info className="h-3.5 w-3.5 mr-2" />
-                  {t("components.navigation.about")}
-                </Button>
-              </Link>
               {/* Logout */}
               {isLoggedIn && (
                 <UserMenu user={user} locale={locale} logger={logger} />

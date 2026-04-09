@@ -16,7 +16,8 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, t, logger, user, request }) =>
       BrowserSharedRepository.executeFill<FillResponseOutput>(
         {
-          sessionId: request?.headers.get("authorization") ?? user.id ?? user.leadId,
+          sessionId:
+            request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.FILL,
           args: BrowserSharedRepository.filterUndefinedArgs({
             uid: data.uid,

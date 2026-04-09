@@ -8,6 +8,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type {
   HeadlessAiStreamResult,
   HeadlessPreCall,
@@ -20,15 +21,15 @@ import type {
 } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
+import { agentEnv } from "@/app/api/[locale]/agent/env";
 import type { ImageGenModelId } from "@/app/api/[locale]/agent/image-generation/models";
+import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import type { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
 import type { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { defaultLocale } from "@/i18n/core/config";
 import { scopedTranslation } from "../stream/i18n";
 
@@ -41,10 +42,28 @@ export interface TestStreamParams {
    * Explicit parent message ID for retry/branch tests.
    * When set, the user message is created as a child of this message
    * instead of the thread's most recent message.
+   *
+   * UI equivalent: pass message.parentId here and operation "retry"/"edit"
+   * to exactly replicate what branchMessage/retryMessage hooks do.
    */
   explicitParentMessageId?: string;
+  /**
+   * Override the stream operation. Mirrors the UI's operation field.
+   * - "retry": same as UI retryMessage (uses message.parentId as parent)
+   * - "edit": same as UI branchMessage (uses message.parentId as parent)
+   * - "send": default - new user message (uses last message or explicitParentMessageId)
+   * When not provided, headless.ts auto-resolves based on threadId presence.
+   */
+  operationOverride?: "send" | "retry" | "edit";
   /** File attachments to include with the user message (images, audio, PDFs, video) */
   attachments?: File[];
+  /**
+   * Audio file for STT transcription (voice UI flow - NOT the attachment gap-fill path).
+   * When provided, the audio is transcribed via SpeechToTextRepository before the AI runs.
+   * The transcribed text becomes the user message content (no variants, no gap-fill).
+   * Use this to test the dedicated STT path; use `attachments` for the audioVisionModel path.
+   */
+  audioInput?: File | null;
   /**
    * Override the default VIBE_TEST_AI_MODEL for this test.
    * Use when testing a specific model (e.g. native multimodal LLM for image output).
@@ -79,9 +98,14 @@ export interface TestStreamParams {
    * Useful for setting requiresConfirmation=true to test approve mode.
    */
   availableTools?: Array<{ toolId: string; requiresConfirmation: boolean }>;
+  /**
+   * Force all model resolution (chat + image/music/video gen) to a specific API provider.
+   * Used by UNBOTTLED self-relay tests to route all inference through the UNBOTTLED provider.
+   */
+  providerOverride?: ApiProvider;
 }
 
-/** Slim message shape — only fields we assert on */
+/** Slim message shape - only fields we assert on */
 export interface SlimMessage {
   id: string;
   role: string;
@@ -93,8 +117,11 @@ export interface SlimMessage {
   isAI: boolean;
   toolCall: {
     toolName?: string;
+    args?: ToolCallResult;
     result?: ToolCallResult;
     isDeferred?: boolean;
+    toolCallId?: string;
+    originalToolCallId?: string;
   } | null;
   generatedMedia: { type: string; url?: string | null }[] | null;
   /** True when this is a compacting summary message */
@@ -159,8 +186,11 @@ function slimMessages(
     toolCall: r.metadata?.toolCall
       ? {
           toolName: r.metadata.toolCall.toolName,
+          args: r.metadata.toolCall.args,
           result: r.metadata.toolCall.result,
           isDeferred: r.metadata.toolCall.isDeferred === true,
+          toolCallId: r.metadata.toolCall.toolCallId,
+          originalToolCallId: r.metadata.toolCall.originalToolCallId,
         }
       : null,
     generatedMedia: r.metadata?.generatedMedia
@@ -201,10 +231,47 @@ export async function fetchThreadMessages(
     .where(eq(chatMessages.threadId, threadId));
 
   return slimMessages(
-    rows.map((r) => ({
-      ...r,
-      metadata: r.metadata ?? {},
-    })),
+    rows
+      .map((r) => ({
+        ...r,
+        metadata: r.metadata ?? {},
+      }))
+      .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
+  );
+}
+
+/**
+ * Poll until a thread's streamingState returns to 'idle'.
+ * Use after runTestStream when the stream aborted into 'waiting' state
+ * (queue WAIT mode: task in flight, revival pending).
+ *
+ * When the revival stream finishes, streamingState transitions idle|waiting → idle.
+ * Re-fetches messages once idle so callers get the post-revival thread state.
+ *
+ * Throws if the thread does not become idle within maxWaitMs.
+ */
+export async function waitForThreadIdle(
+  threadId: string,
+  maxWaitMs = 90_000,
+): Promise<SlimMessage[]> {
+  const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
+  const pollIntervalMs = 500;
+  const start = Date.now();
+  while (Date.now() - start < maxWaitMs) {
+    const [row] = await db
+      .select({ streamingState: chatThreads.streamingState })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, threadId));
+    if (row?.streamingState === "idle") {
+      return fetchThreadMessages(threadId);
+    }
+    await new Promise((resolve) => {
+      setTimeout(resolve, pollIntervalMs);
+    });
+  }
+  // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
+  throw new Error(
+    `waitForThreadIdle: thread ${threadId} did not become idle within ${maxWaitMs}ms`,
   );
 }
 
@@ -230,30 +297,43 @@ export async function runTestStream(
     skill,
     explicitParentMessageId,
     attachments,
+    audioInput,
     model,
     favoriteId,
     preCalls,
     wakeUpRevival,
     mediaModelOverrides,
+    providerOverride,
     availableTools,
+    operationOverride: callerOperationOverride,
   } = params;
 
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
   const { t } = scopedTranslation.scopedT(defaultLocale);
 
+  // Resolve effective operationOverride:
+  // - wakeUpRevival takes precedence (needs wakeup-resume, handled in headless.ts)
+  // - caller-provided override (retry/edit) is used as-is when wakeUpRevival is false
+  // - fallback: "send" for append turns (threadId present), undefined for new threads
+  const resolvedOperationOverride = wakeUpRevival
+    ? undefined // headless.ts resolves to wakeup-resume automatically
+    : callerOperationOverride
+      ? callerOperationOverride
+      : threadId
+        ? "send"
+        : undefined;
+
   const result = await runHeadlessAiStream({
     prompt,
-    // When favoriteId is provided, don't pass a default model — let the
+    // When favoriteId is provided, don't pass a default model - let the
     // favorite's resolved model win (including its apiProvider, e.g. UNBOTTLED).
     model: model ?? (favoriteId ? undefined : agentEnv.VIBE_TEST_AI_MODEL),
     favoriteId,
-    // When favoriteId is provided, don't pass a default skill — let the
+    // When favoriteId is provided, don't pass a default skill - let the
     // favorite's resolved skill win.
     skill: skill ?? (favoriteId ? undefined : NO_SKILL_ID),
     threadId,
-    // For append turns, use "send" so the prompt is treated as a new user message.
-    // wakeUpRevival overrides this — it needs the wakeup-resume operation.
-    operationOverride: threadId && !wakeUpRevival ? "send" : undefined,
+    operationOverride: resolvedOperationOverride,
     rootFolderId: DefaultFolderId.CRON,
     user,
     locale: defaultLocale,
@@ -261,9 +341,11 @@ export async function runTestStream(
     t,
     explicitParentMessageId,
     attachments,
+    audioInput,
     preCalls,
     wakeUpRevival,
     mediaModelOverrides,
+    providerOverride,
     availableTools: availableTools ?? null,
   });
 

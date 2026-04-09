@@ -90,7 +90,7 @@ export class FilePartHandler {
         userId,
       });
       mediaUrl = uploadResult.url;
-      logger.info("[FilePartHandler] Uploaded generated media", {
+      logger.debug("[FilePartHandler] Uploaded generated media", {
         mediaType,
         generatedType,
         url: mediaUrl,
@@ -142,7 +142,6 @@ export class FilePartHandler {
           generatedType,
           mediaType,
           mediaUrl,
-          prompt,
           creditCost,
         );
         await ctx.dbWriter.emitSyntheticToolMessage({
@@ -189,7 +188,6 @@ export class FilePartHandler {
           generatedType,
           mediaType,
           mediaUrl,
-          prompt,
           creditCost,
         );
         await ctx.dbWriter.emitSyntheticToolMessage({
@@ -227,16 +225,20 @@ export class FilePartHandler {
     generatedType: "image" | "audio" | "video",
     mediaType: string,
     mediaUrl: string,
-    prompt: string,
     creditCost: number,
   ): ToolCall {
     const toolCallId = crypto.randomUUID();
-    const args: ToolCall["args"] = { prompt };
+    // args.prompt is intentionally empty for natively-generated media (Gemini file parts).
+    // An empty prompt signals to gap-fill that the content is unknown - so on the next turn
+    // with a model that cannot see the media natively, the vision bridge kicks in to produce
+    // a text description before the AI run starts.
+    const args: ToolCall["args"] = { prompt: "" };
     const result: ToolCall["result"] = {
       file: mediaUrl,
-      // text is always populated — prompt at generation time, fallback if empty
-      // so gap-fill only needs to fire for truly unknown content (native LLM file outputs)
-      text: prompt || `[generated ${generatedType}]`,
+      // text is intentionally empty for natively-generated media (Gemini file parts).
+      // Gap-fill Pass 2 (bridgeMediaUrl) uses vision bridge to populate it on the first
+      // non-image-capable turn. An empty text here signals that the bridge is needed.
+      text: "",
       mediaType,
       creditCost,
     };

@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
       title: "unbottled wróciło. I jest teraz naprawdę dobre.",
       category: "Aktualizacja produktu",
       excerpt:
-        "Nowe modele, generowanie obrazów/wideo/muzyki i całkowicie przeprojektowany onboarding. Jeśli odszedłeś wcześnie — chcemy, żebyś spróbował jeszcze raz.",
+        "Nowe modele, generowanie obrazów/wideo/muzyki i całkowicie przeprojektowany onboarding. Jeśli odszedłeś wcześnie - chcemy, żebyś spróbował jeszcze raz.",
       readTime: "5 min czytania",
     },
     oneCodebase: {

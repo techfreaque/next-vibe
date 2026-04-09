@@ -1,7 +1,7 @@
 /**
  * URL Cache Cleanup Repository
  * Deletes stale URL fetch cache files older than RETENTION_DAYS.
- * Uses StorageAdapter — works transparently with S3 or local filesystem.
+ * Uses StorageAdapter - works transparently with S3 or local filesystem.
  */
 
 import "server-only";

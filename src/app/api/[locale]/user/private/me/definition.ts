@@ -4,11 +4,13 @@
  */
 
 import { dateSchema } from "next-vibe/shared/types/common.schema";
+import { lazy } from "react";
 import { z } from "zod";
 
 import { leadId } from "@/app/api/[locale]/leads/types";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   objectField,
   objectUnionField,
   requestField,
@@ -26,6 +28,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { UserRole } from "../../user-roles/enum";
 import { userRoleResponseSchema } from "../../user-roles/types";
 import { scopedTranslation } from "./i18n";
+
+const MeUpdateWidget = lazy(() =>
+  import("./widget").then((m) => ({ default: m.MeUpdateWidget })),
+);
 
 /**
  * GET /me - Retrieve current user profile or JWT payload
@@ -161,6 +167,56 @@ const { GET } = createEndpoint({
             content: "get.response.stripeCustomerId" as const,
             schema: z.string().nullable(),
           }),
+          bio: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.bio" as const,
+            schema: z.string().nullable(),
+          }),
+          websiteUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.websiteUrl" as const,
+            schema: z.string().nullable(),
+          }),
+          twitterUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.twitterUrl" as const,
+            schema: z.string().nullable(),
+          }),
+          youtubeUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.youtubeUrl" as const,
+            schema: z.string().nullable(),
+          }),
+          instagramUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.instagramUrl" as const,
+            schema: z.string().nullable(),
+          }),
+          tiktokUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.tiktokUrl" as const,
+            schema: z.string().nullable(),
+          }),
+          githubUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.githubUrl" as const,
+            schema: z.string().nullable(),
+          }),
+          discordUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.discordUrl" as const,
+            schema: z.string().nullable(),
+          }),
+          creatorAccentColor: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.creatorAccentColor" as const,
+            schema: z.string().nullable(),
+          }),
+          creatorHeaderImageUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.creatorHeaderImageUrl" as const,
+            schema: z.string().nullable(),
+          }),
         },
       }),
     ] as const,
@@ -236,6 +292,16 @@ const { GET } = createEndpoint({
         isActive: true,
         emailVerified: true,
         stripeCustomerId: null,
+        bio: null,
+        websiteUrl: null,
+        twitterUrl: null,
+        youtubeUrl: null,
+        instagramUrl: null,
+        tiktokUrl: null,
+        githubUrl: null,
+        discordUrl: null,
+        creatorAccentColor: null,
+        creatorHeaderImageUrl: null,
       },
     },
   },
@@ -260,12 +326,9 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "update.title" as const,
-    description: "update.description" as const,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: MeUpdateWidget,
+    usage: { request: "data", response: true } as const,
     children: {
       // === BASIC INFORMATION ===
       basicInfo: objectField(scopedTranslation, {
@@ -325,6 +388,116 @@ const { POST } = createEndpoint({
                 message: "update.fields.email.validation.invalid",
               })
               .optional(),
+          }),
+        },
+      }),
+
+      // === CREATOR / PROFILE INFO ===
+      profileInfo: objectField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "update.groups.profileInfo.title" as const,
+        description: "update.groups.profileInfo.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { request: "data" },
+        children: {
+          bio: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXTAREA,
+            label: "update.fields.bio.label" as const,
+            description: "update.fields.bio.description" as const,
+            placeholder: "update.fields.bio.placeholder" as const,
+            columns: 12,
+            schema: z.string().max(500).optional().nullable(),
+          }),
+          websiteUrl: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.URL,
+            label: "update.fields.websiteUrl.label" as const,
+            description: "update.fields.websiteUrl.description" as const,
+            placeholder: "update.fields.websiteUrl.placeholder" as const,
+            columns: 6,
+            schema: z.url().optional().nullable(),
+          }),
+          twitterUrl: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.URL,
+            label: "update.fields.twitterUrl.label" as const,
+            description: "update.fields.twitterUrl.description" as const,
+            placeholder: "update.fields.twitterUrl.placeholder" as const,
+            columns: 6,
+            schema: z.url().optional().nullable(),
+          }),
+          youtubeUrl: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.URL,
+            label: "update.fields.youtubeUrl.label" as const,
+            description: "update.fields.youtubeUrl.description" as const,
+            placeholder: "update.fields.youtubeUrl.placeholder" as const,
+            columns: 6,
+            schema: z.url().optional().nullable(),
+          }),
+          instagramUrl: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.URL,
+            label: "update.fields.instagramUrl.label" as const,
+            description: "update.fields.instagramUrl.description" as const,
+            placeholder: "update.fields.instagramUrl.placeholder" as const,
+            columns: 6,
+            schema: z.url().optional().nullable(),
+          }),
+          tiktokUrl: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.URL,
+            label: "update.fields.tiktokUrl.label" as const,
+            description: "update.fields.tiktokUrl.description" as const,
+            placeholder: "update.fields.tiktokUrl.placeholder" as const,
+            columns: 6,
+            schema: z.url().optional().nullable(),
+          }),
+          githubUrl: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.URL,
+            label: "update.fields.githubUrl.label" as const,
+            description: "update.fields.githubUrl.description" as const,
+            placeholder: "update.fields.githubUrl.placeholder" as const,
+            columns: 6,
+            schema: z.url().optional().nullable(),
+          }),
+          discordUrl: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.URL,
+            label: "update.fields.discordUrl.label" as const,
+            description: "update.fields.discordUrl.description" as const,
+            placeholder: "update.fields.discordUrl.placeholder" as const,
+            columns: 6,
+            schema: z.url().optional().nullable(),
+          }),
+          creatorAccentColor: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "update.fields.creatorAccentColor.label" as const,
+            description:
+              "update.fields.creatorAccentColor.description" as const,
+            placeholder:
+              "update.fields.creatorAccentColor.placeholder" as const,
+            columns: 6,
+            schema: z
+              .string()
+              .regex(/^#[0-9a-fA-F]{6}$/)
+              .optional()
+              .nullable(),
+          }),
+          creatorHeaderImageUrl: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.URL,
+            label: "update.fields.creatorHeaderImageUrl.label" as const,
+            description:
+              "update.fields.creatorHeaderImageUrl.description" as const,
+            placeholder:
+              "update.fields.creatorHeaderImageUrl.placeholder" as const,
+            columns: 6,
+            schema: z.url().optional().nullable(),
           }),
         },
       }),
@@ -446,6 +619,56 @@ const { POST } = createEndpoint({
             content: "update.response.stripeCustomerId" as const,
             schema: z.string().nullable(),
           }),
+          bio: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "update.response.bio" as const,
+            schema: z.string().nullable().optional(),
+          }),
+          websiteUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "update.response.websiteUrl" as const,
+            schema: z.string().nullable().optional(),
+          }),
+          twitterUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "update.response.twitterUrl" as const,
+            schema: z.string().nullable().optional(),
+          }),
+          youtubeUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "update.response.youtubeUrl" as const,
+            schema: z.string().nullable().optional(),
+          }),
+          instagramUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "update.response.instagramUrl" as const,
+            schema: z.string().nullable().optional(),
+          }),
+          tiktokUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "update.response.tiktokUrl" as const,
+            schema: z.string().nullable().optional(),
+          }),
+          githubUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "update.response.githubUrl" as const,
+            schema: z.string().nullable().optional(),
+          }),
+          discordUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "update.response.discordUrl" as const,
+            schema: z.string().nullable().optional(),
+          }),
+          creatorAccentColor: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "update.response.creatorAccentColor" as const,
+            schema: z.string().nullable().optional(),
+          }),
+          creatorHeaderImageUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "update.response.creatorHeaderImageUrl" as const,
+            schema: z.string().nullable().optional(),
+          }),
           changesSummary: objectField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "update.response.changesSummary.title" as const,
@@ -552,6 +775,9 @@ const { POST } = createEndpoint({
           publicName: "JD",
           email: "customer@example.com",
         },
+        profileInfo: {
+          bio: "I build AI tools for creators.",
+        },
         privacySettings: {
           marketingConsent: true,
         },
@@ -562,6 +788,7 @@ const { POST } = createEndpoint({
           publicName: "",
           email: "invalid-email",
         },
+        profileInfo: {},
         privacySettings: {
           marketingConsent: false,
         },

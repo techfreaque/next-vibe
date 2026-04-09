@@ -16,7 +16,10 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Brain } from "next-vibe-ui/ui/icons/Brain";
 import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
+import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { Film } from "next-vibe-ui/ui/icons/Film";
 import { Info } from "next-vibe-ui/ui/icons/Info";
+import { Mic } from "next-vibe-ui/ui/icons/Mic";
 import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
 import {
   Slider,
@@ -35,48 +38,56 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
 import { useMemo, useState } from "react";
 
-import { COMPACT_TRIGGER } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
 import {
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
 } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import {
-  getBestImageVisionModel,
-  getBestVideoVisionModel,
-  getBestAudioVisionModel,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
-import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
-import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
-import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
-import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
-import type { Modality, ModelRole } from "@/app/api/[locale]/agent/models/enum";
 import {
   getChatModelById,
-  type ChatModelId,
   type ChatManualModelSelection,
+  type ChatModelId,
   type ChatModelSelection,
 } from "@/app/api/[locale]/agent/ai-stream/models";
+import { COMPACT_TRIGGER } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
 import {
   audioVisionModelSelectionSchema,
+  getBestAudioVisionModel,
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
-import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
+import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
+import {
+  getBestImageGenModel,
+  imageGenModelSelectionSchema,
+} from "@/app/api/[locale]/agent/image-generation/models";
+import type { Modality, ModelRole } from "@/app/api/[locale]/agent/models/enum";
 import type { AnyRoleModelSelection } from "@/app/api/[locale]/agent/models/selection";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
+import {
+  getBestMusicGenModel,
+  musicGenModelSelectionSchema,
+} from "@/app/api/[locale]/agent/music-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import {
+  getBestSttModel,
+  sttModelSelectionSchema,
+} from "@/app/api/[locale]/agent/speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import {
+  getBestTtsModel,
+  voiceModelSelectionSchema,
+} from "@/app/api/[locale]/agent/text-to-speech/models";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
+import {
+  getBestVideoGenModel,
+  videoGenModelSelectionSchema,
+} from "@/app/api/[locale]/agent/video-generation/models";
 
 import {
   ModelSelector,
@@ -85,6 +96,8 @@ import {
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as skillIdTranslation } from "@/app/api/[locale]/agent/chat/skills/[id]/i18n";
+import { ModelGroup } from "@/app/api/[locale]/agent/chat/skills/[id]/widget";
 import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,
@@ -478,6 +491,18 @@ interface SelectorConfig {
     ReturnType<typeof scopedTranslation.scopedT>["t"]
   >[0];
   allowedRoles: ModelRole[];
+  /** Which model group this selector belongs to */
+  group: "eyes" | "ears" | "media";
+  /** Which slot label key (inside get.models.slots.*) */
+  slotKey:
+    | "imageVision"
+    | "videoVision"
+    | "stt"
+    | "tts"
+    | "audioVision"
+    | "imageGen"
+    | "musicGen"
+    | "videoGen";
   /** When set, only models with all these input modalities are shown (e.g. vision bridge: ["image"]) */
   requiredInputs?: Modality[];
   /** Platform-level default selection to display when no value is set */
@@ -611,46 +636,13 @@ function makeDefaultSelection(
 // Static config (no defaults - computed inside component with env awareness)
 const SELECTOR_CONFIGS: Omit<SelectorConfig, "defaultModelSelection">[] = [
   {
-    key: "voiceModelSelection",
-    selectorKey: "voice",
-    labelKey: "post.voiceModelSelection.label",
-    placeholderKey: "post.voiceModelSelection.placeholder",
-    allowedRoles: ["tts"],
-  },
-  {
-    key: "imageGenModelSelection",
-    selectorKey: "imageGen",
-    labelKey: "post.imageGenModel.label",
-    placeholderKey: "post.imageGenModel.placeholder",
-    allowedRoles: ["image-gen"],
-  },
-  {
-    key: "musicGenModelSelection",
-    selectorKey: "musicGen",
-    labelKey: "post.musicGenModel.label",
-    placeholderKey: "post.musicGenModel.placeholder",
-    allowedRoles: ["audio-gen"],
-  },
-  {
-    key: "videoGenModelSelection",
-    selectorKey: "videoGen",
-    labelKey: "post.videoGenModel.label",
-    placeholderKey: "post.videoGenModel.placeholder",
-    allowedRoles: ["video-gen"],
-  },
-  {
-    key: "sttModelSelection",
-    selectorKey: "stt",
-    labelKey: "post.sttModel.label",
-    placeholderKey: "post.sttModel.placeholder",
-    allowedRoles: ["stt"],
-  },
-  {
     key: "imageVisionModelSelection",
     selectorKey: "imageVision",
     labelKey: "post.imageVisionModel.label",
     placeholderKey: "post.imageVisionModel.placeholder",
     allowedRoles: ["image-vision"],
+    group: "eyes",
+    slotKey: "imageVision",
   },
   {
     key: "videoVisionModelSelection",
@@ -658,6 +650,26 @@ const SELECTOR_CONFIGS: Omit<SelectorConfig, "defaultModelSelection">[] = [
     labelKey: "post.videoVisionModel.label",
     placeholderKey: "post.videoVisionModel.placeholder",
     allowedRoles: ["video-vision"],
+    group: "eyes",
+    slotKey: "videoVision",
+  },
+  {
+    key: "sttModelSelection",
+    selectorKey: "stt",
+    labelKey: "post.sttModel.label",
+    placeholderKey: "post.sttModel.placeholder",
+    allowedRoles: ["stt"],
+    group: "ears",
+    slotKey: "stt",
+  },
+  {
+    key: "voiceModelSelection",
+    selectorKey: "voice",
+    labelKey: "post.voiceModelSelection.label",
+    placeholderKey: "post.voiceModelSelection.placeholder",
+    allowedRoles: ["tts"],
+    group: "ears",
+    slotKey: "tts",
   },
   {
     key: "audioVisionModelSelection",
@@ -665,6 +677,35 @@ const SELECTOR_CONFIGS: Omit<SelectorConfig, "defaultModelSelection">[] = [
     labelKey: "post.audioVisionModel.label",
     placeholderKey: "post.audioVisionModel.placeholder",
     allowedRoles: ["audio-vision"],
+    group: "ears",
+    slotKey: "audioVision",
+  },
+  {
+    key: "imageGenModelSelection",
+    selectorKey: "imageGen",
+    labelKey: "post.imageGenModel.label",
+    placeholderKey: "post.imageGenModel.placeholder",
+    allowedRoles: ["image-gen"],
+    group: "media",
+    slotKey: "imageGen",
+  },
+  {
+    key: "musicGenModelSelection",
+    selectorKey: "musicGen",
+    labelKey: "post.musicGenModel.label",
+    placeholderKey: "post.musicGenModel.placeholder",
+    allowedRoles: ["audio-gen"],
+    group: "media",
+    slotKey: "musicGen",
+  },
+  {
+    key: "videoGenModelSelection",
+    selectorKey: "videoGen",
+    labelKey: "post.videoGenModel.label",
+    placeholderKey: "post.videoGenModel.placeholder",
+    allowedRoles: ["video-gen"],
+    group: "media",
+    slotKey: "videoGen",
   },
 ];
 
@@ -710,6 +751,7 @@ export function SettingsModelSelectorsSection({
   updateSettings,
 }: SettingsModelSelectorsSectionProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: tId } = skillIdTranslation.scopedT(locale);
   const envAvailability = useEnvAvailability();
 
   const [activeSelector, setActiveSelector] = useState<ActiveSelector>(null);
@@ -810,47 +852,78 @@ export function SettingsModelSelectorsSection({
   // ── Default view: trigger cards ──────────────────────────────────────────
   const chatSelection = getChatModelSelection(settings);
 
-  return (
-    <Div className="flex flex-col gap-3">
-      {/* Chat model trigger */}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-xs font-medium text-muted-foreground">
-          {t("patch.chatModel.label")}
+  const renderSelector = (
+    config: Omit<SelectorConfig, "defaultModelSelection">,
+  ): JSX.Element => {
+    const currentSelection = getModelSelectionFromSettings(
+      settings,
+      config.key,
+    );
+    return (
+      <Div key={config.key} className="flex flex-col gap-1">
+        <Span className="text-xs opacity-40">
+          {tId(`get.models.slots.${config.slotKey}`)}
         </Span>
         <ModelSelectorTrigger
-          modelSelection={chatSelection}
-          placeholder={t("patch.chatModel.placeholder")}
-          onClick={() => setActiveSelector("chat")}
+          modelSelection={currentSelection}
+          allowedRoles={config.allowedRoles}
+          requiredInputs={config.requiredInputs}
+          defaultModelSelection={selectorDefaults[config.key]}
+          placeholder={t(config.placeholderKey)}
+          onClick={() => setActiveSelector(config.selectorKey)}
           locale={locale}
           user={user}
         />
       </Div>
+    );
+  };
 
-      {/* Media model triggers */}
-      {SELECTOR_CONFIGS.map((config) => {
-        const currentSelection = getModelSelectionFromSettings(
-          settings,
-          config.key,
-        );
+  return (
+    <Div className="flex flex-col gap-3">
+      {/* Brain - Chat */}
+      <ModelGroup
+        icon={<Brain className="h-4 w-4" />}
+        label={tId("get.models.brain")}
+      >
+        <Div className="flex flex-col gap-1">
+          <Span className="text-xs opacity-40">
+            {tId("get.models.slots.chat")}
+          </Span>
+          <ModelSelectorTrigger
+            modelSelection={chatSelection}
+            placeholder={t("patch.chatModel.placeholder")}
+            onClick={() => setActiveSelector("chat")}
+            locale={locale}
+            user={user}
+          />
+        </Div>
+      </ModelGroup>
 
-        return (
-          <Div key={config.key} className="flex flex-col gap-1">
-            <Span className="text-xs font-medium text-muted-foreground">
-              {t(config.labelKey)}
-            </Span>
-            <ModelSelectorTrigger
-              modelSelection={currentSelection}
-              allowedRoles={config.allowedRoles}
-              requiredInputs={config.requiredInputs}
-              defaultModelSelection={selectorDefaults[config.key]}
-              placeholder={t(config.placeholderKey)}
-              onClick={() => setActiveSelector(config.selectorKey)}
-              locale={locale}
-              user={user}
-            />
-          </Div>
-        );
-      })}
+      {/* Eyes - Vision */}
+      <ModelGroup
+        icon={<Eye className="h-4 w-4" />}
+        label={tId("get.models.eyes")}
+      >
+        {SELECTOR_CONFIGS.filter((c) => c.group === "eyes").map(renderSelector)}
+      </ModelGroup>
+
+      {/* Ears & Voice */}
+      <ModelGroup
+        icon={<Mic className="h-4 w-4" />}
+        label={tId("get.models.ears")}
+      >
+        {SELECTOR_CONFIGS.filter((c) => c.group === "ears").map(renderSelector)}
+      </ModelGroup>
+
+      {/* Media - Generation */}
+      <ModelGroup
+        icon={<Film className="h-4 w-4" />}
+        label={tId("get.models.media")}
+      >
+        {SELECTOR_CONFIGS.filter((c) => c.group === "media").map(
+          renderSelector,
+        )}
+      </ModelGroup>
     </Div>
   );
 }

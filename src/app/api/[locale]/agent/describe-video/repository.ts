@@ -174,7 +174,6 @@ export class DescribeVideoRepository {
         imageVisionModelSelection: chatSettings.imageVisionModelSelection,
         videoVisionModelSelection: chatSettings.videoVisionModelSelection,
         audioVisionModelSelection: chatSettings.audioVisionModelSelection,
-        translationModelId: chatSettings.translationModelId,
         defaultChatMode: chatSettings.defaultChatMode,
         imageGenModelSelection: chatSettings.imageGenModelSelection,
         musicGenModelSelection: chatSettings.musicGenModelSelection,

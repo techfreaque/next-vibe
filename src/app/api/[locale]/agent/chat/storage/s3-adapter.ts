@@ -356,7 +356,7 @@ export class S3StorageAdapter implements StorageAdapter {
         }
       }
     } catch {
-      // Bucket/prefix doesn't exist — return empty
+      // Bucket/prefix doesn't exist - return empty
     }
 
     return results;

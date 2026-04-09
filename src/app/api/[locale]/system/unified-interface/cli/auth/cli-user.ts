@@ -151,7 +151,7 @@ export async function getCliUser(
           );
           if (!isSessionAdmin && getCliUserEmail()) {
             logger.debug(
-              "[CLI AUTH] Session user is not ADMIN and VIBE_ADMIN_USER_EMAIL is set — falling through to env admin",
+              "[CLI AUTH] Session user is not ADMIN and VIBE_ADMIN_USER_EMAIL is set - falling through to env admin",
             );
             // fall through to Step 2
           } else {

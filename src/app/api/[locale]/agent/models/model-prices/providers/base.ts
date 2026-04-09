@@ -3,8 +3,8 @@
  * Each provider extends this and implements fetch().
  */
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { CREDIT_VALUE_USD } from "@/app/api/[locale]/products/constants";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Modality } from "../../enum";
 import type { ApiProvider } from "../../models";
 
@@ -60,12 +60,13 @@ export interface SettingsUpdate {
 }
 
 /**
- * Add or remove a provider entry in a model's `providers[]` array.
+ * Add or update a provider entry in a model's `providers[]` array.
  * Used by the Unbottled fetcher to dynamically manage UNBOTTLED entries.
+ * All cost fields are already marked up (30%) by the fetcher.
  */
 export interface ProviderEntryOperation {
-  /** "add" inserts a new entry; "remove" deletes an existing entry */
-  action: "add" | "remove";
+  /** "add" inserts a new entry; "remove" deletes an existing entry; "update" rewrites an existing UNBOTTLED entry in-place */
+  action: "add" | "remove" | "update";
   /** The role/category this model belongs to (chat, image-gen, etc.) */
   role: string;
   /** Enum key of the model definition (e.g. "GPT_5_4") */
@@ -74,12 +75,32 @@ export interface ProviderEntryOperation {
   modelId: string;
   /** API provider for the entry */
   provider: ApiProvider;
-  /** Provider model string for the entry (used as providerModel in source) */
+  /** Provider model string for the entry */
   providerModel: string;
-  /** Credit cost for the entry (for add operations) */
-  creditCost?: number;
   /** Source for the update comment */
   source: string;
+  // Cost fields (already marked up):
+  inputTokenCost?: number;
+  outputTokenCost?: number;
+  cacheReadTokenCost?: number;
+  cacheWriteTokenCost?: number;
+  creditCostPerImage?: number;
+  creditCostPerClip?: number;
+  creditCostPerSecond?: number;
+  creditCostPerCharacter?: number;
+  creditCost?: number;
+  // Non-cost fields copied verbatim from primary provider:
+  defaultDurationSeconds?: number;
+  minDurationSeconds?: number;
+  maxDurationSeconds?: number;
+  supportedDurations?: readonly string[];
+  supportedResolutions?: readonly string[];
+  supportedAspectRatios?: readonly string[];
+  supportedSizes?: readonly string[];
+  supportedQualities?: readonly string[];
+  pricingByResolution?: Partial<Record<string, number>>;
+  pricingBySize?: Partial<Record<string, number>>;
+  pricingByQuality?: Partial<Record<string, number>>;
 }
 
 export interface ProviderPriceResult {

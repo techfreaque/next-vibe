@@ -45,6 +45,18 @@ export const users = pgTable("users", {
   // Avatar
   avatarUrl: text("avatar_url"),
 
+  // Creator profile fields
+  bio: text("bio"),
+  websiteUrl: text("website_url"),
+  twitterUrl: text("twitter_url"),
+  youtubeUrl: text("youtube_url"),
+  instagramUrl: text("instagram_url"),
+  tiktokUrl: text("tiktok_url"),
+  githubUrl: text("github_url"),
+  discordUrl: text("discord_url"),
+  creatorAccentColor: text("creator_accent_color"),
+  creatorHeaderImageUrl: text("creator_header_image_url"),
+
   // Two-Factor Authentication
   twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
   twoFactorSecret: text("two_factor_secret"),

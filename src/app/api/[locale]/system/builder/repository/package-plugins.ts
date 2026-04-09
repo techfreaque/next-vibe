@@ -4,10 +4,10 @@
  * Bun plugins automatically injected when a BuildConfig has a `manifest` field.
  * These handle the standard concerns of building a standalone next-vibe package:
  *
- *  - scopedGeneratedPlugin     — redirects generated imports to scoped files
- *  - scopedEndpointsMetaPlugin — stubs endpoints-meta to only the manifest tools
- *  - widgetStubPlugin          — replaces widget.tsx with CLI overrides or no-ops
- *  - nativeStubPlugin          — stubs native-binary modules (ssh2, playwright, …)
+ *  - scopedGeneratedPlugin     - redirects generated imports to scoped files
+ *  - scopedEndpointsMetaPlugin - stubs endpoints-meta to only the manifest tools
+ *  - widgetStubPlugin          - replaces widget.tsx with CLI overrides or no-ops
+ *  - nativeStubPlugin          - stubs native-binary modules (ssh2, playwright, …)
  */
 
 import { existsSync, readFileSync } from "node:fs";
@@ -54,7 +54,7 @@ export function createScopedGeneratedPlugin(generatedDir: string): BunPlugin {
 
 function buildEndpointsMeta(manifest: PackageManifest): string {
   const entries = manifest.endpoints.map((toolName) => {
-    // We can only emit a minimal stub here — the real fields come from the
+    // We can only emit a minimal stub here - the real fields come from the
     // generated endpoint registry. Keep enough for help to work.
     return `{ toolName: ${JSON.stringify(toolName)} }`;
   });

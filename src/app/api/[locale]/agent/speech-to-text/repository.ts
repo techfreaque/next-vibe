@@ -20,12 +20,17 @@ import {
   PROVIDER_SETUP_INSTRUCTIONS,
 } from "@/app/api/[locale]/agent/env-availability";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { getSttModelById } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
+import {
+  DEFAULT_STT_MODEL_SELECTION,
+  DEFAULT_STT_MODEL_ID,
+} from "@/app/api/[locale]/agent/speech-to-text/constants";
+import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
+import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { CreditRepository } from "../../credits/repository";
 import {
   CREDIT_VALUE_USD,
@@ -34,7 +39,6 @@ import {
   STT_MINIMUM_BALANCE,
 } from "../../products/repository-client";
 import type { JwtPayloadType } from "../../user/auth/types";
-import { DEFAULT_STT_MODEL_ID } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import type { SpeechToTextPostResponseOutput } from "./definition";
 import {
   scopedTranslation as sttScopedTranslation,
@@ -60,12 +64,33 @@ export class SpeechToTextRepository {
     sttModelId?: SttModelId,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
     const t = sttScopedTranslation.scopedT(locale).t;
-    const resolvedModelId = sttModelId ?? DEFAULT_STT_MODEL_ID;
-    const modelOption = getSttModelById(resolvedModelId);
     const language = getLanguageFromLocale(locale);
 
+    // Resolve model with env-based provider fallback (respects which keys are configured)
+    const selection: SttModelSelection = sttModelId
+      ? ({
+          ...DEFAULT_STT_MODEL_SELECTION,
+          manualModelId: sttModelId,
+        } as SttModelSelection)
+      : DEFAULT_STT_MODEL_SELECTION;
+    const modelOption = getBestSttModel(selection, user, agentEnvAvailability);
+
+    if (!modelOption) {
+      logger.error("[STT] No STT provider available", {
+        sttModelId: sttModelId ?? DEFAULT_STT_MODEL_ID,
+      });
+      return fail({
+        message: t("post.errors.transcriptionFailed"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: {
+          error:
+            "No speech-to-text provider is configured. Add OPENAI_API_KEY, EDEN_AI_API_KEY, DEEPGRAM_API_KEY, or UNBOTTLED_CLOUD_CREDENTIALS.",
+        },
+      });
+    }
+
     logger.debug("[STT] Starting audio transcription", {
-      sttModelId: resolvedModelId,
+      sttModelId: modelOption.id,
       apiProvider: modelOption.apiProvider,
       providerModel: modelOption.providerModel,
       language,
@@ -158,7 +183,7 @@ export class SpeechToTextRepository {
         default:
           logger.error("[STT] Unsupported STT provider", {
             apiProvider: modelOption.apiProvider,
-            sttModelId: resolvedModelId,
+            sttModelId: modelOption.id,
           });
           return fail({
             message: t("post.errors.transcriptionFailed"),
@@ -191,14 +216,14 @@ export class SpeechToTextRepository {
       } else {
         logger.error(
           "[STT] Provider did not return cost or duration - charging 1-second minimum",
-          { sttModelId: resolvedModelId },
+          { sttModelId: modelOption.id },
         );
         creditsNeeded = STT_COST_PER_SECOND;
       }
 
       logger.debug("[STT] Transcription successful", {
         textLength: text.length,
-        sttModelId: resolvedModelId,
+        sttModelId: modelOption.id,
         apiProvider: modelOption.apiProvider,
         duration,
         creditsNeeded,
@@ -225,7 +250,7 @@ export class SpeechToTextRepository {
       }
 
       if (deductResult.data.partialDeduction) {
-        logger.info("[STT] Partial credit deduction (insufficient funds)", {
+        logger.debug("[STT] Partial credit deduction (insufficient funds)", {
           requestedCost: creditsNeeded,
           duration,
         });
@@ -244,7 +269,7 @@ export class SpeechToTextRepository {
       const errorMessage = parseError(error).message;
       logger.error("[STT] Failed to transcribe audio", {
         error: errorMessage,
-        sttModelId: resolvedModelId,
+        sttModelId: modelOption.id,
         apiProvider: modelOption.apiProvider,
       });
 

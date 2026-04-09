@@ -221,7 +221,7 @@
     {
       "type": "text-delta",
       "id": "text-0",
-      "delta": " — The mediaType null on both wakeUp and approve modes indicates the issue"
+      "delta": " - The mediaType null on both wakeUp and approve modes indicates the issue"
     },
     {
       "type": "text-delta",
@@ -231,7 +231,7 @@
     {
       "type": "text-delta",
       "id": "text-0",
-      "delta": " or the response serialization.\n\n2. **Detach Cleanup** — The st"
+      "delta": " or the response serialization.\n\n2. **Detach Cleanup** - The st"
     },
     {
       "type": "text-delta",
@@ -246,12 +246,12 @@
     {
       "type": "text-delta",
       "id": "text-0",
-      "delta": " Generation Works** — The fact that generate_music succeeded while generate_image consistently fails suggests the issue is isolated to image generation,"
+      "delta": " Generation Works** - The fact that generate_music succeeded while generate_image consistently fails suggests the issue is isolated to image generation,"
     },
     {
       "type": "text-delta",
       "id": "text-0",
-      "delta": " not the broader media generation infrastructure.\n\n4. **Credits Still Charged** — Even with null"
+      "delta": " not the broader media generation infrastructure.\n\n4. **Credits Still Charged** - Even with null"
     },
     {
       "type": "text-delta",

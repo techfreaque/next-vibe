@@ -1,0 +1,147 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[WP2 local-ws-tool] Use the tool-help tool to look up \"generate_image\". Reply STEP_OK if the lookup worked, FAILED: <reason> otherwise.",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user is asking me to use the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " `tool-help` tool to look up \"generate_image\" and report back with STEP_OK if"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " it works, or FAILED: <reason> if it doesn't.\n\nThis is"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " a straightforward task. I need to call the `tool-help` function with a query parameter for \"generate_image\"."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nLooking at the tool-help function schema:\n```json\n{\n  \"name\": \"mcp__"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "vibe-tools__tool-help\",\n  \"parameters\": {\n    \"properties"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\": {\n      \"callbackMode\": {...},\n      \"category\": {\"type\": \"string\"},\n      \"instance"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Id\": {\"type\": \"string\"},\n      \"page\": {\"type\": \"number\"},\n      \"pageSize\": {\"type\": \"number\"},\n      \"query\": {\"type\": \"string\"},\n      \"toolName\": {\"type\": \"string\"}"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n    },\n    \"type\": \"object\"\n  }\n}\n```\n\nI should call it with `query: \"generate_image\"` to"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " search for the tool."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "faa4fdf8-4492-461f-8ffc-d2612b98259d",
+      "toolName": "tool-help",
+      "input": "{\"query\":\"generate_image\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "faa4fdf8-4492-461f-8ffc-d2612b98259d",
+      "toolName": "tool-help",
+      "result": "{\n  \"tools\": [\n    {\n      \"name\": \"generate_image\",\n      \"title\": \"Generate Image\",\n      \"description\": \"Generate an image from a text prompt using AI\",\n      \"category\": \"AI\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ],\n      \"parameters\": {\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n        \"type\": \"object\",\n        \"properties\": {\n          \"prompt\": {\n            \"type\": \"string\",\n            \"minLength\": 1,\n            \"maxLength\": 2000,\n            \"description\": \"Describe the image you want to generate\"\n          },\n          \"model\": {\n            \"default\": \"gemini-3-pro-image-preview\",\n            \"type\": \"string\",\n            \"enum\": [\n              \"flux-pro\",\n              \"flux-2-max\",\n              \"flux-2-klein-4b\",\n              \"riverflow-v2-pro\",\n              \"riverflow-v2-fast\",\n              \"riverflow-v2-max-preview\",\n              \"riverflow-v2-standard-preview\",\n              \"riverflow-v2-fast-preview\",\n              \"flux-2-flex\",\n              \"flux-2-pro\",\n              \"seedream-4.5\",\n              \"gen4-t2i-turbo\",\n              \"gen4-image\",\n              \"wan-2.7-t2i\",\n              \"grok-t2i\",\n              \"z-image-base\",\n              \"z-image-turbo\",\n              \"flux-pro-1.1-ultra\",\n              \"imagen-4-ultra\",\n              \"imagen-4\",\n              \"imagen-4-fast\",\n              \"qwen-t2i\",\n              \"realtime-t2i\",\n              \"gemini-3.1-flash-image-preview\",\n              \"gemini-3-pro-image-preview\",\n              \"gpt-5-image-mini\",\n              \"gpt-5-image\"\n            ],\n            \"description\": \"Select an image generation model\"\n          },\n          \"size\": {\n            \"default\": \"post.size.square1024\",\n            \"type\": \"string\",\n            \"enum\": [\n              \"post.size.square1024\",\n              \"post.size.landscape1792\",\n              \"post.size.portrait1792\"\n            ],\n            \"description\": \"Select output image dimensions\"\n          },\n          \"quality\": {\n            \"default\": \"post.quality.standard\",\n            \"type\": \"string\",\n            \"enum\": [\n              \"post.quality.standard\",\n              \"post.quality.hd\"\n            ],\n            \"description\": \"Select output image quality\"\n          },\n          \"aspectRatio\": {\n            \"type\": \"string\",\n            \"description\": \"Output image aspect ratio\"\n          }\n        },\n        \"required\": [\n          \"prompt\"\n        ]\n      },\n      \"examples\": {\n        \"inputs\": {\n          \"default\": {\n            \"prompt\": \"A photorealistic sunset over a mountain lake\",\n            \"model\": \"gemini-3-pro-image-preview\",\n            \"size\": \"post.size.square1024\",\n            \"quality\": \"post.quality.standard\"\n          }\n        },\n        \"responses\": {\n          \"default\": {\n            \"imageUrl\": \"https://example.com/generated-image.png\",\n            \"creditCost\": 4\n          }\n        }\n      }\n    }\n  ],\n  \"totalCount\": 350,\n  \"matchedCount\": 1,\n  \"hint\": \"Call as: execute-tool toolName=\\\"generate_image\\\". CLI: vibe generate_image [--field=value].\",\n  \"currentPlatform\": \"ai\",\n  \"currentEnv\": \"development\"\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tool-help lookup worked successfully. I"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " found the generate_image tool with full details including:\n- Tool name: generate_image\n- Description: Generate an image from a text prompt using AI\n- Required"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " parameter: prompt\n- Optional parameters: model, size, quality, aspectRatio\n- Multiple supported models available\n- Works"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " across multiple platforms including cli, ai, mcp, cron, etc.\n\nThe lookup was successful, so"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " I should respond with STEP_OK."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "STEP_OK"
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 425,
+        "totalTokens": 443,
+        "cachedInputTokens": 6620
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 7919
+        }
+      }
+    }
+  ]
+}

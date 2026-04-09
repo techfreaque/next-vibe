@@ -25,6 +25,16 @@ export const translations: typeof enTranslations = {
       createdAt: "Utworzono",
       updatedAt: "Zaktualizowano",
       stripeCustomerId: "ID klienta Stripe",
+      bio: "Bio",
+      websiteUrl: "Strona internetowa",
+      twitterUrl: "X / Twitter",
+      youtubeUrl: "YouTube",
+      instagramUrl: "Instagram",
+      tiktokUrl: "TikTok",
+      githubUrl: "GitHub",
+      discordUrl: "Discord",
+      creatorAccentColor: "Kolor akcentu",
+      creatorHeaderImageUrl: "Obraz nagłówka",
       user: {
         title: "Informacje o użytkowniku",
         description: "Szczegóły profilu użytkownika",
@@ -89,6 +99,11 @@ export const translations: typeof enTranslations = {
         title: "Ustawienia prywatności",
         description: "Kontroluj, kto może zobaczyć informacje o Twoim profilu",
       },
+      profileInfo: {
+        title: "Profil twórcy",
+        description:
+          "Bio, linki społecznościowe i branding dla stron Twoich skilli",
+      },
     },
     fields: {
       email: {
@@ -145,8 +160,9 @@ export const translations: typeof enTranslations = {
         help: "Wybierz, kto może przeglądać twój profil: publiczny (wszyscy), prywatny (tylko ty) lub tylko kontakty",
       },
       marketingConsent: {
-        label: "Zgoda marketingowa",
-        description: "Otrzymuj komunikację marketingową",
+        label: "Subskrybuj newsletter",
+        description:
+          "Sporadyczne aktualizacje o nowych modelach i funkcjach. Bez spamu, tylko to co ważne.",
         placeholder: "Włącz e-maile marketingowe",
         help: "Wybierz, czy chcesz otrzymywać e-maile marketingowe i komunikaty promocyjne",
       },
@@ -158,6 +174,51 @@ export const translations: typeof enTranslations = {
         validation: {
           maxLength: "Bio nie może przekraczać 500 znaków",
         },
+      },
+      websiteUrl: {
+        label: "Strona internetowa",
+        description: "Twoja strona osobista lub firmowa",
+        placeholder: "https://twojastrona.pl",
+      },
+      twitterUrl: {
+        label: "X / Twitter",
+        description: "URL Twojego profilu X (Twitter)",
+        placeholder: "https://x.com/twojhandle",
+      },
+      youtubeUrl: {
+        label: "YouTube",
+        description: "URL Twojego kanału YouTube",
+        placeholder: "https://youtube.com/@twójkanał",
+      },
+      instagramUrl: {
+        label: "Instagram",
+        description: "URL Twojego profilu Instagram",
+        placeholder: "https://instagram.com/twojhandle",
+      },
+      tiktokUrl: {
+        label: "TikTok",
+        description: "URL Twojego profilu TikTok",
+        placeholder: "https://tiktok.com/@twojhandle",
+      },
+      githubUrl: {
+        label: "GitHub",
+        description: "URL Twojego profilu GitHub",
+        placeholder: "https://github.com/twójlogin",
+      },
+      discordUrl: {
+        label: "Discord",
+        description: "Link do Twojego serwera lub profilu Discord",
+        placeholder: "https://discord.gg/twójserwer",
+      },
+      creatorAccentColor: {
+        label: "Kolor akcentu",
+        description: "Kolor hex dla brandingu strony skilla (opcjonalnie)",
+        placeholder: "#7c3aed",
+      },
+      creatorHeaderImageUrl: {
+        label: "Obraz nagłówka",
+        description: "URL obrazu bannera dla hero Twojej strony skilla",
+        placeholder: "https://twojastrona.pl/banner.jpg",
       },
     },
     response: {
@@ -180,6 +241,16 @@ export const translations: typeof enTranslations = {
       createdAt: "Utworzono",
       updatedAt: "Zaktualizowano",
       stripeCustomerId: "ID klienta Stripe",
+      bio: "Bio",
+      websiteUrl: "Strona internetowa",
+      twitterUrl: "X / Twitter",
+      youtubeUrl: "YouTube",
+      instagramUrl: "Instagram",
+      tiktokUrl: "TikTok",
+      githubUrl: "GitHub",
+      discordUrl: "Discord",
+      creatorAccentColor: "Kolor akcentu",
+      creatorHeaderImageUrl: "Obraz nagłówka",
       user: "Zaktualizowane informacje o użytkowniku",
       changesSummary: {
         title: "Podsumowanie zmian",
@@ -298,6 +369,33 @@ export const translations: typeof enTranslations = {
     profile: "profil",
     user: "użytkownik",
     account: "konto",
+  },
+
+  widget: {
+    save: "Zapisz profil",
+    saving: "Zapisywanie...",
+    editProfile: "Edytuj profil",
+    cancelEdit: "Anuluj",
+    memberSince: "Członek od",
+    profileCard: {
+      title: "Profil twórcy",
+      description: "Twoja publiczna tożsamość na platformie",
+    },
+    socialCard: {
+      title: "Social linki",
+      description: "Połącz swoje platformy",
+    },
+    emailCard: {
+      title: "Lista mailingowa",
+      description: "Rozwijaj publiczność dzięki przechwytywaniu leadów",
+    },
+    previewCard: {
+      title: "Twój publiczny profil",
+      description: "Tak widzą cię inni",
+    },
+    noPreview: "Uzupełnij profil, aby zobaczyć podgląd",
+    noSocials: "Nie dodano jeszcze żadnych linków społecznościowych",
+    viewPublicProfile: "Zobacz publiczny profil",
   },
 
   // Sub-routes

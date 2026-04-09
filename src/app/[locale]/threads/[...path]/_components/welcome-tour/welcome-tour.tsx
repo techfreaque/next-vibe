@@ -2,6 +2,7 @@
 /* eslint-disable react-compiler/react-compiler -- Complex mount-only effect requires intentional dependency exclusion */
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import type { EventData } from "react-joyride";
 import { ACTIONS, EVENTS, Joyride, STATUS } from "react-joyride";
 
@@ -11,8 +12,6 @@ import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useSidebarCollapsed } from "../sidebar/use-sidebar-collapsed";
@@ -28,6 +27,7 @@ import {
   TOUR_DATA_ATTRS,
   TOUR_IN_PROGRESS_KEY,
   TOUR_LAST_STEP_KEY,
+  TOUR_PLACEMENTS,
   TOUR_SKIPPED_KEY,
   TOUR_SPACING,
   TOUR_STORAGE_KEY,
@@ -42,16 +42,16 @@ interface WelcomeTourProps {
   isAuthenticated: boolean;
   locale: CountryLanguage;
   autoStart?: boolean;
+  totalModelCount: number;
 }
 
 export function WelcomeTour({
   isAuthenticated,
   locale,
   autoStart = true,
+  totalModelCount,
 }: WelcomeTourProps): React.ReactElement | null {
   const { t } = scopedTranslation.scopedT(locale);
-  const envAvailability = useEnvAvailability();
-  const totalModelCount = getAvailableModelCount(envAvailability, false);
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [steps, setSteps] = useState<TourStepConfig[]>([]);
@@ -68,6 +68,12 @@ export function WelcomeTour({
   const onboardingComplete = useTourState((state) => state.onboardingComplete);
   const setOnboardingComplete = useTourState(
     (state) => state.setOnboardingComplete,
+  );
+  const onboardingCompanionId = useTourState(
+    (state) => state.onboardingCompanionId,
+  );
+  const setOnboardingCompanionId = useTourState(
+    (state) => state.setOnboardingCompanionId,
   );
 
   // Sidebar footer state (for expanding bottom sheet during tour)
@@ -114,9 +120,18 @@ export function WelcomeTour({
       const lastStepIndex = parseInt(lastStep, 10);
       const resumeStep = tourSteps[lastStepIndex];
 
+      // Steps 2 and 3 are shown inside the open model selector - reopen it on resume
+      const isInsideSelector =
+        lastStepIndex > MODEL_SELECTOR_STEP_INDEX &&
+        lastStepIndex <= BROWSE_SKILLS_STEP_INDEX;
+
       let resumeDelay = 500;
 
-      if (resumeStep?.target) {
+      if (isInsideSelector) {
+        setModelSelectorOpen(true);
+        // Extra time for selector to open and render its contents
+        resumeDelay = 900;
+      } else if (resumeStep?.target) {
         const target = resumeStep.target as string;
 
         if (isSidebarTarget(target)) {
@@ -212,11 +227,41 @@ export function WelcomeTour({
       waitingForSelectorRef.current = false;
       setOnboardingComplete(false);
 
+      // If a companion was added during onboarding, inject a "meet your companion" step
+      if (onboardingCompanionId) {
+        const companionStep: TourStepConfig = {
+          target: getTourSelector(TOUR_DATA_ATTRS.FAVORITES_COMPANION_GROUP),
+          content: (
+            <React.Fragment>
+              <H3>{t("components.welcomeTour.meetCompanion.title")}</H3>
+              <P>{t("components.welcomeTour.meetCompanion.description")}</P>
+            </React.Fragment>
+          ),
+          placement: TOUR_PLACEMENTS.BOTTOM,
+          skipBeacon: true,
+        };
+        const insertAt = stepIndex + 1;
+        setSteps((prev) => {
+          const next = [...prev];
+          next.splice(insertAt, 0, companionStep);
+          return next;
+        });
+        setOnboardingCompanionId(null);
+      }
+
       goToNextStep();
       // Wait for favorites list to fully render before resuming tour
       setTimeout(() => setRun(true), 800);
     }
-  }, [onboardingComplete, goToNextStep, setOnboardingComplete]);
+  }, [
+    onboardingComplete,
+    goToNextStep,
+    setOnboardingComplete,
+    onboardingCompanionId,
+    setOnboardingCompanionId,
+    stepIndex,
+    t,
+  ]);
 
   // Resume tour after bottom sheet animation completes
   useEffect(() => {
@@ -410,9 +455,22 @@ export function WelcomeTour({
             }
           }
 
-          // Going back to model selector step - reopen the selector
+          // Going back to model selector step - close selector so user can click through again
           if (prevIndex === MODEL_SELECTOR_STEP_INDEX) {
+            setModelSelectorOpen(false);
+          }
+
+          // Going back into inside-selector steps - reopen selector with delay
+          const prevIsInsideSelector =
+            prevIndex > MODEL_SELECTOR_STEP_INDEX &&
+            prevIndex <= BROWSE_SKILLS_STEP_INDEX;
+          if (prevIsInsideSelector) {
             setModelSelectorOpen(true);
+            setRun(false);
+            setStepIndex(prevIndex);
+            localStorage.setItem(TOUR_LAST_STEP_KEY, prevIndex.toString());
+            setTimeout(() => setRun(true), 900);
+            return;
           }
 
           setStepIndex(prevIndex);

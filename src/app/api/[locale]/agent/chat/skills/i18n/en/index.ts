@@ -173,6 +173,9 @@ export const translations = {
         2: "Write a creative short story about time travel",
         3: "What are the latest trends in AI?",
       },
+      variants: {
+        default: "Default",
+      },
     },
     freeSpeechActivist: {
       name: "Free Speech Activist",
@@ -1335,10 +1338,6 @@ export const translations = {
         "Multimodal LLM for analyzing audio inputs. null = user preference wins (bridge model). Set when this skill requires audio understanding.",
       placeholder: "System default",
     },
-    translationModel: {
-      label: "Translation Model",
-      description: "Model used for text translation",
-    },
     imageGenModel: {
       label: "Image Generation Model",
       description:
@@ -1375,7 +1374,7 @@ export const translations = {
       title: "Model Selection",
       label: "Model Selection",
       description:
-        "Chat model for this skill. FILTERS (recommended): set intelligenceRange/priceRange/contentRange/speedRange — system picks best available. Use MANUAL only when you need a specific model's unique capabilities (reasoning models, specific uncensored model). null = platform default. See MODEL-RESOLUTION.md for full priority rules.",
+        "Chat model for this skill. FILTERS (recommended): set intelligenceRange/priceRange/contentRange/speedRange - system picks best available. Use MANUAL only when you need a specific model's unique capabilities (reasoning models, specific uncensored model). null = platform default. See MODEL-RESOLUTION.md for full priority rules.",
     },
     availableTools: {
       label: "Allowed Tools",

@@ -1,6 +1,12 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  subNav: {
+    backToApp: "Zurück zur App",
+    settings: "Profileinstellungen",
+    leadMagnet: "Lead Magnet",
+    referral: "Empfehlungen",
+  },
   auth: {
     common: {
       passwordStrength: {

@@ -56,7 +56,7 @@ const STEP_LABELS = {
   updatePackageJson: "Update package.json scripts (check, lint, typecheck)?",
   // eslint-disable-next-line i18next/no-literal-string
   enableEslint:
-    "Enable ESLint? (import sorting, React hooks — slower but catches more)",
+    "Enable ESLint? (import sorting, React hooks - slower but catches more)",
   // eslint-disable-next-line i18next/no-literal-string
   enableReactRules: "Enable React-specific linting rules?",
   // eslint-disable-next-line i18next/no-literal-string

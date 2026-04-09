@@ -4,7 +4,7 @@
  *
  * Starts an AI stream for a remote WS Provider client.
  * The client sends a message + model. AI events stream via WebSocket.
- * All tools are executed server-side — the client only observes events.
+ * All tools are executed server-side - the client only observes events.
  */
 
 import { z } from "zod";

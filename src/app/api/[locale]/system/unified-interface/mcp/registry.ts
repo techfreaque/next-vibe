@@ -247,6 +247,7 @@ export class MCPRegistry {
         imageGenModelId: undefined,
         musicGenModelId: undefined,
         videoGenModelId: undefined,
+        isRevival: undefined,
       },
     };
 

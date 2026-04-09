@@ -52,11 +52,11 @@ export interface MediaCapabilitiesParams {
   imageGenModelName: string | null;
   musicGenModelName: string | null;
   videoGenModelName: string | null;
-  /** true when the chat model IS the image gen model (same model ID) — tool is redundant */
+  /** true when the chat model IS the image gen model (same model ID) - tool is redundant */
   imageGenIsSameAsChatModel: boolean;
-  /** true when the chat model IS the music gen model (same model ID) — tool is redundant */
+  /** true when the chat model IS the music gen model (same model ID) - tool is redundant */
   musicGenIsSameAsChatModel: boolean;
-  /** true when the chat model IS the video gen model (same model ID) — tool is redundant */
+  /** true when the chat model IS the video gen model (same model ID) - tool is redundant */
   videoGenIsSameAsChatModel: boolean;
 }
 

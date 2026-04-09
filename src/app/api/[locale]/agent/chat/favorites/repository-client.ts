@@ -93,8 +93,11 @@ export class ChatFavoritesRepositoryClient {
       const cards = storedConfigs.map((config): FavoriteCard => {
         const character = DEFAULT_SKILLS.find((c) => c.id === config.skillId);
         const variant = config.variantId
-          ? character?.variants.find((v) => v.id === config.variantId)
-          : undefined;
+          ? (character?.variants.find((v) => v.id === config.variantId) ??
+            character?.variants.find((v) => v.isDefault) ??
+            character?.variants[0])
+          : (character?.variants.find((v) => v.isDefault) ??
+            character?.variants[0]);
         return this.computeFavoriteDisplayFields(
           config,
           variant?.modelSelection,
@@ -103,7 +106,7 @@ export class ChatFavoritesRepositoryClient {
           character?.tagline ? tChar(character.tagline) : null,
           character?.description ? tChar(character.description) : null,
           activeFavoriteId,
-          null,
+          variant?.voiceModelSelection ?? null,
           locale,
           user,
           env,

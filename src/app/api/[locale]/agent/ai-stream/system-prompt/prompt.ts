@@ -465,7 +465,7 @@ function buildMediaLine(opts: {
 
   if (isSameAsChatModel) {
     // Case 1: chat model = gen model → native, tool is omitted from pinned
-    return `- ${label}: native (you output ${modality} directly — no tool needed)`;
+    return `- ${label}: native (you output ${modality} directly - no tool needed)`;
   }
 
   if (genModelName) {

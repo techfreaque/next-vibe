@@ -5,8 +5,8 @@
 
 import "server-only";
 
-import { generateText as aiGenerateText } from "ai";
 import type { LanguageModel } from "ai";
+import { generateText as aiGenerateText } from "ai";
 import { eq } from "drizzle-orm";
 import {
   ErrorResponseTypes,
@@ -16,17 +16,17 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { db } from "@/app/api/[locale]/system/db";
-import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import {
   ModalityResolver,
   type BridgeContext,
 } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
 import { ProviderFactory } from "@/app/api/[locale]/agent/ai-stream/repository/core/provider-factory";
-import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
+import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -99,7 +99,7 @@ export class DescribeImageRepository {
                 type: "text" as const,
                 text: data.context
                   ? `${data.context}\n\nDescribe this image in detail.`
-                  : "Describe this image in detail. Be comprehensive — include colors, objects, text, layout, and any notable features.",
+                  : "Describe this image in detail. Be comprehensive - include colors, objects, text, layout, and any notable features.",
               },
             ],
           },
@@ -174,7 +174,6 @@ export class DescribeImageRepository {
         imageVisionModelSelection: chatSettings.imageVisionModelSelection,
         videoVisionModelSelection: chatSettings.videoVisionModelSelection,
         audioVisionModelSelection: chatSettings.audioVisionModelSelection,
-        translationModelId: chatSettings.translationModelId,
         defaultChatMode: chatSettings.defaultChatMode,
         imageGenModelSelection: chatSettings.imageGenModelSelection,
         musicGenModelSelection: chatSettings.musicGenModelSelection,

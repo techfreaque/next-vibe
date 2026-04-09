@@ -8,11 +8,14 @@ import "server-only";
 
 import { execSync } from "node:child_process";
 
-import { success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import { rawPool } from "@/app/api/[locale]/system/db";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { formatDatabase } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
@@ -48,13 +51,15 @@ function readProcMeminfo(): { totalKb: number; availableKb: number } | null {
 /** Read disk usage for /app (or /). Returns null if df unavailable. */
 function readDiskUsedPct(): number | null {
   try {
-    const raw = execSync(
-      "df /app --output=pcent 2>/dev/null || df / --output=pcent",
-      {
-        encoding: "utf-8",
-      },
-    );
-    const match = /(\d+)%/.exec(raw);
+    // Use -P (POSIX format) - compatible with BusyBox df and GNU df.
+    // POSIX output: "Filesystem 1024-blocks Used Available Capacity% Mounted"
+    const raw = execSync("df -P /app 2>/dev/null || df -P /", {
+      encoding: "utf-8",
+    });
+    // Pick the last data line's 5th column (e.g. "72%")
+    const lines = raw.trim().split("\n");
+    const dataLine = lines[lines.length - 1];
+    const match = /\s(\d+)%\s/.exec(dataLine ?? "");
     return match ? parseInt(match[1], 10) : null;
   } catch {
     return null;
@@ -65,7 +70,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ logger }) => {
+    handler: async ({ t }) => {
       const warnings: string[] = [];
       let status: "ok" | "warning" | "critical" = "ok";
 
@@ -77,17 +82,9 @@ export const { POST, tools } = endpointsHandler({
       if (dbResponseMs >= THRESHOLDS.dbCriticalMs) {
         status = "critical";
         warnings.push(`DB response critical: ${dbResponseMs}ms`);
-        logger.error(
-          formatDatabase(`DB response critical: ${dbResponseMs}ms`, "🗄️ "),
-          { dbResponseMs },
-        );
       } else if (dbResponseMs >= THRESHOLDS.dbWarnMs) {
         status = "warning";
         warnings.push(`DB response slow: ${dbResponseMs}ms`);
-        logger.warn(
-          formatDatabase(`DB response slow: ${dbResponseMs}ms`, "🗄️ "),
-          { dbResponseMs },
-        );
       }
 
       // --- Memory check ---
@@ -105,21 +102,11 @@ export const { POST, tools } = endpointsHandler({
       if (memoryUsedPct >= THRESHOLDS.memCriticalPct) {
         status = "critical";
         warnings.push(`Memory critical: ${memoryUsedPct}%`);
-        logger.error(`[Health] Memory critical: ${memoryUsedPct}%`, {
-          memoryUsedPct,
-          heapUsedMb,
-          rssMb,
-        });
       } else if (memoryUsedPct >= THRESHOLDS.memWarnPct) {
         if (status === "ok") {
           status = "warning";
         }
         warnings.push(`Memory high: ${memoryUsedPct}%`);
-        logger.warn(`[Health] Memory high: ${memoryUsedPct}%`, {
-          memoryUsedPct,
-          heapUsedMb,
-          rssMb,
-        });
       }
 
       // --- Disk check ---
@@ -129,31 +116,18 @@ export const { POST, tools } = endpointsHandler({
         if (diskUsedPct >= THRESHOLDS.diskCriticalPct) {
           status = "critical";
           warnings.push(`Disk critical: ${diskUsedPct}%`);
-          logger.error(`[Health] Disk critical: ${diskUsedPct}%`, {
-            diskUsedPct,
-          });
         } else if (diskUsedPct >= THRESHOLDS.diskWarnPct) {
           if (status === "ok") {
             status = "warning";
           }
           warnings.push(`Disk high: ${diskUsedPct}%`);
-          logger.warn(`[Health] Disk high: ${diskUsedPct}%`, { diskUsedPct });
         }
       }
 
       const uptimeHours = Math.round(process.uptime() / 3600);
 
-      // Only log when healthy - debug level so it doesn't pollute prod logs
-      if (status === "ok") {
-        logger.debug(formatDatabase("System health check - OK", "🗄️ "), {
-          dbResponseMs,
-          memoryUsedPct,
-          diskUsedPct,
-        });
-      }
-
-      return success({
-        healthy: status !== "critical",
+      const result = {
+        healthy: status === "ok",
         status,
         dbResponseMs,
         memoryUsedPct,
@@ -162,7 +136,19 @@ export const { POST, tools } = endpointsHandler({
         diskUsedPct,
         uptimeHours,
         warnings,
-      });
+      };
+
+      // Fail the task so the runner records it as FAILED in history.
+      // Only non-ok status causes a failure - the task history shows the warnings.
+      if (status !== "ok") {
+        return fail({
+          message: t("dbHealth.post.errors.systemAlert"),
+          messageParams: { status, warnings: warnings.join("; ") },
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+
+      return success(result);
     },
   },
 });

@@ -125,6 +125,16 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     ];
   }, [endpoint, logger, urlPathParams, customQueryKey, requestData]);
 
+  // Prevent cross-request SSR cache contamination:
+  // In TanStack Start, the queryClient is a module-level singleton shared across all
+  // server-side renders. Without this, User A's cached credits (e.g. 50) would bleed
+  // into User B's SSR render, ignoring User B's fresh initialData (e.g. 20 or 0).
+  // On the server, force-set initialData into the cache so each request gets its own
+  // fresh value. On the client, initialData is set via the useQuery option (standard path).
+  if (initialData && typeof window === "undefined") {
+    queryClient.setQueryData(queryKey, success(initialData));
+  }
+
   // Use React Query's useQuery hook
   const query = useQuery({
     queryKey,

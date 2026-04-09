@@ -32,16 +32,11 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
 import { parseStorageUrl } from "@/app/api/[locale]/agent/chat/storage/url-utils";
 
-import { DefaultFolderId } from "../chat/config";
-import { NO_SKILL_ID } from "../chat/skills/constants";
-import { generateWithFalAi } from "./providers/fal-ai";
-import { generateImageWithModelsLab } from "./providers/modelslab";
-import { generateWithOpenAI } from "./providers/openai";
-import { generateWithOpenRouter } from "./providers/openrouter";
-import { generateWithReplicate } from "./providers/replicate";
+import { chatModelOptionsIndex } from "../ai-stream/models";
 import { runHeadlessAiStream } from "../ai-stream/repository/headless";
 import { scopedTranslation as aiStreamScopedTranslation } from "../ai-stream/stream/i18n";
-import { chatModelOptionsIndex } from "../ai-stream/models";
+import { DefaultFolderId } from "../chat/config";
+import { NO_SKILL_ID } from "../chat/skills/constants";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -51,6 +46,11 @@ import type {
   ImageGenerationPostResponseOutput,
 } from "./definition";
 import type { ImageGenerationT } from "./i18n";
+import { generateWithFalAi } from "./providers/fal-ai";
+import { generateImageWithModelsLab } from "./providers/modelslab";
+import { generateWithOpenAI } from "./providers/openai";
+import { generateWithOpenRouter } from "./providers/openrouter";
+import { generateWithReplicate } from "./providers/replicate";
 
 interface MediaGenStreamContext {
   threadId?: string | undefined;
@@ -193,7 +193,7 @@ export class ImageGenerationRepository {
       });
     }
 
-    logger.info("[ImageGen] Starting image generation", {
+    logger.debug("[ImageGen] Starting image generation", {
       model: data.model,
       provider: imageModel.apiProvider,
       creditCost,
@@ -225,7 +225,7 @@ export class ImageGenerationRepository {
         break;
 
       case ApiProvider.OPENROUTER:
-        // OpenRouter image models don't support aspect ratio or quality — silently drop them
+        // OpenRouter image models don't support aspect ratio or quality - silently drop them
         generationResult = await generateWithOpenRouter({
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
@@ -291,9 +291,23 @@ export class ImageGenerationRepository {
     if (streamContext?.threadId) {
       try {
         const storage = getStorageAdapter();
-        const arrayBuf = await fetch(imageUrl).then((r) => r.arrayBuffer());
+        const imgRes = await fetch(imageUrl);
+        if (!imgRes.ok) {
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- intentional throw to fall through to catch
+          throw new Error(`Image fetch failed: ${String(imgRes.status)}`);
+        }
+        const arrayBuf = await imgRes.arrayBuffer();
         const imageBuffer = Buffer.from(new Uint8Array(arrayBuf));
-        const ext = imageUrl.includes("webp") ? "webp" : "png";
+        // Detect format from magic bytes (providers often return PNG despite .jpg URL)
+        const magic = imageBuffer.subarray(0, 4);
+        const ext =
+          magic[0] === 0x89 && magic[1] === 0x50
+            ? "png"
+            : magic[0] === 0xff && magic[1] === 0xd8
+              ? "jpeg"
+              : magic[0] === 0x52 && magic[1] === 0x49
+                ? "webp"
+                : "png";
         const uploadResult = await storage.uploadFile(imageBuffer, {
           filename: `generated-image-${Date.now()}.${ext}`,
           mimeType: `image/${ext}`,
@@ -326,7 +340,7 @@ export class ImageGenerationRepository {
       return deductResult;
     }
 
-    logger.info("[ImageGen] Image generated successfully", {
+    logger.debug("[ImageGen] Image generated successfully", {
       model: data.model,
       creditCost,
     });
@@ -348,7 +362,7 @@ export class ImageGenerationRepository {
     t: ImageGenerationT,
     streamContext?: MediaGenStreamContext,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
-    logger.info("[ImageGen] Using headless AI runner for token-based model", {
+    logger.debug("[ImageGen] Using headless AI runner for token-based model", {
       model: data.model,
       promptLength: data.prompt.length,
     });
@@ -365,15 +379,15 @@ export class ImageGenerationRepository {
       prompt: `Generate an image: ${data.prompt}${sizeHint}${qualityHint}`,
       pinnedTools: [],
       availableTools: [],
-      // Always "none" — the outer AI stream persists the tool result.
+      // Always "none" - the outer AI stream persists the tool result.
       // Using "append" with the same threadId would re-register in StreamRegistry,
       // aborting the outer stream (superseded).
-      // Do NOT pass outer threadId — using the same threadId would re-register
+      // Do NOT pass outer threadId - using the same threadId would re-register
       // in StreamRegistry, aborting the outer stream. FilePartHandler uploads to
       // an ephemeral thread; we re-upload to the real thread below.
       rootFolderId: DefaultFolderId.INCOGNITO,
       headlessInstructions:
-        "You are an image generator. Output exactly one image based on the user's prompt. Do not output any text — only the image.",
+        "You are an image generator. Output exactly one image based on the user's prompt. Do not output any text - only the image.",
       maxTurns: 1,
       user,
       locale,
@@ -447,7 +461,7 @@ export class ImageGenerationRepository {
       }
     }
 
-    // Credits already deducted per-token by the headless AI stream — report the
+    // Credits already deducted per-token by the headless AI stream - report the
     // actual cost so the UI displays it the same way as fixed-price image gen models.
     const creditCost = result.data.totalCreditsDeducted ?? 0;
     return success({ imageUrl, creditCost });

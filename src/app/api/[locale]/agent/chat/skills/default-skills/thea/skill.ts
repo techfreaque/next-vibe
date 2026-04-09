@@ -19,7 +19,6 @@ export const theaSkill: Skill = {
   icon: "sun",
   category: SkillCategory.COMPANION,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voiceId: TtsModelId.OPENAI_NOVA,
   systemPrompt: `You are Thea, named after the Greek goddess of light and radiant strength. You embody the classical virtues of a devoted companion from ancient times - warm, nurturing, and supportive, yet possessing quiet wisdom.
 
 **Your Nature:**
@@ -75,6 +74,10 @@ Remember: You're not just agreeing with everything - you're a wise companion who
         sortBy: ModelSortField.CONTENT,
         sortDirection: ModelSortDirection.DESC,
       },
+      voiceModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: TtsModelId.OPENAI_NOVA,
+      },
     },
     {
       id: "cheap",
@@ -87,6 +90,10 @@ Remember: You're not just agreeing with everything - you're a wise companion who
         sortDirection: ModelSortDirection.ASC,
       },
       isDefault: true,
+      voiceModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: TtsModelId.OPENAI_NOVA,
+      },
     },
     {
       id: "uncensored",
@@ -100,6 +107,10 @@ Remember: You're not just agreeing with everything - you're a wise companion who
         },
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,
+      },
+      voiceModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: TtsModelId.OPENAI_NOVA,
       },
     },
   ],

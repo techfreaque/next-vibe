@@ -1,4 +1,6 @@
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { STANDARD_MARKUP_PERCENTAGE } from "../../products/constants";
 import type { ChatModelId, ChatModelOption } from "../ai-stream/models";
 import type {
@@ -7,16 +9,19 @@ import type {
   VideoVisionModelId,
 } from "../ai-stream/vision-models";
 import {
-  type ContentLevelValue,
   ContentLevelDB,
+  type ContentLevelValue,
   IntelligenceLevelDB,
   type IntelligenceLevelValue,
   ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
   PriceLevel,
   PriceLevelDB,
   SpeedLevelDB,
   type SpeedLevelValue,
 } from "../chat/skills/enum";
+import type { SkillsT } from "../chat/skills/i18n";
 import type { AgentTranslationKey } from "../i18n";
 import type {
   ImageGenModelId,
@@ -32,9 +37,6 @@ import type {
   VideoGenModelId,
   VideoGenModelOption,
 } from "../video-generation/models";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { SkillsT } from "../chat/skills/i18n";
 import { type Modality, type ModelUtilityValue } from "./enum";
 
 // ============================================
@@ -391,7 +393,7 @@ export interface ModelOptionCreditBased extends ModelOptionBase {
   creditCostPerCharacter?: never;
   defaultDurationSeconds?: never;
 }
-/** Union of all billing-shape interfaces — used for type-safe guard discrimination. */
+/** Union of all billing-shape interfaces - used for type-safe guard discrimination. */
 type AnyModelOptionShape =
   | ModelOptionTokenBased
   | ModelOptionCreditBased
@@ -688,6 +690,12 @@ export interface ModelProviderEnvAvailability {
   falAi: boolean;
   modelsLab: boolean;
   unbottled: boolean;
+  /** OpenAI STT (Whisper direct API) - requires OPENAI_API_KEY */
+  openAiStt: boolean;
+  /** Eden AI STT - requires EDEN_AI_API_KEY */
+  edenAiStt: boolean;
+  /** Deepgram STT - requires DEEPGRAM_API_KEY */
+  deepgram: boolean;
 }
 
 /**
@@ -722,6 +730,12 @@ export function isModelProviderAvailable(
       return env.modelsLab;
     case ApiProvider.UNBOTTLED:
       return env.unbottled;
+    case ApiProvider.OPENAI_STT:
+      return env.openAiStt;
+    case ApiProvider.EDEN_AI_STT:
+      return env.edenAiStt;
+    case ApiProvider.DEEPGRAM:
+      return env.deepgram;
     default:
       return true;
   }
@@ -848,7 +862,7 @@ export const PRICE_REFERENCE_STT_SECONDS = 30; // typical voice message
 
 /**
  * Get the representative credit cost for a model option (with 30% markup).
- * Use for display, sorting, and comparison — NOT for actual billing.
+ * Use for display, sorting, and comparison - NOT for actual billing.
  * For actual billing, use calculateCreditCost() with real token counts.
  *
  * TTS/STT models return an average-usage cost (e.g. 600 chars for TTS,
@@ -956,7 +970,7 @@ export function meetsRangeConstraint<T>(
 
 /**
  * Generic pool filter for any model role.
- * Handles: null → all available, MANUAL → lookup by id (fallback to FILTERS on unavailable), FILTERS → range constraints.
+ * Handles: null → all available, MANUAL → lookup by id (fallback to FILTERS on unavailable), FILTERS → range constraints + sort.
  */
 export function filterRoleModels<
   TOption extends ModelOptionBase,
@@ -967,6 +981,10 @@ export function filterRoleModels<
     contentRange?: { min?: string; max?: string };
     speedRange?: { min?: string; max?: string };
     priceRange?: { min?: string; max?: string };
+    sortBy?: string;
+    sortDirection?: string;
+    sortBy2?: string;
+    sortDirection2?: string;
   },
 >(
   pool: TOption[],
@@ -993,7 +1011,7 @@ export function filterRoleModels<
     }
     // Fall through to filter fallback
   }
-  return pool.filter((m) => {
+  const filtered = pool.filter((m) => {
     if (m.adminOnly && !isAdmin) {
       return false;
     }
@@ -1012,6 +1030,46 @@ export function filterRoleModels<
       meetsRangeConstraint(m.speed, selection.speedRange, SpeedLevelDB)
     );
   });
+  if (!selection.sortBy) {
+    return filtered;
+  }
+  return filtered.toSorted((a, b) => {
+    const dir1 = selection.sortDirection ?? ModelSortDirection.DESC;
+    const v1a = getRoleModelSortValue(a, selection.sortBy);
+    const v1b = getRoleModelSortValue(b, selection.sortBy);
+    const primary = dir1 === ModelSortDirection.ASC ? v1a - v1b : v1b - v1a;
+    if (primary !== 0 || !selection.sortBy2) {
+      return primary;
+    }
+    const dir2 = selection.sortDirection2 ?? ModelSortDirection.DESC;
+    const v2a = getRoleModelSortValue(a, selection.sortBy2);
+    const v2b = getRoleModelSortValue(b, selection.sortBy2);
+    return dir2 === ModelSortDirection.ASC ? v2a - v2b : v2b - v2a;
+  });
+}
+
+function getRoleModelSortValue(
+  model: ModelOptionBase,
+  sortBy: string | undefined,
+): number {
+  switch (sortBy) {
+    case ModelSortField.INTELLIGENCE: {
+      const idx = IntelligenceLevelDB.indexOf(model.intelligence);
+      return idx === -1 ? 0 : idx;
+    }
+    case ModelSortField.SPEED: {
+      const idx = SpeedLevelDB.indexOf(model.speed);
+      return idx === -1 ? 0 : idx;
+    }
+    case ModelSortField.PRICE:
+      return getModelPrice(model);
+    case ModelSortField.CONTENT: {
+      const idx = ContentLevelDB.indexOf(model.content);
+      return idx === -1 ? 0 : idx;
+    }
+    default:
+      return 0;
+  }
 }
 
 /** Format credit cost for display */

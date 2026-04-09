@@ -580,7 +580,7 @@ export function startWebSocketServer(
 
     <div class="eyebrow">System Status</div>
     <h1>Back in a moment</h1>
-    <p class="subtext">The server is catching its breath — either waking up after an update or recovering from high load. It'll be right back.</p>
+    <p class="subtext">The server is catching its breath - either waking up after an update or recovering from high load. It'll be right back.</p>
 
     <div class="status-bar">
       <div class="status-dot warn" id="sdot"></div>

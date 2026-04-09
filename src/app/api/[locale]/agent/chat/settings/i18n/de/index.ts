@@ -97,9 +97,6 @@ export const translations: typeof enTranslations = {
       label: "Audio-Vision-Modell",
       placeholder: "Systemstandard",
     },
-    translationModel: {
-      label: "Übersetzungsmodell",
-    },
     imageGenModel: {
       label: "Bildgenerierungsmodell",
       placeholder: "Systemstandard",

@@ -152,7 +152,9 @@ export function buildMessagePath(
 
   let currentMessage: ChatMessage | undefined;
   if (rootMessages.length > 1 && isRealBranch(rootMessages)) {
-    const rootBranchIndex = branchIndices[BRANCH_INDEX_KEY] ?? 0;
+    // Default to last (most recent) branch when no explicit index is stored
+    const rootBranchIndex =
+      branchIndices[BRANCH_INDEX_KEY] ?? rootMessages.length - 1;
     const validRootIndex = Math.min(
       Math.max(0, rootBranchIndex),
       rootMessages.length - 1,
@@ -175,7 +177,9 @@ export function buildMessagePath(
     }
 
     if (children.length > 1 && isRealBranch(children)) {
-      const branchIndex = branchIndices[currentMessage.id] ?? 0;
+      // Default to last (most recent) branch when no explicit index is stored
+      const branchIndex =
+        branchIndices[currentMessage.id] ?? children.length - 1;
       const validIndex = Math.min(
         Math.max(0, branchIndex),
         children.length - 1,

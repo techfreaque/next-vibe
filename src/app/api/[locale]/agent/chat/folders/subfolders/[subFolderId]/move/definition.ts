@@ -18,8 +18,13 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazy } from "react";
+
 import { scopedTranslation } from "./i18n";
-import { FolderMoveContainer } from "./widget";
+
+const FolderMoveContainer = lazy(() =>
+  import("./widget").then((m) => ({ default: m.FolderMoveContainer })),
+);
 
 /**
  * Move Folder Endpoint (PATCH)

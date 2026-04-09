@@ -1,0 +1,62 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v6/images/text2img",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "9e8372d60a06240d-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Mon, 06 Apr 2026 20:12:41 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=8SFcBIVjBWWiL1uTuo4q%2F6moz%2FwCW43hgjbvWahYUr3AsHM5h%2BbJLvFijCgXVdh60JnN9cXyoNRjOxKngZ1iMcHWiJT48vKIIAoYGSsBAgX78WbadiCXrU5EpEBbnH4%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "4f7831ecc53ebfb24eb0e2c1a27cbb4b",
+    "x-request-time": "2.426",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.001",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "success",
+    "id": 174053724,
+    "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise",
+    "output": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/4a67d876-0215-4b08-8bd1-d3a19969cb3c-0.jpg"
+    ],
+    "proxy_links": [
+      "https://cdn2.stablediffusionapi.com/generations/4a67d876-0215-4b08-8bd1-d3a19969cb3c-0.jpg"
+    ],
+    "meta": {
+      "model_id": "z-image-turbo",
+      "prompt": " detach-test hyperrealistic, full body, detailed clothing, highly detailed, cinematic lighting, stunningly beautiful, intricate, sharp focus, f/1. 8, 85mm, (centered image composition), (professionally color graded), ((bright soft diffused light)), volumetric fog, trending on instagram, trending on tumblr, HDR 4K, 8K",
+      "negative_prompt": " (child:1.5), ((((underage)))), ((((child)))), (((kid))), (((preteen))), (teen:1.5) ugly, tiling, poorly drawn hands, poorly drawn feet, poorly drawn face, out of frame, extra limbs, disfigured, deformed, body out of frame, bad anatomy, watermark, signature, cut off, low contrast, underexposed, overexposed, bad art, beginner, amateur, distorted face, blurry, draft, grainy",
+      "width": 512,
+      "height": 512,
+      "guidance": null,
+      "samples": 1,
+      "safety_checker": "no",
+      "safety_checker_type": "black",
+      "num_inference_steps": 9,
+      "seed": 181,
+      "webhook": null,
+      "track_id": null,
+      "base64": "no",
+      "highres_fix": null,
+      "watermark": "no",
+      "temp": "no",
+      "lora_stength": "",
+      "id": 174053724,
+      "file_prefix": "4a67d876-0215-4b08-8bd1-d3a19969cb3c",
+      "output": [
+        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/4a67d876-0215-4b08-8bd1-d3a19969cb3c-0.jpg"
+      ]
+    }
+  }
+}

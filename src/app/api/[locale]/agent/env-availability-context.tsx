@@ -30,6 +30,9 @@ const ALL_PROVIDERS_AVAILABLE: AgentEnvAvailability = {
   falAi: true,
   modelsLab: true,
   unbottled: true,
+  openAiStt: true,
+  edenAiStt: true,
+  deepgram: true,
 };
 
 interface EnvAvailabilityState {
@@ -43,14 +46,14 @@ const useEnvAvailabilityStore = create<EnvAvailabilityState>((set) => ({
 }));
 
 /**
- * React hook — use in components.
+ * React hook - use in components.
  */
 export function useEnvAvailability(): AgentEnvAvailability {
   return useEnvAvailabilityStore((s) => s.env);
 }
 
 /**
- * Get env availability outside React — use in static class methods, route handlers, etc.
+ * Get env availability outside React - use in static class methods, route handlers, etc.
  */
 export function getEnvAvailability(): AgentEnvAvailability {
   return useEnvAvailabilityStore.getState().env;

@@ -119,7 +119,7 @@ You are here to create immersive roleplay experiences. Embody skills fully and s
       variantName: "skills.roleplaySkill.variants.deep" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.KIMI_K2,
+        manualModelId: ChatModelId.KIMI_K2_5,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,

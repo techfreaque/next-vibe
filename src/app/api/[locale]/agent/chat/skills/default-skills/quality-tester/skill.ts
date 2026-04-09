@@ -1,4 +1,8 @@
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { AudioVisionModelId } from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { ImageGenModelId } from "@/app/api/[locale]/agent/image-generation/models";
+import { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
+import { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { Skill } from "../../config";
@@ -25,7 +29,7 @@ export const qualityTesterSkill: Skill = {
 
 While doing it, pay attention to everything you encounter: tool descriptions, parameter names, error messages, result formats, credit costs. You are the last line of defense before a real user sees this.
 
-HARD STOP — if any of these happen, stop and report instead of retrying or working around it:
+HARD STOP - if any of these happen, stop and report instead of retrying or working around it:
 - A tool returns an error, empty result, or nonsensical output
 - Same failure happens twice
 - A generated result (image/music/video) is missing, broken URL, or clearly wrong
@@ -41,7 +45,7 @@ Failure report format:
 3. Exact error text, tool name, or result
 4. Severity: BLOCKER (unusable) | MAJOR (works but wrong) | MINOR (cosmetic/confusing)
 
-If everything works, respond normally to the user. Only flag issues — don't narrate the process.`,
+If everything works, respond normally to the user. Only flag issues - don't narrate the process.`,
   suggestedPrompts: [
     "skills.qualityTester.suggestedPrompts.0" as const,
     "skills.qualityTester.suggestedPrompts.1" as const,
@@ -67,6 +71,22 @@ If everything works, respond normally to the user. Only flag issues — don't na
         sortDirection: ModelSortDirection.ASC,
       },
       isDefault: true,
+      imageGenModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ImageGenModelId.Z_IMAGE_TURBO,
+      },
+      musicGenModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: MusicGenModelId.LYRIA_3,
+      },
+      videoGenModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: VideoGenModelId.LTX_2_PRO_T2V,
+      },
+      audioVisionModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: AudioVisionModelId.GEMINI_2_5_FLASH,
+      },
     },
     {
       id: "budget",
@@ -83,6 +103,22 @@ If everything works, respond normally to the user. Only flag issues — don't na
         },
         sortBy: ModelSortField.PRICE,
         sortDirection: ModelSortDirection.ASC,
+      },
+      imageGenModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ImageGenModelId.Z_IMAGE_TURBO,
+      },
+      musicGenModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: MusicGenModelId.LYRIA_3,
+      },
+      videoGenModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: VideoGenModelId.LTX_2_PRO_T2V,
+      },
+      audioVisionModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: AudioVisionModelId.GEMINI_2_5_FLASH,
       },
     },
   ],

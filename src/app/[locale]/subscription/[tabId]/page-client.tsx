@@ -54,7 +54,7 @@ export function SubscriptionPageClient({
   return (
     <Container className="py-8 flex flex-col gap-8">
       {/* Header - same for all tabs */}
-      <SubscriptionHeader locale={locale} isAuthenticated={isAuthenticated} />
+      <SubscriptionHeader />
 
       {/* Credit Balance Card */}
       <EndpointsPage

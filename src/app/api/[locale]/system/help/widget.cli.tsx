@@ -26,7 +26,7 @@ import type {
 
 type HelpToolItem = HelpToolMetadataSerialized;
 
-/** JSON Schema property — may have nested properties, enum values, anyOf etc. */
+/** JSON Schema property - may have nested properties, enum values, anyOf etc. */
 interface JsonSchemaProperty {
   type?: string | string[];
   description?: string;
@@ -141,7 +141,7 @@ function resolveSchema(prop: JsonSchemaProperty): JsonSchemaProperty {
     const inner = resolveSchema(nonNull[0]);
     return { ...inner, description: prop.description ?? inner.description };
   }
-  // Discriminated union — merge all object branches' properties
+  // Discriminated union - merge all object branches' properties
   const merged: JsonSchemaProperty = {
     description: prop.description,
     properties: {},
@@ -155,7 +155,7 @@ function resolveSchema(prop: JsonSchemaProperty): JsonSchemaProperty {
           merged.properties![pk] = pv;
         } else {
           const existing = merged.properties![pk];
-          // Both branches have a const (discriminator) — merge into enum
+          // Both branches have a const (discriminator) - merge into enum
           if (pv.const !== undefined || existing.const !== undefined) {
             const base =
               existing.enum ??
@@ -201,7 +201,7 @@ function stripEnumPrefix(v: string): string {
   return v.split(".").pop() ?? v;
 }
 
-/** Inline object shape: {key1,key2,...} — max 5 keys to stay readable */
+/** Inline object shape: {key1,key2,...} - max 5 keys to stay readable */
 function inlineObjectShape(
   properties: Record<string, JsonSchemaProperty>,
 ): string {
@@ -228,7 +228,7 @@ function typeLabel(prop: JsonSchemaProperty): string {
     return resolved.enum.map(stripEnumPrefix).join("|") + nullable;
   }
 
-  // Array — show item shape if available
+  // Array - show item shape if available
   const rawType = Array.isArray(resolved.type)
     ? resolved.type.filter((x) => x !== "null").join("|")
     : (resolved.type ?? "");
@@ -255,7 +255,7 @@ function typeLabel(prop: JsonSchemaProperty): string {
     return `any[]${nullable}`;
   }
 
-  // Object — show inline shape instead of bare "object"
+  // Object - show inline shape instead of bare "object"
   if (resolved.properties && Object.keys(resolved.properties).length > 0) {
     return `${inlineObjectShape(resolved.properties)}${nullable}`;
   }
@@ -269,7 +269,7 @@ function typeLabel(prop: JsonSchemaProperty): string {
  * Expansion rules:
  * - Only expand `modelSelection` at the top level (the primary chat model param).
  *   Auxiliary model selections (voiceModelSelection, imageGenModelSelection etc.)
- *   stay collapsed — their usage is covered by the description.
+ *   stay collapsed - their usage is covered by the description.
  * - At depth 1, only show selectionType + manualModelId; skip filter-range noise
  *   (intelligenceRange, priceRange, contentRange, speedRange, sortBy*, sortDirection*).
  */
@@ -292,7 +292,7 @@ const FILTER_NOISE_KEYS = new Set([
   "sortDirection2",
 ]);
 
-// All top-level object params are expanded — no whitelist needed.
+// All top-level object params are expanded - no whitelist needed.
 // typeLabel() always shows inline shapes; collectParamRows expands any object.
 
 function collectParamRows(
@@ -394,7 +394,7 @@ function renderDetailCli(tool: HelpToolItem): string {
       lines.push("");
       lines.push(chalk.bold("Parameters"));
       const rows = collectParamRows(props, required);
-      // Cap key column at 28 chars — avoids blowout from long sub-keys
+      // Cap key column at 28 chars - avoids blowout from long sub-keys
       const KEY_COL = Math.min(
         Math.max(...rows.map((r) => r.key.length + r.indent * 2), 4),
         28,
@@ -429,7 +429,7 @@ function renderDetailCli(tool: HelpToolItem): string {
     }
   }
 
-  // Examples — one flag per line for readability
+  // Examples - one flag per line for readability
   if (tool.examples?.inputs) {
     const exampleEntries = Object.entries(tool.examples.inputs);
     if (exampleEntries.length > 0) {

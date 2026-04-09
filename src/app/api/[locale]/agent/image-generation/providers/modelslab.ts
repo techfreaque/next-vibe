@@ -24,7 +24,7 @@ interface ModelsLabImageResponse {
   message?: string;
 }
 
-const POLL_INTERVAL_MS = 3000;
+const POLL_INTERVAL_MS = process.env.NODE_ENV === "test" ? 50 : 3000;
 const MAX_POLL_ATTEMPTS = 20;
 
 export async function generateImageWithModelsLab(params: {
@@ -45,7 +45,7 @@ export async function generateImageWithModelsLab(params: {
     });
   }
 
-  logger.info("[ModelsLab Image] Submitting generation request", {
+  logger.debug("[ModelsLab Image] Submitting generation request", {
     providerModel,
     promptLength: prompt.length,
   });
@@ -86,14 +86,14 @@ export async function generateImageWithModelsLab(params: {
     // Immediate success
     const immediateUrl = result.proxy_links?.[0] ?? result.output?.[0];
     if (result.status === "success" && immediateUrl) {
-      logger.info("[ModelsLab Image] Image generated immediately");
+      logger.debug("[ModelsLab Image] Image generated immediately");
       return success({ imageUrl: immediateUrl });
     }
 
     // Async processing - poll fetch_result URL
     if (result.status === "processing" && result.fetch_result) {
       const fetchUrl = result.fetch_result;
-      logger.info("[ModelsLab Image] Request queued, polling", {
+      logger.debug("[ModelsLab Image] Request queued, polling", {
         fetchUrl,
         eta: result.eta,
       });
@@ -128,7 +128,7 @@ export async function generateImageWithModelsLab(params: {
 
         const pollUrl = pollResult.proxy_links?.[0] ?? pollResult.output?.[0];
         if (pollResult.status === "success" && pollUrl) {
-          logger.info("[ModelsLab Image] Image generated successfully");
+          logger.debug("[ModelsLab Image] Image generated successfully");
           return success({ imageUrl: pollUrl });
         }
 

@@ -2,7 +2,7 @@
  * Claude Code Fixture Store
  *
  * Provides deterministic test replay for the Claude Code provider, which uses
- * the Agent SDK's query() and does NOT go through global.fetch — so the HTTP
+ * the Agent SDK's query() and does NOT go through global.fetch - so the HTTP
  * fetch cache cannot intercept it.
  *
  * Works identically to fetch-cache.ts in concept:
@@ -42,7 +42,7 @@ const CLAUDE_CODE_CACHE_DIR = join(
 let currentTestCase = "unknown";
 const callCounters = new Map<string, number>();
 
-/** Called by fetch-cache.ts setFetchCacheContext — keeps both stores in sync */
+/** Called by fetch-cache.ts setFetchCacheContext - keeps both stores in sync */
 export function setClaudeCodeFixtureContext(testCase: string): void {
   currentTestCase = slugify(testCase);
   callCounters.clear();
@@ -113,7 +113,7 @@ export async function withClaudeCodeFixture(
     return replayFixture(fixture.parts);
   }
 
-  // ── Cache miss — real call ───────────────────────────────────────────────
+  // ── Cache miss - real call ───────────────────────────────────────────────
   const realStream = await producer();
   return captureAndWrite(realStream, fp, modelId, userPrompt);
 }

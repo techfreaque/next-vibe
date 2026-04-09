@@ -427,7 +427,9 @@ export async function handleTaskCompletion(params: {
       // runs with the correct leadId for credit validation - not the complete-task caller's identity.
       if (directResumeUser && directResumeLocale) {
         const { t } = aiStreamScopedTranslation.scopedT(directResumeLocale);
-        void ResumeStreamRepository.resume(
+        // Await so callers that await handleTaskCompletion (e.g. pulse) get a fully
+        // resolved revival. The cron task above is a safety net if this throws.
+        await ResumeStreamRepository.resume(
           resumeInput,
           directResumeUser,
           directResumeLocale,

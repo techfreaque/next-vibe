@@ -54,6 +54,8 @@ export class GapFillExecutor {
     messages: ModelMessage[];
     /** Raw ChatMessage history (needed for attachment data + variant cache) */
     chatHistory: ChatMessage[];
+    /** ID of the current user message - used directly instead of content-based lookup */
+    currentUserMessageId?: string | null;
     activeModel: ChatModelOption;
     bridgeContext: BridgeContext;
     dbWriter: MessageDbWriter;
@@ -66,6 +68,7 @@ export class GapFillExecutor {
     const {
       messages,
       chatHistory,
+      currentUserMessageId,
       activeModel,
       bridgeContext,
       dbWriter,
@@ -80,9 +83,16 @@ export class GapFillExecutor {
       chatHistory.map((m) => [m.id, m]),
     );
 
+    // Find index of the last user message in ModelMessage array so we can
+    // use currentUserMessageId directly instead of a fallible content-based lookup.
+    const lastUserMsgIndex = messages.reduce(
+      (acc, msg, i) => (msg.role === "user" ? i : acc),
+      -1,
+    );
+
     // Process all messages in parallel
     const updated = await Promise.all(
-      messages.map(async (msg): Promise<ModelMessage> => {
+      messages.map(async (msg, msgIndex): Promise<ModelMessage> => {
         // Only user messages can have attachments
         if (msg.role !== "user" || !Array.isArray(msg.content)) {
           return msg;
@@ -99,7 +109,9 @@ export class GapFillExecutor {
             return false;
           }
           const mime =
-            "mimeType" in p && typeof p.mimeType === "string" ? p.mimeType : "";
+            "mediaType" in p && typeof p.mediaType === "string"
+              ? p.mediaType
+              : "";
           const modality: Modality = mime.startsWith("video/")
             ? "video"
             : "audio";
@@ -110,15 +122,27 @@ export class GapFillExecutor {
           return msg;
         }
 
-        // Find the ChatMessage that corresponds to this ModelMessage
-        // We identify by matching text content (heuristic; good enough)
-        const textPart = parts.find((p) => p.type === "text");
-        const msgText =
-          textPart && "text" in textPart ? String(textPart.text) : "";
-
-        const chatMsg = [...chatHistoryById.values()].find(
-          (m) => m.content === msgText || msgText.startsWith(m.content ?? ""),
-        );
+        // Find the ChatMessage that corresponds to this ModelMessage.
+        // Primary path: if this is the last user message and currentUserMessageId
+        // is provided, use it directly - avoids fragile content-based lookup.
+        // Fallback: match by text content (heuristic for historical messages).
+        let chatMsg: ChatMessage | undefined;
+        if (msgIndex === lastUserMsgIndex && currentUserMessageId) {
+          chatMsg = chatHistoryById.get(currentUserMessageId);
+          if (!chatMsg) {
+            // The current user message may not be in chatHistoryById (e.g. it was
+            // added to messages but not to chatHistory). Build a minimal stub so
+            // emitGapFillCompleted can write the variant to the correct DB row.
+            chatMsg = { id: currentUserMessageId } as ChatMessage;
+          }
+        } else {
+          const textPart = parts.find((p) => p.type === "text");
+          const msgText =
+            textPart && "text" in textPart ? String(textPart.text) : "";
+          chatMsg = [...chatHistoryById.values()].find(
+            (m) => m.content === msgText || msgText.startsWith(m.content ?? ""),
+          );
+        }
 
         // Replace each unsupported attachment part with text variant - in parallel
         const newParts = await Promise.all(
@@ -147,8 +171,8 @@ export class GapFillExecutor {
 
             if (part.type === "file") {
               const mime =
-                "mimeType" in part && typeof part.mimeType === "string"
-                  ? part.mimeType
+                "mediaType" in part && typeof part.mediaType === "string"
+                  ? part.mediaType
                   : "";
               const modality: Modality = mime.startsWith("video/")
                 ? "video"
@@ -226,6 +250,9 @@ export class GapFillExecutor {
             // in practice for our media tools it's always { type: "json", value: {...} }
             interface MediaOutputValue {
               file?: string;
+              imageUrl?: string;
+              videoUrl?: string;
+              audioUrl?: string;
               text?: string | null;
               mediaType?: string;
               creditCost?: number;
@@ -239,10 +266,17 @@ export class GapFillExecutor {
               return part;
             }
 
+            // Normalize: FilePartHandler stores { file }, real tool APIs store { imageUrl/videoUrl/audioUrl }
             const fileUrl =
               typeof outputValue.file === "string"
                 ? outputValue.file
-                : undefined;
+                : typeof outputValue.imageUrl === "string"
+                  ? outputValue.imageUrl
+                  : typeof outputValue.videoUrl === "string"
+                    ? outputValue.videoUrl
+                    : typeof outputValue.audioUrl === "string"
+                      ? outputValue.audioUrl
+                      : undefined;
             const existingText =
               typeof outputValue.text === "string" ? outputValue.text : null;
 
@@ -255,7 +289,7 @@ export class GapFillExecutor {
               return part;
             }
 
-            // Check if model can see this modality — if it can, it doesn't need text
+            // Check if model can see this modality - if it can, it doesn't need text
             const modality: Modality =
               p.toolName === IMAGE_GEN_ALIAS
                 ? "image"
@@ -272,7 +306,7 @@ export class GapFillExecutor {
                 ? (toolCallIdToChatMessageId.get(p.toolCallId) ?? null)
                 : null;
 
-            logger.info(
+            logger.debug(
               `[GapFill] Bridging null-text ${modality} tool result via vision`,
               {
                 fileUrl: fileUrl.slice(0, 80),
@@ -335,8 +369,8 @@ export class GapFillExecutor {
 
     const isImage = part.type === "image";
     const mime =
-      !isImage && "mimeType" in part && typeof part.mimeType === "string"
-        ? part.mimeType
+      !isImage && "mediaType" in part && typeof part.mediaType === "string"
+        ? part.mediaType
         : "";
     const isVideo = !isImage && mime.startsWith("video/");
 
@@ -387,7 +421,7 @@ export class GapFillExecutor {
       });
     }
 
-    // Audio file → STT bridge
+    // Audio file → audio-vision bridge
     return GapFillExecutor.bridgeStt({
       part: part as FilePart,
       chatMessageId,
@@ -396,7 +430,6 @@ export class GapFillExecutor {
       abortSignal: params.abortSignal,
       logger,
       user,
-      locale,
       modality,
       bridgeType,
     });
@@ -534,7 +567,6 @@ export class GapFillExecutor {
     abortSignal: AbortSignal;
     logger: EndpointLogger;
     user: JwtPayloadType;
-    locale: CountryLanguage;
     modality: Modality;
     bridgeType: "stt" | "vision" | "translation" | "tts";
   }): Promise<string | null> {
@@ -545,115 +577,20 @@ export class GapFillExecutor {
       dbWriter,
       logger,
       user,
-      locale,
       modality,
       bridgeType,
     } = params;
 
-    const sttModel = ModalityResolver.resolveSttModel(bridgeContext, user);
-
-    // Path 1: dedicated STT model (Whisper, Deepgram, etc.)
-    if (sttModel) {
-      try {
-        // Reconstruct a File from the FilePart's base64 data
-        const mimeType =
-          "mimeType" in part && part.mimeType
-            ? String(part.mimeType)
-            : "audio/webm";
-
-        let audioBytes: Uint8Array;
-        if ("data" in part && part.data) {
-          const data = part.data;
-          if (typeof data === "string") {
-            audioBytes = Buffer.from(data, "base64");
-          } else if (data instanceof ArrayBuffer) {
-            audioBytes = new Uint8Array(data);
-          } else {
-            // Uint8Array or Buffer (Buffer extends Uint8Array)
-            audioBytes = new Uint8Array(
-              (data as Uint8Array).buffer,
-              (data as Uint8Array).byteOffset,
-              (data as Uint8Array).byteLength,
-            );
-          }
-        } else if ("url" in part && part.url) {
-          // URL-based file - fetch the bytes
-          const response = await fetch(String(part.url));
-          const arrayBuffer = await response.arrayBuffer();
-          audioBytes = new Uint8Array(arrayBuffer);
-        } else {
-          logger.warn("[GapFill] FilePart has no data or url, skipping STT");
-          return null;
-        }
-
-        const ext = mimeType.split("/")[1]?.split(";")[0] ?? "webm";
-        const audioFile = new File(
-          [audioBytes.buffer as ArrayBuffer],
-          `audio.${ext}`,
-          {
-            type: mimeType,
-          },
-        );
-
-        const { SpeechToTextRepository } =
-          await import("../../../speech-to-text/repository");
-
-        const result = await SpeechToTextRepository.transcribeAudio(
-          audioFile,
-          user,
-          locale,
-          logger,
-          sttModel.id,
-        );
-
-        if (result.success) {
-          const transcript = result.data.response.text;
-          const creditCost = result.data.creditCost ?? 0;
-
-          if (chatMessageId && transcript) {
-            const variant = {
-              modality: "text" as Modality,
-              content: transcript,
-              modelId: sttModel.id,
-              creditCost,
-              createdAt: new Date().toISOString(),
-            };
-
-            await dbWriter.emitGapFillCompleted({
-              messageId: chatMessageId,
-              bridgeType,
-              modality,
-              variant,
-            });
-          }
-
-          return transcript || null;
-        }
-
-        logger.warn(
-          "[GapFill] Dedicated STT failed, trying audio-vision LLM fallback",
-          { error: result.message, modality },
-        );
-      } catch (err) {
-        logger.warn(
-          "[GapFill] Dedicated STT threw, trying audio-vision LLM fallback",
-          {
-            error: err instanceof Error ? err.message : String(err),
-            bridgeType,
-          },
-        );
-      }
-    }
-
-    // Path 2: audio-input LLM fallback (e.g. Gemini via AudioVisionModelId pool)
-    // Used when no dedicated STT is configured, or when dedicated STT fails.
+    // Audio attachment bridging uses audio-vision LLM only (e.g. Gemini).
+    // Dedicated STT models (Whisper, Deepgram) are reserved for the voice UI
+    // transcription flow, not for gap-filling audio file attachments.
     const audioVisionModel = ModalityResolver.resolveAudioVisionModel(
       bridgeContext,
       user,
     );
     if (!audioVisionModel) {
       logger.warn(
-        "[GapFill] No STT or audio-vision model configured, skipping audio bridge",
+        "[GapFill] No audio-vision model configured, skipping audio bridge",
         { modality },
       );
       return null;
@@ -666,8 +603,8 @@ export class GapFillExecutor {
 
     try {
       const mimeType =
-        "mimeType" in part && part.mimeType
-          ? String(part.mimeType)
+        "mediaType" in part && part.mediaType
+          ? String(part.mediaType)
           : "audio/webm";
 
       let fileData: FilePart;
@@ -702,7 +639,7 @@ export class GapFillExecutor {
               fileData,
               {
                 type: "text" as const,
-                text: "Transcribe the speech in this audio file. Output only the transcribed text with no additional commentary. If there is no speech, describe what you hear briefly.",
+                text: "Describe what you hear in this audio file in 1-3 sentences. If it contains speech, transcribe the spoken words. If it contains music, describe the instruments, genre, and mood. Be specific and concise.",
               },
             ],
           },
@@ -800,15 +737,15 @@ export class GapFillExecutor {
     );
 
     try {
-      // Build file part — pass data or URL depending on what's available
+      // Build file part - pass data or URL depending on what's available
       let fileData: FilePart;
       if ("data" in part && part.data) {
         fileData = {
           type: "file" as const,
           data: part.data,
           mediaType:
-            "mimeType" in part && part.mimeType
-              ? (part.mimeType as `video/${string}`)
+            "mediaType" in part && part.mediaType
+              ? (part.mediaType as `video/${string}`)
               : "video/mp4",
         };
       } else if ("url" in part && part.url) {
@@ -816,8 +753,8 @@ export class GapFillExecutor {
           type: "file" as const,
           data: new URL(String(part.url)),
           mediaType:
-            "mimeType" in part && part.mimeType
-              ? (part.mimeType as `video/${string}`)
+            "mediaType" in part && part.mediaType
+              ? (part.mediaType as `video/${string}`)
               : "video/mp4",
         };
       } else {
@@ -942,7 +879,7 @@ export class GapFillExecutor {
           ? "Describe this video in detail. Include the visual content, actions, scene, style, and any notable elements. This description will be shown to another AI model that cannot see video."
           : "Describe this audio in detail. Include the content, instruments, mood, tempo, and any notable elements. This description will be shown to another AI model that cannot hear audio.";
 
-    // Build content parts per modality — separate paths for correct typing
+    // Build content parts per modality - separate paths for correct typing
     const contentParts: ImagePart | FilePart =
       modality === "image"
         ? { type: "image" as const, image: new URL(mediaUrl) }

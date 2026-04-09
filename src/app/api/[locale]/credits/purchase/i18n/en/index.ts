@@ -41,10 +41,10 @@ export const translations = {
       features: {
         credits: "{{count}} credits included",
         expiry: "Credits never expire",
-        bestFor: "Best for occasional usage",
+        bestFor: "Stack on top of your monthly credits",
       },
       requiresSubscription:
-        "An active subscription is required to purchase credit packs",
+        "Credit packs are for subscribers who need more. Subscribe first to unlock them.",
       totalSummary: "{{totalCredits}} credits total · {{totalPrice}} total",
     },
     submit: {

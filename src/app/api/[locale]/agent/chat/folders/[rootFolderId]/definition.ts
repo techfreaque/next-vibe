@@ -27,10 +27,15 @@ import {
   UserRoleDB,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazy } from "react";
+
 import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
 import { DefaultFolderId } from "../../config";
 import { scopedTranslation } from "./i18n";
-import { FoldersListContainer } from "./widget/widget";
+
+const FoldersListContainer = lazy(() =>
+  import("./widget/widget").then((m) => ({ default: m.FoldersListContainer })),
+);
 
 /**
  * Get Folders List Endpoint (GET)

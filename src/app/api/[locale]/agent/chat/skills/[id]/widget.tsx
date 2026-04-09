@@ -10,13 +10,18 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "next-vibe-ui/ui/collapsible";
-import { Div } from "next-vibe-ui/ui/div";
+import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { Brain } from "next-vibe-ui/ui/icons/Brain";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
+import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
+import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { Film } from "next-vibe-ui/ui/icons/Film";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Mic } from "next-vibe-ui/ui/icons/Mic";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Share2 } from "next-vibe-ui/ui/icons/Share2";
@@ -28,71 +33,75 @@ import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
+import { Image } from "next-vibe-ui/ui/image";
 import { Input } from "next-vibe-ui/ui/input";
+import { Link } from "next-vibe-ui/ui/link";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
-  getBestImageVisionModel,
-  getBestVideoVisionModel,
-  getBestAudioVisionModel,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
-import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
-import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
-import {
-  DEFAULT_CHAT_MODEL_SELECTION,
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+  DEFAULT_CHAT_MODEL_SELECTION,
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
 } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
-import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import {
   chatModelSelectionSchema,
+  getBestChatModel,
   type ChatModelSelection,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
+  getBestAudioVisionModel,
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
   type AudioVisionModelSelection,
   type ImageVisionModelSelection,
   type VideoVisionModelSelection,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
+  getBestImageGenModel,
   imageGenModelSelectionSchema,
   type ImageGenModelSelection,
 } from "@/app/api/[locale]/agent/image-generation/models";
-import {
-  musicGenModelSelectionSchema,
-  type MusicGenModelSelection,
-} from "@/app/api/[locale]/agent/music-generation/models";
-import {
-  sttModelSelectionSchema,
-  type SttModelSelection,
-} from "@/app/api/[locale]/agent/speech-to-text/models";
-import {
-  voiceModelSelectionSchema,
-  type VoiceModelSelection,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
-import {
-  videoGenModelSelectionSchema,
-  type VideoGenModelSelection,
-} from "@/app/api/[locale]/agent/video-generation/models";
+import { type AnyModelOptionWithVision } from "@/app/api/[locale]/agent/models/all-models";
+import { modelProviders } from "@/app/api/[locale]/agent/models/models";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
-import { ttsModelOptions } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
+import {
+  getBestMusicGenModel,
+  musicGenModelSelectionSchema,
+  type MusicGenModelSelection,
+} from "@/app/api/[locale]/agent/music-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import {
+  getBestSttModel,
+  sttModelSelectionSchema,
+  type SttModelSelection,
+} from "@/app/api/[locale]/agent/speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import {
+  getBestTtsModel,
+  ttsModelOptions,
+  voiceModelSelectionSchema,
+  type VoiceModelSelection,
+} from "@/app/api/[locale]/agent/text-to-speech/models";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
+import {
+  getBestVideoGenModel,
+  videoGenModelSelectionSchema,
+  type VideoGenModelSelection,
+} from "@/app/api/[locale]/agent/video-generation/models";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
@@ -775,12 +784,12 @@ export function SkillEditContainer({
                 field={children.systemPrompt}
               />
 
-              {/* Chat model selector */}
-              {form && (
+              {/* ── BRAIN ── */}
+              <ModelGroup
+                icon={<Brain className="w-3.5 h-3.5" />}
+                label={t("get.models.brain")}
+              >
                 <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("patch.chatModel.label")}
-                  </Span>
                   <ModelSelectorTrigger
                     modelSelection={form.watch("modelSelection") ?? undefined}
                     defaultModelSelection={platformChatDefault}
@@ -795,128 +804,16 @@ export function SkillEditContainer({
                     </Span>
                   )}
                 </Div>
-              )}
+              </ModelGroup>
 
-              {/* Voice (TTS) model selector */}
-              {form && (
+              {/* ── EYES ── */}
+              <ModelGroup
+                icon={<Eye className="w-3.5 h-3.5" />}
+                label={t("get.models.eyes")}
+              >
                 <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("patch.voice.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={form.watch("voiceModelSelection")}
-                    allowedRoles={["tts"]}
-                    defaultModelSelection={platformTtsDefault}
-                    placeholder={t("patch.voice.placeholder")}
-                    onClick={() => setActiveSelector("voice")}
-                    locale={locale}
-                    user={user}
-                  />
-                  {form.formState.errors.voiceModelSelection && (
-                    <Span className="text-xs text-destructive">
-                      {form.formState.errors.voiceModelSelection.message}
-                    </Span>
-                  )}
-                </Div>
-              )}
-
-              {/* Image Generation model selector */}
-              {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("patch.imageGenModel.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={form.watch("imageGenModelSelection")}
-                    allowedRoles={["image-gen"]}
-                    defaultModelSelection={platformImageGenDefault}
-                    placeholder={t("patch.imageGenModel.placeholder")}
-                    onClick={() => setActiveSelector("imageGen")}
-                    locale={locale}
-                    user={user}
-                  />
-                  {form.formState.errors.imageGenModelSelection && (
-                    <Span className="text-xs text-destructive">
-                      {form.formState.errors.imageGenModelSelection.message}
-                    </Span>
-                  )}
-                </Div>
-              )}
-
-              {/* Music Generation model selector */}
-              {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("patch.musicGenModel.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={form.watch("musicGenModelSelection")}
-                    allowedRoles={["audio-gen"]}
-                    defaultModelSelection={platformMusicGenDefault}
-                    placeholder={t("patch.musicGenModel.placeholder")}
-                    onClick={() => setActiveSelector("musicGen")}
-                    locale={locale}
-                    user={user}
-                  />
-                  {form.formState.errors.musicGenModelSelection && (
-                    <Span className="text-xs text-destructive">
-                      {form.formState.errors.musicGenModelSelection.message}
-                    </Span>
-                  )}
-                </Div>
-              )}
-
-              {/* Video Generation model selector */}
-              {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("patch.videoGenModel.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={form.watch("videoGenModelSelection")}
-                    allowedRoles={["video-gen"]}
-                    defaultModelSelection={platformVideoGenDefault}
-                    placeholder={t("patch.videoGenModel.placeholder")}
-                    onClick={() => setActiveSelector("videoGen")}
-                    locale={locale}
-                    user={user}
-                  />
-                  {form.formState.errors.videoGenModelSelection && (
-                    <Span className="text-xs text-destructive">
-                      {form.formState.errors.videoGenModelSelection.message}
-                    </Span>
-                  )}
-                </Div>
-              )}
-
-              {/* STT model selector */}
-              {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("patch.sttModel.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={form.watch("sttModelSelection")}
-                    allowedRoles={["stt"]}
-                    defaultModelSelection={platformSttDefault}
-                    placeholder={t("patch.sttModel.placeholder")}
-                    onClick={() => setActiveSelector("stt")}
-                    locale={locale}
-                    user={user}
-                  />
-                  {form.formState.errors.sttModelSelection && (
-                    <Span className="text-xs text-destructive">
-                      {form.formState.errors.sttModelSelection.message}
-                    </Span>
-                  )}
-                </Div>
-              )}
-
-              {/* Image Vision model selector */}
-              {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("patch.imageVisionModel.label")}
+                  <Span className="text-xs opacity-40">
+                    {t("get.models.slots.imageVision")}
                   </Span>
                   <ModelSelectorTrigger
                     modelSelection={form.watch("imageVisionModelSelection")}
@@ -933,13 +830,9 @@ export function SkillEditContainer({
                     </Span>
                   )}
                 </Div>
-              )}
-
-              {/* Video Vision model selector */}
-              {form && (
                 <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("patch.videoVisionModel.label")}
+                  <Span className="text-xs opacity-40">
+                    {t("get.models.slots.videoVision")}
                   </Span>
                   <ModelSelectorTrigger
                     modelSelection={form.watch("videoVisionModelSelection")}
@@ -956,13 +849,54 @@ export function SkillEditContainer({
                     </Span>
                   )}
                 </Div>
-              )}
+              </ModelGroup>
 
-              {/* Audio Vision model selector */}
-              {form && (
+              {/* ── EARS & VOICE ── */}
+              <ModelGroup
+                icon={<Mic className="w-3.5 h-3.5" />}
+                label={t("get.models.ears")}
+              >
                 <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("patch.audioVisionModel.label")}
+                  <Span className="text-xs opacity-40">
+                    {t("get.models.slots.stt")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("sttModelSelection")}
+                    allowedRoles={["stt"]}
+                    defaultModelSelection={platformSttDefault}
+                    placeholder={t("patch.sttModel.placeholder")}
+                    onClick={() => setActiveSelector("stt")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.sttModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.sttModelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs opacity-40">
+                    {t("get.models.slots.tts")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("voiceModelSelection")}
+                    allowedRoles={["tts"]}
+                    defaultModelSelection={platformTtsDefault}
+                    placeholder={t("patch.voice.placeholder")}
+                    onClick={() => setActiveSelector("voice")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.voiceModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.voiceModelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs opacity-40">
+                    {t("get.models.slots.audioVision")}
                   </Span>
                   <ModelSelectorTrigger
                     modelSelection={form.watch("audioVisionModelSelection")}
@@ -979,7 +913,71 @@ export function SkillEditContainer({
                     </Span>
                   )}
                 </Div>
-              )}
+              </ModelGroup>
+
+              {/* ── MEDIA ── */}
+              <ModelGroup
+                icon={<Film className="w-3.5 h-3.5" />}
+                label={t("get.models.media")}
+              >
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs opacity-40">
+                    {t("get.models.slots.imageGen")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("imageGenModelSelection")}
+                    allowedRoles={["image-gen"]}
+                    defaultModelSelection={platformImageGenDefault}
+                    placeholder={t("patch.imageGenModel.placeholder")}
+                    onClick={() => setActiveSelector("imageGen")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.imageGenModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.imageGenModelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs opacity-40">
+                    {t("get.models.slots.musicGen")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("musicGenModelSelection")}
+                    allowedRoles={["audio-gen"]}
+                    defaultModelSelection={platformMusicGenDefault}
+                    placeholder={t("patch.musicGenModel.placeholder")}
+                    onClick={() => setActiveSelector("musicGen")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.musicGenModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.musicGenModelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs opacity-40">
+                    {t("get.models.slots.videoGen")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("videoGenModelSelection")}
+                    allowedRoles={["video-gen"]}
+                    defaultModelSelection={platformVideoGenDefault}
+                    placeholder={t("patch.videoGenModel.placeholder")}
+                    onClick={() => setActiveSelector("videoGen")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.videoGenModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.videoGenModelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+              </ModelGroup>
 
               {/* Context Memory Budget */}
               {form && (
@@ -1161,6 +1159,143 @@ function useViewDefaults(): {
   }, [user, env]);
 }
 
+/** Compact read-only model card - slot label + provider icon + model name + credit cost */
+function ModelCard({
+  model,
+  slot,
+  locale,
+  nameClassName,
+}: {
+  model: AnyModelOptionWithVision;
+  slot: string;
+  locale: CountryLanguage;
+  nameClassName?: string;
+}): React.JSX.Element {
+  const provider = modelProviders[model.provider];
+  const providerIcon = provider?.icon as IconKey | undefined;
+
+  return (
+    <Div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        padding: "10px 12px",
+        borderRadius: 10,
+        border: "1px solid rgba(255,255,255,0.07)",
+        background: "rgba(255,255,255,0.03)",
+        minWidth: 0,
+      }}
+    >
+      <Span style={{ flexShrink: 0, opacity: 0.6 }}>
+        {providerIcon ? (
+          <Icon icon={providerIcon} className="w-5 h-5" />
+        ) : (
+          <Sparkles className="w-5 h-5" />
+        )}
+      </Span>
+      <Div style={{ flex: 1, minWidth: 0 }}>
+        <Span
+          style={{
+            display: "block",
+            fontSize: 10,
+            fontWeight: 700,
+            opacity: 0.4,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            lineHeight: 1.2,
+            marginBottom: 2,
+          }}
+        >
+          {slot}
+        </Span>
+        <Span
+          className={`block text-[13px] font-semibold leading-snug overflow-hidden text-ellipsis whitespace-nowrap${nameClassName ? ` ${nameClassName}` : ""}`}
+        >
+          {model.name}
+        </Span>
+        <Div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            lineHeight: 1.3,
+          }}
+        >
+          <Span style={{ fontSize: 11, opacity: 0.45, flexShrink: 0 }}>
+            {provider?.name ?? model.provider}
+          </Span>
+          <Span
+            aria-hidden
+            style={{
+              fontSize: 11,
+              opacity: 0.25,
+              flexShrink: 0,
+              lineHeight: 1,
+            }}
+          >
+            {
+              // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string
+              "·"
+            }
+          </Span>
+          <ModelCreditDisplay
+            modelId={model.id}
+            variant="text"
+            className="text-[11px] opacity-45 leading-none"
+            locale={locale}
+          />
+        </Div>
+      </Div>
+    </Div>
+  );
+}
+
+/** Group of ModelCards/selectors with icon heading and responsive grid */
+export function ModelGroup({
+  icon,
+  label,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  children: React.ReactNode;
+}): React.JSX.Element {
+  return (
+    <Div className="flex flex-col gap-2">
+      <Div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          opacity: 0.45,
+        }}
+      >
+        <Span style={{ display: "flex", alignItems: "center" }}>{icon}</Span>
+        <Span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+          }}
+        >
+          {label}
+        </Span>
+      </Div>
+      <Div
+        style={{
+          display: "grid",
+          gap: 8,
+          gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+        }}
+      >
+        {children}
+      </Div>
+    </Div>
+  );
+}
+
 export function SkillViewContainer({
   field,
 }: GetWidgetProps): React.JSX.Element {
@@ -1176,9 +1311,11 @@ export function SkillViewContainer({
   const defaultVariant = variants?.find((v) => v.isDefault) ?? variants?.[0];
   const modelSelection = defaultVariant?.modelSelection;
   const skillOwnership = field.value?.skillOwnership;
-  const skillId = navigation?.current?.params?.urlPathParams?.id as
-    | string
-    | undefined;
+  const form = useWidgetForm<typeof definitionGet.GET>();
+  const skillId =
+    (navigation?.current?.params?.urlPathParams?.id as string | undefined) ??
+    (form?.getValues?.("id") as string | undefined) ??
+    undefined;
 
   const skillData = field.value;
   const { addToFavorites } = useAddToFavorites({
@@ -1220,8 +1357,58 @@ export function SkillViewContainer({
   };
 
   const isOwner = skillOwnership === SkillOwnershipType.USER;
+  const isLoading = !field.value;
+  const env = useEnvAvailability();
 
-  // Shared content section (system prompt + model)
+  // Resolve all models once for the view
+  const resolvedModels = useMemo(() => {
+    const sv = field.value;
+    const chatSel =
+      sv?.variants?.[0]?.modelSelection ??
+      modelSelection ??
+      viewDefaults.chat ??
+      null;
+    const ttsSel = sv?.voiceModelSelection ?? viewDefaults.tts ?? null;
+    const sttSel = sv?.sttModelSelection ?? viewDefaults.stt ?? null;
+    const imageVisionSel =
+      sv?.imageVisionModelSelection ?? viewDefaults.imageVision ?? null;
+    const videoVisionSel =
+      sv?.videoVisionModelSelection ?? viewDefaults.videoVision ?? null;
+    const audioVisionSel =
+      sv?.audioVisionModelSelection ?? viewDefaults.audioVision ?? null;
+    const imageGenSel =
+      sv?.imageGenModelSelection ?? viewDefaults.imageGen ?? null;
+    const musicGenSel =
+      sv?.musicGenModelSelection ?? viewDefaults.musicGen ?? null;
+    const videoGenSel =
+      sv?.videoGenModelSelection ?? viewDefaults.videoGen ?? null;
+    return {
+      chat: chatSel ? getBestChatModel(chatSel, user, env) : null,
+      tts: ttsSel ? getBestTtsModel(ttsSel, user, env) : null,
+      stt: sttSel ? getBestSttModel(sttSel, user, env) : null,
+      imageVision: imageVisionSel
+        ? getBestImageVisionModel(imageVisionSel, user, env)
+        : null,
+      videoVision: videoVisionSel
+        ? getBestVideoVisionModel(videoVisionSel, user, env)
+        : null,
+      audioVision: audioVisionSel
+        ? getBestAudioVisionModel(audioVisionSel, user, env)
+        : null,
+      imageGen: imageGenSel
+        ? getBestImageGenModel(imageGenSel, user, env)
+        : null,
+      musicGen: musicGenSel
+        ? getBestMusicGenModel(musicGenSel, user, env)
+        : null,
+      videoGen: videoGenSel
+        ? getBestVideoGenModel(videoGenSel, user, env)
+        : null,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [field.value, user, env, modelSelection]);
+
+  // Shared content section (system prompt + models)
   const ContentSection = (
     <>
       {/* System Prompt Collapsible */}
@@ -1259,170 +1446,302 @@ export function SkillViewContainer({
         </Collapsible>
       )}
 
-      {/* Chat Model - View Only */}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-xs font-medium text-muted-foreground">
-          {t("patch.chatModel.label")}
-        </Span>
-        <ModelSelectorTrigger
-          modelSelection={modelSelection ?? undefined}
-          defaultModelSelection={viewDefaults.chat}
-          placeholder={t("patch.chatModel.placeholder")}
-          locale={locale}
-          user={user}
-        />
-      </Div>
+      {/* ── BRAIN ── */}
+      {resolvedModels.chat && (
+        <ModelGroup
+          icon={<Brain className="w-3.5 h-3.5" />}
+          label={t("get.models.brain")}
+        >
+          <ModelCard
+            model={resolvedModels.chat}
+            slot={t("get.models.slots.chat")}
+            locale={locale}
+          />
+        </ModelGroup>
+      )}
 
-      {/* Voice (TTS) - View Only */}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-xs font-medium text-muted-foreground">
-          {t("patch.voice.label")}
-        </Span>
-        <ModelSelectorTrigger
-          modelSelection={field.value?.voiceModelSelection ?? undefined}
-          allowedRoles={["tts"]}
-          defaultModelSelection={viewDefaults.tts}
-          placeholder={t("patch.voice.placeholder")}
-          locale={locale}
-          user={user}
-        />
-      </Div>
+      {/* ── EYES ── image + video vision */}
+      {(resolvedModels.imageVision ?? resolvedModels.videoVision) && (
+        <ModelGroup
+          icon={<Eye className="w-3.5 h-3.5" />}
+          label={t("get.models.eyes")}
+        >
+          {resolvedModels.imageVision && (
+            <ModelCard
+              model={resolvedModels.imageVision}
+              slot={t("get.models.slots.imageVision")}
+              locale={locale}
+            />
+          )}
+          {resolvedModels.videoVision && (
+            <ModelCard
+              model={resolvedModels.videoVision}
+              slot={t("get.models.slots.videoVision")}
+              locale={locale}
+            />
+          )}
+        </ModelGroup>
+      )}
 
-      {/* Image Generation - View Only */}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-xs font-medium text-muted-foreground">
-          {t("patch.imageGenModel.label")}
-        </Span>
-        <ModelSelectorTrigger
-          modelSelection={field.value?.imageGenModelSelection ?? undefined}
-          allowedRoles={["image-gen"]}
-          defaultModelSelection={viewDefaults.imageGen}
-          placeholder={t("patch.imageGenModel.placeholder")}
-          locale={locale}
-          user={user}
-        />
-      </Div>
+      {/* ── EARS & VOICE ── STT + TTS + audio vision */}
+      {(resolvedModels.stt ??
+        resolvedModels.tts ??
+        resolvedModels.audioVision) && (
+        <ModelGroup
+          icon={<Mic className="w-3.5 h-3.5" />}
+          label={t("get.models.ears")}
+        >
+          {resolvedModels.stt && (
+            <ModelCard
+              model={resolvedModels.stt}
+              slot={t("get.models.slots.stt")}
+              locale={locale}
+            />
+          )}
+          {resolvedModels.tts && (
+            <ModelCard
+              model={resolvedModels.tts}
+              slot={t("get.models.slots.tts")}
+              locale={locale}
+            />
+          )}
+          {resolvedModels.audioVision && (
+            <ModelCard
+              model={resolvedModels.audioVision}
+              slot={t("get.models.slots.audioVision")}
+              locale={locale}
+            />
+          )}
+        </ModelGroup>
+      )}
 
-      {/* Music Generation - View Only */}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-xs font-medium text-muted-foreground">
-          {t("patch.musicGenModel.label")}
-        </Span>
-        <ModelSelectorTrigger
-          modelSelection={field.value?.musicGenModelSelection ?? undefined}
-          allowedRoles={["audio-gen"]}
-          defaultModelSelection={viewDefaults.musicGen}
-          placeholder={t("patch.musicGenModel.placeholder")}
-          locale={locale}
-          user={user}
-        />
-      </Div>
-
-      {/* Video Generation - View Only */}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-xs font-medium text-muted-foreground">
-          {t("patch.videoGenModel.label")}
-        </Span>
-        <ModelSelectorTrigger
-          modelSelection={field.value?.videoGenModelSelection ?? undefined}
-          allowedRoles={["video-gen"]}
-          defaultModelSelection={viewDefaults.videoGen}
-          placeholder={t("patch.videoGenModel.placeholder")}
-          locale={locale}
-          user={user}
-        />
-      </Div>
-
-      {/* STT - View Only */}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-xs font-medium text-muted-foreground">
-          {t("patch.sttModel.label")}
-        </Span>
-        <ModelSelectorTrigger
-          modelSelection={field.value?.sttModelSelection ?? undefined}
-          allowedRoles={["stt"]}
-          defaultModelSelection={viewDefaults.stt}
-          placeholder={t("patch.sttModel.placeholder")}
-          locale={locale}
-          user={user}
-        />
-      </Div>
-
-      {/* Image Vision - View Only */}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-xs font-medium text-muted-foreground">
-          {t("patch.imageVisionModel.label")}
-        </Span>
-        <ModelSelectorTrigger
-          modelSelection={field.value?.imageVisionModelSelection ?? undefined}
-          allowedRoles={["image-vision"]}
-          defaultModelSelection={viewDefaults.imageVision}
-          placeholder={t("patch.imageVisionModel.placeholder")}
-          locale={locale}
-          user={user}
-        />
-      </Div>
-
-      {/* Video Vision - View Only */}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-xs font-medium text-muted-foreground">
-          {t("patch.videoVisionModel.label")}
-        </Span>
-        <ModelSelectorTrigger
-          modelSelection={field.value?.videoVisionModelSelection ?? undefined}
-          allowedRoles={["video-vision"]}
-          defaultModelSelection={viewDefaults.videoVision}
-          placeholder={t("patch.videoVisionModel.placeholder")}
-          locale={locale}
-          user={user}
-        />
-      </Div>
-
-      {/* Audio Vision - View Only */}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-xs font-medium text-muted-foreground">
-          {t("patch.audioVisionModel.label")}
-        </Span>
-        <ModelSelectorTrigger
-          modelSelection={field.value?.audioVisionModelSelection ?? undefined}
-          allowedRoles={["audio-vision"]}
-          defaultModelSelection={viewDefaults.audioVision}
-          placeholder={t("patch.audioVisionModel.placeholder")}
-          locale={locale}
-          user={user}
-        />
-      </Div>
+      {/* ── MEDIA ── image + music + video gen */}
+      {(resolvedModels.imageGen ??
+        resolvedModels.musicGen ??
+        resolvedModels.videoGen) && (
+        <ModelGroup
+          icon={<Film className="w-3.5 h-3.5" />}
+          label={t("get.models.media")}
+        >
+          {resolvedModels.imageGen && (
+            <ModelCard
+              model={resolvedModels.imageGen}
+              slot={t("get.models.slots.imageGen")}
+              locale={locale}
+            />
+          )}
+          {resolvedModels.musicGen && (
+            <ModelCard
+              model={resolvedModels.musicGen}
+              slot={t("get.models.slots.musicGen")}
+              locale={locale}
+            />
+          )}
+          {resolvedModels.videoGen && (
+            <ModelCard
+              model={resolvedModels.videoGen}
+              slot={t("get.models.slots.videoGen")}
+              locale={locale}
+            />
+          )}
+        </ModelGroup>
+      )}
     </>
   );
 
+  const creator = field.value?.creatorProfile ?? null;
+  const accent = creator?.creatorAccentColor ?? "#8b5cf6";
+
   return (
     <Div className="flex flex-col gap-0">
-      <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
+      <Div className="flex flex-row gap-2 px-4 pt-4 pb-2">
         <NavigateButtonWidget field={children.backButton} />
       </Div>
 
-      <Div className="group overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4 flex flex-col gap-4">
-        <SkillCard
-          icon={field.value?.icon ?? null}
-          name={field.value?.name ?? null}
-          tagline={field.value?.tagline ?? null}
-          description={field.value?.description ?? null}
-          voiceModelSelection={field.value?.voiceModelSelection ?? null}
-          skillOwnership={skillOwnership ?? SkillOwnershipType.SYSTEM}
-          locale={locale}
-          isLoading={!field.value}
-          isAddedToFav={isAddedToFav}
-          addToFavorites={addToFavorites}
-          skillId={skillId ?? ""}
-          field={field}
-          navigation={navigation}
-          logger={logger}
-          user={user}
-          t={t}
-          isOwner={isOwner}
-          handleDelete={handleDelete}
-        />
-        {ContentSection}
+      <Div className="group flex flex-col">
+        {/* ── HERO ── */}
+        <Div
+          style={{
+            position: "relative",
+            textAlign: "center",
+            padding: "20px 24px 28px",
+            overflow: "hidden",
+            background: `radial-gradient(ellipse 70% 60% at 50% 40%, ${accent}18 0%, transparent 70%)`,
+          }}
+        >
+          {/* creator row - above skill identity */}
+          {creator && <CreatorRow creator={creator} />}
+
+          {/* icon */}
+          <Div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: creator ? 20 : 4,
+              marginBottom: 16,
+            }}
+          >
+            <Span
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: 20,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: `linear-gradient(135deg, ${accent}28, ${accent}0a)`,
+                border: `1px solid ${accent}30`,
+                boxShadow: `0 0 40px ${accent}20`,
+              }}
+            >
+              {field.value?.icon ? (
+                <Span style={{ color: `${accent}cc` }}>
+                  <Icon
+                    icon={field.value.icon as IconKey}
+                    className="w-9 h-9"
+                  />
+                </Span>
+              ) : (
+                <Skeleton className="w-9 h-9 rounded-full" />
+              )}
+            </Span>
+          </Div>
+
+          {/* name */}
+          {field.value?.name ? (
+            <Span
+              style={{
+                display: "block",
+                fontSize: "clamp(32px, 8vw, 56px)",
+                fontWeight: 900,
+                letterSpacing: "-0.04em",
+                lineHeight: 0.95,
+                background: `linear-gradient(150deg, #fff 30%, ${accent}aa 90%)`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                marginBottom: 10,
+              }}
+            >
+              {field.value.name}
+            </Span>
+          ) : (
+            <Skeleton className="h-12 w-48 mx-auto mb-3" />
+          )}
+
+          {/* tagline */}
+          {field.value?.tagline ? (
+            <Span
+              style={{
+                display: "block",
+                fontSize: 14,
+                opacity: 0.7,
+                lineHeight: 1.5,
+                marginBottom: field.value.description ? 16 : 4,
+              }}
+            >
+              {field.value.tagline}
+            </Span>
+          ) : (
+            <Skeleton className="h-4 w-40 mx-auto mb-2" />
+          )}
+
+          {/* description */}
+          {field.value?.description && (
+            <Span
+              style={{
+                display: "block",
+                fontSize: 13,
+                opacity: 0.55,
+                lineHeight: 1.6,
+                maxWidth: 480,
+                margin: "0 auto",
+                textAlign: "center",
+              }}
+            >
+              {field.value.description}
+            </Span>
+          )}
+        </Div>
+
+        {/* ── ACTIONS ── */}
+        <Div className="px-4 pb-4 flex flex-col gap-4">
+          {!isLoading && (
+            <Div className="flex items-center gap-2 flex-wrap">
+              {!isAddedToFav && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="gap-1"
+                  onClick={addToFavorites}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Zap className="h-4 w-4" />
+                  )}
+                  {t("get.quickAdd")}
+                </Button>
+              )}
+              <CustomizeAndAddButton
+                skillId={skillId ?? ""}
+                field={field}
+                navigation={navigation}
+                logger={logger}
+                user={user}
+                locale={locale}
+                t={t}
+                variant={isAddedToFav ? "default" : "outline"}
+                size="sm"
+              />
+              <ShareEarnButton
+                skillId={skillId ?? ""}
+                locale={locale}
+                t={t}
+                user={user}
+                logger={logger}
+              />
+              {isOwner ? (
+                <>
+                  <Div className="flex-1" />
+                  <EditSkillButton
+                    skillId={skillId ?? ""}
+                    navigation={navigation}
+                    t={t}
+                    isOwner={true}
+                    variant="outline"
+                    size="sm"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1 text-destructive hover:bg-destructive/10"
+                    onClick={handleDelete}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    {t("get.delete")}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Div className="flex-1" />
+                  <EditSkillButton
+                    skillId={skillId ?? ""}
+                    navigation={navigation}
+                    t={t}
+                    isOwner={false}
+                    variant="outline"
+                    size="sm"
+                  />
+                </>
+              )}
+            </Div>
+          )}
+
+          {/* ── DETAILS ── */}
+          <Div className="flex flex-col gap-4">{ContentSection}</Div>
+        </Div>
       </Div>
     </Div>
   );
@@ -1433,6 +1752,96 @@ const ownershipIcon = {
   [SkillOwnershipType.SYSTEM]: Sparkles,
   [SkillOwnershipType.PUBLIC]: Users,
 };
+
+const CREATOR_SOCIALS = [
+  { key: "twitterUrl", label: "X" },
+  { key: "youtubeUrl", label: "YouTube" },
+  { key: "instagramUrl", label: "Instagram" },
+  { key: "tiktokUrl", label: "TikTok" },
+  { key: "githubUrl", label: "GitHub" },
+  { key: "discordUrl", label: "Discord" },
+  { key: "websiteUrl", label: "Website" },
+] as const;
+
+type CreatorProfile = NonNullable<SkillGetResponseOutput["creatorProfile"]>;
+
+/**
+ * Compact creator attribution row - shown at the top of skill view when skill is user-owned
+ */
+function CreatorRow({
+  creator,
+}: {
+  creator: CreatorProfile;
+}): React.JSX.Element {
+  const accent = creator.creatorAccentColor ?? "#8b5cf6";
+  const socialLinks = CREATOR_SOCIALS.flatMap(({ key, label }) => {
+    const url = creator[key as keyof CreatorProfile];
+    return typeof url === "string" && url ? [{ url, label }] : [];
+  });
+
+  return (
+    <Div className="flex items-start gap-3 px-1 pb-1">
+      {/* avatar */}
+      <Span
+        style={{
+          flexShrink: 0,
+          borderRadius: "50%",
+          overflow: "hidden",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 36,
+          height: 36,
+          border: `1.5px solid ${accent}44`,
+          background: `${accent}12`,
+        }}
+      >
+        {creator.avatarUrl ? (
+          <Image
+            src={creator.avatarUrl}
+            alt={creator.publicName}
+            width={36}
+            height={36}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        ) : (
+          <Span style={{ color: `${accent}88` }}>
+            <User className="w-4 h-4" />
+          </Span>
+        )}
+      </Span>
+      {/* name + bio + socials */}
+      <Div className="flex flex-col gap-0.5 min-w-0">
+        <Span className="text-sm font-semibold leading-tight">
+          {creator.publicName}
+        </Span>
+        {creator.bio && (
+          <Span className="text-xs text-muted-foreground line-clamp-1 leading-snug">
+            {creator.bio}
+          </Span>
+        )}
+        {socialLinks.length > 0 && (
+          <Div className="flex flex-wrap gap-1 mt-0.5">
+            {socialLinks.map(({ url, label }) => (
+              <Link
+                key={label}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="no-underline"
+              >
+                <Span className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground hover:text-foreground transition-colors opacity-65 rounded-full border border-current px-1.5 py-px">
+                  {label}
+                  <ExternalLink className="w-2 h-2" />
+                </Span>
+              </Link>
+            ))}
+          </Div>
+        )}
+      </Div>
+    </Div>
+  );
+}
 
 function VoiceDisplayName({
   voiceModelSelection,
@@ -1676,6 +2085,14 @@ function ShareEarnButton({
   const [creating, setCreating] = useState(false);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [popoverRect, setPopoverRect] = useState<DOMRect | null>(null);
+  const wrapperRef = useRef<DivRefObject>(null);
+
+  useEffect(() => {
+    if (open && wrapperRef.current) {
+      setPopoverRect(wrapperRef.current.getBoundingClientRect());
+    }
+  }, [open]);
 
   const handleOpen = async (): Promise<void> => {
     if (open) {
@@ -1764,136 +2181,160 @@ function ShareEarnButton({
     }
   };
 
-  return (
-    <Div className="relative">
-      <Button
-        variant="outline"
-        size="sm"
-        className="gap-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
-        onClick={handleOpen}
-      >
-        <DollarSign className="h-3.5 w-3.5" />
-        {t("get.share.button")}
-      </Button>
-
-      {open && (
-        <Div className="absolute right-0 top-full mt-2 z-50 w-80 rounded-xl border bg-card shadow-lg p-4 flex flex-col gap-3">
-          <Div className="flex items-center justify-between">
-            <Div className="flex items-center gap-2">
-              <Share2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-              <Span className="font-semibold text-sm">
-                {t("get.share.title")}
-              </Span>
-            </Div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6"
-              onClick={() => setOpen(false)}
-            >
-              <X className="h-3.5 w-3.5" />
-            </Button>
-          </Div>
-
-          <Span className="text-xs text-muted-foreground">
-            {t("get.share.description")}
-          </Span>
-
-          {loading ? (
-            <Div className="flex items-center justify-center py-4">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            </Div>
-          ) : codes !== null && codes.length > 0 ? (
-            <>
-              <Div className="flex flex-col gap-1.5">
-                <Span className="text-xs font-medium text-muted-foreground">
-                  {t("get.share.selectCode")}
+  const popoverContent =
+    open && popoverRect
+      ? createPortal(
+          <Div
+            style={{
+              position: "fixed",
+              zIndex: 9999,
+              width: 320,
+              top: popoverRect.bottom + 8,
+              right: window.innerWidth - popoverRect.right,
+              borderRadius: 12,
+              border: "1px solid hsl(var(--border))",
+              backgroundColor: "hsl(var(--popover))",
+              boxShadow:
+                "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+              padding: 16,
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+            }}
+          >
+            <Div className="flex items-center justify-between">
+              <Div className="flex items-center gap-2">
+                <Share2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <Span className="font-semibold text-sm">
+                  {t("get.share.title")}
                 </Span>
-                {codes.map((c) => (
-                  <Button
-                    key={c.code}
-                    variant={selectedCode === c.code ? "default" : "outline"}
-                    size="sm"
-                    className="justify-start gap-2 font-mono text-xs"
-                    onClick={() => setSelectedCode(c.code)}
-                  >
-                    {c.code}
-                    {c.label && (
-                      <Span className="font-sans text-muted-foreground">
-                        {c.label}
-                      </Span>
-                    )}
-                  </Button>
-                ))}
               </Div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() => setOpen(false)}
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            </Div>
 
-              {shareUrl && (
+            <Span className="text-xs text-muted-foreground">
+              {t("get.share.description")}
+            </Span>
+
+            {loading ? (
+              <Div className="flex items-center justify-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </Div>
+            ) : codes !== null && codes.length > 0 ? (
+              <>
                 <Div className="flex flex-col gap-1.5">
                   <Span className="text-xs font-medium text-muted-foreground">
-                    {t("get.share.linkReady")}
+                    {t("get.share.selectCode")}
                   </Span>
-                  <Div className="flex items-center gap-2">
-                    <Div className="flex-1 rounded-md border bg-muted/50 px-2.5 py-1.5 text-xs font-mono truncate">
-                      {shareUrl}
-                    </Div>
+                  {codes.map((c) => (
                     <Button
-                      variant="default"
+                      key={c.code}
+                      variant={selectedCode === c.code ? "default" : "outline"}
                       size="sm"
-                      className="gap-1 shrink-0"
-                      onClick={handleCopy}
+                      className="justify-start gap-2 font-mono text-xs"
+                      onClick={() => setSelectedCode(c.code)}
                     >
-                      {copied ? (
-                        <>
-                          <Check className="h-3.5 w-3.5" />
-                          {t("get.share.copied")}
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-3.5 w-3.5" />
-                          {t("get.share.copyLink")}
-                        </>
+                      {c.code}
+                      {c.label && (
+                        <Span className="font-sans text-muted-foreground">
+                          {c.label}
+                        </Span>
                       )}
                     </Button>
-                  </Div>
+                  ))}
                 </Div>
-              )}
-            </>
-          ) : (
-            <Div className="flex flex-col gap-2">
-              <Span className="text-xs text-muted-foreground">
-                {t("get.share.noCodesYet")}
-              </Span>
-              <Div className="flex gap-2">
-                <Input
-                  value={newCode}
-                  onChange={(e) => setNewCode(e.target.value)}
-                  placeholder={t("get.share.codePlaceholder")}
-                  className="h-8 text-xs font-mono"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      void handleCreate();
-                    }
-                  }}
-                />
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={handleCreate}
-                  disabled={creating || newCode.trim().length < 3}
-                  className="shrink-0"
-                >
-                  {creating ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    t("get.share.createCode")
-                  )}
-                </Button>
+
+                {shareUrl && (
+                  <Div className="flex flex-col gap-1.5">
+                    <Span className="text-xs font-medium text-muted-foreground">
+                      {t("get.share.linkReady")}
+                    </Span>
+                    <Div className="flex items-center gap-2">
+                      <Div className="flex-1 rounded-md border bg-muted/50 px-2.5 py-1.5 text-xs font-mono truncate">
+                        {shareUrl}
+                      </Div>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="gap-1 shrink-0"
+                        onClick={handleCopy}
+                      >
+                        {copied ? (
+                          <>
+                            <Check className="h-3.5 w-3.5" />
+                            {t("get.share.copied")}
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-3.5 w-3.5" />
+                            {t("get.share.copyLink")}
+                          </>
+                        )}
+                      </Button>
+                    </Div>
+                  </Div>
+                )}
+              </>
+            ) : (
+              <Div className="flex flex-col gap-2">
+                <Span className="text-xs text-muted-foreground">
+                  {t("get.share.noCodesYet")}
+                </Span>
+                <Div className="flex gap-2">
+                  <Input
+                    value={newCode}
+                    onChange={(e) => setNewCode(e.target.value)}
+                    placeholder={t("get.share.codePlaceholder")}
+                    className="h-8 text-xs font-mono"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        void handleCreate();
+                      }
+                    }}
+                  />
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={handleCreate}
+                    disabled={creating || newCode.trim().length < 3}
+                    className="shrink-0"
+                  >
+                    {creating ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      t("get.share.createCode")
+                    )}
+                  </Button>
+                </Div>
               </Div>
-            </Div>
-          )}
-        </Div>
-      )}
-    </Div>
+            )}
+          </Div>,
+          document.body,
+        )
+      : null;
+
+  return (
+    <>
+      <Div ref={wrapperRef} className="inline-flex">
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
+          onClick={handleOpen}
+        >
+          <DollarSign className="h-3.5 w-3.5" />
+          {t("get.share.button")}
+        </Button>
+      </Div>
+      {popoverContent}
+    </>
   );
 }
 

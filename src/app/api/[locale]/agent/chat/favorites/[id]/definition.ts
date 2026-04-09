@@ -72,7 +72,7 @@ import {
   FAVORITE_UPDATE_ALIAS,
 } from "../constants";
 
-import { ChatModelId, ChatModelIdOptions } from "../../../ai-stream/models";
+import { ChatModelId } from "../../../ai-stream/models";
 import { scopedTranslation } from "./i18n";
 
 const FavoriteEditContainer = lazy(() =>
@@ -650,19 +650,6 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: audioVisionModelSelectionSchema.nullable().optional(),
       }),
-      translationModelId: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: ChatModelIdOptions,
-        label: "patch.translationModel.label" as const,
-        description: "patch.translationModel.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-        schema: z.enum(ChatModelId).nullable().optional(),
-      }),
       imageGenModelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -1042,12 +1029,6 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         hidden: true,
         schema: audioVisionModelSelectionSchema.nullable().optional(),
-      }),
-
-      translationModelId: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.enum(ChatModelId).optional(),
       }),
 
       imageGenModelSelection: responseField(scopedTranslation, {

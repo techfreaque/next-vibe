@@ -1,15 +1,17 @@
 import { z } from "zod";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { ChatModelId, chatModelOptionsIndex } from "../ai-stream/models";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
-  PriceLevel,
   SpeedLevel,
 } from "../chat/skills/enum";
+import {
+  filtersSelectionSchema,
+  sharedFilterPropsSchema,
+} from "../models/selection";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -24,7 +26,6 @@ import {
   type ModelProviderConfigTokenBased,
   type ModelProviderEnvAvailability,
 } from "../models/models";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 export enum ImageGenModelId {
   FLUX_PRO = "flux-pro",
@@ -50,7 +51,7 @@ export enum ImageGenModelId {
   IMAGEN_4_FAST = "imagen-4-fast",
   QWEN_T2I = "qwen-t2i",
   REALTIME_T2I = "realtime-t2i",
-  // BEGIN:llm-generated — do not edit manually, updated by price updater
+  // BEGIN:llm-generated - do not edit manually, updated by price updater
   GEMINI_3_1_FLASH_IMAGE_PREVIEW = "gemini-3.1-flash-image-preview",
   GEMINI_3_PRO_IMAGE_PREVIEW = "gemini-3-pro-image-preview",
   GPT_5_IMAGE_MINI = "gpt-5-image-mini",
@@ -58,7 +59,7 @@ export enum ImageGenModelId {
   // END:llm-generated
 }
 
-/** IDs of LLM-based chat models that also produce images — definitions are derived from the chat model, not duplicated here */
+/** IDs of LLM-based chat models that also produce images - definitions are derived from the chat model, not duplicated here */
 export const llmImageGenModelIds = [
   ImageGenModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
   ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
@@ -90,6 +91,14 @@ export const imageGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "flux-pro-1.1",
         creditCostPerImage: 6, // updated: 2026-04-04 from modelslab.com
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.FLUX_PRO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "flux-pro",
+        creditCostPerImage: 7.8, // updated: 2026-04-07 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -134,6 +143,14 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
+      {
+        id: ImageGenModelId.FLUX_2_MAX,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "flux-2-max",
+        creditCostPerImage: 9.1, // updated: 2026-04-07 from unbottled.ai
+        supportedSizes: [],
+        supportedQualities: [],
+      },
     ],
     utilities: [
       ModelUtility.IMAGE_GEN,
@@ -167,6 +184,14 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
+      {
+        id: ImageGenModelId.FLUX_2_KLEIN_4B,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "flux-2-klein-4b",
+        creditCostPerImage: 1.82, // updated: 2026-04-07 from unbottled.ai
+        supportedSizes: [],
+        supportedQualities: [],
+      },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
@@ -193,10 +218,20 @@ export const imageGenModelDefinitions: Record<
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "sourceful/riverflow-v2-pro",
         creditCostPerImage: 15, // updated: 2026-03-31 from openrouter-api
-        pricingByResolution: { "1024px": 15, "2048px": 15, "4096px": 33 }, // updated: 2026-04-04 from openrouter-api
+        pricingByResolution: { "1024px": 15, "2048px": 15, "4096px": 33 }, // updated: 2026-04-07 from openrouter-api
         supportedResolutions: ["1024px", "2048px", "4096px"], // updated: 2026-04-04 from openrouter-api
         supportedSizes: [],
         supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.RIVERFLOW_V2_PRO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "riverflow-v2-pro",
+        creditCostPerImage: 19.5, // updated: 2026-04-07 from unbottled.ai
+        supportedResolutions: ["1024px", "2048px", "4096px"],
+        supportedSizes: [],
+        supportedQualities: [],
+        pricingByResolution: { "1024px": 19.5, "2048px": 19.5, "4096px": 42.9 }, // updated: 2026-04-07 from unbottled.ai
       },
     ],
     utilities: [
@@ -228,10 +263,20 @@ export const imageGenModelDefinitions: Record<
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "sourceful/riverflow-v2-fast",
         creditCostPerImage: 2, // updated: 2026-03-31 from openrouter-api
-        pricingByResolution: { "1024px": 2, "2048px": 4 }, // updated: 2026-04-04 from openrouter-api
+        pricingByResolution: { "1024px": 2, "2048px": 4 }, // updated: 2026-04-07 from openrouter-api
         supportedResolutions: ["1024px", "2048px"], // updated: 2026-04-04 from openrouter-api
         supportedSizes: [],
         supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.RIVERFLOW_V2_FAST,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "riverflow-v2-fast",
+        creditCostPerImage: 2.6, // updated: 2026-04-07 from unbottled.ai
+        supportedResolutions: ["1024px", "2048px"],
+        supportedSizes: [],
+        supportedQualities: [],
+        pricingByResolution: { "1024px": 2.6, "2048px": 5.2 }, // updated: 2026-04-07 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
@@ -259,6 +304,14 @@ export const imageGenModelDefinitions: Record<
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "sourceful/riverflow-v2-max-preview",
         creditCostPerImage: 7.5, // updated: 2026-03-31 from openrouter-api
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.RIVERFLOW_V2_MAX_PREVIEW,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "riverflow-v2-max-preview",
+        creditCostPerImage: 9.75, // updated: 2026-04-07 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -295,6 +348,14 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
+      {
+        id: ImageGenModelId.RIVERFLOW_V2_STANDARD_PREVIEW,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "riverflow-v2-standard-preview",
+        creditCostPerImage: 4.55, // updated: 2026-04-07 from unbottled.ai
+        supportedSizes: [],
+        supportedQualities: [],
+      },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -324,6 +385,14 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
+      {
+        id: ImageGenModelId.RIVERFLOW_V2_FAST_PREVIEW,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "riverflow-v2-fast-preview",
+        creditCostPerImage: 3.9, // updated: 2026-04-07 from unbottled.ai
+        supportedSizes: [],
+        supportedQualities: [],
+      },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
@@ -350,6 +419,14 @@ export const imageGenModelDefinitions: Record<
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "black-forest-labs/flux.2-flex",
         creditCostPerImage: 6, // updated: 2026-03-31 from openrouter-api
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.FLUX_2_FLEX,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "flux-2-flex",
+        creditCostPerImage: 7.8, // updated: 2026-04-07 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -391,6 +468,14 @@ export const imageGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "flux-2-pro",
         creditCostPerImage: 5.4, // updated: 2026-04-04 from modelslab.com
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.FLUX_2_PRO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "flux-2-pro",
+        creditCostPerImage: 3.9, // updated: 2026-04-07 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -441,7 +526,15 @@ export const imageGenModelDefinitions: Record<
           "3:2",
           "2:3",
           "21:9",
-        ], // updated: 2026-04-04 from modelslab.com
+        ], // updated: 2026-04-07 from modelslab.com
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.SEEDREAM_4_5,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "seedream-4.5",
+        creditCostPerImage: 5.2, // updated: 2026-04-07 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -471,6 +564,14 @@ export const imageGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "gen4_image_turbo",
         creditCostPerImage: 2.5, // updated: 2026-03-31 from modelslab.com
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.GEN4_T2I_TURBO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gen4-t2i-turbo",
+        creditCostPerImage: 3.25, // updated: 2026-04-07 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -510,7 +611,26 @@ export const imageGenModelDefinitions: Record<
           "113:48",
           "88:38",
           "7:3",
-        ], // updated: 2026-04-04 from modelslab.com
+        ], // updated: 2026-04-07 from modelslab.com
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.GEN4_IMAGE,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gen4-image",
+        creditCostPerImage: 11.44, // updated: 2026-04-07 from unbottled.ai
+        supportedAspectRatios: [
+          "16:9",
+          "9:16",
+          "1:1",
+          "85:48",
+          "4:3",
+          "3:4",
+          "113:48",
+          "88:38",
+          "7:3",
+        ],
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -540,6 +660,14 @@ export const imageGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "wan-2.7-t2i",
         creditCostPerImage: 3, // updated: 2026-04-04 from modelslab.com
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.WAN_2_7_T2I,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "wan-2.7-t2i",
+        creditCostPerImage: 3.9, // updated: 2026-04-07 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -573,6 +701,15 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
+      {
+        id: ImageGenModelId.GROK_T2I,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "grok-t2i",
+        creditCostPerImage: 3.12, // updated: 2026-04-07 from unbottled.ai
+        supportedAspectRatios: ["1:1", "9:16", "3:4", "4:3", "16:9"],
+        supportedSizes: [],
+        supportedQualities: [],
+      },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -599,6 +736,14 @@ export const imageGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "z-image-base",
         creditCostPerImage: 0.47, // updated: 2026-04-04 from modelslab.com
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.Z_IMAGE_BASE,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "z-image-base",
+        creditCostPerImage: 0.611, // updated: 2026-04-07 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -631,6 +776,14 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
+      {
+        id: ImageGenModelId.Z_IMAGE_TURBO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "z-image-turbo",
+        creditCostPerImage: 0.611, // updated: 2026-04-07 from unbottled.ai
+        supportedSizes: [],
+        supportedQualities: [],
+      },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
@@ -657,6 +810,14 @@ export const imageGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "flux-pro-1.1-ultra",
         creditCostPerImage: 8, // updated: 2026-04-04 from modelslab.com
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.FLUX_PRO_1_1_ULTRA,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "flux-pro-1.1-ultra",
+        creditCostPerImage: 10.4, // updated: 2026-04-07 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -694,6 +855,15 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
+      {
+        id: ImageGenModelId.IMAGEN_4_ULTRA,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "imagen-4-ultra",
+        creditCostPerImage: 9.36, // updated: 2026-04-07 from unbottled.ai
+        supportedAspectRatios: ["1:1", "3:4", "4:3", "9:16", "16:9"],
+        supportedSizes: [],
+        supportedQualities: [],
+      },
     ],
     utilities: [
       ModelUtility.IMAGE_GEN,
@@ -725,6 +895,15 @@ export const imageGenModelDefinitions: Record<
         providerModel: "imagen-4.0",
         creditCostPerImage: 4.4, // updated: 2026-04-04 from modelslab.com
         supportedAspectRatios: ["1:1", "3:4", "4:3", "9:16", "16:9"], // updated: 2026-04-04 from modelslab.com
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.IMAGEN_4,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "imagen-4",
+        creditCostPerImage: 5.72, // updated: 2026-04-07 from unbottled.ai
+        supportedAspectRatios: ["1:1", "3:4", "4:3", "9:16", "16:9"],
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -762,6 +941,15 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
+      {
+        id: ImageGenModelId.IMAGEN_4_FAST,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "imagen-4-fast",
+        creditCostPerImage: 3.12, // updated: 2026-04-07 from unbottled.ai
+        supportedAspectRatios: ["1:1", "3:4", "4:3", "9:16", "16:9"],
+        supportedSizes: [],
+        supportedQualities: [],
+      },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
@@ -791,6 +979,14 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
+      {
+        id: ImageGenModelId.QWEN_T2I,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "qwen-t2i",
+        creditCostPerImage: 0.611, // updated: 2026-04-07 from unbottled.ai
+        supportedSizes: [],
+        supportedQualities: [],
+      },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
@@ -817,6 +1013,14 @@ export const imageGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "realtime-t2i",
         creditCostPerImage: 0.47, // updated: 2026-04-04 from modelslab.com
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.REALTIME_T2I,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "realtime-t2i",
+        creditCostPerImage: 0.611, // updated: 2026-04-07 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -913,7 +1117,7 @@ function chatModelToImageGenOption(
   return null;
 }
 
-// BEGIN:llm-image-defs — LLM multimodal models that output images; definitions derived from chat models
+// BEGIN:llm-image-defs - LLM multimodal models that output images; definitions derived from chat models
 const llmImageGenModelOptions: ImageGenModelOption[] = (
   [
     chatModelToImageGenOption(
@@ -1114,44 +1318,67 @@ export function getImageGenModelById(
   return imageGenModelOptionsIndex[modelId];
 }
 
+/**
+ * Resolve an image gen model option using a specific API provider.
+ * Picks the cheapest provider variant for `modelId` that matches `provider`.
+ * Falls back to the default (cheapest overall) if no matching provider exists.
+ */
+export function getImageGenModelForProvider(
+  modelId: ImageGenModelId,
+  provider: ApiProvider,
+): ImageGenModelOption | undefined {
+  // LLM-based image gen models (Gemini, GPT image variants) are not in imageGenModelDefinitions
+  if ((llmImageGenModelIds as readonly string[]).includes(modelId)) {
+    return getImageGenModelById(modelId);
+  }
+  const def = imageGenModelDefinitions[modelId as DedicatedImageGenModelId];
+  if (!def) {
+    return undefined;
+  }
+  const matching = [...def.providers]
+    .filter((p) => p.apiProvider === provider)
+    .toSorted((a, b) => getProviderPrice(a) - getProviderPrice(b));
+
+  for (const p of matching) {
+    if (p.creditCostPerImage !== undefined) {
+      return {
+        id: modelId as DedicatedImageGenModelId,
+        name: def.name,
+        provider: def.by,
+        apiProvider: p.apiProvider,
+        description: def.description,
+        parameterCount: def.parameterCount,
+        contextWindow: def.contextWindow,
+        icon: def.icon,
+        providerModel: p.providerModel,
+        utilities: def.utilities,
+        supportsTools: def.supportsTools,
+        intelligence: def.intelligence,
+        speed: def.speed,
+        content: def.content,
+        features: def.features,
+        weaknesses: def.weaknesses,
+        adminOnly: p.adminOnly,
+        inputs: def.inputs,
+        outputs: def.outputs,
+        voiceMeta: def.voiceMeta,
+        creditCostPerImage: p.creditCostPerImage,
+        supportedSizes: p.supportedSizes,
+        supportedQualities: p.supportedQualities,
+        pricingBySize: p.pricingBySize,
+        pricingByQuality: p.pricingByQuality,
+        supportedAspectRatios: p.supportedAspectRatios,
+      } satisfies ModelOptionImageBased & { id: ImageGenModelId };
+    }
+  }
+
+  // No matching provider - fall back to default
+  return getImageGenModelById(modelId);
+}
+
 // ============================================================
 // IMAGE GEN MODEL SELECTION SCHEMA
 // ============================================================
-
-const sharedFilterPropsSchema = z.object({
-  intelligenceRange: z
-    .object({
-      min: z.enum(IntelligenceLevel).optional(),
-      max: z.enum(IntelligenceLevel).optional(),
-    })
-    .optional(),
-  priceRange: z
-    .object({
-      min: z.enum(PriceLevel).optional(),
-      max: z.enum(PriceLevel).optional(),
-    })
-    .optional(),
-  contentRange: z
-    .object({
-      min: z.enum(ContentLevel).optional(),
-      max: z.enum(ContentLevel).optional(),
-    })
-    .optional(),
-  speedRange: z
-    .object({
-      min: z.enum(SpeedLevel).optional(),
-      max: z.enum(SpeedLevel).optional(),
-    })
-    .optional(),
-  sortBy: z.enum(ModelSortField).optional(),
-  sortDirection: z.enum(ModelSortDirection).optional(),
-  sortBy2: z.enum(ModelSortField).optional(),
-  sortDirection2: z.enum(ModelSortDirection).optional(),
-});
-
-const filtersSelectionSchema = z
-  .object({ selectionType: z.literal(ModelSelectionType.FILTERS) })
-  .merge(sharedFilterPropsSchema);
 
 export const imageGenModelSelectionSchema = z.discriminatedUnion(
   "selectionType",

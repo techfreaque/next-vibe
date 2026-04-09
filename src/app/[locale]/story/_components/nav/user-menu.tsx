@@ -83,6 +83,13 @@ export function UserMenu({
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className="cursor-pointer">
+          <Link href={`/${locale}/user/settings`}>
+            <Settings className="mr-2 h-4 w-4" />
+            <Span>{t("nav.settings")}</Span>
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild className="cursor-pointer">
           <Link href={`/${locale}/help`}>
             <HelpCircle className="mr-2 h-4 w-4" />
             <Span>{t("nav.help")}</Span>

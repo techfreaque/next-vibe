@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
@@ -171,15 +170,6 @@ export function ReferralPageClient({
       <Div className="absolute inset-0 bg-gradient-to-b from-violet-500/8 via-background to-background -z-10" />
 
       <Div className="container px-4 md:px-6 py-8 md:py-12 max-w-4xl mx-auto">
-        {/* Back Button */}
-        <Link
-          href={`/${locale}/threads`}
-          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-10"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {t("backToChat")}
-        </Link>
-
         {/* ── HERO ── */}
         <Div className="mb-12">
           <Badge variant="secondary" className="mb-4 gap-1.5 text-xs">

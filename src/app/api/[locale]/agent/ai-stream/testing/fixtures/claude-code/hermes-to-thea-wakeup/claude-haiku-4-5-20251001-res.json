@@ -1,0 +1,567 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[HT1 direct-wakeup] Use the tool-help tool on the thea instance (prefix: thea__) to look up \"generate_image\". Use wakeUp callback mode. Reply STEP_OK when the tool result is available, or FAILED: <reason>.",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user is asking me to:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n1. Use the tool-help tool on the \"thea\" instance\n2. Look up \"generate_image\"\n3. Use wakeUp callback mode\n4. Reply STEP_OK when the tool result is available,"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " or FAILED: <reason>\n\nLooking at the context, I see:\n- There are remote instances"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " available\n- The context mentions \"Remote tools use the same callbackMode system"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " as local tools. Default is \"wait\" - the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tool result arrives automatically once the remote instance finishes execution"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ".\"\n- The user has 1 connected local instance:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " \"hermes\" - but this task asks for"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " \"thea\" instance\n\nWait, let me re-read. The task says \"thea instance (prefix: thea__)"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\". This suggests there's a thea instance available. Looking at the execute-tool documentation, it mentions `instance"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Id` parameter.\n\nHowever, I don't see \"thea\" mentioned in the context under"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " \"Remote Instances\". Let me check again... The context says \"User"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " has 1 connected local instance: - \"hermes\"\".\n\nSo it seems like there's only \"her"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "mes\" available, not \"thea\". But the task specifically asks for \"thea instance (prefix: thea__)\".\n\nLet me try to call"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the tool-help tool with instanceId=\"thea\". The tool-help function has an optional instanceId parameter.\n\nActually, looking"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " at the tool-help schema:\n```\n\"instanceId\": {\"type\": \"string\"}\n```\n\nAnd looking"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " at execute-tool:\n```\n\"instanceId\": {\"type\": \"string\"}\n```\n\nSo I should be able"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " to specify instanceId=\"thea\" in the tool-help call. Let me do that with callbackMode=\"wakeUp\".\n\nThe tool-help function signature is:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n- query (optional string)\n- toolName"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " (optional string)\n"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\n- category (optional string)\n-"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " page (optional number)\n- pageSize (optional number)\n- instanceId (optional string)\n- callbackMode (optional enum)\n\nFor this task, I need to call tool-help with query=\"generate_image\", instanceId=\"thea\","
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " and callbackMode=\"wakeUp\" to retrieve information about the generate_image tool on the remote"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " thea instance."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "f124a880-ef22-423d-8dea-57fbe97547b2",
+      "toolName": "tool-help",
+      "input": "{\"query\":\"generate_image\",\"instanceId\":\"thea\",\"callbackMode\":\"wakeUp\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "f124a880-ef22-423d-8dea-57fbe97547b2",
+      "toolName": "tool-help",
+      "result": "{\n  \"taskId\": \"local-wu-1775434873120-qb008x\",\n  \"status\": \"status.pending\",\n  \"hint\": \"Result will be injected when complete. Call wait-for-task only if you need the result before continuing.\"\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The tool has"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " been detached with wakeUp mode. The taskId is \"local-wu-1"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "775434873120-qb008x\" and the status is \"status.pending\". The hint says the result will be injected when complete, and I"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " should only call wait-for-task if I need the result before continuing.\n\nAccording to the instructions, with wakeUp mode, \"The result"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " is automatically injected into this thread when ready - the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " stream revives and you will see the tool result as"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " a new message. Do NOT call wait-for-task for wakeUp.\""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nSo I should wait for the result to be automatically injected. But the user is asking me"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " to \"Reply STEP_OK when the tool result is available\". This suggests I should wait for the result and then respond with STEP_OK.\n\nActually"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ", let me re-read the instructions: \"wakeUp - Fire and forget. Returns `{"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "taskId}` immediately. The result is automatically injected into this thread when ready - the stream revives and you will see the tool result as a new message.\"\n\nSo the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " stream should automatically revive when the task is complete, and I'll see the result."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " But for now, I just got the taskId and pending status. I should wait for the automatic"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " injection.\n\nHowever, the user is asking me to \"Reply STEP_OK when the tool result is available, or FAILED: <reason>\". This suggests I should wait"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " for the result.\n\nLet me check if I should use wait-for-task. The instructions say \"Do NOT call wait-for-task for wakeUp.\" So I should just wait for the automatic"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " injection.\n\nBut I need to acknowledge that I've initiated the task. Since"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the task is now pending and will inject the result automatically, I should probably wait and see if"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the result comes through. But I can't just sit here doing nothing -"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the user is asking me to reply when the result is available.\n\nActually, I think the right approach is to wait for the result to be inj"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "ected automatically due to wakeUp mode. "
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nThe"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " stream should pause and then revive with the result once it's ready. Since I've received the pending status, I'm now waiting for the automatic"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " continuation with the result. In this interface, I need to hold and"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " see if another message arrives with the tool's output."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nRe"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-reading the instructions: calling wait-for-task blocks until completion and the stream resumes with the result automatically"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ". But the guidance explicitly says not to use"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " wait-for-task for wakeUp since it automatically injects the result instead. The expectation appears to be that the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " result will be injected as a new message in this thread without requiring additional tool calls from"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " me. I should simply wait without making further calls and let the system deliver the result."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " The user's instruction to reply STEP_OK when the tool result is available suggests I need to actively acknowledge"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " once it arrives."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " wakeUp mode will automatically inject the result as the next message, at which point I should respond with STEP_OK.\n\nI've already made the tool"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " call and received a pending status. Since the system handles the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " injection automatically in wakeUp mode, I just need to wait for that result to appear. The next message should contain the injected result, and then"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " I can acknowledge it with STEP_OK."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " task is pending with a wakeUp mode call, so I'm"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " waiting for the system to automatically inject the result into this thread. Once that happens, I should respond with STEP_OK if"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " successful or FAILED with a reason if something goes wrong. I can't make"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " another tool call to wait—the system will handle sending me the next message with the injected result, and that's when"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " I'll provide the appropriate response."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " of"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the task in the background, then resume the stream with the result. But"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " in this text interface, I need to wait for the next message from the system containing the actual result"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " before I can reply with STEP_OK or FAILED.\n\nSo my approach should"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " be: acknowledge that the task is initiated and pending, then wait for the system to inject the result as a follow-up message. Once I see"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " that result, I'll respond appropriately with STEP_OK or the failure reason."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " message"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " to complete the interaction.\n\nLooking at the function result more"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " carefully, the hint indicates the result will be automatically injected once the task completes,"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " and I should only call wait-for-task if I actually need the result before proceeding. Since the w"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "akeUp task doesn't require me to act on its result, I should simply wait for the injection without"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " making additional calls. Once the result arrives, I'll respond with the appropriate status message to"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " finish the exchange."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " wakeUp call is fire-and-forget, so the result will be"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " automatically injected back into this thread without me needing to do anything else. The stream will pause and then resume with the tool"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " result appearing as a new message. Once that happens, I can respond with STEP_OK. For"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " now, I should just acknowledge that the task has been initiated and wait for the system to inject the result."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " result is pending and will be injected automatically, so I should wait for that injection before responding."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " The user's instruction to \"Reply STEP_OK when the tool result is available\" suggests I should hold off until"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the result actually arrives. I'll wait silently rather than send an"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " intermediate message, since the system will handle the injection."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " I"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " need to understand the wakeUp flow correctly. The tool returns"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " a taskId immediately, then the result gets automatically injected into the conversation when ready—the stream will"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " resume on its own and I'll see the result as a new message. I shouldn"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "'t call wait-for-task or do anything else; I just need to wait for that automatic injection to happen."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " system should automatically inject the result as a new message, which I'll then acknowledge"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " with STEP_OK. I'll keep my response brief and indicate I'm ready to proceed once"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " that injection arrives."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "Task initiated with wakeUp mode. TaskId: `"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "local-wu-1775434873120-qb008x`. Status: pending. Awaiting automatic result injection..."
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 4733,
+        "totalTokens": 4751,
+        "cachedInputTokens": 6636
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 7316
+        }
+      }
+    }
+  ]
+}

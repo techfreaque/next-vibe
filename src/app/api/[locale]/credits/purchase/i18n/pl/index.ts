@@ -42,12 +42,12 @@ export const translations: typeof enTranslations = {
       features: {
         credits: "{{count}} kredytów w zestawie",
         expiry: "Kredyty nigdy nie wygasają",
-        bestFor: "Najlepsze do okazjonalnego użycia",
+        bestFor: "Dokupujesz gdy miesięczne kredyty się kończą",
       },
       totalSummary:
         "{{totalCredits}} kredytów łącznie · {{totalPrice}} łącznie",
       requiresSubscription:
-        "Aktywna subskrypcja jest wymagana do zakupu pakietów kredytów",
+        "Pakiety kredytów są dla subskrybentów potrzebujących więcej. Najpierw wykup subskrypcję.",
     },
     submit: {
       text: "Kup pakiet kredytów",

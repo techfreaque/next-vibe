@@ -7,17 +7,17 @@ import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 
 import favoritesEndpoint from "@/app/api/[locale]/agent/chat/favorites/definition";
 import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
+import {
+  scopedTranslation as chatScopedTranslation,
+  type ChatT,
+} from "@/app/api/[locale]/agent/chat/i18n";
+import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { CountryLanguage } from "@/i18n/core/config";
-import {
-  scopedTranslation as chatScopedTranslation,
-  type ChatT,
-} from "@/app/api/[locale]/agent/chat/i18n";
-import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 
 const SelectorOnboarding = lazy(() =>
   import("./selector-onboarding").then((mod) => ({
@@ -49,6 +49,10 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
   const logger = useWidgetLogger();
   const { t } = chatScopedTranslation.scopedT(locale);
   const setOnboardingComplete = useTourState((s) => s.setOnboardingComplete);
+  const setOnboardingCompanionId = useTourState(
+    (s) => s.setOnboardingCompanionId,
+  );
+  const tourActive = useTourState((s) => s.isActive);
   const { favorites, isInitialLoading: favoritesLoading } = useChatFavorites(
     logger,
     {
@@ -64,7 +68,12 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
 
   useEffect(() => {
     if (!favoritesLoading && view !== "onboarding") {
-      setView(needsOnboarding ? "onboarding" : "favorites");
+      const nextView = needsOnboarding ? "onboarding" : "favorites";
+      setView(nextView);
+      // Tour is waiting for onboarding signal - fire it immediately when skipping onboarding
+      if (nextView === "favorites" && tourActive) {
+        setOnboardingComplete(true);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [favoritesLoading, needsOnboarding]);
@@ -78,8 +87,9 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
       <Suspense fallback={<LoadingSpinner t={t} />}>
         <SelectorOnboarding
           locale={locale}
-          onDone={() => {
+          onDone={(firstCompanionId) => {
             setView("favorites");
+            setOnboardingCompanionId(firstCompanionId);
             setOnboardingComplete(true);
           }}
         />

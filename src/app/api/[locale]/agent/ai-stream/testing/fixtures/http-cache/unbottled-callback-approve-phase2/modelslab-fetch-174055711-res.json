@@ -1,0 +1,19 @@
+{
+  "type": "text",
+  "url": "https://modelslab.com/api/v6/images/fetch/174055711",
+  "status": 503,
+  "headers": {
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "9e839af4aef3dcc0-FRA",
+    "connection": "keep-alive",
+    "content-length": "19",
+    "content-type": "text/plain",
+    "date": "Mon, 06 Apr 2026 20:40:28 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=1RtwMfISY0kDKRc6t4LyQIRjooWut6cF5ZglDltNtEEKhPjej7KnP1VzZ7ASggcCqNqk504OA5vQVKxLF9IJJK2sPha5kq56Lp6HBuXtHab%2FvjDYMqG3xnsEvAung%2BQ%3D\"}]}",
+    "server": "cloudflare",
+    "x-cloud-trace-context": "15520c8c7a33b3c6849310bd3b297e9d"
+  },
+  "body": "Service Unavailable"
+}

@@ -17,7 +17,7 @@
 ## Dev & Build Commands
 
 - **Server status:** `grep "^PORT:" .tmp/.vibe-dev.pid` → shows active port. Read `.tmp/vibe-dev.log` for recent logs/errors; last line `--- server offline ---` means stopped.
-- **`vibe dev`** - dev server (TanStack/Vite default). Auto-increments port if 3000 is taken. One instance per project; re-running replaces it. Use `nohup vibe dev > /dev/null 2>&1 &` for background. Hot reload — no restart needed between code changes unless explicitly broken.
+- **`vibe dev`** - dev server (TanStack/Vite default). Auto-increments port if 3000 is taken. One instance per project; re-running replaces it. Use `nohup vibe dev > /dev/null 2>&1 &` for background. Hot reload - no restart needed between code changes unless explicitly broken.
 - **`vibe rebuild`** - zero-downtime update. Use for all production updates. `vibe build && vibe start` only for a fresh first start (no running instance).
 - **Rule:** `vibe dev`, `vibe rebuild` are safe to run anytime without asking.
 
@@ -58,30 +58,9 @@ src/app/api/[locale]/<category>/<feature>/
 
 **Widget rules:** Every endpoint gets a widget - the auto-renderer is a last resort for trivial internal tooling only. `widget.tsx` handles web + native (use `useWidgetPlatform()` to branch). `widget.cli.tsx` handles CLI + MCP (use `useInkWidgetPlatform()` to branch - chalk+colors for CLI, plain compact text for MCP, detail threshold for lists). Widgets are scoped to deepest route, self-contained. Shared UI lives in the canonical owner's widget; others import from owner, never reverse. Embed foreign UI via `EndpointsPage` (dialog) or `navigation.push()` - never import internal components.
 
-## Pattern Reference - Read Before You Write
+## Pattern Reference
 
-| File you're working on      | Read this first                          |
-| --------------------------- | ---------------------------------------- |
-| `definition.ts`             | `docs/patterns/definition.md`            |
-| `repository.ts`             | `docs/patterns/repository.md`            |
-| `route.ts`                  | `docs/patterns/route.md`                 |
-| `i18n/` files               | `docs/patterns/i18n.md`                  |
-| `enum.ts`                   | `docs/patterns/enum.md`                  |
-| `db.ts` / schema            | `docs/patterns/database.md`              |
-| `seeds.ts`                  | `docs/patterns/seeds.md`                 |
-| `tasks/` (cron)             | `docs/patterns/tasks.md`                 |
-| Logger usage                | `docs/patterns/logger.md`                |
-| Email sending               | `docs/patterns/email.md`                 |
-| `widget.tsx` / `widget/`    | `docs/patterns/widget.md`                |
-| `widget.cli.tsx`            | `docs/patterns/widget.cli.md`            |
-| `hooks.ts` / `hooks/`       | `docs/patterns/hooks.md`                 |
-| `repository.native.ts`      | `docs/patterns/repository.native.md`     |
-| `repository-client.ts`      | `docs/patterns/repository.client.md`     |
-| `route-client.ts`           | `docs/patterns/repository.client.md`     |
-| `skill.ts` (default-skills) | `docs/patterns/skill.md`                 |
-| `system-prompt/` folder     | `docs/patterns/system-prompt.md`         |
-| Vibe Sense data source      | `docs/patterns/vibe-sense-datasource.md` |
-| `next-vibe-ui` imports      | `docs/patterns/next-vibe-ui.md`          |
+All patterns in `docs/patterns/`. Key ones: `definition.md`, `repository.md`, `route.md`, `i18n.md`, `widget.md`, `widget.cli.md`, `hooks.md`, `database.md`, `enum.md`, `next-vibe-ui.md`. Read the relevant doc before writing any file of that type.
 
 ## Agent Roles
 
@@ -102,7 +81,7 @@ src/app/api/[locale]/<category>/<feature>/
 
 **Never `rm`** . Always `mv` to `./.tmp/todelete/<goodname>/<originalname>`. The past is preserved, not destroyed.
 
-**Git:** Don't use git unless the user explicitly asks. Never reset, checkout, or revert — the present state is what matters. Git history is irrelevant to the work.
+**Git:** Don't use git unless the user explicitly asks. Never reset, checkout, or revert - the present state is what matters. Git history is irrelevant to the work.
 
 **Proactive by default:** If you encounter anything that smells wrong - type errors, inconsistent patterns, broken imports, dead code, misnamed files, half-implemented features - add it to the task list and fix it. Don't wait to be asked. The only exception is large architectural changes or out-of-scope refactors that could break things; those get flagged, not silently done.
 
@@ -127,9 +106,48 @@ A claim about functionality is worthless without verification. The user should n
 2. **No task ID** → summary: what was done, files changed, follow-ups.
 3. Concise and confident. Only ask approval for architectural decisions.
 
+## Copywriting & UI Text - Absolute Rules
+
+**Voice:** Warrior clarity. Direct. Provocative. Zero fluff. Every sentence earns its place.
+
+**What to avoid:**
+
+- Generic marketing phrases ("innovative solution", "seamless experience", "empower your workflow")
+- Coaching language ("unlock your potential", "level up")
+- Filler adjectives that don't add information
+- Passive constructions - always active, always concrete
+- Anything that could appear in a 2022 Instagram ad
+
+**What to aim for:**
+
+- Lead with the problem the user actually feels, not the feature
+- Benefit first, mechanism second: "No data stored - architecture makes it impossible, not policy"
+- Short sentences. Sentence fragments if they hit harder.
+- "Sog" (pull) principle: copy so clear and relevant that users come to you. State the real pain, then remove it.
+- Every headline must be self-explanatory - no interpretation required
+
+**Translations - never literal:**
+
+- EN/DE/PL must each read like a native speaker wrote it for that audience
+- German tends toward compound authority; Polish is direct and slightly warmer; English is punchy
+- If a literal translation sounds robotic or weak, rewrite for the emotion/meaning, not the words
+- Common DE trap: don't translate English idioms word-for-word - find the German equivalent that lands the same punch
+- Test each language independently: would a native speaker cringe or nod?
+
+**Structure for feature blocks (homepage/landing):**
+
+- Hook (3-6 words, scroll-stopping)
+- Subline (1 sentence, concrete benefit, no abstract nouns)
+- 2-3 sentences max body (what it does, why it matters, who it's for)
+- CTA: action verb + specific outcome (not "Learn more" - "Run it on your server")
+
+## Known Transient Issues (TODO: remove when fixed)
+
+- **TDZ `Cannot access '__vite_ssr_import_N__' before initialization`** - caused by other agents modifying files mid-compile. Not a real code bug. 1-3 page refreshes clears it. Do NOT waste time debugging unless it persists after 3 refreshes on a cold page load. This is a framework issue not an actualy circular dependency issue.
+
 ## Memory & CLAUDE.md Hygiene
 
 - After discovering new stable patterns, update CLAUDE.md or memory files proactively.
 - Keep CLAUDE.md under ~130 lines. If adding, remove something outdated first.
 - Remove entries that are stale, superseded, or only needed once.
-- When user says "remember X" or "always do Y" — write it immediately.
+- When user says "remember X" or "always do Y" - write it immediately.

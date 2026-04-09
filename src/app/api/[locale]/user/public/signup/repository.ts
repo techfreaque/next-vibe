@@ -155,12 +155,44 @@ export class SignupRepository {
         );
       }
 
+      // Resolve skillCreatorUserId from lead.skillId (if it's a UUID → look up customSkills owner)
+      let skillCreatorUserId: string | null = null;
+      try {
+        const { db: dbInstance } = await import("@/app/api/[locale]/system/db");
+        const { leads: leadsTable } =
+          await import("@/app/api/[locale]/leads/db");
+        const { eq: eqFn } = await import("drizzle-orm");
+        const [leadRow] = await dbInstance
+          .select({ skillId: leadsTable.skillId })
+          .from(leadsTable)
+          .where(eqFn(leadsTable.id, user.leadId))
+          .limit(1);
+        const skillId = leadRow?.skillId;
+        if (skillId && /^[0-9a-f-]{36}$/i.test(skillId)) {
+          // UUID skillId — look up the skill owner in customSkills
+          const { customSkills } =
+            await import("@/app/api/[locale]/agent/chat/skills/db");
+          const [skill] = await dbInstance
+            .select({ userId: customSkills.userId })
+            .from(customSkills)
+            .where(eqFn(customSkills.id, skillId))
+            .limit(1);
+          skillCreatorUserId = skill?.userId ?? null;
+        }
+        // If skillId is not a UUID (built-in skill), skillCreatorUserId stays null
+      } catch (skillErr) {
+        logger.warn("Failed to resolve skillCreatorUserId from lead.skillId", {
+          error: String(skillErr),
+        });
+      }
+
       // Convert lead referral to user referral (Phase 2: make referral permanent)
       await ReferralRepository.convertLeadReferralToUser(
         userData.id,
         user.leadId,
         logger,
         locale,
+        skillCreatorUserId,
       );
 
       // Merge lead wallet into user wallet immediately (not lazy)

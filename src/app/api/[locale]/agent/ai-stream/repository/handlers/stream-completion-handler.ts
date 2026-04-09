@@ -55,7 +55,7 @@ export class StreamCompletionHandler {
     // Finalize current ASSISTANT message if exists.
     // Emits CONTENT_DONE and does the final DB flush.
     if (ctx.currentAssistantMessageId && ctx.currentAssistantContent) {
-      logger.info("[AI Stream] Calling finalizeAssistantMessage", {
+      logger.debug("[AI Stream] Calling finalizeAssistantMessage", {
         messageId: ctx.currentAssistantMessageId,
         contentLength: ctx.currentAssistantContent.length,
       });

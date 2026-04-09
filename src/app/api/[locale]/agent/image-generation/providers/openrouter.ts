@@ -40,7 +40,7 @@ export async function generateWithOpenRouter(params: {
     });
   }
 
-  logger.info("[OpenRouter Image] Generating image", {
+  logger.debug("[OpenRouter Image] Generating image", {
     model: providerModel,
     promptLength: prompt.length,
   });
@@ -108,7 +108,7 @@ export async function generateWithOpenRouter(params: {
       });
     }
 
-    logger.info("[OpenRouter Image] Image generated successfully");
+    logger.debug("[OpenRouter Image] Image generated successfully");
     return success({ imageUrl });
   } catch (error) {
     const errorMessage = parseError(error).message;

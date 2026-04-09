@@ -1,0 +1,36 @@
+{
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "method": "POST",
+  "headers": {
+    "authorization": "[redacted]",
+    "content-type": "application/json",
+    "http-referer": "https://unbottled.ai",
+    "user-agent": "ai/6.0.141 ai-sdk/provider-utils/4.0.1 runtime/bun/1.3.10",
+    "x-openrouter-categories": "general-chat,roleplay,personal-agent",
+    "x-title": "Unbottled AI"
+  },
+  "body": {
+    "messages": [
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "content": [
+          {
+            "image_url": {
+              "url": "https://example.com/injected-test-image.jpg"
+            },
+            "type": "image_url"
+          },
+          {
+            "text": "Describe this generated image in detail. Include subject, style, colors, composition, and any notable elements. This description will be shown to another AI model that cannot see images.",
+            "type": "text"
+          }
+        ],
+        "role": "user"
+      }
+    ],
+    "model": "google/gemini-2.5-flash"
+  }
+}

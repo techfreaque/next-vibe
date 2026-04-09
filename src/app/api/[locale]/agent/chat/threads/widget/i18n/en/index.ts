@@ -66,8 +66,11 @@ export const translations = {
     navigation: {
       subscription: "Subscription & Credits",
       referral: "Referral Program",
-      help: "Help",
+      settings: "Profile Settings",
+      leadMagnet: "Lead Magnet",
+      help: "Feedback & Support",
       about: "About",
+      websiteBlog: "Website & Blog",
       admin: "Admin Dashboard",
     },
     confirmations: {
@@ -111,6 +114,11 @@ export const translations = {
         description:
           "Explore 40+ skills - coders, researchers, writers, advisors and more. Add one as a favorite and it shows up right here.",
         tip: "Skills give your AI a clear focus and the right model for the job.",
+      },
+      meetCompanion: {
+        title: "Meet Your Companion",
+        description:
+          "Your companion is ready. Click any variant to start a conversation — each one has a different style and model behind it.",
       },
       rootFolders: {
         title: "Your Chat Folders",

@@ -638,6 +638,7 @@ function InteractiveHelp({
             imageGenModelId: undefined,
             musicGenModelId: undefined,
             videoGenModelId: undefined,
+            isRevival: undefined,
             currentToolMessageId: undefined,
             callerToolCallId: undefined,
             pendingToolMessages: undefined,

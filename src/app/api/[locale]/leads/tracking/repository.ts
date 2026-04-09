@@ -52,6 +52,27 @@ interface AnonymousLeadResult {
 }
 
 /**
+ * Extracts a skillId from a URL path if the path matches /[locale]/skill/[skillId].
+ * Works for relative URLs like "/en/skill/abc-123" or absolute URLs.
+ */
+function extractSkillIdFromUrl(url: string): string | null {
+  try {
+    // Normalize: parse as URL if absolute, otherwise treat as path
+    let path: string;
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      path = new URL(url).pathname;
+    } else {
+      path = url.split("?")[0] ?? url;
+    }
+    // Match /<locale>/skill/<skillId> where skillId is a UUID
+    const match = /\/[^/]+\/skill\/([0-9a-f-]{36})/i.exec(path);
+    return match?.[1] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Handles all server-side tracking operations
  */
 export class LeadTrackingRepository {
@@ -1016,6 +1037,19 @@ export class LeadTrackingRepository {
               ref,
               leadId: currentLeadId,
             },
+          );
+        }
+      }
+
+      // Extract skillId from destination URL if visiting a skill page (first-touch only)
+      if (url && currentLeadId) {
+        const skillIdFromUrl = extractSkillIdFromUrl(url);
+        if (skillIdFromUrl) {
+          void LeadsRepository.updateLeadSkillId(
+            currentLeadId,
+            skillIdFromUrl,
+            false, // first-touch: only set if not already attributed
+            logger,
           );
         }
       }

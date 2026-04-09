@@ -24,6 +24,16 @@ export const translations = {
       createdAt: "Created At",
       updatedAt: "Updated At",
       stripeCustomerId: "Stripe Customer ID",
+      bio: "Bio",
+      websiteUrl: "Website",
+      twitterUrl: "X / Twitter",
+      youtubeUrl: "YouTube",
+      instagramUrl: "Instagram",
+      tiktokUrl: "TikTok",
+      githubUrl: "GitHub",
+      discordUrl: "Discord",
+      creatorAccentColor: "Accent Color",
+      creatorHeaderImageUrl: "Header Image",
       user: {
         title: "User Information",
         description: "User profile details",
@@ -88,6 +98,10 @@ export const translations = {
         title: "Privacy Settings",
         description: "Control who can see your profile information",
       },
+      profileInfo: {
+        title: "Creator Profile",
+        description: "Bio, social links, and branding for your skill pages",
+      },
     },
     fields: {
       email: {
@@ -144,8 +158,9 @@ export const translations = {
         help: "Choose who can view your profile: public (everyone), private (only you), or contacts only",
       },
       marketingConsent: {
-        label: "Marketing Consent",
-        description: "Receive marketing communications",
+        label: "Subscribe to Newsletter",
+        description:
+          "Occasional updates about new models and features. No spam, just what matters.",
         placeholder: "Enable marketing emails",
         help: "Choose whether to receive marketing emails and promotional communications",
       },
@@ -157,6 +172,51 @@ export const translations = {
         validation: {
           maxLength: "Bio cannot exceed 500 characters",
         },
+      },
+      websiteUrl: {
+        label: "Website",
+        description: "Your personal or business website",
+        placeholder: "https://yoursite.com",
+      },
+      twitterUrl: {
+        label: "X / Twitter",
+        description: "Your X (Twitter) profile URL",
+        placeholder: "https://x.com/yourhandle",
+      },
+      youtubeUrl: {
+        label: "YouTube",
+        description: "Your YouTube channel URL",
+        placeholder: "https://youtube.com/@yourchannel",
+      },
+      instagramUrl: {
+        label: "Instagram",
+        description: "Your Instagram profile URL",
+        placeholder: "https://instagram.com/yourhandle",
+      },
+      tiktokUrl: {
+        label: "TikTok",
+        description: "Your TikTok profile URL",
+        placeholder: "https://tiktok.com/@yourhandle",
+      },
+      githubUrl: {
+        label: "GitHub",
+        description: "Your GitHub profile URL",
+        placeholder: "https://github.com/yourusername",
+      },
+      discordUrl: {
+        label: "Discord",
+        description: "Your Discord server or profile link",
+        placeholder: "https://discord.gg/yourserver",
+      },
+      creatorAccentColor: {
+        label: "Accent Color",
+        description: "Hex color for your skill page branding (optional)",
+        placeholder: "#7c3aed",
+      },
+      creatorHeaderImageUrl: {
+        label: "Header Image",
+        description: "Banner image URL for your skill page hero",
+        placeholder: "https://yoursite.com/banner.jpg",
       },
     },
     response: {
@@ -179,6 +239,16 @@ export const translations = {
       createdAt: "Created At",
       updatedAt: "Updated At",
       stripeCustomerId: "Stripe Customer ID",
+      bio: "Bio",
+      websiteUrl: "Website",
+      twitterUrl: "X / Twitter",
+      youtubeUrl: "YouTube",
+      instagramUrl: "Instagram",
+      tiktokUrl: "TikTok",
+      githubUrl: "GitHub",
+      discordUrl: "Discord",
+      creatorAccentColor: "Accent Color",
+      creatorHeaderImageUrl: "Header Image",
       user: "Updated User Information",
       changesSummary: {
         title: "Changes Summary",
@@ -297,6 +367,33 @@ export const translations = {
     profile: "profile",
     user: "user",
     account: "account",
+  },
+
+  widget: {
+    save: "Save Profile",
+    saving: "Saving...",
+    editProfile: "Edit Profile",
+    cancelEdit: "Cancel",
+    memberSince: "Member since",
+    profileCard: {
+      title: "Creator Profile",
+      description: "Your public identity across the platform",
+    },
+    socialCard: {
+      title: "Social Links",
+      description: "Connect your platforms",
+    },
+    emailCard: {
+      title: "Email List",
+      description: "Grow your audience with lead capture",
+    },
+    previewCard: {
+      title: "Your Public Profile",
+      description: "How others see you",
+    },
+    noPreview: "Fill in your profile to see a preview",
+    noSocials: "No social links added yet",
+    viewPublicProfile: "View public profile",
   },
 
   // Sub-routes

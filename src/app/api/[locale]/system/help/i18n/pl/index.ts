@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
       query: {
         label: "Zapytanie wyszukiwania (opcjonalne)",
         description:
-          "Filtruj narzędzia po słowie kluczowym. Słowa oddzielone spacją są wszystkie wymagane. Wyszukuje po nazwie, aliasach, opisie, tagach — dopasowania nazwy/aliasu mają wyższy priorytet. Dokładne dopasowanie nazwy/aliasu automatycznie pokazuje pełne szczegóły. Pozostaw puste aby wyświetlić wszystkie.",
+          "Filtruj narzędzia po słowie kluczowym. Słowa oddzielone spacją są wszystkie wymagane. Wyszukuje po nazwie, aliasach, opisie, tagach - dopasowania nazwy/aliasu mają wyższy priorytet. Dokładne dopasowanie nazwy/aliasu automatycznie pokazuje pełne szczegóły. Pozostaw puste aby wyświetlić wszystkie.",
         placeholder: "np. pobierz url, generowanie obrazów...",
       },
       category: {

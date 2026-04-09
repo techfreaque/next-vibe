@@ -172,7 +172,7 @@ export const translations: typeof enTranslations = {
         pack: "Paket",
         packs: "Pakete",
         requiresSubscription:
-          "Credit-Pakete erfordern ein aktives Abonnement. Abonnieren Sie, um monatliche Credits zu erhalten und die Möglichkeit freizuschalten, Credit-Pakete zu kaufen!",
+          "Credit-Pakete sind für Abonnenten, die mehr als ihr monatliches Kontingent brauchen. Zuerst abonnieren.",
       },
     },
     history: {

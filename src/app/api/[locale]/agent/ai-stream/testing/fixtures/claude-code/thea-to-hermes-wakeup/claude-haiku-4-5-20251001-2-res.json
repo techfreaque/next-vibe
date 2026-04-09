@@ -1,0 +1,191 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[TH1 queue-wakeup] Use the tool-help tool on the hermes-dev instance (prefix: hermes-dev__) to look up the \"generate_image\" tool. Use wakeUp callback mode. Reply STEP_OK when the tool result is available, or FAILED: <reason> if anything went wrong.\n[Tool result for wait-for-task]:\n{\n  \"result\": {\n    \"hint\": \"No capability snapshot for instance \\\"hermes-dev\\\". Connect the instance and wait for a sync pulse.\",\n    \"tools\": [],\n    \"totalCount\": 0,\n    \"matchedCount\": 0\n  },\n  \"status\": \"status.co",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The task"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " is asking me to:\n1. Use the tool-help tool on the hermes-dev instance to look up the \"generate_image\" tool\n2. Use wakeUp callback mode\n3. Reply STEP_OK when the tool result is available, or"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " FAILED: <reason> if something went wrong\n\nThe results show that I've already attempted this and received"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ":\n```\n{\n  \"hint\": \"No capability snapshot for instance \\\"hermes-dev\\\". Connect the instance and wait for a sync pulse.\",\n  \"tools\": [],\n  \"totalCount\": 0,\n  \"matchedCount\": 0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n}\n```\n\nThis indicates that the hermes-dev instance is not currently connected or synchronized. The system is telling me there's no capability snapshot available for this instance, which means it"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " hasn't connected yet and completed a sync pulse.\n\nLooking at the context provided"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " earlier, I see:\n- \"Remote Instances: User has"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " 1 connected local instance: \"hermes\" - use"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " help(instanceId=\"hermes\") to discover tools"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "...\"\n\nWait, the remote instance is called \"hermes\", not \"hermes"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-dev\". Let me re-read the task. The task says \"on the hermes-dev instance (prefix: hermes-dev__)\" - but"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the context says the user has a connected instance called \"hermes\".\n\nActually, looking more carefully at the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " system context section:\n- \"Instance: Cloud production"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " (unbottled.ai)\"\n- \"Instance ID"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ": hermes-dev\"\n- \"Environment: development (NODE_ENV=development)\"\n\nSo"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " hermes-dev is the LOCAL instance (this one), not a remote one.\n\nBut the task is"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " asking me to call tool-help \"on the hermes-dev instance\" with prefix \"hermes-dev__\". This is confusing because"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ":\n1. I AM running on hermes-dev (that's the local dev instance mentioned"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " in the system context)\n"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\n2. The tool-help result shows"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " no capability snapshot for hermes-dev\n\nLooking at the remote instances section again:\n- \"User has 1 connected local instance: \"hermes\" - use help(instanceId=\"hermes\") to discover tools, execute-tool(toolName, instanceId=\"her"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "mes\", input) to run them\"\n\nSo there's a connected instance called \"hermes\" (not hermes-dev). The task explicitly specifies her"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "mes-dev, but that instance lacks a capability snapshot. I need to respond with FAILED since"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the required instance isn't properly initialized."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nThe her"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "mes-dev instance needs to establish a connection and complete a sync cycle before I can retrieve any tool information. Without the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " capability snapshot, I can't look up the generate_image tool as requested."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "FAILED: No capability snapshot for instance \"hermes-dev\". The instance is not currently connected or synchronized. Tool"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " capability discovery requires the instance to complete an initial sync pulse. Unable to retrieve the"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " generate_image tool information at this time."
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 10,
+        "outputTokens": 740,
+        "totalTokens": 750,
+        "cachedInputTokens": 0
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 6992
+        }
+      }
+    }
+  ]
+}

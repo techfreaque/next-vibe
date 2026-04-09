@@ -23,8 +23,8 @@ import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage, ToolCallResult } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
-import { createMetadataSystemMessage } from "../system-prompt/message-metadata";
 import type { ChatModelOption } from "../../models";
+import { createMetadataSystemMessage } from "../system-prompt/message-metadata";
 
 export class MessageConverter {
   /**
@@ -57,6 +57,7 @@ export class MessageConverter {
         const contentParts: Array<
           | { type: "text"; text: string }
           | { type: "image"; image: string | URL }
+          | { type: "file"; data: Uint8Array; mediaType: string }
         > = [];
 
         // Add text content if present
@@ -129,6 +130,16 @@ export class MessageConverter {
                     },
                   );
                 }
+              } else if (
+                attachment.mimeType.startsWith("audio/") ||
+                attachment.mimeType.startsWith("video/")
+              ) {
+                // Audio/video: pass as FilePart (Uint8Array) so models that support it can process it
+                contentParts.push({
+                  type: "file",
+                  data: Buffer.from(base64Data, "base64"),
+                  mediaType: attachment.mimeType,
+                });
               } else if (isDocumentMimeType(attachment.mimeType)) {
                 // Documents (PDF, DOCX, XLSX): Extract text content
                 try {
@@ -241,7 +252,7 @@ export class MessageConverter {
                 .toString("base64")
                 .slice(0, 20)
             : "no-result";
-          logger.info("[CACHE DEBUG] Tool message conversion", {
+          logger.debug("[CACHE DEBUG] Tool message conversion", {
             toolCallId: toolCall.toolCallId,
             toolName: toolCall.toolName,
             resultHash,
@@ -518,7 +529,7 @@ export class MessageConverter {
             supersededToolCallIds.has(toolCall.toolCallId) &&
             !toolCall.isDeferred
           ) {
-            logger.info(
+            logger.debug(
               "[MessageConverter] Skipping superseded tool call - deferred result takes over",
               {
                 toolCallId: toolCall.toolCallId,
@@ -839,10 +850,27 @@ export class MessageConverter {
     ) {
       const mediaResult = result as {
         file?: string;
+        imageUrl?: string;
+        videoUrl?: string;
+        audioUrl?: string;
         text?: string | null;
         mediaType?: string;
         creditCost?: number;
       };
+
+      // Normalize: generate_image/video/music return { imageUrl / videoUrl / audioUrl }
+      // while FilePartHandler (native Gemini gen) stores { file }.
+      // Resolve the canonical file URL from whichever field is present.
+      const fileUrl =
+        mediaResult.file ??
+        mediaResult.imageUrl ??
+        mediaResult.videoUrl ??
+        mediaResult.audioUrl;
+
+      // If neither format has a media URL, fall through to generic JSON passthrough.
+      if (!fileUrl && !mediaResult.text) {
+        return { type: "json", value: result ?? null };
+      }
 
       // Determine which modality this tool produces
       const modality: Modality =
@@ -854,13 +882,13 @@ export class MessageConverter {
 
       const modelCanSee = modelConfig?.inputs?.includes(modality) ?? false;
 
-      if (modelCanSee && mediaResult.file) {
-        // Model supports this modality — pass file URL so it can see its own output.
+      if (modelCanSee && fileUrl) {
+        // Model supports this modality - pass file URL so it can see its own output.
         // Preserve text alongside so model has both the visual and the description.
         return {
           type: "json" as const,
           value: {
-            file: mediaResult.file,
+            file: fileUrl,
             text: mediaResult.text ?? null,
             mediaType: mediaResult.mediaType ?? null,
             creditCost: mediaResult.creditCost ?? null,
@@ -868,12 +896,26 @@ export class MessageConverter {
         };
       }
 
-      // Model cannot see the file — pass only text description.
-      // gap-fill-executor ensures text is populated before this runs.
+      // Model cannot see the file - pass URL + text so the AI can reference it by URL
+      // and also has a text description if gap-fill produced one.
+      // Always include the media URL (imageUrl/videoUrl/audioUrl) so the AI can cite it.
       return {
         type: "json" as const,
         value: {
-          text: mediaResult.text ?? "[generated media]",
+          ...(mediaResult.imageUrl !== undefined && {
+            imageUrl: mediaResult.imageUrl,
+          }),
+          ...(mediaResult.videoUrl !== undefined && {
+            videoUrl: mediaResult.videoUrl,
+          }),
+          ...(mediaResult.audioUrl !== undefined && {
+            audioUrl: mediaResult.audioUrl,
+          }),
+          ...(fileUrl &&
+            !mediaResult.imageUrl &&
+            !mediaResult.videoUrl &&
+            !mediaResult.audioUrl && { file: fileUrl }),
+          text: mediaResult.text ?? null,
           mediaType: mediaResult.mediaType ?? null,
           creditCost: mediaResult.creditCost ?? null,
         } satisfies ToolCallResult,

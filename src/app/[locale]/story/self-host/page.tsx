@@ -25,6 +25,7 @@ import { scopedTranslation } from "./i18n";
 
 export interface SelfHostPageData {
   locale: CountryLanguage;
+  modelCount: number;
 }
 
 export async function tanstackLoader({
@@ -33,7 +34,8 @@ export async function tanstackLoader({
   params: Promise<{ locale: CountryLanguage }>;
 }): Promise<SelfHostPageData> {
   const { locale } = await params;
-  return { locale };
+  const modelCount = getAvailableModelCount(agentEnvAvailability, false);
+  return { locale, modelCount };
 }
 
 export const revalidate = 3600;
@@ -103,19 +105,23 @@ const INCLUDES = [
   "free",
 ] as const;
 
-export function TanstackPage({ locale }: SelfHostPageData): JSX.Element {
-  return <SelfHostPageContent locale={locale} />;
+export function TanstackPage({
+  locale,
+  modelCount,
+}: SelfHostPageData): JSX.Element {
+  return <SelfHostPageContent locale={locale} modelCount={modelCount} />;
 }
 
 function SelfHostPageContent({
   locale,
+  modelCount,
 }: {
   locale: CountryLanguage;
+  modelCount: number;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const modelCount = getAvailableModelCount(agentEnvAvailability, false);
 
   const publicUser: JWTPublicPayloadType = {
     isPublic: true,

@@ -22,7 +22,13 @@ import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import type { WsEmitCallback } from "../../chat/threads/[threadId]/messages/emitter";
 import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
-import { getTtsModelById, type TtsModelId } from "../../text-to-speech/models";
+import {
+  getTtsModelById,
+  ttsModelDefinitions,
+  type TtsModelId,
+} from "../../text-to-speech/models";
+import type { ModelProviderConfigTtsBased } from "@/app/api/[locale]/agent/models/models";
+import { getProviderPrice } from "@/app/api/[locale]/agent/models/models";
 
 /**
  * Minimum skills before emitting a TTS chunk
@@ -267,7 +273,7 @@ export class StreamingTTSHandler {
           this.wsEmit(event);
         }
 
-        this.logger.info("[Streaming TTS] Emitted audio chunk successfully", {
+        this.logger.debug("[Streaming TTS] Emitted audio chunk successfully", {
           chunkIndex: chunkIdx,
           textLength: cleanText.length,
           audioDataLength: audioDataUrl.length,
@@ -330,43 +336,81 @@ export class StreamingTTSHandler {
   }
 
   /**
-   * Generate TTS audio using model-based provider routing.
-   * Routes to OpenAI TTS, Eden AI TTS, or ElevenLabs based on the voice model's ApiProvider.
+   * Check if a TTS provider has its API key configured.
+   */
+  private isProviderAvailable(apiProvider: ApiProvider): boolean {
+    switch (apiProvider) {
+      case ApiProvider.OPENAI_TTS:
+        return Boolean(agentEnv.OPENAI_API_KEY);
+      case ApiProvider.EDEN_AI_TTS:
+        return Boolean(agentEnv.EDEN_AI_API_KEY);
+      case ApiProvider.ELEVENLABS:
+        return Boolean(agentEnv.ELEVENLABS_API_KEY);
+      case ApiProvider.UNBOTTLED:
+        return Boolean(agentEnv.UNBOTTLED_CLOUD_CREDENTIALS);
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Generate TTS audio using model-based provider routing with fallback.
+   * Iterates providers in price order, skipping those without configured API keys.
    * Returns base64 data URL or null on failure.
    */
   private async generateTTS(text: string): Promise<string | null> {
-    const modelOption = getTtsModelById(this.voiceId);
+    const modelDef = ttsModelDefinitions[this.voiceId];
     const language = getLanguageFromLocale(this.locale);
+
+    // Sort providers by price and find the first one with a configured key
+    const sortedProviders = [...modelDef.providers]
+      .filter((p): p is ModelProviderConfigTtsBased => "creditCostPerCharacter" in p)
+      .toSorted((a, b) => getProviderPrice(a) - getProviderPrice(b));
+
+    const provider = sortedProviders.find((p) =>
+      this.isProviderAvailable(p.apiProvider),
+    );
+
+    if (!provider) {
+      this.logger.error("[Streaming TTS] No TTS provider available", {
+        voiceId: this.voiceId,
+        triedProviders: sortedProviders.map((p) => p.apiProvider),
+      });
+      return null;
+    }
 
     this.logger.debug("[Streaming TTS] Generating TTS", {
       voiceId: this.voiceId,
-      apiProvider: modelOption.apiProvider,
+      apiProvider: provider.apiProvider,
       textLength: text.length,
       language,
     });
 
     try {
-      switch (modelOption.apiProvider) {
+      switch (provider.apiProvider) {
         case ApiProvider.OPENAI_TTS:
-          return await this.callOpenAITTS(text, modelOption.providerModel);
+          return await this.callOpenAITTS(text, provider.providerModel);
 
         case ApiProvider.EDEN_AI_TTS: {
           const gender =
-            modelOption.voiceMeta?.gender === "male" ? "MALE" : "FEMALE";
+            modelDef.voiceMeta?.gender === "male" ? "MALE" : "FEMALE";
           return await this.callEdenAITTS(
             text,
-            modelOption.providerModel,
+            provider.providerModel,
             gender,
             language,
           );
         }
 
         case ApiProvider.ELEVENLABS:
-          return await this.callElevenLabsTTS(text, modelOption.providerModel);
+          return await this.callElevenLabsTTS(text, provider.providerModel);
+
+        case ApiProvider.UNBOTTLED:
+          return await this.callUnbottledTTS(text, provider.providerModel);
 
         default:
           this.logger.error("[Streaming TTS] Unsupported TTS provider", {
-            apiProvider: modelOption.apiProvider,
+            apiProvider: provider.apiProvider,
             voiceId: this.voiceId,
           });
           return null;
@@ -388,11 +432,6 @@ export class StreamingTTSHandler {
     text: string,
     providerModel: string,
   ): Promise<string | null> {
-    if (!agentEnv.OPENAI_API_KEY) {
-      this.logger.error("[Streaming TTS] OpenAI API key not configured");
-      return null;
-    }
-
     // Derive voice name from model ID: "openai-nova" → "nova"
     const voiceName = this.voiceId.split("-").slice(1).join("-");
 
@@ -438,11 +477,6 @@ export class StreamingTTSHandler {
     voiceGender: "MALE" | "FEMALE",
     language: string,
   ): Promise<string | null> {
-    if (!agentEnv.EDEN_AI_API_KEY) {
-      this.logger.error("[Streaming TTS] Eden AI API key not configured");
-      return null;
-    }
-
     interface EdenAITTSResponse {
       [provider: string]: {
         audio_resource_url?: string;
@@ -528,18 +562,13 @@ export class StreamingTTSHandler {
     text: string,
     providerModel: string,
   ): Promise<string | null> {
-    if (!agentEnv.ELEVENLABS_API_KEY) {
-      this.logger.error("[Streaming TTS] ElevenLabs API key not configured");
-      return null;
-    }
-
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${providerModel}`,
       {
         method: "POST",
         headers: {
           // eslint-disable-next-line i18next/no-literal-string
-          "xi-api-key": agentEnv.ELEVENLABS_API_KEY,
+          "xi-api-key": agentEnv.ELEVENLABS_API_KEY ?? "",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -586,7 +615,7 @@ export class StreamingTTSHandler {
     });
 
     if (!this.isEnabled || !this.messageId || this.isCancelled) {
-      this.logger.info(
+      this.logger.debug(
         "[Streaming TTS] flush() skipped - not enabled, no messageId, or cancelled",
       );
       return;
@@ -594,7 +623,7 @@ export class StreamingTTSHandler {
 
     // Enqueue remaining buffer content for generation
     const cleanBuffer = this.stripSpecialTags(this.buffer).trim();
-    this.logger.info("[Streaming TTS] flush() cleanBuffer", {
+    this.logger.debug("[Streaming TTS] flush() cleanBuffer", {
       cleanBufferLength: cleanBuffer.length,
       cleanBufferPreview: cleanBuffer.substring(0, 100),
     });
@@ -608,7 +637,7 @@ export class StreamingTTSHandler {
         this.generateAndEmitChunk(cleanBuffer, idx),
       );
     } else {
-      this.logger.info("[Streaming TTS] flush() - no content to emit");
+      this.logger.debug("[Streaming TTS] flush() - no content to emit");
     }
 
     // Wait for ALL background generations + emissions to finish
@@ -643,7 +672,7 @@ export class StreamingTTSHandler {
   cancel(): void {
     this.isCancelled = true;
     this.buffer = "";
-    this.logger.info(
+    this.logger.debug(
       "[Streaming TTS] Cancelled - no further chunks will generate",
     );
   }

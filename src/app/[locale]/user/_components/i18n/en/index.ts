@@ -1,4 +1,10 @@
 export const translations = {
+  subNav: {
+    backToApp: "Back to app",
+    settings: "Profile Settings",
+    leadMagnet: "Lead Magnet",
+    referral: "Referral",
+  },
   auth: {
     common: {
       passwordStrength: {

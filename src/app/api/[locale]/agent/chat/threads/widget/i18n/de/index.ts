@@ -68,8 +68,11 @@ export const translations: typeof enTranslations = {
     navigation: {
       subscription: "Abonnement & Credits",
       referral: "Empfehlungsprogramm",
-      help: "Hilfe",
+      settings: "Profileinstellungen",
+      leadMagnet: "Lead Magnet",
+      help: "Feedback & Support",
       about: "Über uns",
+      websiteBlog: "Website & Blog",
       admin: "Admin-Dashboard",
     },
     confirmations: {
@@ -113,6 +116,11 @@ export const translations: typeof enTranslations = {
         description:
           "Entdecke 40+ Skills - von Programmierern und Forschern bis zu Autoren und Beratern. Füge einen Skill als Favorit hinzu und er erscheint direkt hier.",
         tip: "Skills geben deiner KI einen klaren Fokus und das passende Modell für die Aufgabe.",
+      },
+      meetCompanion: {
+        title: "Dein Begleiter ist bereit",
+        description:
+          "Klicke auf eine Variante, um ein Gespräch zu starten — jede hat einen anderen Stil und ein anderes Modell dahinter.",
       },
       rootFolders: {
         title: "Ihre Chat-Ordner",

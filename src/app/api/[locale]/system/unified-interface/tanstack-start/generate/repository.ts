@@ -338,7 +338,7 @@ export class GenerateTanstackRoutesRepository {
     const isClientComponent =
       GenerateTanstackRoutesRepository.hasUseClientDirective(srcFile) ||
       GenerateTanstackRoutesRepository.hasSyncDefaultExport(srcFile);
-    // Respect Next.js `export const dynamic = "force-dynamic"` — disable caching
+    // Respect Next.js `export const dynamic = "force-dynamic"` - disable caching
     const isForceDynamic =
       GenerateTanstackRoutesRepository.hasForceDynamic(srcFile);
     const staleTime = isForceDynamic ? "0" : "Infinity";

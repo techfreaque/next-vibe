@@ -168,7 +168,7 @@ export const translations = {
         pack: "Pack",
         packs: "Packs",
         requiresSubscription:
-          "Credit packs require an active subscription. Subscribe to get monthly credits and unlock the ability to buy credit packs!",
+          "Credit packs are for active subscribers who need more than their monthly allowance. Subscribe first.",
       },
     },
     history: {

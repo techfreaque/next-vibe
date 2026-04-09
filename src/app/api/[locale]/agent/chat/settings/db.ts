@@ -74,9 +74,6 @@ export const chatSettings = pgTable("chat_settings", {
     "audio_vision_model_selection",
   ).$type<AudioVisionModelSelection>(),
 
-  // Translation model for pure generators (null = fast cheap LLM)
-  translationModelId: text("translation_model_id").$type<ChatModelId>(),
-
   // Default chat mode (null = "text")
   defaultChatMode: text("default_chat_mode").$type<ChatMode>(),
 

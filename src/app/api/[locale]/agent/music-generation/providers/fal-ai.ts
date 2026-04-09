@@ -25,7 +25,7 @@ interface FalAiStatusResponse {
   status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
 }
 
-const POLL_INTERVAL_MS = 3000;
+const POLL_INTERVAL_MS = process.env.NODE_ENV === "test" ? 50 : 3000;
 const MAX_POLL_ATTEMPTS = 30;
 
 export async function generateMusicWithFalAi(params: {
@@ -47,7 +47,7 @@ export async function generateMusicWithFalAi(params: {
     });
   }
 
-  logger.info("[Fal.ai Music] Submitting generation request", {
+  logger.debug("[Fal.ai Music] Submitting generation request", {
     model: providerModel,
     durationSeconds,
     promptLength: prompt.length,
@@ -81,7 +81,7 @@ export async function generateMusicWithFalAi(params: {
 
     const queueResult = (await submitResponse.json()) as FalAiQueueResponse;
     const requestId = queueResult.request_id;
-    logger.info("[Fal.ai Music] Request queued, polling", { requestId });
+    logger.debug("[Fal.ai Music] Request queued, polling", { requestId });
 
     for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
       if (signal?.aborted) {
@@ -131,7 +131,7 @@ export async function generateMusicWithFalAi(params: {
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
-        logger.info("[Fal.ai Music] Music generated successfully");
+        logger.debug("[Fal.ai Music] Music generated successfully");
         return success({ audioUrl });
       }
 

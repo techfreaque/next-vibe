@@ -19,7 +19,7 @@ export const translations = {
       query: {
         title: "Suchanfrage (optional)",
         description:
-          "Regex-Filter nach dem Abrufen. Nur Absätze die das Muster treffen werden zurückgegeben, nach Trefferzahl gewichtet, bis zum Zeichenlimit. Ohne Angabe erhält man die vollständige Seite (bei großen Seiten mittig gekürzt). Syntax: JS-Regex — 'Authentifizierung', '(login|signup)', 'class\\s+\\w+'. Ungültiger Regex fällt auf wörtliche Übereinstimmung zurück.",
+          "Regex-Filter nach dem Abrufen. Nur Absätze die das Muster treffen werden zurückgegeben, nach Trefferzahl gewichtet, bis zum Zeichenlimit. Ohne Angabe erhält man die vollständige Seite (bei großen Seiten mittig gekürzt). Syntax: JS-Regex - 'Authentifizierung', '(login|signup)', 'class\\s+\\w+'. Ungültiger Regex fällt auf wörtliche Übereinstimmung zurück.",
         placeholder: "Authentifizierung",
       },
     },

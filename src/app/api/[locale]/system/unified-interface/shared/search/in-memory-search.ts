@@ -64,20 +64,20 @@ export function searchItems<T>(items: T[], options: SearchOptions<T>): T[] {
       for (const value of values) {
         const v = value.toLowerCase();
 
-        // Exact full match — highest signal
+        // Exact full match - highest signal
         if (v === normalized) {
           score += field.weight * 3.0;
           continue;
         }
 
-        // All terms present — strong signal
+        // All terms present - strong signal
         const allPresent = terms.every((term) => v.includes(term));
         if (allPresent) {
           score += field.weight * 2.0;
           continue;
         }
 
-        // Partial — score per matching term
+        // Partial - score per matching term
         for (const term of terms) {
           if (v.includes(term)) {
             score += field.weight * 1.0;

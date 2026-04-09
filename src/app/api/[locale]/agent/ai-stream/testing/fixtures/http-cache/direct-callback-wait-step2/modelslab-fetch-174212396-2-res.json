@@ -1,0 +1,37 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v6/images/fetch/174212396",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "9e90c16a78665d69-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Wed, 08 Apr 2026 10:58:13 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=rn16xdPqhldR2BBbdtGyR01i5YDVTEscxYQx6dkiAVIFJBwU%2FJhK%2BFG%2BlNIFaiRjoFwphwFUjPY5BPb4upemUAQ4IfV8nUc%2BxgAkFmWZaRDtprG8IWvHgOpJ5oOVqxc%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "32f3e2f63b3708439f23686a9294c367",
+    "x-request-time": "1.227",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.001",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "success",
+    "id": 174212396,
+    "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise",
+    "output": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/628c8030-52a5-43ef-8fa6-ce1dfef7e0bc-0.jpg"
+    ],
+    "proxy_links": [
+      "https://cdn2.stablediffusionapi.com/generations/628c8030-52a5-43ef-8fa6-ce1dfef7e0bc-0.jpg"
+    ]
+  }
+}

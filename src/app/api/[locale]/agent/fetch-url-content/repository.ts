@@ -16,8 +16,8 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import TurndownService from "turndown";
 import { z } from "zod";
 
-import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
+import { agentEnv } from "@/app/api/[locale]/agent/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { FetchUrlContentGetResponseOutput } from "./definition";
@@ -31,7 +31,7 @@ const MAX_CHARS = 12_000;
 /** Cache TTL in milliseconds (5 minutes) */
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
-/** Virtual threadId namespace for URL cache — never a real chat thread */
+/** Virtual threadId namespace for URL cache - never a real chat thread */
 const CACHE_THREAD_ID = "url-fetch-cache";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -123,7 +123,7 @@ function filterByQuery(content: string, query: string): TruncateResult {
   try {
     regex = new RegExp(query, "i");
   } catch {
-    // Invalid regex — fall back to literal substring
+    // Invalid regex - fall back to literal substring
     regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
   }
 

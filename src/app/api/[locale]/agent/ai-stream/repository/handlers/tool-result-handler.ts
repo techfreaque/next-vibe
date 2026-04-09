@@ -9,8 +9,8 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
@@ -322,7 +322,7 @@ export class ToolResultHandler {
 
     // Note: for detach tasks, the execute-tool goroutine handles its own
     // handleTaskCompletion call (WS event, optional wakeUp revival). Do NOT
-    // call handleTaskCompletion here — it would race with the goroutine and
+    // call handleTaskCompletion here - it would race with the goroutine and
     // overwrite the initial { taskId, status, hint } result with null.
 
     return {

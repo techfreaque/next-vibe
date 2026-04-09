@@ -19,8 +19,8 @@ import {
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { collectServerDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
@@ -125,7 +125,7 @@ export class ToolErrorHandler {
         });
       }
 
-      logger.info(
+      logger.debug(
         "[AI Stream] Tool not in availableTools - returning disabled error to model",
         {
           toolName: part.toolName,
@@ -174,7 +174,7 @@ export class ToolErrorHandler {
     }
 
     if (requiresConfirmation) {
-      logger.info(
+      logger.debug(
         "[AI Stream] Fallback tool requires confirmation - emitting TOOL_WAITING",
         {
           toolName: part.toolName,
@@ -230,7 +230,7 @@ export class ToolErrorHandler {
     });
 
     if (fallbackResult && "data" in fallbackResult) {
-      logger.info(
+      logger.debug(
         "[AI Stream] Tool fallback execution succeeded (discovered via tool-help)",
         {
           toolName: part.toolName,
@@ -261,7 +261,7 @@ export class ToolErrorHandler {
         user,
       });
 
-      logger.info("[AI Stream] TOOL_RESULT event sent (fallback)", {
+      logger.debug("[AI Stream] TOOL_RESULT event sent (fallback)", {
         messageId: toolMessageId,
         toolName: part.toolName,
         isIncognito,
@@ -343,7 +343,7 @@ export class ToolErrorHandler {
     const { toolName, args, user, locale, logger } = params;
 
     try {
-      logger.info(
+      logger.debug(
         "[AI Stream] Attempting fallback execution for discovered tool",
         { toolName },
       );
@@ -481,7 +481,7 @@ export class ToolErrorHandler {
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
 
-    logger.info("[AI Stream] Tool error event received", {
+    logger.debug("[AI Stream] Tool error event received", {
       toolName: part.toolName,
       error,
       toolCallId: part.toolCallId,
@@ -509,7 +509,7 @@ export class ToolErrorHandler {
       user,
     });
 
-    logger.info("[AI Stream] TOOL_RESULT event sent (error)", {
+    logger.debug("[AI Stream] TOOL_RESULT event sent (error)", {
       messageId: toolMessageId,
       toolName: part.toolName,
       isIncognito,

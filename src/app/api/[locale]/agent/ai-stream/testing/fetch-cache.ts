@@ -1,10 +1,10 @@
 /**
- * HTTP Fetch Cache — SSE-aware, named-file design
+ * HTTP Fetch Cache - SSE-aware, named-file design
  *
  * Intercepts global.fetch for external HTTP calls in tests.
  * Caches every call as two files:
- *   fixtures/http-cache/{testCase}/{model}-req.json  — full request (url, headers, body)
- *   fixtures/http-cache/{testCase}/{model}-res.json  — full response (human-readable)
+ *   fixtures/http-cache/{testCase}/{model}-req.json  - full request (url, headers, body)
+ *   fixtures/http-cache/{testCase}/{model}-res.json  - full response (human-readable)
  *
  * Response file formats:
  *   SSE streams  → { type: "sse",    events: ["data: {...}", "data: [DONE]"], ... }
@@ -27,7 +27,13 @@
  * Cache bust: delete fixtures/http-cache/{testCase}/
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -49,8 +55,10 @@ let strictMode = false;
 export function setFetchCacheContext(testCase: string): void {
   currentTestCase = slugify(testCase);
   callCounters.clear();
-  // Keep Claude Code fixture store in sync — it doesn't use fetch so needs its own context
+  // Keep Claude Code fixture store in sync - it doesn't use fetch so needs its own context
   setClaudeCodeFixtureContext(testCase);
+  // eslint-disable-next-line no-console
+  console.log(`[FetchCache] context set: ${currentTestCase}`);
 }
 
 /**
@@ -60,6 +68,34 @@ export function setFetchCacheContext(testCase: string): void {
  */
 export function setFetchCacheStrictMode(strict: boolean): void {
   strictMode = strict;
+}
+
+/**
+ * Patch all fixture files in a named context directory, replacing every
+ * occurrence of `oldStr` with `newStr`. Use this to update dynamic values
+ * (e.g. taskIds) in recorded fixtures before replaying them in a subsequent
+ * test step that depends on a value produced by the previous step.
+ *
+ * Call with the TARGET context name (not necessarily the current context).
+ * Safe to call when the directory doesn't exist yet (no-op).
+ */
+export function patchFetchCacheFixtures(
+  contextName: string,
+  oldStr: string,
+  newStr: string,
+): void {
+  const dir = cacheDir(slugify(contextName));
+  if (!existsSync(dir)) {
+    return;
+  }
+  const files = readdirSync(dir).filter((f) => f.endsWith(".json"));
+  for (const file of files) {
+    const fp = join(dir, file);
+    const content = readFileSync(fp, "utf-8");
+    if (content.includes(oldStr)) {
+      writeFileSync(fp, content.replaceAll(oldStr, newStr), "utf-8");
+    }
+  }
 }
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -386,9 +422,21 @@ export function installFetchCache(): void {
 
     // ── Cache hit ────────────────────────────────────────────────────────────
     if (existsSync(rp)) {
+      // eslint-disable-next-line no-console
+      console.log("[FetchCache] HIT", {
+        rp: rp.split("/").slice(-3).join("/"),
+        model: modelName,
+        index: callIndex,
+      });
       const cached = JSON.parse(readFileSync(rp, "utf-8")) as ResFile;
       return replayFromCache(cached);
     }
+    // eslint-disable-next-line no-console
+    console.log("[FetchCache] MISS", {
+      rp: rp.split("/").slice(-3).join("/"),
+      model: modelName,
+      index: callIndex,
+    });
 
     // ── Cache miss ────────────────────────────────────────────────────────────
     if (strictMode) {
@@ -423,8 +471,8 @@ export function installFetchCache(): void {
 
     if (isStream && real.body) {
       // TransformStream: pass chunks through to caller AND collect them.
-      // Cache is written in flush() — after the caller has fully consumed the
-      // stream — so the file is always complete before the test ends.
+      // Cache is written in flush() - after the caller has fully consumed the
+      // stream - so the file is always complete before the test ends.
       const chunks: Uint8Array[] = [];
       const transform = new TransformStream<Uint8Array, Uint8Array>({
         transform(chunk, controller): void {

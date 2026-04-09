@@ -83,7 +83,7 @@ export class ToolCallHandler {
       currentAssistantMessageId = ctx.getNextAssistantMessageId();
       currentParentId = currentAssistantMessageId;
 
-      logger.info(
+      logger.debug(
         "[AI Stream] Creating placeholder ASSISTANT message for tool-call parent chain",
         {
           messageId: currentAssistantMessageId,
@@ -217,7 +217,7 @@ export class ToolCallHandler {
     });
 
     if (requiresConfirmation) {
-      logger.info(
+      logger.debug(
         "[AI Stream] Tool requires confirmation - emitting TOOL_WAITING (stream will continue)",
         {
           messageId: toolMessageId,
@@ -232,7 +232,7 @@ export class ToolCallHandler {
         toolCallId,
       });
 
-      logger.info(
+      logger.debug(
         "[AI Stream] Emitted TOOL_WAITING event - continuing to process more tool calls",
         { messageId: toolMessageId, toolName: part.toolName },
       );

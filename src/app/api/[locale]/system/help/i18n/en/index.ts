@@ -13,7 +13,7 @@ export const translations = {
       query: {
         label: "Search Query (optional)",
         description:
-          "Filter tools by keyword. Space-separated words are all required (e.g. 'fetch url' matches tools with both words). Case-insensitive match across name, aliases, description, tags — name/alias matches rank higher. Exact name/alias match auto-shows full detail. Omit to list all tools.",
+          "Filter tools by keyword. Space-separated words are all required (e.g. 'fetch url' matches tools with both words). Case-insensitive match across name, aliases, description, tags - name/alias matches rank higher. Exact name/alias match auto-shows full detail. Omit to list all tools.",
         placeholder: "e.g. fetch url, image gen, memory...",
       },
       category: {

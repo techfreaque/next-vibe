@@ -35,6 +35,12 @@ export class ToolsSetupHandler {
     modelConfig: ChatModelOption;
     pinnedTools: ToolConfigItem[] | null | undefined;
     availableTools: ToolConfigItem[] | null | undefined;
+    /**
+     * Raw client-provided availableTools before cascade override.
+     * requiresConfirmation values here always take precedence over the cascade,
+     * so confirmation settings survive even when the cascade overrides availableTools.
+     */
+    confirmationOverrides: ToolConfigItem[] | null | undefined;
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
@@ -76,13 +82,24 @@ export class ToolsSetupHandler {
     );
 
     // Build client confirmation config from visible + active tools
-    // Keyed by preferred tool name for consistent lookup
+    // Keyed by preferred tool name for consistent lookup.
+    // confirmationOverrides (raw client availableTools pre-cascade) takes final precedence
+    // so client-specified requiresConfirmation survives cascade overrides.
     const clientConfirmationConfig = new Map<string, boolean>();
     const allToolConfigs = [
       ...(params.pinnedTools ?? []),
       ...(params.availableTools ?? []),
     ];
     for (const toolConfig of allToolConfigs) {
+      const preferredName = resolveToPreferredName(toolConfig.toolId);
+      const isConfirmedTool = confirmedToolNames.has(preferredName);
+      clientConfirmationConfig.set(
+        preferredName,
+        isConfirmedTool ? false : toolConfig.requiresConfirmation,
+      );
+    }
+    // Apply confirmation overrides last - always wins over cascade
+    for (const toolConfig of params.confirmationOverrides ?? []) {
       const preferredName = resolveToPreferredName(toolConfig.toolId);
       const isConfirmedTool = confirmedToolNames.has(preferredName);
       clientConfirmationConfig.set(
@@ -159,6 +176,16 @@ export class ToolsSetupHandler {
           requiresConfirmation: clientConfig ?? meta.requiresConfirmation,
           credits,
         });
+      }
+    }
+
+    // Also inject client confirmation config for tools NOT in pinnedTools (fallback tools).
+    // When the model calls a tool via fallback, tool-error-handler looks up toolsConfig.
+    // Without this, client-specified requiresConfirmation: true is silently ignored for
+    // tools that aren't in the visible/loaded set.
+    for (const [toolName, requiresConfirmation] of clientConfirmationConfig) {
+      if (!toolsConfig.has(toolName) && !confirmedToolNames.has(toolName)) {
+        toolsConfig.set(toolName, { requiresConfirmation, credits: 0 });
       }
     }
 

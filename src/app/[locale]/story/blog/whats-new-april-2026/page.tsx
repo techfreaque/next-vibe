@@ -6,7 +6,7 @@ import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
-import { H1, H2, H3, Muted, P } from "next-vibe-ui/ui/typography";
+import { H1, H2, Muted, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { getAvailableSkillCount } from "@/app/api/[locale]/agent/chat/skills/config";
@@ -225,7 +225,7 @@ export function TanstackPage({
       </Div>
 
       <Div className="container mx-auto px-4 py-12 max-w-3xl space-y-14">
-        {/* ── Honest ── plain prose, no chrome */}
+        {/* ── Honest ── plain prose */}
         <Div>
           <H2 className="text-xl font-bold mb-4">{t("honest.title")}</H2>
           <P className="text-muted-foreground leading-relaxed mb-3">
@@ -243,14 +243,14 @@ export function TanstackPage({
           <Div className="text-xs font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400 mb-4">
             {t("whatsNew.label")}
           </Div>
-          <Div className="space-y-2.5">
+          <Div className="space-y-2.5 mb-6">
             {(
               [
                 { key: "whatsNew.item1", dot: "bg-purple-500" },
                 { key: "whatsNew.item2", dot: "bg-blue-500" },
                 { key: "whatsNew.item3", dot: "bg-blue-400" },
-                { key: "whatsNew.item4", dot: "bg-slate-400" },
-                { key: "whatsNew.item5", dot: "bg-emerald-500" },
+                { key: "whatsNew.item4", dot: "bg-emerald-500" },
+                { key: "whatsNew.item5", dot: "bg-slate-400" },
               ] as const
             ).map(({ key, dot }) => (
               <Div key={key} className="flex items-baseline gap-3">
@@ -261,25 +261,23 @@ export function TanstackPage({
               </Div>
             ))}
           </Div>
-          <Div className="mt-6 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 px-4 py-3 text-sm text-blue-800 dark:text-blue-200">
+          <Div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 px-4 py-3 text-sm text-blue-800 dark:text-blue-200">
             {t("whatsNew.betaNote")}
           </Div>
         </Div>
 
         <Separator />
 
-        {/* ── Multimodal ── progressive reveal: lead → how → examples → note */}
+        {/* ── Multimodal ── lead + two example cards + note */}
         <Div>
           <H2 className="text-xl font-bold mb-3">{t("multimodal.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-4">
+          <P className="text-muted-foreground leading-relaxed mb-3">
             {t("multimodal.lead")}
           </P>
           <P className="text-muted-foreground leading-relaxed mb-6">
             {t("multimodal.how", { appName })}
           </P>
-
-          {/* Two concrete examples side by side */}
-          <Div className="grid sm:grid-cols-2 gap-3 mb-6">
+          <Div className="grid sm:grid-cols-2 gap-3 mb-5">
             <Div className="rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 px-4 py-4">
               <Div className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                 {t("multimodal.visionLabel")}
@@ -293,11 +291,10 @@ export function TanstackPage({
                 {t("multimodal.localLabel")}
               </Div>
               <P className="text-sm text-muted-foreground leading-relaxed">
-                {t("multimodal.local")}
+                {t("multimodal.local", { appName })}
               </P>
             </Div>
           </Div>
-
           <Div className="rounded-lg bg-muted/40 border px-4 py-3 text-sm text-muted-foreground">
             {t("multimodal.note")}
           </Div>
@@ -305,15 +302,29 @@ export function TanstackPage({
 
         <Separator />
 
-        {/* ── Companions ── two cards side by side, dark headers with personality */}
+        {/* ── Monitoring ── the real bug story */}
+        <Div>
+          <H2 className="text-xl font-bold mb-4">{t("monitoring.title")}</H2>
+          <P className="text-muted-foreground leading-relaxed mb-3">
+            {t("monitoring.p1")}
+          </P>
+          <P className="text-muted-foreground leading-relaxed mb-5">
+            {t("monitoring.p2")}
+          </P>
+          <Div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-200">
+            {t("monitoring.note", { appName })}
+          </Div>
+        </Div>
+
+        <Separator />
+
+        {/* ── Companions ── two cards with dark headers */}
         <Div>
           <H2 className="text-xl font-bold mb-1">{t("companions.title")}</H2>
           <P className="text-muted-foreground text-sm mb-6">
             {t("companions.subtitle")}
           </P>
-
           <Div className="grid sm:grid-cols-2 gap-4 mb-5">
-            {/* Thea */}
             <Div className="rounded-xl border border-purple-200 dark:border-purple-800 overflow-hidden">
               <Div className="bg-purple-700 px-5 py-4">
                 <Div className="font-bold text-white">
@@ -329,8 +340,6 @@ export function TanstackPage({
                 </P>
               </Div>
             </Div>
-
-            {/* Hermes */}
             <Div className="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
               <Div className="bg-slate-800 px-5 py-4">
                 <Div className="font-bold text-white">
@@ -347,8 +356,6 @@ export function TanstackPage({
               </Div>
             </Div>
           </Div>
-
-          {/* Variants inline */}
           <Div className="rounded-lg bg-muted/40 border px-4 py-3 text-sm text-muted-foreground mb-3">
             <Span className="font-semibold text-foreground">
               {t("companions.variantsLabel")} —{" "}
@@ -365,13 +372,12 @@ export function TanstackPage({
 
         <Separator />
 
-        {/* ── Model tiers ── three cards, color coded */}
+        {/* ── Model tiers ── 3-column color cards */}
         <Div>
           <H2 className="text-xl font-bold mb-2">{t("modelTiers.title")}</H2>
-          <P className="text-muted-foreground text-sm mb-6">
+          <P className="text-muted-foreground text-sm mb-5">
             {t("modelTiers.intro")}
           </P>
-
           <Div className="grid sm:grid-cols-3 gap-3 mb-4">
             <TierCard
               tier="brilliant"
@@ -399,7 +405,7 @@ export function TanstackPage({
 
         <Separator />
 
-        {/* ── Skills ── prose, no fake list */}
+        {/* ── Skills ── prose with real count */}
         <Div>
           <H2 className="text-xl font-bold mb-4">
             {t("skills.title", { skillCount })}
@@ -417,7 +423,7 @@ export function TanstackPage({
 
         <Separator />
 
-        {/* ── Skill economy ── pitch section */}
+        {/* ── Skill economy ── pitch + examples + CTAs */}
         <Div>
           <H2 className="text-xl font-bold mb-4">{t("skillEconomy.title")}</H2>
           <P className="text-muted-foreground leading-relaxed mb-3">
@@ -426,10 +432,9 @@ export function TanstackPage({
           <P className="text-muted-foreground leading-relaxed mb-8">
             {t("skillEconomy.p2")}
           </P>
-
-          <H3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
+          <Div className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">
             {t("skillEconomy.examplesLabel")}
-          </H3>
+          </Div>
           <Div className="grid sm:grid-cols-2 gap-3 mb-6">
             <ExampleCard
               title={t("skillEconomy.example1Title")}
@@ -452,11 +457,9 @@ export function TanstackPage({
               variant="dev"
             />
           </Div>
-
           <Div className="rounded-lg bg-muted/40 border px-4 py-3 text-sm text-muted-foreground mb-6">
             {t("skillEconomy.note")}
           </Div>
-
           <Div className="flex flex-col sm:flex-row gap-3">
             <Button
               asChild
@@ -478,6 +481,22 @@ export function TanstackPage({
 
         <Separator />
 
+        {/* ── Self-host ── startup angle */}
+        <Div>
+          <H2 className="text-xl font-bold mb-4">{t("selfHost.title")}</H2>
+          <P className="text-muted-foreground leading-relaxed mb-3">
+            {t("selfHost.p1", { appName })}
+          </P>
+          <P className="text-muted-foreground leading-relaxed mb-5">
+            {t("selfHost.p2", { appName })}
+          </P>
+          <Div className="rounded-lg bg-muted/40 border px-4 py-3 text-sm text-muted-foreground">
+            {t("selfHost.note")}
+          </Div>
+        </Div>
+
+        <Separator />
+
         {/* ── Roadmap ── brief */}
         <Div>
           <H2 className="text-xl font-bold mb-4">{t("roadmap.title")}</H2>
@@ -491,7 +510,7 @@ export function TanstackPage({
 
         <Separator />
 
-        {/* ── Mission ── conviction statement + Hermes quote */}
+        {/* ── Mission ── conviction + Hermes quote */}
         <Div>
           <H2 className="text-xl font-bold mb-4">{t("mission.title")}</H2>
           <P className="text-muted-foreground leading-relaxed mb-3">
@@ -507,7 +526,7 @@ export function TanstackPage({
 
         <Separator />
 
-        {/* ── Feedback ── CTA */}
+        {/* ── Feedback ── CTA with reward */}
         <Div>
           <H2 className="text-xl font-bold mb-4">{t("feedback.title")}</H2>
           <P className="text-muted-foreground leading-relaxed mb-3">
@@ -516,16 +535,21 @@ export function TanstackPage({
           <P className="text-muted-foreground leading-relaxed mb-6">
             {t("feedback.p2")}
           </P>
-
           <Div className="rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 px-5 py-4 mb-4">
             <Div className="font-semibold text-purple-900 dark:text-purple-200 text-sm mb-1">
               {t("feedback.rewardTitle")}
             </Div>
-            <P className="text-sm text-purple-800 dark:text-purple-300 leading-relaxed">
+            <P className="text-sm text-purple-800 dark:text-purple-300 leading-relaxed mb-4">
               {t("feedback.rewardBody")}
             </P>
+            <Button
+              asChild
+              size="sm"
+              className="bg-purple-700 hover:bg-purple-800 text-white"
+            >
+              <Link href={`/${locale}/help`}>{t("feedback.cta")}</Link>
+            </Button>
           </Div>
-
           <Div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
             {t("feedback.payingNote")}
           </Div>
@@ -548,14 +572,9 @@ export function TanstackPage({
               size="lg"
               className="gap-2 bg-purple-700 hover:bg-purple-800 text-white"
             >
-              <Link href={`/${locale}/chat`}>
+              <Link href={`/${locale}/threads`}>
                 {t("close.cta", { appName })}
                 <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="gap-2">
-              <Link href="mailto:feedback@unbottled.ai">
-                {t("close.ctaFeedback")}
               </Link>
             </Button>
           </Div>

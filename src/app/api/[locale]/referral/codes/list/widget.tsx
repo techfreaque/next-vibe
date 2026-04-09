@@ -239,7 +239,7 @@ export function ReferralCodesListContainer({
                   {t("codes.list.widget.linkGen")}
                 </Span>
                 <Span className="text-xs text-muted-foreground/50">
-                  — {t("codes.list.widget.linkGenHint")}
+                  - {t("codes.list.widget.linkGenHint")}
                 </Span>
               </Div>
               <LinkGenerator code={code.code} t={t} />

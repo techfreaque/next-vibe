@@ -143,9 +143,9 @@ export const remoteInstancesFragment: SystemPromptFragment<RemoteInstancesData> 
 
       const lines = remoteConnections.map(
         (c) =>
-          `- "${c.instanceId}" - use help(instanceId="${c.instanceId}") to discover tools, execute-tool(toolName, instanceId="${c.instanceId}", input) to run them`,
+          `- "${c.instanceId}" - use tool-help(instanceId="${c.instanceId}") to discover tools, execute-tool(toolName='...', instanceId="${c.instanceId}", input={...}) to run them`,
       );
 
-      return `## Remote Instances\n\nUser has ${remoteConnections.length} connected local instance${remoteConnections.length === 1 ? "" : "s"}:\n\n${lines.join("\n")}\n\nRemote tools use the same callbackMode system as local tools. Default is "wait" - the tool result arrives automatically once the remote instance finishes execution. No special handling needed.`;
+      return `## Remote Instances\n\nUser has ${remoteConnections.length} connected local instance${remoteConnections.length === 1 ? "" : "s"}:\n\n${lines.join("\n")}\n\n**Tool naming rules:**\n- **Meta-tools** (\`tool-help\`, \`execute-tool\`): always call by bare name with \`instanceId\` param. Example: \`tool-help(instanceId="hermes")\`, \`execute-tool(toolName="ssh-exec", instanceId="hermes", input={...})\`\n- **Pinned tools**: appear in your tool list as \`instanceId__toolName\` (e.g. \`hermes__generate_image\`). Call them directly by their prefixed name - no instanceId param needed.\n\nRemote tools use the same callbackMode system as local tools. Default is "wait" - the tool result arrives automatically once the remote instance finishes execution. No special handling needed.`;
     },
   };

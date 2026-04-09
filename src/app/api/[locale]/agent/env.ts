@@ -10,10 +10,10 @@ import "server-only";
 
 import { z } from "zod";
 
-import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 
-// Resolved once at module load — used by both CLAUDE_CODE_ENABLED and VIBE_TEST_AI_MODEL
+// Resolved once at module load - used by both CLAUDE_CODE_ENABLED and VIBE_TEST_AI_MODEL
 function resolveClaudeCodeEnabled(): boolean {
   const raw = process.env["CLAUDE_CODE_ENABLED"];
   if (raw === "true") {

@@ -340,6 +340,43 @@ export function useMessagesSubscription(
             optionsRef.current.onStreamFinished?.();
           }
 
+          // Clear any stuck isStreaming flags on messages in this thread.
+          // CONTENT_DONE normally clears them, but if it was missed (race, disconnect,
+          // or abort) the message stays stuck showing the loading animation forever.
+          apiClient.updateEndpointData(
+            messagesDefinition.GET,
+            logger,
+            (old) => {
+              if (!old?.success) {
+                return old;
+              }
+              const hasStuck = old.data.messages.some(
+                (m) => m.metadata?.isStreaming,
+              );
+              if (!hasStuck) {
+                return old;
+              }
+              return {
+                ...old,
+                data: {
+                  ...old.data,
+                  messages: old.data.messages.map((m) =>
+                    m.metadata?.isStreaming
+                      ? {
+                          ...m,
+                          metadata: { ...m.metadata, isStreaming: false },
+                        }
+                      : m,
+                  ),
+                },
+              };
+            },
+            {
+              urlPathParams: { threadId },
+              requestData: { rootFolderId },
+            },
+          );
+
           // Seed the path cache with the messages already in the messages cache.
           // This prevents the path endpoint from refetching from the server when
           // isPendingCreate clears - we already have all messages optimistically.

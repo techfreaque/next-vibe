@@ -1,14 +1,16 @@
 import { z } from "zod";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
-  PriceLevel,
   SpeedLevel,
 } from "../chat/skills/enum";
+import {
+  filtersSelectionSchema,
+  sharedFilterPropsSchema,
+} from "../models/selection";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -20,7 +22,6 @@ import {
   type ModelProviderConfigVideoBased,
   type ModelProviderEnvAvailability,
 } from "../models/models";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 export enum VideoGenModelId {
   WAN_2_7_T2V = "wan-2-7-t2v",
@@ -46,7 +47,7 @@ export enum VideoGenModelId {
   LIPSYNC_2 = "lipsync-2",
   GROK_T2V = "grok-t2v",
   GROK_I2V = "grok-i2v",
-  // BEGIN:llm-generated — do not edit manually, updated by price updater
+  // BEGIN:llm-generated - do not edit manually, updated by price updater
   // END:llm-generated
 }
 
@@ -73,8 +74,20 @@ export const videoGenModelDefinitions: Record<
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 15, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["5", "10", "15"], // updated: 2026-04-04 from modelslab.com
-        pricingByResolution: { "720p": 10, "1080p": 15 }, // updated: 2026-04-04 from modelslab.com
+        pricingByResolution: { "720p": 10, "1080p": 15 }, // updated: 2026-04-07 from modelslab.com
         defaultDurationSeconds: 5,
+      },
+      {
+        id: VideoGenModelId.WAN_2_7_T2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "wan-2-7-t2v",
+        creditCostPerSecond: 13, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 5,
+        maxDurationSeconds: 15,
+        supportedDurations: ["5", "10", "15"],
+        supportedResolutions: ["1080p"],
+        pricingByResolution: { "720p": 13, "1080p": 19.5 }, // updated: 2026-04-07 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -107,8 +120,20 @@ export const videoGenModelDefinitions: Record<
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 15, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["5", "10", "15"], // updated: 2026-04-04 from modelslab.com
-        pricingByResolution: { "720p": 10, "1080p": 15 }, // updated: 2026-04-04 from modelslab.com
+        pricingByResolution: { "720p": 10, "1080p": 15 }, // updated: 2026-04-07 from modelslab.com
         defaultDurationSeconds: 5,
+      },
+      {
+        id: VideoGenModelId.WAN_2_6_I2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "wan-2-6-i2v",
+        creditCostPerSecond: 13, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 5,
+        maxDurationSeconds: 15,
+        supportedDurations: ["5", "10", "15"],
+        supportedResolutions: ["1080p"],
+        pricingByResolution: { "720p": 13, "1080p": 19.5 }, // updated: 2026-04-07 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -141,8 +166,20 @@ export const videoGenModelDefinitions: Record<
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["5"], // updated: 2026-04-04 from modelslab.com
-        pricingByResolution: { "720p": 5, "1080p": 7.5 }, // updated: 2026-04-04 from modelslab.com
+        pricingByResolution: { "720p": 5, "1080p": 7.5 }, // updated: 2026-04-07 from modelslab.com
         defaultDurationSeconds: 5,
+      },
+      {
+        id: VideoGenModelId.WAN_2_6_I2V_FLASH,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "wan-2-6-i2v-flash",
+        creditCostPerSecond: 6.5, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 5,
+        maxDurationSeconds: 5,
+        supportedDurations: ["5"],
+        supportedResolutions: ["1080p"],
+        pricingByResolution: { "720p": 6.5, "1080p": 9.75 }, // updated: 2026-04-07 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -174,6 +211,14 @@ export const videoGenModelDefinitions: Record<
         supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
       },
+      {
+        id: VideoGenModelId.SEEDANCE_1_5_PRO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "seedance-1-5-pro",
+        creditCostPerSecond: 5.72, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        supportedAspectRatios: ["16:9", "9:16"],
+      },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -201,6 +246,13 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "omni-human-1.5",
         creditCostPerSecond: 14, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+      {
+        id: VideoGenModelId.OMNIHUMAN_1_5,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "omnihuman-1-5",
+        creditCostPerSecond: 18.2, // updated: 2026-04-07 from unbottled.ai
         defaultDurationSeconds: 5,
       },
     ],
@@ -236,6 +288,17 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["3", "4", "6", "8"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
       },
+      {
+        id: VideoGenModelId.VEO_3_1,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "veo-3-1",
+        creditCostPerSecond: 62.4, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 3,
+        maxDurationSeconds: 8,
+        supportedDurations: ["3", "4", "6", "8"],
+        supportedAspectRatios: ["16:9", "9:16"],
+      },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -269,6 +332,17 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["3", "4", "6", "8"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
       },
+      {
+        id: VideoGenModelId.VEO_3_1_FAST,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "veo-3-1-fast",
+        creditCostPerSecond: 31.2, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 3,
+        maxDurationSeconds: 8,
+        supportedDurations: ["3", "4", "6", "8"],
+        supportedAspectRatios: ["16:9", "9:16"],
+      },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -300,6 +374,16 @@ export const videoGenModelDefinitions: Record<
         maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["5", "10"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
+      },
+      {
+        id: VideoGenModelId.KLING_V2_5_TURBO_I2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kling-v2-5-turbo-i2v",
+        creditCostPerSecond: 10.92, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 5,
+        maxDurationSeconds: 10,
+        supportedDurations: ["5", "10"],
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -334,6 +418,17 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["5", "10"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
       },
+      {
+        id: VideoGenModelId.KLING_V2_5_TURBO_T2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kling-v2-5-turbo-t2v",
+        creditCostPerSecond: 10.92, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 5,
+        maxDurationSeconds: 10,
+        supportedDurations: ["5", "10"],
+        supportedAspectRatios: ["16:9", "9:16", "1:1"],
+      },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -366,6 +461,16 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["5", "10"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
       },
+      {
+        id: VideoGenModelId.KLING_V2_1_MASTER_T2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kling-v2-1-master-t2v",
+        creditCostPerSecond: 43.68, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 5,
+        maxDurationSeconds: 10,
+        supportedDurations: ["5", "10"],
+      },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -397,6 +502,16 @@ export const videoGenModelDefinitions: Record<
         maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["5", "10"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
+      },
+      {
+        id: VideoGenModelId.KLING_V2_1_MASTER_I2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kling-v2-1-master-i2v",
+        creditCostPerSecond: 43.68, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 5,
+        maxDurationSeconds: 10,
+        supportedDurations: ["5", "10"],
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -431,6 +546,17 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["5", "10"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
       },
+      {
+        id: VideoGenModelId.KLING_3_0_T2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kling-3-0-t2v",
+        creditCostPerSecond: 13, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 5,
+        maxDurationSeconds: 10,
+        supportedDurations: ["5", "10"],
+        supportedAspectRatios: ["16:9", "9:16", "1:1"],
+      },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -463,6 +589,17 @@ export const videoGenModelDefinitions: Record<
         maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["6", "8", "10"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
+      },
+      {
+        id: VideoGenModelId.LTX_2_PRO_T2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "ltx-2-pro-t2v",
+        creditCostPerSecond: 1.82, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 6,
+        maxDurationSeconds: 10,
+        supportedDurations: ["6", "8", "10"],
+        supportedResolutions: ["2K", "4K"],
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -497,6 +634,17 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["6", "8", "10"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
       },
+      {
+        id: VideoGenModelId.LTX_2_3_PRO_I2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "ltx-2-3-pro-i2v",
+        creditCostPerSecond: 1.82, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 6,
+        maxDurationSeconds: 10,
+        supportedDurations: ["6", "8", "10"],
+        supportedResolutions: ["2K", "4K"],
+      },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -524,6 +672,13 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "Hailuo-2.3-t2v",
         creditCostPerSecond: 5.5, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+      {
+        id: VideoGenModelId.HAILUO_2_3_T2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "hailuo-2-3-t2v",
+        creditCostPerSecond: 7.15, // updated: 2026-04-07 from unbottled.ai
         defaultDurationSeconds: 5,
       },
     ],
@@ -558,6 +713,16 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["6", "10"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
       },
+      {
+        id: VideoGenModelId.HAILUO_2_3_I2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "hailuo-2-3-i2v",
+        creditCostPerSecond: 7.15, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 6,
+        maxDurationSeconds: 10,
+        supportedDurations: ["6", "10"],
+      },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -589,6 +754,16 @@ export const videoGenModelDefinitions: Record<
         maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["6", "10"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
+      },
+      {
+        id: VideoGenModelId.HAILUO_2_3_FAST_I2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "hailuo-2-3-fast-i2v",
+        creditCostPerSecond: 4.94, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 6,
+        maxDurationSeconds: 10,
+        supportedDurations: ["6", "10"],
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -623,6 +798,17 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["2", "4", "8", "12"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
       },
+      {
+        id: VideoGenModelId.SORA_2,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "sora-2",
+        creditCostPerSecond: 16.25, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 4,
+        maxDurationSeconds: 12,
+        supportedDurations: ["2", "4", "8", "12"],
+        supportedAspectRatios: ["16:9", "9:16"],
+      },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -655,6 +841,17 @@ export const videoGenModelDefinitions: Record<
         maxDurationSeconds: 12, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["2", "4", "8", "12"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
+      },
+      {
+        id: VideoGenModelId.SORA_2_PRO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "sora-2-pro",
+        creditCostPerSecond: 46.8, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 4,
+        maxDurationSeconds: 12,
+        supportedDurations: ["2", "4", "8", "12"],
+        supportedAspectRatios: ["16:9", "9:16"],
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -692,8 +889,25 @@ export const videoGenModelDefinitions: Record<
           "33:14",
           "53:30",
           "4:3",
-        ], // updated: 2026-04-04 from modelslab.com
+        ], // updated: 2026-04-07 from modelslab.com
         defaultDurationSeconds: 5,
+      },
+      {
+        id: VideoGenModelId.GEN4_ALEPH,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gen4-aleph",
+        creditCostPerSecond: 23.4, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        supportedAspectRatios: [
+          "16:9",
+          "9:16",
+          "69:52",
+          "1:1",
+          "52:69",
+          "33:14",
+          "53:30",
+          "4:3",
+        ],
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -722,6 +936,13 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "lipsync-2",
         creditCostPerSecond: 7, // updated: 2026-03-31 from modelslab.com
+        defaultDurationSeconds: 5,
+      },
+      {
+        id: VideoGenModelId.LIPSYNC_2,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "lipsync-2",
+        creditCostPerSecond: 9.1, // updated: 2026-04-07 from unbottled.ai
         defaultDurationSeconds: 5,
       },
     ],
@@ -757,6 +978,17 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["1", "15"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
       },
+      {
+        id: VideoGenModelId.GROK_T2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "grok-t2v",
+        creditCostPerSecond: 7.8, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 1,
+        maxDurationSeconds: 15,
+        supportedDurations: ["1", "15"],
+        supportedResolutions: ["720p"],
+      },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -789,6 +1021,17 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["1", "15"], // updated: 2026-04-04 from modelslab.com
         supportedResolutions: ["HD"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
+      },
+      {
+        id: VideoGenModelId.GROK_I2V,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "grok-i2v",
+        creditCostPerSecond: 7.8, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 1,
+        maxDurationSeconds: 15,
+        supportedDurations: ["1", "15"],
+        supportedResolutions: ["HD"],
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -880,44 +1123,69 @@ export function getVideoGenModelById(
   return videoGenModelOptionsIndex[modelId];
 }
 
+/**
+ * Resolve a video gen model option using a specific API provider.
+ * Picks the cheapest provider variant for `modelId` that matches `provider`.
+ * Falls back to the default (cheapest overall) if no matching provider exists.
+ */
+export function getVideoGenModelForProvider(
+  modelId: VideoGenModelId,
+  provider: ApiProvider,
+): VideoGenModelOption | undefined {
+  const def = videoGenModelDefinitions[modelId];
+  if (!def) {
+    return undefined;
+  }
+  const matching = [...def.providers]
+    .filter((p) => p.apiProvider === provider)
+    .toSorted((a, b) => getProviderPrice(a) - getProviderPrice(b));
+
+  for (const p of matching) {
+    if (
+      p.creditCostPerSecond !== undefined &&
+      p.defaultDurationSeconds !== undefined
+    ) {
+      const typed = p satisfies ModelProviderConfigVideoBased;
+      return {
+        id: modelId,
+        name: def.name,
+        provider: def.by,
+        apiProvider: p.apiProvider,
+        description: def.description,
+        parameterCount: def.parameterCount,
+        contextWindow: def.contextWindow,
+        icon: def.icon,
+        providerModel: p.providerModel,
+        utilities: def.utilities,
+        supportsTools: def.supportsTools,
+        intelligence: def.intelligence,
+        speed: def.speed,
+        content: def.content,
+        features: def.features,
+        weaknesses: def.weaknesses,
+        adminOnly: p.adminOnly,
+        inputs: def.inputs,
+        outputs: def.outputs,
+        voiceMeta: def.voiceMeta,
+        creditCostPerSecond: typed.creditCostPerSecond,
+        defaultDurationSeconds: typed.defaultDurationSeconds,
+        supportedDurations: typed.supportedDurations,
+        maxDurationSeconds: typed.maxDurationSeconds,
+        minDurationSeconds: typed.minDurationSeconds,
+        supportedResolutions: typed.supportedResolutions,
+        supportedAspectRatios: typed.supportedAspectRatios,
+        pricingByResolution: typed.pricingByResolution,
+      };
+    }
+  }
+
+  // No matching provider - fall back to default
+  return getVideoGenModelById(modelId);
+}
+
 // ============================================================
 // VIDEO GEN MODEL SELECTION SCHEMA
 // ============================================================
-
-const sharedFilterPropsSchema = z.object({
-  intelligenceRange: z
-    .object({
-      min: z.enum(IntelligenceLevel).optional(),
-      max: z.enum(IntelligenceLevel).optional(),
-    })
-    .optional(),
-  priceRange: z
-    .object({
-      min: z.enum(PriceLevel).optional(),
-      max: z.enum(PriceLevel).optional(),
-    })
-    .optional(),
-  contentRange: z
-    .object({
-      min: z.enum(ContentLevel).optional(),
-      max: z.enum(ContentLevel).optional(),
-    })
-    .optional(),
-  speedRange: z
-    .object({
-      min: z.enum(SpeedLevel).optional(),
-      max: z.enum(SpeedLevel).optional(),
-    })
-    .optional(),
-  sortBy: z.enum(ModelSortField).optional(),
-  sortDirection: z.enum(ModelSortDirection).optional(),
-  sortBy2: z.enum(ModelSortField).optional(),
-  sortDirection2: z.enum(ModelSortDirection).optional(),
-});
-
-const filtersSelectionSchema = z
-  .object({ selectionType: z.literal(ModelSelectionType.FILTERS) })
-  .merge(sharedFilterPropsSchema);
 
 export const videoGenModelSelectionSchema = z.discriminatedUnion(
   "selectionType",

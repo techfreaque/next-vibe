@@ -18,8 +18,8 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { ModelDefinition } from "@/app/api/[locale]/agent/models/models";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 
@@ -35,6 +35,7 @@ import { DeepgramPriceFetcher } from "./providers/deepgram";
 import { EdenAiPriceFetcher } from "./providers/eden-ai";
 import { ElevenLabsPriceFetcher } from "./providers/elevenlabs";
 import { FalAiPriceFetcher } from "./providers/fal-ai";
+import { FreedomGptPriceFetcher } from "./providers/freedomgpt";
 import { ModelslabPriceFetcher } from "./providers/modelslab";
 import { OpenAiImagePriceFetcher } from "./providers/openai-images";
 import { OpenAiSttPriceFetcher } from "./providers/openai-stt";
@@ -42,19 +43,20 @@ import { OpenAiTtsPriceFetcher } from "./providers/openai-tts";
 import { OpenRouterImagePriceFetcher } from "./providers/openrouter-image";
 import { OpenRouterTokenPriceFetcher } from "./providers/openrouter-token";
 import { ReplicatePriceFetcher } from "./providers/replicate";
-import { FreedomGptPriceFetcher } from "./providers/freedomgpt";
 import { UnbottledPriceFetcher } from "./providers/unbottled";
 import { UncensoredAiPriceFetcher } from "./providers/uncensored-ai";
+
 import { chatModelDefinitions } from "../../ai-stream/models";
 import { imageGenModelDefinitions } from "../../image-generation/models";
 import { musicGenModelDefinitions } from "../../music-generation/models";
-import { videoGenModelDefinitions } from "../../video-generation/models";
-import { ttsModelDefinitions } from "../../text-to-speech/models";
 import { sttModelDefinitions } from "../../speech-to-text/models";
+import { ttsModelDefinitions } from "../../text-to-speech/models";
+import { videoGenModelDefinitions } from "../../video-generation/models";
 
 export type { PriceFetcher, ProviderPriceResult };
 
-const ALL_FETCHERS: PriceFetcher[] = [
+/** Fetchers that run on every platform */
+const BASE_FETCHERS: PriceFetcher[] = [
   new OpenRouterTokenPriceFetcher(),
   new OpenRouterImagePriceFetcher(),
   new ReplicatePriceFetcher(),
@@ -68,8 +70,10 @@ const ALL_FETCHERS: PriceFetcher[] = [
   new ModelslabPriceFetcher(),
   new UncensoredAiPriceFetcher(),
   new FreedomGptPriceFetcher(),
-  new UnbottledPriceFetcher(),
 ];
+
+/** Unbottled fetcher - web-only, instantiated per call with platform */
+const UNBOTTLED_FETCHER = new UnbottledPriceFetcher();
 
 /** ISO date string YYYY-MM-DD */
 function today(): string {
@@ -96,7 +100,7 @@ function buildUpdateComment(source: string): string {
 /**
  * Check if a price line already has the correct value and a valid update comment.
  * Returns true if the line should be skipped (no update needed).
- * Only updates the timestamp when the actual value changes — preserves the
+ * Only updates the timestamp when the actual value changes - preserves the
  * original date so you can see when a price last *actually* changed.
  */
 function isAlreadyUpToDate(
@@ -214,9 +218,9 @@ function applyCacheCostUpdate(
     return { content: updated, changed };
   }
 
-  // Insert after insertAfterField
+  // Insert after insertAfterField (value may be numeric or an identifier like calculateCreditCost)
   const insertRegex = new RegExp(
-    `(providerModel:\\s*"${escapedProviderModel}"[\\s\\S]*?${insertAfterField}:\\s*[\\d.]+[,]?(?:\\s*//[^\n]*)?)(\\n)`,
+    `(providerModel:\\s*"${escapedProviderModel}"[\\s\\S]*?${insertAfterField}:\\s*[\\w.]+[,]?(?:\\s*//[^\n]*)?)(\\n)`,
   );
   if (insertRegex.test(content)) {
     const updated = content.replace(
@@ -415,9 +419,125 @@ const ENUM_PREFIX_BY_ROLE: Record<string, string> = {
 };
 
 /**
- * Add an UNBOTTLED provider entry to a model's `providers: [...]` array.
- * Inserts before the closing `]` of the providers array.
+ * Build the TypeScript source for an UNBOTTLED provider entry from a typed op.
+ * All cost fields in op are already marked up. Non-cost fields are copied verbatim.
  */
+function buildUnbottledEntrySource(
+  enumPrefix: string,
+  enumKey: string,
+  op: ProviderEntryOperation,
+): string {
+  const comment = buildUpdateComment(op.source);
+  const lines: string[] = [
+    `        id: ${enumPrefix}.${enumKey},`,
+    `        apiProvider: ApiProvider.UNBOTTLED,`,
+    `        providerModel: "${op.providerModel}",`,
+  ];
+
+  // Token-based costs
+  if (typeof op.inputTokenCost === "number") {
+    lines.push(`        creditCost: calculateCreditCost,`);
+    lines.push(`        inputTokenCost: ${op.inputTokenCost}, ${comment}`);
+  }
+  if (typeof op.outputTokenCost === "number") {
+    lines.push(`        outputTokenCost: ${op.outputTokenCost}, ${comment}`);
+  }
+  if (typeof op.cacheReadTokenCost === "number") {
+    lines.push(
+      `        cacheReadTokenCost: ${op.cacheReadTokenCost}, ${comment}`,
+    );
+  }
+  if (typeof op.cacheWriteTokenCost === "number") {
+    lines.push(
+      `        cacheWriteTokenCost: ${op.cacheWriteTokenCost}, ${comment}`,
+    );
+  }
+
+  // Flat credit cost (non-token)
+  if (typeof op.creditCost === "number") {
+    lines.push(`        creditCost: ${op.creditCost}, ${comment}`);
+  }
+
+  // Per-image
+  if (typeof op.creditCostPerImage === "number") {
+    lines.push(
+      `        creditCostPerImage: ${op.creditCostPerImage}, ${comment}`,
+    );
+  }
+
+  // Per-second (video / STT)
+  if (typeof op.creditCostPerSecond === "number") {
+    lines.push(
+      `        creditCostPerSecond: ${op.creditCostPerSecond}, ${comment}`,
+    );
+  }
+
+  // Per-clip (music)
+  if (typeof op.creditCostPerClip === "number") {
+    lines.push(
+      `        creditCostPerClip: ${op.creditCostPerClip}, ${comment}`,
+    );
+  }
+
+  // Per-character (TTS)
+  if (typeof op.creditCostPerCharacter === "number") {
+    lines.push(
+      `        creditCostPerCharacter: ${op.creditCostPerCharacter}, ${comment}`,
+    );
+  }
+
+  // Non-cost fields
+  if (op.defaultDurationSeconds !== undefined) {
+    lines.push(`        defaultDurationSeconds: ${op.defaultDurationSeconds},`);
+  }
+  if (op.minDurationSeconds !== undefined) {
+    lines.push(`        minDurationSeconds: ${op.minDurationSeconds},`);
+  }
+  if (op.maxDurationSeconds !== undefined) {
+    lines.push(`        maxDurationSeconds: ${op.maxDurationSeconds},`);
+  }
+  if (op.supportedDurations !== undefined) {
+    lines.push(
+      `        supportedDurations: ${JSON.stringify(op.supportedDurations)},`,
+    );
+  }
+  if (op.supportedResolutions !== undefined) {
+    lines.push(
+      `        supportedResolutions: ${JSON.stringify(op.supportedResolutions)},`,
+    );
+  }
+  if (op.supportedAspectRatios !== undefined) {
+    lines.push(
+      `        supportedAspectRatios: ${JSON.stringify(op.supportedAspectRatios)},`,
+    );
+  }
+  if (op.supportedSizes !== undefined) {
+    lines.push(`        supportedSizes: ${JSON.stringify(op.supportedSizes)},`);
+  }
+  if (op.supportedQualities !== undefined) {
+    lines.push(
+      `        supportedQualities: ${JSON.stringify(op.supportedQualities)},`,
+    );
+  }
+  if (op.pricingByResolution !== undefined) {
+    lines.push(
+      `        pricingByResolution: ${JSON.stringify(op.pricingByResolution)}, ${comment}`,
+    );
+  }
+  if (op.pricingBySize !== undefined) {
+    lines.push(
+      `        pricingBySize: ${JSON.stringify(op.pricingBySize)}, ${comment}`,
+    );
+  }
+  if (op.pricingByQuality !== undefined) {
+    lines.push(
+      `        pricingByQuality: ${JSON.stringify(op.pricingByQuality)}, ${comment}`,
+    );
+  }
+
+  return `      {\n${lines.join("\n")}\n      },\n    `;
+}
+
 export function addProviderEntry(
   content: string,
   op: ProviderEntryOperation,
@@ -427,18 +547,7 @@ export function addProviderEntry(
     return { content, changed: false };
   }
 
-  const comment = buildUpdateComment(op.source);
-
-  // Find the model definition block, then locate the providers array closing bracket
-  // Pattern: [EnumPrefix.KEY]: { ... providers: [ ... ], ... }
-  // We need to insert before the last `],` or `]` in the providers array
-  const blockStart = new RegExp(`\\[${enumPrefix}\\.${op.enumKey}\\]:\\s*\\{`);
-  const blockMatch = blockStart.exec(content);
-  if (!blockMatch) {
-    return { content, changed: false };
-  }
-
-  // Check if UNBOTTLED entry already exists for this model
+  // Check if UNBOTTLED entry already exists
   const existingCheck = new RegExp(
     `\\[${enumPrefix}\\.${op.enumKey}\\]:\\s*\\{[\\s\\S]*?apiProvider:\\s*ApiProvider\\.UNBOTTLED`,
   );
@@ -446,19 +555,23 @@ export function addProviderEntry(
     return { content, changed: false };
   }
 
-  // Find the providers array for this specific model block.
-  // We search from the block start and find the `providers: [` opening,
-  // then count brackets to find the matching closing `]`.
-  const blockStartIdx = blockMatch.index;
+  const entry = buildUnbottledEntrySource(enumPrefix, op.enumKey, op);
+
+  // Find providers array close ] to insert before it
+  const blockStart = new RegExp(`\\[${enumPrefix}\\.${op.enumKey}\\]:\\s*\\{`);
+  const blockMatch = blockStart.exec(content);
+  if (!blockMatch) {
+    return { content, changed: false };
+  }
+
   const providersOpenRegex = /providers:\s*\[/g;
-  providersOpenRegex.lastIndex = blockStartIdx;
+  providersOpenRegex.lastIndex = blockMatch.index;
   const providersMatch = providersOpenRegex.exec(content);
   if (!providersMatch) {
     return { content, changed: false };
   }
 
-  // Walk from the opening `[` to find the matching `]`
-  const openIdx = providersMatch.index + providersMatch[0].length - 1; // index of `[`
+  const openIdx = providersMatch.index + providersMatch[0].length - 1;
   let depth = 1;
   let closeIdx = -1;
   for (let i = openIdx + 1; i < content.length; i++) {
@@ -477,13 +590,110 @@ export function addProviderEntry(
     return { content, changed: false };
   }
 
-  // Build the new provider entry
-  const creditCost = op.creditCost ?? 0;
-  const entry = `      {\n        id: ${enumPrefix}.${op.enumKey},\n        apiProvider: ApiProvider.UNBOTTLED,\n        providerModel: "${op.providerModel}",\n        creditCost: ${creditCost}, ${comment}\n      },\n    `;
-
-  // Insert before the closing `]`
   const updated = content.slice(0, closeIdx) + entry + content.slice(closeIdx);
+  return { content: updated, changed: true };
+}
 
+/**
+ * Update an existing UNBOTTLED provider entry to match the primary provider's structure.
+ * Replaces the entire UNBOTTLED block with a freshly generated entry from the typed op.
+ */
+export function updateUnbottledEntry(
+  content: string,
+  op: ProviderEntryOperation,
+): { content: string; changed: boolean } {
+  const enumPrefix = ENUM_PREFIX_BY_ROLE[op.role];
+  if (!enumPrefix) {
+    return { content, changed: false };
+  }
+
+  const newEntry = buildUnbottledEntrySource(enumPrefix, op.enumKey, op);
+
+  // Find and replace the existing UNBOTTLED block
+  const blockStart = new RegExp(`\\[${enumPrefix}\\.${op.enumKey}\\]:\\s*\\{`);
+  const blockMatch = blockStart.exec(content);
+  if (!blockMatch) {
+    return { content, changed: false };
+  }
+
+  const providersOpenRegex = /providers:\s*\[/g;
+  providersOpenRegex.lastIndex = blockMatch.index;
+  const providersMatch = providersOpenRegex.exec(content);
+  if (!providersMatch) {
+    return { content, changed: false };
+  }
+
+  const openIdx = providersMatch.index + providersMatch[0].length - 1;
+  let depth = 1;
+  let closeIdx = -1;
+  for (let i = openIdx + 1; i < content.length; i++) {
+    if (content[i] === "[") {
+      depth++;
+    }
+    if (content[i] === "]") {
+      depth--;
+    }
+    if (depth === 0) {
+      closeIdx = i;
+      break;
+    }
+  }
+  if (closeIdx === -1) {
+    return { content, changed: false };
+  }
+
+  const providersArrayContent = content.slice(openIdx + 1, closeIdx);
+
+  // Find the UNBOTTLED block within the providers array
+  let objDepth = 0;
+  let objStart = -1;
+  let unbottledStart = -1;
+  let unbottledEnd = -1;
+  for (let i = 0; i < providersArrayContent.length; i++) {
+    if (providersArrayContent[i] === "{") {
+      if (objDepth === 0) {
+        objStart = i;
+      }
+      objDepth++;
+    }
+    if (providersArrayContent[i] === "}") {
+      objDepth--;
+      if (objDepth === 0 && objStart !== -1) {
+        const block = providersArrayContent.slice(objStart, i + 1);
+        if (block.includes("ApiProvider.UNBOTTLED")) {
+          unbottledStart = openIdx + 1 + objStart;
+          unbottledEnd = openIdx + 1 + i + 1;
+          break;
+        }
+        objStart = -1;
+      }
+    }
+  }
+  if (unbottledStart === -1) {
+    return { content, changed: false };
+  }
+
+  // Expand to include leading whitespace and trailing comma+newline
+  let removeStart = unbottledStart;
+  while (
+    removeStart > 0 &&
+    (content[removeStart - 1] === " " || content[removeStart - 1] === "\n")
+  ) {
+    removeStart--;
+  }
+  let removeEnd = unbottledEnd;
+  if (content[removeEnd] === ",") {
+    removeEnd++;
+  }
+  if (content[removeEnd] === "\n") {
+    removeEnd++;
+  }
+
+  const updated = `${content.slice(0, removeStart)}\n    ${newEntry.trimEnd()}\n${content.slice(removeEnd)}`;
+
+  if (updated === content) {
+    return { content, changed: false };
+  }
   return { content: updated, changed: true };
 }
 
@@ -598,8 +808,10 @@ export class ModelPricesRepository {
     t: ModelPricesT,
   ): Promise<ResponseType<ModelPricesGetResponseOutput>> {
     try {
+      const fetchers: PriceFetcher[] = [...BASE_FETCHERS, UNBOTTLED_FETCHER];
+
       const providerResults: ProviderPriceResult[] = await Promise.all(
-        ALL_FETCHERS.map((fetcher) => fetcher.fetch(logger)),
+        fetchers.map((fetcher) => fetcher.fetch(logger)),
       );
 
       const allUpdates = providerResults.flatMap((r) => r.updates);
@@ -615,7 +827,7 @@ export class ModelPricesRepository {
       const allFailures = providerResults.flatMap((r) => r.failures);
 
       const agentDir = join(process.cwd(), "src/app/api/[locale]/agent");
-      // Role file paths — model definitions live in modality-specific subdirs
+      // Role file paths - model definitions live in modality-specific subdirs
       const roleFilePaths: Record<string, string> = {
         chat: join(agentDir, "ai-stream/models.ts"),
         "image-gen": join(agentDir, "image-generation/models.ts"),
@@ -699,14 +911,34 @@ export class ModelPricesRepository {
           "\\$&",
         );
 
+        // Token cost fields: insert if missing, update if present
         if (
+          update.field === "inputTokenCost" ||
+          update.field === "outputTokenCost" ||
           update.field === "cacheReadTokenCost" ||
           update.field === "cacheWriteTokenCost"
         ) {
-          const insertAfter =
-            update.field === "cacheWriteTokenCost"
-              ? "cacheReadTokenCost"
-              : "outputTokenCost";
+          const insertAfterMap: Record<string, string> = {
+            inputTokenCost: "creditCost",
+            outputTokenCost: "inputTokenCost",
+            cacheReadTokenCost: "outputTokenCost",
+            cacheWriteTokenCost: "cacheReadTokenCost",
+          };
+          const insertAfter = insertAfterMap[update.field] ?? "outputTokenCost";
+
+          // For inputTokenCost: also migrate creditCost: <number> → creditCost: calculateCreditCost
+          if (update.field === "inputTokenCost") {
+            const migrateRegex = new RegExp(
+              `(providerModel:\\s*"${escaped}"[\\s\\S]*?)(creditCost:\\s*)[\\d.]+([,]?(?:\\s*//[^\n]*)?)`,
+            );
+            if (migrateRegex.test(roleFileContents[role])) {
+              roleFileContents[role] = roleFileContents[role].replace(
+                migrateRegex,
+                "$1$2calculateCreditCost$3",
+              );
+            }
+          }
+
           const result = applyCacheCostUpdate(
             roleFileContents[role],
             escaped,
@@ -746,13 +978,15 @@ export class ModelPricesRepository {
         }
       }
 
-      // Apply provider entry operations (add/remove UNBOTTLED entries)
-      // Must run BEFORE price updates so newly added entries can receive their prices.
-      // Removals run first, then additions.
+      // Apply provider entry operations (add/remove/update UNBOTTLED entries)
+      // Order: removals first, then additions, then updates (rewrite existing block).
       const removals = allProviderEntryOps.filter(
         (op) => op.action === "remove",
       );
       const additions = allProviderEntryOps.filter((op) => op.action === "add");
+      const updates = allProviderEntryOps.filter(
+        (op) => op.action === "update",
+      );
       for (const op of [...removals, ...additions]) {
         const roleContent = roleFileContents[op.role];
         if (!roleContent) {
@@ -768,6 +1002,18 @@ export class ModelPricesRepository {
           logger.info(
             `[Unbottled] ${op.action === "add" ? "Added" : "Removed"} provider entry for ${op.modelId}`,
           );
+        }
+      }
+      for (const op of updates) {
+        const roleContent = roleFileContents[op.role];
+        if (!roleContent) {
+          continue;
+        }
+        const result = updateUnbottledEntry(roleContent, op);
+        if (result.changed) {
+          roleFileContents[op.role] = result.content;
+          updatedCount++;
+          logger.info(`[Unbottled] Updated provider entry for ${op.modelId}`);
         }
       }
 
@@ -1076,7 +1322,7 @@ export class ModelPricesRepository {
       }
 
       logger.info("Unified model pricing update completed", {
-        providers: ALL_FETCHERS.length,
+        providers: fetchers.length,
         totalUpdates: allUpdates.length,
         written: updatedCount,
         failures: allFailures.length,
@@ -1084,7 +1330,7 @@ export class ModelPricesRepository {
 
       return success({
         summary: {
-          totalProviders: ALL_FETCHERS.length,
+          totalProviders: fetchers.length,
           totalModels: allUpdates.length,
           modelsUpdated: updatedCount,
           fileUpdated: updatedCount > 0,

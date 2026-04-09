@@ -5,11 +5,11 @@ import {
   ModelSortDirection,
   ModelSortField,
 } from "../chat/skills/enum";
-import { ImageGenModelId } from "./models";
 import type { ImageGenModelSelection } from "../image-generation/models";
+import { ImageGenModelId } from "./models";
 
 /**
- * Default image generation model selection — MANUAL preferred model with 2-level sort fallback.
+ * Default image generation model selection - MANUAL preferred model with 2-level sort fallback.
  * Use resolveModelSelectionForEnv(selection, env) before getBestImageGenModel() to env-filter.
  */
 export const DEFAULT_IMAGE_GEN_MODEL_SELECTION: ImageGenModelSelection = {

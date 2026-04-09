@@ -72,6 +72,23 @@ export const translations: typeof enTranslations = {
       label: "Charakter-ID",
       description: "Die eindeutige Kennung der Charakter",
     },
+    models: {
+      brain: "Gehirn",
+      eyes: "Augen",
+      ears: "Ohren & Stimme",
+      media: "Medien",
+      slots: {
+        chat: "Chat",
+        imageVision: "Bilderkennung",
+        videoVision: "Videoerkennung",
+        stt: "Sprache zu Text",
+        tts: "Text zu Sprache",
+        audioVision: "Audioerkennung",
+        imageGen: "Bildgenerierung",
+        musicGen: "Musikgenerierung",
+        videoGen: "Videogenerierung",
+      },
+    },
     systemPrompt: {
       label: "System-Prompt",
     },
@@ -278,10 +295,6 @@ export const translations: typeof enTranslations = {
       label: "Audio-Vision-Modell",
       description: "Modell zur Audioanalyse",
       placeholder: "Systemstandard",
-    },
-    translationModel: {
-      label: "Übersetzungsmodell",
-      description: "Modell für die Textübersetzung",
     },
     imageGenModel: {
       label: "Bildgenerierungsmodell",

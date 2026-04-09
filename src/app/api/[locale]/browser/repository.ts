@@ -69,7 +69,7 @@ interface MCPResponse {
 }
 
 /**
- * Per-session MCP connection — one chrome-devtools-mcp process per session.
+ * Per-session MCP connection - one chrome-devtools-mcp process per session.
  * Each connects to the shared Chrome via --browserUrl, so they share tabs
  * without sharing a request queue.
  */
@@ -122,7 +122,7 @@ export class BrowserRepository {
   };
 
   /**
-   * Tools that manage pages — skip pageId injection for these.
+   * Tools that manage pages - skip pageId injection for these.
    */
   private static readonly PAGE_MGMT_TOOLS = new Set([
     "new_page",
@@ -223,6 +223,73 @@ export class BrowserRepository {
         success: toolSuccess,
         executionId,
       });
+
+      // After a user-initiated new_page, update session.pageId to the new tab.
+      if (mcpToolName === "new_page" && toolSuccess) {
+        const text =
+          mcpResult?.content?.find((b) => b.type === "text")?.text ?? "";
+        const match = /^(\d+):[^\n]*\[selected\]/m.exec(text);
+        if (match) {
+          session.pageId = parseInt(match[1], 10);
+        }
+      }
+
+      // If the tool reported "No page found", the session's pageId is stale
+      // (e.g. after a server restart Chrome kept running but page IDs reset).
+      // Clear it so the next request re-claims a fresh tab automatically.
+      const errorText =
+        mcpResult?.content?.find((b) => b.type === "text")?.text ?? "";
+      if (isToolError && errorText.includes("No page found")) {
+        logger.warn(
+          "[Browser Repository] Stale pageId detected, resetting session tab",
+          {
+            sessionId: data.sessionId,
+            stalePageId: session.pageId,
+          },
+        );
+        session.pageId = null;
+        await BrowserRepository.claimSessionPage(
+          session,
+          data.sessionId,
+          logger,
+        );
+        // Retry the tool call once with the fresh pageId.
+        const retryResult = await BrowserRepository.callTool(
+          session,
+          mcpToolName,
+          parsedArgs,
+          logger,
+        );
+        const retryMcpResult = retryResult.result as typeof mcpResult;
+        const retrySuccess =
+          retryResult.success && retryMcpResult?.isError !== true;
+        const retryContent = retryMcpResult?.content ?? [];
+        if (retrySuccess && retryContent.some((b) => b.type === "image")) {
+          const contentBlocks: ContentBlock[] = [];
+          for (const b of retryContent) {
+            if (b.type === "image" && b.data && b.mimeType) {
+              contentBlocks.push({
+                type: "image",
+                data: b.data,
+                mimeType: b.mimeType,
+              });
+            } else if (b.type === "text" && b.text) {
+              contentBlocks.push({ type: "text", text: b.text });
+            }
+          }
+          return createContentResponse(contentBlocks);
+        }
+        return success({
+          success: retrySuccess,
+          result: retryContent,
+          status: [
+            retrySuccess
+              ? BrowserToolStatus.COMPLETED
+              : BrowserToolStatus.FAILED,
+          ],
+          executionId,
+        });
+      }
 
       const content = mcpResult?.content ?? [];
 
@@ -491,7 +558,7 @@ export class BrowserRepository {
         "new_page",
         { url: "about:blank" },
         logger,
-        true, // skip pageId injection — no tab yet
+        true, // skip pageId injection - no tab yet
       );
       if (!result.success) {
         logger.warn(
@@ -544,8 +611,8 @@ export class BrowserRepository {
         : args;
 
     // If the caller explicitly selects a page, track it.
-    if (toolName === "select_page" && typeof args.index === "number") {
-      session.pageId = args.index;
+    if (toolName === "select_page" && typeof args.pageId === "number") {
+      session.pageId = args.pageId;
     }
 
     const toolRequest: MCPRequest = {

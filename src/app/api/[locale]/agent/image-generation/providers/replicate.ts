@@ -20,7 +20,7 @@ interface ReplicatePrediction {
   error?: string;
 }
 
-const POLL_INTERVAL_MS = 2000;
+const POLL_INTERVAL_MS = process.env.NODE_ENV === "test" ? 50 : 2000;
 const MAX_POLL_ATTEMPTS = 30;
 
 async function pollPrediction(
@@ -118,7 +118,7 @@ export async function generateWithReplicate(params: {
     height = 1792;
   }
 
-  logger.info("[Replicate] Creating prediction", {
+  logger.debug("[Replicate] Creating prediction", {
     model: providerModel,
     width,
     height,
@@ -154,7 +154,7 @@ export async function generateWithReplicate(params: {
     }
 
     const prediction = (await response.json()) as ReplicatePrediction;
-    logger.info("[Replicate] Prediction created, polling", {
+    logger.debug("[Replicate] Prediction created, polling", {
       predictionId: prediction.id,
     });
     return pollPrediction(prediction.id, logger, locale, signal);

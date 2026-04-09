@@ -1,0 +1,111 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[HT1 direct-wakeup] Use the tool-help tool on the thea instance (prefix: thea__) to look up \"generate_image\". Use wakeUp callback mode. Reply STEP_OK when the tool result is available, or FAILED: <reason>.\n[Tool result for tool-help]:\n{\n  \"status\": \"pending\",\n  \"hint\": \"Result will be injected into this thread when ready. Do NOT call this tool again.\"\n}\nTask initiated with wakeUp mode. TaskId: `local-wu-1775434873120-qb008x`. Status: pending. Awaiting automatic result injection...\n[HT2 direct-wa",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user is asking me to use the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tool-help tool with the \"thea\" instance (using the \"thea__\" prefix) to look up \"generate_image\", with"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " endLoop callback mode.\n\nLooking at the context provided, I can see that the only connected instance is \"hermes\""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " - the context shows:\n- \"User has 1 connected local"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " instance: 'hermes'\"\n\nThe tasks HT1 and HT2 tried to access \"th"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "ea\" instance and both failed or are pending because that"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " instance is not available.\n\nNow for HT3, I need to:\n1. Use tool-help tool\n2. Use \"thea__\""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " prefix (but the tool-help doesn't have a direct instanceId parameter shown"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " in its definition)\n3. Look up \"generate_image\"\n4. Use endLoop callback mode\n5. End response"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " after dispatching (meaning don't wait for result)\n\nLooking at the tool-help parameters, I see:\n- `instanceId` parameter ("
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "optional) - this is probably what I should use instead of a prefix\n- `toolName` parameter - I should set"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " this to \"generate_image\"\n\nLet me call tool-help with:\n- instanceId: \"thea\"\n- toolName: \"generate_image\"\n-"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " callbackMode: \"endLoop\""
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "c8eea591-89e9-4db8-97be-dafcf944b37b",
+      "toolName": "tool-help",
+      "input": "{\"toolName\":\"generate_image\",\"instanceId\":\"thea\",\"callbackMode\":\"endLoop\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "c8eea591-89e9-4db8-97be-dafcf944b37b",
+      "toolName": "tool-help",
+      "result": "{\n  \"tools\": [],\n  \"totalCount\": 0,\n  \"matchedCount\": 0,\n  \"hint\": \"No capability snapshot for instance \\\"thea\\\". Connect the instance and wait for a sync pulse.\"\n}"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 20,
+        "outputTokens": 16,
+        "totalTokens": 36,
+        "cachedInputTokens": 0
+      },
+      "finishReason": "other",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 14508
+        }
+      }
+    }
+  ]
+}

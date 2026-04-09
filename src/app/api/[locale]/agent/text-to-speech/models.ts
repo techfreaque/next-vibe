@@ -5,11 +5,12 @@ import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
-  PriceLevel,
   SpeedLevel,
 } from "../chat/skills/enum";
+import {
+  filtersSelectionSchema,
+  sharedFilterPropsSchema,
+} from "../models/selection";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -69,6 +70,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "openai",
         creditCostPerCharacter: 0.0016, // updated: 2026-04-03 from api.edenai.run
       },
+      {
+        id: TtsModelId.OPENAI_ALLOY,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "openai-alloy",
+        creditCostPerCharacter: 0.002, // updated: 2026-04-07 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.OPENAI_NOVA]: {
@@ -103,6 +110,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         apiProvider: ApiProvider.EDEN_AI_TTS,
         providerModel: "openai",
         creditCostPerCharacter: 0.0016, // updated: 2026-04-03 from api.edenai.run
+      },
+      {
+        id: TtsModelId.OPENAI_NOVA,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "openai-nova",
+        creditCostPerCharacter: 0.002, // updated: 2026-04-07 from unbottled.ai
       },
     ],
   },
@@ -139,6 +152,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "openai",
         creditCostPerCharacter: 0.0016, // updated: 2026-04-03 from api.edenai.run
       },
+      {
+        id: TtsModelId.OPENAI_ONYX,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "openai-onyx",
+        creditCostPerCharacter: 0.002, // updated: 2026-04-07 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.OPENAI_ECHO]: {
@@ -167,6 +186,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "tts-1",
         creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
+      },
+      {
+        id: TtsModelId.OPENAI_ECHO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "openai-echo",
+        creditCostPerCharacter: 0.002, // updated: 2026-04-07 from unbottled.ai
       },
     ],
   },
@@ -197,6 +222,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "tts-1",
         creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
+      {
+        id: TtsModelId.OPENAI_SHIMMER,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "openai-shimmer",
+        creditCostPerCharacter: 0.002, // updated: 2026-04-07 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.OPENAI_FABLE]: {
@@ -225,6 +256,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "tts-1",
         creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
+      },
+      {
+        id: TtsModelId.OPENAI_FABLE,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "openai-fable",
+        creditCostPerCharacter: 0.002, // updated: 2026-04-07 from unbottled.ai
       },
     ],
   },
@@ -256,6 +293,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "21m00Tcm4TlvDq8ikWAM",
         creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
       },
+      {
+        id: TtsModelId.ELEVENLABS_RACHEL,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "elevenlabs-rachel",
+        creditCostPerCharacter: 0.039, // updated: 2026-04-07 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.ELEVENLABS_JOSH]: {
@@ -285,6 +328,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         apiProvider: ApiProvider.ELEVENLABS,
         providerModel: "TxGEqnHWrfWFTfGW9XjX",
         creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
+      },
+      {
+        id: TtsModelId.ELEVENLABS_JOSH,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "elevenlabs-josh",
+        creditCostPerCharacter: 0.039, // updated: 2026-04-07 from unbottled.ai
       },
     ],
   },
@@ -316,6 +365,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "EXAVITQu4vr4xnSDxMaL",
         creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
       },
+      {
+        id: TtsModelId.ELEVENLABS_BELLA,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "elevenlabs-bella",
+        creditCostPerCharacter: 0.039, // updated: 2026-04-07 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.ELEVENLABS_ADAM]: {
@@ -345,6 +400,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         apiProvider: ApiProvider.ELEVENLABS,
         providerModel: "pNInz6obpgDQGcFmaJgB",
         creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
+      },
+      {
+        id: TtsModelId.ELEVENLABS_ADAM,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "elevenlabs-adam",
+        creditCostPerCharacter: 0.039, // updated: 2026-04-07 from unbottled.ai
       },
     ],
   },
@@ -387,6 +448,7 @@ function buildTtsModelOptions(): Record<string, TtsModelOption> {
           voiceMeta: def.voiceMeta,
           creditCostPerCharacter: p.creditCostPerCharacter ?? 0,
         };
+        break;
       }
     }
   }
@@ -412,41 +474,6 @@ export function getTtsModelById(modelId: TtsModelId): TtsModelOption {
 // ============================================================
 // TTS MODEL SELECTION SCHEMA
 // ============================================================
-
-const sharedFilterPropsSchema = z.object({
-  intelligenceRange: z
-    .object({
-      min: z.enum(IntelligenceLevel).optional(),
-      max: z.enum(IntelligenceLevel).optional(),
-    })
-    .optional(),
-  priceRange: z
-    .object({
-      min: z.enum(PriceLevel).optional(),
-      max: z.enum(PriceLevel).optional(),
-    })
-    .optional(),
-  contentRange: z
-    .object({
-      min: z.enum(ContentLevel).optional(),
-      max: z.enum(ContentLevel).optional(),
-    })
-    .optional(),
-  speedRange: z
-    .object({
-      min: z.enum(SpeedLevel).optional(),
-      max: z.enum(SpeedLevel).optional(),
-    })
-    .optional(),
-  sortBy: z.enum(ModelSortField).optional(),
-  sortDirection: z.enum(ModelSortDirection).optional(),
-  sortBy2: z.enum(ModelSortField).optional(),
-  sortDirection2: z.enum(ModelSortDirection).optional(),
-});
-
-const filtersSelectionSchema = z
-  .object({ selectionType: z.literal(ModelSelectionType.FILTERS) })
-  .merge(sharedFilterPropsSchema);
 
 export const voiceModelSelectionSchema = z.discriminatedUnion("selectionType", [
   z

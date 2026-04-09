@@ -895,13 +895,26 @@ export class ResumeStreamRepository {
               }
             }
 
+            // Walk forward from the tool message to handle the confirm-approve-queue case:
+            // when approve-mode confirmation ran an AI response BEFORE revival
+            // (queue path: tool result was {status:pending}, AI responded, then pulse
+            // executed the task and fired revival), the tool message already has a child.
+            // Walking to the leaf ensures revival appends AFTER that child, not as sibling.
+            // For the normal WAIT case (stream aborted before AI response), the tool
+            // message has no children, so walkToLeafMessage returns it unchanged.
+            const waitRevivalParentId = await walkToLeafMessage(
+              effectiveThreadId,
+              resolvedToolMessageId,
+              resolvedToolMessageId,
+            );
+
             void runHeadlessAiStream({
               favoriteId: favoriteId ?? undefined,
               model: resolvedModel,
               skill: resolvedSkill,
               prompt: "",
               wakeUpRevival: true,
-              explicitParentMessageId: resolvedToolMessageId,
+              explicitParentMessageId: waitRevivalParentId,
               sequenceIdOverride: resolvedExisting?.sequenceId ?? undefined,
               threadId: effectiveThreadId,
               rootFolderId: threadRootFolderId,

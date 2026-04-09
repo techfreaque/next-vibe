@@ -16,8 +16,8 @@ import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
 import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
+import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -188,9 +188,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
           retryingMessageId === message.id && !isLoadingRetryAttachments;
         const isAnswering = answeringMessageId === message.id;
 
-        const branches = branchInfo[message.id];
-        const hasBranches = branches && branches.siblings.length > 1;
-
         const nextMessage =
           index < messages.length - 1 ? messages[index + 1] : null;
 
@@ -204,6 +201,22 @@ export const LinearMessageView = React.memo(function LinearMessageView({
         const allGroupMessages = group
           ? [group.primary, ...group.continuations]
           : [message];
+
+        // Find branch info for this message or any of its group continuations.
+        // When the branch point is a tool message (continuation), it is skipped
+        // by the isContinuation guard above - so we scan the full group here.
+        let branches = branchInfo[message.id];
+        let branchPointId = message.id;
+        if (!branches) {
+          for (const gm of allGroupMessages) {
+            const b = branchInfo[gm.id];
+            if (b) {
+              branches = b;
+              branchPointId = gm.id;
+            }
+          }
+        }
+        const hasBranches = branches && branches.siblings.length > 1;
         const newerMsg = allGroupMessages.find(
           (m) =>
             m.metadata?.hasNewerHistory === true && m.metadata?.newerAnchorId,
@@ -361,7 +374,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                     };
                   })}
                   onSwitchBranch={(branchIndex) =>
-                    onSwitchBranch(message.id, branchIndex)
+                    onSwitchBranch(branchPointId, branchIndex)
                   }
                   locale={locale}
                 />

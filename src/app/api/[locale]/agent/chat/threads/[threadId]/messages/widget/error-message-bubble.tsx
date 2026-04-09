@@ -62,7 +62,7 @@ export function ErrorMessageBubble({
     const parsed = JSON.parse(message.content || "{}") as ErrorResponseType;
     if (parsed && typeof parsed === "object" && "message" in parsed) {
       errorData = parsed;
-      displayContent = parsed.message;
+      displayContent = interpolateParams(parsed.message, parsed.messageParams);
 
       // Also translate the error type if available
       if (parsed.errorType?.errorKey) {
@@ -140,10 +140,25 @@ export function ErrorMessageBubble({
 }
 
 /**
+ * Replace {{key}} placeholders in a message string with values from params
+ */
+function interpolateParams(
+  message: string,
+  params?: Record<string, string | number>,
+): string {
+  if (!params) {
+    return message;
+  }
+  return message.replace(/\{\{(\w+)\}\}/g, (match, key: string) =>
+    key in params ? String(params[key]) : match,
+  );
+}
+
+/**
  * Recursively translate error causes
  */
 function translateErrorRecursive(error: ErrorResponseType): string {
-  const mainMessage = error.message;
+  const mainMessage = interpolateParams(error.message, error.messageParams);
 
   if (error.cause) {
     const causeMessage = translateErrorRecursive(error.cause);

@@ -25,7 +25,7 @@ interface FalAiStatusResponse {
   status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
 }
 
-const POLL_INTERVAL_MS = 2000;
+const POLL_INTERVAL_MS = process.env.NODE_ENV === "test" ? 50 : 2000;
 const MAX_POLL_ATTEMPTS = 30;
 
 export async function generateWithFalAi(params: {
@@ -53,7 +53,7 @@ export async function generateWithFalAi(params: {
     imageSize = "portrait_4_3";
   }
 
-  logger.info("[Fal.ai] Submitting generation request", {
+  logger.debug("[Fal.ai] Submitting generation request", {
     model: providerModel,
     imageSize,
     promptLength: prompt.length,
@@ -87,7 +87,7 @@ export async function generateWithFalAi(params: {
 
     const queueResult = (await submitResponse.json()) as FalAiQueueResponse;
     const requestId = queueResult.request_id;
-    logger.info("[Fal.ai] Request queued, polling", { requestId });
+    logger.debug("[Fal.ai] Request queued, polling", { requestId });
 
     for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
       if (signal?.aborted) {
@@ -137,7 +137,7 @@ export async function generateWithFalAi(params: {
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
-        logger.info("[Fal.ai] Image generated successfully");
+        logger.debug("[Fal.ai] Image generated successfully");
         return success({ imageUrl });
       }
 

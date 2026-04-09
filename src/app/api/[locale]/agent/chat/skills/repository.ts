@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq, ne, or } from "drizzle-orm";
+import { and, count, eq, ne, or } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -56,6 +56,9 @@ import type {
   SkillCreateRequestOutput,
   SkillCreateResponseOutput,
 } from "./create/definition";
+import { referralCodes } from "@/app/api/[locale]/referral/db";
+import { users } from "@/app/api/[locale]/user/db";
+import { skillVotes } from "./db";
 import { customSkills } from "./db";
 import type {
   SkillListItem,
@@ -464,6 +467,10 @@ export class SkillsRepository {
       // Check default skills first
       const defaultSkill = DEFAULT_SKILLS.find((p) => p.id === skillId);
       if (defaultSkill) {
+        // Use the default variant's model selections as skill-level defaults
+        const defaultVariant =
+          defaultSkill.variants.find((v) => v.isDefault) ??
+          defaultSkill.variants[0];
         return success<SkillGetResponseOutput>({
           icon: defaultSkill.icon,
           name: t(defaultSkill.name),
@@ -471,41 +478,21 @@ export class SkillsRepository {
           description: t(defaultSkill.description),
           category: defaultSkill.category,
           isPublic: false,
-          voiceModelSelection: defaultSkill.voiceId
-            ? {
-                selectionType: ModelSelectionType.MANUAL,
-                manualModelId: defaultSkill.voiceId,
-              }
-            : null,
-          sttModelSelection: defaultSkill.sttModelId
-            ? {
-                selectionType: ModelSelectionType.MANUAL,
-                manualModelId: defaultSkill.sttModelId,
-              }
-            : null,
-          imageVisionModelSelection: defaultSkill.imageVisionModelId
-            ? {
-                selectionType: ModelSelectionType.MANUAL,
-                manualModelId: defaultSkill.imageVisionModelId,
-              }
-            : null,
-          videoVisionModelSelection: defaultSkill.videoVisionModelId
-            ? {
-                selectionType: ModelSelectionType.MANUAL,
-                manualModelId: defaultSkill.videoVisionModelId,
-              }
-            : null,
-          audioVisionModelSelection: defaultSkill.audioVisionModelId
-            ? {
-                selectionType: ModelSelectionType.MANUAL,
-                manualModelId: defaultSkill.audioVisionModelId,
-              }
-            : null,
-          translationModelId: defaultSkill.translationModelId ?? null,
-          imageGenModelSelection: null,
-          musicGenModelSelection: null,
-          videoGenModelSelection: null,
-          defaultChatMode: defaultSkill.defaultChatMode ?? null,
+          voiceModelSelection: defaultVariant?.voiceModelSelection ?? null,
+          sttModelSelection: defaultVariant?.sttModelSelection ?? null,
+          imageVisionModelSelection:
+            defaultVariant?.imageVisionModelSelection ?? null,
+          videoVisionModelSelection:
+            defaultVariant?.videoVisionModelSelection ?? null,
+          audioVisionModelSelection:
+            defaultVariant?.audioVisionModelSelection ?? null,
+          imageGenModelSelection:
+            defaultVariant?.imageGenModelSelection ?? null,
+          musicGenModelSelection:
+            defaultVariant?.musicGenModelSelection ?? null,
+          videoGenModelSelection:
+            defaultVariant?.videoGenModelSelection ?? null,
+          defaultChatMode: defaultVariant?.defaultChatMode ?? null,
           systemPrompt: defaultSkill.systemPrompt,
           skillOwnership: SkillOwnershipType.SYSTEM,
           compactTrigger: null,
@@ -520,7 +507,19 @@ export class SkillsRepository {
             id: v.id,
             modelSelection: v.modelSelection,
             isDefault: v.isDefault,
+            voiceModelSelection: v.voiceModelSelection,
+            sttModelSelection: v.sttModelSelection,
+            imageVisionModelSelection: v.imageVisionModelSelection,
+            videoVisionModelSelection: v.videoVisionModelSelection,
+            audioVisionModelSelection: v.audioVisionModelSelection,
+            defaultChatMode: v.defaultChatMode,
+            imageGenModelSelection: v.imageGenModelSelection,
+            musicGenModelSelection: v.musicGenModelSelection,
+            videoGenModelSelection: v.videoGenModelSelection,
           })),
+          longContent: null,
+          favoritesCount: 0,
+          creatorProfile: null,
         });
       }
 
@@ -533,17 +532,11 @@ export class SkillsRepository {
           description: null,
           category: NO_SKILL.category,
           isPublic: false,
-          voiceModelSelection: NO_SKILL.voiceId
-            ? {
-                selectionType: ModelSelectionType.MANUAL,
-                manualModelId: NO_SKILL.voiceId,
-              }
-            : null,
+          voiceModelSelection: null,
           sttModelSelection: null,
           imageVisionModelSelection: null,
           videoVisionModelSelection: null,
           audioVisionModelSelection: null,
-          translationModelId: null,
           imageGenModelSelection: null,
           musicGenModelSelection: null,
           videoGenModelSelection: null,
@@ -553,11 +546,23 @@ export class SkillsRepository {
           compactTrigger: null,
           availableTools: null,
           pinnedTools: null,
-          variants: NO_SKILL.variants.map((v) => ({
+          variants: (NO_SKILL.variants as SkillVariant[]).map((v) => ({
             id: v.id,
             modelSelection: v.modelSelection,
             isDefault: v.isDefault,
+            voiceModelSelection: v.voiceModelSelection,
+            sttModelSelection: v.sttModelSelection,
+            imageVisionModelSelection: v.imageVisionModelSelection,
+            videoVisionModelSelection: v.videoVisionModelSelection,
+            audioVisionModelSelection: v.audioVisionModelSelection,
+            defaultChatMode: v.defaultChatMode,
+            imageGenModelSelection: v.imageGenModelSelection,
+            musicGenModelSelection: v.musicGenModelSelection,
+            videoGenModelSelection: v.videoGenModelSelection,
           })),
+          longContent: null,
+          favoritesCount: 0,
+          creatorProfile: null,
         });
       }
 
@@ -598,6 +603,51 @@ export class SkillsRepository {
         });
       }
 
+      // Fetch creator profile for USER-owned public skills
+      let creatorProfile: SkillGetResponseOutput["creatorProfile"] = null;
+      let favoritesCount = 0;
+
+      // Count favorites (votes) for this skill
+      const [votesResult] = await db
+        .select({ count: count() })
+        .from(skillVotes)
+        .where(eq(skillVotes.skillId, skillId));
+      favoritesCount = votesResult?.count ?? 0;
+
+      // Fetch creator profile if skill is owned by a user
+      if (customSkill.ownershipType === SkillOwnershipType.USER) {
+        const [creatorUser] = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, customSkill.userId))
+          .limit(1);
+
+        if (creatorUser) {
+          const [refCode] = await db
+            .select({ code: referralCodes.code })
+            .from(referralCodes)
+            .where(eq(referralCodes.ownerUserId, customSkill.userId))
+            .limit(1);
+
+          creatorProfile = {
+            userId: creatorUser.id,
+            publicName: creatorUser.publicName,
+            avatarUrl: creatorUser.avatarUrl ?? null,
+            bio: creatorUser.bio ?? null,
+            websiteUrl: creatorUser.websiteUrl ?? null,
+            twitterUrl: creatorUser.twitterUrl ?? null,
+            youtubeUrl: creatorUser.youtubeUrl ?? null,
+            instagramUrl: creatorUser.instagramUrl ?? null,
+            tiktokUrl: creatorUser.tiktokUrl ?? null,
+            githubUrl: creatorUser.githubUrl ?? null,
+            discordUrl: creatorUser.discordUrl ?? null,
+            creatorAccentColor: creatorUser.creatorAccentColor ?? null,
+            creatorHeaderImageUrl: creatorUser.creatorHeaderImageUrl ?? null,
+            referralCode: refCode?.code ?? null,
+          };
+        }
+      }
+
       // Return only response fields (exclude database fields like userId, createdAt, updatedAt)
       // Flattened response
       return success<SkillGetResponseOutput>({
@@ -615,7 +665,6 @@ export class SkillsRepository {
           customSkill.videoVisionModelSelection ?? null,
         audioVisionModelSelection:
           customSkill.audioVisionModelSelection ?? null,
-        translationModelId: customSkill.translationModelId ?? null,
         imageGenModelSelection: customSkill.imageGenModelSelection ?? null,
         musicGenModelSelection: customSkill.musicGenModelSelection ?? null,
         videoGenModelSelection: customSkill.videoGenModelId
@@ -647,6 +696,9 @@ export class SkillsRepository {
               },
             ]
           : [],
+        longContent: customSkill.longContent ?? null,
+        favoritesCount,
+        creatorProfile,
       });
     } catch (error) {
       logger.error("Failed to get skill by ID", parseError(error));
@@ -728,7 +780,6 @@ export class SkillsRepository {
           imageVisionModelSelection: data.imageVisionModelSelection ?? null,
           videoVisionModelSelection: data.videoVisionModelSelection ?? null,
           audioVisionModelSelection: data.audioVisionModelSelection ?? null,
-          translationModelId: data.translationModelId ?? null,
           imageGenModelSelection: SkillsRepository.normalizeImageGenSelection(
             data.imageGenModelSelection ?? null,
           ),
@@ -812,7 +863,6 @@ export class SkillsRepository {
             imageVisionModelSelection: data.imageVisionModelSelection ?? null,
             videoVisionModelSelection: data.videoVisionModelSelection ?? null,
             audioVisionModelSelection: data.audioVisionModelSelection ?? null,
-            translationModelId: data.translationModelId ?? null,
             imageGenModelSelection: SkillsRepository.normalizeImageGenSelection(
               data.imageGenModelSelection ?? null,
             ),
@@ -1088,7 +1138,7 @@ export class SkillsRepository {
         t,
         user,
         variant.id,
-        t(variant.variantName),
+        variant.variantName ? t(variant.variantName) : "",
         true,
         variant.isDefault ?? false,
       ),

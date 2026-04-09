@@ -174,7 +174,7 @@ export const translations: typeof enTranslations = {
         pack: "Pakiet",
         packs: "Pakiety",
         requiresSubscription:
-          "Pakiety kredytów wymagają aktywnej subskrypcji. Subskrybuj, aby otrzymać miesięczne kredyty i odblokować możliwość kupowania pakietów kredytów!",
+          "Pakiety kredytów są dla subskrybentów, którym skończyły się miesięczne kredyty. Najpierw wykup subskrypcję.",
       },
     },
     history: {

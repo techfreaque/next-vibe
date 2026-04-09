@@ -1,0 +1,261 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[HT1 direct-wakeup] Use the tool-help tool on the thea instance (prefix: thea__) to look up \"generate_image\". Use wakeUp callback mode. Reply STEP_OK when the tool result is available, or FAILED: <reason>.\n[Tool result for tool-help]:\n{\n  \"status\": \"pending\",\n  \"hint\": \"Result will be injected into this thread when ready. Do NOT call this tool again.\"\n}\nTask initiated with wakeUp mode. TaskId: `local-wu-1775434873120-qb008x`. Status: pending. Awaiting automatic result injection...\n[HT2 direct-wa",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user is asking me to complete"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " two direct tasks:\n\n1. **HT1 (direct-wakeup)**: Use the tool-help tool on the \"thea\" instance with"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " \"generate_image\" lookup, using wakeUp callback mode. Reply STEP_OK when the tool result is available, or FAILED: <reason>.\n\n2. **HT2"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " (direct-wait)**: Use the tool-help tool on the \"thea\" instance with \"generate_image\" lookup, using wait callback mode. Reply STEP_OK when done, or FAILED: <reason>.\n\nHowever, I can"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " see from the system context that only the \"hermes\" instance is connected. The \"thea\" instance is not available in this environment.\n\nLooking at the results"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " I've already received:\n- HT1 shows a wakeUp task"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Id was created: `local-wu-1775434923348-ip23ow`\n- HT2 shows a failure: \"No capability snapshot for instance 'thea'. Instance is not connected"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " or not synced.\"\n\nWait, let me re-read what happened. The user provided two tasks"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " but it seems I (or the previous context) already attempted"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " them. Let me look at the timeline:\n\nThe system reminder shows context was captured"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " at different times, and the user is now asking me to complete two tasks. But the function results"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " shown indicate:\n1. First attempt at HT1 returned a"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " pending status with taskId\n2. HT2 returned a failure\n\nHowever, I need to be clear"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " about what I should do NOW. The user is asking me to:\n- HT1: Execute tool"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-help on thea instance for \"generate_image\" with wakeUp mode, reply STEP_OK when result available or"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " FAILED\n- HT2: Execute tool-help on thea instance for \"generate_image\" with wait mode, reply STEP_OK when done or FAILED\n\nBut looking at the results, it seems these have"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " already been attempted and both are showing issues with the \""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "thea\" instance not being available.\n"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nLooking"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " at the exact instruction, the notation \"thea__\" indicates I should use `instanceId=\"thea\"` with the tool-help tool. The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " error message states \"No capability snapshot for instance 'thea'. Connect the instance and wait for a sync pulse.\" Since the thea instance isn"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "'t connected, both tasks will fail with this reason."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nRe"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-examining the context more carefully, only \"hermes\" is listed as a connected local instance. The th"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "ea instance isn't mentioned in the available instances at all. For HT1, the wakeUp"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " task was initiated but returned a pending taskId without actual capability data since thea isn't connected—it will likely timeout or fail."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " For HT2, the failure is straightforward: thea instance is not connected and therefore unav"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "ailable."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " th"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "ea is not connected and has no capability snapshot.\n\nThe core"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " issue is that the thea instance isn't available - it's not connected to the system, so neither HT1 nor HT2"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " can access the tool-help capability to look up \"generate_image\"."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " HT1 was sent with wakeUp mode expecting a callback, but without the instance"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " being connected, it can't proceed. HT2 attempted with wait mode and"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " immediately failed for the same reason. I need to report that both attempts are blocked"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " by the instance connectivity issue."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "**HT1 Status:**\nFAILED:"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " thea instance not connected. No capability snapshot available for the \"thea\" instance. It is not synced to"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " this environment.\n\n**HT2 Status:**\nFAILED: thea instance not connected. No capability snapshot available for the \"thea\" instance. It is not synced to this environment.\n\n**Root Cause:**"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "\nThe system context indicates only one remote instance is connected: **\"hermes\"**. The \"thea\" instance referenced in both tasks is not configured or connected."
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " Both tool-help attempts to query \"thea__"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "\" fail because the instance lacks a capability snapshot and cannot be discovered.\n\n**Recommendation"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": ":**\nTo proceed, either:\n1. Connect and sync the \"thea\" instance to this environment,"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " or\n2. Redirect tasks to use the \"hermes\" instance (currently available)"
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 10,
+        "outputTokens": 1630,
+        "totalTokens": 1640,
+        "cachedInputTokens": 0
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 7172
+        }
+      }
+    }
+  ]
+}

@@ -126,7 +126,9 @@ function getVariantLabel(
   if (!variant) {
     return null;
   }
-  return skillsScopedTranslation.scopedT(locale).t(variant.variantName);
+  return variant.variantName
+    ? skillsScopedTranslation.scopedT(locale).t(variant.variantName)
+    : null;
 }
 
 /**

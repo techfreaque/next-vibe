@@ -43,11 +43,6 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
-  getBestImageVisionModel,
-  getBestVideoVisionModel,
-  getBestAudioVisionModel,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import {
   ImageQuality,
   ImageSize,
   MusicDuration,
@@ -55,6 +50,11 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
 import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/store";
 import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
+import {
+  getBestAudioVisionModel,
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { AGENT_MESSAGE_LENGTH } from "@/app/api/[locale]/agent/chat/constants";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
@@ -339,7 +339,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const isImageModel =
     currentModel?.outputs?.includes("image") === true &&
     currentModel?.outputs?.includes("text") !== true;
-  // Audio-gen models never reach the chat stream pipeline — always false here.
+  // Audio-gen models never reach the chat stream pipeline - always false here.
   const isAudioModel = false;
   // isGenerativeModel: pure generator - no streaming conversation, hides voice/call mode
   const isGenerativeModel = isImageModel || isAudioModel;
@@ -501,6 +501,15 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     () => void voice.submitAudioDirectly(),
     [voice],
   );
+
+  // Smart send: in STT mode uses voice.submitVoice(), otherwise normal submit
+  const handleSmartSend = useCallback(() => {
+    if (voice.isRecording || voice.isProcessing) {
+      void voice.submitVoice();
+    } else {
+      void handleSubmit();
+    }
+  }, [voice, handleSubmit]);
 
   const handleToggleCallMode = useCallback(
     () => !voiceUnconfigured && setTTSAutoplay(!ttsAutoplay),
@@ -873,15 +882,16 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    type="submit"
+                    type="button"
                     size="icon"
                     variant="default"
                     disabled={
                       !canPost ||
-                      !input.trim() ||
-                      voice.isRecording ||
-                      voice.isProcessing
+                      (!input.trim() &&
+                        !voice.isRecording &&
+                        !voice.isProcessing)
                     }
+                    onClick={handleSmartSend}
                     className="h-8 w-8 @sm:h-9 @sm:w-9"
                   >
                     <Send className="h-4 w-4" />

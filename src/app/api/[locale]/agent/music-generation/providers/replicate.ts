@@ -20,8 +20,8 @@ interface ReplicatePrediction {
   error?: string;
 }
 
-const POLL_INTERVAL_MS = 3000;
-const MAX_POLL_ATTEMPTS = 30;
+const POLL_INTERVAL_MS = process.env.NODE_ENV === "test" ? 50 : 3000;
+const MAX_POLL_ATTEMPTS = 80;
 
 async function pollPrediction(
   predictionId: string,
@@ -109,7 +109,7 @@ export async function generateMusicWithReplicate(params: {
     });
   }
 
-  logger.info("[Replicate Music] Creating prediction", {
+  logger.debug("[Replicate Music] Creating prediction", {
     model: providerModel,
     durationSeconds,
     promptLength: prompt.length,
@@ -150,7 +150,7 @@ export async function generateMusicWithReplicate(params: {
     }
 
     const prediction = (await response.json()) as ReplicatePrediction;
-    logger.info("[Replicate Music] Prediction created, polling", {
+    logger.debug("[Replicate Music] Prediction created, polling", {
       predictionId: prediction.id,
     });
     return pollPrediction(prediction.id, logger, locale, signal);

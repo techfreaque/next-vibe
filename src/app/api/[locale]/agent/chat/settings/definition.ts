@@ -111,11 +111,6 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: audioVisionModelSelectionSchema.nullable().optional(),
       }),
-      translationModelId: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.enum(ChatModelId).optional(),
-      }),
       imageGenModelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
@@ -341,14 +336,6 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: audioVisionModelSelectionSchema.nullable().optional(),
       }),
-      translationModelId: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "post.translationModel.label" as const,
-        options: ChatModelIdOptions,
-        columns: 6,
-        schema: z.enum(ChatModelId).optional(),
-      }),
       imageGenModelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -514,7 +501,6 @@ const { POST } = createEndpoint({
         imageVisionModelSelection: undefined,
         videoVisionModelSelection: undefined,
         audioVisionModelSelection: undefined,
-        translationModelId: undefined,
         defaultChatMode: undefined,
       },
     },

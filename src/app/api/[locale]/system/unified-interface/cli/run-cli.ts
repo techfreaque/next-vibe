@@ -202,7 +202,7 @@ export function runCli({
           command !== "h" &&
           !(await getEndpoint(command))
         ) {
-          // rawCommand is not a known tool — treat it as the first path arg
+          // rawCommand is not a known tool - treat it as the first path arg
           args = [command, ...args];
           command = defaultEndpoint;
         }

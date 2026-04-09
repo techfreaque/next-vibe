@@ -160,7 +160,7 @@ export async function startHotkeyDaemon(
   logger: EndpointLogger,
   onToggle: () => Promise<void>,
 ): Promise<never> {
-  logger.info("Starting STT hotkey daemon", {
+  logger.debug("Starting STT hotkey daemon", {
     platform: platformDetector.detect(),
   });
 
@@ -175,7 +175,7 @@ export async function startHotkeyDaemon(
   const reader = proc.stdout.getReader();
   const decoder = new TextDecoder();
 
-  logger.info("Daemon process started, monitoring for TOGGLE events");
+  logger.debug("Daemon process started, monitoring for TOGGLE events");
 
   try {
     while (true) {
@@ -194,7 +194,7 @@ export async function startHotkeyDaemon(
         logger.debug("Processing line", { line: trimmed });
 
         if (trimmed === "TOGGLE") {
-          logger.info("Hotkey detected, toggling STT");
+          logger.debug("Hotkey detected, toggling STT");
           try {
             await onToggle();
           } catch (error) {
@@ -223,7 +223,7 @@ export async function startHotkeyDaemon(
           }
         } else if (trimmed) {
           // Log all output for visibility
-          logger.info("Shell output", { output: trimmed });
+          logger.debug("Shell output", { output: trimmed });
         }
       }
     }

@@ -52,7 +52,7 @@ export async function generateWithOpenAI(params: {
 
   const apiSize = mapSizeToOpenAI(size);
   const apiQuality = mapQualityToOpenAI(quality);
-  logger.info("[OpenAI Images] Generating image", {
+  logger.debug("[OpenAI Images] Generating image", {
     model: providerModel,
     size: apiSize,
     quality: apiQuality,
@@ -99,7 +99,7 @@ export async function generateWithOpenAI(params: {
       });
     }
 
-    logger.info("[OpenAI Images] Image generated successfully");
+    logger.debug("[OpenAI Images] Image generated successfully");
     return success({ imageUrl });
   } catch (error) {
     const errorMessage = parseError(error).message;

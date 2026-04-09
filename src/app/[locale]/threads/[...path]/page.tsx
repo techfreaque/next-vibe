@@ -56,6 +56,7 @@ import { EnvAvailabilitySetter } from "@/app/api/[locale]/agent/env-availability
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
@@ -488,6 +489,9 @@ export function TanstackPage({
     return <Div>{userT("auth.errors.unknownError")}</Div>;
   }
 
+  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
+  const totalModelCount = getAvailableModelCount(envAvailability, isAdmin);
+
   return (
     <>
       <EnvAvailabilitySetter env={envAvailability} />
@@ -514,7 +518,7 @@ export function TanstackPage({
           initialSubFolderContentsData={initialSubFolderContentsData}
           initialSubFolderId={initialSubFolderId}
         >
-          <ChatInterface user={user} />
+          <ChatInterface user={user} totalModelCount={totalModelCount} />
         </ChatBootProvider>
       </ChatNavigationProvider>
     </>

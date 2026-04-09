@@ -78,10 +78,6 @@ export const translations = {
         "Audio vision LLM override. null = user global preference wins (bridge model).",
       placeholder: "Inherit from skill",
     },
-    translationModel: {
-      label: "Translation Model",
-      description: "Model used for text translation",
-    },
     imageGenModel: {
       label: "Image Generation Model",
       description:

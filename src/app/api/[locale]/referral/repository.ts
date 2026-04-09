@@ -426,15 +426,21 @@ export class ReferralRepository {
    * Convert lead referral to user referral (Phase 2: During signup)
    * Called after user account is created to make referral permanent
    * Uses the LATEST referral code linked to the lead (most recent by createdAt)
+   * @param skillCreatorUserId - Optional: the skill creator who gets Level 1 commission
    */
   static async convertLeadReferralToUser(
     userId: string,
     leadId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    skillCreatorUserId?: string | null,
   ): Promise<ResponseType<void>> {
     try {
-      logger.debug("Converting lead referral to user", { userId, leadId });
+      logger.debug("Converting lead referral to user", {
+        userId,
+        leadId,
+        skillCreatorUserId,
+      });
 
       // Check if user already has a referrer
       const [existingUserReferral] = await db
@@ -489,11 +495,22 @@ export class ReferralRepository {
         return success();
       }
 
+      // Guard skillCreatorUserId: null if same as referrer or self
+      let resolvedSkillCreatorUserId: string | null =
+        skillCreatorUserId ?? null;
+      if (
+        resolvedSkillCreatorUserId === referrerUserId ||
+        resolvedSkillCreatorUserId === userId
+      ) {
+        resolvedSkillCreatorUserId = null;
+      }
+
       // Create user referral record (permanent)
       await db.insert(userReferrals).values({
         referrerUserId,
         referredUserId: userId,
         referralCodeId: leadReferral.referralCodeId,
+        skillCreatorUserId: resolvedSkillCreatorUserId,
       });
 
       // Increment code usage count
@@ -508,6 +525,7 @@ export class ReferralRepository {
       logger.debug("Lead referral converted to user successfully", {
         userId,
         referrerUserId,
+        skillCreatorUserId: resolvedSkillCreatorUserId,
         referralCode: referralCode.code,
       });
 
@@ -766,35 +784,70 @@ export class ReferralRepository {
 
   /**
    * Get referral chain for a user (private helper)
+   *
+   * Chain layout:
+   *   chain[0] = direct referrer (Level 0, 10% flat)
+   *   chain[1] = skill creator (Level 1, first upline share) — only if skillCreatorUserId is set
+   *   chain[2+] = upline referrers walking from skill creator (or from direct referrer if no skill creator)
+   *
+   * Deduplication: any userId already in the chain is skipped when walking upline.
    */
   private static async getReferralChain(
     userId: string,
     logger: EndpointLogger,
   ): Promise<string[]> {
     const chain: string[] = [];
-    let currentUserId: string | null = userId;
+    const seen = new Set<string>();
 
-    // Traverse up the referral chain
-    // chain[0] = direct referrer + up to MAX_UPLINE_LEVELS above them
-    const maxChain = 1 + REFERRAL_CONFIG.MAX_UPLINE_LEVELS;
-    for (let i = 0; i < maxChain; i++) {
+    // Get the direct referral for this user (Level 0)
+    const [directReferral] = await db
+      .select()
+      .from(userReferrals)
+      .where(eq(userReferrals.referredUserId, userId))
+      .limit(1);
+
+    if (!directReferral) {
+      logger.debug("No referral chain found for user", { userId });
+      return chain;
+    }
+
+    // Level 0: direct referrer
+    chain.push(directReferral.referrerUserId);
+    seen.add(directReferral.referrerUserId);
+
+    // Level 1: skill creator (if set and different from referrer)
+    let currentUserId: string = directReferral.referrerUserId;
+    if (
+      directReferral.skillCreatorUserId &&
+      !seen.has(directReferral.skillCreatorUserId)
+    ) {
+      chain.push(directReferral.skillCreatorUserId);
+      seen.add(directReferral.skillCreatorUserId);
+      currentUserId = directReferral.skillCreatorUserId;
+    }
+
+    // Levels 2+: walk upline from currentUserId (up to MAX_UPLINE_LEVELS total upline slots)
+    const maxUpline = REFERRAL_CONFIG.MAX_UPLINE_LEVELS;
+    for (let i = chain.length - 1; i < maxUpline; i++) {
       const [referral] = await db
         .select()
         .from(userReferrals)
         .where(eq(userReferrals.referredUserId, currentUserId))
         .limit(1);
 
-      if (!referral) {
+      if (!referral || seen.has(referral.referrerUserId)) {
         break;
       }
 
       chain.push(referral.referrerUserId);
+      seen.add(referral.referrerUserId);
       currentUserId = referral.referrerUserId;
     }
 
     logger.debug("Referral chain retrieved", {
       userId,
       chainLength: chain.length,
+      hasSkillCreator: !!directReferral.skillCreatorUserId,
     });
     return chain;
   }

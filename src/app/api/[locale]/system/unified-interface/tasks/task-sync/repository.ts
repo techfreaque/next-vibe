@@ -65,6 +65,14 @@ interface SyncedCronTask {
   notificationTargets: NotificationTarget[];
   tags: string[];
   targetInstance: string | null;
+  /** Revival context - typed columns for wakeUp/wait callback flow */
+  wakeUpCallbackMode: string | null;
+  wakeUpThreadId: string | null;
+  wakeUpToolMessageId: string | null;
+  wakeUpLeafMessageId: string | null;
+  wakeUpModelId: string | null;
+  wakeUpSkillId: string | null;
+  wakeUpFavoriteId: string | null;
 }
 
 /**
@@ -140,9 +148,16 @@ export class TaskSyncRepository {
       taskInput: task.taskInput,
       runOnce: task.runOnce,
       outputMode: task.outputMode,
-      notificationTargets: task.notificationTargets as NotificationTarget[],
-      tags: task.tags as string[],
+      notificationTargets: task.notificationTargets,
+      tags: task.tags,
       targetInstance: task.targetInstance,
+      wakeUpCallbackMode: task.wakeUpCallbackMode ?? null,
+      wakeUpThreadId: task.wakeUpThreadId ?? null,
+      wakeUpToolMessageId: task.wakeUpToolMessageId ?? null,
+      wakeUpLeafMessageId: task.wakeUpLeafMessageId ?? null,
+      wakeUpModelId: task.wakeUpModelId ?? null,
+      wakeUpSkillId: task.wakeUpSkillId ?? null,
+      wakeUpFavoriteId: task.wakeUpFavoriteId ?? null,
     };
   }
 
@@ -169,6 +184,7 @@ export class TaskSyncRepository {
         // Reject tasks whose routeId is not a known local endpoint.
         // Prevents a compromised remote from injecting arbitrary route executions.
         const resolvedPath = getFullPath(remoteTask.routeId);
+
         if (resolvedPath === null) {
           logger.warn(
             "Rejecting remote task - routeId not recognised locally",
@@ -205,6 +221,14 @@ export class TaskSyncRepository {
           tags: remoteTask.tags,
           targetInstance: remoteTask.targetInstance,
           updatedAt: new Date(),
+          // Revival context - preserve typed columns for wakeUp/wait callback flow
+          wakeUpCallbackMode: remoteTask.wakeUpCallbackMode ?? null,
+          wakeUpThreadId: remoteTask.wakeUpThreadId ?? null,
+          wakeUpToolMessageId: remoteTask.wakeUpToolMessageId ?? null,
+          wakeUpLeafMessageId: remoteTask.wakeUpLeafMessageId ?? null,
+          wakeUpModelId: remoteTask.wakeUpModelId ?? null,
+          wakeUpSkillId: remoteTask.wakeUpSkillId ?? null,
+          wakeUpFavoriteId: remoteTask.wakeUpFavoriteId ?? null,
         };
         // Only include fields the remote explicitly sent
         if (remoteTask.version !== undefined) {
@@ -260,6 +284,11 @@ export class TaskSyncRepository {
             remoteTask.targetInstance !== null
               ? true
               : (definitionFields.runOnce ?? remoteTask.runOnce);
+          // Delegated tasks (targetInstance set) are always inserted as enabled=true.
+          // The sender may have disabled the task locally to prevent its own cron from
+          // double-executing it, but the recipient should always run what it receives.
+          const effectiveEnabled =
+            remoteTask.targetInstance !== null ? true : remoteTask.enabled;
           await db.insert(cronTasks).values({
             id: remoteTask.id,
             shortId: nanoid(8),
@@ -268,7 +297,7 @@ export class TaskSyncRepository {
             category: definitionFields.category ?? remoteTask.category,
             schedule: definitionFields.schedule ?? remoteTask.schedule,
             priority: definitionFields.priority ?? remoteTask.priority,
-            enabled: remoteTask.enabled,
+            enabled: effectiveEnabled,
             ...definitionFields,
             runOnce: effectiveRunOnce,
           });
@@ -344,6 +373,7 @@ export class TaskSyncRepository {
 
       const activeConnections =
         await RemoteConnectionRepository.getAllActiveConnectionsForSync();
+
       if (activeConnections.length === 0) {
         return success({ pulled: 0 });
       }
@@ -437,8 +467,11 @@ export class TaskSyncRepository {
           // sent to cloud. On first sync it is null → send "none" (a non-empty sentinel)
           // so cloud's condition `if (data.capabilitiesJson)` fires and stores the caps.
           const body: Record<string, string> = {
-            // Tell the remote who we are - our own selfInstanceId
-            instanceId: conn.remoteInstanceId ?? localInstanceId,
+            // Tell the remote who we are - our OWN local instanceId (e.g. "hermes-dev" or "hermes").
+            // The remote uses this to look up the connection and return tasks targeting us.
+            // Note: conn.remoteInstanceId is the REMOTE's self-identity (what they registered as),
+            // not ours. Using localInstanceId ensures we correctly identify ourselves.
+            instanceId: localInstanceId,
             memoriesHash: localMemoriesHash,
             capabilitiesVersion: conn.capabilitiesVersion ?? "none",
             taskCursor,
@@ -570,6 +603,10 @@ export class TaskSyncRepository {
           // Apply remote tasks (REMOTE_TOOL_CALL tasks for this local instance)
           if (data.tasks) {
             const remoteTasks = JSON.parse(data.tasks) as SyncedCronTask[];
+            // Match by OUR own localInstanceId - tasks that target us.
+            // The remote creates tasks with targetInstance = our label (e.g. "hermes"),
+            // so we filter for localInstanceId ("hermes"), not conn.remoteInstanceId
+            // ("hermes-dev" = what the remote calls itself, not what it calls us).
             const relevant = remoteTasks.filter(
               (task) => task.targetInstance === localInstanceId,
             );
@@ -1097,12 +1134,15 @@ export class TaskSyncRepository {
       .select()
       .from(cronTasks)
       .where(
-        sql`${cronTasks.userId} = ${user.id} AND ${cronTasks.targetInstance} = ${connRow?.remoteInstanceId ?? instanceId} AND ${cronTasks.createdAt} > ${cursor} AND ${cronTasks.lastExecutionStatus} IS NULL`,
+        // connRow.instanceId = the label we use for the caller (e.g. "hermes" when hermes calls us).
+        // Tasks targeting the caller have targetInstance = that label, so this is the correct filter.
+        // Note: connRow.remoteInstanceId is the caller's self-identity which may differ from our label for them.
+        sql`${cronTasks.userId} = ${user.id} AND ${cronTasks.targetInstance} = ${connRow?.instanceId ?? instanceId} AND ${cronTasks.createdAt} > ${cursor} AND ${cronTasks.lastExecutionStatus} IS NULL`,
       )
       .limit(50);
 
-    const tasks = pendingTasks.map((t) =>
-      TaskSyncRepository.serializeForSync(t),
+    const tasks = pendingTasks.map((task) =>
+      TaskSyncRepository.serializeForSync(task),
     );
 
     return success({

@@ -15,7 +15,7 @@ type OnboardingStep = "welcome" | "guest" | "companion" | "usecases";
 
 interface SelectorOnboardingProps {
   locale: CountryLanguage;
-  onDone: () => void;
+  onDone: (firstCompanionId: string | null) => void;
 }
 
 export function SelectorOnboarding({

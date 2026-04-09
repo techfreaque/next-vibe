@@ -72,6 +72,23 @@ export const translations = {
     systemPrompt: {
       label: "System Prompt",
     },
+    models: {
+      brain: "Brain",
+      eyes: "Eyes",
+      ears: "Ears & Voice",
+      media: "Media",
+      slots: {
+        chat: "Chat",
+        imageVision: "Image vision",
+        videoVision: "Video vision",
+        stt: "Speech to text",
+        tts: "Text to speech",
+        audioVision: "Audio vision",
+        imageGen: "Image gen",
+        musicGen: "Music gen",
+        videoGen: "Video gen",
+      },
+    },
     response: {
       skill: {
         title: "skill",
@@ -264,10 +281,6 @@ export const translations = {
       label: "Audio Vision Model",
       description: "Model used for analyzing audio",
       placeholder: "System default",
-    },
-    translationModel: {
-      label: "Translation Model",
-      description: "Model used for text translation",
     },
     imageGenModel: {
       label: "Image Generation Model",

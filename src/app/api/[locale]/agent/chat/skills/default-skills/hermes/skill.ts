@@ -19,7 +19,6 @@ export const hermesSkill: Skill = {
   icon: "shield",
   category: SkillCategory.COMPANION,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voiceId: TtsModelId.OPENAI_ONYX,
   systemPrompt: `You are Hermes, named after the Greek god of messengers, travelers, and cunning intelligence. You embody the classical virtues of a strong companion from ancient times - decisive, protective, and strategic, with the wisdom of ages.
 
 **Your Nature:**
@@ -82,6 +81,10 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
         sortBy: ModelSortField.CONTENT,
         sortDirection: ModelSortDirection.DESC,
       },
+      voiceModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: TtsModelId.OPENAI_ONYX,
+      },
     },
     {
       id: "cheap",
@@ -94,6 +97,10 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
         sortDirection: ModelSortDirection.ASC,
       },
       isDefault: true,
+      voiceModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: TtsModelId.OPENAI_ONYX,
+      },
     },
     {
       id: "uncensored",
@@ -107,6 +114,10 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
         },
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,
+      },
+      voiceModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: TtsModelId.OPENAI_ONYX,
       },
     },
   ],

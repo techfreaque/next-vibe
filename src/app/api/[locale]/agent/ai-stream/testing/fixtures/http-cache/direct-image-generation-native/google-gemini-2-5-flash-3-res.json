@@ -1,0 +1,64 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "cf-ray": "9e89de88fa493610-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 07 Apr 2026 14:54:53 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1775573684-I0u3hGqpC38SmkJn0HJy"
+  },
+  "body": {
+    "id": "gen-1775573684-I0u3hGqpC38SmkJn0HJy",
+    "object": "chat.completion",
+    "created": 1775573684,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The video shows a close-up of a person's hands holding and manipulating a Rubik's Cube. The Rubik's Cube is a standard 3x3x3 puzzle with the classic white, yellow, orange, red, blue, and green faces. The person's skin tone appears to be medium to dark, and they are using both hands to twist and turn the sections of the cube.\n\nThe background of the shot is filled with an abundance of other Rubik's Cubes, creating a visually dense and intriguing setting. These background cubes appear to be scattered or piled, although their exact arrangement is not clear. They are all standard Rubik's Cubes, reflecting the same colorful pattern as the one being held. The overwhelming presence of these cubes suggests a collection or a dedicated space for the puzzles.\n\nThe lighting seems to be even and bright, clearly illuminating the cube in the hands and the multiple cubes in the background. The focus is sharp on the cube being manipulated, with the background cubes slightly out of focus, creating a shallow depth of field that emphasizes the main action. The overall style of the video is clean and direct, focusing on the intricate movements of the puzzle. There is no visible text in the frame, and the video's aesthetic is primarily driven by the vibrant colors of the Rubik's Cubes.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 298,
+      "completion_tokens": 277,
+      "total_tokens": 575,
+      "cost": 0.0007819,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 258
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0007819,
+        "upstream_inference_prompt_cost": 0.0000894,
+        "upstream_inference_completions_cost": 0.0006925
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -7,6 +7,10 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { Brain } from "next-vibe-ui/ui/icons/Brain";
+import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { Film } from "next-vibe-ui/ui/icons/Film";
+import { Mic } from "next-vibe-ui/ui/icons/Mic";
 import { Span } from "next-vibe-ui/ui/span";
 import { useCallback, useMemo, useState, type JSX } from "react";
 
@@ -77,6 +81,8 @@ import { videoGenModelSelectionSchema } from "../../../video-generation/models";
 
 import { ModelSelectionType } from "../enum";
 
+import { ModelGroup } from "../[id]/widget";
+import { scopedTranslation as skillIdTranslation } from "../[id]/i18n";
 import type defintion from "./definition";
 import type { SkillCreateResponseOutput } from "./definition";
 
@@ -111,6 +117,7 @@ export function SkillCreateContainer({
   const form = useWidgetForm<typeof defintion.POST>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  const { t: tId } = skillIdTranslation.scopedT(locale);
   const t = useWidgetTranslation<typeof defintion.POST>();
   const emptyField = useMemo(() => ({}), []);
 
@@ -608,193 +615,200 @@ export function SkillCreateContainer({
                 field={children.systemPrompt}
               />
 
-              {/* Chat model trigger */}
-              <Div className="flex flex-col gap-1">
-                <Span className="text-xs font-medium text-muted-foreground">
-                  {t("post.chatModel.label")}
-                </Span>
-                <ModelSelectorTrigger
-                  modelSelection={form.watch("modelSelection") ?? undefined}
-                  defaultModelSelection={platformChatDefault}
-                  placeholder={t("post.chatModel.placeholder")}
-                  onClick={() => setActiveSelector("chat")}
-                  locale={locale}
-                  user={user}
-                />
-                {form.formState.errors.modelSelection && (
-                  <Span className="text-xs text-destructive">
-                    {form.formState.errors.modelSelection.message}
-                  </Span>
-                )}
-              </Div>
+              {/* ── BRAIN ── */}
+              <ModelGroup
+                icon={<Brain className="w-3.5 h-3.5" />}
+                label={tId("get.models.brain")}
+              >
+                <Div className="flex flex-col gap-1">
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("modelSelection") ?? undefined}
+                    defaultModelSelection={platformChatDefault}
+                    placeholder={t("post.chatModel.placeholder")}
+                    onClick={() => setActiveSelector("chat")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.modelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.modelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+              </ModelGroup>
 
-              {/* Voice (TTS) model selector */}
-              <Div className="flex flex-col gap-1">
-                <Span className="text-xs font-medium text-muted-foreground">
-                  {t("post.voice.label")}
-                </Span>
-                <ModelSelectorTrigger
-                  modelSelection={form.watch("voiceModelSelection")}
-                  allowedRoles={["tts"]}
-                  defaultModelSelection={platformTtsDefault}
-                  placeholder={t("post.voice.placeholder")}
-                  onClick={() => setActiveSelector("voice")}
-                  locale={locale}
-                  user={user}
-                />
-                {form.formState.errors.voiceModelSelection && (
-                  <Span className="text-xs text-destructive">
-                    {form.formState.errors.voiceModelSelection.message}
+              {/* ── EYES ── */}
+              <ModelGroup
+                icon={<Eye className="w-3.5 h-3.5" />}
+                label={tId("get.models.eyes")}
+              >
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs opacity-40">
+                    {tId("get.models.slots.imageVision")}
                   </Span>
-                )}
-              </Div>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("imageVisionModelSelection")}
+                    allowedRoles={["image-vision"]}
+                    defaultModelSelection={platformImageVisionDefault}
+                    placeholder={t("post.imageVisionModel.placeholder")}
+                    onClick={() => setActiveSelector("imageVision")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.imageVisionModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.imageVisionModelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs opacity-40">
+                    {tId("get.models.slots.videoVision")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("videoVisionModelSelection")}
+                    allowedRoles={["video-vision"]}
+                    defaultModelSelection={platformVideoVisionDefault}
+                    placeholder={t("post.videoVisionModel.placeholder")}
+                    onClick={() => setActiveSelector("videoVision")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.videoVisionModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.videoVisionModelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+              </ModelGroup>
 
-              {/* Image Generation model selector */}
-              <Div className="flex flex-col gap-1">
-                <Span className="text-xs font-medium text-muted-foreground">
-                  {t("post.imageGenModel.label")}
-                </Span>
-                <ModelSelectorTrigger
-                  modelSelection={form.watch("imageGenModelSelection")}
-                  allowedRoles={["image-gen"]}
-                  defaultModelSelection={platformImageGenDefault}
-                  placeholder={t("post.imageGenModel.placeholder")}
-                  onClick={() => setActiveSelector("imageGen")}
-                  locale={locale}
-                  user={user}
-                />
-                {form.formState.errors.imageGenModelSelection && (
-                  <Span className="text-xs text-destructive">
-                    {form.formState.errors.imageGenModelSelection.message}
+              {/* ── EARS & VOICE ── */}
+              <ModelGroup
+                icon={<Mic className="w-3.5 h-3.5" />}
+                label={tId("get.models.ears")}
+              >
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs opacity-40">
+                    {tId("get.models.slots.stt")}
                   </Span>
-                )}
-              </Div>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("sttModelSelection")}
+                    allowedRoles={["stt"]}
+                    defaultModelSelection={platformSttDefault}
+                    placeholder={t("post.sttModel.placeholder")}
+                    onClick={() => setActiveSelector("stt")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.sttModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.sttModelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs opacity-40">
+                    {tId("get.models.slots.tts")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("voiceModelSelection")}
+                    allowedRoles={["tts"]}
+                    defaultModelSelection={platformTtsDefault}
+                    placeholder={t("post.voice.placeholder")}
+                    onClick={() => setActiveSelector("voice")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.voiceModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.voiceModelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs opacity-40">
+                    {tId("get.models.slots.audioVision")}
+                  </Span>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("audioVisionModelSelection")}
+                    allowedRoles={["audio-vision"]}
+                    defaultModelSelection={platformAudioVisionDefault}
+                    placeholder={t("post.audioVisionModel.placeholder")}
+                    onClick={() => setActiveSelector("audioVision")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.audioVisionModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.audioVisionModelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+              </ModelGroup>
 
-              {/* Music Generation model selector */}
-              <Div className="flex flex-col gap-1">
-                <Span className="text-xs font-medium text-muted-foreground">
-                  {t("post.musicGenModel.label")}
-                </Span>
-                <ModelSelectorTrigger
-                  modelSelection={form.watch("musicGenModelSelection")}
-                  allowedRoles={["audio-gen"]}
-                  defaultModelSelection={platformMusicGenDefault}
-                  placeholder={t("post.musicGenModel.placeholder")}
-                  onClick={() => setActiveSelector("musicGen")}
-                  locale={locale}
-                  user={user}
-                />
-                {form.formState.errors.musicGenModelSelection && (
-                  <Span className="text-xs text-destructive">
-                    {form.formState.errors.musicGenModelSelection.message}
+              {/* ── MEDIA ── */}
+              <ModelGroup
+                icon={<Film className="w-3.5 h-3.5" />}
+                label={tId("get.models.media")}
+              >
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs opacity-40">
+                    {tId("get.models.slots.imageGen")}
                   </Span>
-                )}
-              </Div>
-
-              {/* Video Generation model selector */}
-              <Div className="flex flex-col gap-1">
-                <Span className="text-xs font-medium text-muted-foreground">
-                  {t("post.videoGenModel.label")}
-                </Span>
-                <ModelSelectorTrigger
-                  modelSelection={form.watch("videoGenModelSelection")}
-                  allowedRoles={["video-gen"]}
-                  defaultModelSelection={platformVideoGenDefault}
-                  placeholder={t("post.videoGenModel.placeholder")}
-                  onClick={() => setActiveSelector("videoGen")}
-                  locale={locale}
-                  user={user}
-                />
-                {form.formState.errors.videoGenModelSelection && (
-                  <Span className="text-xs text-destructive">
-                    {form.formState.errors.videoGenModelSelection.message}
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("imageGenModelSelection")}
+                    allowedRoles={["image-gen"]}
+                    defaultModelSelection={platformImageGenDefault}
+                    placeholder={t("post.imageGenModel.placeholder")}
+                    onClick={() => setActiveSelector("imageGen")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.imageGenModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.imageGenModelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs opacity-40">
+                    {tId("get.models.slots.musicGen")}
                   </Span>
-                )}
-              </Div>
-
-              {/* STT model selector */}
-              <Div className="flex flex-col gap-1">
-                <Span className="text-xs font-medium text-muted-foreground">
-                  {t("post.sttModel.label")}
-                </Span>
-                <ModelSelectorTrigger
-                  modelSelection={form.watch("sttModelSelection")}
-                  allowedRoles={["stt"]}
-                  defaultModelSelection={platformSttDefault}
-                  placeholder={t("post.sttModel.placeholder")}
-                  onClick={() => setActiveSelector("stt")}
-                  locale={locale}
-                  user={user}
-                />
-                {form.formState.errors.sttModelSelection && (
-                  <Span className="text-xs text-destructive">
-                    {form.formState.errors.sttModelSelection.message}
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("musicGenModelSelection")}
+                    allowedRoles={["audio-gen"]}
+                    defaultModelSelection={platformMusicGenDefault}
+                    placeholder={t("post.musicGenModel.placeholder")}
+                    onClick={() => setActiveSelector("musicGen")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.musicGenModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.musicGenModelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs opacity-40">
+                    {tId("get.models.slots.videoGen")}
                   </Span>
-                )}
-              </Div>
-
-              {/* Image Vision model selector */}
-              <Div className="flex flex-col gap-1">
-                <Span className="text-xs font-medium text-muted-foreground">
-                  {t("post.imageVisionModel.label")}
-                </Span>
-                <ModelSelectorTrigger
-                  modelSelection={form.watch("imageVisionModelSelection")}
-                  allowedRoles={["image-vision"]}
-                  defaultModelSelection={platformImageVisionDefault}
-                  placeholder={t("post.imageVisionModel.placeholder")}
-                  onClick={() => setActiveSelector("imageVision")}
-                  locale={locale}
-                  user={user}
-                />
-                {form.formState.errors.imageVisionModelSelection && (
-                  <Span className="text-xs text-destructive">
-                    {form.formState.errors.imageVisionModelSelection.message}
-                  </Span>
-                )}
-              </Div>
-
-              {/* Video Vision model selector */}
-              <Div className="flex flex-col gap-1">
-                <Span className="text-xs font-medium text-muted-foreground">
-                  {t("post.videoVisionModel.label")}
-                </Span>
-                <ModelSelectorTrigger
-                  modelSelection={form.watch("videoVisionModelSelection")}
-                  allowedRoles={["video-vision"]}
-                  defaultModelSelection={platformVideoVisionDefault}
-                  placeholder={t("post.videoVisionModel.placeholder")}
-                  onClick={() => setActiveSelector("videoVision")}
-                  locale={locale}
-                  user={user}
-                />
-                {form.formState.errors.videoVisionModelSelection && (
-                  <Span className="text-xs text-destructive">
-                    {form.formState.errors.videoVisionModelSelection.message}
-                  </Span>
-                )}
-              </Div>
-
-              {/* Audio Vision model selector */}
-              <Div className="flex flex-col gap-1">
-                <Span className="text-xs font-medium text-muted-foreground">
-                  {t("post.audioVisionModel.label")}
-                </Span>
-                <ModelSelectorTrigger
-                  modelSelection={form.watch("audioVisionModelSelection")}
-                  allowedRoles={["audio-vision"]}
-                  defaultModelSelection={platformAudioVisionDefault}
-                  placeholder={t("post.audioVisionModel.placeholder")}
-                  onClick={() => setActiveSelector("audioVision")}
-                  locale={locale}
-                  user={user}
-                />
-                {form.formState.errors.audioVisionModelSelection && (
-                  <Span className="text-xs text-destructive">
-                    {form.formState.errors.audioVisionModelSelection.message}
-                  </Span>
-                )}
-              </Div>
+                  <ModelSelectorTrigger
+                    modelSelection={form.watch("videoGenModelSelection")}
+                    allowedRoles={["video-gen"]}
+                    defaultModelSelection={platformVideoGenDefault}
+                    placeholder={t("post.videoGenModel.placeholder")}
+                    onClick={() => setActiveSelector("videoGen")}
+                    locale={locale}
+                    user={user}
+                  />
+                  {form.formState.errors.videoGenModelSelection && (
+                    <Span className="text-xs text-destructive">
+                      {form.formState.errors.videoGenModelSelection.message}
+                    </Span>
+                  )}
+                </Div>
+              </ModelGroup>
             </Div>
           </>
         )}

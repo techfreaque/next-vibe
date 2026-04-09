@@ -15,12 +15,12 @@ import { eq, sql } from "drizzle-orm";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { MessageVariant } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
 import type {
   AudioVisionModelId,
   ImageVisionModelId,
   VideoVisionModelId,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import type { MessageVariant } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
 import { db } from "@/app/api/[locale]/system/db";
@@ -63,9 +63,9 @@ export class MessageDbWriter {
   lastAssistantMessageId: string | null = null;
   /** Tracks the final text content of the last assistant message - populated even in incognito */
   lastAssistantContent: string | null = null;
-  /** Tracks the URL of the last generated media (image/audio/video) — used by headless callers */
+  /** Tracks the URL of the last generated media (image/audio/video) - used by headless callers */
   lastGeneratedMediaUrl: string | null = null;
-  /** Running total of credits deducted during this stream — used by headless callers to report cost */
+  /** Running total of credits deducted during this stream - used by headless callers to report cost */
   totalCreditsDeducted = 0;
 
   constructor(

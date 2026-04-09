@@ -23,8 +23,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { CreditRepository } from "../../../credits/repository";
 import type { CreditsT as CreditModuleT } from "../../../credits/i18n";
+import { CreditRepository } from "../../../credits/repository";
 import { createAdapters } from "./adapters/factory";
 import type {
   SttHotkeyPostRequestOutput,
@@ -61,7 +61,7 @@ export class SttHotkeyRepository {
     logger: EndpointLogger,
     t: AgentT,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
-    logger.info("Handling hotkey action", {
+    logger.debug("Handling hotkey action", {
       action: data.action,
       userId: user.isPublic ? user.leadId : user.id,
     });
@@ -245,7 +245,7 @@ export class SttHotkeyRepository {
     }
 
     await session.start();
-    logger.info("Recording started");
+    logger.debug("Recording started");
 
     return success({
       response: {
@@ -283,7 +283,7 @@ export class SttHotkeyRepository {
     const durationInSeconds = Math.ceil(duration / 1000); // Round up to nearest second
     const cost = durationInSeconds * STT_COST_PER_SECOND;
 
-    logger.info("Recording stopped and text inserted", {
+    logger.debug("Recording stopped and text inserted", {
       textLength: text.length,
       duration,
       durationInSeconds,

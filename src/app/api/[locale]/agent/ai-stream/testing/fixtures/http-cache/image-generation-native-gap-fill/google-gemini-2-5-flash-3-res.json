@@ -1,0 +1,64 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "cf-ray": "9e8b95413f0edc8e-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 07 Apr 2026 19:54:23 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1775591655-3cIfUwGyzguFPNkjmwu4"
+  },
+  "body": {
+    "id": "gen-1775591655-3cIfUwGyzguFPNkjmwu4",
+    "object": "chat.completion",
+    "created": 1775591655,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The close-up video shows a pair of hands holding and manipulating a 3x3 Rubik's Cube. The hands are dark-skinned and are in the process of turning and twisting the cube's faces. The cube itself is a standard Rubik's Cube with red, blue, white, green, orange, and yellow squares. On one side of the cube, a black 'X' mark is visible on a white square.\n\nThe background of the video is filled with a large collection of Rubik's Cubes of various sizes, predominantly 3x3 but with some smaller and larger ones visible. These cubes are scattered across a dark, reflective surface, likely a table. Many of them are jumbled and unsolved, displaying a mix of colors, while some appear to be solved with single-color faces. The lighting is relatively bright, highlighting the colors of the cubes and the details of the hands.\n\nThe style of the video is practical and focused on the action of solving or manipulating the Rubik's Cube. There are no discernible texts beyond the 'X' on the cube. The depth of field is shallow, keeping the primary Rubik's Cube and hands in sharp focus while blurring the extensive collection of cubes in the background.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 298,
+      "completion_tokens": 258,
+      "total_tokens": 556,
+      "cost": 0.0007344,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 258
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0007344,
+        "upstream_inference_prompt_cost": 0.0000894,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

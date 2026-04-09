@@ -43,11 +43,11 @@ export const translations: typeof enTranslations = {
       features: {
         credits: "{{count}} Credits enthalten",
         expiry: "Credits verfallen nie",
-        bestFor: "Ideal für gelegentliche Nutzung",
+        bestFor: "Ergänzt dein monatliches Kontingent",
       },
       totalSummary: "{{totalCredits}} Credits gesamt · {{totalPrice}} gesamt",
       requiresSubscription:
-        "Ein aktives Abonnement ist erforderlich, um Credit-Pakete zu kaufen",
+        "Credit-Pakete sind für Abonnenten, die mehr brauchen. Zuerst abonnieren.",
     },
     submit: {
       text: "Credit-Paket kaufen",

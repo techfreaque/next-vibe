@@ -14,9 +14,9 @@ import {
   getChatModelById,
   type ChatModelId,
 } from "@/app/api/[locale]/agent/ai-stream/models";
-import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
+import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -187,7 +187,7 @@ export class AbortErrorHandler {
 
     // Idempotency: if already handled, skip
     if (ctx.abortHandled) {
-      logger.info("[AI Stream] AbortErrorHandler already ran, skipping", {
+      logger.debug("[AI Stream] AbortErrorHandler already ran, skipping", {
         reason: streamAbort?.reason ?? error.name,
       });
       return { wasHandled: true };
@@ -195,26 +195,39 @@ export class AbortErrorHandler {
 
     const isToolConfirmation = streamAbort?.isToolPause ?? false;
     const isLoopStop = streamAbort?.isLoopStop ?? false;
+    // isSilentStop: intentional stops - skip ALL partial content + error message writes.
+    const isSilentStop =
+      streamAbort?.reason === AbortReason.USER_CANCELLED ||
+      streamAbort?.reason === AbortReason.SUPERSEDED;
+    // isNoErrorStop: save partial content but do NOT emit an error message bubble.
+    // CLIENT_DISCONNECTED: user closed the tab - partial content is preserved but no
+    // "Generation was stopped" bubble should appear (nobody is there to read it, and
+    // it would create an orphan branch if a confirm/wakeUp stream already updated the thread).
+    const isNoErrorStop =
+      streamAbort?.reason === AbortReason.CLIENT_DISCONNECTED;
 
-    logger.info("[AI Stream] Stream aborted", {
+    logger.debug("[AI Stream] Stream aborted", {
       reason: streamAbort?.reason ?? error.name,
       isToolConfirmation,
       isLoopStop,
+      isSilentStop,
+      isNoErrorStop,
       hasPartialContent: !!ctx.currentAssistantContent,
       contentLength: ctx.currentAssistantContent.length,
     });
 
-    // Save partial content and pending tools to database (non-incognito, non-tool-confirmation, non-loop-stop)
-    // Tool confirmation and loop stop both close the controller early in finish-step-handler,
-    // so SSE emission would panic. Only client-disconnect warrants partial content save + notification.
-    // Incognito: skip DB writes but still emit SSE so the frontend cache is updated.
-    if (!isToolConfirmation && !isLoopStop) {
+    // Save partial content and pending tools to database.
+    // Suppressed for: tool-confirmation, loop-stop, user-cancelled, superseded.
+    // Tool confirmation and loop stop close the controller early in finish-step-handler
+    // so SSE emission would panic. User-cancelled and superseded are intentional stops
+    // that must not leave error messages in the thread.
+    if (!isToolConfirmation && !isLoopStop && !isSilentStop) {
       try {
         let totalCredits = 0;
 
         if (ctx.currentAssistantMessageId && ctx.currentAssistantContent) {
           if (!isIncognito) {
-            logger.info("[AI Stream] Saving partial content to database", {
+            logger.debug("[AI Stream] Saving partial content to database", {
               messageId: ctx.currentAssistantMessageId,
               contentLength: ctx.currentAssistantContent.length,
             });
@@ -243,7 +256,7 @@ export class AbortErrorHandler {
 
             totalCredits += modelCreditCost;
 
-            logger.info("[AI Stream] Estimated usage for aborted stream", {
+            logger.debug("[AI Stream] Estimated usage for aborted stream", {
               messageId: ctx.currentAssistantMessageId,
               promptTokens: tokenEstimate.promptTokens,
               completionTokens: tokenEstimate.completionTokens,
@@ -261,7 +274,7 @@ export class AbortErrorHandler {
               completionTokens: tokenEstimate.completionTokens,
             });
 
-            logger.info("[AI Stream] Saved partial content to database", {
+            logger.debug("[AI Stream] Saved partial content to database", {
               messageId: ctx.currentAssistantMessageId,
               totalTokens: tokenEstimate.totalTokens,
             });
@@ -289,7 +302,7 @@ export class AbortErrorHandler {
                 model,
               });
 
-              logger.info("[AI Stream] Deducted and emitted model credits", {
+              logger.debug("[AI Stream] Deducted and emitted model credits", {
                 amount: modelCreditCost,
                 model,
               });
@@ -317,7 +330,7 @@ export class AbortErrorHandler {
         if (!isIncognito) {
           // Save pending tool messages to database
           if (ctx.pendingToolMessages.size > 0) {
-            logger.info(
+            logger.debug(
               "[AI Stream] Saving pending tool messages to database",
               {
                 count: ctx.pendingToolMessages.size,
@@ -353,13 +366,13 @@ export class AbortErrorHandler {
                   model,
                 });
 
-                logger.info("[AI Stream] Deducted and emitted tool credits", {
+                logger.debug("[AI Stream] Deducted and emitted tool credits", {
                   toolName: toolCall.toolName,
                   amount: toolCall.creditsUsed,
                 });
               }
 
-              logger.info("[AI Stream] Saved pending tool message", {
+              logger.debug("[AI Stream] Saved pending tool message", {
                 messageId,
                 toolName: toolCall.toolName,
               });
@@ -367,34 +380,35 @@ export class AbortErrorHandler {
           }
 
           if (userId && totalCredits > 0) {
-            logger.info("[AI Stream] Total credits for aborted stream", {
+            logger.debug("[AI Stream] Total credits for aborted stream", {
               totalCredits,
             });
           }
         }
 
         // Write interruption error message to DB (non-incognito) + emit SSE (always).
-        // emitErrorMessage already skips DB writes for incognito internally.
-        // Store the plain translation key as content so the bubble renders it without
-        // an error type label or error code - it's an informational stop, not an error.
-        await ctx.dbWriter.emitErrorMessage({
-          threadId,
-          errorType: "STREAM_ERROR",
-          error: fail({
-            message: t("info.streamInterrupted"),
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          }),
-          content: t("info.streamInterrupted"),
-          parentId: ctx.lastParentId,
-          sequenceId: ctx.sequenceId,
-          userId,
-        });
+        // Skipped for CLIENT_DISCONNECTED - nobody is there to see it, and it would
+        // create orphan branches if a confirm/wakeUp stream already updated the thread.
+        if (!isNoErrorStop) {
+          await ctx.dbWriter.emitErrorMessage({
+            threadId,
+            errorType: "STREAM_ERROR",
+            error: fail({
+              message: t("info.streamInterrupted"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            }),
+            content: t("info.streamInterrupted"),
+            parentId: ctx.lastParentId,
+            sequenceId: ctx.sequenceId,
+            userId,
+          });
 
-        logger.info("[AI Stream] Emitted interruption error message", {
-          isIncognito,
-          hasPartialContent: !!ctx.currentAssistantMessageId,
-          pendingToolsCount: ctx.pendingToolMessages.size,
-        });
+          logger.debug("[AI Stream] Emitted interruption error message", {
+            isIncognito,
+            hasPartialContent: !!ctx.currentAssistantMessageId,
+            pendingToolsCount: ctx.pendingToolMessages.size,
+          });
+        }
       } catch (saveError) {
         logger.error("[AI Stream] Failed to save partial content/tools", {
           error:

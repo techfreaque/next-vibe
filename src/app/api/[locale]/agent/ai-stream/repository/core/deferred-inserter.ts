@@ -110,7 +110,7 @@ export async function insertDeferredWakeUpMessage(
     logger,
   );
 
-  logger.info("[WakeUp] Deferred message inserted by live stream", {
+  logger.debug("[WakeUp] Deferred message inserted by live stream", {
     threadId,
     toolMessageId,
     deferredId,

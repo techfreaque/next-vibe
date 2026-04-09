@@ -73,6 +73,10 @@ export const leads = pgTable("leads", {
   // Referral tracking (first-touch, immutable)
   referralCode: text("referral_code"),
 
+  // Skill attribution — the skill that brought this lead to the platform (last-write-wins before signup)
+  // Stored as plain text (UUID or built-in skill id), no FK since built-in skills have no DB row
+  skillId: text("skill_id"),
+
   // Lead qualification
   status: text("status", { enum: LeadStatusDB })
     .notNull()

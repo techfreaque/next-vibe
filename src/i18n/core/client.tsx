@@ -151,7 +151,7 @@ export function TranslationProvider({
     await storage.setItem(LOCALE_COOKIE_NAME, newLocale);
     await setCookie(LOCALE_COOKIE_NAME, newLocale);
 
-    // Single navigation — replace the locale segment in the path
+    // Single navigation - replace the locale segment in the path
     if (pathname) {
       const pathSegments = pathname.split("/");
       if (pathSegments.length > 1 && pathSegments[1]) {

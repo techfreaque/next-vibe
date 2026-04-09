@@ -1,0 +1,202 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[CB-D1 direct-wait] Use the tool-help tool (thea__ prefix, wait mode) to look up \"generate_image\". Reply STEP_OK when done.",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " user is asking me to use the tool-help tool to look up \"generate_image\" with a \"thea__\" prefix and wait mode. They want me to reply with \""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "STEP_OK\" when done.\n\nLet me break this down:\n1. Use tool-help tool\n2. Search"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " for \"generate_image\"\n3. The \"thea__\" prefix seems to refer to an instance ID"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n4. Use \"wait\" mode (default)\n5. Reply \"STEP_OK\" when complete"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nLooking at the system context, I see that there's a mention of \"Remote Instances\" with"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " a \"hermes\" instance. The \"thea__\" prefix might indicate"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " a different instance. However, the context mentions \"No capability snapshot for"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " instance 'thea'\". So \"thea\" appears"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " to be another instance that may not be fully connected.\n\nLet me call"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tool-help to look up \"generate_image\". The tool-help function can take a query parameter and instance"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Id parameter. Since they mention \"thea__\" prefix, they might be referring to an instance called \"thea\".\n\nActually"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ", looking more carefully at the context, it says:\n- \"hint:No capability snapshot for instance \""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "thea\". Connect the instance and wai...\""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nSo \"thea\" is an instance that's not fully connected. But the user is asking me to use it anyway. Let"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " me try to call tool-help with instanceId=\"thea\" and query=\"generate_image\".\n\nActually, I should"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " re-read the instruction. They say \"thea__ prefix\" - this might mean"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the instanceId is \"thea\". Let me try that."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "e793e9c9-0673-480d-8951-de6e97077f3b",
+      "toolName": "tool-help",
+      "input": "{\"query\":\"generate_image\",\"instanceId\":\"thea\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "e793e9c9-0673-480d-8951-de6e97077f3b",
+      "toolName": "tool-help",
+      "result": "{\n  \"tools\": [],\n  \"totalCount\": 0,\n  \"matchedCount\": 0,\n  \"hint\": \"No capability snapshot for instance \\\"thea\\\". Connect the instance and wait for a sync pulse.\"\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tool-help returned that there's no capability snapshot for instance \"thea\". The instance isn't fully connected. The hint says to \"Connect the instance and wait for a"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " sync pulse.\"\n\nHowever, the user asked me to reply \"STEP_OK\" when done. They"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " gave me a specific task: use tool-help to look up \"generate_image\" with thea prefix."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " I've attempted to do that, and got a result (even"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " though it's a hint about the instance not being connected).\n\nShould I report this as complete? The user said"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " \"Reply STEP_OK when done\" - they may be testing the workflow or this"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " may be part of a multi-step process. Since I've executed the tool-help command as"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " requested, I should respond with STEP_OK as instructed."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "STEP_OK"
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 631,
+        "totalTokens": 649,
+        "cachedInputTokens": 6708
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 7227
+        }
+      }
+    }
+  ]
+}

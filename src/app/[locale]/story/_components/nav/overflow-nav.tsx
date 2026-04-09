@@ -3,6 +3,7 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -107,11 +108,13 @@ function InlineNavItem({
   locale,
   t,
   totalModelCount,
+  isActive,
 }: {
   item: NavItemType;
   locale: CountryLanguage;
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
   totalModelCount: number;
+  isActive: boolean;
 }): JSX.Element {
   if (item.children) {
     return (
@@ -169,8 +172,11 @@ function InlineNavItem({
   return (
     <Link href={`/${locale}${item.href}`}>
       <Button
-        variant="ghost"
-        className="px-2 py-3 text-sm font-medium transition-colors hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1.5"
+        variant={isActive ? "default" : "ghost"}
+        className={cn(
+          "px-2 py-3 text-sm font-medium transition-colors flex items-center gap-1.5",
+          !isActive && "hover:text-blue-600 dark:hover:text-blue-400",
+        )}
       >
         {item.icon}
         {t(item.title)}
@@ -187,6 +193,7 @@ export function OverflowNav({
   totalModelCount,
 }: OverflowNavProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const pathname = usePathname() ?? "";
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [visibleCount, setVisibleCount] = useState(navigationItems.length);
@@ -272,6 +279,11 @@ export function OverflowNav({
             locale={locale}
             t={t}
             totalModelCount={totalModelCount}
+            isActive={
+              !item.children &&
+              !!item.href &&
+              pathname.endsWith(`/${locale}${item.href}`)
+            }
           />
         </Div>
       ))}

@@ -270,7 +270,7 @@ export class LocalStorageAdapter implements StorageAdapter {
         }
       }
     } catch {
-      // Directory doesn't exist — return empty
+      // Directory doesn't exist - return empty
     }
 
     return results;

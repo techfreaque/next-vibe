@@ -129,16 +129,13 @@ async function seedFavorites(
     const resolvedModelSelection = variant.modelSelection
       ? variant.modelSelection
       : null;
+    const companionDefaultVariant =
+      companion.variants.find((v) => v.isDefault) ?? companion.variants[0];
     const id = await addFavorite({
       skillId: companionId,
       variantId: variant.id,
       icon: companion.icon,
-      voiceModelSelection: companion.voiceId
-        ? {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: companion.voiceId,
-          }
-        : undefined,
+      voiceModelSelection: companionDefaultVariant?.voiceModelSelection,
       modelSelection: resolvedModelSelection,
     });
     if (id) {
@@ -228,7 +225,7 @@ async function seedFavorites(
 interface UsecasesStepProps {
   companionId: string;
   locale: CountryLanguage;
-  onDone: () => void;
+  onDone: (firstCompanionId: string | null) => void;
   onBack: () => void;
 }
 
@@ -279,18 +276,17 @@ export function UsecasesStep({
           ? skill?.variants?.find((v) => v.id === entry.variantId)
           : undefined;
         const effectiveModelSelection = variant?.modelSelection ?? null;
+        const skillDefaultVariant = skill
+          ? (skill.variants.find((v) => v.isDefault) ?? skill.variants[0])
+          : null;
+        const skillVoiceSel = skillDefaultVariant?.voiceModelSelection ?? null;
         return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
           {
             id: entry.id,
             skillId: entry.skillId,
             variantId: entry.variantId,
             customIcon: skill?.icon ?? null,
-            voiceModelSelection: skill?.voiceId
-              ? {
-                  selectionType: ModelSelectionType.MANUAL,
-                  manualModelId: skill.voiceId,
-                }
-              : null,
+            voiceModelSelection: skillVoiceSel,
             modelSelection: entry.modelSelection,
             position: index,
           },
@@ -300,12 +296,7 @@ export function UsecasesStep({
           skill?.tagline ? tSkill(skill.tagline) : null,
           skill?.description ? tSkill(skill.description) : null,
           firstId,
-          skill?.voiceId
-            ? {
-                selectionType: ModelSelectionType.MANUAL,
-                manualModelId: skill.voiceId,
-              }
-            : null,
+          skillVoiceSel,
           locale,
           user,
           envAvailability,
@@ -342,7 +333,7 @@ export function UsecasesStep({
         userRoles,
       );
       applyOptimisticFavorites(entries, firstCompanionId);
-      onDone();
+      onDone(firstCompanionId);
       try {
         if (firstCompanionId) {
           const defaultEntry = entries.find((e) => e.id === firstCompanionId);
@@ -367,15 +358,15 @@ export function UsecasesStep({
               ? Object.values(ChatModelId).find((id) => id === resolvedAnyId)
               : undefined) ?? ChatModelId.KIMI_K2_5;
           const companion = COMPANION_SKILLS.find((c) => c.id === companionId);
-          // Use stored voiceModelSelection from settings, or convert scalar voiceId from skill config
+          const companionVariant = companion
+            ? (companion.variants.find((v) => v.isDefault) ??
+              companion.variants[0])
+            : null;
+          // Use stored voiceModelSelection from settings, or from companion skill's default variant
           const voiceSel: VoiceModelSelection | null =
             settings?.voiceModelSelection ??
-            (companion?.voiceId
-              ? {
-                  selectionType: ModelSelectionType.MANUAL,
-                  manualModelId: companion.voiceId,
-                }
-              : null);
+            companionVariant?.voiceModelSelection ??
+            null;
           setActiveFavorite(
             firstCompanionId,
             companionId,

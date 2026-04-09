@@ -2,7 +2,7 @@
  * WS Provider Stream Repository
  *
  * Delegates to AiStreamRepository.createAiStream() to run the AI stream.
- * The cloud side executes all tools server-side — the client only observes
+ * The cloud side executes all tools server-side - the client only observes
  * events via WebSocket (subscribe + unsubscribe, no tool-result messages).
  */
 
@@ -82,7 +82,7 @@ export class WsProviderStreamRepository {
         musicDuration: undefined,
       };
 
-      // 3. Call AiStreamRepository.createAiStream() — cloud executes all tools server-side
+      // 3. Call AiStreamRepository.createAiStream() - cloud executes all tools server-side
       const result = await AiStreamRepository.createAiStream({
         data: aiStreamData,
         locale,

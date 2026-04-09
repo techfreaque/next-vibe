@@ -21,10 +21,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
-import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
 import type {
@@ -128,37 +128,34 @@ export class FavoritesCreateRepository {
         character = characterResult.data;
       }
 
-      // Store model selections normalized: null = not set / cascade to skill or platform default
-      const voiceToStore = normalizeTtsSelection(
+      // Store model selections normalized: null = not set / cascade to skill variant or platform default
+      let voiceToStore = normalizeTtsSelection(
         data.voiceModelSelection ?? null,
       );
-      const sttModelSelectionToStore = normalizeSttSelection(
+      let sttModelSelectionToStore = normalizeSttSelection(
         data.sttModelSelection ?? null,
       );
-      const imageVisionModelSelectionToStore =
+      let imageVisionModelSelectionToStore =
         data.imageVisionModelSelection ?? null;
-      const videoVisionModelSelectionToStore =
+      let videoVisionModelSelectionToStore =
         data.videoVisionModelSelection ?? null;
-      const audioVisionModelSelectionToStore =
+      let audioVisionModelSelectionToStore =
         data.audioVisionModelSelection ?? null;
-      const translationModelIdToStore =
-        character && data.translationModelId === character.translationModelId
-          ? null
-          : (data.translationModelId ?? null);
-      const imageGenModelSelectionToStore = normalizeImageGenSelection(
+
+      let imageGenModelSelectionToStore = normalizeImageGenSelection(
         data.imageGenModelSelection ?? null,
       );
-      const musicGenModelSelectionToStore = data.musicGenModelSelection ?? null;
-      const videoGenModelSelectionToStore = data.videoGenModelSelection ?? null;
-      const defaultChatModeToStore =
+      let musicGenModelSelectionToStore = data.musicGenModelSelection ?? null;
+      let videoGenModelSelectionToStore = data.videoGenModelSelection ?? null;
+      let defaultChatModeToStore =
         character && data.defaultChatMode === character.defaultChatMode
           ? null
           : (data.defaultChatMode ?? null);
 
-      // If a variantId is provided and no explicit model selection was provided,
-      // resolve the variant's default modelSelection from the skill's variants.
+      // If a variantId is provided, resolve model selections from the variant.
+      // Explicit fields from the request override variant defaults.
       let modelSelectionToStore = data.modelSelection;
-      if (!modelSelectionToStore && data.variantId && data.skillId) {
+      if (data.variantId && data.skillId) {
         const skillResult = await SkillsRepository.getSkillById(
           { id: data.skillId },
           user,
@@ -170,7 +167,62 @@ export class FavoritesCreateRepository {
             (v) => v.id === data.variantId,
           );
           if (variant) {
-            modelSelectionToStore = variant.modelSelection ?? null;
+            if (!modelSelectionToStore) {
+              modelSelectionToStore = variant.modelSelection ?? null;
+            }
+            // Seed per-modality selections from variant if not explicitly provided
+            if (!voiceToStore && variant.voiceModelSelection) {
+              voiceToStore = normalizeTtsSelection(variant.voiceModelSelection);
+            }
+            if (!sttModelSelectionToStore && variant.sttModelSelection) {
+              sttModelSelectionToStore = normalizeSttSelection(
+                variant.sttModelSelection,
+              );
+            }
+            if (
+              !imageVisionModelSelectionToStore &&
+              variant.imageVisionModelSelection
+            ) {
+              imageVisionModelSelectionToStore =
+                variant.imageVisionModelSelection;
+            }
+            if (
+              !videoVisionModelSelectionToStore &&
+              variant.videoVisionModelSelection
+            ) {
+              videoVisionModelSelectionToStore =
+                variant.videoVisionModelSelection;
+            }
+            if (
+              !audioVisionModelSelectionToStore &&
+              variant.audioVisionModelSelection
+            ) {
+              audioVisionModelSelectionToStore =
+                variant.audioVisionModelSelection;
+            }
+            if (
+              !imageGenModelSelectionToStore &&
+              variant.imageGenModelSelection
+            ) {
+              imageGenModelSelectionToStore = normalizeImageGenSelection(
+                variant.imageGenModelSelection,
+              );
+            }
+            if (
+              !musicGenModelSelectionToStore &&
+              variant.musicGenModelSelection
+            ) {
+              musicGenModelSelectionToStore = variant.musicGenModelSelection;
+            }
+            if (
+              !videoGenModelSelectionToStore &&
+              variant.videoGenModelSelection
+            ) {
+              videoGenModelSelectionToStore = variant.videoGenModelSelection;
+            }
+            if (!defaultChatModeToStore && variant.defaultChatMode) {
+              defaultChatModeToStore = variant.defaultChatMode;
+            }
           }
         }
       }
@@ -196,7 +248,6 @@ export class FavoritesCreateRepository {
           imageVisionModelSelection: imageVisionModelSelectionToStore,
           videoVisionModelSelection: videoVisionModelSelectionToStore,
           audioVisionModelSelection: audioVisionModelSelectionToStore,
-          translationModelId: translationModelIdToStore,
           imageGenModelSelection: imageGenModelSelectionToStore,
           musicGenModelSelection: musicGenModelSelectionToStore,
           videoGenModelSelection: videoGenModelSelectionToStore,

@@ -16,7 +16,8 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ t, logger, user, request }) => {
       return BrowserSharedRepository.executeMCPTool(
         {
-          sessionId: request?.headers.get("authorization") ?? user.id ?? user.leadId,
+          sessionId:
+            request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.LIST_PAGES,
           args: BrowserSharedRepository.filterUndefinedArgs({}),
         },

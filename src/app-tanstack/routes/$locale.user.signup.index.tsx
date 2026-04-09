@@ -5,14 +5,16 @@ import { toNextParams } from "@/app/api/[locale]/system/unified-interface/tansta
 import { TanstackPage as Page } from "@/app/[locale]/user/signup/page";
 
 const loadData = createServerFn({ method: "GET" })
-  .inputValidator((data: Record<string, string>) => data)
+  .inputValidator((data: { params: Record<string, string>; search: Record<string, string> }) => data)
   .handler(async ({ data }) => {
     const { tanstackLoader } = await import("@/app/[locale]/user/signup/page");
-        return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
+        return tanstackLoader({ params: Promise.resolve(toNextParams(data.params)), searchParams: Promise.resolve(data.search) });
   });
 
 export const Route = createFileRoute("/$locale/user/signup/")({
   staleTime: 0,
-  loader: ({ params }) => loadData({ data: params as Record<string, string> }),
+  validateSearch: (search: Record<string, string>) => search,
+  loaderDeps: ({ search }) => ({ search }),
+  loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),
   component: () => <Page {...Route.useLoaderData()} />,
 });

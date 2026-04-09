@@ -1,0 +1,31 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "cache-control": "no-cache",
+    "cf-ray": "9e82f974d817dbd7-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Mon, 06 Apr 2026 18:49:49 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1775501387-8mgT06uCNY9O0Uu0EU2x"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1775501387-8mgT06uCNY9O0Uu0EU2x\",\"object\":\"chat.completion.chunk\",\"created\":1775501387,\"model\":\"moonshotai/kimi-k2.5-0127\",\"provider\":\"Chutes\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\" HELLO STEP_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1775501387-8mgT06uCNY9O0Uu0EU2x\",\"object\":\"chat.completion.chunk\",\"created\":1775501387,\"model\":\"moonshotai/kimi-k2.5-0127\",\"provider\":\"Chutes\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1775501387-8mgT06uCNY9O0Uu0EU2x\",\"object\":\"chat.completion.chunk\",\"created\":1775501387,\"model\":\"moonshotai/kimi-k2.5-0127\",\"provider\":\"Chutes\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":6193,\"completion_tokens\":40,\"total_tokens\":6233,\"cost\":0.0024464211,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.0024464211,\"upstream_inference_prompt_cost\":0.0023700611,\"upstream_inference_completions_cost\":0.00007636},\"completion_tokens_details\":{\"reasoning_tokens\":40,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

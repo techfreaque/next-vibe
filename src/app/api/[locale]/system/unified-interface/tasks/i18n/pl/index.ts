@@ -291,6 +291,7 @@ export const translations: typeof enTranslations = {
           title: "Błąd walidacji",
           description: "Nieprawidłowe parametry żądania",
         },
+        systemAlert: "System {{status}}: {{warnings}}",
       },
       success: {
         title: "DB zdrowa",

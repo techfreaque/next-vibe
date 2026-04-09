@@ -280,6 +280,7 @@ export const translations = {
           title: "Validation Error",
           description: "Invalid request parameters",
         },
+        systemAlert: "System {{status}}: {{warnings}}",
       },
       success: {
         title: "DB Healthy",

@@ -40,11 +40,32 @@ export class FinishStepHandler {
       });
     }
 
+    // endLoop + remote queue: if a remote task is still in-flight (waitingForRemoteResult),
+    // use REMOTE_TOOL_WAIT instead of LOOP_STOP so the thread enters "waiting" state and
+    // the pulse path executes the task, backfills the result, then transitions → "idle".
+    // The endLoop flag is preserved in wakeUpCallbackMode on the cron task; handleTaskCompletion
+    // inserts a deferred message and clears the waiting state without firing revival.
+    const { streamContext } = params;
+    if (
+      ctx.shouldStopLoop &&
+      streamContext.waitingForRemoteResult &&
+      ctx.pendingToolMessages.size === 0
+    ) {
+      streamContext.waitingForRemoteResult = false;
+      logger.debug(
+        "[AI Stream] endLoop + remote queue - using REMOTE_TOOL_WAIT so pulse can backfill",
+      );
+      streamAbortController.abort(
+        new StreamAbortError(AbortReason.REMOTE_TOOL_WAIT),
+      );
+      return { shouldAbort: true };
+    }
+
     // endLoop: abort only when no more tool-calls are pending (supports sequential tool calls).
     // shouldStopLoop persists across steps - once set it stays true until abort.
     // Only abort when pendingToolMessages is empty (all tool steps done, AI response turn next).
     if (ctx.shouldStopLoop && ctx.pendingToolMessages.size === 0) {
-      logger.info(
+      logger.debug(
         "[AI Stream] Step complete - model requested loop stop via endLoop, aborting stream",
       );
 
@@ -61,9 +82,10 @@ export class FinishStepHandler {
     // the placeholder results and generating a response before user confirms.
     if (
       ctx.stepHasToolsAwaitingConfirmation &&
-      ctx.pendingToolMessages.size === 0
+      ctx.pendingToolMessages.size === 0 &&
+      !streamContext.waitingForRemoteResult
     ) {
-      logger.info(
+      logger.debug(
         "[AI Stream] APPROVE - all tool steps complete, aborting before AI response turn",
       );
       streamAbortController.abort(
@@ -72,19 +94,35 @@ export class FinishStepHandler {
       return { shouldAbort: true };
     }
 
+    // WAIT mode: abort here (at finish-step) to prevent the AI SDK from making
+    // another API call (call 2) with the pending tool result. Deferring from tool-result
+    // to here guarantees no race between the abort signal and the next HTTP request.
+    if (
+      streamContext.waitingForRemoteResult &&
+      ctx.pendingToolMessages.size === 0
+    ) {
+      streamContext.waitingForRemoteResult = false;
+      logger.debug(
+        "[AI Stream] WAIT mode - all tool steps complete, aborting before AI response turn",
+      );
+      streamAbortController.abort(
+        new StreamAbortError(AbortReason.REMOTE_TOOL_WAIT),
+      );
+      return { shouldAbort: true };
+    }
+
     // Remote queue / wait-for-task: if a tool set pendingTimeoutMs, start the timeout timer.
     // The timer fires AbortReason.STREAM_TIMEOUT so the stream dies cleanly - revival handles
     // continuation when /report delivers the result. Clears itself if stream aborts first.
-    const { streamContext } = params;
     if (streamContext.pendingTimeoutMs) {
       const timeoutMs = streamContext.pendingTimeoutMs;
       streamContext.pendingTimeoutMs = undefined; // consume - only fire once
-      logger.info(
+      logger.debug(
         "[AI Stream] Starting stream timeout timer (remote result pending)",
         { timeoutMs },
       );
       const timer = setTimeout(() => {
-        logger.info("[AI Stream] Stream timeout reached - aborting stream", {
+        logger.debug("[AI Stream] Stream timeout reached - aborting stream", {
           timeoutMs,
         });
         streamAbortController.abort(

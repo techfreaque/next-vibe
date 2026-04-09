@@ -13,19 +13,18 @@ import type { EndpointLogger } from "../../../system/unified-interface/shared/lo
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { getBestChatModel, type ChatModelId } from "../../ai-stream/models";
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
-import type { ChatMode } from "../../models/enum";
 import type { ModelProviderEnvAvailability } from "../../models/models";
 
-import { ViewMode } from "../enum";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
 import type {
   TtsModelId,
   VoiceModelSelection,
 } from "../../text-to-speech/models";
+import { ViewMode } from "../enum";
 import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,
 } from "./definition";
-import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
 
 /**
  * Storage key for chat settings
@@ -98,7 +97,6 @@ export class ChatSettingsRepositoryClient {
       imageVisionModelSelection: undefined,
       videoVisionModelSelection: undefined,
       audioVisionModelSelection: undefined,
-      translationModelId: undefined,
       imageGenModelSelection: undefined,
       musicGenModelSelection: undefined,
       defaultChatMode: undefined,
@@ -154,11 +152,7 @@ export class ChatSettingsRepositoryClient {
         audioVisionModelSelection:
           overrides.audioVisionModelSelection ??
           defaults.audioVisionModelSelection,
-        translationModelId:
-          overrides.translationModelId ?? defaults.translationModelId,
-        defaultChatMode:
-          (overrides.defaultChatMode as ChatMode | undefined) ??
-          defaults.defaultChatMode,
+        defaultChatMode: overrides.defaultChatMode ?? defaults.defaultChatMode,
         viewMode: overrides.viewMode ?? defaults.viewMode,
         availableTools:
           "availableTools" in overrides
@@ -241,9 +235,6 @@ export class ChatSettingsRepositoryClient {
     ) {
       overrides.audioVisionModelSelection = settings.audioVisionModelSelection;
     }
-    if (settings.translationModelId !== defaults.translationModelId) {
-      overrides.translationModelId = settings.translationModelId;
-    }
     if (settings.defaultChatMode !== defaults.defaultChatMode) {
       overrides.defaultChatMode = settings.defaultChatMode;
     }
@@ -308,8 +299,6 @@ export class ChatSettingsRepositoryClient {
         updates.videoVisionModelSelection ?? current.videoVisionModelSelection,
       audioVisionModelSelection:
         updates.audioVisionModelSelection ?? current.audioVisionModelSelection,
-      translationModelId:
-        updates.translationModelId ?? current.translationModelId,
       defaultChatMode: updates.defaultChatMode ?? current.defaultChatMode,
       viewMode: updates.viewMode ?? current.viewMode,
       availableTools:

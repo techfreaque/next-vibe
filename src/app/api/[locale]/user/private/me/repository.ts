@@ -209,10 +209,7 @@ export class UserProfileRepository {
 
       // Flatten the nested data structure for database update
       // Always sync locale from URL path to keep user locale in sync
-      const updateData: Record<
-        string,
-        string | boolean | Date | null | undefined
-      > = {
+      const updateData: Partial<typeof users.$inferInsert> = {
         updatedAt: new Date(),
         locale,
       };
@@ -235,8 +232,51 @@ export class UserProfileRepository {
         updateData.marketingConsent = data.privacySettings.marketingConsent;
       }
 
+      // Handle profileInfo (creator fields + social links)
+      if (data.profileInfo) {
+        const p = data.profileInfo;
+        if (p.bio !== undefined) {
+          updateData.bio = p.bio;
+        }
+        if (p.websiteUrl !== undefined) {
+          updateData.websiteUrl = p.websiteUrl;
+        }
+        if (p.twitterUrl !== undefined) {
+          updateData.twitterUrl = p.twitterUrl;
+        }
+        if (p.youtubeUrl !== undefined) {
+          updateData.youtubeUrl = p.youtubeUrl;
+        }
+        if (p.instagramUrl !== undefined) {
+          updateData.instagramUrl = p.instagramUrl;
+        }
+        if (p.tiktokUrl !== undefined) {
+          updateData.tiktokUrl = p.tiktokUrl;
+        }
+        if (p.githubUrl !== undefined) {
+          updateData.githubUrl = p.githubUrl;
+        }
+        if (p.discordUrl !== undefined) {
+          updateData.discordUrl = p.discordUrl;
+        }
+        if (p.creatorAccentColor !== undefined) {
+          updateData.creatorAccentColor = p.creatorAccentColor;
+        }
+        if (p.creatorHeaderImageUrl !== undefined) {
+          updateData.creatorHeaderImageUrl = p.creatorHeaderImageUrl;
+        }
+      }
+
       // Update user in database
       await db.update(users).set(updateData).where(eq(users.id, userId));
+
+      // Cascade email change to linked lead record
+      if (updateData.email && currentUser.leadId) {
+        await db
+          .update(leads)
+          .set({ email: updateData.email, updatedAt: new Date() })
+          .where(eq(leads.id, currentUser.leadId));
+      }
 
       logger.debug("Successfully updated user profile", { userId });
 

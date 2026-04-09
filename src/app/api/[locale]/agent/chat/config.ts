@@ -40,7 +40,7 @@ export enum DefaultFolderId {
 
 /**
  * Tool IDs denied per folder type. Stacked onto deniedToolIds in stream-setup.
- * Uses plain string aliases (not imports) to avoid circular deps — config.ts is foundational.
+ * Uses plain string aliases (not imports) to avoid circular deps - config.ts is foundational.
  * Admin-only tools (campaign-starter, leads-import, etc.) are already gated by allowedRoles
  * and don't need explicit denial here.
  */
@@ -48,7 +48,7 @@ export const FOLDER_DENIED_TOOL_IDS: Partial<
   Record<DefaultFolderId, readonly string[]>
 > = {
   [DefaultFolderId.INCOGNITO]: [
-    // Task infrastructure — results can't route back to localStorage-only threads
+    // Task infrastructure - results can't route back to localStorage-only threads
     "coding-agent", // escalateToTask + spawns OS processes
     "ssh-exec", // escalates long commands to cron tasks
     "execute-tool", // creates remote cron tasks (PUBLIC-accessible)
@@ -165,6 +165,8 @@ export interface ToolExecutionContext {
   videoGenModelId: VideoGenModelId | undefined;
   /** Whether this is a headless/cron invocation */
   headless: boolean | undefined;
+  /** Whether this is a revival stream (resume-stream after wakeUp task completed). */
+  isRevival: boolean | undefined;
   /**
    * Mutable signal set by remote tools with callbackMode=wait.
    * Stream layer checks this after tool-result to pause and wait for /report.

@@ -62,6 +62,7 @@ const VIBE_SENSE_STREAM_CONTEXT: ToolExecutionContext = {
   imageGenModelId: undefined,
   musicGenModelId: undefined,
   videoGenModelId: undefined,
+  isRevival: undefined,
 };
 
 // ─── Execution Context ────────────────────────────────────────────────────────

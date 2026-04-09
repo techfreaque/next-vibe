@@ -12,7 +12,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 /** Recording submit mode - determines what happens after recording stops */
-type RecordingSubmitMode = "toInput" | "directSubmit";
+type RecordingSubmitMode = "toInput" | "directSubmit" | "transcribeAndSubmit";
 
 interface UseVoiceRecordingOptions {
   /** Current input value */
@@ -50,6 +50,11 @@ export interface UseVoiceRecordingReturn {
   transcribeToInput: () => void;
   /** Stop and submit audio directly */
   submitAudioDirectly: () => Promise<void>;
+  /**
+   * Smart submit: if no existing input → submit audio directly;
+   * if existing input → transcribe and append to input, then submit combined text.
+   */
+  submitVoice: () => Promise<void>;
   /** Cancel recording without saving */
   cancelRecording: () => void;
   /** Toggle pause/resume */
@@ -87,6 +92,12 @@ export function useVoiceRecording({
       const mode = voiceModeRef.current;
       if (mode === "directSubmit" && onSubmitText) {
         void onSubmitText(text);
+      } else if (mode === "transcribeAndSubmit" && onSubmitText) {
+        // Append transcribed text to existing input, then submit combined
+        const cur = currentValueRef.current;
+        const combined = cur ? `${cur}\n${text}` : text;
+        onValueChange(combined);
+        void onSubmitText(combined);
       } else {
         const cur = currentValueRef.current;
         const newValue = cur ? `${cur}\n${text}` : text;
@@ -163,6 +174,23 @@ export function useVoiceRecording({
     await onSubmitAudio(audioFile);
   }, [stopRecordingAndGetBlob, onSubmitAudio, logger]);
 
+  /**
+   * Smart submit triggered by the main send button during STT mode.
+   * - No existing input: submit raw audio directly (voice-to-voice)
+   * - Existing input: transcribe and append to existing text, then submit combined
+   */
+  const submitVoice = useCallback(async (): Promise<void> => {
+    const hasExisting = currentValueRef.current.trim().length > 0;
+    if (hasExisting) {
+      // Transcribe and merge with existing input, then submit
+      voiceModeRef.current = "transcribeAndSubmit";
+      stopRecording();
+    } else {
+      // No existing input - submit raw audio directly
+      await submitAudioDirectly();
+    }
+  }, [stopRecording, submitAudioDirectly]);
+
   // Cancel recording
   const cancelRecording = useCallback((): void => {
     cancelSTT();
@@ -180,6 +208,7 @@ export function useVoiceRecording({
       startRecording,
       transcribeToInput,
       submitAudioDirectly,
+      submitVoice,
       cancelRecording,
       togglePause,
       clearError,
@@ -194,6 +223,7 @@ export function useVoiceRecording({
       startRecording,
       transcribeToInput,
       submitAudioDirectly,
+      submitVoice,
       cancelRecording,
       togglePause,
       clearError,

@@ -13,15 +13,14 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
 import { getVideoGenModelById } from "@/app/api/[locale]/agent/video-generation/models";
+import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
 
-import { generateVideoWithModelsLab } from "./providers/modelslab";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -31,6 +30,7 @@ import type {
   VideoGenerationPostResponseOutput,
 } from "./definition";
 import type { VideoGenerationT } from "./i18n";
+import { generateVideoWithModelsLab } from "./providers/modelslab";
 
 interface MediaGenStreamContext {
   threadId?: string | undefined;
@@ -119,7 +119,7 @@ export class VideoGenerationRepository {
       });
     }
 
-    // Calculate credit cost — use pricingByResolution override when resolution is selected
+    // Calculate credit cost - use pricingByResolution override when resolution is selected
     const perSecondCost =
       (data.resolution
         ? videoModel.pricingByResolution?.[data.resolution]
@@ -130,7 +130,7 @@ export class VideoGenerationRepository {
     const rounded = Math.round(rawCost * 10) / 10;
     const creditCost = rounded % 1 === 0 ? Math.round(rounded) : rounded;
 
-    logger.info("[VideoGen] Starting video generation", {
+    logger.debug("[VideoGen] Starting video generation", {
       model: data.model,
       provider: videoModel.apiProvider,
       creditCost,
@@ -225,7 +225,7 @@ export class VideoGenerationRepository {
       return deductResult;
     }
 
-    logger.info("[VideoGen] Video generated successfully", {
+    logger.debug("[VideoGen] Video generated successfully", {
       model: data.model,
       creditCost,
       durationSeconds,

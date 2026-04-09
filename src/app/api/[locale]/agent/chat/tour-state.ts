@@ -9,6 +9,8 @@ interface TourState {
   modelSelectorOnboarding: boolean;
   // Set to true when the selector onboarding finishes (companion + usecases steps done)
   onboardingComplete: boolean;
+  // The favorite ID of the first companion added during onboarding (for the joyride "meet your companion" step)
+  onboardingCompanionId: string | null;
   // Current tour step index (for coordination)
   currentStepIndex: number;
   // Callback to advance tour (set by welcome-tour)
@@ -17,6 +19,7 @@ interface TourState {
   setModelSelectorOpen: (open: boolean) => void;
   setModelSelectorOnboarding: (onboarding: boolean) => void;
   setOnboardingComplete: (complete: boolean) => void;
+  setOnboardingCompanionId: (id: string | null) => void;
   setCurrentStepIndex: (index: number) => void;
   setAdvanceTour: (callback: (() => void) | null) => void;
 }
@@ -28,6 +31,7 @@ export const useTourState = create<TourState>()(
       modelSelectorOpen: false,
       modelSelectorOnboarding: false,
       onboardingComplete: false,
+      onboardingCompanionId: null,
       currentStepIndex: 0,
       advanceTour: null,
       setTourActive: (active: boolean): void => {
@@ -41,6 +45,9 @@ export const useTourState = create<TourState>()(
       },
       setOnboardingComplete: (complete: boolean): void => {
         set({ onboardingComplete: complete });
+      },
+      setOnboardingCompanionId: (id: string | null): void => {
+        set({ onboardingCompanionId: id });
       },
       setCurrentStepIndex: (index: number): void => {
         set({ currentStepIndex: index });

@@ -17,19 +17,18 @@ import {
   COMPANION_SKILLS,
   DEFAULT_SKILLS,
 } from "@/app/api/[locale]/system/generated/skills-index";
-import type { ChatModelId } from "../../ai-stream/models";
-import type {
-  AudioVisionModelId,
-  ImageVisionModelId,
-  VideoVisionModelId,
-} from "../../ai-stream/vision-models";
-import type { ImageGenModelId } from "../../image-generation/models";
-import type { ChatMode } from "../../models/enum";
 import type { ChatModelSelection } from "../../ai-stream/models";
-import type { MusicGenModelId } from "../../music-generation/models";
-import type { SttModelId } from "../../speech-to-text/models";
-import type { TtsModelId } from "../../text-to-speech/models";
-import type { VideoGenModelId } from "../../video-generation/models";
+import type {
+  AudioVisionModelSelection,
+  ImageVisionModelSelection,
+  VideoVisionModelSelection,
+} from "../../ai-stream/vision-models";
+import type { ImageGenModelSelection } from "../../image-generation/models";
+import type { ChatMode } from "../../models/enum";
+import type { MusicGenModelSelection } from "../../music-generation/models";
+import type { SttModelSelection } from "../../speech-to-text/models";
+import type { VoiceModelSelection } from "../../text-to-speech/models";
+import type { VideoGenModelSelection } from "../../video-generation/models";
 import type { ToolConfigItem } from "../settings/definition";
 import { NO_SKILL_ID } from "./constants";
 import {
@@ -62,18 +61,37 @@ export function getAvailableSkillCount(
 }
 
 /**
- * A named variant of a skill with its own model selection.
+ * A named variant of a skill with its own model selection and optional model overrides.
  * Skills with variants are expanded into grouped rows in the skill list.
+ * All model fields use ModelSelection types (same pattern as favorites/settings).
  */
 export interface SkillVariant {
   /** Unique identifier within the skill, e.g. "brilliant", "uncensored" */
   id: string;
   /** Localized sub-label shown under the skill name, e.g. "skills.thea.variants.brilliant" */
   variantName: SkillsTranslationKey;
-  /** Model selection for this variant - required, drives model resolution */
+  /** Chat model selection for this variant - required, drives model resolution */
   modelSelection: ChatModelSelection;
+  /** Default chat mode for this variant (text/voice/call). */
+  defaultChatMode?: ChatMode;
   /** Which variant is the default when none is specified */
   isDefault?: boolean;
+  /** TTS voice selection for this variant. Falls back to platform default if not set. */
+  voiceModelSelection?: VoiceModelSelection;
+  /** STT model selection for this variant. Falls back to platform default if not set. */
+  sttModelSelection?: SttModelSelection;
+  /** Image vision bridge model selection for this variant. */
+  imageVisionModelSelection?: ImageVisionModelSelection;
+  /** Video vision bridge model selection for this variant. */
+  videoVisionModelSelection?: VideoVisionModelSelection;
+  /** Audio vision bridge model selection for this variant. */
+  audioVisionModelSelection?: AudioVisionModelSelection;
+  /** Image generation model selection for this variant (overrides user settings). */
+  imageGenModelSelection?: ImageGenModelSelection;
+  /** Music generation model selection for this variant (overrides user settings). */
+  musicGenModelSelection?: MusicGenModelSelection;
+  /** Video generation model selection for this variant (overrides user settings). */
+  videoGenModelSelection?: VideoGenModelSelection;
 }
 
 /**
@@ -95,16 +113,6 @@ export interface Skill {
   icon: IconKey;
   systemPrompt: string;
   category: typeof SkillCategoryValue;
-  voiceId?: TtsModelId;
-  sttModelId?: SttModelId;
-  imageVisionModelId?: ImageVisionModelId;
-  videoVisionModelId?: VideoVisionModelId;
-  audioVisionModelId?: AudioVisionModelId;
-  translationModelId?: ChatModelId;
-  defaultChatMode?: ChatMode;
-  imageGenModelId?: ImageGenModelId;
-  musicGenModelId?: MusicGenModelId;
-  videoGenModelId?: VideoGenModelId;
   suggestedPrompts: SkillsTranslationKey[];
   /** Named variants. Expanded as grouped rows in skill list. */
   variants: SkillVariant[];
@@ -147,7 +155,6 @@ export const NO_SKILL = {
   id: NO_SKILL_ID,
   category: SkillCategory.ASSISTANT,
   ownershipType: SkillOwnershipType.SYSTEM,
-  voiceId: undefined,
   suggestedPrompts: [
     "skills.default.suggestedPrompts.0" as const,
     "skills.default.suggestedPrompts.1" as const,
@@ -167,5 +174,5 @@ export const NO_SKILL = {
         sortDirection2: ModelSortDirection.ASC,
       },
     },
-  ],
+  ] satisfies SkillVariant[],
 };

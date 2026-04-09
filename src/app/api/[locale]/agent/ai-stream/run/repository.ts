@@ -183,6 +183,7 @@ export class AiStreamRunRepository {
               escalateToTask: undefined,
               callerCallbackMode: undefined,
               onEscalatedTaskCancel: undefined,
+              isRevival: false,
             },
           );
           preCallResults.push({

@@ -34,6 +34,8 @@ export interface AgentEnvAvailability {
   scrappey: boolean;
   /** OpenAI Images API (DALL-E, gpt-image-1) */
   openAiImages: boolean;
+  /** OpenAI STT (Whisper direct API) */
+  openAiStt: boolean;
   /** Replicate (Flux Pro, SDXL, video models) */
   replicate: boolean;
   /** Fal.ai (fast image and video inference) */
@@ -42,11 +44,15 @@ export interface AgentEnvAvailability {
   modelsLab: boolean;
   /** Unbottled AI provider (remote cloud instance) */
   unbottled: boolean;
+  /** Eden AI STT */
+  edenAiStt: boolean;
+  /** Deepgram STT */
+  deepgram: boolean;
 }
 
 /**
  * Server-side singleton for env availability.
- * Evaluated once at module load time — import and use directly on server.
+ * Evaluated once at module load time - import and use directly on server.
  */
 export const agentEnvAvailability: AgentEnvAvailability = (() => {
   const braveSearch = Boolean(agentEnv.BRAVE_SEARCH_API_KEY);
@@ -65,10 +71,13 @@ export const agentEnvAvailability: AgentEnvAvailability = (() => {
     veniceAI: Boolean(agentEnv.VENICE_AI_API_KEY),
     scrappey: Boolean(agentEnv.SCRAPPEY_API_KEY),
     openAiImages: Boolean(agentEnv.OPENAI_API_KEY),
+    openAiStt: Boolean(agentEnv.OPENAI_API_KEY),
     replicate: Boolean(agentEnv.REPLICATE_API_TOKEN),
     falAi: Boolean(agentEnv.FAL_AI_API_KEY),
     modelsLab: Boolean(agentEnv.MODELSLAB_API_KEY),
     unbottled: Boolean(agentEnv.UNBOTTLED_CLOUD_CREDENTIALS),
+    edenAiStt: Boolean(agentEnv.EDEN_AI_API_KEY),
+    deepgram: Boolean(agentEnv.DEEPGRAM_API_KEY),
   };
 })();
 
@@ -151,6 +160,21 @@ export const PROVIDER_SETUP_INSTRUCTIONS = {
     envKey: "UNBOTTLED_CLOUD_CREDENTIALS",
     url: "https://unbottled.ai",
     label: "Unbottled AI",
+  },
+  openAiStt: {
+    envKey: "OPENAI_API_KEY",
+    url: "https://platform.openai.com/api-keys",
+    label: "OpenAI Whisper (STT)",
+  },
+  edenAiStt: {
+    envKey: "EDEN_AI_API_KEY",
+    url: "https://app.edenai.run/user/settings#api",
+    label: "Eden AI (STT)",
+  },
+  deepgram: {
+    envKey: "DEEPGRAM_API_KEY",
+    url: "https://console.deepgram.com",
+    label: "Deepgram",
   },
 } as const satisfies Record<
   Exclude<keyof AgentEnvAvailability, "anySearch">,

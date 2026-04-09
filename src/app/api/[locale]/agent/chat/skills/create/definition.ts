@@ -6,11 +6,6 @@
 import { z } from "zod";
 
 import {
-  CHAT_MODE_IDS,
-  ChatModeOptions,
-} from "@/app/api/[locale]/agent/models/enum";
-import { ChatModelIdOptions } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
   chatModelSelectionSchema,
   type ChatModelSelection,
 } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -20,6 +15,10 @@ import {
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import {
+  CHAT_MODE_IDS,
+  ChatModeOptions,
+} from "@/app/api/[locale]/agent/models/enum";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
@@ -43,7 +42,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { lazy } from "react";
 import { iconSchema } from "../../../../shared/types/common.schema";
-import { ChatModelId } from "../../../ai-stream/models";
+import { ChatModelId, getBestChatModel } from "../../../ai-stream/models";
 import {
   CATEGORY_CONFIG,
   ContentLevel,
@@ -57,7 +56,6 @@ import { SKILL_CREATE_ALIAS } from "../constants";
 import { CategoryOptions, SkillCategory, SkillCategoryDB } from "../enum";
 import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "../i18n";
-import { getBestChatModel } from "../../../ai-stream/models";
 
 const SkillCreateContainer = lazy(() =>
   import("./widget").then((m) => ({ default: m.SkillCreateContainer })),
@@ -360,19 +358,6 @@ const { POST } = createEndpoint({
           optionalColor: "transparent",
         },
       }),
-      translationModelId: requestField(scopedTranslation, {
-        schema: z.enum(ChatModelId).nullable().optional(),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: ChatModelIdOptions,
-        label: "post.translationModel.label" as const,
-        description: "post.translationModel.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-      }),
       imageGenModelSelection: requestField(scopedTranslation, {
         schema: imageGenModelSelectionSchema.nullable().optional(),
         type: WidgetType.FORM_FIELD,
@@ -441,7 +426,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "post.modelSelection.label" as const,
         description: "post.modelSelection.description" as const,
-        schema: chatModelSelectionSchema.nullable(),
+        schema: chatModelSelectionSchema.nullable().optional(),
       }),
 
       // Tool configuration - which tools this skill can use (null = use global settings default)

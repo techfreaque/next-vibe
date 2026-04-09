@@ -36,7 +36,6 @@ import type {
   AiStreamPostResponseOutput,
 } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
-import { ModalityResolver } from "./core/modality-resolver";
 import { clearStreamingState } from "./core/stream-registry";
 import {
   subscribeWakeUpSignal,
@@ -98,6 +97,7 @@ export class AiStreamRepository {
     user: JwtPayloadType;
     request: NextRequest | undefined;
     headless: true;
+    isRevival?: boolean;
     t: AiStreamT;
     extraInstructions?: string;
     excludeMemories?: boolean;
@@ -108,6 +108,7 @@ export class AiStreamRepository {
       videoGenModelId?: VideoGenModelId;
       imageGenModelId?: ImageGenModelId;
     };
+    providerOverride?: ApiProvider;
   }): Promise<ResponseType<HeadlessAiStreamResult>>;
 
   /** Interactive overload - returns response output (events stream via WS) */
@@ -133,12 +134,14 @@ export class AiStreamRepository {
     user,
     request,
     headless = false,
+    isRevival,
     t: aiStreamT,
     extraInstructions,
     excludeMemories,
     favoriteIdOverride,
     sequenceIdOverride,
     mediaModelOverrides,
+    providerOverride,
     toolsOverride,
   }: {
     data: AiStreamPostRequestOutput;
@@ -147,6 +150,7 @@ export class AiStreamRepository {
     user: JwtPayloadType;
     request: NextRequest | undefined;
     headless?: boolean;
+    isRevival?: boolean;
     t: AiStreamT;
     extraInstructions?: string;
     excludeMemories?: boolean;
@@ -157,6 +161,7 @@ export class AiStreamRepository {
       videoGenModelId?: VideoGenModelId;
       imageGenModelId?: ImageGenModelId;
     };
+    providerOverride?: ApiProvider;
     toolsOverride?: Record<string, CoreTool>;
   }): Promise<
     | ResponseType<AiStreamPostResponseOutput>
@@ -177,10 +182,12 @@ export class AiStreamRepository {
       maxDuration: AiStreamRepository.maxDuration,
       request,
       headless,
+      isRevival,
       extraInstructions,
       excludeMemories,
       favoriteIdOverride,
       mediaModelOverrides,
+      providerOverride,
       toolsOverride,
     });
 
@@ -246,6 +253,7 @@ export class AiStreamRepository {
       isNewThread,
       userMessageId,
       aiMessageId,
+      userMessageCreatedAt,
       messages,
       systemPrompt,
       trailingSystemMessage,
@@ -269,7 +277,7 @@ export class AiStreamRepository {
     // All confirmations were wakeUp-pending - no AI turn needed here.
     // resume-stream will handle revival when each goroutine completes.
     if (skipAiTurn) {
-      logger.info(
+      logger.debug(
         "[AiStream] All confirmations wakeUp-pending - skipping AI turn, revival handles it",
         { threadId: data.threadId },
       );
@@ -324,7 +332,7 @@ export class AiStreamRepository {
         lastPayload = payload;
       }
 
-      logger.info("[WakeUp] Firing revival after stream yield", {
+      logger.debug("[WakeUp] Firing revival after stream yield", {
         threadId: threadResultThreadId,
         deferredCount: payloads.length,
         lastDeferredId,
@@ -396,7 +404,7 @@ export class AiStreamRepository {
         const unsubscribeWakeUp = subscribeWakeUpSignal(
           threadResultThreadId,
           (payload) => {
-            logger.info(
+            logger.debug(
               "[WakeUp] Signal received - will yield at next step boundary",
               {
                 threadId: threadResultThreadId,
@@ -528,7 +536,12 @@ export class AiStreamRepository {
             // Compacting gets its own sequenceId so it appears as a
             // separate, independently-deletable message group in the UI.
             const compactingSequenceId = crypto.randomUUID();
-            const compactingMessageCreatedAt = new Date();
+            // Use timestamp from just before user message insert, minus 1ms.
+            // Compacting re-parents the user message (compacting → user), so
+            // compacting.createdAt must be strictly less than user.createdAt.
+            const compactingMessageCreatedAt = new Date(
+              userMessageCreatedAt.getTime() - 1,
+            );
             const compactingResult = await CompactingHandler.executeCompacting({
               messagesToCompact: compactingCheck.messagesToCompact,
               branchMessages: compactingCheck.branchMessages,
@@ -617,7 +630,7 @@ export class AiStreamRepository {
             ctx.currentParentId =
               userMessageId ?? compactingResult.compactingMessageId;
 
-            logger.info("[Compacting] Updated messages for main stream", {
+            logger.debug("[Compacting] Updated messages for main stream", {
               messageCount: messages.length,
               compactingMessageId: compactingResult.compactingMessageId,
               contextParentId: ctx.currentParentId,
@@ -660,6 +673,7 @@ export class AiStreamRepository {
             const gapFilledMessages = await GapFillExecutor.runGapFill({
               messages,
               chatHistory,
+              currentUserMessageId: userMessageId ?? null,
               activeModel: modelConfig,
               bridgeContext,
               dbWriter: ctx.dbWriter,
@@ -682,7 +696,7 @@ export class AiStreamRepository {
             },
           );
 
-          // Execute main AI stream — UNBOTTLED models bypass local AI SDK
+          // Execute main AI stream - UNBOTTLED models bypass local AI SDK
           // and relay through unbottled.ai cloud instead.
           if (modelConfig.apiProvider === ApiProvider.UNBOTTLED) {
             const { executeUnbottledStream } =
@@ -758,8 +772,6 @@ export class AiStreamRepository {
               imageSize: data.imageSize ?? undefined,
               imageQuality: data.imageQuality ?? undefined,
               musicDuration: data.musicDuration ?? undefined,
-              translationModel:
-                ModalityResolver.resolveTranslationModel(bridgeContext),
             });
           }
 
@@ -790,7 +802,7 @@ export class AiStreamRepository {
           if (streamAbortController.signal.aborted) {
             // AbortErrorHandler should have already run in StreamExecutionHandler.
             // Log and continue - the finally block will emit STREAM_FINISHED.
-            logger.info(
+            logger.debug(
               "[AI Stream] Post-abort error in outer catch (abort already handled)",
               {
                 abortHandled: ctx.abortHandled,
@@ -837,7 +849,7 @@ export class AiStreamRepository {
             headlessPendingWakeUps.length > 0 &&
             streamAbortController.signal.aborted
           ) {
-            logger.info(
+            logger.debug(
               "[WakeUp] Headless: skipping revival - stream was aborted",
               {
                 threadId: threadResultThreadId,
@@ -936,7 +948,7 @@ export class AiStreamRepository {
                 return handleWakeUpRevivalBatch(pendingWakeUps);
               }
               if (pendingWakeUps.length > 0) {
-                logger.info(
+                logger.debug(
                   "[WakeUp] Skipping revival - stream was aborted by user",
                   {
                     threadId: threadResultThreadId,

@@ -279,6 +279,7 @@ export class TaskExecuteRepository {
               imageGenModelId: undefined,
               musicGenModelId: undefined,
               videoGenModelId: undefined,
+              isRevival: undefined,
             },
           }),
           new Promise<never>((...[, reject]) => {

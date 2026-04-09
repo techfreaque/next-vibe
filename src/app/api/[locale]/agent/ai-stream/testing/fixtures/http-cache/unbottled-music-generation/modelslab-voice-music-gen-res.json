@@ -1,0 +1,41 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v7/voice/music-gen",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "9e83519a4944814d-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Mon, 06 Apr 2026 19:50:14 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=mSwcG%2Bz%2FBAwxI8VNlX2OndynkW%2FVxz0ro8T5Wp1avhuAc8LhpMwYcljq0HP6BcmbfwobdAGgPwfRsNyBWkBzQ3jsORCDssivyRYkK0mw4fppayV78vi2aulcpdiTHE4%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "476ced90f0e3c2848679415ae1ffd049",
+    "x-request-time": "17.247",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.000",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "success",
+    "generationTime": 15,
+    "id": 3889797,
+    "output": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/a75c764c-80ea-4d18-82e2-3936f1229418.mp3"
+    ],
+    "proxy_links": [
+      "https://cdn2.stablediffusionapi.com/generations/a75c764c-80ea-4d18-82e2-3936f1229418.mp3"
+    ],
+    "meta": {
+      "prompt": "upbeat piano melody",
+      "model_id": "lyria-3"
+    }
+  }
+}

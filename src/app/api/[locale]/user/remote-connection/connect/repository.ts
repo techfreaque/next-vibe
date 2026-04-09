@@ -82,10 +82,12 @@ export class RemoteConnectionConnectRepository {
       return "Remote URL must use http or https";
     }
     const host = parsed.hostname;
-    // Allow loopback/private addresses in development or preview mode (for local-to-local testing)
+    // Allow loopback/private addresses in development, test, or preview mode (for local-to-local testing)
     const isDev =
       envClient.NODE_ENV === "development" ||
+      envClient.NODE_ENV === "test" ||
       env.NODE_ENV === "development" ||
+      env.NODE_ENV === "test" ||
       env.IS_PREVIEW_MODE === true;
     if (!isDev) {
       if (
@@ -328,21 +330,94 @@ export class RemoteConnectionConnectRepository {
       user.id,
     );
 
-    // ── Step 3b: Generate reverse token for bidirectional auth ───────────────
-    // The remote needs a JWT signed by OUR secret to call our /report endpoint.
-    // This enables the remote to push task completion status back to us.
+    // ── Step 3b: Obtain reverse session token for bidirectional auth ─────────
+    // The remote needs a REAL session token (not a self-signed JWT) to call our
+    // endpoints. We log into ourselves so the remote gets a session-backed token
+    // that passes validateWebSession on our server. Same flow as how we logged
+    // into the remote in step 2.
     let reverseToken: string | undefined;
-    const reverseTokenResult = await AuthRepository.signJwt(
-      user,
-      logger,
-      locale,
-    );
-    if (reverseTokenResult.success) {
-      reverseToken = reverseTokenResult.data;
-    } else {
+    let reverseLeadId: string | undefined;
+    const localUrl = envClient.NEXT_PUBLIC_APP_URL ?? "";
+    if (localUrl) {
+      try {
+        // Ping ourselves to get a fresh leadId cookie.
+        let localPingLeadId: string | undefined;
+        try {
+          const localPingResp = await fetch(`${localUrl}/${locale}`, {
+            method: "GET",
+            redirect: "follow",
+            signal: AbortSignal.timeout(10000),
+          });
+          const setCookieLocal = localPingResp.headers.get("set-cookie") ?? "";
+          const localMatch = setCookieLocal.match(
+            new RegExp(`${LEAD_ID_COOKIE_NAME}=([^;]+)`),
+          );
+          if (localMatch?.[1]) {
+            localPingLeadId = localMatch[1];
+          }
+        } catch {
+          // Non-fatal - continue without ping leadId
+        }
+
+        // Login to ourselves to get a session-backed token.
+        const localLoginUrl = `${localUrl}/api/${locale}/${loginEndpoints.POST.path.join("/")}`;
+        const localLoginHeaders: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (localPingLeadId) {
+          localLoginHeaders.Cookie = `${LEAD_ID_COOKIE_NAME}=${localPingLeadId}`;
+        }
+        const localLoginResp = await fetch(localLoginUrl, {
+          method: "POST",
+          headers: localLoginHeaders,
+          body: JSON.stringify({
+            email,
+            password,
+            rememberMe: true,
+          }),
+          signal: AbortSignal.timeout(15000),
+        });
+        if (localLoginResp.ok) {
+          const localLoginBody = (await localLoginResp.json()) as {
+            success?: boolean;
+            data?: LoginPostResponseOutput;
+          };
+          if (localLoginBody.data?.token) {
+            reverseToken = localLoginBody.data.token;
+            reverseLeadId = localLoginBody.data.leadId ?? undefined;
+            logger.debug(
+              "[CONNECT] Obtained reverse session token via self-login",
+            );
+          }
+        } else {
+          logger.warn("[CONNECT] Self-login for reverse token failed", {
+            status: localLoginResp.status,
+          });
+        }
+      } catch (reverseErr) {
+        logger.warn(
+          "[CONNECT] Self-login error for reverse token (non-fatal)",
+          {
+            error: String(reverseErr),
+          },
+        );
+      }
+    }
+
+    if (!reverseToken) {
+      // Fallback: use a self-signed JWT - only works if remote skips session validation.
       logger.warn(
-        "[CONNECT] Failed to generate reverse token, continuing without it",
+        "[CONNECT] No reverse session token - falling back to signed JWT (reverse calls may fail auth)",
       );
+      const reverseTokenResult = await AuthRepository.signJwt(
+        user,
+        logger,
+        locale,
+      );
+      if (reverseTokenResult.success) {
+        reverseToken = reverseTokenResult.data;
+        reverseLeadId = user.leadId;
+      }
     }
 
     // ── Step 4: Register this instance on the remote ───────────────────────────
@@ -357,7 +432,7 @@ export class RemoteConnectionConnectRepository {
         instanceId: selfInstanceId,
         locale,
         reverseToken,
-        reverseLeadId: user.leadId,
+        reverseLeadId,
         logger,
       });
 

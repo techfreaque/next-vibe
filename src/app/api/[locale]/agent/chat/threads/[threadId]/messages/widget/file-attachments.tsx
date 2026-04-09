@@ -6,18 +6,18 @@
  * Handles server-stored files (URL) and incognito files (base64 → blob URL).
  */
 
-import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui/div";
 import { Audio } from "next-vibe-ui/ui/audio";
+import { Div } from "next-vibe-ui/ui/div";
 import { Download } from "next-vibe-ui/ui/icons/Download";
 import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { Film } from "next-vibe-ui/ui/icons/Film";
-import { Music } from "next-vibe-ui/ui/icons/Music";
 import { Image as ImageIcon } from "next-vibe-ui/ui/icons/Image";
+import { Music } from "next-vibe-ui/ui/icons/Music";
 import { Image } from "next-vibe-ui/ui/image";
 import { ExternalLink } from "next-vibe-ui/ui/link";
-import { Video } from "next-vibe-ui/ui/video";
 import { Span } from "next-vibe-ui/ui/span";
+import { Video } from "next-vibe-ui/ui/video";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
@@ -94,7 +94,7 @@ export function FileAttachments({
 }
 
 /**
- * Single file attachment — picks the right renderer per media type.
+ * Single file attachment - picks the right renderer per media type.
  */
 function FileAttachmentItem({
   attachment,

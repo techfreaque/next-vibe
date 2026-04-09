@@ -325,7 +325,7 @@ export class TextToSpeechRepository {
     const modelOption = getTtsModelById(data.voiceId);
     const language = TextToSpeechRepository.mapLocaleToLanguage(locale);
 
-    logger.info("[TTS] Starting text-to-speech conversion", {
+    logger.debug("[TTS] Starting text-to-speech conversion", {
       voiceId: data.voiceId,
       provider: modelOption.apiProvider,
       language,
@@ -374,7 +374,7 @@ export class TextToSpeechRepository {
     const characterCount = data.text.length;
     const creditsNeeded = characterCount * TTS_COST_PER_CHARACTER;
 
-    logger.info("[TTS] Calculating TTS credits", {
+    logger.debug("[TTS] Calculating TTS credits", {
       characterCount,
       creditsNeeded,
     });
@@ -432,7 +432,7 @@ export class TextToSpeechRepository {
 
       const audioUrl = audioResult.data;
 
-      logger.info("[TTS] Text-to-speech conversion successful", {
+      logger.debug("[TTS] Text-to-speech conversion successful", {
         audioSize: audioUrl.length,
         provider: modelOption.apiProvider,
       });
@@ -457,7 +457,7 @@ export class TextToSpeechRepository {
       }
 
       if (deductResult.data.partialDeduction) {
-        logger.info("[TTS] Partial credit deduction (insufficient funds)", {
+        logger.debug("[TTS] Partial credit deduction (insufficient funds)", {
           requestedCost: creditsNeeded,
           characterCount,
         });

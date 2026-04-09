@@ -94,9 +94,6 @@ export const translations = {
       label: "Audio Vision Model",
       placeholder: "System default",
     },
-    translationModel: {
-      label: "Translation Model",
-    },
     imageGenModel: {
       label: "Image Generation Model",
       placeholder: "System default",

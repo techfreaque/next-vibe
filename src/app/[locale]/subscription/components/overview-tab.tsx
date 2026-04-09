@@ -320,7 +320,7 @@ export function OverviewTab({
                                     key={primaryId}
                                     className="flex items-center gap-3 p-2 rounded bg-accent"
                                   >
-                                    <Span className="flex items-center gap-1">
+                                    <Span className="flex items-center gap-1 flex-1 min-w-0">
                                       {def.name}
                                       {isLegacy && (
                                         <Span className="text-xs text-muted-foreground">
@@ -335,7 +335,7 @@ export function OverviewTab({
                                     <ModelCreditDisplay
                                       modelId={primaryId}
                                       variant="text"
-                                      className="font-mono"
+                                      className="font-mono text-xs shrink-0"
                                       locale={locale}
                                     />
                                   </Div>

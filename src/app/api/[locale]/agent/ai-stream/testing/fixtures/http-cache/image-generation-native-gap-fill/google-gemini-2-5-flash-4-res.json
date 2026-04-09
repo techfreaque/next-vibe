@@ -1,0 +1,64 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "cf-ray": "9e8b95403f16db06-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 07 Apr 2026 19:54:19 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1775591654-ZFAIgyavDGTKAnj6ntNd"
+  },
+  "body": {
+    "id": "gen-1775591654-ZFAIgyavDGTKAnj6ntNd",
+    "object": "chat.completion",
+    "created": 1775591654,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This image is a simplified, stylized representation of the Japanese national flag. It features a stark white background with a prominent, solid red circle centrally placed.\n\nHere's a breakdown of the elements:\n\n**Colors:**\n*   **White:** The dominant color, covering the entire background of the image. It represents purity and integrity in the Japanese flag.\n*   **Red:** A bold, solid red color is used for the circular emblem. This red is vibrant and stands out strongly against the white. In the Japanese flag, the red sun disc symbolizes Amaterasu, the sun goddess, from whom the imperial family is said to be descended.\n\n**Objects:**\n*   **Circle:** The primary object is a perfectly round, solid red circle.\n\n**Layout:**\n*   The circle is positioned precisely in the center of the square image frame, maintaining an equal distance from all four edges.\n*   The white background extends uniformly around the circle.\n\n**Notable Features:**\n*   **Simplicity and Minimalism:** The design is incredibly simple, consisting of only two colors and one geometric shape. This minimalism is a defining characteristic of the Japanese flag, often referred to as \"Hinomaru\" (circle of the sun).\n*   **Contrast:** The bright red circle creates a strong visual contrast against the pure white background.\n*   **Symbolism:** The image directly reproduces the essential design of the Japanese flag, making it immediately recognizable as such.\n\nIn essence, it's a clear, straightforward depiction of the Japanese flag's iconic red disc on a white field.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 2655,
+      "completion_tokens": 325,
+      "total_tokens": 2980,
+      "cost": 0.0013611066666666667,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 1328,
+        "cache_write_tokens": 1328,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0013611066666666667,
+        "upstream_inference_prompt_cost": 0.0005486066666666666,
+        "upstream_inference_completions_cost": 0.0008125
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

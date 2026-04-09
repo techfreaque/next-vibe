@@ -156,18 +156,22 @@ export class RouteExecuteRepository {
       // calls execute-tool, creates a task, waits, resume-streams again, etc.
       // Instead, auto-upgrade WAIT to WAKE_UP so the remote task completes
       // asynchronously and the result is injected back via resume-stream.
-      if (instanceId && streamContext?.headless) {
+      // Circuit breaker: revival streams (resume-stream after wakeUp task completed) must not
+      // create new remote WAIT tasks - this causes an infinite loop where each revival calls
+      // execute-tool, creates a task, waits, resume-streams again, etc.
+      // Only auto-upgrade in revival streams (isRevival=true), NOT all headless streams.
+      if (instanceId && streamContext?.isRevival) {
         const callbackMode = data.callbackMode ?? CallbackMode.WAIT;
         if (callbackMode === CallbackMode.WAIT) {
           logger.debug(
-            "[RouteExecute] Auto-upgrading remote WAIT to WAKE_UP in headless stream (loop prevention)",
+            "[RouteExecute] Auto-upgrading remote WAIT to WAKE_UP in revival stream (loop prevention)",
             { toolName, instanceId },
           );
           data = { ...data, callbackMode: CallbackMode.WAKE_UP };
         }
       }
       // Folder-type restrictions: block remote tools and async callback modes
-      // for incognito/public folders (defense in depth — tools-loader also blocks these).
+      // for incognito/public folders (defense in depth - tools-loader also blocks these).
       const { FOLDER_ALLOWS_REMOTE_TOOLS, FOLDER_BLOCKED_CALLBACK_MODES } =
         await import("@/app/api/[locale]/agent/chat/config");
 
@@ -279,11 +283,12 @@ export class RouteExecuteRepository {
           });
         }
 
-        const { capabilities, remoteInstanceId } = connInfo;
-        // Use the remote's actual INSTANCE_ID for targetInstance so task-sync
-        // can route the task correctly (task-sync matches targetInstance = remoteInstanceId).
-        // Falls back to the raw instanceId if remoteInstanceId is not set.
-        const effectiveTargetInstance = remoteInstanceId ?? instanceId;
+        const { capabilities } = connInfo;
+        // targetInstance = instanceId (our local label for the remote, e.g. "hermes").
+        // syncTasks filters tasks by connRow.instanceId which is also this label.
+        // Do NOT use remoteInstanceId (the remote's self-label, e.g. "hermes-dev") —
+        // that's what the remote calls itself, not what we call it.
+        const effectiveTargetInstance = instanceId;
 
         const known = capabilities.some((c) => c.toolName === toolName);
         if (!known) {
@@ -456,6 +461,13 @@ export class RouteExecuteRepository {
 
         const taskId = `remote-${instanceId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
+        // eslint-disable-next-line no-console
+        console.log("[RouteExecute] Creating DB task", {
+          toolName,
+          taskId,
+          callbackMode,
+          threadId: effectiveThreadId,
+        });
         await db.insert(cronTasks).values({
           id: taskId,
           shortId: taskId,
@@ -464,7 +476,11 @@ export class RouteExecuteRepository {
           category: TaskCategory.SYSTEM,
           schedule: "* * * * *", // run every minute - runOnce disables after first execution
           priority: CronTaskPriority.HIGH,
-          enabled: true,
+          // Disabled locally: this task is queued for a remote instance to pull and execute.
+          // The remote inserts it as enabled=true (upsertRemoteTasks always enables delegated tasks).
+          // Keeping it disabled prevents the local cron from double-executing it when both
+          // instances share the same INSTANCE_ID (e.g., dev and prod both using 'hermes').
+          enabled: false,
           runOnce: true,
           // Tool execution input only - no routing context mixed in.
           taskInput: strippedInput ?? {},
@@ -589,6 +605,7 @@ export class RouteExecuteRepository {
         // handleTaskCompletion (via /report) delivers the result. Clean abort - no error shown.
         // - WAIT: revival fires after completion (backfills original tool message, AI continues)
         // - END_LOOP: no revival, just backfill + deferred message, TASK_COMPLETED WS event
+
         if (
           (callbackMode === CallbackMode.WAIT ||
             callbackMode === CallbackMode.END_LOOP) &&
@@ -736,7 +753,7 @@ export class RouteExecuteRepository {
               });
             } catch (execInsertErr) {
               // Parent cron_tasks row may have been deleted (e.g. test teardown cancelThreadTasks).
-              // This is non-fatal — execution history is best-effort for detach tasks.
+              // This is non-fatal - execution history is best-effort for detach tasks.
               logger.warn(
                 "[execute-tool detach] Failed to insert execution history (parent deleted?)",
                 {
@@ -752,6 +769,8 @@ export class RouteExecuteRepository {
             // detach: result stays in task history only - never injected into thread.
             // Keep the task row (disabled + completed) so wait-for-task can find the result
             // if the AI later decides to block on it. Emit TASK_COMPLETED WS for UI bubble.
+            // Also store __result in taskInput so wait-for-task can read it in the
+            // "already completed" path (race: task finishes before wait-for-task is called).
             await db
               .update(cronTasks)
               .set({
@@ -760,6 +779,10 @@ export class RouteExecuteRepository {
                 lastExecutionDuration:
                   completedAt.getTime() - startedAt.getTime(),
                 enabled: false,
+                taskInput: {
+                  ...(input ?? {}),
+                  __result: (finalResult ?? null) as JsonValue,
+                },
                 updatedAt: completedAt,
               })
               .where(eq(cronTasks.id, taskId));
@@ -790,16 +813,22 @@ export class RouteExecuteRepository {
               const upgradedToolMessageId =
                 latestTask?.wakeUpToolMessageId ?? effectiveToolMessageId;
 
+              // Honour WAIT upgrade: if wait-for-task registered a waiter, fire WAIT revival.
+              // WAIT backfills the wait-for-task tool message inline + fires headless stream.
+              const detachFinalCallbackMode =
+                upgradedCallbackMode === CallbackMode.WAKE_UP ||
+                upgradedCallbackMode === CallbackMode.WAIT
+                  ? upgradedCallbackMode
+                  : CallbackMode.DETACH;
+
               await handleTaskCompletion({
                 toolMessageId: upgradedToolMessageId,
                 threadId: upgradedThreadId,
-                callbackMode:
-                  upgradedCallbackMode === CallbackMode.WAKE_UP
-                    ? CallbackMode.WAKE_UP
-                    : CallbackMode.DETACH,
+                callbackMode: detachFinalCallbackMode,
                 status: finalStatus,
                 output:
-                  upgradedCallbackMode === CallbackMode.WAKE_UP
+                  detachFinalCallbackMode === CallbackMode.WAKE_UP ||
+                  detachFinalCallbackMode === CallbackMode.WAIT
                     ? finalResult
                     : null,
                 taskId,

@@ -1581,7 +1581,7 @@ export interface BuildConfig extends Omit<
   env?: Record<string, string>;
   profiles?: Partial<Record<BuildProfile, Partial<BuildConfig>>>;
   /**
-   * Package manifest — when set, the builder automatically:
+   * Package manifest - when set, the builder automatically:
    *  - Runs PackageEndpointGeneratorRepository.generate() as a preBuild step
    *  - Injects scoped-generated, endpoints-meta, widget-stub, and native-stub
    *    Bun plugins into every EXECUTABLE filesToCompile entry

@@ -16,7 +16,8 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, t, logger, user, request }) =>
       BrowserSharedRepository.executeClosePage<ClosePageResponseOutput>(
         {
-          sessionId: request?.headers.get("authorization") ?? user.id ?? user.leadId,
+          sessionId:
+            request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.CLOSE_PAGE,
           args: BrowserSharedRepository.filterUndefinedArgs({
             pageId: data.pageId,

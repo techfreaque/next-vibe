@@ -44,9 +44,17 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ChatModelId,
   chatModelOptions,
+  filterChatModels,
+  getBestChatModel,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   AudioVisionModelId,
+  filterAudioVisionModels,
+  filterImageVisionModels,
+  filterVideoVisionModels,
+  getBestAudioVisionModel,
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
   ImageVisionModelId,
   VideoVisionModelId,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
@@ -60,41 +68,11 @@ import {
   PRICE_DISPLAY,
   SPEED_DISPLAY,
 } from "@/app/api/[locale]/agent/chat/skills/enum";
-import {
-  filterChatModels,
-  getBestChatModel,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  filterImageVisionModels,
-  getBestImageVisionModel,
-  filterVideoVisionModels,
-  getBestVideoVisionModel,
-  filterAudioVisionModels,
-  getBestAudioVisionModel,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import {
-  filterImageGenModels,
-  getBestImageGenModel,
-} from "@/app/api/[locale]/agent/image-generation/models";
-import {
-  filterMusicGenModels,
-  getBestMusicGenModel,
-} from "@/app/api/[locale]/agent/music-generation/models";
-import {
-  filterSttModels,
-  getBestSttModel,
-} from "@/app/api/[locale]/agent/speech-to-text/models";
-import {
-  filterTtsModels,
-  getBestTtsModel,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
-import {
-  filterVideoGenModels,
-  getBestVideoGenModel,
-} from "@/app/api/[locale]/agent/video-generation/models";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import {
+  filterImageGenModels,
+  getBestImageGenModel,
   ImageGenModelId,
   imageGenModelOptions,
 } from "@/app/api/[locale]/agent/image-generation/models";
@@ -114,18 +92,26 @@ import {
   type ModelType,
 } from "@/app/api/[locale]/agent/models/models";
 import {
+  filterMusicGenModels,
+  getBestMusicGenModel,
   MusicGenModelId,
   musicGenModelOptions,
 } from "@/app/api/[locale]/agent/music-generation/models";
 import {
+  filterSttModels,
+  getBestSttModel,
   SttModelId,
   sttModelOptions,
 } from "@/app/api/[locale]/agent/speech-to-text/models";
 import {
+  filterTtsModels,
+  getBestTtsModel,
   TtsModelId,
   ttsModelOptions,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
 import {
+  filterVideoGenModels,
+  getBestVideoGenModel,
   VideoGenModelId,
   videoGenModelOptions,
 } from "@/app/api/[locale]/agent/video-generation/models";
@@ -155,7 +141,7 @@ function getAllModelOptions(): AnyModelOption[] {
 
 /**
  * Look up a model option by ID across all roles.
- * Local implementation — avoids importing cross-role utility from models.ts.
+ * Local implementation - avoids importing cross-role utility from models.ts.
  */
 function lookupModelById(id: AnyModelId): AnyModelOption | undefined {
   return (
@@ -170,7 +156,7 @@ function lookupModelById(id: AnyModelId): AnyModelOption | undefined {
 
 /**
  * Returns true when a ModelOption belongs to the given ModelRole.
- * Local implementation — avoids importing cross-role utility from models.ts.
+ * Local implementation - avoids importing cross-role utility from models.ts.
  * Uses enum membership for correctness (multimodal models share structural fields).
  */
 function modelMatchesRoleLocal(
@@ -203,7 +189,7 @@ function modelMatchesRoleLocal(
 
 /**
  * Returns all UI tab types a model should appear in.
- * Local implementation — avoids importing cross-role utility from models.ts.
+ * Local implementation - avoids importing cross-role utility from models.ts.
  * Image-gen models that also output text (multimodal, e.g. Gemini) appear in both text and image tabs.
  */
 function modelOptionToTypes(m: AnyModelOptionWithVision): ModelType[] {
@@ -236,7 +222,7 @@ function getFilteredModelsByRoleDispatch(
   user: JwtPayloadType,
   env: AgentEnvAvailability,
 ): AnyModelOptionWithVision[] {
-  // Extract shared filter props — valid for all role getters regardless of manual ID
+  // Extract shared filter props - valid for all role getters regardless of manual ID
   const filters: FiltersModelSelection | null = selection
     ? {
         selectionType: ModelSelectionType.FILTERS,
@@ -320,7 +306,7 @@ function getBestModelByRoleDispatch(
     ) {
       return model;
     }
-    // Manual model not resolvable — fall through to filter-based resolution below
+    // Manual model not resolvable - fall through to filter-based resolution below
   }
 
   // Extract filter props as a FiltersModelSelection for role-specific getters
@@ -387,6 +373,8 @@ interface ModelCardProps {
   providerSuffix?: string | null;
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
   locale: CountryLanguage;
+  /** Optional className applied to the model name text */
+  nameClassName?: string;
 }
 
 export function ModelCard({
@@ -400,6 +388,7 @@ export function ModelCard({
   providerSuffix = null,
   t,
   locale,
+  nameClassName,
 }: ModelCardProps): JSX.Element {
   const isUnavailable = disabled || Boolean(setupRequired);
 
@@ -433,6 +422,7 @@ export function ModelCard({
             className={cn(
               "text-sm font-medium truncate",
               selected && "text-primary",
+              nameClassName,
             )}
           >
             {model.name}
@@ -787,7 +777,7 @@ export interface ModelSelectorProps {
 }
 
 /** Returns true if the model's provider is available given current env */
-export function isProviderAvailable(
+function isProviderAvailable(
   model: AnyModelOptionWithVision,
   envAvailability: AgentEnvAvailability | undefined,
 ): boolean {
@@ -2316,6 +2306,8 @@ export interface ModelSelectorTriggerProps {
   onClick?: () => void;
   locale: CountryLanguage;
   user: JwtPayloadType;
+  /** Optional className applied to the model name text */
+  nameClassName?: string;
 }
 
 /**
@@ -2332,6 +2324,7 @@ export function ModelSelectorTrigger({
   onClick,
   locale,
   user,
+  nameClassName,
 }: ModelSelectorTriggerProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const envAvailability = useEnvAvailability();
@@ -2402,6 +2395,7 @@ export function ModelSelectorTrigger({
                 className={cn(
                   "text-sm font-medium truncate",
                   isUnavailable && "text-muted-foreground",
+                  nameClassName,
                 )}
               >
                 {resolvedModel.name}
@@ -2432,21 +2426,33 @@ export function ModelSelectorTrigger({
                 </Badge>
               )}
             </Div>
-            <Span className="text-[11px] text-muted-foreground">
-              {modelProviders[resolvedModel.provider]?.name ??
-                resolvedModel.provider}
-            </Span>
+            <Div className="flex items-center gap-1">
+              <Span className="text-[11px] text-muted-foreground">
+                {modelProviders[resolvedModel.provider]?.name ??
+                  resolvedModel.provider}
+              </Span>
+              {!isUnavailable && (
+                <>
+                  <Span
+                    aria-hidden
+                    className="text-[11px] text-muted-foreground/50"
+                  >
+                    {
+                      // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string
+                      "·"
+                    }
+                  </Span>
+                  <ModelCreditDisplay
+                    modelId={resolvedModel.id}
+                    variant="text"
+                    className="text-[11px] text-muted-foreground"
+                    locale={locale}
+                  />
+                </>
+              )}
+            </Div>
           </Div>
           <Div className="flex items-center gap-1.5 shrink-0">
-            {!isUnavailable && (
-              <ModelCreditDisplay
-                modelId={resolvedModel.id}
-                variant="badge"
-                badgeVariant="secondary"
-                className="text-[10px] h-5"
-                locale={locale}
-              />
-            )}
             {isClickable && (
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             )}

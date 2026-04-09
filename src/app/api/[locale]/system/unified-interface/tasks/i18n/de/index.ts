@@ -290,6 +290,7 @@ export const translations: typeof enTranslations = {
           title: "Validierungsfehler",
           description: "Ungültige Anfrageparameter",
         },
+        systemAlert: "System {{status}}: {{warnings}}",
       },
       success: {
         title: "DB gesund",

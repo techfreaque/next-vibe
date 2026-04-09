@@ -4,38 +4,19 @@
  */
 import "server-only";
 
-import type { ChatFavorite } from "@/app/api/[locale]/agent/chat/favorites/db";
-import type { ChatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
-import type { Skill } from "@/app/api/[locale]/agent/chat/skills/config";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import {
-  getBestImageVisionModel,
-  getBestVideoVisionModel,
-  getBestAudioVisionModel,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
-import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
-import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
-import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
 } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
-import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import {
-  getChatModelById,
   type ChatModelId,
   type ChatModelOption,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
+  getBestAudioVisionModel,
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
   type AudioVisionModelId,
   type AudioVisionModelOption,
   type ImageVisionModelId,
@@ -43,32 +24,56 @@ import {
   type VideoVisionModelId,
   type VideoVisionModelOption,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { type ImageGenModelOption } from "@/app/api/[locale]/agent/image-generation/models";
-import { type MusicGenModelOption } from "@/app/api/[locale]/agent/music-generation/models";
+import type { ChatFavorite } from "@/app/api/[locale]/agent/chat/favorites/db";
+import type { ChatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
+import type { SkillVariant } from "@/app/api/[locale]/agent/chat/skills/config";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
+  getBestImageGenModel,
+  type ImageGenModelOption,
+} from "@/app/api/[locale]/agent/image-generation/models";
+import type { Modality } from "@/app/api/[locale]/agent/models/enum";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
+import {
+  getBestMusicGenModel,
+  type MusicGenModelOption,
+} from "@/app/api/[locale]/agent/music-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import {
+  getBestSttModel,
   type SttModelId,
   type SttModelOption,
 } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import {
+  getBestTtsModel,
   type TtsModelId,
   type TtsModelOption,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { type VideoGenModelOption } from "@/app/api/[locale]/agent/video-generation/models";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
+import {
+  getBestVideoGenModel,
+  type VideoGenModelOption,
+} from "@/app/api/[locale]/agent/video-generation/models";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-/** Fields read from skill config for bridge model resolution (skill still uses scalar IDs) */
+/**
+ * Fields read from an active skill variant for bridge model resolution.
+ * All modality fields use ModelSelection types (same as favorites/settings).
+ * Resolved from the active SkillVariant at runtime by stream-setup.
+ */
 export type BridgeSkill = Pick<
-  Skill,
-  | "voiceId"
-  | "sttModelId"
-  | "imageVisionModelId"
-  | "videoVisionModelId"
-  | "audioVisionModelId"
-  | "translationModelId"
+  SkillVariant,
+  | "voiceModelSelection"
+  | "sttModelSelection"
+  | "imageVisionModelSelection"
+  | "videoVisionModelSelection"
+  | "audioVisionModelSelection"
   | "defaultChatMode"
-  | "imageGenModelId"
-  | "musicGenModelId"
-  | "videoGenModelId"
+  | "imageGenModelSelection"
+  | "musicGenModelSelection"
+  | "videoGenModelSelection"
 >;
 
 /** Fields read from favorite DB row for bridge model resolution (DB uses ModelSelectionSimple JSONB) */
@@ -79,11 +84,11 @@ export type BridgeFavorite = Pick<
   | "imageVisionModelSelection"
   | "videoVisionModelSelection"
   | "audioVisionModelSelection"
-  | "translationModelId"
   | "defaultChatMode"
   | "imageGenModelSelection"
   | "musicGenModelSelection"
   | "videoGenModelSelection"
+  | "variantId"
 >;
 
 /** Fields read from settings DB row for bridge model resolution (DB uses ModelSelectionSimple JSONB) */
@@ -94,7 +99,6 @@ export type BridgeSettings = Pick<
   | "imageVisionModelSelection"
   | "videoVisionModelSelection"
   | "audioVisionModelSelection"
-  | "translationModelId"
   | "defaultChatMode"
   | "imageGenModelSelection"
   | "musicGenModelSelection"
@@ -139,13 +143,13 @@ export type VariantResolution =
 
 export class ModalityResolver {
   /**
-   * Cascade: userSettings → favorite → skill (scalar id) → system default
-   * Used by bridge models (STT, TTS, vision) — user preference overrides skill config.
+   * Cascade: userSettings → favorite → skill (selection) → system default
+   * Used by bridge models (STT, TTS, vision) - user preference overrides skill config.
    */
   private static cascadeBridgeModel<TSelection, TOption>(
     userSettingsSelection: TSelection | null | undefined,
     favoriteSelection: TSelection | null | undefined,
-    skillModelId: string | null | undefined,
+    skillSelection: TSelection | null | undefined,
     defaultSelection: TSelection,
     getBest: (sel: TSelection, user: JwtPayloadType) => TOption | null,
     user: JwtPayloadType,
@@ -164,45 +168,29 @@ export class ModalityResolver {
       return fromFavorite;
     }
 
-    if (skillModelId) {
-      const fromSkill = getBest(
-        {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: skillModelId,
-        } as TSelection,
-        user,
-      );
-      if (fromSkill) {
-        return fromSkill;
-      }
+    const fromSkill = skillSelection ? getBest(skillSelection, user) : null;
+    if (fromSkill) {
+      return fromSkill;
     }
 
     return getBest(defaultSelection, user);
   }
 
   /**
-   * Cascade: skill (scalar id) → favorite → userSettings → system default
-   * Used by media gen models (image/music/video) — skill config has highest priority.
+   * Cascade: skill (selection) → favorite → userSettings → system default
+   * Used by media gen models (image/music/video) - skill config has highest priority.
    */
   private static cascadeMediaGenModel<TSelection, TOption>(
-    skillModelId: string | null | undefined,
+    skillSelection: TSelection | null | undefined,
     favoriteSelection: TSelection | null | undefined,
     userSettingsSelection: TSelection | null | undefined,
     defaultSelection: TSelection,
     getBest: (sel: TSelection, user: JwtPayloadType) => TOption | null,
     user: JwtPayloadType,
   ): TOption | null {
-    if (skillModelId) {
-      const fromSkill = getBest(
-        {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: skillModelId,
-        } as TSelection,
-        user,
-      );
-      if (fromSkill) {
-        return fromSkill;
-      }
+    const fromSkill = skillSelection ? getBest(skillSelection, user) : null;
+    if (fromSkill) {
+      return fromSkill;
     }
 
     const fromFavorite = favoriteSelection
@@ -222,7 +210,7 @@ export class ModalityResolver {
     return getBest(defaultSelection, user);
   }
 
-  /** Resolve STT model: userSettings → favorite → skill → system default */
+  /** Resolve STT model: userSettings → favorite → skill variant → system default */
   static resolveSttModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
@@ -231,14 +219,14 @@ export class ModalityResolver {
     return this.cascadeBridgeModel(
       ctx.userSettings?.sttModelSelection,
       ctx.favorite?.sttModelSelection,
-      ctx.skill?.sttModelId,
+      ctx.skill?.sttModelSelection,
       DEFAULT_STT_MODEL_SELECTION,
       (sel, u) => getBestSttModel(sel, u, env),
       user,
     );
   }
 
-  /** Resolve TTS voice model: userSettings → favorite → skill → system default */
+  /** Resolve TTS voice model: userSettings → favorite → skill variant → system default */
   static resolveTtsModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
@@ -247,14 +235,14 @@ export class ModalityResolver {
     return this.cascadeBridgeModel(
       ctx.userSettings?.voiceModelSelection,
       ctx.favorite?.voiceModelSelection,
-      ctx.skill?.voiceId,
+      ctx.skill?.voiceModelSelection,
       DEFAULT_TTS_MODEL_SELECTION,
       (sel, u) => getBestTtsModel(sel, u, env),
       user,
     );
   }
 
-  /** Resolve TTS voice ID: userSettings → favorite → skill → system default */
+  /** Resolve TTS voice ID: userSettings → favorite → skill variant → system default */
   static resolveTtsVoiceId(
     ctx: BridgeContext,
     user: JwtPayloadType,
@@ -262,7 +250,7 @@ export class ModalityResolver {
     return this.resolveTtsModel(ctx, user)?.id ?? null;
   }
 
-  /** Resolve image vision model: userSettings → favorite → skill → system default */
+  /** Resolve image vision model: userSettings → favorite → skill variant → system default */
   static resolveImageVisionModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
@@ -271,14 +259,14 @@ export class ModalityResolver {
     return this.cascadeBridgeModel(
       ctx.userSettings?.imageVisionModelSelection,
       ctx.favorite?.imageVisionModelSelection,
-      ctx.skill?.imageVisionModelId,
+      ctx.skill?.imageVisionModelSelection,
       DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       (sel, u) => getBestImageVisionModel(sel, u, env),
       user,
     );
   }
 
-  /** Resolve video vision model: userSettings → favorite → skill → system default */
+  /** Resolve video vision model: userSettings → favorite → skill variant → system default */
   static resolveVideoVisionModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
@@ -287,14 +275,14 @@ export class ModalityResolver {
     return this.cascadeBridgeModel(
       ctx.userSettings?.videoVisionModelSelection,
       ctx.favorite?.videoVisionModelSelection,
-      ctx.skill?.videoVisionModelId,
+      ctx.skill?.videoVisionModelSelection,
       DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       (sel, u) => getBestVideoVisionModel(sel, u, env),
       user,
     );
   }
 
-  /** Resolve audio vision model: userSettings → favorite → skill → system default */
+  /** Resolve audio vision model: userSettings → favorite → skill variant → system default */
   static resolveAudioVisionModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
@@ -303,7 +291,7 @@ export class ModalityResolver {
     return this.cascadeBridgeModel(
       ctx.userSettings?.audioVisionModelSelection,
       ctx.favorite?.audioVisionModelSelection,
-      ctx.skill?.audioVisionModelId,
+      ctx.skill?.audioVisionModelSelection,
       DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       (sel, u) => getBestAudioVisionModel(sel, u, env),
       user,
@@ -311,22 +299,7 @@ export class ModalityResolver {
   }
 
   /**
-   * Resolve translation model via cascade: userSettings → favorite → skill → null
-   */
-  static resolveTranslationModel(ctx: BridgeContext): ChatModelOption | null {
-    const modelId: ChatModelId | undefined =
-      ctx.userSettings?.translationModelId ??
-      ctx.favorite?.translationModelId ??
-      ctx.skill?.translationModelId ??
-      undefined;
-    if (!modelId) {
-      return null;
-    }
-    return getChatModelById(modelId);
-  }
-
-  /**
-   * Resolve default chat mode via cascade: userSettings → favorite → skill → "text"
+   * Resolve default chat mode via cascade: userSettings → favorite → skill variant → "text"
    */
   static resolveDefaultChatMode(ctx: BridgeContext): "text" | "voice" | "call" {
     return (
@@ -337,14 +310,14 @@ export class ModalityResolver {
     );
   }
 
-  /** Resolve image gen model: skill → favorite → userSettings → system default */
+  /** Resolve image gen model: skill variant → favorite → userSettings → system default */
   static resolveImageGenModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
   ): ImageGenModelOption | null {
     const env = agentEnvAvailability;
     return this.cascadeMediaGenModel(
-      ctx.skill?.imageGenModelId,
+      ctx.skill?.imageGenModelSelection,
       ctx.favorite?.imageGenModelSelection,
       ctx.userSettings?.imageGenModelSelection,
       DEFAULT_IMAGE_GEN_MODEL_SELECTION,
@@ -353,14 +326,14 @@ export class ModalityResolver {
     );
   }
 
-  /** Resolve music gen model: skill → favorite → userSettings → system default */
+  /** Resolve music gen model: skill variant → favorite → userSettings → system default */
   static resolveMusicGenModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
   ): MusicGenModelOption | null {
     const env = agentEnvAvailability;
     return this.cascadeMediaGenModel(
-      ctx.skill?.musicGenModelId,
+      ctx.skill?.musicGenModelSelection,
       ctx.favorite?.musicGenModelSelection,
       ctx.userSettings?.musicGenModelSelection,
       DEFAULT_MUSIC_GEN_MODEL_SELECTION,
@@ -369,14 +342,14 @@ export class ModalityResolver {
     );
   }
 
-  /** Resolve video gen model: skill → favorite → userSettings → system default */
+  /** Resolve video gen model: skill variant → favorite → userSettings → system default */
   static resolveVideoGenModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
   ): VideoGenModelOption | null {
     const env = agentEnvAvailability;
     return this.cascadeMediaGenModel(
-      ctx.skill?.videoGenModelId,
+      ctx.skill?.videoGenModelSelection,
       ctx.favorite?.videoGenModelSelection,
       ctx.userSettings?.videoGenModelSelection,
       DEFAULT_VIDEO_GEN_MODEL_SELECTION,
@@ -420,7 +393,7 @@ export class ModalityResolver {
   }
 
   /**
-   * Check if a media modality can be handled — either natively by the model
+   * Check if a media modality can be handled - either natively by the model
    * or via a bridge model (vision/STT). Returns the unsupported modalities.
    */
   static getUnsupportedMediaModalities(

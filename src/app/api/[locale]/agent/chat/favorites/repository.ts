@@ -265,7 +265,7 @@ export class ChatFavoritesRepository {
           const variant = defaultSkill?.variants?.find(
             (v) => v.id === row.variantId,
           );
-          if (variant) {
+          if (variant?.variantName) {
             variantLabel = charT(variant.variantName);
           }
         }
@@ -358,7 +358,7 @@ export class ChatFavoritesRepository {
         const variant = defaultSkill?.variants?.find(
           (v) => v.id === row.variantId,
         );
-        if (variant) {
+        if (variant?.variantName) {
           variantLabel = charT(variant.variantName);
         }
       }

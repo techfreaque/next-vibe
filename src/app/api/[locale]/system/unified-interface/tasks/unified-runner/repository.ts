@@ -356,6 +356,7 @@ export class UnifiedTaskRunnerRepository {
           imageGenModelId: undefined,
           musicGenModelId: undefined,
           videoGenModelId: undefined,
+          isRevival: undefined,
         },
       });
 

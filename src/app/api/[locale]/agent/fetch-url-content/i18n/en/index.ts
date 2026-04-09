@@ -18,7 +18,7 @@ export const translations = {
       query: {
         title: "Search Query (optional)",
         description:
-          "Regex filter applied after fetching. Only paragraphs matching the pattern are returned, ranked by match count, up to the character limit. Omit to get the full page (middle-truncated if large). Syntax: any JS regex — 'authentication', '(login|signup)', 'class\\s+\\w+'. Invalid regex falls back to literal match.",
+          "Regex filter applied after fetching. Only paragraphs matching the pattern are returned, ranked by match count, up to the character limit. Omit to get the full page (middle-truncated if large). Syntax: any JS regex - 'authentication', '(login|signup)', 'class\\s+\\w+'. Invalid regex falls back to literal match.",
         placeholder: "authentication",
       },
     },

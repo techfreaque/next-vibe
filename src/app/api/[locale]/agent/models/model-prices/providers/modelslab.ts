@@ -572,7 +572,7 @@ export class ModelslabPriceFetcher extends PriceFetcher {
       if (settings && (config.isVideo || config.isImage || config.isAudio)) {
         const llmsUrl = `${detailUrl}/llms.txt`;
 
-        // Duration settings — video and audio models
+        // Duration settings - video and audio models
         if (
           (config.isVideo || config.isAudio) &&
           settings.durations &&
@@ -604,7 +604,7 @@ export class ModelslabPriceFetcher extends PriceFetcher {
           });
         }
 
-        // Resolution settings — video only
+        // Resolution settings - video only
         if (
           config.isVideo &&
           settings.resolutions &&
@@ -619,7 +619,7 @@ export class ModelslabPriceFetcher extends PriceFetcher {
           });
         }
 
-        // Aspect ratios — shared between video and image models
+        // Aspect ratios - shared between video and image models
         if (settings.aspectRatios && settings.aspectRatios.length > 0) {
           const arStrings = settings.aspectRatios.map((r) => `"${r}"`);
           settingsUpdates.push({

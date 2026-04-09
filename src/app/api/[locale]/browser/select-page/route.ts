@@ -18,7 +18,8 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, t, logger, user, request }) =>
       BrowserSharedRepository.executeSelectPage<SelectPageResponseOutput>(
         {
-          sessionId: request?.headers.get("authorization") ?? user.id ?? user.leadId,
+          sessionId:
+            request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.SELECT_PAGE,
           args: BrowserSharedRepository.filterUndefinedArgs({
             pageId: data.pageId,

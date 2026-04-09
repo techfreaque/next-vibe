@@ -9,10 +9,6 @@ import {
   CHAT_MODE_IDS,
   ChatModeOptions,
 } from "@/app/api/[locale]/agent/models/enum";
-import {
-  ChatModelId,
-  ChatModelIdOptions,
-} from "@/app/api/[locale]/agent/ai-stream/models";
 import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
@@ -291,19 +287,6 @@ const { POST } = createEndpoint({
         description: "post.audioVisionModel.description" as const,
         columns: 6,
         schema: audioVisionModelSelectionSchema.nullable().optional(),
-      }),
-      translationModelId: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: ChatModelIdOptions,
-        label: "post.translationModel.label" as const,
-        description: "post.translationModel.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-        schema: z.enum(ChatModelId).nullable().optional(),
       }),
       imageGenModelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

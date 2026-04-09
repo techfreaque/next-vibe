@@ -22,9 +22,11 @@ import {
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import {
+  MusicGenModelId,
+  MusicGenModelIdOptions,
+} from "@/app/api/[locale]/agent/music-generation/models";
 import { lazy } from "react";
-import { MusicGenModelIdOptions } from "@/app/api/[locale]/agent/music-generation/models";
-import { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
 import {
   DEFAULT_MUSIC_DURATION,
   MusicDuration,
@@ -55,7 +57,7 @@ const { POST } = createEndpoint({
   category: "endpointCategories.ai",
   tags: ["tags.music", "tags.generation", "tags.ai"],
   dynamicTitle: ({ request }) => {
-    const prompt = request?.prompt as string | undefined;
+    const prompt = request?.prompt;
     if (!prompt?.trim()) {
       return undefined;
     }
@@ -90,9 +92,7 @@ const { POST } = createEndpoint({
         description: "post.model.description",
         columns: 6,
         options: MusicGenModelIdOptions,
-        schema: z
-          .enum(MusicGenModelId)
-          .default(MusicGenModelId.MUSICGEN_STEREO),
+        schema: z.enum(MusicGenModelId).default(MusicGenModelId.LYRIA_3),
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
         serverDefault: (ctx) => ctx.streamContext?.musicGenModelId,
       }),
@@ -200,7 +200,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         prompt: "Upbeat electronic music with a catchy melody",
-        model: MusicGenModelId.MUSICGEN_STEREO,
+        model: MusicGenModelId.LYRIA_3,
         duration: DEFAULT_MUSIC_DURATION,
       },
     },

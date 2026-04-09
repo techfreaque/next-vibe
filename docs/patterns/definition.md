@@ -187,7 +187,7 @@ objectField(st, { type: WidgetType.CONTAINER, usage: {}, children: {...} })
 
 When the auto-rendered UI isn't sufficient, use `customWidgetObject` to wire a React component directly into the definition.
 
-**CRITICAL: Always use `lazyCliWidget` — never statically import `widget.tsx`.** Static import breaks `vibe gen` (SSR/bun module resolution fails). `lazyCliWidget` also automatically routes `import("./widget")` → `widget.cli.tsx` in CLI/MCP context (the Bun plugin intercepts by name).
+**CRITICAL: Always use `lazyCliWidget` - never statically import `widget.tsx`.** Static import breaks `vibe gen` (SSR/bun module resolution fails). `lazyCliWidget` also automatically routes `import("./widget")` → `widget.cli.tsx` in CLI/MCP context (the Bun plugin intercepts by name).
 
 ```typescript
 import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
@@ -799,7 +799,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 // Local imports - always use ./i18n (module-local scope)
 import { scopedTranslation } from "./i18n";
 import { MyEnum, MyEnumOptions } from "./enum";
-// if using customWidgetObject — ALWAYS lazy, never static import:
+// if using customWidgetObject - ALWAYS lazy, never static import:
 import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 const MyWidget = lazyCliWidget(() =>
   import("./widget").then((m) => ({ default: m.MyWidget })),

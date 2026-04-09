@@ -1,0 +1,167 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[TH1 queue-wakeup] Use the tool-help tool on the hermes-dev instance (prefix: hermes-dev__) to look up the \"generate_image\" tool. Use wakeUp callback mode. Reply STEP_OK when the tool result is available, or FAILED: <reason> if anything went wrong.\n[Tool result for tool-help]:\n{\n  \"status\": \"pending\",\n  \"hint\": \"Result will be injected into this thread when ready. Do NOT call this tool again.\"\n}\nWaiting for wakeUp result...\n[Tool result for wait-for-task]:\n{\n  \"result\": {\n    \"hint\": \"No capabil",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " user is asking me to use the tool-help tool with the hermes-dev instance prefix and detach callback mode to look up \"generate_image\". This"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " is a task from a queue (TH3 queue-detach).\n\nBased"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " on the context:\n- hermes-dev is a local instance that"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " doesn't seem to be currently connected\n- The previous attempts (TH1 "
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "and TH2) failed because there's \"No capability snapshot for instance 'hermes-dev'\" and the instance needs to \"Connect the instance and wait for a sync"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " pulse\"\n- I need to use execute-tool to call tool-help on hermes-dev with detach callback mode\n\nLet me try this. The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " detach callback mode means \"Fire and forget. Returns {task"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Id} immediately. Tool runs in background.\"\n\nI'll use execute-tool with:\n- toolName: \"tool-help\""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n- instanceId: \"hermes-dev\"\n- input: with query parameter for"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " \"generate_image\"\n- callbackMode: \"detach\"\n\nActually, looking at the tool-help parameters, I need to search for \"generate_image\" tool"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ". Let me construct the call properly."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "ca335315-e95a-4340-acbf-aa9db70f3802",
+      "toolName": "execute-tool",
+      "input": "{\"toolName\":\"tool-help\",\"input\":{\"query\":\"generate_image\"},\"instanceId\":\"hermes-dev\",\"callbackMode\":\"detach\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "ca335315-e95a-4340-acbf-aa9db70f3802",
+      "toolName": "execute-tool",
+      "result": "Error: Tool Not Found"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The execute"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-tool call failed with \"Tool Not Found\" again. This confirms that the hermes-dev instance is not connected or synchronized, so it can't execute"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " any tools.\n\nBased on the context provided and the previous task results, the issue is that:\n1. her"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "mes-dev has \"No capability snapshot\" \n2. The instance needs to \"Connect the instance and wait for a sync pulse\"\n3. Without a capability snapshot, execute"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-tool cannot find any tools on that instance\n\nI need to report FAILED with"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the reason."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "FAILED: The hermes-dev instance is not connected or has not completed capability"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " synchronization. The execute-tool call returned \"Tool Not Found\" error, indicating the instance is unreachable or unsynchronized. According to the previous"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " context, the instance must \"Connect the instance and wait for a sync pulse\" before remote tool execution is possible."
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 593,
+        "totalTokens": 611,
+        "cachedInputTokens": 7289
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 7717
+        }
+      }
+    }
+  ]
+}

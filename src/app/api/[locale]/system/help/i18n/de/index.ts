@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
       query: {
         label: "Suchanfrage (optional)",
         description:
-          "Tools nach Stichwort filtern. Leerzeichen-getrennte Wörter sind alle erforderlich. Sucht über Name, Aliase, Beschreibung, Tags — Name/Alias-Treffer werden höher gewichtet. Exakter Name/Alias-Treffer zeigt automatisch Volldetails. Leer lassen um alle anzuzeigen.",
+          "Tools nach Stichwort filtern. Leerzeichen-getrennte Wörter sind alle erforderlich. Sucht über Name, Aliase, Beschreibung, Tags - Name/Alias-Treffer werden höher gewichtet. Exakter Name/Alias-Treffer zeigt automatisch Volldetails. Leer lassen um alle anzuzeigen.",
         placeholder: "z.B. URL abrufen, Bildgenerator...",
       },
       category: {

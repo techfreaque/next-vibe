@@ -735,6 +735,7 @@ export class LeadsRepository {
           browser: leads.browser,
           os: leads.os,
           referralCode: leads.referralCode,
+          skillId: leads.skillId,
           emailJourneyVariant: leads.emailJourneyVariant,
           bouncedAt: leads.bouncedAt,
           invalidAt: leads.invalidAt,
@@ -1244,6 +1245,40 @@ export class LeadsRepository {
       return fail({
         message: t("leadsErrors.leads.patch.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Internal: Set skill attribution on a lead.
+   * @param overwrite - if false (default), only sets if skill_id is currently NULL (first-touch)
+   *                    if true, always overwrites (e.g. user explicitly interacted with a skill)
+   */
+  static async updateLeadSkillId(
+    leadId: string,
+    skillId: string,
+    overwrite: boolean,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      if (overwrite) {
+        await db
+          .update(leads)
+          .set({ skillId, updatedAt: new Date() })
+          .where(eq(leads.id, leadId));
+      } else {
+        // Only set if not already attributed (first-touch wins)
+        await db
+          .update(leads)
+          .set({ skillId, updatedAt: new Date() })
+          .where(and(eq(leads.id, leadId), sql`${leads.skillId} IS NULL`));
+      }
+      logger.debug("Lead skillId updated", { leadId, skillId, overwrite });
+    } catch (error) {
+      logger.error("Failed to update lead skillId", {
+        leadId,
+        skillId,
+        error: parseError(error).message,
       });
     }
   }

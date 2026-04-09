@@ -25,7 +25,7 @@ import { createStore, useStore } from "zustand";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { DefaultFolderId, isDefaultFolderId } from "../config";
+import { DefaultFolderId } from "../config";
 
 /**
  * Navigation state shape
@@ -183,7 +183,21 @@ function createChatNavigationStore(opts?: {
         window.history.pushState(null, "", url.toString());
       }
     },
-    setNavigation: (state): void => set(state),
+    setNavigation: (state): void => {
+      // When navigating to a different thread, clear leafMessageId so the
+      // new thread resolves its own latest branch rather than using the
+      // stale leaf from the previous thread.
+      const current = get();
+      const threadChanged =
+        state.activeThreadId !== undefined &&
+        state.activeThreadId !== current.activeThreadId;
+      if (threadChanged && typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("message");
+        window.history.replaceState(null, "", url.toString());
+      }
+      set(threadChanged ? { ...state, leafMessageId: null } : state);
+    },
     initNavigation: (
       activeThreadId,
       currentRootFolderId,
@@ -301,58 +315,4 @@ export function useChatNavigationStore<T>(
     );
   }
   return useStore(store, selector);
-}
-
-// ─── URL parsing (unchanged) ─────────────────────────────────────────────────
-
-/**
- * Parse pathname into navigation state.
- * Used to sync store from URL changes (client-side navigation).
- *
- * URL patterns:
- * - /[locale]/threads/[rootId]                         → root folder view
- * - /[locale]/threads/[rootId]/new                     → new thread
- * - /[locale]/threads/[rootId]/[uuid]                  → thread OR folder (ambiguous)
- * - /[locale]/threads/[rootId]/[folderId]/[threadId]   → thread in folder
- * - /[locale]/threads/[rootId]/[folderId]/new          → new thread in folder
- */
-export function parsePathnameToNavState(pathname: string): {
-  rootFolderId: DefaultFolderId;
-  subFolderId: string | null;
-  threadId: string | null;
-} {
-  const parts = pathname.split("/").filter(Boolean);
-  const threadsIdx = parts.indexOf("threads");
-  if (threadsIdx === -1) {
-    return {
-      rootFolderId: DefaultFolderId.PRIVATE,
-      subFolderId: null,
-      threadId: null,
-    };
-  }
-
-  const rootId = parts[threadsIdx + 1] as DefaultFolderId | undefined;
-  const seg3 = parts[threadsIdx + 2];
-  const seg4 = parts[threadsIdx + 3];
-
-  const rootFolderId =
-    rootId && isDefaultFolderId(rootId) ? rootId : DefaultFolderId.PRIVATE;
-
-  let subFolderId: string | null = null;
-  let threadId: string | null = null;
-
-  if (seg4) {
-    // 4-segment: /threads/<root>/<folderId>/<threadId|new>
-    subFolderId = seg3 ?? null;
-    threadId = seg4;
-  } else if (seg3) {
-    // 3-segment: /threads/<root>/<something>
-    // Ambiguous - could be folderId or threadId.
-    // Treat as threadId here; the server page.tsx disambiguates via DB lookup
-    // and the store gets the correct values from initNavigation().
-    // For client-side nav, this is always a threadId or "new".
-    threadId = seg3;
-  }
-
-  return { rootFolderId, subFolderId, threadId };
 }

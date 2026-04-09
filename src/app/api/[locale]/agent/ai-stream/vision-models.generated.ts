@@ -1,5 +1,5 @@
 /**
- * AUTO-GENERATED — do not edit manually.
+ * AUTO-GENERATED - do not edit manually.
  * Source: chatModelDefinitions inputs field.
  * Re-run: vibe update-all-model-prices or vibe gen
  */

@@ -1,14 +1,16 @@
 import { z } from "zod";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
-  PriceLevel,
   SpeedLevel,
 } from "../chat/skills/enum";
+import {
+  filtersSelectionSchema,
+  sharedFilterPropsSchema,
+} from "../models/selection";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -20,7 +22,6 @@ import {
   type ModelProviderConfigAudioBased,
   type ModelProviderEnvAvailability,
 } from "../models/models";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { MusicDuration } from "./enum";
 
 const ALL_DURATIONS = [
@@ -35,7 +36,7 @@ export enum MusicGenModelId {
   ELEVENLABS_MUSIC = "elevenlabs-music",
   SONAUTO_SONG = "sonauto-song",
   LYRIA_3 = "lyria-3",
-  // BEGIN:llm-generated — do not edit manually, updated by price updater
+  // BEGIN:llm-generated - do not edit manually, updated by price updater
   // END:llm-generated
 }
 
@@ -57,9 +58,21 @@ export const musicGenModelDefinitions: Record<
         id: MusicGenModelId.MUSICGEN_STEREO,
         apiProvider: ApiProvider.REPLICATE,
         providerModel: "meta/musicgen",
-        creditCostPerClip: 6.1, // updated: 2026-04-04 from replicate-html-p50
+        creditCostPerClip: 4.4, // updated: 2026-04-07 from replicate-html-p50
         defaultDurationSeconds: 8,
         supportedDurations: ALL_DURATIONS,
+      },
+      {
+        id: MusicGenModelId.MUSICGEN_STEREO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "musicgen-stereo",
+        creditCostPerClip: 5.72, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 8,
+        supportedDurations: [
+          "post.duration.short",
+          "post.duration.medium",
+          "post.duration.long",
+        ],
       },
     ],
     utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
@@ -92,6 +105,15 @@ export const musicGenModelDefinitions: Record<
         supportedDurations: [MusicDuration.LONG],
         minDurationSeconds: 30,
       },
+      {
+        id: MusicGenModelId.MUSIC_GEN,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "music-gen",
+        creditCostPerClip: 27.3, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 30,
+        minDurationSeconds: 30,
+        supportedDurations: ["post.duration.long"],
+      },
     ],
     utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -121,6 +143,18 @@ export const musicGenModelDefinitions: Record<
         creditCostPerClip: 21, // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 30,
         supportedDurations: ALL_DURATIONS,
+      },
+      {
+        id: MusicGenModelId.ELEVENLABS_MUSIC,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "elevenlabs-music",
+        creditCostPerClip: 27.3, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 30,
+        supportedDurations: [
+          "post.duration.short",
+          "post.duration.medium",
+          "post.duration.long",
+        ],
       },
     ],
     utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
@@ -152,6 +186,18 @@ export const musicGenModelDefinitions: Record<
         defaultDurationSeconds: 30,
         supportedDurations: ALL_DURATIONS,
       },
+      {
+        id: MusicGenModelId.SONAUTO_SONG,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "sonauto-song",
+        creditCostPerClip: 10.4, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 30,
+        supportedDurations: [
+          "post.duration.short",
+          "post.duration.medium",
+          "post.duration.long",
+        ],
+      },
     ],
     utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
@@ -181,6 +227,14 @@ export const musicGenModelDefinitions: Record<
         creditCostPerClip: 5, // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 30,
         supportedDurations: [MusicDuration.LONG],
+      },
+      {
+        id: MusicGenModelId.LYRIA_3,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "lyria-3",
+        creditCostPerClip: 6.5, // updated: 2026-04-07 from unbottled.ai
+        defaultDurationSeconds: 30,
+        supportedDurations: ["post.duration.long"],
       },
     ],
     utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
@@ -265,44 +319,62 @@ export function getMusicGenModelById(
   return musicGenModelOptionsIndex[modelId];
 }
 
+/**
+ * Resolve a music gen model option using a specific API provider.
+ * Picks the cheapest provider variant for `modelId` that matches `provider`.
+ * Falls back to the default (cheapest overall) if no matching provider exists.
+ */
+export function getMusicGenModelForProvider(
+  modelId: MusicGenModelId,
+  provider: ApiProvider,
+): MusicGenModelOption | undefined {
+  const def = musicGenModelDefinitions[modelId];
+  if (!def) {
+    return undefined;
+  }
+  const matching = [...def.providers]
+    .filter((p) => p.apiProvider === provider)
+    .toSorted((a, b) => getProviderPrice(a) - getProviderPrice(b));
+
+  for (const p of matching) {
+    if (p.creditCostPerClip !== undefined) {
+      const typed = p satisfies ModelProviderConfigAudioBased;
+      return {
+        id: modelId,
+        name: def.name,
+        provider: def.by,
+        apiProvider: p.apiProvider,
+        description: def.description,
+        parameterCount: def.parameterCount,
+        contextWindow: def.contextWindow,
+        icon: def.icon,
+        providerModel: p.providerModel,
+        utilities: def.utilities,
+        supportsTools: def.supportsTools,
+        intelligence: def.intelligence,
+        speed: def.speed,
+        content: def.content,
+        features: def.features,
+        weaknesses: def.weaknesses,
+        adminOnly: p.adminOnly,
+        inputs: def.inputs,
+        outputs: def.outputs,
+        voiceMeta: def.voiceMeta,
+        creditCostPerClip: typed.creditCostPerClip,
+        defaultDurationSeconds: typed.defaultDurationSeconds,
+        supportedDurations: typed.supportedDurations,
+        minDurationSeconds: typed.minDurationSeconds,
+      };
+    }
+  }
+
+  // No matching provider - fall back to default
+  return getMusicGenModelById(modelId);
+}
+
 // ============================================================
 // MUSIC GEN MODEL SELECTION SCHEMA
 // ============================================================
-
-const sharedFilterPropsSchema = z.object({
-  intelligenceRange: z
-    .object({
-      min: z.enum(IntelligenceLevel).optional(),
-      max: z.enum(IntelligenceLevel).optional(),
-    })
-    .optional(),
-  priceRange: z
-    .object({
-      min: z.enum(PriceLevel).optional(),
-      max: z.enum(PriceLevel).optional(),
-    })
-    .optional(),
-  contentRange: z
-    .object({
-      min: z.enum(ContentLevel).optional(),
-      max: z.enum(ContentLevel).optional(),
-    })
-    .optional(),
-  speedRange: z
-    .object({
-      min: z.enum(SpeedLevel).optional(),
-      max: z.enum(SpeedLevel).optional(),
-    })
-    .optional(),
-  sortBy: z.enum(ModelSortField).optional(),
-  sortDirection: z.enum(ModelSortDirection).optional(),
-  sortBy2: z.enum(ModelSortField).optional(),
-  sortDirection2: z.enum(ModelSortDirection).optional(),
-});
-
-const filtersSelectionSchema = z
-  .object({ selectionType: z.literal(ModelSelectionType.FILTERS) })
-  .merge(sharedFilterPropsSchema);
 
 export const musicGenModelSelectionSchema = z.discriminatedUnion(
   "selectionType",

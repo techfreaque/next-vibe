@@ -1,6 +1,6 @@
 /**
  * URL Cache Cleanup Route Handler
- * Thin wrapper — all logic lives in repository.ts
+ * Thin wrapper - all logic lives in repository.ts
  */
 
 import "server-only";

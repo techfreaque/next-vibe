@@ -187,7 +187,6 @@ export class SingleFavoriteRepository {
           favorite.videoVisionModelSelection ?? undefined,
         audioVisionModelSelection:
           favorite.audioVisionModelSelection ?? undefined,
-        translationModelId: favorite.translationModelId ?? undefined,
         imageGenModelSelection:
           favorite.imageGenModelSelection ??
           character?.imageGenModelSelection ??
@@ -307,10 +306,6 @@ export class SingleFavoriteRepository {
         data.audioVisionModelSelection !== undefined
           ? data.audioVisionModelSelection
           : null;
-      const translationModelIdToStore =
-        character && data.translationModelId === character.translationModelId
-          ? null
-          : (data.translationModelId ?? null);
       const imageGenModelSelectionToStore = normalizeImageGenSelection(
         data.imageGenModelSelection !== undefined
           ? data.imageGenModelSelection
@@ -343,7 +338,6 @@ export class SingleFavoriteRepository {
           imageVisionModelSelection: imageVisionModelSelectionToStore,
           videoVisionModelSelection: videoVisionModelSelectionToStore,
           audioVisionModelSelection: audioVisionModelSelectionToStore,
-          translationModelId: translationModelIdToStore,
           imageGenModelSelection: imageGenModelSelectionToStore,
           musicGenModelSelection: musicGenModelSelectionToStore,
           videoGenModelSelection: videoGenModelSelectionToStore,

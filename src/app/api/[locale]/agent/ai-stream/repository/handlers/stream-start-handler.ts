@@ -106,42 +106,47 @@ export class StreamStartHandler {
     });
 
     // Pre-set stepHasToolsAwaitingConfirmation if the loaded message history already
-    // contains a waiting_for_confirmation tool result. This happens in wakeUp revival
-    // streams where the approve tool's placeholder is in the DB history - the tool-call
-    // handler never fires for history messages so the flag would stay false, causing
-    // the AI SDK stopWhen predicate to never trigger and spawning extra turns.
-    const hasHistoryPendingConfirmation = messages.some((msg) => {
-      if (msg.role !== "tool") {
-        return false;
-      }
-      const content = msg.content;
-      if (!Array.isArray(content)) {
-        return false;
-      }
-      return content.some((part) => {
-        if (typeof part !== "object" || part === null) {
+    // contains a waiting_for_confirmation tool result AND this stream is processing
+    // a tool confirmation (toolConfirmationResults is non-empty). This handles wakeUp
+    // revival streams where the approve tool's placeholder is in the DB history - the
+    // tool-call handler never fires for history messages so the flag would stay false,
+    // causing the AI SDK stopWhen predicate to never trigger and spawning extra turns.
+    // Do NOT pre-set for fresh user turns: those may have old confirm placeholders in
+    // history from previous turns that have already been handled.
+    if (toolConfirmationResults.length > 0) {
+      const hasHistoryPendingConfirmation = messages.some((msg) => {
+        if (msg.role !== "tool") {
           return false;
         }
-        const p = part as ToolResultPart;
-        if (p.type !== "tool-result") {
+        const content = msg.content;
+        if (!Array.isArray(content)) {
           return false;
         }
-        const output = p.output;
-        if (!output || typeof output !== "object" || Array.isArray(output)) {
-          return false;
-        }
-        const o = output as { type?: string; value?: { status?: string } };
-        if (o.type !== "json") {
-          return false;
-        }
-        return o.value?.status === "waiting_for_confirmation";
+        return content.some((part) => {
+          if (typeof part !== "object" || part === null) {
+            return false;
+          }
+          const p = part as ToolResultPart;
+          if (p.type !== "tool-result") {
+            return false;
+          }
+          const output = p.output;
+          if (!output || typeof output !== "object" || Array.isArray(output)) {
+            return false;
+          }
+          const o = output as { type?: string; value?: { status?: string } };
+          if (o.type !== "json") {
+            return false;
+          }
+          return o.value?.status === "waiting_for_confirmation";
+        });
       });
-    });
-    if (hasHistoryPendingConfirmation) {
-      ctx.stepHasToolsAwaitingConfirmation = true;
-      logger.debug(
-        "[AI Stream] Pre-set stepHasToolsAwaitingConfirmation=true from history (wakeUp revival with pending approve)",
-      );
+      if (hasHistoryPendingConfirmation) {
+        ctx.stepHasToolsAwaitingConfirmation = true;
+        logger.debug(
+          "[AI Stream] Pre-set stepHasToolsAwaitingConfirmation=true from history (wakeUp revival with pending approve)",
+        );
+      }
     }
 
     // Create streaming TTS handler if voice mode enabled

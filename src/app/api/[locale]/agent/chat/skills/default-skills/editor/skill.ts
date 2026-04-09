@@ -86,7 +86,7 @@ export const editorSkill: Skill = {
       variantName: "skills.editor.variants.deep" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.KIMI_K2,
+        manualModelId: ChatModelId.KIMI_K2_5,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,

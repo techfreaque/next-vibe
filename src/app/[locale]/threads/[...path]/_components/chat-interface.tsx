@@ -34,9 +34,13 @@ import { WelcomeTour } from "./welcome-tour/welcome-tour";
 
 interface ChatInterfaceProps {
   user: JwtPayloadType;
+  totalModelCount: number;
 }
 
-export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
+export function ChatInterface({
+  user,
+  totalModelCount,
+}: ChatInterfaceProps): JSX.Element {
   const currentRootFolderId = useChatNavigationStore(
     (s) => s.currentRootFolderId,
   );
@@ -192,6 +196,7 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
           isAuthenticated={isAuthenticated}
           locale={locale}
           autoStart={true}
+          totalModelCount={totalModelCount}
         />
       </ErrorBoundary>
     </>

@@ -237,7 +237,7 @@ export class RouteDelegationHandler {
           PlatformMarker.CLI_AUTH_BYPASS,
         );
 
-      // vibe check (c / check) skips DB for performance — it runs constantly during dev
+      // vibe check (c / check) skips DB for performance - it runs constantly during dev
       const isVibeCheckRoute =
         resolvedCommand.startsWith("c ") ||
         resolvedCommand === "c" ||
@@ -363,6 +363,7 @@ export class RouteDelegationHandler {
                   imageGenModelId: undefined,
                   musicGenModelId: undefined,
                   videoGenModelId: undefined,
+                  isRevival: undefined,
                 },
               });
             return result;
@@ -522,6 +523,7 @@ export class RouteDelegationHandler {
             imageGenModelId: undefined,
             musicGenModelId: undefined,
             videoGenModelId: undefined,
+            isRevival: undefined,
           },
         });
 

@@ -32,6 +32,7 @@ import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
 import { endpointToToolName, getPreferredToolName } from "../shared/utils/path";
 import type { JsonValue } from "../tasks/unified-runner/types";
+import { CallbackMode } from "./execute-tool/constants";
 
 /**
  * CoreTool type from AI SDK
@@ -201,12 +202,11 @@ function createToolFromEndpoint(
         ...serverDefaultPatch,
       };
 
-      const { CallbackMode: CM } =
-        await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");
+      // CallbackMode is imported at the top of the file - use it directly (no async import needed)
       const callbackMode =
         typeof callbackModeParam === "string" &&
-        Object.values(CM).includes(callbackModeParam as never)
-          ? (callbackModeParam as (typeof CM)[keyof typeof CM])
+        Object.values(CallbackMode).includes(callbackModeParam as never)
+          ? (callbackModeParam as (typeof CallbackMode)[keyof typeof CallbackMode])
           : null;
 
       context.logger.debug("[ToolsLoader] CoreTool execute called", {
@@ -261,10 +261,29 @@ function createToolFromEndpoint(
         }
 
         if (
-          callbackMode === CM.DETACH ||
-          callbackMode === CM.WAKE_UP ||
+          callbackMode === CallbackMode.DETACH ||
+          callbackMode === CallbackMode.WAKE_UP ||
           toolName === "execute-tool"
         ) {
+          // For WAIT/END_LOOP modes: eagerly mark waitingForRemoteResult on the SHARED
+          // streamContext SYNCHRONOUSLY (before any await). The AI SDK can emit finish-step
+          // concurrently with async tool execution. If we wait until after DB operations in
+          // RouteExecuteRepository.execute(), FinishStep fires while waitingForRemoteResult
+          // is still undefined and skips the REMOTE_TOOL_WAIT abort, leaving thread "idle".
+          // We eagerly set it now, then reset it after execute() if no WAIT task was created.
+          // For execute-tool: effective callbackMode is in restParams.callbackMode.
+          const earlyCallbackMode =
+            toolName === "execute-tool"
+              ? (restParams as Record<string, JsonValue>).callbackMode
+              : callbackMode;
+          const didEagerlySetWaiting =
+            (earlyCallbackMode === CallbackMode.WAIT ||
+              earlyCallbackMode === CallbackMode.END_LOOP) &&
+            !!context.streamContext;
+          if (didEagerlySetWaiting) {
+            context.streamContext.waitingForRemoteResult = true;
+          }
+
           // Inject the correct toolMessageId for this specific parallel tool call.
           // pendingToolMessages is keyed by AI SDK toolCallId - populated by stream-part-handler.
           // The AI SDK may call execute() before stream-part-handler processes the tool-call event,
@@ -317,10 +336,13 @@ function createToolFromEndpoint(
           ) as Parameters<typeof RouteExecuteRepository.execute>[0];
 
           // Build a per-call context snapshot with the resolved IDs.
+          // Reset waitingForRemoteResult to false in the copy so we can detect whether
+          // RouteExecuteRepository.execute() actually created a WAIT task (sets it to true).
           // This avoids mutating the shared streamContext which would race with sibling parallel calls.
           const perCallStreamContext = context.streamContext
             ? {
                 ...context.streamContext,
+                waitingForRemoteResult: false as boolean | undefined,
                 callerToolCallId: options?.toolCallId,
                 currentToolMessageId:
                   perCallToolMessageId ??
@@ -334,7 +356,7 @@ function createToolFromEndpoint(
               }
             : context.streamContext;
 
-          context.logger.info(
+          context.logger.debug(
             "[ToolsLoader] wakeUp/detach via RouteExecuteRepository",
             {
               toolName,
@@ -354,14 +376,17 @@ function createToolFromEndpoint(
           );
 
           // Propagate waitingForRemoteResult back to the shared streamContext.
-          // perCallStreamContext is a copy - mutations to it don't affect the original.
-          // stream-part-handler checks context.streamContext.waitingForRemoteResult to
-          // decide whether to abort the stream at the tool-result event.
-          if (
-            perCallStreamContext?.waitingForRemoteResult &&
-            context.streamContext
-          ) {
-            context.streamContext.waitingForRemoteResult = true;
+          // perCallStreamContext started with waitingForRemoteResult=false; execute() sets it
+          // to true only when a real remote WAIT/END_LOOP task was created.
+          // If execute() did NOT create a WAIT task, reset the eager flag we set above.
+          if (perCallStreamContext?.waitingForRemoteResult) {
+            // Confirm: a real WAIT task was created - keep the shared flag true
+            if (context.streamContext) {
+              context.streamContext.waitingForRemoteResult = true;
+            }
+          } else if (didEagerlySetWaiting && context.streamContext) {
+            // No WAIT task created (e.g. local execution, direct HTTP, dedup) - reset
+            context.streamContext.waitingForRemoteResult = false;
           }
 
           if (!result.success) {

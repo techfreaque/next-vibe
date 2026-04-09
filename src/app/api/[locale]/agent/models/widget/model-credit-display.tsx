@@ -44,17 +44,17 @@ import {
 import { getCreditCostFromModel, getModelPrice } from "../all-models";
 import { scopedTranslation } from "../i18n";
 import {
-  type AnyModelId,
-  type AnyModelOption,
   PRICE_REFERENCE_STT_SECONDS,
   PRICE_REFERENCE_TTS_CHARS,
+  type AnyModelId,
+  type AnyModelOption,
 } from "../models";
 
 /**
  * Props for ModelCreditDisplay component
  */
 export interface ModelCreditDisplayProps {
-  /** Any model ID — chat, image, video, music, TTS, STT */
+  /** Any model ID - chat, image, video, music, TTS, STT */
   modelId: AnyModelId;
 
   /** Display variant - badge (default) or text */
@@ -175,7 +175,7 @@ export function ModelCreditDisplay({
   let popoverContent: JSX.Element;
 
   if (!model) {
-    // Unknown model — show free
+    // Unknown model - show free
     costText = t("selector.free");
     popoverContent = (
       <Div className="space-y-2">
@@ -293,7 +293,7 @@ export function ModelCreditDisplay({
       </Div>
     );
   } else if (model.creditCostPerCharacter !== undefined) {
-    // TTS (cost per character) — badge shows average cost like LLMs
+    // TTS (cost per character) - badge shows average cost like LLMs
     const avgCost = getModelPrice(model); // average for ~600 chars
     const costPerCharWithMarkup =
       model.creditCostPerCharacter * (1 + STANDARD_MARKUP_PERCENTAGE);
@@ -368,7 +368,7 @@ export function ModelCreditDisplay({
     model.creditCostPerSecond !== undefined &&
     model.defaultDurationSeconds === undefined
   ) {
-    // STT (cost per second — no defaultDurationSeconds) — badge shows average cost
+    // STT (cost per second - no defaultDurationSeconds) - badge shows average cost
     const avgCost = getModelPrice(model); // average for ~30s
     const costPerSecWithMarkup =
       model.creditCostPerSecond * (1 + STANDARD_MARKUP_PERCENTAGE);
@@ -637,7 +637,7 @@ export function ModelCreditDisplay({
     <Div
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="inline-block"
+      className="inline-flex items-center"
       onClick={(e) => e.stopPropagation()}
     >
       <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -645,7 +645,7 @@ export function ModelCreditDisplay({
           <Button
             variant="ghost"
             size="sm"
-            className="h-auto p-0 hover:bg-transparent cursor-help"
+            className="h-auto min-h-0 p-0 hover:bg-transparent cursor-help leading-none"
             onClick={(e) => {
               e.stopPropagation();
               setIsOpen(!isOpen);

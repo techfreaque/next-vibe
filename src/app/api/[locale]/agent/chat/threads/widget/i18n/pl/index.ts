@@ -68,8 +68,11 @@ export const translations: typeof enTranslations = {
     navigation: {
       subscription: "Subskrypcja i Kredyty",
       referral: "Program Poleceń",
-      help: "Pomoc",
+      settings: "Ustawienia profilu",
+      leadMagnet: "Lead Magnet",
+      help: "Opinie i Wsparcie",
       about: "O nas",
+      websiteBlog: "Strona & Blog",
       admin: "Panel Admina",
     },
     confirmations: {
@@ -113,6 +116,11 @@ export const translations: typeof enTranslations = {
         description:
           "Przeglądaj 40+ skillów - koderzy, badacze, pisarze, doradcy i więcej. Dodaj dowolny jako ulubiony i pojawi się tutaj.",
         tip: "Skille dają twojej AI konkretny cel i właściwy model do zadania.",
+      },
+      meetCompanion: {
+        title: "Poznaj swojego towarzysza",
+        description:
+          "Twój towarzysz jest gotowy. Kliknij dowolny wariant, aby rozpocząć rozmowę — każdy ma inny styl i model.",
       },
       rootFolders: {
         title: "Twoje foldery czatów",

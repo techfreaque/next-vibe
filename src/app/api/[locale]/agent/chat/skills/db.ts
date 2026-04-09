@@ -16,7 +16,10 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import type { ChatMode } from "@/app/api/[locale]/agent/models/enum";
+import {
+  CHAT_MODE_IDS,
+  type ChatMode,
+} from "@/app/api/[locale]/agent/models/enum";
 import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
@@ -42,7 +45,6 @@ import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 
-import type { ChatModelId } from "../../ai-stream/models";
 import type { VideoGenModelId } from "../../video-generation/models";
 import type { ToolConfigItem } from "../settings/definition";
 import type {
@@ -96,9 +98,6 @@ export const customSkills = pgTable("custom_skills", {
     "audio_vision_model_selection",
   ).$type<AudioVisionModelSelection>(),
 
-  // Translation model for pure generators (null = cascade)
-  translationModelId: text("translation_model_id").$type<ChatModelId>(),
-
   // Default chat mode for this skill (null = cascade to user settings → "text")
   defaultChatMode: text("default_chat_mode").$type<ChatMode>(),
 
@@ -150,6 +149,9 @@ export const customSkills = pgTable("custom_skills", {
     .notNull()
     .default(SkillTrustLevel.COMMUNITY)
     .$type<typeof SkillTrustLevelValue>(),
+
+  // Creator long-form content (markdown, no length limit)
+  longContent: text("long_content"),
 
   // Lightweight versioning - set when status transitions to PUBLISHED
   publishedAt: timestamp("published_at"),
@@ -287,6 +289,7 @@ export type NewCustomSkill = typeof customSkills.$inferInsert;
 
 export const skillVariantSchema = z.object({
   id: z.string(),
+  displayName: z.string().max(50).optional(),
   modelSelection: chatModelSelectionSchema,
   imageGenModelSelection: imageGenModelSelectionSchema.optional(),
   musicGenModelSelection: musicGenModelSelectionSchema.optional(),
@@ -296,6 +299,7 @@ export const skillVariantSchema = z.object({
   imageVisionModelSelection: imageVisionModelSelectionSchema.optional(),
   videoVisionModelSelection: videoVisionModelSelectionSchema.optional(),
   audioVisionModelSelection: audioVisionModelSelectionSchema.optional(),
+  defaultChatMode: z.enum(CHAT_MODE_IDS).optional(),
   isDefault: z.boolean().optional(),
 });
 

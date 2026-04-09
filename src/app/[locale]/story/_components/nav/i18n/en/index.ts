@@ -1,6 +1,8 @@
 export const translations = {
   help: "Help",
   logout: "Log Out",
+  settings: "Profile Settings",
+  leadMagnet: "Lead Magnet",
   enableLightMode: "Enable light mode",
   enableDarkMode: "Enable dark mode",
   notifications: "Notifications",
@@ -44,6 +46,10 @@ export const translations = {
   getStarted: "Get Started Free",
   signIn: "Sign In",
   goToApp: "Open App",
+  backToChat: "Back to Chat",
+  unbottledHome: "Website & Blog",
+  subscription: "Subscription",
+  referral: "Referral",
   services: {
     title: "Platform",
     features: {

@@ -23,8 +23,8 @@ interface ModelsLabMusicResponse {
   message?: string;
 }
 
-const POLL_INTERVAL_MS = 5000;
-const MAX_POLL_ATTEMPTS = 30;
+const POLL_INTERVAL_MS = process.env.NODE_ENV === "test" ? 50 : 3000;
+const MAX_POLL_ATTEMPTS = 80;
 
 export async function generateMusicWithModelsLab(params: {
   providerModel: string;
@@ -45,7 +45,7 @@ export async function generateMusicWithModelsLab(params: {
     });
   }
 
-  logger.info("[ModelsLab Music] Submitting generation request", {
+  logger.debug("[ModelsLab Music] Submitting generation request", {
     providerModel,
     durationSeconds,
     promptLength: prompt.length,
@@ -86,14 +86,14 @@ export async function generateMusicWithModelsLab(params: {
 
     // Immediate success
     if (result.status === "success" && result.output?.[0]) {
-      logger.info("[ModelsLab Music] Music generated immediately");
+      logger.debug("[ModelsLab Music] Music generated immediately");
       return success({ audioUrl: result.output[0] });
     }
 
     // Async processing - poll fetch_result URL
     if (result.status === "processing" && result.fetch_result) {
       const fetchUrl = result.fetch_result;
-      logger.info("[ModelsLab Music] Request queued, polling", {
+      logger.debug("[ModelsLab Music] Request queued, polling", {
         fetchUrl,
         eta: result.eta,
       });
@@ -127,7 +127,7 @@ export async function generateMusicWithModelsLab(params: {
           (await pollResponse.json()) as ModelsLabMusicResponse;
 
         if (pollResult.status === "success" && pollResult.output?.[0]) {
-          logger.info("[ModelsLab Music] Music generated successfully");
+          logger.debug("[ModelsLab Music] Music generated successfully");
           return success({ audioUrl: pollResult.output[0] });
         }
 

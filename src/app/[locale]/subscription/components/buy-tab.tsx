@@ -32,21 +32,6 @@ export function BuyTab({
       transition={{ delay: 0.1 }}
       className="flex flex-col gap-6"
     >
-      {hasPaymentProvider && (
-        <Div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <EndpointsPage
-            endpoint={createSubscriptionDefinition}
-            user={user}
-            locale={locale}
-          />
-          <EndpointsPage
-            endpoint={purchaseDefinitions}
-            user={user}
-            locale={locale}
-          />
-        </Div>
-      )}
-
       {isAdmin && (
         <>
           <EndpointsPage
@@ -77,6 +62,21 @@ export function BuyTab({
             forceMethod="POST"
           />
         </>
+      )}
+
+      {hasPaymentProvider && (
+        <Div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <EndpointsPage
+            endpoint={createSubscriptionDefinition}
+            user={user}
+            locale={locale}
+          />
+          <EndpointsPage
+            endpoint={purchaseDefinitions}
+            user={user}
+            locale={locale}
+          />
+        </Div>
       )}
     </MotionDiv>
   );

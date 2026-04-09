@@ -15,8 +15,6 @@ import { clearDraft } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { stripSpecialTags } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
-
 import { DefaultFolderId } from "../../../../config";
 import type { ChatMessage, MessageMetadata } from "../../../../db";
 import { ChatMessageRole } from "../../../../enum";
@@ -388,15 +386,14 @@ function handleContentDone(
     finishReason: e.finishReason ?? undefined,
     isStreaming: false,
   };
-  // Strip think/chat tags from final content - the server sends raw content
-  // including reasoning blocks; the UI and localStorage should store clean text.
-  const cleanContent = e.content ? stripSpecialTags(e.content) : e.content;
+  // Keep raw content including <think> tags - the Markdown component parses
+  // and renders them as collapsible thinking blocks. TTS/copy do their own stripping.
   updateMessages(threadId, rootFolderId, logger, (msgs) =>
     msgs.map((m) =>
       m.id === e.messageId
         ? {
             ...m,
-            content: cleanContent,
+            content: e.content ?? m.content,
             metadata: { ...m.metadata, ...tokenMetadata },
             updatedAt: new Date(),
           }

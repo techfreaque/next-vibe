@@ -67,7 +67,6 @@ export class StreamExecutionHandler {
     imageSize?: string;
     imageQuality?: string;
     musicDuration?: string;
-    translationModel?: ChatModelOption | null;
   }): Promise<void> {
     const {
       provider,
@@ -177,7 +176,7 @@ export class StreamExecutionHandler {
             tools,
             stopWhen: [
               stepCountIs(MAX_TOOL_CALLS),
-              // endLoop / approve: stop before the next AI turn starts.
+              // endLoop / approve / wait: stop before the next AI turn starts.
               // The current step (tool calls + results) finishes naturally;
               // this predicate prevents the AI SDK from making another API request.
               // wakeUp: also yield when a wake-up-ready pub/sub signal has arrived.
@@ -185,7 +184,8 @@ export class StreamExecutionHandler {
                 (): StopCondition<typeof tools> => () =>
                   ctx.shouldStopLoop ||
                   ctx.stepHasToolsAwaitingConfirmation ||
-                  ctx.shouldYieldForWakeUp
+                  ctx.shouldYieldForWakeUp ||
+                  params.streamContext.waitingForRemoteResult === true
               )(),
             ],
             onStepFinish: (stepResult): void => {
@@ -237,6 +237,35 @@ export class StreamExecutionHandler {
         });
 
         if (shouldAbort) {
+          // Stream was intentionally aborted (e.g. REMOTE_TOOL_WAIT, endLoop).
+          // Run AbortErrorHandler now - the stream loop exited via 'return', not
+          // via an exception, so the catch block below will NOT fire.
+          // AbortErrorHandler sets thread → "waiting" for REMOTE_TOOL_WAIT so
+          // clearStreamingState (in the finally block) sees the state and skips.
+          if (streamAbortController.signal.aborted && !ctx.abortHandled) {
+            const reason = streamAbortController.signal.reason;
+            const abortError =
+              reason instanceof Error
+                ? reason
+                : new Error(String(reason ?? "Stream aborted"));
+            const { AbortErrorHandler } = await import("./abort-error-handler");
+            await AbortErrorHandler.handleAbortError({
+              error: abortError,
+              ctx,
+              logger,
+              threadId,
+              isIncognito,
+              userId,
+              model,
+              systemPrompt,
+              trailingSystemMessage,
+              messages,
+              tools,
+              user,
+              t,
+            });
+            ctx.abortHandled = true;
+          }
           return;
         }
       }
@@ -275,7 +304,7 @@ export class StreamExecutionHandler {
           });
           ctx.abortHandled = true;
         } else {
-          logger.info(
+          logger.debug(
             "[AI Stream] Swallowing post-abort error (already handled)",
             {
               abortReason: abortError.message,

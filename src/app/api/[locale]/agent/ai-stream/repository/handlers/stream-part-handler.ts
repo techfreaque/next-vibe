@@ -13,7 +13,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { AiStreamT } from "../../stream/i18n";
-import { AbortReason, StreamAbortError } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
 import type { StreamingTTSHandler } from "../streaming-tts";
 import { FilePartHandler } from "./file-part-handler";
@@ -289,7 +288,7 @@ export class StreamPartHandler {
                 .update(cronTasksTable)
                 .set({ wakeUpToolMessageId: toolMsgId })
                 .where(drizzleEq(cronTasksTable.id, escalatedId));
-              logger.info(
+              logger.debug(
                 "[AI Stream] Backfilled wakeUpToolMessageId on escalated task",
                 { escalatedId, toolMsgId },
               );
@@ -323,7 +322,7 @@ export class StreamPartHandler {
         // all complete before the stream aborts at the AI-response turn boundary.
         if (result.requiresConfirmation) {
           ctx.stepHasToolsAwaitingConfirmation = true;
-          logger.info(
+          logger.debug(
             "[AI Stream] Tool requires confirmation - will abort at finish-step after all tool steps complete",
             {
               toolName: part.toolName,
@@ -435,23 +434,21 @@ export class StreamPartHandler {
         ctx.currentAssistantContent = "";
         ctx.isInReasoningBlock = false;
 
-        // Remote tool with callbackMode=wait: abort stream IMMEDIATELY.
-        // Cannot defer to finish-step because the AI SDK continues generating
-        // text in the same step after tool-result (no finish-step boundary).
+        // Remote tool with callbackMode=wait: defer abort to finish-step (same as endLoop/approve).
+        // finish-step fires after all tool results, before the AI SDK makes the next API call.
+        // Aborting here (at tool-result) caused the AI SDK to sometimes initiate call 2 before
+        // the abort signal was checked, consuming an extra fetch-cache counter slot and
+        // skewing fixture indices. Deferring to finish-step guarantees no call 2.
         // /report backfills the real result and resume-stream wakes the thread.
         if (streamContext.waitingForRemoteResult) {
-          streamContext.waitingForRemoteResult = false;
-          logger.info(
-            "[AI Stream] Remote tool wait mode - aborting stream immediately",
+          logger.debug(
+            "[AI Stream] Remote tool wait mode - deferring abort to finish-step",
             {
               toolName: part.toolName,
               toolCallId: part.toolCallId,
             },
           );
-          streamAbortController.abort(
-            new StreamAbortError(AbortReason.REMOTE_TOOL_WAIT),
-          );
-          return { shouldAbort: true };
+          // Don't clear waitingForRemoteResult yet - finish-step-handler reads it.
         }
 
         // endLoop: defer abort to finish-step (same as approve).
@@ -460,7 +457,7 @@ export class StreamPartHandler {
         // finish-step fires after all tool results in the step, before the AI SDK
         // makes the next API call, so deferring there is always safe.
         if (ctx.shouldStopLoop) {
-          logger.info(
+          logger.debug(
             "[AI Stream] endLoop tool result received - deferring abort to finish-step",
             {
               toolName: part.toolName,

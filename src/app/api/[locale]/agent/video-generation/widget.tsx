@@ -16,16 +16,18 @@ import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
-import { getVideoGenModelById } from "@/app/api/[locale]/agent/video-generation/models";
+import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
+import {
+  getBestVideoGenModel,
+  getVideoGenModelById,
+} from "@/app/api/[locale]/agent/video-generation/models";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
@@ -170,7 +172,7 @@ export function VideoGenerationContainer({
     [resolvedVideoBased?.supportedDurations],
   );
 
-  // Aspect ratio options from model capabilities — memoized to avoid stale deps in useEffect
+  // Aspect ratio options from model capabilities - memoized to avoid stale deps in useEffect
   const aspectRatioOptions = useMemo(
     () => resolvedVideoBased?.supportedAspectRatios || [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -299,7 +301,7 @@ export function VideoGenerationContainer({
           </Div>
         </Div>
 
-        {/* Duration presets — dynamic per model */}
+        {/* Duration presets - dynamic per model */}
         <Div className="flex flex-col gap-1.5">
           <Span className="text-xs font-medium text-muted-foreground">
             {t("post.duration.label")}
@@ -325,7 +327,7 @@ export function VideoGenerationContainer({
           </Div>
         </Div>
 
-        {/* Aspect ratio — only shown when model supports multiple ratios */}
+        {/* Aspect ratio - only shown when model supports multiple ratios */}
         {aspectRatioOptions.length > 1 && (
           <Div className="flex flex-col gap-1.5">
             <Span className="text-xs font-medium text-muted-foreground">
@@ -348,7 +350,7 @@ export function VideoGenerationContainer({
           </Div>
         )}
 
-        {/* Resolution — only shown when model supports multiple resolutions */}
+        {/* Resolution - only shown when model supports multiple resolutions */}
         {resolutionOptions.length > 1 && (
           <Div className="flex flex-col gap-1.5">
             <Span className="text-xs font-medium text-muted-foreground">

@@ -224,7 +224,7 @@ export function testEndpoint<
           } else {
             // Accept either AUTH_ERROR (401) or FORBIDDEN (403) as valid rejection
             // Also skip internal errors which indicate route registration issues, not auth failures
-            // Skip "Tool not found" errors — route not registered (run vibe gen)
+            // Skip "Tool not found" errors - route not registered (run vibe gen)
             if (
               typeof response.message === "string" &&
               response.message.includes("Tool not found")

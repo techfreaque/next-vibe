@@ -119,8 +119,6 @@ export class ChatSettingsRepository {
         audioVisionModelSelection:
           setting.audioVisionModelSelection ??
           defaults.audioVisionModelSelection,
-        translationModelId:
-          setting.translationModelId ?? defaults.translationModelId,
         imageGenModelSelection:
           setting.imageGenModelSelection ?? defaults.imageGenModelSelection,
         musicGenModelSelection:
@@ -251,10 +249,6 @@ export class ChatSettingsRepository {
               data.audioVisionModelSelection !== undefined
                 ? (data.audioVisionModelSelection ?? null)
                 : undefined,
-            translationModelId:
-              data.translationModelId !== undefined
-                ? (data.translationModelId ?? null)
-                : undefined,
             imageGenModelSelection:
               data.imageGenModelSelection !== undefined
                 ? (data.imageGenModelSelection ?? null)
@@ -326,7 +320,6 @@ export class ChatSettingsRepository {
             imageVisionModelSelection: data.imageVisionModelSelection ?? null,
             videoVisionModelSelection: data.videoVisionModelSelection ?? null,
             audioVisionModelSelection: data.audioVisionModelSelection ?? null,
-            translationModelId: data.translationModelId ?? null,
             imageGenModelSelection: data.imageGenModelSelection ?? null,
             musicGenModelSelection: data.musicGenModelSelection ?? null,
             videoGenModelSelection: data.videoGenModelSelection ?? null,

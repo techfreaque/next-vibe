@@ -27,7 +27,7 @@ export const CHROME_REMOTE_DEBUG_PORT = 9222;
 /**
  * Default Chrome DevTools MCP configuration.
  * Connects to a shared Chrome instance via --browserUrl instead of launching
- * its own Chrome — this allows multiple Bun processes (hermes, hermes-dev,
+ * its own Chrome - this allows multiple Bun processes (hermes, hermes-dev,
  * Claude Code) to share one Chrome without profile-lock conflicts.
  */
 export const chromeMCPConfig: ChromeMCPConfig = {

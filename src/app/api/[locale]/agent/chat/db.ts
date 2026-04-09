@@ -42,8 +42,8 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import { leads } from "@/app/api/[locale]/leads/db";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
@@ -244,7 +244,7 @@ export interface MessageMetadata {
     createdAt: string; // ISO timestamp
   }>;
 
-  // Real-time gap-fill status — set on GAP_FILL_STARTED, cleared on GAP_FILL_COMPLETED.
+  // Real-time gap-fill status - set on GAP_FILL_STARTED, cleared on GAP_FILL_COMPLETED.
   // Used to show labeled status chips ("Transcribing audio…", "Analyzing image…", etc.)
   gapFillStatus?: {
     bridgeType: "stt" | "vision" | "translation" | "tts";

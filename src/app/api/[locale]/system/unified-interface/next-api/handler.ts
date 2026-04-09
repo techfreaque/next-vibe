@@ -185,6 +185,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           imageGenModelId: undefined,
           musicGenModelId: undefined,
           videoGenModelId: undefined,
+          isRevival: undefined,
         },
       });
 

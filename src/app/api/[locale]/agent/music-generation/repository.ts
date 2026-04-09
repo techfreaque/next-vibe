@@ -23,8 +23,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
 
-import { generateMusicWithModelsLab } from "./providers/modelslab";
-import { generateMusicWithReplicate } from "./providers/replicate";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -35,6 +33,8 @@ import type {
 } from "./definition";
 import { MUSIC_DURATION_SECONDS } from "./enum";
 import type { MusicGenerationT } from "./i18n";
+import { generateMusicWithModelsLab } from "./providers/modelslab";
+import { generateMusicWithReplicate } from "./providers/replicate";
 
 interface MediaGenStreamContext {
   threadId?: string | undefined;
@@ -94,7 +94,7 @@ export class MusicGenerationRepository {
       durationSeconds = nearest;
     }
 
-    logger.info("[MusicGen] Starting music generation", {
+    logger.debug("[MusicGen] Starting music generation", {
       model: data.model,
       provider: audioModel.apiProvider,
       creditCost,
@@ -196,7 +196,7 @@ export class MusicGenerationRepository {
       return deductResult;
     }
 
-    logger.info("[MusicGen] Music generated successfully", {
+    logger.debug("[MusicGen] Music generated successfully", {
       model: data.model,
       creditCost,
       durationSeconds,

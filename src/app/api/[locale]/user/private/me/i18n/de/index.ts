@@ -25,6 +25,16 @@ export const translations: typeof enTranslations = {
       createdAt: "Erstellt am",
       updatedAt: "Aktualisiert am",
       stripeCustomerId: "Stripe-Kunden-ID",
+      bio: "Bio",
+      websiteUrl: "Website",
+      twitterUrl: "X / Twitter",
+      youtubeUrl: "YouTube",
+      instagramUrl: "Instagram",
+      tiktokUrl: "TikTok",
+      githubUrl: "GitHub",
+      discordUrl: "Discord",
+      creatorAccentColor: "Akzentfarbe",
+      creatorHeaderImageUrl: "Header-Bild",
       user: {
         title: "Benutzerinformationen",
         description: "Benutzerprofildetails",
@@ -89,6 +99,10 @@ export const translations: typeof enTranslations = {
         title: "Datenschutzeinstellungen",
         description: "Steuern Sie, wer Ihre Profilinformationen sehen kann",
       },
+      profileInfo: {
+        title: "Creator-Profil",
+        description: "Bio, Social-Links und Branding für deine Skill-Seiten",
+      },
     },
     fields: {
       email: {
@@ -147,8 +161,9 @@ export const translations: typeof enTranslations = {
         help: "Wählen Sie, wer Ihr Profil sehen kann: öffentlich (alle), privat (nur Sie) oder nur Kontakte",
       },
       marketingConsent: {
-        label: "Marketing-Einverständnis",
-        description: "Marketing-Kommunikation erhalten",
+        label: "Newsletter abonnieren",
+        description:
+          "Gelegentliche Updates über neue Modelle und Features. Kein Spam, nur was zählt.",
         placeholder: "Marketing-E-Mails aktivieren",
         help: "Wählen Sie, ob Sie Marketing-E-Mails und Werbemitteilungen erhalten möchten",
       },
@@ -160,6 +175,51 @@ export const translations: typeof enTranslations = {
         validation: {
           maxLength: "Die Bio darf nicht länger als 500 Zeichen sein",
         },
+      },
+      websiteUrl: {
+        label: "Website",
+        description: "Deine persönliche oder geschäftliche Website",
+        placeholder: "https://deine-seite.de",
+      },
+      twitterUrl: {
+        label: "X / Twitter",
+        description: "Dein X (Twitter) Profil-URL",
+        placeholder: "https://x.com/deinhandle",
+      },
+      youtubeUrl: {
+        label: "YouTube",
+        description: "Dein YouTube-Kanal-URL",
+        placeholder: "https://youtube.com/@deinkanal",
+      },
+      instagramUrl: {
+        label: "Instagram",
+        description: "Dein Instagram-Profil-URL",
+        placeholder: "https://instagram.com/deinhandle",
+      },
+      tiktokUrl: {
+        label: "TikTok",
+        description: "Dein TikTok-Profil-URL",
+        placeholder: "https://tiktok.com/@deinhandle",
+      },
+      githubUrl: {
+        label: "GitHub",
+        description: "Dein GitHub-Profil-URL",
+        placeholder: "https://github.com/deinbenutzername",
+      },
+      discordUrl: {
+        label: "Discord",
+        description: "Dein Discord-Server oder Profil-Link",
+        placeholder: "https://discord.gg/deinserver",
+      },
+      creatorAccentColor: {
+        label: "Akzentfarbe",
+        description: "Hex-Farbe für dein Skill-Seiten-Branding (optional)",
+        placeholder: "#7c3aed",
+      },
+      creatorHeaderImageUrl: {
+        label: "Header-Bild",
+        description: "Banner-Bild-URL für deinen Skill-Seiten-Hero",
+        placeholder: "https://deine-seite.de/banner.jpg",
       },
     },
     response: {
@@ -182,6 +242,16 @@ export const translations: typeof enTranslations = {
       createdAt: "Erstellt am",
       updatedAt: "Aktualisiert am",
       stripeCustomerId: "Stripe-Kunden-ID",
+      bio: "Bio",
+      websiteUrl: "Website",
+      twitterUrl: "X / Twitter",
+      youtubeUrl: "YouTube",
+      instagramUrl: "Instagram",
+      tiktokUrl: "TikTok",
+      githubUrl: "GitHub",
+      discordUrl: "Discord",
+      creatorAccentColor: "Akzentfarbe",
+      creatorHeaderImageUrl: "Header-Bild",
       user: "Aktualisierte Benutzerinformationen",
       changesSummary: {
         title: "Änderungszusammenfassung",
@@ -301,6 +371,33 @@ export const translations: typeof enTranslations = {
     profile: "profil",
     user: "benutzer",
     account: "konto",
+  },
+
+  widget: {
+    save: "Profil speichern",
+    saving: "Wird gespeichert...",
+    editProfile: "Profil bearbeiten",
+    cancelEdit: "Abbrechen",
+    memberSince: "Mitglied seit",
+    profileCard: {
+      title: "Creator-Profil",
+      description: "Deine öffentliche Identität auf der Plattform",
+    },
+    socialCard: {
+      title: "Social Links",
+      description: "Verbinde deine Plattformen",
+    },
+    emailCard: {
+      title: "E-Mail-Liste",
+      description: "Baue dein Publikum mit Lead-Erfassung auf",
+    },
+    previewCard: {
+      title: "Dein öffentliches Profil",
+      description: "So sehen dich andere",
+    },
+    noPreview: "Fülle dein Profil aus, um eine Vorschau zu sehen",
+    noSocials: "Noch keine Social Links hinzugefügt",
+    viewPublicProfile: "Öffentliches Profil ansehen",
   },
 
   // Sub-routes

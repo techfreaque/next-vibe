@@ -106,17 +106,17 @@
     {
       "type": "text-delta",
       "id": "text-0",
-      "delta": " `callbackMode='wait'` is not valid. Available callbackMode values are:\n- `\"detach\"` — Fire and forget, returns"
+      "delta": " `callbackMode='wait'` is not valid. Available callbackMode values are:\n- `\"detach\"` - Fire and forget, returns"
     },
     {
       "type": "text-delta",
       "id": "text-0",
-      "delta": " taskId\n- `\"wakeUp\"` — Fire and forget with auto-injection when complete\n- `\"endLoop\"` — Execute synchron"
+      "delta": " taskId\n- `\"wakeUp\"` - Fire and forget with auto-injection when complete\n- `\"endLoop\"` - Execute synchron"
     },
     {
       "type": "text-delta",
       "id": "text-0",
-      "delta": "ously, return result, stop tool loop\n- `\"approve\"` — Require user confirmation before executing\n\nThere is a separate `wait-for-task` tool"
+      "delta": "ously, return result, stop tool loop\n- `\"approve\"` - Require user confirmation before executing\n\nThere is a separate `wait-for-task` tool"
     },
     {
       "type": "text-delta",
@@ -131,7 +131,7 @@
     {
       "type": "text-delta",
       "id": "text-0",
-      "delta": "_image — waits for completion before returning?\n2. **`callbackMode='detach'`** followed by a"
+      "delta": "_image - waits for completion before returning?\n2. **`callbackMode='detach'`** followed by a"
     },
     {
       "type": "text-delta",

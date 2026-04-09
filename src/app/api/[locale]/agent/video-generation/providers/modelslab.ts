@@ -24,8 +24,9 @@ interface ModelsLabVideoResponse {
   message?: string;
 }
 
-const POLL_INTERVAL_MS = 5000;
-const MAX_POLL_ATTEMPTS = 40;
+// Allow tests to override poll interval to avoid 5s × N waits on fixture replay
+const POLL_INTERVAL_MS = process.env.NODE_ENV === "test" ? 50 : 2000;
+const MAX_POLL_ATTEMPTS = 80;
 
 export async function generateVideoWithModelsLab(params: {
   providerModel: string;
@@ -69,7 +70,7 @@ export async function generateVideoWithModelsLab(params: {
     ? "https://modelslab.com/api/v6/video/text2video_ultra"
     : "https://modelslab.com/api/v6/video/text2video";
 
-  logger.info("[ModelsLab Video] Submitting generation request", {
+  logger.debug("[ModelsLab Video] Submitting generation request", {
     providerModel,
     endpoint,
     durationSeconds,
@@ -111,7 +112,7 @@ export async function generateVideoWithModelsLab(params: {
     if (result.status === "success") {
       const videoUrl = result.output?.[0] ?? result.proxy_links?.[0];
       if (videoUrl) {
-        logger.info("[ModelsLab Video] Video generated immediately");
+        logger.debug("[ModelsLab Video] Video generated immediately");
         return success({ videoUrl });
       }
     }
@@ -119,7 +120,7 @@ export async function generateVideoWithModelsLab(params: {
     // Async processing - poll fetch_result URL
     if (result.status === "processing" && result.fetch_result) {
       const fetchUrl = result.fetch_result;
-      logger.info("[ModelsLab Video] Request queued, polling", {
+      logger.debug("[ModelsLab Video] Request queued, polling", {
         fetchUrl,
         eta: result.eta,
       });
@@ -158,7 +159,7 @@ export async function generateVideoWithModelsLab(params: {
           const videoUrl =
             pollResult.output?.[0] ?? pollResult.proxy_links?.[0];
           if (videoUrl) {
-            logger.info("[ModelsLab Video] Video generated successfully");
+            logger.debug("[ModelsLab Video] Video generated successfully");
             return success({ videoUrl });
           }
         }

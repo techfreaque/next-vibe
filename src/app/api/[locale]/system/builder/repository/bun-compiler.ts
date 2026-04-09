@@ -225,7 +225,7 @@ export class BunCompiler implements IBunCompiler {
     }
 
     // Rename output file if the desired output name differs from input base name.
-    // Bun always names the output after the entrypoint — rename to the desired name.
+    // Bun always names the output after the entrypoint - rename to the desired name.
     if (needsRename) {
       const builtPath = resolve(outDir, `${inputBaseName}.js`);
       if (existsSync(builtPath) && builtPath !== outfilePath) {

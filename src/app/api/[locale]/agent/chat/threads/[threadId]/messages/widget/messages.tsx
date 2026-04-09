@@ -318,10 +318,19 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
 
     const load = async (): Promise<void> => {
       try {
+        // Pass the current leafMessageId so the server resolves the correct branch.
+        // Without this, navigating away and back after a branch causes the server
+        // to resolve to the newest-child chain (possibly the old branch).
+        const currentLeafForLoad = leafMessageIdRef.current;
         const response = await executeQuery({
           endpoint: pathDefinitions.GET,
           logger,
-          requestData: { rootFolderId: currentRootFolderId },
+          requestData: {
+            rootFolderId: currentRootFolderId,
+            ...(currentLeafForLoad
+              ? { leafMessageId: currentLeafForLoad }
+              : {}),
+          },
           pathParams: { threadId: activeThreadId },
           locale,
           user,

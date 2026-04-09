@@ -29,7 +29,6 @@ import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 
-import type { ChatModelId } from "../../ai-stream/models";
 import type { ToolConfigItem } from "../settings/definition";
 import type { FavoriteGetModelSelection } from "./[id]/definition";
 
@@ -78,9 +77,6 @@ export const chatFavorites = pgTable("chat_favorites", {
   audioVisionModelSelection: jsonb(
     "audio_vision_model_selection",
   ).$type<AudioVisionModelSelection>(),
-
-  // Translation model for pure generators (null = cascade)
-  translationModelId: text("translation_model_id").$type<ChatModelId>(),
 
   // Default chat mode for this favorite (null = cascade to skill → user settings → "text")
   defaultChatMode: text("default_chat_mode").$type<ChatMode>(),

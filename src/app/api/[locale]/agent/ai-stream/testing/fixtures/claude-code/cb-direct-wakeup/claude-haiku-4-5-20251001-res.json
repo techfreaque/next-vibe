@@ -1,0 +1,328 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[CB-D1 direct-wait] Use the tool-help tool (thea__ prefix, wait mode) to look up \"generate_image\". Reply STEP_OK when done.\n[Tool result for tool-help]:\n{\n  \"hint\": \"No capability snapshot for instance \\\"thea\\\". Connect the instance and wait for a sync pulse.\",\n  \"tools\": [],\n  \"totalCount\": 0,\n  \"matchedCount\": 0\n}\nSTEP_OK\n[CB-D2 direct-wakeup] Use the tool-help tool (thea__ prefix, wakeUp mode) to look up \"generate_image\". Reply STEP_OK after revival.",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user is asking me to:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n1. Use the tool-help tool with the \"thea__\" prefix in \"wakeUp\" mode to"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " look up \"generate_image\"\n2. Reply STEP_OK after revival\n\nThis appears to be a test task to understand how the w"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "akeUp callback mode works. Let me call tool-help with:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n- query: \"generate_image\"\n- callbackMode: \"wakeUp\"\n- Some kind of instance reference -"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the prefix \"thea__\" suggests this might be an instance ID\n\nLooking at the context, there's mention"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " of \"Remote Instances\" and it says \"User has "
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "1 connected local instance: 'hermes'\". But the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " task mentions \"thea__\" which isn't mentioned in my context. However, I can try to use"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " it as an instanceId parameter.\n\nActually, looking more carefully at the tool-help parameters"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ":\n```\n\"toolName\": {\"type\": \"string\"},\n\"category\": {\"type\": \"string\"},\n\"instanceId\": {\"type\": \""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "string\"},\n```\n\nThe instanceId might be what I need to set. But the task says \"thea__ prefix\" -"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " maybe that means the instanceId should be \"thea\" or something starting with \"thea__\"?\n\nLet me re"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-read: \"Use the tool-help tool (thea__ prefix, wakeUp mode)\"\n\nThis could mean:\n- Use tool-help with a"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " thea instance (instanceId=\"thea\")\n- The \"thea__\" might"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " be a prefix convention\n\nLooking at the previous step, it says:\n```\n["
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Tool result for tool-help]:\n{\n  \"hint\": \"No capability snapshot for instance \\\"thea\\\". Connect the instance and wait for a sync pulse.\",\n```\n\nSo \""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "thea\" is indeed an instance name, and the error is that it's not connected."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " But the instruction for step D2 asks me to try again"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " with wakeUp mode. This might be testing whether wakeUp mode will wait for the instance to connect and"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " sync.\n"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nI"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "'ll invoke tool-help with instanceId set to \"thea\", the query parameter as \"generate_image\", and callback"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Mode as \"wakeUp\" to see if this mode handles the disconnected instance differently."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "9eb9600b-f920-4c05-a244-e0becefb9af5",
+      "toolName": "tool-help",
+      "input": "{\"query\":\"generate_image\",\"instanceId\":\"thea\",\"callbackMode\":\"wakeUp\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "9eb9600b-f920-4c05-a244-e0becefb9af5",
+      "toolName": "tool-help",
+      "result": "{\n  \"taskId\": \"local-wu-1775435562600-85b551\",\n  \"status\": \"status.pending\",\n  \"hint\": \"Result will be injected when complete. Call wait-for-task only if you need the result before continuing.\"\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The w"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "akeUp mode returned a taskId with status \"pending\" and indicates that the result will be injected when complete. According to the instructions, I should NOT"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " call wait-for-task for wakeUp - it will automatically revive the stream when ready.\n\nHowever, the instruction"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " asks me to \"Reply STEP_OK after revival\". This means I should wait for the result to come back automatically"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " via the wakeUp mechanism.\n\nLet me wait for this to be inj"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "ected into the thread automatically."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "Waiting for wakeUp injection..."
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-2"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": "I've submitted the tool-help call with wakeUp mode. The taskId is \"local-wu-1"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": "775435562600-85b551\". According to the instructions:\n\n\"wakeUp\" - Fire and forget. Returns"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": " `{taskId}` immediately. The result is automatically"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": " injected into this thread when ready - the stream revives and"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": " you will see the tool result as a new message."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": " Do NOT call wait-for-task for wakeUp.\n\nSo I should NOT call wait-for-task."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": " Instead, the stream should automatically resume when the result is ready. Let me wait for that to happen"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": ".\n\nActually, looking at the system context again, it seems the instance \"thea\" isn't listed as a connected instance"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": ". The context says:\n\"User has 1 connected local instance: 'hermes'\"\n\nAnd the previous"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": " step got an error: \"No capability snapshot for instance \\\"thea\\\". Connect the instance and wait for a sync pulse.\"\n\nThe w"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": "akeUp mode is supposed to wait for the instance to sync and return the result. Let me be patient and allow the stream to revive when"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": " it's ready.\n\nHowever, I'm in a state where I've"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": " sent a wakeUp request and am waiting for the result to be injected. The instructions say I should not call wait-for-task for w"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": "akeUp, as the stream will revive automatically.\n\nSince I can't actively wait (the stream should auto"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": "-revive), I'll acknowledge that I'm waiting and ready for the result to be injected."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-2",
+      "delta": ""
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-2"
+    },
+    {
+      "type": "text-start",
+      "id": "text-1"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": "Task submitted with taskId `local-wu-1775435562600-85b551` in w"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": "akeUp mode. Stream is paused pending automatic result injection. Waiting for th"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": "ea instance to sync and reply..."
+    },
+    {
+      "type": "text-end",
+      "id": "text-1"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 1115,
+        "totalTokens": 1133,
+        "cachedInputTokens": 6880
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 7558
+        }
+      }
+    }
+  ]
+}

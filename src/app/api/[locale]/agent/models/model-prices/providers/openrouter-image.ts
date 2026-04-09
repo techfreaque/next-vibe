@@ -10,7 +10,7 @@
  *   sourceful:cents_per_4k_image_output   - cents per 4K image (÷ 100)
  *   seedream:cents_per_image_output       - cents per image (÷ 100)
  *
- * Resolution tiers come from display_pricing[0].tiers — used to populate
+ * Resolution tiers come from display_pricing[0].tiers - used to populate
  * supportedResolutions and pricingByResolution on Riverflow models.
  *
  * Token-based image models (gemini image-preview, gpt-5-image, etc.) use

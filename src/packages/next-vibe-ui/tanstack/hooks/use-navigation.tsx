@@ -2,12 +2,7 @@
  * TanStack Start implementation of Next.js navigation hooks
  * Mirrors the web/hooks/use-navigation.tsx interface
  */
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearch,
-} from "@tanstack/react-router";
+import { useLocation, useNavigate, useParams } from "@tanstack/react-router";
 
 /**
  * Get the router instance
@@ -41,5 +36,15 @@ export function usePathname(): string {
   return useLocation().pathname;
 }
 
-export { useParams, useSearch as useSearchParams };
+export { useParams };
+
+/**
+ * Get current URL search params
+ * Compatible with Next.js useSearchParams - works without specifying a route
+ */
+export function useSearchParams(): URLSearchParams {
+  const { searchStr } = useLocation();
+  return new URLSearchParams(searchStr);
+}
+
 export { notFound } from "../lib/not-found";

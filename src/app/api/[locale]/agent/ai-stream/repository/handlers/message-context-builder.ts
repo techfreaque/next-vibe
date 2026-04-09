@@ -416,7 +416,7 @@ export class MessageContextBuilder {
 
       if (result.totalRemoved > 0) {
         visionWarningMessage = result.warningMessage;
-        params.logger.info(
+        params.logger.debug(
           "[BuildMessageContext] Replaced attachments with cached variants",
           {
             model: modelConfig.name,
@@ -990,11 +990,23 @@ export class MessageContextBuilder {
           sum +
           Math.ceil(
             m.content
-              .map((part) =>
-                typeof part === "object" && "text" in part
-                  ? (part as { text: string }).text
-                  : JSON.stringify(part),
-              )
+              .map((part) => {
+                if (typeof part === "object") {
+                  // Binary file parts (audio/video): count as fixed ~300 token overhead,
+                  // not the raw bytes (Uint8Array JSON.stringify produces massive output)
+                  if ("type" in part && part.type === "file") {
+                    return " ".repeat(300 * 4);
+                  }
+                  if ("text" in part) {
+                    return (part as { text: string }).text;
+                  }
+                  if ("image" in part) {
+                    // Images: fixed ~400 token overhead
+                    return " ".repeat(400 * 4);
+                  }
+                }
+                return JSON.stringify(part);
+              })
               .join("").length / 4,
           )
         );

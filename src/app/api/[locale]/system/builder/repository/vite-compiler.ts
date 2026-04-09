@@ -56,7 +56,7 @@ type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
  * importing file path.
  *
  * - **SSR**: the shim resolves normally via `resolve.alias` + the SSR resolver
- *   plugin — no-op in SSR, throws otherwise.
+ *   plugin - no-op in SSR, throws otherwise.
  * - **Client**: this plugin's `load` hook detects the shim path, looks up
  *   which file imported it, and returns a throw with the source file baked in.
  *
@@ -80,7 +80,7 @@ function serverOnlyTracePlugin(
     enforce: "pre",
 
     resolveId(source: string, importer: string | undefined): undefined {
-      // Only record edges for the client environment — SSR imports are fine.
+      // Only record edges for the client environment - SSR imports are fine.
       const envName = (this.environment as { name?: string } | undefined)?.name;
       if (envName === "ssr") {
         return undefined;
@@ -139,7 +139,7 @@ function serverOnlyTracePlugin(
       }
 
       return [
-        `// server-only shim — this module should never run in the client bundle`,
+        `// server-only shim - this module should never run in the client bundle`,
         `if (!import.meta.env.SSR) {`,
         `  throw new Error("[server-only] imported in client bundle\\n\\n  Source: ${sourceInfo}\\n\\n  This file imports \\"server-only\\" and must not be included in the client bundle.\\n  Move server-only code into a .server.ts file or use createServerFn().\\n");`,
         `}`,
@@ -711,8 +711,9 @@ export class ViteCompiler {
               return undefined;
             }
             if (
-              !id.includes("/src/app/") ||
-              (!id.endsWith("/layout.tsx") && !id.endsWith("/page.tsx"))
+              !id.replace(/\?.*$/, "").includes("/src/app/") ||
+              (!id.replace(/\?.*$/, "").endsWith("/layout.tsx") &&
+                !id.replace(/\?.*$/, "").endsWith("/page.tsx"))
             ) {
               return undefined;
             }
@@ -731,9 +732,13 @@ export class ViteCompiler {
               "\n",
             );
             // Remove Next.js-only server exports that may pull in server-only imports:
-            // generateMetadata, viewport
+            // generateMetadata (both `export async function` and `export const = async` forms), viewport
             result = result.replace(
               /\nexport async function generateMetadata[\s\S]*?(?=\nexport |\nfunction |\nconst |\nclass |\ninterface |\ntype |\n\/\/|$)/,
+              "\n",
+            );
+            result = result.replace(
+              /\nexport const generateMetadata\s*=\s*async[\s\S]*?(?=\nexport |\nfunction |\nconst |\nclass |\ninterface |\ntype |\n\/\/|$)/,
               "\n",
             );
             result = result.replace(/\nexport const viewport[\s\S]*?;\n/, "\n");
@@ -1151,8 +1156,9 @@ export class ViteCompiler {
               }
               // Only target layout.tsx and page.tsx in src/app/[locale]
               if (
-                !id.includes("/src/app/") ||
-                (!id.endsWith("/layout.tsx") && !id.endsWith("/page.tsx"))
+                !id.replace(/\?.*$/, "").includes("/src/app/") ||
+                (!id.replace(/\?.*$/, "").endsWith("/layout.tsx") &&
+                  !id.replace(/\?.*$/, "").endsWith("/page.tsx"))
               ) {
                 return undefined;
               }
@@ -1177,9 +1183,13 @@ export class ViteCompiler {
                 "\n",
               );
               // Remove Next.js-only server exports that may pull in server-only imports:
-              // generateMetadata, viewport
+              // generateMetadata (both `export async function` and `export const = async` forms), viewport
               result = result.replace(
                 /\nexport async function generateMetadata[\s\S]*?(?=\nexport |\nfunction |\nconst |\nclass |\ninterface |\ntype |\n\/\/|$)/,
+                "\n",
+              );
+              result = result.replace(
+                /\nexport const generateMetadata\s*=\s*async[\s\S]*?(?=\nexport |\nfunction |\nconst |\nclass |\ninterface |\ntype |\n\/\/|$)/,
                 "\n",
               );
               result = result.replace(
@@ -1259,8 +1269,9 @@ export class ViteCompiler {
                 return undefined;
               }
               if (
-                !id.includes("/src/app/") ||
-                (!id.endsWith("/layout.tsx") && !id.endsWith("/page.tsx"))
+                !id.replace(/\?.*$/, "").includes("/src/app/") ||
+                (!id.replace(/\?.*$/, "").endsWith("/layout.tsx") &&
+                  !id.replace(/\?.*$/, "").endsWith("/page.tsx"))
               ) {
                 return undefined;
               }
@@ -1414,37 +1425,21 @@ export class ViteCompiler {
               if (srcModules.length === 0) {
                 return;
               }
-              // Invalidate changed src/ modules AND their importers in the SSR runner
-              // evaluated-module cache. The runner's invalidateModule() only clears a
-              // single node (no recursive importer walk), so parent modules keep stale
-              // `__vite_ssr_import_XX__` bindings that hit TDZ errors on the first SSR
-              // request after HMR. We walk importers ourselves to fix this.
+              // Invalidate ALL evaluated SSR modules on every src/ change.
+              // Walking only importers misses stale bindings in circular deps:
+              // when A→B→A exists, Vite may only track one direction, so the
+              // other side keeps a stale __vite_ssr_import_N__ binding that hits
+              // TDZ on the next SSR request. Clearing everything is safe in dev
+              // - modules re-evaluate on demand, so this just forces a clean
+              // re-evaluation of the full SSR module graph after each HMR.
               const ssrEnv = viteServer.environments?.["ssr"];
               if (ssrEnv && isRunnableDevEnvironment(ssrEnv)) {
-                const evalMods = ssrEnv.runner.evaluatedModules;
-                const seen = new Set<string>();
-                const invalidateWithImporters = (moduleId: string): void => {
-                  if (seen.has(moduleId)) {
-                    return;
-                  }
-                  seen.add(moduleId);
-                  const ssrMod = evalMods.getModuleById(moduleId);
-                  if (!ssrMod) {
-                    return;
-                  }
-                  // Snapshot importers before invalidation clears them
-                  const importerIds = [...ssrMod.importers];
-                  evalMods.invalidateModule(ssrMod);
-                  // Recursively invalidate all modules that imported this one
-                  for (const importerId of importerIds) {
-                    invalidateWithImporters(importerId);
-                  }
-                };
-                for (const mod of srcModules) {
-                  if (mod.id) {
-                    invalidateWithImporters(mod.id);
-                  }
-                }
+                // Use the runner's built-in clear() which clears all three
+                // internal maps (idToModuleMap, fileToModulesMap,
+                // urlToIdModuleMap) atomically - same as what Vite does on a
+                // full program reload. This forces a clean re-evaluation chain
+                // on the next SSR request with no stale module references.
+                ssrEnv.runner.evaluatedModules.clear();
               }
               // Also invalidate the SSR environment module graph so Vite
               // re-transforms modules on the next SSR request.

@@ -136,6 +136,7 @@ export async function sendTestRequest<
         imageGenModelId: undefined,
         musicGenModelId: undefined,
         videoGenModelId: undefined,
+        isRevival: undefined,
       },
     });
 

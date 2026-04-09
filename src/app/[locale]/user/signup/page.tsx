@@ -21,6 +21,7 @@ import { scopedTranslation as pageT } from "./i18n";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
+  searchParams?: Promise<Record<string, string | undefined>>;
 }
 
 export interface SignUpPageData {
@@ -75,8 +76,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function tanstackLoader({
   params,
+  searchParams,
 }: Props): Promise<SignUpPageData> {
   const { locale } = await params;
+  const search = searchParams ? await searchParams : {};
+  const refFromUrl = search["ref"] ?? null;
+  const skillIdFromUrl = search["skillId"] ?? null;
+
   const logger = createEndpointLogger(false, Date.now(), locale);
   const user = await UserRepository.getUserByAuth({}, locale, logger);
 
@@ -89,11 +95,35 @@ export async function tanstackLoader({
     return { locale, user: null, initialReferralCode: null };
   }
 
-  // Get the latest referral code for the lead (if any)
-  let initialReferralCode: string | null = null;
-  if (user.data.leadId) {
+  const leadId = user.data.leadId;
+
+  // Store skillId on lead from URL param (first-touch, if not already set)
+  if (leadId && skillIdFromUrl) {
+    const { LeadsRepository } =
+      await import("@/app/api/[locale]/leads/repository");
+    void LeadsRepository.updateLeadSkillId(
+      leadId,
+      skillIdFromUrl,
+      false,
+      logger,
+    );
+  }
+
+  // Link referral code from URL param if present
+  if (leadId && refFromUrl) {
+    void ReferralRepository.linkReferralToLead(
+      leadId,
+      refFromUrl,
+      logger,
+      locale,
+    );
+  }
+
+  // Get the latest referral code for the lead (URL ref takes priority over DB)
+  let initialReferralCode: string | null = refFromUrl;
+  if (!initialReferralCode && leadId) {
     const referralResult = await ReferralRepository.getLatestLeadReferralCode(
-      user.data.leadId,
+      leadId,
       logger,
       locale,
     );

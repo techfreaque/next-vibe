@@ -2,20 +2,20 @@
 
 Fast parallel checks. Clean output for humans and AI.
 
-`vibe-check` runs **oxlint + oxfmt + tsgo + ESLint** in parallel from one config file — linting, formatting, and type checking in a single command. The same toolchain powers [unbottled.ai](https://unbottled.ai).
+`vibe-check` runs **oxlint + oxfmt + tsgo + ESLint** in parallel from one config file - linting, formatting, and type checking in a single command. The same toolchain powers [unbottled.ai](https://unbottled.ai).
 
 **For humans:** one command replaces four tools, output is structured and readable, warm runs are near-instant.
 
-**For AI agents:** add the MCP server and agents receive the `check` tool with instructions baked into the tool schema itself — not a README they might skip, not a shell command they'll misuse. The tool description enforces: _use this, never shell out to `tsc` or `eslint`_. Paginated structured results, no context pollution.
+**For AI agents:** add the MCP server and agents receive the `check` tool with instructions baked into the tool schema itself - not a README they might skip, not a shell command they'll misuse. The tool description enforces: _use this, never shell out to `tsc` or `eslint`_. Paginated structured results, no context pollution.
 
 ## What it runs
 
 | Tool       | Role                                                           | Speed (warm) |
 | ---------- | -------------------------------------------------------------- | ------------ |
-| **oxlint** | Rust linter — primary linter, handles most rules               | ~240ms       |
-| **oxfmt**  | Rust formatter — auto-formats on every run, no separate step   | ~50ms        |
+| **oxlint** | Rust linter - primary linter, handles most rules               | ~240ms       |
+| **oxfmt**  | Rust formatter - auto-formats on every run, no separate step   | ~50ms        |
 | **tsgo**   | Native TypeScript checker (`@typescript/native-preview`)       | ~130ms       |
-| **ESLint** | Optional bridge — rules not yet in oxlint (import sort, hooks) | ~830ms       |
+| **ESLint** | Optional bridge - rules not yet in oxlint (import sort, hooks) | ~830ms       |
 
 All four run in parallel. Total time = slowest tool, not the sum.
 
@@ -23,7 +23,7 @@ All four run in parallel. Total time = slowest tool, not the sum.
 
 ## Performance
 
-tsgo uses incremental builds (`tsbuildinfo`) — warm runs on unchanged files are near-instant.
+tsgo uses incremental builds (`tsbuildinfo`) - warm runs on unchanged files are near-instant.
 
 | Project size     | Files | Cold  | Warm   |
 | ---------------- | ----- | ----- | ------ |
@@ -44,10 +44,10 @@ No ESLint needed? Skip the `eslint*` packages and set `skipEslint: true` in `che
 | Package                            | Version    | Role                                                   |
 | ---------------------------------- | ---------- | ------------------------------------------------------ |
 | `oxlint`                           | `>=1.0.0`  | Rust linter                                            |
-| `oxfmt`                            | `>=0.40.0` | Rust formatter — replaces Prettier, runs automatically |
-| `@typescript/native-preview`       | `>=7.0.0`  | Native TS checker (`tsgo`) — 10× faster than `tsc`     |
+| `oxfmt`                            | `>=0.40.0` | Rust formatter - replaces Prettier, runs automatically |
+| `@typescript/native-preview`       | `>=7.0.0`  | Native TS checker (`tsgo`) - 10× faster than `tsc`     |
 | `typescript`                       | `>=5.0.0`  | Type definitions (used by tsgo + ESLint)               |
-| `eslint`                           | `>=9.0.0`  | Optional — import sorting, React hooks rules           |
+| `eslint`                           | `>=9.0.0`  | Optional - import sorting, React hooks rules           |
 | `eslint-plugin-react-compiler`     | `>=19.0.0` | React compiler rules                                   |
 | `eslint-plugin-react-hooks`        | `>=5.0.0`  | React hooks rules                                      |
 | `eslint-plugin-simple-import-sort` | `>=12.0.0` | Import sorting                                         |
@@ -56,7 +56,7 @@ No ESLint needed? Skip the `eslint*` packages and set `skipEslint: true` in `che
 ## Quick Start
 
 ```sh
-# Configure (interactive wizard — detects your stack)
+# Configure (interactive wizard - detects your stack)
 bunx vibe-check config
 
 # Run
@@ -65,9 +65,9 @@ bunx vibe-check src/
 
 ## MCP Server
 
-The MCP server is what makes agents use `check` correctly — the tool description instructs them at the protocol level, not via a README they might skip.
+The MCP server is what makes agents use `check` correctly - the tool description instructs them at the protocol level, not via a README they might skip.
 
-**Ask the user which editor/agent they use, then write the right config — don't dump all variants on them:**
+**Ask the user which editor/agent they use, then write the right config - don't dump all variants on them:**
 
 | Editor / Agent                | Config location                                                           |
 | ----------------------------- | ------------------------------------------------------------------------- |
@@ -76,7 +76,7 @@ The MCP server is what makes agents use `check` correctly — the tool descripti
 | Claude Desktop (Win)          | `%APPDATA%\Claude\claude_desktop_config.json`                             |
 | Zed                           | `.zed/settings.json` in the project root                                  |
 
-The MCP entry is the same in all cases — only the file location differs:
+The MCP entry is the same in all cases - only the file location differs:
 
 ```json
 {
@@ -90,9 +90,9 @@ The MCP entry is the same in all cases — only the file location differs:
 }
 ```
 
-The config wizard (`vibe-check config`) handles `.mcp.json` automatically — just say yes to the MCP question and it writes the file. For other editors, write the entry to the correct location above.
+The config wizard (`vibe-check config`) handles `.mcp.json` automatically - just say yes to the MCP question and it writes the file. For other editors, write the entry to the correct location above.
 
-Once set up, agents see `check` in their tool list with a description that instructs: _use this tool, never `tsc` or `eslint` in a shell_. Enforcement is at the MCP protocol level — in the tool schema the agent receives.
+Once set up, agents see `check` in their tool list with a description that instructs: _use this tool, never `tsc` or `eslint` in a shell_. Enforcement is at the MCP protocol level - in the tool schema the agent receives.
 
 ## CLI Reference
 
@@ -134,7 +134,7 @@ const config = (): CheckConfig => ({
   },
   typecheck: {
     enabled: true,
-    tsgo: true, // @typescript/native-preview — 10× faster than tsc
+    tsgo: true, // @typescript/native-preview - 10× faster than tsc
   },
   // ESLint: optional. Remove eslint peer deps + set skipEslint: true to go fully ESLint-free.
   eslint: {
@@ -152,7 +152,7 @@ const config = (): CheckConfig => ({
     },
   },
   prettier: {
-    enabled: true, // oxfmt reads this — runs automatically on every check
+    enabled: true, // oxfmt reads this - runs automatically on every check
     singleQuote: false,
     trailingComma: "all",
   },
@@ -169,7 +169,7 @@ export default config;
 | `react`             | `true`  | React-specific oxlint rules                              |
 | `nextjs`            | `true`  | Next.js-specific rules                                   |
 | `i18n`              | `true`  | i18n string literal checks                               |
-| `tsgo`              | `true`  | Use `@typescript/native-preview` — 10× faster than `tsc` |
+| `tsgo`              | `true`  | Use `@typescript/native-preview` - 10× faster than `tsc` |
 | `jsxCapitalization` | `false` | Enforce uppercase JSX component names                    |
 | `pedantic`          | `false` | Stricter style rules                                     |
 | `restrictedSyntax`  | `true`  | Ban `throw`, `unknown`, bare `object` types              |
@@ -195,7 +195,7 @@ Copy this prompt into Claude Code, Cursor, or any agent with file access. It wil
 ```
 I want to migrate this project to @next-vibe/checker. Please do the following:
 
-1. Audit the current setup — read these files if they exist:
+1. Audit the current setup - read these files if they exist:
    - package.json (scripts, devDependencies)
    - .eslintrc / eslint.config.* / .eslintrc.json / .eslintrc.js
    - .prettierrc / prettier.config.* / prettier.config.js
@@ -241,7 +241,7 @@ I want to migrate this project to @next-vibe/checker. Please do the following:
 
 8. Set up the MCP server so AI agents run checks correctly.
    Ask the user: "Which editor/agent do you use? (Claude Code / Cursor / Windsurf / Claude Desktop / Zed / other)"
-   Then write the MCP entry to the right location for their answer — don't show all variants:
+   Then write the MCP entry to the right location for their answer - don't show all variants:
    - Claude Code, Cursor, Windsurf → .mcp.json in project root (vibe-check config does this automatically)
    - Claude Desktop macOS → ~/Library/Application Support/Claude/claude_desktop_config.json
    - Claude Desktop Windows → %APPDATA%\Claude\claude_desktop_config.json

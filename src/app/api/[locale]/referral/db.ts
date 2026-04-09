@@ -77,6 +77,13 @@ export const userReferrals = pgTable("user_referrals", {
   referralCodeId: uuid("referral_code_id")
     .notNull()
     .references(() => referralCodes.id, { onDelete: "cascade" }),
+  /**
+   * Optional: the skill creator who gets inserted at Level 1 in the commission chain.
+   * Set when a user signs up via a skill landing page owned by someone other than their referrer.
+   */
+  skillCreatorUserId: uuid("skill_creator_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

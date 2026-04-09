@@ -152,7 +152,7 @@ export function useBranchManagement({
     }
 
     const newMessages = messages
-      .filter((m) => !prevIds.has(m.id))
+      .filter((m) => !prevIds.has(m.id) && !m.metadata?.isOptimistic)
       .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     if (newMessages.length === 0) {

@@ -174,6 +174,9 @@ export const translations: typeof enTranslations = {
         2: "Napisz kreatywne krótkie opowiadanie o podróżach w czasie",
         3: "Jakie są najnowsze trendy w AI?",
       },
+      variants: {
+        default: "Domyślna",
+      },
     },
     freeSpeechActivist: {
       name: "Aktywista Wolności Słowa",
@@ -1446,10 +1449,6 @@ export const translations: typeof enTranslations = {
       label: "Model wizji audio",
       description: "Model do analizy audio",
       placeholder: "Domyślny systemowy",
-    },
-    translationModel: {
-      label: "Model tłumaczenia",
-      description: "Model używany do tłumaczenia tekstu",
     },
     imageGenModel: {
       label: "Model generowania obrazów",

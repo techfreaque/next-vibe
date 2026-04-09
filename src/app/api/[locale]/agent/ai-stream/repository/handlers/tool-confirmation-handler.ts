@@ -277,6 +277,8 @@ export class ToolConfirmationHandler {
 
         if (!isIncognito) {
           // Check whether the wakeUp result already landed (newer sequence present).
+          // Exclude error messages - they belong to prior sequences and should not
+          // be counted as evidence that a new sequence has started.
           const newerSequenceMessage = toolMessage.sequenceId
             ? await db
                 .select({ id: chatMessages.id })
@@ -286,6 +288,7 @@ export class ToolConfirmationHandler {
                     eq(chatMessages.threadId, toolMessage.threadId),
                     gt(chatMessages.createdAt, toolMessage.createdAt),
                     ne(chatMessages.sequenceId, toolMessage.sequenceId),
+                    ne(chatMessages.role, ChatMessageRole.ERROR),
                   ),
                 )
                 .limit(1)
@@ -351,7 +354,7 @@ export class ToolConfirmationHandler {
               }
             }
 
-            logger.info(
+            logger.debug(
               "[Tool Confirmation] wakeUp confirm (Case B) - goroutine running, resume-stream handles revival",
               { toolMessageId: toolConfirmation.messageId, pendingTaskId },
             );
@@ -366,7 +369,7 @@ export class ToolConfirmationHandler {
             };
           }
           // Case A: wakeUp already completed - fall through to the deferred insertion path below.
-          logger.info(
+          logger.debug(
             "[Tool Confirmation] wakeUp confirm (Case A) - wakeUp already landed, inserting confirm deferred after revival",
             { toolMessageId: toolConfirmation.messageId },
           );
@@ -416,6 +419,8 @@ export class ToolConfirmationHandler {
       } else if (!isIncognito) {
         // Same sequence (no newer messages from a different sequence): update in-place.
         // Different sequence (messages exist after this one in a new sequence): insert deferred.
+        // Exclude error messages - they belong to prior sequences and should not
+        // be counted as evidence that a new sequence has started.
         const newerSequenceMessage = toolMessage.sequenceId
           ? await db
               .select({ id: chatMessages.id })
@@ -425,10 +430,18 @@ export class ToolConfirmationHandler {
                   eq(chatMessages.threadId, toolMessage.threadId),
                   gt(chatMessages.createdAt, toolMessage.createdAt),
                   ne(chatMessages.sequenceId, toolMessage.sequenceId),
+                  ne(chatMessages.role, ChatMessageRole.ERROR),
                 ),
               )
               .limit(1)
-          : [{ id: "sentinel" }]; // no sequenceId → treat as different sequence
+          : []; // no sequenceId → treat as same sequence (update in-place)
+
+        logger.debug("[Tool Confirmation] newerSequenceMessage check", {
+          sequenceId: toolMessage.sequenceId,
+          newerCount: newerSequenceMessage.length,
+          messageId: toolConfirmation.messageId,
+          hasToolResult: !!toolResult,
+        });
 
         if (newerSequenceMessage.length === 0) {
           // Same sequence - update the original message in-place (no superseding needed)
@@ -442,8 +455,6 @@ export class ToolConfirmationHandler {
             .where(eq(chatMessages.id, toolConfirmation.messageId));
           logger.debug("[Tool Confirmation] Tool executed - updated in-place", {
             messageId: toolConfirmation.messageId,
-            hasResult: !!toolResult,
-            hasError: !!toolError,
           });
           return {
             success: true,
@@ -574,6 +585,8 @@ export class ToolConfirmationHandler {
           },
         };
       } else if (!isIncognito) {
+        // Exclude error messages - they belong to prior sequences and should not
+        // be counted as evidence that a new sequence has started.
         const newerSequenceMessage = toolMessage.sequenceId
           ? await db
               .select({ id: chatMessages.id })
@@ -583,6 +596,7 @@ export class ToolConfirmationHandler {
                   eq(chatMessages.threadId, toolMessage.threadId),
                   gt(chatMessages.createdAt, toolMessage.createdAt),
                   ne(chatMessages.sequenceId, toolMessage.sequenceId),
+                  ne(chatMessages.role, ChatMessageRole.ERROR),
                 ),
               )
               .limit(1)

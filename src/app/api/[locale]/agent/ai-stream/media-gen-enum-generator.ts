@@ -16,7 +16,7 @@ import type { Modality } from "../models/enum";
 import type { ModelDefinition } from "../models/models";
 
 const BEGIN_MARKER =
-  "  // BEGIN:llm-generated — do not edit manually, updated by price updater";
+  "  // BEGIN:llm-generated - do not edit manually, updated by price updater";
 const END_MARKER = "  // END:llm-generated";
 
 interface EnumEntry {
@@ -46,7 +46,7 @@ function spliceEnumEntries(source: string, entries: EnumEntry[]): string {
   const beginIdx = source.indexOf(BEGIN_MARKER);
   const endIdx = source.indexOf(END_MARKER);
   if (beginIdx === -1 || endIdx === -1) {
-    // Return source unchanged — caller handles missing markers gracefully
+    // Return source unchanged - caller handles missing markers gracefully
     return source;
   }
   const before = source.slice(0, beginIdx + BEGIN_MARKER.length);

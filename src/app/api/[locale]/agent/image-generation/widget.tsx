@@ -18,9 +18,11 @@ import { useMemo, useState } from "react";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import { getImageGenModelById } from "@/app/api/[locale]/agent/image-generation/models";
-import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import {
+  getBestImageGenModel,
+  getImageGenModelById,
+} from "@/app/api/[locale]/agent/image-generation/models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
@@ -231,7 +233,7 @@ export function ImageGenerationContainer({
           />
         </Div>
 
-        {/* Size presets — hidden when model doesn't support size selection */}
+        {/* Size presets - hidden when model doesn't support size selection */}
         {availableSizePresets.length > 0 && (
           <Div className="flex flex-col gap-1.5">
             <Span className="text-xs font-medium text-muted-foreground">
@@ -262,7 +264,7 @@ export function ImageGenerationContainer({
           </Div>
         )}
 
-        {/* Quality — only shown when model supports quality selection (e.g. OpenAI) */}
+        {/* Quality - only shown when model supports quality selection (e.g. OpenAI) */}
         {availableQualityOptions.length > 0 && (
           <Div className="flex gap-3">
             <Div className="flex flex-col gap-1.5 flex-1">
@@ -287,7 +289,7 @@ export function ImageGenerationContainer({
           </Div>
         )}
 
-        {/* Aspect ratio — only shown when model supports multiple ratios */}
+        {/* Aspect ratio - only shown when model supports multiple ratios */}
         {showAspectRatioOptions && supportedAspectRatios && (
           <Div className="flex flex-col gap-1.5">
             <Span className="text-xs font-medium text-muted-foreground">

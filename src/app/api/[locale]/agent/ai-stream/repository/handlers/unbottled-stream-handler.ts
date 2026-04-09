@@ -17,14 +17,19 @@
 
 import "server-only";
 
-import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
+import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
-import { defaultLocale } from "@/i18n/core/config";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { ChatModelId, ChatModelOption } from "../../models";
+import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { defaultLocale } from "@/i18n/core/config";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
+import { ChatMessageRole } from "../../../chat/enum";
+import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
 import {
   StreamEventType,
   createStreamEvent,
@@ -40,11 +45,8 @@ import {
   type ToolCallEventData,
   type ToolResultEventData,
 } from "../../../chat/threads/[threadId]/messages/events";
-import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
-import { ChatMessageRole } from "../../../chat/enum";
 import type { UnbottledCloudSession } from "../../../env";
-import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import { fail } from "next-vibe/shared/types/response.schema";
+import type { ChatModelId, ChatModelOption } from "../../models";
 import type { AiStreamT } from "../../stream/i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
@@ -117,7 +119,7 @@ export async function executeUnbottledStream(
   // 1. POST to cloud's ws-provider/stream
   const streamUrl = `${session.remoteUrl}/api/${defaultLocale}/agent/ai-stream/ws-provider/stream`;
 
-  logger.info("[Unbottled] Starting cloud stream", {
+  logger.debug("[Unbottled] Starting cloud stream", {
     model,
     remoteUrl: session.remoteUrl,
   });
@@ -195,13 +197,13 @@ export async function executeUnbottledStream(
   }
 
   const remoteThreadId = streamResult.data.responseThreadId;
-  logger.info("[Unbottled] Cloud stream started", {
+  logger.debug("[Unbottled] Cloud stream started", {
     remoteThreadId,
     remoteMessageId: streamResult.data.messageId,
   });
 
   // 2. Connect to cloud's WebSocket and subscribe to remote thread's messages
-  // Auth via query params — the cloud's WS server accepts token+leadId as URL params.
+  // Auth via query params - the cloud's WS server accepts token+leadId as URL params.
   const remoteChannel = `agent/chat/threads/${remoteThreadId}/messages`;
   const wsProtocol = session.remoteUrl.startsWith("https://") ? "wss:" : "ws:";
   const wsHost = session.remoteUrl.replace(/^https?:\/\//, "");
@@ -233,7 +235,7 @@ export async function executeUnbottledStream(
 
     // Abort handler
     const onAbort = (): void => {
-      logger.info("[Unbottled] Stream aborted, closing cloud WS");
+      logger.debug("[Unbottled] Stream aborted, closing cloud WS");
       finish();
     };
     streamAbortController.signal.addEventListener("abort", onAbort, {
@@ -333,7 +335,7 @@ export async function executeUnbottledStream(
 
           if (data.role === ChatMessageRole.ASSISTANT) {
             if (!firstAssistantCreated) {
-              // First assistant message — uses pre-generated aiMessageId
+              // First assistant message - uses pre-generated aiMessageId
               firstAssistantCreated = true;
               currentAssistantId = aiMessageId;
               currentAssistantContent = "";
@@ -343,7 +345,7 @@ export async function executeUnbottledStream(
                 parentMessageId ?? userMessageId,
               );
             } else {
-              // Subsequent assistant in a tool loop — fresh ID, parent = last tool message
+              // Subsequent assistant in a tool loop - fresh ID, parent = last tool message
               const newLocalId = crypto.randomUUID();
               currentAssistantId = newLocalId;
               currentAssistantContent = "";
@@ -354,7 +356,7 @@ export async function executeUnbottledStream(
               );
             }
           } else if (data.role === ChatMessageRole.TOOL && data.toolCall) {
-            // Tool message from cloud — parent is the current assistant message
+            // Tool message from cloud - parent is the current assistant message
             const localToolMessageId = crypto.randomUUID();
             remoteToLocalId.set(data.messageId, localToolMessageId);
             lastToolMessageId = localToolMessageId;
@@ -431,7 +433,7 @@ export async function executeUnbottledStream(
 
         case StreamEventType.TOOL_CALL: {
           // Already handled in MESSAGE_CREATED for TOOL role.
-          // This is just a real-time UX event — re-emit with local ID.
+          // This is just a real-time UX event - re-emit with local ID.
           const data = msg.data as ToolCallEventData;
           const localId = remoteToLocalId.get(data.messageId);
           if (localId) {
@@ -518,7 +520,7 @@ export async function executeUnbottledStream(
 
         case StreamEventType.CREDITS_DEDUCTED: {
           const data = msg.data as CreditsDeductedEventData;
-          // Deduct credits locally — the cloud already charged its own credits,
+          // Deduct credits locally - the cloud already charged its own credits,
           // but the self-hosted instance needs to track local credit usage too.
           await dbWriter.deductAndEmitCredits({
             user,
@@ -601,7 +603,7 @@ export async function executeUnbottledStream(
 
         case StreamEventType.STREAM_FINISHED: {
           const data = msg.data as StreamFinishedEventData;
-          logger.info("[Unbottled] Cloud stream finished", {
+          logger.debug("[Unbottled] Cloud stream finished", {
             reason: data.reason,
           });
 
@@ -680,7 +682,7 @@ async function executeSelfRelay(params: UnbottledStreamParams): Promise<void> {
     }
   }
 
-  logger.info("[Unbottled] Self-relay mode — running in-process", {
+  logger.debug("[Unbottled] Self-relay mode - running in-process", {
     model,
     underlyingModel,
   });
@@ -731,7 +733,7 @@ async function executeSelfRelay(params: UnbottledStreamParams): Promise<void> {
 
   // Create the local assistant message.
   // The AI message is always parented to the user message (not the previous
-  // turn's AI message — that is the user message's parent).
+  // turn's AI message - that is the user message's parent).
   if (!isIncognito) {
     await dbWriter.emitMessageCreated({
       messageId: aiMessageId,
@@ -768,7 +770,7 @@ async function executeSelfRelay(params: UnbottledStreamParams): Promise<void> {
     completionTokens: null,
   });
 
-  // Credits were already deducted by the headless run — just track the total
+  // Credits were already deducted by the headless run - just track the total
   // so the caller's capturedTotalCreditsDeducted is correct.
   dbWriter.totalCreditsDeducted += creditsDeducted;
 
@@ -777,7 +779,7 @@ async function executeSelfRelay(params: UnbottledStreamParams): Promise<void> {
     dbWriter.lastGeneratedMediaUrl = result.data.lastGeneratedMediaUrl;
   }
 
-  logger.info("[Unbottled] Self-relay complete", {
+  logger.debug("[Unbottled] Self-relay complete", {
     contentLength: responseContent.length,
     creditsDeducted,
   });

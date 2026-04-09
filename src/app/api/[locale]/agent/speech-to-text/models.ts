@@ -4,11 +4,12 @@ import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
-  PriceLevel,
   SpeedLevel,
 } from "../chat/skills/enum";
+import {
+  filtersSelectionSchema,
+  sharedFilterPropsSchema,
+} from "../models/selection";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -60,6 +61,12 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         providerModel: "openai",
         creditCostPerSecond: 0.0106, // updated: 2026-04-03 from api.edenai.run
       },
+      {
+        id: SttModelId.OPENAI_WHISPER,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "openai-whisper",
+        creditCostPerSecond: 0.013, // updated: 2026-04-07 from unbottled.ai
+      },
     ],
   },
   [SttModelId.DEEPGRAM_NOVA_2]: {
@@ -88,14 +95,20 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         providerModel: "nova-2",
         creditCostPerSecond: 0.0097, // updated: 2026-03-31 from deepgram.com
       },
+      {
+        id: SttModelId.DEEPGRAM_NOVA_2,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "deepgram-nova-2",
+        creditCostPerSecond: 0.0126, // updated: 2026-04-07 from unbottled.ai
+      },
     ],
   },
 };
 
 export type SttModelOption = ModelOptionSttBased & { id: SttModelId };
 
-function buildSttModelOptions(): Record<string, SttModelOption> {
-  const result: Record<string, SttModelOption> = {};
+function buildSttModelOptions(): SttModelOption[] {
+  const result: SttModelOption[] = [];
   for (const [modelId, def] of Object.entries(sttModelDefinitions)) {
     const sortedProviders = [...def.providers].toSorted(
       (a, b) => getProviderPrice(a) - getProviderPrice(b),
@@ -106,7 +119,7 @@ function buildSttModelOptions(): Record<string, SttModelOption> {
         !("defaultDurationSeconds" in provider)
       ) {
         const p = provider as ModelProviderConfigSttBased;
-        result[modelId] = {
+        result.push({
           id: modelId as SttModelId,
           name: def.name,
           provider: def.by,
@@ -128,70 +141,23 @@ function buildSttModelOptions(): Record<string, SttModelOption> {
           outputs: def.outputs,
           voiceMeta: def.voiceMeta,
           creditCostPerSecond: p.creditCostPerSecond,
-        };
+        });
       }
     }
   }
   return result;
 }
 
-const sttModelOptionsIndex: Record<string, SttModelOption> =
-  buildSttModelOptions();
-
-export const sttModelOptions: SttModelOption[] = Object.values(
-  sttModelOptionsIndex,
-).filter((m): m is SttModelOption => m !== undefined);
+export const sttModelOptions: SttModelOption[] = buildSttModelOptions();
 
 export const SttModelIdOptions = Object.values(SttModelId).map((id) => ({
   value: id,
   label: sttModelOptions.find((m) => m.id === id)?.name ?? id,
 }));
 
-export function getSttModelById(modelId: SttModelId): SttModelOption {
-  return (
-    sttModelOptionsIndex[modelId] ??
-    sttModelOptionsIndex[SttModelId.OPENAI_WHISPER]!
-  );
-}
-
 // ============================================================
 // STT MODEL SELECTION SCHEMA
 // ============================================================
-
-const sharedFilterPropsSchema = z.object({
-  intelligenceRange: z
-    .object({
-      min: z.enum(IntelligenceLevel).optional(),
-      max: z.enum(IntelligenceLevel).optional(),
-    })
-    .optional(),
-  priceRange: z
-    .object({
-      min: z.enum(PriceLevel).optional(),
-      max: z.enum(PriceLevel).optional(),
-    })
-    .optional(),
-  contentRange: z
-    .object({
-      min: z.enum(ContentLevel).optional(),
-      max: z.enum(ContentLevel).optional(),
-    })
-    .optional(),
-  speedRange: z
-    .object({
-      min: z.enum(SpeedLevel).optional(),
-      max: z.enum(SpeedLevel).optional(),
-    })
-    .optional(),
-  sortBy: z.enum(ModelSortField).optional(),
-  sortDirection: z.enum(ModelSortDirection).optional(),
-  sortBy2: z.enum(ModelSortField).optional(),
-  sortDirection2: z.enum(ModelSortDirection).optional(),
-});
-
-const filtersSelectionSchema = z
-  .object({ selectionType: z.literal(ModelSelectionType.FILTERS) })
-  .merge(sharedFilterPropsSchema);
 
 export const sttModelSelectionSchema = z.discriminatedUnion("selectionType", [
   z

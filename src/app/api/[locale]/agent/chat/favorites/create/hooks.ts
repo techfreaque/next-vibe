@@ -15,11 +15,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { IconKey } from "../../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type {
   ChatModelId,
   ChatModelSelection,
 } from "../../../ai-stream/models";
-import type { IconKey } from "../../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useEnvAvailability } from "../../../env-availability-context";
 import type { VoiceModelSelection } from "../../../text-to-speech/models";
 import characterSingleDefinitions from "../../skills/[id]/definition";

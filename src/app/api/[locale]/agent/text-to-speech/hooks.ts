@@ -223,18 +223,18 @@ export function useTTSAudio({
     const nextIndex = refs.currentPlayingIndex;
     const audio = refs.audioQueue[nextIndex];
 
-    logger.info(`TTS: playNextChunk called`, {
+    logger.debug(`TTS: playNextChunk called`, {
       nextIndex,
       totalChunks: refs.chunks.length,
       hasAudio: !!audio,
     });
 
     if (!audio) {
-      logger.info(`TTS: No audio available for chunk ${nextIndex + 1}`);
+      logger.debug(`TTS: No audio available for chunk ${nextIndex + 1}`);
       return;
     }
 
-    logger.info(`TTS: Playing chunk ${nextIndex + 1}/${refs.chunks.length}`);
+    logger.debug(`TTS: Playing chunk ${nextIndex + 1}/${refs.chunks.length}`);
     setStore(messageId, { currentChunk: nextIndex + 1, isPlaying: true });
 
     // Schedule prefetch of next chunk based on current audio duration
@@ -306,7 +306,7 @@ export function useTTSAudio({
         }
       } else {
         // All chunks played
-        logger.info("TTS: All chunks played, stopping");
+        logger.debug("TTS: All chunks played, stopping");
         setStore(messageId, { isPlaying: false });
         refs2.isProcessing = false;
       }
@@ -385,13 +385,13 @@ export function useTTSAudio({
     setStore(messageId, { error: null, isLoading: true });
 
     try {
-      logger.info("TTS: Starting playAudio", {
+      logger.debug("TTS: Starting playAudio", {
         originalTextLength: text.length,
         originalTextPreview: text.slice(0, 100),
       });
 
       if (!text.trim()) {
-        logger.info("TTS: No text to process");
+        logger.debug("TTS: No text to process");
         refs.isProcessing = false;
         setStore(messageId, { isLoading: false });
         return;
@@ -400,7 +400,7 @@ export function useTTSAudio({
       const chunks = chunkTextForTTS(text);
       refs.chunks = chunks;
 
-      logger.info("TTS: Text chunked", {
+      logger.debug("TTS: Text chunked", {
         numChunks: chunks.length,
         chunkLengths: chunks.map((c) => c.length),
         firstChunkPreview: chunks[0]?.slice(0, 50),

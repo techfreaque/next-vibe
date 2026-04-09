@@ -1,0 +1,76 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[WP1 local-ws-basic] Reply with exactly: HELLO_TEST STEP_OK",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user is asking me to reply"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " with exactly: `HELLO_TEST STEP_OK`\n\nThis appears to be a test/validation task"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ". The format suggests this is a basic workflow test (WP1 = Workflow Part"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " 1, local-ws-basic = local workflow basic).\n\nI should respond with exactly what"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " they asked for, nothing more, nothing less. No tool calls needed, just"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the plain text response."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "HELLO_TEST STEP_OK"
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 10,
+        "outputTokens": 109,
+        "totalTokens": 119,
+        "cachedInputTokens": 0
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 6598
+        }
+      }
+    }
+  ]
+}

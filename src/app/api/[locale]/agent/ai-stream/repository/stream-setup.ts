@@ -16,12 +16,14 @@ import {
 
 import {
   getChatModelById,
+  getChatModelForProvider,
   type ChatModelOption,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
 import {
   getImageGenModelById,
+  getImageGenModelForProvider,
   type ImageGenModelId,
 } from "@/app/api/[locale]/agent/image-generation/models";
 import {
@@ -30,11 +32,13 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import {
   getMusicGenModelById,
+  getMusicGenModelForProvider,
   type MusicGenModelId,
 } from "@/app/api/[locale]/agent/music-generation/models";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import {
   getVideoGenModelById,
+  getVideoGenModelForProvider,
   type VideoGenModelId,
 } from "@/app/api/[locale]/agent/video-generation/models";
 import { db } from "@/app/api/[locale]/system/db";
@@ -103,6 +107,7 @@ export interface StreamSetupResult {
   userMessageId: string | null;
   aiMessageId: string;
   aiMessageCreatedAt: Date;
+  userMessageCreatedAt: Date;
   messages: ModelMessage[];
   systemPrompt: string;
   trailingSystemMessage: string;
@@ -189,15 +194,23 @@ export async function setupAiStream(params: {
   extraInstructions: string | undefined;
   excludeMemories: boolean | undefined;
   headless: boolean | undefined;
+  /** Whether this is a revival stream (resume-stream after wakeUp task completed). */
+  isRevival: boolean | undefined;
   /** Override the favoriteId stored in streamContext (used by headless runs with explicit favoriteId) */
   favoriteIdOverride: string | undefined;
-  /** Override resolved media gen models — used by integration tests to force a specific provider */
+  /** Override resolved media gen models - used by integration tests to force a specific provider */
   mediaModelOverrides?: {
     musicGenModelId?: MusicGenModelId;
     videoGenModelId?: VideoGenModelId;
     imageGenModelId?: ImageGenModelId;
   };
-  /** Override tools entirely — used by API provider for client-provided tools only */
+  /**
+   * Force all model resolution (chat + image/music/video gen) to use a specific API provider.
+   * When set, picks the cheapest variant of each resolved model from that provider.
+   * Used by UNBOTTLED self-relay tests to route all inference through the UNBOTTLED provider.
+   */
+  providerOverride?: ApiProvider;
+  /** Override tools entirely - used by API provider for client-provided tools only */
   toolsOverride?: Record<string, CoreTool>;
 }): Promise<ResponseType<StreamSetupResult>> {
   const {
@@ -210,6 +223,7 @@ export async function setupAiStream(params: {
     ipAddress,
     aiStreamT,
     mediaModelOverrides,
+    providerOverride,
   } = params;
   const isIncognito = data.rootFolderId === "incognito";
 
@@ -278,8 +292,25 @@ export async function setupAiStream(params: {
           .where(eq(chatFavorites.id, effectiveFavoriteId))
           .limit(1);
         if (favRow) {
+          // Include the skill in the mini bridge so skill-level model defaults
+          // (e.g. quality-tester.imageGenModelId) are respected when the favorite
+          // has no explicit model selection.
+          const uuidPattern =
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+          const favSkill = uuidPattern.test(favRow.skillId)
+            ? null
+            : (DEFAULT_SKILLS.find((c) => c.id === favRow.skillId) ?? null);
+          const favVariantId = favRow.variantId ?? null;
+          const favActiveVariant = favSkill
+            ? ((favVariantId
+                ? (favSkill.variants.find((v) => v.id === favVariantId) ??
+                  favSkill.variants.find((v) => v.isDefault) ??
+                  favSkill.variants[0])
+                : (favSkill.variants.find((v) => v.isDefault) ??
+                  favSkill.variants[0])) ?? null)
+            : null;
           const miniBridgeCtx: BridgeContext = {
-            skill: null,
+            skill: favActiveVariant,
             favorite: favRow,
             userSettings: null,
           };
@@ -338,6 +369,7 @@ export async function setupAiStream(params: {
         videoGenModelId: confirmMediaModels.videoGenModelId,
         favoriteId: params.favoriteIdOverride,
         headless: params.headless,
+        isRevival: params.isRevival,
         waitingForRemoteResult: undefined,
         onEscalatedTaskCancel: undefined,
         pendingEscalatedTaskId: undefined,
@@ -363,7 +395,9 @@ export async function setupAiStream(params: {
       errorType: ErrorResponseTypes.AUTH_ERROR,
     });
   }
-  const modelConfig = getChatModelById(data.model);
+  const modelConfig = providerOverride
+    ? getChatModelForProvider(data.model, providerOverride)
+    : getChatModelById(data.model);
 
   // Guard: TTS/STT models are dispatched via their own handlers, not the LLM stream pipeline
   if (
@@ -539,6 +573,11 @@ export async function setupAiStream(params: {
     data.operation === "answer-as-ai" || data.operation === "wakeup-resume"
       ? null
       : data.userMessageId;
+
+  // Capture timestamp before user message insert so compacting message can be
+  // assigned a timestamp strictly earlier (compacting re-parents user message,
+  // so its createdAt must be < user message's createdAt to preserve chain order)
+  const userMessageCreatedAt = new Date();
 
   // Create user message with attachments (if applicable)
   const userMessageResult =
@@ -836,13 +875,13 @@ export async function setupAiStream(params: {
     };
   })();
 
-  // Inject folder-type denied tools — applies regardless of skill/favorite cascade.
+  // Inject folder-type denied tools - applies regardless of skill/favorite cascade.
   // Works for incognito (userId=null) because the IIFE returns an empty deniedToolIds set.
   for (const toolId of FOLDER_DENIED_TOOL_IDS[data.rootFolderId] ?? []) {
     resolvedToolConfig.deniedToolIds.add(toolId);
   }
 
-  // Resolve bridge models via cascade: skill → favorite → userSettings → system default
+  // Resolve bridge models via cascade: skill variant → favorite → userSettings → system default
   // This wires the ModalityResolver into the stream pipeline so all downstream
   // handlers (STT, TTS, vision bridge, translation) use the correct models.
   const bridgeContext = await (async (): Promise<BridgeContext> => {
@@ -850,67 +889,7 @@ export async function setupAiStream(params: {
     let favoriteConfig: BridgeContext["favorite"] = null;
     let userSettingsConfig: BridgeContext["userSettings"] = null;
 
-    // Resolve skill: default skills come from config, custom skills from DB
-    if (data.skill) {
-      const uuidPattern =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (uuidPattern.test(data.skill)) {
-        const [customSkillRow] = await db
-          .select({
-            voiceModelSelection: customSkills.voiceModelSelection,
-            sttModelSelection: customSkills.sttModelSelection,
-            imageVisionModelSelection: customSkills.imageVisionModelSelection,
-            videoVisionModelSelection: customSkills.videoVisionModelSelection,
-            audioVisionModelSelection: customSkills.audioVisionModelSelection,
-            translationModelId: customSkills.translationModelId,
-            defaultChatMode: customSkills.defaultChatMode,
-          })
-          .from(customSkills)
-          .where(eq(customSkills.id, data.skill))
-          .limit(1);
-        if (customSkillRow) {
-          // Custom skills use ModelSelectionSimple - map them to the BridgeFavorite shape
-          // for the modality resolver (skill scalar IDs will be null)
-          skillConfig = {
-            voiceId: undefined,
-            sttModelId: undefined,
-            imageVisionModelId: undefined,
-            videoVisionModelId: undefined,
-            audioVisionModelId: undefined,
-            translationModelId: customSkillRow.translationModelId ?? undefined,
-            defaultChatMode: customSkillRow.defaultChatMode ?? undefined,
-            imageGenModelId: undefined,
-            musicGenModelId: undefined,
-            videoGenModelId: undefined,
-          };
-          // Store the JSONB selections in favConfig so ModalityResolver picks them up
-          // (custom skill overrides are treated as a "virtual favorite" layer here)
-          favoriteConfig = {
-            voiceModelSelection: customSkillRow.voiceModelSelection ?? null,
-            sttModelSelection: customSkillRow.sttModelSelection ?? null,
-            imageVisionModelSelection:
-              customSkillRow.imageVisionModelSelection ?? null,
-            videoVisionModelSelection:
-              customSkillRow.videoVisionModelSelection ?? null,
-            audioVisionModelSelection:
-              customSkillRow.audioVisionModelSelection ?? null,
-            translationModelId: customSkillRow.translationModelId ?? null,
-            defaultChatMode: customSkillRow.defaultChatMode ?? null,
-            imageGenModelSelection: null,
-            musicGenModelSelection: null,
-            videoGenModelSelection: null,
-          };
-        }
-      } else {
-        const defaultSkill = DEFAULT_SKILLS.find((c) => c.id === data.skill);
-        if (defaultSkill) {
-          skillConfig = defaultSkill;
-        }
-      }
-    }
-
-    // Resolve favorite: explicit favoriteIdOverride takes priority,
-    // then activeFavoriteId from user settings, then nothing.
+    // Resolve favorite and userSettings first so we know the active variantId
     if (userId) {
       const [userSettingsRow] = await db
         .select({
@@ -920,7 +899,6 @@ export async function setupAiStream(params: {
           imageVisionModelSelection: chatSettings.imageVisionModelSelection,
           videoVisionModelSelection: chatSettings.videoVisionModelSelection,
           audioVisionModelSelection: chatSettings.audioVisionModelSelection,
-          translationModelId: chatSettings.translationModelId,
           defaultChatMode: chatSettings.defaultChatMode,
           imageGenModelSelection: chatSettings.imageGenModelSelection,
           musicGenModelSelection: chatSettings.musicGenModelSelection,
@@ -945,6 +923,57 @@ export async function setupAiStream(params: {
           .limit(1);
         if (favRow) {
           favoriteConfig = favRow;
+        }
+      }
+    }
+
+    // Resolve skill: default skills come from config (variant-aware), custom skills from DB
+    if (data.skill) {
+      const uuidPattern =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidPattern.test(data.skill)) {
+        // Custom skills store model selections directly on the skill row
+        const [customSkillRow] = await db
+          .select({
+            voiceModelSelection: customSkills.voiceModelSelection,
+            sttModelSelection: customSkills.sttModelSelection,
+            imageVisionModelSelection: customSkills.imageVisionModelSelection,
+            videoVisionModelSelection: customSkills.videoVisionModelSelection,
+            audioVisionModelSelection: customSkills.audioVisionModelSelection,
+            defaultChatMode: customSkills.defaultChatMode,
+          })
+          .from(customSkills)
+          .where(eq(customSkills.id, data.skill))
+          .limit(1);
+        if (customSkillRow) {
+          skillConfig = {
+            voiceModelSelection:
+              customSkillRow.voiceModelSelection ?? undefined,
+            sttModelSelection: customSkillRow.sttModelSelection ?? undefined,
+            imageVisionModelSelection:
+              customSkillRow.imageVisionModelSelection ?? undefined,
+            videoVisionModelSelection:
+              customSkillRow.videoVisionModelSelection ?? undefined,
+            audioVisionModelSelection:
+              customSkillRow.audioVisionModelSelection ?? undefined,
+            defaultChatMode: customSkillRow.defaultChatMode ?? undefined,
+            imageGenModelSelection: undefined,
+            musicGenModelSelection: undefined,
+            videoGenModelSelection: undefined,
+          };
+        }
+      } else {
+        // Default skill: resolve the active variant and use its model selections
+        const defaultSkill = DEFAULT_SKILLS.find((c) => c.id === data.skill);
+        if (defaultSkill) {
+          const activeVariantId = favoriteConfig?.variantId ?? null;
+          const activeVariant = activeVariantId
+            ? (defaultSkill.variants.find((v) => v.id === activeVariantId) ??
+              defaultSkill.variants.find((v) => v.isDefault) ??
+              defaultSkill.variants[0])
+            : (defaultSkill.variants.find((v) => v.isDefault) ??
+              defaultSkill.variants[0]);
+          skillConfig = activeVariant ?? null;
         }
       }
     }
@@ -980,16 +1009,31 @@ export async function setupAiStream(params: {
     user,
   );
 
-  // Apply test overrides — only set in integration tests to bypass user-settings cascade
+  // Apply overrides - mediaModelOverrides targets specific model IDs; providerOverride routes via a provider
   const effectiveImageGenModel = mediaModelOverrides?.imageGenModelId
     ? getImageGenModelById(mediaModelOverrides.imageGenModelId)
-    : resolvedImageGenModel;
+    : providerOverride && resolvedImageGenModel
+      ? (getImageGenModelForProvider(
+          resolvedImageGenModel.id,
+          providerOverride,
+        ) ?? resolvedImageGenModel)
+      : resolvedImageGenModel;
   const effectiveMusicGenModel = mediaModelOverrides?.musicGenModelId
     ? getMusicGenModelById(mediaModelOverrides.musicGenModelId)
-    : resolvedMusicGenModel;
+    : providerOverride && resolvedMusicGenModel
+      ? (getMusicGenModelForProvider(
+          resolvedMusicGenModel.id,
+          providerOverride,
+        ) ?? resolvedMusicGenModel)
+      : resolvedMusicGenModel;
   const effectiveVideoGenModel = mediaModelOverrides?.videoGenModelId
     ? getVideoGenModelById(mediaModelOverrides.videoGenModelId)
-    : resolvedVideoGenModel;
+    : providerOverride && resolvedVideoGenModel
+      ? (getVideoGenModelForProvider(
+          resolvedVideoGenModel.id,
+          providerOverride,
+        ) ?? resolvedVideoGenModel)
+      : resolvedVideoGenModel;
 
   logger.debug("[Setup] Bridge models resolved via cascade", {
     ttsModelId: resolvedTtsModel?.id ?? null,
@@ -997,7 +1041,6 @@ export async function setupAiStream(params: {
       ModalityResolver.resolveSttModel(bridgeContext, user)?.id ?? null,
     imageVisionModelId:
       ModalityResolver.resolveImageVisionModel(bridgeContext, user)?.id ?? null,
-    hasTranslation: !!ModalityResolver.resolveTranslationModel(bridgeContext),
     imageGenModelId: effectiveImageGenModel?.id ?? null,
     musicGenModelId: effectiveMusicGenModel?.id ?? null,
     videoGenModelId: effectiveVideoGenModel?.id ?? null,
@@ -1065,6 +1108,7 @@ export async function setupAiStream(params: {
     musicGenModelId: effectiveMusicGenModel?.id ?? undefined,
     videoGenModelId: effectiveVideoGenModel?.id ?? undefined,
     headless: params.headless,
+    isRevival: params.isRevival,
     // favoriteId: from headless override (run endpoint) - lets resume-stream reload full context
     favoriteId: params.favoriteIdOverride,
     currentToolMessageId: undefined,
@@ -1137,10 +1181,10 @@ export async function setupAiStream(params: {
 
   // Remove media generation tools when:
   // 1. No model is configured for that modality (tool would fail at runtime)
-  // 2. The active chat model IS the configured gen model — native output is better,
+  // 2. The active chat model IS the configured gen model - native output is better,
   //    the tool would just be a slower detour through the same model.
   //    Note: if a different specialized gen model is configured (e.g. Flux when using Gemini),
-  //    the tool stays — the user explicitly picked a different model for generation.
+  //    the tool stays - the user explicitly picked a different model for generation.
   const filterUnavailableMediaTools = <T extends { toolId: string }>(
     tools: T[] | null | undefined,
   ): T[] | null | undefined => {
@@ -1159,7 +1203,7 @@ export async function setupAiStream(params: {
         }
         const imageGenIdStr: string = effectiveImageGenModel.id;
         if (imageGenIdStr === chatModelIdStr) {
-          return false; // active model IS the image gen model — use native output
+          return false; // active model IS the image gen model - use native output
         }
       }
       if (t.toolId === "generate_music") {
@@ -1168,7 +1212,7 @@ export async function setupAiStream(params: {
         }
         const musicGenIdStr: string = effectiveMusicGenModel.id;
         if (musicGenIdStr === chatModelIdStr) {
-          return false; // active model IS the music gen model — use native output
+          return false; // active model IS the music gen model - use native output
         }
       }
       if (t.toolId === "generate_video") {
@@ -1177,7 +1221,7 @@ export async function setupAiStream(params: {
         }
         const videoGenIdStr: string = effectiveVideoGenModel.id;
         if (videoGenIdStr === chatModelIdStr) {
-          return false; // active model IS the video gen model — use native output
+          return false; // active model IS the video gen model - use native output
         }
       }
       return true;
@@ -1206,6 +1250,8 @@ export async function setupAiStream(params: {
         modelConfig,
         // Tool config cascade: cascade-resolved (favorite/skill) takes precedence over client-provided.
         // deniedTools are stripped from both sets before reaching the AI SDK.
+        // requiresConfirmation from data.availableTools always takes precedence:
+        // cascade determines which tools are permitted; client specifies confirmation per-tool.
         pinnedTools: filterUnavailableMediaTools(
           applyDeniedFilter(resolvedToolConfig.pinnedTools ?? data.pinnedTools),
         ),
@@ -1214,6 +1260,7 @@ export async function setupAiStream(params: {
             resolvedToolConfig.availableTools ?? data.availableTools,
           ),
         ),
+        confirmationOverrides: data.availableTools,
         user,
         locale,
         logger,
@@ -1363,7 +1410,7 @@ export async function setupAiStream(params: {
       }
     }
 
-    logger.info("[StreamSetup] Tool escalated to task", {
+    logger.debug("[StreamSetup] Tool escalated to task", {
       taskId: escalatedTaskId,
       callbackMode,
       taskThreadId,
@@ -1382,7 +1429,7 @@ export async function setupAiStream(params: {
           .update(cronTasksTable)
           .set({ lastExecutionStatus: CronStatus.CANCELLED, enabled: false })
           .where(drizzleEq(cronTasksTable.id, escalatedTaskId));
-        logger.info("[StreamSetup] Escalated task marked CANCELLED", {
+        logger.debug("[StreamSetup] Escalated task marked CANCELLED", {
           taskId: escalatedTaskId,
         });
         // Clear "waiting" → "idle" so the thread unlocks for new messages.
@@ -1510,6 +1557,7 @@ export async function setupAiStream(params: {
       userMessageId,
       aiMessageId,
       aiMessageCreatedAt,
+      userMessageCreatedAt,
       messages,
       systemPrompt: updatedSystemPrompt,
       trailingSystemMessage,

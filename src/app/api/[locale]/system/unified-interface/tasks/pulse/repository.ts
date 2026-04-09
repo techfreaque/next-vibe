@@ -575,7 +575,7 @@ export class PulseHealthRepository {
         }
 
         if (dbTask.runOnce) {
-          logger.info(
+          logger.debug(
             `[run-once] Task "${dbTask.displayName}" disabled before execution`,
           );
         }
@@ -702,6 +702,7 @@ export class PulseHealthRepository {
                       imageGenModelId: undefined,
                       musicGenModelId: undefined,
                       videoGenModelId: undefined,
+                      isRevival: undefined,
                       waitingForRemoteResult: undefined,
                       abortSignal: taskAbortController.signal,
                       callerCallbackMode: undefined,
@@ -855,7 +856,7 @@ export class PulseHealthRepository {
             const completionUserId = cronUser.id;
 
             if (taskToolMessageId && completionUserId) {
-              void handleTaskCompletion({
+              await handleTaskCompletion({
                 toolMessageId: taskToolMessageId,
                 threadId: taskThreadId,
                 callbackMode: taskCallbackMode,
@@ -870,6 +871,8 @@ export class PulseHealthRepository {
                 leafMessageId: dbTask.wakeUpLeafMessageId ?? null,
                 userId: completionUserId,
                 logger,
+                directResumeUser: cronUser,
+                directResumeLocale: userLocale,
               }).catch((completionErr: Error) => {
                 logger.error("handleTaskCompletion failed in pulse", {
                   taskId: dbTask.id,
@@ -1003,7 +1006,7 @@ export class PulseHealthRepository {
     },
   ): Promise<ResponseType<void>> {
     try {
-      // Only persist failures — successful pulses are silent going forward
+      // Only persist failures - successful pulses are silent going forward
       if (isSuccessful) {
         return success(undefined);
       }

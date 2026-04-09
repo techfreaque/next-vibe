@@ -195,6 +195,16 @@ export class UserRepository {
       const completeUser: CompleteUserType = {
         ...standardUser,
         stripeCustomerId: user.stripeCustomerId,
+        bio: user.bio,
+        websiteUrl: user.websiteUrl,
+        twitterUrl: user.twitterUrl,
+        youtubeUrl: user.youtubeUrl,
+        instagramUrl: user.instagramUrl,
+        tiktokUrl: user.tiktokUrl,
+        githubUrl: user.githubUrl,
+        discordUrl: user.discordUrl,
+        creatorAccentColor: user.creatorAccentColor,
+        creatorHeaderImageUrl: user.creatorHeaderImageUrl,
       };
 
       return success(completeUser) as ResponseType<ExtendedUserType<T>>;

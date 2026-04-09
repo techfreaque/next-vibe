@@ -72,10 +72,12 @@ function ModelCard({
   model,
   locale,
   t,
+  nameClassName,
 }: {
   model: ModelListItem;
   locale: Parameters<typeof ModelCreditDisplay>[0]["locale"];
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
+  nameClassName?: string;
 }): JSX.Element {
   const typeIcon = TYPE_ICONS[model.type] ?? "•";
 
@@ -88,7 +90,11 @@ function ModelCard({
         </Span>
         <Div className="flex-1 min-w-0">
           <Div className="flex items-center gap-1.5 flex-wrap">
-            <Span className="font-semibold text-sm truncate">{model.name}</Span>
+            <Span
+              className={`font-semibold text-sm truncate${nameClassName ? ` ${nameClassName}` : ""}`}
+            >
+              {model.name}
+            </Span>
             <Span className="text-xs text-muted-foreground">
               {model.provider}
             </Span>

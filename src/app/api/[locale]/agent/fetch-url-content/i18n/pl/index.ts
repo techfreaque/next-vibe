@@ -19,7 +19,7 @@ export const translations = {
       query: {
         title: "Zapytanie (opcjonalne)",
         description:
-          "Filtr regex stosowany po pobraniu. Zwracane są tylko akapity pasujące do wzorca, posortowane według liczby dopasowań, do limitu znaków. Pominięcie zwraca pełną stronę (obciętą środkowo przy dużych stronach). Składnia: regex JS — 'uwierzytelnianie', '(login|rejestracja)', 'class\\s+\\w+'. Nieprawidłowy regex wraca do dopasowania dosłownego.",
+          "Filtr regex stosowany po pobraniu. Zwracane są tylko akapity pasujące do wzorca, posortowane według liczby dopasowań, do limitu znaków. Pominięcie zwraca pełną stronę (obciętą środkowo przy dużych stronach). Składnia: regex JS - 'uwierzytelnianie', '(login|rejestracja)', 'class\\s+\\w+'. Nieprawidłowy regex wraca do dopasowania dosłownego.",
         placeholder: "uwierzytelnianie",
       },
     },

@@ -1,0 +1,14 @@
+{
+  "url": "https://modelslab.com/api/v6/video/text2video",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "key": "t20x6N3haz5IAxDzfP0MBUSzQ5IpjZ5nMkd5AY9nKDuGR7svtN53lD31jsMa",
+    "model_id": "ltx-2-pro-t2v",
+    "prompt": "spinning cube",
+    "output_type": "mp4",
+    "num_frames": 25
+  }
+}

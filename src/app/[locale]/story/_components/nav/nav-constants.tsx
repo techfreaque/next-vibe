@@ -30,7 +30,9 @@ export type NavPaths =
   | "/story/invest"
   | "/help"
   | "/admin"
-  | "/threads";
+  | "/threads"
+  | "/user/settings"
+  | "/user/referral";
 
 export type NavItemType = NavSingleItemType | NavParentItemType;
 

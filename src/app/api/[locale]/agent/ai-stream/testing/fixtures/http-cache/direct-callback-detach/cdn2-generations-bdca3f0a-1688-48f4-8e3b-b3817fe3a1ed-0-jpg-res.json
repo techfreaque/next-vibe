@@ -1,0 +1,10 @@
+{
+  "type": "binary",
+  "url": "https://cdn2.stablediffusionapi.com/generations/bdca3f0a-1688-48f4-8e3b-b3817fe3a1ed-0.jpg",
+  "status": 200,
+  "headers": {
+    "content-type": "image/jpeg",
+    "content-length": "67"
+  },
+  "body": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4z8AAAAACAAHiIbwzAAAAAElFTkSuQmCC"
+}

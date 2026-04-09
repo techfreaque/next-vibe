@@ -7,72 +7,76 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { Brain } from "next-vibe-ui/ui/icons/Brain";
+import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { Film } from "next-vibe-ui/ui/icons/Film";
+import { Mic } from "next-vibe-ui/ui/icons/Mic";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";
 import { useMemo, useState } from "react";
 
-import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
-import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
-  getBestImageVisionModel,
-  getBestVideoVisionModel,
-  getBestAudioVisionModel,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
-import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
-import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import {
+  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
   DEFAULT_CHAT_MODEL_SELECTION,
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
-  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
 } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
-import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import {
   chatManualModelSelectionSchema,
   chatModelSelectionSchema,
+  getBestChatModel,
   type ChatModelSelection,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
+  getBestAudioVisionModel,
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
   type AudioVisionModelSelection,
   type ImageVisionModelSelection,
   type VideoVisionModelSelection,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { scopedTranslation as skillIdTranslation } from "@/app/api/[locale]/agent/chat/skills/[id]/i18n";
+import { ModelGroup } from "@/app/api/[locale]/agent/chat/skills/[id]/widget";
+import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
+  getBestImageGenModel,
   imageGenModelSelectionSchema,
   type ImageGenModelSelection,
 } from "@/app/api/[locale]/agent/image-generation/models";
 import {
-  musicGenModelSelectionSchema,
-  type MusicGenModelSelection,
-} from "@/app/api/[locale]/agent/music-generation/models";
-import {
-  sttModelSelectionSchema,
-  type SttModelSelection,
-} from "@/app/api/[locale]/agent/speech-to-text/models";
-import {
-  voiceModelSelectionSchema,
-  type VoiceModelSelection,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
-import {
-  videoGenModelSelectionSchema,
-  type VideoGenModelSelection,
-} from "@/app/api/[locale]/agent/video-generation/models";
-import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
+import {
+  getBestMusicGenModel,
+  musicGenModelSelectionSchema,
+  type MusicGenModelSelection,
+} from "@/app/api/[locale]/agent/music-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import {
+  getBestSttModel,
+  sttModelSelectionSchema,
+  type SttModelSelection,
+} from "@/app/api/[locale]/agent/speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import {
+  getBestTtsModel,
+  voiceModelSelectionSchema,
+  type VoiceModelSelection,
+} from "@/app/api/[locale]/agent/text-to-speech/models";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
+import {
+  getBestVideoGenModel,
+  videoGenModelSelectionSchema,
+  type VideoGenModelSelection,
+} from "@/app/api/[locale]/agent/video-generation/models";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -88,6 +92,7 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { useChatSettings } from "../../settings/hooks";
 import { useSkill } from "../../skills/[id]/hooks";
 import { DEFAULT_SKILLS } from "../../skills/config";
@@ -95,7 +100,6 @@ import { ModelSelectionType } from "../../skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "../../skills/i18n";
 import type definition from "./definition";
 import type { FavoriteCreateResponseOutput } from "./definition";
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 /**
  * Props for custom widget
@@ -116,6 +120,7 @@ export function FavoriteCreateContainer({
   const form = useWidgetForm<typeof definition.POST>();
   const t = useWidgetTranslation<typeof definition.POST>();
   const locale = useWidgetLocale();
+  const { t: tId } = skillIdTranslation.scopedT(locale);
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const navigate = useWidgetNavigation();
@@ -775,7 +780,7 @@ export function FavoriteCreateContainer({
                             const variant = skill?.variants?.find(
                               (v) => v.id === variantId,
                             );
-                            if (variant) {
+                            if (variant?.variantName) {
                               return skillsScopedTranslation
                                 .scopedT(locale)
                                 .t(variant.variantName);
@@ -789,198 +794,198 @@ export function FavoriteCreateContainer({
                 </Div>
               )}
 
-              {/* Chat Model Selector */}
+              {/* Brain - Chat */}
               {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("post.chatModel.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={favoriteModelSelection ?? null}
-                    characterModelSelection={
-                      isNoSkill ? undefined : characterModelSelection
-                    }
-                    defaultModelSelection={platformChatDefault}
-                    placeholder={t("post.chatModel.placeholder")}
-                    onClick={() => setActiveSelector("chat")}
-                    locale={locale}
-                    user={user}
-                  />
-                </Div>
+                <ModelGroup
+                  icon={<Brain className="h-4 w-4" />}
+                  label={tId("get.models.brain")}
+                >
+                  <Div className="flex flex-col gap-1">
+                    <Span className="text-xs opacity-40">
+                      {tId("get.models.slots.chat")}
+                    </Span>
+                    <ModelSelectorTrigger
+                      modelSelection={favoriteModelSelection ?? null}
+                      characterModelSelection={
+                        isNoSkill ? undefined : characterModelSelection
+                      }
+                      defaultModelSelection={platformChatDefault}
+                      placeholder={t("post.chatModel.placeholder")}
+                      onClick={() => setActiveSelector("chat")}
+                      locale={locale}
+                      user={user}
+                    />
+                  </Div>
+                </ModelGroup>
               )}
 
-              {/* Voice Model Selector */}
+              {/* Eyes - Vision */}
               {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("post.voice.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={voiceModelSelection ?? null}
-                    characterModelSelection={
-                      characterData?.voiceModelSelection ?? platformTtsDefault
-                    }
-                    allowedRoles={["tts"]}
-                    defaultModelSelection={platformTtsDefault}
-                    placeholder={t("post.voice.placeholder")}
-                    onClick={() => setActiveSelector("voice")}
-                    locale={locale}
-                    user={user}
-                  />
-                </Div>
+                <ModelGroup
+                  icon={<Eye className="h-4 w-4" />}
+                  label={tId("get.models.eyes")}
+                >
+                  <Div className="flex flex-col gap-1">
+                    <Span className="text-xs opacity-40">
+                      {tId("get.models.slots.imageVision")}
+                    </Span>
+                    <ModelSelectorTrigger
+                      modelSelection={imageVisionModelSelection ?? null}
+                      characterModelSelection={
+                        characterData?.imageVisionModelSelection ??
+                        platformImageVisionDefault
+                      }
+                      allowedRoles={["image-vision"]}
+                      defaultModelSelection={platformImageVisionDefault}
+                      placeholder={t("post.imageVisionModel.placeholder")}
+                      onClick={() => setActiveSelector("imageVision")}
+                      locale={locale}
+                      user={user}
+                    />
+                  </Div>
+                  <Div className="flex flex-col gap-1">
+                    <Span className="text-xs opacity-40">
+                      {tId("get.models.slots.videoVision")}
+                    </Span>
+                    <ModelSelectorTrigger
+                      modelSelection={videoVisionModelSelection ?? null}
+                      characterModelSelection={
+                        characterData?.videoVisionModelSelection ??
+                        platformVideoVisionDefault
+                      }
+                      allowedRoles={["video-vision"]}
+                      defaultModelSelection={platformVideoVisionDefault}
+                      placeholder={t("post.videoVisionModel.placeholder")}
+                      onClick={() => setActiveSelector("videoVision")}
+                      locale={locale}
+                      user={user}
+                    />
+                  </Div>
+                </ModelGroup>
               )}
 
-              {/* Image Generation Model Selector */}
+              {/* Ears & Voice */}
               {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("post.imageGenModel.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={imageGenModelSelection ?? null}
-                    characterModelSelection={
-                      characterData?.imageGenModelSelection ??
-                      platformImageGenDefault
-                    }
-                    allowedRoles={["image-gen"]}
-                    defaultModelSelection={platformImageGenDefault}
-                    placeholder={t("post.imageGenModel.placeholder")}
-                    onClick={() => setActiveSelector("imageGen")}
-                    locale={locale}
-                    user={user}
-                  />
-                </Div>
+                <ModelGroup
+                  icon={<Mic className="h-4 w-4" />}
+                  label={tId("get.models.ears")}
+                >
+                  <Div className="flex flex-col gap-1">
+                    <Span className="text-xs opacity-40">
+                      {tId("get.models.slots.stt")}
+                    </Span>
+                    <ModelSelectorTrigger
+                      modelSelection={sttModelSelection ?? null}
+                      characterModelSelection={
+                        characterData?.sttModelSelection ?? platformSttDefault
+                      }
+                      allowedRoles={["stt"]}
+                      defaultModelSelection={platformSttDefault}
+                      placeholder={t("post.sttModel.placeholder")}
+                      onClick={() => setActiveSelector("stt")}
+                      locale={locale}
+                      user={user}
+                    />
+                  </Div>
+                  <Div className="flex flex-col gap-1">
+                    <Span className="text-xs opacity-40">
+                      {tId("get.models.slots.tts")}
+                    </Span>
+                    <ModelSelectorTrigger
+                      modelSelection={voiceModelSelection ?? null}
+                      characterModelSelection={
+                        characterData?.voiceModelSelection ?? platformTtsDefault
+                      }
+                      allowedRoles={["tts"]}
+                      defaultModelSelection={platformTtsDefault}
+                      placeholder={t("post.voice.placeholder")}
+                      onClick={() => setActiveSelector("voice")}
+                      locale={locale}
+                      user={user}
+                    />
+                  </Div>
+                  <Div className="flex flex-col gap-1">
+                    <Span className="text-xs opacity-40">
+                      {tId("get.models.slots.audioVision")}
+                    </Span>
+                    <ModelSelectorTrigger
+                      modelSelection={audioVisionModelSelection ?? null}
+                      characterModelSelection={
+                        characterData?.audioVisionModelSelection ??
+                        platformAudioVisionDefault
+                      }
+                      allowedRoles={["audio-vision"]}
+                      defaultModelSelection={platformAudioVisionDefault}
+                      placeholder={t("post.audioVisionModel.placeholder")}
+                      onClick={() => setActiveSelector("audioVision")}
+                      locale={locale}
+                      user={user}
+                    />
+                  </Div>
+                </ModelGroup>
               )}
 
-              {/* Music Generation Model Selector */}
+              {/* Media - Generation */}
               {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("post.musicGenModel.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={musicGenModelSelection ?? null}
-                    characterModelSelection={
-                      characterData?.musicGenModelSelection ??
-                      platformMusicGenDefault
-                    }
-                    allowedRoles={["audio-gen"]}
-                    defaultModelSelection={platformMusicGenDefault}
-                    placeholder={t("post.musicGenModel.placeholder")}
-                    onClick={() => setActiveSelector("musicGen")}
-                    locale={locale}
-                    user={user}
-                  />
-                </Div>
-              )}
-
-              {/* Video Generation Model Selector */}
-              {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("post.videoGenModel.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={videoGenModelSelection ?? null}
-                    characterModelSelection={
-                      characterData?.videoGenModelSelection ??
-                      platformVideoGenDefault
-                    }
-                    allowedRoles={["video-gen"]}
-                    defaultModelSelection={platformVideoGenDefault}
-                    placeholder={t("post.videoGenModel.placeholder")}
-                    onClick={() => setActiveSelector("videoGen")}
-                    locale={locale}
-                    user={user}
-                  />
-                </Div>
-              )}
-
-              {/* STT Model Selector */}
-              {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("post.sttModel.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={sttModelSelection ?? null}
-                    characterModelSelection={
-                      characterData?.sttModelSelection ?? platformSttDefault
-                    }
-                    allowedRoles={["stt"]}
-                    defaultModelSelection={platformSttDefault}
-                    placeholder={t("post.sttModel.placeholder")}
-                    onClick={() => setActiveSelector("stt")}
-                    locale={locale}
-                    user={user}
-                  />
-                </Div>
-              )}
-
-              {/* Image Vision Model Selector */}
-              {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("post.imageVisionModel.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={imageVisionModelSelection ?? null}
-                    characterModelSelection={
-                      characterData?.imageVisionModelSelection ??
-                      platformImageVisionDefault
-                    }
-                    allowedRoles={["image-vision"]}
-                    defaultModelSelection={platformImageVisionDefault}
-                    placeholder={t("post.imageVisionModel.placeholder")}
-                    onClick={() => setActiveSelector("imageVision")}
-                    locale={locale}
-                    user={user}
-                  />
-                </Div>
-              )}
-
-              {/* Video Vision Model Selector */}
-              {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("post.videoVisionModel.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={videoVisionModelSelection ?? null}
-                    characterModelSelection={
-                      characterData?.videoVisionModelSelection ??
-                      platformVideoVisionDefault
-                    }
-                    allowedRoles={["video-vision"]}
-                    defaultModelSelection={platformVideoVisionDefault}
-                    placeholder={t("post.videoVisionModel.placeholder")}
-                    onClick={() => setActiveSelector("videoVision")}
-                    locale={locale}
-                    user={user}
-                  />
-                </Div>
-              )}
-
-              {/* Audio Vision Model Selector */}
-              {form && (
-                <Div className="flex flex-col gap-1">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("post.audioVisionModel.label")}
-                  </Span>
-                  <ModelSelectorTrigger
-                    modelSelection={audioVisionModelSelection ?? null}
-                    characterModelSelection={
-                      characterData?.audioVisionModelSelection ??
-                      platformAudioVisionDefault
-                    }
-                    allowedRoles={["audio-vision"]}
-                    defaultModelSelection={platformAudioVisionDefault}
-                    placeholder={t("post.audioVisionModel.placeholder")}
-                    onClick={() => setActiveSelector("audioVision")}
-                    locale={locale}
-                    user={user}
-                  />
-                </Div>
+                <ModelGroup
+                  icon={<Film className="h-4 w-4" />}
+                  label={tId("get.models.media")}
+                >
+                  <Div className="flex flex-col gap-1">
+                    <Span className="text-xs opacity-40">
+                      {tId("get.models.slots.imageGen")}
+                    </Span>
+                    <ModelSelectorTrigger
+                      modelSelection={imageGenModelSelection ?? null}
+                      characterModelSelection={
+                        characterData?.imageGenModelSelection ??
+                        platformImageGenDefault
+                      }
+                      allowedRoles={["image-gen"]}
+                      defaultModelSelection={platformImageGenDefault}
+                      placeholder={t("post.imageGenModel.placeholder")}
+                      onClick={() => setActiveSelector("imageGen")}
+                      locale={locale}
+                      user={user}
+                    />
+                  </Div>
+                  <Div className="flex flex-col gap-1">
+                    <Span className="text-xs opacity-40">
+                      {tId("get.models.slots.musicGen")}
+                    </Span>
+                    <ModelSelectorTrigger
+                      modelSelection={musicGenModelSelection ?? null}
+                      characterModelSelection={
+                        characterData?.musicGenModelSelection ??
+                        platformMusicGenDefault
+                      }
+                      allowedRoles={["audio-gen"]}
+                      defaultModelSelection={platformMusicGenDefault}
+                      placeholder={t("post.musicGenModel.placeholder")}
+                      onClick={() => setActiveSelector("musicGen")}
+                      locale={locale}
+                      user={user}
+                    />
+                  </Div>
+                  <Div className="flex flex-col gap-1">
+                    <Span className="text-xs opacity-40">
+                      {tId("get.models.slots.videoGen")}
+                    </Span>
+                    <ModelSelectorTrigger
+                      modelSelection={videoGenModelSelection ?? null}
+                      characterModelSelection={
+                        characterData?.videoGenModelSelection ??
+                        platformVideoGenDefault
+                      }
+                      allowedRoles={["video-gen"]}
+                      defaultModelSelection={platformVideoGenDefault}
+                      placeholder={t("post.videoGenModel.placeholder")}
+                      onClick={() => setActiveSelector("videoGen")}
+                      locale={locale}
+                      user={user}
+                    />
+                  </Div>
+                </ModelGroup>
               )}
             </Div>
           </>

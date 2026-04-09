@@ -5,24 +5,23 @@
 
 import { z } from "zod";
 
-import {
-  CHAT_MODE_IDS,
-  ChatModeOptions,
-} from "@/app/api/[locale]/agent/models/enum";
-import { ChatModelIdOptions } from "@/app/api/[locale]/agent/ai-stream/models";
-import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
 import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { skillVariantSchema } from "@/app/api/[locale]/agent/chat/skills/db";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
+import {
+  CHAT_MODE_IDS,
+  ChatModeOptions,
+} from "@/app/api/[locale]/agent/models/enum";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
-import { skillVariantSchema } from "@/app/api/[locale]/agent/chat/skills/db";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -50,7 +49,7 @@ import {
 
 import { lazy } from "react";
 import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
-import { ChatModelId } from "../../../ai-stream/models";
+import { ChatModelId, getBestChatModel } from "../../../ai-stream/models";
 import { TtsModelId } from "../../../text-to-speech/models";
 import {
   ContentLevel,
@@ -71,7 +70,6 @@ import type { SkillListResponseOutput } from "../definition";
 import { CategoryOptions, SkillCategory } from "../enum";
 import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "./i18n";
-import { getBestChatModel } from "../../../ai-stream/models";
 
 const SkillEditContainer = lazy(() =>
   import("./widget").then((m) => ({ default: m.SkillEditContainer })),
@@ -658,19 +656,6 @@ const { PATCH } = createEndpoint({
           optionalColor: "transparent",
         },
       }),
-      translationModelId: requestField(scopedTranslation, {
-        schema: z.enum(ChatModelId).nullable().optional(),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: ChatModelIdOptions,
-        label: "patch.translationModel.label" as const,
-        description: "patch.translationModel.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-      }),
       imageGenModelSelection: requestField(scopedTranslation, {
         schema: imageGenModelSelectionSchema.nullable().optional(),
         type: WidgetType.FORM_FIELD,
@@ -863,7 +848,6 @@ const { PATCH } = createEndpoint({
         imageGenModelSelection: undefined,
         musicGenModelSelection: undefined,
         videoGenModelSelection: undefined,
-        translationModelId: undefined,
         defaultChatMode: undefined,
         modelSelection: {
           selectionType: ModelSelectionType.MANUAL,
@@ -992,11 +976,6 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: audioVisionModelSelectionSchema.nullable(),
       }),
-      translationModelId: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.enum(ChatModelId).nullable().optional(),
-      }),
       imageGenModelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
@@ -1064,6 +1043,40 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.array(skillVariantSchema),
+      }),
+
+      // === CREATOR ECONOMY FIELDS ===
+      longContent: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().nullable(),
+      }),
+      favoritesCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.number().int(),
+      }),
+      creatorProfile: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z
+          .object({
+            userId: z.uuid(),
+            publicName: z.string(),
+            avatarUrl: z.string().nullable(),
+            bio: z.string().nullable(),
+            websiteUrl: z.string().nullable(),
+            twitterUrl: z.string().nullable(),
+            youtubeUrl: z.string().nullable(),
+            instagramUrl: z.string().nullable(),
+            tiktokUrl: z.string().nullable(),
+            githubUrl: z.string().nullable(),
+            discordUrl: z.string().nullable(),
+            creatorAccentColor: z.string().nullable(),
+            creatorHeaderImageUrl: z.string().nullable(),
+            referralCode: z.string().nullable(),
+          })
+          .nullable(),
       }),
 
       // === BUTTONS ===
@@ -1142,6 +1155,9 @@ const { GET } = createEndpoint({
         compactTrigger: null,
         availableTools: null,
         pinnedTools: null,
+        longContent: null,
+        favoritesCount: 0,
+        creatorProfile: null,
         variants: [
           {
             id: "default",
@@ -1183,6 +1199,9 @@ const { GET } = createEndpoint({
         compactTrigger: null,
         availableTools: null,
         pinnedTools: null,
+        longContent: null,
+        favoritesCount: 42,
+        creatorProfile: null,
         variants: [
           {
             id: "default",

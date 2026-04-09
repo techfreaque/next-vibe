@@ -21,6 +21,7 @@ interface NavbarProps {
   hasSubscription: boolean;
   navigationItems: NavItemType[];
   totalModelCount: number;
+  hideUserMenu?: boolean;
 }
 
 export function Navbar({
@@ -30,6 +31,7 @@ export function Navbar({
   hasSubscription,
   navigationItems,
   totalModelCount,
+  hideUserMenu = false,
 }: NavbarProps): JSX.Element {
   return (
     <Div className="sticky top-0 z-50 w-full transition-all duration-300 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md shadow-sm">
@@ -58,15 +60,19 @@ export function Navbar({
           <CountrySelector isNavBar locale={locale} user={user} />
 
           {/* Auth buttons display logic */}
-          {!user.isPublic ? (
-            <UserMenu
-              user={user}
-              userProfile={userProfile}
-              locale={locale}
-              hasSubscription={hasSubscription}
-            />
-          ) : (
-            <AuthButtons locale={locale} />
+          {!hideUserMenu && (
+            <>
+              {!user.isPublic ? (
+                <UserMenu
+                  user={user}
+                  userProfile={userProfile}
+                  locale={locale}
+                  hasSubscription={hasSubscription}
+                />
+              ) : (
+                <AuthButtons locale={locale} />
+              )}
+            </>
           )}
 
           {/* Mobile hamburger menu */}

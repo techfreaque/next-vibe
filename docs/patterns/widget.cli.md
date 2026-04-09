@@ -32,7 +32,7 @@ The CLI Bun plugin automatically substitutes `widget.cli.tsx` for `widget.tsx` w
 
 If no `widget.cli.tsx` exists, the plugin stubs out `widget.tsx` with a no-op so React imports don't crash in the CLI context.
 
-**Export name must match `widget.tsx` exactly.** The plugin resolves by the name passed to `lazyCliWidget` — `m.MyWidget` must exist as a named export in both files. Use a re-export alias if the internal name differs:
+**Export name must match `widget.tsx` exactly.** The plugin resolves by the name passed to `lazyCliWidget` - `m.MyWidget` must exist as a named export in both files. Use a re-export alias if the internal name differs:
 
 ```ts
 // widget.tsx
@@ -318,8 +318,8 @@ if (!value) return <Box />;  // ✅
 - [ ] No chalk/terminal-links in MCP path
 - [ ] List endpoints: detail threshold applied (≤5 full detail, >5 compact list)
 - [ ] Pagination hints present for both MCP (plain text) and CLI (dim hint with command)
-- [ ] `definition.ts` uses `lazyCliWidget` (not static import) — plugin routes to `widget.cli.tsx` automatically
-- [ ] Export name matches `widget.tsx` exactly (Bun swaps by name — mismatch = silent CLI failure)
+- [ ] `definition.ts` uses `lazyCliWidget` (not static import) - plugin routes to `widget.cli.tsx` automatically
+- [ ] Export name matches `widget.tsx` exactly (Bun swaps by name - mismatch = silent CLI failure)
 - [ ] Shared components use `.cli.tsx` suffix and canonical owner folder
 
 ---

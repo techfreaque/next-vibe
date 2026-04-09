@@ -35,6 +35,7 @@ import {
 import { ThreadsRepository } from "../../chat/threads/repository";
 import { agentEnvAvailability } from "../../env-availability";
 import type { ImageGenModelId } from "../../image-generation/models";
+import type { ApiProvider } from "../../models/models";
 import type { MusicGenModelId } from "../../music-generation/models";
 import type { VideoGenModelId } from "../../video-generation/models";
 import type { ChatModelId } from "../models";
@@ -125,11 +126,11 @@ export interface HeadlessAiStreamParams {
   /**
    * Override the derived operation for test / special-case callers.
    * When set to "send", the prompt is treated as a new user message appended
-   * to the thread history — parentMessageId is still used for history loading
+   * to the thread history - parentMessageId is still used for history loading
    * but the AI receives the prompt as a user turn, not an answer-as-ai continuation.
    * Use this in integration tests to simulate normal user multi-turn conversations.
    */
-  operationOverride?: "send";
+  operationOverride?: "send" | "retry" | "edit";
   /**
    * Explicit parent message ID for history loading.
    * When provided, skips the "find last message by createdAt" query and uses
@@ -145,7 +146,7 @@ export interface HeadlessAiStreamParams {
    */
   sequenceIdOverride?: string;
   /**
-   * Override resolved media gen models — bypasses the user-settings cascade.
+   * Override resolved media gen models - bypasses the user-settings cascade.
    * Used in integration tests to force a specific provider (e.g. modelslab-music-gen)
    * regardless of what the admin user has saved in their settings.
    */
@@ -154,8 +155,22 @@ export interface HeadlessAiStreamParams {
     videoGenModelId?: VideoGenModelId;
     imageGenModelId?: ImageGenModelId;
   };
+  /**
+   * Force all model resolution (chat + image/music/video gen) to use a specific API provider.
+   * When set, picks the cheapest variant of each resolved model from that provider.
+   * Used by UNBOTTLED self-relay to route all inference through the UNBOTTLED provider.
+   */
+  providerOverride?: ApiProvider;
   /** File attachments to include with the user message (images, audio, PDFs, video) */
   attachments?: File[];
+  /**
+   * Audio input for STT transcription (voice UI flow).
+   * When provided, the audio is transcribed via SpeechToTextRepository before the AI runs.
+   * The transcribed text replaces the prompt as the user message content.
+   * This is the dedicated STT path - distinct from audio file attachments which go through
+   * the gap-fill audioVisionModel bridge instead.
+   */
+  audioInput?: File | null;
   /**
    * Tool confirmations to process before the AI stream starts.
    * Each entry confirms or rejects a pending tool call by its message ID.
@@ -183,9 +198,9 @@ export interface HeadlessAiStreamResult {
   threadId?: string;
   /** Final text content - populated in memory even for incognito (no DB read needed) */
   lastAiMessageContent: string | null;
-  /** URL of the last generated media (image/audio/video) — set when native file parts are emitted */
+  /** URL of the last generated media (image/audio/video) - set when native file parts are emitted */
   lastGeneratedMediaUrl?: string | null;
-  /** Total credits deducted during this stream (model + tools) — for cost display in callers */
+  /** Total credits deducted during this stream (model + tools) - for cost display in callers */
   totalCreditsDeducted?: number;
 }
 
@@ -293,7 +308,9 @@ export async function runHeadlessAiStream(
     explicitParentMessageId,
     sequenceIdOverride,
     mediaModelOverrides,
+    providerOverride,
     attachments: headlessAttachments,
+    audioInput,
     toolConfirmations: headlessToolConfirmations,
     user,
     locale,
@@ -533,7 +550,7 @@ export async function runHeadlessAiStream(
       toolConfirmations: headlessToolConfirmations ?? null,
       messageHistory: [] as AiStreamPostRequestOutput["messageHistory"],
       voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
-      audioInput: { file: null },
+      audioInput: { file: audioInput ?? null },
       resumeToken: null,
       timezone: "UTC",
       attachments: headlessAttachments ?? null,
@@ -547,11 +564,13 @@ export async function runHeadlessAiStream(
       request: undefined,
       t: aiStreamT,
       headless: true,
+      isRevival: wakeUpRevival === true,
       extraInstructions: headlessInstructions,
       excludeMemories,
       favoriteIdOverride: favoriteId,
       sequenceIdOverride,
       mediaModelOverrides,
+      providerOverride,
     });
 
     if (!result.success) {

@@ -21,7 +21,7 @@ import type { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to
 import type { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 
-const sharedFilterPropsSchema = z.object({
+export const sharedFilterPropsSchema = z.object({
   intelligenceRange: z
     .object({
       min: z.enum(IntelligenceLevel).optional(),
@@ -52,11 +52,11 @@ const sharedFilterPropsSchema = z.object({
   sortDirection2: z.enum(ModelSortDirection).optional(),
 });
 
-const filtersModelSelectionSchema = z
+export const filtersSelectionSchema = z
   .object({ selectionType: z.literal(ModelSelectionType.FILTERS) })
   .merge(sharedFilterPropsSchema);
 
-export type FiltersModelSelection = z.infer<typeof filtersModelSelectionSchema>;
+export type FiltersModelSelection = z.infer<typeof filtersSelectionSchema>;
 
 export type AnyRoleModelSelection =
   | z.infer<typeof chatModelSelectionSchema>

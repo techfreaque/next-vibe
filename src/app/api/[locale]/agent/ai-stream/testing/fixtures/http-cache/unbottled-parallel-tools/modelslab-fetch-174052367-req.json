@@ -1,0 +1,10 @@
+{
+  "url": "https://modelslab.com/api/v6/images/fetch/174052367",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "key": "t20x6N3haz5IAxDzfP0MBUSzQ5IpjZ5nMkd5AY9nKDuGR7svtN53lD31jsMa"
+  }
+}

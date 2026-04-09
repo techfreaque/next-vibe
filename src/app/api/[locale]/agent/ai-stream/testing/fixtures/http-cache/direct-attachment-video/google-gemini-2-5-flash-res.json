@@ -1,0 +1,64 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "cf-ray": "9e8987a13a235d82-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 07 Apr 2026 13:55:35 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1775570125-q23HjvlmVnIWdNAVYVyZ"
+  },
+  "body": {
+    "id": "gen-1775570125-q23HjvlmVnIWdNAVYVyZ",
+    "object": "chat.completion",
+    "created": 1775570125,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video clip, approximately four seconds in length, captures a close-up shot of a person's hands holding and manipulating a Rubik's Cube. The hands are a medium-brown skin tone, with visible veins and creases, suggesting an adult's hands.\n\nThe primary focus of the shot is the Rubik's Cube itself. It's a standard 3x3x3 cube with the classic colorful faces: red, orange, yellow, green, blue, and white. The cube is partially scrambled, showing a mix of colors on each visible face. On one side of the cube, a small white sticker with a black \"X\" is visible on one of the pieces. The hands are actively rotating a section of the cube, performing a typical solving motion.\n\nIn the background, a large collection of other Rubik's Cubes and similar puzzle cubes are densely packed together, filling the entire frame beyond the hands. These background cubes are mostly unscrambled or partially scrambled, displaying a vibrant array of colors. The lighting is bright, illuminating the cube and hands clearly.\n\nThe style of the video is direct and focused, with a shallow depth of field that keeps the active cube sharp while blurring the background collection. There is no visible text other than the \"X\" on the cube piece. The overall impression is one of a puzzle enthusiast surrounded by their collection, actively engaged in the process of solving.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 298,
+      "completion_tokens": 291,
+      "total_tokens": 589,
+      "cost": 0.0008169,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 258
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0008169,
+        "upstream_inference_prompt_cost": 0.0000894,
+        "upstream_inference_completions_cost": 0.0007275
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}
