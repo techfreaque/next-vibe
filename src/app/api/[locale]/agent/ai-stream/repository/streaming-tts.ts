@@ -12,6 +12,7 @@ import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { TTS_COST_PER_CHARACTER } from "@/app/api/[locale]/products/repository-client";
@@ -22,13 +23,8 @@ import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import type { WsEmitCallback } from "../../chat/threads/[threadId]/messages/emitter";
 import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
-import {
-  getTtsModelById,
-  ttsModelDefinitions,
-  type TtsModelId,
-} from "../../text-to-speech/models";
-import type { ModelProviderConfigTtsBased } from "@/app/api/[locale]/agent/models/models";
-import { getProviderPrice } from "@/app/api/[locale]/agent/models/models";
+import { filterTtsModels, type TtsModelId } from "../../text-to-speech/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "../../text-to-speech/constants";
 
 /**
  * Minimum skills before emitting a TTS chunk
@@ -336,81 +332,56 @@ export class StreamingTTSHandler {
   }
 
   /**
-   * Check if a TTS provider has its API key configured.
-   */
-  private isProviderAvailable(apiProvider: ApiProvider): boolean {
-    switch (apiProvider) {
-      case ApiProvider.OPENAI_TTS:
-        return Boolean(agentEnv.OPENAI_API_KEY);
-      case ApiProvider.EDEN_AI_TTS:
-        return Boolean(agentEnv.EDEN_AI_API_KEY);
-      case ApiProvider.ELEVENLABS:
-        return Boolean(agentEnv.ELEVENLABS_API_KEY);
-      case ApiProvider.UNBOTTLED:
-        return Boolean(agentEnv.UNBOTTLED_CLOUD_CREDENTIALS);
-      default:
-        return false;
-    }
-  }
-
-  /**
    * Generate TTS audio using model-based provider routing with fallback.
-   * Iterates providers in price order, skipping those without configured API keys.
+   * Resolves the cheapest available provider via the standard filterTtsModels path.
    * Returns base64 data URL or null on failure.
    */
   private async generateTTS(text: string): Promise<string | null> {
-    const modelDef = ttsModelDefinitions[this.voiceId];
     const language = getLanguageFromLocale(this.locale);
 
-    // Sort providers by price and find the first one with a configured key
-    const sortedProviders = [...modelDef.providers]
-      .filter((p): p is ModelProviderConfigTtsBased => "creditCostPerCharacter" in p)
-      .toSorted((a, b) => getProviderPrice(a) - getProviderPrice(b));
+    const selection = {
+      ...DEFAULT_TTS_MODEL_SELECTION,
+      manualModelId: this.voiceId,
+    };
+    const modelOption =
+      filterTtsModels(selection, this.user, agentEnvAvailability)[0] ?? null;
 
-    const provider = sortedProviders.find((p) =>
-      this.isProviderAvailable(p.apiProvider),
-    );
-
-    if (!provider) {
+    if (!modelOption) {
       this.logger.error("[Streaming TTS] No TTS provider available", {
         voiceId: this.voiceId,
-        triedProviders: sortedProviders.map((p) => p.apiProvider),
       });
       return null;
     }
 
     this.logger.debug("[Streaming TTS] Generating TTS", {
       voiceId: this.voiceId,
-      apiProvider: provider.apiProvider,
+      apiProvider: modelOption.apiProvider,
       textLength: text.length,
       language,
     });
 
     try {
-      switch (provider.apiProvider) {
+      switch (modelOption.apiProvider) {
         case ApiProvider.OPENAI_TTS:
-          return await this.callOpenAITTS(text, provider.providerModel);
+          return await this.callOpenAITTS(text, modelOption.providerModel);
 
         case ApiProvider.EDEN_AI_TTS: {
           const gender =
-            modelDef.voiceMeta?.gender === "male" ? "MALE" : "FEMALE";
+            modelOption.voiceMeta?.gender === "male" ? "MALE" : "FEMALE";
           return await this.callEdenAITTS(
             text,
-            provider.providerModel,
+            modelOption.providerModel,
             gender,
             language,
           );
         }
 
         case ApiProvider.ELEVENLABS:
-          return await this.callElevenLabsTTS(text, provider.providerModel);
-
-        case ApiProvider.UNBOTTLED:
-          return await this.callUnbottledTTS(text, provider.providerModel);
+          return await this.callElevenLabsTTS(text, modelOption.providerModel);
 
         default:
           this.logger.error("[Streaming TTS] Unsupported TTS provider", {
-            apiProvider: provider.apiProvider,
+            apiProvider: modelOption.apiProvider,
             voiceId: this.voiceId,
           });
           return null;

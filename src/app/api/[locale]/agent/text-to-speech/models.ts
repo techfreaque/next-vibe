@@ -413,19 +413,18 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
 
 export type TtsModelOption = ModelOptionTtsBased & { id: TtsModelId };
 
-function buildTtsModelOptions(): Record<string, TtsModelOption> {
-  const result: Record<string, TtsModelOption> = {};
+function buildTtsModelOptions(): TtsModelOption[] {
+  const result: TtsModelOption[] = [];
   for (const [modelId, def] of objectEntries(ttsModelDefinitions)) {
     const sortedProviders = [...def.providers].toSorted(
       (a, b) => getProviderPrice(a) - getProviderPrice(b),
     );
     for (const provider of sortedProviders) {
-      if ("creditCostPerCharacter" in provider) {
-        const p = provider;
-        if (!p.creditCostPerCharacter) {
-          continue;
-        }
-        result[modelId] = {
+      if (
+        "creditCostPerCharacter" in provider &&
+        provider.creditCostPerCharacter
+      ) {
+        result.push({
           id: modelId,
           name: def.name,
           provider: def.by,
@@ -446,30 +445,20 @@ function buildTtsModelOptions(): Record<string, TtsModelOption> {
           inputs: def.inputs,
           outputs: def.outputs,
           voiceMeta: def.voiceMeta,
-          creditCostPerCharacter: p.creditCostPerCharacter ?? 0,
-        };
-        break;
+          creditCostPerCharacter: provider.creditCostPerCharacter,
+        });
       }
     }
   }
   return result;
 }
 
-const ttsModelOptionsIndex: Record<string, TtsModelOption> =
-  buildTtsModelOptions();
-
-export const ttsModelOptions: TtsModelOption[] = Object.values(
-  ttsModelOptionsIndex,
-).filter((m): m is TtsModelOption => m !== undefined);
+export const ttsModelOptions: TtsModelOption[] = buildTtsModelOptions();
 
 export const TtsModelIdOptions = Object.values(TtsModelId).map((id) => ({
   value: id,
   label: ttsModelOptions.find((m) => m.id === id)?.name ?? id,
 }));
-
-export function getTtsModelById(modelId: TtsModelId): TtsModelOption {
-  return ttsModelOptionsIndex[modelId];
-}
 
 // ============================================================
 // TTS MODEL SELECTION SCHEMA

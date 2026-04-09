@@ -696,6 +696,12 @@ export interface ModelProviderEnvAvailability {
   edenAiStt: boolean;
   /** Deepgram STT - requires DEEPGRAM_API_KEY */
   deepgram: boolean;
+  /** OpenAI TTS - requires OPENAI_API_KEY */
+  openAiTts: boolean;
+  /** Eden AI TTS - requires EDEN_AI_API_KEY */
+  edenAiTts: boolean;
+  /** ElevenLabs TTS - requires ELEVENLABS_API_KEY */
+  elevenlabs: boolean;
 }
 
 /**
@@ -736,6 +742,12 @@ export function isModelProviderAvailable(
       return env.edenAiStt;
     case ApiProvider.DEEPGRAM:
       return env.deepgram;
+    case ApiProvider.OPENAI_TTS:
+      return env.openAiTts;
+    case ApiProvider.EDEN_AI_TTS:
+      return env.edenAiTts;
+    case ApiProvider.ELEVENLABS:
+      return env.elevenlabs;
     default:
       return true;
   }

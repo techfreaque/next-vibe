@@ -48,6 +48,12 @@ export interface AgentEnvAvailability {
   edenAiStt: boolean;
   /** Deepgram STT */
   deepgram: boolean;
+  /** OpenAI TTS - requires OPENAI_API_KEY */
+  openAiTts: boolean;
+  /** Eden AI TTS - requires EDEN_AI_API_KEY */
+  edenAiTts: boolean;
+  /** ElevenLabs TTS - requires ELEVENLABS_API_KEY */
+  elevenlabs: boolean;
 }
 
 /**
@@ -78,6 +84,9 @@ export const agentEnvAvailability: AgentEnvAvailability = (() => {
     unbottled: Boolean(agentEnv.UNBOTTLED_CLOUD_CREDENTIALS),
     edenAiStt: Boolean(agentEnv.EDEN_AI_API_KEY),
     deepgram: Boolean(agentEnv.DEEPGRAM_API_KEY),
+    openAiTts: Boolean(agentEnv.OPENAI_API_KEY),
+    edenAiTts: Boolean(agentEnv.EDEN_AI_API_KEY),
+    elevenlabs: Boolean(agentEnv.ELEVENLABS_API_KEY),
   };
 })();
 
@@ -175,6 +184,21 @@ export const PROVIDER_SETUP_INSTRUCTIONS = {
     envKey: "DEEPGRAM_API_KEY",
     url: "https://console.deepgram.com",
     label: "Deepgram",
+  },
+  openAiTts: {
+    envKey: "OPENAI_API_KEY",
+    url: "https://platform.openai.com/api-keys",
+    label: "OpenAI TTS",
+  },
+  edenAiTts: {
+    envKey: "EDEN_AI_API_KEY",
+    url: "https://app.edenai.run/user/settings#api",
+    label: "Eden AI TTS",
+  },
+  elevenlabs: {
+    envKey: "ELEVENLABS_API_KEY",
+    url: "https://elevenlabs.io/app/settings/api-keys",
+    label: "ElevenLabs",
   },
 } as const satisfies Record<
   Exclude<keyof AgentEnvAvailability, "anySearch">,
