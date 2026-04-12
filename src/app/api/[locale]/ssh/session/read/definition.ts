@@ -25,6 +25,7 @@ export const { GET } = createEndpoint({
   description: "session.read.get.description" as const,
   icon: "terminal",
   category: "endpointCategories.ssh",
+  subCategory: "endpointCategories.sshTerminal",
   allowedRoles: [UserRole.ADMIN],
   tags: ["category" as const],
 

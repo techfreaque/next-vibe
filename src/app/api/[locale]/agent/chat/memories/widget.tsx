@@ -218,19 +218,19 @@ export function MemoriesListContainer({
               </Span>
               <Span className="text-lg font-semibold">{stats.total}</Span>
             </Div>
-            <Div className="flex flex-col p-2 rounded-md bg-green-50 dark:bg-green-950/20">
+            <Div className="flex flex-col p-2 rounded-md bg-success/10">
               <Span className="text-xs text-muted-foreground">
                 {t("stats.highPriority")}
               </Span>
-              <Span className="text-lg font-semibold text-green-600 dark:text-green-400">
+              <Span className="text-lg font-semibold text-success">
                 {stats.highPriority}
               </Span>
             </Div>
-            <Div className="flex flex-col p-2 rounded-md bg-blue-50 dark:bg-blue-950/20">
+            <Div className="flex flex-col p-2 rounded-md bg-info/10">
               <Span className="text-xs text-muted-foreground">
                 {t("stats.avgPriority")}
               </Span>
-              <Span className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+              <Span className="text-lg font-semibold text-info">
                 {stats.avgPriority}
               </Span>
             </Div>

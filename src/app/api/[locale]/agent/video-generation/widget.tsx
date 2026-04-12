@@ -16,7 +16,6 @@ import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
@@ -116,7 +115,6 @@ export function VideoGenerationContainer({
   const children = field.children;
   const prompt = form?.watch("prompt") ?? "";
   const user = useWidgetUser();
-  const envAvailability = useEnvAvailability();
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const [showModelSelector, setShowModelSelector] = useState(false);
@@ -139,11 +137,7 @@ export function VideoGenerationContainer({
   const defaultModelSelection = useMemo(():
     | VideoGenModelSelection
     | undefined => {
-    const m = getBestVideoGenModel(
-      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestVideoGenModel(DEFAULT_VIDEO_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -154,7 +148,7 @@ export function VideoGenerationContainer({
       return undefined;
     }
     return { selectionType: ModelSelectionType.MANUAL, manualModelId: modelId };
-  }, [user, envAvailability]);
+  }, [user]);
 
   const resolvedModelId: VideoGenModelId | undefined =
     currentModelId ??

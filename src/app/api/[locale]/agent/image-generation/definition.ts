@@ -23,6 +23,7 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
+  getBestImageGenModel,
   ImageGenModelId,
   ImageGenModelIdOptions,
 } from "@/app/api/[locale]/agent/image-generation/models";
@@ -56,6 +57,7 @@ const { POST } = createEndpoint({
   description: "post.description",
   icon: "image",
   category: "endpointCategories.ai",
+  subCategory: "endpointCategories.aiGeneration",
   tags: ["tags.image", "tags.generation", "tags.ai"],
   dynamicTitle: ({ request }) => {
     const prompt = request?.prompt as string | undefined;
@@ -97,7 +99,13 @@ const { POST } = createEndpoint({
           .enum(ImageGenModelId)
           .default(ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW),
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
-        serverDefault: (ctx) => ctx.streamContext?.imageGenModelId,
+        serverDefault: (ctx) => {
+          const sel = ctx.streamContext?.imageGenModelSelection;
+          if (!sel || !ctx.user) {
+            return undefined;
+          }
+          return getBestImageGenModel(sel, ctx.user)?.id;
+        },
       }),
       size: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

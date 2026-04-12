@@ -6,7 +6,6 @@ import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import {
   ProductIds,
@@ -88,7 +87,7 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
   const currencySymbol = countryInfo.symbol;
 
   const isAdmin = !jwtUser.isPublic && jwtUser.roles.includes(UserRole.ADMIN);
-  const modelCount = getAvailableModelCount(agentEnvAvailability, isAdmin);
+  const modelCount = getAvailableModelCount(isAdmin);
 
   return {
     locale,
@@ -115,12 +114,12 @@ export function TanstackPage({
   return (
     <Div
       role="main"
-      className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900"
+      className="min-h-screen bg-primary/5 bg-linear-to-b from-primary/5 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900"
     >
       <Div className="container max-w-6xl mx-auto pt-8 px-4">
         <Link
           href={`/${locale}/threads`}
-          className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mb-8"
+          className="inline-flex items-center text-sm text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary mb-8"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
           {t("nav.home")}

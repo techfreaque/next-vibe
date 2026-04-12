@@ -90,7 +90,7 @@ export function BooleanFieldWidget<
                       checked={formField.value}
                       onCheckedChange={(checked) => formField.onChange(checked)}
                       disabled={isDisabled || field.disabled || field.readonly}
-                      className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                      className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
                   </FormControl>
                   <Label
@@ -143,7 +143,7 @@ export function BooleanFieldWidget<
                       checked={formField.value}
                       onCheckedChange={(checked) => formField.onChange(checked)}
                       disabled={isDisabled || field.disabled || field.readonly}
-                      className="data-[state=checked]:bg-blue-600"
+                      className="data-[state=checked]:bg-primary"
                     />
                   </FormControl>
                   {field.switchLabel && (

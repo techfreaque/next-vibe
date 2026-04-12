@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   title: "emulate.title",
   description: "emulate.description",
   category: "endpointCategories.browser",
+  subCategory: "endpointCategories.browserPages",
   icon: "settings",
   tags: [
     "emulate.tags.browserAutomation",

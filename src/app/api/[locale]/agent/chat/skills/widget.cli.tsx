@@ -58,15 +58,14 @@ function renderDetailCli(items: SkillListItem[]): string {
     const label = skillLabel(item);
     const icon = ""; // icon keys are not ANSI-renderable, skip
     lines.push(chalk.bold.cyan(`${icon}${label}`));
-    lines.push(chalk.white(`  ${item.tagline}`));
+    if (item.tagline) {
+      lines.push(chalk.dim(`  ${item.tagline}`));
+    }
     lines.push(
       chalk.dim(`  ${item.modelInfo}`) +
         chalk.dim(" • ") +
         chalk.dim(item.modelProvider),
     );
-    if (item.description && item.description !== item.tagline) {
-      lines.push(chalk.dim(`  ${item.description}`));
-    }
     lines.push("");
   }
 
@@ -104,8 +103,8 @@ function renderListCli(data: SkillListResponseOutput): string {
     for (const item of section.skills) {
       const label = chalk.green(skillLabel(item).padEnd(maxLabelLen + 1));
       const tagline = chalk.dim(
-        item.tagline.length > 50
-          ? `${item.tagline.slice(0, 47)}...`
+        item.tagline.length > 38
+          ? `${item.tagline.slice(0, 35)}...`
           : item.tagline,
       );
       const model = chalk.yellow(item.modelInfo);
@@ -193,7 +192,7 @@ export function SkillsListCliWidget({ field }: CliWidgetProps): JSX.Element {
 
   return (
     <Box flexDirection="column">
-      <Text wrap="end">{output}</Text>
+      <Text wrap="truncate-end">{output}</Text>
     </Box>
   );
 }

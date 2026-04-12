@@ -366,11 +366,11 @@ export const translations = {
       headline: "You're in. No filters, no lectures.",
       subject: "Your {{appName}} subscription is active",
       previewText:
-        "{{privateName}}, you're live. 800 credits/month, {{modelCount}} models, zero restrictions.",
+        "{{privateName}}, you're live. {{subscriptionCredits}} credits/month, {{modelCount}} models, zero restrictions.",
       activeBadge: "Active",
       greeting: "Hey {{privateName}},",
       intro:
-        "Your {{appName}} subscription is confirmed and ready. You have 800 credits every month across all models - no daily caps, no content filters, no explanations required.",
+        "Your {{appName}} subscription is confirmed and ready. You have {{subscriptionCredits}} credits every month across all models - no daily caps, no content filters, no explanations required.",
       models: {
         title: "{{modelCount}} models, 3 categories",
         mainstream: "Mainstream",
@@ -379,7 +379,7 @@ export const translations = {
       },
       included: {
         title: "What you get every month:",
-        credits: "800 credits per month (auto-renewed)",
+        credits: "{{subscriptionCredits}} credits per month (auto-renewed)",
         models: "Access to all {{modelCount}} AI models",
         nolimits: "No daily limits - use all credits whenever you want",
         uncensored: "Uncensored models with no content filters",
@@ -390,7 +390,7 @@ export const translations = {
       packs: {
         title: "Need more credits?",
         description:
-          "Buy credit packs anytime - €5 for 500 credits. They never expire and stack on top of your monthly allowance. Only available to subscribers.",
+          "Buy credit packs anytime - {{packPrice}} for {{packCredits}} credits. They never expire and stack on top of your monthly allowance. Only available to subscribers.",
         cta: "Buy Credit Pack",
       },
       manage: "Manage or cancel your subscription anytime in",

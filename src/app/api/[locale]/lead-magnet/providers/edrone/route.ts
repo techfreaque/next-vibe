@@ -14,7 +14,7 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "EDRONE",
         {
-          edroneAppId: data.edroneAppId,
+          edroneAppId: data.edroneAppId || undefined,
         },
         {
           listId: data.listId ?? null,

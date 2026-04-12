@@ -67,7 +67,7 @@ import {
   useMessageOperations,
   type MessageOperationsDeps,
 } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-operations";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
@@ -108,8 +108,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   // Boot context
   const bootContext = useChatBootContext();
   const { initialSettingsData, initialSkillData } = bootContext;
-  const envAvailability = useEnvAvailability();
-
   // Input store
   const input = useChatInputStore((s) => s.input);
   const rawSetInput = useChatInputStore((s) => s.setInput);
@@ -140,8 +138,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     logger,
     initialSettingsData,
   );
-  const env = useEnvAvailability();
-  const defaults = ChatSettingsRepositoryClient.getDefaults(user, env);
+  const defaults = ChatSettingsRepositoryClient.getDefaults(user);
   const effectiveSettings = settings ?? defaults;
   const ttsAutoplay = effectiveSettings.ttsAutoplay;
   const selectedSkill = effectiveSettings.selectedSkill;
@@ -327,7 +324,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
 
   const { t } = aiStreamScopedTranslation.scopedT(locale);
   const voiceRuntime = useVoiceRuntimeState();
-  const voiceUnconfigured = !envAvailability.voice;
+  const voiceUnconfigured = !agentEnvAvailability.voice;
 
   const currentModel = getChatModelById(selectedModel);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
@@ -356,7 +353,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       effectiveSettings.imageVisionModelSelection ??
         DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       user,
-      env,
     );
   const canAcceptVideo =
     currentModel?.inputs?.includes("video") === true ||
@@ -364,7 +360,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       effectiveSettings.videoVisionModelSelection ??
         DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       user,
-      env,
     );
   const canAcceptAudio =
     currentModel?.inputs?.includes("audio") === true ||
@@ -372,7 +367,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       effectiveSettings.audioVisionModelSelection ??
         DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       user,
-      env,
     );
 
   // Build dynamic accept string: always include documents, conditionally include media
@@ -533,9 +527,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
         "@container",
         "p-2 @sm:p-3 @md:p-4 backdrop-blur",
         "border border-border rounded-t-lg",
-        ttsAutoplay
-          ? "bg-green-100/70 dark:bg-green-950/70 border-green-300 dark:border-green-800"
-          : "bg-blue-200/70 dark:bg-blue-950/70",
+        ttsAutoplay ? "bg-success/10 border-success/30" : "bg-primary/10",
         className,
       )}
     >
@@ -602,7 +594,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           {/* Hint overlay */}
           {!input && canPost && (
             <Div className="absolute inset-0 pl-3 pr-3 pointer-events-none hidden @sm:flex flex-col justify-between pb-1">
-              <Div className="text-sm text-muted-foreground/70 pt-2">
+              <Div className="text-sm text-foreground pt-2">
                 {isImageModel
                   ? t("input.imagePlaceholder")
                   : isAudioModel
@@ -610,23 +602,23 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                     : t("input.placeholder")}
               </Div>
               {!isGenerativeModel && (
-                <Div className="flex items-center gap-2 text-[11px] text-muted-foreground/40">
+                <Div className="flex items-center gap-2 text-[11px] text-foreground/70">
                   <Span>
-                    <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
+                    <Kbd className="px-1 py-px rounded text-[10px] font-medium font-sans">
                       {t("input.keyboardShortcuts.enter")}
                     </Kbd>{" "}
                     {t("input.keyboardShortcuts.toSend")}
                   </Span>
-                  <Span className="opacity-30">{"/"}</Span>
+                  <Span className="opacity-40">{"/"}</Span>
                   <Span>
-                    <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
+                    <Kbd className="px-1 py-px rounded text-[10px] font-medium font-sans">
                       {t("input.keyboardShortcuts.shiftEnter")}
                     </Kbd>{" "}
                     {t("input.keyboardShortcuts.forNewLine")}
                   </Span>
-                  <Span className="opacity-30">{"/"}</Span>
+                  <Span className="opacity-40">{"/"}</Span>
                   <Span>
-                    <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
+                    <Kbd className="px-1 py-px rounded text-[10px] font-medium font-sans">
                       {t("input.keyboardShortcuts.ctrlV")}
                     </Kbd>{" "}
                     {t("input.keyboardShortcuts.orPasteFiles")}
@@ -778,7 +770,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                       "h-8 w-8 @sm:h-9 @sm:w-9",
                       !voiceUnconfigured &&
                         ttsAutoplay &&
-                        "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500",
+                        "bg-success hover:bg-success/90",
                       voiceUnconfigured && "opacity-50 cursor-not-allowed",
                     )}
                     data-tour={TOUR_DATA_ATTRS.CALL_MODE_BUTTON}

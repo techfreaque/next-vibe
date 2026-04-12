@@ -1,6 +1,4 @@
 import {
-  ContentLevel,
-  IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
@@ -14,8 +12,6 @@ export const DEFAULT_TTS_VOICE_ID: TtsModelId = TtsModelId.OPENAI_NOVA;
 export const DEFAULT_TTS_MODEL_SELECTION: VoiceModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
   manualModelId: TtsModelId.OPENAI_NOVA,
-  intelligenceRange: { min: IntelligenceLevel.SMART },
-  contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,

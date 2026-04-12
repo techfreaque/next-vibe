@@ -130,7 +130,7 @@ export function CampaignStarterConfigContainer({
         <NavigateButtonWidget field={children.backButton} />
         <Div className="flex items-center gap-2 mr-auto">
           {hasBeenSaved ? (
-            <CheckCircle className="h-5 w-5 text-green-500" />
+            <CheckCircle className="h-5 w-5 text-success" />
           ) : (
             <Settings className="h-5 w-5 text-muted-foreground" />
           )}
@@ -344,7 +344,7 @@ function PerRunBudgetHint({
 
   return (
     <Div
-      className={`flex items-center gap-1.5 text-xs rounded px-2 py-1 ${isZero ? "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400" : "bg-muted/40 text-muted-foreground"}`}
+      className={`flex items-center gap-1.5 text-xs rounded px-2 py-1 ${isZero ? "bg-warning/10 text-warning" : "bg-muted/40 text-muted-foreground"}`}
     >
       <Span>
         {isZero

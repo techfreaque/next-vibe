@@ -16,7 +16,7 @@ export const translations = {
     title: "One definition.",
     titleAccent: "Thirteen platforms.",
     subtitle:
-      "next-vibe turns a single TypeScript definition into thirteen platforms at once - web form, CLI command, MCP tool, mobile screen, cron job, WebSocket, admin panel, and more. Full type safety, zero drift, zero repetition.",
+      "next-vibe turns a single TypeScript definition into thirteen platforms at once - interactive web UI, CLI command, MCP tool, mobile screen, cron job, WebSocket, admin panel, and more. Full type safety, zero drift, zero repetition.",
     ctaGithub: "Star on GitHub",
     ctaDocs: "Read the pattern docs",
     stat1Label: "typed endpoints",
@@ -30,7 +30,7 @@ export const translations = {
     eyebrow: "The problem",
     title: "You've built the same thing thirteen times.",
     subtitle:
-      "Every feature needs a web form, CLI command, MCP tool, mobile screen, cron job, WebSocket handler, admin panel, and more. Same validation, same i18n, same error handling - just dressed differently. Every time.",
+      "Every feature needs a custom web UI, CLI command, MCP tool, mobile screen, cron job, WebSocket handler, admin panel, and more. Same validation, same i18n, same error handling - just dressed differently. Every time.",
     callout: "next-vibe builds all thirteen from one file.",
   },
   pattern: {
@@ -46,7 +46,7 @@ export const translations = {
       "Business logic lives here - DB queries, auth checks, error handling with success()/fail(). The route.ts is just a thin delegator; validation, logging, and platform registration happen automatically.",
     widgetTitle: "widget.tsx - the UI (optional)",
     widgetBody:
-      "Without a widget, the framework auto-renders your fields on every platform. Add widget.tsx to fully control how your feature looks on web and native - the same component renders in admin panels, embedded widgets, and mobile screens.",
+      "Without a widget, the framework auto-renders your fields everywhere. Add widget.tsx to ship a fully custom interactive UI - the same component renders in admin panels, embedded widgets, and mobile screens.",
     deleteLine:
       "Delete the folder. The feature disappears from every platform at once.",
   },
@@ -62,7 +62,7 @@ export const translations = {
       },
       reactUi: {
         label: "React UI",
-        description: "Auto-generated form - no JSX required",
+        description: "Purpose-built interactive UI - no JSX required",
       },
       cli: {
         label: "CLI",

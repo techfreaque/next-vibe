@@ -37,8 +37,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { configScopedTranslation } from "@/config/i18n";
 import { FEATURED_MODELS } from "../../../agent/ai-stream/models";
-import { agentEnvAvailability } from "../../../agent/env-availability";
 import { contactClientRepository } from "../../../contact/repository-client";
+import { getPricingParams } from "../../../products/repository-client";
 import { EmailTemplate } from "../../../messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,
@@ -83,6 +83,7 @@ function SignupWelcomeEmail({
 }): ReactElement {
   const { t: globalT } = configScopedTranslation.scopedT(locale);
   const appName = globalT("appName");
+  const pricingParams = getPricingParams(locale);
 
   const modelCategories = [
     {
@@ -225,7 +226,7 @@ function SignupWelcomeEmail({
         </Text>
 
         {[
-          t("email.free.credits"),
+          t("email.free.credits", pricingParams),
           t("email.free.allModels", {
             modelCount: props.totalModelCount,
           }),
@@ -316,7 +317,7 @@ function SignupWelcomeEmail({
             marginBottom: "14px",
           }}
         >
-          {t("email.upgrade.desc")}
+          {t("email.upgrade.desc", pricingParams)}
         </Text>
         <Button
           href={`${tracking.baseUrl}/${locale}/subscription`}
@@ -455,7 +456,7 @@ async function renderWelcomeEmailByEmail(
     privateName: user.privateName,
     userId: user.id,
     leadId: user.leadId,
-    totalModelCount: getAvailableModelCount(agentEnvAvailability, false),
+    totalModelCount: getAvailableModelCount(false),
   };
   const { t: globalT } = configScopedTranslation.scopedT(locale);
 
@@ -510,7 +511,7 @@ function renderAdminNotificationEmailContent(
       locale={locale}
       title={t("admin_notification.title")}
       previewText={t("admin_notification.preview", {
-        appName: globalT("appName"),
+        privateName: user.privateName,
       })}
       recipientEmail={recipientEmail}
       tracking={tracking}

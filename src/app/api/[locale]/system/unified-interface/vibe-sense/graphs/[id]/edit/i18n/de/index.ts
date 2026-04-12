@@ -67,9 +67,11 @@ export const translations: typeof enTranslations = {
   widget: {
     back: "Zurueck",
     save: "Speichern (neue Version)",
+    saveNew: "Graph erstellen",
     saving: "Speichern...",
     saveError: "Speichern fehlgeschlagen",
     unsaved: "Ungespeicherte Aenderungen",
+    nameMissing: "Name eingeben vor dem Speichern",
     help: "Knoten verschieben. Handles verbinden um Kanten hinzuzufuegen.",
     nameLabel: "Name",
     slugLabel: "Slug",
@@ -152,8 +154,11 @@ export const translations: typeof enTranslations = {
       deleteConfirmYes: "Delete",
       deleteConfirmNo: "Cancel",
       openEndpoint: "Endpunkt oeffnen",
+      paneNone: "Nicht im Chart rendern",
     },
     graphSettings: "Graph-Einstellungen",
+    graphSettingsHint:
+      "Name und Slug setzen, dann Knoten in die Pipeline ziehen",
     canvasEmpty: "Canvas ist leer",
     canvasEmptyHint: "Knoten aus der Palette hierher ziehen",
     shortcutDelete: "Del - Knoten loeschen",

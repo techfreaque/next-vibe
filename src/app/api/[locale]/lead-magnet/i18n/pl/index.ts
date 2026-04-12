@@ -118,6 +118,7 @@ export const translations = {
         label: "Aktywny",
         description: "Włącz formularz lead capture na stronie skilla",
       },
+      secretKeepExisting: "Zostaw puste, aby zachować istniejący klucz",
       saveTitle: "Zapisz konfigurację",
       saveDescription: "Połącz swoją platformę e-mail, żeby zbierać leady",
       saveTag: "lead-magnet-provider",

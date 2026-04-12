@@ -2,13 +2,16 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Bot } from "next-vibe-ui/ui/icons/Bot";
 import { BookOpen } from "next-vibe-ui/ui/icons/BookOpen";
 import { Briefcase } from "next-vibe-ui/ui/icons/Briefcase";
+import { Code } from "next-vibe-ui/ui/icons/Code";
 import { Folder } from "next-vibe-ui/ui/icons/Folder";
 import { SiGithub } from "next-vibe-ui/ui/icons/SiGithub";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
+import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Tag } from "next-vibe-ui/ui/icons/Tag";
+import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
@@ -28,9 +31,14 @@ import { Logo } from "../../_components/logo";
 interface FooterProps {
   locale: CountryLanguage;
   totalModelCount: number;
+  isPublic: boolean;
 }
 
-const Footer: React.FC<FooterProps> = ({ locale, totalModelCount }) => {
+const Footer: React.FC<FooterProps> = ({
+  locale,
+  totalModelCount,
+  isPublic,
+}) => {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const currentYear = new Date().getFullYear();
@@ -68,11 +76,38 @@ const Footer: React.FC<FooterProps> = ({ locale, totalModelCount }) => {
             >
               <Div role="listitem">
                 <Link
-                  href={`/${locale}/story#features`}
+                  href={`/${locale}/story?tab=unbottled#universe-content`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
                   <Sparkles className="h-4 w-4" />
-                  {t("footer.platform.features")}
+                  {t("footer.platform.featuresUncensoredAi")}
+                </Link>
+              </Div>
+              <Div role="listitem">
+                <Link
+                  href={`/${locale}/story?tab=personal#universe-content`}
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
+                >
+                  <Server className="h-4 w-4" />
+                  {t("footer.platform.featuresSelfHosted")}
+                </Link>
+              </Div>
+              <Div role="listitem">
+                <Link
+                  href={`/${locale}/story?tab=nextvibe#universe-content`}
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
+                >
+                  <Code className="h-4 w-4" />
+                  {t("footer.platform.featuresOpenSource")}
+                </Link>
+              </Div>
+              <Div role="listitem">
+                <Link
+                  href={`/${locale}/story?tab=referral#universe-content`}
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
+                >
+                  <TrendingUp className="h-4 w-4" />
+                  {t("footer.platform.featuresReferral")}
                 </Link>
               </Div>
               <Div role="listitem">
@@ -86,7 +121,7 @@ const Footer: React.FC<FooterProps> = ({ locale, totalModelCount }) => {
               </Div>
               <Div role="listitem">
                 <Link
-                  href={`/${locale}/story#model-costs`}
+                  href={`/${locale}/subscription/overview`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
                   <Bot className="h-4 w-4" />
@@ -95,7 +130,7 @@ const Footer: React.FC<FooterProps> = ({ locale, totalModelCount }) => {
               </Div>
               <Div role="listitem">
                 <Link
-                  href={`/${locale}/story#features`}
+                  href={`/${locale}/skills`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
                   <Users className="h-4 w-4" />
@@ -116,7 +151,11 @@ const Footer: React.FC<FooterProps> = ({ locale, totalModelCount }) => {
             >
               <Div role="listitem">
                 <Link
-                  href={`/${locale}/story#features`}
+                  href={
+                    isPublic
+                      ? `/${locale}/story?tab=unbottled#privacy`
+                      : `/${locale}/threads/private`
+                  }
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
                   <Folder className="h-4 w-4" />
@@ -125,7 +164,7 @@ const Footer: React.FC<FooterProps> = ({ locale, totalModelCount }) => {
               </Div>
               <Div role="listitem">
                 <Link
-                  href={`/${locale}/story#features`}
+                  href={`/${locale}/threads/incognito`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
                   <Shield className="h-4 w-4" />
@@ -134,7 +173,11 @@ const Footer: React.FC<FooterProps> = ({ locale, totalModelCount }) => {
               </Div>
               <Div role="listitem">
                 <Link
-                  href={`/${locale}/story#features`}
+                  href={
+                    isPublic
+                      ? `/${locale}/story?tab=unbottled#privacy`
+                      : `/${locale}/threads/shared`
+                  }
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
                   <Users className="h-4 w-4" />

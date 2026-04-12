@@ -1,7 +1,7 @@
 export const translations = {
   title: "Otrzymuj leady na e-mail",
   description:
-    "Dostawaj powiadomienie e-mail za każdym razem, gdy ktoś wypełni Twój formularz. Bez zewnętrznych platform — korzysta z e-maila Twojego konta.",
+    "Dostawaj powiadomienie e-mail za każdym razem, gdy ktoś wypełni Twój formularz. Bez zewnętrznych platform - korzysta z e-maila Twojego konta.",
   notifyEmail: {
     label: "E-mail powiadomień",
     description:

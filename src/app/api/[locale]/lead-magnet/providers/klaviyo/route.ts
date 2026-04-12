@@ -14,7 +14,7 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "KLAVIYO",
         {
-          klaviyoApiKey: data.klaviyoApiKey,
+          klaviyoApiKey: data.klaviyoApiKey || undefined,
         },
         {
           listId: data.listId ?? null,

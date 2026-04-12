@@ -58,7 +58,7 @@ export function CodeQualityIssueList({
 
   if (!items || items.length === 0) {
     return (
-      <Div className="text-green-600">
+      <Div className="text-success">
         {t("widgets.codeQualityList.noIssues")}
       </Div>
     );
@@ -70,7 +70,7 @@ export function CodeQualityIssueList({
         <Div key={file} className="space-y-2">
           <Div className="font-bold">
             {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Visual marker */}
-            <Span className="text-blue-600 underline">● {file}</Span>
+            <Span className="text-primary underline">● {file}</Span>
             <Span className="ml-2 text-gray-500">
               ({fileItems.length} item{fileItems.length !== 1 ? "s" : ""})
             </Span>
@@ -79,10 +79,10 @@ export function CodeQualityIssueList({
             {fileItems.map((item, idx) => {
               const severityColor =
                 item.severity === "error"
-                  ? "text-red-600"
+                  ? "text-destructive"
                   : item.severity === "warning"
-                    ? "text-yellow-600"
-                    : "text-blue-600";
+                    ? "text-warning"
+                    : "text-primary";
 
               const icon =
                 item.severity === "error"
@@ -100,7 +100,7 @@ export function CodeQualityIssueList({
                 <Div key={idx} className="text-sm">
                   <ExternalLink
                     href={editorUrl}
-                    className="text-blue-600 hover:underline"
+                    className="text-primary hover:underline"
                   >
                     {item.line || 1}:{item.column || 1}
                   </ExternalLink>
@@ -143,16 +143,16 @@ export function CodeQualityFilesList({
       <Div className="space-y-1">
         {files.map((fileEntry, idx) => (
           <Div key={idx} className="flex items-center gap-2 text-sm">
-            <Span className="font-mono text-blue-600 underline">
+            <Span className="font-mono text-primary underline">
               {fileEntry.file}
             </Span>
             {fileEntry.errors > 0 && (
-              <Span className="text-red-600">
+              <Span className="text-destructive">
                 {fileEntry.errors} error{fileEntry.errors !== 1 ? "s" : ""}
               </Span>
             )}
             {fileEntry.warnings > 0 && (
-              <Span className="text-yellow-600">
+              <Span className="text-warning">
                 {fileEntry.warnings} warning
                 {fileEntry.warnings !== 1 ? "s" : ""}
               </Span>
@@ -217,7 +217,9 @@ export function CodeQualitySummary({
           {totalErrors !== undefined && totalErrors > 0 && (
             <Div>
               <Span>{widgetT("widgets.codeQualitySummary.errors")}: </Span>
-              <Span className="font-semibold text-red-600">{totalErrors}</Span>
+              <Span className="font-semibold text-destructive">
+                {totalErrors}
+              </Span>
             </Div>
           )}
         </Div>

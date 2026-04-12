@@ -86,11 +86,11 @@ export function KagiSearchResultsContainer({
         <Div className="flex flex-col gap-4">
           {/* AI Answer Section */}
           {output && (
-            <Card className="border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20">
+            <Card className="border-info/20 bg-info/5">
               <CardContent className="p-0">
-                <Div className="flex items-center gap-2 px-4 py-3 border-b border-blue-200 dark:border-blue-800 bg-blue-100/50 dark:bg-blue-900/20">
-                  <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <Span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+                <Div className="flex items-center gap-2 px-4 py-3 border-b border-info/20 bg-info/10">
+                  <Sparkles className="h-4 w-4 text-info" />
+                  <Span className="text-sm font-semibold text-foreground">
                     {t("get.response.output.title")}
                   </Span>
                 </Div>

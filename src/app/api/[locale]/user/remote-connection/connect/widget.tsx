@@ -113,9 +113,9 @@ export function RemoteConnectWidget({
             </Div>
 
             {/* Security notice */}
-            <Div className="col-span-2 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-800 dark:bg-amber-950">
-              <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-              <P className="text-xs text-amber-700 dark:text-amber-300">
+            <Div className="col-span-2 flex items-start gap-2 rounded-md border border-warning/30 bg-warning/10 px-3 py-2">
+              <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0 mt-0.5" />
+              <P className="text-xs text-warning">
                 {t("post.credentialWarning")}
               </P>
             </Div>

@@ -34,6 +34,7 @@ const { POST } = createEndpoint({
   description: "request.description",
   icon: "lock",
   category: "endpointCategories.userAuth",
+  subCategory: "endpointCategories.userAuthLogin",
   tags: ["request.tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   fields: objectField(scopedTranslation, {

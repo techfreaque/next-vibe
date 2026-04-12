@@ -47,6 +47,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   category: "endpointCategories.leads",
+  subCategory: "endpointCategories.leadsManagement",
   tags: ["tags.leads", "tags.create"],
   allowedRoles: [UserRole.ADMIN],
   icon: "user-plus",

@@ -121,6 +121,7 @@ export const translations = {
         label: "Active",
         description: "Enable the lead capture form on your skill page",
       },
+      secretKeepExisting: "Leave blank to keep your existing key",
       saveTitle: "Save Config",
       saveDescription: "Connect your email platform to capture leads",
       saveTag: "lead-magnet-provider",

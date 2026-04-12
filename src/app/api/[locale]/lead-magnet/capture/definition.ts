@@ -30,7 +30,8 @@ export const { POST } = createEndpoint({
   title: "submit.title" as const,
   description: "submit.description" as const,
   icon: "mail",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetCapture",
   tags: ["submit.tag" as const],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

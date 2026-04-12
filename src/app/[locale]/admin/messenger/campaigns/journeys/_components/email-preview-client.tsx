@@ -5,7 +5,6 @@
 
 "use client";
 
-import { render } from "@react-email/render";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Dialog,
@@ -19,17 +18,14 @@ import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Iframe } from "next-vibe-ui/ui/iframe";
 import { Span } from "next-vibe-ui/ui/span";
 import { H2, P } from "next-vibe-ui/ui/typography";
-import { parseError } from "next-vibe/shared/utils";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import type { EmailTemplateResult } from "@/app/api/[locale]/leads/campaigns/emails";
 import type {
   EmailCampaignStageValue,
   EmailJourneyVariantValue,
 } from "@/app/api/[locale]/leads/enum";
 import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -38,7 +34,9 @@ import { TestEmailForm } from "./test-email-form";
 interface EmailPreviewClientProps {
   journeyVariant: typeof EmailJourneyVariantValue;
   stage: typeof EmailCampaignStageValue;
-  emailPreview: EmailTemplateResult;
+  emailTo: string;
+  emailSubject: string;
+  emailHtml: string;
   companyName: string;
   companyEmail: string;
   locale: CountryLanguage;
@@ -48,7 +46,9 @@ interface EmailPreviewClientProps {
 export function EmailPreviewClient({
   journeyVariant,
   stage,
-  emailPreview,
+  emailTo,
+  emailSubject,
+  emailHtml,
   companyName,
   companyEmail,
   locale,
@@ -56,23 +56,6 @@ export function EmailPreviewClient({
 }: EmailPreviewClientProps): React.JSX.Element {
   const { t } = leadsScopedTranslation.scopedT(locale);
   const [isTestEmailOpen, setIsTestEmailOpen] = useState(false);
-  const [renderedHtml, setRenderedHtml] = useState<string>("");
-  const logger = createEndpointLogger(false, Date.now(), locale);
-
-  useEffect(() => {
-    // Render JSX to HTML for preview
-    const renderEmailHtml = async (): Promise<void> => {
-      try {
-        const html = await render(emailPreview.jsx);
-        setRenderedHtml(html);
-      } catch (error) {
-        logger.error("Failed to render email HTML:", parseError(error));
-        setRenderedHtml(t("admin.emails.preview.error"));
-      }
-    };
-
-    void renderEmailHtml();
-  }, [emailPreview.jsx, logger, t]);
 
   return (
     <>
@@ -130,7 +113,7 @@ export function EmailPreviewClient({
                   {t("admin.emails.recipient")}:
                 </Span>
                 <Span className="ml-2 text-gray-600 dark:text-gray-400">
-                  {emailPreview.to}
+                  {emailTo}
                 </Span>
               </Div>
               <Div>
@@ -138,7 +121,7 @@ export function EmailPreviewClient({
                   {t("admin.emails.subject")}:
                 </Span>
                 <Span className="ml-2 text-gray-600 dark:text-gray-400">
-                  {emailPreview.subject}
+                  {emailSubject}
                 </Span>
               </Div>
             </Div>
@@ -164,7 +147,7 @@ export function EmailPreviewClient({
               {/* Email HTML Content */}
               <Div className="bg-white">
                 <Iframe
-                  srcDoc={renderedHtml}
+                  srcDoc={emailHtml}
                   className="w-full h-[600px] border-0"
                   title={t("admin.emails.preview_title")}
                   sandbox="allow-same-origin"

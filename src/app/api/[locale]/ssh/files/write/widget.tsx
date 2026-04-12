@@ -61,7 +61,7 @@ export function FilesWriteContainer({ field }: WidgetProps): React.JSX.Element {
 
       {/* Result */}
       {value && (
-        <Div className="flex items-center gap-2 px-4 py-2 border-b bg-green-50 dark:bg-green-950/20 text-xs text-green-700 dark:text-green-300">
+        <Div className="flex items-center gap-2 px-4 py-2 border-b bg-success/10 text-xs text-success-foreground">
           <Span>
             ✓ {t("widget.bytesWritten")}: {value.bytesWritten.toLocaleString()}
           </Span>

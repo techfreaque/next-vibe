@@ -53,13 +53,20 @@ export const translations = {
   },
   widget: {
     loading: "Wird geladen…",
+    pitch: {
+      headline: "Aus Besuchern werden Abonnenten",
+      body: "Wer deine Skill-Seite oder dein Creator-Profil besucht, sieht ein Anmeldefeld. Ein Klick - und die E-Mail-Adresse landet direkt in deiner Liste. Keine Extra-Apps, kein Mittelsmann, keine monatliche Gebühr für die Basis-Erfassung.",
+      step1: "Jemand besucht deine Skill-Seite oder dein Creator-Profil",
+      step2: "Er trägt sich ins Formular ein",
+      step3: "Die E-Mail landet direkt in deiner Liste",
+    },
     noConfig:
-      "Keine E-Mail-Plattform verbunden. Wähle unten eine aus, um Leads zu erfassen.",
+      "Verbinde eine E-Mail-Plattform, um Abonnenten über deine Skill-Seiten und dein Creator-Profil zu sammeln.",
     active: "Aktiv",
     inactive: "Inaktiv",
-    choosePlatform: "E-Mail-Plattform wählen",
+    choosePlatform: "E-Mail-Plattform verbinden",
     switchPlatform: "Plattform wechseln",
-    selectPlaceholder: "Plattform auswählen…",
+    selectPlaceholder: "Plattform wählen…",
     providers: {
       GETRESPONSE: "GetResponse",
       KLAVIYO: "Klaviyo",

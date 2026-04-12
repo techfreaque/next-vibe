@@ -38,11 +38,11 @@ function getTextVariantClassName(variant: TextVariant): string {
     case "error":
       return "text-destructive";
     case "success":
-      return "text-green-600 dark:text-green-400";
+      return "text-success";
     case "warning":
       return "text-yellow-600 dark:text-yellow-400";
     case "info":
-      return "text-blue-600 dark:text-blue-400";
+      return "text-info";
     case "muted":
       return "text-muted-foreground";
     default:

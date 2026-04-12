@@ -14,9 +14,9 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "YOULEAD",
         {
-          youLeadAppId: data.youLeadAppId,
-          youLeadClientId: data.youLeadClientId,
-          youLeadAppSecretKey: data.youLeadAppSecretKey,
+          youLeadAppId: data.youLeadAppId || undefined,
+          youLeadClientId: data.youLeadClientId || undefined,
+          youLeadAppSecretKey: data.youLeadAppSecretKey || undefined,
         },
         {
           listId: data.listId ?? null,

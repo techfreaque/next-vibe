@@ -35,9 +35,9 @@ export function SkillReportContainer({
   if (data?.reported) {
     return (
       <Div className="flex flex-col gap-4 p-4">
-        <Div className="rounded-lg border border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/20 p-4 flex items-center gap-3">
-          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0" />
-          <Span className="text-sm font-medium text-green-700 dark:text-green-300">
+        <Div className="rounded-lg border border-success/30 bg-success/10 p-4 flex items-center gap-3">
+          <CheckCircle className="h-5 w-5 text-success shrink-0" />
+          <Span className="text-sm font-medium text-success-foreground">
             {t("post.success.title")}
           </Span>
         </Div>
@@ -55,7 +55,7 @@ export function SkillReportContainer({
       </Div>
 
       <Div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
+        <AlertTriangle className="h-4 w-4 text-warning shrink-0" />
         <Span>{t("post.description")}</Span>
       </Div>
 

@@ -31,7 +31,8 @@ export const { POST } = createEndpoint({
   title: "providers.expertsender.title" as const,
   description: "providers.expertsender.description" as const,
   icon: "mail",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetIntegrations",
   tags: ["providers.shared.saveTag" as const],
   allowedRoles: ALLOWED_ROLES,
   fields: objectField(scopedTranslation, {
@@ -55,11 +56,10 @@ export const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "providers.expertsender.expertSenderApiKey.label" as const,
-        description:
-          "providers.expertsender.expertSenderApiKey.description" as const,
+        description: "providers.shared.secretKeepExisting" as const,
         placeholder:
           "providers.expertsender.expertSenderApiKey.placeholder" as const,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       listId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

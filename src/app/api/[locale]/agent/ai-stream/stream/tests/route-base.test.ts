@@ -925,7 +925,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // UI retry/branch on T2's user message uses userMsg.parentId = this value.
       // So retry/branch user messages are SIBLINGS of T2's user message under t2BranchParentId.
       let t2BranchParentId: string;
-      // T2's user message ID — a sibling of the retry/branch user messages under t2BranchParentId.
+      // T2's user message ID - a sibling of the retry/branch user messages under t2BranchParentId.
       let t2UserMsgId: string;
       let branchRetryAiMsgId: string; // From retry+branch test
       let branchForkAiMsgId: string; // From branch fork
@@ -1162,7 +1162,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const added = newMessages(messages, prevCount);
 
-          // Capture T2's user message ID — it's a sibling of the retry/branch user messages.
+          // Capture T2's user message ID - it's a sibling of the retry/branch user messages.
           // T2 user message has parentId = t2BranchParentId (the value of lastMainAiMsgId before T2).
           const t2AddedUser = added.find((m) => m.role === "user");
           t2UserMsgId = t2AddedUser?.id ?? "";

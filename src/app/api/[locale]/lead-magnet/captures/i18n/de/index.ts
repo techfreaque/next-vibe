@@ -51,7 +51,7 @@ export const translations = {
   },
   widget: {
     empty:
-      "Noch keine Leads erfasst. Teile deine Skill-Seite, um mit dem Sammeln zu beginnen.",
+      "Noch keine Abonnenten. Teile deine Skill-Seite - jeder Besuch ist eine Chance für deine Liste.",
     exportCsv: "CSV exportieren",
     columns: {
       date: "Datum",

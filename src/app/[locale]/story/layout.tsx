@@ -1,12 +1,13 @@
+/* eslint-disable oxlint-plugin-jsx-capitalization/jsx-capitalization */
 export const dynamic = "force-dynamic";
 
+import { getPathname } from "next-vibe-ui/lib/headers";
 import { Div } from "next-vibe-ui/ui/div";
 import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type { JSX, ReactNode } from "react";
 
 import Footer from "@/app/[locale]/story/_components/footer";
 import { Navbar } from "@/app/[locale]/story/_components/nav/navbar";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
@@ -21,6 +22,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { navItems } from "../story/_components/nav/nav-constants";
+import { SITE_FOOTER_ID } from "./constants";
+
+export { SITE_FOOTER_ID } from "./constants";
 
 export interface SiteLayoutData {
   locale: CountryLanguage;
@@ -28,6 +32,7 @@ export interface SiteLayoutData {
   userProfile: StandardUserType | undefined;
   hasSubscription: boolean;
   totalModelCount: number;
+  isHomePage: boolean;
   children?: ReactNode;
 }
 
@@ -69,9 +74,21 @@ export async function tanstackLoader({
   }
 
   const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
-  const totalModelCount = getAvailableModelCount(agentEnvAvailability, isAdmin);
+  const totalModelCount = getAvailableModelCount(isAdmin);
 
-  return { locale, user, userProfile, hasSubscription, totalModelCount };
+  const pathname = await getPathname();
+  const normalizedPath = pathname.replace(/\/+$/, "");
+  const isHomePage =
+    normalizedPath === `/${locale}/story` || normalizedPath === `/${locale}`;
+
+  return {
+    locale,
+    user,
+    userProfile,
+    hasSubscription,
+    totalModelCount,
+    isHomePage,
+  };
 }
 
 export function TanstackPage({
@@ -80,6 +97,7 @@ export function TanstackPage({
   userProfile,
   hasSubscription,
   totalModelCount,
+  isHomePage,
   children,
 }: SiteLayoutData): JSX.Element {
   return (
@@ -94,7 +112,16 @@ export function TanstackPage({
           totalModelCount={totalModelCount}
         />
         {children}
-        <Footer locale={locale} totalModelCount={totalModelCount} />
+        <Div
+          id={SITE_FOOTER_ID}
+          style={isHomePage ? { display: "none" } : undefined}
+        >
+          <Footer
+            locale={locale}
+            totalModelCount={totalModelCount}
+            isPublic={user.isPublic}
+          />
+        </Div>
       </Div>
     </PageLayout>
   );

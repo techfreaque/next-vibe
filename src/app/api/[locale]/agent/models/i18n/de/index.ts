@@ -68,19 +68,10 @@ export const translations = {
       openDesc: "Weniger Einschränkungen",
       uncensoredDesc: "Keine Einschränkungen",
     },
-    speed: {
-      fast: "Schnell",
-      balanced: "Ausgewogen",
-      thorough: "Gründlich",
-      fastDesc: "Schnelle Antworten",
-      balancedDesc: "Gute Balance",
-      thoroughDesc: "Detaillierte Analyse",
-    },
   },
   sort: {
     intelligence: "Intelligenz",
     price: "Preis",
-    speed: "Geschwindigkeit",
     content: "Inhalt",
   },
   ranges: {
@@ -95,10 +86,6 @@ export const translations = {
     contentRange: {
       minLabel: "Min. Inhalt",
       maxLabel: "Max. Inhalt",
-    },
-    speedRange: {
-      minLabel: "Min. Geschwindigkeit",
-      maxLabel: "Max. Geschwindigkeit",
     },
   },
   credits: {

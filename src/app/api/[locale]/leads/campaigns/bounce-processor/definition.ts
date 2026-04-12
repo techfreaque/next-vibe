@@ -38,7 +38,8 @@ const { POST } = createEndpoint({
   aliases: [BOUNCE_PROCESSOR_ALIAS],
   title: "post.title",
   description: "post.description",
-  category: "endpointCategories.leadsCampaigns",
+  category: "endpointCategories.emailCampaigns",
+  subCategory: "endpointCategories.emailCampaignsProcessing",
   icon: "mail",
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
@@ -209,7 +210,8 @@ const { GET } = createEndpoint({
   icon: "mail",
   title: "get.title",
   description: "get.description",
-  category: "endpointCategories.leadsCampaigns",
+  category: "endpointCategories.emailCampaigns",
+  subCategory: "endpointCategories.emailCampaignsProcessing",
   tags: ["tag"],
 
   fields: objectField(scopedTranslation, {

@@ -73,9 +73,9 @@ export default function CodeQualityFilesWidget<
           const { file, errors, warnings, total } = fileEntry;
           return (
             <Div key={idx} className="flex items-center gap-2 text-sm">
-              <Span className="font-mono text-blue-600 underline">{file}</Span>
+              <Span className="font-mono text-primary underline">{file}</Span>
               {errors > 0 && (
-                <Span className="text-red-600">
+                <Span className="text-destructive">
                   {errors} error{errors !== 1 ? "s" : ""}
                 </Span>
               )}

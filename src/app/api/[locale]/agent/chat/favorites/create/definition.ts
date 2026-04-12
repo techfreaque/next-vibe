@@ -5,10 +5,6 @@
 
 import { z } from "zod";
 
-import {
-  CHAT_MODE_IDS,
-  ChatModeOptions,
-} from "@/app/api/[locale]/agent/models/enum";
 import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
@@ -16,6 +12,10 @@ import {
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import {
+  CHAT_MODE_IDS,
+  ChatModeOptions,
+} from "@/app/api/[locale]/agent/models/enum";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import {
@@ -39,9 +39,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
 import { lazy } from "react";
 import { iconSchema } from "../../../../shared/types/common.schema";
-import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
@@ -69,7 +69,8 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "plus" as const,
-  category: "endpointCategories.chatFavorites",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.chatFavorites",
   tags: ["tags.favorites" as const],
 
   aliases: [FAVORITE_CREATE_ALIAS],
@@ -83,9 +84,6 @@ const { POST } = createEndpoint({
         locale,
         user,
       }) => {
-        const { getEnvAvailability } =
-          await import("../../../env-availability-context");
-        const env = getEnvAvailability();
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         const favoritesDefinition = await import("../definition");
@@ -133,7 +131,7 @@ const { POST } = createEndpoint({
           customVariantName: requestData.customVariantName ?? null,
           customIcon: null,
           voiceModelSelection: requestData.voiceModelSelection ?? null,
-          modelSelection: requestData.modelSelection,
+          modelSelection: requestData.modelSelection ?? null,
           position: 0, // Will be set correctly by the list
         };
 
@@ -158,7 +156,6 @@ const { POST } = createEndpoint({
                 null,
                 locale,
                 user,
-                env,
               );
 
             return {
@@ -331,7 +328,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "post.modelSelection.label" as const,
         description: "post.modelSelection.description" as const,
-        schema: chatModelSelectionSchema.nullable(),
+        schema: chatModelSelectionSchema.nullable().optional(),
       }),
 
       // Auto-compacting token threshold (null = fall through to character/settings default)
@@ -381,7 +378,7 @@ const { POST } = createEndpoint({
       // === RESPONSE ===
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        schema: z.string().uuid(),
+        schema: z.string(),
         hidden: true,
       }),
 

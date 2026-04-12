@@ -5,7 +5,6 @@ import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
-  SpeedLevel,
 } from "../chat/skills/enum";
 import { ModelUtility } from "../models/enum";
 import {
@@ -13,11 +12,11 @@ import {
   calculateCreditCost,
   defaultFeatures,
   filterRoleModels,
+  getModelForProvider,
   getProviderPrice,
   type ModelDefinition,
   type ModelOptionCreditBased,
   type ModelOptionTokenBased,
-  type ModelProviderEnvAvailability,
 } from "../models/models";
 import {
   filtersSelectionSchema,
@@ -121,7 +120,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.UNCENSORED,
     features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.CODING],
@@ -158,7 +156,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.UNCENSORED,
     features: { ...defaultFeatures, toolCalling: false },
     weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
@@ -200,7 +197,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.UNCENSORED,
     features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.CODING],
@@ -241,7 +237,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.UNCENSORED,
     features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
@@ -263,7 +258,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
   //   utilities: [ModelUtility.FAST, ModelUtility.CHAT],
   //   supportsTools: false,
   //   intelligence: IntelligenceLevel.QUICK,
-  //   speed: SpeedLevel.FAST,
   //   content: ContentLevel.UNCENSORED,
   //   features: { ...defaultFeatures },
   //   weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
@@ -285,7 +279,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
   //   utilities: [ModelUtility.FAST, ModelUtility.REASONING],
   //   supportsTools: false,
   //   intelligence: IntelligenceLevel.SMART,
-  //   speed: SpeedLevel.FAST,
   //   content: ContentLevel.UNCENSORED,
   //   features: { ...defaultFeatures },
   //   weaknesses: [ModelUtility.CODING],
@@ -307,7 +300,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
   //   utilities: [ModelUtility.FAST, ModelUtility.CHAT],
   //   supportsTools: false,
   //   intelligence: IntelligenceLevel.QUICK,
-  //   speed: SpeedLevel.FAST,
   //   content: ContentLevel.UNCENSORED,
   //   features: { ...defaultFeatures },
   //   weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
@@ -362,7 +354,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -413,7 +404,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -471,7 +461,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -521,7 +510,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -579,7 +567,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -626,7 +613,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -666,7 +652,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -709,7 +694,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -747,7 +731,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -792,7 +775,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -838,7 +820,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -879,7 +860,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.LEGACY, ModelUtility.CODING],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -924,7 +904,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -970,7 +949,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -1011,7 +989,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -1057,7 +1034,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -1096,7 +1072,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CHAT],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -1135,7 +1110,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -1181,7 +1155,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -1222,7 +1195,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.SMART],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -1270,7 +1242,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -1311,7 +1282,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART, ModelUtility.CHAT],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -1352,7 +1322,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.LEGACY, ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -1393,7 +1362,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.LEGACY, ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -1436,7 +1404,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.CHAT, ModelUtility.CODING],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -1480,7 +1447,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -1524,7 +1490,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -1568,7 +1533,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -1612,7 +1576,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -1653,7 +1616,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -1695,7 +1657,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -1732,7 +1693,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -1769,7 +1729,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -1809,7 +1768,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -1846,7 +1804,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.LEGACY, ModelUtility.VISION, ModelUtility.CHAT],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -1886,7 +1843,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -1926,7 +1882,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -1965,7 +1920,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.LEGACY, ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -2007,7 +1961,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.LEGACY, ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -2049,7 +2002,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -2095,7 +2047,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -2137,7 +2088,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: { ...defaultFeatures },
   },
@@ -2176,7 +2126,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.ANALYSIS],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -2218,7 +2167,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -2240,7 +2188,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
   //   utilities: [ModelUtility.CHAT, ModelUtility.FAST],
   //   supportsTools: true,
   //   intelligence: IntelligenceLevel.QUICK,
-  //   speed: SpeedLevel.FAST,
   //   content: ContentLevel.MAINSTREAM,
   //   features: { ...defaultFeatures, toolCalling: true },
   //   weaknesses: [ModelUtility.ANALYSIS, ModelUtility.CODING],
@@ -2276,7 +2223,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -2311,7 +2257,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -2353,7 +2298,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -2388,7 +2332,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -2427,7 +2370,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -2462,7 +2404,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.ANALYSIS, ModelUtility.CODING],
@@ -2507,7 +2448,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
@@ -2551,7 +2491,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
@@ -2595,7 +2534,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.MAINSTREAM,
     features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
@@ -2640,7 +2578,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: { ...defaultFeatures, streaming: false },
   },
@@ -2681,7 +2618,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: { ...defaultFeatures, streaming: false },
   },
@@ -2722,7 +2658,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: { ...defaultFeatures, streaming: false },
   },
@@ -2783,7 +2718,6 @@ function buildChatOption(
     utilities: def.utilities,
     supportsTools: def.supportsTools,
     intelligence: def.intelligence,
-    speed: def.speed,
     content: def.content,
     features: def.features,
     weaknesses: def.weaknesses,
@@ -2843,9 +2777,42 @@ function buildChatModelOptions(): Record<ChatModelId, ChatModelOption> {
 export const chatModelOptionsIndex: Record<string, ChatModelOption> =
   buildChatModelOptions();
 
+/** One entry per model (cheapest provider overall). Used for display/UI and ID lookups. */
 export const chatModelOptions: ChatModelOption[] = Object.values(
   chatModelOptionsIndex,
 ).filter((m): m is ChatModelOption => m !== undefined);
+
+/**
+ * All (model, provider) combinations sorted cheapest-first.
+ * Used exclusively by filterChatModels so filterRoleModels can pick the cheapest
+ * AVAILABLE provider per model (falls back to next provider if cheapest is unconfigured).
+ */
+function buildChatModelOptionsPool(): ChatModelOption[] {
+  const pool: ChatModelOption[] = [];
+  for (const modelId of Object.values(ChatModelId)) {
+    const def = chatModelDefinitions[modelId];
+    const sortedProviders = [...def.providers].toSorted(
+      (a, b) => getProviderPrice(a) - getProviderPrice(b),
+    );
+    for (const provider of sortedProviders) {
+      if (
+        provider.creditCostPerClip !== undefined ||
+        provider.creditCostPerSecond !== undefined ||
+        provider.creditCostPerCharacter !== undefined
+      ) {
+        continue;
+      }
+      const option = buildChatOption(modelId, def, provider);
+      if (option) {
+        pool.push(option);
+      }
+    }
+  }
+  return pool;
+}
+
+export const chatModelOptionsPool: ChatModelOption[] =
+  buildChatModelOptionsPool();
 
 export const ChatModelIdOptions = Object.values(ChatModelId).map((id) => ({
   value: id,
@@ -2870,34 +2837,21 @@ export function getChatModelById(
 
 /**
  * Resolve a chat model option using a specific API provider.
- * Picks the cheapest provider variant for `modelId` that matches `provider`.
+ * Picks the cheapest provider variant for `modelId` that matches `provider` from the pool.
  * Falls back to the default (cheapest overall) if no matching provider exists.
  */
 export function getChatModelForProvider(
   modelId: ChatModelId,
   provider: ApiProvider,
 ): ChatModelOption {
-  const def = chatModelDefinitions[modelId];
-  const matching = [...def.providers]
-    .filter((p) => p.apiProvider === provider)
-    .toSorted((a, b) => getProviderPrice(a) - getProviderPrice(b));
-
-  for (const p of matching) {
-    if (
-      p.creditCostPerClip !== undefined ||
-      p.creditCostPerSecond !== undefined ||
-      p.creditCostPerCharacter !== undefined
-    ) {
-      continue;
-    }
-    const option = buildChatOption(modelId, def, p);
-    if (option) {
-      return option;
-    }
-  }
-
-  // No matching provider found - fall back to default
-  return getChatModelById(modelId);
+  return (
+    getModelForProvider(
+      modelId,
+      provider,
+      chatModelOptionsPool,
+      getChatModelById(modelId),
+    ) ?? getChatModelById(modelId)
+  );
 }
 
 // ============================================================
@@ -2928,16 +2882,14 @@ export type ChatModelSelection = z.infer<typeof chatModelSelectionSchema>;
 export function filterChatModels(
   selection: ChatModelSelection,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): ChatModelOption[] {
-  return filterRoleModels(chatModelOptions, selection, user, env);
+  return filterRoleModels(chatModelOptionsPool, selection, user);
 }
 
 /** Get best chat model from a selection. */
 export function getBestChatModel(
   selection: ChatModelSelection,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): ChatModelOption | null {
-  return filterChatModels(selection, user, env)[0] ?? null;
+  return filterChatModels(selection, user)[0] ?? null;
 }

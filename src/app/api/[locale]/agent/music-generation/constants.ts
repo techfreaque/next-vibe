@@ -3,8 +3,6 @@
  */
 
 import {
-  ContentLevel,
-  IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
@@ -21,8 +19,6 @@ export const AUDIO_GEN_TOOL_NAME = "audio_gen" as const;
 export const DEFAULT_MUSIC_GEN_MODEL_SELECTION: MusicGenModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
   manualModelId: MusicGenModelId.LYRIA_3,
-  intelligenceRange: { min: IntelligenceLevel.SMART },
-  contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,

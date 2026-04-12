@@ -14,7 +14,7 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "GETRESPONSE",
         {
-          getresponseApiKey: data.getresponseApiKey,
+          getresponseApiKey: data.getresponseApiKey || undefined,
         },
         {
           listId: data.listId ?? null,

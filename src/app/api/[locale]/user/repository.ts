@@ -42,6 +42,22 @@ import { UserRole, type UserRoleValue } from "./user-roles/enum";
 import { UserRolesRepository } from "./user-roles/repository";
 
 /**
+ * Derive a URL-safe slug from a display name.
+ * "Jane Doe" → "jane-doe", "Ünïcödé!" → "unicode"
+ */
+export function deriveSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // strip diacritics
+    .replace(/[^a-z0-9\s-]/g, "") // keep alphanumeric, spaces, hyphens
+    .trim()
+    .replace(/[\s]+/g, "-") // spaces → hyphens
+    .replace(/-{2,}/g, "-") // collapse multiple hyphens
+    .slice(0, 60); // max length
+}
+
+/**
  * User Repository
  */
 export class UserRepository {
@@ -195,6 +211,7 @@ export class UserRepository {
       const completeUser: CompleteUserType = {
         ...standardUser,
         stripeCustomerId: user.stripeCustomerId,
+        creatorSlug: user.creatorSlug ?? deriveSlug(user.publicName),
         bio: user.bio,
         websiteUrl: user.websiteUrl,
         twitterUrl: user.twitterUrl,
@@ -205,6 +222,7 @@ export class UserRepository {
         discordUrl: user.discordUrl,
         creatorAccentColor: user.creatorAccentColor,
         creatorHeaderImageUrl: user.creatorHeaderImageUrl,
+        avatarUrl: user.avatarUrl,
       };
 
       return success(completeUser) as ResponseType<ExtendedUserType<T>>;

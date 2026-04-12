@@ -35,6 +35,7 @@ export const translations: typeof enTranslations = {
       custom: "Benutzerdefiniert",
     },
     source: {
+      all: "Alle",
       builtIn: "Eingebaut",
       my: "Meine Charaktere",
       community: "Community",
@@ -72,11 +73,6 @@ export const translations: typeof enTranslations = {
       open: "Offen",
       uncensored: "Unzensiert",
     },
-    speed: {
-      fast: "Schnell",
-      balanced: "Ausgewogen",
-      thorough: "Gründlich",
-    },
     skillType: {
       persona: "Persona",
       specialist: "Spezialist",
@@ -96,7 +92,6 @@ export const translations: typeof enTranslations = {
     sort: {
       intelligence: "Intelligenz",
       price: "Preis",
-      speed: "Geschwindigkeit",
       content: "Inhalt",
     },
     sortDirection: {
@@ -1057,6 +1052,8 @@ export const translations: typeof enTranslations = {
       variants: {
         gemini: "Gemini",
         fast: "Schnell",
+        cheapAndSmart: "Günstig & Schlau",
+        brilliant: "Brilliant",
       },
     },
     qualityTester: {
@@ -1103,6 +1100,11 @@ export const translations: typeof enTranslations = {
         label: "Seitengröße",
         description:
           "Anzahl der Skills pro Seite (1–500). KI/MCP-Aufrufer verwenden standardmäßig 25; menschliche Aufrufer erhalten alle.",
+      },
+      sourceFilter: {
+        label: "Quelle",
+        description:
+          "Filtere nach Herkunft: eingebaut, Community oder eigene Charaktere.",
       },
     },
     container: {
@@ -1186,8 +1188,6 @@ export const translations: typeof enTranslations = {
           maxPrice: { content: "Maximalpreis" },
           minContent: { content: "Minimale Inhaltsstufe" },
           maxContent: { content: "Maximale Inhaltsstufe" },
-          minSpeed: { content: "Minimale Geschwindigkeit" },
-          maxSpeed: { content: "Maximale Geschwindigkeit" },
           preferredStrengths: { content: "Bevorzugte Stärken" },
           ignoredWeaknesses: { content: "Ignorierte Schwächen" },
           manualModelId: { content: "Manuelles Modell" },
@@ -1390,12 +1390,6 @@ export const translations: typeof enTranslations = {
       label: "Maximale Inhaltsstufe",
       description: "Maximale Inhaltsmoderationsebene für das Modell",
     },
-    speedRange: {
-      label: "Geschwindigkeitsbereich",
-      description: "Antwortgeschwindigkeit-Stufenbereich",
-      minLabel: "Min. Geschwindigkeit",
-      maxLabel: "Max. Geschwindigkeit",
-    },
     preferredStrengths: {
       label: "Bevorzugte Stärken",
       description: "Modellfähigkeiten und Stärken, die bevorzugt werden",
@@ -1410,6 +1404,11 @@ export const translations: typeof enTranslations = {
       label: "Manuelles Modell",
       description:
         "Spezifisches Modell, das immer mit diesem Charakter verwendet werden soll",
+    },
+    variants: {
+      label: "Varianten",
+      description:
+        "Benannte Varianten mit eigener Modellauswahl. Jede Variante braucht: id (eindeutiger String), modelSelection (Pflicht), isDefault (genau eine muss true sein).",
     },
     availableTools: {
       label: "Erlaubte Tools",

@@ -66,7 +66,7 @@ export function MessageAuthorInfo({
 }: MessageAuthorProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
-  const authorColor = isAI ? "text-blue-500" : "text-foreground";
+  const authorColor = isAI ? "text-primary" : "text-foreground";
 
   // Determine display name based on author
   let displayName: string;

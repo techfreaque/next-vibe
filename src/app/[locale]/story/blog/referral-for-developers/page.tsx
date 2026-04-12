@@ -53,19 +53,22 @@ export async function tanstackLoader({
 }
 
 function MathRow({
-  referrals,
-  casual,
-  heavy,
+  profile,
+  spend,
+  direct,
+  skill,
 }: {
-  referrals: string;
-  casual: string;
-  heavy: string;
+  profile: string;
+  spend: string;
+  direct: string;
+  skill: string;
 }): JSX.Element {
   return (
-    <Div className="grid grid-cols-3 px-4 py-3 border-t text-sm font-mono">
-      <Span className="text-cyan-300">{referrals}</Span>
-      <Span className="text-gray-300">{casual}</Span>
-      <Span className="text-cyan-400 font-semibold">{heavy}</Span>
+    <Div className="grid grid-cols-4 px-4 py-3 border-t text-sm font-mono">
+      <Span className="text-gray-300">{profile}</Span>
+      <Span className="text-gray-400">{spend}</Span>
+      <Span className="text-cyan-300">{direct}</Span>
+      <Span className="text-emerald-400 font-semibold">{skill}</Span>
     </Div>
   );
 }
@@ -154,45 +157,43 @@ export function TanstackPage({
 
         <Separator />
 
-        {/* API angle */}
+        {/* Skill angle */}
         <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("apiAngle.title")}</H2>
+          <H2 className="text-2xl font-bold mb-6">{t("skillAngle.title")}</H2>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("apiAngle.p1", { appName })}
+            {t("skillAngle.p1")}
+          </P>
+          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+            {t("skillAngle.p2")}
           </P>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("apiAngle.p2", { appName })}
+            {t("skillAngle.p3")}
           </P>
         </Div>
 
         <Separator />
 
-        {/* Math */}
+        {/* Math table */}
         <Div>
           <H2 className="text-2xl font-bold mb-2">{t("math.title")}</H2>
           <Muted className="mb-6">{t("math.subtitle")}</Muted>
 
           <Div className="overflow-hidden rounded-xl border border-gray-700 bg-gray-900 mb-6">
-            <Div className="grid grid-cols-3 bg-gray-800 px-4 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide font-mono">
-              <Span>{t("math.tableHeaderReferrals")}</Span>
-              <Span>{t("math.tableHeaderCasual")}</Span>
-              <Span>{t("math.tableHeaderHeavy")}</Span>
+            <Div className="grid grid-cols-4 bg-gray-800 px-4 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide font-mono">
+              <Span>{t("math.tableHeaderProfile")}</Span>
+              <Span>{t("math.tableHeaderSpend")}</Span>
+              <Span>{t("math.tableHeaderDirect")}</Span>
+              <Span>{t("math.tableHeaderSkill")}</Span>
             </Div>
-            <MathRow
-              referrals={t("math.rows.0.referrals")}
-              casual={t("math.rows.0.casual")}
-              heavy={t("math.rows.0.heavy")}
-            />
-            <MathRow
-              referrals={t("math.rows.1.referrals")}
-              casual={t("math.rows.1.casual")}
-              heavy={t("math.rows.1.heavy")}
-            />
-            <MathRow
-              referrals={t("math.rows.2.referrals")}
-              casual={t("math.rows.2.casual")}
-              heavy={t("math.rows.2.heavy")}
-            />
+            {([0, 1, 2, 3] as const).map((i) => (
+              <MathRow
+                key={i}
+                profile={t(`math.rows.${i}.profile`)}
+                spend={t(`math.rows.${i}.spend`)}
+                direct={t(`math.rows.${i}.direct`)}
+                skill={t(`math.rows.${i}.skill`)}
+              />
+            ))}
           </Div>
 
           <Div className="p-4 rounded-lg bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-800 text-sm text-cyan-800 dark:text-cyan-200 mb-4">
@@ -208,14 +209,37 @@ export function TanstackPage({
 
         <Separator />
 
-        {/* Multi-level for builders */}
+        {/* Chain */}
         <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("multilevel.title")}</H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("multilevel.p1", { appName })}
+          <H2 className="text-2xl font-bold mb-6">{t("chain.title")}</H2>
+          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+            {t("chain.p1")}
           </P>
+          <Div className="space-y-2 mb-6">
+            {(
+              [
+                "level0",
+                "level1",
+                "level2",
+                "level3",
+                "level4",
+                "total",
+              ] as const
+            ).map((key) => (
+              <Div
+                key={key}
+                className={`flex items-start gap-3 p-3 rounded-lg text-sm ${
+                  key === "total"
+                    ? "bg-emerald-950/30 border border-emerald-800/40 text-emerald-300 font-semibold"
+                    : "bg-gray-900/60 border border-gray-700/40 text-gray-300"
+                }`}
+              >
+                <Span className="font-mono">{t(`chain.${key}`)}</Span>
+              </Div>
+            ))}
+          </Div>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("multilevel.p2", { appName })}
+            {t("chain.p2")}
           </P>
         </Div>
 
@@ -249,7 +273,7 @@ export function TanstackPage({
               size="lg"
               className="gap-2 bg-cyan-700 hover:bg-cyan-800 text-white"
             >
-              <Link href={`/${locale}/user/referral`}>
+              <Link href={`/${locale}/user/(account)/referral`}>
                 {t("close.createCode")}
                 <ArrowRight className="h-4 w-4" />
               </Link>

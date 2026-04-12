@@ -11,10 +11,10 @@ import { Languages } from "next-vibe-ui/ui/icons/Languages";
 
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
+import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, Muted, P } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
+import type { ComponentType, JSX } from "react";
 
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -58,30 +58,8 @@ export async function tanstackLoader({
   const { locale } = await params;
   return {
     locale,
-    modelCount: getAvailableModelCount(agentEnvAvailability, false),
+    modelCount: getAvailableModelCount(false),
   };
-}
-
-function ScenarioCard({
-  label,
-  spend,
-  earn,
-}: {
-  label: string;
-  spend: string;
-  earn: string;
-}): JSX.Element {
-  return (
-    <Div className="rounded-xl border p-4 bg-muted/30">
-      <Div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-        {label}
-      </Div>
-      <Div className="text-sm font-medium">{spend}</Div>
-      <Div className="text-sm text-violet-600 dark:text-violet-400 font-semibold mt-1">
-        {earn}
-      </Div>
-    </Div>
-  );
 }
 
 function StepCard({
@@ -111,7 +89,7 @@ function ExampleCard({
   title,
   body,
 }: {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   title: string;
   body: string;
 }): JSX.Element {
@@ -254,8 +232,11 @@ export function TanstackPage({
           <Div className="p-4 rounded-lg bg-muted/50 border font-mono text-xs mb-6 overflow-x-auto">
             {t("shareLink.p2", { appName })}
           </Div>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
+          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
             {t("shareLink.p3")}
+          </P>
+          <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
+            {t("shareLink.p4")}
           </P>
         </Div>
 
@@ -299,23 +280,59 @@ export function TanstackPage({
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
             {t("theMath.p1")}
           </P>
-          <Div className="grid sm:grid-cols-2 gap-4 mb-6">
-            <ScenarioCard
-              label={t("theMath.scenario1Label")}
-              spend={t("theMath.scenario1Spend")}
-              earn={t("theMath.scenario1Earn")}
-            />
-            <ScenarioCard
-              label={t("theMath.scenario2Label")}
-              spend={t("theMath.scenario2Spend")}
-              earn={t("theMath.scenario2Earn")}
-            />
+          <Div className="overflow-hidden rounded-xl border border-gray-700 bg-gray-900 mb-6">
+            <Div className="grid grid-cols-3 bg-gray-800 px-4 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+              <Span>{t("theMath.tableHeaderProfile")}</Span>
+              <Span>{t("theMath.tableHeaderSpend")}</Span>
+              <Span className="text-violet-400">
+                {t("theMath.tableHeaderEarn")}
+              </Span>
+            </Div>
+            {(["row1", "row2", "row3", "row4"] as const).map((row) => (
+              <Div
+                key={row}
+                className="grid grid-cols-3 px-4 py-3 border-t border-gray-700/60 text-sm"
+              >
+                <Span className="text-gray-300">
+                  {t(`theMath.${row}Profile`)}
+                </Span>
+                <Span className="text-gray-400">
+                  {t(`theMath.${row}Spend`)}
+                </Span>
+                <Span className="text-violet-400 font-semibold">
+                  {t(`theMath.${row}Earn`)}
+                </Span>
+              </Div>
+            ))}
           </Div>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
             {t("theMath.p2")}
           </P>
           <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
             {t("theMath.p3")}
+          </P>
+        </Div>
+
+        <Separator />
+
+        {/* Chain */}
+        <Div>
+          <H2 className="text-2xl font-bold mb-6">{t("chain.title")}</H2>
+          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+            {t("chain.p1")}
+          </P>
+          <Div className="space-y-2 mb-6">
+            {(["level1", "level2", "level3", "level4"] as const).map((key) => (
+              <Div
+                key={key}
+                className="flex items-start gap-3 p-3 rounded-lg bg-gray-900/60 border border-gray-700/40 text-gray-300 text-sm"
+              >
+                <Span>{t(`chain.${key}`)}</Span>
+              </Div>
+            ))}
+          </Div>
+          <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
+            {t("chain.p2")}
           </P>
         </Div>
 
@@ -377,7 +394,7 @@ export function TanstackPage({
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="gap-2">
-              <Link href={`/${locale}/user/referral`}>
+              <Link href={`/${locale}/user/(account)/referral`}>
                 <DollarSign className="h-4 w-4" />
                 {t("close.referralPage")}
               </Link>

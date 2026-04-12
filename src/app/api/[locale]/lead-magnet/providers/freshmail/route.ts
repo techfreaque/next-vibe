@@ -14,9 +14,9 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "FRESHMAIL",
         {
-          freshmailApiKey: data.freshmailApiKey,
-          freshmailApiSecret: data.freshmailApiSecret,
-          listHash: data.listHash,
+          freshmailApiKey: data.freshmailApiKey || undefined,
+          freshmailApiSecret: data.freshmailApiSecret || undefined,
+          listHash: data.listHash || undefined,
         },
         {
           listId: data.listId ?? null,

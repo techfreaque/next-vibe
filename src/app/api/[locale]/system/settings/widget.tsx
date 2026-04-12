@@ -214,13 +214,13 @@ function SettingRow({
             <Lock className="h-3 w-3 text-muted-foreground shrink-0" />
           )}
           {setting.isSensitive && setting.isEncrypted && (
-            <ShieldPlus className="h-3 w-3 text-green-500 shrink-0" />
+            <ShieldPlus className="h-3 w-3 text-success shrink-0" />
           )}
           <Span className="font-mono text-xs text-muted-foreground truncate">
             {setting.key}
           </Span>
           {setting.onboardingRequired && (
-            <Span className="text-[10px] px-1 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 shrink-0">
+            <Span className="text-[10px] px-1 py-0.5 rounded bg-warning/10 text-warning shrink-0">
               {t("widget.required")}
             </Span>
           )}
@@ -238,7 +238,7 @@ function SettingRow({
             <Span
               className={cn(
                 "font-mono text-xs truncate block",
-                !setting.isConfigured && "text-red-500 dark:text-red-400",
+                !setting.isConfigured && "text-destructive",
               )}
             >
               {setting.isConfigured
@@ -278,10 +278,10 @@ function ModuleCard({
   const allConfigured = module.configuredCount === module.totalCount;
   const noneConfigured = module.configuredCount === 0;
   const healthColor = allConfigured
-    ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+    ? "bg-success/10 text-success"
     : noneConfigured
       ? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-      : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
+      : "bg-warning/10 text-warning";
   const healthLabel = allConfigured
     ? t("widget.configured")
     : noneConfigured
@@ -517,7 +517,7 @@ export function SystemSettingsWidget({ field }: WidgetProps): JSX.Element {
           )}
 
           {needsOnboarding && (
-            <Div className="flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-950/20 border-b text-sm text-amber-700 dark:text-amber-300">
+            <Div className="flex items-center gap-2 px-4 py-2 bg-warning/10 border-b text-sm text-warning">
               <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
               <Div className="flex flex-col">
                 <Span>{t("widget.onboardingBanner")}</Span>
@@ -546,7 +546,7 @@ export function SystemSettingsWidget({ field }: WidgetProps): JSX.Element {
 
           {/* Restart banner */}
           {pendingRestart && (
-            <Div className="flex items-center gap-2 px-4 py-3 bg-blue-50 dark:bg-blue-950/20 border-t text-sm text-blue-700 dark:text-blue-300">
+            <Div className="flex items-center gap-2 px-4 py-3 bg-info/10 border-t text-sm text-info">
               <RefreshCw className="h-3.5 w-3.5 shrink-0" />
               <Span className="flex-1">
                 {isDevMode

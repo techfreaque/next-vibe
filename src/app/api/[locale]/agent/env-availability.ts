@@ -1,13 +1,13 @@
 /**
  * Agent Environment Availability
  *
- * Server-side utility that exposes which AI provider keys are configured.
- * Use this to gate features and show setup instructions instead of hard errors.
+ * Exposes which AI provider keys are configured as boolean flags.
+ * Reads from NEXT_PUBLIC_AGENT_* client env vars - set automatically by the
+ * vibe runtime (environment.ts) from the server-side API keys before build.
+ * Safe to import in both server and client code (no server-only dependency).
  */
 
-import "server-only";
-
-import { agentEnv } from "./env";
+import { envClient } from "@/config/env-client";
 
 export interface AgentEnvAvailability {
   /** Main LLM routing - most models require this */
@@ -57,36 +57,36 @@ export interface AgentEnvAvailability {
 }
 
 /**
- * Server-side singleton for env availability.
- * Evaluated once at module load time - import and use directly on server.
+ * Singleton for env availability - reads from NEXT_PUBLIC_AGENT_* client vars.
+ * Evaluated once at module load time. Safe to import anywhere.
  */
 export const agentEnvAvailability: AgentEnvAvailability = (() => {
-  const braveSearch = Boolean(agentEnv.BRAVE_SEARCH_API_KEY);
-  const kagiSearch = Boolean(agentEnv.KAGI_API_KEY);
+  const braveSearch = envClient.NEXT_PUBLIC_AGENT_BRAVE_SEARCH;
+  const kagiSearch = envClient.NEXT_PUBLIC_AGENT_KAGI_SEARCH;
 
   return {
-    openRouter: Boolean(agentEnv.OPENROUTER_API_KEY),
-    claudeCode: agentEnv.CLAUDE_CODE_ENABLED === true,
-    voice: Boolean(agentEnv.EDEN_AI_API_KEY),
+    openRouter: envClient.NEXT_PUBLIC_AGENT_OPEN_ROUTER,
+    claudeCode: envClient.NEXT_PUBLIC_AGENT_CLAUDE_CODE,
+    voice: envClient.NEXT_PUBLIC_AGENT_VOICE,
     braveSearch,
     kagiSearch,
     anySearch: braveSearch || kagiSearch,
-    uncensoredAI: Boolean(agentEnv.UNCENSORED_AI_API_KEY),
-    freedomGPT: Boolean(agentEnv.FREEDOMGPT_API_KEY),
-    gabAI: Boolean(agentEnv.GAB_AI_API_KEY),
-    veniceAI: Boolean(agentEnv.VENICE_AI_API_KEY),
-    scrappey: Boolean(agentEnv.SCRAPPEY_API_KEY),
-    openAiImages: Boolean(agentEnv.OPENAI_API_KEY),
-    openAiStt: Boolean(agentEnv.OPENAI_API_KEY),
-    replicate: Boolean(agentEnv.REPLICATE_API_TOKEN),
-    falAi: Boolean(agentEnv.FAL_AI_API_KEY),
-    modelsLab: Boolean(agentEnv.MODELSLAB_API_KEY),
-    unbottled: Boolean(agentEnv.UNBOTTLED_CLOUD_CREDENTIALS),
-    edenAiStt: Boolean(agentEnv.EDEN_AI_API_KEY),
-    deepgram: Boolean(agentEnv.DEEPGRAM_API_KEY),
-    openAiTts: Boolean(agentEnv.OPENAI_API_KEY),
-    edenAiTts: Boolean(agentEnv.EDEN_AI_API_KEY),
-    elevenlabs: Boolean(agentEnv.ELEVENLABS_API_KEY),
+    uncensoredAI: envClient.NEXT_PUBLIC_AGENT_UNCENSORED_AI,
+    freedomGPT: envClient.NEXT_PUBLIC_AGENT_FREEDOM_GPT,
+    gabAI: envClient.NEXT_PUBLIC_AGENT_GAB_AI,
+    veniceAI: envClient.NEXT_PUBLIC_AGENT_VENICE_AI,
+    scrappey: envClient.NEXT_PUBLIC_AGENT_SCRAPPEY,
+    openAiImages: envClient.NEXT_PUBLIC_AGENT_OPEN_AI_IMAGES,
+    openAiStt: envClient.NEXT_PUBLIC_AGENT_OPEN_AI_STT,
+    replicate: envClient.NEXT_PUBLIC_AGENT_REPLICATE,
+    falAi: envClient.NEXT_PUBLIC_AGENT_FAL_AI,
+    modelsLab: envClient.NEXT_PUBLIC_AGENT_MODELS_LAB,
+    unbottled: envClient.NEXT_PUBLIC_AGENT_UNBOTTLED,
+    edenAiStt: envClient.NEXT_PUBLIC_AGENT_EDEN_AI_STT,
+    deepgram: envClient.NEXT_PUBLIC_AGENT_DEEPGRAM,
+    openAiTts: envClient.NEXT_PUBLIC_AGENT_OPEN_AI_TTS,
+    edenAiTts: envClient.NEXT_PUBLIC_AGENT_EDEN_AI_TTS,
+    elevenlabs: envClient.NEXT_PUBLIC_AGENT_ELEVENLABS,
   };
 })();
 

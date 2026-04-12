@@ -105,12 +105,6 @@ export const translations: typeof enTranslations = {
           "Wybieraj spośród ponad {{modelCount}} modeli AI, w tym głównonurtowych, open-source i bez cenzury.",
         tip: "Kliknij, aby otworzyć selektor modeli i wybrać towarzysza.",
       },
-      companionVariants: {
-        title: "Warianty twojego towarzysza",
-        description:
-          "Twój towarzysz ma kilka wariantów - brilliant do głębokiego myślenia, smart do codziennych zadań i bez cenzury do niefiltrowanych odpowiedzi. Dotknij dowolny wiersz, aby natychmiast przełączyć.",
-        tip: "Możesz przeciągać, aby zmienić kolejność, lub dodawać kolejne warianty w dowolnym momencie.",
-      },
       browseSkills: {
         title: "Odkryj więcej skillów",
         description:
@@ -118,9 +112,10 @@ export const translations: typeof enTranslations = {
         tip: "Skille dają twojej AI konkretny cel i właściwy model do zadania.",
       },
       meetCompanion: {
-        title: "Poznaj swojego towarzysza",
+        title: "Twój towarzysz gotowy",
         description:
-          "Twój towarzysz jest gotowy. Kliknij dowolny wariant, aby rozpocząć rozmowę — każdy ma inny styl i model.",
+          "Kilka wariantów, jeden cel - brilliant do głębokiego myślenia, smart na co dzień, bez cenzury dla niefiltrowanych odpowiedzi. Kliknij dowolny, żeby zacząć.",
+        tip: "Przeciągnij, żeby zmienić kolejność, lub dodaj więcej wariantów w każdej chwili.",
       },
       rootFolders: {
         title: "Twoje foldery czatów",

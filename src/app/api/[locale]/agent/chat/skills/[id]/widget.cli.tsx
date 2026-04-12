@@ -34,10 +34,7 @@ function renderGetCli(value: SkillGetResponseOutput): string {
   const lines: string[] = [];
   lines.push(chalk.bold.cyan(value.name ?? "(unnamed)"));
   if (value.tagline) {
-    lines.push(chalk.white(`  ${value.tagline}`));
-  }
-  if (value.description && value.description !== value.tagline) {
-    lines.push(chalk.dim(`  ${value.description}`));
+    lines.push(chalk.dim(`  ${value.tagline}`));
   }
   if (value.variants && value.variants.length > 0) {
     lines.push("");
@@ -84,7 +81,7 @@ export function SkillGetCliWidget({ field }: GetCliWidgetProps): JSX.Element {
 
   return (
     <Box flexDirection="column">
-      <Text wrap="end">{output}</Text>
+      <Text wrap="truncate-end">{output}</Text>
     </Box>
   );
 }
@@ -130,7 +127,7 @@ export function SkillEditCliWidget({
 
   return (
     <Box flexDirection="column">
-      <Text wrap="end">{output}</Text>
+      <Text wrap="truncate-end">{output}</Text>
     </Box>
   );
 }

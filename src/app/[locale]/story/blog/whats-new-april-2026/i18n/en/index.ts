@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "123 models. Eyes, ears, hands. One companion.",
     description:
-      "unbottled rebuilt everything that was rough. 123 models that can see, hear, speak, generate images, video and music — with companions that actually push back.",
+      "unbottled rebuilt everything that was rough. 123 models that can see, hear, speak, generate images, video and music - with companions that actually push back.",
     category: "Product Update",
     imageAlt: "unbottled.ai - April 2026 product update",
     keywords:

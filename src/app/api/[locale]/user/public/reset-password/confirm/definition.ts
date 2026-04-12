@@ -33,6 +33,7 @@ const { POST } = createEndpoint({
   description: "confirm.description",
   icon: "lock",
   category: "endpointCategories.userAuth",
+  subCategory: "endpointCategories.userAuthLogin",
   tags: ["confirm.tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   fields: customWidgetObject({

@@ -35,6 +35,7 @@ const imapSyncTask = createCronTask(definitions.POST, tools.POST, {
     maxMessages: 100,
     accountIds: ["add-uuid-of-an-imap-account-here"],
   },
+  hidden: true,
 });
 
 export const tasks: Task[] = [imapSyncTask];

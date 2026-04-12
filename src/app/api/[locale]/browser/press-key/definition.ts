@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   title: "press-key.title",
   description: "press-key.description",
   category: "endpointCategories.browser",
+  subCategory: "endpointCategories.browserInteraction",
   icon: "keyboard",
   tags: ["press-key.tags.browserAutomation", "press-key.tags.inputAutomation"],
 

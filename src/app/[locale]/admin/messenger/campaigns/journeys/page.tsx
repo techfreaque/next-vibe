@@ -103,14 +103,14 @@ export function TanstackPage({
             className="flex flex-col gap-4"
           >
             {/* Journey Description */}
-            <Div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-              <H3 className="font-semibold text-blue-900 dark:text-blue-100">
+            <Div className="bg-info/10 p-4 rounded-lg">
+              <H3 className="font-semibold text-foreground">
                 {journey.info.name}
               </H3>
-              <P className="text-blue-700 dark:text-blue-200 text-sm mt-1">
+              <P className="text-info text-sm mt-1">
                 {journey.info.description}
               </P>
-              <Span className="text-xs text-blue-600 dark:text-blue-300 mt-1">
+              <Span className="text-xs text-info mt-1">
                 {journey.stages.length} {t("admin.emails.stages")}
               </Span>
             </Div>
@@ -122,7 +122,7 @@ export function TanstackPage({
                   key={`${journey.variant}-${stage}`}
                   href={`/${locale}/admin/messenger/campaigns/journeys/${journey.variant}/${stage}`}
                 >
-                  <Card className="hover:shadow-lg transition-shadow hover:border-blue-300 dark:hover:border-blue-700 cursor-pointer h-full">
+                  <Card className="hover:shadow-lg transition-shadow hover:border-primary/30 cursor-pointer h-full">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base flex items-center gap-2">
                         <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />

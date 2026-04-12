@@ -32,6 +32,7 @@ const { POST } = createEndpoint({
   description: "post.description",
   icon: "mail-open",
   category: "endpointCategories.analyticsDataSources",
+  subCategory: "endpointCategories.messengerMessages",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 

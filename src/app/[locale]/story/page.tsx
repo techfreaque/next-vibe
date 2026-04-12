@@ -4,28 +4,19 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { getMaxToolCountAllPlatforms } from "@/app/api/[locale]/agent/chat/default-tool-counts";
-import { getAvailableSkillCount } from "@/app/api/[locale]/agent/chat/skills/config";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   type ModelCountsByContentLevel,
   getAvailableModelCount,
   getAvailableModelCountsByContentLevel,
   getAvailableProviderCount,
 } from "@/app/api/[locale]/agent/models/all-models";
-import {
-  ProductIds,
-  productsRepository,
-} from "@/app/api/[locale]/products/repository-client";
-import { endpointsMeta } from "@/app/api/[locale]/system/generated/endpoints-meta/en";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
-import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
 import { HomeClient } from "./_components/home-client";
@@ -61,14 +52,11 @@ export async function generateMetadata({
 interface StoryPageData {
   locale: CountryLanguage;
   totalToolCount: number;
-  totalEndpointCount: number;
   totalModelCount: number;
   totalProviderCount: number;
-  totalSkillCount: number;
   modelCountsByTier: ModelCountsByContentLevel;
-  subPrice: number;
-  subCurrency: string;
   hasUser: boolean;
+  authError?: string;
 }
 
 export async function tanstackLoader({
@@ -87,50 +75,45 @@ export async function tanstackLoader({
   );
 
   const totalToolCount = getMaxToolCountAllPlatforms();
-  const totalEndpointCount = endpointsMeta.length;
-  const products = productsRepository.getProducts(locale);
-  const country = getCountryFromLocale(locale);
-  const countryInfo = languageConfig.countryInfo[country];
 
-  const user = userResponse.success ? userResponse.data : null;
-  const isAdmin = user
-    ? !user.isPublic && user.roles.includes(UserRole.ADMIN)
-    : false;
-  const userRoles = user ? user.roles : [UserRole.PUBLIC];
+  if (!userResponse.success) {
+    logger.error("Failed to get user for story page", {
+      error: userResponse.message,
+    });
+    return {
+      locale,
+      totalToolCount,
+      totalModelCount: getAvailableModelCount(false),
+      totalProviderCount: getAvailableProviderCount(false),
+      modelCountsByTier: getAvailableModelCountsByContentLevel(false),
+      hasUser: false,
+      authError: userResponse.message,
+    };
+  }
+
+  const user = userResponse.data;
+  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
 
   return {
     locale,
     totalToolCount,
-    totalEndpointCount,
-    totalModelCount: getAvailableModelCount(agentEnvAvailability, isAdmin),
-    totalProviderCount: getAvailableProviderCount(
-      agentEnvAvailability,
-      isAdmin,
-    ),
-    modelCountsByTier: getAvailableModelCountsByContentLevel(
-      agentEnvAvailability,
-      isAdmin,
-    ),
-    totalSkillCount: getAvailableSkillCount(userRoles),
-    subPrice: products[ProductIds.SUBSCRIPTION].price,
-    subCurrency: countryInfo.symbol,
-    hasUser: userResponse.success && !!userResponse.data,
+    totalModelCount: getAvailableModelCount(isAdmin),
+    totalProviderCount: getAvailableProviderCount(isAdmin),
+    modelCountsByTier: getAvailableModelCountsByContentLevel(isAdmin),
+    hasUser: !user.isPublic,
   };
 }
 
 export function TanstackPage({
   locale,
   totalToolCount,
-  totalEndpointCount,
   totalModelCount,
   totalProviderCount,
-  totalSkillCount,
   modelCountsByTier,
-  subPrice,
-  subCurrency,
   hasUser,
+  authError,
 }: StoryPageData): JSX.Element {
-  if (!hasUser) {
+  if (authError) {
     const { t } = scopedTranslation.scopedT(locale);
     return (
       <Div>
@@ -152,13 +135,10 @@ export function TanstackPage({
     <HomeClient
       locale={locale}
       totalToolCount={totalToolCount}
-      totalEndpointCount={totalEndpointCount}
       totalModelCount={totalModelCount}
       totalProviderCount={totalProviderCount}
-      totalSkillCount={totalSkillCount}
       modelCountsByTier={modelCountsByTier}
-      subPrice={subPrice}
-      subCurrency={subCurrency}
+      hasUser={hasUser}
     />
   );
 }

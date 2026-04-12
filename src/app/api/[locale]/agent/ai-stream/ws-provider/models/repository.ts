@@ -9,6 +9,7 @@ import { chatModelOptions } from "@/app/api/[locale]/agent/ai-stream/models";
 import { imageGenModelOptions } from "@/app/api/[locale]/agent/image-generation/models";
 import { getModelPrice } from "@/app/api/[locale]/agent/models/all-models";
 import {
+  isModelProviderAvailable,
   type AnyModelOption,
   modelProviders,
 } from "@/app/api/[locale]/agent/models/models";
@@ -40,7 +41,9 @@ function mapModel(model: AnyModelOption, category: string): ModelEntry {
 }
 
 function mapModels(models: AnyModelOption[], category: string): ModelEntry[] {
-  return models.filter((m) => !m.adminOnly).map((m) => mapModel(m, category));
+  return models
+    .filter((m) => !m.adminOnly && isModelProviderAvailable(m))
+    .map((m) => mapModel(m, category));
 }
 
 export class WsProviderModelsRepository {

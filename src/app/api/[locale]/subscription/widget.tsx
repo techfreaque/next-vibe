@@ -75,7 +75,7 @@ export function SubscriptionOverviewContainer({
     if (provider === PaymentProvider.NOWPAYMENTS) {
       return <Bitcoin className="h-5 w-5 text-orange-500" />;
     }
-    return <CreditCard className="h-5 w-5 text-blue-600" />;
+    return <CreditCard className="h-5 w-5 text-primary" />;
   };
 
   const getProviderName = (provider?: string): string => {
@@ -131,10 +131,10 @@ export function SubscriptionOverviewContainer({
               <Badge
                 className={
                   isCanceled
-                    ? "bg-red-600 text-white"
+                    ? "bg-destructive text-destructive-foreground"
                     : isCanceling
-                      ? "bg-amber-600 text-white"
-                      : "bg-green-600 text-white"
+                      ? "bg-warning text-warning-foreground"
+                      : "bg-success text-success-foreground"
                 }
               >
                 {isCanceled
@@ -213,10 +213,10 @@ export function SubscriptionOverviewContainer({
 
           {/* Cancellation Warning */}
           {isCanceling && (
-            <Div className="mt-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+            <Div className="mt-4 p-4 rounded-lg bg-warning/10 border border-warning/30">
               <Div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                <Div className="text-sm text-amber-800 dark:text-amber-200">
+                <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+                <Div className="text-sm text-warning-foreground">
                   <Div className="font-semibold mb-1">
                     {t("cancellation.title")}
                   </Div>
@@ -234,10 +234,10 @@ export function SubscriptionOverviewContainer({
 
           {/* Canceled Info */}
           {isCanceled && (
-            <Div className="mt-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+            <Div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive/30">
               <Div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                <Div className="text-sm text-red-800 dark:text-red-200">
+                <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                <Div className="text-sm text-destructive-foreground">
                   <Div className="font-semibold mb-1">
                     {t("canceled.title")}
                   </Div>

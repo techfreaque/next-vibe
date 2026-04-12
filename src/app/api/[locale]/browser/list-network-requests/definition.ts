@@ -28,7 +28,8 @@ const { POST } = createEndpoint({
   path: ["browser", "list-network-requests"],
   title: "list-network-requests.title",
   description: "list-network-requests.description",
-  category: "endpointCategories.browserDevTools",
+  category: "endpointCategories.browser",
+  subCategory: "endpointCategories.browserDevTools",
   icon: "network",
   tags: [
     "list-network-requests.tags.browserAutomation",

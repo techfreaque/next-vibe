@@ -31,7 +31,8 @@ export const { POST } = createEndpoint({
   title: "providers.platformEmail.title" as const,
   description: "providers.platformEmail.description" as const,
   icon: "mail",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetIntegrations",
   tags: ["providers.shared.saveTag" as const],
   allowedRoles: ALLOWED_ROLES,
 

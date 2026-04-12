@@ -21,11 +21,10 @@ import type {
 } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
-import { agentEnv } from "@/app/api/[locale]/agent/env";
-import type { ImageGenModelId } from "@/app/api/[locale]/agent/image-generation/models";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import type { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
-import type { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
+import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
+import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -89,9 +88,9 @@ export interface TestStreamParams {
    * Bypasses the user-settings cascade so tests run a specific provider.
    */
   mediaModelOverrides?: {
-    imageGenModelId?: ImageGenModelId;
-    musicGenModelId?: MusicGenModelId;
-    videoGenModelId?: VideoGenModelId;
+    imageGenModelSelection?: ImageGenModelSelection;
+    musicGenModelSelection?: MusicGenModelSelection;
+    videoGenModelSelection?: VideoGenModelSelection;
   };
   /**
    * Tools available to the AI for execution (permission layer).
@@ -141,6 +140,12 @@ export interface TestStreamResult {
   result: ResponseType<HeadlessAiStreamResult>;
   /** Messages from DB (only when result.success && threadId present) */
   messages: SlimMessage[];
+  /**
+   * Number of tool schemas loaded into the AI context window.
+   * Mirrors result.data.pinnedToolCount - pulled out for convenient assertion.
+   * 0 when stream failed.
+   */
+  pinnedToolCount: number;
 }
 
 /**
@@ -325,12 +330,10 @@ export async function runTestStream(
 
   const result = await runHeadlessAiStream({
     prompt,
-    // When favoriteId is provided, don't pass a default model - let the
-    // favorite's resolved model win (including its apiProvider, e.g. UNBOTTLED).
-    model: model ?? (favoriteId ? undefined : agentEnv.VIBE_TEST_AI_MODEL),
+    // Never inject a fallback model - headless.ts resolves from skill variant or favorite.
+    // Explicit model param is only for tests that must target a specific model.
+    model,
     favoriteId,
-    // When favoriteId is provided, don't pass a default skill - let the
-    // favorite's resolved skill win.
     skill: skill ?? (favoriteId ? undefined : NO_SKILL_ID),
     threadId,
     operationOverride: resolvedOperationOverride,
@@ -355,5 +358,9 @@ export async function runTestStream(
     messages = await fetchThreadMessages(result.data.threadId);
   }
 
-  return { result, messages };
+  return {
+    result,
+    messages,
+    pinnedToolCount: result.success ? result.data.pinnedToolCount : 0,
+  };
 }

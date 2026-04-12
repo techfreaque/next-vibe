@@ -31,7 +31,8 @@ export const { POST } = createEndpoint({
   title: "providers.datanext.title" as const,
   description: "providers.datanext.description" as const,
   icon: "mail",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetIntegrations",
   tags: ["providers.shared.saveTag" as const],
   allowedRoles: ALLOWED_ROLES,
   fields: objectField(scopedTranslation, {
@@ -45,19 +46,18 @@ export const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "providers.datanext.datanextApiKey.label" as const,
-        description: "providers.datanext.datanextApiKey.description" as const,
+        description: "providers.shared.secretKeepExisting" as const,
         placeholder: "providers.datanext.datanextApiKey.placeholder" as const,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       datanextApiSecret: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "providers.datanext.datanextApiSecret.label" as const,
-        description:
-          "providers.datanext.datanextApiSecret.description" as const,
+        description: "providers.shared.secretKeepExisting" as const,
         placeholder:
           "providers.datanext.datanextApiSecret.placeholder" as const,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       datanextFormId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

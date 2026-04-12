@@ -766,8 +766,8 @@ export const translations = {
     welcome: {
       title: "Think of us as your AI team.",
       line1:
-        "Your companion handles everyday chat. Specialists step in for coding, research, writing - whatever the task needs.",
-      line2: "The AI switches between them automatically. You just talk.",
+        "A companion for everyday conversation. Specialists for coding, research, writing - you pick one when the task calls for it.",
+      line2: "Same chat. You switch when it matters. Takes seconds.",
       line3: "Let's get you set up in under a minute.",
       continue: "Get Started",
     },

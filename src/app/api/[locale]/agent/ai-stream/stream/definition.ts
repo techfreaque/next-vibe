@@ -64,6 +64,7 @@ const { POST } = createEndpoint({
   description: "post.description",
   icon: "sparkles",
   category: "endpointCategories.ai",
+  subCategory: "endpointCategories.aiInference",
   tags: ["tags.streaming", "tags.chat", "tags.ai"],
 
   // No events - ai-stream emits to the messages channel directly.

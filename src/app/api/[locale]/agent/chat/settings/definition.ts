@@ -56,7 +56,8 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "settings" as const,
-  category: "endpointCategories.chatSettings",
+  category: "endpointCategories.chat",
+  subCategory: "endpointCategories.chatSettings",
   tags: ["tags.settings" as const],
 
   aliases: [CHAT_SETTINGS_GET_ALIAS],
@@ -261,7 +262,8 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "settings" as const,
-  category: "endpointCategories.chatSettings",
+  category: "endpointCategories.chat",
+  subCategory: "endpointCategories.chatSettings",
   tags: ["tags.settings" as const],
 
   aliases: [CHAT_SETTINGS_UPDATE_ALIAS],

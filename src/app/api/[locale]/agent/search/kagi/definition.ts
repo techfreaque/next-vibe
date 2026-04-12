@@ -54,6 +54,7 @@ const { GET } = createEndpoint({
   // Credit cost - use calculated price from centralized pricing
   credits: FEATURE_COSTS.KAGI_SEARCH, // 1.95 credits per search
   category: "endpointCategories.ai",
+  subCategory: "endpointCategories.aiSearch",
   tags: ["tags.search" as const, "tags.web" as const, "tags.ai" as const],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

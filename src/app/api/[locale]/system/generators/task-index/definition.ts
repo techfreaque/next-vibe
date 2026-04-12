@@ -25,7 +25,8 @@ const { POST } = createEndpoint({
   path: ["system", "generators", "task-index"],
   title: "post.title",
   description: "post.description",
-  category: "endpointCategories.systemDevTools",
+  category: "endpointCategories.devTools",
+  subCategory: "endpointCategories.devToolsGenerators",
   tags: ["post.title"],
   icon: "wand",
   allowedRoles: [

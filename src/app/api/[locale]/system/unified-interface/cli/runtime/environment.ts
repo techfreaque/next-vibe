@@ -273,6 +273,92 @@ export function loadEnvironment(): EnvironmentResult {
     }
   }
 
+  // Derive NEXT_PUBLIC_AGENT_* availability flags from raw process.env so the
+  // client bundle can read them without importing server-only modules.
+  // This runs after .env is loaded so all agent keys are available.
+  // Must happen before Next.js / Vite bundler freezes env at build time.
+  const agentAvailability: Record<string, string> = {
+    NEXT_PUBLIC_AGENT_OPEN_ROUTER: Boolean(
+      process.env["OPENROUTER_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_CLAUDE_CODE: (() => {
+      const raw = process.env["CLAUDE_CODE_ENABLED"];
+      if (raw === "true") {
+        return "true";
+      }
+      if (raw === "false") {
+        return "false";
+      }
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { execSync } = require("node:child_process") as {
+          execSync: (
+            cmd: string,
+            opts: { stdio: string; timeout: number },
+          ) => void;
+        };
+        execSync("claude --version", { stdio: "ignore", timeout: 3000 });
+        return "true";
+      } catch {
+        return "false";
+      }
+    })(),
+    NEXT_PUBLIC_AGENT_VOICE: Boolean(process.env["EDEN_AI_API_KEY"]).toString(),
+    NEXT_PUBLIC_AGENT_BRAVE_SEARCH: Boolean(
+      process.env["BRAVE_SEARCH_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_KAGI_SEARCH: Boolean(
+      process.env["KAGI_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_UNCENSORED_AI: Boolean(
+      process.env["UNCENSORED_AI_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_FREEDOM_GPT: Boolean(
+      process.env["FREEDOMGPT_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_GAB_AI: Boolean(process.env["GAB_AI_API_KEY"]).toString(),
+    NEXT_PUBLIC_AGENT_VENICE_AI: Boolean(
+      process.env["VENICE_AI_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_SCRAPPEY: Boolean(
+      process.env["SCRAPPEY_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_OPEN_AI_IMAGES: Boolean(
+      process.env["OPENAI_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_OPEN_AI_STT: Boolean(
+      process.env["OPENAI_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_REPLICATE: Boolean(
+      process.env["REPLICATE_API_TOKEN"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_FAL_AI: Boolean(process.env["FAL_AI_API_KEY"]).toString(),
+    NEXT_PUBLIC_AGENT_MODELS_LAB: Boolean(
+      process.env["MODELSLAB_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_UNBOTTLED: Boolean(
+      process.env["UNBOTTLED_CLOUD_CREDENTIALS"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_EDEN_AI_STT: Boolean(
+      process.env["EDEN_AI_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_DEEPGRAM: Boolean(
+      process.env["DEEPGRAM_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_OPEN_AI_TTS: Boolean(
+      process.env["OPENAI_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_EDEN_AI_TTS: Boolean(
+      process.env["EDEN_AI_API_KEY"],
+    ).toString(),
+    NEXT_PUBLIC_AGENT_ELEVENLABS: Boolean(
+      process.env["ELEVENLABS_API_KEY"],
+    ).toString(),
+  };
+  for (const [key, value] of Object.entries(agentAvailability)) {
+    process.env[key] = value;
+  }
+
   // Determine platform based on detection
   const platform = isPackage ? Platform.CLI_PACKAGE : Platform.CLI;
 

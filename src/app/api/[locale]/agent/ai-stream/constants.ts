@@ -1,6 +1,4 @@
 import {
-  ContentLevel,
-  IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
@@ -25,8 +23,6 @@ import {
 export const DEFAULT_CHAT_MODEL_SELECTION: ChatModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
   manualModelId: ChatModelId.KIMI_K2_5,
-  intelligenceRange: { min: IntelligenceLevel.SMART },
-  contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,
@@ -38,8 +34,7 @@ export const DEFAULT_CHAT_MODEL_SELECTION: ChatModelSelection = {
  */
 export const DEFAULT_IMAGE_VISION_MODEL_SELECTION: ImageVisionModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
-  manualModelId: ImageVisionModelId.GEMINI_2_5_FLASH,
-  intelligenceRange: { min: IntelligenceLevel.SMART },
+  manualModelId: ImageVisionModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,
@@ -51,8 +46,7 @@ export const DEFAULT_IMAGE_VISION_MODEL_SELECTION: ImageVisionModelSelection = {
  */
 export const DEFAULT_VIDEO_VISION_MODEL_SELECTION: VideoVisionModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
-  manualModelId: VideoVisionModelId.GEMINI_2_5_FLASH,
-  intelligenceRange: { min: IntelligenceLevel.SMART },
+  manualModelId: VideoVisionModelId.GEMINI_3_1_FLASH_LITE_PREVIEW,
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,
@@ -64,8 +58,7 @@ export const DEFAULT_VIDEO_VISION_MODEL_SELECTION: VideoVisionModelSelection = {
  */
 export const DEFAULT_AUDIO_VISION_MODEL_SELECTION: AudioVisionModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
-  manualModelId: AudioVisionModelId.GEMINI_2_5_FLASH,
-  intelligenceRange: { min: IntelligenceLevel.SMART },
+  manualModelId: AudioVisionModelId.GEMINI_3_1_FLASH_LITE_PREVIEW,
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,

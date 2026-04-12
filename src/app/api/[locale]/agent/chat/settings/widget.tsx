@@ -60,7 +60,6 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
   getBestImageGenModel,
@@ -123,7 +122,6 @@ function formatTokens(n: number): string {
  */
 function getModelContextWindow(
   user: JwtPayloadType,
-  env: ReturnType<typeof useEnvAvailability>,
   modelSelection: ChatModelSelection | ChatModelId | null | undefined,
   characterModelSelection?: ChatModelSelection | null,
 ): number {
@@ -138,7 +136,6 @@ function getModelContextWindow(
     modelSelection ?? null,
     characterModelSelection ?? undefined,
     user,
-    env,
   );
   return best?.contextWindow ?? MAX_ABSOLUTE;
 }
@@ -275,19 +272,13 @@ export function CompactTriggerEdit({
   className,
   user,
 }: CompactTriggerEditProps): JSX.Element {
-  const env = useEnvAvailability();
   const modelCap = useMemo(
     () =>
       Math.min(
-        getModelContextWindow(
-          user,
-          env,
-          modelSelection,
-          characterModelSelection,
-        ),
+        getModelContextWindow(user, modelSelection, characterModelSelection),
         MAX_ABSOLUTE,
       ),
-    [modelSelection, characterModelSelection, user, env],
+    [modelSelection, characterModelSelection, user],
   );
 
   const effectiveValue = value ?? COMPACT_TRIGGER;
@@ -512,14 +503,13 @@ interface SelectorConfig {
 function makeDefaultSelection(
   roles: ModelRole[],
   user: JwtPayloadType,
-  env: ReturnType<typeof useEnvAvailability>,
 ): AnyRoleModelSelection | undefined {
   const role = roles[0];
   const manual = {
     selectionType: ModelSelectionType.MANUAL,
   };
   if (role === "tts") {
-    const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user, env);
+    const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -530,7 +520,7 @@ function makeDefaultSelection(
     return r.success ? r.data : undefined;
   }
   if (role === "stt") {
-    const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user, env);
+    const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -541,11 +531,7 @@ function makeDefaultSelection(
     return r.success ? r.data : undefined;
   }
   if (role === "image-gen") {
-    const m = getBestImageGenModel(
-      DEFAULT_IMAGE_GEN_MODEL_SELECTION,
-      user,
-      env,
-    );
+    const m = getBestImageGenModel(DEFAULT_IMAGE_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -556,11 +542,7 @@ function makeDefaultSelection(
     return r.success ? r.data : undefined;
   }
   if (role === "audio-gen") {
-    const m = getBestMusicGenModel(
-      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
-      user,
-      env,
-    );
+    const m = getBestMusicGenModel(DEFAULT_MUSIC_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -571,11 +553,7 @@ function makeDefaultSelection(
     return r.success ? r.data : undefined;
   }
   if (role === "video-gen") {
-    const m = getBestVideoGenModel(
-      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
-      user,
-      env,
-    );
+    const m = getBestVideoGenModel(DEFAULT_VIDEO_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -589,7 +567,6 @@ function makeDefaultSelection(
     const m = getBestImageVisionModel(
       DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       user,
-      env,
     );
     if (!m) {
       return undefined;
@@ -604,7 +581,6 @@ function makeDefaultSelection(
     const m = getBestVideoVisionModel(
       DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       user,
-      env,
     );
     if (!m) {
       return undefined;
@@ -619,7 +595,6 @@ function makeDefaultSelection(
     const m = getBestAudioVisionModel(
       DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       user,
-      env,
     );
     if (!m) {
       return undefined;
@@ -752,8 +727,6 @@ export function SettingsModelSelectorsSection({
 }: SettingsModelSelectorsSectionProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: tId } = skillIdTranslation.scopedT(locale);
-  const envAvailability = useEnvAvailability();
-
   const [activeSelector, setActiveSelector] = useState<ActiveSelector>(null);
 
   // Env-aware defaults - recompute when env changes
@@ -762,10 +735,10 @@ export function SettingsModelSelectorsSection({
       Object.fromEntries(
         SELECTOR_CONFIGS.map((c) => [
           c.key,
-          makeDefaultSelection(c.allowedRoles, user, envAvailability),
+          makeDefaultSelection(c.allowedRoles, user),
         ]),
       ),
-    [user, envAvailability],
+    [user],
   );
 
   // ── Full-panel takeover: chat model ──────────────────────────────────────

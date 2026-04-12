@@ -14,9 +14,9 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "SAILTHRU",
         {
-          sailthruApiKey: data.sailthruApiKey,
-          sailthruSecret: data.sailthruSecret,
-          listName: data.listName,
+          sailthruApiKey: data.sailthruApiKey || undefined,
+          sailthruSecret: data.sailthruSecret || undefined,
+          listName: data.listName || undefined,
         },
         {
           listId: data.listId ?? null,

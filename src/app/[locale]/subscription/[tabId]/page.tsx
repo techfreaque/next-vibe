@@ -9,8 +9,6 @@ import { notFound } from "next-vibe-ui/lib/not-found";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import type { JSX } from "react";
 
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import type { CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
@@ -47,7 +45,6 @@ export interface SubscriptionTabPageData {
   initialHistory: CreditsHistoryGetResponseOutput | null;
   hasPaymentProvider: boolean;
   isAdmin: boolean;
-  envAvailability: AgentEnvAvailability;
 }
 
 const BASE_TABS = ["overview", "buy", "history"];
@@ -168,7 +165,6 @@ export async function tanstackLoader({
     initialHistory,
     hasPaymentProvider,
     isAdmin,
-    envAvailability: agentEnvAvailability,
   };
 }
 
@@ -182,7 +178,6 @@ export function TanstackPage({
   initialHistory,
   hasPaymentProvider,
   isAdmin,
-  envAvailability,
 }: SubscriptionTabPageData): JSX.Element {
   return (
     <SubscriptionPageClient
@@ -195,7 +190,6 @@ export function TanstackPage({
       initialHistory={initialHistory}
       hasPaymentProvider={hasPaymentProvider}
       isAdmin={isAdmin}
-      envAvailability={envAvailability}
     />
   );
 }

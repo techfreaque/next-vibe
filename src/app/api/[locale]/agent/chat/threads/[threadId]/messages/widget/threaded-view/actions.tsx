@@ -120,7 +120,7 @@ export function ThreadedMessageActions({
           variant="ghost"
           size="unset"
           onClick={onToggleCollapse}
-          className="px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold hover:bg-blue-500/20 transition-all"
+          className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-all"
           title={t("widget.threadedView.expandReplies")}
         >
           {replyCount}{" "}
@@ -156,10 +156,10 @@ export function ThreadedMessageActions({
             size="unset"
             onClick={() => onVoteMessage(message.id, userVote === "up" ? 0 : 1)}
             className={cn(
-              "flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 transition-all",
+              "flex items-center gap-1 px-2 py-1 rounded hover:bg-primary/10 transition-all",
               userVote === "up"
-                ? "text-blue-400"
-                : "text-muted-foreground hover:text-blue-400",
+                ? "text-primary"
+                : "text-muted-foreground hover:text-primary",
             )}
             title={t("widget.threadedView.actions.upvote")}
           >
@@ -171,8 +171,8 @@ export function ThreadedMessageActions({
             <Span
               className={cn(
                 "text-xs font-medium min-w-6 text-center",
-                voteScore > 0 && "text-blue-400",
-                voteScore < 0 && "text-red-400",
+                voteScore > 0 && "text-primary",
+                voteScore < 0 && "text-destructive",
               )}
             >
               {voteScore > 0 ? `+${voteScore}` : voteScore}
@@ -185,10 +185,10 @@ export function ThreadedMessageActions({
               onVoteMessage(message.id, userVote === "down" ? 0 : -1)
             }
             className={cn(
-              "flex items-center gap-1 px-2 py-1 rounded hover:bg-red-500/10 transition-all",
+              "flex items-center gap-1 px-2 py-1 rounded hover:bg-destructive/10 transition-all",
               userVote === "down"
-                ? "text-red-400"
-                : "text-muted-foreground hover:text-red-400",
+                ? "text-destructive"
+                : "text-muted-foreground hover:text-destructive",
             )}
             title={t("widget.threadedView.actions.downvote")}
           >
@@ -216,8 +216,8 @@ export function ThreadedMessageActions({
             isTTSLoading
               ? "bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 hover:text-orange-300"
               : isPlaying
-                ? "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300"
-                : "text-muted-foreground hover:bg-blue-500/10 hover:text-blue-400",
+                ? "bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary/80"
+                : "text-muted-foreground hover:bg-primary/10 hover:text-primary",
           )}
           title={
             isTTSLoading
@@ -259,7 +259,7 @@ export function ThreadedMessageActions({
         variant="ghost"
         size="unset"
         onClick={(): void => startReply(message.id)}
-        className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
+        className="flex items-center gap-1 px-2 py-1 rounded hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
         title={t("widget.threadedView.actions.replyToMessage")}
       >
         <MessageSquare className="h-3.5 w-3.5" />
@@ -272,7 +272,7 @@ export function ThreadedMessageActions({
           variant="ghost"
           size="unset"
           onClick={(): void => startEdit(message.id)}
-          className="flex items-center gap-1 px-2 py-1 rounded hover:bg-green-500/10 text-muted-foreground hover:text-green-400 transition-all"
+          className="flex items-center gap-1 px-2 py-1 rounded hover:bg-success/10 text-muted-foreground hover:text-success transition-all"
           title={t("widget.threadedView.actions.branchMessage")}
         >
           <GitBranch className="h-3.5 w-3.5" />
@@ -288,7 +288,7 @@ export function ThreadedMessageActions({
           onClick={(): void => {
             onStartRetry(message);
           }}
-          className="flex items-center gap-1 px-2 py-1 rounded hover:bg-yellow-500/10 text-muted-foreground hover:text-yellow-400 transition-all"
+          className="flex items-center gap-1 px-2 py-1 rounded hover:bg-warning/10 text-muted-foreground hover:text-warning transition-all"
           title={t("widget.threadedView.actions.retryWithDifferent")}
         >
           <Span>{t("widget.threadedView.actions.retry")}</Span>
@@ -320,7 +320,7 @@ export function ThreadedMessageActions({
             `${window.location.href}#thread-msg-${message.id}`,
           );
         }}
-        className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
+        className="flex items-center gap-1 px-2 py-1 rounded hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
         title={t("widget.threadedView.actions.copyPermalink")}
       >
         <Share2 className="h-3.5 w-3.5" />
@@ -332,7 +332,7 @@ export function ThreadedMessageActions({
         variant="ghost"
         size="unset"
         onClick={handleDelete}
-        className="flex items-center gap-1 px-2 py-1 rounded hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all"
+        className="flex items-center gap-1 px-2 py-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all"
         title={t("widget.threadedView.actions.deleteMessage")}
       >
         <Span>{t("widget.threadedView.actions.delete")}</Span>
@@ -352,7 +352,7 @@ export function ThreadedMessageActions({
               block: "center",
             });
           }}
-          className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
+          className="flex items-center gap-1 px-2 py-1 rounded hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
         >
           <CornerDownRight className="h-3.5 w-3.5" />
           <Span>{t("widget.threadedView.actions.parent")}</Span>
@@ -365,7 +365,7 @@ export function ThreadedMessageActions({
           variant="ghost"
           size="unset"
           onClick={onToggleCollapse}
-          className="ml-1 px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold hover:bg-blue-500/20 transition-all"
+          className="ml-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-all"
           title={t("widget.threadedView.collapseReplies")}
         >
           {replyCount}{" "}

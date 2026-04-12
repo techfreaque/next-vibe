@@ -110,9 +110,7 @@ export function IconFieldWidget<
                   >
                     <Span>{tField(field.label)}</Span>
                     {field.label && style === "asterisk" && isRequired && (
-                      <Span className="text-blue-600 dark:text-blue-400 font-bold">
-                        *
-                      </Span>
+                      <Span className="text-info font-bold">*</Span>
                     )}
                     {field.description && descriptionStyle === "tooltip" && (
                       <TooltipProvider delayDuration={300}>
@@ -138,7 +136,7 @@ export function IconFieldWidget<
                   {style === "badge" && isRequired && (
                     <Badge
                       variant="secondary"
-                      className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
+                      className="text-xs px-2 py-0.5 bg-info/10 text-info border-info/20"
                     >
                       {widgetT("widgets.formFields.common.required")}
                     </Badge>

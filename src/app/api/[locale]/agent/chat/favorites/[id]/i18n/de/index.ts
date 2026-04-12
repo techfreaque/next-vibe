@@ -79,12 +79,6 @@ export const translations: typeof enTranslations = {
       maxContent: {
         content: "Max. Inhaltsstufe: {{value}}",
       },
-      minSpeed: {
-        content: "Min. Geschwindigkeit: {{value}}",
-      },
-      maxSpeed: {
-        content: "Max. Geschwindigkeit: {{value}}",
-      },
       content: {
         content: "Inhaltsstufe: {{value}}",
       },
@@ -203,6 +197,9 @@ export const translations: typeof enTranslations = {
     skillId: {
       label: "Charakter",
     },
+    variantId: {
+      label: "Variante",
+    },
     customVariantName: {
       label: "Variantenname",
       description:
@@ -298,16 +295,6 @@ export const translations: typeof enTranslations = {
     maxContent: {
       label: "Maximale Inhaltsstufe",
       description: "Maximale Inhaltsmoderationsebene für das Modell",
-    },
-    minSpeed: {
-      label: "Minimale Geschwindigkeit",
-      description:
-        "Minimale Geschwindigkeitsstufe, die für das Modell erforderlich ist",
-    },
-    maxSpeed: {
-      label: "Maximale Geschwindigkeit",
-      description:
-        "Maximale Geschwindigkeitsstufe, die für das Modell zulässig ist",
     },
     content: {
       label: "Inhaltsstufe",

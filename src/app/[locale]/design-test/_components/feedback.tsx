@@ -5,6 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "next-vibe-ui/ui/avatar";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
+import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Progress } from "next-vibe-ui/ui/progress";
 import { Section } from "next-vibe-ui/ui/section";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
@@ -27,11 +31,26 @@ export function FeedbackPreview(): JSX.Element {
                 <AlertDescription>This is a default alert.</AlertDescription>
               </Alert>
 
-              <Alert variant="destructive">
+              <Alert variant="destructive" icon={AlertCircle}>
                 <AlertTitle>Destructive Alert</AlertTitle>
                 <AlertDescription>
                   This is a destructive alert.
                 </AlertDescription>
+              </Alert>
+
+              <Alert variant="success" icon={CheckCircle}>
+                <AlertTitle>Success Alert</AlertTitle>
+                <AlertDescription>This is a success alert.</AlertDescription>
+              </Alert>
+
+              <Alert variant="warning" icon={AlertTriangle}>
+                <AlertTitle>Warning Alert</AlertTitle>
+                <AlertDescription>This is a warning alert.</AlertDescription>
+              </Alert>
+
+              <Alert variant="info" icon={Info}>
+                <AlertTitle>Info Alert</AlertTitle>
+                <AlertDescription>This is an info alert.</AlertDescription>
               </Alert>
             </Div>
           </Div>
@@ -43,6 +62,10 @@ export function FeedbackPreview(): JSX.Element {
               <Badge variant="secondary">Secondary</Badge>
               <Badge variant="destructive">Destructive</Badge>
               <Badge variant="outline">Outline</Badge>
+              <Badge variant="success">Success</Badge>
+              <Badge variant="warning">Warning</Badge>
+              <Badge variant="info">Info</Badge>
+              <Badge variant="notification">Notification</Badge>
             </Div>
           </Div>
 
@@ -83,10 +106,27 @@ export function FeedbackPreview(): JSX.Element {
               <Button onClick={() => toast("Default toast")}>
                 Default Toast
               </Button>
-              <Button onClick={() => toast.success("Success!")}>
+              <Button
+                variant="success"
+                onClick={() => toast.success("Success!")}
+              >
                 Success Toast
               </Button>
-              <Button onClick={() => toast.error("Error!")}>Error Toast</Button>
+              <Button
+                variant="destructive"
+                onClick={() => toast.error("Error!")}
+              >
+                Error Toast
+              </Button>
+              <Button
+                variant="warning"
+                onClick={() => toast.warning("Warning!")}
+              >
+                Warning Toast
+              </Button>
+              <Button variant="info" onClick={() => toast.info("Info!")}>
+                Info Toast
+              </Button>
             </Div>
           </Div>
         </Div>

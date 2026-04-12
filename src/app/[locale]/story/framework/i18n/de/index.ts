@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
     title: "Eine Definition.",
     titleAccent: "Dreizehn Plattformen.",
     subtitle:
-      "next-vibe macht aus einer einzigen TypeScript-Definition dreizehn Plattformen gleichzeitig - Web-Formular, CLI-Befehl, MCP-Tool, Mobile-Screen, Cron-Job, WebSocket, Admin-Panel und mehr. Vollständig typsicher, ohne Drift, ohne Wiederholung.",
+      "next-vibe macht aus einer einzigen TypeScript-Definition dreizehn Plattformen gleichzeitig - maßgeschneiderte Web-UI, CLI-Befehl, MCP-Tool, Mobile-Screen, Cron-Job, WebSocket, Admin-Panel und mehr. Vollständig typsicher, ohne Drift, ohne Wiederholung.",
     ctaGithub: "Auf GitHub staren",
     ctaDocs: "Pattern-Dokumentation lesen",
     stat1Label: "typed endpoints",
@@ -32,7 +32,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Das Problem",
     title: "Du hast dasselbe dreizehnmal gebaut.",
     subtitle:
-      "Jedes Feature braucht ein Web-Formular, CLI-Befehl, MCP-Tool, Mobile-Screen, Cron-Job, WebSocket-Handler, Admin-Panel und mehr. Gleiche Validierung, gleiche i18n, gleiche Fehlerbehandlung - nur anders verkleidet. Jedes Mal.",
+      "Jedes Feature braucht eine eigene Web-UI, einen CLI-Befehl, ein MCP-Tool, einen Mobile-Screen, Cron-Job, WebSocket-Handler, Admin-Panel und mehr. Gleiche Validierung, gleiche i18n, gleiche Fehlerbehandlung - nur anders verkleidet. Jedes Mal.",
     callout: "next-vibe baut alle dreizehn aus einer Datei.",
   },
   pattern: {
@@ -48,7 +48,7 @@ export const translations: typeof enTranslations = {
       "Business-Logik lebt hier - DB-Abfragen, Auth-Prüfungen, Fehlerbehandlung mit success()/fail(). Die route.ts ist nur ein dünner Delegator; Validierung, Logging und Plattform-Registrierung laufen automatisch.",
     widgetTitle: "widget.tsx - die UI (optional)",
     widgetBody:
-      "Ohne Widget rendert das Framework deine Felder automatisch auf jeder Plattform. Füge widget.tsx hinzu, um vollständige Kontrolle über das Aussehen im Web und auf Native zu haben - dieselbe Komponente rendert in Admin-Panels, eingebetteten Widgets und Mobile-Screens.",
+      "Ohne Widget rendert das Framework deine Felder überall automatisch. Füge widget.tsx hinzu, um eine vollständig angepasste interaktive UI auszuliefern - dieselbe Komponente rendert in Admin-Panels, eingebetteten Widgets und Mobile-Screens.",
     deleteLine:
       "Ordner löschen. Das Feature verschwindet sofort von jeder Plattform.",
   },
@@ -64,7 +64,7 @@ export const translations: typeof enTranslations = {
       },
       reactUi: {
         label: "React UI",
-        description: "Automatisch generiertes Formular - kein JSX nötig",
+        description: "Maßgeschneiderte interaktive UI - kein JSX nötig",
       },
       cli: {
         label: "CLI",

@@ -14,11 +14,13 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "ADOBECAMPAIGN",
         {
-          adobeCampaignOrganizationId: data.adobeCampaignOrganizationId,
-          adobeCampaignClientId: data.adobeCampaignClientId,
-          adobeCampaignClientSecret: data.adobeCampaignClientSecret,
-          adobeCampaignApiKey: data.adobeCampaignApiKey,
-          adobeCampaignListId: data.adobeCampaignListId,
+          adobeCampaignOrganizationId:
+            data.adobeCampaignOrganizationId || undefined,
+          adobeCampaignClientId: data.adobeCampaignClientId || undefined,
+          adobeCampaignClientSecret:
+            data.adobeCampaignClientSecret || undefined,
+          adobeCampaignApiKey: data.adobeCampaignApiKey || undefined,
+          adobeCampaignListId: data.adobeCampaignListId || undefined,
         },
         {
           listId: data.listId ?? null,

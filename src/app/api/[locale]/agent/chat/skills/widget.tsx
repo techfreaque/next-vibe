@@ -50,7 +50,6 @@ import { useTouchDevice } from "@/hooks/use-touch-device";
 import { cn } from "../../../shared/utils";
 import { Icon } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useSelectorOnboardingContext } from "../../ai-stream/stream/widget/selector/selector-onboarding/context";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import { useAddToFavorites } from "../favorites/create/hooks";
 import { useChatFavorites } from "../favorites/hooks/hooks";
@@ -58,7 +57,7 @@ import skillDetailDefinitions from "./[id]/definition";
 import { COMPANION_SKILLS } from "./config";
 import type definition from "./definition";
 import type { SkillListItem, SkillListResponseOutput } from "./definition";
-import { SkillOwnershipType, SkillTrustLevel } from "./enum";
+import { SkillOwnershipType, SkillSourceFilter, SkillTrustLevel } from "./enum";
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 
 /**
@@ -90,6 +89,7 @@ export function SkillsListContainer({
   const isPublic = user.isPublic;
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const searchQuery = form.watch("query") ?? "";
+  const sourceFilter = form.watch("sourceFilter") ?? "";
   const { isOnboarding, companionSkillId } = useSelectorOnboardingContext();
   const setModelSelectorOpen = useTourState(
     (state) => state.setModelSelectorOpen,
@@ -132,9 +132,9 @@ export function SkillsListContainer({
     return map;
   }, [favorites]);
 
-  // When query is active: server already filtered - flatten all sections into a
-  // single ranked list (VERIFIED first, then by voteCount desc).
-  // When no query: return sections as-is.
+  // When query is active: server already filtered by source - flatten all sections
+  // into a single ranked list (VERIFIED first, then by voteCount desc).
+  // When no query: return sections as-is (server already applied source filter).
   const filteredSections = useMemo(() => {
     const sections = field.value?.sections;
     if (!sections) {
@@ -143,7 +143,7 @@ export function SkillsListContainer({
     if (!searchQuery.trim()) {
       return sections;
     }
-    // Server already filtered - just flatten and rank
+    // Server already filtered by source - just flatten and rank
     const allSkills = sections.flatMap((section) => section.skills);
     const ranked = allSkills.toSorted((a, b) => {
       const aVerified = a.trustLevel === SkillTrustLevel.VERIFIED ? 0 : 1;
@@ -265,12 +265,22 @@ export function SkillsListContainer({
   // Loading state - show spinner that fills the scrollable area
   if (!field.value) {
     return (
-      <Div className="flex flex-col gap-0 h-[min(800px,calc(100dvh-100px))]">
+      <Div
+        className={`flex flex-col gap-0${isFullPage ? "" : " h-[min(800px,calc(100dvh-100px))]"}`}
+      >
         {/* Top Actions: Back + Create + Fullscreen */}
         {!isOnboarding && (
           <Div className="flex flex-row gap-2 px-4 py-4 shrink-0">
             <NavigateButtonWidget field={children.backButton} />
             <Div className="ml-auto flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="default"
+                onClick={handleCreateCustomClick}
+              >
+                {t("get.createButton.label")}
+              </Button>
               {!isFullPage && (
                 <Link
                   href={`/${locale}/skills`}
@@ -280,14 +290,6 @@ export function SkillsListContainer({
                   <Maximize className="h-4 w-4" />
                 </Link>
               )}
-              <Button
-                type="button"
-                variant="outline"
-                size="default"
-                onClick={handleCreateCustomClick}
-              >
-                {t("get.createButton.label")}
-              </Button>
             </Div>
           </Div>
         )}
@@ -302,12 +304,22 @@ export function SkillsListContainer({
 
   // Both public and authenticated users see the same skill list
   return (
-    <Div className="flex flex-col gap-0 h-[min(800px,calc(100dvh-100px))]">
+    <Div
+      className={`flex flex-col gap-0${isFullPage ? "" : " h-[min(800px,calc(100dvh-100px))]"}`}
+    >
       {/* Top Actions: Back + Create + Fullscreen */}
       {!isOnboarding && (
         <Div className="flex flex-row gap-2 px-4 py-4 shrink-0">
           <NavigateButtonWidget field={children.backButton} />
           <Div className="ml-auto flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="default"
+              onClick={handleCreateCustomClick}
+            >
+              {t("get.createButton.label")}
+            </Button>
             {!isFullPage && (
               <Link
                 href={`/${locale}/skills`}
@@ -317,20 +329,14 @@ export function SkillsListContainer({
                 <Maximize className="h-4 w-4" />
               </Link>
             )}
-            <Button
-              type="button"
-              variant="outline"
-              size="default"
-              onClick={handleCreateCustomClick}
-            >
-              {t("get.createButton.label")}
-            </Button>
           </Div>
         </Div>
       )}
 
       {/* Scrollable Content */}
-      <Div className="border-t border-border overflow-y-auto flex-1">
+      <Div
+        className={`border-t border-border flex-1${isFullPage ? "" : " overflow-y-auto"}`}
+      >
         <Div className="p-4">
           {/* Onboarding Success Banner */}
           {isOnboarding && companionSkill && (
@@ -382,46 +388,98 @@ export function SkillsListContainer({
           <TextWidget field={children.skillsTitle} fieldName="skillsTitle" />
           <TextWidget field={children.skillsDesc} fieldName="skillsDesc" />
 
-          {/* Search bar */}
-          <Div className="relative mb-2">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              type="text"
-              value={searchQuery}
-              onChange={(e) =>
-                form.setValue("query", e.target.value, {
-                  shouldValidate: true,
-                  shouldDirty: true,
-                  shouldTouch: true,
-                })
-              }
-              placeholder={t("get.search.placeholder")}
-              className="pl-9 pr-8 h-9 text-sm"
-            />
-            {searchQuery && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
-                onClick={() =>
-                  form.setValue("query", "", {
+          {/* Search + source filter */}
+          <Div className="flex flex-wrap items-center gap-2 mb-2">
+            {/* Search bar */}
+            <Div className="relative flex-1 min-w-[140px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <Input
+                type="text"
+                value={searchQuery}
+                onChange={(e) =>
+                  form.setValue("query", e.target.value, {
                     shouldValidate: true,
                     shouldDirty: true,
                     shouldTouch: true,
                   })
                 }
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
+                placeholder={t("get.search.placeholder")}
+                className="pl-9 pr-8 h-9 text-sm"
+              />
+              {searchQuery && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
+                  onClick={() =>
+                    form.setValue("query", "", {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                      shouldTouch: true,
+                    })
+                  }
+                >
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </Div>
+
+            {/* Source filter pills */}
+            {!isOnboarding && (
+              <Div className="flex rounded-md border border-border p-0.5">
+                {(
+                  [
+                    {
+                      value: SkillSourceFilter.BUILT_IN,
+                      label: "enums.source.builtIn" as const,
+                    },
+                    {
+                      value: SkillSourceFilter.COMMUNITY,
+                      label: "enums.source.community" as const,
+                    },
+                    ...(!isPublic
+                      ? [
+                          {
+                            value: SkillSourceFilter.MY,
+                            label: "enums.source.my" as const,
+                          },
+                        ]
+                      : []),
+                  ] as const
+                ).map((filter) => {
+                  const isActive = sourceFilter === filter.value;
+                  return (
+                    <Button
+                      key={filter.value}
+                      type="button"
+                      variant="ghost"
+                      size="unset"
+                      onClick={() =>
+                        form.setValue("sourceFilter", filter.value, {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                          shouldTouch: true,
+                        })
+                      }
+                      className={cn(
+                        "h-7 px-2.5 text-xs rounded-sm",
+                        isActive
+                          ? "bg-primary text-primary-foreground font-medium shadow-sm"
+                          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                      )}
+                    >
+                      {t(filter.label)}
+                    </Button>
+                  );
+                })}
+              </Div>
             )}
           </Div>
 
           {/* Sections */}
           <Div className="flex flex-col gap-6">
-            {filteredSections !== null &&
-            filteredSections.length === 0 &&
-            searchQuery ? (
+            {filteredSections !== null && filteredSections.length === 0 ? (
               <Div className="text-center text-sm text-muted-foreground py-8">
                 {t("get.search.noResults")}
               </Div>
@@ -1071,7 +1129,7 @@ function SkillCard({
               fieldName={`sections.${idx}.skills.${char.id}.tagline`}
             />
             {char.trustLevel === SkillTrustLevel.VERIFIED && (
-              <Div className="flex items-center gap-1 text-xs text-blue-500">
+              <Div className="flex items-center gap-1 text-xs text-primary">
                 <CheckCircle2 className="h-3.5 w-3.5" />
               </Div>
             )}
@@ -1475,7 +1533,6 @@ function SkillFavoriteActions({
 }): React.JSX.Element {
   const [isActivating, setIsActivating] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
-  const env = useEnvAvailability();
   const isCurrentlyActive =
     activeFavoriteId !== null && favoriteIds.includes(activeFavoriteId);
 
@@ -1517,7 +1574,6 @@ function SkillFavoriteActions({
         favorite.modelSelection,
         favorite.characterModelSelection ?? undefined,
         user,
-        env,
       );
       const modelId = bestModel?.id || null;
 
@@ -1577,7 +1633,6 @@ function SkillFavoriteActions({
         favorite.modelSelection,
         favorite.characterModelSelection ?? undefined,
         user,
-        env,
       );
       const modelId = bestModel?.id || null;
 

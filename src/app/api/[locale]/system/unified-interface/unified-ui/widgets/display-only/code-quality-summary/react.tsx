@@ -95,7 +95,9 @@ export default function CodeQualitySummaryWidget<
           {totalErrors > 0 && (
             <Div>
               <Span>{widgetT("widgets.codeQualitySummary.errors")}: </Span>
-              <Span className="font-semibold text-red-600">{totalErrors}</Span>
+              <Span className="font-semibold text-destructive">
+                {totalErrors}
+              </Span>
             </Div>
           )}
         </Div>

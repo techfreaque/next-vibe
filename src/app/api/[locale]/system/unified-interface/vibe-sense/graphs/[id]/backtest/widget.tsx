@@ -148,7 +148,7 @@ export function BacktestWidget({
                   <Badge
                     key={nodeId}
                     variant="outline"
-                    className="text-xs font-mono text-red-500 border-red-300"
+                    className="text-xs font-mono text-destructive border-destructive/30"
                   >
                     {nodeId}
                   </Badge>

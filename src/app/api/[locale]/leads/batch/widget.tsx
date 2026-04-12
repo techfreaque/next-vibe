@@ -121,20 +121,20 @@ export function LeadsBatchUpdateContainer({
 
       {/* Active Filter Summary (prefilled from list, read-only display) */}
       {hasActiveFilters && (
-        <Div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 p-3 flex flex-col gap-2">
-          <Span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+        <Div className="rounded-lg border border-info/20 bg-info/10 p-3 flex flex-col gap-2">
+          <Span className="text-xs font-medium text-info">
             {t("widget.update.activeFiltersLabel")}
           </Span>
           <Div className="flex flex-wrap gap-1.5">
             {activeSearch && (
-              <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
+              <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-info/10 text-info">
                 {t("widget.update.filterSearch")}: {activeSearch}
               </Span>
             )}
             {activeStatus.map((s) => (
               <Span
                 key={s}
-                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-info/10 text-info"
               >
                 {leadsT(s)}
               </Span>
@@ -142,7 +142,7 @@ export function LeadsBatchUpdateContainer({
             {activeCampaignStage.map((s) => (
               <Span
                 key={s}
-                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-info/10 text-info"
               >
                 {leadsT(s)}
               </Span>
@@ -150,7 +150,7 @@ export function LeadsBatchUpdateContainer({
             {activeSource.map((s) => (
               <Span
                 key={s}
-                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-info/10 text-info"
               >
                 {leadsT(s)}
               </Span>
@@ -213,15 +213,15 @@ export function LeadsBatchUpdateContainer({
 
       {/* High-volume warning for dry-run with many matches */}
       {isHighVolume && (
-        <Div className="rounded-lg border border-yellow-300 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/30 p-3 flex items-start gap-2">
-          <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+        <Div className="rounded-lg border border-warning/30 bg-warning/10 p-3 flex items-start gap-2">
+          <AlertTriangle className="h-4 w-4 text-warning mt-0.5 flex-shrink-0" />
           <Div className="flex flex-col gap-0.5">
-            <Span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
+            <Span className="text-sm font-medium text-warning-foreground">
               {t("widget.update.highVolumeTitle", {
                 count: totalMatched,
               })}
             </Span>
-            <Span className="text-xs text-yellow-700 dark:text-yellow-400">
+            <Span className="text-xs text-warning">
               {t("widget.update.highVolumeDescription")}
             </Span>
           </Div>
@@ -230,11 +230,11 @@ export function LeadsBatchUpdateContainer({
 
       {/* Partial batch progress info */}
       {isPartialBatch && (
-        <Div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 p-3 flex items-start gap-2">
-          <Span className="text-sm font-medium text-blue-800 dark:text-blue-300">
+        <Div className="rounded-lg border border-info/20 bg-info/10 p-3 flex items-start gap-2">
+          <Span className="text-sm font-medium text-info">
             {t("widget.update.partialBatchTitle")}
           </Span>
-          <Span className="text-xs text-blue-700 dark:text-blue-400">
+          <Span className="text-xs text-info">
             {t("widget.update.partialBatchDescription", {
               processed: totalProcessed,
               matched: totalMatched,
@@ -249,15 +249,15 @@ export function LeadsBatchUpdateContainer({
           className={cn(
             "rounded-lg border p-4 flex flex-col gap-3",
             response.success
-              ? "border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/20"
-              : "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/20",
+              ? "border-success/30 bg-success/10"
+              : "border-destructive/30 bg-destructive/10",
           )}
         >
           <Div className="flex items-center gap-2">
             {response.success ? (
-              <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <CheckCircle className="h-5 w-5 text-success" />
             ) : (
-              <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+              <AlertTriangle className="h-5 w-5 text-destructive" />
             )}
             <Span className="font-medium text-sm">
               {response.success
@@ -283,7 +283,7 @@ export function LeadsBatchUpdateContainer({
               </Span>
             </Div>
             <Div className="text-center">
-              <Span className="block text-2xl font-bold tabular-nums text-green-600 dark:text-green-400">
+              <Span className="block text-2xl font-bold tabular-nums text-success">
                 {response.totalUpdated ?? 0}
               </Span>
               <Span className="text-xs text-muted-foreground">
@@ -313,7 +313,7 @@ export function LeadsBatchUpdateContainer({
       {preview.length > 0 && (
         <Div className="rounded-lg border bg-card">
           <Div className="px-4 py-3 border-b flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-yellow-500" />
+            <AlertTriangle className="h-4 w-4 text-warning" />
             <Span className="text-sm font-medium">
               {t("widget.update.dryRunPreviewTitle", {
                 count: preview.length,
@@ -362,15 +362,15 @@ export function LeadsBatchUpdateContainer({
 
       {/* Errors */}
       {errors.length > 0 && (
-        <Div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/20 p-4">
-          <Span className="text-sm font-medium text-red-700 dark:text-red-300 block mb-2">
+        <Div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4">
+          <Span className="text-sm font-medium text-destructive block mb-2">
             {t("widget.update.errorsTitle", {
               count: errors.length,
             })}
           </Span>
           <Div className="flex flex-col gap-1">
             {errors.map((err, i) => (
-              <Div key={i} className="text-xs text-red-600 dark:text-red-400">
+              <Div key={i} className="text-xs text-destructive">
                 {t("widget.update.errorRow", {
                   leadId: err.leadId,
                   error: err.error,
@@ -512,12 +512,12 @@ export function LeadsBatchDeleteContainer({
 
       {/* Prominent danger warning with lead count - shown when preview has entries and no result yet */}
       {preview.length > 0 && !response?.success && (
-        <Div className="rounded-lg border-2 border-red-400 bg-red-50 dark:border-red-700 dark:bg-red-950/40 p-4 flex items-start gap-3">
-          <Div className="h-9 w-9 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center flex-shrink-0">
-            <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />
+        <Div className="rounded-lg border-2 border-destructive/40 bg-destructive/10 p-4 flex items-start gap-3">
+          <Div className="h-9 w-9 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+            <Trash2 className="h-5 w-5 text-destructive" />
           </Div>
           <Div className="flex flex-col gap-1">
-            <Span className="font-semibold text-sm text-red-800 dark:text-red-200">
+            <Span className="font-semibold text-sm text-destructive">
               {preview.length !== 1
                 ? t("widget.delete.warningTitlePlural", {
                     count: preview.length,
@@ -526,7 +526,7 @@ export function LeadsBatchDeleteContainer({
                     count: preview.length,
                   })}
             </Span>
-            <Span className="text-xs text-red-700 dark:text-red-300">
+            <Span className="text-xs text-destructive/80">
               {t("widget.delete.warningDescription")}
             </Span>
           </Div>
@@ -538,15 +538,15 @@ export function LeadsBatchDeleteContainer({
           className={cn(
             "rounded-lg border p-4",
             response.success
-              ? "border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/20"
-              : "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/20",
+              ? "border-success/30 bg-success/10"
+              : "border-destructive/30 bg-destructive/10",
           )}
         >
           <Div className="flex items-center gap-2 mb-3">
             {response.success ? (
-              <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <CheckCircle className="h-5 w-5 text-success" />
             ) : (
-              <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+              <AlertTriangle className="h-5 w-5 text-destructive" />
             )}
             <Span className="font-medium text-sm">
               {response.success
@@ -564,7 +564,7 @@ export function LeadsBatchDeleteContainer({
               </Span>
             </Div>
             <Div className="text-center">
-              <Span className="block text-2xl font-bold tabular-nums text-red-600 dark:text-red-400">
+              <Span className="block text-2xl font-bold tabular-nums text-destructive">
                 {response.totalDeleted ?? 0}
               </Span>
               <Span className="text-xs text-muted-foreground">
@@ -591,10 +591,10 @@ export function LeadsBatchDeleteContainer({
       )}
 
       {preview.length > 0 && (
-        <Div className="rounded-lg border border-red-200 bg-card">
-          <Div className="px-4 py-3 border-b border-red-200 flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-red-500" />
-            <Span className="text-sm font-medium text-red-700 dark:text-red-300">
+        <Div className="rounded-lg border border-destructive/30 bg-card">
+          <Div className="px-4 py-3 border-b border-destructive/30 flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+            <Span className="text-sm font-medium text-destructive">
               {t("widget.delete.previewTitle", {
                 count: preview.length,
               })}
@@ -636,7 +636,7 @@ export function LeadsBatchDeleteContainer({
       )}
 
       {errors.length > 0 && (
-        <Div className="text-xs text-red-600 dark:text-red-400 flex flex-col gap-1">
+        <Div className="text-xs text-destructive flex flex-col gap-1">
           {errors.map((err, i) => (
             <Span key={i}>
               {t("widget.delete.errorRow", {

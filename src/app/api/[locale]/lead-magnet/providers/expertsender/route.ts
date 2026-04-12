@@ -14,8 +14,8 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "EXPERTSENDER",
         {
-          expertSenderApiDomain: data.expertSenderApiDomain,
-          expertSenderApiKey: data.expertSenderApiKey,
+          expertSenderApiDomain: data.expertSenderApiDomain || undefined,
+          expertSenderApiKey: data.expertSenderApiKey || undefined,
         },
         {
           listId: data.listId ?? null,

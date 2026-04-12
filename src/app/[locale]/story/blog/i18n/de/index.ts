@@ -87,6 +87,14 @@ export const translations: typeof enTranslations = {
         "Erstelle eigene AI Skills, teile sie mit deinem Empfehlungslink und verdiene 10 % wiederkehrende Provision von jedem Nutzer, der sich über deine Skill-Seite anmeldet.",
       readTime: "6 Min. Lesezeit",
     },
+    referralLanding: {
+      title:
+        "10 % direkt. 15 % via Skill. 20 % total. Wiederkehrend für immer.",
+      category: "Empfehlungen",
+      excerpt:
+        "Die vollständige Mechanik des Empfehlungs- und Skill-Programms - Kettenaufschlüsselung, genaue Prozentsätze pro Ebene, Auszahlungsoptionen und wie der Skill-Bonus stapelt.",
+      readTime: "4 Min. Lesezeit",
+    },
   },
   labels: {
     readMore: "Weiterlesen",

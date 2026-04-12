@@ -353,9 +353,9 @@ export const translations: typeof enTranslations = {
       step1Title: "Utwórz kody polecające",
       step1Body:
         "Generuj unikalne kody dla różnych grup - znajomych, mediów społecznościowych lub kampanii.",
-      step2Title: "Udostępnij swój link",
+      step2Title: "Udostępnij link - lub link do skilla",
       step2Body:
-        "Gdy ktoś zarejestruje się przez Twój link i zasubskrybuje, zarabiasz prowizję.",
+        "Link polecający: {{directPct}} każdej płatności od tego użytkownika, wiecznie. Link do skilla: {{skillPct}} łącznie ({{directPct}} bezpośrednio + {{skillBonusPct}} bonus za skill) - dwa źródła dochodu, jeden link.",
       step3Title: "Otrzymaj płatność",
       step3Body:
         "Zarobki są natychmiastowe. Użyj ich jako kredytów do czatów lub wypłać w krypto.",

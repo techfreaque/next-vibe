@@ -25,6 +25,7 @@ const { POST } = createEndpoint({
   description: "post.description" as const,
   icon: "bitcoin" as const,
   category: "endpointCategories.payments",
+  subCategory: "endpointCategories.paymentProviders",
   tags: [
     "post.tags.nowpayments" as const,
     "post.tags.cli" as const,

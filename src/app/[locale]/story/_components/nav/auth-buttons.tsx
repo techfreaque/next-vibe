@@ -26,11 +26,7 @@ export function AuthButtons({ locale }: AuthButtonsProps): JSX.Element {
         <Link href={`/${locale}/user/login`}>{t("nav.user.login")}</Link>
       </Button>
       {/* Signup - always visible, compact on mobile */}
-      <Button
-        asChild
-        size="sm"
-        className="bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 md:text-sm md:h-10 md:px-4 md:py-2"
-      >
+      <Button asChild size="sm">
         <Link href={`/${locale}/user/signup`}>{t("nav.user.signup")}</Link>
       </Button>
     </Div>

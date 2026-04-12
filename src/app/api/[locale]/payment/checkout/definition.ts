@@ -38,6 +38,7 @@ const { POST } = createEndpoint({
   title: "title" as const,
   description: "description" as const,
   category: "endpointCategories.payments",
+  subCategory: "endpointCategories.paymentTransactions",
   icon: "credit-card" as const,
   tags: [
     "tags.subscription" as const,

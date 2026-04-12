@@ -336,7 +336,7 @@ export const translations = {
     },
     free: {
       title: "What you get for free, forever:",
-      credits: "20 credits per month - no card, no expiry",
+      credits: "{{freeCredits}} credits per month - no card, no expiry",
       allModels: "Access to all {{modelCount}} AI models",
       uncensored: "4 uncensored models that actually answer your questions",
       chatModes: "Private, Incognito, Shared, and Public chat modes",
@@ -345,7 +345,7 @@ export const translations = {
     ctaButton: "Start Chatting Now",
     upgrade: {
       title: "Want more?",
-      desc: "€8/month gets you 800 credits - that's 40× more. Plus you can buy extra credit packs that never expire. Perfect if you use AI daily.",
+      desc: "{{subscriptionPrice}}/month gets you {{subscriptionCredits}} credits - that's 40× more. Plus you can buy extra credit packs that never expire. Perfect if you use AI daily.",
       cta: "Upgrade to Pro",
     },
     signoff: "Happy chatting,\nThe {{appName}} Team",

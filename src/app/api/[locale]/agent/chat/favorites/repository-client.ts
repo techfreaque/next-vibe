@@ -17,13 +17,11 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import { generateFavoriteSlug, generateSlug } from "../slugify";
 import { parseError } from "../../../shared/utils";
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { getModelDisplayName } from "../../models/all-models";
-import {
-  modelProviders,
-  type ModelProviderEnvAvailability,
-} from "../../models/models";
+import { modelProviders } from "../../models/models";
 import type { ChatModelSelection } from "../../ai-stream/models";
 import type { VoiceModelSelection } from "../../text-to-speech/models";
 
@@ -35,7 +33,6 @@ import { ModelSelectionType } from "../skills/enum";
 import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
 import { getBestChatModelForFavorite } from "./[id]/definition";
 import type {
-  FavoriteGetModelSelection,
   FavoriteGetResponseOutput,
   FavoriteUpdateRequestOutput,
   FavoriteUpdateResponseOutput,
@@ -59,7 +56,7 @@ interface StoredLocalFavorite {
   customVariantName?: string | null;
   customIcon: IconKey | null;
   voiceModelSelection: VoiceModelSelection | null;
-  modelSelection: FavoriteGetModelSelection | null;
+  modelSelection: ChatModelSelection | null;
   position: number;
 }
 
@@ -75,14 +72,10 @@ export class ChatFavoritesRepositoryClient {
     logger: EndpointLogger,
     locale: CountryLanguage,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): Promise<ResponseType<FavoritesListResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const settings = ChatSettingsRepositoryClient.loadLocalSettings(
-        user,
-        env,
-      );
+      const settings = ChatSettingsRepositoryClient.loadLocalSettings(user);
       const activeFavoriteId = settings.activeFavoriteId;
 
       // Load stored minimal configs
@@ -109,7 +102,6 @@ export class ChatFavoritesRepositoryClient {
           variant?.voiceModelSelection ?? null,
           locale,
           user,
-          env,
         );
       });
 
@@ -143,15 +135,34 @@ export class ChatFavoritesRepositoryClient {
   ): Promise<ResponseType<FavoriteCreateResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const id = `local-${Date.now()}`;
       const currentConfigs = this.loadAllLocalFavorites();
+
+      // Generate a slug-based ID for localStorage favorites
+      const skillId = data.skillId ?? "default";
+      const defaultSkill = DEFAULT_SKILLS.find((c) => c.id === skillId);
+      const skillSlug = defaultSkill?.id ?? generateSlug(skillId);
+      const baseSlug = generateFavoriteSlug({
+        customVariantName: data.customVariantName,
+        skillSlug,
+        variantId: data.variantId,
+      });
+      const existingSlugs = currentConfigs.map((c) => c.id);
+      // Ensure uniqueness: append -2, -3, etc. if needed
+      let id = baseSlug || "favorite";
+      if (existingSlugs.includes(id)) {
+        let counter = 2;
+        while (existingSlugs.includes(`${id}-${counter}`)) {
+          counter++;
+        }
+        id = `${id}-${counter}`;
+      }
 
       const newConfig: StoredLocalFavorite = {
         id,
-        skillId: data.skillId ?? "default",
+        skillId,
         variantId: data.variantId ?? null,
         voiceModelSelection: data.voiceModelSelection ?? null,
-        modelSelection: data.modelSelection,
+        modelSelection: data.modelSelection ?? null,
         customIcon: null,
         position: currentConfigs.length,
       };
@@ -328,14 +339,12 @@ export class ChatFavoritesRepositoryClient {
     characterVoiceSelection: VoiceModelSelection | null,
     locale: CountryLanguage,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): FavoriteCard {
     const { t } = scopedTranslation.scopedT(locale);
     const bestModel = getBestChatModelForFavorite(
       stored.modelSelection,
       characterModelSelection ?? undefined,
       user,
-      env,
     );
     const hasSkill = stored.skillId !== "default";
 

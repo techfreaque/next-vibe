@@ -86,7 +86,6 @@ function mapDefinitionToItem(
     contextWindow: def.contextWindow ?? null,
     parameterCount: def.parameterCount ?? null,
     intelligence: keyToLabel(def.intelligence),
-    speed: keyToLabel(def.speed),
     content: keyToLabel(def.content),
     price,
     supportsTools: def.supportsTools,

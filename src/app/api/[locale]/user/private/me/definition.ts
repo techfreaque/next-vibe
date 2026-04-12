@@ -45,6 +45,7 @@ const { GET } = createEndpoint({
   description: "get.description" as const,
   icon: "user",
   category: "endpointCategories.userAuth",
+  subCategory: "endpointCategories.userAuthProfile",
   tags: ["tag" as const],
   allowedRoles: [
     UserRole.PUBLIC,
@@ -207,6 +208,11 @@ const { GET } = createEndpoint({
             content: "get.response.discordUrl" as const,
             schema: z.string().nullable(),
           }),
+          creatorSlug: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.creatorSlug" as const,
+            schema: z.string().nullable().optional(),
+          }),
           creatorAccentColor: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.creatorAccentColor" as const,
@@ -216,6 +222,11 @@ const { GET } = createEndpoint({
             type: WidgetType.TEXT,
             content: "get.response.creatorHeaderImageUrl" as const,
             schema: z.string().nullable(),
+          }),
+          avatarUrl: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.avatarUrl" as const,
+            schema: z.string().nullable().optional(),
           }),
         },
       }),
@@ -302,6 +313,7 @@ const { GET } = createEndpoint({
         discordUrl: null,
         creatorAccentColor: null,
         creatorHeaderImageUrl: null,
+        avatarUrl: null,
       },
     },
   },
@@ -318,9 +330,9 @@ const { POST } = createEndpoint({
   description: "update.description" as const,
   icon: "user-check" as const,
   category: "endpointCategories.userAuth",
+  subCategory: "endpointCategories.userAuthProfile",
   tags: ["tag" as const],
   allowedRoles: [
-    UserRole.PUBLIC,
     UserRole.CUSTOMER,
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
@@ -403,7 +415,7 @@ const { POST } = createEndpoint({
         children: {
           bio: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXTAREA,
+            fieldType: FieldDataType.MARKDOWN_TEXTAREA,
             label: "update.fields.bio.label" as const,
             description: "update.fields.bio.description" as const,
             placeholder: "update.fields.bio.placeholder" as const,
@@ -473,9 +485,26 @@ const { POST } = createEndpoint({
             columns: 6,
             schema: z.url().optional().nullable(),
           }),
-          creatorAccentColor: requestField(scopedTranslation, {
+          creatorSlug: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
+            label: "update.fields.creatorSlug.label" as const,
+            description: "update.fields.creatorSlug.description" as const,
+            placeholder: "update.fields.creatorSlug.placeholder" as const,
+            columns: 12,
+            schema: z
+              .string()
+              .max(60)
+              .regex(
+                /^[a-z0-9-]*$/,
+                "update.fields.creatorSlug.validation.invalid" as never,
+              )
+              .optional()
+              .nullable(),
+          }),
+          creatorAccentColor: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.COLOR,
             label: "update.fields.creatorAccentColor.label" as const,
             description:
               "update.fields.creatorAccentColor.description" as const,
@@ -490,14 +519,14 @@ const { POST } = createEndpoint({
           }),
           creatorHeaderImageUrl: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.URL,
+            fieldType: FieldDataType.FILE,
             label: "update.fields.creatorHeaderImageUrl.label" as const,
             description:
               "update.fields.creatorHeaderImageUrl.description" as const,
             placeholder:
               "update.fields.creatorHeaderImageUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            schema: z.string().optional().nullable(),
           }),
         },
       }),
@@ -657,6 +686,11 @@ const { POST } = createEndpoint({
           discordUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "update.response.discordUrl" as const,
+            schema: z.string().nullable().optional(),
+          }),
+          creatorSlug: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "update.response.creatorSlug" as const,
             schema: z.string().nullable().optional(),
           }),
           creatorAccentColor: responseField(scopedTranslation, {
@@ -878,6 +912,7 @@ const { DELETE } = createEndpoint({
   description: "delete.description" as const,
   icon: "user-x" as const,
   category: "endpointCategories.userAuth",
+  subCategory: "endpointCategories.userAuthProfile",
   tags: ["tag" as const],
   allowedRoles: [
     UserRole.CUSTOMER,

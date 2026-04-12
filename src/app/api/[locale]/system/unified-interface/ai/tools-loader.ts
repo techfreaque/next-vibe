@@ -239,7 +239,7 @@ function createToolFromEndpoint(
 
       // Race tool execution against the abort signal so cancellation
       // kills even long-running tool calls immediately.
-      const abortSignal = context.streamContext?.abortSignal;
+      const abortSignal = context.streamContext.abortSignal;
       const executeToolInline = async (): Promise<JsonValue> => {
         // Detach and wakeUp need task creation + backfill + resume-stream scheduling.
         // Route through RouteExecuteRepository which handles both modes.
@@ -400,6 +400,28 @@ function createToolFromEndpoint(
         }
 
         // Default path: execute inline (wait, endLoop, approve handled by stream layer)
+        // Spin-wait for pendingToolMessages entry so currentToolMessageId is set
+        // before execute() runs. Same race as wakeUp/detach: AI SDK may call execute()
+        // before stream-part-handler processes the tool-call event (200ms cap, 20×10ms).
+        if (options?.toolCallId && context.streamContext) {
+          let pending = context.streamContext.pendingToolMessages?.get(
+            options.toolCallId,
+          );
+          if (!pending) {
+            for (let i = 0; i < 20 && !pending; i++) {
+              await new Promise<void>((resolve) => {
+                setTimeout(resolve, 10);
+              });
+              pending = context.streamContext.pendingToolMessages?.get(
+                options.toolCallId,
+              );
+            }
+          }
+          if (pending) {
+            context.streamContext.currentToolMessageId = pending.messageId;
+          }
+        }
+
         const { RouteExecutionExecutor } =
           await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
         const result = await RouteExecutionExecutor.executeGenericHandler({
@@ -538,7 +560,7 @@ function createRemoteTool(params: {
     description: cap.description || cap.title,
     inputSchema,
     execute: async (input, options) => {
-      const abortSignal = streamContext?.abortSignal;
+      const abortSignal = streamContext.abortSignal;
 
       const executeRemoteInline = async (): Promise<JsonValue> => {
         // Delegate to execute-tool which routes to the remote

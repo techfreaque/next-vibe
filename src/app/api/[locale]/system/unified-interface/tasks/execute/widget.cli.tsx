@@ -165,7 +165,7 @@ export function TaskExecuteContainer({ field }: CliWidgetProps): JSX.Element {
 
   return (
     <Box flexDirection="column">
-      <Text wrap="end">{output}</Text>
+      <Text wrap="truncate-end">{output}</Text>
     </Box>
   );
 }

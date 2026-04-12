@@ -144,7 +144,6 @@ function ImageAttachment({
   attachment: FileAttachment;
   displayUrl: string;
 }): JSX.Element {
-  const isServerFile = displayUrl.startsWith("/api/");
   return (
     <Div className="rounded-xl overflow-hidden bg-muted/20 border border-border/50">
       <ExternalLink
@@ -158,7 +157,7 @@ function ImageAttachment({
           alt={attachment.filename}
           width={800}
           height={600}
-          unoptimized={isServerFile}
+          unoptimized={true}
           className="w-full max-h-72 object-contain"
         />
       </ExternalLink>

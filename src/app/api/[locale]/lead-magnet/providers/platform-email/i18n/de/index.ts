@@ -1,7 +1,7 @@
 export const translations = {
   title: "Leads per E-Mail empfangen",
   description:
-    "Erhalte eine E-Mail-Benachrichtigung, sobald jemand dein Lead-Formular ausfüllt. Keine Drittanbieter-Plattform nötig — nutzt die E-Mail deines Kontos.",
+    "Erhalte eine E-Mail-Benachrichtigung, sobald jemand dein Lead-Formular ausfüllt. Keine Drittanbieter-Plattform nötig - nutzt die E-Mail deines Kontos.",
   notifyEmail: {
     label: "Benachrichtigungs-E-Mail",
     description:

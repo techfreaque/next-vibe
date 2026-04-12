@@ -3,7 +3,6 @@ import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { Skill } from "../../config";
 import {
   ContentLevel,
-  IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
@@ -74,12 +73,10 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
-        intelligenceRange: {
-          min: IntelligenceLevel.BRILLIANT,
-          max: IntelligenceLevel.BRILLIANT,
-        },
-        sortBy: ModelSortField.CONTENT,
+        sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,
+        sortBy2: ModelSortField.PRICE,
+        sortDirection2: ModelSortDirection.ASC,
       },
       voiceModelSelection: {
         selectionType: ModelSelectionType.MANUAL,
@@ -92,9 +89,10 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.KIMI_K2_5,
-        contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
-        sortBy: ModelSortField.PRICE,
-        sortDirection: ModelSortDirection.ASC,
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+        sortBy2: ModelSortField.PRICE,
+        sortDirection2: ModelSortDirection.ASC,
       },
       isDefault: true,
       voiceModelSelection: {

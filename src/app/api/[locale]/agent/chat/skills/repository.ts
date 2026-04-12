@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, eq, ne, or } from "drizzle-orm";
+import { and, count, eq, ne, or, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -31,7 +31,6 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
@@ -39,6 +38,11 @@ import type { IconKey } from "../../../system/unified-interface/unified-ui/widge
 import { getModelDisplayName } from "../../models/all-models";
 import { modelProviders } from "../../models/models";
 
+import { leadMagnetConfigs } from "@/app/api/[locale]/lead-magnet/db";
+import { referralCodes } from "@/app/api/[locale]/referral/db";
+import { users } from "@/app/api/[locale]/user/db";
+import { getBestChatModel } from "../../ai-stream/models";
+import { ensureUniqueSlug, generateSlug, isUuid } from "../slugify";
 import type {
   SkillDeleteResponseOutput,
   SkillGetResponseOutput,
@@ -56,10 +60,7 @@ import type {
   SkillCreateRequestOutput,
   SkillCreateResponseOutput,
 } from "./create/definition";
-import { referralCodes } from "@/app/api/[locale]/referral/db";
-import { users } from "@/app/api/[locale]/user/db";
-import { skillVotes } from "./db";
-import { customSkills } from "./db";
+import { type SkillVariantData, customSkills, skillVotes } from "./db";
 import type {
   SkillListItem,
   SkillListRequestOutput,
@@ -73,16 +74,48 @@ import {
   CATEGORY_CONFIG,
   ModelSelectionType,
   SkillOwnershipType,
+  SkillSourceFilter,
 } from "./enum";
-import type { SkillsT } from "./i18n";
+import type { SkillsT, SkillsTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
-import { getBestChatModel } from "../../ai-stream/models";
 
 /**
  * Skills Repository - Static class pattern
  * All methods return ResponseType for consistent error handling
  */
 export class SkillsRepository {
+  /**
+   * Resolve a skill identifier (UUID or slug) to a DB where condition.
+   * Returns null if the identifier doesn't match any known format.
+   */
+  static resolveSkillIdCondition(skillId: string): ReturnType<typeof eq> {
+    if (isUuid(skillId)) {
+      return eq(customSkills.id, skillId);
+    }
+    // Treat as slug
+    return eq(customSkills.slug, skillId);
+  }
+
+  /**
+   * Generate a unique slug for a new skill.
+   */
+  private static async generateUniqueSkillSlug(name: string): Promise<string> {
+    const base = generateSlug(name) || "skill";
+    // Check existing slugs in DB
+    const existing = await db
+      .select({ slug: customSkills.slug })
+      .from(customSkills)
+      .where(sql`${customSkills.slug} LIKE ${`${base}%`}`);
+    const existingSlugs = existing.map((r) => r.slug);
+    // Also check default skill IDs to avoid collisions
+    const defaultIds = DEFAULT_SKILLS.map((s) => s.id);
+    return ensureUniqueSlug(base, [
+      ...existingSlugs,
+      ...defaultIds,
+      NO_SKILL_ID,
+    ]);
+  }
+
   private static isSelectionEqual<T>(a: T, b: T): boolean {
     return JSON.stringify(a) === JSON.stringify(b);
   }
@@ -177,79 +210,134 @@ export class SkillsRepository {
       const userId = user.id;
       const query = data?.query?.trim().toLowerCase();
       const requestedCharId = data?.skillId?.trim();
+      const source = data?.sourceFilter;
 
       // For authenticated users, return default + user's own + public from others
       if (userId) {
         logger.debug("Getting all skills for user", { userId });
 
-        // Fetch custom skills
-        const customSkillsList = await db
-          .select({
-            id: customSkills.id,
-            name: customSkills.name,
-            description: customSkills.description,
-            icon: customSkills.icon,
-            systemPrompt: customSkills.systemPrompt,
-            category: customSkills.category,
-            tagline: customSkills.tagline,
-            ownershipType: customSkills.ownershipType,
-            modelSelection: customSkills.modelSelection,
-            voteCount: customSkills.voteCount,
-            trustLevel: customSkills.trustLevel,
-          })
-          .from(customSkills)
-          .where(
-            or(
-              // User's own skills (any ownershipType)
-              eq(customSkills.userId, userId),
-              // PUBLIC skills from other users
-              and(
-                eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
-                ne(customSkills.userId, userId),
+        // Fetch custom skills from DB (skip when filtering to built-in only)
+        const needCustom = source !== SkillSourceFilter.BUILT_IN;
+        const customSkillsCards: SkillListItem[] = [];
+
+        if (needCustom) {
+          // Build DB where clause based on source filter
+          const dbCondition =
+            source === SkillSourceFilter.MY
+              ? eq(customSkills.userId, userId)
+              : source === SkillSourceFilter.COMMUNITY
+                ? and(
+                    eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
+                    ne(customSkills.userId, userId),
+                  )
+                : or(
+                    eq(customSkills.userId, userId),
+                    and(
+                      eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
+                      ne(customSkills.userId, userId),
+                    ),
+                  );
+
+          const customSkillsList = await db
+            .select({
+              id: customSkills.id,
+              slug: customSkills.slug,
+              name: customSkills.name,
+              description: customSkills.description,
+              icon: customSkills.icon,
+              systemPrompt: customSkills.systemPrompt,
+              category: customSkills.category,
+              tagline: customSkills.tagline,
+              ownershipType: customSkills.ownershipType,
+              modelSelection: customSkills.modelSelection,
+              variants: customSkills.variants,
+              voteCount: customSkills.voteCount,
+              trustLevel: customSkills.trustLevel,
+            })
+            .from(customSkills)
+            .where(dbCondition);
+
+          // Map custom skills to card display fields (expand variants for multi-variant skills)
+          for (const char of customSkillsList) {
+            // Use slug as the external ID (fall back to UUID for old data without slug)
+            const externalId = char.slug || char.id;
+            const variants = char.variants;
+            if (variants && variants.length > 1) {
+              customSkillsCards.push(
+                ...SkillsRepository.expandDefaultSkill(
+                  {
+                    icon: char.icon,
+                    name: char.name,
+                    tagline: char.tagline,
+                    description: char.description,
+                    category: char.category,
+                    ownershipType: char.ownershipType,
+                    voteCount: char.voteCount,
+                    trustLevel: char.trustLevel,
+                    variants: variants.map((v: SkillVariantData) => ({
+                      ...v,
+                      variantName: (v.displayName ??
+                        v.id) as SkillsTranslationKey,
+                    })),
+                  },
+                  externalId,
+                  t,
+                  user,
+                ),
+              );
+            } else {
+              customSkillsCards.push(
+                SkillsRepository.mapSkillToListItem(
+                  externalId,
+                  {
+                    icon: char.icon,
+                    name: char.name,
+                    tagline: char.tagline,
+                    description: char.description,
+                    category: char.category,
+                    modelSelection: char.modelSelection,
+                    ownershipType: char.ownershipType,
+                    voteCount: char.voteCount,
+                    trustLevel: char.trustLevel,
+                  },
+                  t,
+                  user,
+                ),
+              );
+            }
+          }
+        }
+
+        // Map default skills (skip when filtering to custom-only sources)
+        const needDefaults =
+          source === SkillSourceFilter.BUILT_IN ||
+          source === SkillSourceFilter.ALL ||
+          !source;
+        const defaultSkillsCards: SkillListItem[] = [];
+
+        if (needDefaults) {
+          const filteredDefaults = SkillsRepository.filterDefaultSkills(user);
+          for (const char of filteredDefaults) {
+            defaultSkillsCards.push(
+              ...SkillsRepository.expandDefaultSkill(
+                {
+                  icon: char.icon,
+                  name: t(char.name),
+                  tagline: t(char.tagline),
+                  description: t(char.description),
+                  category: char.category,
+                  ownershipType: SkillOwnershipType.SYSTEM,
+                  voteCount: null,
+                  trustLevel: null,
+                  variants: char.variants,
+                },
+                char.id,
+                t,
+                user,
               ),
-            ),
-          );
-
-        // Map custom skills to card display fields
-        const customSkillsCards = customSkillsList.map((char) => {
-          return SkillsRepository.mapSkillToListItem(
-            char.id,
-            {
-              icon: char.icon,
-              name: char.name,
-              tagline: char.tagline,
-              description: char.description,
-              category: char.category,
-              modelSelection: char.modelSelection,
-              ownershipType: char.ownershipType,
-              voteCount: char.voteCount,
-              trustLevel: char.trustLevel,
-            },
-            t,
-            user,
-          );
-        });
-
-        // Map default skills to card display fields (filtered by role + instance)
-        const filteredDefaults = SkillsRepository.filterDefaultSkills(user);
-        const defaultSkillsCards = filteredDefaults.flatMap((char) => {
-          return SkillsRepository.expandDefaultSkill(
-            {
-              icon: char.icon,
-              name: t(char.name),
-              tagline: t(char.tagline),
-              description: t(char.description),
-              category: char.category,
-              ownershipType: SkillOwnershipType.SYSTEM,
-              voteCount: null,
-              trustLevel: null,
-              variants: char.variants,
-            },
-            char.id,
-            t,
-            user,
-          );
-        });
+            );
+          }
+        }
 
         // Combine all skills
         let allSkills = [...defaultSkillsCards, ...customSkillsCards];
@@ -288,53 +376,132 @@ export class SkillsRepository {
         );
       }
 
-      // For public/lead users, return only default skills as card display fields (filtered)
-      logger.debug("Getting default skills for public user");
-      const filteredDefaults = SkillsRepository.filterDefaultSkills(user);
-      let defaultSkillsCards = filteredDefaults.flatMap((char) => {
-        return SkillsRepository.expandDefaultSkill(
-          {
-            icon: char.icon,
-            name: t(char.name),
-            tagline: t(char.tagline),
-            description: t(char.description),
-            category: char.category,
-            ownershipType: SkillOwnershipType.SYSTEM,
-            voteCount: null,
-            trustLevel: null,
-            variants: char.variants,
-          },
-          char.id,
-          t,
-          user,
-        );
-      });
+      // For public/lead users: built-in defaults + community (public) custom skills
+      logger.debug("Getting skills for public user");
+
+      // Built-in skills (skip when filtering to community only)
+      const defaultSkillsCards: SkillListItem[] = [];
+      if (source !== SkillSourceFilter.COMMUNITY) {
+        const filteredDefaults = SkillsRepository.filterDefaultSkills(user);
+        for (const char of filteredDefaults) {
+          defaultSkillsCards.push(
+            ...SkillsRepository.expandDefaultSkill(
+              {
+                icon: char.icon,
+                name: t(char.name),
+                tagline: t(char.tagline),
+                description: t(char.description),
+                category: char.category,
+                ownershipType: SkillOwnershipType.SYSTEM,
+                voteCount: null,
+                trustLevel: null,
+                variants: char.variants,
+              },
+              char.id,
+              t,
+              user,
+            ),
+          );
+        }
+      }
+
+      // Community (public) custom skills (skip when filtering to built-in only)
+      const communitySkillsCards: SkillListItem[] = [];
+      if (source !== SkillSourceFilter.BUILT_IN) {
+        const publicSkills = await db
+          .select({
+            id: customSkills.id,
+            slug: customSkills.slug,
+            name: customSkills.name,
+            description: customSkills.description,
+            icon: customSkills.icon,
+            category: customSkills.category,
+            tagline: customSkills.tagline,
+            ownershipType: customSkills.ownershipType,
+            modelSelection: customSkills.modelSelection,
+            variants: customSkills.variants,
+            voteCount: customSkills.voteCount,
+            trustLevel: customSkills.trustLevel,
+          })
+          .from(customSkills)
+          .where(eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC));
+
+        for (const char of publicSkills) {
+          const externalId = char.slug || char.id;
+          const variants = char.variants;
+          if (variants && variants.length > 1) {
+            communitySkillsCards.push(
+              ...SkillsRepository.expandDefaultSkill(
+                {
+                  icon: char.icon,
+                  name: char.name,
+                  tagline: char.tagline,
+                  description: char.description,
+                  category: char.category,
+                  ownershipType: char.ownershipType,
+                  voteCount: char.voteCount,
+                  trustLevel: char.trustLevel,
+                  variants: variants.map((v: SkillVariantData) => ({
+                    ...v,
+                    variantName: (v.displayName ??
+                      v.id) as SkillsTranslationKey,
+                  })),
+                },
+                externalId,
+                t,
+                user,
+              ),
+            );
+          } else {
+            communitySkillsCards.push(
+              SkillsRepository.mapSkillToListItem(
+                externalId,
+                {
+                  icon: char.icon,
+                  name: char.name,
+                  tagline: char.tagline,
+                  description: char.description,
+                  category: char.category,
+                  modelSelection: char.modelSelection,
+                  ownershipType: char.ownershipType,
+                  voteCount: char.voteCount,
+                  trustLevel: char.trustLevel,
+                },
+                t,
+                user,
+              ),
+            );
+          }
+        }
+      }
+
+      let allSkills = [...defaultSkillsCards, ...communitySkillsCards];
 
       // Apply search filter if query is provided
       if (query) {
-        defaultSkillsCards = defaultSkillsCards.filter(
-          (char) =>
-            char.name.toLowerCase().includes(query) ||
-            char.description.toLowerCase().includes(query) ||
-            char.tagline.toLowerCase().includes(query) ||
-            char.category.toLowerCase().includes(query) ||
-            char.id.toLowerCase().includes(query),
-        );
+        allSkills = searchItems(allSkills, {
+          query,
+          fields: [
+            searchField((s) => s.name, 1.0),
+            searchField((s) => s.tagline, 0.5),
+            searchField((s) => s.description ?? "", 0.3),
+            searchField((s) => s.category, 0.2),
+            searchField((s) => s.id, 0.1),
+          ],
+        });
       }
 
       // Apply skill ID filter if requested
       if (requestedCharId) {
-        defaultSkillsCards = defaultSkillsCards.filter(
-          (char) => char.id === requestedCharId,
-        );
+        allSkills = allSkills.filter((char) => char.id === requestedCharId);
       }
 
       // Group skills by category into sections
-      const sections = this.groupSkillsIntoSections(defaultSkillsCards, t);
+      const sections = this.groupSkillsIntoSections(allSkills, t);
 
       return success(
         this.buildResponse(
-          defaultSkillsCards,
+          allSkills,
           sections,
           isCompact,
           currentPage,
@@ -502,7 +669,12 @@ export class SkillsRepository {
                 requiresConfirmation: tool.requiresConfirmation ?? false,
               }))
             : null,
-          pinnedTools: null,
+          pinnedTools: defaultSkill.pinnedTools
+            ? defaultSkill.pinnedTools.map((tool) => ({
+                toolId: tool.toolId,
+                requiresConfirmation: tool.requiresConfirmation ?? false,
+              }))
+            : null,
           variants: defaultSkill.variants.map((v) => ({
             id: v.id,
             modelSelection: v.modelSelection,
@@ -566,26 +738,17 @@ export class SkillsRepository {
         });
       }
 
-      // Guard: custom skills use UUID IDs; non-UUID strings are unknown IDs
-      const uuidRegex =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(skillId)) {
-        return fail({
-          message: t("id.get.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      // Check custom skills
+      // Check custom skills by UUID or slug
       // Return skill if:
       // 1. User owns it (any ownershipType)
       // 2. It's PUBLIC (regardless of owner)
+      const idCondition = SkillsRepository.resolveSkillIdCondition(skillId);
       const [customSkill] = await db
         .select()
         .from(customSkills)
         .where(
           and(
-            eq(customSkills.id, skillId),
+            idCondition,
             userId
               ? or(
                   eq(customSkills.userId, userId),
@@ -607,15 +770,18 @@ export class SkillsRepository {
       let creatorProfile: SkillGetResponseOutput["creatorProfile"] = null;
       let favoritesCount = 0;
 
-      // Count favorites (votes) for this skill
+      // Count favorites (votes) for this skill (always use UUID, not slug)
       const [votesResult] = await db
         .select({ count: count() })
         .from(skillVotes)
-        .where(eq(skillVotes.skillId, skillId));
+        .where(eq(skillVotes.skillId, customSkill.id));
       favoritesCount = votesResult?.count ?? 0;
 
-      // Fetch creator profile if skill is owned by a user
-      if (customSkill.ownershipType === SkillOwnershipType.USER) {
+      // Fetch creator profile if skill is owned by a user (private or published)
+      if (
+        customSkill.ownershipType === SkillOwnershipType.USER ||
+        customSkill.ownershipType === SkillOwnershipType.PUBLIC
+      ) {
         const [creatorUser] = await db
           .select()
           .from(users)
@@ -629,8 +795,22 @@ export class SkillsRepository {
             .where(eq(referralCodes.ownerUserId, customSkill.userId))
             .limit(1);
 
+          // Lead magnet config for this creator
+          const [lmConfig] = await db
+            .select({
+              isActive: leadMagnetConfigs.isActive,
+              headline: leadMagnetConfigs.headline,
+              buttonText: leadMagnetConfigs.buttonText,
+            })
+            .from(leadMagnetConfigs)
+            .where(eq(leadMagnetConfigs.userId, customSkill.userId))
+            .limit(1);
+
           creatorProfile = {
             userId: creatorUser.id,
+            creatorSlug:
+              creatorUser.creatorSlug ??
+              creatorUser.publicName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
             publicName: creatorUser.publicName,
             avatarUrl: creatorUser.avatarUrl ?? null,
             bio: creatorUser.bio ?? null,
@@ -644,6 +824,9 @@ export class SkillsRepository {
             creatorAccentColor: creatorUser.creatorAccentColor ?? null,
             creatorHeaderImageUrl: creatorUser.creatorHeaderImageUrl ?? null,
             referralCode: refCode?.code ?? null,
+            leadMagnetActive: lmConfig?.isActive ?? false,
+            leadMagnetHeadline: lmConfig?.headline ?? null,
+            leadMagnetButtonText: lmConfig?.buttonText ?? null,
           };
         }
       }
@@ -687,15 +870,17 @@ export class SkillsRepository {
             toolId: tool.toolId,
             requiresConfirmation: tool.requiresConfirmation ?? false,
           })) ?? null,
-        variants: customSkill.modelSelection
-          ? [
-              {
-                id: "default",
-                modelSelection: customSkill.modelSelection,
-                isDefault: true,
-              },
-            ]
-          : [],
+        variants:
+          customSkill.variants ??
+          (customSkill.modelSelection
+            ? [
+                {
+                  id: "default",
+                  modelSelection: customSkill.modelSelection,
+                  isDefault: true,
+                },
+              ]
+            : []),
         longContent: customSkill.longContent ?? null,
         favoritesCount,
         creatorProfile,
@@ -721,17 +906,12 @@ export class SkillsRepository {
       return defaultSkill.companionPrompt ?? null;
     }
 
-    // Custom skill - DB lookup by ID only (no user filter; caller already validated ownership)
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(skillId)) {
-      return null;
-    }
-
+    // Custom skill - DB lookup by UUID or slug (no user filter; caller already validated ownership)
+    const idCondition = SkillsRepository.resolveSkillIdCondition(skillId);
     const [row] = await db
       .select({ companionPrompt: customSkills.companionPrompt })
       .from(customSkills)
-      .where(eq(customSkills.id, skillId))
+      .where(idCondition)
       .limit(1);
 
     return row?.companionPrompt ?? null;
@@ -761,10 +941,28 @@ export class SkillsRepository {
         name: data.name,
       });
 
+      // Build variants array: use provided variants or auto-create single default variant
+      const effectiveModelSelection =
+        data.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
+      const effectiveVariants =
+        data.variants && data.variants.length > 0
+          ? data.variants
+          : [
+              {
+                id: "default",
+                modelSelection: effectiveModelSelection,
+                isDefault: true,
+              },
+            ];
+
+      // Generate a unique slug from the skill name
+      const slug = await SkillsRepository.generateUniqueSkillSlug(data.name);
+
       const [skill] = await db
         .insert(customSkills)
         .values({
           userId,
+          slug,
           name: data.name,
           description: data.description,
           tagline: data.tagline,
@@ -791,7 +989,8 @@ export class SkillsRepository {
               ? (data.videoGenModelSelection.manualModelId ?? null)
               : null,
           defaultChatMode: data.defaultChatMode ?? null,
-          modelSelection: data.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
+          modelSelection: effectiveModelSelection,
+          variants: effectiveVariants,
           ownershipType: data.isPublic
             ? SkillOwnershipType.PUBLIC
             : SkillOwnershipType.USER,
@@ -801,7 +1000,7 @@ export class SkillsRepository {
 
       return success({
         success: t("post.success.title"),
-        id: skill.id,
+        id: skill.slug,
       });
     } catch (error) {
       logger.error("Failed to create skill", parseError(error));
@@ -844,14 +1043,26 @@ export class SkillsRepository {
           defaultSkillId: skillId,
         });
 
+        // Fall back to the default skill's icon if not provided
+        const defaultSkillForIcon = DEFAULT_SKILLS.find(
+          (c) => c.id === skillId,
+        );
+        const iconToUse = data.icon ?? defaultSkillForIcon?.icon ?? "sparkles";
+
+        // Generate slug for the new custom skill derived from a default skill
+        const derivedSlug = await SkillsRepository.generateUniqueSkillSlug(
+          data.name,
+        );
+
         await db
           .insert(customSkills)
           .values({
             userId,
+            slug: derivedSlug,
             name: data.name,
             description: data.description,
             tagline: data.tagline,
-            icon: data.icon,
+            icon: iconToUse,
             systemPrompt: data.systemPrompt,
             category: data.category,
             voiceModelSelection: SkillsRepository.normalizeTtsSelection(
@@ -875,6 +1086,17 @@ export class SkillsRepository {
                 : null,
             defaultChatMode: data.defaultChatMode ?? null,
             modelSelection: data.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
+            variants:
+              data.variants && data.variants.length > 0
+                ? data.variants
+                : [
+                    {
+                      id: "default",
+                      modelSelection:
+                        data.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
+                      isDefault: true,
+                    },
+                  ],
             ownershipType: data.isPublic
               ? SkillOwnershipType.PUBLIC
               : SkillOwnershipType.USER,
@@ -890,13 +1112,12 @@ export class SkillsRepository {
 
       logger.debug("Updating custom skill", { userId, skillId });
 
-      // Get existing skill to compare icon
+      // Get existing skill to compare icon (lookup by UUID or slug)
+      const idCondition = SkillsRepository.resolveSkillIdCondition(skillId);
       const [existingSkill] = await db
         .select()
         .from(customSkills)
-        .where(
-          and(eq(customSkills.id, skillId), eq(customSkills.userId, userId)),
-        )
+        .where(and(idCondition, eq(customSkills.userId, userId)))
         .limit(1);
 
       if (!existingSkill) {
@@ -931,14 +1152,27 @@ export class SkillsRepository {
             : null
           : undefined;
       // Remove videoGenModelSelection from spread (we use videoGenModelId column instead)
-      const { videoGenModelSelection, ...dataWithoutVideoGen } =
-        dataWithoutIsPublic;
+      const {
+        videoGenModelSelection,
+        variants: requestVariants,
+        ...dataWithoutVideoGen
+      } = dataWithoutIsPublic;
       void videoGenModelSelection;
+
+      // Sync modelSelection from default variant when variants are provided
+      const variantsToWrite = requestVariants ?? undefined;
+      const defaultVariantModelSelection = variantsToWrite
+        ? variantsToWrite.find((v) => v.isDefault)?.modelSelection
+        : undefined;
+
       const updateValues = Object.fromEntries(
         Object.entries({
           ...dataWithoutVideoGen,
           icon: iconToUpdate,
           ownershipType,
+          variants: variantsToWrite,
+          // Sync top-level modelSelection from default variant for backward compat
+          modelSelection: defaultVariantModelSelection ?? data.modelSelection,
           voiceModelSelection: SkillsRepository.normalizeTtsSelection(
             data.voiceModelSelection ?? null,
           ),
@@ -959,7 +1193,10 @@ export class SkillsRepository {
           updatedAt: new Date(),
         })
         .where(
-          and(eq(customSkills.id, skillId), eq(customSkills.userId, userId)),
+          and(
+            eq(customSkills.id, existingSkill.id),
+            eq(customSkills.userId, userId),
+          ),
         )
         .returning();
 
@@ -1009,11 +1246,10 @@ export class SkillsRepository {
 
       logger.debug("Deleting custom skill", { userId, skillId });
 
+      const deleteCondition = SkillsRepository.resolveSkillIdCondition(skillId);
       const result = await db
         .delete(customSkills)
-        .where(
-          and(eq(customSkills.id, skillId), eq(customSkills.userId, userId)),
-        )
+        .where(and(deleteCondition, eq(customSkills.userId, userId)))
         .returning();
 
       if (result.length === 0) {
@@ -1069,7 +1305,7 @@ export class SkillsRepository {
   ): SkillListItem {
     // Get best model from skill's modelSelection
     const selection = char.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
-    const bestModel = getBestChatModel(selection, user, agentEnvAvailability);
+    const bestModel = getBestChatModel(selection, user);
 
     const modelId = bestModel?.id ?? null;
     const isAdmin =

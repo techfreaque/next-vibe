@@ -9,7 +9,7 @@ import { join } from "node:path";
 
 import { enableDebugLogger } from "@/config/debug";
 
-const DEBUG_DIR = "/home/max/projects/next-vibe/.tmp/ai-debug-runs";
+const DEBUG_DIR = join(process.cwd(), ".tmp", "ai-debug-runs");
 let requestSeq = 0;
 
 function ensureDir(): void {

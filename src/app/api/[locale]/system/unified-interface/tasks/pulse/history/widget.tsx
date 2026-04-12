@@ -71,16 +71,13 @@ const FILTER_TO_PULSE_STATUS: Partial<Record<StatusFilter, string>> = {
 };
 
 const STATUS_COLOR_MAP: Record<string, string> = {
-  [PulseExecutionStatus.SUCCESS]:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  [PulseExecutionStatus.FAILURE]:
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  [PulseExecutionStatus.SUCCESS]: "bg-success/10 text-success",
+  [PulseExecutionStatus.FAILURE]: "bg-destructive/10 text-destructive",
   [PulseExecutionStatus.TIMEOUT]:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
   [PulseExecutionStatus.CANCELLED]:
     "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
-  [PulseExecutionStatus.PENDING]:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+  [PulseExecutionStatus.PENDING]: "bg-warning/10 text-warning",
 };
 
 const DEFAULT_STATUS_CLASS =
@@ -128,9 +125,9 @@ function SummaryCard({
 }): React.JSX.Element {
   const valueClass =
     variant === "success"
-      ? "text-xl font-bold tabular-nums text-green-600 dark:text-green-400"
+      ? "text-xl font-bold tabular-nums text-success"
       : variant === "danger"
-        ? "text-xl font-bold tabular-nums text-red-600 dark:text-red-400"
+        ? "text-xl font-bold tabular-nums text-destructive"
         : "text-xl font-bold tabular-nums";
 
   return (
@@ -185,9 +182,9 @@ function StatusChip({
 
 // eslint-disable-next-line i18next/no-literal-string
 const TASK_LIST_COLORS = {
-  blue: "text-blue-600 dark:text-blue-400",
-  green: "text-green-600 dark:text-green-400",
-  red: "text-red-600 dark:text-red-400",
+  blue: "text-info",
+  green: "text-success",
+  red: "text-destructive",
   muted: "text-muted-foreground",
 } as const;
 
@@ -277,14 +274,14 @@ function ExecutionCard({
               </Span>
             )}
             {execution.tasksSucceeded.length > 0 && (
-              <Span className="text-green-600 dark:text-green-400">
+              <Span className="text-success">
                 {t("widget.succeeded", {
                   count: execution.tasksSucceeded.length,
                 })}
               </Span>
             )}
             {execution.tasksFailed.length > 0 && (
-              <Span className="text-red-600 dark:text-red-400">
+              <Span className="text-destructive">
                 {t("widget.failed", { count: execution.tasksFailed.length })}
               </Span>
             )}
@@ -494,19 +491,19 @@ export function PulseHistoryContainer({
           <SummaryCard
             label={t("widget.summary.successful")}
             value={summary.successfulExecutions}
-            icon={<CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+            icon={<CheckCircle className="h-3.5 w-3.5 text-success" />}
             variant="success"
           />
           <SummaryCard
             label={t("widget.summary.failed")}
             value={summary.failedExecutions}
-            icon={<XCircle className="h-3.5 w-3.5 text-red-500" />}
+            icon={<XCircle className="h-3.5 w-3.5 text-destructive" />}
             variant="danger"
           />
           <SummaryCard
             label={t("widget.summary.successRate")}
             value={`${Math.round(summary.successRate)}%`}
-            icon={<TrendingUp className="h-3.5 w-3.5 text-green-500" />}
+            icon={<TrendingUp className="h-3.5 w-3.5 text-success" />}
             variant="success"
           />
           <SummaryCard

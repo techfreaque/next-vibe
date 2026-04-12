@@ -103,12 +103,6 @@ export const translations = {
           "Select from {{modelCount}} AI models including mainstream, open-source, and uncensored options.",
         tip: "Click to open the model selector and pick your companion.",
       },
-      companionVariants: {
-        title: "Your Companion Variants",
-        description:
-          "Your companion comes in multiple variants - brilliant for deep thinking, smart for everyday tasks, and uncensored for unfiltered responses. Tap any row to switch instantly.",
-        tip: "You can drag to reorder or add more variants anytime.",
-      },
       browseSkills: {
         title: "Discover More Skills",
         description:
@@ -118,7 +112,8 @@ export const translations = {
       meetCompanion: {
         title: "Meet Your Companion",
         description:
-          "Your companion is ready. Click any variant to start a conversation — each one has a different style and model behind it.",
+          "Your companion comes in multiple variants - brilliant for deep thinking, smart for everyday tasks, uncensored for unfiltered responses. Click any to start a conversation.",
+        tip: "Drag to reorder or add more variants anytime.",
       },
       rootFolders: {
         title: "Your Chat Folders",

@@ -22,6 +22,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { customSkills } from "../../db";
 import type { SkillStatusValue } from "../../enum";
 import { SkillOwnershipType, SkillStatus } from "../../enum";
+import { SkillsRepository } from "../../repository";
 import type { SkillPublishPatchResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -43,7 +44,8 @@ export class SkillPublishRepository {
         });
       }
 
-      // Fetch the skill - must belong to caller
+      // Fetch the skill - resolve by UUID or slug
+      const idCondition = SkillsRepository.resolveSkillIdCondition(skillId);
       const [skill] = await db
         .select({
           id: customSkills.id,
@@ -53,7 +55,7 @@ export class SkillPublishRepository {
           publishedAt: customSkills.publishedAt,
         })
         .from(customSkills)
-        .where(eq(customSkills.id, skillId));
+        .where(idCondition);
 
       if (!skill) {
         return fail({
@@ -100,7 +102,7 @@ export class SkillPublishRepository {
           changeNote: data.changeNote ?? null,
           updatedAt: new Date(),
         })
-        .where(eq(customSkills.id, skillId));
+        .where(eq(customSkills.id, skill.id));
 
       return success({
         status_response: newStatus,

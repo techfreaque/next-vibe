@@ -345,10 +345,9 @@ function renderText(node: RenderNode): string {
     const wrap = props.wrap;
     switch (wrap) {
       case "wrap":
-      case "end":
-      case "middle":
-      case "truncate-end":
+      case "hard":
       case "truncate":
+      case "truncate-end":
       case "truncate-middle":
       case "truncate-start":
         // Not implemented - requires terminal width calculation
@@ -468,6 +467,7 @@ function renderBox(node: RenderNode): string {
       case "center":
       case "flex-end":
       case "stretch":
+      case "baseline":
         // Not implemented - requires layout engine
         break;
       default: {
@@ -485,6 +485,8 @@ function renderBox(node: RenderNode): string {
       case "center":
       case "flex-end":
       case "auto":
+      case "baseline":
+      case "stretch":
         // Not implemented - requires layout engine
         break;
       default: {
@@ -551,6 +553,7 @@ function renderBox(node: RenderNode): string {
     switch (position) {
       case "absolute":
       case "relative":
+      case "static":
         // Not implemented - requires layout engine
         break;
       default: {

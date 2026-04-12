@@ -32,6 +32,7 @@ export const { GET } = createEndpoint({
   title: "stats.get.title",
   description: "stats.get.description",
   category: "endpointCategories.referral",
+  subCategory: "endpointCategories.referralProgram",
   icon: "trending-up",
   tags: ["tags.referral", "tags.get"],
   allowedRoles: [

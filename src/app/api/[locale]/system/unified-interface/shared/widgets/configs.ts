@@ -71,6 +71,7 @@ import type { TagsFieldWidgetConfig } from "../../unified-ui/widgets/form-fields
 import type { TextArrayFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/text-array-field/types";
 import type { TextFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/text-field/types";
 import type { TextareaFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/textarea-field/types";
+import type { MarkdownTextareaFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/markdown-textarea-field/types";
 import type { TimeFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/time-field/types";
 import type { TimeRangeFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/time-range-field/types";
 import type { SignalsFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/signals-field/types";
@@ -146,6 +147,12 @@ export type FormFieldWidgetConfig<
       TUsage
     >
   | TextareaFieldWidgetConfig<
+      TKey,
+      // @ts-expect-error - TSchema constraint mismatch
+      TSchema,
+      TUsage
+    >
+  | MarkdownTextareaFieldWidgetConfig<
       TKey,
       // @ts-expect-error - TSchema constraint mismatch
       TSchema,

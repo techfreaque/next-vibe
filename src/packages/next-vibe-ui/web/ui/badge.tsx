@@ -17,7 +17,12 @@ const badgeVariants = cva(
           "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80 shadow-sm",
         outline: "text-foreground",
         notification:
-          "border-transparent bg-red-500 text-white shadow hover:bg-red-600",
+          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
+        success:
+          "border-transparent bg-success text-success-foreground shadow hover:bg-success/80",
+        warning:
+          "border-transparent bg-warning text-warning-foreground shadow hover:bg-warning/80",
+        info: "border-transparent bg-info text-info-foreground shadow hover:bg-info/80",
       },
     },
     defaultVariants: {
@@ -33,7 +38,10 @@ const badgeTextVariants = cva("text-xs font-semibold", {
       secondary: "text-secondary-foreground",
       destructive: "text-destructive-foreground",
       outline: "text-foreground",
-      notification: "text-white",
+      notification: "text-destructive-foreground",
+      success: "text-success-foreground",
+      warning: "text-warning-foreground",
+      info: "text-info-foreground",
     },
   },
   defaultVariants: {

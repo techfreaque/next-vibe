@@ -12,6 +12,11 @@ export const translations: typeof enTranslations = {
       visitWebsite: "Odwiedź stronę",
       allRightsReserved:
         "© {{currentYear}} {{appName}}. Wszelkie prawa zastrzeżone.",
+      feedbackHook: "Masz coś do powiedzenia? Odpowiedz - naprawdę to czytamy.",
+      feedbackBody:
+        "Zgłoś błąd, poproś o funkcję albo napisz, czego brakuje. Za pomocne opinie darzymy 200 darmowych kredytów.",
+      feedbackLink: "Wyślij opinię →",
+      footerSeparator: " · ",
     },
   },
   post: {

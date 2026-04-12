@@ -81,7 +81,7 @@ export function PreviewPropsForm({
               <Label htmlFor={fieldId} className="font-medium">
                 {labelText}
                 {config.required && (
-                  <Span className="text-red-500 ml-1">*</Span>
+                  <Span className="text-destructive ml-1">*</Span>
                 )}
               </Label>
               {descriptionText && (
@@ -108,7 +108,7 @@ export function PreviewPropsForm({
               <Label htmlFor={fieldId} className="font-medium">
                 {labelText}
                 {config.required && (
-                  <Span className="text-red-500 ml-1">*</Span>
+                  <Span className="text-destructive ml-1">*</Span>
                 )}
               </Label>
               {descriptionText && (
@@ -135,7 +135,7 @@ export function PreviewPropsForm({
               <Label htmlFor={fieldId} className="font-medium">
                 {labelText}
                 {config.required && (
-                  <Span className="text-red-500 ml-1">*</Span>
+                  <Span className="text-destructive ml-1">*</Span>
                 )}
               </Label>
               {descriptionText && (
@@ -191,7 +191,7 @@ export function PreviewPropsForm({
               <Label htmlFor={fieldId} className="font-medium">
                 {labelText}
                 {config.required && (
-                  <Span className="text-red-500 ml-1">*</Span>
+                  <Span className="text-destructive ml-1">*</Span>
                 )}
               </Label>
               {descriptionText && (
@@ -218,7 +218,7 @@ export function PreviewPropsForm({
               <Label htmlFor={fieldId} className="font-medium">
                 {labelText}
                 {config.required && (
-                  <Span className="text-red-500 ml-1">*</Span>
+                  <Span className="text-destructive ml-1">*</Span>
                 )}
               </Label>
               {descriptionText && (

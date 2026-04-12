@@ -153,7 +153,7 @@ export function ImapSyncContainer({
             </Div>
             {result.errors.length > 0 && (
               <Div className="mt-2">
-                <Span className="text-xs font-semibold text-red-600">
+                <Span className="text-xs font-semibold text-destructive">
                   {t("widget.errors")}
                 </Span>
                 {result.errors.map((err, i) => (

@@ -14,10 +14,10 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "DATANEXT",
         {
-          datanextApiKey: data.datanextApiKey,
-          datanextApiSecret: data.datanextApiSecret,
-          datanextFormId: data.datanextFormId,
-          datanextCampaignId: data.datanextCampaignId,
+          datanextApiKey: data.datanextApiKey || undefined,
+          datanextApiSecret: data.datanextApiSecret || undefined,
+          datanextFormId: data.datanextFormId || undefined,
+          datanextCampaignId: data.datanextCampaignId || undefined,
         },
         {
           listId: data.listId ?? null,

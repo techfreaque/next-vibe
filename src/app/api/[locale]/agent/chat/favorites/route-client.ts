@@ -7,8 +7,6 @@
 import { clientEndpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/client-multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { getEnvAvailability } from "../../env-availability-context";
-
 import definitions from "./definition";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
 
@@ -19,11 +17,6 @@ export const { GET } = clientEndpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     handler: ({ logger, locale, user }) =>
-      ChatFavoritesRepositoryClient.getFavorites(
-        logger,
-        locale,
-        user,
-        getEnvAvailability(),
-      ),
+      ChatFavoritesRepositoryClient.getFavorites(logger, locale, user),
   },
 });

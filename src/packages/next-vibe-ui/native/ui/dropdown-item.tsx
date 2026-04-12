@@ -29,7 +29,7 @@ export function DropdownItem({
       disabled={disabled}
       className={`w-full rounded-md px-3 py-2.5 ${
         shouldShowHighlight
-          ? "border-2 border-blue-500/50 bg-blue-500/10"
+          ? "border-2 border-primary/50 bg-primary/10"
           : "border-2 border-transparent active:bg-accent/50"
       } ${disabled ? "opacity-50" : ""} ${className}`}
     >

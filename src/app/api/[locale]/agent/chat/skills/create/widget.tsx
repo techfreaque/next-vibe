@@ -36,44 +36,43 @@ import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interfac
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
-  getBestImageVisionModel,
-  getBestVideoVisionModel,
-  getBestAudioVisionModel,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
-import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
-import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
-import { isModelOptionImageBased } from "@/app/api/[locale]/agent/models/models";
-import {
-  DEFAULT_CHAT_MODEL_SELECTION,
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+  DEFAULT_CHAT_MODEL_SELECTION,
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
 } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
-import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
-
-import type { AnyRoleModelSelection } from "../../../models/selection";
-import { chatModelSelectionSchema } from "../../../ai-stream/models";
+import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
-  audioVisionModelSelectionSchema,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-} from "../../../ai-stream/vision-models";
+  getBestAudioVisionModel,
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
+import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
+import { isModelOptionImageBased } from "@/app/api/[locale]/agent/models/models";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
+import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
+import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
+
+import { chatModelSelectionSchema } from "../../../ai-stream/models";
 import type {
   AudioVisionModelSelection,
   ImageVisionModelSelection,
   VideoVisionModelSelection,
 } from "../../../ai-stream/vision-models";
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "../../../ai-stream/vision-models";
 import { imageGenModelSelectionSchema } from "../../../image-generation/models";
+import type { AnyRoleModelSelection } from "../../../models/selection";
 import { musicGenModelSelectionSchema } from "../../../music-generation/models";
 import { sttModelSelectionSchema } from "../../../speech-to-text/models";
 import { voiceModelSelectionSchema } from "../../../text-to-speech/models";
@@ -81,8 +80,8 @@ import { videoGenModelSelectionSchema } from "../../../video-generation/models";
 
 import { ModelSelectionType } from "../enum";
 
-import { ModelGroup } from "../[id]/widget";
 import { scopedTranslation as skillIdTranslation } from "../[id]/i18n";
+import { ModelGroup } from "../[id]/widget";
 import type defintion from "./definition";
 import type { SkillCreateResponseOutput } from "./definition";
 
@@ -121,16 +120,11 @@ export function SkillCreateContainer({
   const t = useWidgetTranslation<typeof defintion.POST>();
   const emptyField = useMemo(() => ({}), []);
 
-  const envAvailability = useEnvAvailability();
   const [activeSelector, setActiveSelector] = useState<ActiveSelector>(null);
 
   // Platform-level default model selections (env-aware)
   const platformChatDefault = useMemo(() => {
-    const m = getBestChatModel(
-      DEFAULT_CHAT_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -139,14 +133,10 @@ export function SkillCreateContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformTtsDefault = useMemo(() => {
-    const m = getBestTtsModel(
-      DEFAULT_TTS_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -154,14 +144,10 @@ export function SkillCreateContainer({
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: m.id,
     };
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformImageGenDefault = useMemo(() => {
-    const m = getBestImageGenModel(
-      DEFAULT_IMAGE_GEN_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestImageGenModel(DEFAULT_IMAGE_GEN_MODEL_SELECTION, user);
     if (!m || !isModelOptionImageBased(m)) {
       return undefined;
     }
@@ -169,14 +155,10 @@ export function SkillCreateContainer({
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: m.id,
     };
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformMusicGenDefault = useMemo(() => {
-    const m = getBestMusicGenModel(
-      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestMusicGenModel(DEFAULT_MUSIC_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -184,14 +166,10 @@ export function SkillCreateContainer({
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: m.id,
     };
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformVideoGenDefault = useMemo(() => {
-    const m = getBestVideoGenModel(
-      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestVideoGenModel(DEFAULT_VIDEO_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -199,14 +177,10 @@ export function SkillCreateContainer({
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: m.id,
     };
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformSttDefault = useMemo(() => {
-    const m = getBestSttModel(
-      DEFAULT_STT_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -214,7 +188,7 @@ export function SkillCreateContainer({
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: m.id,
     };
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformImageVisionDefault = useMemo(():
     | ImageVisionModelSelection
@@ -222,7 +196,6 @@ export function SkillCreateContainer({
     const m = getBestImageVisionModel(
       DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       user,
-      envAvailability,
     );
     if (!m) {
       return undefined;
@@ -232,7 +205,7 @@ export function SkillCreateContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformVideoVisionDefault = useMemo(():
     | VideoVisionModelSelection
@@ -240,7 +213,6 @@ export function SkillCreateContainer({
     const m = getBestVideoVisionModel(
       DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       user,
-      envAvailability,
     );
     if (!m) {
       return undefined;
@@ -250,7 +222,7 @@ export function SkillCreateContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformAudioVisionDefault = useMemo(():
     | AudioVisionModelSelection
@@ -258,7 +230,6 @@ export function SkillCreateContainer({
     const m = getBestAudioVisionModel(
       DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       user,
-      envAvailability,
     );
     if (!m) {
       return undefined;
@@ -268,7 +239,7 @@ export function SkillCreateContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   return (
     <Div className="flex flex-col gap-0">
@@ -841,7 +812,7 @@ function ModelSelectorWrapper({
   return (
     <>
       {error && (
-        <Div className="text-red-500 text-sm mb-2">{error.message}</Div>
+        <Div className="text-destructive text-sm mb-2">{error.message}</Div>
       )}
       <ModelSelector
         modelSelection={modelSelection ?? undefined}

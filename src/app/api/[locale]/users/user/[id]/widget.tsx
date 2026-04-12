@@ -64,13 +64,11 @@ interface DeleteWidgetProps {
 }
 
 const ROLE_COLORS: Record<string, string> = {
-  ADMIN: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  ADMIN: "bg-destructive/10 text-destructive",
   PARTNER_ADMIN:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  PARTNER_EMPLOYEE:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  CUSTOMER:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  PARTNER_EMPLOYEE: "bg-warning/10 text-warning",
+  CUSTOMER: "bg-success/10 text-success",
   PUBLIC: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300",
 };
 
@@ -266,11 +264,11 @@ export function UserDetailContainer({
               )}
               <Div className="flex gap-1 flex-wrap">
                 {isActive ? (
-                  <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                  <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success">
                     <CheckCircle className="h-3 w-3" /> {t("id.widget.active")}
                   </Span>
                 ) : (
-                  <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                  <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive">
                     <XCircle className="h-3 w-3" /> {t("id.widget.inactive")}
                   </Span>
                 )}
@@ -280,9 +278,9 @@ export function UserDetailContainer({
               <Mail className="h-3.5 w-3.5 flex-shrink-0" />
               <Span className="truncate">{email}</Span>
               {emailVerified ? (
-                <CheckCircle className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+                <CheckCircle className="h-3.5 w-3.5 text-success flex-shrink-0" />
               ) : (
-                <XCircle className="h-3.5 w-3.5 text-yellow-500 flex-shrink-0" />
+                <XCircle className="h-3.5 w-3.5 text-warning flex-shrink-0" />
               )}
             </Div>
             {/* User ID with copy button */}
@@ -300,7 +298,7 @@ export function UserDetailContainer({
                   title="Copy User ID"
                 >
                   {copiedId ? (
-                    <CheckCircle className="h-3 w-3 text-green-500" />
+                    <CheckCircle className="h-3 w-3 text-success" />
                   ) : (
                     <Copy className="h-3 w-3" />
                   )}
@@ -358,7 +356,7 @@ export function UserDetailContainer({
               title="Copy Lead ID"
             >
               {copiedLeadId ? (
-                <CheckCircle className="h-3 w-3 text-green-500" />
+                <CheckCircle className="h-3 w-3 text-success" />
               ) : (
                 <Copy className="h-3 w-3" />
               )}
@@ -539,12 +537,12 @@ export function UserEditContainer({
                 )}
                 <Div className="flex gap-1 flex-wrap">
                   {data?.isActive ? (
-                    <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                    <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success">
                       <CheckCircle className="h-3 w-3" />{" "}
                       {t("id.widget.active")}
                     </Span>
                   ) : (
-                    <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                    <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive">
                       <XCircle className="h-3 w-3" /> {t("id.widget.inactive")}
                     </Span>
                   )}
@@ -554,9 +552,9 @@ export function UserEditContainer({
                 <Mail className="h-3.5 w-3.5 flex-shrink-0" />
                 <Span className="truncate">{email}</Span>
                 {data?.emailVerified ? (
-                  <CheckCircle className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+                  <CheckCircle className="h-3.5 w-3.5 text-success flex-shrink-0" />
                 ) : (
-                  <XCircle className="h-3.5 w-3.5 text-yellow-500 flex-shrink-0" />
+                  <XCircle className="h-3.5 w-3.5 text-warning flex-shrink-0" />
                 )}
               </Div>
               {userId && (
@@ -573,7 +571,7 @@ export function UserEditContainer({
                     title="Copy User ID"
                   >
                     {copiedId ? (
-                      <CheckCircle className="h-3 w-3 text-green-500" />
+                      <CheckCircle className="h-3 w-3 text-success" />
                     ) : (
                       <Copy className="h-3 w-3" />
                     )}
@@ -625,7 +623,7 @@ export function UserEditContainer({
                   title="Copy Lead ID"
                 >
                   {copiedLeadId ? (
-                    <CheckCircle className="h-3 w-3 text-green-500" />
+                    <CheckCircle className="h-3 w-3 text-success" />
                   ) : (
                     <Copy className="h-3 w-3" />
                   )}
@@ -735,14 +733,14 @@ export function UserDeleteContainer({
       </Div>
 
       {data?.success ? (
-        <Div className="rounded-lg border border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/20 p-4 flex items-center gap-3">
-          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+        <Div className="rounded-lg border border-success/30 bg-success/10 p-4 flex items-center gap-3">
+          <CheckCircle className="h-5 w-5 text-success flex-shrink-0" />
           <Div>
-            <Span className="font-medium text-sm block text-green-700 dark:text-green-300">
+            <Span className="font-medium text-sm block text-success-foreground">
               {data.message ?? t("id.widget.userDeletedSuccessfully")}
             </Span>
             {data.deletedAt && (
-              <Span className="text-xs text-green-600 dark:text-green-400">
+              <Span className="text-xs text-success">
                 {t("id.widget.deletedAt")}{" "}
                 {new Date(data.deletedAt).toLocaleString()}
               </Span>
@@ -751,7 +749,7 @@ export function UserDeleteContainer({
         </Div>
       ) : (
         <>
-          <Div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/20 p-4">
+          <Div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4">
             <Div className="flex items-center gap-2 mb-2">
               <Trash2 className="h-5 w-5 text-destructive flex-shrink-0" />
               <Span className="font-medium text-sm text-destructive">

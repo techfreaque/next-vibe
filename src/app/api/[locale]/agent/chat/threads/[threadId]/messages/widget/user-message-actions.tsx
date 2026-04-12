@@ -139,7 +139,7 @@ export function UserMessageActions({
           }
           className={cn(
             isLoading && "text-orange-400 hover:text-orange-300",
-            isPlaying && "text-blue-400 hover:text-blue-300",
+            isPlaying && "text-primary hover:text-primary/80",
           )}
         />
       )}

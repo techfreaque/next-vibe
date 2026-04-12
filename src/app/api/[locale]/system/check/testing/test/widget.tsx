@@ -31,7 +31,7 @@ export function TestResultWidget({
       {/* Header with status */}
       <Div className="flex items-center gap-3">
         <Span
-          className={`text-2xl font-bold ${value.success ? "text-green-500" : "text-red-500"}`}
+          className={`text-2xl font-bold ${value.success ? "text-success" : "text-destructive"}`}
         >
           {value.success ? "Tests Passed" : "Tests Failed"}
         </Span>

@@ -19,18 +19,14 @@ import type definition from "./definition";
 import type { AdminPayoutsGetResponseOutput } from "./definition";
 
 const STATUS_COLORS: Record<string, string> = {
-  "enums.payoutStatus.pending":
-    "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  "enums.payoutStatus.approved":
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  "enums.payoutStatus.rejected":
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  "enums.payoutStatus.pending": "bg-warning/10 text-warning",
+  "enums.payoutStatus.approved": "bg-info/10 text-info",
+  "enums.payoutStatus.rejected": "bg-destructive/10 text-destructive",
   "enums.payoutStatus.processing":
     "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
   "enums.payoutStatus.completed":
     "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-  "enums.payoutStatus.failed":
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  "enums.payoutStatus.failed": "bg-destructive/10 text-destructive",
 };
 
 interface CustomWidgetProps {
@@ -105,7 +101,7 @@ export function AdminPayoutsContainer({
               </Div>
             ) : null}
             {item.rejectionReason ? (
-              <Div className="text-xs text-red-600 dark:text-red-400">
+              <Div className="text-xs text-destructive">
                 {item.rejectionReason}
               </Div>
             ) : null}
@@ -127,7 +123,7 @@ export function AdminPayoutsContainer({
                 <Button
                   size="sm"
                   variant="outline"
-                  className="text-xs text-red-600"
+                  className="text-xs text-destructive"
                   onClick={(): void => handleAction(item.id, "reject")}
                 >
                   {t("admin.payouts.widget.reject")}

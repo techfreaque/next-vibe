@@ -389,11 +389,11 @@ export const translations: typeof enTranslations = {
       headline: "Du bist dabei. Keine Filter, keine Belehrungen.",
       subject: "Dein {{appName}} Abo ist aktiv",
       previewText:
-        "{{privateName}}, du bist live. 800 Credits/Monat, {{modelCount}} Modelle, null Einschränkungen.",
+        "{{privateName}}, du bist live. {{subscriptionCredits}} Credits/Monat, {{modelCount}} Modelle, null Einschränkungen.",
       activeBadge: "Aktiv",
       greeting: "Hey {{privateName}},",
       intro:
-        "Dein {{appName}} Abo ist bestätigt und bereit. Du hast jeden Monat 800 Credits für alle Modelle - keine Tageslimits, keine Inhaltsfilter, keine Erklärungen nötig.",
+        "Dein {{appName}} Abo ist bestätigt und bereit. Du hast jeden Monat {{subscriptionCredits}} Credits für alle Modelle - keine Tageslimits, keine Inhaltsfilter, keine Erklärungen nötig.",
       models: {
         title: "{{modelCount}} Modelle, 3 Kategorien",
         mainstream: "Mainstream",
@@ -402,7 +402,8 @@ export const translations: typeof enTranslations = {
       },
       included: {
         title: "Was du jeden Monat bekommst:",
-        credits: "800 Credits pro Monat (automatisch erneuert)",
+        credits:
+          "{{subscriptionCredits}} Credits pro Monat (automatisch erneuert)",
         models: "Zugriff auf alle {{modelCount}} KI-Modelle",
         nolimits: "Keine Tageslimits - nutz alle Credits wann du willst",
         uncensored: "Unzensierte Modelle ohne Inhaltsfilter",
@@ -414,7 +415,7 @@ export const translations: typeof enTranslations = {
       packs: {
         title: "Mehr Credits benötigt?",
         description:
-          "Kaufe Credit-Pakete jederzeit - 5 € für 500 Credits. Sie verfallen nie und stapeln sich auf dein monatliches Kontingent. Nur für Abonnenten verfügbar.",
+          "Kaufe Credit-Pakete jederzeit - {{packPrice}} für {{packCredits}} Credits. Sie verfallen nie und stapeln sich auf dein monatliches Kontingent. Nur für Abonnenten verfügbar.",
         cta: "Credit-Paket kaufen",
       },
       manage: "Abo jederzeit verwalten oder kündigen in",

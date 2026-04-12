@@ -88,7 +88,7 @@ function UserRow({
             {user.privateName ?? user.email ?? "—"}
           </Span>
           {user.isActive ? (
-            <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+            <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success">
               {t("widget.statusActive")}
             </Span>
           ) : (
@@ -97,7 +97,7 @@ function UserRow({
             </Span>
           )}
           {!user.emailVerified && (
-            <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+            <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-warning/10 text-warning">
               {t("widget.statusUnverified")}
             </Span>
           )}

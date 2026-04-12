@@ -55,18 +55,14 @@ interface CustomWidgetProps {
 }
 
 const STATUS_STYLE: Record<string, string> = {
-  [MessageStatus.SENT]:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  [MessageStatus.SENT]: "bg-success/10 text-success",
   [MessageStatus.DELIVERED]:
     "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-  [MessageStatus.FAILED]:
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  [MessageStatus.PENDING]:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+  [MessageStatus.FAILED]: "bg-destructive/10 text-destructive",
+  [MessageStatus.PENDING]: "bg-warning/10 text-warning",
   [MessageStatus.BOUNCED]:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  [MessageStatus.OPENED]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  [MessageStatus.OPENED]: "bg-info/10 text-info",
   [MessageStatus.CLICKED]:
     "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
 };

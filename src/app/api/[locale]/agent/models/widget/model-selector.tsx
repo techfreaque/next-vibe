@@ -14,21 +14,17 @@ import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { ArrowDown } from "next-vibe-ui/ui/icons/ArrowDown";
 import { ArrowUp } from "next-vibe-ui/ui/icons/ArrowUp";
 import { Check } from "next-vibe-ui/ui/icons/Check";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
 import { Filter } from "next-vibe-ui/ui/icons/Filter";
 import { Search } from "next-vibe-ui/ui/icons/Search";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Input } from "next-vibe-ui/ui/input";
-import { Label } from "next-vibe-ui/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "next-vibe-ui/ui/popover";
 import { RangeSlider } from "next-vibe-ui/ui/range-slider";
-import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
 import {
   Tooltip,
@@ -66,10 +62,8 @@ import {
   ModelSortField,
   ModelSortFieldOptions,
   PRICE_DISPLAY,
-  SPEED_DISPLAY,
 } from "@/app/api/[locale]/agent/chat/skills/enum";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   filterImageGenModels,
   getBestImageGenModel,
@@ -220,7 +214,6 @@ function getFilteredModelsByRoleDispatch(
   selection: AnyRoleModelSelection | null,
   roles: ModelRole[],
   user: JwtPayloadType,
-  env: AgentEnvAvailability,
 ): AnyModelOptionWithVision[] {
   // Extract shared filter props - valid for all role getters regardless of manual ID
   const filters: FiltersModelSelection | null = selection
@@ -229,7 +222,6 @@ function getFilteredModelsByRoleDispatch(
         intelligenceRange: selection.intelligenceRange,
         priceRange: selection.priceRange,
         contentRange: selection.contentRange,
-        speedRange: selection.speedRange,
         sortBy: selection.sortBy,
         sortDirection: selection.sortDirection,
         sortBy2: selection.sortBy2,
@@ -241,37 +233,36 @@ function getFilteredModelsByRoleDispatch(
   for (const role of roles) {
     switch (role) {
       case "tts":
-        results.push(...filterTtsModels(filters, user, env));
+        results.push(...filterTtsModels(filters, user));
         break;
       case "stt":
-        results.push(...filterSttModels(filters, user, env));
+        results.push(...filterSttModels(filters, user));
         break;
       case "image-gen":
-        results.push(...filterImageGenModels(filters, user, env));
+        results.push(...filterImageGenModels(filters, user));
         break;
       case "audio-gen":
-        results.push(...filterMusicGenModels(filters, user, env));
+        results.push(...filterMusicGenModels(filters, user));
         break;
       case "video-gen":
-        results.push(...filterVideoGenModels(filters, user, env));
+        results.push(...filterVideoGenModels(filters, user));
         break;
       case "llm":
         results.push(
           ...filterChatModels(
             filters ?? { selectionType: ModelSelectionType.FILTERS },
             user,
-            env,
           ),
         );
         break;
       case "image-vision":
-        results.push(...filterImageVisionModels(filters, user, env));
+        results.push(...filterImageVisionModels(filters, user));
         break;
       case "video-vision":
-        results.push(...filterVideoVisionModels(filters, user, env));
+        results.push(...filterVideoVisionModels(filters, user));
         break;
       case "audio-vision":
-        results.push(...filterAudioVisionModels(filters, user, env));
+        results.push(...filterAudioVisionModels(filters, user));
         break;
       default:
         break;
@@ -285,7 +276,6 @@ function getBestModelByRoleDispatch(
   selection: AnyRoleModelSelection,
   roles: ModelRole[],
   user: JwtPayloadType,
-  env: AgentEnvAvailability,
 ): AnyModelOptionWithVision | null {
   const isAdmin =
     !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
@@ -301,7 +291,7 @@ function getBestModelByRoleDispatch(
     if (
       model &&
       (!model.adminOnly || isAdmin) &&
-      isModelProviderAvailable(model, env) &&
+      isModelProviderAvailable(model) &&
       roles.some((role) => modelMatchesRoleLocal(model, role))
     ) {
       return model;
@@ -315,7 +305,6 @@ function getBestModelByRoleDispatch(
     intelligenceRange: selection.intelligenceRange,
     priceRange: selection.priceRange,
     contentRange: selection.contentRange,
-    speedRange: selection.speedRange,
     sortBy: selection.sortBy,
     sortDirection: selection.sortDirection,
     sortBy2: selection.sortBy2,
@@ -325,31 +314,31 @@ function getBestModelByRoleDispatch(
     let result: AnyModelOptionWithVision | null = null;
     switch (role) {
       case "tts":
-        result = getBestTtsModel(filtersSelection, user, env);
+        result = getBestTtsModel(filtersSelection, user);
         break;
       case "stt":
-        result = getBestSttModel(filtersSelection, user, env);
+        result = getBestSttModel(filtersSelection, user);
         break;
       case "image-gen":
-        result = getBestImageGenModel(filtersSelection, user, env);
+        result = getBestImageGenModel(filtersSelection, user);
         break;
       case "audio-gen":
-        result = getBestMusicGenModel(filtersSelection, user, env);
+        result = getBestMusicGenModel(filtersSelection, user);
         break;
       case "video-gen":
-        result = getBestVideoGenModel(filtersSelection, user, env);
+        result = getBestVideoGenModel(filtersSelection, user);
         break;
       case "llm":
-        result = getBestChatModel(filtersSelection, user, env);
+        result = getBestChatModel(filtersSelection, user);
         break;
       case "image-vision":
-        result = getBestImageVisionModel(filtersSelection, user, env);
+        result = getBestImageVisionModel(filtersSelection, user);
         break;
       case "video-vision":
-        result = getBestVideoVisionModel(filtersSelection, user, env);
+        result = getBestVideoVisionModel(filtersSelection, user);
         break;
       case "audio-vision":
-        result = getBestAudioVisionModel(filtersSelection, user, env);
+        result = getBestAudioVisionModel(filtersSelection, user);
         break;
       default:
         break;
@@ -532,7 +521,6 @@ interface FilterChip {
 function buildFilterChips({
   intelligenceIndices,
   contentIndices,
-  speedIndices,
   priceIndices,
   sortBy,
   sortDirection,
@@ -543,7 +531,6 @@ function buildFilterChips({
   manualModelId,
   handleIntelligenceChange,
   handleContentChange,
-  handleSpeedChange,
   handlePriceChange,
   setUseSkillBased,
   updateValue,
@@ -551,7 +538,6 @@ function buildFilterChips({
 }: {
   intelligenceIndices: RangeIndices;
   contentIndices: RangeIndices;
-  speedIndices: RangeIndices;
   priceIndices: RangeIndices;
   sortBy: ReturnType<typeof scopedTranslation.scopedT>["t"] extends never
     ? never
@@ -570,7 +556,6 @@ function buildFilterChips({
   manualModelId: AnyModelId | undefined;
   handleIntelligenceChange: (min: number, max: number) => void;
   handleContentChange: (min: number, max: number) => void;
-  handleSpeedChange: (min: number, max: number) => void;
   handlePriceChange: (min: number, max: number) => void;
   setUseSkillBased: (v: boolean) => void;
   updateValue: (s: AnyRoleModelSelection | null) => void;
@@ -609,13 +594,6 @@ function buildFilterChips({
       onRemove: () => handleContentChange(0, CONTENT_DISPLAY.length - 1),
     });
   }
-  if (!isFullRange(speedIndices, SPEED_DISPLAY.length)) {
-    chips.push({
-      key: "speed",
-      label: rangeLabel(SPEED_DISPLAY, speedIndices),
-      onRemove: () => handleSpeedChange(0, SPEED_DISPLAY.length - 1),
-    });
-  }
   if (!isFullRange(priceIndices, PRICE_DISPLAY.length)) {
     chips.push({
       key: "price",
@@ -637,7 +615,6 @@ function buildFilterChips({
           ),
           priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
           contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-          speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
           sortBy: undefined,
           sortDirection: undefined,
           sortBy2: undefined,
@@ -675,7 +652,6 @@ function buildFilterChips({
           ),
           priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
           contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-          speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
           sortBy,
           sortDirection,
           sortBy2: undefined,
@@ -736,11 +712,6 @@ export interface ModelSelectorProps {
   readOnly?: boolean;
 
   /**
-   * Which AI providers have API keys configured (optional - if not provided all are assumed available)
-   */
-  envAvailability?: AgentEnvAvailability;
-
-  /**
    * User's locale for currency formatting
    */
   locale: CountryLanguage;
@@ -777,65 +748,55 @@ export interface ModelSelectorProps {
 }
 
 /** Returns true if the model's provider is available given current env */
-function isProviderAvailable(
-  model: AnyModelOptionWithVision,
-  envAvailability: AgentEnvAvailability | undefined,
-): boolean {
-  if (!envAvailability) {
-    return true;
-  }
-  return isModelProviderAvailable(model, envAvailability);
+function isProviderAvailable(model: AnyModelOptionWithVision): boolean {
+  return isModelProviderAvailable(model);
 }
 
 /** Map ApiProvider to the availability key */
 function getSetupRequiredMessage(
   model: AnyModelOptionWithVision,
-  envAvailability: AgentEnvAvailability | undefined,
   locale: CountryLanguage,
 ): string | null {
-  if (!envAvailability) {
-    return null;
-  }
   const t = scopedTranslation.scopedT(locale).t;
   switch (model.apiProvider) {
     case ApiProvider.OPENROUTER:
-      return envAvailability.openRouter
+      return agentEnvAvailability.openRouter
         ? null
         : `${t("selector.addEnvKey")}: OPENROUTER_API_KEY → openrouter.ai/keys`;
     case ApiProvider.UNCENSORED_AI:
-      return envAvailability.uncensoredAI
+      return agentEnvAvailability.uncensoredAI
         ? null
         : `${t("selector.addEnvKey")}: UNCENSORED_AI_API_KEY`;
     case ApiProvider.FREEDOMGPT:
-      return envAvailability.freedomGPT
+      return agentEnvAvailability.freedomGPT
         ? null
         : `${t("selector.addEnvKey")}: FREEDOMGPT_API_KEY`;
     case ApiProvider.GAB_AI:
-      return envAvailability.gabAI
+      return agentEnvAvailability.gabAI
         ? null
         : `${t("selector.addEnvKey")}: GAB_AI_API_KEY`;
     case ApiProvider.VENICE_AI:
-      return envAvailability.veniceAI
+      return agentEnvAvailability.veniceAI
         ? null
         : `${t("selector.addEnvKey")}: VENICE_AI_API_KEY → venice.ai`;
     case ApiProvider.CLAUDE_CODE:
-      return envAvailability.claudeCode
+      return agentEnvAvailability.claudeCode
         ? null
         : `${t("selector.addEnvKey")}: CLAUDE_CODE_ENABLED=true (install claude CLI)`;
     case ApiProvider.OPENAI_IMAGES:
-      return envAvailability.openAiImages
+      return agentEnvAvailability.openAiImages
         ? null
         : `${t("selector.addEnvKey")}: OPENAI_API_KEY → platform.openai.com/api-keys`;
     case ApiProvider.REPLICATE:
-      return envAvailability.replicate
+      return agentEnvAvailability.replicate
         ? null
         : `${t("selector.addEnvKey")}: REPLICATE_API_TOKEN → replicate.com/account/api-tokens`;
     case ApiProvider.FAL_AI:
-      return envAvailability.falAi
+      return agentEnvAvailability.falAi
         ? null
         : `${t("selector.addEnvKey")}: FAL_AI_API_KEY → fal.ai/dashboard/keys`;
     case ApiProvider.MODELSLAB:
-      return envAvailability.modelsLab
+      return agentEnvAvailability.modelsLab
         ? null
         : `${t("selector.addEnvKey")}: MODELSLAB_API_KEY → modelslab.com`;
     default:
@@ -849,7 +810,6 @@ export function ModelSelector({
   onSelect,
   characterModelSelection,
   readOnly = false,
-  envAvailability: envAvailabilityProp,
   locale,
   user,
   compact = false,
@@ -858,9 +818,6 @@ export function ModelSelector({
   requiredInputs,
 }: ModelSelectorProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  // Prefer prop (for non-chat contexts), fall back to context (chat pages)
-  const envAvailabilityCtx = useEnvAvailability();
-  const envAvailability = envAvailabilityProp ?? envAvailabilityCtx;
   // UI state - initialize to CHARACTER_BASED if modelSelection is null or matches the character selection
   const isMatchingCharacterSelection =
     !!modelSelection &&
@@ -888,7 +845,6 @@ export function ModelSelector({
     }
   }, [characterModelSelection, modelSelection]);
 
-  const [showAllModels, setShowAllModels] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const showUnfilteredModels = false;
   const [showLegacyByGroup, setShowLegacyByGroup] = useState<
@@ -959,14 +915,6 @@ export function ModelSelector({
     [sliderSource],
   );
 
-  const speedIndices = useMemo(
-    () =>
-      sliderSource && sliderSource.speedRange
-        ? getIndicesFromRange(sliderSource.speedRange, SPEED_DISPLAY)
-        : { min: 0, max: SPEED_DISPLAY.length - 1 },
-    [sliderSource],
-  );
-
   const priceIndices = useMemo(
     () =>
       sliderSource && sliderSource.priceRange
@@ -1024,7 +972,6 @@ export function ModelSelector({
         ),
         priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
         contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
         sortBy,
         sortDirection,
       };
@@ -1032,7 +979,7 @@ export function ModelSelector({
       if (newMode === ModelSelectionType.MANUAL) {
         // Try to keep current model, otherwise pick first available filtered model
         const firstAvailable = filteredModels.find((m) =>
-          isProviderAvailable(m, envAvailability),
+          isProviderAvailable(m),
         );
         const currentModel =
           manualModelId ??
@@ -1054,69 +1001,67 @@ export function ModelSelector({
   // Range change handlers - switch to FILTERS mode when editing (unless already in MANUAL)
   const handleIntelligenceChange = (min: number, max: number): void => {
     setUseSkillBased(false);
-    const newType =
-      mode === ModelSelectionType.MANUAL
-        ? ModelSelectionType.MANUAL
-        : ModelSelectionType.FILTERS;
-
     const override = {
       intelligenceRange: getRangeFromIndices(
         { min, max },
         INTELLIGENCE_DISPLAY,
       ),
     };
-    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+    if (manualModelId) {
       updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        priceRange,
+        contentRange,
+        sortBy,
+        sortDirection,
+        sortBy2,
+        sortDirection2,
+        ...override,
+      });
     }
   };
 
   const handleContentChange = (min: number, max: number): void => {
     setUseSkillBased(false);
-    const newType =
-      mode === ModelSelectionType.MANUAL
-        ? ModelSelectionType.MANUAL
-        : ModelSelectionType.FILTERS;
     const override = {
       contentRange: getRangeFromIndices({ min, max }, CONTENT_DISPLAY),
     };
-    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+    if (manualModelId) {
       updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
-    }
-  };
-
-  const handleSpeedChange = (min: number, max: number): void => {
-    setUseSkillBased(false);
-    const newType =
-      mode === ModelSelectionType.MANUAL
-        ? ModelSelectionType.MANUAL
-        : ModelSelectionType.FILTERS;
-    const override = {
-      speedRange: getRangeFromIndices({ min, max }, SPEED_DISPLAY),
-    };
-    if (newType === ModelSelectionType.MANUAL && manualModelId) {
-      updateValue(buildManualSelection(manualModelId, override));
-    } else {
-      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange,
+        priceRange,
+        sortBy,
+        sortDirection,
+        sortBy2,
+        sortDirection2,
+        ...override,
+      });
     }
   };
 
   const handlePriceChange = (min: number, max: number): void => {
     setUseSkillBased(false);
-    const newType =
-      mode === ModelSelectionType.MANUAL
-        ? ModelSelectionType.MANUAL
-        : ModelSelectionType.FILTERS;
     const override = {
       priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
     };
-    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+    if (manualModelId) {
       updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange,
+        contentRange,
+        sortBy,
+        sortDirection,
+        sortBy2,
+        sortDirection2,
+        ...override,
+      });
     }
   };
 
@@ -1134,9 +1079,6 @@ export function ModelSelector({
       contentRange:
         overrides?.contentRange ??
         getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-      speedRange:
-        overrides?.speedRange ??
-        getRangeFromIndices(speedIndices, SPEED_DISPLAY),
       sortBy: "sortBy" in (overrides ?? {}) ? overrides?.sortBy : sortBy,
       sortDirection:
         "sortDirection" in (overrides ?? {})
@@ -1241,15 +1183,13 @@ export function ModelSelector({
   // Type tab change handler
   const handleTypeTabChange = (newType: ModelType): void => {
     setModelTypeTab(newType);
-    setShowAllModels(false);
     setSearchQuery("");
     if (newType !== "text") {
       // Image/audio: force MANUAL, auto-select first available model of that type
       setUseSkillBased(false);
       const first = getAllModelOptions().find(
         (m) =>
-          modelOptionToTypes(m).includes(newType) &&
-          isProviderAvailable(m, envAvailability),
+          modelOptionToTypes(m).includes(newType) && isProviderAvailable(m),
       );
       if (first) {
         updateValue(buildManualSelection(first.id));
@@ -1290,16 +1230,19 @@ export function ModelSelector({
     const defaultDirection = ModelSortDirection.DESC;
 
     setUseSkillBased(false);
-    const newType =
-      mode === ModelSelectionType.MANUAL
-        ? ModelSelectionType.MANUAL
-        : ModelSelectionType.FILTERS;
-
     const override = { sortBy: field, sortDirection: defaultDirection };
-    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+    if (manualModelId) {
       updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange,
+        priceRange,
+        contentRange,
+        sortBy2,
+        sortDirection2,
+        ...override,
+      });
     }
   };
 
@@ -1310,19 +1253,22 @@ export function ModelSelector({
         : ModelSortDirection.ASC;
 
     setUseSkillBased(false);
-    const newType =
-      mode === ModelSelectionType.MANUAL
-        ? ModelSelectionType.MANUAL
-        : ModelSelectionType.FILTERS;
-
     const override = {
       sortBy: sortBy ?? ModelSortField.INTELLIGENCE,
       sortDirection: newDirection,
     };
-    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+    if (manualModelId) {
       updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange,
+        priceRange,
+        contentRange,
+        sortBy2,
+        sortDirection2,
+        ...override,
+      });
     }
   };
 
@@ -1330,19 +1276,22 @@ export function ModelSelector({
     field: (typeof ModelSortField)[keyof typeof ModelSortField],
   ): void => {
     setUseSkillBased(false);
-    const newType =
-      mode === ModelSelectionType.MANUAL
-        ? ModelSelectionType.MANUAL
-        : ModelSelectionType.FILTERS;
-
     const override = {
       sortBy2: field,
       sortDirection2: ModelSortDirection.DESC,
     };
-    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+    if (manualModelId) {
       updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange,
+        priceRange,
+        contentRange,
+        sortBy,
+        sortDirection,
+        ...override,
+      });
     }
   };
 
@@ -1353,19 +1302,22 @@ export function ModelSelector({
         : ModelSortDirection.ASC;
 
     setUseSkillBased(false);
-    const newType =
-      mode === ModelSelectionType.MANUAL
-        ? ModelSelectionType.MANUAL
-        : ModelSelectionType.FILTERS;
-
     const override = {
       sortBy2: sortBy2 ?? ModelSortField.PRICE,
       sortDirection2: newDirection,
     };
-    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+    if (manualModelId) {
       updateValue(buildManualSelection(manualModelId, override));
     } else {
-      updateValue({ selectionType: ModelSelectionType.FILTERS, ...override });
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange,
+        priceRange,
+        contentRange,
+        sortBy,
+        sortDirection,
+        ...override,
+      });
     }
   };
 
@@ -1375,7 +1327,6 @@ export function ModelSelector({
     INTELLIGENCE_DISPLAY,
   );
   const contentRange = getRangeFromIndices(contentIndices, CONTENT_DISPLAY);
-  const speedRange = getRangeFromIndices(speedIndices, SPEED_DISPLAY);
   const priceRange = getRangeFromIndices(priceIndices, PRICE_DISPLAY);
 
   const filteredModels = useMemo(() => {
@@ -1391,7 +1342,6 @@ export function ModelSelector({
               intelligenceRange: activeSelection.intelligenceRange,
               priceRange: activeSelection.priceRange,
               contentRange: activeSelection.contentRange,
-              speedRange: activeSelection.speedRange,
               sortBy: activeSelection.sortBy,
               sortDirection: activeSelection.sortDirection,
               sortBy2: activeSelection.sortBy2,
@@ -1402,7 +1352,6 @@ export function ModelSelector({
         selectionForRole,
         allowedRoles,
         user,
-        envAvailability,
       );
       const withInputFilter = requiredInputs
         ? base.filter((m) =>
@@ -1418,13 +1367,12 @@ export function ModelSelector({
       intelligenceRange,
       priceRange,
       contentRange,
-      speedRange,
       sortBy,
       sortDirection,
       sortBy2,
       sortDirection2,
     };
-    const base = filterChatModels(filtersModelSelection, user, envAvailability);
+    const base = filterChatModels(filtersModelSelection, user);
     return base.filter((m) => modelOptionToTypes(m).includes(modelTypeTab));
   }, [
     allowedRoles,
@@ -1433,13 +1381,11 @@ export function ModelSelector({
     intelligenceRange,
     priceRange,
     contentRange,
-    speedRange,
     sortBy,
     sortDirection,
     sortBy2,
     sortDirection2,
     user,
-    envAvailability,
     modelTypeTab,
   ]);
 
@@ -1456,7 +1402,6 @@ export function ModelSelector({
           characterModelSelection,
           allowedRoles ?? ["llm"],
           user,
-          envAvailability,
         );
       }
       return null;
@@ -1470,7 +1415,6 @@ export function ModelSelector({
     characterModelSelection,
     user,
     allowedRoles,
-    envAvailability,
   ]);
 
   // For non-admins: hide models whose provider is unavailable (admins see them with setup-required styling)
@@ -1490,9 +1434,7 @@ export function ModelSelector({
 
     if (showUnfilteredModels) {
       const all = getAllModelOptions().filter(typeFilter);
-      return isAdmin
-        ? all
-        : all.filter((m) => isProviderAvailable(m, envAvailability));
+      return isAdmin ? all : all.filter((m) => isProviderAvailable(m));
     }
 
     if (!isAdmin) {
@@ -1503,19 +1445,10 @@ export function ModelSelector({
     // Admin: filteredModels has env-available models; append env-unavailable ones
     const filteredIds = new Set(filteredModels.map((m) => m.id));
     const adminExtras = getAllModelOptions().filter(
-      (m) =>
-        typeFilter(m) &&
-        !filteredIds.has(m.id) &&
-        !isProviderAvailable(m, envAvailability),
+      (m) => typeFilter(m) && !filteredIds.has(m.id) && !isProviderAvailable(m),
     );
     return [...filteredModels, ...adminExtras];
-  }, [
-    showUnfilteredModels,
-    filteredModels,
-    isAdmin,
-    envAvailability,
-    modelTypeTab,
-  ]);
+  }, [showUnfilteredModels, filteredModels, isAdmin, modelTypeTab]);
 
   // Compute which model names appear with multiple providers (need provider suffix)
   const duplicateModelNames = useMemo(() => {
@@ -1546,16 +1479,24 @@ export function ModelSelector({
   // Sort and group models
   const sortedAndGroupedModels = useMemo(() => {
     if (!sortBy) {
-      // Default sort: env-available first, then by price ascending
+      // Default: group by provider, available providers first, within each group available-first then price-asc
       const sorted = [...searchFilteredModels].toSorted((a, b) => {
-        const aAvail = isProviderAvailable(a, envAvailability) ? 0 : 1;
-        const bAvail = isProviderAvailable(b, envAvailability) ? 0 : 1;
+        const aAvail = isProviderAvailable(a) ? 0 : 1;
+        const bAvail = isProviderAvailable(b) ? 0 : 1;
         if (aAvail !== bAvail) {
           return aAvail - bAvail;
         }
         return getModelPrice(a) - getModelPrice(b);
       });
-      return { ungrouped: sorted };
+      const grouped: Record<string, AnyModelOptionWithVision[]> = {};
+      for (const model of sorted) {
+        const label = modelProviders[model.provider]?.name ?? model.provider;
+        if (!grouped[label]) {
+          grouped[label] = [];
+        }
+        grouped[label].push(model);
+      }
+      return grouped;
     }
 
     // Get sort value and label based on field
@@ -1570,13 +1511,6 @@ export function ModelSelector({
           return {
             value: idx === -1 ? 0 : idx,
             label: t(INTELLIGENCE_DISPLAY[idx]?.label ?? ""),
-          };
-        }
-        case ModelSortField.SPEED: {
-          const idx = SPEED_DISPLAY.findIndex((d) => d.value === model.speed);
-          return {
-            value: idx === -1 ? 0 : idx,
-            label: t(SPEED_DISPLAY[idx]?.label ?? ""),
           };
         }
         case ModelSortField.PRICE: {
@@ -1616,36 +1550,11 @@ export function ModelSelector({
     }
 
     return grouped;
-  }, [searchFilteredModels, sortBy, t, envAvailability]);
+  }, [searchFilteredModels, sortBy, t]);
 
   // Get display models (limited or all)
-  const displayModels = useMemo(() => {
-    if (
-      Object.keys(sortedAndGroupedModels).length === 1 &&
-      sortedAndGroupedModels.ungrouped
-    ) {
-      const ungrouped = sortedAndGroupedModels.ungrouped;
-      // Always show all results when searching
-      if (showAllModels || searchQuery.trim()) {
-        return ungrouped;
-      }
-      const slice = ungrouped.slice(0, 3);
-      // In MANUAL mode, pin the selected model to the top if it's not in the slice
-      if (
-        mode === ModelSelectionType.MANUAL &&
-        manualModelId &&
-        !slice.some((m) => m.id === manualModelId)
-      ) {
-        const selected = ungrouped.find((m) => m.id === manualModelId);
-        if (selected) {
-          return [selected, ...slice.slice(0, 2)];
-        }
-      }
-      return slice;
-    }
-    // With grouping - return all groups (show more/less handled per group)
-    return sortedAndGroupedModels;
-  }, [sortedAndGroupedModels, showAllModels, searchQuery, mode, manualModelId]);
+  // Always grouped (by provider in default view, by tier when sort is active)
+  const displayModels = sortedAndGroupedModels;
 
   // Available type tabs (only show tabs that have at least 1 accessible model)
   const allModels = useMemo(() => getAllModelOptions(), []);
@@ -1661,7 +1570,7 @@ export function ModelSelector({
         (m) =>
           allowedRoles.some((r) => modelMatchesRoleLocal(m, r)) &&
           modelOptionToTypes(m).includes(defaultModelTypeTab) &&
-          (isAdmin || isProviderAvailable(m, envAvailability)),
+          (isAdmin || isProviderAvailable(m)),
       );
       return hasRoleType ? [defaultModelTypeTab] : [];
     }
@@ -1669,12 +1578,12 @@ export function ModelSelector({
     const hasImage = allModels.some(
       (m) =>
         modelOptionToTypes(m).includes("image") &&
-        (isAdmin || isProviderAvailable(m, envAvailability)),
+        (isAdmin || isProviderAvailable(m)),
     );
     const hasAudio = allModels.some(
       (m) =>
         modelOptionToTypes(m).includes("audio") &&
-        (isAdmin || isProviderAvailable(m, envAvailability)),
+        (isAdmin || isProviderAvailable(m)),
     );
     if (hasImage) {
       types.push("image");
@@ -1683,19 +1592,11 @@ export function ModelSelector({
       types.push("audio");
     }
     return types;
-  }, [
-    chatOnly,
-    allowedRoles,
-    defaultModelTypeTab,
-    allModels,
-    isAdmin,
-    envAvailability,
-  ]);
+  }, [chatOnly, allowedRoles, defaultModelTypeTab, allModels, isAdmin]);
 
   const activeFilterChips = buildFilterChips({
     intelligenceIndices,
     contentIndices,
-    speedIndices,
     priceIndices,
     sortBy,
     sortDirection,
@@ -1706,7 +1607,6 @@ export function ModelSelector({
     manualModelId,
     handleIntelligenceChange,
     handleContentChange,
-    handleSpeedChange,
     handlePriceChange,
     setUseSkillBased,
     updateValue,
@@ -1910,56 +1810,36 @@ export function ModelSelector({
                   avoidCollisions
                   collisionPadding={8}
                 >
-                  {/* Intelligence/Content/Speed only meaningful for LLMs, not media-gen models */}
-                  {(!allowedRoles || allowedRoles.includes("llm")) && (
-                    <>
-                      <RangeSlider
-                        options={INTELLIGENCE_DISPLAY.map((opt) => ({
-                          ...opt,
-                          label: t(opt.label),
-                          description: opt.description
-                            ? t(opt.description)
-                            : undefined,
-                        }))}
-                        minIndex={intelligenceIndices.min}
-                        maxIndex={intelligenceIndices.max}
-                        onChange={handleIntelligenceChange}
-                        minLabel={t("ranges.intelligenceRange.minLabel")}
-                        maxLabel={t("ranges.intelligenceRange.maxLabel")}
-                        disabled={readOnly}
-                      />
-                      <RangeSlider
-                        options={CONTENT_DISPLAY.map((opt) => ({
-                          ...opt,
-                          label: t(opt.label),
-                          description: opt.description
-                            ? t(opt.description)
-                            : undefined,
-                        }))}
-                        minIndex={contentIndices.min}
-                        maxIndex={contentIndices.max}
-                        onChange={handleContentChange}
-                        minLabel={t("ranges.contentRange.minLabel")}
-                        maxLabel={t("ranges.contentRange.maxLabel")}
-                        disabled={readOnly}
-                      />
-                      <RangeSlider
-                        options={SPEED_DISPLAY.map((opt) => ({
-                          ...opt,
-                          label: t(opt.label),
-                          description: opt.description
-                            ? t(opt.description)
-                            : undefined,
-                        }))}
-                        minIndex={speedIndices.min}
-                        maxIndex={speedIndices.max}
-                        onChange={handleSpeedChange}
-                        minLabel={t("ranges.speedRange.minLabel")}
-                        maxLabel={t("ranges.speedRange.maxLabel")}
-                        disabled={readOnly}
-                      />
-                    </>
-                  )}
+                  <RangeSlider
+                    options={INTELLIGENCE_DISPLAY.map((opt) => ({
+                      ...opt,
+                      label: t(opt.label),
+                      description: opt.description
+                        ? t(opt.description)
+                        : undefined,
+                    }))}
+                    minIndex={intelligenceIndices.min}
+                    maxIndex={intelligenceIndices.max}
+                    onChange={handleIntelligenceChange}
+                    minLabel={t("ranges.intelligenceRange.minLabel")}
+                    maxLabel={t("ranges.intelligenceRange.maxLabel")}
+                    disabled={readOnly}
+                  />
+                  <RangeSlider
+                    options={CONTENT_DISPLAY.map((opt) => ({
+                      ...opt,
+                      label: t(opt.label),
+                      description: opt.description
+                        ? t(opt.description)
+                        : undefined,
+                    }))}
+                    minIndex={contentIndices.min}
+                    maxIndex={contentIndices.max}
+                    onChange={handleContentChange}
+                    minLabel={t("ranges.contentRange.minLabel")}
+                    maxLabel={t("ranges.contentRange.maxLabel")}
+                    disabled={readOnly}
+                  />
                   <RangeSlider
                     options={PRICE_DISPLAY.map((opt) => ({
                       ...opt,
@@ -2009,12 +1889,7 @@ export function ModelSelector({
                       {t("selector.sortBy")}
                     </Span>
                     <Div className="flex flex-wrap gap-1">
-                      {ModelSortFieldOptions.filter(
-                        (option) =>
-                          !allowedRoles ||
-                          allowedRoles.includes("llm") ||
-                          option.value === ModelSortField.PRICE,
-                      ).map((option) => (
+                      {ModelSortFieldOptions.map((option) => (
                         <Button
                           key={option.value}
                           type="button"
@@ -2109,82 +1984,13 @@ export function ModelSelector({
 
         {/* Models list */}
         <Div className="flex flex-col gap-3">
-          {/* Model list */}
-          {Array.isArray(displayModels) ? (
-            // Ungrouped list
-            displayModels.length > 0 ? (
-              <Div className="flex flex-col gap-2">
-                {displayModels.map((model: AnyModelOptionWithVision) => {
-                  const isOutsideFilter =
-                    showUnfilteredModels &&
-                    !filteredModels.some(
-                      (m: AnyModelOptionWithVision) => m.id === model.id,
-                    );
-                  const setupRequired = getSetupRequiredMessage(
-                    model,
-                    envAvailability,
-                    locale,
-                  );
-                  return (
-                    <ModelCard
-                      key={model.id}
-                      model={model}
-                      isBest={
-                        mode !== ModelSelectionType.MANUAL &&
-                        model.id === bestFilteredModel?.id
-                      }
-                      selected={
-                        mode === ModelSelectionType.MANUAL &&
-                        manualModelId === model.id
-                      }
-                      onClick={() => handleModelSelect(model.id)}
-                      dimmed={isOutsideFilter}
-                      disabled={readOnly}
-                      setupRequired={setupRequired}
-                      providerSuffix={
-                        duplicateModelNames.has(model.name)
-                          ? apiProviderDisplayNames[model.apiProvider]
-                          : null
-                      }
-                      t={t}
-                      locale={locale}
-                    />
-                  );
-                })}
-                {modelsToShow.length > 3 && !searchQuery.trim() && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="w-full h-8 text-xs"
-                    onClick={() => setShowAllModels(!showAllModels)}
-                    disabled={readOnly}
-                  >
-                    {showAllModels ? (
-                      <>
-                        <ChevronUp className="h-3 w-3 mr-1" />
-                        {t("selector.showLess")}
-                      </>
-                    ) : (
-                      <>
-                        <ChevronDown className="h-3 w-3 mr-1" />
-                        {t("selector.showMore", {
-                          count: modelsToShow.length - 3,
-                        })}
-                      </>
-                    )}
-                  </Button>
-                )}
-              </Div>
-            ) : (
-              <Div className="p-4 text-center text-sm text-muted-foreground border rounded-lg">
-                {searchQuery.trim()
-                  ? t("selector.noSearchResults", { query: searchQuery.trim() })
-                  : t("selector.noMatchingModels")}
-              </Div>
-            )
+          {Object.keys(displayModels).length === 0 ? (
+            <Div className="p-4 text-center text-sm text-muted-foreground border rounded-lg">
+              {searchQuery.trim()
+                ? t("selector.noSearchResults", { query: searchQuery.trim() })
+                : t("selector.noMatchingModels")}
+            </Div>
           ) : (
-            // Grouped list
             <Div className="flex flex-col gap-4">
               {Object.entries(displayModels).map(
                 ([groupLabel, groupModels]) => {
@@ -2203,14 +2009,25 @@ export function ModelSelector({
                     ? models
                     : nonLegacyModels;
 
+                  // Find provider icon by matching group label against modelProviders
+                  const providerEntry = Object.values(modelProviders).find(
+                    (p) => p.name === groupLabel,
+                  );
+
                   return (
                     <Div key={groupLabel} className="flex flex-col gap-2">
-                      <Div className="flex items-center gap-2 px-1">
-                        <Separator className="flex-1" />
-                        <Label className="text-[11px] font-semibold text-primary uppercase tracking-wide">
+                      <Div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg bg-muted/40">
+                        {providerEntry && (
+                          <Div className="w-6 h-6 rounded-md bg-background flex items-center justify-center shrink-0 shadow-sm border border-border/50">
+                            <Icon
+                              icon={providerEntry.icon}
+                              className="h-3.5 w-3.5 text-foreground"
+                            />
+                          </Div>
+                        )}
+                        <Span className="text-xs font-semibold text-foreground">
                           {groupLabel}
-                        </Label>
-                        <Separator className="flex-1" />
+                        </Span>
                       </Div>
                       <Div className="flex flex-col gap-2">
                         {visibleModels.map((model) => {
@@ -2222,7 +2039,6 @@ export function ModelSelector({
                             );
                           const setupRequired = getSetupRequiredMessage(
                             model,
-                            envAvailability,
                             locale,
                           );
                           return (
@@ -2327,7 +2143,6 @@ export function ModelSelectorTrigger({
   nameClassName,
 }: ModelSelectorTriggerProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const envAvailability = useEnvAvailability();
 
   // Resolve the best model to display
   const resolvedModel = useMemo((): AnyModelOptionWithVision | null => {
@@ -2340,28 +2155,18 @@ export function ModelSelectorTrigger({
       return null;
     }
     const roles: ModelRole[] = allowedRoles ?? ["llm"];
-    return getBestModelByRoleDispatch(
-      effectiveSelection,
-      roles,
-      user,
-      envAvailability,
-    );
+    return getBestModelByRoleDispatch(effectiveSelection, roles, user);
   }, [
     modelSelection,
     characterModelSelection,
     defaultModelSelection,
     allowedRoles,
     user,
-    envAvailability,
   ]);
 
   const isClickable = !!onClick;
-  const isInherited = !modelSelection && !!characterModelSelection;
-  const isPlatformDefault =
-    !modelSelection && !characterModelSelection && !!defaultModelSelection;
   const isUnavailable =
-    resolvedModel !== null &&
-    !isProviderAvailable(resolvedModel, envAvailability);
+    resolvedModel !== null && !isProviderAvailable(resolvedModel);
 
   return (
     <Div
@@ -2375,22 +2180,22 @@ export function ModelSelectorTrigger({
     >
       {resolvedModel ? (
         <>
-          <Div
-            className={cn(
-              "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
-              isUnavailable ? "bg-muted/30" : "bg-muted",
-            )}
-          >
-            <Icon
-              icon={resolvedModel.icon}
-              className={cn(
-                "h-4 w-4",
-                isUnavailable && "text-muted-foreground",
-              )}
-            />
-          </Div>
           <Div className="flex-1 min-w-0">
             <Div className="flex items-center gap-1.5">
+              <Div
+                className={cn(
+                  "w-4 h-4 rounded flex items-center justify-center shrink-0",
+                  isUnavailable ? "bg-muted/30" : "bg-muted",
+                )}
+              >
+                <Icon
+                  icon={resolvedModel.icon}
+                  className={cn(
+                    "h-3 w-3",
+                    isUnavailable && "text-muted-foreground",
+                  )}
+                />
+              </Div>
               <Span
                 className={cn(
                   "text-sm font-medium truncate",
@@ -2400,26 +2205,10 @@ export function ModelSelectorTrigger({
               >
                 {resolvedModel.name}
               </Span>
-              {isInherited && (
-                <Badge
-                  variant="secondary"
-                  className="text-[9px] h-4 px-1.5 shrink-0"
-                >
-                  {t("selector.inherited")}
-                </Badge>
-              )}
-              {isPlatformDefault && (
-                <Badge
-                  variant="outline"
-                  className="text-[9px] h-4 px-1.5 shrink-0"
-                >
-                  {t("selector.platformDefault")}
-                </Badge>
-              )}
               {isUnavailable && (
                 <Badge
                   variant="outline"
-                  className="text-[9px] h-4 px-1.5 shrink-0 border-amber-400/50 text-amber-600 dark:text-amber-400"
+                  className="text-[9px] h-4 px-1.5 shrink-0 border-amber-400/50 text-warning"
                 >
                   <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
                   {t("selector.setupRequired")}

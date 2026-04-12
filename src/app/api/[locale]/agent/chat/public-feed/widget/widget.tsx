@@ -111,7 +111,7 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
           className={cn(
             "font-bold text-sm",
             item.score > 0 && "text-orange-500",
-            item.score < 0 && "text-blue-500",
+            item.score < 0 && "text-primary",
           )}
         >
           {item.score}
@@ -119,7 +119,7 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
         <Button
           variant="ghost"
           size="icon"
-          className="h-6 w-6 hover:text-blue-500"
+          className="h-6 w-6 hover:text-primary"
           onClick={(e) => e.stopPropagation()}
         >
           <ArrowBigDown className="h-5 w-5" />
@@ -145,7 +145,7 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
             <Span className="hover:underline">u/{item.authorName}</Span>
           )}
           {item.modelNames.length > 0 && (
-            <Span className="text-blue-500 font-medium">
+            <Span className="text-primary font-medium">
               {item.modelNames.join(", ")}
             </Span>
           )}
@@ -161,7 +161,7 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
           {isRising && (
             <Badge
               variant="secondary"
-              className="text-xs px-1.5 py-0 bg-green-500/10 text-green-600 dark:text-green-400"
+              className="text-xs px-1.5 py-0 bg-success/10 text-success"
             >
               <TrendingUp className="h-3 w-3 mr-1" />
               <Span>{t("sortMode.rising")}</Span>
@@ -170,7 +170,7 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
           {item.score > 50 && (
             <Badge
               variant="secondary"
-              className="text-xs px-1.5 py-0 bg-amber-500/10 text-amber-600 dark:text-amber-400 gap-1"
+              className="text-xs px-1.5 py-0 bg-amber-500/10 text-warning gap-1"
             >
               <Award className="h-3 w-3" />
               <Span>{t("sortMode.hot")}</Span>

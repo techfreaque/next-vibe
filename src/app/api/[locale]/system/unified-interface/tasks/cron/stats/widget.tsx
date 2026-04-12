@@ -118,10 +118,10 @@ function StatCard({
 }): React.JSX.Element {
   const variantClass = {
     default: "text-foreground",
-    success: "text-green-600 dark:text-green-400",
-    danger: "text-red-600 dark:text-red-400",
-    warning: "text-yellow-600 dark:text-yellow-400",
-    info: "text-blue-600 dark:text-blue-400",
+    success: "text-success",
+    danger: "text-destructive",
+    warning: "text-warning",
+    info: "text-info",
   }[variant];
 
   const displayValue =
@@ -228,16 +228,16 @@ function StatusBadge({
 }): React.JSX.Element {
   const cls =
     status === CronTaskStatus.COMPLETED
-      ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+      ? "bg-success/10 text-success"
       : status === CronTaskStatus.FAILED ||
           status === CronTaskStatus.ERROR ||
           status === CronTaskStatus.TIMEOUT
-        ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+        ? "bg-destructive/10 text-destructive"
         : status === CronTaskStatus.RUNNING
-          ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+          ? "bg-info/10 text-info"
           : status === CronTaskStatus.PENDING ||
               status === CronTaskStatus.SCHEDULED
-            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
+            ? "bg-warning/10 text-warning"
             : "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300";
 
   return (
@@ -263,13 +263,13 @@ function PriorityBadge({
 }): React.JSX.Element {
   const cls =
     priority === CronTaskPriority.CRITICAL
-      ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+      ? "bg-destructive/10 text-destructive"
       : priority === CronTaskPriority.HIGH
         ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300"
         : priority === CronTaskPriority.MEDIUM
-          ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+          ? "bg-info/10 text-info"
           : priority === CronTaskPriority.LOW
-            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+            ? "bg-success/10 text-success"
             : "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300";
 
   return (
@@ -288,25 +288,25 @@ function PriorityBadge({
 
 function RecentActivityIcon({ status }: { status: string }): React.JSX.Element {
   if (status === CronTaskStatus.COMPLETED) {
-    return <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />;
+    return <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />;
   }
   if (
     status === CronTaskStatus.FAILED ||
     status === CronTaskStatus.ERROR ||
     status === CronTaskStatus.TIMEOUT
   ) {
-    return <XCircle className="h-4 w-4 text-red-500 flex-shrink-0" />;
+    return <XCircle className="h-4 w-4 text-destructive flex-shrink-0" />;
   }
   if (status === CronTaskStatus.RUNNING) {
     return (
-      <Loader2 className="h-4 w-4 text-blue-500 flex-shrink-0 animate-spin" />
+      <Loader2 className="h-4 w-4 text-primary flex-shrink-0 animate-spin" />
     );
   }
   if (
     status === CronTaskStatus.PENDING ||
     status === CronTaskStatus.SCHEDULED
   ) {
-    return <Clock className="h-4 w-4 text-yellow-500 flex-shrink-0" />;
+    return <Clock className="h-4 w-4 text-warning flex-shrink-0" />;
   }
   return <Activity className="h-4 w-4 text-muted-foreground flex-shrink-0" />;
 }
@@ -401,7 +401,7 @@ function TopPerformingTable({
                     }}
                   />
                 </Div>
-                <Span className="text-xs tabular-nums text-green-600 dark:text-green-400">
+                <Span className="text-xs tabular-nums text-success">
                   {Math.round(task.successRate)}
                   {"%"}
                 </Span>
@@ -459,7 +459,7 @@ function ProblemTasksTable({
                 </Span>
               )}
             </Div>
-            <Span className="text-xs tabular-nums text-right text-red-600 dark:text-red-400">
+            <Span className="text-xs tabular-nums text-right text-destructive">
               {task.failures.toLocaleString()}
             </Span>
             <Span className="text-xs tabular-nums text-right">
@@ -477,7 +477,7 @@ function ProblemTasksTable({
                     }}
                   />
                 </Div>
-                <Span className="text-xs tabular-nums text-red-600 dark:text-red-400">
+                <Span className="text-xs tabular-nums text-destructive">
                   {Math.round(task.failureRate)}
                   {"%"}
                 </Span>
@@ -558,10 +558,10 @@ function DailyStatsTable({
           <Span className="text-right tabular-nums">
             {row.executions.toLocaleString()}
           </Span>
-          <Span className="text-right tabular-nums text-green-600 dark:text-green-400">
+          <Span className="text-right tabular-nums text-success">
             {row.successes.toLocaleString()}
           </Span>
-          <Span className="text-right tabular-nums text-red-600 dark:text-red-400">
+          <Span className="text-right tabular-nums text-destructive">
             {row.failures.toLocaleString()}
           </Span>
           <Span className="text-right tabular-nums">
@@ -722,27 +722,27 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
           className={cn(
             "flex items-center gap-3 rounded-lg border px-4 py-2.5",
             data.systemStatus === "healthy"
-              ? "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800"
+              ? "bg-success/10 border-success/30"
               : data.systemStatus === "warning"
-                ? "bg-yellow-50 border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-800"
-                : "bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800",
+                ? "bg-warning/10 border-warning/30"
+                : "bg-destructive/10 border-destructive/30",
           )}
         >
           {data.systemStatus === "healthy" ? (
-            <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+            <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
           ) : data.systemStatus === "warning" ? (
-            <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+            <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0" />
           ) : (
-            <XCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+            <XCircle className="h-4 w-4 text-destructive flex-shrink-0" />
           )}
           <Span
             className={cn(
               "text-sm font-semibold uppercase tracking-wide",
               data.systemStatus === "healthy"
-                ? "text-green-700 dark:text-green-300"
+                ? "text-success-foreground"
                 : data.systemStatus === "warning"
-                  ? "text-yellow-700 dark:text-yellow-300"
-                  : "text-red-700 dark:text-red-300",
+                  ? "text-warning"
+                  : "text-destructive",
             )}
           >
             {t(`widget.systemStatus.${data.systemStatus}`)}
@@ -770,19 +770,19 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
         <StatCard
           label={t("widget.executedTasks")}
           value={data?.executedTasks}
-          icon={<TrendingUp className="h-3.5 w-3.5 text-blue-500" />}
+          icon={<TrendingUp className="h-3.5 w-3.5 text-primary" />}
           variant="info"
         />
         <StatCard
           label={t("widget.successfulTasks")}
           value={data?.successfulTasks}
-          icon={<CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+          icon={<CheckCircle className="h-3.5 w-3.5 text-success" />}
           variant="success"
         />
         <StatCard
           label={t("widget.failedTasks")}
           value={data?.failedTasks}
-          icon={<XCircle className="h-3.5 w-3.5 text-red-500" />}
+          icon={<XCircle className="h-3.5 w-3.5 text-destructive" />}
           variant="danger"
         />
         <StatCard
@@ -797,7 +797,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
                 )}%`
               : "—"
           }
-          icon={<TrendingUp className="h-3.5 w-3.5 text-green-500" />}
+          icon={<TrendingUp className="h-3.5 w-3.5 text-success" />}
           variant="success"
         />
         <StatCard
@@ -837,28 +837,28 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
             <SmallStatCard
               label={t("widget.runningExecutions")}
               value={data.runningExecutions}
-              icon={<TrendingUp className="h-3 w-3 text-blue-500" />}
+              icon={<TrendingUp className="h-3 w-3 text-primary" />}
             />
           )}
           {data.pendingExecutions !== undefined && (
             <SmallStatCard
               label={t("widget.pendingExecutions")}
               value={data.pendingExecutions}
-              icon={<Clock className="h-3 w-3 text-yellow-500" />}
+              icon={<Clock className="h-3 w-3 text-warning" />}
             />
           )}
           {data.healthyTasks !== undefined && (
             <SmallStatCard
               label={t("widget.healthyTasks")}
               value={data.healthyTasks}
-              icon={<CheckCircle className="h-3 w-3 text-green-500" />}
+              icon={<CheckCircle className="h-3 w-3 text-success" />}
             />
           )}
           {data.degradedTasks !== undefined && (
             <SmallStatCard
               label={t("widget.degradedTasks")}
               value={data.degradedTasks}
-              icon={<AlertTriangle className="h-3 w-3 text-yellow-500" />}
+              icon={<AlertTriangle className="h-3 w-3 text-warning" />}
             />
           )}
           {data.systemLoad !== undefined && (
@@ -878,7 +878,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
             <SmallStatCard
               label={t("widget.executionsLast24h")}
               value={data.executionsLast24h}
-              icon={<Activity className="h-3 w-3 text-blue-500" />}
+              icon={<Activity className="h-3 w-3 text-primary" />}
             />
           )}
         </Div>
@@ -910,7 +910,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
       {topPerformingTasks.length > 0 && (
         <Div className="rounded-lg border bg-card p-4">
           <Div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="h-4 w-4 text-green-500" />
+            <TrendingUp className="h-4 w-4 text-success" />
             <Span className="text-sm font-semibold">
               {t("widget.topPerforming")}
             </Span>
@@ -923,7 +923,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
       {problemTasks.length > 0 && (
         <Div className="rounded-lg border bg-card p-4">
           <Div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="h-4 w-4 text-red-500" />
+            <AlertTriangle className="h-4 w-4 text-destructive" />
             <Span className="text-sm font-semibold">
               {t("widget.problemTasks")}
             </Span>

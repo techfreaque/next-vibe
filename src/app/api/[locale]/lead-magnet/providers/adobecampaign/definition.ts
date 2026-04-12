@@ -31,7 +31,8 @@ export const { POST } = createEndpoint({
   title: "providers.adobecampaign.title" as const,
   description: "providers.adobecampaign.description" as const,
   icon: "mail",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetIntegrations",
   tags: ["providers.shared.saveTag" as const],
   allowedRoles: ALLOWED_ROLES,
   fields: objectField(scopedTranslation, {
@@ -67,21 +68,19 @@ export const { POST } = createEndpoint({
         fieldType: FieldDataType.PASSWORD,
         label:
           "providers.adobecampaign.adobeCampaignClientSecret.label" as const,
-        description:
-          "providers.adobecampaign.adobeCampaignClientSecret.description" as const,
+        description: "providers.shared.secretKeepExisting" as const,
         placeholder:
           "providers.adobecampaign.adobeCampaignClientSecret.placeholder" as const,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       adobeCampaignApiKey: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "providers.adobecampaign.adobeCampaignApiKey.label" as const,
-        description:
-          "providers.adobecampaign.adobeCampaignApiKey.description" as const,
+        description: "providers.shared.secretKeepExisting" as const,
         placeholder:
           "providers.adobecampaign.adobeCampaignApiKey.placeholder" as const,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       adobeCampaignListId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

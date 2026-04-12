@@ -94,14 +94,10 @@ export function ImportJobStatusContainer({
       : null;
 
   const statusColorMap: Record<string, string> = {
-    [CsvImportJobStatus.PENDING]:
-      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-    [CsvImportJobStatus.PROCESSING]:
-      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-    [CsvImportJobStatus.COMPLETED]:
-      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-    [CsvImportJobStatus.FAILED]:
-      "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+    [CsvImportJobStatus.PENDING]: "bg-warning/10 text-warning",
+    [CsvImportJobStatus.PROCESSING]: "bg-info/10 text-info",
+    [CsvImportJobStatus.COMPLETED]: "bg-success/10 text-success",
+    [CsvImportJobStatus.FAILED]: "bg-destructive/10 text-destructive",
   };
 
   const statusColor = info?.status
@@ -120,7 +116,7 @@ export function ImportJobStatusContainer({
           <Loader2
             className={cn(
               "h-5 w-5 text-muted-foreground",
-              isRunning && "animate-spin text-blue-500",
+              isRunning && "animate-spin text-primary",
             )}
           />
           <Span className="font-semibold text-base">
@@ -186,13 +182,13 @@ export function ImportJobStatusContainer({
             <Div className="flex items-center justify-between">
               <Div className="flex items-center gap-2">
                 {info?.status === CsvImportJobStatus.COMPLETED && (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-success" />
                 )}
                 {info?.status === CsvImportJobStatus.FAILED && (
-                  <AlertCircle className="h-5 w-5 text-red-500" />
+                  <AlertCircle className="h-5 w-5 text-destructive" />
                 )}
                 {info?.status === CsvImportJobStatus.PROCESSING && (
-                  <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
+                  <Loader2 className="h-5 w-5 text-primary animate-spin" />
                 )}
                 {info?.status === CsvImportJobStatus.PENDING && (
                   <Clock className="h-5 w-5 text-muted-foreground" />
@@ -213,9 +209,9 @@ export function ImportJobStatusContainer({
               </Span>
             </Div>
             {configuration?.error && (
-              <Div className="rounded-md border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-800 px-3 py-2 flex items-start gap-2">
-                <XCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
-                <Span className="text-xs text-red-700 dark:text-red-300">
+              <Div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 flex items-start gap-2">
+                <XCircle className="h-4 w-4 text-destructive flex-shrink-0 mt-0.5" />
+                <Span className="text-xs text-destructive">
                   {configuration.error}
                 </Span>
               </Div>
@@ -242,7 +238,7 @@ export function ImportJobStatusContainer({
                 </Span>
               </Div>
               <Div className="rounded-lg border bg-card p-4 text-center">
-                <Span className="block text-2xl font-bold tabular-nums text-green-600 dark:text-green-400">
+                <Span className="block text-2xl font-bold tabular-nums text-success">
                   {progress.successfulImports}
                 </Span>
                 <Span className="text-xs text-muted-foreground">
@@ -250,7 +246,7 @@ export function ImportJobStatusContainer({
                 </Span>
               </Div>
               <Div className="rounded-lg border bg-card p-4 text-center">
-                <Span className="block text-2xl font-bold tabular-nums text-red-600 dark:text-red-400">
+                <Span className="block text-2xl font-bold tabular-nums text-destructive">
                   {progress.failedImports}
                 </Span>
                 <Span className="text-xs text-muted-foreground">
@@ -258,7 +254,7 @@ export function ImportJobStatusContainer({
                 </Span>
               </Div>
               <Div className="rounded-lg border bg-card p-4 text-center">
-                <Span className="block text-2xl font-bold tabular-nums text-yellow-600 dark:text-yellow-400">
+                <Span className="block text-2xl font-bold tabular-nums text-warning">
                   {progress.duplicateEmails}
                 </Span>
                 <Span className="text-xs text-muted-foreground">
@@ -426,22 +422,20 @@ export function ImportJobRetryContainer({
           className={cn(
             "rounded-lg border p-4 flex items-start gap-3",
             result.success
-              ? "border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-800"
-              : "border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-800",
+              ? "border-success/30 bg-success/10"
+              : "border-destructive/30 bg-destructive/10",
           )}
         >
           {result.success ? (
-            <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+            <CheckCircle className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
           ) : (
-            <XCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
           )}
           <Div>
             <Span
               className={cn(
                 "font-medium text-sm block",
-                result.success
-                  ? "text-green-700 dark:text-green-300"
-                  : "text-red-700 dark:text-red-300",
+                result.success ? "text-success-foreground" : "text-destructive",
               )}
             >
               {result.success
@@ -452,9 +446,7 @@ export function ImportJobRetryContainer({
               <Span
                 className={cn(
                   "text-xs",
-                  result.success
-                    ? "text-green-600 dark:text-green-400"
-                    : "text-red-600 dark:text-red-400",
+                  result.success ? "text-success" : "text-destructive",
                 )}
               >
                 {result.message}
@@ -557,22 +549,20 @@ export function ImportJobStopContainer({
           className={cn(
             "rounded-lg border p-4 flex items-start gap-3",
             result.success
-              ? "border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-800"
-              : "border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-800",
+              ? "border-success/30 bg-success/10"
+              : "border-destructive/30 bg-destructive/10",
           )}
         >
           {result.success ? (
-            <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+            <CheckCircle className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
           ) : (
-            <XCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
           )}
           <Div>
             <Span
               className={cn(
                 "font-medium text-sm block",
-                result.success
-                  ? "text-green-700 dark:text-green-300"
-                  : "text-red-700 dark:text-red-300",
+                result.success ? "text-success-foreground" : "text-destructive",
               )}
             >
               {result.success
@@ -583,9 +573,7 @@ export function ImportJobStopContainer({
               <Span
                 className={cn(
                   "text-xs",
-                  result.success
-                    ? "text-green-600 dark:text-green-400"
-                    : "text-red-600 dark:text-red-400",
+                  result.success ? "text-success" : "text-destructive",
                 )}
               >
                 {result.message}

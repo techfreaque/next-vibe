@@ -235,6 +235,33 @@ export class UserProfileRepository {
       // Handle profileInfo (creator fields + social links)
       if (data.profileInfo) {
         const p = data.profileInfo;
+        if (p.creatorSlug !== undefined) {
+          if (p.creatorSlug) {
+            // Validate: lowercase alphanumeric + hyphens only
+            const normalized = p.creatorSlug
+              .toLowerCase()
+              .replace(/[^a-z0-9-]/g, "-")
+              .replace(/-{2,}/g, "-")
+              .replace(/^-|-$/g, "")
+              .slice(0, 60);
+            // Check uniqueness
+            const existing = await db
+              .select({ id: users.id })
+              .from(users)
+              .where(eq(users.creatorSlug, normalized))
+              .limit(1);
+            if (existing.length > 0 && existing[0].id !== userId) {
+              return fail({
+                message: t("update.errors.conflict.title"),
+                errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                messageParams: { field: "creatorSlug" },
+              });
+            }
+            updateData.creatorSlug = normalized;
+          } else {
+            updateData.creatorSlug = null;
+          }
+        }
         if (p.bio !== undefined) {
           updateData.bio = p.bio;
         }
@@ -263,7 +290,16 @@ export class UserProfileRepository {
           updateData.creatorAccentColor = p.creatorAccentColor;
         }
         if (p.creatorHeaderImageUrl !== undefined) {
-          updateData.creatorHeaderImageUrl = p.creatorHeaderImageUrl;
+          // File field sends raw base64 - wrap as data URL for storage
+          if (
+            p.creatorHeaderImageUrl &&
+            !p.creatorHeaderImageUrl.startsWith("data:") &&
+            !p.creatorHeaderImageUrl.startsWith("http")
+          ) {
+            updateData.creatorHeaderImageUrl = `data:image/jpeg;base64,${p.creatorHeaderImageUrl}`;
+          } else {
+            updateData.creatorHeaderImageUrl = p.creatorHeaderImageUrl;
+          }
         }
       }
 

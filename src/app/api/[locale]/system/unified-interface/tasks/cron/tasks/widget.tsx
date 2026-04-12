@@ -94,18 +94,13 @@ interface WidgetProps {
 // ---------------------------------------------------------------------------
 
 const STATUS_COLORS: Record<string, string> = {
-  [CronTaskStatus.RUNNING]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  [CronTaskStatus.COMPLETED]:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  [CronTaskStatus.FAILED]:
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  [CronTaskStatus.ERROR]:
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  [CronTaskStatus.RUNNING]: "bg-info/10 text-info",
+  [CronTaskStatus.COMPLETED]: "bg-success/10 text-success",
+  [CronTaskStatus.FAILED]: "bg-destructive/10 text-destructive",
+  [CronTaskStatus.ERROR]: "bg-destructive/10 text-destructive",
   [CronTaskStatus.TIMEOUT]:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  [CronTaskStatus.PENDING]:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+  [CronTaskStatus.PENDING]: "bg-warning/10 text-warning",
   [CronTaskStatus.SCHEDULED]:
     "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
   [CronTaskStatus.CANCELLED]:
@@ -113,10 +108,10 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
-  [CronTaskPriority.CRITICAL]: "text-red-600 dark:text-red-400",
+  [CronTaskPriority.CRITICAL]: "text-destructive",
   [CronTaskPriority.HIGH]: "text-orange-600 dark:text-orange-400",
-  [CronTaskPriority.MEDIUM]: "text-blue-600 dark:text-blue-400",
-  [CronTaskPriority.LOW]: "text-green-600 dark:text-green-400",
+  [CronTaskPriority.MEDIUM]: "text-info",
+  [CronTaskPriority.LOW]: "text-success",
   [CronTaskPriority.BACKGROUND]: "text-gray-500 dark:text-gray-400",
 };
 
@@ -387,7 +382,7 @@ function TaskRow({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-7 w-7 p-0 text-green-600 hover:text-green-700 dark:text-green-400"
+          className="h-7 w-7 p-0 text-success hover:text-success/80"
           onClick={() => onRun(task)}
           title={t("widget.action.runNow")}
         >
@@ -557,7 +552,7 @@ function BulkToolbar({
           type="button"
           variant="outline"
           size="sm"
-          className="h-7 px-2.5 text-xs gap-1.5 text-green-600 hover:text-green-700 border-green-200 hover:border-green-300"
+          className="h-7 px-2.5 text-xs gap-1.5 text-success hover:text-success/80 border-success/30 hover:border-success/50"
           onClick={onBulkRun}
           disabled={isBulkLoading}
         >

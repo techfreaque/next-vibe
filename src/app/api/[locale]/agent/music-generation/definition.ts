@@ -23,6 +23,7 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
+  getBestMusicGenModel,
   MusicGenModelId,
   MusicGenModelIdOptions,
 } from "@/app/api/[locale]/agent/music-generation/models";
@@ -55,6 +56,7 @@ const { POST } = createEndpoint({
   description: "post.description",
   icon: "music",
   category: "endpointCategories.ai",
+  subCategory: "endpointCategories.aiGeneration",
   tags: ["tags.music", "tags.generation", "tags.ai"],
   dynamicTitle: ({ request }) => {
     const prompt = request?.prompt;
@@ -94,7 +96,13 @@ const { POST } = createEndpoint({
         options: MusicGenModelIdOptions,
         schema: z.enum(MusicGenModelId).default(MusicGenModelId.LYRIA_3),
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
-        serverDefault: (ctx) => ctx.streamContext?.musicGenModelId,
+        serverDefault: (ctx) => {
+          const sel = ctx.streamContext?.musicGenModelSelection;
+          if (!sel || !ctx.user) {
+            return undefined;
+          }
+          return getBestMusicGenModel(sel, ctx.user)?.id;
+        },
       }),
       duration: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

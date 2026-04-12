@@ -1,8 +1,4 @@
-import { translations as componentsTranslations } from "../../_components/i18n/en";
-
 export const translations = {
-  _components: componentsTranslations,
-
   tabs: {
     overview: "Overview",
     stats: "Statistics",

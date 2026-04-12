@@ -49,18 +49,11 @@ export const translations: typeof enTranslations = {
       open: "Otwarty",
       uncensored: "Bez cenzury",
     },
-    speed: {
-      any: "Dowolny",
-      fast: "Szybki",
-      balanced: "Zrównoważony",
-      thorough: "Dokładny",
-    },
   },
   modelSelection: {
     sort: {
       intelligence: "Sortuj według poziomu inteligencji",
       price: "Sortuj według ceny",
-      speed: "Sortuj według szybkości odpowiedzi",
       content: "Sortuj według polityki treści",
     },
     sortDirection: {
@@ -69,7 +62,6 @@ export const translations: typeof enTranslations = {
     },
     sortField: {
       intelligence: "Inteligencja",
-      speed: "Prędkość",
       price: "Cena",
       content: "Treść",
     },
@@ -173,12 +165,6 @@ export const translations: typeof enTranslations = {
         },
         maxContent: {
           content: "Maks. poziom treści: {{value}}",
-        },
-        minSpeed: {
-          content: "Min. prędkość: {{value}}",
-        },
-        maxSpeed: {
-          content: "Maks. prędkość: {{value}}",
         },
         content: {
           content: "Poziom treści: {{value}}",
@@ -336,12 +322,6 @@ export const translations: typeof enTranslations = {
       minLabel: "Min. treść",
       maxLabel: "Maks. treść",
     },
-    speedRange: {
-      label: "Zakres prędkości",
-      description: "Zakres poziomu prędkości odpowiedzi",
-      minLabel: "Min. prędkość",
-      maxLabel: "Maks. prędkość",
-    },
     minPrice: {
       label: "Minimalna cena",
       description: "Minimalny koszt kredytów na wiadomość",
@@ -357,14 +337,6 @@ export const translations: typeof enTranslations = {
     maxContent: {
       label: "Maksymalny poziom treści",
       description: "Maksymalny poziom moderacji treści dla modelu",
-    },
-    minSpeed: {
-      label: "Minimalna prędkość",
-      description: "Minimalny poziom prędkości wymagany dla modelu",
-    },
-    maxSpeed: {
-      label: "Maksymalna prędkość",
-      description: "Maksymalny poziom prędkości dozwolony dla modelu",
     },
     content: {
       label: "Poziom treści",

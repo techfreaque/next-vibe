@@ -122,7 +122,7 @@ function BackgroundProcessingNote({
   totalRows: number;
 }): React.JSX.Element {
   return (
-    <Span className="text-xs text-blue-600 dark:text-blue-400">
+    <Span className="text-xs text-info">
       {t("post.widget.backgroundProcessingNote", {
         jobId,
         totalRows,
@@ -222,7 +222,7 @@ export function LeadsImportContainer({
           {/* Guidance */}
           <Div className="rounded-lg border border-dashed bg-muted/30 p-6 flex flex-col gap-4">
             <Div className="flex items-start gap-3">
-              <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+              <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
               <Div className="flex flex-col gap-1">
                 <Span className="font-medium text-sm">
                   {t("post.widget.importGuideTitle")}
@@ -316,11 +316,11 @@ export function LeadsImportContainer({
 
       {/* Chunked processing notice + job actions */}
       {data?.isChunkedProcessing && data.jobId && !isLoading && (
-        <Div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/20 p-4 flex flex-col gap-3">
+        <Div className="rounded-lg border border-info/20 bg-info/10 p-4 flex flex-col gap-3">
           <Div className="flex items-start gap-3">
-            <Loader2 className="h-5 w-5 text-blue-500 animate-spin flex-shrink-0 mt-0.5" />
+            <Loader2 className="h-5 w-5 text-primary animate-spin flex-shrink-0 mt-0.5" />
             <Div>
-              <Span className="font-medium text-sm block text-blue-700 dark:text-blue-300">
+              <Span className="font-medium text-sm block text-info">
                 {t("post.widget.backgroundProcessingTitle")}
               </Span>
               <BackgroundProcessingNote
@@ -335,7 +335,7 @@ export function LeadsImportContainer({
             <Button
               size="sm"
               variant="outline"
-              className="h-7 text-xs gap-1.5 border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-300 dark:hover:bg-blue-900/40"
+              className="h-7 text-xs gap-1.5 border-info/30 text-info hover:bg-info/10"
               onClick={() => {
                 handleCheckJobStatus(data.jobId!);
               }}
@@ -347,7 +347,7 @@ export function LeadsImportContainer({
             <Button
               size="sm"
               variant="outline"
-              className="h-7 text-xs gap-1.5 border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/40"
+              className="h-7 text-xs gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10"
               onClick={() => {
                 handleStopJob(data.jobId!);
               }}
@@ -360,7 +360,7 @@ export function LeadsImportContainer({
               <Button
                 size="sm"
                 variant="outline"
-                className="h-7 text-xs gap-1.5 border-yellow-300 text-yellow-700 hover:bg-yellow-50 dark:border-yellow-700 dark:text-yellow-300 dark:hover:bg-yellow-900/40"
+                className="h-7 text-xs gap-1.5 border-warning/30 text-warning hover:bg-warning/10"
                 onClick={() => {
                   handleRetryFailed(data.jobId!);
                 }}
@@ -386,7 +386,7 @@ export function LeadsImportContainer({
               </Span>
             </Div>
             <Div className="rounded-lg border bg-card p-4 text-center">
-              <Span className="block text-2xl font-bold tabular-nums text-green-600 dark:text-green-400">
+              <Span className="block text-2xl font-bold tabular-nums text-success">
                 {data.successfulImports}
               </Span>
               <Span className="text-xs text-muted-foreground">
@@ -394,7 +394,7 @@ export function LeadsImportContainer({
               </Span>
             </Div>
             <Div className="rounded-lg border bg-card p-4 text-center">
-              <Span className="block text-2xl font-bold tabular-nums text-yellow-600 dark:text-yellow-400">
+              <Span className="block text-2xl font-bold tabular-nums text-warning">
                 {data.duplicateEmails}
               </Span>
               <Span className="text-xs text-muted-foreground">
@@ -402,7 +402,7 @@ export function LeadsImportContainer({
               </Span>
             </Div>
             <Div className="rounded-lg border bg-card p-4 text-center">
-              <Span className="block text-2xl font-bold tabular-nums text-red-600 dark:text-red-400">
+              <Span className="block text-2xl font-bold tabular-nums text-destructive">
                 {data.failedImports}
               </Span>
               <Span className="text-xs text-muted-foreground">
@@ -428,7 +428,7 @@ export function LeadsImportContainer({
               <Button
                 size="sm"
                 variant="outline"
-                className="h-8 text-xs gap-1.5 border-yellow-300 text-yellow-700 hover:bg-yellow-50 dark:border-yellow-700 dark:text-yellow-300 dark:hover:bg-yellow-900/40"
+                className="h-8 text-xs gap-1.5 border-warning/30 text-warning hover:bg-warning/10"
                 onClick={() => {
                   handleRetryFailed(data.jobId!);
                 }}
@@ -448,7 +448,7 @@ export function LeadsImportContainer({
               </Span>
               <Div className="grid grid-cols-3 gap-4">
                 <Div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <CheckCircle className="h-4 w-4 text-success" />
                   <Div>
                     <Span className="font-medium text-sm">
                       {summary.newLeads}
@@ -459,7 +459,7 @@ export function LeadsImportContainer({
                   </Div>
                 </Div>
                 <Div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-500" />
+                  <CheckCircle className="h-4 w-4 text-primary" />
                   <Div>
                     <Span className="font-medium text-sm">
                       {summary.updatedLeads}
@@ -470,7 +470,7 @@ export function LeadsImportContainer({
                   </Div>
                 </Div>
                 <Div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                  <AlertTriangle className="h-4 w-4 text-warning" />
                   <Div>
                     <Span className="font-medium text-sm">
                       {summary.skippedDuplicates}
@@ -503,10 +503,10 @@ export function LeadsImportContainer({
           )}
 
           {errors.length > 0 && (
-            <Div className="rounded-lg border border-red-200 bg-card">
-              <Div className="px-4 py-3 border-b border-red-200 flex items-center gap-2">
-                <XCircle className="h-4 w-4 text-red-500" />
-                <Span className="text-sm font-medium text-red-700 dark:text-red-300">
+            <Div className="rounded-lg border border-destructive/30 bg-card">
+              <Div className="px-4 py-3 border-b border-destructive/30 flex items-center gap-2">
+                <XCircle className="h-4 w-4 text-destructive" />
+                <Span className="text-sm font-medium text-destructive">
                   {t("post.widget.importErrorsTitle", {
                     count: errors.length,
                   })}
@@ -528,9 +528,7 @@ export function LeadsImportContainer({
                         {err.email}
                       </Span>
                     )}
-                    <Span className="text-red-600 dark:text-red-400 flex-1">
-                      {err.error}
-                    </Span>
+                    <Span className="text-destructive flex-1">{err.error}</Span>
                     {err.email && (
                       <Button
                         size="sm"

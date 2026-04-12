@@ -157,7 +157,7 @@ export function TestResultWidget({ field }: CliWidgetProps): React.JSX.Element {
               >
                 <Text color="red">{`  ${String(i + 1)}. ${name}`}</Text>
                 {errorMsg && (
-                  <Text dimColor wrap="end">{`     ${errorMsg}`}</Text>
+                  <Text dimColor wrap="truncate-end">{`     ${errorMsg}`}</Text>
                 )}
               </Box>
             );
@@ -179,7 +179,7 @@ export function TestResultWidget({ field }: CliWidgetProps): React.JSX.Element {
             );
             return (
               <Box key={`err-${String(i)}`} marginLeft={1}>
-                <Text color="yellow" wrap="end">
+                <Text color="yellow" wrap="truncate-end">
                   {`  ${errorLine ?? lines.slice(1).join(" ").trim()}`}
                 </Text>
               </Box>

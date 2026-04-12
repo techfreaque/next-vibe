@@ -49,10 +49,10 @@ interface PostWidgetProps {
 
 function usageColor(percent: number): string {
   return percent >= 90
-    ? "text-red-500"
+    ? "text-destructive"
     : percent >= 70
-      ? "text-amber-500"
-      : "text-green-500";
+      ? "text-warning"
+      : "text-success";
 }
 
 export function PublicCapContainer({ field }: GetWidgetProps): JSX.Element {
@@ -71,11 +71,7 @@ export function PublicCapContainer({ field }: GetWidgetProps): JSX.Element {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.15 }}
     >
-      <Card
-        className={
-          capExceeded ? "border-red-400 dark:border-red-600" : undefined
-        }
-      >
+      <Card className={capExceeded ? "border-destructive" : undefined}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Database className="h-5 w-5 text-primary" />
@@ -106,7 +102,7 @@ export function PublicCapContainer({ field }: GetWidgetProps): JSX.Element {
                 {percentUsed.toFixed(1)}% {t("get.percentUsed.content")}
               </Span>
               {capExceeded ? (
-                <Span className="text-red-500 font-medium">
+                <Span className="text-destructive font-medium">
                   {t("get.capExceeded.content")}
                 </Span>
               ) : (
@@ -124,20 +120,20 @@ export function PublicCapContainer({ field }: GetWidgetProps): JSX.Element {
               {
                 label: t("get.spendToday.content"),
                 value: spendToday.toLocaleString(),
-                color: "text-amber-600 dark:text-amber-400",
-                bg: "bg-amber-50 dark:bg-amber-900/20",
+                color: "text-warning",
+                bg: "bg-warning/10",
               },
               {
                 label: t("get.remainingToday.content"),
                 value: remainingToday.toLocaleString(),
-                color: "text-green-600 dark:text-green-400",
-                bg: "bg-green-50 dark:bg-green-900/20",
+                color: "text-success",
+                bg: "bg-success/10",
               },
               {
                 label: t("get.capAmount.content"),
                 value: capAmount.toLocaleString(),
-                color: "text-blue-600 dark:text-blue-400",
-                bg: "bg-blue-50 dark:bg-blue-900/20",
+                color: "text-info",
+                bg: "bg-info/10",
               },
             ].map((stat) => (
               <Div
@@ -186,7 +182,7 @@ export function PublicCapUpdateContainer({
         <FormAlertWidget field={{}} />
 
         {field.value?.message && (
-          <Div className="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 px-4 py-3 text-sm text-green-700 dark:text-green-300">
+          <Div className="rounded-lg bg-success/10 border border-success/30 px-4 py-3 text-sm text-success-foreground">
             {field.value.message}
           </Div>
         )}

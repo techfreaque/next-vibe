@@ -20,7 +20,6 @@ import type {
   ChatModelId,
   ChatModelSelection,
 } from "../../../ai-stream/models";
-import { useEnvAvailability } from "../../../env-availability-context";
 import type { VoiceModelSelection } from "../../../text-to-speech/models";
 import characterSingleDefinitions from "../../skills/[id]/definition";
 import { ChatFavoritesRepositoryClient } from "../repository-client";
@@ -121,7 +120,6 @@ export function useAddToFavorites({
   onSuccess,
 }: UseAddToFavoritesOptions): UseAddToFavoritesReturn {
   const [isLoading, setIsLoading] = useState(false);
-  const envAvailability = useEnvAvailability();
 
   const addToFavorites = async (e?: ButtonMouseEvent): Promise<void> => {
     e?.stopPropagation();
@@ -243,7 +241,6 @@ export function useAddToFavorites({
               null,
               locale,
               user,
-              envAvailability,
             );
 
           // Override model fields with pre-computed values when available

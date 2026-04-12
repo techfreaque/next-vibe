@@ -1133,6 +1133,46 @@ export class MessageDbWriter {
   }
 
   /**
+   * Emit a partial tool result to the parent thread's WS channel and persist to DB.
+   * The tool message stays in "Executing" state (isPartial=true) but partial result
+   * data is available to the widget. Used by long-running tools (e.g. ai-run) to
+   * stream intermediate state (like a sub-thread ID) before the tool finishes.
+   */
+  async emitPartialToolResult(params: {
+    toolMessageId: string;
+    toolCall: ToolCall;
+  }): Promise<void> {
+    const { toolMessageId, toolCall } = params;
+
+    // WS: TOOL_RESULT event - handler patches toolCall metadata on the message
+    const event = createStreamEvent.toolResult({
+      messageId: toolMessageId,
+      toolName: toolCall.toolName,
+      result: toolCall.result,
+      toolCall,
+    });
+    this.enqueue(event);
+
+    // DB: persist partial result so page refresh shows latest state
+    if (!this.isIncognito) {
+      try {
+        await db
+          .update(chatMessages)
+          .set({ metadata: { toolCall }, updatedAt: new Date() })
+          .where(eq(chatMessages.id, toolMessageId));
+      } catch (err) {
+        this.logger.warn(
+          "[MessageDbWriter] Failed to persist partial tool result",
+          {
+            messageId: toolMessageId,
+            error: err instanceof Error ? err.message : String(err),
+          },
+        );
+      }
+    }
+  }
+
+  /**
    * Write a synthetic TOOL message row for a natively-generated file part.
    * The LLM emitted a file directly (e.g. Gemini Flash Image); this creates
    * a sibling TOOL message so subsequent turns see the file URL in tool-result context.

@@ -455,6 +455,40 @@ export class ProductsRepositoryImpl implements ProductsRepository {
 
 export const productsRepository = new ProductsRepositoryImpl();
 
+function currencySymbol(c: string): string {
+  return c === "EUR" ? "€" : c === "PLN" ? "zł" : "$";
+}
+
+/**
+ * Returns interpolation params for pricing-related i18n strings.
+ * Use as second argument to t() calls that contain {{subscriptionCredits}},
+ * {{packCredits}}, {{packPrice}}, {{freeCredits}}, {{subscriptionPrice}} etc.
+ *
+ * For emails/server-side use getPricingParamsForLocale(locale) instead.
+ */
+export function getPricingParams(
+  locale: CountryLanguage,
+): Record<string, string> {
+  const country = getCountryFromLocale(locale);
+  const free = productDefinitions[ProductIds.FREE_TIER];
+  const sub = productDefinitions[ProductIds.SUBSCRIPTION];
+  const pack = productDefinitions[ProductIds.CREDIT_PACK];
+
+  const subPriceData = sub.priceByCountry[country];
+  const packPriceData = pack.priceByCountry[country];
+
+  const subSymbol = currencySymbol(subPriceData.currency);
+  const packSymbol = currencySymbol(packPriceData.currency);
+
+  return {
+    freeCredits: String(free.credits),
+    subscriptionCredits: String(sub.credits),
+    packCredits: String(pack.credits),
+    subscriptionPrice: `${subSymbol}${subPriceData.price}`,
+    packPrice: `${packSymbol}${packPriceData.price}`,
+  };
+}
+
 /**
  * ============================================================================
  * PRICING PLAN INTERFACES AND HELPERS

@@ -106,8 +106,8 @@ export function TestEmailForm({
 
             {/* Error Message */}
             {sendTestEndpoint.create.error && (
-              <Div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                <P className="text-red-600 dark:text-red-400">
+              <Div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4">
+                <P className="text-destructive">
                   {sendTestEndpoint.create.error.message}
                 </P>
               </Div>
@@ -115,10 +115,8 @@ export function TestEmailForm({
 
             {/* Success Message */}
             {sendTestEndpoint.create.response?.success && (
-              <Div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                <P className="text-green-600 dark:text-green-400">
-                  {t("test.success")}
-                </P>
+              <Div className="bg-success/10 border border-success/30 rounded-lg p-4">
+                <P className="text-success">{t("test.success")}</P>
               </Div>
             )}
 

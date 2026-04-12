@@ -14,7 +14,7 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "CONNECTIF",
         {
-          connectifApiKey: data.connectifApiKey,
+          connectifApiKey: data.connectifApiKey || undefined,
         },
         {
           listId: data.listId ?? null,

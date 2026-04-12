@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -59,7 +59,10 @@ export class FavoritesReorderRepository {
             .update(chatFavorites)
             .set({ position, updatedAt: new Date() })
             .where(
-              and(eq(chatFavorites.id, id), eq(chatFavorites.userId, userId)),
+              and(
+                or(eq(chatFavorites.id, id), eq(chatFavorites.slug, id)),
+                eq(chatFavorites.userId, userId),
+              ),
             );
         }
       });

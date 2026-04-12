@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
       saveProviderConfig(
         user.id,
         "ACUMBAMAIL",
-        { acumbamailApiKey: data.acumbamailApiKey },
+        { acumbamailApiKey: data.acumbamailApiKey || undefined },
         {
           listId: data.listId ?? null,
           headline: data.headline ?? null,

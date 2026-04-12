@@ -5,17 +5,16 @@
 
 import { parseError } from "next-vibe/shared/utils";
 
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
-import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { upsertMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/update-messages";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { ModelProviderEnvAvailability } from "@/app/api/[locale]/agent/models/models";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -61,7 +60,6 @@ export interface MessageOperationDeps {
   /** Called immediately after the optimistic user message is added - switches the visible branch */
   setLeafMessageId?: (messageId: string) => void;
   locale: CountryLanguage;
-  env: ModelProviderEnvAvailability;
 }
 
 /**
@@ -80,7 +78,6 @@ export async function createAndSendUserMessage(
     user,
     settings,
     setLeafMessageId,
-    env,
   } = deps;
 
   const {
@@ -144,19 +141,32 @@ export async function createAndSendUserMessage(
       if (audioInput) {
         messageMetadata = { isTranscribing: true };
       } else if (attachments && attachments.length > 0) {
-        // Build optimistic attachment previews with local blob URLs so the UI
-        // renders file thumbnails immediately, before the server upload completes.
-        const optimisticAttachments = attachments.map((file) => ({
-          id: crypto.randomUUID(),
-          url: URL.createObjectURL(file),
-          filename: file.name,
-          mimeType: file.type,
-          size: file.size,
-        }));
-        messageMetadata = {
-          isUploadingAttachments: true,
-          attachments: optimisticAttachments,
-        };
+        if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
+          // In incognito mode files are never uploaded to server - convert to base64
+          // immediately so the attachment data survives localStorage persistence.
+          const { convertFilesToIncognitoAttachments } =
+            await import("@/app/api/[locale]/agent/chat/incognito/file-utils");
+          const incognitoAttachments =
+            await convertFilesToIncognitoAttachments(attachments);
+          messageMetadata = {
+            isUploadingAttachments: false,
+            attachments: incognitoAttachments,
+          };
+        } else {
+          // Build optimistic attachment previews with local blob URLs so the UI
+          // renders file thumbnails immediately, before the server upload completes.
+          const optimisticAttachments = attachments.map((file) => ({
+            id: crypto.randomUUID(),
+            url: URL.createObjectURL(file),
+            filename: file.name,
+            mimeType: file.type,
+            size: file.size,
+          }));
+          messageMetadata = {
+            isUploadingAttachments: true,
+            attachments: optimisticAttachments,
+          };
+        }
       }
 
       const optimisticUserMessage: ChatMessage = {
@@ -238,7 +248,7 @@ export async function createAndSendUserMessage(
 
     // Voice mode settings - resolve TTS voice from selection or fall back to default
     const resolvedVoiceModel = settings.voiceModelSelection
-      ? getBestTtsModel(settings.voiceModelSelection, user, env)
+      ? getBestTtsModel(settings.voiceModelSelection, user)
       : null;
     const effectiveVoiceMode = {
       enabled: settings.ttsAutoplay,

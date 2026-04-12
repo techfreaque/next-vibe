@@ -1,7 +1,7 @@
 export const translations = {
   title: "Google Sheets",
   description:
-    "Automatically add every new lead as a row in your Google Sheet. Connect your Google account — no API keys required.",
+    "Automatically add every new lead as a row in your Google Sheet. Connect your Google account - no API keys required.",
   connect: {
     label: "Connect Google Account",
     description: "Sign in with Google to authorize access to your spreadsheets",

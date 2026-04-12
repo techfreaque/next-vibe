@@ -69,7 +69,7 @@ export default function HelpPageClient({
             <Div className="flex flex-col gap-6">
               <Div>
                 <Div className="flex items-start mb-2">
-                  <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
+                  <Mail className="h-5 w-5 text-primary mt-0.5 mr-3" />
                   <H3 className="font-medium">
                     {t("pages.help.info.supportEmail")}
                   </H3>
@@ -78,14 +78,14 @@ export default function HelpPageClient({
                   onClick={() => {
                     openUrl(`mailto:${supportEmail}`);
                   }}
-                  className="text-blue-600 dark:text-blue-400 hover:underline ml-8 bg-transparent border-none p-0 cursor-pointer"
+                  className="text-primary hover:underline ml-8 bg-transparent border-none p-0 cursor-pointer"
                 >
                   {supportEmail}
                 </Button>
               </Div>
               <Div>
                 <Div className="flex items-start mb-2">
-                  <Globe className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
+                  <Globe className="h-5 w-5 text-primary mt-0.5 mr-3" />
                   <H3 className="font-medium">
                     {t("pages.help.info.website")}
                   </H3>
@@ -94,7 +94,7 @@ export default function HelpPageClient({
                   href={envClient.NEXT_PUBLIC_APP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:underline ml-8"
+                  className="text-primary hover:underline ml-8"
                 >
                   {t("pages.help.info.websiteUrl")}
                 </Link>

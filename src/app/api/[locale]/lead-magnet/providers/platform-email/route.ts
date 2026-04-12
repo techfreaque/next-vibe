@@ -14,8 +14,8 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "PLATFORM_EMAIL",
         {
-          notifyEmail: data.notifyEmail,
-          notifyEmailName: data.notifyEmailName,
+          notifyEmail: data.notifyEmail || undefined,
+          notifyEmailName: data.notifyEmailName || undefined,
         },
         {
           listId: null,

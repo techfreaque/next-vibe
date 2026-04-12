@@ -363,7 +363,7 @@ export const FlatMessage = memo(function FlatMessage({
         "group/post relative",
         "p-3 mb-2 rounded",
         "transition-colors duration-150",
-        isHighlighted && "bg-blue-500/5",
+        isHighlighted && "bg-primary/5",
       )}
     >
       {/* Logo watermark for first message */}
@@ -464,8 +464,8 @@ export const FlatMessage = memo(function FlatMessage({
                 className={cn(
                   "px-1 py-0.5 rounded text-xs transition-colors",
                   userVote === "up"
-                    ? "text-blue-400"
-                    : "text-muted-foreground/60 hover:text-blue-400",
+                    ? "text-primary"
+                    : "text-muted-foreground/60 hover:text-primary",
                 )}
                 title={t("widget.flatView.actions.upvote")}
               >
@@ -476,8 +476,8 @@ export const FlatMessage = memo(function FlatMessage({
               <Span
                 className={cn(
                   "text-xs font-bold",
-                  voteScore > 0 && "text-blue-400",
-                  voteScore < 0 && "text-red-400",
+                  voteScore > 0 && "text-primary",
+                  voteScore < 0 && "text-destructive",
                 )}
               >
                 {voteScore > 0 ? `+${voteScore}` : voteScore}
@@ -493,8 +493,8 @@ export const FlatMessage = memo(function FlatMessage({
                 className={cn(
                   "px-1 py-0.5 rounded text-xs transition-colors",
                   userVote === "down"
-                    ? "text-red-400"
-                    : "text-muted-foreground/60 hover:text-red-400",
+                    ? "text-destructive"
+                    : "text-muted-foreground/60 hover:text-destructive",
                 )}
                 title={t("widget.flatView.actions.downvote")}
               >
@@ -613,7 +613,7 @@ export const FlatMessage = memo(function FlatMessage({
             "p-3",
             "rounded border transition-colors duration-150",
             isHighlighted
-              ? "border-blue-500/60 bg-blue-500/5"
+              ? "border-primary/60 bg-primary/5"
               : "border-border/30 hover:border-border/50",
           )}
         >
@@ -637,7 +637,7 @@ export const FlatMessage = memo(function FlatMessage({
             "p-3",
             "rounded border transition-colors duration-150",
             isHighlighted
-              ? "border-blue-500/60 bg-blue-500/5"
+              ? "border-primary/60 bg-primary/5"
               : "border-border/30 hover:border-border/50",
           )}
         >

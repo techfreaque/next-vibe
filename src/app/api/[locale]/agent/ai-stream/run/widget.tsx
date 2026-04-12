@@ -60,7 +60,6 @@ import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { platform } from "@/config/env-client";
 import { DefaultFolderId } from "../../chat/config";
 import { ChatMessageRole } from "../../chat/enum";
@@ -374,7 +373,6 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   const form = useWidgetForm<typeof definition.POST>();
   const locale = useWidgetLocale();
   const { t } = runScopedTranslation.scopedT(locale);
-  const env = useEnvAvailability();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const onSubmit = useWidgetOnSubmit();
@@ -471,7 +469,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   const promptValue = form.watch("prompt") ?? "";
   const modelValue: ChatModelId | undefined =
     form.watch("model") ??
-    getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user, env)?.id;
+    getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user)?.id;
   const skillValue = form.watch("skill") ?? "";
 
   const handleContentChange = useCallback(

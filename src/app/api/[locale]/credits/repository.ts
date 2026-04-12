@@ -2120,10 +2120,14 @@ export class CreditRepository {
               .where(eq(creditWallets.id, lockedWallet.id));
 
             // Record transaction
+            // balanceAfter = remaining free in this wallet + user wallet's paid balance
+            // This gives the user a meaningful "total credits after" value in history
+            const freeAfter = lockedWallet.freeCreditsRemaining - deduction;
+            const paidBalance = pool.userWallet?.balance ?? 0;
             await tx.insert(creditTransactions).values({
               walletId: lockedWallet.id,
               amount: -deduction,
-              balanceAfter: lockedWallet.freeCreditsRemaining - deduction,
+              balanceAfter: freeAfter + paidBalance,
               type: CreditTransactionType.USAGE,
               modelId,
               feature,

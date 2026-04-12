@@ -1,13 +1,11 @@
-/* eslint-disable i18next/no-literal-string */
-/* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { CodeBlock } from "next-vibe-ui/ui/markdown";
+import { CodeSnippet } from "next-vibe-ui/ui/markdown";
 import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
-import { H2, H3, H4, P } from "next-vibe-ui/ui/typography";
+import { H2, H3, P } from "next-vibe-ui/ui/typography";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
@@ -164,350 +162,431 @@ const PLATFORMS = ENDPOINT_PLATFORMS.map((key) => ({
 
 // ─── Platform panels ──────────────────────────────────────────────────────────
 
-const WEB_API_SNIPPET = `const res = await fetch(
-  "/api/en/agent/chat/threads?rootFolderId=private",
-  { headers: { Cookie: \`token=\${token}\` } }
-);
-const { threads, totalCount } = await res.json();`;
+function buildWebApiSnippet(locale: CountryLanguage): string {
+  return `const res = await fetch("/api/${locale}/greet", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ name: "Alice" }),
+});
+const { message } = await res.json();
+// message → "Hello, Alice!"`;
+}
 
-function WebApiPanel(): JSX.Element {
+function WebApiPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   return (
-    <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
-      <Div className="px-6 pt-6 pb-4">
-        <P className="text-sm font-semibold text-teal-400 mb-2">
-          Your definition.ts is already a REST API.
+    <Div className="bg-slate-950 min-h-[360px] flex flex-col gap-5 px-6 py-6">
+      <Div>
+        <P className="text-sm font-semibold text-teal-400 mb-1.5">
+          {t("home.architecture.panelDetails.webApi.headline")}
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          The moment you add a path and schema, the endpoint is live at{" "}
-          <Span className="text-slate-300 font-mono">/api/[locale]/[path]</Span>
-          . No routing code to write. No controllers. Any HTTP client — server,
-          browser, mobile — can call it immediately.
+          {t("home.architecture.panelDetails.webApi.bodyPrefix")}{" "}
+          <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
+            /api/[locale]/[path]
+          </Span>
+          {t("home.architecture.panelDetails.webApi.bodySuffix")}
         </P>
       </Div>
-      <CodeBlock code={WEB_API_SNIPPET} language="typescript" />
-      <Div className="px-6 pt-4 pb-5">
-        <P className="text-xs text-slate-500 leading-relaxed">
-          The response shape is inferred from your Zod schema. Validation,
-          role-checking, and error responses are handled before your repository
-          is ever called.
-        </P>
-      </Div>
+      <CodeSnippet
+        code={buildWebApiSnippet(locale)}
+        language="typescript"
+        noCopy
+      />
     </Div>
   );
 }
 
-const STEP_READ = `// hooks.ts - typed, cached, refetch-aware
-const { read } = useThreadsList(
-  { rootFolderId: "private" },
-  user, logger,
+const STEP_READ = `const endpoint = useEndpoint(
+  greetDefinitions,
+  { write: {} },
+  logger, user,
 );
-<<<<<<< HEAD
-// read.data?.threads   →  Thread[]
-// read.isLoading       →  boolean
-// read.isError         →  boolean`;
 
-const STEP_OPTIMISTIC = `// optimistic rename - UI updates before server confirms
+// endpoint.write?.data?.message → "Hello, Alice!"
+// endpoint.write?.isLoading     → boolean
+// endpoint.write?.error         → EndpointError | null`;
+
+const STEP_OPTIMISTIC = `// optimistic update before server confirms
 apiClient.updateEndpointData(
-  definitions.GET, logger,
+  greetDefinitions.POST, logger,
   (old) => old?.success
-    ? success({
-        ...old.data,
-        threads: old.data.threads.map((t) =>
-          t.id === id ? { ...t, title } : t
-        ),
-      })
+    ? success({ ...old.data, message: "Hello!" })
     : old,
-  { requestData: { rootFolderId: "private" } },
-);
-
-// fire & confirm in background
-await apiClient.mutate(
-  patchDef.PATCH, logger, user,
-  { title }, { threadId: id }, locale,
 );`;
 
-const STEP_DIALOG = `// drop in anywhere - renders the full form as a dialog
+const STEP_DIALOG = `// auto-renders form from definition — works anywhere
 <EndpointsPage
-  endpoint={{ POST: createThreadDef.POST }}
+  endpoint={greetDefinitions}
   locale={locale}
   user={user}
-  endpointOptions={{
-    create: {
-      mutationOptions: { onSuccess: closeDialog },
-    },
-  }}
 />`;
 
-function ReactUiPanel(): JSX.Element {
+function ReactUiPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   return (
-    <Div className="bg-[#0d1117] min-h-[360px]">
-      <Div className="flex flex-col gap-0">
-        {/* Step 1 */}
-        <Div className="px-5 pt-5 pb-2">
-          <H4 className="text-[10px] font-semibold uppercase tracking-widest text-blue-400/70 mb-2">
-            1 - Read data
-          </H4>
+    <Div className="bg-slate-950 min-h-[360px] flex flex-col gap-4 px-6 py-6">
+      <P className="text-sm font-semibold text-blue-400">
+        {t("home.architecture.panelDetails.reactUi.headline")}
+      </P>
+      <Div className="flex flex-col gap-3">
+        <Div>
+          <P className="text-[10px] font-semibold uppercase tracking-widest text-blue-400/60 mb-1.5">
+            {t("home.architecture.panelDetails.reactUi.stepRead")}
+          </P>
+          <CodeSnippet code={STEP_READ} language="typescript" noCopy />
         </Div>
-        <CodeBlock code={STEP_READ} language="typescript" />
-
-        {/* Step 2 */}
-        <Div className="h-px bg-white/5 mx-5" />
-        <Div className="px-5 pt-4 pb-2">
-          <H4 className="text-[10px] font-semibold uppercase tracking-widest text-blue-400/70 mb-2">
-            2 - Optimistic update
-          </H4>
+        <Div>
+          <P className="text-[10px] font-semibold uppercase tracking-widest text-blue-400/60 mb-1.5">
+            {t("home.architecture.panelDetails.reactUi.stepOptimistic")}
+          </P>
+          <CodeSnippet code={STEP_OPTIMISTIC} language="typescript" noCopy />
         </Div>
-        <CodeBlock code={STEP_OPTIMISTIC} language="typescript" />
-
-        {/* Step 3 */}
-        <Div className="h-px bg-white/5 mx-5" />
-        <Div className="px-5 pt-4 pb-2">
-          <H4 className="text-[10px] font-semibold uppercase tracking-widest text-blue-400/70 mb-2">
-            3 - Open as dialog
-          </H4>
+        <Div>
+          <P className="text-[10px] font-semibold uppercase tracking-widest text-blue-400/60 mb-1.5">
+            {t("home.architecture.panelDetails.reactUi.stepDialog")}
+          </P>
+          <CodeSnippet code={STEP_DIALOG} language="tsx" noCopy />
         </Div>
-        <CodeBlock code={STEP_DIALOG} language="typescript" />
       </Div>
     </Div>
   );
 }
 
-const CLI_SNIPPET = `$ vibe help
-Available Tools (419) · 28 categories
+// Non-translatable code tokens
+const CODE_BROWSER_WINDOW = "BrowserWindow";
+const CODE_ALLOWED_ROLES = "allowedRoles: [UserRole.ADMIN]";
+const CODE_ENDPOINTS_PAGE = "EndpointsPage";
 
-$ vibe help agent_chat_threads_GET
-  GET /agent/chat/threads
-  --rootFolderId  enum    (required)
-  --limit         number  default 20
+// Non-translatable CLI code tokens
+const CLI_ENDPOINT_FULL = "greet_POST";
+const CLI_METHOD_TOKEN = "POST";
+const CLI_PARAM_NAME = "name";
+const CLI_PARAM_TYPE = "string";
+const CLI_MESSAGE_KEY = "message";
+const CLI_REQUIRED_STAR = "*";
+const CLI_PROMPT_SIGIL = "$ ";
+const CLI_PAREN_OPEN = " (";
+const CLI_PAREN_CLOSE = ")";
+const CLI_DASH_H = " -h";
 
-$ vibe agent_chat_threads_GET --rootFolderId=private
-  threads     Thread[20]
-  totalCount  47`;
+function CliPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const alias = t("home.architecture.snippet.greetAlias");
+  const description = t("home.architecture.snippet.greetDescription");
+  const category = t("home.architecture.snippet.greetCategory");
+  const nameLabel = t("home.architecture.snippet.greetNameLabel");
+  const exampleName = t("home.architecture.snippet.exampleName");
+  const exampleMessage = t("home.architecture.snippet.exampleMessage");
+  const labelCategory = t("home.architecture.snippet.cliCategory");
+  const labelMethod = t("home.architecture.snippet.cliMethod");
+  const labelCallAs = t("home.architecture.snippet.cliCallAs");
+  const labelParameters = t("home.architecture.snippet.cliParameters");
+  const labelExamples = t("home.architecture.snippet.cliExamples");
+  const exampleTitle = t("home.architecture.snippet.greetTitle");
 
-function CliPanel(): JSX.Element {
+  const vibeAlias = `vibe ${alias}`;
+
   return (
-    <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
-      <Div className="px-6 pt-6 pb-4">
-        <P className="text-sm font-semibold text-green-400 mb-2">
-          Every endpoint is a CLI command. No docs needed.
+    <Div className="bg-slate-950 min-h-[360px] flex flex-col gap-5 px-6 py-6">
+      <Div>
+        <P className="text-sm font-semibold text-green-400 mb-1.5">
+          {t("home.architecture.platforms.cli.name")}
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          Run <Span className="text-slate-300 font-mono">vibe help</Span> to
-          browse all 419 tools across 28 categories. Inspect any tool to see its
-          params, then call it directly. The same definition that powers the web
-          UI is what the CLI reads.
+          {t("home.architecture.platforms.cli.benefit")}
         </P>
       </Div>
-      <CodeBlock code={CLI_SNIPPET} language="bash" />
-      <Div className="px-6 pt-4 pb-5">
-        <P className="text-xs text-slate-500 leading-relaxed">
-          Useful for scripting, debugging, and automation — the entire platform
-          is scriptable from day one without any extra effort.
-        </P>
+
+      {/* Terminal output — mirrors `vibe greet -h` */}
+      <Div className="rounded-lg bg-[#011627] border border-slate-700/60 font-mono text-[12px] leading-relaxed overflow-hidden">
+        {/* Prompt line */}
+        <Div className="px-4 pt-3 pb-2 border-b border-slate-700/40">
+          <Span className="text-green-400">{CLI_PROMPT_SIGIL}</Span>
+          <Span className="text-slate-100">
+            {vibeAlias}
+            {CLI_DASH_H}
+          </Span>
+        </Div>
+
+        <Div className="px-4 py-3 flex flex-col gap-3">
+          {/* Title line: alias (endpoint_name) */}
+          <Div>
+            <Span className="text-white font-bold">{alias}</Span>
+            <Span className="text-slate-500">
+              {CLI_PAREN_OPEN}
+              {CLI_ENDPOINT_FULL}
+              {CLI_PAREN_CLOSE}
+            </Span>
+            <Div className="text-slate-400 text-[11px] mt-0.5">
+              {description}
+            </Div>
+          </Div>
+
+          {/* Meta table */}
+          <Div className="flex flex-col gap-0.5">
+            <Div className="flex gap-0">
+              <Span className="text-slate-500 w-20 shrink-0">
+                {labelCategory}
+              </Span>
+              <Span className="text-slate-200">{category}</Span>
+            </Div>
+            <Div className="flex gap-0">
+              <Span className="text-slate-500 w-20 shrink-0">
+                {labelMethod}
+              </Span>
+              <Span className="text-cyan-400">{CLI_METHOD_TOKEN}</Span>
+            </Div>
+            <Div className="flex gap-0">
+              <Span className="text-slate-500 w-20 shrink-0">
+                {labelCallAs}
+              </Span>
+              <Span className="text-slate-200">{vibeAlias}</Span>
+            </Div>
+          </Div>
+
+          {/* Parameters */}
+          <Div>
+            <Div className="text-slate-500 uppercase text-[10px] tracking-widest mb-1.5">
+              {labelParameters}
+            </Div>
+            <Div className="flex items-baseline gap-2 pl-2">
+              <Span className="text-yellow-400 shrink-0">
+                {CLI_REQUIRED_STAR}
+              </Span>
+              <Span className="text-[#82aaff] w-12 shrink-0">
+                {CLI_PARAM_NAME}
+              </Span>
+              <Span className="text-[#7fdbca]">{CLI_PARAM_TYPE}</Span>
+              <Span className="text-slate-600">{"\u2014"}</Span>
+              <Span className="text-slate-400">{nameLabel}</Span>
+            </Div>
+          </Div>
+
+          {/* Examples */}
+          <Div>
+            <Div className="text-slate-500 uppercase text-[10px] tracking-widest mb-1.5">
+              {labelExamples}
+            </Div>
+            <Div className="pl-2">
+              <Div className="text-slate-500 text-[11px]">{exampleTitle}:</Div>
+              <Div className="text-slate-200 mt-0.5">
+                {`${vibeAlias}--name=`}
+                <Span className="text-[#ecc48d]">
+                  &quot;{exampleName}&quot;
+                </Span>
+              </Div>
+
+              <Div className="text-slate-600 text-[11px] mt-1.5 pl-0">
+                {CLI_MESSAGE_KEY}{" "}
+                <Span className="text-[#addb67]">
+                  &quot;{exampleMessage}&quot;
+                </Span>
+              </Div>
+            </Div>
+          </Div>
+        </Div>
       </Div>
     </Div>
   );
 }
 
-const AI_TOOL_SNIPPET = `vibe execute-tool \\
-  --toolName="agent_chat_threads_GET" \\
-  --input.rootFolderId="private" \\
-  --input.limit=20 \\
-  --callbackMode=wakeUp`;
+const AI_TOOL_SNIPPET = `vibe execute-tool \
+  --toolName="greet_POST" \
+  --input='{"name":"Alice"}' \
+  --callbackMode=wait
+# → { message: "Hello, Alice!" }`;
 
-function AiToolPanel(): JSX.Element {
+function AiToolPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   return (
-    <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
-      <Div className="px-6 pt-6 pb-4">
-        <P className="text-sm font-semibold text-purple-400 mb-2">
-          Claude can call any endpoint as a tool — no integration code.
+    <Div className="bg-slate-950 min-h-[360px] flex flex-col gap-5 px-6 py-6">
+      <Div>
+        <P className="text-sm font-semibold text-purple-400 mb-1.5">
+          {t("home.architecture.panelDetails.aiTool.headline")}
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          Every endpoint is automatically available to AI agents via{" "}
-          <Span className="text-slate-300 font-mono">execute-tool</Span>. Claude
-          discovers what exists, inspects the schema, and calls it with typed
-          parameters. Use{" "}
-          <Span className="text-slate-300 font-mono">wakeUp</Span> mode for
-          long-running tasks — the agent suspends and resumes when the result is
-          ready.
+          {t("home.architecture.panelDetails.aiTool.bodyPrefix")}{" "}
+          <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
+            execute-tool
+          </Span>
+          {t("home.architecture.panelDetails.aiTool.bodyMiddle1")}{" "}
+          <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
+            wakeUp
+          </Span>{" "}
+          {t("home.architecture.panelDetails.aiTool.bodyMiddle2")}{" "}
+          <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
+            --instanceId
+          </Span>{" "}
+          {t("home.architecture.panelDetails.aiTool.bodySuffix")}
         </P>
       </Div>
-      <CodeBlock code={AI_TOOL_SNIPPET} language="bash" />
-      <Div className="px-6 pt-4 pb-5">
-        <P className="text-xs text-slate-500 leading-relaxed">
-          Pass <Span className="text-slate-300 font-mono">--instanceId</Span> to
-          delegate the call to a remote instance — Claude on your laptop can
-          trigger work on the production server.
-        </P>
-      </Div>
+      <CodeSnippet code={AI_TOOL_SNIPPET} language="bash" noCopy />
     </Div>
   );
 }
 
-const MCP_SNIPPET = `// claude_desktop_config.json
-"hermes-dev": {
-  "command": "bun",
-  "args": ["vibe-runtime.ts", "mcp"]
+const MCP_SNIPPET = `{
+  "name": "greet_POST",
+  "description": "Returns a personalised greeting",
+  "inputSchema": {
+    "name": { "type": "string", "minLength": 1 }
+  }
 }`;
 
-function McpServerPanel(): JSX.Element {
+function McpServerPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   return (
-    <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
-      <Div className="px-6 pt-6 pb-4">
-        <P className="text-sm font-semibold text-orange-400 mb-2">
-          One config line — Claude Desktop gets 419 tools.
+    <Div className="bg-slate-950 min-h-[360px] flex flex-col gap-5 px-6 py-6">
+      <Div>
+        <P className="text-sm font-semibold text-orange-400 mb-1.5">
+          {t("home.architecture.panelDetails.mcpServer.headline")}
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          Point Claude at the MCP server and every endpoint becomes a callable
-          tool. The server is context-efficient by design:{" "}
-          <Span className="text-slate-300 font-mono">tool-help</Span> returns
-          names and descriptions only — full schemas expand only when you query
-          5 or fewer tools. Claude browses fast, digs in only when needed.
+          {t("home.architecture.panelDetails.mcpServer.bodyPrefix")}{" "}
+          <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
+            hermes-dev
+          </Span>{" "}
+          {t("home.architecture.panelDetails.mcpServer.bodyMiddle")}{" "}
+          <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
+            hermes
+          </Span>{" "}
+          {t("home.architecture.panelDetails.mcpServer.bodySuffix")}
         </P>
       </Div>
-      <CodeBlock code={MCP_SNIPPET} language="json" />
-      <Div className="px-6 pt-4 pb-5">
-        <P className="text-xs text-slate-500 leading-relaxed">
-          Two servers:{" "}
-          <Span className="text-slate-300 font-mono">hermes-dev</Span> points at
-          your local instance,{" "}
-          <Span className="text-slate-300 font-mono">hermes</Span> at
-          production. Add{" "}
-          <Span className="text-slate-300 font-mono">--local</Span> to switch
-          env files.
-        </P>
-      </Div>
+      <CodeSnippet code={MCP_SNIPPET} language="json" noCopy />
     </Div>
   );
 }
 
-const REACT_NATIVE_SNIPPET = `const platform = useWidgetPlatform();
-const isWeb = platform === Platform.NEXT_PAGE;
+const REACT_NATIVE_SNIPPET = `export function GreetWidget({
+  field,
+}: GreetWidgetProps): JSX.Element {
+  const platform = useWidgetPlatform();
+  const form = useWidgetForm();
+  const message = field.value?.message;
 
-if (isWeb) return <ThreadsTable field={field} />;
-return <ThreadsList field={field} />;`;
-
-function ReactNativePanel(): JSX.Element {
+  if (platform === Platform.REACT_NATIVE) {
+    return (
+      <View style={{ gap: 12 }}>
+        <TextInput field={field.children.name} form={form} />
+        {message ? <Text>{message}</Text> : null}
+      </View>
+    );
+  }
   return (
-    <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
-      <Div className="px-6 pt-6 pb-4">
-        <P className="text-sm font-semibold text-cyan-400 mb-2">
-          One widget file. Web and native branch at runtime.
+    <div className="flex flex-col gap-3">
+      <TextFieldWidget field={field.children.name} form={form} />
+      {message && <p className="text-green-600">{message}</p>}
+    </div>
+  );
+}`;
+
+function ReactNativePanel({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  return (
+    <Div className="bg-slate-950 min-h-[360px] flex flex-col gap-5 px-6 py-6">
+      <Div>
+        <P className="text-sm font-semibold text-cyan-400 mb-1.5">
+          {t("home.architecture.panelDetails.reactNative.headline")}
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          The same <Span className="text-slate-300 font-mono">widget.tsx</Span>{" "}
-          serves both React on web and React Native on iOS and Android. A single
-          platform check splits the render path — rich shadcn UI on web, native
-          primitives on mobile. Auth, types, and API calls are shared.
+          {t("home.architecture.panelDetails.reactNative.bodyPrefix")}{" "}
+          <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
+            widget.tsx
+          </Span>{" "}
+          {t("home.architecture.panelDetails.reactNative.bodySuffix")}
         </P>
       </Div>
-      <CodeBlock code={REACT_NATIVE_SNIPPET} language="typescript" />
-      <Div className="px-6 pt-4 pb-5">
-        <P className="text-xs text-slate-500 leading-relaxed">
-          No duplicate logic. No separate mobile app repo. One codebase ships to
-          iOS, Android, and web simultaneously.
-        </P>
-      </Div>
+      <CodeSnippet code={REACT_NATIVE_SNIPPET} language="tsx" noCopy />
     </Div>
   );
 }
 
-const CRON_SNIPPET = `createCronTask(definitions.POST, tools.POST, {
-  id: "error-logs-cleanup",
-  schedule: CRON_SCHEDULES.DAILY_MIDNIGHT,
-  category: TaskCategory.MAINTENANCE,
+const CRON_SNIPPET = `createCronTask(greetEndpoint.POST, tools.POST, {
+  id: "daily-greeting",
+  schedule: CRON_SCHEDULES.DAILY_9AM,
+  category: TaskCategory.NOTIFICATIONS,
   priority: CronTaskPriority.LOW,
   enabled: true,
+  data: { name: "World" },
 })`;
 
-function CronPanel(): JSX.Element {
+function CronPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   return (
-    <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
-      <Div className="px-6 pt-6 pb-4">
-        <P className="text-sm font-semibold text-red-400 mb-2">
-          Any endpoint becomes a scheduled job in one call.
+    <Div className="bg-slate-950 min-h-[360px] flex flex-col gap-5 px-6 py-6">
+      <Div>
+        <P className="text-sm font-semibold text-red-400 mb-1.5">
+          {t("home.architecture.panelDetails.cron.headline")}
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          Wrap an existing endpoint with{" "}
-          <Span className="text-slate-300 font-mono">createCronTask</Span> and
-          it runs on a schedule. No new logic, no separate worker process — the
-          same <Span className="text-slate-300 font-mono">definition.ts</Span>{" "}
-          and <Span className="text-slate-300 font-mono">route.ts</Span> you
-          already wrote. The scheduler picks it up automatically on startup.
+          {t("home.architecture.panelDetails.cron.bodyPrefix")}{" "}
+          <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
+            createCronTask
+          </Span>{" "}
+          {t("home.architecture.panelDetails.cron.bodySuffix")}
         </P>
       </Div>
-      <CodeBlock code={CRON_SNIPPET} language="typescript" />
-      <Div className="px-6 pt-4 pb-5">
-        <P className="text-xs text-slate-500 leading-relaxed">
-          Schedules, categories, priorities, and timeouts are all typed enums.
-          The cron queue is visible in the admin panel and manageable via CLI.
-        </P>
-      </Div>
+      <CodeSnippet code={CRON_SNIPPET} language="typescript" noCopy />
     </Div>
   );
 }
 
-const WEBSOCKET_SNIPPET = `// server — push from any repository
-broadcastLocal("thread:abc123", "message:new", {
-  threadId, content,
+const WEBSOCKET_SNIPPET = `// in handler — push to all connected clients
+broadcastLocal("greetings", "new:greeting", {
+  name: data.name,
+  message: \`Hello, \${data.name}!\`,
 });`;
 
-function WebSocketPanel(): JSX.Element {
+function WebSocketPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   return (
-    <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
-      <Div className="px-6 pt-6 pb-4">
-        <P className="text-sm font-semibold text-yellow-400 mb-2">
-          Real-time push from any repository, one line.
+    <Div className="bg-slate-950 min-h-[360px] flex flex-col gap-5 px-6 py-6">
+      <Div>
+        <P className="text-sm font-semibold text-yellow-400 mb-1.5">
+          {t("home.architecture.panelDetails.websocket.headline")}
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          Clients subscribe to named channels over a persistent WebSocket
-          connection. On the server, any repository can push an event by calling{" "}
-          <Span className="text-slate-300 font-mono">broadcastLocal</Span> with
-          a channel, event name, and payload. No pub/sub infrastructure to set
-          up.
+          {t("home.architecture.panelDetails.websocket.bodyPrefix")}{" "}
+          <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
+            broadcastLocal
+          </Span>{" "}
+          {t("home.architecture.panelDetails.websocket.bodySuffix")}
         </P>
       </Div>
-      <CodeBlock code={WEBSOCKET_SNIPPET} language="typescript" />
-      <Div className="px-6 pt-4 pb-5">
-        <P className="text-xs text-slate-500 leading-relaxed">
-          The AI streaming interface uses this to push tokens to the browser in
-          real time. The same mechanism works for any live data — notifications,
-          presence, progress updates.
-        </P>
-      </Div>
+      <CodeSnippet code={WEBSOCKET_SNIPPET} language="typescript" noCopy />
     </Div>
   );
 }
 
-const ELECTRON_SNIPPET = `# dev — compiles main.js, spawns server, opens window
+const ELECTRON_SNIPPET = `# dev — compile, spawn server, open window
 $ vibe electron --vibeStart=true
 
-# ship — produces .AppImage · .exe · .dmg
+# ship — .AppImage  ·  .exe  ·  .dmg
 $ vibe electron:build --platform=all`;
 
-function ElectronPanel(): JSX.Element {
+function ElectronPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   return (
-    <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
-      <Div className="px-6 pt-6 pb-4">
-        <P className="text-sm font-semibold text-slate-300 mb-2">
-          Your web app becomes a desktop app with two commands.
+    <Div className="bg-slate-950 min-h-[360px] flex flex-col gap-5 px-6 py-6">
+      <Div>
+        <P className="text-sm font-semibold text-slate-300 mb-1.5">
+          {t("home.architecture.panelDetails.electron.headline")}
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          There is no separate desktop codebase. The exact same Next.js app runs
-          inside an Electron{" "}
-          <Span className="text-slate-300 font-mono">BrowserWindow</Span>. Vibe
-          compiles the Electron main process, starts the server, and opens the
-          window — all in one step.
+          {t("home.architecture.panelDetails.electron.bodyPrefix")}{" "}
+          <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
+            {CODE_BROWSER_WINDOW}
+          </Span>
+          {t("home.architecture.panelDetails.electron.bodySuffix")}
         </P>
       </Div>
-      <CodeBlock code={ELECTRON_SNIPPET} language="bash" />
-      <Div className="px-6 pt-4 pb-5">
-        <P className="text-xs text-slate-500 leading-relaxed">
-          The build command packages for all platforms via electron-builder.
-          Everything that works in the browser — auth, AI, real-time — works
-          identically in the desktop app.
-        </P>
-      </Div>
+      <CodeSnippet code={ELECTRON_SNIPPET} language="bash" noCopy />
     </Div>
   );
 }
@@ -517,141 +596,123 @@ const user = await requireAdminUser(locale, redirect);
 
 // page-client.tsx
 <EndpointsPage
-  endpoint={cronQueueDefinition}
+  endpoint={greetDefinitions}
   locale={locale}
   user={user}
 />`;
 
-function AdminPanelPanel(): JSX.Element {
+function AdminPanelPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   return (
-    <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
-      <Div className="px-6 pt-6 pb-4">
-        <P className="text-sm font-semibold text-indigo-400 mb-2">
-          Admin pages write themselves — guard, render, done.
+    <Div className="bg-slate-950 min-h-[360px] flex flex-col gap-5 px-6 py-6">
+      <Div>
+        <P className="text-sm font-semibold text-indigo-400 mb-1.5">
+          {t("home.architecture.panelDetails.adminPanel.headline")}
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          Set{" "}
-          <Span className="text-slate-300 font-mono">
-            allowedRoles: [UserRole.ADMIN]
+          {t("home.architecture.panelDetails.adminPanel.bodyPrefix")}{" "}
+          <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
+            {CODE_ALLOWED_ROLES}
           </Span>{" "}
-          in the definition and the endpoint is locked down everywhere — API,
-          CLI, MCP, and UI. On the page, one guard call and one{" "}
-          <Span className="text-slate-300 font-mono">EndpointsPage</Span>{" "}
-          renders the complete admin interface with zero additional markup.
+          {t("home.architecture.panelDetails.adminPanel.bodyMiddle")}{" "}
+          <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
+            {CODE_ENDPOINTS_PAGE}
+          </Span>{" "}
+          {t("home.architecture.panelDetails.adminPanel.bodySuffix")}
         </P>
       </Div>
-      <CodeBlock code={ADMIN_SNIPPET} language="typescript" />
-      <Div className="px-6 pt-4 pb-5">
-        <P className="text-xs text-slate-500 leading-relaxed">
-          Every admin page in the platform is built this way — cron queue, user
-          management, task runner, settings. All consistent, all role-protected,
-          zero boilerplate.
-        </P>
-      </Div>
+      <CodeSnippet code={ADMIN_SNIPPET} language="tsx" noCopy />
     </Div>
   );
 }
 
 const VIBE_FRAME_SNIPPET = `window.vibeFrameConfig = {
-  serverUrl: "https://unbottled.ai",
+  serverUrl: "https://your-server.com",
   integrations: [{
-    endpoint: "contact_POST",
-    target: "#contact-form",
+    endpoint: "greet_POST",
+    target: "#greet-form",
     theme: "dark",
   }],
 };`;
 
-function VibeFramePanel(): JSX.Element {
+function VibeFramePanel({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   return (
-    <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
-      <Div className="px-6 pt-6 pb-4">
-        <P className="text-sm font-semibold text-pink-400 mb-2">
-          Embed any endpoint into any website with a script tag.
+    <Div className="bg-slate-950 min-h-[360px] flex flex-col gap-5 px-6 py-6">
+      <Div>
+        <P className="text-sm font-semibold text-pink-400 mb-1.5">
+          {t("home.architecture.panelDetails.vibeFrame.headline")}
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          Drop the Vibe Frame script onto any existing site — WordPress,
-          Webflow, plain HTML. Declare which endpoint to render and where to
-          mount it. The full form, validation, and submission flow appears
-          inside the host page, communicating back over a postMessage bridge.
+          {t("home.architecture.panelDetails.vibeFrame.body")}
         </P>
       </Div>
-      <CodeBlock code={VIBE_FRAME_SNIPPET} language="javascript" />
-      <Div className="px-6 pt-4 pb-5">
-        <P className="text-xs text-slate-500 leading-relaxed">
-          No iframes, no CORS headaches. The frame is a first-class citizen of
-          the host page. Use the imperative{" "}
-          <Span className="text-slate-300 font-mono">VibeFrame.mount()</Span>{" "}
-          API for dynamic embedding.
-        </P>
-      </Div>
+      <CodeSnippet code={VIBE_FRAME_SNIPPET} language="javascript" noCopy />
     </Div>
   );
 }
 
-const REMOTE_SKILL_SNIPPET = `// opt out of skill exposure with one role flag
-allowedRoles: [
-  UserRole.CUSTOMER,
-  UserRole.SKILL_OFF, // exclude from skill files
-]`;
+const REMOTE_SKILL_SNIPPET = `## greet_POST
+Returns a personalised greeting.
+**Input:** name (string, required)
+**Output:** message (string)
 
-function RemoteSkillPanel(): JSX.Element {
+---
+# To hide an endpoint from external agents:
+allowedRoles: [UserRole.PUBLIC, UserRole.SKILL_OFF]`;
+
+function RemoteSkillPanel({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   return (
-    <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
-      <Div className="px-6 pt-6 pb-4">
-        <P className="text-sm font-semibold text-amber-400 mb-2">
-          Your API generates its own AI skill manifest automatically.
+    <Div className="bg-slate-950 min-h-[360px] flex flex-col gap-5 px-6 py-6">
+      <Div>
+        <P className="text-sm font-semibold text-amber-400 mb-1.5">
+          {t("home.architecture.panelDetails.remoteSkill.headline")}
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          Every public endpoint is included in a generated markdown skill file
-          that external AI agents can fetch and learn from. Two files are
-          served: one for anonymous users, one for authenticated users. Each
-          endpoint opts in by default — add{" "}
-          <Span className="text-slate-300 font-mono">SKILL_OFF</Span> to exclude
-          it.
+          {t("home.architecture.panelDetails.remoteSkill.bodyPrefix")}{" "}
+          <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
+            SKILL_OFF
+          </Span>{" "}
+          {t("home.architecture.panelDetails.remoteSkill.bodySuffix")}
         </P>
       </Div>
-      <CodeBlock code={REMOTE_SKILL_SNIPPET} language="typescript" />
-      <Div className="px-6 pt-4 pb-5">
-        <P className="text-xs text-slate-500 leading-relaxed">
-          An external AI fetches the manifest once, then knows exactly what your
-          platform can do and how to call it — no manual API docs to maintain.
-        </P>
-      </Div>
+      <CodeSnippet code={REMOTE_SKILL_SNIPPET} language="typescript" noCopy />
     </Div>
   );
 }
 
-const VIBE_BOARD_SNIPPET = `# Vibe Sense — the data layer, live today
-$ vibe system_unified-interface_vibe-sense_graphs_GET
-$ vibe system_unified-interface_vibe-sense_graphs_POST`;
+const VIBE_BOARD_SNIPPET = `# Define a data pipeline for any endpoint
+$ vibe system_vibe-sense_graphs_POST \\
+  --name="Daily Greetings" \\
+  --sourceEndpoint="greet_POST" \\
+  --aggregation="count"
+# → renders as a tile when Vibe Board ships`;
 
-function VibeBoardPanel(): JSX.Element {
+function VibeBoardPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   return (
-    <Div className="bg-[#0d1117] min-h-[360px] flex flex-col gap-0">
-      <Div className="px-6 pt-6 pb-4">
-        <P className="text-sm font-semibold text-violet-400 mb-2">
-          Every endpoint becomes a live dashboard tile.
+    <Div className="bg-slate-950 min-h-[360px] flex flex-col gap-5 px-6 py-6">
+      <Div>
+        <P className="text-sm font-semibold text-violet-400 mb-1.5">
+          {t("home.architecture.panelDetails.vibeBoard.headline")}
         </P>
         <P className="text-xs text-slate-400 leading-relaxed">
-          Vibe Board is the next surface for next-vibe — a drag-and-drop
-          analytics dashboard where any endpoint can be pinned as a tile. The
-          data layer, Vibe Sense, is already live: define a graph pipeline today
-          and it will render automatically when Vibe Board ships.
+          {t("home.architecture.panelDetails.vibeBoard.body")}
         </P>
       </Div>
-      <CodeBlock code={VIBE_BOARD_SNIPPET} language="bash" />
-      <Div className="px-6 pt-4 pb-5">
-        <P className="text-xs text-slate-500 leading-relaxed">
-          No extra instrumentation. The same definition that drives the REST
-          API, CLI, and MCP tool will power the dashboard widget — zero
-          additional code required.
-        </P>
-      </Div>
+      <CodeSnippet code={VIBE_BOARD_SNIPPET} language="bash" noCopy />
     </Div>
   );
 }
 
-const PLATFORM_PANELS: Record<EndpointPlatformKey, () => JSX.Element> = {
+type PanelComponent = (props: { locale: CountryLanguage }) => JSX.Element;
+
+const PLATFORM_PANELS: Record<EndpointPlatformKey, PanelComponent> = {
   webApi: WebApiPanel,
   reactUi: ReactUiPanel,
   cli: CliPanel,
@@ -667,80 +728,258 @@ const PLATFORM_PANELS: Record<EndpointPlatformKey, () => JSX.Element> = {
   vibeBoard: VibeBoardPanel,
 };
 
-// ─── Definition snippet (source box) ─────────────────────────────────────────
+// ─── Source examples (file viewer) ───────────────────────────────────────────
 
-function DefinitionPanel(): JSX.Element {
+type TFn = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
+// ── Example 1: Hello World — definition.ts ────────────────────────────────────
+function buildHelloDefinition(t: TFn): string {
+  const title = t("home.architecture.snippet.greetTitle");
+  const description = t("home.architecture.snippet.greetDescription");
+  const tag = t("home.architecture.snippet.greetTagName");
+  const formLabel = t("home.architecture.snippet.greetFormLabel");
+  const nameLabel = t("home.architecture.snippet.greetNameLabel");
+  const namePlaceholder = t("home.architecture.snippet.greetNamePlaceholder");
+  const submitLabel = t("home.architecture.snippet.greetSubmitLabel");
+  const exampleName = t("home.architecture.snippet.exampleName");
+  const exampleMessage = t("home.architecture.snippet.exampleMessage");
+  return `const { POST } = createEndpoint({
+  method: Methods.POST,
+  path: ["greet"],
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+  title: "${title}",
+  description: "${description}",
+  icon: "hand-wave",
+  tags: ["${tag}"],
+  fields: objectField({
+    type: WidgetType.CONTAINER,
+    title: "${formLabel}",
+    usage: { request: "data", response: true },
+    children: {
+      name: requestField({
+        schema: z.string().min(1).max(100),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "${nameLabel}",
+        placeholder: "${namePlaceholder}",
+      }),
+      message: responseField({
+        schema: z.string(),
+        type: WidgetType.ALERT,
+      }),
+      submitButton: widgetField({
+        type: WidgetType.SUBMIT_BUTTON,
+        text: "${submitLabel}",
+       }),
+    },
+  }),
+  examples: {
+    requests:  { simpleGreeting: { name: "${exampleName}" } },
+    responses: { simpleGreeting: { message: "${exampleMessage}" } },
+  },
+});`;
+}
+
+// ── Example 1: Hello World — route.ts ─────────────────────────────────────────
+const HELLO_ROUTE = `export const { POST, tools } = endpointsHandler({
+  endpoint: greetEndpoint,
+  [Methods.POST]: {
+    handler: ({ data }) => {
+       return success({ message: \`Hello, \${data.name}!\` });
+    },
+  },
+});`;
+
+// ── Example 2: Custom Widget — definition.ts ──────────────────────────────────
+function buildWidgetDefinition(t: TFn): string {
+  const title = t("home.architecture.snippet.greetTitle");
+  const description = t("home.architecture.snippet.greetDescription");
+  const tag = t("home.architecture.snippet.greetTagName");
+  const nameLabel = t("home.architecture.snippet.greetNameLabel");
+  const namePlaceholder = t("home.architecture.snippet.greetNamePlaceholder");
+  const exampleName = t("home.architecture.snippet.exampleName");
+  const exampleMessage = t("home.architecture.snippet.exampleMessage");
+  return `const { POST } = createEndpoint({
+  method: Methods.POST,
+  path: ["greet"],
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+  title: "${title}",
+  description: "${description}",
+  icon: "hand-wave",
+  tags: ["${tag}"],
+  fields: customWidgetObject({
+    render: GreetWidget,
+    children: {
+      name: requestField({
+        schema: z.string().min(1).max(100),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "${nameLabel}",
+        placeholder: "${namePlaceholder}",
+      }),
+      message: responseField({
+        schema: z.string(),
+        type: WidgetType.ALERT,
+      }),
+    },
+  }),
+  examples: {
+    requests:  { simpleGreeting: { name: "${exampleName}" } },
+    responses: { simpleGreeting: { message: "${exampleMessage}" } },
+  },
+});`;
+}
+
+// ── Example 2: Custom Widget — route.ts ───────────────────────────────────────
+const WIDGET_ROUTE = `export const { POST, tools } = endpointsHandler({
+  endpoint: greetEndpoint,
+  [Methods.POST]: {
+    handler: ({ data }) => {
+      return success({ message: \`Hello, \${data.name}!\` });
+    },
+  },
+});`;
+
+// ── Example 2: Custom Widget — widget.tsx ─────────────────────────────────────
+const WIDGET_WIDGET = `"use client";
+
+interface GreetWidgetProps {
+  field: { value: GreetPostResponseOutput | null } &
+    (typeof definition.POST)["fields"];
+}
+
+export function GreetWidget({ field }: GreetWidgetProps): JSX.Element {
+  const message = field.value?.message;
+
   return (
-    <Div className="font-mono text-xs bg-[#0d1117] px-5 py-4 leading-5">
-      <Div className="text-slate-500">
-        {"// definition.ts - the only file you write."}
+    <div className="flex flex-col gap-4 p-4">
+      <TextFieldWidget field={field.children.name} />
+      {message && (
+        <p className="text-lg font-medium text-green-600">{message}</p>
+      )}
+      <SubmitButtonWidget field={field.children.submitButton} />
+    </div>
+  );
+}`;
+
+type ExampleKey = "hello" | "widget";
+
+interface FileEntry {
+  name: string;
+  code: string;
+  lang: string;
+}
+
+function buildFiles(t: TFn): Record<ExampleKey, Record<string, FileEntry>> {
+  return {
+    hello: {
+      "definition.ts": {
+        name: "definition.ts",
+        code: buildHelloDefinition(t),
+        lang: "typescript",
+      },
+      "route.ts": { name: "route.ts", code: HELLO_ROUTE, lang: "typescript" },
+    },
+    widget: {
+      "definition.ts": {
+        name: "definition.ts",
+        code: buildWidgetDefinition(t),
+        lang: "typescript",
+      },
+      "route.ts": { name: "route.ts", code: WIDGET_ROUTE, lang: "typescript" },
+      "widget.tsx": { name: "widget.tsx", code: WIDGET_WIDGET, lang: "tsx" },
+    },
+  };
+}
+
+function FileViewer({
+  files,
+}: {
+  files: Record<string, FileEntry>;
+}): JSX.Element {
+  const keys = Object.keys(files);
+  const [activeFile, setActiveFile] = useState(keys[0]!);
+  const file = files[activeFile]!;
+
+  return (
+    <Div className="overflow-hidden rounded-xl border border-border/50 bg-slate-950">
+      {/* File tabs */}
+      <Div className="flex border-b border-border/40 bg-slate-900/50">
+        {keys.map((key) => (
+          <Button
+            key={key}
+            variant="ghost"
+            size="sm"
+            onClick={() => setActiveFile(key)}
+            className={cn(
+              "h-auto rounded-none px-4 py-2 text-xs font-mono transition-colors border-r border-border/30",
+              activeFile === key
+                ? "text-slate-200 bg-slate-800/80 border-b-2 border-b-primary"
+                : "text-slate-500 hover:text-slate-300 hover:bg-slate-800/40",
+            )}
+          >
+            {files[key]!.name}
+          </Button>
+        ))}
       </Div>
-      <Div className="mt-2">
-        <Span className="text-purple-400">const </Span>
-        <Span className="text-slate-300">{"{ "}</Span>
-        <Span className="text-blue-400">GET</Span>
-        <Span className="text-slate-300">{" } = "}</Span>
-        <Span className="text-yellow-300">createEndpoint</Span>
-        <Span className="text-slate-300">{"({"}</Span>
-      </Div>
-      <Div className="pl-4">
-        <Span className="text-sky-300">path</Span>
-        <Span className="text-slate-400">{": ["}</Span>
-        <Span className="text-amber-300">"agent"</Span>
-        <Span className="text-slate-400">{", "}</Span>
-        <Span className="text-amber-300">"chat"</Span>
-        <Span className="text-slate-400">{", "}</Span>
-        <Span className="text-amber-300">"threads"</Span>
-        <Span className="text-slate-400">{"],"}</Span>
-      </Div>
-      <Div className="pl-4">
-        <Span className="text-sky-300">allowedRoles</Span>
-        <Span className="text-slate-400">{": ["}</Span>
-        <Span className="text-blue-400">UserRole</Span>
-        <Span className="text-slate-400">.</Span>
-        <Span className="text-orange-300">CUSTOMER</Span>
-        <Span className="text-slate-400">{"],"}</Span>
-      </Div>
-      <Div className="pl-4">
-        <Span className="text-sky-300">fields</Span>
-        <Span className="text-slate-400">:{" {"}</Span>
-      </Div>
-      <Div className="pl-8">
-        <Span className="text-sky-300">rootFolderId</Span>
-        <Span className="text-slate-400">{": "}</Span>
-        <Span className="text-yellow-300">requestField</Span>
-        <Span className="text-slate-400">{"({ schema: "}</Span>
-        <Span className="text-blue-400">z</Span>
-        <Span className="text-slate-400">.</Span>
-        <Span className="text-yellow-300">enum</Span>
-        <Span className="text-slate-400">{"(["}</Span>
-        <Span className="text-amber-300">"private"</Span>
-        <Span className="text-slate-400">{" …]) }),"}</Span>
-      </Div>
-      <Div className="pl-8">
-        <Span className="text-sky-300">threads</Span>
-        <Span className="text-slate-400">{": "}</Span>
-        <Span className="text-yellow-300">responseArrayField</Span>
-        <Span className="text-slate-400">{"({ child: "}</Span>
-        <Span className="text-blue-400">ThreadSchema</Span>
-        <Span className="text-slate-400">{" }),"}</Span>
-      </Div>
-      <Div className="pl-4">
-        <Span className="text-slate-400">{"  },"}</Span>
-      </Div>
-      <Div className="pl-4">
-        <Span className="text-sky-300">errorTypes</Span>
-        <Span className="text-slate-400">{": "}</Span>
-        <Span className="text-yellow-300">endpointErrorTypes</Span>
-        <Span className="text-slate-400">,</Span>
-      </Div>
-      <Div>
-        <Span className="text-slate-300">{"});"}</Span>
-      </Div>
+      <AnimatePresence mode="wait">
+        <MotionDiv
+          key={activeFile}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.1 }}
+        >
+          <CodeSnippet
+            code={file.code}
+            language={file.lang}
+            variant="bare"
+            noCopy
+          />
+        </MotionDiv>
+      </AnimatePresence>
     </Div>
   );
 }
 
+function SourceExamples({ t }: { t: TFn }): JSX.Element {
+  const [activeExample, setActiveExample] = useState<ExampleKey>("hello");
+  const allFiles = useMemo(() => buildFiles(t), [t]);
+
+  return (
+    <Div className="mx-auto max-w-2xl">
+      <Div className="flex gap-1 mb-3 border-b border-border/40">
+        {(["hello", "widget"] as ExampleKey[]).map((key) => (
+          <Button
+            key={key}
+            variant="ghost"
+            size="sm"
+            onClick={() => setActiveExample(key)}
+            className={cn(
+              "rounded-none px-4 py-2 text-xs font-medium transition-colors border-b-2 -mb-px",
+              activeExample === key
+                ? "text-foreground border-b-primary"
+                : "text-muted-foreground border-b-transparent hover:text-foreground",
+            )}
+          >
+            {t(`home.architecture.examples.${key}`)}
+          </Button>
+        ))}
+      </Div>
+      <AnimatePresence mode="wait">
+        <MotionDiv
+          key={activeExample}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.15 }}
+        >
+          <FileViewer files={allFiles[activeExample]} />
+        </MotionDiv>
+      </AnimatePresence>
+    </Div>
+  );
+}
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function Architecture({ locale }: ArchitectureProps): JSX.Element {
@@ -787,29 +1026,14 @@ export function Architecture({ locale }: ArchitectureProps): JSX.Element {
           </P>
         </MotionDiv>
 
-        {/* Source definition box */}
+        {/* Source examples */}
         <MotionDiv
-          className="mx-auto max-w-2xl mb-10"
+          className="mb-10"
           initial={{ opacity: 0, y: 16 }}
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
           transition={{ delay: 0.05, duration: 0.5 }}
         >
-          <Div className="rounded-xl border-2 border-cyan-500/40 overflow-hidden shadow-lg shadow-cyan-500/10">
-            <Div className="flex items-center gap-2 px-4 py-2 border-b border-cyan-800/40 bg-cyan-950/80">
-              <Div className="flex gap-1.5">
-                <Div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-                <Div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-                <Div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
-              </Div>
-              <Span className="text-xs font-mono text-cyan-400/80 ml-2">
-                {t("home.architecture.defFilename")}
-              </Span>
-              <Span className="ml-auto text-xs text-cyan-500/60 italic">
-                {t("home.architecture.sourceLabel")}
-              </Span>
-            </Div>
-            <DefinitionPanel />
-          </Div>
+          <SourceExamples t={t} />
         </MotionDiv>
 
         {/* Arrow divider */}
@@ -885,7 +1109,7 @@ export function Architecture({ locale }: ArchitectureProps): JSX.Element {
                     exit={{ opacity: 0, x: -8 }}
                     transition={{ duration: 0.15 }}
                   >
-                    <ActivePanel />
+                    <ActivePanel locale={locale} />
                   </MotionDiv>
                 </AnimatePresence>
               </Div>
@@ -927,7 +1151,7 @@ export function Architecture({ locale }: ArchitectureProps): JSX.Element {
                           activeMeta.color,
                         )}
                       >
-                        {"✓ "}
+                        {`${t("home.architecture.checkmark")} `}
                         {t("home.architecture.callout.pills.autoGenerated")}
                       </Span>
                     </Div>

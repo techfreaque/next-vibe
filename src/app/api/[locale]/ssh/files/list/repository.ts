@@ -16,12 +16,6 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import {
-  getConnectionCredentials,
-  isNodeError,
-  openSshClient,
-  sftpListDir,
-} from "../../client";
 import type {
   FilesListRequestOutput,
   FilesListResponseOutput,
@@ -39,8 +33,9 @@ export class FilesListRepository {
       return FilesListRepository.listSftp(data, user, logger, t);
     }
 
-    // Dynamic imports keep node:fs/promises, node:os, node:path out of the
-    // static module graph so Turbopack's NFT tracer doesn't scan the whole project.
+    // Dynamic imports keep node:fs/promises, node:os, node:path and the ssh2
+    // chain out of the static module graph so Turbopack's NFT tracer doesn't
+    // scan next.config.ts as a side-effect of the ssh2 package.
     const { readdir, stat } = await import("node:fs/promises");
     const { homedir } = await import("node:os");
     const { join, resolve } = await import("node:path");
@@ -100,6 +95,7 @@ export class FilesListRepository {
 
       return success({ entries, currentPath: dirPath });
     } catch (error) {
+      const { isNodeError } = await import("../../client");
       if (isNodeError(error) && error.code === "ENOENT") {
         return fail({
           message: t("errors.directoryNotFound"),
@@ -120,6 +116,14 @@ export class FilesListRepository {
     logger: EndpointLogger,
     t: FilesListT,
   ): Promise<ResponseType<FilesListResponseOutput>> {
+    // Dynamic import keeps ssh2 out of the static NFT trace for this route.
+    const {
+      getConnectionCredentials,
+      openSshClient,
+      sftpListDir,
+      isNodeError,
+    } = await import("../../client");
+
     const credsResult = await getConnectionCredentials(
       data.connectionId!,
       user.id!,

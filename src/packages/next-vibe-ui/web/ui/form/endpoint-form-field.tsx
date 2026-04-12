@@ -126,8 +126,8 @@ function getFieldStyleClassName(
   const baseInputClassName = cn(
     "transition-all duration-200 ease-in-out",
     "border border-input bg-background",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20 focus-visible:border-blue-500",
-    "hover:border-blue-400",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info/20 focus-visible:border-info",
+    "hover:border-info/60",
     "disabled:cursor-not-allowed disabled:opacity-50",
   );
 
@@ -139,25 +139,22 @@ function getFieldStyleClassName(
 
   const baseContainerClassName = "flex flex-col gap-2";
 
-  // Error state - consistent red styling with better spacing and improved dark mode readability
+  // Error state - consistent destructive styling with better spacing and improved dark mode readability
   if (hasError) {
     return {
       containerClassName: cn(
         baseContainerClassName,
-        "p-4 rounded-lg border border-red-200/60 dark:border-red-800/60 bg-red-50/60 dark:bg-red-950/30",
+        "p-4 rounded-lg border border-destructive/20 dark:border-destructive/30 bg-destructive/5 dark:bg-destructive/10",
       ),
-      labelClassName: cn(
-        baseLabelClassName,
-        "text-red-600 dark:text-red-400 font-semibold",
-      ),
+      labelClassName: cn(baseLabelClassName, "text-destructive font-semibold"),
       inputClassName: cn(
         baseInputClassName,
-        "border-red-300 dark:border-red-600 focus-visible:border-red-500 focus-visible:ring-red-500/20",
-        "bg-red-50/40 dark:bg-red-950/20",
+        "border-destructive/30 dark:border-destructive/50 focus-visible:border-destructive focus-visible:ring-destructive/20",
+        "bg-destructive/5 dark:bg-destructive/8",
       ),
       errorClassName: cn(
-        "text-sm text-red-600 dark:text-red-400 flex items-center gap-2 mt-2",
-        "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
+        "text-sm text-destructive flex items-center gap-2 mt-2",
+        "[&>svg]:text-destructive",
       ),
       descriptionClassName: "text-sm text-muted-foreground",
       inlineDescriptionClassName: "text-sm text-muted-foreground",
@@ -171,27 +168,27 @@ function getFieldStyleClassName(
       const successVariants = {
         green: {
           containerClassName:
-            "p-4 rounded-lg border border-green-200/60 dark:border-green-800/60 bg-green-50/60 bg-linear-to-br from-green-50/60 to-emerald-50/40 dark:bg-green-950/30 dark:from-green-950/30 dark:to-emerald-950/20",
-          labelClassName: "text-green-700 dark:text-green-400 font-semibold",
+            "p-4 rounded-lg border border-success/20 dark:border-success/30 bg-success/5 bg-linear-to-br from-success/5 to-success/3 dark:bg-success/10 dark:from-success/10 dark:to-success/5",
+          labelClassName: "text-success font-semibold",
           inputClassName:
-            "border-green-300 dark:border-green-600 focus-visible:border-green-500 focus-visible:ring-green-500/30 bg-green-50/40 dark:bg-green-950/20",
-          descriptionClassName: "text-green-600 dark:text-green-400",
+            "border-success/30 dark:border-success/50 focus-visible:border-success focus-visible:ring-success/30 bg-success/5 dark:bg-success/8",
+          descriptionClassName: "text-success",
         },
         blue: {
           containerClassName:
-            "p-4 rounded-lg border border-blue-200/60 dark:border-blue-800/60 bg-blue-50/60 bg-linear-to-br from-blue-50/60 to-blue-100/40 dark:bg-blue-950/30 dark:from-blue-950/30 dark:to-blue-900/20",
-          labelClassName: "text-blue-700 dark:text-blue-400 font-semibold",
+            "p-4 rounded-lg border border-info/20 dark:border-info/30 bg-info/5 bg-linear-to-br from-info/5 to-info/3 dark:bg-info/10 dark:from-info/10 dark:to-info/5",
+          labelClassName: "text-info font-semibold",
           inputClassName:
-            "border-blue-300 dark:border-blue-600 focus-visible:border-blue-500 focus-visible:ring-blue-500/30 bg-blue-50/40 dark:bg-blue-950/20",
-          descriptionClassName: "text-blue-600 dark:text-blue-400",
+            "border-info/30 dark:border-info/50 focus-visible:border-info focus-visible:ring-info/30 bg-info/5 dark:bg-info/8",
+          descriptionClassName: "text-info",
         },
         purple: {
           containerClassName:
-            "p-4 rounded-lg border border-purple-200/60 dark:border-purple-800/60 bg-purple-50/60 bg-linear-to-br from-purple-50/60 to-purple-100/40 dark:bg-purple-950/30 dark:from-purple-950/30 dark:to-purple-900/20",
-          labelClassName: "text-purple-700 dark:text-purple-400 font-semibold",
+            "p-4 rounded-lg border border-primary/20 dark:border-primary/30 bg-primary/5 bg-linear-to-br from-primary/5 to-primary/3 dark:bg-primary/10 dark:from-primary/10 dark:to-primary/5",
+          labelClassName: "text-primary font-semibold",
           inputClassName:
-            "border-purple-300 dark:border-purple-600 focus-visible:border-purple-500 focus-visible:ring-purple-500/30 bg-purple-50/40 dark:bg-purple-950/20",
-          descriptionClassName: "text-purple-600 dark:text-purple-400",
+            "border-primary/30 dark:border-primary/50 focus-visible:border-primary focus-visible:ring-primary/30 bg-primary/5 dark:bg-primary/8",
+          descriptionClassName: "text-primary",
         },
       };
 
@@ -204,8 +201,8 @@ function getFieldStyleClassName(
         labelClassName: cn(baseLabelClassName, colors.labelClassName),
         inputClassName: cn(baseInputClassName, colors.inputClassName),
         errorClassName: cn(
-          "text-sm text-red-600 dark:text-red-400 flex items-center gap-2 mt-2",
-          "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
+          "text-sm text-destructive flex items-center gap-2 mt-2",
+          "[&>svg]:text-destructive",
         ),
         descriptionClassName: cn("text-sm", colors.descriptionClassName),
         inlineDescriptionClassName: "text-sm text-muted-foreground",
@@ -215,35 +212,35 @@ function getFieldStyleClassName(
     const colorVariantsClassName = {
       blue: {
         containerClassName:
-          "p-4 rounded-lg border border-blue-300/40 dark:border-blue-600/40 bg-blue-50/60 bg-linear-to-br from-blue-50/60 to-blue-100/30 dark:bg-blue-950/30 dark:from-blue-950/30 dark:to-blue-900/20",
-        labelClassName: "text-blue-700 dark:text-blue-400 font-semibold",
+          "p-4 rounded-lg border border-info/30 dark:border-info/40 bg-info/5 bg-linear-to-br from-info/5 to-info/3 dark:bg-info/10 dark:from-info/10 dark:to-info/5",
+        labelClassName: "text-info font-semibold",
         inputClassName:
-          "border-blue-300 dark:border-blue-600 focus-visible:border-blue-500 focus-visible:ring-blue-500/30 bg-blue-50/60 dark:bg-blue-950/30 placeholder:text-blue-500/60",
-        descriptionClassName: "text-blue-600 dark:text-blue-400",
+          "border-info/30 dark:border-info/50 focus-visible:border-info focus-visible:ring-info/30 bg-info/5 dark:bg-info/10 placeholder:text-info/60",
+        descriptionClassName: "text-info",
       },
       amber: {
         containerClassName:
-          "p-4 rounded-lg border border-amber-300/40 dark:border-amber-600/40 bg-amber-50/60 bg-linear-to-br from-amber-50/60 to-amber-100/30 dark:bg-amber-950/30 dark:from-amber-950/30 dark:to-amber-900/20",
-        labelClassName: "text-amber-700 dark:text-amber-400 font-semibold",
+          "p-4 rounded-lg border border-warning/30 dark:border-warning/40 bg-warning/5 bg-linear-to-br from-warning/5 to-warning/3 dark:bg-warning/10 dark:from-warning/10 dark:to-warning/5",
+        labelClassName: "text-warning font-semibold",
         inputClassName:
-          "border-amber-300 dark:border-amber-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/30 bg-amber-50/60 dark:bg-amber-950/30",
-        descriptionClassName: "text-amber-600 dark:text-amber-400",
+          "border-warning/30 dark:border-warning/50 focus-visible:border-warning focus-visible:ring-warning/30 bg-warning/5 dark:bg-warning/10",
+        descriptionClassName: "text-warning",
       },
       red: {
         containerClassName:
-          "p-4 rounded-lg border border-red-300/40 dark:border-red-600/40 bg-red-50/60 bg-linear-to-br from-red-50/60 to-red-100/30 dark:bg-red-950/30 dark:from-red-950/30 dark:to-red-900/20",
-        labelClassName: "text-red-700 dark:text-red-400 font-semibold",
+          "p-4 rounded-lg border border-destructive/30 dark:border-destructive/40 bg-destructive/5 bg-linear-to-br from-destructive/5 to-destructive/3 dark:bg-destructive/10 dark:from-destructive/10 dark:to-destructive/5",
+        labelClassName: "text-destructive font-semibold",
         inputClassName:
-          "border-red-300 dark:border-red-600 focus-visible:border-red-500 focus-visible:ring-red-500/30 bg-red-50/60 dark:bg-red-950/30",
-        descriptionClassName: "text-red-600 dark:text-red-400",
+          "border-destructive/30 dark:border-destructive/50 focus-visible:border-destructive focus-visible:ring-destructive/30 bg-destructive/5 dark:bg-destructive/10",
+        descriptionClassName: "text-destructive",
       },
       green: {
         containerClassName:
-          "p-4 rounded-lg border border-green-300/40 dark:border-green-600/40 bg-green-50/60 bg-linear-to-br from-green-50/60 to-green-100/30 dark:bg-green-950/30 dark:from-green-950/30 dark:to-green-900/20",
-        labelClassName: "text-green-700 dark:text-green-400 font-semibold",
+          "p-4 rounded-lg border border-success/30 dark:border-success/40 bg-success/5 bg-linear-to-br from-success/5 to-success/3 dark:bg-success/10 dark:from-success/10 dark:to-success/5",
+        labelClassName: "text-success font-semibold",
         inputClassName:
-          "border-green-300 dark:border-green-600 focus-visible:border-green-500 focus-visible:ring-green-500/30 bg-green-50/60 dark:bg-green-950/30",
-        descriptionClassName: "text-green-600 dark:text-green-400",
+          "border-success/30 dark:border-success/50 focus-visible:border-success focus-visible:ring-success/30 bg-success/5 dark:bg-success/10",
+        descriptionClassName: "text-success",
       },
     };
 
@@ -253,8 +250,8 @@ function getFieldStyleClassName(
       labelClassName: cn(baseLabelClassName, colors.labelClassName),
       inputClassName: cn(baseInputClassName, colors.inputClassName),
       errorClassName: cn(
-        "text-sm text-red-600 dark:text-red-400 flex items-center gap-2 mt-2",
-        "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
+        "text-sm text-destructive flex items-center gap-2 mt-2",
+        "[&>svg]:text-destructive",
       ),
       descriptionClassName: cn("text-sm", colors.descriptionClassName),
       inlineDescriptionClassName: "text-sm text-muted-foreground",
@@ -267,8 +264,8 @@ function getFieldStyleClassName(
     labelClassName: cn(baseLabelClassName, "text-foreground"),
     inputClassName: baseInputClassName,
     errorClassName: cn(
-      "text-sm text-red-600 dark:text-red-400 flex items-center gap-2 mt-2",
-      "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
+      "text-sm text-destructive flex items-center gap-2 mt-2",
+      "[&>svg]:text-destructive",
     ),
     descriptionClassName: "text-sm text-muted-foreground",
     inlineDescriptionClassName: "text-sm text-muted-foreground",
@@ -294,22 +291,20 @@ function renderPrefillDisplay<TKey extends string>(
   switch (prefillDisplay.variant) {
     case "card":
       return (
-        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-          <p className="text-sm text-blue-700 dark:text-blue-300">
+        <div className="p-3 bg-info/5 dark:bg-info/10 border border-info/20 dark:border-info/30 rounded-md">
+          <p className="text-sm text-info">
             {displayLabel}: <span className="font-semibold">{value}</span>
           </p>
         </div>
       );
     case "highlight":
       return (
-        <div className="p-4 rounded-lg border border-green-200 dark:border-green-800 bg-green-50/60 dark:bg-green-950/30">
+        <div className="p-4 rounded-lg border border-success/20 dark:border-success/30 bg-success/5 dark:bg-success/10">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-green-700 dark:text-green-400 font-medium">
+            <span className="text-sm text-success font-medium">
               {displayLabel}:
             </span>
-            <span className="text-sm text-green-800 dark:text-green-300 font-semibold">
-              {value}
-            </span>
+            <span className="text-sm text-success font-semibold">{value}</span>
           </div>
         </div>
       );
@@ -320,7 +315,7 @@ function renderPrefillDisplay<TKey extends string>(
           <span className="text-sm text-muted-foreground">{displayLabel}:</span>
           <Badge
             variant="secondary"
-            className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
+            className="bg-info/10 dark:bg-info/15 text-info border-info/20 dark:border-info/30"
           >
             {value}
           </Badge>
@@ -441,7 +436,7 @@ function renderFieldInput<
             checked={Boolean(field.value)}
             onCheckedChange={(checked) => field.onChange(checked)}
             disabled={disabled || config.disabled}
-            className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+            className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
           />
           <Label
             htmlFor={field.name}
@@ -476,7 +471,7 @@ function renderFieldInput<
                 value={option.value}
                 id={`${field.name}-${option.value}`}
                 disabled={option.disabled}
-                className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
               <Label
                 htmlFor={`${field.name}-${option.value}`}
@@ -498,7 +493,7 @@ function renderFieldInput<
             checked={Boolean(field.value)}
             onCheckedChange={(checked) => field.onChange(checked)}
             disabled={disabled || config.disabled}
-            className="data-[state=checked]:bg-blue-600"
+            className="data-[state=checked]:bg-primary"
           />
           {config.switchLabel && (
             <Label
@@ -877,9 +872,7 @@ export function EndpointFormField<
                 >
                   <span>{config.label && t(config.label)}</span>
                   {config.label && style === "asterisk" && isRequired && (
-                    <span className="text-blue-600 dark:text-blue-400 font-bold">
-                      *
-                    </span>
+                    <span className="text-info font-bold">*</span>
                   )}
                   {config.description && (
                     <TooltipProvider delayDuration={300}>
@@ -904,7 +897,7 @@ export function EndpointFormField<
                 {style === "badge" && isRequired && (
                   <Badge
                     variant="secondary"
-                    className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
+                    className="text-xs px-2 py-0.5 bg-info/10 dark:bg-info/15 text-info border-info/20 dark:border-info/30"
                   >
                     {widgetT("widgets.formFields.common.required")}
                   </Badge>

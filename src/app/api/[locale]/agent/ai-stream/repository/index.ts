@@ -19,6 +19,7 @@ import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/webs
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { ToolCall } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
 import { buildMessagesChannel } from "../../chat/threads/[threadId]/messages/channel";
 import {
@@ -27,10 +28,10 @@ import {
 } from "../../chat/threads/[threadId]/messages/emitter";
 import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
 import { MessagesRepository } from "../../chat/threads/[threadId]/messages/repository";
-import type { ImageGenModelId } from "../../image-generation/models";
+import type { ImageGenModelSelection } from "../../image-generation/models";
 import { ApiProvider } from "../../models/models";
-import type { MusicGenModelId } from "../../music-generation/models";
-import type { VideoGenModelId } from "../../video-generation/models";
+import type { MusicGenModelSelection } from "../../music-generation/models";
+import type { VideoGenModelSelection } from "../../video-generation/models";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
@@ -104,11 +105,13 @@ export class AiStreamRepository {
     favoriteIdOverride?: string;
     sequenceIdOverride?: string;
     mediaModelOverrides?: {
-      musicGenModelId?: MusicGenModelId;
-      videoGenModelId?: VideoGenModelId;
-      imageGenModelId?: ImageGenModelId;
+      musicGenModelSelection?: MusicGenModelSelection;
+      videoGenModelSelection?: VideoGenModelSelection;
+      imageGenModelSelection?: ImageGenModelSelection;
     };
     providerOverride?: ApiProvider;
+    /** Parent stream's abort signal - sub-stream aborts when parent does */
+    parentAbortSignal?: AbortSignal;
   }): Promise<ResponseType<HeadlessAiStreamResult>>;
 
   /** Interactive overload - returns response output (events stream via WS) */
@@ -143,6 +146,7 @@ export class AiStreamRepository {
     mediaModelOverrides,
     providerOverride,
     toolsOverride,
+    parentAbortSignal,
   }: {
     data: AiStreamPostRequestOutput;
     locale: CountryLanguage;
@@ -157,12 +161,13 @@ export class AiStreamRepository {
     favoriteIdOverride?: string;
     sequenceIdOverride?: string;
     mediaModelOverrides?: {
-      musicGenModelId?: MusicGenModelId;
-      videoGenModelId?: VideoGenModelId;
-      imageGenModelId?: ImageGenModelId;
+      musicGenModelSelection?: MusicGenModelSelection;
+      videoGenModelSelection?: VideoGenModelSelection;
+      imageGenModelSelection?: ImageGenModelSelection;
     };
     providerOverride?: ApiProvider;
     toolsOverride?: Record<string, CoreTool>;
+    parentAbortSignal?: AbortSignal;
   }): Promise<
     | ResponseType<AiStreamPostResponseOutput>
     | ResponseType<HeadlessAiStreamResult>
@@ -189,6 +194,7 @@ export class AiStreamRepository {
       mediaModelOverrides,
       providerOverride,
       toolsOverride,
+      parentAbortSignal,
     });
 
     if (!setupResult.success) {
@@ -296,6 +302,7 @@ export class AiStreamRepository {
     let capturedLastAiMessageContent: string | null = null;
     let capturedLastGeneratedMediaUrl: string | null = null;
     let capturedTotalCreditsDeducted = 0;
+    const capturedPinnedToolCount = tools ? Object.keys(tools).length : 0;
     // Captured wakeUp payloads - queue written by the signal handler, processed in finally for deferred insertion + revival.
     // Array supports parallel wakeUp tools: each completion pushes its payload; all are processed sequentially.
     const capturedWakeUpPayloads: WakeUpPayload[] = [];
@@ -394,6 +401,40 @@ export class AiStreamRepository {
         // tools-loader can inject the correct currentToolMessageId per toolCallId
         // before calling each tool's execute() - parallel-safe, no polling needed.
         streamContext.pendingToolMessages = ctx.pendingToolMessages;
+
+        // Wire emitPartialToolResult so long-running tools (e.g. ai-run) can
+        // stream intermediate state (like a sub-thread ID) before completion.
+        streamContext.emitPartialToolResult = async (
+          partialResult,
+        ): Promise<void> => {
+          const toolMessageId = streamContext.currentToolMessageId;
+          if (!toolMessageId) {
+            return;
+          }
+          // Look up the pending tool data by messageId (callerToolCallId may not be
+          // set for the default inline execution path in tools-loader).
+          let pendingToolCall:
+            | { toolCallData: { toolCall: ToolCall } }
+            | undefined;
+          for (const entry of ctx.pendingToolMessages.values()) {
+            if (entry.messageId === toolMessageId) {
+              pendingToolCall = entry;
+              break;
+            }
+          }
+          if (!pendingToolCall) {
+            return;
+          }
+          const partialToolCall = {
+            ...pendingToolCall.toolCallData.toolCall,
+            result: partialResult,
+            isPartial: true,
+          };
+          await ctx.dbWriter.emitPartialToolResult({
+            toolMessageId,
+            toolCall: partialToolCall,
+          });
+        };
 
         // Wire stop-signal into Agent SDK provider so it can abort its internal loop
         // when endLoop / approve / wakeUp flags are set. The Agent SDK doesn't emit
@@ -872,6 +913,7 @@ export class AiStreamRepository {
             lastAiMessageContent: capturedLastAiMessageContent,
             lastGeneratedMediaUrl: capturedLastGeneratedMediaUrl,
             totalCreditsDeducted: capturedTotalCreditsDeducted,
+            pinnedToolCount: capturedPinnedToolCount,
           },
         } satisfies ResponseType<HeadlessAiStreamResult>;
       }

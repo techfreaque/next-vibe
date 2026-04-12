@@ -53,8 +53,8 @@ function ExitCodeBadge({ code }: { code: number | null }): React.JSX.Element {
       className={cn(
         "inline-flex items-center gap-1 text-xs font-mono px-1.5 py-0.5 rounded",
         ok
-          ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-          : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+          ? "bg-success/10 text-success"
+          : "bg-destructive/10 text-destructive",
       )}
     >
       {ok ? (
@@ -236,7 +236,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
                   className={cn(
                     "px-1.5 py-0.5 rounded text-[10px] font-medium",
                     value.backend === "LOCAL"
-                      ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                      ? "bg-info/10 text-info"
                       : "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
                   )}
                 >
@@ -244,7 +244,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
                 </Span>
               </Div>
               {value.truncated && (
-                <Span className="text-amber-600 dark:text-amber-400">
+                <Span className="text-warning">
                   {t("widget.truncatedWarning")}
                 </Span>
               )}
@@ -267,12 +267,12 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
             {/* stderr */}
             {value.stderr && (
               <Div className="flex flex-col gap-0">
-                <Div className="px-4 py-1 bg-amber-50 dark:bg-amber-900/10 border-b">
-                  <Span className="text-[10px] font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">
+                <Div className="px-4 py-1 bg-warning/10 border-b">
+                  <Span className="text-[10px] font-medium text-warning uppercase tracking-wide">
                     {t("widget.stderrLabel")}
                   </Span>
                 </Div>
-                <Pre className="px-4 py-3 text-xs font-mono whitespace-pre-wrap break-words overflow-x-auto max-h-48 overflow-y-auto text-amber-800 dark:text-amber-300">
+                <Pre className="px-4 py-3 text-xs font-mono whitespace-pre-wrap break-words overflow-x-auto max-h-48 overflow-y-auto text-warning">
                   {value.stderr}
                 </Pre>
               </Div>

@@ -25,7 +25,6 @@ import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useSidebarFooterStore } from "../../welcome-tour/sidebar-footer-store";
@@ -79,7 +78,7 @@ export function SidebarFooter({
               {/* Credits display */}
               {credits && (
                 <>
-                  <Coins className="h-4 w-4 text-blue-500 shrink-0" />
+                  <Coins className="h-4 w-4 text-primary shrink-0" />
                   <Span
                     className="text-sm font-medium truncate"
                     suppressHydrationWarning
@@ -95,8 +94,8 @@ export function SidebarFooter({
               )}
               {/* Account status */}
               <Span className="flex flex-row items-center gap-1.5 min-w-0">
-                <User className="h-3.5 w-3.5 text-blue-500 shrink-0" />
-                <Span className="text-sm text-muted-foreground truncate">
+                <User className="h-3.5 w-3.5 text-primary shrink-0" />
+                <Span className="text-sm truncate">
                   {isLoggedIn
                     ? t("components.sidebar.footer.account")
                     : t("components.sidebar.login")}
@@ -119,8 +118,8 @@ export function SidebarFooter({
         >
           <Div className="px-2 py-2 flex flex-col gap-2 bg-muted/20 border-t border-border/50">
             <Div className="flex flex-col gap-0.5">
-              {/* Login/Signup - shown when logged out (hidden in local mode: no self-signup) */}
-              {!isLoggedIn && !envClient.NEXT_PUBLIC_LOCAL_MODE && (
+              {/* Login/Signup - shown when logged out */}
+              {!isLoggedIn && (
                 <Div
                   className="flex flex-row gap-1.5 py-1"
                   data-tour={TOUR_DATA_ATTRS.SIDEBAR_LOGIN}
@@ -165,21 +164,19 @@ export function SidebarFooter({
                 </Link>
               )}
 
-              {/* Subscription (hidden in local mode: payment disabled) */}
-              {!envClient.NEXT_PUBLIC_LOCAL_MODE && (
-                <Link href={`/${locale}/subscription/overview`}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-full justify-start"
-                    aria-label="Manage subscription"
-                    data-tour={TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON}
-                  >
-                    <ShoppingCart className="h-3.5 w-3.5 mr-2" />
-                    {t("components.navigation.subscription")}
-                  </Button>
-                </Link>
-              )}
+              {/* Subscription */}
+              <Link href={`/${locale}/subscription/overview`}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-full justify-start"
+                  aria-label="Manage subscription"
+                  data-tour={TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON}
+                >
+                  <ShoppingCart className="h-3.5 w-3.5 mr-2" />
+                  {t("components.navigation.subscription")}
+                </Button>
+              </Link>
 
               {/* Feedback & Help */}
               <Link href={`/${locale}/help`}>

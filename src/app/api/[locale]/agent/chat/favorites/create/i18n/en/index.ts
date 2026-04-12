@@ -164,20 +164,6 @@ export const translations = {
       label: "Maximum Content Level",
       description: "Maximum content moderation level for the model",
     },
-    speedRange: {
-      label: "Speed Range",
-      description: "Response speed level range",
-      minLabel: "Min Speed",
-      maxLabel: "Max Speed",
-    },
-    minSpeed: {
-      label: "Minimum Speed",
-      description: "Minimum speed level required for the model",
-    },
-    maxSpeed: {
-      label: "Maximum Speed",
-      description: "Maximum speed level allowed for the model",
-    },
     content: {
       label: "Content Level",
       description: "Content moderation level",

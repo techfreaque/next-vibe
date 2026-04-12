@@ -31,7 +31,7 @@ export function MessageActionButton({
       variant="ghost"
       size="icon"
       onClick={onClick}
-      className={`h-8 w-8 md:h-7 md:w-7 ${variant === "destructive" ? "hover:text-red-500" : ""} ${className || ""}`}
+      className={`h-8 w-8 md:h-7 md:w-7 ${variant === "destructive" ? "hover:text-destructive" : ""} ${className || ""}`}
       title={title}
       disabled={disabled}
     >

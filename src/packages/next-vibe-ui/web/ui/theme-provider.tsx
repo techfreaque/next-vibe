@@ -8,17 +8,24 @@ import type { StyleType } from "../utils/style-type";
 
 export const THEME_COOKIE_NAME = "theme";
 
-/** Mirrors the resolved theme to a non-expiring cookie so SSR can read it. */
+/** Mirrors the resolved theme to a non-expiring cookie so SSR can read it.
+ *  Also cleans up legacy "system" values in localStorage and cookies. */
 function ThemeCookieSync(): null {
-  const { resolvedTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   useEffect(() => {
+    // Sanitize legacy "system" value in localStorage
+    const stored = localStorage.getItem("theme");
+    if (stored !== null && stored !== "light" && stored !== "dark") {
+      setTheme("dark");
+      return;
+    }
     if (!resolvedTheme) {
       return;
     }
     // SameSite=Lax; no Secure required (works on http localhost too).
     // Max-Age=2147483647 ≈ 68 years - effectively non-expiring.
     document.cookie = `${THEME_COOKIE_NAME}=${resolvedTheme};path=/;max-age=2147483647;SameSite=Lax`;
-  }, [resolvedTheme]);
+  }, [resolvedTheme, setTheme]);
   return null;
 }
 
@@ -30,7 +37,7 @@ export type ThemeProviderProps = {
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "dark",
   storageKey = "theme",
   attribute = "class",
   ...props
@@ -39,7 +46,7 @@ export function ThemeProvider({
   return (
     <NextThemesProvider
       defaultTheme={defaultTheme}
-      enableSystem={true}
+      enableSystem={false}
       disableTransitionOnChange={true}
       storageKey={storageKey}
       attribute={attribute}

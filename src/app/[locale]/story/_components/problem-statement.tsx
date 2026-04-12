@@ -12,12 +12,10 @@ import { scopedTranslation } from "./i18n";
 
 interface ProblemStatementProps {
   locale: CountryLanguage;
-  totalModelCount: number;
 }
 
 export function ProblemStatement({
   locale,
-  totalModelCount,
 }: ProblemStatementProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
@@ -39,14 +37,6 @@ export function ProblemStatement({
         <Div className="space-y-4">
           <P className="text-lg md:text-xl text-muted-foreground leading-relaxed">
             {t("home.problem.line1")}
-          </P>
-          <P className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-            {t("home.problem.line2")}
-          </P>
-          <P className="text-lg md:text-xl font-semibold text-foreground leading-relaxed">
-            {t("home.problem.line3", {
-              modelCount: String(totalModelCount),
-            })}
           </P>
         </Div>
       </MotionDiv>

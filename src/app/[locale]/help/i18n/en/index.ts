@@ -1,7 +1,4 @@
-import { translations as contactTranslations } from "@/app/api/[locale]/contact/i18n/en";
-
 export const translations = {
-  contact: contactTranslations,
   nav: {
     home: "Home",
   },

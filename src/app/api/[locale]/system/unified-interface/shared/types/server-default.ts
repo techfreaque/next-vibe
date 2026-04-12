@@ -12,5 +12,5 @@ export interface ServerDefaultContext {
   readonly user: JwtPayloadType;
   readonly locale: CountryLanguage;
   readonly platform: Platform;
-  readonly streamContext?: ToolExecutionContext;
+  readonly streamContext: ToolExecutionContext;
 }

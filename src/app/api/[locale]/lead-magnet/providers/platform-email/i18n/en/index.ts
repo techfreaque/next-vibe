@@ -1,7 +1,7 @@
 export const translations = {
   title: "Get leads by email",
   description:
-    "Receive an email notification every time someone submits your lead form. No third-party platform required — uses your account's email.",
+    "Receive an email notification every time someone submits your lead form. No third-party platform required - uses your account's email.",
   notifyEmail: {
     label: "Notification email",
     description: "The email address where new lead notifications will be sent",

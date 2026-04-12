@@ -7,13 +7,13 @@ import { Lock } from "next-vibe-ui/ui/icons/Lock";
 import { ShieldPlus } from "next-vibe-ui/ui/icons/ShieldPlus";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Users } from "next-vibe-ui/ui/icons/Users";
+import { Link } from "next-vibe-ui/ui/link";
 import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
-import { useInView } from "react-intersection-observer";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type {
@@ -38,6 +38,7 @@ import { configScopedTranslation } from "@/config/i18n";
 
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
+import { useInView } from "react-intersection-observer";
 
 type ScopedT = ReturnType<(typeof scopedTranslation)["scopedT"]>["t"];
 
@@ -56,6 +57,8 @@ interface CapabilityBlockProps {
   visual: ReactNode;
   reversed: boolean;
   delay: number;
+  id?: string;
+  stacked?: boolean;
 }
 
 function CapabilityBlock({
@@ -65,11 +68,39 @@ function CapabilityBlock({
   visual,
   reversed,
   delay,
+  id,
+  stacked = false,
 }: CapabilityBlockProps): JSX.Element {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
+  if (stacked) {
+    return (
+      <Div ref={ref as never} id={id} className="py-16 md:py-24">
+        <MotionDiv
+          className="flex flex-col gap-10"
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.6, delay }}
+        >
+          <Div>
+            <Span className="text-sm font-medium text-primary uppercase tracking-wider mb-3 block">
+              {label}
+            </Span>
+            <H3 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl mb-4">
+              {title}
+            </H3>
+            <P className="text-lg text-muted-foreground leading-relaxed">
+              {description}
+            </P>
+          </Div>
+          <Div>{visual}</Div>
+        </MotionDiv>
+      </Div>
+    );
+  }
+
   return (
-    <Div ref={ref as never} className="py-16 md:py-24">
+    <Div ref={ref as never} id={id} className="py-16 md:py-24">
       <MotionDiv
         className={`grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center ${reversed ? "md:[direction:rtl]" : ""}`}
         initial={{ opacity: 0, y: 30 }}
@@ -832,80 +863,44 @@ function ModelsVisual({
 
   return (
     <Div className="space-y-5">
-      {/* Tier badges - click to switch demo */}
-      <Div className="space-y-3">
+      {/* Header */}
+      <Div className="mb-1">
+        <P className="text-sm font-semibold text-foreground mb-0.5">
+          {t("home.capabilities.models.demo.question")}
+        </P>
+        <P className="text-xs text-muted-foreground">
+          {t("home.capabilities.models.demo.questionSub")}
+        </P>
+      </Div>
+
+      {/* Tier tabs - click to switch demo */}
+      <Div className="grid grid-cols-3 gap-3">
         {tiers.map((tier) => (
           <Button
             key={tier.id}
             variant="ghost"
             onClick={() => handleSelect(tier.id)}
             className={cn(
-              "w-full justify-start text-left rounded-lg border p-4 h-auto transition-all",
+              "w-full justify-start text-left rounded-lg border p-4 h-auto transition-all flex flex-col items-start",
               tier.className,
-              activeId === tier.id ? tier.activeRingClass : "hover:opacity-80",
+              activeId === tier.id
+                ? cn(tier.activeRingClass, "opacity-100")
+                : "opacity-60 hover:opacity-90",
             )}
           >
-            <Div className="w-full">
-              <Div className="flex items-center gap-2 mb-2">
-                <Sparkles className="h-4 w-4" />
-                <Span className="font-semibold text-sm">{tier.name}</Span>
-              </Div>
-              <P className="text-sm opacity-90 whitespace-normal text-left">
-                {tier.models}
-              </P>
+            <Div className="flex items-center gap-2 mb-1.5">
+              <Sparkles className="h-3.5 w-3.5 shrink-0" />
+              <Span className="font-semibold text-sm">{tier.name}</Span>
             </Div>
+            <P className="text-xs opacity-80 whitespace-normal text-left leading-relaxed">
+              {tier.models}
+            </P>
           </Button>
         ))}
       </Div>
 
-      {/* Censorship demo - same question, real message components */}
+      {/* Demo output */}
       <Div>
-        <Div className="flex items-center justify-between mb-3">
-          <Span className="text-xs font-mono text-muted-foreground">
-            {t("home.capabilities.models.demo.question")}
-          </Span>
-          <Div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleSelect("mainstream")}
-              className={cn(
-                "rounded-full px-3 py-1 text-xs font-medium transition-all h-auto",
-                activeId === "mainstream"
-                  ? "bg-indigo-600 text-white hover:bg-indigo-600"
-                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              {t("home.capabilities.models.demo.mainstreamTab")}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleSelect("open")}
-              className={cn(
-                "rounded-full px-3 py-1 text-xs font-medium transition-all h-auto",
-                activeId === "open"
-                  ? "bg-emerald-600 text-white hover:bg-emerald-600"
-                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              {t("home.capabilities.models.demo.openTab")}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleSelect("uncensored")}
-              className={cn(
-                "rounded-full px-3 py-1 text-xs font-medium transition-all h-auto",
-                activeId === "uncensored"
-                  ? "bg-rose-600 text-white hover:bg-rose-600"
-                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              {t("home.capabilities.models.demo.uncensoredTab")}
-            </Button>
-          </Div>
-        </Div>
         <MockChatProvider>
           <Div className="rounded-lg border bg-card/50 overflow-hidden p-4 space-y-1 max-h-[32rem] overflow-y-auto">
             <UserMessageBubble
@@ -1101,6 +1096,7 @@ function PrivacyVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
   const levels = [
     {
       key: "private" as const,
+      href: `/${locale}/threads/private`,
       icon: Lock,
       iconClass: "text-sky-600 dark:text-sky-300",
       bgClass:
@@ -1108,6 +1104,7 @@ function PrivacyVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
     },
     {
       key: "shared" as const,
+      href: `/${locale}/threads/shared`,
       icon: Users,
       iconClass: "text-teal-600 dark:text-teal-300",
       bgClass:
@@ -1115,6 +1112,7 @@ function PrivacyVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
     },
     {
       key: "public" as const,
+      href: `/${locale}/threads/public`,
       icon: Globe,
       iconClass: "text-amber-600 dark:text-amber-300",
       bgClass:
@@ -1122,6 +1120,7 @@ function PrivacyVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
     },
     {
       key: "incognito" as const,
+      href: `/${locale}/threads/incognito`,
       icon: ShieldPlus,
       iconClass: "text-purple-600 dark:text-purple-300",
       bgClass:
@@ -1132,9 +1131,10 @@ function PrivacyVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
   return (
     <Div className="space-y-3">
       {levels.map((level) => (
-        <Div
+        <Link
           key={level.key}
-          className={`flex items-center gap-4 rounded-lg border p-4 ${level.bgClass}`}
+          href={level.href}
+          className={`flex items-center gap-4 rounded-lg border p-4 transition-opacity hover:opacity-80 ${level.bgClass}`}
         >
           <level.icon className={`h-5 w-5 shrink-0 ${level.iconClass}`} />
           <Div>
@@ -1145,7 +1145,7 @@ function PrivacyVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
               {t(`home.capabilities.privacy.levels.${level.key}.desc`)}
             </P>
           </Div>
-        </Div>
+        </Link>
       ))}
     </Div>
   );
@@ -1184,6 +1184,7 @@ export function CapabilityShowcase({
           }
           reversed={false}
           delay={0}
+          stacked={true}
         />
 
         <CapabilityBlock
@@ -1205,6 +1206,7 @@ export function CapabilityShowcase({
         />
 
         <CapabilityBlock
+          id="privacy"
           label={t("home.capabilities.privacy.label")}
           title={t("home.capabilities.privacy.title")}
           description={t("home.capabilities.privacy.description")}

@@ -1,16 +1,6 @@
-// Parent aggregator for cron translations
-// Imports from co-located child directory i18n folders
-import { translations as historyTranslations } from "../../history/i18n/pl";
-import { translations as statsTranslations } from "../../stats/i18n/pl";
-import { translations as taskTranslations } from "../../task/i18n/pl";
-import { translations as tasksTranslations } from "../../tasks/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  history: historyTranslations,
-  stats: statsTranslations,
-  task: taskTranslations,
-  tasks: tasksTranslations,
   // Shared cron-level translations (Polish)
   taskManagement: "Zarządzanie zadaniami",
   taskDetails: {

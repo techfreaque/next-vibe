@@ -43,7 +43,8 @@ const { GET } = createEndpoint({
   title: "search.get.title" as const,
   description: "search.get.description" as const,
   icon: "search",
-  category: "endpointCategories.chatMessages",
+  category: "endpointCategories.messages",
+  subCategory: "endpointCategories.messagesSearch",
   tags: ["tags.messages" as const],
 
   errorTypes: {

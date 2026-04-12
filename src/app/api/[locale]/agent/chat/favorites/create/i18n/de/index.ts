@@ -141,12 +141,6 @@ export const translations: typeof enTranslations = {
       minLabel: "Min. Inhalt",
       maxLabel: "Max. Inhalt",
     },
-    speedRange: {
-      label: "Geschwindigkeitsbereich",
-      description: "Antwortgeschwindigkeit-Stufenbereich",
-      minLabel: "Min. Geschwindigkeit",
-      maxLabel: "Max. Geschwindigkeit",
-    },
     minPrice: {
       label: "Mindestpreis",
       description: "Minimale Kreditkosten pro Nachricht",
@@ -162,16 +156,6 @@ export const translations: typeof enTranslations = {
     maxContent: {
       label: "Maximale Inhaltsstufe",
       description: "Maximale Inhaltsmoderationsebene für das Modell",
-    },
-    minSpeed: {
-      label: "Minimale Geschwindigkeit",
-      description:
-        "Minimale Geschwindigkeitsstufe, die für das Modell erforderlich ist",
-    },
-    maxSpeed: {
-      label: "Maximale Geschwindigkeit",
-      description:
-        "Maximale Geschwindigkeitsstufe, die für das Modell zulässig ist",
     },
     content: {
       label: "Inhaltsstufe",

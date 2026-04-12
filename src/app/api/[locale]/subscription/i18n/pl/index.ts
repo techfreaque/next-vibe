@@ -367,11 +367,11 @@ export const translations: typeof enTranslations = {
       headline: "Jesteś w środku. Bez filtrów, bez wykładów.",
       subject: "Twoja subskrypcja {{appName}} jest aktywna",
       previewText:
-        "{{privateName}}, jesteś live. 800 creditów/miesiąc, {{modelCount}} modeli, zero ograniczeń.",
+        "{{privateName}}, jesteś live. {{subscriptionCredits}} creditów/miesiąc, {{modelCount}} modeli, zero ograniczeń.",
       activeBadge: "Aktywna",
       greeting: "Hej {{privateName}},",
       intro:
-        "Twoja subskrypcja {{appName}} jest potwierdzona i gotowa. Masz 800 creditów każdego miesiąca na wszystkie modele - bez dziennych limitów, bez filtrów treści, bez tłumaczenia się.",
+        "Twoja subskrypcja {{appName}} jest potwierdzona i gotowa. Masz {{subscriptionCredits}} creditów każdego miesiąca na wszystkie modele - bez dziennych limitów, bez filtrów treści, bez tłumaczenia się.",
       models: {
         title: "{{modelCount}} modeli, 3 kategorie",
         mainstream: "Główny nurt",
@@ -380,7 +380,8 @@ export const translations: typeof enTranslations = {
       },
       included: {
         title: "Co dostajesz każdego miesiąca:",
-        credits: "800 creditów miesięcznie (automatyczne odnowienie)",
+        credits:
+          "{{subscriptionCredits}} creditów miesięcznie (automatyczne odnowienie)",
         models: "Dostęp do wszystkich {{modelCount}} modeli AI",
         nolimits: "Brak dziennych limitów - używaj creditów kiedy chcesz",
         uncensored: "Niecenzurowane modele bez filtrów treści",
@@ -392,7 +393,7 @@ export const translations: typeof enTranslations = {
       packs: {
         title: "Potrzebujesz więcej creditów?",
         description:
-          "Kupuj pakiety creditów w dowolnym momencie - 5 € za 500 creditów. Nigdy nie wygasają i sumują się z miesięcznym przydziałem. Dostępne tylko dla subskrybentów.",
+          "Kupuj pakiety creditów w dowolnym momencie - {{packPrice}} za {{packCredits}} creditów. Nigdy nie wygasają i sumują się z miesięcznym przydziałem. Dostępne tylko dla subskrybentów.",
         cta: "Kup pakiet creditów",
       },
       manage: "Zarządzaj lub anuluj subskrypcję w dowolnym momencie w",

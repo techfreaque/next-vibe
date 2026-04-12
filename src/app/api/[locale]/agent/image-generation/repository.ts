@@ -12,7 +12,6 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   getImageGenModelById,
   type ImageGenModelId,
@@ -182,7 +181,7 @@ export class ImageGenerationRepository {
     );
 
     // Check provider availability before attempting generation
-    if (!isModelProviderAvailable(imageModel, agentEnvAvailability)) {
+    if (!isModelProviderAvailable(imageModel)) {
       return fail({
         message: t("post.errors.notConfigured", {
           label: imageModel.apiProvider,

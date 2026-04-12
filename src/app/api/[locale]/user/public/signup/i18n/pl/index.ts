@@ -339,7 +339,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       title: "Co dostajesz za darmo, na zawsze:",
-      credits: "20 creditów miesięcznie - bez karty, bez daty wygaśnięcia",
+      credits: "{{freeCredits}} creditów miesięcznie - bez karty, bez daty wygaśnięcia",
       allModels: "Dostęp do wszystkich {{modelCount}} modeli AI",
       uncensored:
         "4 niecenzurowane modele, które naprawdę odpowiadają na pytania",
@@ -349,7 +349,7 @@ export const translations: typeof enTranslations = {
     ctaButton: "Zacznij rozmawiać",
     upgrade: {
       title: "Chcesz więcej?",
-      desc: "8 €/miesiąc daje Ci 800 creditów - to 40× więcej. Możesz też kupować dodatkowe pakiety creditów, które nigdy nie wygasają. Idealne do codziennego użytku AI.",
+      desc: "{{subscriptionPrice}}/miesiąc daje Ci {{subscriptionCredits}} creditów - to 40× więcej. Możesz też kupować dodatkowe pakiety creditów, które nigdy nie wygasają. Idealne do codziennego użytku AI.",
       cta: "Zobacz plan Unlimited",
     },
     signoff: "Miłych rozmów,\nZespół {{appName}}",

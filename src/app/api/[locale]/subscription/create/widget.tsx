@@ -32,7 +32,6 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import {
   PaymentProvider,
@@ -94,9 +93,8 @@ export function SubscriptionCreateContainer({
   const onSubmit = useWidgetOnSubmit();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
-  const envAvailability = useEnvAvailability();
   const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
-  const totalModelCount = getAvailableModelCount(envAvailability, isAdmin);
+  const totalModelCount = getAvailableModelCount(isAdmin);
 
   // Get current subscription status
   const subscriptionEndpoint = useSubscription(logger, user);
@@ -185,7 +183,7 @@ export function SubscriptionCreateContainer({
               className="h-auto p-4 justify-start"
               onClick={() => handleProviderSelect(PaymentProvider.STRIPE)}
             >
-              <CreditCard className="h-6 w-6 text-blue-600 mr-3" />
+              <CreditCard className="h-6 w-6 text-primary mr-3" />
               <Div className="text-left">
                 <Div className="font-semibold">{t("buy.provider.stripe")}</Div>
                 <Div className="text-sm text-muted-foreground">
@@ -211,7 +209,7 @@ export function SubscriptionCreateContainer({
               </Div>
             </Button>
             {isCryptoDisabled && (
-              <Div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 p-3 text-sm text-amber-700 dark:text-amber-300">
+              <Div className="flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning-foreground">
                 <Info className="h-4 w-4 mt-0.5 shrink-0" />
                 {t("buy.provider.cryptoMonthlyDisabled")}
               </Div>
@@ -283,7 +281,7 @@ export function SubscriptionCreateContainer({
               </Div>
             </Div>
             {billingInterval === BillingInterval.YEARLY && (
-              <Div className="text-sm text-green-600 dark:text-green-400">
+              <Div className="text-sm text-success">
                 {t("buy.subscription.yearlyEquivalent", {
                   monthlyPrice: formatPrice(
                     monthlyEquivalent,
@@ -306,7 +304,7 @@ export function SubscriptionCreateContainer({
               </Span>
             </Div>
             <Div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-amber-600" />
+              <Calendar className="h-4 w-4 text-warning" />
               <Span>
                 {t("buy.subscription.features.expiry", {
                   modelCount: totalModelCount,
@@ -314,7 +312,7 @@ export function SubscriptionCreateContainer({
               </Span>
             </Div>
             <Div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-green-600" />
+              <TrendingUp className="h-4 w-4 text-success" />
               <Span>{t("buy.subscription.features.bestFor")}</Span>
             </Div>
           </Div>
@@ -325,17 +323,13 @@ export function SubscriptionCreateContainer({
               <Button variant="ghost" asChild className="flex-1 hidden sm:flex">
                 <Link href={`/${locale}/user/login`}>{t("buy.login")}</Link>
               </Button>
-              <Button
-                asChild
-                className="flex-1 bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
-                size="lg"
-              >
+              <Button asChild className="flex-1" size="lg">
                 <Link href={`/${locale}/user/signup`}>{t("buy.signup")}</Link>
               </Button>
             </Div>
           ) : isLoadingSubscription ? null : hasActiveSubscription ? (
-            <Div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-              <Div className="text-sm text-green-700 dark:text-green-300">
+            <Div className="p-3 rounded-lg bg-success/10 border border-success/30">
+              <Div className="text-sm text-success-foreground">
                 {t("buy.subscription.buttonAlreadySubscribed")}
               </Div>
             </Div>

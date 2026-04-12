@@ -43,7 +43,8 @@ export const { GET } = createEndpoint({
   title: "list.title" as const,
   description: "list.description" as const,
   icon: "users",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetCapture",
   tags: ["list.tag" as const],
   allowedRoles: ALLOWED_ROLES,
 

@@ -472,7 +472,7 @@ export function TanstackPage({
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link href={`/${locale}/user/referral`}>
+              <Link href={`/${locale}/user/(account)/referral`}>
                 {t("skillEconomy.ctaReferral")}
               </Link>
             </Button>

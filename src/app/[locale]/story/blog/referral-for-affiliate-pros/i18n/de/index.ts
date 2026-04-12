@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Ich bin Affiliate-Marketer. Was ist bei KI-Abos anders?",
     description:
-      "Für erfahrene Affiliate-Marketer: Warum KI-Abo-Empfehlungen langfristig besser laufen als die meisten Programme, die du bisher betreut hast.",
+      "Für erfahrene Affiliate-Marketer: Warum KI-Abo-Empfehlungen langfristig besser laufen als die meisten Programme - und wie Skill-Bonus plus Upline-Kette das Rechenmodell verändern.",
     category: "Empfehlungsprogramm",
     imageAlt:
       "Ein Diagramm, das wiederkehrendes Umsatzwachstum über Zeit zeigt",
@@ -13,25 +13,25 @@ export const translations: typeof enTranslations = {
   },
   hero: {
     backToBlog: "Zurück zum Blog",
-    brand: "unbottled.ai - ",
+    brand: "{{appName}} - ",
     icon: "📊",
     category: "Für Affiliate-Profis",
     readTime: "6 Min. Lesezeit",
     title: "Ich bin Affiliate-Marketer. Was ist bei KI-Abos anders?",
     subtitle:
-      "Du weißt, wie Affiliate-Programme funktionieren. Hier ist, was den KI-Abo-Ansatz interessant macht.",
+      "Du weißt, wie Affiliate-Programme funktionieren. Hier ist, was dieses hier interessant macht.",
   },
   recurringMath: {
     title: "Die Rechnung mit wiederkehrenden Einnahmen",
-    p1: "Die meisten Affiliate-Programme zahlen einmalig. E-Commerce: du bekommst einen Anteil am Kauf. Software-Tests: du bekommst eine Pauschale beim Upgrade. KI-Abos sind anders - sie verlängern sich monatlich, und deine Provision auch.",
-    p2: "Der durchschnittliche unbottled.ai-Nutzer gibt etwa 8 $/Monat aus. Bei 10 % Direktprovision sind das 0,80 $/Monat pro Empfehlung. Nicht aufregend. Aber hier ändert sich die Rechnung:",
+    p1: "Die meisten Affiliate-Programme zahlen einmalig. E-Commerce: ein Anteil pro Kauf. Software-Trial: Pauschale beim Upgrade. {{appName}} zahlt 10 % jeder Abo-Zahlung - jeden Monat, für immer. Das verändert die Mathematik grundlegend.",
+    p2: "Der durchschnittliche Nutzer gibt rund 8 $/Monat aus. Bei 10 % Direktprovision sind das 0,80 $/Monat pro Empfehlung. Aber hier ändert sich die Rechnung:",
     powerUserTitle: "Der Power-User-Multiplikator",
     powerUserBody:
-      "Entwickler und KI-Vielnutzer geben 200 $+/Monat aus, ohne mit der Wimper zu zucken - der durchschnittliche Dev hat heute ein 200 $/Monat Claude Code- oder Codex-Abo als Baseline. Eine Power-User-Empfehlung bringt dir 20 $+/Monat - wiederkehrend. Das ist mehr als 12 normale Empfehlungen zusammen.",
-    floorTitle: "Deine alten Empfehlungen werden mit der Zeit wertvoller",
+      "Entwickler und KI-Vielnutzer geben 100–200 $+/Monat aus - viele haben Claude Code, Codex und ein separates API-Budget gleichzeitig laufen. Eine Entwickler-Empfehlung bringt dir 10–20 $+/Monat wiederkehrend. Das ist mehr als ein Dutzend normaler Empfehlungen zusammen.",
+    floorTitle: "ARPU wächst mit der Plattform",
     floorBody:
-      "Unbottled.ai fügt ständig neue Modelle und Features hinzu - und wenn die Plattform wertvoller wird, geben die Nutzer mehr aus. Eine Empfehlung von vor sechs Monaten bringt dir heute mehr Provision als damals - ohne dass du irgendetwas getan hast. Deine bestehende Empfehlungsbasis arbeitet also im Hintergrund weiter für dich.",
-    tableTitle: "Provisionszenarien",
+      "Jedes Mal, wenn {{appName}} neue Modelle, Features oder Modalitäten hinzufügt, geben bestehende Abonnenten mehr aus. Empfehlungen von vor sechs Monaten sind heute mehr wert als damals - ohne zusätzliche Arbeit deinerseits.",
+    tableTitle: "Was du pro Empfehlung pro Monat verdienst",
     tableHeaderProfile: "Nutzerprofil",
     tableHeaderSpend: "Monatliche Ausgaben",
     tableHeaderYouEarn: "Du verdienst/Monat",
@@ -44,58 +44,60 @@ export const translations: typeof enTranslations = {
     row3Profile: "Intensiver KI-Nutzer",
     row3Spend: "100 $",
     row3Earn: "10,00 $",
-    row4Profile: "Power-User",
+    row4Profile: "Entwickler / Power User",
     row4Spend: "200 $+",
     row4Earn: "20,00 $+",
   },
   structure: {
-    title: "Die Provisionsstruktur - was du tatsächlich bekommst",
-    p1: "Direkte Empfehlung: 10 % jeder Zahlung von Leuten, die du empfiehlst. Das ist der Kern. Der gehört dir immer, egal was in der Kette sonst passiert.",
-    p2: "Upline-Pool: ein zusätzlicher 10 %-Pool, der auf deine Upline-Kette verteilt wird, mit geometrischem Abfall. Wenn deine Empfehlungen auch andere empfehlen, bekommst du einen Anteil dieser Einnahmen - bis zu 5 Ebenen tief.",
-    p3: "Ehrliche Offenlegung: Die Upline-Prozentsätze werden schnell klein. Die direkten 10 % sind das eigentliche Einkommen. Der Upline-Bonus ist nett, wenn deine Empfehlungen aktive Promoter sind, aber bau keine Strategie darauf auf.",
+    title: "Die vollständige Provisionsstruktur",
+    p1: "Direkte Empfehlung: 10 % jeder Zahlung von Leuten, die du direkt empfiehlst. Das gehört dir immer, für immer, unabhängig von allem anderen.",
+    p2: "Skill-Bonus: Wenn sich jemand über einen Skill anmeldet, den du veröffentlicht hast, verdienst du zusätzlich 5 % auf ihre Zahlungen - 15 % total von diesem Nutzer. Skills sind teilbare KI-Setups, die jeder erstellen und veröffentlichen kann.",
+    p3: "Mehrstufige Kette: Ein zusätzlicher 10 %-Pool wird über bis zu 5 Ebenen deiner Empfehlungskette verteilt, mit geometrischem Abfall - jede Ebene verdient halb so viel wie die darüber. Empfehlungen deiner Empfehlungen bringen dir ~5 %, deren Empfehlungen ~2,5 % usw. Maximale Gesamtausschüttung über alle Empfänger: ~20 % einer einzelnen Zahlung.",
+    p4: "Ehrliche Einschätzung: Die Ketten-Boni werden schnell klein. Die 10 % direkt + 5 % Skill sind das eigentliche Einkommen. Bau keine Strategie auf mehrstufige Tiefe - bau auf qualitativ hochwertige direkte Empfehlungen.",
   },
   audience: {
-    title: "Wer ist die natürliche Zielgruppe dieser Plattform?",
+    title: "Wer konvertiert auf dieser Plattform",
     intro:
-      "unbottled.ai hat eine klare Positionierung: KI mit freier Meinungsäußerung und {{modelCount}} Modellen, nutzergesteuerter Inhaltsfilterung, Privacy-First. Das spricht an:",
+      "Der Kern-Pitch von {{appName}}: unzensierte KI mit {{modelCount}} Modellen, nutzergesteuerter Inhaltsfilterung, Open Source, Privacy-First. Das spricht besonders an:",
     group1Title: "Entwickler und technische Nutzer",
     group1Body:
-      "Leute, die API-Zugang wollen, restriktive KI-Richtlinien hassen und schon für mehrere KI-Abos zahlen. Geben viel aus, bleiben lange.",
+      "Zahlen bereits für mehrere KI-Tools. Wollen weniger Einschränkungen. Hoher ARPU, hohe Retention, empfehlen weiter in ihren Communities. Beste Zielgruppe.",
     group2Title: "Datenschutzbewusste Nutzer",
     group2Body:
-      "Leute, die auf Signal gewechselt haben, VPNs nutzen, ihre Tools selbst hosten. Denen ist wichtig, wo ihre Daten landen. Open Source und Privacy-First konvertiert hier gut.",
+      "Signal-User, VPN-Abonnenten, Self-Hoster. Der Open-Source- und Privacy-by-Architecture-Ansatz konvertiert gut. Sie misstrauen geschlossenen Plattformen.",
     group3Title: "Content-Creator",
     group3Body:
-      "Autoren, YouTuber und Blogger, die KI für Entwürfe, Recherche und Brainstorming nutzen. Sie profitieren von unzensierten Modellen für Fiction, Adult-Content oder kontroverse Themen.",
+      "Autoren, YouTuber, Blogger, die KI für Entwürfe, Recherche, Skripte nutzen. Profitieren von unzensierten Modellen für Fiction, Grenzfälle oder kontroverse Themen.",
     group4Title: "KI-neugierige Einsteiger",
     group4Body:
-      "Leute, die dem KI-Trend folgen, aber von den Optionen überfordert sind. Die {{modelCount}}-Modellauswahl und die einfache Oberfläche konvertieren gut über Tutorial-Content.",
+      "Leute, die dem KI-Trend folgen, aber von den Optionen überfordert sind. Eine einzelne Plattform mit allen großen Modellen plus unzensierten Alternativen. Tutorial-Content konvertiert hier gut.",
   },
   promotion: {
-    title: "Promotion-Ansätze, die funktionieren",
-    angle1Title: '"Ich hab 10 KI-Tools verglichen, damit du es nicht musst"',
+    title: "Ansätze, die konvertieren",
+    angle1Title:
+      '"Ich hab 10 KI-Tools verglichen - das eine, das ich behalten hab"',
     angle1Body:
-      "Vergleichs-Content konvertiert Affiliate-Traffic gut. Heb die Modellvielfalt, die Preisgestaltung und die Free-Speech-Positionierung von unbottled.ai gegenüber Single-Model-Tools hervor.",
-    angle2Title: "Entwickler-Community-Posts",
+      "Vergleichs-Content ist der beste Affiliate-Treiber in dieser Kategorie. Heb Modellvielfalt, Preisgestaltung und Free-Speech-Positionierung gegenüber Single-Model-Tools hervor.",
+    angle2Title: "Entwickler-Communities",
     angle2Body:
-      "GitHub-README-Abschnitte, Dev-Discord-Server, r/LocalLLaMA, Hacker News. Technische Nutzer geben mehr aus und empfehlen Tools aktiv in ihren Communities weiter.",
-    angle3Title: "Privacy/Self-Hosting-Communities",
+      "GitHub READMEs, Dev-Discords, r/LocalLLaMA, Hacker News. Technische Nutzer haben höheren ARPU und empfehlen natürlich weiter in ihren Communities. Skill-Link einbetten für doppeltes Einkommen.",
+    angle3Title: "Privacy- und Self-Hosting-Communities",
     angle3Body:
-      "r/selfhosted, Privacy-Foren, Mastodon-Instanzen. Der Open-Source-Charakter und die Self-Hosting-Option kommen hier gut an.",
-    angle4Title: "Tutorial-Content",
+      "r/selfhosted, Privacy-Foren, Mastodon. Der Open-Source-Codebase und die Self-Hosting-Option kommen hier gut an. Diese Nutzer hassen geschlossene Plattformen.",
+    angle4Title: "Tutorial-Content mit dem Tool",
     angle4Body:
-      '"Wie du KI für X nutzt"-Content mit unbottled.ai als Tool. Spezifische Anwendungsfälle (Coding-Assistent, Schreiben, Recherche) konvertieren besser als generische KI-Reviews.',
+      '"Wie du KI für X nutzt" mit {{appName}} als konkretem Tool. Coding-Assistent, Schreiben, Recherche - spezifische Anwendungsfälle konvertieren besser als generische KI-Reviews.',
   },
   payouts: {
-    title: "Auszahlung - keine Überraschungen",
-    p1: "Mindestauszahlung: 40 $. Das entspricht etwa 50 Gelegenheitsnutzer-Empfehlungsmonaten oder 2 Monaten von einem 200 $/Monat-Dev-Abonnenten.",
-    p2: "Auszahlungsoptionen: BTC, USDC oder Plattform-Credits (sofort). Krypto-Auszahlungen werden innerhalb von 48 Stunden nach Admin-Genehmigung verarbeitet. Kein Bankkonto nötig.",
-    p3: "Tracking: Echtzeit-Dashboard mit Besuchern, Anmeldungen, Umsatz und Einnahmen pro Empfehlungscode. Du kannst mehrere Codes für verschiedene Kampagnen erstellen.",
+    title: "Auszahlungsdetails",
+    p1: "Mindestauszahlung: 40 $. Das entspricht etwa 50 Gelegenheitsnutzer-Monaten oder 2 Monaten von einem Entwickler-Abonnenten.",
+    p2: "Optionen: BTC, USDC (innerhalb von 48 Stunden nach Genehmigung) oder Plattform-Credits (sofort). Kein Bankkonto nötig.",
+    p3: "Tracking: Echtzeit-Dashboard mit Besuchern, Anmeldungen, Umsatz und Einnahmen pro Code. Mehrere Codes für verschiedene Kampagnen erstellbar.",
   },
   close: {
     title: "Lohnt sich als Ergänzung",
-    p1: "Das ist nicht das bestbezahlte Affiliate-Programm, das du je laufen lassen wirst. Es ist ein Programm mit wiederkehrender Provision in einer Kategorie (KI-Tools), die schnell wächst - und wo Vielnutzer bereits ordentlich ausgeben, mit steigender Tendenz.",
-    p2: "Wenn du eine Zielgruppe hast, die sich mit einem der Segmente oben überschneidet, ist ein Code und ein Post die Investition wert.",
+    p1: "Nicht das bestbezahlte Programm, das du je laufen lassen wirst. Aber wiederkehrende Provisionen in einer schnell wachsenden Kategorie, mit einem Power-User-Segment, das bereits ordentlich ausgibt - das ist eine andere Asset-Klasse als einmalige Affiliate-Auszahlungen.",
+    p2: "Wenn sich deine Zielgruppe mit einem der obigen Segmente überschneidet, ist ein Code und ein Post die Investition wert.",
     createCode: "Empfehlungscode erstellen",
     joinDiscord: "Discord beitreten",
     backToBlog: "Zurück zum Blog",

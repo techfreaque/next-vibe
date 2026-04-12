@@ -109,7 +109,7 @@ export function CodeQualityIssueListCli({
     }
     return (
       <Box flexDirection="column">
-        <Text wrap="end">{mcpLines.join("\n")}</Text>
+        <Text wrap="truncate-end">{mcpLines.join("\n")}</Text>
       </Box>
     );
   }
@@ -165,7 +165,7 @@ export function CodeQualityIssueListCli({
 
   return (
     <Box flexDirection="column">
-      <Text wrap="end">{outputLines.join("\n")}</Text>
+      <Text wrap="truncate-end">{outputLines.join("\n")}</Text>
     </Box>
   );
 }

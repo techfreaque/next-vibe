@@ -263,7 +263,7 @@ export function ConfigCreateCliWidget({ field }: CliWidgetProps): JSX.Element {
     const text = renderResult(value, isMcp);
     return (
       <Box flexDirection="column">
-        <Text wrap="end">{text}</Text>
+        <Text wrap="truncate-end">{text}</Text>
       </Box>
     );
   }

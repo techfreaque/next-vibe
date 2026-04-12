@@ -353,7 +353,7 @@ export function UserViewContainer({
                 variant="ghost"
                 size="sm"
                 onClick={() => void handleUnban()}
-                className="gap-1 text-green-600 hover:text-green-700"
+                className="gap-1 text-success hover:text-success/80"
               >
                 <CheckCircle className="h-4 w-4" />
                 {t("ban.unbanUser")}
@@ -409,7 +409,7 @@ export function UserViewContainer({
                 {basicInfo.isActive && (
                   <Badge
                     variant="default"
-                    className="gap-1 bg-green-600 hover:bg-green-700"
+                    className="gap-1 bg-success hover:bg-success/90"
                   >
                     <CheckCircle className="h-3 w-3" />
                     {t("status.active")}
@@ -434,14 +434,14 @@ export function UserViewContainer({
 
           {/* Banned Reason */}
           {basicInfo.isBanned && basicInfo.bannedReason && (
-            <Div className="rounded-lg bg-red-50 dark:bg-red-950/20 p-3 border border-red-200 dark:border-red-800">
+            <Div className="rounded-lg bg-destructive/10 p-3 border border-destructive/30">
               <Div className="flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5" />
+                <AlertCircle className="h-4 w-4 text-destructive mt-0.5" />
                 <Div>
-                  <P className="text-sm font-medium text-red-600 dark:text-red-400">
+                  <P className="text-sm font-medium text-destructive">
                     {t("fields.banReason")}
                   </P>
-                  <P className="text-sm text-red-600/80 dark:text-red-400/80">
+                  <P className="text-sm text-destructive/80 dark:text-destructive/80">
                     {basicInfo.bannedReason}
                   </P>
                 </Div>
@@ -469,7 +469,7 @@ export function UserViewContainer({
                   onClick={handleCopyUserId}
                 >
                   {copyIdSuccess ? (
-                    <CheckCircle className="h-3 w-3 text-green-500" />
+                    <CheckCircle className="h-3 w-3 text-success" />
                   ) : (
                     <Copy className="h-3 w-3" />
                   )}
@@ -489,7 +489,7 @@ export function UserViewContainer({
               <Div className="flex items-center gap-1">
                 {basicInfo.twoFactorEnabled ? (
                   <>
-                    <Shield className="h-3 w-3 text-green-600" />
+                    <Shield className="h-3 w-3 text-success" />
                     <P className="text-sm">{t("fields.enabled")}</P>
                   </>
                 ) : (
@@ -656,7 +656,7 @@ function OverviewTab({
               value={chatStats.totalThreads}
               description={`${chatStats.activeThreads} active, ${chatStats.archivedThreads} archived`}
               icon={MessageSquare}
-              colorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+              colorClassName="bg-info/10 text-info"
             />
             <StatCard
               title={t("widget.stats.totalMessages")}
@@ -669,7 +669,7 @@ function OverviewTab({
               title={t("widget.stats.userMessages")}
               value={chatStats.userMessages}
               icon={User}
-              colorClassName="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+              colorClassName="bg-success/10 text-success"
             />
             <StatCard
               title={t("widget.stats.lastActivity")}
@@ -713,13 +713,13 @@ function OverviewTab({
               title={t("widget.stats.totalSpent")}
               value={creditInfo.totalCreditsSpent.toFixed(2)}
               icon={TrendingUp}
-              colorClassName="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
+              colorClassName="bg-destructive/10 text-destructive"
             />
             <StatCard
               title={t("widget.stats.totalPurchased")}
               value={creditInfo.totalCreditsPurchased.toFixed(2)}
               icon={CreditCard}
-              colorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+              colorClassName="bg-info/10 text-info"
             />
           </Div>
           <Separator />
@@ -742,7 +742,7 @@ function OverviewTab({
               title={t("credits.permanent")}
               value={creditInfo.permanentCredits.toFixed(2)}
               icon={Shield}
-              colorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+              colorClassName="bg-info/10 text-info"
             />
             <StatCard
               title={t("credits.bonus")}
@@ -754,7 +754,7 @@ function OverviewTab({
               title={t("credits.earned")}
               value={creditInfo.earnedCredits.toFixed(2)}
               icon={DollarSign}
-              colorClassName="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+              colorClassName="bg-success/10 text-success"
             />
           </Div>
         </CardContent>
@@ -824,13 +824,13 @@ function OverviewTab({
               value={paymentStats.successfulPayments}
               description={`${t("widget.stats.failed")}: ${paymentStats.failedPayments}`}
               icon={CheckCircle}
-              colorClassName="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+              colorClassName="bg-success/10 text-success"
             />
             <StatCard
               title={t("widget.stats.totalRefunds")}
               value={formatCurrency(paymentStats.totalRefundsCents)}
               icon={XCircle}
-              colorClassName="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
+              colorClassName="bg-destructive/10 text-destructive"
             />
             <StatCard
               title={t("widget.stats.lastPayment")}
@@ -840,7 +840,7 @@ function OverviewTab({
                   : t("widget.stats.never")
               }
               icon={Calendar}
-              colorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+              colorClassName="bg-info/10 text-info"
             />
           </Div>
           <Separator className="my-4" />
@@ -860,7 +860,7 @@ function OverviewTab({
               <Div className="flex items-center gap-1">
                 {paymentStats.hasActiveSubscription ? (
                   <>
-                    <CheckCircle className="h-3 w-3 text-green-600" />
+                    <CheckCircle className="h-3 w-3 text-success" />
                     <P className="text-sm">{t("common.yes")}</P>
                   </>
                 ) : (
@@ -993,7 +993,7 @@ function OverviewTab({
               <P className="text-xs text-muted-foreground">
                 {t("referrals.earnings")}
               </P>
-              <P className="text-xl font-bold text-blue-600 dark:text-blue-400">
+              <P className="text-xl font-bold text-info">
                 {formatCurrency(referralStats.totalReferralEarningsCents)}
               </P>
             </Div>

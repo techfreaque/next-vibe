@@ -58,7 +58,8 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "globe",
-  category: "endpointCategories.chatThreads",
+  category: "endpointCategories.threads",
+  subCategory: "endpointCategories.threadsManagement",
   tags: ["tags.publicFeed" as const],
 
   fields: customWidgetObject({

@@ -113,9 +113,6 @@ function ModelCard({
             >
               {model.content}
             </Badge>
-            <Badge variant="outline" className="text-[10px] h-4 px-1">
-              {model.speed}
-            </Badge>
           </Div>
         </Div>
         {/* Price */}
@@ -137,9 +134,7 @@ function ModelCard({
           </Span>
         ) : null}
         {model.supportsTools && (
-          <Span className="text-green-600">
-            {t("get.browser.supportsTools")}
-          </Span>
+          <Span className="text-success">{t("get.browser.supportsTools")}</Span>
         )}
         <Span className="font-mono text-[10px] opacity-60 truncate">
           {model.id}

@@ -36,6 +36,7 @@ const modelPricesTask = createCronTask(definitions.GET, tools.GET, {
   timeout: TASK_TIMEOUTS.MEDIUM,
   historyInterval: HISTORY_INTERVALS.EVERY_RUN,
   taskInput: undefined,
+  hidden: true,
 });
 
 export const tasks: Task[] = [modelPricesTask];

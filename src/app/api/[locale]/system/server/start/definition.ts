@@ -32,7 +32,8 @@ const { POST } = createEndpoint({
   aliases: START_ALIASES,
   title: "post.title",
   description: "post.description",
-  category: "endpointCategories.systemDevTools",
+  category: "endpointCategories.server",
+  subCategory: "endpointCategories.serverManagement",
   tags: ["tags.start"],
   icon: "zap",
   allowedRoles: [

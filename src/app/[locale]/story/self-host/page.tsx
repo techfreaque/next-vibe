@@ -13,7 +13,6 @@ import type { JSX } from "react";
 
 import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
@@ -34,7 +33,7 @@ export async function tanstackLoader({
   params: Promise<{ locale: CountryLanguage }>;
 }): Promise<SelfHostPageData> {
   const { locale } = await params;
-  const modelCount = getAvailableModelCount(agentEnvAvailability, false);
+  const modelCount = getAvailableModelCount(false);
   return { locale, modelCount };
 }
 

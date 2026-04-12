@@ -86,6 +86,13 @@ export const translations = {
         "Skills are pre-configured AI setups you craft once and share anywhere. The referral link in the share URL earns you 10% recurring from every signup. Here's how.",
       readTime: "7 min read",
     },
+    referralLanding: {
+      title: "10% direct. 15% via skill. 20% total. Recurring forever.",
+      category: "Referrals",
+      excerpt:
+        "The full mechanics of the referral and skills earn program - chain breakdown, exact percentages per level, payout options, and how the skill bonus stacks.",
+      readTime: "4 min read",
+    },
   },
   labels: {
     readMore: "Read more",

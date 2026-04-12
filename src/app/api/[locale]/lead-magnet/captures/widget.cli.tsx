@@ -92,7 +92,7 @@ export function LeadMagnetCapturesCliWidget({
 
   return (
     <Box flexDirection="column">
-      <Text wrap="end">{output}</Text>
+      <Text wrap="truncate-end">{output}</Text>
     </Box>
   );
 }

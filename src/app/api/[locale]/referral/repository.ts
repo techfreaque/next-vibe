@@ -787,7 +787,7 @@ export class ReferralRepository {
    *
    * Chain layout:
    *   chain[0] = direct referrer (Level 0, 10% flat)
-   *   chain[1] = skill creator (Level 1, first upline share) — only if skillCreatorUserId is set
+   *   chain[1] = skill creator (Level 1, first upline share) - only if skillCreatorUserId is set
    *   chain[2+] = upline referrers walking from skill creator (or from direct referrer if no skill creator)
    *
    * Deduplication: any userId already in the chain is skipped when walking upline.

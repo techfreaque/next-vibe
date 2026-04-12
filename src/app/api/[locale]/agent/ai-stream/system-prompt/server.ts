@@ -6,7 +6,6 @@ import { FEATURED_MODELS } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 import { memories as memoriesTable } from "@/app/api/[locale]/agent/chat/memories/db";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import {
   ProductIds,
@@ -127,7 +126,7 @@ export async function loadPromptContextData(
     subLabel,
     packLabel,
     uncensoredNames: FEATURED_MODELS.uncensored.join(", "),
-    totalModelCount: getAvailableModelCount(agentEnvAvailability, isAdmin),
+    totalModelCount: getAvailableModelCount(isAdmin),
     isExposedFolder,
     privateName,
     publicName,

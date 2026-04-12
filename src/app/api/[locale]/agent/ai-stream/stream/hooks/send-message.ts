@@ -6,6 +6,7 @@
 import { success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStatus } from "@/app/api/[locale]/agent/chat/enum";
@@ -14,14 +15,11 @@ import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/defi
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import pathDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/definition";
 import threadsDefinition from "@/app/api/[locale]/agent/chat/threads/definition";
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { ModelProviderEnvAvailability } from "@/app/api/[locale]/agent/models/models";
 
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";
@@ -62,7 +60,6 @@ export interface SendMessageDeps {
     voiceModelSelection: VoiceModelSelection | null | undefined;
   };
   locale: CountryLanguage;
-  env: ModelProviderEnvAvailability;
 }
 
 export async function sendMessage(
@@ -84,7 +81,6 @@ export async function sendMessage(
     user,
     settings,
     locale,
-    env,
   } = deps;
   const { content } = params;
 
@@ -378,7 +374,6 @@ export async function sendMessage(
         user,
         settings,
         locale,
-        env,
       },
     );
 

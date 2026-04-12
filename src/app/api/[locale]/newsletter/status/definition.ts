@@ -33,7 +33,8 @@ const { GET } = createEndpoint({
   description: "description",
   icon: "newspaper",
   tags: [],
-  category: "endpointCategories.leadsCampaigns",
+  category: "endpointCategories.newsletter",
+  subCategory: "endpointCategories.newsletterSubscriptions",
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,

@@ -18,7 +18,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { agentEnvAvailability } from "../../env-availability";
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
 import { getDefaultToolIdsForUser } from "../constants";
 import { chatSettings } from "./db";
@@ -91,16 +90,11 @@ export class ChatSettingsRepository {
 
       if (settings.length === 0) {
         logger.debug("No settings found for user, returning defaults");
-        return success(
-          ChatSettingsRepositoryClient.getDefaults(user, agentEnvAvailability),
-        );
+        return success(ChatSettingsRepositoryClient.getDefaults(user));
       }
 
       const setting = settings[0];
-      const defaults = ChatSettingsRepositoryClient.getDefaults(
-        user,
-        agentEnvAvailability,
-      );
+      const defaults = ChatSettingsRepositoryClient.getDefaults(user);
       const result: ChatSettingsGetResponseOutput = {
         selectedModel: setting.selectedModel ?? defaults.selectedModel,
         selectedSkill: setting.selectedSkill ?? defaults.selectedSkill,
@@ -171,10 +165,7 @@ export class ChatSettingsRepository {
         .from(chatSettings)
         .where(eq(chatSettings.userId, userId));
 
-      const defaults = ChatSettingsRepositoryClient.getDefaults(
-        user,
-        agentEnvAvailability,
-      );
+      const defaults = ChatSettingsRepositoryClient.getDefaults(user);
 
       // Normalize tools - null passthrough means "all allowed"
       const availableToolsToStore =

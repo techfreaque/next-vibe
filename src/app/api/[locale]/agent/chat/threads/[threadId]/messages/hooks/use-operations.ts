@@ -8,13 +8,13 @@ import { toast } from "next-vibe-ui/hooks/use-toast";
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useMemo } from "react";
 
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { answerAsAI as answerAsAIOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/answer-as-ai";
 import { branchMessage as branchMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/branch-message";
 import { retryMessage as retryMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/retry-message";
 import { sendMessage as sendMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import messageIdDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition";
 import voteDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
@@ -23,8 +23,6 @@ import {
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import type { StartStreamFn } from "../../../../../ai-stream/stream/hooks/shared";
 import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
@@ -128,7 +126,6 @@ export function useMessageOperations(
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
-  const env = useEnvAvailability();
   const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
   const navSetAborting = useChatNavigationStore((s) => s.setAborting);
 
@@ -187,7 +184,6 @@ export function useMessageOperations(
           user,
           settings: { ...settings, selectedModel: settings.selectedModel },
           locale,
-          env,
         },
         onThreadCreated,
       );
@@ -202,7 +198,6 @@ export function useMessageOperations(
       user,
       settings,
       locale,
-      env,
     ],
   );
 
@@ -230,7 +225,6 @@ export function useMessageOperations(
         settings: { ...settings, selectedModel: settings.selectedModel },
         setLeafMessageId,
         locale,
-        env,
       });
     },
     [
@@ -243,7 +237,6 @@ export function useMessageOperations(
       settings,
       setLeafMessageId,
       locale,
-      env,
     ],
   );
 
@@ -273,7 +266,6 @@ export function useMessageOperations(
         settings: { ...settings, selectedModel: settings.selectedModel },
         setLeafMessageId,
         locale,
-        env,
       });
     },
     [
@@ -286,7 +278,6 @@ export function useMessageOperations(
       settings,
       setLeafMessageId,
       locale,
-      env,
     ],
   );
 

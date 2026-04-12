@@ -31,6 +31,7 @@ const { POST } = createEndpoint({
   title: "adminAdd.post.title" as const,
   description: "adminAdd.post.description" as const,
   category: "endpointCategories.credits",
+  subCategory: "endpointCategories.creditsManagement",
   icon: "coins" as const,
   tags: ["adminAdd.post.tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,

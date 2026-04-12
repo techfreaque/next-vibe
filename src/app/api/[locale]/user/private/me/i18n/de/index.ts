@@ -33,8 +33,10 @@ export const translations: typeof enTranslations = {
       tiktokUrl: "TikTok",
       githubUrl: "GitHub",
       discordUrl: "Discord",
+      creatorSlug: "Profil-URL",
       creatorAccentColor: "Akzentfarbe",
       creatorHeaderImageUrl: "Header-Bild",
+      avatarUrl: "Profilbild",
       user: {
         title: "Benutzerinformationen",
         description: "Benutzerprofildetails",
@@ -211,6 +213,15 @@ export const translations: typeof enTranslations = {
         description: "Dein Discord-Server oder Profil-Link",
         placeholder: "https://discord.gg/deinserver",
       },
+      creatorSlug: {
+        label: "Profil-URL",
+        description:
+          "Dein individueller Profillink – erscheint in deiner öffentlichen Adresse",
+        placeholder: "jane-doe",
+        validation: {
+          invalid: "Nur Kleinbuchstaben, Zahlen und Bindestriche erlaubt",
+        },
+      },
       creatorAccentColor: {
         label: "Akzentfarbe",
         description: "Hex-Farbe für dein Skill-Seiten-Branding (optional)",
@@ -250,6 +261,7 @@ export const translations: typeof enTranslations = {
       tiktokUrl: "TikTok",
       githubUrl: "GitHub",
       discordUrl: "Discord",
+      creatorSlug: "Profil-URL",
       creatorAccentColor: "Akzentfarbe",
       creatorHeaderImageUrl: "Header-Bild",
       user: "Aktualisierte Benutzerinformationen",
@@ -388,8 +400,9 @@ export const translations: typeof enTranslations = {
       description: "Verbinde deine Plattformen",
     },
     emailCard: {
-      title: "E-Mail-Liste",
-      description: "Baue dein Publikum mit Lead-Erfassung auf",
+      title: "Deine E-Mail-Liste",
+      description:
+        "Besucher deiner Skill-Seite können sich eintragen. Die Liste gehört dir - kein Mittelsmann.",
     },
     previewCard: {
       title: "Dein öffentliches Profil",
@@ -398,6 +411,16 @@ export const translations: typeof enTranslations = {
     noPreview: "Fülle dein Profil aus, um eine Vorschau zu sehen",
     noSocials: "Noch keine Social Links hinzugefügt",
     viewPublicProfile: "Öffentliches Profil ansehen",
+    profileUrl: "Dein Link",
+    slugWarning:
+      "Wenn du diese URL änderst, werden alle bestehenden Links zu deinem Profil ungültig.",
+    bioPreview: "Vorschau",
+    bioEdit: "Bearbeiten",
+    skills: {
+      title: "Meine Skills",
+      chat: "Jetzt chatten",
+      add: "Zur Sammlung hinzufügen",
+    },
   },
 
   // Sub-routes

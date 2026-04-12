@@ -7,40 +7,19 @@
  */
 
 import type { JSX, ReactNode } from "react";
-import { useRef, useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { create } from "zustand";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatBootValue } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { UseNavigationStackReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
-import { EnvAvailabilitySetter } from "@/app/api/[locale]/agent/env-availability-context";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { WidgetContextStoreContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import type { WidgetContextStoreType } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/widget-context-store";
+import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
-
-const MOCK_ENV: AgentEnvAvailability = {
-  openRouter: false,
-  voice: false,
-  braveSearch: false,
-  kagiSearch: false,
-  anySearch: false,
-  uncensoredAI: false,
-  freedomGPT: false,
-  gabAI: false,
-  veniceAI: false,
-  scrappey: false,
-  claudeCode: false,
-  openAiImages: false,
-  replicate: false,
-  falAi: false,
-  modelsLab: false,
-  unbottled: false,
-};
+import { WidgetContextStoreContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import type { WidgetContextStoreType } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/widget-context-store";
 
 const MOCK_CREDITS: ChatBootValue["initialCredits"] = {
   total: 0,
@@ -105,7 +84,6 @@ export function MockChatProvider({
 
   return (
     <WidgetContextStoreContext.Provider value={widgetStoreRef.current}>
-      <EnvAvailabilitySetter env={MOCK_ENV} />
       <ChatBootContext.Provider value={mockValue}>
         <NavigationStackProvider>
           <ChatNavigationProvider

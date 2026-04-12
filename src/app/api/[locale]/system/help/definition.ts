@@ -50,6 +50,7 @@ const aiToolMetadataSchema = z.object({
   // Present in list mode with query/category
   method: z.string().optional(),
   category: z.string(),
+  subCategory: z.string().optional(),
   aliases: z.array(z.string()).optional(),
   // Only present in detail mode (toolName param)
   requiresConfirmation: z.boolean().optional(),
@@ -84,7 +85,8 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "help-circle",
-  category: "endpointCategories.system",
+  category: "endpointCategories.ai",
+  subCategory: "endpointCategories.aiTools",
   tags: ["get.tags.tools" as const],
   allowedRoles: [
     UserRole.PUBLIC,
@@ -120,6 +122,15 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "get.fields.category.label" as const,
         description: "get.fields.category.description" as const,
+        columns: 4,
+        schema: z.string().optional(),
+      }),
+
+      subCategory: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.subCategory.label" as const,
+        description: "get.fields.subCategory.description" as const,
         columns: 4,
         schema: z.string().optional(),
       }),
@@ -242,7 +253,15 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         content: "get.fields.categories.title" as const,
         schema: z
-          .array(z.object({ name: z.string(), count: z.number() }))
+          .array(
+            z.object({
+              name: z.string(),
+              count: z.number(),
+              subCategories: z
+                .array(z.object({ name: z.string(), count: z.number() }))
+                .optional(),
+            }),
+          )
           .optional(),
       }),
 

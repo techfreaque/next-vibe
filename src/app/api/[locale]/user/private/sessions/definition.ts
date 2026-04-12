@@ -80,6 +80,7 @@ const { GET } = createEndpoint({
   description: "list.description",
   icon: "key",
   category: "endpointCategories.userAuth",
+  subCategory: "endpointCategories.userAuthSessions",
   tags: ["list.tag"],
   allowedRoles: ALLOWED_ROLES,
   fields: objectField(scopedTranslation, {
@@ -127,6 +128,7 @@ const { POST } = createEndpoint({
   description: "create.description",
   icon: "key",
   category: "endpointCategories.userAuth",
+  subCategory: "endpointCategories.userAuthSessions",
   tags: ["create.tag"],
   allowedRoles: ALLOWED_ROLES,
   fields: objectField(scopedTranslation, {

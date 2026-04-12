@@ -27,7 +27,8 @@ const { POST } = createEndpoint({
   path: ["system", "side-tasks", "generators", "generate-trpc-router"],
   title: "title",
   description: "description",
-  category: "endpointCategories.systemDevTools",
+  category: "endpointCategories.devTools",
+  subCategory: "endpointCategories.devToolsGenerators",
   tags: ["tag"],
   icon: "code",
   allowedRoles: [

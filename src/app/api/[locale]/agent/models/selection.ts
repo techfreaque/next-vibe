@@ -13,7 +13,6 @@ import {
   ModelSortDirection,
   ModelSortField,
   PriceLevel,
-  SpeedLevel,
 } from "@/app/api/[locale]/agent/chat/skills/enum";
 import type { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import type { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
@@ -38,12 +37,6 @@ export const sharedFilterPropsSchema = z.object({
     .object({
       min: z.enum(ContentLevel).optional(),
       max: z.enum(ContentLevel).optional(),
-    })
-    .optional(),
-  speedRange: z
-    .object({
-      min: z.enum(SpeedLevel).optional(),
-      max: z.enum(SpeedLevel).optional(),
     })
     .optional(),
   sortBy: z.enum(ModelSortField).optional(),

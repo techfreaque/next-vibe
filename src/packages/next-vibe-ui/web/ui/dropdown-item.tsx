@@ -50,7 +50,7 @@ export function DropdownItem(props: DropdownItemProps): JSX.Element {
       size="sm"
       className={`w-full justify-start font-medium rounded-md px-3 py-2.5 min-h-fit h-auto ${
         shouldShowRainbow
-          ? "border-2 border-blue-500/50 bg-blue-500/10"
+          ? "border-2 border-primary/50 bg-primary/10"
           : "border-2 border-transparent hover:bg-accent/50"
       } ${className}`}
       onMouseEnter={handleMouseEnter}

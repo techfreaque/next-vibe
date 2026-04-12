@@ -155,10 +155,8 @@ interface PatchWidgetProps {
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const STATUS_COLORS: Record<string, string> = {
-  [LeadStatus.NEW]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  [LeadStatus.PENDING]:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+  [LeadStatus.NEW]: "bg-info/10 text-info",
+  [LeadStatus.PENDING]: "bg-warning/10 text-warning",
   [LeadStatus.CAMPAIGN_RUNNING]:
     "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
   [LeadStatus.WEBSITE_USER]:
@@ -169,8 +167,7 @@ const STATUS_COLORS: Record<string, string> = {
     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
   [LeadStatus.SIGNED_UP]:
     "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-  [LeadStatus.SUBSCRIPTION_CONFIRMED]:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  [LeadStatus.SUBSCRIPTION_CONFIRMED]: "bg-success/10 text-success",
   [LeadStatus.UNSUBSCRIBED]:
     "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
 };
@@ -323,7 +320,7 @@ function CopyButton({
       title={label ?? text}
     >
       {copied ? (
-        <CheckCircle className="h-3 w-3 text-green-500" />
+        <CheckCircle className="h-3 w-3 text-success" />
       ) : (
         <Copy className="h-3 w-3" />
       )}
@@ -353,7 +350,7 @@ function CampaignFunnel({
                 isCurrent
                   ? "bg-primary text-primary-foreground border-primary shadow-sm"
                   : isPast
-                    ? "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
+                    ? "bg-success/10 text-success border-success/30"
                     : "bg-muted/50 text-muted-foreground border-transparent",
               )}
               title={t(stage.labelKey)}
@@ -743,7 +740,7 @@ function OverviewTab({
                   href={contactDetails.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline truncate flex items-center gap-1"
+                  className="text-sm text-info hover:underline truncate flex items-center gap-1"
                 >
                   {contactDetails.website}
                   <ExternalLinkIcon className="h-3 w-3 flex-shrink-0" />
@@ -792,7 +789,7 @@ function DetailsTab({
         <CardContent>
           <Div className="grid grid-cols-2 gap-3">
             <Div className="flex items-center gap-2">
-              <BarChart2 className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+              <BarChart2 className="h-3.5 w-3.5 text-success flex-shrink-0" />
               <InfoRow
                 label={t("widget.emailsOpened")}
                 value={engagement.emailsOpened}
@@ -815,12 +812,12 @@ function DetailsTab({
             )}
             {engagement.unsubscribedAt && (
               <Div className="col-span-2 flex items-start gap-2">
-                <AlertTriangle className="h-3.5 w-3.5 text-red-500 mt-0.5 flex-shrink-0" />
+                <AlertTriangle className="h-3.5 w-3.5 text-destructive mt-0.5 flex-shrink-0" />
                 <Div>
                   <P className="text-xs text-muted-foreground">
                     {t("widget.unsubscribed")}
                   </P>
-                  <P className="text-sm text-red-600 dark:text-red-400">
+                  <P className="text-sm text-destructive">
                     {formatSimpleDate(engagement.unsubscribedAt, locale)}
                   </P>
                 </Div>
@@ -838,7 +835,7 @@ function DetailsTab({
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
-              <Check className="h-4 w-4 text-green-600" />
+              <Check className="h-4 w-4 text-success" />
               {t("widget.conversion")}
             </CardTitle>
           </CardHeader>
@@ -883,9 +880,9 @@ function DetailsTab({
               )}
             </Div>
             {hasSubscription && (
-              <Div className="mt-3 pt-3 border-t flex items-center gap-2 p-2 rounded-lg bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800">
-                <CreditCard className="h-4 w-4 text-green-600 dark:text-green-400" />
-                <P className="text-sm text-green-700 dark:text-green-400 font-medium">
+              <Div className="mt-3 pt-3 border-t flex items-center gap-2 p-2 rounded-lg bg-success/10 border border-success/30">
+                <CreditCard className="h-4 w-4 text-success" />
+                <P className="text-sm text-success font-medium">
                   {t("widget.activeSubscriberSince")}{" "}
                   {formatSimpleDate(
                     conversion.subscriptionConfirmedAt!,
@@ -993,14 +990,11 @@ function LinkedIdentitiesTab({
   const { identity, lifecycle, linkedLeads, linkedUsers } = data;
 
   const DEVICE_TYPE_COLORS: Record<string, string> = {
-    [DeviceType.DESKTOP]:
-      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-    [DeviceType.MOBILE]:
-      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+    [DeviceType.DESKTOP]: "bg-info/10 text-info",
+    [DeviceType.MOBILE]: "bg-success/10 text-success",
     [DeviceType.TABLET]:
       "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-    [DeviceType.BOT]:
-      "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+    [DeviceType.BOT]: "bg-destructive/10 text-destructive",
     [DeviceType.UNKNOWN]:
       "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
   };
@@ -1104,7 +1098,7 @@ function LinkedIdentitiesTab({
               )}
               {lifecycle.invalidAt && (
                 <Div className="flex items-start gap-2">
-                  <AlertCircle className="h-3.5 w-3.5 text-red-500 mt-0.5 flex-shrink-0" />
+                  <AlertCircle className="h-3.5 w-3.5 text-destructive mt-0.5 flex-shrink-0" />
                   <InfoRow
                     label={t("widget.invalidAt")}
                     value={formatSimpleDate(lifecycle.invalidAt, locale)}
@@ -1717,11 +1711,11 @@ export function LeadEditContainer(props: PatchWidgetProps): React.JSX.Element {
       <Div className="px-4 pt-4 flex flex-col gap-4">
         {/* Success: show after actual PATCH submission completes */}
         {showSuccess && (
-          <Card className="border-green-200 bg-green-50 dark:bg-green-900/10 dark:border-green-800">
+          <Card className="border-success/30 bg-success/10">
             <CardContent className="pt-3 pb-3">
               <Div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-                <P className="text-sm text-green-700 dark:text-green-400 font-medium">
+                <CheckCircle className="h-4 w-4 text-success" />
+                <P className="text-sm text-success font-medium">
                   {t("patch.success.description")}
                 </P>
               </Div>

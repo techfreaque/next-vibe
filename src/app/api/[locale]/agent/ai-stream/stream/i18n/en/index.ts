@@ -16,7 +16,7 @@ export const translations = {
       title: "Run AI Agent",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
-        "Run a headless AI agent and return the final text response. Set model + prompt for a simple one-shot, or pass favoriteId to load a saved skill + model + tools preset. Credits consumed based on model.",
+        "Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.",
       container: {
         title: "AI Agent Run",
         description: "Configure pre-calls and prompt for headless AI execution",
@@ -36,7 +36,7 @@ export const translations = {
         skill: {
           label: "Skill",
           description:
-            "Skill ID or 'default'. Defines the AI persona and system prompt. Optional when favoriteId is set. Overrides the favorite's skill.",
+            "Skill ID or default skill name. Defines the AI persona and system prompt. Use 'skill-creator' to create/edit AI skills. Optional when favoriteId is set.",
           placeholder: "default",
         },
         prompt: {
@@ -121,7 +121,7 @@ export const translations = {
         subFolderId: {
           label: "Sub-folder ID",
           description:
-            "Optional UUID of a sub-folder within the root folder for organising runs.",
+            "Optional UUID of a sub-folder within the root folder. For manual organisation only - do NOT pass this when calling ai-run programmatically or from AI tools. Leave empty in all automated/agent contexts.",
           placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         excludeMemories: {
@@ -134,6 +134,7 @@ export const translations = {
         text: "The AI's response text (think-tags stripped). Null if the model produced no output.",
         promptTokens: "Prompt tokens consumed (input cost)",
         completionTokens: "Completion tokens generated (output cost)",
+        creditCost: "Credits charged for this run. Null for incognito runs.",
         threadId:
           "Thread UUID where the run was stored. Null if rootFolderId was 'incognito'. Use this to continue the conversation via appendThreadId.",
         lastAiMessageId:
@@ -674,10 +675,10 @@ export const translations = {
   onboarding: {
     back: "Back",
     welcome: {
-      title: "Think of us as your AI team.",
+      title: "One AI for everything. The right one for each thing.",
       line1:
-        "Your companion handles everyday chat. Specialists step in for coding, research, writing - whatever the task needs.",
-      line2: "The AI switches between them automatically. You just talk.",
+        "A companion for everyday conversation. Specialists for coding, research, writing - you pick one when the task calls for it.",
+      line2: "Same chat. You switch when it matters. Takes seconds.",
       line3: "Let's get you set up in under a minute.",
       continue: "Get Started",
     },

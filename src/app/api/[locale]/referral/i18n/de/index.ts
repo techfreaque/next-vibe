@@ -352,9 +352,9 @@ export const translations: typeof enTranslations = {
       step1Title: "Empfehlungscodes erstellen",
       step1Body:
         "Einzigartige Codes für verschiedene Zielgruppen generieren - Freunde, soziale Medien oder Kampagnen.",
-      step2Title: "Link teilen",
+      step2Title: "Link teilen - oder Skill-Link",
       step2Body:
-        "Wenn jemand über Ihren Link anmeldet und abonniert, verdienen Sie Provision.",
+        "Empfehlungslink: {{directPct}} jeder Zahlung von diesem Nutzer, für immer. Skill-Link: {{skillPct}} gesamt ({{directPct}} direkt + {{skillBonusPct}} Skill-Bonus) - zwei Einnahmequellen, ein Link.",
       step3Title: "Bezahlt werden",
       step3Body:
         "Einnahmen sind sofort verfügbar. Als Chat-Credits nutzen oder in Krypto auszahlen.",

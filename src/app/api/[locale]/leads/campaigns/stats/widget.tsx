@@ -54,10 +54,10 @@ function StatCard({
 }): React.JSX.Element {
   const variantClass = {
     default: "text-foreground",
-    success: "text-green-600 dark:text-green-400",
-    warning: "text-yellow-600 dark:text-yellow-400",
-    danger: "text-red-600 dark:text-red-400",
-    info: "text-blue-600 dark:text-blue-400",
+    success: "text-success",
+    warning: "text-warning",
+    danger: "text-destructive",
+    info: "text-info",
   }[variant];
 
   const formatted = useMemo(() => {
@@ -194,12 +194,12 @@ function formatDuration(ms: number | null | undefined): string {
 function getStatusDotColor(status: string | null): string {
   switch (status) {
     case CronTaskStatus.COMPLETED:
-      return "bg-green-500";
+      return "bg-success";
     case CronTaskStatus.FAILED:
     case CronTaskStatus.ERROR:
-      return "bg-red-500";
+      return "bg-destructive";
     case CronTaskStatus.RUNNING:
-      return "bg-blue-500 animate-pulse";
+      return "bg-primary animate-pulse";
     default:
       return "bg-gray-400";
   }
@@ -208,11 +208,11 @@ function getStatusDotColor(status: string | null): string {
 function getHealthBg(health: string): string {
   switch (health) {
     case "healthy":
-      return "bg-green-50 border-green-200 dark:bg-green-900/10 dark:border-green-800";
+      return "bg-success/10 border-success/30";
     case "warning":
-      return "bg-orange-50 border-orange-200 dark:bg-orange-900/10 dark:border-orange-800";
+      return "bg-warning/10 border-warning/30";
     case "critical":
-      return "bg-red-50 border-red-200 dark:bg-red-900/10 dark:border-red-800";
+      return "bg-destructive/10 border-destructive/30";
     default:
       return "bg-muted border-border";
   }
@@ -221,11 +221,11 @@ function getHealthBg(health: string): string {
 function getHealthColor(health: string): string {
   switch (health) {
     case "healthy":
-      return "text-green-600 dark:text-green-400";
+      return "text-success";
     case "warning":
       return "text-orange-600 dark:text-orange-400";
     case "critical":
-      return "text-red-600 dark:text-red-400";
+      return "text-destructive";
     default:
       return "text-muted-foreground";
   }
@@ -279,7 +279,7 @@ function CronHealthSection({
               <Span className="font-medium">{stats.successRate24h}%</Span>
             )}
             {stats.failedTasks24h > 0 && (
-              <Span className="text-red-600 dark:text-red-400 font-medium">
+              <Span className="text-destructive font-medium">
                 {stats.failedTasks24h} {t("widget.cronHealth.failed24h")}
               </Span>
             )}
@@ -296,20 +296,20 @@ function CronHealthSection({
           {alerts.map((alert) => (
             <Div
               key={alert.taskId}
-              className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/10 p-3 flex flex-col gap-1"
+              className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 flex flex-col gap-1"
             >
               <Div className="flex items-center gap-2">
-                <AlertTriangle className="h-3.5 w-3.5 text-red-600 dark:text-red-400 flex-shrink-0" />
-                <Span className="font-semibold text-sm text-red-700 dark:text-red-300">
+                <AlertTriangle className="h-3.5 w-3.5 text-destructive flex-shrink-0" />
+                <Span className="font-semibold text-sm text-destructive">
                   {alert.taskName}
                 </Span>
-                <Span className="text-xs text-red-600 dark:text-red-400 ml-auto">
+                <Span className="text-xs text-destructive ml-auto">
                   {alert.consecutiveFailures}{" "}
                   {t("widget.cronHealth.alertFailures")}
                 </Span>
               </Div>
               {alert.lastError && (
-                <Span className="text-xs text-red-600 dark:text-red-400 font-mono pl-5 truncate">
+                <Span className="text-xs text-destructive font-mono pl-5 truncate">
                   {alert.lastError}
                 </Span>
               )}
@@ -344,7 +344,7 @@ function CronHealthSection({
                       <Div
                         className={cn(
                           "w-2 h-2 rounded-full flex-shrink-0",
-                          task.enabled ? "bg-green-500" : "bg-gray-400",
+                          task.enabled ? "bg-success" : "bg-gray-400",
                         )}
                       />
                       <Span className="font-semibold text-sm truncate">
@@ -372,10 +372,10 @@ function CronHealthSection({
                       className={cn(
                         "font-medium",
                         successRate >= 95
-                          ? "text-green-600 dark:text-green-400"
+                          ? "text-success"
                           : successRate >= 80
                             ? "text-orange-600 dark:text-orange-400"
-                            : "text-red-600 dark:text-red-400",
+                            : "text-destructive",
                       )}
                     >
                       {successRate}%
@@ -488,12 +488,12 @@ export function CampaignStatsWidget({
       {/* ── Hero row: 2 large highlight cards ───────────────────────── */}
       <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Active campaigns card */}
-        <Div className="rounded-xl border bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 p-5 flex flex-col gap-3">
+        <Div className="rounded-xl border bg-gradient-to-br from-info/10 to-primary/10 p-5 flex flex-col gap-3">
           <Div className="flex items-center gap-2">
-            <Div className="rounded-lg bg-blue-100 dark:bg-blue-900/50 p-2">
-              <Activity className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <Div className="rounded-lg bg-info/10 p-2">
+              <Activity className="h-4 w-4 text-info" />
             </Div>
-            <Span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+            <Span className="text-sm font-medium text-foreground">
               {t("widget.activeCampaigns")}
             </Span>
           </Div>
@@ -514,12 +514,12 @@ export function CampaignStatsWidget({
         </Div>
 
         {/* Today's activity card */}
-        <Div className="rounded-xl border bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 p-5 flex flex-col gap-3">
+        <Div className="rounded-xl border bg-gradient-to-br from-success/10 to-success/5 p-5 flex flex-col gap-3">
           <Div className="flex items-center gap-2">
-            <Div className="rounded-lg bg-green-100 dark:bg-green-900/50 p-2">
-              <Zap className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <Div className="rounded-lg bg-success/10 p-2">
+              <Zap className="h-4 w-4 text-success" />
             </Div>
-            <Span className="text-sm font-medium text-green-900 dark:text-green-100">
+            <Span className="text-sm font-medium text-foreground">
               {t("widget.sendPerformance")}
             </Span>
           </Div>
@@ -546,7 +546,7 @@ export function CampaignStatsWidget({
           <Span className="text-xs text-muted-foreground">
             {t("get.response.openRate")}
           </Span>
-          <Span className="text-2xl font-bold tabular-nums text-blue-600 dark:text-blue-400">
+          <Span className="text-2xl font-bold tabular-nums text-info">
             {hasData ? `${(data.openRate * 100).toFixed(1)}%` : "—"}
           </Span>
           <Span className="text-xs text-muted-foreground">
@@ -559,7 +559,7 @@ export function CampaignStatsWidget({
           <Span className="text-xs text-muted-foreground">
             {t("get.response.clickRate")}
           </Span>
-          <Span className="text-2xl font-bold tabular-nums text-blue-600 dark:text-blue-400">
+          <Span className="text-2xl font-bold tabular-nums text-info">
             {hasData ? `${(data.clickRate * 100).toFixed(1)}%` : "—"}
           </Span>
           <Span className="text-xs text-muted-foreground">
@@ -572,7 +572,7 @@ export function CampaignStatsWidget({
           <Span className="text-xs text-muted-foreground">
             {t("get.response.deliveryRate")}
           </Span>
-          <Span className="text-2xl font-bold tabular-nums text-green-600 dark:text-green-400">
+          <Span className="text-2xl font-bold tabular-nums text-success">
             {hasData ? `${(data.deliveryRate * 100).toFixed(1)}%` : "—"}
           </Span>
           <Span className="text-xs text-muted-foreground">
@@ -589,7 +589,7 @@ export function CampaignStatsWidget({
             className={cn(
               "text-2xl font-bold tabular-nums",
               hasData && data.failureRate > 0.05
-                ? "text-red-600 dark:text-red-400"
+                ? "text-destructive"
                 : "text-foreground",
             )}
           >
@@ -698,7 +698,7 @@ export function CampaignStatsWidget({
                     <Span className="text-xs font-medium">{q.locale}</Span>
                     <Div className="flex items-center gap-2">
                       {isZeroBudget ? (
-                        <Span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                        <Span className="text-xs text-warning font-medium">
                           {t("widget.perRunBudgetZero")}
                         </Span>
                       ) : q.perRunBudget > 0 ? (

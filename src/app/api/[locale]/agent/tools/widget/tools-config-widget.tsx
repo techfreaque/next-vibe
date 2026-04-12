@@ -807,7 +807,7 @@ function ToolConfigRow({
                   className={cn(
                     "h-6 w-6 p-0 shrink-0",
                     requiresConfirmation
-                      ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20"
+                      ? "text-warning bg-warning/10 hover:bg-warning/20"
                       : "text-muted-foreground/40 hover:text-muted-foreground",
                   )}
                   onClick={(e) => {

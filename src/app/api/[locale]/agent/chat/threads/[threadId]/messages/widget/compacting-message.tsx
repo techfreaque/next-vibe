@@ -44,16 +44,16 @@ export function CompactingMessage({
 
   if (isFailed) {
     return (
-      <Div className="relative border border-red-500/20 bg-gradient-to-r from-red-500/5 to-orange-500/5 rounded-lg my-2 overflow-hidden shadow-sm">
+      <Div className="relative border border-destructive/20 bg-gradient-to-r from-destructive/5 to-orange-500/5 rounded-lg my-2 overflow-hidden shadow-sm">
         <Div className="flex items-center gap-2 p-3">
-          <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
-          <Span className="text-sm font-medium text-red-700 dark:text-red-400">
+          <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+          <Span className="text-sm font-medium text-destructive">
             {t("compacting.failed")}
           </Span>
           {compactedMessageCount !== undefined && compactedMessageCount > 0 && (
             <Badge
               variant="outline"
-              className="text-xs bg-red-500/10 border-red-500/30 flex-shrink-0"
+              className="text-xs bg-destructive/10 border-destructive/30 flex-shrink-0"
             >
               {compactedMessageCount}{" "}
               {compactedMessageCount === 1 ? "msg" : "msgs"}

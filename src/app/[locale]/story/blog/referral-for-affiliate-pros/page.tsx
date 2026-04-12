@@ -11,7 +11,6 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, Muted, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -53,7 +52,7 @@ export async function tanstackLoader({
   const { locale } = await params;
   return {
     locale,
-    modelCount: getAvailableModelCount(agentEnvAvailability, false),
+    modelCount: getAvailableModelCount(false),
   };
 }
 
@@ -283,6 +282,11 @@ export function TanstackPage({
                 {t("structure.p3")}
               </P>
             </Div>
+            <Div className="flex items-start gap-3 p-4 rounded-lg bg-muted/20 border border-muted">
+              <P className="text-sm text-muted-foreground leading-relaxed italic">
+                {t("structure.p4")}
+              </P>
+            </Div>
           </Div>
         </Div>
 
@@ -373,7 +377,7 @@ export function TanstackPage({
               size="lg"
               className="gap-2 bg-violet-700 hover:bg-violet-800 text-white"
             >
-              <Link href={`/${locale}/user/referral`}>
+              <Link href={`/${locale}/user/(account)/referral`}>
                 {t("close.createCode")}
                 <ArrowRight className="h-4 w-4" />
               </Link>

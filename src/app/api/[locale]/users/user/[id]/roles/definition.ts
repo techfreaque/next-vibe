@@ -39,7 +39,8 @@ const { POST } = createEndpoint({
   title: "roles.post.title" as const,
   description: "roles.post.description" as const,
   icon: "shield" as const,
-  category: "endpointCategories.userManagement",
+  category: "endpointCategories.userAdmin",
+  subCategory: "endpointCategories.userAdminManagement",
   tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
@@ -176,7 +177,8 @@ const { DELETE } = createEndpoint({
   title: "roles.delete.title" as const,
   description: "roles.delete.description" as const,
   icon: "shield" as const,
-  category: "endpointCategories.userManagement",
+  category: "endpointCategories.userAdmin",
+  subCategory: "endpointCategories.userAdminManagement",
   tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 

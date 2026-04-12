@@ -10,6 +10,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
@@ -38,93 +39,105 @@ import type { FavoriteGetModelSelection } from "./[id]/definition";
  * Users can have multiple favorites for the same character with different settings
  * skillId can be null for model-only setups
  */
-export const chatFavorites = pgTable("chat_favorites", {
-  id: uuid("id").primaryKey().defaultRandom(),
+export const chatFavorites = pgTable(
+  "chat_favorites",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
 
-  // Owner
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
+    // Human-readable slug (unique per user, auto-generated from skill+variant or customVariantName)
+    slug: text("slug").notNull().default(""),
 
-  // Skill reference
-  // Note: DB column is "character_id", mapped to skillId in code
-  skillId: text("character_id").notNull(),
+    // Owner
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
 
-  // Variant reference - null means "no variant / skill default"
-  variantId: text("variant_id"),
+    // Skill reference
+    // Note: DB column is "character_id", mapped to skillId in code
+    skillId: text("character_id").notNull(),
 
-  // Custom variant display name (overrides skill variant's default name)
-  customVariantName: text("custom_variant_name"),
+    // Variant reference - null means "no variant / skill default"
+    variantId: text("variant_id"),
 
-  // Custom icon (emoji or icon identifier)
-  customIcon: text("custom_icon").$type<IconKey>(),
+    // Custom variant display name (overrides skill variant's default name)
+    customVariantName: text("custom_variant_name"),
 
-  // Voice model selection (null = cascade to skill → user settings → system default)
-  voiceModelSelection: jsonb(
-    "voice_model_selection",
-  ).$type<VoiceModelSelection>(),
+    // Custom icon (emoji or icon identifier)
+    customIcon: text("custom_icon").$type<IconKey>(),
 
-  // STT model selection (null = cascade to user settings → system default)
-  sttModelSelection: jsonb("stt_model_selection").$type<SttModelSelection>(),
+    // Voice model selection (null = cascade to skill → user settings → system default)
+    voiceModelSelection: jsonb(
+      "voice_model_selection",
+    ).$type<VoiceModelSelection>(),
 
-  // Vision model selections per modality (null = cascade to user settings → system default)
-  imageVisionModelSelection: jsonb(
-    "image_vision_model_selection",
-  ).$type<ImageVisionModelSelection>(),
-  videoVisionModelSelection: jsonb(
-    "video_vision_model_selection",
-  ).$type<VideoVisionModelSelection>(),
-  audioVisionModelSelection: jsonb(
-    "audio_vision_model_selection",
-  ).$type<AudioVisionModelSelection>(),
+    // STT model selection (null = cascade to user settings → system default)
+    sttModelSelection: jsonb("stt_model_selection").$type<SttModelSelection>(),
 
-  // Default chat mode for this favorite (null = cascade to skill → user settings → "text")
-  defaultChatMode: text("default_chat_mode").$type<ChatMode>(),
+    // Vision model selections per modality (null = cascade to user settings → system default)
+    imageVisionModelSelection: jsonb(
+      "image_vision_model_selection",
+    ).$type<ImageVisionModelSelection>(),
+    videoVisionModelSelection: jsonb(
+      "video_vision_model_selection",
+    ).$type<VideoVisionModelSelection>(),
+    audioVisionModelSelection: jsonb(
+      "audio_vision_model_selection",
+    ).$type<AudioVisionModelSelection>(),
 
-  // Image/music/video gen model selections (null = cascade to skill → user settings → system default)
-  imageGenModelSelection: jsonb(
-    "image_gen_model_selection",
-  ).$type<ImageGenModelSelection>(),
-  musicGenModelSelection: jsonb(
-    "music_gen_model_selection",
-  ).$type<MusicGenModelSelection>(),
-  videoGenModelSelection: jsonb(
-    "video_gen_model_selection",
-  ).$type<VideoGenModelSelection>(),
+    // Default chat mode for this favorite (null = cascade to skill → user settings → "text")
+    defaultChatMode: text("default_chat_mode").$type<ChatMode>(),
 
-  // Model selection (stores only MANUAL or FILTERS, null means use character defaults)
-  modelSelection: jsonb("model_selection").$type<FavoriteGetModelSelection>(),
-  position: integer("position").notNull(),
-  color: text("color"),
+    // Image/music/video gen model selections (null = cascade to skill → user settings → system default)
+    imageGenModelSelection: jsonb(
+      "image_gen_model_selection",
+    ).$type<ImageGenModelSelection>(),
+    musicGenModelSelection: jsonb(
+      "music_gen_model_selection",
+    ).$type<MusicGenModelSelection>(),
+    videoGenModelSelection: jsonb(
+      "video_gen_model_selection",
+    ).$type<VideoGenModelSelection>(),
 
-  // Auto-compacting token threshold (null = fall through to character/settings default)
-  compactTrigger: integer("compact_trigger"),
+    // Model selection (stores only MANUAL or FILTERS, null means use character defaults)
+    modelSelection: jsonb("model_selection").$type<FavoriteGetModelSelection>(),
+    position: integer("position").notNull(),
+    color: text("color"),
 
-  // Memory budget in chars (null = inherit from skill → user settings; overrides for this favorite)
-  memoryLimit: integer("memory_limit"),
+    // Auto-compacting token threshold (null = fall through to character/settings default)
+    compactTrigger: integer("compact_trigger"),
 
-  // Tool configuration - null = fall through to character/settings default
-  availableTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
-  pinnedTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
-  // Additional tool blocks on top of skill defaults
-  deniedTools: jsonb("denied_tools").$type<ToolConfigItem[] | null>(),
+    // Memory budget in chars (null = inherit from skill → user settings; overrides for this favorite)
+    memoryLimit: integer("memory_limit"),
 
-  // User-level prompt customization - appended to skill's systemPrompt
-  promptAppend: text("prompt_append"),
+    // Tool configuration - null = fall through to character/settings default
+    availableTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
+    pinnedTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
+    // Additional tool blocks on top of skill defaults
+    deniedTools: jsonb("denied_tools").$type<ToolConfigItem[] | null>(),
 
-  // Sub-agent favorite override: which favorite config sub-agents spawned by this favorite inherit
-  // null = task isolation (sub-agents get skill systemPrompt + companionPrompt only, no user favorites)
-  // set = sub-agents inherit that favorite's model + tool config (power-user override)
-  subAgentFavoriteId: uuid("sub_agent_favorite_id"),
+    // User-level prompt customization - appended to skill's systemPrompt
+    promptAppend: text("prompt_append"),
 
-  // Usage stats
-  useCount: integer("use_count").default(0).notNull(),
-  lastUsedAt: timestamp("last_used_at"),
+    // Sub-agent favorite override: which favorite config sub-agents spawned by this favorite inherit
+    // null = task isolation (sub-agents get skill systemPrompt + companionPrompt only, no user favorites)
+    // set = sub-agents inherit that favorite's model + tool config (power-user override)
+    subAgentFavoriteId: uuid("sub_agent_favorite_id"),
 
-  // Timestamps
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+    // Usage stats
+    useCount: integer("use_count").default(0).notNull(),
+    lastUsedAt: timestamp("last_used_at"),
+
+    // Timestamps
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    userSlugIdx: unique("chat_favorites_user_slug_idx").on(
+      table.userId,
+      table.slug,
+    ),
+  }),
+);
 
 /**
  * Relations

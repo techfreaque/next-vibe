@@ -72,7 +72,7 @@ export function RecordingInputArea({
           <Div className="flex items-center gap-3">
             <Span className="relative flex h-3 w-3">
               {isPaused ? (
-                <Span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500" />
+                <Span className="relative inline-flex rounded-full h-3 w-3 bg-warning" />
               ) : (
                 <>
                   <Span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
@@ -83,9 +83,7 @@ export function RecordingInputArea({
             <Span
               className={cn(
                 "text-base font-medium",
-                isPaused
-                  ? "text-yellow-600 dark:text-yellow-400"
-                  : "text-destructive",
+                isPaused ? "text-warning" : "text-destructive",
               )}
             >
               {isPaused

@@ -12,6 +12,7 @@ import { Menu } from "next-vibe-ui/ui/icons/Menu";
 import { Navigation } from "next-vibe-ui/ui/icons/Navigation";
 import { Palette } from "next-vibe-ui/ui/icons/Palette";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
+import { Star } from "next-vibe-ui/ui/icons/Star";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { SidebarLayout } from "next-vibe-ui/ui/sidebar";
@@ -25,13 +26,44 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { ThemeToggle } from "../../_components/theme-toggle";
 import { AdvancedPreview } from "./advanced";
 import { ButtonsPreview } from "./buttons";
+import { ColorsPreview } from "./colors";
 import { DataDisplayPreview } from "./data-display";
 import { FeedbackPreview } from "./feedback";
 import { FormsPreview } from "./forms";
 import { LayoutsPreview } from "./layouts";
 import { NavigationPreview } from "./navigation";
 import { OverlaysPreview } from "./overlays";
+import { PaletteSwitcher } from "./palette-switcher";
 import { SpecialPreview } from "./special";
+import { UnifiedWidgetsPreview } from "./unified-widgets";
+
+function SidebarNavButton({
+  targetId,
+  icon: IconComponent,
+  label,
+}: {
+  targetId: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+}): React.JSX.Element {
+  return (
+    <Button
+      variant="ghost"
+      className="w-full justify-start"
+      size="sm"
+      onClick={() => {
+        if (!platform.isReactNative) {
+          document
+            .querySelector(`#${targetId}`)
+            ?.scrollIntoView({ behavior: "smooth" });
+        }
+      }}
+    >
+      <IconComponent className="h-4 w-4 mr-2" />
+      {label}
+    </Button>
+  );
+}
 
 export function DesignTestPageLayout({
   locale,
@@ -73,143 +105,75 @@ export function DesignTestPageLayout({
               <ScrollArea className="h-full">
                 <Div className="flex flex-col gap-1">
                   <P className="px-2 text-xs font-semibold text-muted-foreground mb-2">
+                    FOUNDATIONS
+                  </P>
+                  <SidebarNavButton
+                    targetId="colors"
+                    icon={Palette}
+                    label="Colors"
+                  />
+                  <SidebarNavButton
+                    targetId="data-display"
+                    icon={Database}
+                    label="Typography & Data"
+                  />
+
+                  <P className="px-2 text-xs font-semibold text-muted-foreground mb-2 mt-4">
                     COMPONENTS
                   </P>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    size="sm"
-                    onClick={() => {
-                      if (!platform.isReactNative) {
-                        document
-                          .querySelector("#buttons")
-                          ?.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  >
-                    <Palette className="h-4 w-4 mr-2" />
-                    Buttons
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    size="sm"
-                    onClick={() => {
-                      if (!platform.isReactNative) {
-                        document
-                          .querySelector("#forms")
-                          ?.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  >
-                    <Box className="h-4 w-4 mr-2" />
-                    Forms
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    size="sm"
-                    onClick={() => {
-                      if (!platform.isReactNative) {
-                        document
-                          .querySelector("#feedback")
-                          ?.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  >
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Feedback
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    size="sm"
-                    onClick={() => {
-                      if (!platform.isReactNative) {
-                        document
-                          .querySelector("#layouts")
-                          ?.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  >
-                    <Layout className="h-4 w-4 mr-2" />
-                    Layouts
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    size="sm"
-                    onClick={() => {
-                      if (!platform.isReactNative) {
-                        document
-                          .querySelector("#navigation")
-                          ?.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  >
-                    <Navigation className="h-4 w-4 mr-2" />
-                    Navigation
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    size="sm"
-                    onClick={() => {
-                      if (!platform.isReactNative) {
-                        document
-                          .querySelector("#overlays")
-                          ?.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  >
-                    <Layers className="h-4 w-4 mr-2" />
-                    Overlays
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    size="sm"
-                    onClick={() => {
-                      if (!platform.isReactNative) {
-                        document
-                          .querySelector("#data-display")
-                          ?.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  >
-                    <Database className="h-4 w-4 mr-2" />
-                    Data Display
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    size="sm"
-                    onClick={() => {
-                      if (!platform.isReactNative) {
-                        document
-                          .querySelector("#advanced")
-                          ?.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  >
-                    <Layers className="h-4 w-4 mr-2" />
-                    Advanced
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    size="sm"
-                    onClick={() => {
-                      if (!platform.isReactNative) {
-                        document
-                          .querySelector("#special")
-                          ?.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  >
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Special
-                  </Button>
+                  <SidebarNavButton
+                    targetId="buttons"
+                    icon={Star}
+                    label="Buttons & Actions"
+                  />
+                  <SidebarNavButton
+                    targetId="forms"
+                    icon={Box}
+                    label="Forms & Inputs"
+                  />
+                  <SidebarNavButton
+                    targetId="feedback"
+                    icon={Sparkles}
+                    label="Feedback"
+                  />
+                  <SidebarNavButton
+                    targetId="layouts"
+                    icon={Layout}
+                    label="Layouts"
+                  />
+                  <SidebarNavButton
+                    targetId="navigation"
+                    icon={Navigation}
+                    label="Navigation"
+                  />
+                  <SidebarNavButton
+                    targetId="overlays"
+                    icon={Layers}
+                    label="Overlays"
+                  />
+
+                  <P className="px-2 text-xs font-semibold text-muted-foreground mb-2 mt-4">
+                    ADVANCED
+                  </P>
+                  <SidebarNavButton
+                    targetId="advanced"
+                    icon={Sparkles}
+                    label="Motion & Details"
+                  />
+                  <SidebarNavButton
+                    targetId="special"
+                    icon={Database}
+                    label="Markdown & Tables"
+                  />
+
+                  <P className="px-2 text-xs font-semibold text-muted-foreground mb-2 mt-4">
+                    UNIFIED INTERFACE
+                  </P>
+                  <SidebarNavButton
+                    targetId="unified-widgets"
+                    icon={Box}
+                    label="Unified Widgets (59)"
+                  />
                 </Div>
               </ScrollArea>
             </Div>
@@ -225,16 +189,35 @@ export function DesignTestPageLayout({
         closeSidebarLabel="Close sidebar"
       >
         <Container className="max-w-full mx-auto pt-15 pb-10 space-y-12 px-6">
-          <Div className="space-y-2">
+          <Div className="space-y-4">
             <H1>Vibe UI Component Library</H1>
             <Large className="text-muted-foreground">
-              Demo of Vibe UI components
+              Comprehensive showcase of every component and variant
             </Large>
+            <Div className="p-4 rounded-lg border bg-card">
+              <H4 className="mb-3 text-sm font-semibold">Color Palette</H4>
+              <PaletteSwitcher />
+            </Div>
+          </Div>
+
+          <Separator />
+          <Div id="colors">
+            <ColorsPreview />
+          </Div>
+
+          <Separator />
+          <Div id="data-display">
+            <DataDisplayPreview />
           </Div>
 
           <Separator />
           <Div id="buttons">
             <ButtonsPreview />
+          </Div>
+
+          <Separator />
+          <Div id="forms">
+            <FormsPreview />
           </Div>
 
           <Separator />
@@ -258,11 +241,6 @@ export function DesignTestPageLayout({
           </Div>
 
           <Separator />
-          <Div id="data-display">
-            <DataDisplayPreview />
-          </Div>
-
-          <Separator />
           <Div id="advanced">
             <AdvancedPreview />
           </Div>
@@ -273,8 +251,8 @@ export function DesignTestPageLayout({
           </Div>
 
           <Separator />
-          <Div id="forms">
-            <FormsPreview />
+          <Div id="unified-widgets">
+            <UnifiedWidgetsPreview />
           </Div>
         </Container>
       </SidebarLayout>

@@ -38,7 +38,8 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "download",
-  category: "endpointCategories.systemDevTools",
+  category: "endpointCategories.interfaces",
+  subCategory: "endpointCategories.interfacesCli",
   tags: ["post.title"],
   allowedRoles: [
     UserRole.ADMIN,

@@ -9,6 +9,11 @@ export const translations = {
       copyright: "© {{currentYear}} {{appName}}. All rights reserved.",
       visitWebsite: "Visit Website",
       allRightsReserved: "© {{currentYear}} {{appName}}. All rights reserved.",
+      feedbackHook: "Got something to say? Reply - we actually read it.",
+      feedbackBody:
+        "Report a bug, request a feature, or tell us what's missing. Useful feedback earns 200 free credits.",
+      feedbackLink: "Reply with feedback →",
+      footerSeparator: " · ",
     },
   },
   post: {

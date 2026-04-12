@@ -233,7 +233,6 @@ const FullCard = React.memo(function FullCard({
   user: ReturnType<typeof useWidgetContext>["user"];
 }): React.JSX.Element {
   const isActive = Boolean(item.activeBadge);
-  const variantLabel = getVariantLabel(item, locale);
 
   return (
     <Div
@@ -275,11 +274,6 @@ const FullCard = React.memo(function FullCard({
               fieldName={arrayFieldPath(FAVORITES_FIELD, index, "name")}
             />
           </Span>
-          {variantLabel && (
-            <Span className="text-xs font-bold px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
-              {variantLabel}
-            </Span>
-          )}
           <TextWidget
             field={withValue(
               fieldChildren.favorites.child.children.tagline,
@@ -305,27 +299,8 @@ const FullCard = React.memo(function FullCard({
           )}
           fieldName={arrayFieldPath(FAVORITES_FIELD, index, "description")}
         />
+        {/* Model-only: skip model name (already in title), keep provider + price */}
         <Div className="flex items-center gap-1 text-xs text-muted-foreground mt-2">
-          <IconWidget
-            field={withValue(
-              fieldChildren.favorites.child.children.modelIcon,
-              item.modelIcon,
-              item,
-            )}
-            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "modelIcon")}
-          />
-          <TextWidget
-            field={withValue(
-              fieldChildren.favorites.child.children.modelInfo,
-              item.modelInfo,
-              item,
-            )}
-            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "modelInfo")}
-          />
-          <TextWidget
-            field={fieldChildren.favorites.child.children.separator1}
-            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "separator1")}
-          />
           <TextWidget
             field={withValue(
               fieldChildren.favorites.child.children.modelProvider,
@@ -536,7 +511,7 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
                   )}
                 />
                 <Span className="opacity-60">
-                  {getTtsModelById(item.voiceId).name}
+                  {getTtsModelById(item.voiceId)?.name}
                 </Span>
               </>
             ) : null}
@@ -639,10 +614,12 @@ const SortableGroup = React.memo(function SortableGroup({
     [group.id, onItemDragEnd],
   );
 
+  const isModelOnly = group.skillId === NO_SKILL_ID;
   const isSingle = group.items.length === 1;
+  const singleIsActive = isSingle && Boolean(group.items[0].activeBadge);
 
-  // Single-item group: render as full card (no group chrome)
-  if (isSingle) {
+  // Model-only: render as full card (no group chrome)
+  if (isModelOnly) {
     const item = group.items[0];
     const globalIndex = allFavorites.findIndex((f) => f.id === item.id);
     return (
@@ -674,7 +651,7 @@ const SortableGroup = React.memo(function SortableGroup({
     );
   }
 
-  // Multi-item group: character header + compact variant rows
+  // Skill group (single or multi): character header + compact variant rows
   return (
     <Div
       ref={setNodeRef as React.Ref<DivRefObject>}
@@ -687,23 +664,47 @@ const SortableGroup = React.memo(function SortableGroup({
         zIndex: isDragging ? 999 : undefined,
       }}
     >
-      <Div className="rounded-lg border overflow-hidden">
+      <Div
+        className={cn(
+          "rounded-lg border overflow-hidden transition-colors",
+          isSingle && !singleIsActive && "hover:bg-accent cursor-pointer",
+          isSingle && singleIsActive && "bg-primary/5 border-primary/20",
+        )}
+        onClick={
+          isSingle
+            ? () => !singleIsActive && void handleSelectFavorite(group.items[0])
+            : undefined
+        }
+      >
         {/* Group header - matches full card layout */}
         <Div className="group relative flex items-start gap-4 px-4 pt-4 pb-2">
-          <Div className="flex items-center justify-center rounded-lg bg-primary/10 w-12 h-12 shrink-0">
+          <Div
+            className={cn(
+              "flex items-center justify-center rounded-lg w-12 h-12 shrink-0",
+              isSingle && singleIsActive
+                ? "bg-primary/15 text-primary"
+                : "bg-primary/10",
+            )}
+          >
             <Icon icon={group.icon} className="h-6 w-6" />
           </Div>
           <Div className="flex-1 min-w-0">
             <Div className="flex items-center gap-2 flex-wrap">
-              <Span className="font-bold">{group.name}</Span>
+              <Span
+                className={cn("font-bold", singleIsActive && "text-primary")}
+              >
+                {group.name}
+              </Span>
               {group.tagline ? (
                 <Span className="text-sm text-muted-foreground">
                   {group.tagline}
                 </Span>
               ) : null}
-              <Span className="text-xs text-muted-foreground/60 bg-muted px-1.5 py-0.5 rounded-full">
-                {group.items.length}
-              </Span>
+              {group.items.length > 1 && (
+                <Span className="text-xs text-muted-foreground/60 bg-muted px-1.5 py-0.5 rounded-full">
+                  {group.items.length}
+                </Span>
+              )}
             </Div>
             {group.description ? (
               <Span className="text-xs text-muted-foreground">

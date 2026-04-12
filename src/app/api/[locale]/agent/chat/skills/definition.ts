@@ -40,6 +40,8 @@ import {
   SkillCategory,
   SkillCategoryDB,
   SkillOwnershipTypeDB,
+  SkillSourceFilter,
+  SkillSourceFilterDB,
   SkillTrustLevelDB,
 } from "./enum";
 
@@ -75,10 +77,16 @@ const { GET } = createEndpoint({
     return undefined;
   },
   icon: "sparkles" as const,
-  category: "endpointCategories.chatSkills",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.skillsManagement",
   tags: ["tags.skills" as const],
 
-  options: {},
+  options: {
+    formOptions: {
+      autoSubmit: true,
+      debounceMs: 250,
+    },
+  },
 
   aliases: [SKILLS_LIST_ALIAS],
 
@@ -123,6 +131,15 @@ const { GET } = createEndpoint({
         description: "get.fields.pageSize.description" as const,
         columns: 4,
         schema: z.number().int().min(1).max(500).optional(),
+      }),
+      sourceFilter: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.sourceFilter.label" as const,
+        description: "get.fields.sourceFilter.description" as const,
+        columns: 4,
+        schema: z.enum(SkillSourceFilterDB).default(SkillSourceFilter.BUILT_IN),
+        hidden: true,
       }),
 
       // Flattened top action buttons (no container wrapper)

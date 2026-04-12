@@ -47,6 +47,8 @@ const configSchema = z.object({
   isActive: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  /** Non-sensitive credential fields (no API keys/secrets/passwords) for pre-filling edit forms */
+  publicCredentials: z.record(z.string(), z.string()).nullable(),
 });
 
 export const { GET } = createEndpoint({
@@ -56,7 +58,8 @@ export const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "settings",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetCapture",
   tags: ["get.tag" as const],
   allowedRoles: ALLOWED_ROLES,
 
@@ -133,6 +136,7 @@ export const { GET } = createEndpoint({
           isActive: true,
           createdAt: "2024-01-15T10:00:00.000Z",
           updatedAt: "2024-01-15T10:00:00.000Z",
+          publicCredentials: null,
         },
       },
     },
@@ -146,7 +150,8 @@ export const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "trash",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetCapture",
   tags: ["delete.tag" as const],
   allowedRoles: ALLOWED_ROLES,
 

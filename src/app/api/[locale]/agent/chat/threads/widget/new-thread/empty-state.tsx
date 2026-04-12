@@ -67,7 +67,7 @@ export function ChatEmptyState({
       blue: {
         bg: "bg-blue-500/20",
         border: "border-blue-500/50",
-        text: "text-blue-500",
+        text: "text-primary",
         "hover-bg": "hover:bg-blue-500/10",
       },
     };

@@ -36,7 +36,8 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "link" as const,
-  category: "endpointCategories.userAuth",
+  category: "endpointCategories.remote",
+  subCategory: "endpointCategories.remoteInstances",
   tags: ["tags.remoteConnection" as const],
   aliases: ["remote-connect", "connect-remote"] as const,
 

@@ -25,20 +25,36 @@ import {
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import { REFERRAL_CONFIG } from "../config";
+import { REFERRAL_CONFIG, computeLevelPercentages } from "../config";
 import type definition from "./definition";
 import type { PayoutGetResponseOutput } from "./definition";
 
+function fmtPct(v: number): string {
+  const pct = v * 100;
+  const r3 = Math.round(pct * 1000) / 1000;
+  if (r3 % 1 === 0) {
+    return `${r3.toFixed(0)}%`;
+  }
+  const r1 = Math.round(pct * 10) / 10;
+  if (r1 === r3) {
+    return `${r1.toFixed(1)}%`;
+  }
+  const r2 = Math.round(pct * 100) / 100;
+  if (r2 === r3) {
+    return `${r2.toFixed(2)}%`;
+  }
+  return `${r3.toFixed(3)}%`;
+}
+
 const STATUS_COLORS: Record<string, string> = {
-  PENDING:
-    "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  APPROVED: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  REJECTED: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  PENDING: "bg-warning/10 text-warning",
+  APPROVED: "bg-info/10 text-info",
+  REJECTED: "bg-destructive/10 text-destructive",
   PROCESSING:
     "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
   COMPLETED:
     "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-  FAILED: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  FAILED: "bg-destructive/10 text-destructive",
 };
 
 interface CustomWidgetProps {
@@ -60,6 +76,13 @@ export function ReferralPayoutContainer({
       navigation.push(payoutDef.POST, { popNavigationOnSuccess: 1 });
     })();
   };
+
+  const percentages = computeLevelPercentages();
+  const directPct = fmtPct(REFERRAL_CONFIG.DIRECT_PERCENTAGE);
+  const skillBonusPct = fmtPct(percentages[1] ?? 0);
+  const skillPct = fmtPct(
+    REFERRAL_CONFIG.DIRECT_PERCENTAGE + (percentages[1] ?? 0),
+  );
 
   const available = data?.earnedCreditsAvailable ?? 0;
   const canRequestPayout = available >= REFERRAL_CONFIG.MIN_PAYOUT_CENTS;
@@ -98,7 +121,11 @@ export function ReferralPayoutContainer({
                   {
                     key: "step2",
                     title: t("payout.widget.step2Title"),
-                    body: t("payout.widget.step2Body"),
+                    body: t("payout.widget.step2Body", {
+                      directPct,
+                      skillPct,
+                      skillBonusPct,
+                    }),
                   },
                   {
                     key: "step3",
@@ -126,15 +153,13 @@ export function ReferralPayoutContainer({
         {/* Withdraw Your Earnings - state-aware */}
         <Card
           className={
-            canRequestPayout
-              ? "border-emerald-200 dark:border-emerald-800"
-              : "border-amber-200 dark:border-amber-800"
+            canRequestPayout ? "border-success/30" : "border-warning/30"
           }
         >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Wallet
-                className={`h-5 w-5 ${canRequestPayout ? "text-emerald-500" : "text-amber-500"}`}
+                className={`h-5 w-5 ${canRequestPayout ? "text-success" : "text-warning"}`}
               />
               {t("payout.widget.withdrawTitle")}
             </CardTitle>
@@ -157,7 +182,7 @@ export function ReferralPayoutContainer({
               <Div className="space-y-2">
                 <Div className="flex justify-between text-xs text-muted-foreground">
                   <Span>{t("payout.widget.progressLabel")}</Span>
-                  <Span className="text-amber-600 dark:text-amber-400 font-medium tabular-nums">
+                  <Span className="text-warning font-medium tabular-nums">
                     {`${remainingDollars} ${t("payout.widget.moreToUnlock")}`}
                   </Span>
                 </Div>
@@ -181,7 +206,7 @@ export function ReferralPayoutContainer({
 
             {/* Payout options */}
             <Div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-              <Coins className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
+              <Coins className="h-5 w-5 text-primary mt-0.5 shrink-0" />
               <Div>
                 <Div className="font-medium text-sm">
                   {t("payout.widget.useAsCredits")}
@@ -259,7 +284,7 @@ export function ReferralPayoutContainer({
                       ) : null}
                     </Div>
                     {item.rejectionReason ? (
-                      <Div className="flex items-center gap-1 mt-1 text-xs text-red-600 dark:text-red-400">
+                      <Div className="flex items-center gap-1 mt-1 text-xs text-destructive">
                         <AlertCircle className="h-3 w-3 shrink-0" />
                         <Span>{item.rejectionReason}</Span>
                       </Div>

@@ -34,6 +34,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   category: "endpointCategories.ai",
+  subCategory: "endpointCategories.aiTools",
   tags: [
     "tags.scraping" as const,
     "tags.web" as const,

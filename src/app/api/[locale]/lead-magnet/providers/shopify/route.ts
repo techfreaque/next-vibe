@@ -14,8 +14,8 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "SHOPIFY",
         {
-          shopifyDomain: data.shopifyDomain,
-          shopifyAccessToken: data.shopifyAccessToken,
+          shopifyDomain: data.shopifyDomain || undefined,
+          shopifyAccessToken: data.shopifyAccessToken || undefined,
         },
         {
           listId: data.listId ?? null,

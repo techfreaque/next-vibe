@@ -133,7 +133,6 @@ export function Selector({
           {!isModelOnly && isClient && currentSkill && (
             <Span
               className={cn(
-                "text-muted-foreground/50",
                 modelSupportsTools ? "hidden @md:inline" : "inline",
               )}
             >
@@ -142,7 +141,7 @@ export function Selector({
           )}
 
           {/* Model icon */}
-          <Span className="flex items-center justify-center w-5 h-5 shrink-0 opacity-70">
+          <Span className="flex items-center justify-center w-5 h-5 shrink-0">
             {currentModel?.icon ? (
               <Icon icon={currentModel.icon} className="h-4 w-4" />
             ) : null}
@@ -151,7 +150,7 @@ export function Selector({
           {/* Model name - hidden when container is too narrow, shown earlier when no tools */}
           <Span
             className={cn(
-              "max-w-[80px] @xl:max-w-[105px] @2xl:max-w-[140px] truncate text-muted-foreground",
+              "max-w-[80px] @xl:max-w-[105px] @2xl:max-w-[140px] truncate",
               modelSupportsTools ? "hidden @xl:inline" : "hidden @md:inline",
             )}
             suppressHydrationWarning

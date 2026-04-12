@@ -323,7 +323,7 @@ export function TanstackPage({
               body={t("firststeps.step2Body")}
             >
               <Link
-                href={`/${locale}/user/referral`}
+                href={`/${locale}/user/(account)/referral`}
                 className="text-emerald-600 dark:text-emerald-400 underline hover:text-emerald-700 dark:hover:text-emerald-300"
               >
                 {t("firststeps.step2Link")}
@@ -361,7 +361,7 @@ export function TanstackPage({
               size="lg"
               className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
             >
-              <Link href={`/${locale}/user/referral`}>
+              <Link href={`/${locale}/user/(account)/referral`}>
                 {t("close.createCode")}
                 <ArrowRight className="h-4 w-4" />
               </Link>

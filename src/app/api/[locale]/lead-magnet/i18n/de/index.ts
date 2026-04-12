@@ -119,6 +119,8 @@ export const translations = {
         label: "Aktiv",
         description: "Lead-Capture-Formular auf deiner Skill-Seite aktivieren",
       },
+      secretKeepExisting:
+        "Leer lassen, um den bestehenden Schlüssel zu behalten",
       saveTitle: "Konfiguration speichern",
       saveDescription: "Verbinde deine E-Mail-Plattform zum Erfassen von Leads",
       saveTag: "lead-magnet-provider",

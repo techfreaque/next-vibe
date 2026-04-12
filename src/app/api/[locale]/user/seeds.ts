@@ -91,16 +91,27 @@ export async function dev(
           .where(eq(users.email, user.email))
           .limit(1);
         if (results.length > 0) {
-          // Admin user (index 0): sync password from env
-          if (i === 0 && env.VIBE_ADMIN_USER_PASSWORD) {
-            const hashed = await hashPassword(env.VIBE_ADMIN_USER_PASSWORD);
+          // Admin user (index 0): sync password + profile data from env
+          if (i === 0) {
+            const adminUpdates: Record<string, string> = {};
+            if (env.VIBE_ADMIN_USER_PASSWORD) {
+              adminUpdates.password = await hashPassword(
+                env.VIBE_ADMIN_USER_PASSWORD,
+              );
+            }
             await db
               .update(users)
-              .set({ password: hashed })
+              .set({
+                ...adminUpdates,
+                bio: "Building the future of AI. Open source enthusiast, full-stack developer, and creator of unbottled.ai.",
+                websiteUrl: "https://unbottled.ai",
+                twitterUrl: "https://x.com/unbottled_ai",
+                githubUrl: "https://github.com/nicepkg",
+                youtubeUrl: "https://youtube.com/@unbottled",
+                discordUrl: "https://discord.gg/unbottled",
+              })
               .where(eq(users.id, results[0].id));
-            logger.debug(
-              `Synced admin password from VIBE_ADMIN_USER_PASSWORD env`,
-            );
+            logger.debug(`Synced admin profile data (password, bio, socials)`);
           }
 
           // Create minimal user object for now

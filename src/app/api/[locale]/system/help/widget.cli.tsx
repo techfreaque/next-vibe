@@ -75,6 +75,7 @@ function flattenValue(
   keyPath: string,
   value: CliValue,
   prefix: string,
+  isMcp = false,
 ): string[] {
   if (value === undefined || value === null) {
     return [];
@@ -85,14 +86,15 @@ function flattenValue(
   if (typeof value === "object") {
     const results: string[] = [];
     for (const [sk, sv] of Object.entries(value as CliRequestData)) {
-      results.push(...flattenValue(`${keyPath}.${sk}`, sv, prefix));
+      results.push(...flattenValue(`${keyPath}.${sk}`, sv, prefix, isMcp));
     }
     return results;
   }
-  // Strip i18n enum prefix for readability: "enums.category.coding" → "coding"
+  // Strip i18n enum prefix for CLI readability: "enums.category.coding" → "coding"
+  // MCP keeps full key so AI can pass exact values
   const display =
     typeof value === "string" && value.startsWith("enums.")
-      ? (value.split(".").pop() ?? value)
+      ? stripEnumPrefix(value, isMcp)
       : value;
   const formatted =
     typeof display === "string" ? `"${display}"` : String(display);
@@ -104,10 +106,14 @@ function flattenValue(
  * Objects expand recursively as --key.sub.subkey="value".
  * Undefined and null values are omitted.
  */
-function serializeExampleArgs(exData: CliRequestData, prefix = "--"): string {
+function serializeExampleArgs(
+  exData: CliRequestData,
+  prefix = "--",
+  isMcp = false,
+): string {
   const flags: string[] = [];
   for (const [k, v] of Object.entries(exData)) {
-    flags.push(...flattenValue(k, v, prefix));
+    flags.push(...flattenValue(k, v, prefix, isMcp));
   }
   return flags.join(" ");
 }
@@ -196,8 +202,15 @@ function isNullable(prop: JsonSchemaProperty): boolean {
   return false;
 }
 
-/** Strip i18n prefix: "enums.category.coding" → "coding" */
-function stripEnumPrefix(v: string): string {
+/**
+ * Strip i18n prefix for display: "enums.category.coding" → "coding"
+ * MCP mode: keep full key so AI can copy-paste exact values
+ * CLI mode: strip for human readability
+ */
+function stripEnumPrefix(v: string, isMcp = false): string {
+  if (isMcp) {
+    return v;
+  }
   return v.split(".").pop() ?? v;
 }
 
@@ -211,13 +224,13 @@ function inlineObjectShape(
 }
 
 /** Human-readable type label for a schema property. */
-function typeLabel(prop: JsonSchemaProperty): string {
+function typeLabel(prop: JsonSchemaProperty, isMcp = false): string {
   const resolved = resolveSchema(prop);
   const nullable = isNullable(prop) ? "|null" : "";
 
   // Single const value (literal)
   if (resolved.const !== undefined) {
-    return `"${stripEnumPrefix(resolved.const)}"${nullable}`;
+    return `"${stripEnumPrefix(resolved.const, isMcp)}"${nullable}`;
   }
 
   if (resolved.enum && resolved.enum.length > 0) {
@@ -225,7 +238,9 @@ function typeLabel(prop: JsonSchemaProperty): string {
     if (resolved.enum.length > 10) {
       return `string${nullable}`;
     }
-    return resolved.enum.map(stripEnumPrefix).join("|") + nullable;
+    return (
+      resolved.enum.map((v) => stripEnumPrefix(v, isMcp)).join("|") + nullable
+    );
   }
 
   // Array - show item shape if available
@@ -245,7 +260,7 @@ function typeLabel(prop: JsonSchemaProperty): string {
         if (itemResolved.enum.length > 10) {
           return `string[]${nullable}`;
         }
-        return `(${itemResolved.enum.map(stripEnumPrefix).join("|")})[]${nullable}`;
+        return `(${itemResolved.enum.map((v) => stripEnumPrefix(v, isMcp)).join("|")})[]${nullable}`;
       }
       const itemType = Array.isArray(itemResolved.type)
         ? itemResolved.type.filter((x) => x !== "null").join("|")
@@ -302,6 +317,7 @@ function collectParamRows(
   indent = 0,
   depth = 0,
   parentRequired = true,
+  isMcp = false,
 ): ParamRow[] {
   const rows: ParamRow[] = [];
   for (const [key, rawProp] of Object.entries(props)) {
@@ -327,6 +343,7 @@ function collectParamRows(
           indent,
           depth + 1,
           subParentRequired,
+          isMcp,
         ),
       );
     } else {
@@ -334,7 +351,7 @@ function collectParamRows(
         key: fullKey,
         indent,
         required: isReq,
-        typeStr: typeLabel(rawProp),
+        typeStr: typeLabel(rawProp, isMcp),
         description: rawProp.description ?? "",
       });
     }
@@ -393,7 +410,7 @@ function renderDetailCli(tool: HelpToolItem): string {
     if (props && Object.keys(props).length > 0) {
       lines.push("");
       lines.push(chalk.bold("Parameters"));
-      const rows = collectParamRows(props, required);
+      const rows = collectParamRows(props, required, "", 0, 0, true, false);
       // Cap key column at 28 chars - avoids blowout from long sub-keys
       const KEY_COL = Math.min(
         Math.max(...rows.map((r) => r.key.length + r.indent * 2), 4),
@@ -438,7 +455,7 @@ function renderDetailCli(tool: HelpToolItem): string {
       for (const [exName, exData] of exampleEntries) {
         const flags: string[] = [];
         for (const [k, v] of Object.entries(exData)) {
-          for (const flag of flattenValue(k, v, "--")) {
+          for (const flag of flattenValue(k, v, "--", false)) {
             flags.push(flag);
           }
         }
@@ -477,7 +494,7 @@ function renderDetailMcp(tool: HelpToolItem): string {
     if (props && Object.keys(props).length > 0) {
       lines.push("");
       lines.push("Parameters:");
-      const rows = collectParamRows(props, required);
+      const rows = collectParamRows(props, required, "", 0, 0, true, true);
       for (const row of rows) {
         const pad = " ".repeat(row.indent * 2);
         const req = row.required ? ", required" : "";
@@ -493,7 +510,7 @@ function renderDetailMcp(tool: HelpToolItem): string {
       lines.push("");
       lines.push("Examples:");
       for (const [exName, exData] of exampleEntries) {
-        const args = serializeExampleArgs(exData);
+        const args = serializeExampleArgs(exData, "--", true);
         lines.push(`  ${exName}: vibe ${tool.name} ${args}`);
       }
     }
@@ -505,7 +522,11 @@ function renderDetailMcp(tool: HelpToolItem): string {
 // ── Category Overview ────────────────────────────────────────────────────
 
 function renderCategoriesCli(
-  categories: { name: string; count: number }[],
+  categories: {
+    name: string;
+    count: number;
+    subCategories?: { name: string; count: number }[];
+  }[],
   totalCount: number,
 ): string {
   const lines: string[] = [];
@@ -518,27 +539,50 @@ function renderCategoriesCli(
   for (const cat of categories) {
     const padded = cat.name.padEnd(maxNameLen + 2);
     lines.push(
-      `  ${chalk.blue(padded)}${chalk.dim(`${cat.count} tool${cat.count !== 1 ? "s" : ""}`)}`,
+      `  ${chalk.bold.blue(padded)}${chalk.dim(`${cat.count} tool${cat.count !== 1 ? "s" : ""}`)}`,
     );
+    if (cat.subCategories && cat.subCategories.length > 0) {
+      for (const sub of cat.subCategories) {
+        const subPadded = sub.name.padEnd(maxNameLen);
+        lines.push(
+          `    ${chalk.cyan(subPadded)}  ${chalk.dim(`${sub.count}`)}`,
+        );
+      }
+    }
   }
 
   lines.push("");
-  lines.push(chalk.dim(`Use: vibe help --category="<name>" to filter`));
+  lines.push(
+    chalk.dim(
+      `Use: vibe help --category="<name>" or --subCategory="<name>" to filter`,
+    ),
+  );
 
   return lines.join("\n");
 }
 
 function renderCategoriesMcp(
-  categories: { name: string; count: number }[],
+  categories: {
+    name: string;
+    count: number;
+    subCategories?: { name: string; count: number }[];
+  }[],
   totalCount: number,
 ): string {
   const lines: string[] = [];
   lines.push(`Tool Categories (${totalCount} tools)`);
   for (const cat of categories) {
     lines.push(`  ${cat.name}: ${cat.count} tools`);
+    if (cat.subCategories && cat.subCategories.length > 0) {
+      for (const sub of cat.subCategories) {
+        lines.push(`    ${sub.name}: ${sub.count}`);
+      }
+    }
   }
   lines.push("");
-  lines.push(`Use category="<name>" to filter, toolName="<name>" for detail.`);
+  lines.push(
+    `Use category="<name>" or subCategory="<name>" to filter, toolName="<name>" for detail.`,
+  );
   return lines.join("\n");
 }
 
@@ -561,30 +605,40 @@ function renderToolListCli(
   lines.push(chalk.bold(`Available Tools`) + chalk.dim(` (${showing})`));
   lines.push("");
 
-  // Group by category
-  const groups = new Map<string, HelpToolItem[]>();
+  // Group by category → subCategory
+  const groups = new Map<string, Map<string, HelpToolItem[]>>();
   for (const tool of tools) {
     const cat = tool.category || "Other";
-    const existing = groups.get(cat) ?? [];
+    const sub = tool.subCategory ?? cat;
+    const subMap = groups.get(cat) ?? new Map<string, HelpToolItem[]>();
+    const existing = subMap.get(sub) ?? [];
     existing.push(tool);
-    groups.set(cat, existing);
+    subMap.set(sub, existing);
+    groups.set(cat, subMap);
   }
 
   // Find longest tool name for alignment
   const maxNameLen = Math.max(...tools.map((t) => t.name.length), 8);
 
-  for (const [category, categoryTools] of groups) {
+  for (const [category, subMap] of groups) {
     lines.push(`  ${chalk.bold.underline(category)}`);
-    for (const tool of categoryTools) {
-      const name = chalk.green(tool.name.padEnd(maxNameLen + 1));
-      const desc = chalk.dim(
-        tool.description.length > 60
-          ? `${tool.description.slice(0, 57)}...`
-          : tool.description,
-      );
-      const credits = formatCredits(tool.credits);
-      const creditsStr = credits ? ` ${chalk.yellow(credits)}` : "";
-      lines.push(`    ${name} ${desc}${creditsStr}`);
+    for (const [sub, subTools] of subMap) {
+      // Only print subCategory header if it differs from category and there are multiple subCategories
+      if (subMap.size > 1 && sub !== category) {
+        lines.push(`    ${chalk.dim(sub)}`);
+      }
+      for (const tool of subTools) {
+        const name = chalk.green(tool.name.padEnd(maxNameLen + 1));
+        const desc = chalk.dim(
+          tool.description.length > 60
+            ? `${tool.description.slice(0, 57)}...`
+            : tool.description,
+        );
+        const credits = formatCredits(tool.credits);
+        const creditsStr = credits ? ` ${chalk.yellow(credits)}` : "";
+        const indent = subMap.size > 1 && sub !== category ? "      " : "    ";
+        lines.push(`${indent}${name} ${desc}${creditsStr}`);
+      }
     }
     lines.push("");
   }
@@ -697,7 +751,7 @@ export function HelpToolsWidget({ field }: CliWidgetProps): JSX.Element {
 
   return (
     <Box flexDirection="column">
-      <Text wrap="end">{output}</Text>
+      <Text wrap="truncate-end">{output}</Text>
     </Box>
   );
 }

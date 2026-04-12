@@ -186,26 +186,7 @@ export const getTourSteps = (
       // Allow user to click the selector to open it
       blockTargetInteraction: false,
     },
-    // Step 3: Companion variants - shown inside the open selector after onboarding completes
-    {
-      target: getTourSelector(TOUR_DATA_ATTRS.FAVORITES_COMPANION_GROUP),
-      content: (
-        <Div className="space-y-2">
-          <H3 className="text-lg font-semibold">
-            {t("components.welcomeTour.companionVariants.title")}
-          </H3>
-          <P className="text-sm">
-            {t("components.welcomeTour.companionVariants.description")}
-          </P>
-          <P className="text-xs text-muted-foreground">
-            {t("components.welcomeTour.companionVariants.tip")}
-          </P>
-        </Div>
-      ),
-      placement: TOUR_PLACEMENTS.BOTTOM,
-      skipBeacon: true,
-    },
-    // Step 4: Browse Skills button - discover more specialists
+    // Step 3: Browse Skills button - discover more specialists
     {
       target: getTourSelector(TOUR_DATA_ATTRS.FAVORITES_BROWSE_SKILLS),
       content: (
@@ -472,13 +453,13 @@ export const getTourSteps = (
       content: (
         <Div className="space-y-3">
           <H3 className="text-lg font-semibold flex items-center gap-2">
-            <Icon icon="phone" className="h-5 w-5 text-green-500" />
+            <Icon icon="phone" className="h-5 w-5 text-success" />
             {t("components.welcomeTour.callMode.title")}
           </H3>
           <P className="text-sm">
             {t("components.welcomeTour.callMode.description")}
           </P>
-          <P className="text-sm font-semibold text-green-500">
+          <P className="text-sm font-semibold text-success">
             {t("components.welcomeTour.callMode.tip")}
           </P>
         </Div>

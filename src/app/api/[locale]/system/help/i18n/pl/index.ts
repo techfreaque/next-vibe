@@ -22,6 +22,10 @@ export const translations: typeof enTranslations = {
         label: "Filtr kategorii",
         description: "Filtruj narzędzia według nazwy kategorii",
       },
+      subCategory: {
+        label: "Filtr podkategorii",
+        description: "Filtruj narzędzia według nazwy podkategorii",
+      },
       toolName: {
         label: "Nazwa narzędzia (szczegóły)",
         description: "Pobierz pełne szczegóły dla konkretnego narzędzia.",

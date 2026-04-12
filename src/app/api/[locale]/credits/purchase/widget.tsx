@@ -154,7 +154,7 @@ export function CreditsPurchaseContainer({
               className="h-auto p-4 justify-start"
               onClick={() => handleProviderSelect(PaymentProvider.STRIPE)}
             >
-              <CreditCard className="h-6 w-6 text-blue-600 mr-3" />
+              <CreditCard className="h-6 w-6 text-primary mr-3" />
               <Div className="text-left">
                 <Div className="font-semibold">{t("post.provider.stripe")}</Div>
                 <Div className="text-sm text-muted-foreground">
@@ -180,7 +180,7 @@ export function CreditsPurchaseContainer({
               </Div>
             </Button>
             {isCryptoDisabled && (
-              <Div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 p-3 text-sm text-amber-700 dark:text-amber-300">
+              <Div className="flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
                 <Info className="h-4 w-4 mt-0.5 shrink-0" />
                 {t("post.provider.cryptoMinimumDisabled", {
                   min: MIN_QTY_CRYPTO,
@@ -210,7 +210,7 @@ export function CreditsPurchaseContainer({
           {/* Features */}
           <Div className="flex flex-col gap-3 text-sm">
             <Div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-green-600" />
+              <Sparkles className="h-4 w-4 text-success" />
               <Span>
                 {t("post.pack.features.credits", {
                   count: packCredits,
@@ -218,11 +218,11 @@ export function CreditsPurchaseContainer({
               </Span>
             </Div>
             <Div className="flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-green-600" />
+              <AlertCircle className="h-4 w-4 text-success" />
               <Span>{t("post.pack.features.expiry")}</Span>
             </Div>
             <Div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-blue-600" />
+              <TrendingUp className="h-4 w-4 text-info" />
               <Span>{t("post.pack.features.bestFor")}</Span>
             </Div>
           </Div>
@@ -316,8 +316,8 @@ export function CreditsPurchaseContainer({
               )}
             </Div>
           ) : (
-            <Div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-              <Div className="text-sm text-amber-700 dark:text-amber-300">
+            <Div className="mt-4 p-3 rounded-lg bg-warning/10 border border-warning/30">
+              <Div className="text-sm text-warning">
                 <Info className="h-4 w-4 inline mr-2" />
                 {t("post.pack.requiresSubscription")}
               </Div>

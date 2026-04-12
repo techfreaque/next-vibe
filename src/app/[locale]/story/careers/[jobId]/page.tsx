@@ -14,13 +14,13 @@ import { Ul } from "next-vibe-ui/ui/ul";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
-import { scopedTranslation } from "./i18n";
 import { scopedTranslation as careersScopedTranslation } from "../i18n";
+import { scopedTranslation } from "./i18n";
 
 interface JobType {
   title: string;
@@ -100,6 +100,7 @@ export interface JobPostingPageData {
   locale: CountryLanguage;
   job: JobType;
   otherJobs: Array<{ key: string; job: JobType }>;
+  supportMail: string;
 }
 
 export async function tanstackLoader({
@@ -203,13 +204,19 @@ export async function tanstackLoader({
     .slice(0, 2)
     .map(([key, j]) => ({ key, job: j }));
 
-  return { locale, job, otherJobs };
+  return {
+    locale,
+    job,
+    otherJobs,
+    supportMail: contactClientRepository.getSupportEmail(locale),
+  };
 }
 
 export function TanstackPage({
   locale,
   job,
   otherJobs,
+  supportMail,
 }: JobPostingPageData): JSX.Element {
   const { t } = careersScopedTranslation.scopedT(locale);
 
@@ -419,7 +426,7 @@ export function TanstackPage({
 
                       <Button className="w-full" asChild>
                         <Link
-                          href={`mailto:${contactClientRepository.getSupportEmail(locale)}?subject=Application for ${job.title}`}
+                          href={`mailto:${supportMail}?subject=Application for ${job.title}`}
                         >
                           {t("applyNow")}
                         </Link>

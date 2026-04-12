@@ -1,14 +1,13 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Wrench } from "next-vibe-ui/ui/icons/Wrench";
 import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React from "react";
 
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
@@ -42,8 +41,7 @@ export function ToolsButton({
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const { settings } = useChatSettings(user, logger);
-  const env = useEnvAvailability();
-  const defaults = ChatSettingsRepositoryClient.getDefaults(user, env);
+  const defaults = ChatSettingsRepositoryClient.getDefaults(user);
   const effectiveSettings = settings ?? defaults;
 
   // Compute enabledTools from settings (same logic as the old useChat hook)

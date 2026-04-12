@@ -14,11 +14,11 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "SALESMANAGO",
         {
-          salesManagoClientId: data.salesManagoClientId,
-          salesManagoApiKey: data.salesManagoApiKey,
-          salesManagoSha: data.salesManagoSha,
-          salesManagoDomain: data.salesManagoDomain,
-          salesManagoOwner: data.salesManagoOwner,
+          salesManagoClientId: data.salesManagoClientId || undefined,
+          salesManagoApiKey: data.salesManagoApiKey || undefined,
+          salesManagoSha: data.salesManagoSha || undefined,
+          salesManagoDomain: data.salesManagoDomain || undefined,
+          salesManagoOwner: data.salesManagoOwner || undefined,
         },
         {
           listId: data.listId ?? null,

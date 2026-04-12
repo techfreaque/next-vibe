@@ -64,7 +64,7 @@ export default function TrackPage({
   return (
     <Div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <Div className="text-center">
-        <Div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
+        <Div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
         <P className="text-gray-600 dark:text-gray-400">
           {t("tracking.redirecting")}
         </P>

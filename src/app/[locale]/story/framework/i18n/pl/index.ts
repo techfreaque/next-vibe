@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
     title: "Jedna definicja.",
     titleAccent: "Trzynaście platform.",
     subtitle:
-      "next-vibe zamienia pojedynczą definicję TypeScript w trzynaście platform naraz - formularz web, polecenie CLI, narzędzie MCP, ekran mobilny, cron job, WebSocket, panel admina i więcej. Pełne bezpieczeństwo typów, zero dryfu, zero powtórzeń.",
+      "next-vibe zamienia pojedynczą definicję TypeScript w trzynaście platform naraz - dedykowany interfejs web, polecenie CLI, narzędzie MCP, ekran mobilny, cron job, WebSocket, panel admina i więcej. Pełne bezpieczeństwo typów, zero dryfu, zero powtórzeń.",
     ctaGithub: "Daj gwiazdkę na GitHub",
     ctaDocs: "Czytaj dokumentację wzorców",
     stat1Label: "typed endpoints",
@@ -32,7 +32,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Problem",
     title: "Budowałeś to samo trzynaście razy.",
     subtitle:
-      "Każdy feature potrzebuje formularza web, polecenia CLI, narzędzia MCP, ekranu mobilnego, cron joba, handlera WebSocket, panelu admina i więcej. Ta sama walidacja, ten sam i18n, ta sama obsługa błędów - tylko inaczej ubrana. Za każdym razem.",
+      "Każdy feature potrzebuje własnego interfejsu web, polecenia CLI, narzędzia MCP, ekranu mobilnego, cron joba, handlera WebSocket, panelu admina i więcej. Ta sama walidacja, ten sam i18n, ta sama obsługa błędów - tylko inaczej ubrana. Za każdym razem.",
     callout: "next-vibe buduje wszystkie trzynaście z jednego pliku.",
   },
   pattern: {
@@ -48,7 +48,7 @@ export const translations: typeof enTranslations = {
       "Logika biznesowa żyje tu - zapytania DB, sprawdzanie uprawnień, obsługa błędów z success()/fail(). Plik route.ts to tylko cienki delegator; walidacja, logowanie i rejestracja platform działają automatycznie.",
     widgetTitle: "widget.tsx - UI (opcjonalny)",
     widgetBody:
-      "Bez widgetu framework automatycznie renderuje pola na każdej platformie. Dodaj widget.tsx, żeby w pełni kontrolować wygląd na web i native - ten sam komponent renderuje w panelach admina, osadzonych widgetach i ekranach mobilnych.",
+      "Bez widgetu framework automatycznie renderuje pola wszędzie. Dodaj widget.tsx, żeby dostarczyć w pełni customowy interaktywny interfejs - ten sam komponent renderuje w panelach admina, osadzonych widgetach i ekranach mobilnych.",
     deleteLine: "Usuń folder. Feature znika z każdej platformy naraz.",
   },
   surfaces: {
@@ -63,7 +63,7 @@ export const translations: typeof enTranslations = {
       },
       reactUi: {
         label: "React UI",
-        description: "Automatycznie generowany formularz - bez JSX",
+        description: "Dedykowany interaktywny interfejs - bez JSX",
       },
       cli: {
         label: "CLI",

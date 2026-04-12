@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -25,7 +25,9 @@ import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-sp
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { ensureUniqueSlug, generateFavoriteSlug, isUuid } from "../../slugify";
 import { scopedTranslation as charactersScopedTranslation } from "../../skills/i18n";
+import { FavoritesCreateRepository } from "../create/repository";
 import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
 import type {
@@ -84,6 +86,25 @@ function normalizeImageGenSelection(
  */
 export class SingleFavoriteRepository {
   /**
+   * Resolve a favorite by slug or UUID within a user's favorites.
+   */
+  private static resolveFavoriteCondition(
+    favoriteId: string,
+    userId: string,
+  ): ReturnType<typeof and> {
+    if (isUuid(favoriteId)) {
+      return and(
+        eq(chatFavorites.id, favoriteId),
+        eq(chatFavorites.userId, userId),
+      );
+    }
+    return and(
+      eq(chatFavorites.slug, favoriteId),
+      eq(chatFavorites.userId, userId),
+    );
+  }
+
+  /**
    * Get a single favorite by ID
    */
   static async getFavorite(
@@ -113,9 +134,9 @@ export class SingleFavoriteRepository {
         .select()
         .from(chatFavorites)
         .where(
-          and(
-            eq(chatFavorites.id, urlPathParams.id),
-            eq(chatFavorites.userId, userId),
+          SingleFavoriteRepository.resolveFavoriteCondition(
+            urlPathParams.id,
+            userId,
           ),
         )
         .limit(1);
@@ -247,15 +268,12 @@ export class SingleFavoriteRepository {
         });
       }
 
-      // First, get the existing favorite
+      // First, get the existing favorite (resolve by slug or UUID)
       const [existing] = await db
         .select()
         .from(chatFavorites)
         .where(
-          and(
-            eq(chatFavorites.id, favoriteId),
-            eq(chatFavorites.userId, userId),
-          ),
+          SingleFavoriteRepository.resolveFavoriteCondition(favoriteId, userId),
         )
         .limit(1);
 
@@ -324,10 +342,56 @@ export class SingleFavoriteRepository {
       // Store modelSelection directly (null = use character defaults)
       const modelSelectionToStore = data.modelSelection;
 
+      // Regenerate slug if skill, variant, or customVariantName changed
+      const newSkillId = data.skillId ?? existing.skillId;
+      const newVariantId =
+        data.variantId !== undefined
+          ? data.variantId || null
+          : existing.variantId;
+      const newCustomVariantName =
+        data.customVariantName !== undefined
+          ? data.customVariantName || null
+          : existing.customVariantName;
+
+      let slugUpdate: string | undefined;
+      if (
+        newSkillId !== existing.skillId ||
+        newVariantId !== existing.variantId ||
+        newCustomVariantName !== existing.customVariantName
+      ) {
+        const skillSlug = FavoritesCreateRepository.resolveSkillSlug(
+          newSkillId,
+          character?.name ?? null,
+        );
+        const baseSlug = generateFavoriteSlug({
+          customVariantName: newCustomVariantName,
+          skillSlug,
+          variantId: newVariantId,
+        });
+        const existingSlugs = await db
+          .select({ slug: chatFavorites.slug })
+          .from(chatFavorites)
+          .where(
+            and(
+              eq(chatFavorites.userId, userId),
+              sql`${chatFavorites.slug} LIKE ${`${baseSlug}%`}`,
+              // Exclude the current favorite from collision check
+              sql`${chatFavorites.id} != ${existing.id}`,
+            ),
+          );
+        slugUpdate = ensureUniqueSlug(
+          baseSlug || "favorite",
+          existingSlugs.map((r) => r.slug),
+        );
+      }
+
       const [updated] = await db
         .update(chatFavorites)
         .set({
+          ...(slugUpdate !== undefined ? { slug: slugUpdate } : {}),
           skillId: data.skillId,
+          variantId:
+            data.variantId !== undefined ? data.variantId || null : undefined,
           customVariantName:
             data.customVariantName !== undefined
               ? data.customVariantName || null
@@ -353,7 +417,7 @@ export class SingleFavoriteRepository {
         })
         .where(
           and(
-            eq(chatFavorites.id, favoriteId),
+            eq(chatFavorites.id, existing.id),
             eq(chatFavorites.userId, userId),
           ),
         )
@@ -426,9 +490,9 @@ export class SingleFavoriteRepository {
       const result = await db
         .delete(chatFavorites)
         .where(
-          and(
-            eq(chatFavorites.id, urlPathParams.id),
-            eq(chatFavorites.userId, userId),
+          SingleFavoriteRepository.resolveFavoriteCondition(
+            urlPathParams.id,
+            userId,
           ),
         )
         .returning();

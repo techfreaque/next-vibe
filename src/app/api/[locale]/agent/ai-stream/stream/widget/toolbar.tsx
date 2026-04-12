@@ -3,7 +3,6 @@
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
@@ -28,7 +27,6 @@ interface ChatToolbarProps {
 export function ChatToolbar({ locale }: ChatToolbarProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  const env = useEnvAvailability();
   const { initialSettingsData } = useChatBootContext();
   const { settings, setViewMode: onViewModeChange } = useChatSettings(
     user,
@@ -37,7 +35,7 @@ export function ChatToolbar({ locale }: ChatToolbarProps): JSX.Element {
   );
   const viewMode =
     settings?.viewMode ??
-    ChatSettingsRepositoryClient.getDefaults(user, env).viewMode;
+    ChatSettingsRepositoryClient.getDefaults(user).viewMode;
   return (
     <Div className="absolute right-4 top-4 z-40 flex gap-1">
       {/* Thread view mode toggle */}

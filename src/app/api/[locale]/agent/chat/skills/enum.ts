@@ -130,29 +130,6 @@ export const ContentLevelDB = [
 ] as const;
 
 /**
- * Speed Level Enum (actual model tiers, no ANY)
- * How fast the model should respond
- */
-export const {
-  enum: SpeedLevel,
-  options: SpeedLevelOptions,
-  Value: SpeedLevelValue,
-} = createEnumOptions(scopedTranslation, {
-  FAST: "enums.speed.fast",
-  BALANCED: "enums.speed.balanced",
-  THOROUGH: "enums.speed.thorough",
-});
-
-/**
- * Database enum array for Drizzle
- */
-export const SpeedLevelDB = [
-  SpeedLevel.FAST,
-  SpeedLevel.BALANCED,
-  SpeedLevel.THOROUGH,
-] as const;
-
-/**
  * Model Sort Field Enum
  */
 export const {
@@ -162,14 +139,12 @@ export const {
 } = createEnumOptions(modelsScopedTranslation, {
   INTELLIGENCE: "sort.intelligence",
   PRICE: "sort.price",
-  SPEED: "sort.speed",
   CONTENT: "sort.content",
 });
 
 export const ModelSortFieldDB = [
   ModelSortField.INTELLIGENCE,
   ModelSortField.PRICE,
-  ModelSortField.SPEED,
   ModelSortField.CONTENT,
 ] as const;
 
@@ -259,27 +234,6 @@ export const CONTENT_DISPLAY: TierDisplayConfig<typeof ContentLevelValue>[] = [
     label: "tiers.content.uncensored",
     icon: "shield-off",
     description: "tiers.content.uncensoredDesc",
-  },
-];
-
-export const SPEED_DISPLAY: TierDisplayConfig<typeof SpeedLevelValue>[] = [
-  {
-    value: SpeedLevel.FAST,
-    label: "tiers.speed.fast",
-    icon: "zap",
-    description: "tiers.speed.fastDesc",
-  },
-  {
-    value: SpeedLevel.BALANCED,
-    label: "tiers.speed.balanced",
-    icon: "scale",
-    description: "tiers.speed.balancedDesc",
-  },
-  {
-    value: SpeedLevel.THOROUGH,
-    label: "tiers.speed.thorough",
-    icon: "microscope",
-    description: "tiers.speed.thoroughDesc",
   },
 ];
 
@@ -379,6 +333,29 @@ export const SkillOwnershipTypeDB = [
   SkillOwnershipType.SYSTEM,
   SkillOwnershipType.USER,
   SkillOwnershipType.PUBLIC,
+] as const;
+
+/**
+ * Skill Source Filter Enum
+ * UI filter for skills list - uses friendly labels from enums.source.*
+ * ALL is available for CLI/MCP but hidden in web UI (default: BUILT_IN)
+ */
+export const {
+  enum: SkillSourceFilter,
+  options: SkillSourceFilterOptions,
+  Value: SkillSourceFilterValue,
+} = createEnumOptions(scopedTranslation, {
+  ALL: "enums.source.all",
+  BUILT_IN: "enums.source.builtIn",
+  COMMUNITY: "enums.source.community",
+  MY: "enums.source.my",
+});
+
+export const SkillSourceFilterDB = [
+  SkillSourceFilter.ALL,
+  SkillSourceFilter.BUILT_IN,
+  SkillSourceFilter.COMMUNITY,
+  SkillSourceFilter.MY,
 ] as const;
 
 /**

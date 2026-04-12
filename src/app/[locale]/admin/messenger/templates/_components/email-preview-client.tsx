@@ -225,8 +225,8 @@ export function EmailPreviewClient({
           )}
 
           {previewEndpoint.create && previewEndpoint.create.error && (
-            <Div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-              <P className="text-red-600 dark:text-red-400">
+            <Div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4">
+              <P className="text-destructive">
                 {previewEndpoint.create.error.message}
               </P>
             </Div>

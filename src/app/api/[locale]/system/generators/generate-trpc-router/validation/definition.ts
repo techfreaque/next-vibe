@@ -34,7 +34,8 @@ export const { POST } = createEndpoint({
   scopedTranslation,
   title: "title",
   description: "description",
-  category: "endpointCategories.systemDevTools",
+  category: "endpointCategories.devTools",
+  subCategory: "endpointCategories.devToolsGenerators",
   tags: ["tags.trpc", "tags.validation"],
   icon: "code",
   allowedRoles: [

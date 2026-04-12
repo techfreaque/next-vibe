@@ -147,7 +147,7 @@ function FormLabel({ className, children }: FormLabelProps): React.JSX.Element {
 
   return (
     <Label
-      className={cn(error && "text-red-600 dark:text-red-400", className)}
+      className={cn(error && "text-destructive", className)}
       htmlFor={formItemId}
     >
       {children}
@@ -229,7 +229,7 @@ function FormMessage({
   return (
     <P
       id={formMessageId}
-      className="text-[0.8rem] font-medium text-red-600 dark:text-red-400"
+      className="text-[0.8rem] font-medium text-destructive"
     >
       {t(String(body))}
     </P>

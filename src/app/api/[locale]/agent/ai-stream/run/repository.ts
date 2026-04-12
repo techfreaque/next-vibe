@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -109,7 +109,7 @@ export class AiStreamRunRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: AiStreamT,
-    streamContext?: ToolExecutionContext,
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<AiStreamRunPostResponseOutput>> {
     try {
       const {
@@ -173,9 +173,9 @@ export class AiStreamRunRepository {
               modelId: undefined,
               favoriteId: undefined,
               headless: undefined,
-              imageGenModelId: undefined,
-              musicGenModelId: undefined,
-              videoGenModelId: undefined,
+              imageGenModelSelection: undefined,
+              musicGenModelSelection: undefined,
+              videoGenModelSelection: undefined,
               waitingForRemoteResult: undefined,
               pendingEscalatedTaskId: undefined,
               cancelPendingStreamTimer: undefined,
@@ -183,6 +183,7 @@ export class AiStreamRunRepository {
               escalateToTask: undefined,
               callerCallbackMode: undefined,
               onEscalatedTaskCancel: undefined,
+              variantId: undefined,
               isRevival: false,
             },
           );
@@ -232,7 +233,10 @@ export class AiStreamRunRepository {
             .from(chatFavorites)
             .where(
               and(
-                eq(chatFavorites.id, favoriteId),
+                or(
+                  eq(chatFavorites.id, favoriteId),
+                  eq(chatFavorites.slug, favoriteId),
+                ),
                 eq(chatFavorites.userId, userId),
               ),
             )
@@ -251,6 +255,36 @@ export class AiStreamRunRepository {
                 requiresConfirmation: entry.requiresConfirmation ?? false,
               }));
             }
+          }
+        }
+      }
+
+      // ── Step 2b: Resolve tool config from skill definition if needed ─────
+      // When skill is set and tools are still not resolved, load from the skill's
+      // availableTools / pinnedTools config (same as interactive chat does).
+      if (skill && (!resolvedPinnedTools || !resolvedAvailableTools)) {
+        const skillDef = await SkillsRepository.getSkillById(
+          { id: skill },
+          user,
+          logger,
+          locale,
+        );
+        if (skillDef.success) {
+          const {
+            availableTools: skillAvailableTools,
+            pinnedTools: skillPinnedTools,
+          } = skillDef.data;
+          if (!resolvedAvailableTools && skillAvailableTools) {
+            resolvedAvailableTools = skillAvailableTools.map((entry) => ({
+              toolId: entry.toolId,
+              requiresConfirmation: entry.requiresConfirmation ?? false,
+            }));
+          }
+          if (!resolvedPinnedTools && skillPinnedTools) {
+            resolvedPinnedTools = skillPinnedTools.map((entry) => ({
+              toolId: entry.toolId,
+              requiresConfirmation: entry.requiresConfirmation ?? false,
+            }));
           }
         }
       }
@@ -276,7 +310,10 @@ export class AiStreamRunRepository {
             .from(chatFavorites)
             .where(
               and(
-                eq(chatFavorites.id, streamContext.favoriteId),
+                or(
+                  eq(chatFavorites.id, streamContext.favoriteId),
+                  eq(chatFavorites.slug, streamContext.favoriteId),
+                ),
                 eq(chatFavorites.userId, userId),
               ),
             )
@@ -317,7 +354,7 @@ export class AiStreamRunRepository {
         pinnedTools: resolvedPinnedTools ?? defaultTools, // default: base tools; null = all tools
         availableTools: resolvedAvailableTools ?? null, // null = all tools permitted
         headlessInstructions: effectiveInstructions,
-        maxTurns: maxTurns ?? 1,
+        maxTurns,
         threadId: appendThreadId,
         subFolderId,
         rootFolderId,
@@ -327,6 +364,18 @@ export class AiStreamRunRepository {
         locale,
         logger,
         t,
+        // Emit partial tool result with threadId so the parent UI can start
+        // rendering sub-thread messages before the headless stream finishes.
+        onThreadCreated: streamContext?.emitPartialToolResult
+          ? async (subThreadId: string): Promise<void> => {
+              await streamContext.emitPartialToolResult!({
+                threadId: subThreadId,
+              });
+            }
+          : undefined,
+        // Propagate parent cancellation: when the parent stream is aborted,
+        // the sub-agent stream stops too.
+        abortSignal: streamContext.abortSignal,
       });
 
       if (!streamResult.success) {
@@ -342,6 +391,7 @@ export class AiStreamRunRepository {
       let rawText: string | null = lastAiMessageContent ?? null;
       let promptTokens: number | null = null;
       let completionTokens: number | null = null;
+      let creditCost: number | null = null;
 
       if (!isIncognito) {
         const [aiMessage] = await db
@@ -356,6 +406,7 @@ export class AiStreamRunRepository {
         rawText = aiMessage?.content ?? rawText;
         promptTokens = aiMessage?.metadata?.promptTokens ?? null;
         completionTokens = aiMessage?.metadata?.completionTokens ?? null;
+        creditCost = aiMessage?.metadata?.creditCost ?? null;
       }
 
       const text = rawText
@@ -398,6 +449,7 @@ export class AiStreamRunRepository {
         threadCreatedAt,
         promptTokens,
         completionTokens,
+        creditCost,
         preCallResults: preCallResults.map((r) => ({
           routeId: r.routeId,
           success: r.success,

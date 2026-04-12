@@ -13,7 +13,6 @@ import { BuyTab } from "@/app/[locale]/subscription/components/buy-tab";
 import { OverviewTab } from "@/app/[locale]/subscription/components/overview-tab";
 import { SubscriptionHeader } from "@/app/[locale]/subscription/components/subscription-header";
 import { SubscriptionTabsNav } from "@/app/[locale]/subscription/components/subscription-tabs-nav";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import creditsDefinition from "@/app/api/[locale]/credits/definition";
@@ -36,7 +35,6 @@ interface SubscriptionPageClientProps {
   initialHistory: CreditsHistoryGetResponseOutput | null;
   hasPaymentProvider: boolean;
   isAdmin: boolean;
-  envAvailability: AgentEnvAvailability;
 }
 
 export function SubscriptionPageClient({
@@ -49,7 +47,6 @@ export function SubscriptionPageClient({
   initialHistory,
   hasPaymentProvider,
   isAdmin,
-  envAvailability,
 }: SubscriptionPageClientProps): JSX.Element {
   return (
     <Container className="py-8 flex flex-col gap-8">
@@ -64,6 +61,10 @@ export function SubscriptionPageClient({
         endpointOptions={{
           read: {
             initialData: initialCredits || undefined,
+            queryOptions: {
+              staleTime: 0,
+              refetchOnWindowFocus: true,
+            },
           },
         }}
       />
@@ -92,8 +93,7 @@ export function SubscriptionPageClient({
       {activeTab === "overview" && (
         <OverviewTab
           locale={locale}
-          envAvailability={envAvailability}
-          totalModelCount={getAvailableModelCount(envAvailability, isAdmin)}
+          totalModelCount={getAvailableModelCount(isAdmin)}
           isAdmin={isAdmin}
           onSwitchTab={() => {
             // Navigation handled by SubscriptionTabsNav links
@@ -123,6 +123,10 @@ export function SubscriptionPageClient({
                   targetLeadId: undefined,
                 },
                 initialData: initialHistory || undefined,
+                queryOptions: {
+                  staleTime: 0,
+                  refetchOnWindowFocus: true,
+                },
               },
             }}
           />

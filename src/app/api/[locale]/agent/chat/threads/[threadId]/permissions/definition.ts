@@ -33,7 +33,8 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "shield",
-  category: "endpointCategories.chatThreads",
+  category: "endpointCategories.threads",
+  subCategory: "endpointCategories.threadsManagement",
   tags: ["tags.threads" as const, "tags.permissions" as const],
 
   fields: objectField(scopedTranslation, {
@@ -177,7 +178,8 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "shield",
-  category: "endpointCategories.chatThreads",
+  category: "endpointCategories.threads",
+  subCategory: "endpointCategories.threadsManagement",
   tags: ["tags.threads" as const, "tags.permissions" as const],
 
   fields: objectField(scopedTranslation, {

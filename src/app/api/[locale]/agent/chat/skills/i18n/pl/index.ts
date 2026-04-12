@@ -35,6 +35,7 @@ export const translations: typeof enTranslations = {
       custom: "Niestandardowe",
     },
     source: {
+      all: "Wszystkie",
       builtIn: "Wbudowane",
       my: "Moje postacie",
       community: "Społeczność",
@@ -72,11 +73,6 @@ export const translations: typeof enTranslations = {
       open: "Otwarty",
       uncensored: "Bez cenzury",
     },
-    speed: {
-      fast: "Szybki",
-      balanced: "Zrównoważony",
-      thorough: "Dokładny",
-    },
     skillType: {
       persona: "Persona",
       specialist: "Specjalista",
@@ -96,7 +92,6 @@ export const translations: typeof enTranslations = {
     sort: {
       intelligence: "Inteligencja",
       price: "Cena",
-      speed: "Prędkość",
       content: "Treść",
     },
     sortDirection: {
@@ -1059,6 +1054,8 @@ export const translations: typeof enTranslations = {
       variants: {
         gemini: "Gemini",
         fast: "Szybki",
+        cheapAndSmart: "Tani i Sprytny",
+        brilliant: "Brilliant",
       },
     },
     qualityTester: {
@@ -1105,6 +1102,11 @@ export const translations: typeof enTranslations = {
         label: "Rozmiar strony",
         description:
           "Liczba umiejętności na stronie (1–500). Wywołujący AI/MCP domyślnie 25; ludzie otrzymują wszystkie.",
+      },
+      sourceFilter: {
+        label: "Źródło",
+        description:
+          "Filtruj po źródle: wbudowane, społeczność lub twoje własne postacie.",
       },
     },
     container: {
@@ -1188,8 +1190,6 @@ export const translations: typeof enTranslations = {
           maxPrice: { content: "Maksymalna cena" },
           minContent: { content: "Minimalny poziom treści" },
           maxContent: { content: "Maksymalny poziom treści" },
-          minSpeed: { content: "Minimalna prędkość" },
-          maxSpeed: { content: "Maksymalna prędkość" },
           preferredStrengths: { content: "Preferowane mocne strony" },
           ignoredWeaknesses: { content: "Ignorowane słabe strony" },
           manualModelId: { content: "Ręczny model" },
@@ -1364,12 +1364,6 @@ export const translations: typeof enTranslations = {
       minLabel: "Min. treść",
       maxLabel: "Maks. treść",
     },
-    speedRange: {
-      label: "Zakres prędkości",
-      description: "Zakres poziomu prędkości odpowiedzi",
-      minLabel: "Min. prędkość",
-      maxLabel: "Maks. prędkość",
-    },
     minPrice: {
       label: "Minimalna cena",
       description: "Minimalny koszt kredytów na wiadomość z tą postacią",
@@ -1405,6 +1399,11 @@ export const translations: typeof enTranslations = {
     manualModelId: {
       label: "Model ręczny",
       description: "Konkretny model zawsze używany z tą postacią",
+    },
+    variants: {
+      label: "Warianty",
+      description:
+        "Nazwane warianty z własnymi ustawieniami modelu. Każdy wariant wymaga: id (unikalny string), modelSelection (wymagane), isDefault (dokładnie jeden musi być true).",
     },
     availableTools: {
       label: "Dozwolone narzędzia",

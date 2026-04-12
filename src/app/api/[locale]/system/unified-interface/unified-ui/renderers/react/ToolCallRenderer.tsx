@@ -304,7 +304,9 @@ export function ToolCallRenderer({
       const result = await tryLoadIdentifier(toolCall.toolName);
       if (result.success) {
         setDefinition(result.data);
-        // Apply definition's defaultExpanded once loaded, but only if there's no user override
+        // Apply definition's defaultExpanded once loaded, but only if there's no user override.
+        // For defaultExpanded=true tools, open state follows isLoading: expanded while working,
+        // collapsed when done.
         if (result.data.defaultExpanded !== undefined) {
           const hasUserOverride =
             collapseState &&
@@ -314,7 +316,15 @@ export function ToolCallRenderer({
               !result.data.defaultExpanded,
             ) !== !result.data.defaultExpanded;
           if (!hasUserOverride) {
-            setIsOpen(result.data.defaultExpanded);
+            // defaultExpanded tools open while loading (no result yet), closed when done
+            const currentlyLoading =
+              Boolean(toolCall.isPartial) ||
+              (!toolCall.result &&
+                !toolCall.error &&
+                !toolCall.waitingForConfirmation &&
+                toolCall.status !== "completed" &&
+                toolCall.status !== "failed");
+            setIsOpen(result.data.defaultExpanded ? currentlyLoading : false);
           }
         }
       }
@@ -322,6 +332,11 @@ export function ToolCallRenderer({
     void loadDef();
   }, [
     toolCall.toolName,
+    toolCall.isPartial,
+    toolCall.result,
+    toolCall.error,
+    toolCall.waitingForConfirmation,
+    toolCall.status,
     definition,
     tryLoadIdentifier,
     collapseState,
@@ -329,6 +344,7 @@ export function ToolCallRenderer({
     toolIndex,
   ]);
 
+  const isPartial = Boolean(toolCall.isPartial);
   const hasResult = Boolean(toolCall.result);
   // Detect error: toolCall.error should be an ErrorResponseType (object with success=false).
   // Also detect when toolCall.result is an ErrorResponseType (tool returned fail() without throwing).
@@ -367,14 +383,15 @@ export function ToolCallRenderer({
     toolCall.isConfirmed === false &&
     hasError;
   const isLoading =
-    !hasResult &&
-    !hasError &&
-    !isWaitingForConfirmation &&
-    !isTerminalStatus &&
-    !isSentToBackground &&
-    !isWakeUpBackground &&
-    !isWaitingForRemote &&
-    !isConfirmedByUser;
+    isPartial ||
+    (!hasResult &&
+      !hasError &&
+      !isWaitingForConfirmation &&
+      !isTerminalStatus &&
+      !isSentToBackground &&
+      !isWakeUpBackground &&
+      !isWaitingForRemote &&
+      !isConfirmedByUser);
 
   /** Extract a displayable error message from toolCall.error or toolCall.result (when it's an ErrorResponseType) */
   const getErrorMessage = (): string => {
@@ -615,7 +632,7 @@ export function ToolCallRenderer({
                 </Span>
               )}
               {isDeniedByUser && (
-                <Span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400">
+                <Span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
                   {t(
                     isWakeUpBackground
                       ? "widgets.toolCall.status.deniedWakeUp"
@@ -624,18 +641,18 @@ export function ToolCallRenderer({
                 </Span>
               )}
               {isWaitingForConfirmation && decision?.type === "confirmed" && (
-                <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-500">
+                <Span className="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success dark:text-success">
                   {t("widgets.toolCall.status.pendingConfirmation")}
                 </Span>
               )}
               {isWaitingForConfirmation && decision?.type === "declined" && (
-                <Span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-500">
+                <Span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive dark:text-destructive">
                   {t("widgets.toolCall.status.pendingCancellation")}
                 </Span>
               )}
               {isWaitingForConfirmation &&
                 (!decision || decision.type === "pending") && (
-                  <Span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-500">
+                  <Span className="text-xs px-2 py-0.5 rounded-full bg-warning/10 text-warning">
                     {t(
                       isWakeUpBackground
                         ? "widgets.toolCall.status.waitingForConfirmationWakeUp"
@@ -658,13 +675,13 @@ export function ToolCallRenderer({
                     );
                   }
                   return (
-                    <Span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500">
+                    <Span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-primary">
                       {t("widgets.toolCall.status.executing")}
                     </Span>
                   );
                 })()}
               {isSentToBackground && (
-                <Span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                <Span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-warning">
                   {t("widgets.toolCall.status.sentToBackground")}
                 </Span>
               )}
@@ -703,7 +720,7 @@ export function ToolCallRenderer({
                 </Span>
               )}
               {isConfirmedByUser && !isWakeUpBackground && !isDeniedByUser && (
-                <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
+                <Span className="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success">
                   {t("widgets.toolCall.status.confirmed")}
                 </Span>
               )}
@@ -714,6 +731,7 @@ export function ToolCallRenderer({
               )}
               {(hasResult || isTerminalStatus) &&
                 !hasError &&
+                !isPartial &&
                 !isWaitingForConfirmation &&
                 !isSentToBackground &&
                 !isWakeUpBackground &&
@@ -734,7 +752,7 @@ export function ToolCallRenderer({
                     );
                   }
                   return (
-                    <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
+                    <Span className="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success">
                       {t("widgets.toolCall.status.complete")}
                     </Span>
                   );
@@ -753,7 +771,8 @@ export function ToolCallRenderer({
               </Div>
             )}
             {/* Loading State - show spinner, and endpoint with input data if available */}
-            {isLoading && (
+            {/* When isPartial with result data, skip this - definition-driven rendering below handles it */}
+            {isLoading && !isPartial && (
               <>
                 <Div className="flex items-center gap-2 text-sm text-muted-foreground p-4">
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -808,8 +827,8 @@ export function ToolCallRenderer({
               </Div>
             )}
 
-            {/* Definition-Driven Rendering - handles waiting, completed, and declined states */}
-            {!isLoading &&
+            {/* Definition-Driven Rendering - handles waiting, completed, partial, and declined states */}
+            {(!isLoading || isPartial) &&
               definition &&
               (hasError
                 ? // Declined state - show form fields disabled with error message
@@ -950,8 +969,8 @@ export function ToolCallRenderer({
                   >
                     {/* Show pending confirmation banner */}
                     {isWaitingForConfirmation && isPendingConfirm && (
-                      <Div className="rounded-md bg-green-500/10 border border-green-500/20 p-3">
-                        <Span className="text-green-600 dark:text-green-500 text-sm font-medium">
+                      <Div className="rounded-md bg-success/10 border border-success/20 p-3">
+                        <Span className="text-success dark:text-success text-sm font-medium">
                           {t("widgets.toolCall.status.pendingConfirmation")}
                         </Span>
                       </Div>
@@ -959,8 +978,8 @@ export function ToolCallRenderer({
 
                     {/* Show pending cancellation banner */}
                     {isWaitingForConfirmation && isPendingCancel && (
-                      <Div className="rounded-md bg-red-500/10 border border-red-500/20 p-3">
-                        <Span className="text-red-600 dark:text-red-500 text-sm font-medium">
+                      <Div className="rounded-md bg-destructive/10 border border-destructive/20 p-3">
+                        <Span className="text-destructive dark:text-destructive text-sm font-medium">
                           {t("widgets.toolCall.status.pendingCancellation")}
                         </Span>
                       </Div>
@@ -970,8 +989,8 @@ export function ToolCallRenderer({
                     {isWaitingForConfirmation &&
                       !isDeclined &&
                       !hasPendingDecision && (
-                        <Div className="rounded-md bg-amber-500/10 border border-amber-500/20 p-3 flex items-center justify-between gap-3 flex-wrap">
-                          <Span className="text-amber-600 dark:text-amber-500 text-sm font-medium">
+                        <Div className="rounded-md bg-warning/10 border border-warning/20 p-3 flex items-center justify-between gap-3 flex-wrap">
+                          <Span className="text-warning text-sm font-medium">
                             {t(
                               isWakeUpBackground
                                 ? "widgets.toolCall.messages.confirmationRequiredWakeUp"

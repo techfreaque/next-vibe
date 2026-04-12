@@ -249,6 +249,7 @@ export interface ApiEndpoint<
   };
 
   readonly category: AppLocaleTranslationKey;
+  readonly subCategory: AppLocaleTranslationKey;
   readonly tags: readonly NoInfer<TScopedTranslationKey>[];
 
   /**
@@ -649,6 +650,7 @@ export function createEndpoint<
     description: config.description,
     dynamicTitle: config.dynamicTitle,
     category: config.category,
+    subCategory: config.subCategory,
     tags: config.tags,
     fields: config.fields,
     allowedRoles: config.allowedRoles,

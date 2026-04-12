@@ -86,7 +86,7 @@ export function CopyButton({
             }
           >
             {copied ? (
-              <Check className="h-4 w-4 md:h-3.5 md:w-3.5 text-green-500" />
+              <Check className="h-4 w-4 md:h-3.5 md:w-3.5 text-success" />
             ) : (
               <Copy className="h-4 w-4 md:h-3.5 md:w-3.5" />
             )}
@@ -120,7 +120,7 @@ export function CopyButton({
       }
     >
       {copied ? (
-        <Check className="h-4 w-4 md:h-3.5 md:w-3.5 text-green-500" />
+        <Check className="h-4 w-4 md:h-3.5 md:w-3.5 text-success" />
       ) : (
         <Copy className="h-4 w-4 md:h-3.5 md:w-3.5" />
       )}

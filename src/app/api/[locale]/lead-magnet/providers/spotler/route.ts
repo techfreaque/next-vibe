@@ -14,8 +14,8 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "SPOTLER",
         {
-          spotlerConsumerKey: data.spotlerConsumerKey,
-          spotlerConsumerSecret: data.spotlerConsumerSecret,
+          spotlerConsumerKey: data.spotlerConsumerKey || undefined,
+          spotlerConsumerSecret: data.spotlerConsumerSecret || undefined,
         },
         {
           listId: data.listId ?? null,

@@ -20,10 +20,9 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import { scopedTranslation } from "@/app/[locale]/subscription/i18n";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
-  ApiProvider,
+  isApiProviderAvailable,
   type ModelDefinition,
   getProviderPrice,
   modelProviders,
@@ -46,43 +45,9 @@ import { ttsModelDefinitions } from "@/app/api/[locale]/agent/text-to-speech/mod
 import { videoGenModelDefinitions } from "@/app/api/[locale]/agent/video-generation/models";
 import { formatPrice } from "./types";
 
-function checkProviderAvailable(
-  apiProvider: ApiProvider,
-  envAvailability: AgentEnvAvailability | undefined,
-): boolean {
-  if (!envAvailability) {
-    return true;
-  }
-  switch (apiProvider) {
-    case ApiProvider.OPENROUTER:
-      return envAvailability.openRouter;
-    case ApiProvider.CLAUDE_CODE:
-      return envAvailability.claudeCode;
-    case ApiProvider.UNCENSORED_AI:
-      return envAvailability.uncensoredAI;
-    case ApiProvider.FREEDOMGPT:
-      return envAvailability.freedomGPT;
-    case ApiProvider.GAB_AI:
-      return envAvailability.gabAI;
-    case ApiProvider.VENICE_AI:
-      return envAvailability.veniceAI;
-    case ApiProvider.OPENAI_IMAGES:
-      return envAvailability.openAiImages;
-    case ApiProvider.REPLICATE:
-      return envAvailability.replicate;
-    case ApiProvider.FAL_AI:
-      return envAvailability.falAi;
-    case ApiProvider.MODELSLAB:
-      return envAvailability.modelsLab;
-    default:
-      return true;
-  }
-}
-
 interface OverviewTabProps {
   locale: CountryLanguage;
   onSwitchTab: () => void;
-  envAvailability: AgentEnvAvailability;
   totalModelCount: number;
   isAdmin: boolean;
 }
@@ -109,7 +74,6 @@ function getModelSortPrice(def: ModelDefinition): number {
 export function OverviewTab({
   locale,
   onSwitchTab,
-  envAvailability,
   totalModelCount,
   isAdmin,
 }: OverviewTabProps): JSX.Element {
@@ -147,13 +111,13 @@ export function OverviewTab({
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <Div className="flex flex-col gap-3">
-            <Div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20">
-              <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5" />
+            <Div className="flex items-start gap-3 p-3 rounded-lg bg-warning/10">
+              <Calendar className="h-5 w-5 text-warning mt-0.5" />
               <Div>
-                <P className="font-medium text-amber-900 dark:text-amber-100">
+                <P className="font-medium text-warning">
                   {t("subscription.overview.howItWorks.expiring.title")}
                 </P>
-                <P className="text-sm text-amber-700 dark:text-amber-300">
+                <P className="text-sm text-warning/80">
                   {t("subscription.overview.howItWorks.expiring.description", {
                     subPrice: formatPrice(subscriptionPrice, locale),
                     subCredits: subscriptionCredits,
@@ -163,13 +127,13 @@ export function OverviewTab({
               </Div>
             </Div>
 
-            <Div className="flex items-start gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
-              <Sparkles className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5" />
+            <Div className="flex items-start gap-3 p-3 rounded-lg bg-success/10">
+              <Sparkles className="h-5 w-5 text-success mt-0.5" />
               <Div>
-                <P className="font-medium text-green-900 dark:text-green-100">
+                <P className="font-medium text-success">
                   {t("subscription.overview.howItWorks.permanent.title")}
                 </P>
-                <P className="text-sm text-green-700 dark:text-green-300">
+                <P className="text-sm text-success/80">
                   {t("subscription.overview.howItWorks.permanent.description", {
                     packPrice: formatPrice(packPrice, locale),
                     packCredits,
@@ -179,13 +143,13 @@ export function OverviewTab({
               </Div>
             </Div>
 
-            <Div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-              <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+            <Div className="flex items-start gap-3 p-3 rounded-lg bg-info/10">
+              <Zap className="h-5 w-5 text-info mt-0.5" />
               <Div>
-                <P className="font-medium text-blue-900 dark:text-blue-100">
+                <P className="font-medium text-info">
                   {t("subscription.overview.howItWorks.free.title")}
                 </P>
-                <P className="text-sm text-blue-700 dark:text-blue-300">
+                <P className="text-sm text-info/80">
                   {t("subscription.overview.howItWorks.free.description", {
                     count: freeCredits,
                   })}
@@ -272,7 +236,7 @@ export function OverviewTab({
                       ? def.providers
                       : def.providers.filter((p) => !p.adminOnly);
                     return visibleProviders.some((p) =>
-                      checkProviderAvailable(p.apiProvider, envAvailability),
+                      isApiProviderAvailable(p.apiProvider),
                     );
                   });
                   if (typeModels.length === 0) {

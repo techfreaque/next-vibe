@@ -1,16 +1,12 @@
 import { z } from "zod";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { objectEntries } from "../../shared/utils";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
-  SpeedLevel,
 } from "../chat/skills/enum";
-import {
-  filtersSelectionSchema,
-  sharedFilterPropsSchema,
-} from "../models/selection";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -19,9 +15,11 @@ import {
   getProviderPrice,
   type ModelDefinition,
   type ModelOptionTtsBased,
-  type ModelProviderEnvAvailability,
 } from "../models/models";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import {
+  filtersSelectionSchema,
+  sharedFilterPropsSchema,
+} from "../models/selection";
 
 export enum TtsModelId {
   OPENAI_ALLOY = "openai-alloy",
@@ -50,7 +48,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     utilities: [ModelUtility.TTS],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -61,7 +58,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
       {
         id: TtsModelId.OPENAI_ALLOY,
         apiProvider: ApiProvider.OPENAI_TTS,
-        providerModel: "tts-1",
+        providerModel: "alloy",
         creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
       {
@@ -91,7 +88,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     utilities: [ModelUtility.TTS],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -102,7 +98,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
       {
         id: TtsModelId.OPENAI_NOVA,
         apiProvider: ApiProvider.OPENAI_TTS,
-        providerModel: "tts-1",
+        providerModel: "nova",
         creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
       {
@@ -132,7 +128,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     utilities: [ModelUtility.TTS],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -143,7 +138,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
       {
         id: TtsModelId.OPENAI_ONYX,
         apiProvider: ApiProvider.OPENAI_TTS,
-        providerModel: "tts-1",
+        providerModel: "onyx",
         creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
       {
@@ -173,7 +168,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     utilities: [ModelUtility.TTS],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -184,7 +178,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
       {
         id: TtsModelId.OPENAI_ECHO,
         apiProvider: ApiProvider.OPENAI_TTS,
-        providerModel: "tts-1",
+        providerModel: "echo",
         creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
       {
@@ -208,7 +202,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     utilities: [ModelUtility.TTS],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -219,7 +212,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
       {
         id: TtsModelId.OPENAI_SHIMMER,
         apiProvider: ApiProvider.OPENAI_TTS,
-        providerModel: "tts-1",
+        providerModel: "shimmer",
         creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
       {
@@ -243,7 +236,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     utilities: [ModelUtility.TTS],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -254,7 +246,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
       {
         id: TtsModelId.OPENAI_FABLE,
         apiProvider: ApiProvider.OPENAI_TTS,
-        providerModel: "tts-1",
+        providerModel: "fable",
         creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
       {
@@ -279,7 +271,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     utilities: [ModelUtility.TTS, ModelUtility.SMART],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -315,7 +306,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     utilities: [ModelUtility.TTS, ModelUtility.SMART],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -351,7 +341,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     utilities: [ModelUtility.TTS, ModelUtility.SMART],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -387,7 +376,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     utilities: [ModelUtility.TTS, ModelUtility.SMART],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -437,7 +425,6 @@ function buildTtsModelOptions(): TtsModelOption[] {
           utilities: def.utilities,
           supportsTools: def.supportsTools,
           intelligence: def.intelligence,
-          speed: def.speed,
           content: def.content,
           features: def.features,
           weaknesses: def.weaknesses,
@@ -459,6 +446,12 @@ export const TtsModelIdOptions = Object.values(TtsModelId).map((id) => ({
   value: id,
   label: ttsModelOptions.find((m) => m.id === id)?.name ?? id,
 }));
+
+export function getTtsModelById(
+  modelId: TtsModelId,
+): TtsModelOption | undefined {
+  return ttsModelOptions.find((m) => m.id === modelId);
+}
 
 // ============================================================
 // TTS MODEL SELECTION SCHEMA
@@ -482,15 +475,13 @@ export type VoiceModelSelection = z.infer<typeof voiceModelSelectionSchema>;
 export function filterTtsModels(
   selection: VoiceModelSelection | null | undefined,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): TtsModelOption[] {
-  return filterRoleModels(ttsModelOptions, selection, user, env);
+  return filterRoleModels(ttsModelOptions, selection, user);
 }
 
 export function getBestTtsModel(
   selection: VoiceModelSelection,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): TtsModelOption | null {
-  return filterTtsModels(selection, user, env)[0] ?? null;
+  return filterTtsModels(selection, user)[0] ?? null;
 }

@@ -85,9 +85,10 @@ Remember: You're not just agreeing with everything - you're a wise companion who
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.KIMI_K2_5,
-        contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
-        sortBy: ModelSortField.PRICE,
-        sortDirection: ModelSortDirection.ASC,
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+        sortBy2: ModelSortField.PRICE,
+        sortDirection2: ModelSortDirection.ASC,
       },
       isDefault: true,
       voiceModelSelection: {

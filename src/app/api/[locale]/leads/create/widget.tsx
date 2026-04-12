@@ -42,16 +42,12 @@ interface CustomWidgetProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  [LeadStatus.NEW]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  [LeadStatus.PENDING]:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  [LeadStatus.SUBSCRIPTION_CONFIRMED]:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  [LeadStatus.NEW]: "bg-info/10 text-info",
+  [LeadStatus.PENDING]: "bg-warning/10 text-warning",
+  [LeadStatus.SUBSCRIPTION_CONFIRMED]: "bg-success/10 text-success",
   [LeadStatus.UNSUBSCRIBED]:
     "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
-  [LeadStatus.BOUNCED]:
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  [LeadStatus.BOUNCED]: "bg-destructive/10 text-destructive",
 };
 
 export function LeadCreateContainer({
@@ -118,7 +114,7 @@ export function LeadCreateContainer({
         <Div className="flex items-center gap-2 p-4 border-b">
           <NavigateButtonWidget field={children.backButton} />
           <Div className="flex items-center gap-2 mr-auto">
-            <CheckCircle className="h-5 w-5 text-green-500" />
+            <CheckCircle className="h-5 w-5 text-success" />
             <Span className="font-semibold text-base">
               {t("widget.headerLeadCreated")}
             </Span>

@@ -60,7 +60,7 @@ export function EmailCampaignsConfigWidget({
         <NavigateButtonWidget field={children.backButton} />
         <Div className="flex items-center gap-2 mr-auto">
           {hasBeenSaved ? (
-            <CheckCircle className="h-5 w-5 text-green-500" />
+            <CheckCircle className="h-5 w-5 text-success" />
           ) : (
             <Mail className="h-5 w-5 text-muted-foreground" />
           )}

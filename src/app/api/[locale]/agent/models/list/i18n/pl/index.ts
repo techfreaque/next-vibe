@@ -62,7 +62,6 @@ export const translations = {
         contextWindow: "Kontekst",
         parameterCount: "Parametry",
         intelligence: "Inteligencja",
-        speed: "Szybkość",
         content: "Treść",
         price: "Cena (kredyty)",
         supportsTools: "Narzędzia",

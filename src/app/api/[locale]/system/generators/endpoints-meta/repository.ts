@@ -24,8 +24,8 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import { scopedTranslation as appLocaleScopedTranslation } from "@/app/[locale]/i18n";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
@@ -88,6 +88,8 @@ interface EndpointMeta {
   icon: string;
   /** Pre-translated category label at generation time */
   category: string;
+  /** Pre-translated sub-category label at generation time (optional) */
+  subCategory: string;
   /** Pre-translated tags at generation time */
   tags: string[];
   /** Credit cost (only present when > 0) */
@@ -371,6 +373,7 @@ export class EndpointsMetaGeneratorRepository {
       const title = t(definition.title);
       const description = t(definition.description);
       const category: TranslatedKeyType = appLocaleT(definition.category);
+      const subCategory: TranslatedKeyType = appLocaleT(definition.subCategory);
 
       // Translate tags via scoped i18n
       const tags = (definition.tags ?? []).map((tag: string) => {
@@ -435,8 +438,9 @@ export class EndpointsMetaGeneratorRepository {
         aliases,
         title,
         description,
-        icon: (definition.icon as string | undefined) ?? "",
+        icon: definition.icon,
         category,
+        subCategory,
         tags,
         ...(definition.credits && (definition.credits as number) > 0
           ? { credits: definition.credits as number }
@@ -541,6 +545,7 @@ export interface EndpointMeta {
   description: string;
   icon: string;
   category: string;
+  subCategory: string;
   tags: string[];
   credits?: number;
   requiresConfirmation?: boolean;

@@ -19,6 +19,48 @@ import type { LeadMagnetConfigGetResponseOutput } from "./definition";
 
 type LeadMagnetProviderKey = (typeof LeadMagnetProviderDB)[number];
 
+/**
+ * Credential keys that are sensitive and must never be returned to the client.
+ * Matched by exact key name — all use FieldDataType.PASSWORD in their definitions.
+ */
+const SENSITIVE_CREDENTIAL_KEYS = new Set([
+  "klaviyoApiKey",
+  "getresponseApiKey",
+  "acumbamailApiKey",
+  "adobeCampaignClientSecret",
+  "adobeCampaignApiKey",
+  "cleverreachClientSecret",
+  "connectifApiKey",
+  "datanextApiKey",
+  "datanextApiSecret",
+  "emarsysApiKey",
+  "expertSenderApiKey",
+  "freshmailApiKey",
+  "freshmailApiSecret",
+  "mailupClientSecret",
+  "mailupPassword",
+  "mappPassword",
+  "sailthruApiKey",
+  "sailthruSecret",
+  "salesManagoApiKey",
+  "salesManagoSha",
+  "shopifyAccessToken",
+  "spotlerConsumerSecret",
+  "youLeadAppSecretKey",
+]);
+
+function extractPublicCredentials(
+  credentials: Record<string, string>,
+): Record<string, string> | null {
+  const result: Record<string, string> = {};
+  for (const [key, value] of Object.entries(credentials)) {
+    if (!SENSITIVE_CREDENTIAL_KEYS.has(key) && value !== "") {
+      result[key] = value;
+    }
+  }
+  return Object.keys(result).length > 0 ? result : null;
+}
+
 export const LeadMagnetConfigRepository = {
   async getConfig(
     userId: string,
@@ -46,6 +88,7 @@ export const LeadMagnetConfigRepository = {
         isActive: row.isActive,
         createdAt: row.createdAt.toISOString(),
         updatedAt: row.updatedAt.toISOString(),
+        publicCredentials: extractPublicCredentials(row.credentials),
       },
     });
   },

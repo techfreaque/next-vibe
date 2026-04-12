@@ -138,18 +138,10 @@ function TrendIcon({
   className?: string;
 }): React.JSX.Element {
   if (direction === "up") {
-    return (
-      <ArrowUp
-        className={cn("h-3 w-3 text-green-500 dark:text-green-400", className)}
-      />
-    );
+    return <ArrowUp className={cn("h-3 w-3 text-success", className)} />;
   }
   if (direction === "down") {
-    return (
-      <ArrowDown
-        className={cn("h-3 w-3 text-red-500 dark:text-red-400", className)}
-      />
-    );
+    return <ArrowDown className={cn("h-3 w-3 text-destructive", className)} />;
   }
   return <Minus className={cn("h-3 w-3 text-muted-foreground", className)} />;
 }
@@ -169,10 +161,10 @@ function StatCard({
 }): React.JSX.Element {
   const variantClass = {
     default: "text-foreground",
-    success: "text-green-600 dark:text-green-400",
-    warning: "text-yellow-600 dark:text-yellow-400",
-    danger: "text-red-600 dark:text-red-400",
-    info: "text-blue-600 dark:text-blue-400",
+    success: "text-success",
+    warning: "text-warning",
+    danger: "text-destructive",
+    info: "text-info",
   }[variant];
 
   const formatted = useMemo(() => {
@@ -441,7 +433,7 @@ function ConversionFunnel({
                 <Span className="text-muted-foreground">{stage.label}</Span>
                 <Div className="flex items-center gap-2">
                   {dropPct !== null && dropPct > 0 && (
-                    <Span className="text-red-500 dark:text-red-400">
+                    <Span className="text-destructive">
                       -{dropPct.toFixed(1)}%
                     </Span>
                   )}

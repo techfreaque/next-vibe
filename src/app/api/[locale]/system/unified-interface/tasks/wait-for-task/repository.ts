@@ -40,7 +40,7 @@ export class WaitForTaskRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     t: TasksT,
-    streamContext?: ToolExecutionContext,
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<WaitForTaskResponseOutput>> {
     let { taskId } = data;
 

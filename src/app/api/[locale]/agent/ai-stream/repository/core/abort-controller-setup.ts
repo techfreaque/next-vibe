@@ -8,12 +8,14 @@ import { AbortReason, StreamAbortError } from "./constants";
 
 export class AbortControllerSetup {
   /**
-   * Create abort controller with timeout handling
+   * Create abort controller with timeout handling.
+   * When parentSignal is provided (headless sub-streams), abort propagates from parent.
    */
   static setupAbortController(params: {
     maxDuration: number;
+    parentSignal?: AbortSignal;
   }): AbortController {
-    const { maxDuration } = params;
+    const { maxDuration, parentSignal } = params;
 
     // Create abort controller for this stream - combines request signal with timeout
     const streamAbortController = new AbortController();
@@ -26,6 +28,21 @@ export class AbortControllerSetup {
       );
     };
     timeoutAbortController.addEventListener("abort", timeoutAbortHandler);
+
+    // Propagate parent cancellation (e.g. parent AI stream cancelled while sub-agent runs)
+    if (parentSignal) {
+      if (parentSignal.aborted) {
+        streamAbortController.abort(parentSignal.reason);
+      } else {
+        parentSignal.addEventListener(
+          "abort",
+          () => {
+            streamAbortController.abort(parentSignal.reason);
+          },
+          { once: true },
+        );
+      }
+    }
 
     // Stream survives page refresh - no request.signal linkage.
     // Streams are only cancelled via the cancel endpoint or timeout.

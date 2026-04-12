@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   title: "resize-page.title",
   description: "resize-page.description",
   category: "endpointCategories.browser",
+  subCategory: "endpointCategories.browserPages",
   icon: "maximize",
   tags: [
     "resize-page.tags.browserAutomation",

@@ -286,7 +286,7 @@ export function ReferralCodesListContainer({
                   <DollarSign className="h-3.5 w-3.5" />
                   {t("codes.list.widget.earnings")}
                 </Div>
-                <Div className="text-lg font-semibold tabular-nums text-blue-600 dark:text-blue-400">
+                <Div className="text-lg font-semibold tabular-nums text-info">
                   {formatDollars(code.totalEarningsCents)}
                 </Div>
               </Div>
@@ -309,8 +309,8 @@ export function ReferralCodesListContainer({
 
             {/* Inactive Warning */}
             {!code.isActive && (
-              <Div className="px-4 py-3 border-t bg-red-50 dark:bg-red-950/20">
-                <Div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+              <Div className="px-4 py-3 border-t bg-destructive/10">
+                <Div className="flex items-center gap-2 text-sm text-destructive">
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   <Span>{t("codes.list.widget.inactive")}</Span>
                 </Div>

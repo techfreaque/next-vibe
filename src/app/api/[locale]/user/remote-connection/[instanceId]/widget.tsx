@@ -122,9 +122,9 @@ export function RemoteConnectionByIdWidget({
         <Card>
           <CardHeader>
             <Div className="flex items-center gap-2">
-              <Link2 className="h-5 w-5 text-green-500" />
+              <Link2 className="h-5 w-5 text-success" />
               <CardTitle>{t("widget.connected.title")}</CardTitle>
-              <Badge variant="default" className="ml-auto bg-green-500">
+              <Badge variant="default" className="ml-auto bg-success">
                 {t("widget.connected.badge")}
               </Badge>
             </Div>

@@ -46,6 +46,7 @@ const { POST } = createEndpoint({
   description: "post.description",
   icon: "volume-2",
   category: "endpointCategories.ai",
+  subCategory: "endpointCategories.aiGeneration",
   tags: ["tags.speech", "tags.tts", "tags.ai"],
 
   fields: objectField(scopedTranslation, {

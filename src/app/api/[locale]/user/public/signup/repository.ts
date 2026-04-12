@@ -8,9 +8,9 @@ import "server-only";
 import type { NextRequest } from "next-vibe-ui/lib/request";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -19,10 +19,9 @@ import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { scopedTranslation as signupScopedTranslation } from "./i18n";
-import type { SignupT } from "./i18n";
 import { AuthRepository } from "../../auth/repository";
 import type { JwtPayloadType, JwtPrivatePayloadType } from "../../auth/types";
+import type { NewUser } from "../../db";
 import { UserDetailLevel } from "../../enum";
 import { SessionRepository } from "../../private/session/repository";
 import { UserRepository } from "../../repository";
@@ -38,7 +37,8 @@ import type {
   SignupPostRequestOutput,
   SignupPostResponseOutput,
 } from "./definition";
-import type { NewUser } from "../../db";
+import type { SignupT } from "./i18n";
+import { scopedTranslation as signupScopedTranslation } from "./i18n";
 
 /**
  * Signup repository
@@ -169,7 +169,7 @@ export class SignupRepository {
           .limit(1);
         const skillId = leadRow?.skillId;
         if (skillId && /^[0-9a-f-]{36}$/i.test(skillId)) {
-          // UUID skillId — look up the skill owner in customSkills
+          // UUID skillId - look up the skill owner in customSkills
           const { customSkills } =
             await import("@/app/api/[locale]/agent/chat/skills/db");
           const [skill] = await dbInstance

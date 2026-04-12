@@ -33,10 +33,7 @@ import {
   type ImageGenModelOption,
 } from "@/app/api/[locale]/agent/image-generation/models";
 import { getModelPrice } from "@/app/api/[locale]/agent/models/all-models";
-import {
-  isModelProviderAvailable,
-  type ModelProviderEnvAvailability,
-} from "@/app/api/[locale]/agent/models/models";
+import { isModelProviderAvailable } from "@/app/api/[locale]/agent/models/models";
 import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
 import type {
   AudioVisionModelSelection,
@@ -75,7 +72,6 @@ import {
   ModelSortField,
   PriceLevel,
   PriceLevelDB,
-  SpeedLevelDB,
 } from "./enum";
 import type { SkillsT } from "./i18n";
 
@@ -150,10 +146,6 @@ export class SkillsRepositoryClient {
         const idx = IntelligenceLevelDB.indexOf(model.intelligence);
         return idx === -1 ? 0 : idx;
       }
-      case ModelSortField.SPEED: {
-        const idx = SpeedLevelDB.indexOf(model.speed);
-        return idx === -1 ? 0 : idx;
-      }
       case ModelSortField.PRICE:
         return getModelPrice(model);
       case ModelSortField.CONTENT: {
@@ -171,7 +163,6 @@ export class SkillsRepositoryClient {
   private static applyHardFilters(
     filters: ChatModelSelection,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): ChatModelOption[] {
     const isAdmin =
       !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
@@ -179,7 +170,7 @@ export class SkillsRepositoryClient {
       if (model.adminOnly && !isAdmin) {
         return false;
       }
-      if (!isModelProviderAvailable(model, env)) {
+      if (!isModelProviderAvailable(model)) {
         return false;
       }
 
@@ -196,12 +187,7 @@ export class SkillsRepositoryClient {
           filters.contentRange,
           ContentLevelDB,
         ) &&
-        this.meetsRangeConstraint(
-          modelPrice,
-          filters.priceRange,
-          PriceLevelDB,
-        ) &&
-        this.meetsRangeConstraint(model.speed, filters.speedRange, SpeedLevelDB)
+        this.meetsRangeConstraint(modelPrice, filters.priceRange, PriceLevelDB)
       );
     });
 
@@ -231,7 +217,6 @@ export class SkillsRepositoryClient {
   private static getFilteredModelsInternal(
     modelSelection: ChatModelSelection,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): ChatModelOption[] {
     if (modelSelection.selectionType === ModelSelectionType.MANUAL) {
       const model = getChatModelById(modelSelection.manualModelId);
@@ -241,44 +226,40 @@ export class SkillsRepositoryClient {
         return [];
       }
       // If provider unavailable, fall through to filter fallback
-      if (model && isModelProviderAvailable(model, env)) {
+      if (model && isModelProviderAvailable(model)) {
         return [model];
       }
       // Fall through to FILTERS using the selection's filter constraints
       return this.applyHardFilters(
         { ...modelSelection, selectionType: ModelSelectionType.FILTERS },
         user,
-        env,
       );
     }
 
-    return this.applyHardFilters(modelSelection, user, env);
+    return this.applyHardFilters(modelSelection, user);
   }
 
   static getFilteredModelsForFavorite(
     favoriteModelSelection: FavoriteGetModelSelection | null,
     skillModelSelection: ChatModelSelection | undefined,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): ChatModelOption[] {
     const selectionToUse = favoriteModelSelection ?? skillModelSelection;
     if (!selectionToUse) {
       return [];
     }
-    return this.getFilteredModelsInternal(selectionToUse, user, env);
+    return this.getFilteredModelsInternal(selectionToUse, user);
   }
 
   static getBestModelForFavorite(
     favoriteModelSelection: FavoriteGetModelSelection | null,
     skillModelSelection: ChatModelSelection | undefined,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): ChatModelOption | null {
     const candidates = this.getFilteredModelsForFavorite(
       favoriteModelSelection,
       skillModelSelection,
       user,
-      env,
     );
     return candidates.length > 0 ? candidates[0] : null;
   }
@@ -290,20 +271,17 @@ export class SkillsRepositoryClient {
   static getFilteredModelsForSkill(
     skillModelSelection: ChatModelSelection,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): ChatModelOption[] {
-    return this.getFilteredModelsInternal(skillModelSelection, user, env);
+    return this.getFilteredModelsInternal(skillModelSelection, user);
   }
 
   static getBestModelForSkill(
     skillModelSelection: ChatModelSelection,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): ChatModelOption | null {
     const candidates = this.getFilteredModelsForSkill(
       skillModelSelection,
       user,
-      env,
     );
     return candidates.length > 0 ? candidates[0] : null;
   }
@@ -315,81 +293,71 @@ export class SkillsRepositoryClient {
   static getFilteredTtsModels(
     selection: VoiceModelSelection | null | undefined,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): TtsModelOption[] {
-    return this.filterRoleModels(ttsModelOptions, selection, user, env);
+    return this.filterRoleModels(ttsModelOptions, selection, user);
   }
 
   static getBestTtsModel(
     selection: VoiceModelSelection,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): TtsModelOption | null {
-    return this.getFilteredTtsModels(selection, user, env)[0] ?? null;
+    return this.getFilteredTtsModels(selection, user)[0] ?? null;
   }
 
   static getFilteredSttModels(
     selection: SttModelSelection | null | undefined,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): SttModelOption[] {
-    return this.filterRoleModels(sttModelOptions, selection, user, env);
+    return this.filterRoleModels(sttModelOptions, selection, user);
   }
 
   static getBestSttModel(
     selection: SttModelSelection,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): SttModelOption | null {
-    return this.getFilteredSttModels(selection, user, env)[0] ?? null;
+    return this.getFilteredSttModels(selection, user)[0] ?? null;
   }
 
   static getFilteredImageGenModels(
     selection: ImageGenModelSelection | null | undefined,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): ImageGenModelOption[] {
-    return this.filterRoleModels(imageGenModelOptions, selection, user, env);
+    return this.filterRoleModels(imageGenModelOptions, selection, user);
   }
 
   static getBestImageGenModel(
     selection: ImageGenModelSelection,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): ImageGenModelOption | null {
-    return this.getFilteredImageGenModels(selection, user, env)[0] ?? null;
+    return this.getFilteredImageGenModels(selection, user)[0] ?? null;
   }
 
   static getFilteredMusicGenModels(
     selection: MusicGenModelSelection | null | undefined,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): MusicGenModelOption[] {
-    return this.filterRoleModels(musicGenModelOptions, selection, user, env);
+    return this.filterRoleModels(musicGenModelOptions, selection, user);
   }
 
   static getBestMusicGenModel(
     selection: MusicGenModelSelection,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): MusicGenModelOption | null {
-    return this.getFilteredMusicGenModels(selection, user, env)[0] ?? null;
+    return this.getFilteredMusicGenModels(selection, user)[0] ?? null;
   }
 
   static getFilteredVideoGenModels(
     selection: VideoGenModelSelection | null | undefined,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): VideoGenModelOption[] {
-    return this.filterRoleModels(videoGenModelOptions, selection, user, env);
+    return this.filterRoleModels(videoGenModelOptions, selection, user);
   }
 
   static getBestVideoGenModel(
     selection: VideoGenModelSelection,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): VideoGenModelOption | null {
-    return this.getFilteredVideoGenModels(selection, user, env)[0] ?? null;
+    return this.getFilteredVideoGenModels(selection, user)[0] ?? null;
   }
 
   // ---------------------------------------------------------------------------
@@ -409,20 +377,18 @@ export class SkillsRepositoryClient {
       manualModelId?: string;
       intelligenceRange?: { min?: string; max?: string };
       contentRange?: { min?: string; max?: string };
-      speedRange?: { min?: string; max?: string };
       priceRange?: { min?: string; max?: string };
     },
   >(
     pool: TOption[],
     selection: TSelection | null | undefined,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): TOption[] {
     const isAdmin =
       !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
     if (!selection) {
       return pool.filter(
-        (m) => (!m.adminOnly || isAdmin) && isModelProviderAvailable(m, env),
+        (m) => (!m.adminOnly || isAdmin) && isModelProviderAvailable(m),
       );
     }
     if (selection.selectionType === ModelSelectionType.MANUAL) {
@@ -432,7 +398,7 @@ export class SkillsRepositoryClient {
       if (model?.adminOnly && !isAdmin) {
         return [];
       }
-      if (model && isModelProviderAvailable(model, env)) {
+      if (model && isModelProviderAvailable(model)) {
         return [model];
       }
       // Fall through to filter fallback
@@ -441,7 +407,7 @@ export class SkillsRepositoryClient {
       if (m.adminOnly && !isAdmin) {
         return false;
       }
-      if (!isModelProviderAvailable(m, env)) {
+      if (!isModelProviderAvailable(m)) {
         return false;
       }
       const modelPrice = this.getModelPriceLevel(getModelPrice(m));
@@ -460,8 +426,7 @@ export class SkillsRepositoryClient {
           modelPrice,
           selection.priceRange,
           PriceLevelDB,
-        ) &&
-        this.meetsRangeConstraint(m.speed, selection.speedRange, SpeedLevelDB)
+        )
       );
     });
   }
@@ -475,56 +440,49 @@ export class SkillsRepositoryClient {
       | null
       | undefined,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): T[] {
-    return this.filterRoleModels(pool, selection, user, env);
+    return this.filterRoleModels(pool, selection, user);
   }
 
   static getFilteredImageVisionModels(
     selection: ImageVisionModelSelection | null | undefined,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): ImageVisionModelOption[] {
-    return this.filterVisionPool(imageVisionModelOptions, selection, user, env);
+    return this.filterVisionPool(imageVisionModelOptions, selection, user);
   }
 
   static getBestImageVisionModel(
     selection: ImageVisionModelSelection,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): ImageVisionModelOption | null {
-    return this.getFilteredImageVisionModels(selection, user, env)[0] ?? null;
+    return this.getFilteredImageVisionModels(selection, user)[0] ?? null;
   }
 
   static getFilteredVideoVisionModels(
     selection: VideoVisionModelSelection | null | undefined,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): VideoVisionModelOption[] {
-    return this.filterVisionPool(videoVisionModelOptions, selection, user, env);
+    return this.filterVisionPool(videoVisionModelOptions, selection, user);
   }
 
   static getBestVideoVisionModel(
     selection: VideoVisionModelSelection,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): VideoVisionModelOption | null {
-    return this.getFilteredVideoVisionModels(selection, user, env)[0] ?? null;
+    return this.getFilteredVideoVisionModels(selection, user)[0] ?? null;
   }
 
   static getFilteredAudioVisionModels(
     selection: AudioVisionModelSelection | null | undefined,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): AudioVisionModelOption[] {
-    return this.filterVisionPool(audioVisionModelOptions, selection, user, env);
+    return this.filterVisionPool(audioVisionModelOptions, selection, user);
   }
 
   static getBestAudioVisionModel(
     selection: AudioVisionModelSelection,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): AudioVisionModelOption | null {
-    return this.getFilteredAudioVisionModels(selection, user, env)[0] ?? null;
+    return this.getFilteredAudioVisionModels(selection, user)[0] ?? null;
   }
 }

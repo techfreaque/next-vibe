@@ -14,9 +14,9 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "CLEVERREACH",
         {
-          cleverreachClientId: data.cleverreachClientId,
-          cleverreachClientSecret: data.cleverreachClientSecret,
-          cleverreachListId: data.cleverreachListId,
+          cleverreachClientId: data.cleverreachClientId || undefined,
+          cleverreachClientSecret: data.cleverreachClientSecret || undefined,
+          cleverreachListId: data.cleverreachListId || undefined,
           ...(data.cleverreachFormId
             ? { cleverreachFormId: data.cleverreachFormId }
             : {}),

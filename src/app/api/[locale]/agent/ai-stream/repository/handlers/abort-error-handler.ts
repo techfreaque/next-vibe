@@ -195,14 +195,15 @@ export class AbortErrorHandler {
 
     const isToolConfirmation = streamAbort?.isToolPause ?? false;
     const isLoopStop = streamAbort?.isLoopStop ?? false;
-    // isSilentStop: intentional stops - skip ALL partial content + error message writes.
-    const isSilentStop =
-      streamAbort?.reason === AbortReason.USER_CANCELLED ||
-      streamAbort?.reason === AbortReason.SUPERSEDED;
+    // isSilentStop: intentional stops that must not write anything to DB.
+    // SUPERSEDED: a new stream replaced this one - the new stream owns the thread state.
+    const isSilentStop = streamAbort?.reason === AbortReason.SUPERSEDED;
     // isNoErrorStop: save partial content but do NOT emit an error message bubble.
     // CLIENT_DISCONNECTED: user closed the tab - partial content is preserved but no
     // "Generation was stopped" bubble should appear (nobody is there to read it, and
     // it would create an orphan branch if a confirm/wakeUp stream already updated the thread).
+    // USER_CANCELLED: user hit stop - partial content and error message ARE emitted so
+    // the thread shows the interruption and the AI can acknowledge it on the next turn.
     const isNoErrorStop =
       streamAbort?.reason === AbortReason.CLIENT_DISCONNECTED;
 

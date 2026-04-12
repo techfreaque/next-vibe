@@ -77,12 +77,6 @@ export const translations = {
       maxContent: {
         content: "Max Content Level: {{value}}",
       },
-      minSpeed: {
-        content: "Min Speed: {{value}}",
-      },
-      maxSpeed: {
-        content: "Max Speed: {{value}}",
-      },
       content: {
         content: "Content Level: {{value}}",
       },
@@ -197,6 +191,9 @@ export const translations = {
     skillId: {
       label: "Skill",
     },
+    variantId: {
+      label: "Variant",
+    },
     customVariantName: {
       label: "Variant Name",
       description:
@@ -301,14 +298,6 @@ export const translations = {
     maxContent: {
       label: "Maximum Content Level",
       description: "Maximum content moderation level for the model",
-    },
-    minSpeed: {
-      label: "Minimum Speed",
-      description: "Minimum speed level required for the model",
-    },
-    maxSpeed: {
-      label: "Maximum Speed",
-      description: "Maximum speed level allowed for the model",
     },
     content: {
       label: "Content Level",

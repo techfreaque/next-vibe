@@ -44,10 +44,10 @@ const handleCreateAnother = (): void => {
 };
 
 const ROLE_COLORS: Record<string, string> = {
-  ADMIN: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  ADMIN: "bg-destructive/10 text-destructive",
   PARTNER_ADMIN:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  CUSTOMER: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  CUSTOMER: "bg-info/10 text-info",
 };
 
 export function UserCreateContainer({
@@ -119,7 +119,7 @@ export function UserCreateContainer({
         <Div className="flex items-center gap-2 p-4 border-b">
           <NavigateButtonWidget field={children.backButton} />
           <Div className="flex items-center gap-2 mr-auto">
-            <CheckCircle className="h-5 w-5 text-green-500" />
+            <CheckCircle className="h-5 w-5 text-success" />
             <Span className="font-semibold text-base">
               {t("widget.headerCreated")}
             </Span>
@@ -129,7 +129,7 @@ export function UserCreateContainer({
         <Div className="p-4 flex flex-col gap-4">
           {/* Success message banner */}
           {message && (
-            <Div className="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-3 text-sm text-green-800 dark:text-green-300">
+            <Div className="rounded-lg bg-success/10 border border-success/30 p-3 text-sm text-success-foreground">
               {message}
             </Div>
           )}
@@ -154,12 +154,12 @@ export function UserCreateContainer({
                   </Span>
                 )}
                 {isActive && (
-                  <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                  <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success">
                     {t("widget.activeBadge")}
                   </Span>
                 )}
                 {emailVerified && (
-                  <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                  <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-info/10 text-info">
                     <Mail className="h-3 w-3" />
                     {t("widget.verifiedBadge")}
                   </Span>
@@ -233,7 +233,7 @@ export function UserCreateContainer({
                       className={cn(
                         "flex items-center gap-1 px-1.5 py-0.5 rounded text-xs transition-colors",
                         idCopied
-                          ? "text-green-600 dark:text-green-400"
+                          ? "text-success"
                           : "text-muted-foreground hover:text-foreground hover:bg-muted",
                       )}
                     >

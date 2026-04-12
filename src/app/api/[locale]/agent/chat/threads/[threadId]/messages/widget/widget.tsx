@@ -16,7 +16,13 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useMessagesSubscription } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-messages-subscription";
+import {
+  useWidgetForm,
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetUser,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type definitions from "../definition";
 import type { MessageListResponseOutput } from "../definition";
@@ -73,7 +79,14 @@ function ReadOnlyMessages({
 }: {
   field: { value: MessageListResponseOutput | null | undefined };
 }): React.JSX.Element {
-  const { locale, logger, user } = useWidgetContext();
+  const locale = useWidgetLocale();
+  const form = useWidgetForm<typeof definitions.GET>();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const threadId = form.watch("threadId");
+  const rootFolderId = form.watch("rootFolderId");
+
+  useMessagesSubscription(threadId ?? null, rootFolderId, null, logger);
 
   const messages: ChatMessage[] = useMemo(() => {
     const raw = field.value?.messages;

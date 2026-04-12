@@ -34,6 +34,7 @@ export const translations = {
       custom: "Custom",
     },
     source: {
+      all: "All",
       builtIn: "Built-in",
       my: "My Skills",
       community: "Community",
@@ -71,11 +72,6 @@ export const translations = {
       open: "Open",
       uncensored: "Uncensored",
     },
-    speed: {
-      fast: "Fast",
-      balanced: "Balanced",
-      thorough: "Thorough",
-    },
     skillType: {
       persona: "Persona",
       specialist: "Specialist",
@@ -95,7 +91,6 @@ export const translations = {
     sort: {
       intelligence: "Intelligence",
       price: "Price",
-      speed: "Speed",
       content: "Content",
     },
     sortDirection: {
@@ -1054,6 +1049,8 @@ export const translations = {
       variants: {
         gemini: "Gemini",
         fast: "Fast",
+        cheapAndSmart: "Cheap & Smart",
+        brilliant: "Brilliant",
       },
     },
     qualityTester: {
@@ -1100,6 +1097,11 @@ export const translations = {
         description:
           "Number of skills per page (1–500). AI/MCP callers default to 25; human callers return all.",
       },
+      sourceFilter: {
+        label: "Source",
+        description:
+          "Filter skills by source: built-in, community, or your own custom skills.",
+      },
     },
     container: {
       title: "Skills List",
@@ -1116,7 +1118,7 @@ export const translations = {
       aiModels: "AI models",
       configureAiModelsTitle: "Direct Model Selection",
       advancedChooseText:
-        "Choose from {{count}} models with fine-tuned control over intelligence, speed, and cost",
+        "Choose from {{count}} models with fine-tuned control over intelligence, content, and cost",
       modelsWithCustomFilters: "models with custom filters",
       configureButton: "Configure",
       selectButton: {
@@ -1182,8 +1184,6 @@ export const translations = {
           maxPrice: { content: "Maximum Price" },
           minContent: { content: "Minimum Content Level" },
           maxContent: { content: "Maximum Content Level" },
-          minSpeed: { content: "Minimum Speed" },
-          maxSpeed: { content: "Maximum Speed" },
           preferredStrengths: { content: "Preferred Strengths" },
           ignoredWeaknesses: { content: "Ignored Weaknesses" },
           manualModelId: { content: "Manual Model" },
@@ -1374,7 +1374,12 @@ export const translations = {
       title: "Model Selection",
       label: "Model Selection",
       description:
-        "Chat model for this skill. FILTERS (recommended): set intelligenceRange/priceRange/contentRange/speedRange - system picks best available. Use MANUAL only when you need a specific model's unique capabilities (reasoning models, specific uncensored model). null = platform default. See MODEL-RESOLUTION.md for full priority rules.",
+        "Chat model for this skill. FILTERS (recommended): set intelligenceRange/priceRange/contentRange - system picks best available. Use MANUAL only when you need a specific model's unique capabilities (reasoning models, specific uncensored model). null = platform default. See MODEL-RESOLUTION.md for full priority rules.",
+    },
+    variants: {
+      label: "Variants",
+      description:
+        "Named variants with per-variant model selections. Each variant needs: id (unique string), modelSelection (required), isDefault (exactly one must be true). Optional: displayName, voice/vision/gen model overrides.",
     },
     availableTools: {
       label: "Allowed Tools",
@@ -1456,12 +1461,6 @@ export const translations = {
     maxContent: {
       label: "Maximum Content Level",
       description: "Maximum content moderation level for the model",
-    },
-    speedRange: {
-      label: "Speed Range",
-      description: "Response speed level range",
-      minLabel: "Min Speed",
-      maxLabel: "Max Speed",
     },
     preferredStrengths: {
       label: "Preferred Strengths",

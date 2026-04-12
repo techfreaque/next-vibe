@@ -500,7 +500,7 @@ export function ModelCreditDisplay({
                       {scenario.willCompact && (
                         <Badge
                           variant="outline"
-                          className="text-[9px] h-4 px-1 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20"
+                          className="text-[9px] h-4 px-1 bg-warning/10 text-warning border-warning/20"
                         >
                           {t("creditDisplay.tokenBased.triggersCompacting")}
                         </Badge>

@@ -67,7 +67,6 @@ import {
   getBestVideoVisionModel,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
 import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
@@ -219,15 +218,9 @@ export function FavoriteEditContainer({
   // Stable props
   const emptyField = useMemo(() => ({}), []);
 
-  const envAvailability = useEnvAvailability();
-
   // Platform-level default model selections (env-aware)
   const platformChatDefault = useMemo((): ChatModelSelection | undefined => {
-    const m = getBestChatModel(
-      DEFAULT_CHAT_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -236,14 +229,10 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformTtsDefault = useMemo((): VoiceModelSelection | undefined => {
-    const m = getBestTtsModel(
-      DEFAULT_TTS_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -252,16 +241,12 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformImageGenDefault = useMemo(():
     | ImageGenModelSelection
     | undefined => {
-    const m = getBestImageGenModel(
-      DEFAULT_IMAGE_GEN_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestImageGenModel(DEFAULT_IMAGE_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -270,16 +255,12 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformMusicGenDefault = useMemo(():
     | MusicGenModelSelection
     | undefined => {
-    const m = getBestMusicGenModel(
-      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestMusicGenModel(DEFAULT_MUSIC_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -288,16 +269,12 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformVideoGenDefault = useMemo(():
     | VideoGenModelSelection
     | undefined => {
-    const m = getBestVideoGenModel(
-      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestVideoGenModel(DEFAULT_VIDEO_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -306,14 +283,10 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformSttDefault = useMemo((): SttModelSelection | undefined => {
-    const m = getBestSttModel(
-      DEFAULT_STT_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -322,7 +295,7 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformImageVisionDefault = useMemo(():
     | ImageVisionModelSelection
@@ -330,7 +303,6 @@ export function FavoriteEditContainer({
     const m = getBestImageVisionModel(
       DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       user,
-      envAvailability,
     );
     if (!m) {
       return undefined;
@@ -340,7 +312,7 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformVideoVisionDefault = useMemo(():
     | VideoVisionModelSelection
@@ -348,7 +320,6 @@ export function FavoriteEditContainer({
     const m = getBestVideoVisionModel(
       DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       user,
-      envAvailability,
     );
     if (!m) {
       return undefined;
@@ -358,7 +329,7 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformAudioVisionDefault = useMemo(():
     | AudioVisionModelSelection
@@ -366,7 +337,6 @@ export function FavoriteEditContainer({
     const m = getBestAudioVisionModel(
       DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       user,
-      envAvailability,
     );
     if (!m) {
       return undefined;
@@ -376,7 +346,7 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const watchedAllowedTools = form.watch("availableTools") ?? null;
   const watchedPinnedTools = form.watch("pinnedTools") ?? null;
@@ -581,7 +551,6 @@ export function FavoriteEditContainer({
                 logger={logger}
                 locale={locale}
                 user={user}
-                envAvailability={envAvailability}
                 isSubmitting={isSubmitting}
                 t={t}
               />
@@ -1502,7 +1471,6 @@ function SaveAndUseButton({
   logger,
   locale,
   user,
-  envAvailability,
   isSubmitting,
   t,
 }: {
@@ -1511,7 +1479,6 @@ function SaveAndUseButton({
   logger: ReturnType<typeof useWidgetLogger>;
   locale: ReturnType<typeof useWidgetLocale>;
   user: ReturnType<typeof useWidgetUser>;
-  envAvailability: ReturnType<typeof useEnvAvailability>;
   isSubmitting: boolean | undefined;
   t: ReturnType<typeof useWidgetTranslation<typeof definitionPatch.PATCH>>;
 }): JSX.Element {
@@ -1553,7 +1520,6 @@ function SaveAndUseButton({
             favoriteData.modelSelection,
             undefined,
             user,
-            envAvailability,
           );
           const parsed = chatManualModelSelectionSchema.safeParse({
             selectionType: ModelSelectionType.MANUAL,

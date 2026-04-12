@@ -1,8 +1,136 @@
-import { translations as navTranslations } from "../../nav/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  nav: navTranslations,
+  nav: {
+    help: "Hilfe",
+    logout: "Abmelden",
+    settings: "Profileinstellungen",
+    leadMagnet: "Lead Magnet",
+    enableLightMode: "Hellen Modus aktivieren",
+    enableDarkMode: "Dunklen Modus aktivieren",
+    notifications: "Benachrichtigungen",
+    welcomeNotification: {
+      title: "Willkommen bei {{appName}}!",
+      description:
+        "Starten Sie damit, die KI-Modelle zu erkunden und Ihr erstes Gespräch zu erstellen.",
+    },
+    company: "Unternehmen",
+    about: {
+      title: "Über uns",
+      description: "Erfahren Sie mehr über unser Unternehmen",
+    },
+    careers: {
+      title: "Karriere",
+      description: "Werden Sie Teil unseres Teams",
+    },
+    invest: {
+      title: "Investieren",
+      description: "Unterstütze die offene KI-Plattform",
+    },
+    blog: {
+      title: "Blog",
+      description: "Technische Einblicke in die Architektur von next-vibe",
+    },
+    user: {
+      dashboard: "Dashboard",
+      completeOnboarding: "Onboarding abschließen",
+      login: "Anmelden",
+      signup: "Registrieren",
+    },
+    home: "Startseite",
+    pricing: "Preise & Abo",
+    features: "Funktionen",
+    framework: {
+      title: "Framework",
+      description: "Die Open-Source-Engine hinter der Plattform",
+    },
+    buildASkill: {
+      title: "Skill erstellen",
+      description: "Eigene KI für alles. Drei Wege zum Ziel.",
+    },
+    forum: "Forum",
+    contact: "Kontakt",
+    getStarted: "Kostenlos starten",
+    signIn: "Anmelden",
+    goToApp: "App öffnen",
+    backToChat: "Zurück zum Chat",
+    unbottledHome: "Website & Blog",
+    subscription: "Abonnement",
+    referral: "Empfehlungsprogramm",
+    services: {
+      title: "Plattform",
+      features: {
+        title: "Funktionen",
+        description: "KI-Chat + Forum-Funktionen",
+      },
+      process: {
+        title: "Wie es funktioniert",
+        description: "Starten Sie in 4 einfachen Schritten",
+      },
+      aiModels: {
+        title: "KI-Modelle",
+        description: "{{modelCount}} unzensierte KI-Modelle",
+      },
+      folders: {
+        title: "Privatsphäre-Level",
+        description: "Privat, Inkognito, Geteilt, Öffentlich",
+      },
+      characters: {
+        title: "KI-Skills",
+        description: "Benutzerdefinierte & Community-Skills",
+      },
+    },
+    post: {
+      title: "Titel",
+      description: "Endpunkt-Beschreibung",
+      form: {
+        title: "Konfiguration",
+        description: "Parameter konfigurieren",
+      },
+      response: {
+        title: "Antwort",
+        description: "Antwortdaten",
+      },
+      errors: {
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Anfrageparameter",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Interner Serverfehler",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unbekannter Fehler ist aufgetreten",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Netzwerkfehler aufgetreten",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Zugriff verboten",
+        },
+        notFound: {
+          title: "Nicht gefunden",
+          description: "Ressource nicht gefunden",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Datenkonflikt aufgetreten",
+        },
+      },
+      success: {
+        title: "Erfolg",
+        description: "Vorgang erfolgreich abgeschlossen",
+      },
+    },
+  },
   newsletter: {
     title: "Bleib auf dem Laufenden",
     description:
@@ -33,7 +161,7 @@ export const translations: typeof enTranslations = {
       title: "Deine KI. Deine Regeln.",
       subtitle:
         "{{modelCount}} Modelle. Bilder, Videos und Musik generieren. {{skillCount}} Skills. ~{{toolCount}} Tools. SSH, E-Mail, Browser-Automatisierung. Kostenlos auf {{appName}} - oder selbst hosten.",
-      cta: "Kostenlos starten",
+      cta: "Jetzt chatten",
       secondaryCta: "Selbst hosten",
       tabUnbottled: "{{appName}}",
       tabSelfHost: "selbst gehostet",
@@ -123,26 +251,28 @@ export const translations: typeof enTranslations = {
     splitHero: {
       or: "ODER",
       clickToExplore: "Klicken zum Erkunden",
-      header: "Drei Wege. Eine Plattform.",
-      subheader: "Wähle deinen Einstieg.",
+      header: "Vier Produkte. Eine Plattform.",
+
+      subheader:
+        "Uncensored AI · Self-hosted Agent · Open-Source-Framework · Passives Einkommen",
       unbottled: {
-        badge: "KI ohne Zensur",
-        titleLine1: "Deine KI.",
-        titleLine2: "Deine Regeln.",
+        badge: "Unzensiert · Open · Mainstream",
+        titleLine1: "Unzensierte KI.",
+        titleLine2: "Frag alles.",
         subtitle:
-          "{{modelCount}} Modelle in drei Stufen. Du wählst den Filter - mainstream, offen oder unzensiert.",
+          "{{modelCount}} Modelle. Drei Stufen - du entscheidest. Pro Gespräch wechselbar. Die echte Antwort, nicht die genehmigte Version.",
         pill1: "{{modelCount}} Modelle - du wählst den Filter",
         pill2: "Bilder, Video & Musik generieren",
         pill3: "{{skillCount}}+ Skills mit Gedächtnis & Suche",
-        cta: "Kostenlos testen",
+        cta: "Jetzt chatten",
         ctaExplore: "Mehr erfahren",
       },
       personal: {
         badge: "Self-hosted KI-Agent",
-        titleLine1: "Dein Agent.",
-        titleLine2: "Deine Maschine.",
+        titleLine1: "Du fragst.",
+        titleLine2: "Es liefert.",
         subtitle:
-          "Alle {{modelCount}} Modelle auf deiner Hardware. Surft, codet, bedient Terminals, erledigt Aufgaben während du schläfst. Eigene Keys oder dein {{appName}}-Konto.",
+          "Jedes Tool, das Thea baut, landet sofort auf deinem Dashboard - vollständige UI, CLI, KI-Tool, Cron-Job. SSH, E-Mail, Browser-Automatisierung. Deine Maschine. Deine Daten.",
         pill1: "Browser, Terminal & SSH eingebaut",
         pill2: "Läuft 24/7 im Hintergrund",
         pill3: "Eigene Keys oder {{appName}}-Konto",
@@ -151,15 +281,24 @@ export const translations: typeof enTranslations = {
       },
       nextvibe: {
         badge: "Open Source · MIT + GPL v3",
-        titleLine1: "Eine Definition.",
-        titleLine2: "Jede Plattform.",
+        titleLine1: "Einmal schreiben.",
+        titleLine2: "Überall deployen.",
         subtitle:
-          "Einen Endpoint definieren. Web-Formular, CLI-Befehl, KI-Tool, MCP-Server, Cron-Job, Mobile-Screen und Desktop-App erhalten - automatisch. Derselbe TypeScript-Vertrag treibt alle an. Fork es, besitz es.",
+          "Eine TypeScript-Definition wird automatisch zur maßgeschneiderten Web-UI, CLI-Befehl, KI-Tool, MCP-Server, Mobile-Screen und Cron-Job. Gleicher Vertrag. Null Rewrites. Fork es, besitz es.",
         pill1: "Treibt {{appName}} an",
         pill2: "Zero any / unknown / throw",
         pill3: "{{platformCount}} Plattformen pro Endpoint",
         ctaGithub: "Auf GitHub starten",
         ctaDocs: "Framework entdecken",
+        ctaExplore: "Mehr erfahren",
+      },
+      referral: {
+        badge: "Skill-Ökonomie",
+        titleLine1: "Publish. Refer.",
+        titleLine2: "Verdienen.",
+        subtitle:
+          "Skills bauen. 15% verdienen, wenn sich jemand darüber anmeldet. Jeden weiterempfehlen - 10% jeder Zahlung, für immer. Ihr Netzwerk zahlt dir auch.",
+        cta: "Jetzt verdienen",
         ctaExplore: "Mehr erfahren",
       },
       tab: {
@@ -175,6 +314,10 @@ export const translations: typeof enTranslations = {
         nextvibeSub: "Das Framework",
         nextvibeDesc:
           "Das MIT-lizenzierte Framework hinter {{appName}} - ein Endpoint, alle Plattformen, fork und besitz es",
+        referral: "Verdienen",
+        referralSub: "Skills & Empfehlungen",
+        referralDesc:
+          "10% wiederkehrend pro Empfehlung, +5% pro Skill. Mehrstufige Kette. Bis zu 20% gesamt pro Zahlung.",
       },
     },
     selector: {
@@ -209,10 +352,6 @@ export const translations: typeof enTranslations = {
       title: "Jede KI-Plattform entscheidet, was du fragen darfst.",
       line1:
         "ChatGPT verweigert. Claude weicht aus. Gemini fügt Disclaimer hinzu. Den Filter hast du nicht gewählt - sie haben ihn gewählt. Was du zurückbekommst ist nicht die Antwort. Es ist das, was ihr Safety-Team genehmigt hat.",
-      line2:
-        "Modell wechseln, Kontext verlieren. Fünf Apps, keine kennt dich. Jede Session fängt bei null an.",
-      line3:
-        "{{modelCount}} Modelle. Drei Stufen. Du wählst den Filter - nicht wir.",
     },
     capabilities: {
       memory: {
@@ -284,14 +423,16 @@ export const translations: typeof enTranslations = {
         },
       },
       models: {
-        label: "Modellfreiheit",
-        title: "{{modelCount}} Modelle. Du kontrollierst den Filter.",
+        label: "Echte Modellfreiheit",
+        title: "{{modelCount}} Modelle. Du entscheidest.",
         description:
-          "Mainstream für Alltag. Open-Weight wenn du mehr willst. Unzensiert wenn du die volle Antwort brauchst - das ist unser Vorteil. Modell mitten im Chat wechseln. Dieselbe Frage, drei verschiedene Antworten - jetzt kannst du alle vergleichen.",
+          "Drei Stufen. Mainstream wenn du die beste Antwort brauchst, die Geld kaufen kann. Open-Weight für alles andere - überraschend leistungsfähig, ein Bruchteil des Preises. Unzensiert wenn du die rohe Meinung willst, nicht die bereinigte. Wechsel mitten im Chat. Stell allen dreien dieselbe Frage und schau, was du wirklich denkst.",
         andMore: "+ {{count}} weitere",
         imageAlt: "Modell-Auswahl mit Inhaltstufen-Badges",
         demo: {
-          question: "Gleiche Frage. Verschiedene Stufe.",
+          question: "Eine Frage. Drei Antworten.",
+          questionSub:
+            "Wähle eine Stufe und sieh, wie sich die Antwort verändert.",
           userQuestion:
             "War es eine gute Idee, den COVID-Impfstoff zu nehmen? Warum oder warum nicht? Kurz halten.",
           mainstreamTab: "Mainstream",
@@ -473,7 +614,7 @@ export const translations: typeof enTranslations = {
           label: "Reichweite",
           themLabel: "OpenClaw / fragmentierte Dev-Stacks",
           them: "Eine Plattform pro Tool. Für Web schreiben, für CLI umschreiben, für Mobile umschreiben, für deinen AI-Agenten umschreiben. Wartung mit jeder Plattform multiplizieren.",
-          us: "Eine Endpoint-Definition → Web-Formular, CLI-Befehl, KI-Tool, MCP-Server, Cron-Job, Mobile-Screen, Desktop-App. Automatisch. Kein Extra-Code.",
+          us: "Eine Endpoint-Definition → maßgeschneiderte Web-UI, CLI-Befehl, KI-Tool, MCP-Server, Cron-Job, Mobile-Screen, Desktop-App. Automatisch. Kein Extra-Code.",
           whyItMatters:
             "Einmal schreiben. Das Framework handhabt jede Plattform. Das ist der Unlock, den OpenClaw eine Abstraktion entfernt war.",
         },
@@ -503,7 +644,7 @@ export const translations: typeof enTranslations = {
       architecture: {
         title: "{{toolCount}}+ KI-Tools",
         description:
-          "Eine Endpoint-Definition wird zu Web-Formular, CLI-Befehl, KI-Tool, MCP-Server und Cron-Job. Automatisch.",
+          "Eine Endpoint-Definition wird zur Live-Web-UI, CLI-Befehl, KI-Tool, MCP-Server und Cron-Job. Automatisch.",
       },
       shell: {
         title: "Shell & SSH",
@@ -525,10 +666,40 @@ export const translations: typeof enTranslations = {
       badge: "Das Framework",
       title: "Eine Definition. {{platformCount}} Plattformen. Kein Drift.",
       subtitle:
-        "Schreibe einen Endpoint. Erhalte Web-Formular, CLI-Befehl, KI-Tool, MCP-Server, Cron-Job, WebSocket, Mobile-Screen, Desktop-App, Admin-Panel, Agent-Skill und mehr - automatisch. Typsicher. Rollengesteuert.",
+        "Schreibe einen Endpoint. Erhalte interaktive Web-UI, CLI-Befehl, KI-Tool, MCP-Server, Cron-Job, WebSocket, Mobile-Screen, Desktop-App, Admin-Panel, Agent-Skill und mehr - automatisch. Typsicher. Rollengesteuert.",
       sourceLabel: "✦ Einzige Quelle der Wahrheit",
       defFilename: "definition.ts",
       compilesTo: "wird automatisch zu",
+      snippet: {
+        title: "Chat-Threads auflisten",
+        description: "Gibt alle Threads zurück, auf die der Nutzer Zugriff hat",
+        category: "Chat",
+        tag: "threads",
+        rootFolderIdLabel: "Stammordner",
+        threadsLabel: "Threads",
+        greetTitle: "Nutzer begrüßen",
+        greetDescription: "Gibt eine persönliche Begrüßung zurück",
+        greetFormLabel: "Begrüßungsformular",
+        greetTagName: "begrüßungen",
+        greetNameLabel: "Dein Name",
+        greetNamePlaceholder: "z.B. Alice",
+        greetSubmitLabel: "Hallo sagen",
+        tagDemo: "demo",
+        namePlaceholder: "Dein Name",
+        exampleName: "Alice",
+        exampleMessage: "Hallo, Alice!",
+        greetAlias: "greet",
+        greetCategory: "Begrüßungen",
+        cliCategory: "Kategorie",
+        cliMethod: "Methode",
+        cliCallAs: "Aufruf",
+        cliParameters: "Parameter",
+        cliExamples: "Beispiele",
+      },
+      examples: {
+        hello: "Hello World",
+        widget: "Custom Widget",
+      },
       platforms: {
         webApi: {
           name: "REST-API",
@@ -585,7 +756,7 @@ export const translations: typeof enTranslations = {
       },
       callout: {
         title: "Dein KI baut neue Tools für sich selbst",
-        body: "Endpoint hinzufügen → sofort KI-Tool, CLI-Befehl, Web-Formular und geplanter Job. Der Stack ist rekursiv. Claude Code baut next-vibe mit next-vibe.",
+        body: "Endpoint hinzufügen → sofort KI-Tool, CLI-Befehl, Live-Web-UI und geplanter Job. Der Stack ist rekursiv. Claude Code baut next-vibe mit next-vibe.",
         pills: {
           typeSafe: "Durchgehend typsicher",
           roleControlled: "Rollengesteuert",
@@ -593,11 +764,94 @@ export const translations: typeof enTranslations = {
           autoGenerated: "Null Boilerplate",
         },
       },
+      checkmark: "✓",
+      panelDetails: {
+        webApi: {
+          headline: "Pfad definieren. Der REST-Endpoint existiert.",
+          bodyPrefix:
+            "Kein Routing-Config. Keine Controller. Sobald du Pfad und Schema definierst, ist der Endpoint live unter",
+          bodySuffix:
+            ". Rollenprüfung, Validierung und Fehlerformate laufen, bevor dein Code startet.",
+        },
+        reactUi: {
+          headline:
+            "Typisiertes Datenladen. Optimistische Updates. Modal-UI. Drei Zeilen jeweils.",
+          stepRead: "Daten lesen",
+          stepOptimistic: "Optimistisches Update",
+          stepDialog: "Als Dialog öffnen",
+        },
+        aiTool: {
+          headline: "Claude ruft jeden Endpoint direkt auf. Kein Kleber-Code.",
+          bodyPrefix: "Jeder Endpoint ist KI-Agenten via",
+          bodyMiddle1: "zugänglich. Nutze",
+          bodyMiddle2:
+            "für lange Tasks — der Agent pausiert und setzt fort wenn fertig. Übergib",
+          bodySuffix: "um auf einem Remote-Server auszuführen.",
+        },
+        mcpServer: {
+          headline:
+            "Ein Config-Eintrag. Claude Desktop erhält sofort 419 Tools.",
+          bodyPrefix:
+            "Zeig Claude auf den MCP-Server und jeder Endpoint wird aufrufbar. Der Server ist token-effizient: Tool-Discovery liefert nur Namen, vollständige Schemas expandieren bei Bedarf. Zwei Server —",
+          bodyMiddle: "(lokal) und",
+          bodySuffix: "(Produktion).",
+        },
+        reactNative: {
+          headline:
+            "Eine Widget-Datei. Web und Native teilen sich zur Laufzeit auf.",
+          bodyPrefix: "Dasselbe",
+          bodySuffix:
+            "bedient React im Web und React Native auf iOS und Android. Eine Plattformprüfung, zwei Render-Pfade. Auth, Typen und API-Aufrufe sind geteilt. Kein separates Mobile-Repo.",
+        },
+        cron: {
+          headline: "Jeden Endpoint nach Zeitplan. Ein Aufruf.",
+          bodyPrefix: "Wrapp jeden bestehenden Endpoint mit",
+          bodySuffix:
+            "— keine neue Logik, kein separater Worker. Dieselbe Definition und Route, die du bereits geschrieben hast. Zeitpläne, Prioritäten und Kategorien sind typisierte Enums. Im Admin-Panel sichtbar, per CLI verwaltbar.",
+        },
+        websocket: {
+          headline: "Echtzeit-Push aus jedem Repository. Eine Zeile.",
+          bodyPrefix:
+            "Clients abonnieren benannte Kanäle über eine persistente WebSocket-Verbindung. Jedes Repository ruft",
+          bodySuffix:
+            "mit Kanal, Event und Payload auf. Keine Pub/Sub-Infrastruktur einzurichten. Derselbe Mechanismus treibt KI-Token-Streaming an.",
+        },
+        electron: {
+          headline: "Deine Web-App ist eine Desktop-App. Zwei Befehle.",
+          bodyPrefix:
+            "Keine separate Desktop-Codebasis. Dieselbe Next.js-App läuft in einem Electron",
+          bodySuffix:
+            ". Dev startet Server und öffnet das Fenster in einem Schritt. Build für alle Plattformen via electron-builder.",
+        },
+        adminPanel: {
+          headline: "Admin-Seiten schreiben sich selbst.",
+          bodyPrefix: "Setze",
+          bodyMiddle:
+            "und der Endpoint ist überall gesperrt — API, CLI, MCP, UI. Ein Guard-Aufruf plus",
+          bodySuffix:
+            "rendert das vollständige Admin-Interface. Jeder Admin-Screen in der Plattform ist exakt so gebaut.",
+        },
+        vibeFrame: {
+          headline: "Jeder Endpoint. Jede Website. Ein Script-Tag.",
+          body: "Vibe Frame auf jede bestehende Site droppen — WordPress, Webflow, reines HTML. Endpoint und Mount-Punkt deklarieren. Das vollständige Formular, Validierung und Submission-Flow erscheinen inline über eine postMessage-Bridge. Keine Iframes, keine CORS-Probleme.",
+        },
+        remoteSkill: {
+          headline: "Deine API dokumentiert sich selbst als KI-Skill.",
+          bodyPrefix:
+            "Jeder öffentliche Endpoint ist in einem generierten Skill-Manifest enthalten, das externe KI-Agenten abrufen und erlernen. Zwei Dateien: eine für anonyme, eine für authentifizierte Nutzer. Jeder Endpoint ist standardmäßig dabei — füge",
+          bodySuffix:
+            "hinzu um ihn auszuschließen. Keine manuelle API-Dokumentation mehr pflegen.",
+        },
+        vibeBoard: {
+          headline: "Jeder Endpoint wird zum Live-Dashboard-Kachel.",
+          body: "Vibe Board ist die nächste Oberfläche — ein Drag-and-Drop-Analytics-Dashboard, auf dem jeder Endpoint als Kachel angepinnt werden kann. Die Datenschicht, Vibe Sense, ist heute live. Definiere jetzt eine Graph-Pipeline und sie rendert automatisch wenn Vibe Board erscheint. Dieselbe Definition, null zusätzlicher Code.",
+        },
+      },
       surfaceDemo: {
         title: "Derselbe Endpoint. Jede Plattform.",
         web: {
           tab: "Web UI",
-          code: "Auto-generiertes Formular mit\nValidierung, Fehlerzuständen,\nund Lade-UI.\nKein Frontend-Code geschrieben.",
+          code: "Angepasste interaktive UI mit\nValidierung, Fehlerzuständen,\nund Lade-UI.\nKein Frontend-Code geschrieben.",
         },
         cli: {
           tab: "CLI",
@@ -668,7 +922,7 @@ export const translations: typeof enTranslations = {
         label: "Das Framework",
         title: "Deine KI baut neue Tools für sich selbst.",
         description:
-          "Einen Endpoint hinzufügen, und er wird sofort ein Web-Formular, CLI-Befehl, KI-aufrufbares Tool, MCP-Server-Tool und geplanter Job. Der Stack ist rekursiv - Claude Code baut next-vibe mit next-vibe.",
+          "Einen Endpoint hinzufügen, und er wird sofort eine angepasste interaktive UI, CLI-Befehl, KI-aufrufbares Tool, MCP-Server-Tool und geplanter Job. Der Stack ist rekursiv - Claude Code baut next-vibe mit next-vibe.",
       },
       demos: {
         endpoint: {
@@ -678,7 +932,7 @@ export const translations: typeof enTranslations = {
           reasoning:
             "Delegiere an Claude Code. Drei Dateien: definition.ts, repository.ts, route.ts. Es kennt die Muster.",
           summaryResponse:
-            "Fertig. Drei Dateien, 0 Lint-Fehler. Der Subscriptions-Endpoint ist live als Web-Formular, CLI-Befehl, KI-Tool und MCP-Server-Tool - automatisch. Keine extra Verdrahtung.",
+            "Fertig. Drei Dateien, 0 Lint-Fehler. Der Subscriptions-Endpoint ist live als interaktive Admin-UI, CLI-Befehl, KI-Tool und MCP-Server-Tool - automatisch. Keine extra Verdrahtung.",
         },
         surfaces: {
           tab: "Plattformen",
@@ -687,7 +941,7 @@ export const translations: typeof enTranslations = {
           reasoning:
             "Eine Definition registriert. Hier ist jede Plattform, auf der er automatisch verfügbar wurde.",
           summaryResponse:
-            "subscriptions-list_GET ist jetzt auf 6 Plattformen verfügbar:\n\n• Web UI - automatisch generiertes Formular unter /admin/subscriptions\n• CLI - vibe subscriptions-list --status=active\n• KI-Tool - von jedem Agenten mit ADMIN-Rolle aufrufbar\n• MCP-Server - Claude Desktop und Cursor erkennen es automatisch\n• REST API - GET /api/de/agent/subscriptions\n• tRPC - trpc.agent.subscriptionsList.useQuery()\n\nEine Definition. Keine Routing-Konfiguration. Keine separate CLI-Registrierung. Das Framework liest die Definition zur Laufzeit auf jeder Plattform.",
+            "subscriptions-list_GET ist jetzt auf 6 Plattformen verfügbar:\n\n• Web UI - interaktive Admin-Oberfläche unter /admin/subscriptions\n• CLI - vibe subscriptions-list --status=active\n• KI-Tool - von jedem Agenten mit ADMIN-Rolle aufrufbar\n• MCP-Server - Claude Desktop und Cursor erkennen es automatisch\n• REST API - GET /api/de/agent/subscriptions\n• tRPC - trpc.agent.subscriptionsList.useQuery()\n\nEine Definition. Keine Routing-Konfiguration. Keine separate CLI-Registrierung. Das Framework liest die Definition zur Laufzeit auf jeder Plattform.",
         },
         cron: {
           tab: "Cron",
@@ -790,7 +1044,7 @@ export const translations: typeof enTranslations = {
       tenPlatforms: {
         title: "Sofort auf jeder Plattform",
         description:
-          "Jedes Tool, das deine KI baut, ist automatisch Web-Formular, CLI-Befehl, KI-aufrufbares Tool, MCP-Server und Cron-Job. Eine Definition. Du denkst nie über Plattformen nach - sie erscheinen einfach.",
+          "Jedes Tool, das deine KI baut, bekommt sofort eine vollständige interaktive UI, CLI-Befehl, KI-aufrufbares Tool, MCP-Server und Cron-Job. Eine Definition. Du denkst nie über Plattformen nach - sie erscheinen einfach.",
       },
       shipEverywhere: {
         title: "Dein Dashboard, deine Tools",
@@ -838,9 +1092,39 @@ export const translations: typeof enTranslations = {
     cta: {
       title: "Frag, was du wirklich wissen willst.",
       subtitle:
-        "{{modelCount}} Modelle. Bilder, Videos & Musik. Persistentes Gedächtnis. Live-Suche. Kostenlos starten - keine Kreditkarte nötig.",
-      signUp: "Kostenlos starten",
-      viewPlans: "Preise ansehen",
+        "{{modelCount}} Modelle. Ihre Regeln gelten hier nicht. Kostenlos starten - keine Kreditkarte nötig.",
+      tryIt: "Jetzt chatten",
+      signUp: "Konto erstellen",
+      signUpSub: "kostenlos",
+    },
+    ctaUnbottled: {
+      title: "Frag, was du wirklich wissen willst.",
+      subtitle:
+        "{{modelCount}} Modelle. Ihre Regeln gelten hier nicht. Kostenlos starten - keine Kreditkarte nötig.",
+      primary: "Jetzt chatten",
+      secondary: "Konto erstellen",
+      secondarySub: "kostenlos",
+    },
+    ctaPersonal: {
+      title: "Dein Agent. Dein Server. Deine Daten.",
+      subtitle:
+        "SSH, Browser, E-Mail, Code. Immer aktiv. Alles, was Thea baut, bleibt auf deiner Maschine.",
+      primary: "Kostenlos selbst hosten",
+      secondary: "Auf GitHub ansehen",
+    },
+    ctaNextvibe: {
+      title: "Eine Definition. Jede Plattform.",
+      subtitle:
+        "Web-UI, CLI, KI-Tool, MCP-Server, mobiler Bildschirm, Cron-Job — automatisch. Fork it. Own it.",
+      primary: "Dokumentation lesen",
+      secondary: "Auf GitHub starten",
+    },
+    ctaReferral: {
+      title: "Fang heute an zu verdienen.",
+      subtitle:
+        "Teile deinen Link. Veröffentliche einen Skill. Verdiene bei jeder Zahlung, für immer.",
+      primary: "Zum Empfehlungs-Dashboard",
+      secondary: "Skill erstellen",
     },
     pricingSection: {
       title: "Einfache Preisgestaltung",
@@ -1593,6 +1877,10 @@ export const translations: typeof enTranslations = {
     platform: {
       title: "Plattform",
       features: "Funktionen",
+      featuresUncensoredAi: "Unzensierte KI",
+      featuresSelfHosted: "Selbstgehosteter Agent",
+      featuresOpenSource: "Open-Source-Framework",
+      featuresReferral: "Empfehlungseinnahmen",
       subscription: "Abonnement",
       aiModels: "KI-Modelle",
       characters: "Skills",

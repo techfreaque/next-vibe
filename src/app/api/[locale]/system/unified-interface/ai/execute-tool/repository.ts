@@ -127,7 +127,7 @@ export class RouteExecuteRepository {
       // Bail out immediately if the stream was cancelled before tool execution started.
       // The abort signal fires when StreamRegistry.cancel() is called - any DB writes
       // or network calls after this point would create orphaned rows.
-      if (streamContext?.abortSignal?.aborted) {
+      if (streamContext.abortSignal.aborted) {
         logger.debug(
           "[RouteExecute] Stream was cancelled before tool execution started - skipping",
           { toolName: data.toolName },
@@ -1225,7 +1225,7 @@ export class RouteExecuteRepository {
       // Discard result if stream was cancelled during tool execution.
       // The abort signal may have fired while the tool was running - any result
       // returned after cancellation should be ignored to prevent ghost responses.
-      if (streamContext?.abortSignal?.aborted) {
+      if (streamContext.abortSignal.aborted) {
         logger.debug(
           "[RouteExecute] Stream was cancelled during tool execution - discarding result",
           { toolName },

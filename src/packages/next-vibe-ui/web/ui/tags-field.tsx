@@ -147,7 +147,7 @@ export function TagsField<TKey extends string>({
       <div
         className={cn(
           "min-h-[40px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm",
-          "focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500",
+          "focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary",
           disabled && "cursor-not-allowed opacity-50",
           "flex flex-wrap gap-2 items-center",
         )}

@@ -7,7 +7,6 @@
 
 "use client";
 
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -147,15 +146,12 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   const onSubmit = useWidgetOnSubmit();
   const endpointMutations = useWidgetEndpointMutations();
 
-  const env = useEnvAvailability();
-
   // Use settings directly (no ChatProvider dependency)
   const settingsOps = useChatSettings(user, logger);
   const effectiveSettings = useMemo(
     () =>
-      settingsOps.settings ??
-      ChatSettingsRepositoryClient.getDefaults(user, env),
-    [settingsOps.settings, user, env],
+      settingsOps.settings ?? ChatSettingsRepositoryClient.getDefaults(user),
+    [settingsOps.settings, user],
   );
   const enabledTools = useMemo((): EnabledTool[] | null => {
     const { availableTools, pinnedTools } = effectiveSettings;
@@ -812,7 +808,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
                 className={cn(
                   "text-[10px] font-mono",
                   currentEnv === "production"
-                    ? "bg-red-500/10 text-red-600 border-red-500/20"
+                    ? "bg-destructive/10 text-destructive border-destructive/20"
                     : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
                 )}
               >
@@ -906,7 +902,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
                   conn.healthStatus === "warning" &&
                     "border-amber-500/30 text-amber-600",
                   conn.healthStatus === "critical" &&
-                    "border-red-500/30 text-red-600",
+                    "border-red-500/30 text-destructive",
                   conn.healthStatus === "disconnected" &&
                     "border-gray-500/30 text-gray-400",
                 )}
@@ -1318,7 +1314,7 @@ function ToolRow({
                   className={cn(
                     "h-7 w-7 p-0 shrink-0",
                     requiresConfirmation
-                      ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20"
+                      ? "text-warning bg-warning/10 hover:bg-warning/20"
                       : "text-muted-foreground/40 hover:text-muted-foreground",
                   )}
                   onClick={(e) => {

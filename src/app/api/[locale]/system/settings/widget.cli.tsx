@@ -306,9 +306,9 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
           skillId: undefined,
           modelId: undefined,
           headless: undefined,
-          imageGenModelId: undefined,
-          musicGenModelId: undefined,
-          videoGenModelId: undefined,
+          imageGenModelSelection: undefined,
+          musicGenModelSelection: undefined,
+          videoGenModelSelection: undefined,
           isRevival: undefined,
           currentToolMessageId: undefined,
           callerToolCallId: undefined,
@@ -321,6 +321,7 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
           callerCallbackMode: undefined,
           onEscalatedTaskCancel: undefined,
           escalateToTask: undefined,
+          variantId: undefined,
         },
       });
       setSaveMsg("Saved \u2713");
@@ -750,9 +751,9 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
           skillId: undefined,
           modelId: undefined,
           headless: undefined,
-          imageGenModelId: undefined,
-          musicGenModelId: undefined,
-          videoGenModelId: undefined,
+          imageGenModelSelection: undefined,
+          musicGenModelSelection: undefined,
+          videoGenModelSelection: undefined,
           isRevival: undefined,
           currentToolMessageId: undefined,
           callerToolCallId: undefined,
@@ -765,6 +766,7 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
           callerCallbackMode: undefined,
           onEscalatedTaskCancel: undefined,
           escalateToTask: undefined,
+          variantId: undefined,
         },
       });
       setSaveMsg("Saved ✓");
@@ -1043,7 +1045,7 @@ export function SystemSettingsWidget({ field }: CliWidgetProps): JSX.Element {
 
   return (
     <Box flexDirection="column">
-      <Text wrap="end">{output}</Text>
+      <Text wrap="truncate-end">{output}</Text>
     </Box>
   );
 }
@@ -1097,9 +1099,9 @@ export function SystemSettingsPatchWidget(): JSX.Element {
             skillId: undefined,
             modelId: undefined,
             headless: undefined,
-            imageGenModelId: undefined,
-            musicGenModelId: undefined,
-            videoGenModelId: undefined,
+            imageGenModelSelection: undefined,
+            musicGenModelSelection: undefined,
+            videoGenModelSelection: undefined,
             isRevival: undefined,
             currentToolMessageId: undefined,
             callerToolCallId: undefined,
@@ -1112,6 +1114,7 @@ export function SystemSettingsPatchWidget(): JSX.Element {
             callerCallbackMode: undefined,
             onEscalatedTaskCancel: undefined,
             escalateToTask: undefined,
+            variantId: undefined,
           },
         });
         if (result.success) {

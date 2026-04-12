@@ -66,6 +66,7 @@ export type StandardUserType = z.infer<typeof standardUserSchema>;
  */
 export const completeUserSchema = standardUserSchema.extend({
   stripeCustomerId: z.string().nullable(),
+  creatorSlug: z.string().nullable().optional(),
   bio: z.string().nullable().optional(),
   websiteUrl: z.string().nullable().optional(),
   twitterUrl: z.string().nullable().optional(),
@@ -76,6 +77,7 @@ export const completeUserSchema = standardUserSchema.extend({
   discordUrl: z.string().nullable().optional(),
   creatorAccentColor: z.string().nullable().optional(),
   creatorHeaderImageUrl: z.string().nullable().optional(),
+  avatarUrl: z.string().nullable().optional(),
 });
 export type CompleteUserType = z.infer<typeof completeUserSchema>;
 

@@ -18,6 +18,10 @@ export async function getSeedModule(
   switch (moduleName) {
     case "[rootFolderId]":
       return (await import("../../agent/chat/folders/[rootFolderId]/seeds")) as EnvironmentSeeds;
+    case "skills":
+      return (await import("../../agent/chat/skills/seeds")) as EnvironmentSeeds;
+    case "lead-magnet":
+      return (await import("../../lead-magnet/seeds")) as EnvironmentSeeds;
     case "leads":
       return (await import("../../leads/seeds")) as EnvironmentSeeds;
     case "messages":
@@ -49,6 +53,8 @@ export async function getSeedModule(
 export function getAllSeedModuleNames(): string[] {
   return [
     "[rootFolderId]",
+    "skills",
+    "lead-magnet",
     "leads",
     "messages",
     "smtp-client",

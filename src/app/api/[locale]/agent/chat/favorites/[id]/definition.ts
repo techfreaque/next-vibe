@@ -6,10 +6,6 @@
 import { z } from "zod";
 
 import {
-  CHAT_MODE_IDS,
-  ChatModeOptions,
-} from "@/app/api/[locale]/agent/models/enum";
-import {
   chatModelSelectionSchema,
   filterChatModels,
   type ChatModelSelection,
@@ -21,12 +17,14 @@ import {
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import {
+  CHAT_MODE_IDS,
+  ChatModeOptions,
+} from "@/app/api/[locale]/agent/models/enum";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
-import type { ModelProviderEnvAvailability } from "@/app/api/[locale]/agent/models/models";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   dateSchema,
   iconSchema,
@@ -52,6 +50,7 @@ import {
   SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { lazy } from "react";
@@ -64,7 +63,6 @@ import {
   IntelligenceLevel,
   ModelSelectionType,
   PriceLevel,
-  SpeedLevel,
 } from "../../skills/enum";
 import {
   FAVORITE_DELETE_ALIAS,
@@ -92,7 +90,8 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "trash" as const,
-  category: "endpointCategories.chatFavorites",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.chatFavorites",
   tags: ["tags.favorites" as const],
 
   aliases: [FAVORITE_DELETE_ALIAS],
@@ -199,7 +198,7 @@ const { DELETE } = createEndpoint({
         label: "delete.id.label" as const,
         description: "delete.id.description" as const,
         hidden: true,
-        schema: z.string().uuid(),
+        schema: z.string(),
       }),
 
       // Button container for horizontal layout
@@ -320,7 +319,8 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "edit" as const,
-  category: "endpointCategories.chatFavorites",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.chatFavorites",
   tags: ["tags.favorites" as const],
 
   aliases: [FAVORITE_UPDATE_ALIAS],
@@ -329,9 +329,6 @@ const { PATCH } = createEndpoint({
     mutationOptions: {
       onSuccess: async (data) => {
         const { logger, pathParams, requestData, user, locale } = data;
-        const { getEnvAvailability } =
-          await import("../../../env-availability-context");
-        const env = getEnvAvailability();
 
         // Import dependencies
         const { apiClient } =
@@ -358,7 +355,6 @@ const { PATCH } = createEndpoint({
               requestData.modelSelection,
               undefined,
               user,
-              env,
             );
             const parsed = z.enum(ChatModelId).safeParse(bestModel?.id);
             modelId = parsed.success
@@ -504,7 +500,6 @@ const { PATCH } = createEndpoint({
                       null,
                       locale,
                       user,
-                      env,
                     );
 
                   updatedFavorite.activeBadge = fav.activeBadge;
@@ -556,7 +551,7 @@ const { PATCH } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "patch.id.label" as const,
         hidden: true,
-        schema: z.string().uuid(),
+        schema: z.string(),
       }),
 
       // Delete button configuration
@@ -589,6 +584,14 @@ const { PATCH } = createEndpoint({
         columns: 6,
         hidden: true,
         schema: z.string().optional(),
+      }),
+      variantId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.variantId.label" as const,
+        columns: 6,
+        hidden: true,
+        schema: z.string().nullable().optional(),
       }),
 
       customVariantName: requestField(scopedTranslation, {
@@ -775,7 +778,6 @@ const { PATCH } = createEndpoint({
       }),
 
       backButton: backButton(scopedTranslation, {
-        label: "patch.backButton.label" as const,
         icon: "arrow-left",
         variant: "outline",
         usage: { request: "data&urlPathParams" },
@@ -862,10 +864,6 @@ const { PATCH } = createEndpoint({
             min: ContentLevel.MAINSTREAM,
             max: ContentLevel.UNCENSORED,
           },
-          speedRange: {
-            min: SpeedLevel.FAST,
-            max: SpeedLevel.THOROUGH,
-          },
         },
         compactTrigger: null,
         availableTools: [
@@ -898,7 +896,8 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "star" as const,
-  category: "endpointCategories.chatFavorites",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.chatFavorites",
   tags: ["tags.favorites" as const],
 
   aliases: [FAVORITE_GET_ALIAS],
@@ -910,9 +909,9 @@ const { GET } = createEndpoint({
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.TEXT,
         label: "get.id.label" as const,
-        schema: z.string().uuid(),
+        schema: z.string(),
         hidden: true,
       }),
 
@@ -1200,10 +1199,6 @@ const { GET } = createEndpoint({
             min: ContentLevel.OPEN,
             max: ContentLevel.UNCENSORED,
           },
-          speedRange: {
-            min: SpeedLevel.FAST,
-            max: SpeedLevel.THOROUGH,
-          },
         },
         characterModelSelection: {
           selectionType: ModelSelectionType.FILTERS,
@@ -1218,10 +1213,6 @@ const { GET } = createEndpoint({
           contentRange: {
             min: ContentLevel.OPEN,
             max: ContentLevel.UNCENSORED,
-          },
-          speedRange: {
-            min: SpeedLevel.FAST,
-            max: SpeedLevel.THOROUGH,
           },
         },
         compactTrigger: null,
@@ -1335,13 +1326,12 @@ export function filterChatModelsForFavorite(
   favoriteModelSelection: FavoriteGetModelSelection | null,
   skillModelSelection: ChatModelSelection | undefined,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): ReturnType<typeof filterChatModels> {
   const selectionToUse = favoriteModelSelection ?? skillModelSelection;
   if (!selectionToUse) {
     return [];
   }
-  return filterChatModels(selectionToUse, user, env);
+  return filterChatModels(selectionToUse, user);
 }
 
 /** Get best chat model for a favorite. */
@@ -1349,14 +1339,12 @@ export function getBestChatModelForFavorite(
   favoriteModelSelection: FavoriteGetModelSelection | null,
   skillModelSelection: ChatModelSelection | undefined,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): ReturnType<typeof getBestChatModel> {
   return (
     filterChatModelsForFavorite(
       favoriteModelSelection,
       skillModelSelection,
       user,
-      env,
     )[0] ?? null
   );
 }

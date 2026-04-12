@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   title: "drag.title",
   description: "drag.description",
   category: "endpointCategories.browser",
+  subCategory: "endpointCategories.browserInteraction",
   icon: "move",
   tags: ["drag.tags.browserAutomation", "drag.tags.inputAutomation"],
 

@@ -65,7 +65,7 @@ function NewsletterWelcomeEmail({
   return (
     <EmailTemplate
       locale={locale}
-      title={t("emailTemplate.welcome.title")}
+      title={t("emailTemplate.welcome.title", { appName })}
       previewText={t("emailTemplate.welcome.preview")}
       recipientEmail={recipientEmail}
       tracking={tracking}
@@ -221,6 +221,7 @@ export const newsletterWelcomeEmailTemplate: EmailTemplateDefinition<
     userId: "example-user-id-123",
   },
   render: ({ requestData, responseData, locale, t }) => {
+    const { t: configT } = configScopedTranslation.scopedT(locale);
     try {
       const templateProps: NewsletterWelcomeProps = {
         email: requestData.email,
@@ -232,7 +233,9 @@ export const newsletterWelcomeEmailTemplate: EmailTemplateDefinition<
       return success({
         toEmail: requestData.email,
         toName: requestData.name || requestData.email,
-        subject: t("emailTemplate.welcome.subject"),
+        subject: t("emailTemplate.welcome.subject", {
+          appName: configT("appName"),
+        }),
         leadId: responseData.leadId,
         jsx: newsletterWelcomeEmailTemplate.component({
           props: templateProps,

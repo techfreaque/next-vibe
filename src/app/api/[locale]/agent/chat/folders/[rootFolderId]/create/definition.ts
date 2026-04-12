@@ -43,9 +43,11 @@ const { POST } = createEndpoint({
 
   title: "title" as const,
   description: "description" as const,
-  category: "endpointCategories.chatThreads",
+
   tags: ["tags.folders" as const],
   icon: "folder-plus" as const,
+  category: "endpointCategories.chat",
+  subCategory: "endpointCategories.chatOrganization",
 
   fields: customWidgetObject({
     render: FolderCreateContainer,

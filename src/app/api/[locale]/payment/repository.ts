@@ -15,6 +15,46 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import type Stripe from "stripe";
 
+/** Extracted from Stripe.Checkout.SessionCreateParams - TS6 can't resolve merged class/namespace */
+type StripeCheckoutSessionCreateParams = NonNullable<
+  Parameters<Stripe["checkout"]["sessions"]["create"]>[0]
+>;
+type StripeCheckoutPaymentMethodType = NonNullable<
+  StripeCheckoutSessionCreateParams["payment_method_types"]
+>[number];
+type StripeCheckoutMode = NonNullable<
+  StripeCheckoutSessionCreateParams["mode"]
+>;
+
+/**
+ * Map our CheckoutMode enum values to Stripe's mode parameter.
+ * Our enums use i18n key patterns like "enums.checkoutMode.payment".
+ */
+const CHECKOUT_MODE_TO_STRIPE: Record<
+  typeof CheckoutModeValue,
+  StripeCheckoutMode
+> = {
+  [CheckoutMode.PAYMENT]: "payment",
+  [CheckoutMode.SUBSCRIPTION]: "subscription",
+  [CheckoutMode.SETUP]: "setup",
+};
+
+/**
+ * Map our PaymentMethodType enum values to Stripe's payment_method_types parameter.
+ * Our enums use i18n key patterns like "enums.paymentMethodType.card".
+ */
+const PAYMENT_METHOD_TO_STRIPE: Record<
+  typeof PaymentMethodTypeValue,
+  StripeCheckoutPaymentMethodType
+> = {
+  [PaymentMethodType.CARD]: "card",
+  [PaymentMethodType.BANK_TRANSFER]: "customer_balance",
+  [PaymentMethodType.PAYPAL]: "paypal",
+  [PaymentMethodType.APPLE_PAY]: "card",
+  [PaymentMethodType.GOOGLE_PAY]: "card",
+  [PaymentMethodType.SEPA_DEBIT]: "sepa_debit",
+};
+
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -31,7 +71,14 @@ import type {
   PaymentPostRequestOutput,
   PaymentPostResponseOutput,
 } from "./definition";
-import { CheckoutMode, PaymentProvider, PaymentStatus } from "./enum";
+import {
+  CheckoutMode,
+  type CheckoutModeValue,
+  PaymentMethodType,
+  type PaymentMethodTypeValue,
+  PaymentProvider,
+  PaymentStatus,
+} from "./enum";
 import type { PaymentT } from "./i18n";
 import { scopedTranslation } from "./i18n";
 import type {
@@ -134,29 +181,14 @@ export class PaymentRepository {
           },
         });
       }
-      // Map enum translation keys to Stripe API values
-      const paymentMethodTypes = (data.paymentMethodTypes?.map((type) => {
-        // Extract last part of translation key (e.g., "card" from "enums.paymentMethodType.card")
-        const parts = type.split(".");
-        const value = parts.at(-1);
-        if (!value) {
-          return "";
-        }
-        // Convert camelCase to snake_case for Stripe (applePay -> apple_pay)
-        return value
-          .replaceAll(/([A-Z])/g, (match) => `_${match}`)
-          .toLowerCase();
-      }) || [
-        "card",
-      ]) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
+      // Map our enum values to Stripe API values via typed lookup tables
+      const paymentMethodTypes = data.paymentMethodTypes?.map(
+        (type) => PAYMENT_METHOD_TO_STRIPE[type],
+      ) ?? ["card"];
 
-      // Extract mode value from translation key
-      const modeParts = data.mode.split(".");
-      const modeValue = modeParts.at(
-        -1,
-      ) as Stripe.Checkout.SessionCreateParams.Mode;
+      const modeValue = CHECKOUT_MODE_TO_STRIPE[data.mode];
 
-      const sessionConfig: Stripe.Checkout.SessionCreateParams = {
+      const sessionConfig: StripeCheckoutSessionCreateParams = {
         customer: stripeCustomerId,
         payment_method_types: paymentMethodTypes,
         mode: modeValue,

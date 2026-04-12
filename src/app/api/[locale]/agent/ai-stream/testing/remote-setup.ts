@@ -18,13 +18,13 @@
 
 import "server-only";
 
-import { and, eq, sql } from "drizzle-orm";
-import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
 import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
+import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import { and, eq, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
@@ -233,7 +233,7 @@ export async function resolveProdAdminToken(): Promise<string> {
  * Problem: hermes (port 3001) and hermes-dev (port 3000) share the same codebase
  * and similar DB setup. The execute-tool task is created in hermes-dev's DB as
  * enabled=false (to prevent local pulse from running it). Hermes's automated cron
- * is unreliable in local dev — it may or may not pick up the task depending on
+ * is unreliable in local dev - it may or may not pick up the task depending on
  * timing and cursor state. Polling for hermes to execute + /report back is fragile.
  *
  * Additionally: when hermes does post /report and create a resume-stream cron task,
@@ -451,7 +451,12 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
         videoGenModelSelection: chatFavorites.videoGenModelSelection,
       })
       .from(chatFavorites)
-      .where(eq(chatFavorites.id, remoteTask.wakeUpFavoriteId))
+      .where(
+        or(
+          eq(chatFavorites.id, remoteTask.wakeUpFavoriteId),
+          eq(chatFavorites.slug, remoteTask.wakeUpFavoriteId),
+        ),
+      )
       .limit(1);
     if (fav) {
       favoriteRow = fav;
@@ -506,26 +511,12 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
         }
       : null,
   };
-  const resolvedImageGenModel = ModalityResolver.resolveImageGenModel(
-    userBridgeCtx,
-    taskUser,
-  );
-  const resolvedMusicGenModel = ModalityResolver.resolveMusicGenModel(
-    userBridgeCtx,
-    taskUser,
-  );
-  const resolvedVideoGenModel = ModalityResolver.resolveVideoGenModel(
-    userBridgeCtx,
-    taskUser,
-  );
-  const { isModelOptionImageBased } =
-    await import("@/app/api/[locale]/agent/models/models");
-  const handlerImageGenModelId =
-    resolvedImageGenModel && isModelOptionImageBased(resolvedImageGenModel)
-      ? resolvedImageGenModel.id
-      : undefined;
-  const handlerMusicGenModelId = resolvedMusicGenModel?.id;
-  const handlerVideoGenModelId = resolvedVideoGenModel?.id;
+  const handlerImageGenModelSelection =
+    ModalityResolver.resolveImageGenSelection(userBridgeCtx);
+  const handlerMusicGenModelSelection =
+    ModalityResolver.resolveMusicGenSelection(userBridgeCtx);
+  const handlerVideoGenModelSelection =
+    ModalityResolver.resolveVideoGenSelection(userBridgeCtx);
 
   /**
    * Execute one remote task handler in-process and return its output.
@@ -599,9 +590,10 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
         callerCallbackMode: undefined,
         onEscalatedTaskCancel: undefined,
         escalateToTask: undefined,
-        imageGenModelId: handlerImageGenModelId,
-        musicGenModelId: handlerMusicGenModelId,
-        videoGenModelId: handlerVideoGenModelId,
+        imageGenModelSelection: handlerImageGenModelSelection,
+        musicGenModelSelection: handlerMusicGenModelSelection,
+        videoGenModelSelection: handlerVideoGenModelSelection,
+        variantId: undefined,
         isRevival: undefined,
       },
     }).catch((err: Error) => {
@@ -627,7 +619,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
       success: handlerResult
         ? (handlerResult as { success?: boolean }).success
         : null,
-      videoGenModelId: handlerVideoGenModelId,
+      videoGenModelSelectionType: handlerVideoGenModelSelection.selectionType,
       taskOutputWaiting:
         taskOutput && typeof taskOutput === "object"
           ? (taskOutput as Record<string, JsonValue>)["waiting"]
@@ -815,7 +807,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
   // wait-for-task(detach dependency): if the handler result is waiting=true, the
   // wait-for-task registered itself as a waiter on a detach task (e.g. generate_image).
   // The wakeUp context is now on the dependency task. Don't handleTaskCompletion for
-  // wait-for-task now — instead recurse to run the dependency task first. The dependency's
+  // wait-for-task now - instead recurse to run the dependency task first. The dependency's
   // handleTaskCompletion will fire the revival with the real result.
   const isWaiting =
     taskOutput &&
@@ -988,7 +980,7 @@ export async function triggerHermesPulseExecute(
   };
 
   // 15s timeout: pulse/execute can hang if hermes has accumulated real tasks.
-  // This is best-effort E2E coverage only — triggerLocalPulse drives the actual test.
+  // This is best-effort E2E coverage only - triggerLocalPulse drives the actual test.
   const signal = AbortSignal.timeout(15_000);
   let pulseResp: Response;
   try {

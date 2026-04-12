@@ -31,7 +31,8 @@ export const GoogleSheetsCredentialsRepository = {
     if (!row) {
       return null;
     }
-    const creds = row.credentials as GoogleSheetsCredentials;
+    const creds = row.credentials as Record<string, string | undefined> &
+      GoogleSheetsCredentials;
     if (!creds.googleRefreshToken) {
       return null;
     }

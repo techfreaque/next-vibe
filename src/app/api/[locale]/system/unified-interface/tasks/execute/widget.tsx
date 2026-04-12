@@ -96,16 +96,16 @@ function StatusIcon({
   status: string | null | undefined;
 }): JSX.Element {
   if (status === CronTaskStatus.COMPLETED) {
-    return <CheckCircle className="h-6 w-6 text-green-600" />;
+    return <CheckCircle className="h-6 w-6 text-success" />;
   }
   if (
     status === CronTaskStatus.FAILED ||
     status === CronTaskStatus.ERROR ||
     status === CronTaskStatus.TIMEOUT
   ) {
-    return <XCircle className="h-6 w-6 text-red-500" />;
+    return <XCircle className="h-6 w-6 text-destructive" />;
   }
-  return <AlertTriangle className="h-6 w-6 text-yellow-500" />;
+  return <AlertTriangle className="h-6 w-6 text-warning" />;
 }
 
 // ---------------------------------------------------------------------------
@@ -234,12 +234,10 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
     const status = result.status;
 
     const statusBgClass = isSuccess
-      ? "bg-green-50 border-green-200 dark:bg-green-900/10 dark:border-green-800/40"
-      : "bg-red-50 border-red-200 dark:bg-red-900/10 dark:border-red-800/40";
+      ? "bg-success/10 border-success/30"
+      : "bg-destructive/10 border-destructive/30";
 
-    const statusTextClass = isSuccess
-      ? "text-green-800 dark:text-green-300"
-      : "text-red-800 dark:text-red-300";
+    const statusTextClass = isSuccess ? "text-success" : "text-destructive";
 
     return (
       <Div className="flex flex-col gap-4 p-4">

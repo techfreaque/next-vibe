@@ -113,27 +113,40 @@ export function SidebarWrapper({
   if (isMobile) {
     return (
       <Div className="flex flex-row h-screen h-max-screen w-full">
-        {!collapsed && (
-          <Div
-            suppressHydrationWarning
-            className={cn(
-              "fixed inset-y-0 left-0 z-50 bg-background border-r border-border",
-              SIDEBAR_WIDTH,
-            )}
-          >
-            <Div className="h-full w-full bg-background">
-              <WidgetSidebar locale={locale} user={user} logger={logger} />
-            </Div>
-          </Div>
-        )}
+        <AnimatePresence>
+          {!collapsed && (
+            <MotionDiv
+              key="mobile-sidebar"
+              initial={{ x: -260 }}
+              animate={{ x: 0 }}
+              exit={{ x: -260 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className={cn(
+                "fixed inset-y-0 left-0 z-[210] bg-background border-r border-border",
+                SIDEBAR_WIDTH,
+              )}
+            >
+              <Div className="h-full w-full bg-background">
+                <WidgetSidebar locale={locale} user={user} logger={logger} />
+              </Div>
+            </MotionDiv>
+          )}
+        </AnimatePresence>
 
-        {!collapsed && (
-          <Div
-            className="fixed inset-0 bg-black/50 z-30"
-            onClick={() => setSidebarCollapsed(!collapsed)}
-            aria-label={t("common.close")}
-          />
-        )}
+        <AnimatePresence>
+          {!collapsed && (
+            <MotionDiv
+              key="mobile-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="fixed inset-0 bg-black/50 z-[200]"
+              onClick={() => setSidebarCollapsed(!collapsed)}
+              aria-label={t("common.close")}
+            />
+          )}
+        </AnimatePresence>
 
         <Div className="h-screen h-max-screen w-full">{children}</Div>
       </Div>

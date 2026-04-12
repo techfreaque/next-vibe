@@ -47,7 +47,6 @@ import {
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazy } from "react";
 import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
 import { ChatModelId, getBestChatModel } from "../../../ai-stream/models";
 import { TtsModelId } from "../../../text-to-speech/models";
@@ -70,11 +69,12 @@ import type { SkillListResponseOutput } from "../definition";
 import { CategoryOptions, SkillCategory } from "../enum";
 import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "./i18n";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 
-const SkillEditContainer = lazy(() =>
+const SkillEditContainer = lazyCliWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillEditContainer })),
 );
-const SkillViewContainer = lazy(() =>
+const SkillViewContainer = lazyCliWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillViewContainer })),
 );
 
@@ -100,7 +100,8 @@ const { DELETE } = createEndpoint({
     return undefined;
   },
   icon: "trash" as const,
-  category: "endpointCategories.chatSkills",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.skillsManagement",
   tags: ["tags.skills" as const],
 
   aliases: [SKILL_DELETE_ALIAS],
@@ -177,7 +178,7 @@ const { DELETE } = createEndpoint({
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.TEXT,
         label: "delete.id.label" as const,
         description: "delete.id.description" as const,
         hidden: true,
@@ -322,7 +323,8 @@ const { PATCH } = createEndpoint({
     return undefined;
   },
   icon: "sparkles" as const,
-  category: "endpointCategories.chatSkills",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.skillsManagement",
   tags: ["tags.skills" as const],
 
   aliases: [SKILL_UPDATE_ALIAS],
@@ -333,8 +335,6 @@ const { PATCH } = createEndpoint({
         // Import apiClient, skills list GET endpoint, and repository client
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
-        const { getEnvAvailability } =
-          await import("../../../env-availability-context");
         const skillsDefinition = await import("../definition");
         const skillSingleDefinitions = await import("./definition");
 
@@ -408,11 +408,7 @@ const { PATCH } = createEndpoint({
                     // Recalculate model info if modelSelection changed
                     const modelSel = data.requestData.modelSelection;
                     const bestModel = modelSel
-                      ? getBestChatModel(
-                          modelSel,
-                          data.user,
-                          getEnvAvailability(),
-                        )
+                      ? getBestChatModel(modelSel, data.user)
                       : null;
 
                     return {
@@ -725,6 +721,15 @@ const { PATCH } = createEndpoint({
         description: "patch.modelSelection.description" as const,
         schema: chatModelSelectionSchema.nullable(),
       }),
+      // Named variants with per-variant model selections
+      variants: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.variants.label" as const,
+        description: "patch.variants.description" as const,
+        hidden: true,
+        schema: z.array(skillVariantSchema).optional(),
+      }),
 
       // Auto-compacting token threshold (null = use global/settings default)
       compactTrigger: requestField(scopedTranslation, {
@@ -892,7 +897,8 @@ const { GET } = createEndpoint({
     return undefined;
   },
   icon: "sparkles" as const,
-  category: "endpointCategories.chatSkills",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.skillsManagement",
   tags: ["tags.skills" as const],
 
   aliases: [SKILL_GET_ALIAS],
@@ -1062,6 +1068,7 @@ const { GET } = createEndpoint({
         schema: z
           .object({
             userId: z.uuid(),
+            creatorSlug: z.string(),
             publicName: z.string(),
             avatarUrl: z.string().nullable(),
             bio: z.string().nullable(),
@@ -1075,6 +1082,9 @@ const { GET } = createEndpoint({
             creatorAccentColor: z.string().nullable(),
             creatorHeaderImageUrl: z.string().nullable(),
             referralCode: z.string().nullable(),
+            leadMagnetActive: z.boolean(),
+            leadMagnetHeadline: z.string().nullable(),
+            leadMagnetButtonText: z.string().nullable(),
           })
           .nullable(),
       }),

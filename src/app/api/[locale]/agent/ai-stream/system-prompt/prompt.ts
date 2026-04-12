@@ -471,10 +471,10 @@ function buildMediaLine(opts: {
   if (genModelName) {
     if (hasNative) {
       // Case 2: different gen model + native capability → mention both, prefer tool
-      return `- ${label}: You can produce ${modality} natively, but the user prefers ${genModelName} via ${toolAlias} tool. Use the tool by default; use native output only if explicitly asked.`;
+      return `- ${label}: You can produce ${modality} natively, but the user prefers ${genModelName}. Use \`tool-help\` with \`toolName="${toolAlias}"\` to get the full schema, then call it via \`execute-tool\`. Use native output only if explicitly asked.`;
     }
     // Case 3: different gen model, no native → tool only
-    return `- ${label}: ${genModelName} available via ${toolAlias} tool`;
+    return `- ${label}: ${genModelName} available. Use \`tool-help\` with \`toolName="${toolAlias}"\` to get the full schema, then call it via \`execute-tool\`.`;
   }
 
   if (hasNative) {

@@ -12,6 +12,7 @@ import {
 } from "next-vibe-ui/ui/collapsible";
 import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { Brain } from "next-vibe-ui/ui/icons/Brain";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
@@ -21,6 +22,7 @@ import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { Eye } from "next-vibe-ui/ui/icons/Eye";
 import { Film } from "next-vibe-ui/ui/icons/Film";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 import { Mic } from "next-vibe-ui/ui/icons/Mic";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
@@ -29,6 +31,7 @@ import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Star } from "next-vibe-ui/ui/icons/Star";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { User } from "next-vibe-ui/ui/icons/User";
+import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
 import { X } from "next-vibe-ui/ui/icons/X";
@@ -63,7 +66,6 @@ import {
   type ImageVisionModelSelection,
   type VideoVisionModelSelection,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
   getBestImageGenModel,
@@ -132,9 +134,14 @@ import {
   ToolsConfigEdit,
   type ToolsConfigValue,
 } from "../../../tools/widget/tools-config-widget";
-import { useAddToFavorites } from "../../favorites/create/hooks";
+import {
+  useAddToFavorites,
+  type SkillDataForFavorite,
+} from "../../favorites/create/hooks";
+import type { FavoriteCard } from "../../favorites/definition";
 import { useChatFavorites } from "../../favorites/hooks/hooks";
 import { CompactTriggerEdit } from "../../settings/widget";
+import type { SkillVariantData } from "../../skills/db";
 import {
   ModelSelectionType,
   SkillOwnershipType,
@@ -183,8 +190,6 @@ export function SkillEditContainer({
   const skillHook = useSkill(skillId, user, logger);
   const skillOwnership = skillHook.read?.data?.skillOwnership;
 
-  const envAvailability = useEnvAvailability();
-
   // Single active selector state replaces 5 separate open/close states
   const [activeSelector, setActiveSelector] = useState<
     | "chat"
@@ -201,11 +206,7 @@ export function SkillEditContainer({
 
   // Platform-level default model selections (env-aware)
   const platformChatDefault = useMemo((): ChatModelSelection | undefined => {
-    const m = getBestChatModel(
-      DEFAULT_CHAT_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -214,14 +215,10 @@ export function SkillEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformTtsDefault = useMemo((): VoiceModelSelection | undefined => {
-    const m = getBestTtsModel(
-      DEFAULT_TTS_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -230,16 +227,12 @@ export function SkillEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformImageGenDefault = useMemo(():
     | ImageGenModelSelection
     | undefined => {
-    const m = getBestImageGenModel(
-      DEFAULT_IMAGE_GEN_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestImageGenModel(DEFAULT_IMAGE_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -248,16 +241,12 @@ export function SkillEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformMusicGenDefault = useMemo(():
     | MusicGenModelSelection
     | undefined => {
-    const m = getBestMusicGenModel(
-      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestMusicGenModel(DEFAULT_MUSIC_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -266,16 +255,12 @@ export function SkillEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformVideoGenDefault = useMemo(():
     | VideoGenModelSelection
     | undefined => {
-    const m = getBestVideoGenModel(
-      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestVideoGenModel(DEFAULT_VIDEO_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -284,14 +269,10 @@ export function SkillEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformSttDefault = useMemo((): SttModelSelection | undefined => {
-    const m = getBestSttModel(
-      DEFAULT_STT_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
@@ -300,7 +281,7 @@ export function SkillEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformImageVisionDefault = useMemo(():
     | ImageVisionModelSelection
@@ -308,7 +289,6 @@ export function SkillEditContainer({
     const m = getBestImageVisionModel(
       DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       user,
-      envAvailability,
     );
     if (!m) {
       return undefined;
@@ -318,7 +298,7 @@ export function SkillEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformVideoVisionDefault = useMemo(():
     | VideoVisionModelSelection
@@ -326,7 +306,6 @@ export function SkillEditContainer({
     const m = getBestVideoVisionModel(
       DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       user,
-      envAvailability,
     );
     if (!m) {
       return undefined;
@@ -336,7 +315,7 @@ export function SkillEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   const platformAudioVisionDefault = useMemo(():
     | AudioVisionModelSelection
@@ -344,7 +323,6 @@ export function SkillEditContainer({
     const m = getBestAudioVisionModel(
       DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       user,
-      envAvailability,
     );
     if (!m) {
       return undefined;
@@ -354,7 +332,7 @@ export function SkillEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user, envAvailability]);
+  }, [user]);
 
   // Stable props
   const emptyField = useMemo(() => ({}), []);
@@ -1019,11 +997,10 @@ function useViewDefaults(): {
   videoVision: VideoVisionModelSelection | undefined;
   audioVision: AudioVisionModelSelection | undefined;
 } {
-  const env = useEnvAvailability();
   const user = useWidgetUser();
   return useMemo(() => {
     const mkChat = (): ChatModelSelection | undefined => {
-      const m = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user, env);
+      const m = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user);
       if (!m) {
         return undefined;
       }
@@ -1034,7 +1011,7 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkVoice = (): VoiceModelSelection | undefined => {
-      const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user, env);
+      const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user);
       if (!m) {
         return undefined;
       }
@@ -1045,11 +1022,7 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkImageGen = (): ImageGenModelSelection | undefined => {
-      const m = getBestImageGenModel(
-        DEFAULT_IMAGE_GEN_MODEL_SELECTION,
-        user,
-        env,
-      );
+      const m = getBestImageGenModel(DEFAULT_IMAGE_GEN_MODEL_SELECTION, user);
       if (!m) {
         return undefined;
       }
@@ -1060,11 +1033,7 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkMusicGen = (): MusicGenModelSelection | undefined => {
-      const m = getBestMusicGenModel(
-        DEFAULT_MUSIC_GEN_MODEL_SELECTION,
-        user,
-        env,
-      );
+      const m = getBestMusicGenModel(DEFAULT_MUSIC_GEN_MODEL_SELECTION, user);
       if (!m) {
         return undefined;
       }
@@ -1075,11 +1044,7 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkVideoGen = (): VideoGenModelSelection | undefined => {
-      const m = getBestVideoGenModel(
-        DEFAULT_VIDEO_GEN_MODEL_SELECTION,
-        user,
-        env,
-      );
+      const m = getBestVideoGenModel(DEFAULT_VIDEO_GEN_MODEL_SELECTION, user);
       if (!m) {
         return undefined;
       }
@@ -1090,7 +1055,7 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkStt = (): SttModelSelection | undefined => {
-      const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user, env);
+      const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user);
       if (!m) {
         return undefined;
       }
@@ -1104,7 +1069,6 @@ function useViewDefaults(): {
       const m = getBestImageVisionModel(
         DEFAULT_IMAGE_VISION_MODEL_SELECTION,
         user,
-        env,
       );
       if (!m) {
         return undefined;
@@ -1119,7 +1083,6 @@ function useViewDefaults(): {
       const m = getBestVideoVisionModel(
         DEFAULT_VIDEO_VISION_MODEL_SELECTION,
         user,
-        env,
       );
       if (!m) {
         return undefined;
@@ -1134,7 +1097,6 @@ function useViewDefaults(): {
       const m = getBestAudioVisionModel(
         DEFAULT_AUDIO_VISION_MODEL_SELECTION,
         user,
-        env,
       );
       if (!m) {
         return undefined;
@@ -1156,7 +1118,7 @@ function useViewDefaults(): {
       videoVision: mkVideoVision(),
       audioVision: mkAudioVision(),
     };
-  }, [user, env]);
+  }, [user]);
 }
 
 /** Compact read-only model card - slot label + provider icon + model name + credit cost */
@@ -1301,6 +1263,7 @@ export function SkillViewContainer({
 }: GetWidgetProps): React.JSX.Element {
   const children = field.children;
   const [systemPromptOpen, setSystemPromptOpen] = useState(false);
+  const [isLandingPage, setIsLandingPage] = useState(false);
   const navigation = useWidgetNavigation();
   const context = useWidgetContext();
   const { logger, user } = context;
@@ -1308,8 +1271,6 @@ export function SkillViewContainer({
   const viewDefaults = useViewDefaults();
   const t = useWidgetTranslation<typeof definitionGet.GET>();
   const variants = field.value?.variants;
-  const defaultVariant = variants?.find((v) => v.isDefault) ?? variants?.[0];
-  const modelSelection = defaultVariant?.modelSelection;
   const skillOwnership = field.value?.skillOwnership;
   const form = useWidgetForm<typeof definitionGet.GET>();
   const skillId =
@@ -1318,30 +1279,11 @@ export function SkillViewContainer({
     undefined;
 
   const skillData = field.value;
-  const { addToFavorites } = useAddToFavorites({
-    skillId: skillId ?? "",
-    logger,
-    user,
-    locale,
-    characterData:
-      skillId && skillData
-        ? {
-            id: skillId,
-            icon: skillData.icon ?? null,
-            name: skillData.name ?? null,
-            tagline: skillData.tagline ?? null,
-            description: skillData.description ?? null,
-            voiceModelSelection: skillData.voiceModelSelection ?? null,
-            modelSelection: modelSelection ?? null,
-          }
-        : undefined,
-  });
 
   // Check if skill is in favorites by fetching favorites list
   const { favorites } = useChatFavorites(logger, {
     activeFavoriteId: null,
   });
-  const isAddedToFav = favorites.some((fav) => fav.skillId === skillId);
 
   const handleDelete = async (): Promise<void> => {
     if (!skillId) {
@@ -1358,60 +1300,10 @@ export function SkillViewContainer({
 
   const isOwner = skillOwnership === SkillOwnershipType.USER;
   const isLoading = !field.value;
-  const env = useEnvAvailability();
 
-  // Resolve all models once for the view
-  const resolvedModels = useMemo(() => {
-    const sv = field.value;
-    const chatSel =
-      sv?.variants?.[0]?.modelSelection ??
-      modelSelection ??
-      viewDefaults.chat ??
-      null;
-    const ttsSel = sv?.voiceModelSelection ?? viewDefaults.tts ?? null;
-    const sttSel = sv?.sttModelSelection ?? viewDefaults.stt ?? null;
-    const imageVisionSel =
-      sv?.imageVisionModelSelection ?? viewDefaults.imageVision ?? null;
-    const videoVisionSel =
-      sv?.videoVisionModelSelection ?? viewDefaults.videoVision ?? null;
-    const audioVisionSel =
-      sv?.audioVisionModelSelection ?? viewDefaults.audioVision ?? null;
-    const imageGenSel =
-      sv?.imageGenModelSelection ?? viewDefaults.imageGen ?? null;
-    const musicGenSel =
-      sv?.musicGenModelSelection ?? viewDefaults.musicGen ?? null;
-    const videoGenSel =
-      sv?.videoGenModelSelection ?? viewDefaults.videoGen ?? null;
-    return {
-      chat: chatSel ? getBestChatModel(chatSel, user, env) : null,
-      tts: ttsSel ? getBestTtsModel(ttsSel, user, env) : null,
-      stt: sttSel ? getBestSttModel(sttSel, user, env) : null,
-      imageVision: imageVisionSel
-        ? getBestImageVisionModel(imageVisionSel, user, env)
-        : null,
-      videoVision: videoVisionSel
-        ? getBestVideoVisionModel(videoVisionSel, user, env)
-        : null,
-      audioVision: audioVisionSel
-        ? getBestAudioVisionModel(audioVisionSel, user, env)
-        : null,
-      imageGen: imageGenSel
-        ? getBestImageGenModel(imageGenSel, user, env)
-        : null,
-      musicGen: musicGenSel
-        ? getBestMusicGenModel(musicGenSel, user, env)
-        : null,
-      videoGen: videoGenSel
-        ? getBestVideoGenModel(videoGenSel, user, env)
-        : null,
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [field.value, user, env, modelSelection]);
-
-  // Shared content section (system prompt + models)
-  const ContentSection = (
+  // System prompt collapsible section (shared across modes)
+  const SystemPromptSection = (
     <>
-      {/* System Prompt Collapsible */}
       {(field.value?.systemPrompt || !field.value) && (
         <Collapsible open={systemPromptOpen} onOpenChange={setSystemPromptOpen}>
           <Div className="rounded-lg border">
@@ -1445,113 +1337,598 @@ export function SkillViewContainer({
           </Div>
         </Collapsible>
       )}
-
-      {/* ── BRAIN ── */}
-      {resolvedModels.chat && (
-        <ModelGroup
-          icon={<Brain className="w-3.5 h-3.5" />}
-          label={t("get.models.brain")}
-        >
-          <ModelCard
-            model={resolvedModels.chat}
-            slot={t("get.models.slots.chat")}
-            locale={locale}
-          />
-        </ModelGroup>
-      )}
-
-      {/* ── EYES ── image + video vision */}
-      {(resolvedModels.imageVision ?? resolvedModels.videoVision) && (
-        <ModelGroup
-          icon={<Eye className="w-3.5 h-3.5" />}
-          label={t("get.models.eyes")}
-        >
-          {resolvedModels.imageVision && (
-            <ModelCard
-              model={resolvedModels.imageVision}
-              slot={t("get.models.slots.imageVision")}
-              locale={locale}
-            />
-          )}
-          {resolvedModels.videoVision && (
-            <ModelCard
-              model={resolvedModels.videoVision}
-              slot={t("get.models.slots.videoVision")}
-              locale={locale}
-            />
-          )}
-        </ModelGroup>
-      )}
-
-      {/* ── EARS & VOICE ── STT + TTS + audio vision */}
-      {(resolvedModels.stt ??
-        resolvedModels.tts ??
-        resolvedModels.audioVision) && (
-        <ModelGroup
-          icon={<Mic className="w-3.5 h-3.5" />}
-          label={t("get.models.ears")}
-        >
-          {resolvedModels.stt && (
-            <ModelCard
-              model={resolvedModels.stt}
-              slot={t("get.models.slots.stt")}
-              locale={locale}
-            />
-          )}
-          {resolvedModels.tts && (
-            <ModelCard
-              model={resolvedModels.tts}
-              slot={t("get.models.slots.tts")}
-              locale={locale}
-            />
-          )}
-          {resolvedModels.audioVision && (
-            <ModelCard
-              model={resolvedModels.audioVision}
-              slot={t("get.models.slots.audioVision")}
-              locale={locale}
-            />
-          )}
-        </ModelGroup>
-      )}
-
-      {/* ── MEDIA ── image + music + video gen */}
-      {(resolvedModels.imageGen ??
-        resolvedModels.musicGen ??
-        resolvedModels.videoGen) && (
-        <ModelGroup
-          icon={<Film className="w-3.5 h-3.5" />}
-          label={t("get.models.media")}
-        >
-          {resolvedModels.imageGen && (
-            <ModelCard
-              model={resolvedModels.imageGen}
-              slot={t("get.models.slots.imageGen")}
-              locale={locale}
-            />
-          )}
-          {resolvedModels.musicGen && (
-            <ModelCard
-              model={resolvedModels.musicGen}
-              slot={t("get.models.slots.musicGen")}
-              locale={locale}
-            />
-          )}
-          {resolvedModels.videoGen && (
-            <ModelCard
-              model={resolvedModels.videoGen}
-              slot={t("get.models.slots.videoGen")}
-              locale={locale}
-            />
-          )}
-        </ModelGroup>
-      )}
     </>
   );
+
+  // Variants to render — always show at least the single variant
+  const variantsToRender = variants ?? [];
 
   const creator = field.value?.creatorProfile ?? null;
   const accent = creator?.creatorAccentColor ?? "#8b5cf6";
 
+  useEffect(() => {
+    setIsLandingPage(window.location.pathname.includes("/skill/"));
+  }, []);
+
+  // ── LANDING PAGE MODE ──────────────────────────────────────────────────────
+  // Creator-first layout: the creator is the hero, the skill is a featured
+  // creation within their profile. Think MySpace meets skill tree.
+  if (isLandingPage) {
+    const signupUrl = creator?.referralCode
+      ? `/${locale}/user/signup?ref=${creator.referralCode}&skillId=${skillId ?? ""}`
+      : `/${locale}/user/signup${skillId ? `?skillId=${skillId}` : ""}`;
+
+    const favCount = field.value?.favoritesCount ?? 0;
+
+    const cardStyle = {
+      background: "rgba(255,255,255,0.03)",
+      border: "1px solid rgba(255,255,255,0.08)",
+      borderRadius: 16,
+      overflow: "hidden",
+    } as const;
+
+    // Build social links list
+    const socialLinks = creator
+      ? CREATOR_SOCIALS.flatMap(({ key, label }) => {
+          const url = creator[key as keyof CreatorProfile];
+          return typeof url === "string" && url ? [{ key, url, label }] : [];
+        })
+      : [];
+
+    const heroBg = creator?.creatorHeaderImageUrl
+      ? {
+          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.88)), url(${creator.creatorHeaderImageUrl})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }
+      : {
+          background: `radial-gradient(ellipse 70% 60% at 50% 40%, ${accent}18 0%, transparent 70%)`,
+        };
+
+    return (
+      <Div className="flex flex-col">
+        {/* ── NAV ── */}
+        <Div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 100,
+            padding: "0 24px",
+            height: 52,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background: "rgba(15,5,32,0.85)",
+            backdropFilter: "blur(20px)",
+            borderBottom: "1px solid rgba(255,255,255,0.05)",
+          }}
+        >
+          <Link
+            href={`/${locale}`}
+            className="text-xs no-underline text-white/60 hover:text-white/90 transition-colors flex items-center gap-1.5"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            {t("get.landing.backToHome")}
+          </Link>
+          <Div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {user.isPublic ? (
+              <>
+                <Link
+                  href={`/${locale}/user/login`}
+                  className="text-xs no-underline px-3 py-1.5 opacity-45 text-white"
+                >
+                  {t("get.landing.signIn")}
+                </Link>
+                <Link href={signupUrl} className="no-underline">
+                  <Span className="text-xs font-semibold px-4 py-1.5 rounded-lg bg-violet-600 text-white cursor-pointer">
+                    {t("get.landing.joinFree")}
+                  </Span>
+                </Link>
+              </>
+            ) : (
+              <Link
+                href={`/${locale}/skills`}
+                className="text-xs no-underline px-3 py-1.5 text-white/60 hover:text-white/90 transition-colors flex items-center gap-1.5"
+              >
+                {t("get.landing.allSkills")}
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            )}
+          </Div>
+        </Div>
+
+        {/* ── HERO ── */}
+        <Div
+          style={{
+            ...heroBg,
+            textAlign: "center",
+            paddingTop: 88,
+            paddingBottom: 40,
+            paddingLeft: 24,
+            paddingRight: 24,
+            overflow: "hidden",
+          }}
+        >
+          {/* Icon */}
+          <Div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: 20,
+            }}
+          >
+            <Span
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: 20,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: `linear-gradient(135deg, ${accent}28, ${accent}0a)`,
+                border: `1px solid ${accent}30`,
+                boxShadow: `0 0 40px ${accent}20`,
+              }}
+            >
+              {field.value?.icon ? (
+                <Span style={{ color: `${accent}cc` }}>
+                  <Icon
+                    icon={field.value.icon as IconKey}
+                    className="w-9 h-9"
+                  />
+                </Span>
+              ) : (
+                <Skeleton className="w-9 h-9 rounded-full" />
+              )}
+            </Span>
+          </Div>
+
+          {/* Name */}
+          {field.value?.name ? (
+            <Span
+              style={{
+                display: "block",
+                fontSize: "clamp(28px, 7vw, 48px)",
+                fontWeight: 900,
+                letterSpacing: "-0.04em",
+                lineHeight: 0.95,
+                background: `linear-gradient(150deg, #fff 30%, ${accent}aa 90%)`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                marginBottom: 12,
+              }}
+            >
+              {field.value.name}
+            </Span>
+          ) : (
+            <Skeleton className="h-12 w-48 mx-auto mb-3" />
+          )}
+
+          {/* Tagline */}
+          {field.value?.tagline && (
+            <Span
+              style={{
+                display: "block",
+                fontSize: 15,
+                opacity: 0.65,
+                marginBottom: 8,
+                lineHeight: 1.4,
+              }}
+            >
+              {field.value.tagline}
+            </Span>
+          )}
+
+          {/* Meta: favorites */}
+          {favCount > 0 && (
+            <Span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                fontSize: 12,
+                opacity: 0.4,
+                marginBottom: 8,
+              }}
+            >
+              <Star className="w-3 h-3" />
+              {favCount}
+            </Span>
+          )}
+
+          {/* CTA buttons */}
+          {!isLoading && (
+            <Div
+              style={{
+                display: "flex",
+                gap: 10,
+                justifyContent: "center",
+                flexWrap: "wrap",
+                marginTop: 20,
+              }}
+            >
+              {user.isPublic ? (
+                <Link href={signupUrl} className="no-underline">
+                  <Span className="inline-flex items-center gap-2 text-sm font-semibold px-6 py-2.5 rounded-lg bg-violet-600 text-white cursor-pointer">
+                    <Sparkles className="w-4 h-4" />
+                    {t("get.landing.startFree")}
+                  </Span>
+                </Link>
+              ) : (
+                <CustomizeAndAddButton
+                  skillId={skillId ?? ""}
+                  field={field}
+                  navigation={navigation}
+                  logger={logger}
+                  user={user}
+                  locale={locale}
+                  t={t}
+                />
+              )}
+              <ShareEarnButton
+                skillId={skillId ?? ""}
+                user={user}
+                logger={logger}
+                locale={locale}
+                t={t}
+                navigation={navigation}
+              />
+            </Div>
+          )}
+
+          {/* Creator attribution */}
+          {creator && (
+            <>
+              <Div
+                style={{
+                  height: 1,
+                  background: "rgba(255,255,255,0.06)",
+                  margin: "28px auto 0",
+                  maxWidth: 320,
+                }}
+              />
+              <Link
+                href={`/${locale}/creator/${creator.creatorSlug}`}
+                className="no-underline"
+              >
+                <Div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    marginTop: 16,
+                    opacity: 0.5,
+                  }}
+                >
+                  <Span
+                    style={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: "50%",
+                      overflow: "hidden",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: `${accent}20`,
+                      border: `1px solid ${accent}30`,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {creator.avatarUrl ? (
+                      <Image
+                        src={creator.avatarUrl}
+                        alt={creator.publicName}
+                        width={24}
+                        height={24}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <User className="w-3 h-3" />
+                    )}
+                  </Span>
+                  <Span style={{ fontSize: 12 }}>by {creator.publicName}</Span>
+                  <ArrowRight className="h-3 w-3" />
+                </Div>
+              </Link>
+            </>
+          )}
+        </Div>
+
+        {/* ── DETAILS ── */}
+        <Div
+          style={{
+            maxWidth: 560,
+            margin: "0 auto",
+            width: "100%",
+            paddingTop: 24,
+            paddingBottom: 32,
+            paddingLeft: 16,
+            paddingRight: 16,
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
+          }}
+        >
+          {/* Description — open prose, no collapse */}
+          {field.value?.description && (
+            <Span
+              style={{
+                display: "block",
+                fontSize: 14,
+                lineHeight: 1.75,
+                color: "rgba(255,255,255,0.6)",
+                padding: "0 4px",
+              }}
+            >
+              {field.value.description}
+            </Span>
+          )}
+
+          {/* Variants — top-level, VariantCard has own border */}
+          {!isLoading && variantsToRender.length > 0 && (
+            <Div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {variantsToRender.map((v) => (
+                <VariantCard
+                  key={v.id}
+                  variant={v}
+                  skillId={skillId ?? ""}
+                  skillData={skillData}
+                  isDefault={v.isDefault ?? false}
+                  logger={logger}
+                  user={user}
+                  locale={locale}
+                  favorites={favorites}
+                  field={field}
+                  navigation={navigation}
+                  t={t}
+                  viewDefaults={viewDefaults}
+                  isOwner={isOwner}
+                  handleDelete={handleDelete}
+                  defaultExpanded={false}
+                />
+              ))}
+            </Div>
+          )}
+
+          {/* Creator card — avatar + name + bio + social links */}
+          {creator && (
+            <Div style={cardStyle}>
+              {/* Creator identity row */}
+              <Div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 14,
+                  padding: "16px 20px",
+                }}
+              >
+                <Span
+                  style={{
+                    flexShrink: 0,
+                    width: 48,
+                    height: 48,
+                    borderRadius: "50%",
+                    overflow: "hidden",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: `1px solid ${accent}40`,
+                    background: `${accent}12`,
+                  }}
+                >
+                  {creator.avatarUrl ? (
+                    <Image
+                      src={creator.avatarUrl}
+                      alt={creator.publicName}
+                      width={48}
+                      height={48}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
+                    <Span style={{ color: `${accent}88` }}>
+                      <User className="w-5 h-5" />
+                    </Span>
+                  )}
+                </Span>
+                <Div style={{ flex: 1, minWidth: 0 }}>
+                  <Span
+                    style={{
+                      display: "block",
+                      fontSize: 15,
+                      fontWeight: 700,
+                      color: "#fff",
+                      marginBottom: creator.bio ? 4 : 0,
+                    }}
+                  >
+                    {creator.publicName}
+                  </Span>
+                  {creator.bio && (
+                    <Span
+                      style={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        fontSize: 13,
+                        lineHeight: 1.5,
+                        color: "rgba(255,255,255,0.45)",
+                      }}
+                    >
+                      {creator.bio}
+                    </Span>
+                  )}
+                </Div>
+                <Link
+                  href={`/${locale}/creator/${creator.creatorSlug}`}
+                  className="no-underline flex-shrink-0"
+                >
+                  <Span
+                    style={{
+                      fontSize: 12,
+                      color: `${accent}80`,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 3,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {t("get.landing.viewProfile")}
+                    <ArrowRight className="h-3 w-3" />
+                  </Span>
+                </Link>
+              </Div>
+
+              {/* Social link rows */}
+              {socialLinks.map(({ key, url, label }, idx) => (
+                <Link
+                  key={key}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="no-underline"
+                >
+                  <Div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      padding: "12px 20px",
+                      borderTop:
+                        idx === 0
+                          ? "1px solid rgba(255,255,255,0.06)"
+                          : "1px solid rgba(255,255,255,0.04)",
+                    }}
+                  >
+                    <Span
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: "#fff",
+                        width: 72,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {label}
+                    </Span>
+                    <Span
+                      style={{
+                        flex: 1,
+                        fontSize: 13,
+                        color: "rgba(255,255,255,0.35)",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {displayDomain(url)}
+                    </Span>
+                    <ExternalLink className="w-3.5 h-3.5 opacity-40" />
+                  </Div>
+                </Link>
+              ))}
+            </Div>
+          )}
+
+          {/* System prompt — collapsible, only if present */}
+          {field.value?.systemPrompt && (
+            <Div style={cardStyle}>
+              <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <Div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      padding: "14px 20px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <Span
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: "#fff",
+                        flex: 1,
+                      }}
+                    >
+                      {t("get.landing.aboutSkill")}
+                    </Span>
+                    <ChevronDown className="w-3.5 h-3.5 opacity-40 flex-shrink-0" />
+                  </Div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <Div
+                    style={{
+                      padding: "0 20px 16px",
+                      borderTop: "1px solid rgba(255,255,255,0.04)",
+                    }}
+                  >
+                    {SystemPromptSection}
+                  </Div>
+                </CollapsibleContent>
+              </Collapsible>
+            </Div>
+          )}
+
+          {/* Lead capture — inline, always visible when active */}
+          {creator?.leadMagnetActive && skillId && (
+            <Div style={{ ...cardStyle, padding: "16px 20px" }}>
+              <LeadCaptureForm
+                skillId={skillId}
+                headline={creator.leadMagnetHeadline}
+                buttonText={creator.leadMagnetButtonText}
+                locale={locale}
+                t={t}
+              />
+            </Div>
+          )}
+
+          {/* More from creator */}
+          {creator && (
+            <CreatorOtherSkills
+              creatorUserId={creator.userId}
+              creatorSlug={creator.creatorSlug}
+              creatorName={creator.publicName}
+              currentSkillId={skillId ?? ""}
+              locale={locale}
+              t={t}
+              accent={accent}
+            />
+          )}
+
+          {/* Bottom CTA (guest only) */}
+          <LandingBottomCTA
+            skillName={field.value?.name ?? ""}
+            locale={locale}
+            signupUrl={signupUrl}
+            t={t}
+            user={user}
+            navigation={navigation}
+          />
+
+          {/* Footer */}
+          <Div style={{ padding: "12px 0", textAlign: "center" }}>
+            <Span style={{ fontSize: 12, opacity: 0.2 }}>
+              {t("get.landing.copyright")} unbottled.ai
+            </Span>
+          </Div>
+        </Div>
+      </Div>
+    );
+  }
+
+  // ── PANEL MODE (existing layout, unchanged) ────────────────────────────────
   return (
     <Div className="flex flex-col gap-0">
       <Div className="flex flex-row gap-2 px-4 pt-4 pb-2">
@@ -1664,85 +2041,400 @@ export function SkillViewContainer({
           )}
         </Div>
 
-        {/* ── ACTIONS ── */}
+        {/* ── VARIANTS (with per-variant actions + model details) ── */}
         <Div className="px-4 pb-4 flex flex-col gap-4">
-          {!isLoading && (
-            <Div className="flex items-center gap-2 flex-wrap">
-              {!isAddedToFav && (
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="gap-1"
-                  onClick={addToFavorites}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Zap className="h-4 w-4" />
-                  )}
-                  {t("get.quickAdd")}
-                </Button>
+          {!isLoading && variantsToRender.length > 0 && (
+            <Div className="flex flex-col gap-2">
+              {variantsToRender.length > 1 && (
+                <Div className="text-sm font-semibold opacity-60">
+                  {t("get.variants.title")}
+                </Div>
               )}
-              <CustomizeAndAddButton
-                skillId={skillId ?? ""}
-                field={field}
-                navigation={navigation}
-                logger={logger}
-                user={user}
-                locale={locale}
-                t={t}
-                variant={isAddedToFav ? "default" : "outline"}
-                size="sm"
-              />
-              <ShareEarnButton
-                skillId={skillId ?? ""}
-                locale={locale}
-                t={t}
-                user={user}
-                logger={logger}
-              />
-              {isOwner ? (
-                <>
-                  <Div className="flex-1" />
-                  <EditSkillButton
-                    skillId={skillId ?? ""}
-                    navigation={navigation}
-                    t={t}
-                    isOwner={true}
-                    variant="outline"
-                    size="sm"
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-1 text-destructive hover:bg-destructive/10"
-                    onClick={handleDelete}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    {t("get.delete")}
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Div className="flex-1" />
-                  <EditSkillButton
-                    skillId={skillId ?? ""}
-                    navigation={navigation}
-                    t={t}
-                    isOwner={false}
-                    variant="outline"
-                    size="sm"
-                  />
-                </>
-              )}
+              {variantsToRender.map((v, idx) => (
+                <VariantCard
+                  key={v.id}
+                  variant={v}
+                  skillId={skillId ?? ""}
+                  skillData={skillData}
+                  isDefault={v.isDefault ?? false}
+                  logger={logger}
+                  user={user}
+                  locale={locale}
+                  favorites={favorites}
+                  field={field}
+                  navigation={navigation}
+                  t={t}
+                  viewDefaults={viewDefaults}
+                  isOwner={isOwner}
+                  handleDelete={handleDelete}
+                  defaultExpanded={
+                    variantsToRender.length === 1 || (v.isDefault ?? idx === 0)
+                  }
+                />
+              ))}
             </Div>
           )}
 
-          {/* ── DETAILS ── */}
-          <Div className="flex flex-col gap-4">{ContentSection}</Div>
+          {/* ── SYSTEM PROMPT ── */}
+          <Div className="flex flex-col gap-4">{SystemPromptSection}</Div>
+
+          {/* ── LEAD CAPTURE (if creator has active config) ── */}
+          {creator?.leadMagnetActive && skillId && (
+            <LeadCaptureForm
+              skillId={skillId}
+              headline={creator.leadMagnetHeadline}
+              buttonText={creator.leadMagnetButtonText}
+              locale={locale}
+              t={t}
+            />
+          )}
         </Div>
       </Div>
+    </Div>
+  );
+}
+
+/**
+ * Expandable variant card — shows variant name + chat model summary in collapsed state.
+ * On expand: per-variant model groups (brain, eyes, ears & voice, media) + action buttons.
+ */
+function VariantCard({
+  variant,
+  skillId,
+  skillData,
+  isDefault,
+  logger,
+  user,
+  locale,
+  favorites,
+  field,
+  navigation,
+  t,
+  viewDefaults,
+  isOwner,
+  handleDelete,
+  defaultExpanded,
+}: {
+  variant: SkillVariantData;
+  skillId: string;
+  skillData: SkillGetResponseOutput | null | undefined;
+  isDefault: boolean;
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  locale: CountryLanguage;
+  favorites: FavoriteCard[];
+  field: { value: SkillGetResponseOutput | null | undefined };
+  navigation: ReturnType<typeof useWidgetNavigation>;
+  t: ReturnType<typeof useWidgetTranslation>;
+  viewDefaults: ReturnType<typeof useViewDefaults>;
+  isOwner: boolean;
+  handleDelete: () => void;
+  defaultExpanded: boolean;
+}): React.JSX.Element {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+
+  // Resolve all models for THIS variant (with skill-level + platform fallbacks)
+  const resolved = useMemo(() => {
+    const chatSel = variant.modelSelection ?? viewDefaults.chat ?? null;
+    const ttsSel =
+      variant.voiceModelSelection ??
+      skillData?.voiceModelSelection ??
+      viewDefaults.tts ??
+      null;
+    const sttSel =
+      variant.sttModelSelection ??
+      skillData?.sttModelSelection ??
+      viewDefaults.stt ??
+      null;
+    const imageVisionSel =
+      variant.imageVisionModelSelection ??
+      skillData?.imageVisionModelSelection ??
+      viewDefaults.imageVision ??
+      null;
+    const videoVisionSel =
+      variant.videoVisionModelSelection ??
+      skillData?.videoVisionModelSelection ??
+      viewDefaults.videoVision ??
+      null;
+    const audioVisionSel =
+      variant.audioVisionModelSelection ??
+      skillData?.audioVisionModelSelection ??
+      viewDefaults.audioVision ??
+      null;
+    const imageGenSel =
+      variant.imageGenModelSelection ??
+      skillData?.imageGenModelSelection ??
+      viewDefaults.imageGen ??
+      null;
+    const musicGenSel =
+      variant.musicGenModelSelection ??
+      skillData?.musicGenModelSelection ??
+      viewDefaults.musicGen ??
+      null;
+    const videoGenSel =
+      variant.videoGenModelSelection ??
+      skillData?.videoGenModelSelection ??
+      viewDefaults.videoGen ??
+      null;
+    return {
+      chat: chatSel ? getBestChatModel(chatSel, user) : null,
+      tts: ttsSel ? getBestTtsModel(ttsSel, user) : null,
+      stt: sttSel ? getBestSttModel(sttSel, user) : null,
+      imageVision: imageVisionSel
+        ? getBestImageVisionModel(imageVisionSel, user)
+        : null,
+      videoVision: videoVisionSel
+        ? getBestVideoVisionModel(videoVisionSel, user)
+        : null,
+      audioVision: audioVisionSel
+        ? getBestAudioVisionModel(audioVisionSel, user)
+        : null,
+      imageGen: imageGenSel ? getBestImageGenModel(imageGenSel, user) : null,
+      musicGen: musicGenSel ? getBestMusicGenModel(musicGenSel, user) : null,
+      videoGen: videoGenSel ? getBestVideoGenModel(videoGenSel, user) : null,
+    };
+  }, [variant, skillData, viewDefaults, user]);
+
+  const provider = resolved.chat
+    ? modelProviders[resolved.chat.provider]
+    : null;
+
+  // Check if this specific variant is already in favorites
+  const isFavorited = favorites.some(
+    (fav) => fav.skillId === skillId && fav.variantId === variant.id,
+  );
+
+  const charData: SkillDataForFavorite | undefined = skillData
+    ? {
+        id: skillId,
+        icon: skillData.icon ?? null,
+        name: skillData.name ?? null,
+        tagline: skillData.tagline ?? null,
+        description: skillData.description ?? null,
+        voiceModelSelection:
+          variant.voiceModelSelection ?? skillData.voiceModelSelection ?? null,
+        modelSelection: variant.modelSelection ?? null,
+      }
+    : undefined;
+
+  const { addToFavorites, isLoading } = useAddToFavorites({
+    skillId,
+    variantId: variant.id,
+    logger,
+    user,
+    locale,
+    characterData: charData,
+  });
+
+  return (
+    <Div className="rounded-lg border overflow-hidden">
+      {/* Collapsed header — click to expand */}
+      <Div
+        className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-muted/30 transition-colors"
+        onClick={() => setExpanded((p) => !p)}
+      >
+        <ChevronDown
+          className={cn(
+            "h-3.5 w-3.5 shrink-0 opacity-40 transition-transform",
+            expanded && "rotate-180",
+          )}
+        />
+        {/* Variant name */}
+        <Div className="flex-1 min-w-0">
+          <Span className="text-sm font-medium truncate">
+            {variant.displayName ?? variant.id}
+          </Span>
+          {isDefault && (
+            <Span className="ml-2 text-xs opacity-50">default</Span>
+          )}
+        </Div>
+
+        {/* Model info summary */}
+        {resolved.chat && (
+          <Div className="flex items-center gap-1.5 text-xs opacity-70 shrink-0">
+            {provider?.icon && (
+              <Icon icon={provider.icon} className="w-3.5 h-3.5" />
+            )}
+            <Span className="truncate max-w-[120px]">{resolved.chat.name}</Span>
+            <ModelCreditDisplay modelId={resolved.chat.id} locale={locale} />
+          </Div>
+        )}
+      </Div>
+
+      {/* Expanded content — model groups + actions */}
+      {expanded && (
+        <Div className="px-3 pb-3 flex flex-col gap-3 border-t pt-3">
+          {/* ── BRAIN ── */}
+          {resolved.chat && (
+            <ModelGroup
+              icon={<Brain className="w-3.5 h-3.5" />}
+              label={t("get.models.brain")}
+            >
+              <ModelCard
+                model={resolved.chat}
+                slot={t("get.models.slots.chat")}
+                locale={locale}
+              />
+            </ModelGroup>
+          )}
+
+          {/* ── EYES ── */}
+          {(resolved.imageVision ?? resolved.videoVision) && (
+            <ModelGroup
+              icon={<Eye className="w-3.5 h-3.5" />}
+              label={t("get.models.eyes")}
+            >
+              {resolved.imageVision && (
+                <ModelCard
+                  model={resolved.imageVision}
+                  slot={t("get.models.slots.imageVision")}
+                  locale={locale}
+                />
+              )}
+              {resolved.videoVision && (
+                <ModelCard
+                  model={resolved.videoVision}
+                  slot={t("get.models.slots.videoVision")}
+                  locale={locale}
+                />
+              )}
+            </ModelGroup>
+          )}
+
+          {/* ── EARS & VOICE ── */}
+          {(resolved.stt ?? resolved.tts ?? resolved.audioVision) && (
+            <ModelGroup
+              icon={<Mic className="w-3.5 h-3.5" />}
+              label={t("get.models.ears")}
+            >
+              {resolved.stt && (
+                <ModelCard
+                  model={resolved.stt}
+                  slot={t("get.models.slots.stt")}
+                  locale={locale}
+                />
+              )}
+              {resolved.tts && (
+                <ModelCard
+                  model={resolved.tts}
+                  slot={t("get.models.slots.tts")}
+                  locale={locale}
+                />
+              )}
+              {resolved.audioVision && (
+                <ModelCard
+                  model={resolved.audioVision}
+                  slot={t("get.models.slots.audioVision")}
+                  locale={locale}
+                />
+              )}
+            </ModelGroup>
+          )}
+
+          {/* ── MEDIA ── */}
+          {(resolved.imageGen ?? resolved.musicGen ?? resolved.videoGen) && (
+            <ModelGroup
+              icon={<Film className="w-3.5 h-3.5" />}
+              label={t("get.models.media")}
+            >
+              {resolved.imageGen && (
+                <ModelCard
+                  model={resolved.imageGen}
+                  slot={t("get.models.slots.imageGen")}
+                  locale={locale}
+                />
+              )}
+              {resolved.musicGen && (
+                <ModelCard
+                  model={resolved.musicGen}
+                  slot={t("get.models.slots.musicGen")}
+                  locale={locale}
+                />
+              )}
+              {resolved.videoGen && (
+                <ModelCard
+                  model={resolved.videoGen}
+                  slot={t("get.models.slots.videoGen")}
+                  locale={locale}
+                />
+              )}
+            </ModelGroup>
+          )}
+
+          {/* ── PER-VARIANT ACTIONS ── */}
+          <Div className="flex items-center gap-2 flex-wrap pt-1 border-t">
+            {!isFavorited && (
+              <Button
+                variant="default"
+                size="sm"
+                className="gap-1"
+                onClick={addToFavorites}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Zap className="h-4 w-4" />
+                )}
+                {t("get.quickAdd")}
+              </Button>
+            )}
+            <CustomizeAndAddButton
+              skillId={skillId}
+              field={field}
+              navigation={navigation}
+              logger={logger}
+              user={user}
+              locale={locale}
+              t={t}
+              variant={isFavorited ? "default" : "outline"}
+              size="sm"
+            />
+            <ShareEarnButton
+              skillId={skillId}
+              locale={locale}
+              t={t}
+              user={user}
+              logger={logger}
+              navigation={navigation}
+            />
+            {isOwner ? (
+              <>
+                <Div className="flex-1" />
+                <EditSkillButton
+                  skillId={skillId}
+                  navigation={navigation}
+                  t={t}
+                  isOwner={true}
+                  variant="outline"
+                  size="sm"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1 text-destructive hover:bg-destructive/10"
+                  onClick={handleDelete}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {t("get.delete")}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Div className="flex-1" />
+                <EditSkillButton
+                  skillId={skillId}
+                  navigation={navigation}
+                  t={t}
+                  isOwner={false}
+                  variant="outline"
+                  size="sm"
+                />
+              </>
+            )}
+          </Div>
+        </Div>
+      )}
     </Div>
   );
 }
@@ -1764,6 +2456,19 @@ const CREATOR_SOCIALS = [
 ] as const;
 
 type CreatorProfile = NonNullable<SkillGetResponseOutput["creatorProfile"]>;
+
+/** Extract display domain from a URL for social link display */
+function displayDomain(url: string): string {
+  try {
+    const u = new URL(url);
+    return (
+      u.hostname.replace(/^www\./, "") +
+      (u.pathname.length > 1 ? u.pathname : "")
+    );
+  } catch {
+    return url;
+  }
+}
 
 /**
  * Compact creator attribution row - shown at the top of skill view when skill is user-owned
@@ -1842,6 +2547,455 @@ function CreatorRow({
     </Div>
   );
 }
+
+// ── LEAD CAPTURE FORM ────────────────────────────────────────────────────────
+
+type CaptureState = "idle" | "submitting" | "done" | "error";
+
+/**
+ * Email capture form — shown when creator has active lead magnet config.
+ * Works in both landing page and panel mode.
+ */
+function LeadCaptureForm({
+  skillId,
+  headline,
+  buttonText,
+  locale,
+  t,
+}: {
+  skillId: string;
+  headline: string | null;
+  buttonText: string | null;
+  locale: CountryLanguage;
+  t: ReturnType<typeof useWidgetTranslation>;
+}): React.JSX.Element {
+  const [state, setState] = useState<CaptureState>("idle");
+  const [firstName, setFirstName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const handleSubmit = useCallback((): void => {
+    if (!firstName.trim() || !email.trim()) {
+      return;
+    }
+    setState("submitting");
+    void (async (): Promise<void> => {
+      try {
+        const [{ apiClient }, captureDef] = await Promise.all([
+          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("@/app/api/[locale]/lead-magnet/capture/definition"),
+        ]);
+        const { createEndpointLogger } =
+          await import("@/app/api/[locale]/system/unified-interface/shared/logger/endpoint");
+        const logger = createEndpointLogger(false, Date.now(), locale);
+        const result = await apiClient.mutate(
+          captureDef.POST,
+          logger,
+          { id: "", isPublic: true, roles: [], leadId: "" } as never,
+          { skillId, firstName: firstName.trim(), email: email.trim() },
+          undefined,
+          locale,
+        );
+        setState(result.success ? "done" : "error");
+      } catch {
+        setState("error");
+      }
+    })();
+  }, [skillId, firstName, email, locale]);
+
+  const displayHeadline = headline ?? t("get.leadCapture.fallbackHeadline");
+  const displayButton = buttonText ?? t("get.leadCapture.fallbackButton");
+
+  if (state === "done") {
+    return (
+      <Div
+        style={{
+          padding: "24px 20px",
+          borderRadius: 12,
+          border: "1px solid rgba(139,92,246,0.25)",
+          background: "rgba(139,92,246,0.08)",
+          textAlign: "center",
+          display: "flex",
+          flexDirection: "column",
+          gap: 6,
+          alignItems: "center",
+        }}
+      >
+        <Span
+          style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: 0 }}
+        >
+          {t("get.leadCapture.doneHeading")}
+        </Span>
+        <Span
+          style={{
+            color: "rgba(255,255,255,0.55)",
+            margin: 0,
+            fontSize: 13,
+          }}
+        >
+          {t("get.leadCapture.doneSub")}
+        </Span>
+      </Div>
+    );
+  }
+
+  return (
+    <Div
+      style={{
+        padding: "20px 20px",
+        borderRadius: 12,
+        border: "1px solid rgba(255,255,255,0.08)",
+        background: "rgba(255,255,255,0.02)",
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+        alignItems: "center",
+        textAlign: "center",
+      }}
+    >
+      <Span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>
+        {displayHeadline}
+      </Span>
+      <Div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+          width: "100%",
+          maxWidth: 320,
+        }}
+      >
+        <Input
+          value={firstName}
+          onChange={(e): void => setFirstName(e.target.value)}
+          placeholder={t("get.leadCapture.namePlaceholder")}
+          disabled={state === "submitting"}
+          className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-violet-500"
+        />
+        <Input
+          type="email"
+          value={email}
+          onChange={(e): void => setEmail(e.target.value)}
+          placeholder={t("get.leadCapture.emailPlaceholder")}
+          disabled={state === "submitting"}
+          className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-violet-500"
+        />
+        <Button
+          onClick={handleSubmit}
+          disabled={
+            state === "submitting" || !firstName.trim() || !email.trim()
+          }
+          className="bg-violet-600 hover:bg-violet-700 text-white"
+        >
+          {state === "submitting"
+            ? t("get.leadCapture.sending")
+            : displayButton}
+        </Button>
+        {state === "error" && (
+          <Span style={{ fontSize: 12, color: "rgba(255,100,100,0.8)" }}>
+            {t("get.leadCapture.error")}
+          </Span>
+        )}
+      </Div>
+      <Span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>
+        {t("get.leadCapture.finePrint")}
+      </Span>
+    </Div>
+  );
+}
+
+// ── LANDING PAGE COMPONENTS ──────────────────────────────────────────────────
+
+/**
+ * Bottom CTA for landing page — signup/login for guests
+ */
+function LandingBottomCTA({
+  skillName,
+  locale,
+  signupUrl,
+  t,
+  user,
+  navigation,
+}: {
+  skillName: string;
+  locale: CountryLanguage;
+  signupUrl: string | null;
+  t: ReturnType<typeof useWidgetTranslation>;
+  user: ReturnType<typeof useWidgetContext>["user"];
+  navigation: ReturnType<typeof useWidgetNavigation>;
+}): React.JSX.Element | null {
+  if (!user.isPublic) {
+    return null;
+  }
+
+  const handleLogin = (): void => {
+    void (async (): Promise<void> => {
+      const def =
+        await import("@/app/api/[locale]/user/public/login/definition");
+      navigation.push(def.default.POST);
+    })();
+  };
+
+  return (
+    <Div
+      style={{
+        borderTop: "1px solid rgba(255,255,255,0.05)",
+        padding: "48px 24px",
+        textAlign: "center",
+      }}
+    >
+      <Span
+        style={{
+          display: "block",
+          fontSize: 24,
+          fontWeight: 800,
+          letterSpacing: "-0.03em",
+          color: "#fff",
+          marginBottom: 8,
+        }}
+      >
+        {t("get.landing.tryCta", { name: skillName })}
+      </Span>
+      <Span
+        style={{
+          fontSize: 14,
+          color: "rgba(255,255,255,0.4)",
+          display: "block",
+          marginBottom: 24,
+        }}
+      >
+        {t("get.landing.tryCtaSub")}
+      </Span>
+      <Div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 12,
+        }}
+      >
+        <Link
+          href={signupUrl ?? `/${locale}/user/signup`}
+          className="no-underline"
+        >
+          <Span className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-lg bg-violet-600 text-white cursor-pointer">
+            <UserPlus className="w-4 h-4" />
+            {t("get.landing.startFree")}
+          </Span>
+        </Link>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-white/40 hover:text-white/70"
+          onClick={handleLogin}
+        >
+          {t("get.landing.alreadyHaveAccount")}
+        </Button>
+      </Div>
+    </Div>
+  );
+}
+
+/**
+ * Shows other public skills by the same creator — fetched client-side.
+ */
+function CreatorOtherSkills({
+  creatorUserId,
+  creatorSlug,
+  creatorName,
+  currentSkillId,
+  locale,
+  t,
+  accent,
+}: {
+  creatorUserId: string;
+  creatorSlug: string;
+  creatorName: string;
+  currentSkillId: string;
+  locale: CountryLanguage;
+  t: ReturnType<typeof useWidgetTranslation>;
+  accent: string;
+}): React.JSX.Element | null {
+  const [skills, setSkills] = useState<
+    Array<{
+      id: string;
+      slug: string | null;
+      icon: string | null;
+      name: string;
+      tagline: string | null;
+    }>
+  >([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    void (async (): Promise<void> => {
+      try {
+        const [{ apiClient }, listDef] = await Promise.all([
+          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("@/app/api/[locale]/agent/chat/skills/definition"),
+        ]);
+        const { createEndpointLogger } =
+          await import("@/app/api/[locale]/system/unified-interface/shared/logger/endpoint");
+        const logger = createEndpointLogger(false, Date.now(), locale);
+        const result = await apiClient.fetch(
+          listDef.default.GET,
+          logger,
+          { id: "", isPublic: true, roles: [], leadId: "" } as never,
+          { sourceFilter: "enums.source.community" as const },
+          undefined,
+          locale,
+        );
+        if (result.success && Array.isArray(result.data)) {
+          const filtered = (
+            result.data as Array<{
+              id: string;
+              slug: string | null;
+              icon: string | null;
+              name: string;
+              tagline: string | null;
+              userId?: string;
+              ownershipType?: string;
+            }>
+          ).filter(
+            (s) =>
+              s.id !== currentSkillId &&
+              s.ownershipType !== "enums.ownershipType.system",
+          );
+          setSkills(filtered.slice(0, 6));
+        }
+      } catch {
+        // Silent fail — optional section
+      }
+      setLoaded(true);
+    })();
+  }, [creatorUserId, currentSkillId, locale]);
+
+  if (!loaded || skills.length === 0) {
+    return null;
+  }
+
+  return (
+    <Div
+      style={{
+        borderTop: `1px solid ${accent}15`,
+        padding: "32px 24px",
+      }}
+    >
+      <Span
+        style={{
+          display: "block",
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          color: `${accent}70`,
+          marginBottom: 16,
+        }}
+      >
+        {t("get.landing.moreFromCreator", { name: creatorName })}
+      </Span>
+
+      <Div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+          gap: 12,
+        }}
+      >
+        {skills.map((s) => (
+          <Link
+            key={s.id}
+            href={`/${locale}/skill/${s.slug ?? s.id}`}
+            className="no-underline"
+          >
+            <Div
+              style={{
+                padding: "14px 16px",
+                borderRadius: 12,
+                border: "1px solid rgba(255,255,255,0.06)",
+                background: "rgba(255,255,255,0.02)",
+                display: "flex",
+                gap: 12,
+                alignItems: "center",
+              }}
+            >
+              <Span
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 10,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: `${accent}12`,
+                  flexShrink: 0,
+                }}
+              >
+                {s.icon ? (
+                  <Span style={{ color: `${accent}aa` }}>
+                    <Icon icon={s.icon as IconKey} className="w-4.5 h-4.5" />
+                  </Span>
+                ) : (
+                  <Sparkles className="w-4 h-4" />
+                )}
+              </Span>
+              <Div className="min-w-0">
+                <Span
+                  style={{
+                    display: "block",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "#fff",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {s.name}
+                </Span>
+                {s.tagline && (
+                  <Span
+                    style={{
+                      display: "block",
+                      fontSize: 11,
+                      color: "rgba(255,255,255,0.35)",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {s.tagline}
+                  </Span>
+                )}
+              </Div>
+            </Div>
+          </Link>
+        ))}
+      </Div>
+
+      <Div style={{ marginTop: 16, textAlign: "center" }}>
+        <Link
+          href={`/${locale}/creator/${creatorSlug}`}
+          className="no-underline"
+        >
+          <Span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              fontSize: 13,
+              color: `${accent}80`,
+            }}
+          >
+            {t("get.landing.viewProfile")}
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Span>
+        </Link>
+      </Div>
+    </Div>
+  );
+}
+
+// ── END LANDING PAGE COMPONENTS ─────────────────────────────────────────────
 
 function VoiceDisplayName({
   voiceModelSelection,
@@ -1972,7 +3126,7 @@ export function SkillCard({
               skillOwnership === SkillOwnershipType.USER
                 ? "bg-primary/10 text-primary"
                 : skillOwnership === SkillOwnershipType.SYSTEM
-                  ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                  ? "bg-blue-500/10 text-info"
                   : "bg-purple-500/10 text-purple-600 dark:text-purple-400",
             )}
           >
@@ -2016,6 +3170,7 @@ export function SkillCard({
             t={t}
             user={user}
             logger={logger}
+            navigation={navigation}
           />
           {isOwner ? (
             <>
@@ -2068,12 +3223,14 @@ function ShareEarnButton({
   t,
   user,
   logger,
+  navigation,
 }: {
   skillId: string;
   locale: CountryLanguage;
   t: ReturnType<typeof useWidgetTranslation>;
   user: ReturnType<typeof useWidgetContext>["user"];
   logger: ReturnType<typeof useWidgetContext>["logger"];
+  navigation: ReturnType<typeof useWidgetNavigation>;
 }): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const [codes, setCodes] = useState<Array<{
@@ -2094,12 +3251,35 @@ function ShareEarnButton({
     }
   }, [open]);
 
+  const handleSignup = (): void => {
+    setOpen(false);
+    void (async (): Promise<void> => {
+      const def =
+        await import("@/app/api/[locale]/user/public/signup/definition");
+      navigation.push(def.default.POST);
+    })();
+  };
+
+  const handleLogin = (): void => {
+    setOpen(false);
+    void (async (): Promise<void> => {
+      const def =
+        await import("@/app/api/[locale]/user/public/login/definition");
+      navigation.push(def.default.POST);
+    })();
+  };
+
   const handleOpen = async (): Promise<void> => {
     if (open) {
       setOpen(false);
       return;
     }
     setOpen(true);
+
+    // Public users can't create referral codes - show auth prompt
+    if (user.isPublic) {
+      return;
+    }
 
     if (codes !== null) {
       return;
@@ -2223,7 +3403,33 @@ function ShareEarnButton({
               {t("get.share.description")}
             </Span>
 
-            {loading ? (
+            {user.isPublic ? (
+              <Div className="flex flex-col gap-3 pt-1">
+                <Span className="text-xs text-muted-foreground">
+                  {t("get.share.authRequired")}
+                </Span>
+                <Div className="flex flex-col gap-2">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="gap-2"
+                    onClick={handleSignup}
+                  >
+                    <UserPlus className="h-3.5 w-3.5" />
+                    {t("get.share.signup")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                    onClick={handleLogin}
+                  >
+                    <LogIn className="h-3.5 w-3.5" />
+                    {t("get.share.login")}
+                  </Button>
+                </Div>
+              </Div>
+            ) : loading ? (
               <Div className="flex items-center justify-center py-4">
                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
               </Div>

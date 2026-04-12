@@ -32,12 +32,12 @@ import {
   isFiltersSelection,
   isManualSelection,
 } from "../../chat/skills/create/definition";
+import { isUuid } from "../../chat/slugify";
 import { ThreadsRepository } from "../../chat/threads/repository";
-import { agentEnvAvailability } from "../../env-availability";
-import type { ImageGenModelId } from "../../image-generation/models";
+import type { ImageGenModelSelection } from "../../image-generation/models";
 import type { ApiProvider } from "../../models/models";
-import type { MusicGenModelId } from "../../music-generation/models";
-import type { VideoGenModelId } from "../../video-generation/models";
+import type { MusicGenModelSelection } from "../../music-generation/models";
+import type { VideoGenModelSelection } from "../../video-generation/models";
 import type { ChatModelId } from "../models";
 import type { AiStreamPostRequestOutput } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
@@ -151,9 +151,9 @@ export interface HeadlessAiStreamParams {
    * regardless of what the admin user has saved in their settings.
    */
   mediaModelOverrides?: {
-    musicGenModelId?: MusicGenModelId;
-    videoGenModelId?: VideoGenModelId;
-    imageGenModelId?: ImageGenModelId;
+    musicGenModelSelection?: MusicGenModelSelection;
+    videoGenModelSelection?: VideoGenModelSelection;
+    imageGenModelSelection?: ImageGenModelSelection;
   };
   /**
    * Force all model resolution (chat + image/music/video gen) to use a specific API provider.
@@ -189,6 +189,17 @@ export interface HeadlessAiStreamParams {
   logger: EndpointLogger;
   /** Translation function for ai-stream module */
   t: AiStreamT;
+  /**
+   * Called as soon as the sub-thread ID is determined (before the AI stream starts).
+   * Used by ai-run to emit a partial tool result with the threadId so the parent
+   * UI can start rendering sub-thread messages in real-time.
+   */
+  onThreadCreated?: (threadId: string) => Promise<void>;
+  /**
+   * Parent stream's abort signal. When the calling stream is cancelled, this
+   * sub-stream aborts too. Works for any headless tool call, not just ai-run.
+   */
+  abortSignal: AbortSignal;
 }
 
 export interface HeadlessAiStreamResult {
@@ -202,6 +213,11 @@ export interface HeadlessAiStreamResult {
   lastGeneratedMediaUrl?: string | null;
   /** Total credits deducted during this stream (model + tools) - for cost display in callers */
   totalCreditsDeducted?: number;
+  /**
+   * Number of tool schemas loaded into the AI context window for this stream.
+   * 0 = no tools. Used in tests to assert skill/favorite tool configuration is correct.
+   */
+  pinnedToolCount: number;
 }
 
 /**
@@ -221,12 +237,13 @@ export async function resolveFavorite(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<{ model: ChatModelId; skill: string } | null> {
+  const favoriteIdCondition = isUuid(favoriteId)
+    ? eq(chatFavorites.id, favoriteId)
+    : eq(chatFavorites.slug, favoriteId);
   const [favorite] = await db
     .select()
     .from(chatFavorites)
-    .where(
-      and(eq(chatFavorites.id, favoriteId), eq(chatFavorites.userId, userId)),
-    )
+    .where(and(favoriteIdCondition, eq(chatFavorites.userId, userId)))
     .limit(1);
 
   if (!favorite) {
@@ -245,7 +262,7 @@ export async function resolveFavorite(
     };
   }
   if (sel && isFiltersSelection(sel)) {
-    const best = getBestChatModel(sel, user, agentEnvAvailability);
+    const best = getBestChatModel(sel, user);
     if (best) {
       return { model: best.id, skill };
     }
@@ -269,7 +286,7 @@ export async function resolveFavorite(
         : null;
       const varSel = variant?.modelSelection;
       if (varSel && (isManualSelection(varSel) || isFiltersSelection(varSel))) {
-        const best = getBestChatModel(varSel, user, agentEnvAvailability);
+        const best = getBestChatModel(varSel, user);
         if (best) {
           return { model: best.id, skill };
         }
@@ -316,6 +333,7 @@ export async function runHeadlessAiStream(
     locale,
     logger,
     t: aiStreamT,
+    abortSignal: parentAbortSignal,
   } = params;
 
   try {
@@ -365,7 +383,7 @@ export async function runHeadlessAiStream(
           if (isManualSelection(varSel) && "manualModelId" in varSel) {
             model = varSel.manualModelId;
           } else if (isFiltersSelection(varSel)) {
-            const best = getBestChatModel(varSel, user, agentEnvAvailability);
+            const best = getBestChatModel(varSel, user);
             if (best) {
               model = best.id;
             }
@@ -383,6 +401,13 @@ export async function runHeadlessAiStream(
     const rootFolderId = rootFolderIdOverride;
     const effectiveThreadId = existingThreadId ?? crypto.randomUUID();
     const isIncognito = rootFolderId === DefaultFolderId.INCOGNITO;
+
+    // Notify caller of the thread ID before the AI stream starts.
+    // ai-run uses this to emit a partial tool result so the parent UI
+    // can start rendering sub-thread messages in real-time.
+    if (params.onThreadCreated) {
+      await params.onThreadCreated(effectiveThreadId);
+    }
 
     // ── Pre-call injection ─────────────────────────────────────────────────
     // Write pre-call results as proper tool messages in the thread so the AI
@@ -571,6 +596,7 @@ export async function runHeadlessAiStream(
       sequenceIdOverride,
       mediaModelOverrides,
       providerOverride,
+      parentAbortSignal,
     });
 
     if (!result.success) {
@@ -583,6 +609,7 @@ export async function runHeadlessAiStream(
       lastAiMessageContent,
       lastGeneratedMediaUrl,
       totalCreditsDeducted,
+      pinnedToolCount,
     } = result.data;
 
     logger.debug("[Headless AI] Execution complete", {
@@ -590,6 +617,7 @@ export async function runHeadlessAiStream(
       threadId,
       lastAiMessageId,
       isIncognito,
+      pinnedToolCount,
     });
 
     return {
@@ -599,6 +627,7 @@ export async function runHeadlessAiStream(
         lastAiMessageContent,
         lastGeneratedMediaUrl,
         totalCreditsDeducted,
+        pinnedToolCount,
         threadId: isIncognito ? undefined : threadId,
       },
     };

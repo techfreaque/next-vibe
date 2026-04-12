@@ -21,6 +21,11 @@ export const translations = {
         description:
           "Filter tools by category name (case-insensitive). Call with no params first to see available categories.",
       },
+      subCategory: {
+        label: "Sub-Category Filter",
+        description:
+          "Filter tools by sub-category name (case-insensitive). Use together with category to narrow results.",
+      },
       toolName: {
         label: "Tool Name (Detail)",
         description:

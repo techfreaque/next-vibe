@@ -33,7 +33,7 @@ export const leadMagnetConfigs = pgTable(
       .unique() // One config per user
       .references(() => users.id, { onDelete: "cascade" }),
     provider: text("provider").notNull(), // e.g. "klaviyo", "getresponse", etc.
-    credentials: jsonb("credentials").notNull(), // encrypted provider credentials
+    credentials: jsonb("credentials").notNull().$type<Record<string, string>>(), // encrypted provider credentials
     listId: text("list_id"), // optional target list/group within the provider
     headline: text("headline"), // e.g. "Get my AI prompt pack free"
     buttonText: text("button_text"), // e.g. "Get access →"

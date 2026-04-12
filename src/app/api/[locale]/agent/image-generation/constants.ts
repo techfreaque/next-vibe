@@ -1,6 +1,4 @@
 import {
-  ContentLevel,
-  IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
@@ -15,8 +13,6 @@ import { ImageGenModelId } from "./models";
 export const DEFAULT_IMAGE_GEN_MODEL_SELECTION: ImageGenModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
   manualModelId: ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
-  intelligenceRange: { min: IntelligenceLevel.SMART },
-  contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,

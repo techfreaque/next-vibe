@@ -32,21 +32,21 @@ export function PasswordStrengthIndicator(): React.JSX.Element | null {
   // Get colors based on level
   const colorClass =
     level === "weak"
-      ? "bg-red-500"
+      ? "bg-destructive"
       : level === "fair"
         ? "bg-orange-500"
         : level === "good"
-          ? "bg-yellow-500"
-          : "bg-green-500";
+          ? "bg-warning"
+          : "bg-success";
 
   const textColorClass =
     level === "weak"
-      ? "text-red-500"
+      ? "text-destructive"
       : level === "fair"
         ? "text-orange-500"
         : level === "good"
-          ? "text-yellow-500"
-          : "text-green-500";
+          ? "text-warning"
+          : "text-success";
 
   const levelKey =
     level === "weak"
@@ -80,7 +80,7 @@ export function PasswordStrengthIndicator(): React.JSX.Element | null {
         <Div className="flex flex-col gap-1 text-sm mt-1 text-muted-foreground">
           {missing.minLength && (
             <Div className="flex items-center gap-2">
-              <Span className="text-red-500">
+              <Span className="text-destructive">
                 {t("passwordStrength.requirement.minLength.icon")}
               </Span>
               <Span>{t("passwordStrength.requirement.minLength.text")}</Span>
@@ -88,7 +88,7 @@ export function PasswordStrengthIndicator(): React.JSX.Element | null {
           )}
           {missing.uppercase && (
             <Div className="flex items-center gap-2">
-              <Span className="text-red-500">
+              <Span className="text-destructive">
                 {t("passwordStrength.requirement.uppercase.icon")}
               </Span>
               <Span>{t("passwordStrength.requirement.uppercase.text")}</Span>
@@ -96,7 +96,7 @@ export function PasswordStrengthIndicator(): React.JSX.Element | null {
           )}
           {missing.lowercase && (
             <Div className="flex items-center gap-2">
-              <Span className="text-red-500">
+              <Span className="text-destructive">
                 {t("passwordStrength.requirement.lowercase.icon")}
               </Span>
               <Span>{t("passwordStrength.requirement.lowercase.text")}</Span>
@@ -104,7 +104,7 @@ export function PasswordStrengthIndicator(): React.JSX.Element | null {
           )}
           {missing.number && (
             <Div className="flex items-center gap-2">
-              <Span className="text-red-500">
+              <Span className="text-destructive">
                 {t("passwordStrength.requirement.number.icon")}
               </Span>
               <Span>{t("passwordStrength.requirement.number.text")}</Span>
@@ -112,7 +112,7 @@ export function PasswordStrengthIndicator(): React.JSX.Element | null {
           )}
           {missing.special && (
             <Div className="flex items-center gap-2">
-              <Span className="text-yellow-500">
+              <Span className="text-warning">
                 {t("passwordStrength.requirement.special.icon")}
               </Span>
               <Span>{t("passwordStrength.requirement.special.text")}</Span>

@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   title: "upload-file.title",
   description: "upload-file.description",
   category: "endpointCategories.browser",
+  subCategory: "endpointCategories.browserInteraction",
   icon: "upload",
   tags: [
     "upload-file.tags.browserAutomation",

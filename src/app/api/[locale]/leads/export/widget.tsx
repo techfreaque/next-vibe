@@ -271,7 +271,7 @@ export function LeadsExportContainer({
         <Div className="rounded-lg border bg-card p-6 flex flex-col gap-5">
           {/* Success header */}
           <Div className="flex items-center gap-3">
-            <CheckCircle className="h-8 w-8 text-green-500 flex-shrink-0" />
+            <CheckCircle className="h-8 w-8 text-success flex-shrink-0" />
             <Div>
               <Span className="font-semibold block">
                 {t("widget.exportReady")}

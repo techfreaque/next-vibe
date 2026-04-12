@@ -19,7 +19,9 @@ interface SampleData {
 const sampleData: SampleData[] = [
   { id: 1, name: "Alice", email: "alice@example.com", role: "Admin" },
   { id: 2, name: "Bob", email: "bob@example.com", role: "User" },
-  { id: 3, name: "Charlie", email: "charlie@example.com", role: "User" },
+  { id: 3, name: "Charlie", email: "charlie@example.com", role: "Editor" },
+  { id: 4, name: "Diana", email: "diana@example.com", role: "User" },
+  { id: 5, name: "Eve", email: "eve@example.com", role: "Admin" },
 ];
 
 const columns = [
@@ -34,7 +36,7 @@ const columns = [
     accessorKey: "email",
     header: (): React.ReactElement => <P className="font-medium">Email</P>,
     cell: ({ getValue }: { getValue: () => string }): React.ReactElement => (
-      <P>{getValue()}</P>
+      <P className="text-muted-foreground">{getValue()}</P>
     ),
   },
   {
@@ -47,19 +49,52 @@ const columns = [
 ];
 
 const markdownContent = `
-# Markdown Demo
+# Markdown Rendering
 
-This is a **bold** text and this is *italic* text.
+This demonstrates the **Markdown** component with various elements.
 
-## Features
-- Lists work great
-- Code blocks too
-- And much more
+## Formatting
+
+- **Bold text** and *italic text*
+- ~~Strikethrough~~ and \`inline code\`
+- [Links](https://example.com) are styled automatically
+
+## Code Block
 
 \`\`\`typescript
-const greeting = "Hello, World!";
-console.log(greeting);
+interface User {
+  name: string;
+  email: string;
+  role: "admin" | "user";
+}
+
+function greet(user: User): string {
+  return \`Hello, \${user.name}!\`;
+}
 \`\`\`
+
+## Lists
+
+1. First ordered item
+2. Second ordered item
+3. Third ordered item
+
+- Unordered list item
+  - Nested item
+  - Another nested item
+
+## Blockquote
+
+> The only way to do great work is to love what you do.
+> — Steve Jobs
+
+## Table
+
+| Feature | Status | Priority |
+|---------|--------|----------|
+| Auth    | Done   | High     |
+| API     | WIP    | High     |
+| Docs    | Todo   | Medium   |
 `;
 
 export function SpecialPreview(): JSX.Element {
@@ -69,6 +104,7 @@ export function SpecialPreview(): JSX.Element {
         <H2 className="mb-4">Special Components</H2>
 
         <Div className="space-y-6">
+          {/* Data Table */}
           <Div className="space-y-2">
             <H3>Data Table</H3>
             <Card>
@@ -78,8 +114,9 @@ export function SpecialPreview(): JSX.Element {
             </Card>
           </Div>
 
+          {/* Markdown */}
           <Div className="space-y-2">
-            <H3>Markdown</H3>
+            <H3>Markdown Renderer</H3>
             <Card>
               <CardContent className="pt-6">
                 <Markdown content={markdownContent} />
@@ -87,6 +124,7 @@ export function SpecialPreview(): JSX.Element {
             </Card>
           </Div>
 
+          {/* Image */}
           <Div className="space-y-2">
             <H3>Image</H3>
             <Card>

@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   category: "endpointCategories.userAuth",
+  subCategory: "endpointCategories.userAuthDirectory",
   icon: "trash",
   tags: ["post.tag"],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],

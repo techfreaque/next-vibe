@@ -43,11 +43,18 @@ export const translations = {
   },
   widget: {
     loading: "Ładowanie…",
+    pitch: {
+      headline: "Zamień odwiedzających w subskrybentów",
+      body: "Każdy, kto wejdzie na Twoją stronę skilla lub profil twórcy, zobaczy formularz zapisu. Podaje e-mail - trafia prosto do Twojej listy. Bez dodatkowych aplikacji, bez pośredników, bez miesięcznych opłat za samo zbieranie.",
+      step1: "Ktoś odwiedza Twoją stronę skilla lub profil twórcy",
+      step2: "Wypełnia formularz zapisu",
+      step3: "E-mail ląduje bezpośrednio na Twojej liście",
+    },
     noConfig:
-      "Brak połączonej platformy e-mail. Wybierz poniżej, aby zacząć zbierać leady.",
+      "Podłącz platformę e-mail, żeby zbierać subskrybentów ze stron skilli i profilu twórcy.",
     active: "Aktywna",
     inactive: "Nieaktywna",
-    choosePlatform: "Wybierz platformę e-mail",
+    choosePlatform: "Podłącz platformę e-mail",
     switchPlatform: "Zmień platformę",
     selectPlaceholder: "Wybierz platformę…",
     providers: {

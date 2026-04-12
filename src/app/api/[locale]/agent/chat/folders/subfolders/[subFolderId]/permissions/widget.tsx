@@ -143,13 +143,13 @@ export function FolderPermissionsContainer({
 
       {/* Description */}
       <Div className="px-6 pt-6 pb-4">
-        <Div className="flex gap-2 p-4 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900">
-          <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+        <Div className="flex gap-2 p-4 rounded-lg bg-info/10 border border-info/20">
+          <Info className="h-5 w-5 text-info shrink-0 mt-0.5" />
           <Div className="flex flex-col gap-1">
-            <Span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+            <Span className="text-sm font-medium text-foreground">
               {t("get.about")}
             </Span>
-            <Span className="text-sm text-blue-800 dark:text-blue-200">
+            <Span className="text-sm text-info">
               {t("get.container.description")}
             </Span>
           </Div>

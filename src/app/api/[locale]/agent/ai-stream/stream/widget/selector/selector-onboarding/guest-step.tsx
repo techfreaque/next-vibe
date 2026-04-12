@@ -45,7 +45,7 @@ export function GuestStep({
       {/* Header */}
       <Div className="text-center mb-5 shrink-0">
         <Div className="flex justify-center mb-3">
-          <AlertTriangle className="h-10 w-10 text-amber-500" />
+          <AlertTriangle className="h-10 w-10 text-warning" />
         </Div>
         <H3 className="text-lg font-bold mb-1">
           {t("onboarding.guest.title")}
@@ -53,7 +53,7 @@ export function GuestStep({
       </Div>
 
       {/* Warning box */}
-      <Div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-5 mb-5 shrink-0">
+      <Div className="bg-warning/10 border border-warning/30 rounded-xl p-5 mb-5 shrink-0">
         <Div className="space-y-3 text-sm">
           <P className="text-foreground">{t("onboarding.guest.line1")}</P>
           <P className="text-muted-foreground">{t("onboarding.guest.line2")}</P>

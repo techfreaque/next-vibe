@@ -94,7 +94,7 @@ async function teardownQueueConnection(
  *
  * Note: triggerHermesPulse is called first for E2E coverage (ensures the task-sync
  * pull path is exercised). It may return pulled=0 if hermes's automated cron already
- * pulled the task, which is fine — triggerLocalPulse does not depend on hermes
+ * pulled the task, which is fine - triggerLocalPulse does not depend on hermes
  * executing the task.
  */
 async function runQueuePulse(threadId: string): Promise<void> {

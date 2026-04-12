@@ -7,8 +7,6 @@
 import { clientEndpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/client-multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { getEnvAvailability } from "../../env-availability-context";
-
 import definitions from "./definition";
 import { ChatSettingsRepositoryClient } from "./repository-client";
 
@@ -19,19 +17,10 @@ export const { GET, POST } = clientEndpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     handler: ({ logger, user }) =>
-      ChatSettingsRepositoryClient.getSettings(
-        logger,
-        user,
-        getEnvAvailability(),
-      ),
+      ChatSettingsRepositoryClient.getSettings(logger, user),
   },
   [Methods.POST]: {
     handler: ({ data, logger, user }) =>
-      ChatSettingsRepositoryClient.updateSettings(
-        data,
-        logger,
-        user,
-        getEnvAvailability(),
-      ),
+      ChatSettingsRepositoryClient.updateSettings(data, logger, user),
   },
 });

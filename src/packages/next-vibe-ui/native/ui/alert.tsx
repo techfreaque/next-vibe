@@ -29,10 +29,12 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: "",
-        destructive: "border-destructive",
-        success: "border-green-500/50",
-        warning: "border-yellow-500/50",
+        default: "bg-card border-border",
+        destructive:
+          "border-destructive/50 bg-destructive/5 dark:bg-destructive/10",
+        success: "border-success/50 bg-success/5 dark:bg-success/10",
+        warning: "border-warning/50 bg-warning/5 dark:bg-warning/10",
+        info: "border-info/50 bg-info/5 dark:bg-info/10",
       } satisfies Record<AlertVariant, string>,
     },
     defaultVariants: {
@@ -41,31 +43,42 @@ const alertVariants = cva(
   },
 );
 
+const variantTextColorMap: Record<AlertVariant, string> = {
+  default: "text-card-foreground",
+  destructive: "text-destructive",
+  success: "text-success",
+  warning: "text-warning",
+  info: "text-info",
+};
+
+const AlertVariantContext = React.createContext<AlertVariant>("default");
+
 function Alert({
   className,
-  variant,
+  variant = "default",
   children,
   icon: Icon,
   iconSize = 16,
 }: AlertProps): React.JSX.Element {
   const { colors } = useTheme();
+
+  const iconColorForNative =
+    variant === "destructive" ? colors.notification : colors.text;
+
   return (
-    <StyledView
-      role="alert"
-      className={cn(alertVariants({ variant }), className)}
-    >
-      {Icon && (
-        <StyledView className="absolute left-3.5 top-4 -translate-y-0.5">
-          <Icon
-            size={iconSize}
-            color={
-              variant === "destructive" ? colors.notification : colors.text
-            }
-          />
-        </StyledView>
-      )}
-      {children}
-    </StyledView>
+    <AlertVariantContext.Provider value={variant}>
+      <StyledView
+        role="alert"
+        className={cn(alertVariants({ variant }), className)}
+      >
+        {Icon && (
+          <StyledView className="absolute left-3.5 top-4 -translate-y-0.5">
+            <Icon size={iconSize} color={iconColorForNative} />
+          </StyledView>
+        )}
+        {children}
+      </StyledView>
+    </AlertVariantContext.Provider>
   );
 }
 Alert.displayName = "Alert";
@@ -74,10 +87,12 @@ function AlertTitle({
   className,
   children,
 }: AlertTitleProps): React.JSX.Element {
+  const variant = React.useContext(AlertVariantContext);
   return (
     <Span
       className={cn(
-        "pl-7 mb-1 font-medium text-base leading-none tracking-tight text-foreground",
+        "pl-7 mb-1 font-medium text-base leading-none tracking-tight",
+        variantTextColorMap[variant],
         className,
       )}
     >
@@ -91,9 +106,14 @@ function AlertDescription({
   className,
   children,
 }: AlertDescriptionProps): React.JSX.Element {
+  const variant = React.useContext(AlertVariantContext);
   return (
     <Span
-      className={cn("pl-7 text-sm leading-relaxed text-foreground", className)}
+      className={cn(
+        "pl-7 text-sm leading-relaxed",
+        variantTextColorMap[variant],
+        className,
+      )}
     >
       {children}
     </Span>

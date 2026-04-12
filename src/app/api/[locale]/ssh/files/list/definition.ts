@@ -30,6 +30,7 @@ export const { GET } = createEndpoint({
   description: "get.description",
   icon: "folder",
   category: "endpointCategories.ssh",
+  subCategory: "endpointCategories.sshFiles",
   allowedRoles: [UserRole.ADMIN],
   tags: ["category" as const],
 

@@ -607,15 +607,10 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     prevQueryParamsRef.current = queryParams;
   }, [queryParams, query]);
 
-  // Watch for form changes and update query params
+  // Watch for form changes and update query params (debounced)
   useEffect(() => {
     if (autoSubmit) {
-      // Track if this effect is still mounted to prevent memory leaks
       let isMounted = true;
-
-      // Track the last time we submitted to prevent excessive submissions
-      let lastSubmitTime = 0;
-      const minSubmitInterval = 2000; // Minimum 2 seconds between submissions
 
       const subscription = watch((formData) => {
         if (debounceTimerRef.current) {
@@ -623,45 +618,20 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
           debounceTimerRef.current = null;
         }
 
-        // Check if we've submitted recently
-        const now = Date.now();
-        if (now - lastSubmitTime < minSubmitInterval) {
-          // If we're submitting too frequently, use a longer debounce
-          const adjustedDebounce = debounceMs * 2;
+        debounceTimerRef.current = window.setTimeout(() => {
+          if (!isMounted) {
+            return;
+          }
 
-          debounceTimerRef.current = window.setTimeout(() => {
-            if (!isMounted) {
-              return;
-            }
+          if (formData) {
+            // Filter formData through requestSchema to remove response-only fields
+            // This prevents sending response data back to the API as query params
+            const parsed = endpoint.requestSchema.safeParse(formData);
+            const requestOnlyData = parsed.success ? parsed.data : formData;
 
-            if (formData) {
-              // Filter formData through requestSchema to remove response-only fields
-              // This prevents sending response data back to the API as query params
-              const parsed = endpoint.requestSchema.safeParse(formData);
-              const requestOnlyData = parsed.success ? parsed.data : formData;
-
-              lastSubmitTime = Date.now();
-              setQueryParams(requestOnlyData);
-            }
-          }, adjustedDebounce);
-        } else {
-          // Normal debounce behavior
-          debounceTimerRef.current = window.setTimeout(() => {
-            if (!isMounted) {
-              return;
-            }
-
-            if (formData) {
-              // Filter formData through requestSchema to remove response-only fields
-              // This prevents sending response data back to the API as query params
-              const parsed = endpoint.requestSchema.safeParse(formData);
-              const requestOnlyData = parsed.success ? parsed.data : formData;
-
-              lastSubmitTime = Date.now();
-              setQueryParams(requestOnlyData);
-            }
-          }, debounceMs);
-        }
+            setQueryParams(requestOnlyData);
+          }
+        }, debounceMs);
       });
 
       return (): void => {

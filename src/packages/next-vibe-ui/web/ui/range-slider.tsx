@@ -384,7 +384,7 @@ export function RangeSlider({
           <div
             ref={rangeBarRef}
             className={cn(
-              "absolute h-2 top-1 bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 rounded-full shadow-lg",
+              "absolute h-2 top-1 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 rounded-full shadow-lg",
               dragging ? "transition-none" : "transition-all duration-300",
             )}
             style={{
@@ -432,7 +432,7 @@ export function RangeSlider({
             aria-valuemax={options.length - 1}
             aria-valuenow={layoutMinIndex}
             className={cn(
-              "absolute w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full border-4 border-background shadow-xl -translate-x-1/2",
+              "absolute w-8 h-8 bg-gradient-to-br from-violet-400 to-violet-600 rounded-full border-4 border-background shadow-xl -translate-x-1/2",
               dragging === "min"
                 ? "cursor-grabbing scale-125 z-20 transition-none"
                 : "cursor-grab hover:scale-110 z-10 transition-all duration-200",
@@ -461,7 +461,7 @@ export function RangeSlider({
             <div
               ref={minLabelRef}
               className={cn(
-                "absolute top-7 -translate-x-1/2 text-[10px] font-bold text-blue-600 dark:text-blue-400 whitespace-nowrap pointer-events-none",
+                "absolute top-7 -translate-x-1/2 text-[10px] font-bold text-primary dark:text-primary whitespace-nowrap pointer-events-none",
                 dragging === "min"
                   ? "scale-110 transition-none"
                   : "transition-all duration-200",

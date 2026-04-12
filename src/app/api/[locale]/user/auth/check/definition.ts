@@ -27,6 +27,7 @@ const { GET } = createEndpoint({
   description: "check.get.description",
   icon: "shield",
   category: "endpointCategories.userAuth",
+  subCategory: "endpointCategories.userAuthLogin",
   tags: ["search.tag"],
   allowedRoles: [
     UserRole.PUBLIC,

@@ -14,6 +14,7 @@ import {
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { skillVariantSchema } from "@/app/api/[locale]/agent/chat/skills/db";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import {
   CHAT_MODE_IDS,
@@ -50,11 +51,9 @@ import {
   ModelSelectionType,
   PriceLevel,
   SkillOwnershipType,
-  SpeedLevel,
 } from "../../skills/enum";
 import { SKILL_CREATE_ALIAS } from "../constants";
 import { CategoryOptions, SkillCategory, SkillCategoryDB } from "../enum";
-import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "../i18n";
 
 const SkillCreateContainer = lazy(() =>
@@ -83,7 +82,8 @@ const { POST } = createEndpoint({
     return undefined;
   },
   icon: "sparkle" as const,
-  category: "endpointCategories.chatSkills",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.skillsManagement",
   tags: ["tags.skills" as const],
 
   aliases: [SKILL_CREATE_ALIAS],
@@ -91,8 +91,6 @@ const { POST } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async (data) => {
-        const { getEnvAvailability } =
-          await import("@/app/api/[locale]/agent/env-availability-context");
         const skillsDefinition = await import("../definition");
 
         // Optimistically add the new skill to the list
@@ -116,11 +114,7 @@ const { POST } = createEndpoint({
 
             // Get best model for the new skill
             const bestModel = data.requestData.modelSelection
-              ? getBestChatModel(
-                  data.requestData.modelSelection,
-                  data.user,
-                  getEnvAvailability(),
-                )
+              ? getBestChatModel(data.requestData.modelSelection, data.user)
               : null;
 
             // Create the new skill card (only if we have a model)
@@ -133,9 +127,9 @@ const { POST } = createEndpoint({
               icon: data.requestData.icon,
               category: data.requestData.category,
               modelId: bestModel.id,
-              name: data.requestData.name as SkillsTranslationKey,
-              tagline: data.requestData.tagline as SkillsTranslationKey,
-              description: data.requestData.description as SkillsTranslationKey,
+              name: data.requestData.name,
+              tagline: data.requestData.tagline,
+              description: data.requestData.description,
               modelIcon: bestModel.icon,
               modelInfo: bestModel.name,
               modelProvider: bestModel.provider,
@@ -428,6 +422,15 @@ const { POST } = createEndpoint({
         description: "post.modelSelection.description" as const,
         schema: chatModelSelectionSchema.nullable().optional(),
       }),
+      // Named variants with per-variant model selections (optional - single default variant created automatically)
+      variants: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.variants.label" as const,
+        description: "post.variants.description" as const,
+        hidden: true,
+        schema: z.array(skillVariantSchema).optional(),
+      }),
 
       // Tool configuration - which tools this skill can use (null = use global settings default)
       availableTools: requestField(scopedTranslation, {
@@ -588,10 +591,6 @@ const { POST } = createEndpoint({
           contentRange: {
             min: ContentLevel.OPEN,
             max: ContentLevel.UNCENSORED,
-          },
-          speedRange: {
-            min: SpeedLevel.FAST,
-            max: SpeedLevel.BALANCED,
           },
         },
       },

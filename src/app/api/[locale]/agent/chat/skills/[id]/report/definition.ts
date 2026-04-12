@@ -41,7 +41,8 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "alert-triangle",
-  category: "endpointCategories.ai",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.skillsCommunity",
   tags: ["tags.skills"],
 
   fields: customWidgetObject({
@@ -50,11 +51,11 @@ const { POST } = createEndpoint({
     children: {
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.TEXT,
         label: "post.title" as const,
         description: "post.description" as const,
         hidden: true,
-        schema: z.string().uuid(),
+        schema: z.string(),
       }),
 
       reason: requestField(scopedTranslation, {

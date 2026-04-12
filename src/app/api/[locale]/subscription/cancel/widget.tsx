@@ -69,15 +69,15 @@ export function SubscriptionCancelContainer({
 
       {/* Success Response */}
       {field.value?.success && (
-        <Card className="mt-4 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20">
+        <Card className="mt-4 border-success/30 bg-success/10">
           <CardContent className="pt-6">
             <Div className="flex items-center gap-3">
-              <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <CheckCircle className="h-5 w-5 text-success" />
               <Div>
-                <P className="font-medium text-green-900 dark:text-green-100">
+                <P className="font-medium text-success-foreground">
                   {t("delete.success.title")}
                 </P>
-                <P className="text-sm text-green-700 dark:text-green-300">
+                <P className="text-sm text-success-foreground/80">
                   {field.value.message}
                 </P>
               </Div>

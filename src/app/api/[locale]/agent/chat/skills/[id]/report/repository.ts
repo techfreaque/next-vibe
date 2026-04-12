@@ -22,6 +22,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { SKILL_AUTO_HIDE_REPORT_THRESHOLD } from "../../constants";
 import { customSkills, skillReports } from "../../db";
 import { SkillOwnershipType, SkillStatus } from "../../enum";
+import { SkillsRepository } from "../../repository";
 import type { SkillReportPostResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -44,7 +45,8 @@ export class SkillReportRepository {
         });
       }
 
-      // Fetch the skill
+      // Fetch the skill - resolve by UUID or slug
+      const idCondition = SkillsRepository.resolveSkillIdCondition(skillId);
       const [skill] = await db
         .select({
           id: customSkills.id,
@@ -53,7 +55,7 @@ export class SkillReportRepository {
           status: customSkills.status,
         })
         .from(customSkills)
-        .where(eq(customSkills.id, skillId));
+        .where(idCondition);
 
       if (!skill) {
         return fail({
@@ -61,6 +63,9 @@ export class SkillReportRepository {
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
+
+      // Use resolved UUID for all FK operations
+      const resolvedId = skill.id;
 
       // System skills cannot be reported
       if (skill.ownershipType === SkillOwnershipType.SYSTEM) {
@@ -76,7 +81,7 @@ export class SkillReportRepository {
         .from(skillReports)
         .where(
           and(
-            eq(skillReports.skillId, skillId),
+            eq(skillReports.skillId, resolvedId),
             eq(skillReports.userId, userId),
           ),
         );
@@ -91,7 +96,7 @@ export class SkillReportRepository {
       // Insert report
       await db
         .insert(skillReports)
-        .values({ skillId, userId, reason: data.reason });
+        .values({ skillId: resolvedId, userId, reason: data.reason });
 
       const newReportCount = skill.reportCount + 1;
       const shouldAutoHide =
@@ -111,7 +116,7 @@ export class SkillReportRepository {
           ...(shouldAutoHide ? { status: SkillStatus.UNLISTED } : {}),
           updatedAt: new Date(),
         })
-        .where(eq(customSkills.id, skillId));
+        .where(eq(customSkills.id, resolvedId));
 
       return success({
         reported: true,

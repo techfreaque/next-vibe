@@ -16,7 +16,8 @@ import { parseError } from "next-vibe/shared/utils";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { getTtsModelById } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -58,16 +59,6 @@ export class TextToSpeechRepository {
   }
 
   /**
-   * Extract the voice name for OpenAI TTS from the model ID.
-   * "openai-nova" → "nova", "openai-alloy" → "alloy", etc.
-   */
-  private static getOpenAIVoiceName(modelId: string): string {
-    const parts = modelId.split("-");
-    // modelId format: "openai-<voice>" → take everything after "openai-"
-    return parts.slice(1).join("-");
-  }
-
-  /**
    * Fetch and convert audio URL to base64 data URL
    */
   private static async fetchAndConvertAudio(
@@ -105,9 +96,12 @@ export class TextToSpeechRepository {
   /**
    * Convert text to speech via OpenAI TTS API directly
    */
+  /**
+   * `providerModel` is the voice name (e.g. "nova", "alloy").
+   * The OpenAI TTS model ("tts-1") is the same for all voices and hardcoded.
+   */
   private static async callOpenAITTS(
     text: string,
-    voiceId: string,
     providerModel: string,
     language: string,
     logger: EndpointLogger,
@@ -121,12 +115,8 @@ export class TextToSpeechRepository {
       });
     }
 
-    const voiceName = TextToSpeechRepository.getOpenAIVoiceName(voiceId);
-
     logger.debug("[TTS] Calling OpenAI TTS API", {
-      voiceId,
-      voiceName,
-      model: providerModel,
+      voice: providerModel,
       language,
     });
 
@@ -138,9 +128,10 @@ export class TextToSpeechRepository {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: providerModel,
+        // eslint-disable-next-line i18next/no-literal-string
+        model: "tts-1",
         input: text,
-        voice: voiceName,
+        voice: providerModel,
       }),
     });
 
@@ -322,7 +313,16 @@ export class TextToSpeechRepository {
     logger: EndpointLogger,
     t: TextToSpeechT,
   ): Promise<ResponseType<TextToSpeechPostResponseOutput>> {
-    const modelOption = getTtsModelById(data.voiceId);
+    const modelOption = getBestTtsModel(
+      { selectionType: ModelSelectionType.MANUAL, manualModelId: data.voiceId },
+      user,
+    );
+    if (!modelOption) {
+      return fail({
+        message: t("post.errors.not_found.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
     const language = TextToSpeechRepository.mapLocaleToLanguage(locale);
 
     logger.debug("[TTS] Starting text-to-speech conversion", {
@@ -386,7 +386,6 @@ export class TextToSpeechRepository {
         case ApiProvider.OPENAI_TTS:
           audioResult = await TextToSpeechRepository.callOpenAITTS(
             data.text,
-            data.voiceId,
             modelOption.providerModel,
             language,
             logger,

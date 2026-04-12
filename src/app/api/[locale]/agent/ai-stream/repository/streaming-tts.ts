@@ -12,19 +12,24 @@ import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { TTS_COST_PER_CHARACTER } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { ErrorResponseTypes } from "@/app/api/[locale]/shared/types/response.schema";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import type { WsEmitCallback } from "../../chat/threads/[threadId]/messages/emitter";
 import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
-import { filterTtsModels, type TtsModelId } from "../../text-to-speech/models";
-import { DEFAULT_TTS_MODEL_SELECTION } from "../../text-to-speech/constants";
+import {
+  getBestTtsModel,
+  type TtsModelOption,
+  type VoiceModelSelection,
+} from "../../text-to-speech/models";
 
 /**
  * Minimum skills before emitting a TTS chunk
@@ -64,10 +69,15 @@ export class StreamingTTSHandler {
   private readonly wsEmit: WsEmitCallback | null;
   private readonly logger: EndpointLogger;
   private readonly locale: CountryLanguage;
-  private readonly voiceId: TtsModelId;
+  private readonly voiceModelSelection: VoiceModelSelection;
   private readonly user: JwtPayloadType;
   private isEnabled: boolean;
   private isCancelled = false;
+  /**
+   * Cached resolved TTS model. `false` = not yet resolved. `null` = no provider available.
+   * Resolved once on first TTS attempt to avoid per-chunk resolution overhead.
+   */
+  private resolvedTtsModel: TtsModelOption | null | false = false;
   private totalSkillsProcessed = 0;
   /**
    * Sequential generation chain: at most one TTS API call in-flight at a time.
@@ -80,14 +90,14 @@ export class StreamingTTSHandler {
     wsEmit: WsEmitCallback | null;
     logger: EndpointLogger;
     locale: CountryLanguage;
-    voiceId: TtsModelId;
+    voiceModelSelection: VoiceModelSelection;
     user: JwtPayloadType;
     enabled: boolean;
   }) {
     this.wsEmit = params.wsEmit;
     this.logger = params.logger;
     this.locale = params.locale;
-    this.voiceId = params.voiceId;
+    this.voiceModelSelection = params.voiceModelSelection;
     this.user = params.user;
     this.isEnabled = params.enabled;
   }
@@ -318,7 +328,7 @@ export class StreamingTTSHandler {
           textLength: cleanText.length,
           chunkIndex: chunkIdx,
           locale: this.locale,
-          voiceId: this.voiceId,
+          selectionType: this.voiceModelSelection.selectionType,
         });
       }
     } catch (error) {
@@ -339,22 +349,40 @@ export class StreamingTTSHandler {
   private async generateTTS(text: string): Promise<string | null> {
     const language = getLanguageFromLocale(this.locale);
 
-    const selection = {
-      ...DEFAULT_TTS_MODEL_SELECTION,
-      manualModelId: this.voiceId,
-    };
-    const modelOption =
-      filterTtsModels(selection, this.user, agentEnvAvailability)[0] ?? null;
+    // Resolve model once and cache. Emit WS error only on first failed resolution.
+    if (this.resolvedTtsModel === false) {
+      // Resolution: MANUAL → cheapest available provider for that model → FILTERS fallback using selection constraints.
+      // All logic lives in getBestTtsModel → filterRoleModels → agentEnvAvailability imported directly.
+      this.resolvedTtsModel =
+        getBestTtsModel(this.voiceModelSelection, this.user) ?? null;
 
+      if (!this.resolvedTtsModel) {
+        const message = buildMissingKeyMessage("openAiTts");
+        this.logger.error("[Streaming TTS] No TTS provider available", {
+          selectionType: this.voiceModelSelection.selectionType,
+          hint: "Configure OPENAI_API_KEY, ELEVENLABS_API_KEY, or EDEN_AI_API_KEY",
+        });
+        if (this.wsEmit) {
+          this.wsEmit(
+            createStreamEvent.error({
+              success: false,
+              message: message as TranslatedKeyType,
+              errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+            }),
+          );
+        }
+        // Disable TTS for this session to avoid per-chunk error spam
+        this.isEnabled = false;
+      }
+    }
+
+    const modelOption = this.resolvedTtsModel;
     if (!modelOption) {
-      this.logger.error("[Streaming TTS] No TTS provider available", {
-        voiceId: this.voiceId,
-      });
       return null;
     }
 
     this.logger.debug("[Streaming TTS] Generating TTS", {
-      voiceId: this.voiceId,
+      modelId: modelOption.id,
       apiProvider: modelOption.apiProvider,
       textLength: text.length,
       language,
@@ -363,7 +391,7 @@ export class StreamingTTSHandler {
     try {
       switch (modelOption.apiProvider) {
         case ApiProvider.OPENAI_TTS:
-          return await this.callOpenAITTS(text, modelOption.providerModel);
+          return await this.callOpenAITTS(text, modelOption);
 
         case ApiProvider.EDEN_AI_TTS: {
           const gender =
@@ -382,7 +410,7 @@ export class StreamingTTSHandler {
         default:
           this.logger.error("[Streaming TTS] Unsupported TTS provider", {
             apiProvider: modelOption.apiProvider,
-            voiceId: this.voiceId,
+            modelId: modelOption.id,
           });
           return null;
       }
@@ -397,15 +425,14 @@ export class StreamingTTSHandler {
   }
 
   /**
-   * Call OpenAI TTS API directly
+   * Call OpenAI TTS API directly.
+   * `modelOption.providerModel` is the voice name (e.g. "nova", "alloy").
+   * The OpenAI TTS model ("tts-1") is the same for all voices and hardcoded.
    */
   private async callOpenAITTS(
     text: string,
-    providerModel: string,
+    modelOption: TtsModelOption,
   ): Promise<string | null> {
-    // Derive voice name from model ID: "openai-nova" → "nova"
-    const voiceName = this.voiceId.split("-").slice(1).join("-");
-
     const response = await fetch("https://api.openai.com/v1/audio/speech", {
       method: "POST",
       headers: {
@@ -414,9 +441,10 @@ export class StreamingTTSHandler {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: providerModel,
+        // eslint-disable-next-line i18next/no-literal-string
+        model: "tts-1",
         input: text,
-        voice: voiceName,
+        voice: modelOption.providerModel,
       }),
     });
 
@@ -725,7 +753,7 @@ export function createStreamingTTSHandler(params: {
   wsEmit: WsEmitCallback | null;
   logger: EndpointLogger;
   locale: CountryLanguage;
-  voiceId: TtsModelId;
+  voiceModelSelection: VoiceModelSelection;
   user: JwtPayloadType;
   enabled: boolean;
 }): StreamingTTSHandler {

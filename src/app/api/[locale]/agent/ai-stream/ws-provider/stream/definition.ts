@@ -41,6 +41,7 @@ const { POST } = createEndpoint({
   description: "post.description",
   icon: "radio",
   category: "endpointCategories.ai",
+  subCategory: "endpointCategories.aiInference",
   tags: ["tags.ai", "tags.streaming"],
 
   fields: objectField(scopedTranslation, {

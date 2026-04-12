@@ -173,15 +173,23 @@ function handleMessageCreated(
   // Preserve optimistic attachment previews (local blob URLs) until the real
   // FILES_UPLOADED event replaces them with server URLs. The server MESSAGE_CREATED
   // arrives with isUploadingAttachments=true but no attachments array.
-  if (
-    isUserRole &&
-    serverMetadata.isUploadingAttachments &&
-    !serverMetadata.attachments
-  ) {
+  if (isUserRole && serverMetadata.isUploadingAttachments) {
     const cached = getCachedMessages(e.threadId, rootFolderId, logger);
     const optimistic = cached.find((m) => m.id === e.messageId);
-    if (optimistic?.metadata?.attachments) {
-      serverMetadata.attachments = optimistic.metadata.attachments;
+    if (optimistic?.metadata) {
+      // If FILES_UPLOADED already arrived and cleared the flag, preserve that state.
+      if (optimistic.metadata.isUploadingAttachments === false) {
+        serverMetadata.isUploadingAttachments = false;
+        if (optimistic.metadata.attachments) {
+          serverMetadata.attachments = optimistic.metadata.attachments;
+        }
+      } else if (
+        !serverMetadata.attachments &&
+        optimistic.metadata.attachments
+      ) {
+        // FILES_UPLOADED hasn't arrived yet - keep the optimistic blob URLs visible.
+        serverMetadata.attachments = optimistic.metadata.attachments;
+      }
     }
   }
 

@@ -31,6 +31,7 @@ const { POST } = createEndpoint({
   description: "description",
   icon: "log-in",
   category: "endpointCategories.userAuth",
+  subCategory: "endpointCategories.userAuthLogin",
   tags: ["tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   aliases: ["login"],

@@ -343,7 +343,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       title: "Was du kostenlos bekommst, für immer:",
-      credits: "20 Credits pro Monat - keine Karte, kein Ablaufdatum",
+      credits: "{{freeCredits}} Credits pro Monat - keine Karte, kein Ablaufdatum",
       allModels: "Zugriff auf alle {{modelCount}} KI-Modelle",
       uncensored:
         "4 unzensierte Modelle, die deine Fragen wirklich beantworten",
@@ -353,7 +353,7 @@ export const translations: typeof enTranslations = {
     ctaButton: "Jetzt chatten",
     upgrade: {
       title: "Mehr haben?",
-      desc: "8 €/Monat gibt dir 800 Credits - das ist 40× mehr. Dazu kannst du extra Credit-Pakete kaufen, die niemals ablaufen. Perfekt für tägliche KI-Nutzung.",
+      desc: "{{subscriptionPrice}}/Monat gibt dir {{subscriptionCredits}} Credits - das ist 40× mehr. Dazu kannst du extra Credit-Pakete kaufen, die niemals ablaufen. Perfekt für tägliche KI-Nutzung.",
       cta: "Auf Pro upgraden",
     },
     signoff: "Viel Spaß beim Chatten,\nDas {{appName}} Team",

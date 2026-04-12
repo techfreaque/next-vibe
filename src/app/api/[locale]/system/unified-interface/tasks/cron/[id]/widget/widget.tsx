@@ -73,29 +73,21 @@ interface WidgetProps {
 // ---------------------------------------------------------------------------
 
 const STATUS_COLORS: Record<string, string> = {
-  [CronTaskStatus.RUNNING]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  [CronTaskStatus.COMPLETED]:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  [CronTaskStatus.FAILED]:
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  [CronTaskStatus.ERROR]:
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  [CronTaskStatus.RUNNING]: "bg-info/10 text-info",
+  [CronTaskStatus.COMPLETED]: "bg-success/10 text-success",
+  [CronTaskStatus.FAILED]: "bg-destructive/10 text-destructive",
+  [CronTaskStatus.ERROR]: "bg-destructive/10 text-destructive",
   [CronTaskStatus.TIMEOUT]:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  [CronTaskStatus.PENDING]:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+  [CronTaskStatus.PENDING]: "bg-warning/10 text-warning",
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
-  [CronTaskPriority.CRITICAL]:
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  [CronTaskPriority.CRITICAL]: "bg-destructive/10 text-destructive",
   [CronTaskPriority.HIGH]:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  [CronTaskPriority.MEDIUM]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  [CronTaskPriority.LOW]:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  [CronTaskPriority.MEDIUM]: "bg-info/10 text-info",
+  [CronTaskPriority.LOW]: "bg-success/10 text-success",
   [CronTaskPriority.BACKGROUND]:
     "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
 };
@@ -720,7 +712,7 @@ export function CronTaskDetailContainer({
             variant="outline"
             size="sm"
             onClick={handleRun}
-            className="gap-1.5 text-green-700 border-green-400/60 hover:bg-green-50 dark:text-green-400 dark:border-green-700/60 dark:hover:bg-green-900/20"
+            className="gap-1.5 text-success border-success/30 hover:bg-success/10"
           >
             <Play className="h-4 w-4" />
             {t("widget.run")}
@@ -780,7 +772,7 @@ export function CronTaskDetailContainer({
             label={task.enabled ? t("widget.enabled") : t("widget.disabled")}
             className={
               task.enabled
-                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                ? "bg-success/10 text-success"
                 : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
             }
           />
@@ -986,8 +978,8 @@ export function CronTaskDetailContainer({
             }}
           >
             <Div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 flex-shrink-0 text-red-600" />
-              <Div className="text-xs font-semibold uppercase tracking-wide text-red-600">
+              <AlertTriangle className="h-4 w-4 flex-shrink-0 text-destructive" />
+              <Div className="text-xs font-semibold uppercase tracking-wide text-destructive">
                 {t("widget.lastExecutionError")}
               </Div>
             </Div>
@@ -1012,7 +1004,7 @@ export function CronTaskDetailContainer({
             variant="outline"
             size="sm"
             onClick={handleRun}
-            className="gap-1.5 text-green-700 border-green-400/60 hover:bg-green-50 dark:text-green-400 dark:border-green-700/60 dark:hover:bg-green-900/20"
+            className="gap-1.5 text-success border-success/30 hover:bg-success/10"
           >
             <Play className="h-4 w-4" />
             {t("widget.run")}

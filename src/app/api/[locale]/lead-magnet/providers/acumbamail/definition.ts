@@ -31,7 +31,8 @@ export const { POST } = createEndpoint({
   title: "providers.acumbamail.title" as const,
   description: "providers.acumbamail.description" as const,
   icon: "mail",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetIntegrations",
   tags: ["providers.shared.saveTag" as const],
   allowedRoles: ALLOWED_ROLES,
   fields: objectField(scopedTranslation, {
@@ -45,11 +46,10 @@ export const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "providers.acumbamail.acumbamailApiKey.label" as const,
-        description:
-          "providers.acumbamail.acumbamailApiKey.description" as const,
+        description: "providers.shared.secretKeepExisting" as const,
         placeholder:
           "providers.acumbamail.acumbamailApiKey.placeholder" as const,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       listId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

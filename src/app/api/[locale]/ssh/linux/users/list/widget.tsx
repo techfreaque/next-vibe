@@ -113,9 +113,7 @@ export function LinuxUsersListContainer({
                   <TableCell className="px-4 py-2">
                     <Span
                       className={
-                        user.locked
-                          ? "text-red-600 dark:text-red-400"
-                          : "text-green-600 dark:text-green-400"
+                        user.locked ? "text-destructive" : "text-success"
                       }
                     >
                       {user.locked ? t("widget.locked") : t("widget.active")}

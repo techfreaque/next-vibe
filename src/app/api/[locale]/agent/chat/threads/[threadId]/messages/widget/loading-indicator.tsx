@@ -14,13 +14,13 @@ export function LoadingIndicator({
       <Div className="flex-1">
         <Div className="flex items-center gap-2">
           <Div style={{ animationDelay: "0ms" }}>
-            <Div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" />
+            <Div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
           </Div>
           <Div style={{ animationDelay: "150ms" }}>
-            <Div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" />
+            <Div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
           </Div>
           <Div style={{ animationDelay: "300ms" }}>
-            <Div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" />
+            <Div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
           </Div>
         </Div>
 

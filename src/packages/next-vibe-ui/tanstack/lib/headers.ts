@@ -125,6 +125,20 @@ export async function cookies(): Promise<ReadonlyRequestCookies> {
   };
 }
 
+// ── getPathname() ────────────────────────────────────────────────────────────
+
+export async function getPathname(): Promise<string> {
+  try {
+    const req = getRequest();
+    if (req) {
+      return new URL(req.url).pathname;
+    }
+  } catch {
+    // Outside request context
+  }
+  return "";
+}
+
 // ── headers() ───────────────────────────────────────────────────────────────
 
 export async function headers(): Promise<ReadonlyHeaders> {

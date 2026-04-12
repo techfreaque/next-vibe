@@ -32,6 +32,7 @@ const { POST } = createEndpoint({
   title: "title" as const,
   description: "description" as const,
   category: "endpointCategories.payments",
+  subCategory: "endpointCategories.paymentProviders",
   icon: "credit-card" as const,
   tags: ["tags.stripe" as const, "tags.cli" as const, "tags.webhook" as const],
   allowedRoles: [

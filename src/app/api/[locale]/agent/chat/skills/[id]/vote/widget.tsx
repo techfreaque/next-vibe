@@ -54,7 +54,7 @@ export function SkillVoteContainer({ field }: CustomWidgetProps): JSX.Element {
             </Span>
           </Div>
           {data.trustLevel === SkillTrustLevel.VERIFIED && (
-            <Div className="flex items-center gap-1 text-xs text-blue-500">
+            <Div className="flex items-center gap-1 text-xs text-primary">
               <CheckCircle2 className="h-3.5 w-3.5" />
               <Span>{t("post.badge.verified")}</Span>
             </Div>

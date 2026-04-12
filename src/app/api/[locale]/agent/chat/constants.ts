@@ -19,11 +19,8 @@ import { WAIT_FOR_TASK_ALIAS } from "../../system/unified-interface/tasks/wait-f
 import { AI_RUN_ALIAS } from "../ai-stream/run/constants";
 import { CODING_AGENT_ALIAS } from "../coding-agent/constants";
 import { FETCH_URL_ALIAS } from "../fetch-url-content/constants";
-import { IMAGE_GEN_ALIAS } from "../image-generation/constants";
-import { MUSIC_GEN_ALIAS } from "../music-generation/constants";
 import { BRAVE_SEARCH_ALIAS } from "../search/brave/constants";
 import { KAGI_ALIAS } from "../search/kagi/constants";
-import { VIDEO_GEN_ALIAS } from "../video-generation/constants";
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
@@ -68,9 +65,6 @@ export const DEFAULT_TOOL_IDS_PUBLIC = [
   KAGI_ALIAS,
   FETCH_URL_ALIAS,
   AI_RUN_ALIAS,
-  IMAGE_GEN_ALIAS,
-  MUSIC_GEN_ALIAS,
-  VIDEO_GEN_ALIAS,
 ] as const;
 
 /**
@@ -88,9 +82,6 @@ export const DEFAULT_TOOL_IDS_CUSTOMER = [
   MEMORY_UPDATE_ALIAS,
   MEMORY_DELETE_ALIAS,
   AI_RUN_ALIAS,
-  IMAGE_GEN_ALIAS,
-  MUSIC_GEN_ALIAS,
-  VIDEO_GEN_ALIAS,
 ] as const;
 
 /**
@@ -109,9 +100,6 @@ export const DEFAULT_TOOL_IDS_ADMIN = [
   MEMORY_DELETE_ALIAS,
   CODING_AGENT_ALIAS,
   AI_RUN_ALIAS,
-  IMAGE_GEN_ALIAS,
-  MUSIC_GEN_ALIAS,
-  VIDEO_GEN_ALIAS,
 ] as const;
 
 /**

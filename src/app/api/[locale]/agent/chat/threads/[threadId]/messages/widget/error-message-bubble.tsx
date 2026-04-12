@@ -89,22 +89,22 @@ export function ErrorMessageBubble({
         <Div
           className={cn(
             "rounded-2xl px-4 py-3 border",
-            "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800",
+            "bg-destructive/5 border-destructive/30",
           )}
         >
           <Div className="flex items-start gap-2">
-            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
             <Div className="flex-1 space-y-2">
               {errorTypeDisplay && (
-                <Div className="text-xs font-semibold text-red-700 dark:text-red-300 uppercase tracking-wide">
+                <Div className="text-xs font-semibold text-destructive uppercase tracking-wide">
                   {errorTypeDisplay}
                 </Div>
               )}
-              <Div className="text-sm text-red-900 dark:text-red-100 whitespace-pre-wrap">
+              <Div className="text-sm text-destructive-foreground whitespace-pre-wrap">
                 {displayContent}
               </Div>
               {errorData?.errorType?.errorCode && (
-                <Span className="text-xs text-red-600 dark:text-red-400">
+                <Span className="text-xs text-destructive/80">
                   {ts("errorCode")}: {errorData.errorType.errorCode}
                 </Span>
               )}

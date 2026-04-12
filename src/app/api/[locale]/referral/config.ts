@@ -21,17 +21,20 @@ export const REFERRAL_CONFIG = {
 } as const;
 
 /**
- * Compute the commission percentage for each level (0-indexed).
- * Level 0 = direct referrer (always DIRECT_PERCENTAGE).
- * Levels 1..N = upline split with geometric decay.
+ * Hardcoded upline level shares using simple halving.
+ * Level 1 gets UPLINE_PERCENTAGE / 2, each subsequent level halves,
+ * the last level receives whatever remains from the upline pool.
+ *
+ * With UPLINE_PERCENTAGE=0.1 and MAX_UPLINE_LEVELS=5:
+ *   level 1: 5%  (0.1 / 2)
+ *   level 2: 2.5%
+ *   level 3: 1.25%
+ *   level 4: 0.625%
+ *   level 5: 0.625% (remainder - same as level 4 here)
  */
 export function computeLevelPercentages(): number[] {
-  const {
-    DIRECT_PERCENTAGE,
-    UPLINE_PERCENTAGE,
-    DECAY_RATIO,
-    MAX_UPLINE_LEVELS,
-  } = REFERRAL_CONFIG;
+  const { DIRECT_PERCENTAGE, UPLINE_PERCENTAGE, MAX_UPLINE_LEVELS } =
+    REFERRAL_CONFIG;
 
   const percentages: number[] = [DIRECT_PERCENTAGE];
 
@@ -39,13 +42,18 @@ export function computeLevelPercentages(): number[] {
   if (n === 0) {
     return percentages;
   }
-  const q = DECAY_RATIO;
-  // Sum of geometric series: S = (1 - q^n) / (1 - q)
-  const sum = (1 - Math.pow(q, n)) / (1 - q);
 
+  let remaining = UPLINE_PERCENTAGE;
   for (let k = 0; k < n; k++) {
-    const weight = Math.pow(q, k);
-    percentages.push((UPLINE_PERCENTAGE * weight) / sum);
+    const isLast = k === n - 1;
+    if (isLast) {
+      // Last level gets whatever is left
+      percentages.push(remaining);
+    } else {
+      const share = remaining / 2;
+      percentages.push(share);
+      remaining -= share;
+    }
   }
 
   return percentages;

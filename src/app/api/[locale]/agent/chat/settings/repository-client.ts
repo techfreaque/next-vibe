@@ -13,7 +13,6 @@ import type { EndpointLogger } from "../../../system/unified-interface/shared/lo
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { getBestChatModel, type ChatModelId } from "../../ai-stream/models";
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
-import type { ModelProviderEnvAvailability } from "../../models/models";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
 import type {
@@ -42,10 +41,9 @@ export class ChatSettingsRepositoryClient {
   static async getSettings(
     logger: EndpointLogger,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): Promise<ResponseType<ChatSettingsGetResponseOutput>> {
     try {
-      const settings = this.loadLocalSettings(user, env);
+      const settings = this.loadLocalSettings(user);
       logger.debug("Loaded settings from localStorage");
       return success(settings);
     } catch (error) {
@@ -53,7 +51,7 @@ export class ChatSettingsRepositoryClient {
         "Failed to load settings",
         error instanceof Error ? error : new Error(String(error)),
       );
-      return success(this.getDefaults(user, env));
+      return success(this.getDefaults(user));
     }
   }
 
@@ -64,10 +62,9 @@ export class ChatSettingsRepositoryClient {
     data: ChatSettingsUpdateRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): Promise<ResponseType<never>> {
     try {
-      this.updateLocalSettings(data, user, env);
+      this.updateLocalSettings(data, user);
       return success();
     } catch (error) {
       logger.error(
@@ -82,11 +79,8 @@ export class ChatSettingsRepositoryClient {
    * Get default values - shared between client and server
    * Resolves selectedModel through DEFAULT_CHAT_MODEL_SELECTION with env filtering
    */
-  static getDefaults(
-    user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
-  ): ChatSettingsGetResponseOutput {
-    const bestModel = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user, env);
+  static getDefaults(user: JwtPayloadType): ChatSettingsGetResponseOutput {
+    const bestModel = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user);
     return {
       selectedModel: bestModel?.id ?? null,
       selectedSkill: "thea",
@@ -114,20 +108,19 @@ export class ChatSettingsRepositoryClient {
    */
   static loadLocalSettings(
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): ChatSettingsGetResponseOutput {
     if (typeof window === "undefined") {
-      return this.getDefaults(user, env);
+      return this.getDefaults(user);
     }
 
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) {
-      return this.getDefaults(user, env);
+      return this.getDefaults(user);
     }
 
     try {
       const overrides = JSON.parse(stored);
-      const defaults = this.getDefaults(user, env);
+      const defaults = this.getDefaults(user);
 
       // Merge overrides with defaults
       // Use 'in' check for nullable fields to distinguish "explicitly set to null" from "not set"
@@ -173,7 +166,7 @@ export class ChatSettingsRepositoryClient {
             : defaults.codingAgent,
       };
     } catch {
-      return this.getDefaults(user, env);
+      return this.getDefaults(user);
     }
   }
 
@@ -183,13 +176,12 @@ export class ChatSettingsRepositoryClient {
   static saveLocalSettings(
     settings: ChatSettingsGetResponseOutput,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): void {
     if (typeof window === "undefined") {
       return;
     }
 
-    const defaults = this.getDefaults(user, env);
+    const defaults = this.getDefaults(user);
     const overrides: Partial<ChatSettingsGetResponseOutput> = {};
 
     // Only store values that differ from defaults
@@ -276,9 +268,8 @@ export class ChatSettingsRepositoryClient {
   static updateLocalSettings(
     updates: Partial<ChatSettingsUpdateRequestOutput>,
     user: JwtPayloadType,
-    env: ModelProviderEnvAvailability,
   ): ChatSettingsGetResponseOutput {
-    const current = this.loadLocalSettings(user, env);
+    const current = this.loadLocalSettings(user);
     const updated: ChatSettingsGetResponseOutput = {
       selectedModel: updates.selectedModel ?? current.selectedModel,
       selectedSkill: updates.selectedSkill ?? current.selectedSkill,
@@ -323,7 +314,7 @@ export class ChatSettingsRepositoryClient {
           : current.codingAgent,
     };
 
-    this.saveLocalSettings(updated, user, env);
+    this.saveLocalSettings(updated, user);
     return updated;
   }
 

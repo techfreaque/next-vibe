@@ -157,6 +157,10 @@ eagerImport(
   () => import("../../widgets/form-fields/timezone-field/react"),
 );
 eagerImport("url", () => import("../../widgets/form-fields/url-field/react"));
+eagerImport(
+  "markdown-textarea",
+  () => import("../../widgets/form-fields/markdown-textarea-field/react"),
+);
 
 /**
  * Waits for all eager widget imports to resolve.

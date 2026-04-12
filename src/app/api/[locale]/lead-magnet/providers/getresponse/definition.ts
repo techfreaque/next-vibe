@@ -31,7 +31,8 @@ export const { POST } = createEndpoint({
   title: "providers.getresponse.title" as const,
   description: "providers.getresponse.description" as const,
   icon: "mail",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetIntegrations",
   tags: ["providers.shared.saveTag" as const],
   allowedRoles: ALLOWED_ROLES,
 
@@ -46,11 +47,10 @@ export const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "providers.getresponse.getresponseApiKey.label" as const,
-        description:
-          "providers.getresponse.getresponseApiKey.description" as const,
+        description: "providers.shared.secretKeepExisting" as const,
         placeholder:
           "providers.getresponse.getresponseApiKey.placeholder" as const,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       listId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

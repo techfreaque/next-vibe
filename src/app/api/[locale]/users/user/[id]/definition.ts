@@ -45,7 +45,8 @@ const { GET } = createEndpoint({
   title: "id.get.title" as const,
   description: "id.get.description" as const,
   icon: "user",
-  category: "endpointCategories.userManagement",
+  category: "endpointCategories.userAdmin",
+  subCategory: "endpointCategories.userAdminManagement",
   tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
@@ -357,7 +358,8 @@ const { PUT } = createEndpoint({
   title: "id.put.title" as const,
   description: "id.put.description" as const,
   icon: "user-check" as const,
-  category: "endpointCategories.userManagement",
+  category: "endpointCategories.userAdmin",
+  subCategory: "endpointCategories.userAdminManagement",
   tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
@@ -642,7 +644,8 @@ const { DELETE } = createEndpoint({
   title: "id.delete.title" as const,
   description: "id.delete.description" as const,
   icon: "user-x" as const,
-  category: "endpointCategories.userManagement",
+  category: "endpointCategories.userAdmin",
+  subCategory: "endpointCategories.userAdminManagement",
   tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 

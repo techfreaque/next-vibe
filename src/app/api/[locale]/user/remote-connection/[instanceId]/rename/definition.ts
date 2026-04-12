@@ -33,7 +33,8 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "pencil" as const,
-  category: "endpointCategories.userAuth",
+  category: "endpointCategories.remote",
+  subCategory: "endpointCategories.remoteInstances",
   tags: ["tags.remoteConnection" as const],
   aliases: ["remote-rename", "rename-connection"] as const,
 

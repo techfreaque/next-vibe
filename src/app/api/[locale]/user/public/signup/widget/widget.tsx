@@ -165,7 +165,7 @@ export function SignupFormContainer({
                       name={formField.name}
                       checked={formField.value as boolean}
                       onCheckedChange={(checked) => formField.onChange(checked)}
-                      className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                      className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
                   </FormControl>
                   <Label

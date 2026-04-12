@@ -8,6 +8,7 @@ export const SKILL_REPORT_ALIAS = "skill-report" as const;
 export const SKILL_PUBLISH_ALIAS = "skill-publish" as const;
 export const SKILL_MODERATION_ALIAS = "skill-moderation" as const;
 export const NO_SKILL_ID = "default";
+export const SKILL_CREATOR_ID = "skill-creator" as const;
 
 /** Auto-upgrade threshold: vote_count >= this → trust_level = VERIFIED */
 export const SKILL_VERIFIED_VOTE_THRESHOLD = 10;

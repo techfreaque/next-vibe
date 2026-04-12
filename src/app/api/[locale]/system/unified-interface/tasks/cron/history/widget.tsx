@@ -88,18 +88,13 @@ const STATUS_FILTER_LABEL_KEYS: Record<
 };
 
 const STATUS_COLOR_MAP: Record<string, string> = {
-  [CronTaskStatus.RUNNING]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  [CronTaskStatus.COMPLETED]:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  [CronTaskStatus.FAILED]:
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  [CronTaskStatus.ERROR]:
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  [CronTaskStatus.RUNNING]: "bg-info/10 text-info",
+  [CronTaskStatus.COMPLETED]: "bg-success/10 text-success",
+  [CronTaskStatus.FAILED]: "bg-destructive/10 text-destructive",
+  [CronTaskStatus.ERROR]: "bg-destructive/10 text-destructive",
   [CronTaskStatus.TIMEOUT]:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  [CronTaskStatus.PENDING]:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+  [CronTaskStatus.PENDING]: "bg-warning/10 text-warning",
   [CronTaskStatus.CANCELLED]:
     "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
   [CronTaskStatus.SKIPPED]:
@@ -110,9 +105,9 @@ const DEFAULT_STATUS_CLASS =
   "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
 
 const SUMMARY_VALUE_CLASS_SUCCESS =
-  "text-xl font-bold tabular-nums text-green-600 dark:text-green-400";
+  "text-xl font-bold tabular-nums text-success";
 const SUMMARY_VALUE_CLASS_DANGER =
-  "text-xl font-bold tabular-nums text-red-600 dark:text-red-400";
+  "text-xl font-bold tabular-nums text-destructive";
 const SUMMARY_VALUE_CLASS_DEFAULT = "text-xl font-bold tabular-nums";
 
 // ---------------------------------------------------------------------------
@@ -285,7 +280,7 @@ function ExecutionCard({
               variant="ghost"
               size="sm"
               onClick={() => onToggle("error")}
-              className="h-7 px-2 text-xs gap-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+              className="h-7 px-2 text-xs gap-1 text-destructive hover:text-destructive/80"
             >
               {t("widget.error.label")}
               {expandedSection === "error" ? (
@@ -301,7 +296,7 @@ function ExecutionCard({
       {/* Error preview inline when collapsed */}
       {hasError && expandedSection !== "error" && execution.error && (
         <Div
-          className="px-3 pb-2 text-xs text-red-500 dark:text-red-400 truncate cursor-pointer"
+          className="px-3 pb-2 text-xs text-destructive truncate cursor-pointer"
           onClick={() => onToggle("error")}
         >
           {execution.error.message}
@@ -310,21 +305,21 @@ function ExecutionCard({
 
       {/* Expanded: error */}
       {expandedSection === "error" && hasError && (
-        <Div className="border-t border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30 p-3 flex flex-col gap-2">
+        <Div className="border-t border-destructive/30 bg-destructive/10 p-3 flex flex-col gap-2">
           {execution.error && (
             <>
               <Div className="flex items-center gap-2">
-                <XCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
-                <Span className="text-xs font-semibold text-red-700 dark:text-red-300">
+                <XCircle className="h-4 w-4 text-destructive flex-shrink-0" />
+                <Span className="text-xs font-semibold text-destructive">
                   {execution.error.errorType.errorKey}
                 </Span>
               </Div>
-              <Span className="text-sm text-red-800 dark:text-red-200 whitespace-pre-wrap break-words">
+              <Span className="text-sm text-destructive whitespace-pre-wrap break-words">
                 {execution.error.message}
               </Span>
               {execution.error.messageParams &&
                 Object.keys(execution.error.messageParams).length > 0 && (
-                  <Pre className="text-xs text-red-600 dark:text-red-400 font-mono bg-red-100 dark:bg-red-900/40 rounded p-2 overflow-auto">
+                  <Pre className="text-xs text-destructive font-mono bg-destructive/10 rounded p-2 overflow-auto">
                     {JSON.stringify(execution.error.messageParams, null, 2)}
                   </Pre>
                 )}
@@ -507,19 +502,19 @@ export function CronHistoryContainer({
           <SummaryCard
             label={t("widget.summary.successful")}
             value={summary.successfulExecutions}
-            icon={<CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+            icon={<CheckCircle className="h-3.5 w-3.5 text-success" />}
             variant="success"
           />
           <SummaryCard
             label={t("widget.summary.failed")}
             value={summary.failedExecutions}
-            icon={<XCircle className="h-3.5 w-3.5 text-red-500" />}
+            icon={<XCircle className="h-3.5 w-3.5 text-destructive" />}
             variant="danger"
           />
           <SummaryCard
             label={t("widget.summary.successRate")}
             value={`${Math.round(summary.successRate)}%`}
-            icon={<TrendingUp className="h-3.5 w-3.5 text-green-500" />}
+            icon={<TrendingUp className="h-3.5 w-3.5 text-success" />}
             variant="success"
           />
           <SummaryCard

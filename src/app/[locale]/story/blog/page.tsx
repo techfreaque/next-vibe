@@ -55,6 +55,7 @@ export async function tanstackLoader({
 
 interface BlogPost {
   slug: string;
+  customHref?: string;
   titleKey: string;
   categoryKey: string;
   excerptKey: string;
@@ -229,6 +230,20 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
       badgeColor:
         "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800/50",
     },
+    {
+      slug: "referral-landing",
+      customHref: `/${locale}/story/referral`,
+      titleKey: "posts.referralLanding.title",
+      categoryKey: "posts.referralLanding.category",
+      excerptKey: "posts.referralLanding.excerpt",
+      readTimeKey: "posts.referralLanding.readTime",
+      emoji: "💸",
+      accentColor: "text-rose-600 dark:text-rose-400",
+      accentBg: "bg-rose-50 dark:bg-rose-950/30",
+      accentBorder: "border-rose-200 dark:border-rose-800/50",
+      badgeColor:
+        "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/50",
+    },
   ];
 
   const [featured, ...rest] = ALL_POSTS;
@@ -264,7 +279,9 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
             </Div>
 
             <Link
-              href={`/${locale}/story/blog/${featured.slug}`}
+              href={
+                featured.customHref ?? `/${locale}/story/blog/${featured.slug}`
+              }
               className="block group"
             >
               <Card
@@ -319,7 +336,7 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
           {rest.map((post) => (
             <Link
               key={post.slug}
-              href={`/${locale}/story/blog/${post.slug}`}
+              href={post.customHref ?? `/${locale}/story/blog/${post.slug}`}
               className="block group"
             >
               <Card

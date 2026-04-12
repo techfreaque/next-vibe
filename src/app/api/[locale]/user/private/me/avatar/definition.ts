@@ -33,6 +33,7 @@ const { POST } = createEndpoint({
   description: "upload.description",
   icon: "user",
   category: "endpointCategories.userAuth",
+  subCategory: "endpointCategories.userAuthProfile",
   tags: ["tag"],
   allowedRoles: [
     UserRole.CUSTOMER,
@@ -249,6 +250,7 @@ const { DELETE } = createEndpoint({
   description: "delete.description",
   icon: "user-x" as const,
   category: "endpointCategories.userAuth",
+  subCategory: "endpointCategories.userAuthProfile",
   tags: ["tag"],
   allowedRoles: [
     UserRole.CUSTOMER,

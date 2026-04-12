@@ -22,7 +22,10 @@ import {
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
+import {
+  getBestVideoGenModel,
+  VideoGenModelId,
+} from "@/app/api/[locale]/agent/video-generation/models";
 import { lazy } from "react";
 
 import { VIDEO_GEN_ALIAS } from "./constants";
@@ -47,9 +50,10 @@ const { POST } = createEndpoint({
   description: "post.description",
   icon: "video",
   category: "endpointCategories.ai",
+  subCategory: "endpointCategories.aiGeneration",
   tags: ["tags.video", "tags.generation", "tags.ai"],
   dynamicTitle: ({ request }) => {
-    const prompt = request?.prompt as string | undefined;
+    const prompt = request?.prompt;
     if (!prompt?.trim()) {
       return undefined;
     }
@@ -86,7 +90,13 @@ const { POST } = createEndpoint({
         options: [],
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
         schema: z.enum(VideoGenModelId).default(VideoGenModelId.WAN_2_7_T2V),
-        serverDefault: (ctx) => ctx.streamContext?.videoGenModelId,
+        serverDefault: (ctx) => {
+          const sel = ctx.streamContext?.videoGenModelSelection;
+          if (!sel || !ctx.user) {
+            return undefined;
+          }
+          return getBestVideoGenModel(sel, ctx.user)?.id;
+        },
       }),
       duration: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

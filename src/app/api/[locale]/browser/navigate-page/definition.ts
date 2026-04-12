@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   title: "navigate-page.title",
   description: "navigate-page.description",
   category: "endpointCategories.browser",
+  subCategory: "endpointCategories.browserPages",
   icon: "navigation",
   tags: [
     "navigate-page.tags.browserAutomation",

@@ -16,7 +16,6 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import {
@@ -87,7 +86,6 @@ export function ImageGenerationContainer({
   const result = field.value;
   const children = field.children;
   const prompt = form?.watch("prompt") ?? "";
-  const envAvailability = useEnvAvailability();
   const user = useWidgetUser();
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
@@ -112,16 +110,12 @@ export function ImageGenerationContainer({
   const defaultModelSelection = useMemo(():
     | ImageGenModelSelection
     | undefined => {
-    const m = getBestImageGenModel(
-      DEFAULT_IMAGE_GEN_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestImageGenModel(DEFAULT_IMAGE_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
     return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [user, envAvailability]);
+  }, [user]);
 
   const resolvedModelId =
     currentModelId ??

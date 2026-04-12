@@ -5,7 +5,6 @@ import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
-  SpeedLevel,
 } from "../chat/skills/enum";
 import {
   filtersSelectionSchema,
@@ -14,13 +13,14 @@ import {
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
+  buildModelOptionsIndex,
   defaultFeatures,
   filterRoleModels,
+  getModelForProvider,
   getProviderPrice,
   type ModelDefinition,
   type ModelOptionAudioBased,
   type ModelProviderConfigAudioBased,
-  type ModelProviderEnvAvailability,
 } from "../models/models";
 import { MusicDuration } from "./enum";
 
@@ -78,7 +78,6 @@ export const musicGenModelDefinitions: Record<
     utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -118,7 +117,6 @@ export const musicGenModelDefinitions: Record<
     utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -160,7 +158,6 @@ export const musicGenModelDefinitions: Record<
     utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -202,7 +199,6 @@ export const musicGenModelDefinitions: Record<
     utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -240,7 +236,6 @@ export const musicGenModelDefinitions: Record<
     utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -253,12 +248,49 @@ export type MusicGenModelOption = ModelOptionAudioBased & {
   id: MusicGenModelId;
 };
 
-function buildMusicGenModelOptions(): Record<
-  MusicGenModelId,
-  MusicGenModelOption
-> {
-  const result = {} as Record<MusicGenModelId, MusicGenModelOption>;
+function buildMusicGenOption(
+  modelId: MusicGenModelId,
+  def: ModelDefinition,
+  provider: ModelProviderConfigAudioBased,
+): MusicGenModelOption {
+  const p = provider satisfies ModelProviderConfigAudioBased;
+  return {
+    id: modelId,
+    name: def.name,
+    provider: def.by,
+    apiProvider: provider.apiProvider,
+    description: def.description,
+    parameterCount: def.parameterCount,
+    contextWindow: def.contextWindow,
+    icon: def.icon,
+    providerModel: provider.providerModel,
+    utilities: def.utilities,
+    supportsTools: def.supportsTools,
+    intelligence: def.intelligence,
+    content: def.content,
+    features: def.features,
+    weaknesses: def.weaknesses,
+    adminOnly: provider.adminOnly,
+    inputs: def.inputs,
+    outputs: def.outputs,
+    voiceMeta: def.voiceMeta,
+    creditCostPerClip: p.creditCostPerClip,
+    defaultDurationSeconds: p.defaultDurationSeconds,
+    supportedDurations: p.supportedDurations,
+    minDurationSeconds: p.minDurationSeconds,
+  };
+}
 
+// ============================================================
+// MUSIC GEN MODEL RESOLUTION
+// ============================================================
+
+/**
+ * All (model, provider) combinations sorted cheapest-first.
+ * Used by filterMusicGenModels for env-aware provider selection.
+ */
+function buildMusicGenModelOptionsPool(): MusicGenModelOption[] {
+  const pool: MusicGenModelOption[] = [];
   for (const modelId of Object.values(MusicGenModelId)) {
     const def = musicGenModelDefinitions[modelId];
     const sortedProviders = [...def.providers].toSorted(
@@ -266,47 +298,31 @@ function buildMusicGenModelOptions(): Record<
     );
     for (const provider of sortedProviders) {
       if (provider.creditCostPerClip !== undefined) {
-        const p = provider satisfies ModelProviderConfigAudioBased;
-        result[modelId] = {
-          id: modelId,
-          name: def.name,
-          provider: def.by,
-          apiProvider: provider.apiProvider,
-          description: def.description,
-          parameterCount: def.parameterCount,
-          contextWindow: def.contextWindow,
-          icon: def.icon,
-          providerModel: provider.providerModel,
-          utilities: def.utilities,
-          supportsTools: def.supportsTools,
-          intelligence: def.intelligence,
-          speed: def.speed,
-          content: def.content,
-          features: def.features,
-          weaknesses: def.weaknesses,
-          adminOnly: provider.adminOnly,
-          inputs: def.inputs,
-          outputs: def.outputs,
-          voiceMeta: def.voiceMeta,
-          creditCostPerClip: p.creditCostPerClip,
-          defaultDurationSeconds: p.defaultDurationSeconds,
-          supportedDurations: p.supportedDurations,
-          minDurationSeconds: p.minDurationSeconds,
-        };
-        break; // use cheapest provider only
+        pool.push(
+          buildMusicGenOption(
+            modelId,
+            def,
+            provider satisfies ModelProviderConfigAudioBased,
+          ),
+        );
       }
     }
   }
-
-  return result;
+  return pool;
 }
 
-const musicGenModelOptionsIndex: Record<MusicGenModelId, MusicGenModelOption> =
-  buildMusicGenModelOptions();
+const musicGenModelOptionsPool: MusicGenModelOption[] =
+  buildMusicGenModelOptionsPool();
+
+const musicGenModelOptionsIndex: Partial<
+  Record<MusicGenModelId, MusicGenModelOption>
+> = buildModelOptionsIndex(musicGenModelOptionsPool) as Partial<
+  Record<MusicGenModelId, MusicGenModelOption>
+>;
 
 export const musicGenModelOptions: MusicGenModelOption[] = Object.values(
   musicGenModelOptionsIndex,
-);
+).filter((m): m is MusicGenModelOption => m !== undefined);
 
 export const MusicGenModelIdOptions = musicGenModelOptions.map((m) => ({
   value: m.id,
@@ -321,55 +337,19 @@ export function getMusicGenModelById(
 
 /**
  * Resolve a music gen model option using a specific API provider.
- * Picks the cheapest provider variant for `modelId` that matches `provider`.
+ * Picks the cheapest provider variant for `modelId` that matches `provider` from the pool.
  * Falls back to the default (cheapest overall) if no matching provider exists.
  */
 export function getMusicGenModelForProvider(
   modelId: MusicGenModelId,
   provider: ApiProvider,
 ): MusicGenModelOption | undefined {
-  const def = musicGenModelDefinitions[modelId];
-  if (!def) {
-    return undefined;
-  }
-  const matching = [...def.providers]
-    .filter((p) => p.apiProvider === provider)
-    .toSorted((a, b) => getProviderPrice(a) - getProviderPrice(b));
-
-  for (const p of matching) {
-    if (p.creditCostPerClip !== undefined) {
-      const typed = p satisfies ModelProviderConfigAudioBased;
-      return {
-        id: modelId,
-        name: def.name,
-        provider: def.by,
-        apiProvider: p.apiProvider,
-        description: def.description,
-        parameterCount: def.parameterCount,
-        contextWindow: def.contextWindow,
-        icon: def.icon,
-        providerModel: p.providerModel,
-        utilities: def.utilities,
-        supportsTools: def.supportsTools,
-        intelligence: def.intelligence,
-        speed: def.speed,
-        content: def.content,
-        features: def.features,
-        weaknesses: def.weaknesses,
-        adminOnly: p.adminOnly,
-        inputs: def.inputs,
-        outputs: def.outputs,
-        voiceMeta: def.voiceMeta,
-        creditCostPerClip: typed.creditCostPerClip,
-        defaultDurationSeconds: typed.defaultDurationSeconds,
-        supportedDurations: typed.supportedDurations,
-        minDurationSeconds: typed.minDurationSeconds,
-      };
-    }
-  }
-
-  // No matching provider - fall back to default
-  return getMusicGenModelById(modelId);
+  return getModelForProvider(
+    modelId,
+    provider,
+    musicGenModelOptionsPool,
+    getMusicGenModelById(modelId),
+  );
 }
 
 // ============================================================
@@ -392,22 +372,16 @@ export type MusicGenModelSelection = z.infer<
   typeof musicGenModelSelectionSchema
 >;
 
-// ============================================================
-// MUSIC GEN MODEL RESOLUTION
-// ============================================================
-
 export function filterMusicGenModels(
   selection: MusicGenModelSelection | null | undefined,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): MusicGenModelOption[] {
-  return filterRoleModels(musicGenModelOptions, selection, user, env);
+  return filterRoleModels(musicGenModelOptionsPool, selection, user);
 }
 
 export function getBestMusicGenModel(
   selection: MusicGenModelSelection,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): MusicGenModelOption | null {
-  return filterMusicGenModels(selection, user, env)[0] ?? null;
+  return filterMusicGenModels(selection, user)[0] ?? null;
 }

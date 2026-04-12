@@ -136,10 +136,10 @@ export function ReferralStatsContainer({
         <StatCard
           title={t(stats.totalEarnedTitle)}
           IconComponent={DollarSign}
-          iconColorClassName={"text-blue-700 dark:text-blue-300"}
-          iconBgClassName={"bg-blue-100 dark:bg-blue-900/30"}
+          iconColorClassName={"text-info"}
+          iconBgClassName={"bg-info/10"}
           value={stats.totalEarnedValue}
-          valueColorClassName={"text-blue-600 dark:text-blue-400"}
+          valueColorClassName={"text-info"}
           description={t(stats.totalEarnedDescription)}
           formatAsDollars
         />
@@ -150,18 +150,18 @@ export function ReferralStatsContainer({
           iconColorClassName={
             stats.availableCreditsReadyForPayout
               ? "text-violet-700 dark:text-violet-300"
-              : "text-amber-700 dark:text-amber-300"
+              : "text-warning"
           }
           iconBgClassName={
             stats.availableCreditsReadyForPayout
               ? "bg-violet-100 dark:bg-violet-900/30"
-              : "bg-amber-100 dark:bg-amber-900/30"
+              : "bg-warning/10"
           }
           value={stats.availableCreditsValue}
           valueColorClassName={
             stats.availableCreditsReadyForPayout
               ? "text-violet-600 dark:text-violet-400"
-              : "text-amber-600 dark:text-amber-400"
+              : "text-warning"
           }
           description={t(stats.availableCreditsDescription, {
             minPayout: `$${(REFERRAL_CONFIG.MIN_PAYOUT_CENTS / 100).toFixed(2)}`,

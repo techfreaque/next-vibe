@@ -36,6 +36,7 @@ const { POST } = createEndpoint({
   title: "preview.render.post.title" as const,
   description: "preview.render.post.description" as const,
   category: "endpointCategories.messenger",
+  subCategory: "endpointCategories.messengerMessages",
   tags: ["preview.render.post.title" as const],
   icon: "mail",
   allowedRoles: [UserRole.ADMIN] as const,

@@ -44,7 +44,9 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "folder",
-  category: "endpointCategories.chatThreads",
+  category: "endpointCategories.chat",
+  subCategory: "endpointCategories.chatOrganization",
+
   tags: ["tags.folders" as const],
 
   fields: objectField(scopedTranslation, {
@@ -187,7 +189,9 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "folder-x",
-  category: "endpointCategories.chatThreads",
+  category: "endpointCategories.chat",
+  subCategory: "endpointCategories.chatOrganization",
+
   tags: ["tags.folders" as const],
 
   fields: customWidgetObject({

@@ -3,17 +3,15 @@
  * Handles retrying messages in both incognito and server modes
  */
 
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { ModelProviderEnvAvailability } from "@/app/api/[locale]/agent/models/models";
 
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";
@@ -36,7 +34,6 @@ export interface RetryMessageDeps {
   };
   setLeafMessageId?: (messageId: string) => void;
   locale: CountryLanguage;
-  env: ModelProviderEnvAvailability;
 }
 
 export async function retryMessage(

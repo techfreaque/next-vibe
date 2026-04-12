@@ -90,9 +90,7 @@ export function FilesReadContainer({ field }: WidgetProps): React.JSX.Element {
             {t("widget.encoding")}: {value.encoding}
           </Span>
           {value.truncated && (
-            <Span className="text-amber-600 dark:text-amber-400">
-              {t("widget.truncatedWarning")}
-            </Span>
+            <Span className="text-warning">{t("widget.truncatedWarning")}</Span>
           )}
         </Div>
       )}

@@ -44,7 +44,8 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "send",
-  category: "endpointCategories.ai",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.skillsCommunity",
   tags: ["tags.skills"],
 
   fields: customWidgetObject({
@@ -53,11 +54,11 @@ const { PATCH } = createEndpoint({
     children: {
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.TEXT,
         label: "patch.title" as const,
         description: "patch.description" as const,
         hidden: true,
-        schema: z.string().uuid(),
+        schema: z.string(),
       }),
 
       status: requestField(scopedTranslation, {

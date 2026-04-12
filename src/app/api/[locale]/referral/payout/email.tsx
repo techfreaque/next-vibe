@@ -29,6 +29,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { PayoutCurrency } from "../enum";
 import type { ReferralT } from "../i18n";
 import { scopedTranslation } from "../i18n";
+import { REFERRAL_CONFIG } from "../config";
 import type definition from "./definition";
 import {
   type PayoutPostRequestOutput,
@@ -91,7 +92,9 @@ function PayoutUserEmail({
     >
       <Span style={{ fontSize: "16px", lineHeight: "1.6", color: "#374151" }}>
         {isCrypto
-          ? t("payout.email.user.bodyCrypto")
+          ? t("payout.email.user.bodyCrypto", {
+              cryptoPayoutHours: REFERRAL_CONFIG.CRYPTO_PAYOUT_HOURS,
+            })
           : t("payout.email.user.bodyCredits")}
       </Span>
       <Hr style={{ borderColor: "#e5e7eb", margin: "24px 0" }} />

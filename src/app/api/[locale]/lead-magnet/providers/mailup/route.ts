@@ -14,11 +14,11 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "MAILUP",
         {
-          mailupClientId: data.mailupClientId,
-          mailupClientSecret: data.mailupClientSecret,
-          mailupUsername: data.mailupUsername,
-          mailupPassword: data.mailupPassword,
-          mailupListId: data.mailupListId,
+          mailupClientId: data.mailupClientId || undefined,
+          mailupClientSecret: data.mailupClientSecret || undefined,
+          mailupUsername: data.mailupUsername || undefined,
+          mailupPassword: data.mailupPassword || undefined,
+          mailupListId: data.mailupListId || undefined,
         },
         {
           listId: data.listId ?? null,

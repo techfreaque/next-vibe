@@ -175,74 +175,83 @@ export function EmailTemplate({
           {/* Footer */}
           <Section
             style={{
-              backgroundColor: "#f8fafc", // Light gray footer
+              backgroundColor: "#f8fafc",
               borderBottomLeftRadius: "8px",
               borderBottomRightRadius: "8px",
-              padding: "24px",
+              padding: "28px 24px 20px",
               textAlign: "center",
               borderTop: "1px solid #e5e7eb",
             }}
           >
-            {/* Social media links and website button */}
-            <div style={{ marginBottom: "20px" }}>
-              <TrackedLink
-                href={envClient.NEXT_PUBLIC_APP_URL}
-                tracking={tracking}
-                style={{
-                  color: "#1e40af",
-                  textDecoration: "none",
-                  fontWeight: "500",
-                  padding: "8px 12px",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "4px",
-                  backgroundColor: "white",
-                  display: "inline-block",
-                }}
-              >
-                {t("components.email.footer.visitWebsite")}
-              </TrackedLink>
-            </div>
-
+            {/* Feedback ask */}
             <div
               style={{
-                fontSize: "14px",
-                color: "#6b7280",
-                textAlign: "center",
-                margin: "0 0 8px 0",
+                fontSize: "13px",
+                fontWeight: "600",
+                color: "#374151",
+                margin: "0 0 4px 0",
               }}
             >
-              {t("components.email.footer.allRightsReserved", {
-                currentYear,
-                appName: globalT("appName"),
-              })}
+              {t("components.email.footer.feedbackHook")}
             </div>
-
             <div
               style={{
-                fontSize: "14px",
+                fontSize: "12px",
                 color: "#6b7280",
-                textAlign: "center",
-                margin: "8px 0 0 0",
+                lineHeight: "1.5",
+                margin: "0 0 12px 0",
               }}
             >
-              {t("components.email.footer.needHelp")}{" "}
-              <TrackedLink
-                href={`mailto:${contactClientRepository.getSupportEmail(locale)}`}
-                tracking={tracking}
-                style={{ color: "#2563eb" }}
-              >
-                {contactClientRepository.getSupportEmail(locale)}
-              </TrackedLink>
+              {t("components.email.footer.feedbackBody")}
             </div>
+            <TrackedLink
+              href={`mailto:${contactClientRepository.getSupportEmail(locale)}`}
+              tracking={tracking}
+              style={{
+                color: "#2563eb",
+                textDecoration: "none",
+                fontWeight: "500",
+                fontSize: "13px",
+                display: "inline-block",
+                marginBottom: "24px",
+              }}
+            >
+              {t("components.email.footer.feedbackLink")}
+            </TrackedLink>
 
+            {/* Divider */}
+            <div
+              style={{
+                borderTop: "1px solid #e5e7eb",
+                margin: "0 0 16px 0",
+              }}
+            />
+
+            {/* Legal row */}
             <div
               style={{
                 fontSize: "12px",
                 color: "#9ca3af",
                 textAlign: "center",
-                margin: "16px 0 0 0",
+                lineHeight: "1.8",
               }}
             >
+              <TrackedLink
+                href={envClient.NEXT_PUBLIC_APP_URL}
+                tracking={tracking}
+                style={{ color: "#9ca3af", textDecoration: "none" }}
+              >
+                {globalT("appName")}
+              </TrackedLink>
+              {t("components.email.footer.footerSeparator")}
+              <TrackedLink
+                href={`mailto:${contactClientRepository.getSupportEmail(locale)}`}
+                tracking={tracking}
+                style={{ color: "#9ca3af", textDecoration: "none" }}
+              >
+                {t("components.email.footer.needHelp")}
+              </TrackedLink>
+              <br />
               {t("components.email.footer.copyright", {
                 currentYear,
                 appName: globalT("appName"),

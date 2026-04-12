@@ -571,9 +571,9 @@ function ThreadRow({
         {isThreadStreaming && (
           /* eslint-disable i18next/no-literal-string */
           <Div className="flex items-center gap-0.5 shrink-0">
-            <Div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:0ms]" />
-            <Div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:150ms]" />
-            <Div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:300ms]" />
+            <Div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0ms]" />
+            <Div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:150ms]" />
+            <Div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:300ms]" />
           </Div>
           /* eslint-enable i18next/no-literal-string */
         )}

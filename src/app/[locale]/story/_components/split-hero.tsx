@@ -5,39 +5,34 @@ import type { ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
-import { Bot } from "next-vibe-ui/ui/icons/Bot";
 import { Code } from "next-vibe-ui/ui/icons/Code";
-import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
-import { Key } from "next-vibe-ui/ui/icons/Key";
-import { Layers } from "next-vibe-ui/ui/icons/Layers";
 import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { Server } from "next-vibe-ui/ui/icons/Server";
-import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
-import { Clock } from "next-vibe-ui/ui/icons/Clock";
-import { Palette } from "next-vibe-ui/ui/icons/Palette";
-import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
+import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, P } from "next-vibe-ui/ui/typography";
-import type { ComponentType, CSSProperties, JSX } from "react";
+import type { CSSProperties, JSX } from "react";
 import { useState } from "react";
 
-import { PLATFORM_COUNT } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { configScopedTranslation } from "@/config/i18n";
 
 import { scopedTranslation } from "./i18n";
 
-export type ActiveSide = "unbottled" | "personal" | "nextvibe" | null;
+export type ActiveSide =
+  | "unbottled"
+  | "personal"
+  | "nextvibe"
+  | "referral"
+  | null;
 
 interface SplitHeroProps {
   locale: CountryLanguage;
   totalToolCount: number;
   totalModelCount: number;
-  totalSkillCount: number;
   onSideChange?: (side: ActiveSide) => void;
 }
 
@@ -91,33 +86,39 @@ const NEXTVIBE_GRID: CSSProperties = {
   pointerEvents: "none",
 };
 
-/** Shared panel wrapper - centers content vertically & horizontally */
+const REFERRAL_GLOW: CSSProperties = {
+  ...BASE_OVERLAY,
+  background:
+    "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(244,63,94,0.30) 0%, transparent 70%)",
+  opacity: 0.4,
+  pointerEvents: "none",
+};
+const REFERRAL_GRID: CSSProperties = {
+  ...BASE_OVERLAY,
+  opacity: 0.04,
+  backgroundImage:
+    "linear-gradient(rgba(244,63,94,1) 1px, transparent 1px), linear-gradient(90deg, rgba(244,63,94,1) 1px, transparent 1px)",
+  backgroundSize: "48px 48px",
+  pointerEvents: "none",
+};
+
+/** Shared panel wrapper */
 function Panel({
   bg,
   glow,
   grid,
   onClick,
   children,
-  mobileOnly,
-  desktopOnly,
 }: {
   bg: string;
   glow: CSSProperties;
   grid: CSSProperties;
   onClick?: () => void;
   children: React.ReactNode;
-  mobileOnly?: boolean;
-  desktopOnly?: boolean;
 }): JSX.Element {
-  const visibility = mobileOnly
-    ? "md:hidden"
-    : desktopOnly
-      ? "hidden md:flex"
-      : "flex";
-
   return (
     <Div
-      className={`relative ${visibility} flex-col items-center justify-start md:w-1/3 overflow-hidden cursor-pointer self-stretch ${bg}`}
+      className={`relative flex flex-col items-center justify-start overflow-hidden cursor-pointer self-stretch ${bg}`}
       onClick={onClick}
     >
       <Div style={glow} />
@@ -138,24 +139,10 @@ function HorizontalDivider({ label }: { label: string }): JSX.Element {
   );
 }
 
-/** Vertical "OR" divider rendered absolutely between desktop panels */
-function VerticalDivider({ label }: { label: string }): JSX.Element {
-  return (
-    <Div className="absolute inset-y-0 flex flex-col items-center justify-center pointer-events-none z-20">
-      <Div className="w-px flex-1 bg-border/40" />
-      <Div className="w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center my-3 shrink-0">
-        <Span className="text-xs font-bold text-muted-foreground">{label}</Span>
-      </Div>
-      <Div className="w-px flex-1 bg-border/40" />
-    </Div>
-  );
-}
-
 export function SplitHero({
   locale,
   totalToolCount,
   totalModelCount,
-  totalSkillCount,
   onSideChange,
 }: SplitHeroProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
@@ -170,118 +157,110 @@ export function SplitHero({
     onSideChange?.(next);
   }
 
-  const unbottledPills: PillItem[] = [
-    {
-      Icon: Bot,
-      label: t("home.splitHero.unbottled.pill1", {
-        modelCount: String(totalModelCount),
-      }),
-    },
-    { Icon: Palette, label: t("home.splitHero.unbottled.pill2") },
-    {
-      Icon: Zap,
-      label: t("home.splitHero.unbottled.pill3", {
-        skillCount: String(totalSkillCount),
-      }),
-    },
-  ];
-
-  const personalPills: PillItem[] = [
-    { Icon: Terminal, label: t("home.splitHero.personal.pill1") },
-    { Icon: Clock, label: t("home.splitHero.personal.pill2") },
-    {
-      Icon: Key,
-      label: t("home.splitHero.personal.pill3", { appName }),
-    },
-  ];
-
-  const nextvibePills: PillItem[] = [
-    { Icon: Layers, label: t("home.splitHero.nextvibe.pill1", { appName }) },
-    { Icon: Code, label: t("home.splitHero.nextvibe.pill2") },
-    {
-      Icon: GitBranch,
-      label: t("home.splitHero.nextvibe.pill3", {
-        platformCount: String(PLATFORM_COUNT),
-      }),
-    },
-  ];
-
   return (
-    <Div className="relative flex flex-col md:flex-row">
-      {/* Desktop vertical dividers - positioned at 1/3 and 2/3 */}
-      <Div className="absolute inset-y-0 left-1/3 hidden md:flex -translate-x-1/2">
-        <VerticalDivider label={orLabel} />
+    <Div className="relative flex flex-col">
+      {/* Orientation strip */}
+      <Div className="w-full bg-[#080010] px-6 py-12 md:py-20 text-center">
+        <Div className="text-2xl md:text-4xl font-black text-white tracking-tighter mb-3">
+          {t("home.splitHero.header")}
+        </Div>
+        <Div className="text-xs md:text-sm text-white/40 tracking-widest uppercase">
+          {t("home.splitHero.subheader")}
+        </Div>
       </Div>
-      <Div className="absolute inset-y-0 left-2/3 hidden md:flex -translate-x-1/2">
-        <VerticalDivider label={orLabel} />
+      <Div className="relative flex flex-col md:grid md:grid-cols-2">
+        {/*
+        Desktop dividers: four lines meeting at the center point.
+        We draw them as four half-lines rather than two full-lines
+        so there's a single "OR" badge at the intersection.
+      */}
+        {/* Center badge */}
+        <Div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex z-30">
+          <Div className="w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center shrink-0">
+            <Span className="text-xs font-bold text-muted-foreground">
+              {orLabel}
+            </Span>
+          </Div>
+        </Div>
+        {/* Vertical line top half */}
+        <Div className="absolute top-0 left-1/2 h-[calc(50%-20px)] w-px bg-white/20 hidden md:block -translate-x-1/2 z-20" />
+        {/* Vertical line bottom half */}
+        <Div className="absolute bottom-0 left-1/2 h-[calc(50%-20px)] w-px bg-white/20 hidden md:block -translate-x-1/2 z-20" />
+        {/* Horizontal line left half */}
+        <Div className="absolute top-1/2 left-0 w-[calc(50%-20px)] h-px bg-white/20 hidden md:block -translate-y-1/2 z-20" />
+        {/* Horizontal line right half */}
+        <Div className="absolute top-1/2 right-0 w-[calc(50%-20px)] h-px bg-white/20 hidden md:block -translate-y-1/2 z-20" />
+
+        {/* unbottled.ai - top-left */}
+        <Panel
+          bg="bg-[#0d0014]"
+          glow={UNBOTTLED_GLOW}
+          grid={UNBOTTLED_GRID}
+          onClick={() => handleClick("unbottled")}
+        >
+          <UnbottledContent
+            locale={locale}
+            t={t}
+            onSideChange={onSideChange}
+            totalModelCount={totalModelCount}
+          />
+        </Panel>
+
+        <HorizontalDivider label={orLabel} />
+
+        {/* personal self-host - top-right */}
+        <Panel
+          bg="bg-[#000d1b]"
+          glow={PERSONAL_GLOW}
+          grid={PERSONAL_GRID}
+          onClick={() => handleClick("personal")}
+        >
+          <PersonalContent
+            locale={locale}
+            t={t}
+            onSideChange={onSideChange}
+            appName={appName}
+            totalModelCount={totalModelCount}
+          />
+        </Panel>
+
+        <HorizontalDivider label={orLabel} />
+
+        {/* next-vibe framework - bottom-left */}
+        <Panel
+          bg="bg-[#020c1b]"
+          glow={NEXTVIBE_GLOW}
+          grid={NEXTVIBE_GRID}
+          onClick={() => handleClick("nextvibe")}
+        >
+          <NextVibeContent
+            locale={locale}
+            totalToolCount={totalToolCount}
+            t={t}
+            onSideChange={onSideChange}
+          />
+        </Panel>
+
+        <HorizontalDivider label={orLabel} />
+
+        {/* referral + skills - bottom-right */}
+        <Panel
+          bg="bg-[#1a000d]"
+          glow={REFERRAL_GLOW}
+          grid={REFERRAL_GRID}
+          onClick={() => handleClick("referral")}
+        >
+          <ReferralContent locale={locale} t={t} onSideChange={onSideChange} />
+        </Panel>
       </Div>
-
-      {/* unbottled.ai */}
-      <Panel
-        bg="bg-[#0d0014]"
-        glow={UNBOTTLED_GLOW}
-        grid={UNBOTTLED_GRID}
-        onClick={() => handleClick("unbottled")}
-      >
-        <UnbottledContent
-          locale={locale}
-          pills={unbottledPills}
-          t={t}
-          onSideChange={onSideChange}
-          totalModelCount={totalModelCount}
-        />
-      </Panel>
-
-      <HorizontalDivider label={orLabel} />
-
-      {/* personal self-host */}
-      <Panel
-        bg="bg-[#000d1b]"
-        glow={PERSONAL_GLOW}
-        grid={PERSONAL_GRID}
-        onClick={() => handleClick("personal")}
-      >
-        <PersonalContent
-          locale={locale}
-          pills={personalPills}
-          t={t}
-          onSideChange={onSideChange}
-          appName={appName}
-          totalModelCount={totalModelCount}
-        />
-      </Panel>
-
-      <HorizontalDivider label={orLabel} />
-
-      {/* next-vibe framework */}
-      <Panel
-        bg="bg-[#020c1b]"
-        glow={NEXTVIBE_GLOW}
-        grid={NEXTVIBE_GRID}
-        onClick={() => handleClick("nextvibe")}
-      >
-        <NextVibeContent
-          locale={locale}
-          totalToolCount={totalToolCount}
-          pills={nextvibePills}
-          t={t}
-          onSideChange={onSideChange}
-        />
-      </Panel>
     </Div>
   );
 }
 
 type ScopedT = ReturnType<(typeof scopedTranslation)["scopedT"]>["t"];
 
-interface PillItem {
-  Icon: ComponentType<{ className?: string }>;
-  label: ReturnType<ScopedT>;
-}
-
 interface PanelContentProps {
   locale: CountryLanguage;
-  pills: PillItem[];
   t: ScopedT;
   onSideChange?: (side: ActiveSide) => void;
   totalModelCount?: number;
@@ -292,7 +271,7 @@ interface PersonalContentProps extends PanelContentProps {
   totalModelCount: number;
 }
 
-/** Shared inner content layout - always centered within its panel */
+/** Shared inner content layout */
 function PanelInner({ children }: { children: React.ReactNode }): JSX.Element {
   return (
     <Div className="relative z-10 w-full px-8 md:px-10 lg:px-14 py-14 md:py-20 flex flex-col items-center text-center">
@@ -303,7 +282,6 @@ function PanelInner({ children }: { children: React.ReactNode }): JSX.Element {
 
 function UnbottledContent({
   locale,
-  pills,
   t,
   onSideChange,
   totalModelCount = 0,
@@ -325,7 +303,7 @@ function UnbottledContent({
         transition={{ delay: 0.15 }}
         className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-xs font-medium uppercase tracking-wider"
       >
-        <Sparkles className="w-3 h-3" />
+        <MessageSquare className="w-3 h-3" />
         {t("home.splitHero.unbottled.badge")}
       </MotionDiv>
 
@@ -334,9 +312,6 @@ function UnbottledContent({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <P className="text-violet-400/80 text-xs font-mono mb-2 tracking-widest uppercase">
-          unbottled.ai
-        </P>
         <H1 className="text-4xl md:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter text-white leading-[0.9] mb-4">
           {t("home.splitHero.unbottled.titleLine1")}
           <Br />
@@ -356,23 +331,6 @@ function UnbottledContent({
             modelCount: String(totalModelCount),
           })}
         </P>
-      </MotionDiv>
-
-      <MotionDiv
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="flex flex-wrap justify-center gap-2 mb-8"
-      >
-        {pills.map(({ Icon, label }) => (
-          <Span
-            key={String(label)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-violet-200 text-xs font-medium"
-          >
-            <Icon className="w-3 h-3 text-violet-400" />
-            {label}
-          </Span>
-        ))}
       </MotionDiv>
 
       <MotionDiv
@@ -407,11 +365,9 @@ function UnbottledContent({
 
 function PersonalContent({
   locale,
-  pills,
   t,
   onSideChange,
   appName,
-  totalModelCount,
 }: PersonalContentProps): JSX.Element {
   function handleLearnMore(e: ButtonMouseEvent): void {
     e.stopPropagation();
@@ -439,9 +395,6 @@ function PersonalContent({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25 }}
       >
-        <P className="text-emerald-400/80 text-xs font-mono mb-2 tracking-widest uppercase">
-          self-host
-        </P>
         <H2 className="text-4xl md:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter text-white leading-[0.9] mb-4 border-0">
           {t("home.splitHero.personal.titleLine1")}
           <Br />
@@ -457,28 +410,8 @@ function PersonalContent({
         transition={{ delay: 0.35 }}
       >
         <P className="text-emerald-200/60 text-sm md:text-sm lg:text-base leading-relaxed mb-6">
-          {t("home.splitHero.personal.subtitle", {
-            appName,
-            modelCount: String(totalModelCount),
-          })}
+          {t("home.splitHero.personal.subtitle", { appName })}
         </P>
-      </MotionDiv>
-
-      <MotionDiv
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.45 }}
-        className="flex flex-wrap justify-center gap-2 mb-8"
-      >
-        {pills.map(({ Icon, label }) => (
-          <Span
-            key={String(label)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-200 text-xs font-medium"
-          >
-            <Icon className="w-3 h-3 text-emerald-400" />
-            {label}
-          </Span>
-        ))}
       </MotionDiv>
 
       <MotionDiv
@@ -517,8 +450,6 @@ interface NextVibeContentProps extends PanelContentProps {
 
 function NextVibeContent({
   locale,
-  totalToolCount,
-  pills,
   t,
   onSideChange,
 }: NextVibeContentProps): JSX.Element {
@@ -548,9 +479,6 @@ function NextVibeContent({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <P className="text-cyan-400/80 text-xs font-mono mb-2 tracking-widest uppercase">
-          next-vibe
-        </P>
         <H2 className="text-4xl md:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter text-white leading-[0.9] mb-4 border-0">
           {t("home.splitHero.nextvibe.titleLine1")}
           <Br />
@@ -566,27 +494,8 @@ function NextVibeContent({
         transition={{ delay: 0.4 }}
       >
         <P className="text-cyan-200/60 text-sm md:text-sm lg:text-base leading-relaxed mb-6">
-          {t("home.splitHero.nextvibe.subtitle", {
-            toolCount: String(totalToolCount),
-          })}
+          {t("home.splitHero.nextvibe.subtitle")}
         </P>
-      </MotionDiv>
-
-      <MotionDiv
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="flex flex-wrap justify-center gap-2 mb-8"
-      >
-        {pills.map(({ Icon, label }) => (
-          <Span
-            key={String(label)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-200 text-xs font-medium"
-          >
-            <Icon className="w-3 h-3 text-cyan-400" />
-            {label}
-          </Span>
-        ))}
       </MotionDiv>
 
       <MotionDiv
@@ -613,6 +522,90 @@ function NextVibeContent({
           onClick={handleLearnMore}
         >
           {t("home.splitHero.nextvibe.ctaExplore")}
+        </Button>
+      </MotionDiv>
+    </PanelInner>
+  );
+}
+
+function ReferralContent({
+  locale,
+  t,
+  onSideChange,
+}: PanelContentProps): JSX.Element {
+  function handleLearnMore(e: ButtonMouseEvent): void {
+    e.stopPropagation();
+    onSideChange?.("referral");
+    setTimeout(() => {
+      document
+        .getElementById("universe-content")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  }
+  return (
+    <PanelInner>
+      <MotionDiv
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-rose-500/30 bg-rose-500/10 text-rose-300 text-xs font-medium uppercase tracking-wider"
+      >
+        <TrendingUp className="w-3 h-3" />
+        {t("home.splitHero.referral.badge")}
+      </MotionDiv>
+
+      <MotionDiv
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35 }}
+      >
+        <H2 className="text-4xl md:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter text-white leading-[0.9] mb-4 border-0">
+          {t("home.splitHero.referral.titleLine1")}
+          {t("home.splitHero.referral.titleLine2") ? (
+            <>
+              <Br />
+              <Span className="text-transparent bg-clip-text bg-linear-to-br from-rose-400 to-pink-400">
+                {t("home.splitHero.referral.titleLine2")}
+              </Span>
+            </>
+          ) : null}
+        </H2>
+      </MotionDiv>
+
+      <MotionDiv
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.45 }}
+      >
+        <P className="text-rose-200/60 text-sm md:text-sm lg:text-base leading-relaxed mb-6">
+          {t("home.splitHero.referral.subtitle")}
+        </P>
+      </MotionDiv>
+
+      <MotionDiv
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.65 }}
+        className="flex flex-wrap justify-center gap-3 w-full"
+      >
+        <Button
+          size="lg"
+          className="bg-rose-600 hover:bg-rose-500 text-white border-0 font-semibold shadow-lg shadow-rose-900/40"
+          asChild
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Link href={`/${locale}/story/referral`}>
+            {t("home.splitHero.referral.cta")}
+            <TrendingUp className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+        <Button
+          size="lg"
+          variant="outline"
+          className="bg-transparent border-rose-500/40 text-rose-300 hover:bg-rose-500/15 hover:text-rose-200 hover:border-rose-400 font-semibold"
+          onClick={handleLearnMore}
+        >
+          {t("home.splitHero.referral.ctaExplore")}
         </Button>
       </MotionDiv>
     </PanelInner>

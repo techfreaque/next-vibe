@@ -26,6 +26,7 @@ import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { ArrowUp } from "next-vibe-ui/ui/icons/ArrowUp";
 import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
 import { Edit } from "next-vibe-ui/ui/icons/Edit";
@@ -37,6 +38,7 @@ import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Maximize } from "next-vibe-ui/ui/icons/Maximize";
 import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import React, {
@@ -267,7 +269,7 @@ function mergeSignals(prev: SignalItem[], next: SignalItem[]): SignalItem[] {
 // ─── Node Display Config ────────────────────────────────────────────────────
 
 interface NodeDisplayConfig {
-  pane: number;
+  pane: number | null;
   color: string;
   visible: boolean;
   scale?: "left" | "right";
@@ -282,8 +284,11 @@ function getNodeDisplayConfigs(
   let colorIdx = 0;
   for (const s of series) {
     const nc = nodeConfigs?.[s.nodeId];
+    // pane: null = "no chart", pane: undefined = default pane 0
+    const pane =
+      nc && "pane" in nc && nc.pane === null ? null : (nc?.pane ?? 0);
     result.set(s.nodeId, {
-      pane: nc?.pane ?? 0,
+      pane,
       color:
         nc?.color ??
         DEFAULT_LINE_COLORS[colorIdx % DEFAULT_LINE_COLORS.length] ??
@@ -296,7 +301,7 @@ function getNodeDisplayConfigs(
   return result;
 }
 
-/** Group series by pane number */
+/** Group series by pane number. Skips hidden series and series with pane:null. */
 function groupByPane(
   series: SeriesItem[],
   displayConfigs: Map<string, NodeDisplayConfig>,
@@ -305,7 +310,10 @@ function groupByPane(
   for (const s of series) {
     const cfg = displayConfigs.get(s.nodeId);
     if (cfg && !cfg.visible) {
-      continue; // Skip hidden series
+      continue; // Skip legend-hidden series
+    }
+    if (cfg?.pane === null) {
+      continue; // Skip "no chart" series (pane explicitly set to null)
     }
     const pane = cfg?.pane ?? 0;
     const arr = panes.get(pane) ?? [];
@@ -625,7 +633,8 @@ function useMultiPaneRenderer(
   const paneKey = useMemo((): string => {
     const paneSet = new Set<number>();
     for (const [, cfg] of displayConfigs) {
-      if (cfg.visible) {
+      // Include pane even if series is hidden - pane should persist
+      if (cfg.pane !== null) {
         paneSet.add(cfg.pane);
       }
     }
@@ -785,7 +794,7 @@ function useMultiPaneRenderer(
             typeof param.time === "number" ? param.time : undefined;
           const timeStr =
             timeVal !== undefined
-              ? new Date(timeVal * 1000).toLocaleString()
+              ? makeTickFormatter(resolutionRef.current)(timeVal)
               : "";
           onCrosshairMoveRef.current({
             x: param.point.x,
@@ -800,9 +809,7 @@ function useMultiPaneRenderer(
             syncingRef.current = true;
             for (const [otherPaneNum, otherPane] of panesRef.current) {
               if (otherPaneNum !== paneNum) {
-                const firstSeries = otherPane.seriesMap.values().next().value as
-                  | LwcSeries
-                  | undefined;
+                const firstSeries = otherPane.seriesMap.values().next().value;
                 if (firstSeries) {
                   otherPane.chart.setCrosshairPosition(
                     NaN,
@@ -1061,7 +1068,8 @@ function PaneLegend({
 }): React.JSX.Element {
   const paneSeries = series.filter((s) => {
     const cfg = displayConfigs.get(s.nodeId);
-    return cfg?.visible !== false && (cfg?.pane ?? 0) === paneNum;
+    // Show all pane-assigned series in legend (hidden ones appear dimmed, not removed)
+    return cfg?.pane !== null && (cfg?.pane ?? 0) === paneNum;
   });
 
   const legendId = `vs-legend-${String(paneNum)}`;
@@ -1084,14 +1092,11 @@ function PaneLegend({
         >
           <Div className="flex items-center gap-1 bg-background/80 backdrop-blur-sm px-2 py-1 rounded border border-border/30 text-muted-foreground/60 hover:text-muted-foreground hover:bg-background/95 hover:border-border/70 transition-all">
             {collapsed ? (
-              <ChevronRight className="h-3.5 w-3.5" />
+              <ChevronRight className="h-3 w-3" />
             ) : (
-              <ChevronDown className="h-3.5 w-3.5" />
+              <ChevronDown className="h-3 w-3" />
             )}
-            <Span className="text-[10px] font-mono leading-none">
-              {/* eslint-disable-next-line i18n/no-literal-string -- UI label */}
-              L
-            </Span>
+            {!collapsed && <BarChart2 className="h-3 w-3" />}
           </Div>
         </Div>
         {/* Series items */}
@@ -1108,33 +1113,69 @@ function PaneLegend({
               <Div
                 key={s.nodeId}
                 className={cn(
-                  "flex items-center gap-2 bg-background/85 backdrop-blur-sm px-2 py-1 rounded border border-border/40 cursor-pointer pointer-events-auto whitespace-nowrap",
-                  isHidden && "opacity-40",
+                  "group/legend flex items-center gap-2 bg-background/85 backdrop-blur-sm px-2 py-1 rounded border border-border/40 cursor-pointer pointer-events-auto whitespace-nowrap transition-all",
+                  isHidden
+                    ? "opacity-40 border-border/20"
+                    : "hover:border-border/70 hover:bg-background/95",
                 )}
                 onClick={() => onToggleSeries(s.nodeId)}
+                title={isHidden ? "Show series" : "Hide series"}
               >
+                {/* Series color indicator: line + center dot */}
                 <Div
                   style={{
-                    width: "12px",
-                    height: "3px",
-                    borderRadius: "1.5px",
-                    backgroundColor: isHidden ? "#888" : color,
+                    display: "flex",
+                    alignItems: "center",
+                    width: "20px",
                     flexShrink: 0,
                   }}
-                />
+                >
+                  <Div
+                    style={{
+                      width: "20px",
+                      height: "2px",
+                      backgroundColor: isHidden ? "#555" : color,
+                      position: "relative",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Div
+                      style={{
+                        width: "6px",
+                        height: "6px",
+                        borderRadius: "50%",
+                        backgroundColor: isHidden ? "#555" : color,
+                        border: "1.5px solid hsl(var(--background))",
+                        flexShrink: 0,
+                      }}
+                    />
+                  </Div>
+                </Div>
                 <Span
                   className={cn(
                     "text-[11px] font-mono",
-                    isHidden && "line-through text-muted-foreground",
+                    isHidden
+                      ? "line-through text-muted-foreground"
+                      : "text-foreground",
                   )}
                 >
                   {humanizeNodeId(s.nodeId)}
                 </Span>
                 {displayValue !== undefined && !isHidden && (
-                  <Span className="text-[11px] font-semibold tabular-nums text-foreground shrink-0">
+                  <Span className="text-[11px] font-semibold tabular-nums text-foreground shrink-0 ml-1">
                     {formatValue(displayValue)}
                   </Span>
                 )}
+                {/* Eye toggle - shown on hover */}
+                <Div className="ml-auto opacity-0 group-hover/legend:opacity-100 transition-opacity shrink-0">
+                  {isHidden ? (
+                    <Eye className="h-2.5 w-2.5 text-muted-foreground/60" />
+                  ) : (
+                    <EyeOff className="h-2.5 w-2.5 text-muted-foreground/60" />
+                  )}
+                </Div>
               </Div>
             );
           })}
@@ -1350,8 +1391,13 @@ function CrosshairTooltip({
     crosshair.x + tooltipWidth + 40 > containerWidth
       ? crosshair.x - tooltipWidth - 16
       : crosshair.x + 40;
-  // Fixed at top of chart area to avoid obscuring crosshair
-  const top = 8;
+  // Follow cursor Y with clamping so tooltip stays within chart bounds
+  const containerHeight = containerRef.current.clientHeight;
+  const tooltipEstHeight = 60 + crosshair.points.length * 18;
+  const top = Math.min(
+    Math.max(crosshair.y - tooltipEstHeight / 2, 8),
+    containerHeight - tooltipEstHeight - 8,
+  );
 
   return (
     <Div
@@ -1365,9 +1411,10 @@ function CrosshairTooltip({
       }}
     >
       <Div className="bg-popover/95 backdrop-blur-sm border border-border shadow-lg rounded-lg px-2.5 py-2">
-        <P className="text-[10px] text-muted-foreground mb-1.5 font-medium">
+        <P className="text-[10px] text-muted-foreground mb-1 font-medium tabular-nums">
           {crosshair.time}
         </P>
+        <Div className="h-px bg-border/50 mb-1.5" />
         <Div className="flex flex-col gap-0.5">
           {crosshair.points.map((p) => (
             <Div
@@ -1732,6 +1779,7 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
     null,
   );
   const [isSavingLayout, setIsSavingLayout] = useState(false);
+  const [saveLayoutError, setSaveLayoutError] = useState<string | null>(null);
   const [panBackVisible, setPanBackVisible] = useState(false);
   const [crosshair, setCrosshair] = useState<CrosshairState | null>(null);
   const [lastValues, setLastValues] = useState<Map<string, number>>(new Map());
@@ -1762,6 +1810,40 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
 
   // Effective node config: optimistic override when a pane move is in flight
   const effectiveNodeConfig = optimisticConfig?.nodes ?? graph?.config?.nodes;
+
+  // Sync hiddenSeries when graph ID changes:
+  // 1. Start from server-saved visible:false nodes in graph config
+  // 2. Overlay with localStorage per-graph toggle state (no server round-trip needed)
+  useEffect(() => {
+    if (!graph?.id) {
+      return;
+    }
+    const hidden = new Set<string>();
+    const serverConfig = graph.config.nodes;
+    for (const [nodeId, nc] of Object.entries(serverConfig)) {
+      if (nc.visible === false) {
+        hidden.add(nodeId);
+      }
+    }
+    // Overlay localStorage toggles (user clicked eye without saving)
+    try {
+      const stored = localStorage.getItem(`vs-hidden-${graph.id}`);
+      if (stored !== null) {
+        const parsed = JSON.parse(stored) as string[];
+        if (Array.isArray(parsed)) {
+          for (const id of parsed) {
+            if (typeof id === "string") {
+              hidden.add(id);
+            }
+          }
+        }
+      }
+    } catch {
+      // ignore malformed localStorage
+    }
+    setHiddenSeries(hidden);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only sync on graph ID change
+  }, [graph?.id]);
 
   // ── Versions endpoint: DB ancestor chain for prev/next version nav ─────────
   const versionsOptions = useMemo(
@@ -1819,17 +1901,25 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
         setIsSavingLayout(false);
         if (result.success) {
           setOptimisticConfig(null);
+          setSaveLayoutError(null);
           const dataDef = await import("./definition");
           navigation.push(dataDef.default.GET, {
             urlPathParams: { id: result.data.newId },
           });
         } else {
-          // Revert optimistic config on failure
+          // Revert optimistic config on failure and surface the error
           setOptimisticConfig(null);
+          setSaveLayoutError(
+            typeof result.message === "string"
+              ? result.message
+              : t("get.errors.server.title"),
+          );
+          // Auto-dismiss after 4s
+          setTimeout(() => setSaveLayoutError(null), 4000);
         }
       })();
     },
-    [graph, logger, user, locale, navigation],
+    [graph, logger, user, locale, navigation, t],
   );
 
   // Node display configs from graph config (uses optimistic config when in-flight)
@@ -2032,17 +2122,33 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
     })();
   }, [navigation, graph, outerMutations]);
 
-  const handleToggle = useCallback((nodeId: string): void => {
-    setHiddenSeries((prev) => {
-      const next = new Set(prev);
-      if (next.has(nodeId)) {
-        next.delete(nodeId);
-      } else {
-        next.add(nodeId);
+  const handleToggle = useCallback(
+    (nodeId: string): void => {
+      if (!graph) {
+        return;
       }
-      return next;
-    });
-  }, []);
+      // Optimistic local toggle - instant, no server round-trip
+      setHiddenSeries((prev) => {
+        const next = new Set(prev);
+        if (prev.has(nodeId)) {
+          next.delete(nodeId);
+        } else {
+          next.add(nodeId);
+        }
+        // Persist to localStorage keyed to graph ID so it survives reload
+        try {
+          localStorage.setItem(
+            `vs-hidden-${graph.id}`,
+            JSON.stringify([...next]),
+          );
+        } catch {
+          // ignore quota errors
+        }
+        return next;
+      });
+    },
+    [graph],
+  );
 
   const handlePaneCollapse = useCallback((paneNum: number): void => {
     setCollapsedPanes((prev) => {
@@ -2184,6 +2290,21 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
 
   return (
     <Div className="flex flex-col h-[calc(100vh-64px)] min-h-[500px] border rounded-xl overflow-hidden bg-background shadow-sm">
+      {/* Layout save error banner */}
+      {saveLayoutError !== null && (
+        <Div className="flex items-center gap-2 px-3 py-1.5 bg-destructive/10 border-b border-destructive/20 text-destructive text-xs shrink-0">
+          <X className="h-3 w-3 shrink-0" />
+          <Span className="flex-1">{saveLayoutError}</Span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-4 w-4 p-0 text-destructive/60 hover:text-destructive"
+            onClick={() => setSaveLayoutError(null)}
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        </Div>
+      )}
       {/* Toolbar */}
       <Div
         ref={toolbarRef}
@@ -2233,17 +2354,15 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
                 onClick={handleVersionPrev}
                 disabled={!prevVersionId}
                 className="h-7 w-7 p-0"
-                title="Older version"
+                title="Older version (back in time)"
               >
-                <ChevronUp className="h-3.5 w-3.5" />
+                <ChevronLeft className="h-3.5 w-3.5" />
               </Button>
               <Div className="flex items-center gap-0.5 px-1">
                 <History className="h-3 w-3 text-muted-foreground/50" />
                 <Span className="text-[10px] text-muted-foreground/70 tabular-nums">
-                  {/* eslint-disable-next-line i18n/no-literal-string -- UI label */}
-                  {currentVersionIndex >= 0
-                    ? `${String(currentVersionIndex + 1)}/${String(versionChain.length)}`
-                    : `?/${String(versionChain.length)}`}
+                  {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+                  {`${String(currentVersionIndex >= 0 ? currentVersionIndex + 1 : versionChain.length)}/${String(versionChain.length)}`}
                 </Span>
               </Div>
               <Button
@@ -2252,9 +2371,9 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
                 onClick={handleVersionNext}
                 disabled={!nextVersionId}
                 className="h-7 w-7 p-0"
-                title="Newer version"
+                title="Newer version (forward in time)"
               >
-                <ChevronDown className="h-3.5 w-3.5" />
+                <ChevronRight className="h-3.5 w-3.5" />
               </Button>
             </Div>
           </>
@@ -2466,11 +2585,8 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
 
         {/* Initial loading */}
         {isInitialLoading && (
-          <Div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            <P className="text-sm text-muted-foreground">
-              {t("get.widget.loading")}
-            </P>
+          <Div className="absolute inset-0 z-10">
+            <ChartShimmer />
           </Div>
         )}
 
@@ -2495,11 +2611,39 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
 
         {/* Empty state */}
         {!isInitialLoading && !hasData && !isLoading && (
-          <Div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3">
-            <BarChart2 className="h-10 w-10 text-muted-foreground/30" />
-            <P className="text-sm text-muted-foreground">
+          <Div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4">
+            <Div className="relative">
+              <BarChart2 className="h-12 w-12 text-muted-foreground/20" />
+              <Div
+                style={{
+                  position: "absolute",
+                  bottom: "-4px",
+                  right: "-4px",
+                  width: "18px",
+                  height: "18px",
+                  borderRadius: "50%",
+                  backgroundColor: "hsl(var(--muted))",
+                  border: "2px solid hsl(var(--background))",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <RotateCcw className="h-2.5 w-2.5 text-muted-foreground opacity-50" />
+              </Div>
+            </Div>
+            <P className="text-sm text-muted-foreground/70">
               {t("get.widget.noData")}
             </P>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs h-7 gap-1.5"
+              onClick={handleBacktest}
+            >
+              <RotateCcw className="h-3 w-3" />
+              {t("get.widget.backtest")}
+            </Button>
           </Div>
         )}
 
@@ -2513,11 +2657,23 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
 
         {/* Pan-back toast */}
         {panBackVisible && (
-          <Div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 bg-background/90 backdrop-blur-sm border border-border shadow-md rounded-lg px-3 py-1.5 flex items-center gap-2">
-            <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
-            <Span className="text-xs text-muted-foreground">
-              {t("get.widget.loadingEarlierData")}
-            </Span>
+          <Div
+            style={{
+              position: "absolute",
+              bottom: "16px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 30,
+              pointerEvents: "none",
+              animation: "fadeIn 0.15s ease",
+            }}
+          >
+            <Div className="bg-popover/95 backdrop-blur-sm border border-border shadow-lg rounded-full px-4 py-2 flex items-center gap-2">
+              <Loader2 className="h-3 w-3 animate-spin text-primary/70" />
+              <Span className="text-xs font-medium text-foreground/80">
+                {t("get.widget.loadingEarlierData")}
+              </Span>
+            </Div>
           </Div>
         )}
       </Div>

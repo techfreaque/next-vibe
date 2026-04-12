@@ -62,7 +62,7 @@ export function BuildResultWidget({ field }: CliWidgetProps): JSX.Element {
     }
     return (
       <Box flexDirection="column">
-        <Text wrap="end">{lines.join("\n")}</Text>
+        <Text wrap="truncate-end">{lines.join("\n")}</Text>
       </Box>
     );
   }
@@ -88,7 +88,7 @@ export function BuildResultWidget({ field }: CliWidgetProps): JSX.Element {
 
       {steps.length > 0 && (
         <Box flexDirection="column" marginTop={1}>
-          <Text wrap="end">{stepLines.join("\n")}</Text>
+          <Text wrap="truncate-end">{stepLines.join("\n")}</Text>
         </Box>
       )}
 
@@ -98,7 +98,7 @@ export function BuildResultWidget({ field }: CliWidgetProps): JSX.Element {
             Errors:
           </Text>
           {value.errors!.map((err, i) => (
-            <Text key={i} color="red" wrap="end">
+            <Text key={i} color="red" wrap="truncate-end">
               {"  "}
               {err}
             </Text>

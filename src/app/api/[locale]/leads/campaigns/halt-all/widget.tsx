@@ -56,10 +56,10 @@ export function HaltAllWidget({
   const response = field.value;
 
   return (
-    <Div className="flex flex-col gap-3 p-4 border-red-200 dark:border-red-800">
+    <Div className="flex flex-col gap-3 p-4 border-destructive/30">
       {/* Header */}
       <Div className="flex items-center gap-2">
-        <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+        <AlertTriangle className="h-4 w-4 text-destructive" />
         <Span className="font-semibold text-sm">{t("widget.title")}</Span>
         {isSubmitting && (
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground ml-auto" />
@@ -105,7 +105,7 @@ export function HaltAllWidget({
           <AlertDialogFooter>
             <AlertDialogCancel>{t("widget.cancelButton")}</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-destructive hover:bg-destructive/90 text-white"
               onClick={() => {
                 form.setValue("confirm", true);
                 onSubmit?.();
@@ -119,8 +119,8 @@ export function HaltAllWidget({
 
       {/* Success result */}
       {response && (
-        <Div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-3 flex flex-col gap-1">
-          <Div className="flex items-center gap-1 text-red-700 dark:text-red-300 text-xs font-medium">
+        <Div className="rounded-lg bg-destructive/10 p-3 flex flex-col gap-1">
+          <Div className="flex items-center gap-1 text-destructive text-xs font-medium">
             <Check className="h-3 w-3" />
             <Span>{t("widget.done")}</Span>
           </Div>

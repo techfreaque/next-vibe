@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq, max } from "drizzle-orm";
+import { and, eq, max, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -25,6 +25,8 @@ import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-
 import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { ensureUniqueSlug, generateFavoriteSlug } from "../../slugify";
+import { DEFAULT_SKILLS } from "../../skills/config";
 import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
 import type {
@@ -77,6 +79,27 @@ function normalizeImageGenSelection(
  * Favorites Create Repository
  */
 export class FavoritesCreateRepository {
+  /**
+   * Resolve the slug to use for a skill in a favorite slug.
+   * For default skills, use their config ID (e.g. "thea", "hermes").
+   * For custom skills, use the skill name if available.
+   */
+  static resolveSkillSlug(skillId: string, skillName: string | null): string {
+    // Default skills already have short IDs (e.g. "thea", "hermes", "default")
+    const defaultSkill = DEFAULT_SKILLS.find((s) => s.id === skillId);
+    if (defaultSkill) {
+      return defaultSkill.id;
+    }
+    // For custom skills, use the skill name for a readable slug
+    if (skillName) {
+      return skillName
+        .toLowerCase()
+        .replace(/[^a-z0-9-]/g, "-")
+        .replace(/-{2,}/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+    return "favorite";
+  }
   /**
    * Create a new favorite
    */
@@ -235,10 +258,36 @@ export class FavoritesCreateRepository {
 
       const nextPosition = (maxPositionResult?.maxPosition ?? -1) + 1;
 
+      // Generate slug for this favorite
+      const skillSlug = FavoritesCreateRepository.resolveSkillSlug(
+        data.skillId,
+        character?.name ?? null,
+      );
+      const baseSlug = generateFavoriteSlug({
+        customVariantName: data.customVariantName,
+        skillSlug,
+        variantId: data.variantId,
+      });
+      // Ensure uniqueness within this user's favorites
+      const existingSlugs = await db
+        .select({ slug: chatFavorites.slug })
+        .from(chatFavorites)
+        .where(
+          and(
+            eq(chatFavorites.userId, userId),
+            sql`${chatFavorites.slug} LIKE ${`${baseSlug}%`}`,
+          ),
+        );
+      const slug = ensureUniqueSlug(
+        baseSlug || "favorite",
+        existingSlugs.map((r) => r.slug),
+      );
+
       const [favorite] = await db
         .insert(chatFavorites)
         .values({
           userId,
+          slug,
           skillId: data.skillId,
           variantId: data.variantId ?? null,
           customVariantName: data.customVariantName || null,
@@ -271,7 +320,7 @@ export class FavoritesCreateRepository {
 
       return success({
         success: t("post.success.title"),
-        id: favorite.id,
+        id: favorite.slug,
       });
     } catch (error) {
       logger.error("Failed to create favorite", parseError(error));

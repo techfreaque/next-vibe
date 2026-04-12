@@ -66,6 +66,7 @@ interface EndpointMeta {
   description: string;
   icon: string;
   category: string;
+  subCategory: string;
   tags: string[];
   credits?: number;
   requiresConfirmation?: boolean;
@@ -315,6 +316,7 @@ export class HelpRepository {
       ...(!compact && { method: tool.method }),
       description: tool.description,
       category: tool.category,
+      ...(tool.subCategory && { subCategory: tool.subCategory }),
       // compact: only include first alias to avoid token bloat
       aliases:
         tool.aliases.length > 0
@@ -344,6 +346,7 @@ export class HelpRepository {
       ...(!compact && { tags: tool.tags }),
       description: tool.description,
       category: tool.category,
+      ...(tool.subCategory && { subCategory: tool.subCategory }),
       // compact: only include first alias
       aliases:
         tool.aliases.length > 0
@@ -791,14 +794,29 @@ export class HelpRepository {
 
     const totalCount = platformFilteredMeta.length;
 
-    // Build category counts from the FULL set (before statsFilter narrows the list)
-    const categoryMap = new Map<string, number>();
+    // Build two-level category counts from the FULL set (before statsFilter narrows the list)
+    const categoryMap = new Map<string, Map<string, number>>();
     for (const tool of platformFilteredMeta) {
-      categoryMap.set(tool.category, (categoryMap.get(tool.category) ?? 0) + 1);
+      const cat = tool.category;
+      const sub = tool.subCategory ?? cat;
+      const subMap = categoryMap.get(cat) ?? new Map<string, number>();
+      subMap.set(sub, (subMap.get(sub) ?? 0) + 1);
+      categoryMap.set(cat, subMap);
     }
     const categories = [...categoryMap.entries()]
       .toSorted((a, b) => a[0].localeCompare(b[0]))
-      .map(([name, count]) => ({ name, count }));
+      .map(([name, subMap]) => {
+        const subCategories = [...subMap.entries()]
+          .toSorted((a, b) => a[0].localeCompare(b[0]))
+          .map(([subName, count]) => ({ name: subName, count }));
+        const count = subCategories.reduce((n, s) => n + s.count, 0);
+        // Only include subCategories in response if there's more than one
+        return {
+          name,
+          count,
+          ...(subCategories.length > 1 && { subCategories }),
+        };
+      });
 
     // statsFilter: web platforms (NEXT_PAGE, NEXT_API, TRPC, FRAME, ELECTRON) default to "pinned"
     // to avoid loading all tools unnecessarily in the web UI.
@@ -939,9 +957,10 @@ export class HelpRepository {
 
     const query = data.query?.toLowerCase().trim();
     const category = data.category?.toLowerCase().trim();
+    const subCategory = data.subCategory?.toLowerCase().trim();
 
     // Auto-upgrade to detail mode on exact name/alias match
-    if (query && !category) {
+    if (query && !category && !subCategory) {
       const exactMatch = platformFilteredMeta.find(
         (m) =>
           m.toolName.toLowerCase() === query ||
@@ -990,6 +1009,12 @@ export class HelpRepository {
     if (category) {
       filtered = filtered.filter((m) =>
         m.category?.toLowerCase().includes(category),
+      );
+    }
+
+    if (subCategory) {
+      filtered = filtered.filter((m) =>
+        (m.subCategory ?? m.category)?.toLowerCase().includes(subCategory),
       );
     }
 

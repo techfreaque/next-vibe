@@ -55,7 +55,7 @@ export function FavoriteCreateCliWidget({
 
   return (
     <Box flexDirection="column">
-      <Text wrap="end">{output}</Text>
+      <Text wrap="truncate-end">{output}</Text>
     </Box>
   );
 }

@@ -50,9 +50,7 @@ import { ThreadByIdRepository } from "@/app/api/[locale]/agent/chat/threads/[thr
 import type { ThreadListResponseOutput } from "@/app/api/[locale]/agent/chat/threads/definition";
 import { scopedTranslation as threadsScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/i18n";
 import { ThreadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { EnvAvailabilitySetter } from "@/app/api/[locale]/agent/env-availability-context";
+
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
@@ -86,7 +84,6 @@ export interface ThreadsPathPageData {
   initialSubFolderId: string | null;
   initialThreadId: string | null;
   rootFolderPermissions: RootFolderPermissions;
-  envAvailability: AgentEnvAvailability;
   leafMessageId: string | null;
   initialFoldersData: FolderListResponseOutput | null;
   initialThreadsData: ThreadListResponseOutput | null;
@@ -144,7 +141,6 @@ export async function tanstackLoader({
       initialSubFolderId: null,
       initialThreadId: null,
       rootFolderPermissions: { canCreateThread: false, canCreateFolder: false },
-      envAvailability: agentEnvAvailability,
       leafMessageId: null,
       initialFoldersData: null,
       initialThreadsData: null,
@@ -449,7 +445,6 @@ export async function tanstackLoader({
     initialSubFolderId,
     initialThreadId,
     rootFolderPermissions,
-    envAvailability: agentEnvAvailability,
     leafMessageId,
     initialFoldersData,
     initialThreadsData,
@@ -471,7 +466,6 @@ export function TanstackPage({
   initialSubFolderId,
   initialThreadId,
   rootFolderPermissions,
-  envAvailability,
   leafMessageId,
   initialFoldersData,
   initialThreadsData,
@@ -490,11 +484,10 @@ export function TanstackPage({
   }
 
   const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
-  const totalModelCount = getAvailableModelCount(envAvailability, isAdmin);
+  const totalModelCount = getAvailableModelCount(isAdmin);
 
   return (
     <>
-      <EnvAvailabilitySetter env={envAvailability} />
       <ChatNavigationProvider
         activeThreadId={initialThreadId}
         currentRootFolderId={initialRootFolderId}

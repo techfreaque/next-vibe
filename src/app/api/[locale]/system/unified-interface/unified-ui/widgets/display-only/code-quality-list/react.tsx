@@ -112,7 +112,7 @@ export default function CodeQualityListWidget<
 
   if (!value || value.length === 0) {
     return (
-      <Div className="text-green-600">
+      <Div className="text-success">
         {t("widgets.codeQualityList.noIssues")}
       </Div>
     );
@@ -125,7 +125,7 @@ export default function CodeQualityListWidget<
           <Div key={file} className="space-y-2">
             <Div className="font-bold">
               {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Visual marker character */}
-              <Span className="text-blue-600 underline">● {file}</Span>
+              <Span className="text-primary underline">● {file}</Span>
               <Span className="ml-2 text-gray-500">
                 ({items.length} item{items.length !== 1 ? "s" : ""})
               </Span>
@@ -134,10 +134,10 @@ export default function CodeQualityListWidget<
               {items.map((item, idx) => {
                 const severityColor =
                   item.severity === "error"
-                    ? "text-red-600"
+                    ? "text-destructive"
                     : item.severity === "warning"
                       ? "text-yellow-600"
-                      : "text-blue-600";
+                      : "text-primary";
 
                 const icon =
                   item.severity === "error"
@@ -156,7 +156,7 @@ export default function CodeQualityListWidget<
                   <Div key={idx} className="text-sm">
                     <ExternalLink
                       href={editorUrl}
-                      className="text-blue-600 hover:underline"
+                      className="text-primary hover:underline"
                     >
                       {item.line || 1}:{item.column || 1}
                     </ExternalLink>

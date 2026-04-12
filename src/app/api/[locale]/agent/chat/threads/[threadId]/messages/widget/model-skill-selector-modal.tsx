@@ -1,17 +1,15 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Send } from "next-vibe-ui/ui/icons/Send";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Textarea } from "next-vibe-ui/ui/textarea";
-import { H3 } from "next-vibe-ui/ui/typography";
-import { P } from "next-vibe-ui/ui/typography";
+import { H3, P } from "next-vibe-ui/ui/typography";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { Selector } from "@/app/api/[locale]/agent/ai-stream/stream/widget/selector";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
@@ -55,8 +53,7 @@ export function ModelSkillSelectorModal({
 }: ModelSkillSelectorModalProps): JSX.Element {
   // Get settings directly (no context dependency for model/skill)
   const { settings } = useChatSettings(user, logger);
-  const env = useEnvAvailability();
-  const defaults = ChatSettingsRepositoryClient.getDefaults(user, env);
+  const defaults = ChatSettingsRepositoryClient.getDefaults(user);
   const selectedModel = settings?.selectedModel ?? defaults.selectedModel;
   const selectedSkill = settings?.selectedSkill ?? defaults.selectedSkill;
 

@@ -67,7 +67,8 @@ export function createUncensoredAI(logger: EndpointLogger): {
     if (USE_NATIVE_TOOLS) {
       // Native mode: pass tools directly, only convert developer→system messages
       const { messages, ...restBody } = parsedBody;
-      const modifiedMessages = convertDeveloperToSystemMessages(messages);
+      let modifiedMessages = convertDeveloperToSystemMessages(messages);
+      modifiedMessages = flattenArrayContent(modifiedMessages);
 
       bodyString = JSON.stringify(
         {
@@ -90,6 +91,7 @@ export function createUncensoredAI(logger: EndpointLogger): {
       if (tools && tools.length > 0) {
         modifiedMessages = injectToolInstructions(modifiedMessages, tools);
       }
+      modifiedMessages = flattenArrayContent(modifiedMessages);
 
       bodyString = JSON.stringify(
         {
@@ -188,6 +190,26 @@ type JSONValue =
   | null
   | JSONValue[]
   | { [key: string]: JSONValue };
+
+/**
+ * Flatten array message content to a plain string.
+ * Uncensored AI API only accepts string content - passing an array causes
+ * "query.trim is not a function" errors server-side.
+ * After gap-fill, image parts become text descriptions - but the content is still
+ * an array of text parts. We concatenate them into a single string here.
+ */
+function flattenArrayContent(messages: OpenAIMessage[]): OpenAIMessage[] {
+  return messages.map((msg) => {
+    if (!Array.isArray(msg.content)) {
+      return msg;
+    }
+    const text = (msg.content as Array<{ type: string; text?: string }>)
+      .map((p) => (p.type === "text" && p.text ? p.text : ""))
+      .filter(Boolean)
+      .join("\n");
+    return { ...msg, content: text || null };
+  });
+}
 
 interface OpenAIRequestBody {
   model: string;

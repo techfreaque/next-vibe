@@ -14,7 +14,6 @@ import {
 import type { ReactElement } from "react";
 import { z } from "zod";
 
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -34,6 +33,7 @@ import {
 
 import { FEATURED_MODELS } from "../agent/ai-stream/models";
 import { contactClientRepository } from "../contact/repository-client";
+import { getPricingParams } from "../products/repository-client";
 import {
   scopedTranslation as subscriptionScopedTranslation,
   type SubscriptionT,
@@ -84,6 +84,7 @@ function SubscriptionSuccessEmail({
 }): ReactElement {
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const pricingParams = getPricingParams(locale);
 
   const modelCategories = [
     {
@@ -113,6 +114,7 @@ function SubscriptionSuccessEmail({
       previewText={t("email.success.previewText", {
         privateName: props.privateName,
         modelCount: props.totalModelCount,
+        ...pricingParams,
       })}
       recipientEmail={recipientEmail}
       tracking={tracking}
@@ -161,7 +163,7 @@ function SubscriptionSuccessEmail({
           display: "block",
         }}
       >
-        {t("email.success.intro", { appName })}
+        {t("email.success.intro", { appName, ...pricingParams })}
       </Span>
 
       {/* Model showcase */}
@@ -251,7 +253,7 @@ function SubscriptionSuccessEmail({
         </Span>
 
         {[
-          t("email.success.included.credits"),
+          t("email.success.included.credits", pricingParams),
           t("email.success.included.models", {
             modelCount: props.totalModelCount,
           }),
@@ -345,7 +347,7 @@ function SubscriptionSuccessEmail({
             display: "block",
           }}
         >
-          {t("email.success.packs.description")}
+          {t("email.success.packs.description", pricingParams)}
         </Span>
         <Button
           href={`${tracking.baseUrl}/${locale}/subscription`}
@@ -467,7 +469,7 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
         userId: requestData.user?.id ?? user.id,
         leadId: requestData.user?.leadId ?? user.leadId,
         planName: requestData.planName ?? "",
-        totalModelCount: getAvailableModelCount(agentEnvAvailability, false),
+        totalModelCount: getAvailableModelCount(false),
       };
       const tracking = createTrackingContext(
         locale,
@@ -491,7 +493,9 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
       });
     } catch {
       return fail({
-        message: t("email.success.subject"),
+        message: t("email.success.subject", {
+          appName: configT("appName"),
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -534,7 +538,8 @@ function AdminSubscriptionNotificationEmailContent({
       locale={locale}
       title={t("email.admin_notification.title")}
       previewText={t("email.admin_notification.preview", {
-        appName: configT("appName"),
+        userName: user.privateName,
+        planName,
       })}
       recipientEmail={recipientEmail}
       tracking={tracking}
@@ -814,7 +819,9 @@ export const adminSubscriptionNotificationEmailTemplate: EmailTemplateDefinition
       });
     } catch {
       return fail({
-        message: t("email.admin_notification.subject"),
+        message: t("email.admin_notification.subject", {
+          planName: requestData.planName ?? "",
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

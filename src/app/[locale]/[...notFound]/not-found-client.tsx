@@ -22,13 +22,13 @@ export function NotFoundBackButton({
 }): JSX.Element {
   const { t } = pageT.scopedT(locale);
   return (
-    <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900 flex flex-col items-center justify-center px-4 py-12">
+    <Div className="min-h-screen bg-primary/5 bg-linear-to-b from-primary/5 to-background flex flex-col items-center justify-center px-4 py-12">
       <Div className="w-full max-w-3xl">
         <Card className="border-none shadow-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
           <CardContent className="p-0 overflow-hidden">
             <Div className="grid md:grid-cols-2">
               {/* Left side - Illustration */}
-              <Div className="relative h-64 md:h-full bg-blue-600 dark:bg-blue-800 overflow-hidden">
+              <Div className="relative h-64 md:h-full bg-primary overflow-hidden">
                 <Div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=1974')] bg-cover bg-center" />
                 <Div className="relative z-10 h-full flex flex-col items-center justify-center p-6 text-white">
                   <Div className="animate-float">
@@ -48,7 +48,7 @@ export function NotFoundBackButton({
 
               {/* Right side - Content */}
               <Div className="p-8 md:p-10 flex flex-col justify-center">
-                <H2 className="text-3xl font-bold mb-4 text-blue-600 dark:text-blue-400">
+                <H2 className="text-3xl font-bold mb-4 text-primary">
                   {t("pages.notFound.title")}
                 </H2>
                 <P className="text-gray-600 dark:text-gray-300 mb-8">
@@ -63,10 +63,7 @@ export function NotFoundBackButton({
                       {t("pages.notFound.goBack")}
                     </Span>
                   </Button>
-                  <Button
-                    asChild
-                    className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 group"
-                  >
+                  <Button asChild className="group">
                     <Link href={`/${locale}/threads`}>
                       <Home className="mr-2 h-4 w-4" />
                       {t("pages.notFound.goHome")}

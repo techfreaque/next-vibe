@@ -62,7 +62,7 @@ export function SkillModerationContainer({
       {/* Header */}
       <Div className="flex items-center justify-between">
         <Div className="flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-amber-500" />
+          <AlertTriangle className="h-5 w-5 text-warning" />
           <Span className="font-semibold text-base">{t("get.title")}</Span>
         </Div>
         <BadgeWidget
@@ -74,7 +74,7 @@ export function SkillModerationContainer({
       {/* Skills table */}
       {skills.length === 0 ? (
         <Div className="rounded-lg border border-border bg-muted/30 p-8 text-center">
-          <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
+          <CheckCircle2 className="h-8 w-8 text-success mx-auto mb-2" />
           <Span className="text-sm text-muted-foreground">
             {t("get.empty")}
           </Span>
@@ -89,7 +89,7 @@ export function SkillModerationContainer({
                 className={`flex items-center justify-between rounded-lg border px-4 py-3 gap-3 transition-opacity ${
                   isActioned
                     ? "opacity-40 border-border"
-                    : "border-amber-200 dark:border-amber-900 bg-amber-50/40 dark:bg-amber-950/10"
+                    : "border-warning/30 bg-warning/5"
                 }`}
               >
                 {/* Skill info */}
@@ -99,7 +99,7 @@ export function SkillModerationContainer({
                   </Span>
                   <Div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <Span className="flex items-center gap-1">
-                      <AlertTriangle className="h-3 w-3 text-amber-500" />
+                      <AlertTriangle className="h-3 w-3 text-warning" />
                       {skill.reportCount}
                     </Span>
                     {skill.voteCount > 0 && (

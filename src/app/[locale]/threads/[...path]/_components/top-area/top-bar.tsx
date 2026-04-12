@@ -98,7 +98,7 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
         </DialogContent>
       </Dialog>
 
-      <Div className="absolute top-4 left-4 z-51 flex flex-row gap-1 ">
+      <Div className="absolute top-4 left-4 z-[310] flex flex-row gap-1 ">
         {/* Menu Button */}
         <Button
           variant="ghost"

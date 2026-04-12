@@ -32,6 +32,7 @@ const { GET } = createEndpoint({
   description: "get.description",
   icon: "crown",
   category: "endpointCategories.payments",
+  subCategory: "endpointCategories.subscriptionManagement",
   tags: ["tags.subscription", "tags.billing", "tags.get"],
   allowedRoles: [
     UserRole.CUSTOMER,

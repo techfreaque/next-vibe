@@ -39,7 +39,7 @@ export function SetupInstallWidget({ field }: CliWidgetProps): JSX.Element {
     }
     return (
       <Box flexDirection="column">
-        <Text wrap="end">{lines.join("\n")}</Text>
+        <Text wrap="truncate-end">{lines.join("\n")}</Text>
       </Box>
     );
   }
@@ -70,7 +70,7 @@ export function SetupInstallWidget({ field }: CliWidgetProps): JSX.Element {
 
   return (
     <Box flexDirection="column">
-      <Text wrap="end">{lines.join("\n")}</Text>
+      <Text wrap="truncate-end">{lines.join("\n")}</Text>
     </Box>
   );
 }

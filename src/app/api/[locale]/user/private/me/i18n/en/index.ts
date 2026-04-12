@@ -32,8 +32,10 @@ export const translations = {
       tiktokUrl: "TikTok",
       githubUrl: "GitHub",
       discordUrl: "Discord",
+      creatorSlug: "Profile Slug",
       creatorAccentColor: "Accent Color",
       creatorHeaderImageUrl: "Header Image",
+      avatarUrl: "Avatar",
       user: {
         title: "User Information",
         description: "User profile details",
@@ -208,6 +210,14 @@ export const translations = {
         description: "Your Discord server or profile link",
         placeholder: "https://discord.gg/yourserver",
       },
+      creatorSlug: {
+        label: "Profile URL",
+        description: "Your custom profile slug - appears in your public link",
+        placeholder: "jane-doe",
+        validation: {
+          invalid: "Only lowercase letters, numbers, and hyphens allowed",
+        },
+      },
       creatorAccentColor: {
         label: "Accent Color",
         description: "Hex color for your skill page branding (optional)",
@@ -247,6 +257,7 @@ export const translations = {
       tiktokUrl: "TikTok",
       githubUrl: "GitHub",
       discordUrl: "Discord",
+      creatorSlug: "Profile Slug",
       creatorAccentColor: "Accent Color",
       creatorHeaderImageUrl: "Header Image",
       user: "Updated User Information",
@@ -384,8 +395,9 @@ export const translations = {
       description: "Connect your platforms",
     },
     emailCard: {
-      title: "Email List",
-      description: "Grow your audience with lead capture",
+      title: "Your email list",
+      description:
+        "Visitors on your skill page can subscribe. You own the list - no platform in the middle.",
     },
     previewCard: {
       title: "Your Public Profile",
@@ -394,6 +406,16 @@ export const translations = {
     noPreview: "Fill in your profile to see a preview",
     noSocials: "No social links added yet",
     viewPublicProfile: "View public profile",
+    profileUrl: "Your link",
+    slugWarning:
+      "Changing this URL will break any existing links to your profile.",
+    bioPreview: "Preview",
+    bioEdit: "Edit",
+    skills: {
+      title: "My Skills",
+      chat: "Chat now",
+      add: "Add to your collection",
+    },
   },
 
   // Sub-routes

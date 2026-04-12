@@ -22,24 +22,18 @@ import {
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
 import {
-  getImageGenModelById,
-  getImageGenModelForProvider,
-  type ImageGenModelId,
+  getBestImageGenModel,
+  type ImageGenModelSelection,
 } from "@/app/api/[locale]/agent/image-generation/models";
+import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import {
-  ApiProvider,
-  isModelOptionImageBased,
-} from "@/app/api/[locale]/agent/models/models";
-import {
-  getMusicGenModelById,
-  getMusicGenModelForProvider,
-  type MusicGenModelId,
+  getBestMusicGenModel,
+  type MusicGenModelSelection,
 } from "@/app/api/[locale]/agent/music-generation/models";
-import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import {
-  getVideoGenModelById,
-  getVideoGenModelForProvider,
-  type VideoGenModelId,
+  getBestVideoGenModel,
+  type VideoGenModelSelection,
 } from "@/app/api/[locale]/agent/video-generation/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
@@ -61,6 +55,7 @@ import { chatFavorites } from "../../chat/favorites/db";
 import { chatSettings } from "../../chat/settings/db";
 import { DEFAULT_SKILLS } from "../../chat/skills/config";
 import { customSkills } from "../../chat/skills/db";
+import { isUuid } from "../../chat/slugify";
 import { ThreadsRepository } from "../../chat/threads/repository";
 import { type AiStreamPostRequestOutput } from "../stream/definition";
 import { AbortControllerSetup } from "./core/abort-controller-setup";
@@ -116,10 +111,10 @@ export interface StreamSetupResult {
     sequenceId: string;
     toolCall: ToolCall;
   }>;
-  /** Voice mode settings for TTS streaming */
+  /** Voice mode settings for TTS streaming - carries the resolved selection, not a bare ID */
   voiceMode?: {
     enabled: boolean;
-    voiceId: TtsModelId;
+    voiceModelSelection: VoiceModelSelection;
   } | null;
   /** Voice transcription metadata (when audioInput was provided) */
   voiceTranscription?: {
@@ -198,11 +193,11 @@ export async function setupAiStream(params: {
   isRevival: boolean | undefined;
   /** Override the favoriteId stored in streamContext (used by headless runs with explicit favoriteId) */
   favoriteIdOverride: string | undefined;
-  /** Override resolved media gen models - used by integration tests to force a specific provider */
+  /** Override resolved media gen model selections - used by integration tests to force a specific model */
   mediaModelOverrides?: {
-    musicGenModelId?: MusicGenModelId;
-    videoGenModelId?: VideoGenModelId;
-    imageGenModelId?: ImageGenModelId;
+    musicGenModelSelection?: MusicGenModelSelection;
+    videoGenModelSelection?: VideoGenModelSelection;
+    imageGenModelSelection?: ImageGenModelSelection;
   };
   /**
    * Force all model resolution (chat + image/music/video gen) to use a specific API provider.
@@ -212,6 +207,11 @@ export async function setupAiStream(params: {
   providerOverride?: ApiProvider;
   /** Override tools entirely - used by API provider for client-provided tools only */
   toolsOverride?: Record<string, CoreTool>;
+  /**
+   * Parent stream's abort signal. When set, this sub-stream aborts when the parent does.
+   * Used for headless sub-streams (ai-run) so parent cancellation propagates.
+   */
+  parentAbortSignal?: AbortSignal;
 }): Promise<ResponseType<StreamSetupResult>> {
   const {
     data,
@@ -257,6 +257,7 @@ export async function setupAiStream(params: {
   // Create abort controller early so signal is available for confirmations and streamContext
   const streamAbortController = AbortControllerSetup.setupAbortController({
     maxDuration: params.maxDuration,
+    parentSignal: params.parentAbortSignal,
   });
 
   // Handle tool confirmations if present - execute tools and update messages
@@ -267,20 +268,20 @@ export async function setupAiStream(params: {
   }> = [];
 
   if (data.toolConfirmations && data.toolConfirmations.length > 0) {
-    // Resolve media model IDs early for the confirmation context.
+    // Resolve media model selections early for the confirmation context.
     // The full bridge context is built later (after thread/credits), but confirmations
-    // need media model IDs NOW so tool serverDefaults (e.g. image gen model) resolve correctly.
+    // need media model selections NOW so tool serverDefaults (e.g. image gen model) resolve correctly.
     const confirmMediaModels = await (async (): Promise<{
-      imageGenModelId: ImageGenModelId | undefined;
-      musicGenModelId: MusicGenModelId | undefined;
-      videoGenModelId: VideoGenModelId | undefined;
+      imageGenModelSelection: ImageGenModelSelection | undefined;
+      musicGenModelSelection: MusicGenModelSelection | undefined;
+      videoGenModelSelection: VideoGenModelSelection | undefined;
     }> => {
-      // 1. Explicit overrides (legacy path, still honoured if provided)
+      // 1. Explicit overrides (provided by callers such as integration tests)
       if (mediaModelOverrides) {
         return {
-          imageGenModelId: mediaModelOverrides.imageGenModelId,
-          musicGenModelId: mediaModelOverrides.musicGenModelId,
-          videoGenModelId: mediaModelOverrides.videoGenModelId,
+          imageGenModelSelection: mediaModelOverrides.imageGenModelSelection,
+          musicGenModelSelection: mediaModelOverrides.musicGenModelSelection,
+          videoGenModelSelection: mediaModelOverrides.videoGenModelSelection,
         };
       }
       // 2. Resolve from favorite via ModalityResolver cascade
@@ -289,11 +290,15 @@ export async function setupAiStream(params: {
         const [favRow] = await db
           .select()
           .from(chatFavorites)
-          .where(eq(chatFavorites.id, effectiveFavoriteId))
+          .where(
+            isUuid(effectiveFavoriteId)
+              ? eq(chatFavorites.id, effectiveFavoriteId)
+              : eq(chatFavorites.slug, effectiveFavoriteId),
+          )
           .limit(1);
         if (favRow) {
           // Include the skill in the mini bridge so skill-level model defaults
-          // (e.g. quality-tester.imageGenModelId) are respected when the favorite
+          // (e.g. quality-tester.imageGenModelSelection) are respected when the favorite
           // has no explicit model selection.
           const uuidPattern =
             /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -314,32 +319,20 @@ export async function setupAiStream(params: {
             favorite: favRow,
             userSettings: null,
           };
-          const imgModel = ModalityResolver.resolveImageGenModel(
-            miniBridgeCtx,
-            user,
-          );
-          const musModel = ModalityResolver.resolveMusicGenModel(
-            miniBridgeCtx,
-            user,
-          );
-          const vidModel = ModalityResolver.resolveVideoGenModel(
-            miniBridgeCtx,
-            user,
-          );
           return {
-            imageGenModelId:
-              imgModel && isModelOptionImageBased(imgModel)
-                ? imgModel.id
-                : undefined,
-            musicGenModelId: musModel?.id,
-            videoGenModelId: vidModel?.id,
+            imageGenModelSelection:
+              ModalityResolver.resolveImageGenSelection(miniBridgeCtx),
+            musicGenModelSelection:
+              ModalityResolver.resolveMusicGenSelection(miniBridgeCtx),
+            videoGenModelSelection:
+              ModalityResolver.resolveVideoGenSelection(miniBridgeCtx),
           };
         }
       }
       return {
-        imageGenModelId: undefined,
-        musicGenModelId: undefined,
-        videoGenModelId: undefined,
+        imageGenModelSelection: undefined,
+        musicGenModelSelection: undefined,
+        videoGenModelSelection: undefined,
       };
     })();
 
@@ -363,10 +356,11 @@ export async function setupAiStream(params: {
         // Pass leafMessageId from request so deferred confirm inserts use the correct branch tip
         leafMessageId: data.leafMessageId ?? undefined,
         skillId: data.skill,
+        variantId: undefined,
         modelId: data.model,
-        imageGenModelId: confirmMediaModels.imageGenModelId,
-        musicGenModelId: confirmMediaModels.musicGenModelId,
-        videoGenModelId: confirmMediaModels.videoGenModelId,
+        imageGenModelSelection: confirmMediaModels.imageGenModelSelection,
+        musicGenModelSelection: confirmMediaModels.musicGenModelSelection,
+        videoGenModelSelection: confirmMediaModels.videoGenModelSelection,
         favoriteId: params.favoriteIdOverride,
         headless: params.headless,
         isRevival: params.isRevival,
@@ -627,7 +621,11 @@ export async function setupAiStream(params: {
         const [fav] = await db
           .select({ compactTrigger: chatFavorites.compactTrigger })
           .from(chatFavorites)
-          .where(eq(chatFavorites.id, settings.activeFavoriteId))
+          .where(
+            isUuid(settings.activeFavoriteId)
+              ? eq(chatFavorites.id, settings.activeFavoriteId)
+              : eq(chatFavorites.slug, settings.activeFavoriteId),
+          )
           .limit(1);
         if (fav?.compactTrigger !== null && fav?.compactTrigger !== undefined) {
           return fav.compactTrigger;
@@ -750,7 +748,11 @@ export async function setupAiStream(params: {
           memoryLimit: chatFavorites.memoryLimit,
         })
         .from(chatFavorites)
-        .where(eq(chatFavorites.id, userSettings.activeFavoriteId))
+        .where(
+          isUuid(userSettings.activeFavoriteId)
+            ? eq(chatFavorites.id, userSettings.activeFavoriteId)
+            : eq(chatFavorites.slug, userSettings.activeFavoriteId),
+        )
         .limit(1);
 
       // Stack favorite deniedTools on top of skill's
@@ -832,7 +834,7 @@ export async function setupAiStream(params: {
           );
           return {
             availableTools: normalizeToolConfig(defaultChar.availableTools),
-            pinnedTools: null,
+            pinnedTools: normalizeToolConfig(defaultChar.pinnedTools ?? null),
             deniedToolIds,
             promptAppend,
             memoryLimit,
@@ -919,7 +921,11 @@ export async function setupAiStream(params: {
         const [favRow] = await db
           .select()
           .from(chatFavorites)
-          .where(eq(chatFavorites.id, effectiveFavoriteId))
+          .where(
+            isUuid(effectiveFavoriteId)
+              ? eq(chatFavorites.id, effectiveFavoriteId)
+              : eq(chatFavorites.slug, effectiveFavoriteId),
+          )
           .limit(1);
         if (favRow) {
           favoriteConfig = favRow;
@@ -932,7 +938,7 @@ export async function setupAiStream(params: {
       const uuidPattern =
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       if (uuidPattern.test(data.skill)) {
-        // Custom skills store model selections directly on the skill row
+        // Custom skills: resolve variant-aware model selections
         const [customSkillRow] = await db
           .select({
             voiceModelSelection: customSkills.voiceModelSelection,
@@ -941,26 +947,73 @@ export async function setupAiStream(params: {
             videoVisionModelSelection: customSkills.videoVisionModelSelection,
             audioVisionModelSelection: customSkills.audioVisionModelSelection,
             defaultChatMode: customSkills.defaultChatMode,
+            variants: customSkills.variants,
           })
           .from(customSkills)
           .where(eq(customSkills.id, data.skill))
           .limit(1);
         if (customSkillRow) {
-          skillConfig = {
-            voiceModelSelection:
-              customSkillRow.voiceModelSelection ?? undefined,
-            sttModelSelection: customSkillRow.sttModelSelection ?? undefined,
-            imageVisionModelSelection:
-              customSkillRow.imageVisionModelSelection ?? undefined,
-            videoVisionModelSelection:
-              customSkillRow.videoVisionModelSelection ?? undefined,
-            audioVisionModelSelection:
-              customSkillRow.audioVisionModelSelection ?? undefined,
-            defaultChatMode: customSkillRow.defaultChatMode ?? undefined,
-            imageGenModelSelection: undefined,
-            musicGenModelSelection: undefined,
-            videoGenModelSelection: undefined,
-          };
+          // Try to resolve active variant from favorite's variantId
+          const activeVariantId = favoriteConfig?.variantId ?? null;
+          const variants = customSkillRow.variants;
+          const activeVariant =
+            variants && activeVariantId
+              ? (variants.find((v) => v.id === activeVariantId) ??
+                variants.find((v) => v.isDefault) ??
+                variants[0])
+              : variants
+                ? (variants.find((v) => v.isDefault) ?? variants[0])
+                : null;
+
+          skillConfig = activeVariant
+            ? {
+                voiceModelSelection:
+                  activeVariant.voiceModelSelection ??
+                  customSkillRow.voiceModelSelection ??
+                  undefined,
+                sttModelSelection:
+                  activeVariant.sttModelSelection ??
+                  customSkillRow.sttModelSelection ??
+                  undefined,
+                imageVisionModelSelection:
+                  activeVariant.imageVisionModelSelection ??
+                  customSkillRow.imageVisionModelSelection ??
+                  undefined,
+                videoVisionModelSelection:
+                  activeVariant.videoVisionModelSelection ??
+                  customSkillRow.videoVisionModelSelection ??
+                  undefined,
+                audioVisionModelSelection:
+                  activeVariant.audioVisionModelSelection ??
+                  customSkillRow.audioVisionModelSelection ??
+                  undefined,
+                defaultChatMode:
+                  activeVariant.defaultChatMode ??
+                  customSkillRow.defaultChatMode ??
+                  undefined,
+                imageGenModelSelection:
+                  activeVariant.imageGenModelSelection ?? undefined,
+                musicGenModelSelection:
+                  activeVariant.musicGenModelSelection ?? undefined,
+                videoGenModelSelection:
+                  activeVariant.videoGenModelSelection ?? undefined,
+              }
+            : {
+                voiceModelSelection:
+                  customSkillRow.voiceModelSelection ?? undefined,
+                sttModelSelection:
+                  customSkillRow.sttModelSelection ?? undefined,
+                imageVisionModelSelection:
+                  customSkillRow.imageVisionModelSelection ?? undefined,
+                videoVisionModelSelection:
+                  customSkillRow.videoVisionModelSelection ?? undefined,
+                audioVisionModelSelection:
+                  customSkillRow.audioVisionModelSelection ?? undefined,
+                defaultChatMode: customSkillRow.defaultChatMode ?? undefined,
+                imageGenModelSelection: undefined,
+                musicGenModelSelection: undefined,
+                videoGenModelSelection: undefined,
+              };
         }
       } else {
         // Default skill: resolve the active variant and use its model selections
@@ -985,58 +1038,39 @@ export async function setupAiStream(params: {
     };
   })();
 
-  // Resolve TTS voice via cascade (replaces hardcoded data.voiceMode.voice)
-  const resolvedTtsVoiceId = ModalityResolver.resolveTtsVoiceId(
+  // Resolve TTS selection via cascade - actual model resolved at point of use (streaming-tts.ts)
+  const resolvedTtsSelection = ModalityResolver.resolveTtsSelection(
     bridgeContext,
-    user,
-  );
-  const resolvedTtsModel = ModalityResolver.resolveTtsModel(
-    bridgeContext,
-    user,
+    data.voiceMode?.voice ?? undefined,
   );
 
-  // Resolve per-media-type generator models via cascade
-  const resolvedImageGenModel = ModalityResolver.resolveImageGenModel(
-    bridgeContext,
-    user,
-  );
-  const resolvedMusicGenModel = ModalityResolver.resolveMusicGenModel(
-    bridgeContext,
-    user,
-  );
-  const resolvedVideoGenModel = ModalityResolver.resolveVideoGenModel(
-    bridgeContext,
-    user,
-  );
+  // Resolve media gen selections via cascade - actual models resolved at tool execution time
+  const effectiveImageGenSelection: ImageGenModelSelection =
+    mediaModelOverrides?.imageGenModelSelection ??
+    ModalityResolver.resolveImageGenSelection(bridgeContext);
+  const effectiveMusicGenSelection: MusicGenModelSelection =
+    mediaModelOverrides?.musicGenModelSelection ??
+    ModalityResolver.resolveMusicGenSelection(bridgeContext);
+  const effectiveVideoGenSelection: VideoGenModelSelection =
+    mediaModelOverrides?.videoGenModelSelection ??
+    ModalityResolver.resolveVideoGenSelection(bridgeContext);
 
-  // Apply overrides - mediaModelOverrides targets specific model IDs; providerOverride routes via a provider
-  const effectiveImageGenModel = mediaModelOverrides?.imageGenModelId
-    ? getImageGenModelById(mediaModelOverrides.imageGenModelId)
-    : providerOverride && resolvedImageGenModel
-      ? (getImageGenModelForProvider(
-          resolvedImageGenModel.id,
-          providerOverride,
-        ) ?? resolvedImageGenModel)
-      : resolvedImageGenModel;
-  const effectiveMusicGenModel = mediaModelOverrides?.musicGenModelId
-    ? getMusicGenModelById(mediaModelOverrides.musicGenModelId)
-    : providerOverride && resolvedMusicGenModel
-      ? (getMusicGenModelForProvider(
-          resolvedMusicGenModel.id,
-          providerOverride,
-        ) ?? resolvedMusicGenModel)
-      : resolvedMusicGenModel;
-  const effectiveVideoGenModel = mediaModelOverrides?.videoGenModelId
-    ? getVideoGenModelById(mediaModelOverrides.videoGenModelId)
-    : providerOverride && resolvedVideoGenModel
-      ? (getVideoGenModelForProvider(
-          resolvedVideoGenModel.id,
-          providerOverride,
-        ) ?? resolvedVideoGenModel)
-      : resolvedVideoGenModel;
+  // Resolve models once for system-prompt mediaCapabilities (name display only)
+  const effectiveImageGenModel = getBestImageGenModel(
+    effectiveImageGenSelection,
+    user,
+  );
+  const effectiveMusicGenModel = getBestMusicGenModel(
+    effectiveMusicGenSelection,
+    user,
+  );
+  const effectiveVideoGenModel = getBestVideoGenModel(
+    effectiveVideoGenSelection,
+    user,
+  );
 
   logger.debug("[Setup] Bridge models resolved via cascade", {
-    ttsModelId: resolvedTtsModel?.id ?? null,
+    ttsSelectionType: resolvedTtsSelection.selectionType,
     sttModelId:
       ModalityResolver.resolveSttModel(bridgeContext, user)?.id ?? null,
     imageVisionModelId:
@@ -1100,13 +1134,11 @@ export async function setupAiStream(params: {
     threadId: threadResult.data.threadId,
     aiMessageId,
     skillId: data.skill,
+    variantId: bridgeContext.favorite?.variantId ?? undefined,
     modelId: data.model,
-    imageGenModelId:
-      effectiveImageGenModel && isModelOptionImageBased(effectiveImageGenModel)
-        ? effectiveImageGenModel.id
-        : undefined,
-    musicGenModelId: effectiveMusicGenModel?.id ?? undefined,
-    videoGenModelId: effectiveVideoGenModel?.id ?? undefined,
+    imageGenModelSelection: effectiveImageGenSelection,
+    musicGenModelSelection: effectiveMusicGenSelection,
+    videoGenModelSelection: effectiveVideoGenSelection,
     headless: params.headless,
     isRevival: params.isRevival,
     // favoriteId: from headless override (run endpoint) - lets resume-stream reload full context
@@ -1565,18 +1597,12 @@ export async function setupAiStream(params: {
       skipAiTurn:
         (data.toolConfirmations?.length ?? 0) > 0 &&
         toolConfirmationResults.length === 0,
-      voiceMode: (() => {
-        const vm = data.voiceMode
-          ? {
-              enabled: data.voiceMode.enabled ?? false,
-              voiceId:
-                !bridgeContext.userSettings && data.voiceMode.voice
-                  ? data.voiceMode.voice
-                  : (resolvedTtsVoiceId ?? data.voiceMode.voice),
-            }
-          : null;
-        return vm;
-      })(),
+      voiceMode: data.voiceMode
+        ? {
+            enabled: data.voiceMode.enabled ?? false,
+            voiceModelSelection: resolvedTtsSelection,
+          }
+        : null,
       voiceTranscription,
       userMessageMetadata,
       fileUploadPromise,

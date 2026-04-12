@@ -26,7 +26,7 @@ export function RootProviders({
 }): JSX.Element {
   return (
     <QueryProvider>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
         <TranslationProvider currentLocale={locale}>
           <LeadTrackingProvider />
           <ErrorBoundary locale={locale}>{children}</ErrorBoundary>

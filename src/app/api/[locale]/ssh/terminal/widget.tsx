@@ -201,11 +201,11 @@ export function TerminalContainer(): React.JSX.Element {
 
   const statusColor =
     status === "connected"
-      ? "text-green-500"
+      ? "text-success"
       : status === "connecting"
         ? "text-yellow-500"
         : status === "error"
-          ? "text-red-500"
+          ? "text-destructive"
           : "text-muted-foreground";
 
   return (

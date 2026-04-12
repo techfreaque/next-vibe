@@ -5,8 +5,8 @@
 
 import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { ImageGenModelId } from "@/app/api/[locale]/agent/image-generation/models";
-import type { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -14,7 +14,9 @@ import {
   type UserPermissionRoleValue,
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import type { VideoGenModelId } from "../video-generation/models";
+import type { VideoGenModelSelection } from "../video-generation/models";
+
+import type { ToolCallResult } from "./db";
 
 /**
  * Default folder IDs
@@ -155,14 +157,16 @@ export interface ToolExecutionContext {
   favoriteId: string | undefined;
   /** The character/persona driving the conversation */
   skillId: string | undefined;
+  /** The active variant within the skill */
+  variantId: string | undefined;
   /** The model being used */
   modelId: ChatModelId | undefined;
-  /** Resolved image gen model ID from skill/favorite/settings cascade */
-  imageGenModelId: ImageGenModelId | undefined;
-  /** Resolved music gen model ID from skill/favorite/settings cascade */
-  musicGenModelId: MusicGenModelId | undefined;
-  /** Resolved video gen model ID from skill/favorite/settings cascade */
-  videoGenModelId: VideoGenModelId | undefined;
+  /** Cascaded image gen model selection - resolved to actual model at tool execution time */
+  imageGenModelSelection: ImageGenModelSelection | undefined;
+  /** Cascaded music gen model selection - resolved to actual model at tool execution time */
+  musicGenModelSelection: MusicGenModelSelection | undefined;
+  /** Cascaded video gen model selection - resolved to actual model at tool execution time */
+  videoGenModelSelection: VideoGenModelSelection | undefined;
   /** Whether this is a headless/cron invocation */
   headless: boolean | undefined;
   /** Whether this is a revival stream (resume-stream after wakeUp task completed). */
@@ -261,6 +265,13 @@ export interface ToolExecutionContext {
    * again after wait-for-task already delivered the result inline.
    */
   suppressedWakeUpToolMessageIds?: Set<string>;
+  /**
+   * Emit a partial tool result to the parent thread's WS channel and persist to DB.
+   * The tool message stays in "Executing" state but result data is available to the widget.
+   * Called by long-running tools (e.g. ai-run) to stream intermediate state before completion.
+   * Only available in streaming contexts - undefined for cron/headless invocations.
+   */
+  emitPartialToolResult?: (partialResult: ToolCallResult) => Promise<void>;
 }
 
 /**

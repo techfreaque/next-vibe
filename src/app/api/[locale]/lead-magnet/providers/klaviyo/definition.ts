@@ -31,7 +31,8 @@ export const { POST } = createEndpoint({
   title: "providers.klaviyo.title" as const,
   description: "providers.klaviyo.description" as const,
   icon: "mail",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetIntegrations",
   tags: ["providers.shared.saveTag" as const],
   allowedRoles: ALLOWED_ROLES,
 
@@ -46,9 +47,9 @@ export const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "providers.klaviyo.klaviyoApiKey.label" as const,
-        description: "providers.klaviyo.klaviyoApiKey.description" as const,
+        description: "providers.shared.secretKeepExisting" as const,
         placeholder: "providers.klaviyo.klaviyoApiKey.placeholder" as const,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       listId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

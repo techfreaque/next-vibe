@@ -1,6 +1,7 @@
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { agentEnvAvailability } from "../env-availability";
 import { STANDARD_MARKUP_PERCENTAGE } from "../../products/constants";
 import type { ChatModelId, ChatModelOption } from "../ai-stream/models";
 import type {
@@ -18,8 +19,6 @@ import {
   ModelSortField,
   PriceLevel,
   PriceLevelDB,
-  SpeedLevelDB,
-  type SpeedLevelValue,
 } from "../chat/skills/enum";
 import type { SkillsT } from "../chat/skills/i18n";
 import type { AgentTranslationKey } from "../i18n";
@@ -293,7 +292,6 @@ export interface ModelDefinition {
   utilities: (typeof ModelUtilityValue)[];
   supportsTools: boolean;
   intelligence: typeof IntelligenceLevelValue;
-  speed: typeof SpeedLevelValue;
   content: typeof ContentLevelValue;
   features: ModelFeatures;
   weaknesses?: (typeof ModelUtilityValue)[];
@@ -351,8 +349,6 @@ export interface ModelOptionBase {
   // Tier properties for the new model selection system
   /** Intelligence tier: quick, smart, or brilliant */
   intelligence: typeof IntelligenceLevelValue;
-  /** Speed tier: fast, balanced, or thorough */
-  speed: typeof SpeedLevelValue;
   /** Content policy tier: mainstream, open, or uncensored */
   content: typeof ContentLevelValue;
   /** Binary features the model supports */
@@ -394,7 +390,7 @@ export interface ModelOptionCreditBased extends ModelOptionBase {
   defaultDurationSeconds?: never;
 }
 /** Union of all billing-shape interfaces - used for type-safe guard discrimination. */
-type AnyModelOptionShape =
+export type AnyModelOptionShape =
   | ModelOptionTokenBased
   | ModelOptionCreditBased
   | ModelOptionImageBased
@@ -675,45 +671,12 @@ export const modelProviders: Record<string, ModelProvider> = {
 };
 
 /**
- * Minimal env availability shape required by model count helpers.
- * Mirrors AgentEnvAvailability - usable on both server and client.
+ * Returns true when the given API provider is configured in the environment.
+ * Works on both server and client without pulling in server-only env modules.
  */
-export interface ModelProviderEnvAvailability {
-  openRouter: boolean;
-  claudeCode: boolean;
-  uncensoredAI: boolean;
-  freedomGPT: boolean;
-  gabAI: boolean;
-  veniceAI: boolean;
-  openAiImages: boolean;
-  replicate: boolean;
-  falAi: boolean;
-  modelsLab: boolean;
-  unbottled: boolean;
-  /** OpenAI STT (Whisper direct API) - requires OPENAI_API_KEY */
-  openAiStt: boolean;
-  /** Eden AI STT - requires EDEN_AI_API_KEY */
-  edenAiStt: boolean;
-  /** Deepgram STT - requires DEEPGRAM_API_KEY */
-  deepgram: boolean;
-  /** OpenAI TTS - requires OPENAI_API_KEY */
-  openAiTts: boolean;
-  /** Eden AI TTS - requires EDEN_AI_API_KEY */
-  edenAiTts: boolean;
-  /** ElevenLabs TTS - requires ELEVENLABS_API_KEY */
-  elevenlabs: boolean;
-}
-
-/**
- * Returns true when the given model's API provider is configured in the environment.
- * Extracted here so it works on both server and client
- * without pulling in server-only env modules.
- */
-export function isModelProviderAvailable(
-  model: ModelOptionBase,
-  env: ModelProviderEnvAvailability,
-): boolean {
-  switch (model.apiProvider) {
+export function isApiProviderAvailable(provider: ApiProvider): boolean {
+  const env = agentEnvAvailability;
+  switch (provider) {
     case ApiProvider.OPENROUTER:
       return env.openRouter;
     case ApiProvider.CLAUDE_CODE:
@@ -751,6 +714,15 @@ export function isModelProviderAvailable(
     default:
       return true;
   }
+}
+
+/**
+ * Returns true when the given model's API provider is configured in the environment.
+ * Extracted here so it works on both server and client
+ * without pulling in server-only env modules.
+ */
+export function isModelProviderAvailable(model: ModelOptionBase): boolean {
+  return isApiProviderAvailable(model.apiProvider);
 }
 
 function roundMediaCost(v: number): number {
@@ -991,7 +963,6 @@ export function filterRoleModels<
     manualModelId?: string;
     intelligenceRange?: { min?: string; max?: string };
     contentRange?: { min?: string; max?: string };
-    speedRange?: { min?: string; max?: string };
     priceRange?: { min?: string; max?: string };
     sortBy?: string;
     sortDirection?: string;
@@ -1002,24 +973,28 @@ export function filterRoleModels<
   pool: TOption[],
   selection: TSelection | null | undefined,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): TOption[] {
   const isAdmin =
     !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
   if (!selection) {
     return pool.filter(
-      (m) => (!m.adminOnly || isAdmin) && isModelProviderAvailable(m, env),
+      (m) => (!m.adminOnly || isAdmin) && isModelProviderAvailable(m),
     );
   }
   if (selection.selectionType === ModelSelectionType.MANUAL) {
-    const model = selection.manualModelId
-      ? pool.find((m) => m.id === selection.manualModelId)
-      : undefined;
-    if (model?.adminOnly && !isAdmin) {
-      return [];
-    }
-    if (model && isModelProviderAvailable(model, env)) {
-      return [model];
+    if (selection.manualModelId) {
+      // Collect all pool entries for this model ID (multi-provider pools like TTS/STT
+      // have one entry per provider, sorted cheapest-first).
+      const candidates = pool.filter((m) => m.id === selection.manualModelId);
+      if (candidates[0]?.adminOnly && !isAdmin) {
+        return [];
+      }
+      // Pick the cheapest available provider for this model ID.
+      const available = candidates.find((m) => isModelProviderAvailable(m));
+      if (available) {
+        return [available];
+      }
+      // No provider available for this specific model - fall through to filter fallback.
     }
     // Fall through to filter fallback
   }
@@ -1027,7 +1002,7 @@ export function filterRoleModels<
     if (m.adminOnly && !isAdmin) {
       return false;
     }
-    if (!isModelProviderAvailable(m, env)) {
+    if (!isModelProviderAvailable(m)) {
       return false;
     }
     const modelPrice = getModelPriceLevel(getModelPrice(m));
@@ -1038,8 +1013,7 @@ export function filterRoleModels<
         IntelligenceLevelDB,
       ) &&
       meetsRangeConstraint(m.content, selection.contentRange, ContentLevelDB) &&
-      meetsRangeConstraint(modelPrice, selection.priceRange, PriceLevelDB) &&
-      meetsRangeConstraint(m.speed, selection.speedRange, SpeedLevelDB)
+      meetsRangeConstraint(modelPrice, selection.priceRange, PriceLevelDB)
     );
   });
   if (!selection.sortBy) {
@@ -1069,10 +1043,6 @@ function getRoleModelSortValue(
       const idx = IntelligenceLevelDB.indexOf(model.intelligence);
       return idx === -1 ? 0 : idx;
     }
-    case ModelSortField.SPEED: {
-      const idx = SpeedLevelDB.indexOf(model.speed);
-      return idx === -1 ? 0 : idx;
-    }
     case ModelSortField.PRICE:
       return getModelPrice(model);
     case ModelSortField.CONTENT: {
@@ -1082,6 +1052,40 @@ function getRoleModelSortValue(
     default:
       return 0;
   }
+}
+
+/**
+ * Build an index (Record<id, option>) from a flat options array.
+ * The LAST entry for a given ID wins (cheapest-first arrays → cheapest overall).
+ * Use for by-id lookups when you only need the default (cheapest) provider.
+ */
+export function buildModelOptionsIndex<TOption extends ModelOptionBase>(
+  options: TOption[],
+): Partial<Record<string, TOption>> {
+  const index: Partial<Record<string, TOption>> = {};
+  for (const opt of options) {
+    // First entry wins - caller must pass cheapest-first array
+    if (!index[opt.id]) {
+      index[opt.id] = opt;
+    }
+  }
+  return index;
+}
+
+/**
+ * Find the cheapest variant of `modelId` that uses `provider` from the given pool.
+ * Pool must be sorted cheapest-first so the first matching entry is the cheapest.
+ * Returns `fallback` (typically the default cheapest-overall entry) if no match.
+ */
+export function getModelForProvider<TOption extends ModelOptionBase>(
+  modelId: string,
+  provider: ApiProvider,
+  pool: TOption[],
+  fallback: TOption | undefined,
+): TOption | undefined {
+  return (
+    pool.find((m) => m.id === modelId && m.apiProvider === provider) ?? fallback
+  );
 }
 
 /** Format credit cost for display */

@@ -350,9 +350,9 @@ export const translations = {
       step1Title: "Create referral codes",
       step1Body:
         "Generate unique codes for different audiences - friends, social media, or campaigns.",
-      step2Title: "Share your link",
+      step2Title: "Share your link - or a skill link",
       step2Body:
-        "When someone signs up using your link and subscribes, you earn commission.",
+        "Referral link: {{directPct}} of every payment from that user, forever. Skill link: {{skillPct}} total ({{directPct}} direct + {{skillBonusPct}} skill bonus) - two income sources, one link.",
       step3Title: "Get paid",
       step3Body:
         "Earnings are instant. Use them as chat credits or withdraw to crypto.",
@@ -403,7 +403,7 @@ export const translations = {
       },
     },
     errors: {
-      minimumAmount: "Minimum payout amount is $40",
+      minimumAmount: "Minimum payout amount is {{minPayout}}",
       walletRequired: "Wallet address is required for crypto payouts",
       insufficientBalance: "Insufficient balance for payout",
       notFound: "Payout request not found",

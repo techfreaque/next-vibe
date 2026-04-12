@@ -39,6 +39,7 @@ const { POST } = createEndpoint({
   description: "post.description",
   icon: "eye",
   category: "endpointCategories.ai",
+  subCategory: "endpointCategories.aiTools",
   tags: ["tags.image", "tags.vision", "tags.ai"],
   dynamicTitle: ({ request }) => {
     const fileUrl = request?.fileUrl;

@@ -17,6 +17,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
 import { ThemeToggleMobile } from "../../../_components/theme-toggle";
+import type { BadgeVariant } from "next-vibe-ui/ui/badge";
+
 import type { NavItemType } from "./nav-constants";
 
 interface MobileMenuClientProps {
@@ -26,22 +28,16 @@ interface MobileMenuClientProps {
 
 // Helper function to get badge classes based on variant
 
-function getBadgeClasses(
-  variant:
-    | "default"
-    | "secondary"
-    | "destructive"
-    | "outline"
-    | "notification"
-    | null
-    | undefined,
-): string {
+function getBadgeClasses(variant: BadgeVariant | null): string {
   const VARIANT_STYLES = {
     destructive: "bg-destructive text-destructive-foreground",
     outline: "border border-input bg-background text-foreground",
     default: "bg-primary text-primary-foreground",
     notification: "bg-blue-500 text-white",
     secondary: "bg-secondary text-secondary-foreground",
+    success: "bg-success text-success-foreground",
+    warning: "bg-warning text-warning-foreground",
+    info: "bg-info text-info-foreground",
   } as const;
 
   switch (variant) {
@@ -53,6 +49,12 @@ function getBadgeClasses(
       return VARIANT_STYLES.default;
     case "notification":
       return VARIANT_STYLES.notification;
+    case "success":
+      return VARIANT_STYLES.success;
+    case "warning":
+      return VARIANT_STYLES.warning;
+    case "info":
+      return VARIANT_STYLES.info;
     default:
       // Handles "secondary", null, undefined, and any other cases
       return VARIANT_STYLES.secondary;

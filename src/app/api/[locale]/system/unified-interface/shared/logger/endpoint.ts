@@ -9,7 +9,20 @@ import {
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { ErrorResponseType } from "../../../../shared/types/response.schema";
 import { colors, maybeColorize, semantic } from "./colors";
-import { devFileLog, fileLog } from "./file-logger";
+
+// Lazy import keeps file-logger (which uses node:fs + process.cwd()) out of
+// the static module graph so Turbopack's NFT tracer doesn't scan next.config.ts.
+// All usages are fire-and-forget logging so void promise is fine.
+const _fl = (): Promise<{
+  fileLog: (
+    message: string,
+    data?: Record<string, LoggerMetadata>,
+  ) => Promise<void>;
+  devFileLog: (
+    message: string,
+    data?: Record<string, LoggerMetadata>,
+  ) => Promise<void>;
+}> => import("./file-logger");
 
 /**
  * Logger metadata - structured data for logging
@@ -33,12 +46,8 @@ function writeToFile(
   message: string,
   data?: Record<string, LoggerMetadata>,
 ): void {
-  try {
-    fileLog(message, data);
-  } catch {
-    // Ignore errors - logging is best effort
-    // Can't log the error because we're in silent mode
-  }
+  // fileLog handles its own errors internally
+  void _fl().then(({ fileLog }) => fileLog(message, data));
 }
 
 /**
@@ -178,7 +187,9 @@ export function createEndpointLogger(
         console.log(formatMessage(message), ...metadata);
       }
       if (devFileLogging) {
-        devFileLog(formatMessage(message), metadataObj);
+        void _fl().then(({ devFileLog }) =>
+          devFileLog(formatMessage(message), metadataObj),
+        );
       }
     },
 
@@ -212,9 +223,11 @@ export function createEndpointLogger(
         console.error(formatMessage(message), error, ...metadata, locale);
       }
       if (devFileLogging) {
-        devFileLog(
-          formatMessage(message),
-          hasMetadata ? metadataObj : undefined,
+        void _fl().then(({ devFileLog }) =>
+          devFileLog(
+            formatMessage(message),
+            hasMetadata ? metadataObj : undefined,
+          ),
         );
       }
     },
@@ -236,7 +249,9 @@ export function createEndpointLogger(
       }
       if (devFileLogging) {
         const vibePrefix = noTimePrefix ? "" : `[${getTimePrefix()}] `;
-        devFileLog(`${vibePrefix}${message}`, metadataObj);
+        void _fl().then(({ devFileLog }) =>
+          devFileLog(`${vibePrefix}${message}`, metadataObj),
+        );
       }
     },
 
@@ -259,7 +274,9 @@ export function createEndpointLogger(
         if (devFileLogging) {
           const meta = serializeDebugMeta(metadata);
           const timeTag = noTimePrefix ? "" : `[${getTimePrefix()}] `;
-          devFileLog(`${timeTag}${message}${meta}`, metadataObj);
+          void _fl().then(({ devFileLog }) =>
+            devFileLog(`${timeTag}${message}${meta}`, metadataObj),
+          );
         }
       }
     },
@@ -280,7 +297,9 @@ export function createEndpointLogger(
         console.warn(formatMessage(message), ...metadata, locale);
       }
       if (devFileLogging) {
-        devFileLog(formatMessage(message), metadataObj);
+        void _fl().then(({ devFileLog }) =>
+          devFileLog(formatMessage(message), metadataObj),
+        );
       }
     },
     isDebugEnabled: debugEnabled || enableDebugLogger,

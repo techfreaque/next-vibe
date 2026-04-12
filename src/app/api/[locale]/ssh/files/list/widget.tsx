@@ -171,7 +171,7 @@ export function FilesListContainer({ field }: WidgetProps): React.JSX.Element {
               }}
             >
               {entry.type === "dir" ? (
-                <Folder className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                <Folder className="h-4 w-4 text-primary flex-shrink-0" />
               ) : entry.type === "symlink" ? (
                 <Link className="h-4 w-4 text-purple-500 flex-shrink-0" />
               ) : (

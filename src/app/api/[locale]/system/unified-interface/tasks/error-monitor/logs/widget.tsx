@@ -84,7 +84,7 @@ function ErrorLogCard({
       <Div className="flex items-start gap-3 p-3">
         {/* Resolved badge */}
         {log.resolved && (
-          <Span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 mt-0.5 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+          <Span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 mt-0.5 bg-success/10 text-success">
             <Check className="h-3 w-3" />
             {t("widget.detail.resolved")}
           </Span>
@@ -116,7 +116,7 @@ function ErrorLogCard({
               )}
             </Span>
             {log.level === "warn" && (
-              <Span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 px-1 rounded">
+              <Span className="bg-warning/10 text-warning px-1 rounded">
                 {"WARN"}
               </Span>
             )}
@@ -139,7 +139,7 @@ function ErrorLogCard({
               "h-7 px-2 text-xs gap-1",
               log.resolved
                 ? "text-orange-600 hover:text-orange-700 dark:text-orange-400"
-                : "text-green-600 hover:text-green-700 dark:text-green-400",
+                : "text-success hover:text-success/80",
             )}
           >
             {isUpdating ? (
@@ -300,7 +300,7 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
             </Span>
           )}
           {activeCount > 0 && (
-            <Span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+            <Span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive">
               {activeCount} {t("widget.header.activeCount")}
             </Span>
           )}

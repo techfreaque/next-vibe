@@ -32,12 +32,12 @@ import { iconSchema } from "../../../shared/types/common.schema";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { lazy } from "react";
 import { FAVORITES_LIST_ALIAS } from "./constants";
 import type { FavoritesTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 
-const FavoritesListContainer = lazy(() =>
+const FavoritesListContainer = lazyCliWidget(() =>
   import("./widget").then((m) => ({ default: m.FavoritesListContainer })),
 );
 
@@ -55,7 +55,8 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "star" as const,
-  category: "endpointCategories.chatFavorites",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.chatFavorites",
   tags: ["tags.favorites" as const],
 
   aliases: [FAVORITES_LIST_ALIAS],
@@ -162,7 +163,7 @@ const { GET } = createEndpoint({
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
-              schema: z.string().uuid(),
+              schema: z.string(),
             }),
             skillId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

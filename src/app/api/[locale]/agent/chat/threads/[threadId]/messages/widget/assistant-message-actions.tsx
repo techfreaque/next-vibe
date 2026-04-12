@@ -177,10 +177,10 @@ export function AssistantMessageActions({
             size="unset"
             onClick={() => onVote(messageId, userVote === "up" ? 0 : 1)}
             className={cn(
-              "flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-blue-500/10 transition-all",
+              "flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-primary/10 transition-all",
               userVote === "up"
-                ? "text-blue-400"
-                : "text-muted-foreground hover:text-blue-400",
+                ? "text-primary"
+                : "text-muted-foreground hover:text-primary",
             )}
             title={t("widget.common.assistantMessageActions.upvote")}
             disabled={readOnly}
@@ -193,8 +193,8 @@ export function AssistantMessageActions({
             <Span
               className={cn(
                 "text-xs font-medium min-w-5 text-center",
-                voteScore > 0 && "text-blue-400",
-                voteScore < 0 && "text-red-400",
+                voteScore > 0 && "text-primary",
+                voteScore < 0 && "text-destructive",
               )}
             >
               {voteScore > 0 ? `+${voteScore}` : voteScore}
@@ -205,10 +205,10 @@ export function AssistantMessageActions({
             size="unset"
             onClick={() => onVote(messageId, userVote === "down" ? 0 : -1)}
             className={cn(
-              "flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-red-500/10 transition-all",
+              "flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-destructive/10 transition-all",
               userVote === "down"
-                ? "text-red-400"
-                : "text-muted-foreground hover:text-red-400",
+                ? "text-destructive"
+                : "text-muted-foreground hover:text-destructive",
             )}
             title={t("widget.common.assistantMessageActions.downvote")}
             disabled={readOnly}
@@ -258,7 +258,7 @@ export function AssistantMessageActions({
         }
         className={cn(
           isLoading && "text-orange-400 hover:text-orange-300",
-          isPlaying && "text-blue-400 hover:text-blue-300",
+          isPlaying && "text-primary hover:text-primary/80",
         )}
         disabled={readOnly}
       />

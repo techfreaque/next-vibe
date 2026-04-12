@@ -37,6 +37,19 @@ import type { scopedTranslation } from "../i18n";
 import { PROFILE_DEFAULTS, ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";
 
+/** Build Vite `define` entries for all NEXT_PUBLIC_AGENT_* flags.
+ *  Reads from process.env (set by loadEnvironment() before Vite starts). */
+function publicEnvs(): Record<string, string> {
+  const keys = Object.keys(process.env).filter((k) =>
+    k.startsWith("NEXT_PUBLIC_AGENT_"),
+  );
+  const defines: Record<string, string> = {};
+  for (const key of keys) {
+    defines[`process.env.${key}`] = JSON.stringify(process.env[key]);
+  }
+  return defines;
+}
+
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
@@ -944,6 +957,7 @@ export class ViteCompiler {
           process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000",
         ),
         "process.env.NODE_ENV": JSON.stringify("production"),
+        ...publicEnvs(),
       },
       logLevel: verbose ? "info" : "warn",
     };
@@ -959,6 +973,8 @@ export class ViteCompiler {
     /** Public-facing proxy port (e.g. 5000). When set, configures Vite HMR to use this port
      *  so the browser connects to the proxy instead of the internal Vite port directly. */
     publicPort?: number,
+    /** Mutable ref updated on every restart so the caller always holds the current close fn. */
+    closeRef?: { fn: (() => Promise<void>) | undefined },
   ): Promise<{
     success: boolean;
     url?: string;
@@ -1470,6 +1486,45 @@ export class ViteCompiler {
               }
             },
           } as Plugin,
+          // Nitro's ctx._initialized guard prevents re-initialization when Vite
+          // does its built-in server.restart() (triggered by .env changes).
+          // The config() hook sees ctx._initialized=true and skips setupNitroContext,
+          // leaving Nitro with a stale/closed _envRunner - port 3100 never recovers.
+          //
+          // Fix: intercept server.restart() and do a full clean restart instead —
+          // close the current server and spin up a fresh one with new plugin instances
+          // (including a fresh nitro() call with a clean ctx).
+          {
+            name: "nitro-restart-fix",
+            configureServer(srv) {
+              const originalRestart = srv.restart.bind(srv);
+              srv.restart = async (forceOptimize?: boolean): Promise<void> => {
+                // If nitro's env runner is still alive, use Vite's built-in restart.
+                // Only intercept when nitro is already broken (no environments.nitro).
+                // We always intercept here because Vite's restart will always break
+                // Nitro - nitro:init's ctx._initialized guard is unconditional.
+                void forceOptimize; // unused - fresh start always re-optimizes
+                void originalRestart; // kept for reference
+                try {
+                  await srv.close();
+                } catch {
+                  /* ignore close errors */
+                }
+                // Spawn a fresh server: new nitro() call = new ctx = clean _initialized.
+                const result = await viteCompiler.startTanstackDevServer(
+                  fileConfig,
+                  port,
+                  publicPort,
+                  closeRef,
+                );
+                if (!result.success) {
+                  process.stderr.write(
+                    `\n❌ TanStack restart failed: ${result.message ?? "unknown error"}\n`,
+                  );
+                }
+              };
+            },
+          } as Plugin,
         ],
         resolve: {
           tsconfigPaths: true,
@@ -1492,6 +1547,7 @@ export class ViteCompiler {
             process.env["NEXT_PUBLIC_APP_URL"] ??
               `http://localhost:${String(publicPort ?? port ?? 3001)}`,
           ),
+          ...publicEnvs(),
         },
         server: {
           port: port ?? 3001,
@@ -1642,8 +1698,13 @@ export class ViteCompiler {
             "style-to-js",
             "debug",
             "extend",
+            "@tiptap/react",
+            "tiptap-markdown",
+            "markdown-it-task-lists",
+            "fast-equals",
             "use-sync-external-store",
             "use-sync-external-store/shim",
+            "use-sync-external-store/shim/with-selector",
             "lowlight",
             "highlight.js",
             "@babel/runtime/regenerator",
@@ -1702,10 +1763,14 @@ export class ViteCompiler {
       process.stdout.write(`${formatted}\n`);
       devFileLog(formatted);
 
+      const closeFn = (): Promise<void> => server.close();
+      if (closeRef) {
+        closeRef.fn = closeFn;
+      }
       return {
         success: true,
         url,
-        close: (): Promise<void> => server.close(),
+        close: closeFn,
       };
     } catch (error) {
       return { success: false, message: parseError(error).message };

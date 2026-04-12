@@ -6,8 +6,8 @@ import { ExternalLink as ExternalLinkComponent } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { atomOneDark as atomDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { nightOwl as atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
@@ -24,6 +24,8 @@ export type MarkdownProps = {
   content: string;
   messageId?: string;
   hasContentAfter?: boolean;
+  /** When true, this specific message is still streaming. Think tags stay expanded until it becomes false. */
+  isMessageStreaming?: boolean;
   collapseState?: {
     isCollapsed: (
       key: {
@@ -117,6 +119,7 @@ export const Markdown = memo(function Markdown({
   style,
   messageId,
   hasContentAfter = false,
+  isMessageStreaming = false,
   collapseState,
 }: MarkdownProps): JSX.Element {
   const { locale } = useTranslation();
@@ -180,7 +183,10 @@ export const Markdown = memo(function Markdown({
         sectionIndex: index,
       };
       // Determine current state - must match the formula in isThinkingExpanded exactly
-      const autoCollapsed = !isStreaming && (hasContent || hasContentAfter);
+      const activelyStreaming = isStreaming || isMessageStreaming;
+      const autoCollapsed =
+        !activelyStreaming &&
+        (hasContent || hasContentAfter || !isMessageStreaming);
       const currentState = collapseState.isCollapsed(key, autoCollapsed);
       collapseState.toggleCollapse(key, currentState);
     } else {
@@ -206,9 +212,11 @@ export const Markdown = memo(function Markdown({
         sectionType: "thinking" as const,
         sectionIndex: index,
       };
-      // Auto-collapse if there's content in this message OR content after in sequence
-      // Keep expanded while streaming
-      const autoCollapsed = !isStreaming && (hasContent || hasContentAfter);
+      // Auto-collapse if: not actively streaming AND (has content, content after, or thread stream ended)
+      const activelyStreaming = isStreaming || isMessageStreaming;
+      const autoCollapsed =
+        !activelyStreaming &&
+        (hasContent || hasContentAfter || !isMessageStreaming);
       return !collapseState.isCollapsed(key, autoCollapsed);
     }
     // Legacy: use local state
@@ -268,12 +276,12 @@ export const Markdown = memo(function Markdown({
         )),
 
         ul: memo(({ children }: { children: React.ReactNode }) => (
-          <ul className="list-disc list-outside ml-0 pl-6 mb-4 mt-2 space-y-2 text-base marker:text-blue-500 dark:marker:text-blue-400">
+          <ul className="list-disc list-outside ml-0 pl-6 mb-4 mt-2 space-y-2 text-base marker:text-primary dark:marker:text-primary">
             {children}
           </ul>
         )),
         ol: memo(({ children }: { children: React.ReactNode }) => (
-          <ol className="list-decimal list-outside ml-0 pl-6 mb-4 mt-2 space-y-2 text-base marker:text-blue-500 dark:marker:text-blue-400 marker:font-semibold">
+          <ol className="list-decimal list-outside ml-0 pl-6 mb-4 mt-2 space-y-2 text-base marker:text-primary dark:marker:text-primary marker:font-semibold">
             {children}
           </ol>
         )),
@@ -306,7 +314,7 @@ export const Markdown = memo(function Markdown({
                           type="checkbox"
                           checked={props.checked}
                           disabled={props.disabled}
-                          className="mt-1 h-4 w-4 rounded border-2 border-slate-300 dark:border-slate-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 focus:ring-2 cursor-pointer disabled:cursor-not-allowed accent-blue-600 dark:accent-blue-500 transition-colors"
+                          className="mt-1 h-4 w-4 rounded border-2 border-slate-300 dark:border-slate-600 text-primary dark:text-primary focus:ring-primary focus:ring-2 cursor-pointer disabled:cursor-not-allowed accent-primary dark:accent-primary transition-colors"
                           readOnly
                         />
                       );
@@ -365,7 +373,7 @@ export const Markdown = memo(function Markdown({
             // Inline code
             return (
               <code
-                className="bg-slate-100 dark:bg-slate-800/80 text-violet-600 dark:text-violet-400 px-2 py-0.5 rounded-md text-sm font-mono border border-slate-200 dark:border-slate-700/50 font-medium"
+                className="bg-slate-100 dark:bg-slate-800/80 text-primary dark:text-primary px-2 py-0.5 rounded-md text-sm font-mono border border-slate-200 dark:border-slate-700/50 font-medium"
                 {...props}
               >
                 {children}
@@ -380,9 +388,9 @@ export const Markdown = memo(function Markdown({
         }),
 
         blockquote: memo(({ children }: { children: React.ReactNode }) => (
-          <blockquote className="relative border-l-4 border-blue-500 dark:border-blue-400 pl-6 pr-4 py-4 my-4 bg-linear-to-r from-blue-50 via-indigo-50/50 to-transparent dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-transparent rounded-r-xl text-base text-slate-700 dark:text-slate-300 shadow-sm">
+          <blockquote className="relative border-l-4 border-primary dark:border-primary pl-6 pr-4 py-4 my-4 bg-linear-to-r from-blue-50 via-indigo-50/50 to-transparent dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-transparent rounded-r-xl text-base text-slate-700 dark:text-slate-300 shadow-sm">
             <div
-              className="absolute left-2 top-4 text-blue-500/20 dark:text-blue-400/20 text-6xl leading-none font-serif"
+              className="absolute left-2 top-4 text-primary/20 dark:text-primary/20 text-6xl leading-none font-serif"
               aria-hidden="true"
             >
               {DECORATIVE_QUOTE}
@@ -403,7 +411,7 @@ export const Markdown = memo(function Markdown({
               href={href ?? "#"}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 inline-flex items-center gap-1 underline underline-offset-2 decoration-2 hover:decoration-blue-600 dark:hover:decoration-blue-400 transition-all duration-200 font-medium"
+              className="text-primary dark:text-primary hover:text-primary/80 dark:hover:text-primary/80 inline-flex items-center gap-1 underline underline-offset-2 decoration-2 hover:decoration-primary dark:hover:decoration-primary transition-all duration-200 font-medium"
             >
               {children}
               <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" />
@@ -525,9 +533,12 @@ export const Markdown = memo(function Markdown({
 export const CodeBlock = memo(function CodeBlock({
   code,
   language,
+  minimal = false,
 }: {
   code: string;
   language: string;
+  /** Hide the language/copy header and outer card chrome. Use when the parent already provides a titlebar. */
+  minimal?: boolean;
 }): JSX.Element {
   const { locale } = useTranslation();
   const { t } = uiScopedTranslation.scopedT(locale);
@@ -545,36 +556,43 @@ export const CodeBlock = memo(function CodeBlock({
   };
 
   return (
-    <div className="relative my-4 group rounded-xl overflow-hidden shadow-lg border border-slate-800 dark:border-slate-700">
-      {/* Language label */}
-      <div className="flex items-center justify-between bg-slate-900 px-4 py-2 border-b border-slate-700">
-        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-          {language}
-        </span>
-        <button
-          onClick={handleCopy}
-          className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium",
-            "transition-all duration-200",
-            copied
-              ? "bg-green-500/20 text-green-400 border border-green-500/30"
-              : "bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600",
-          )}
-          title={copied ? t("ui.markdown.copied") : t("ui.markdown.copyCode")}
-        >
-          {copied ? (
-            <>
-              <Check className="h-3.5 w-3.5" />
-              {t("ui.markdown.copied")}
-            </>
-          ) : (
-            <>
-              <Copy className="h-3.5 w-3.5" />
-              {t("ui.markdown.copy")}
-            </>
-          )}
-        </button>
-      </div>
+    <div
+      className={
+        minimal
+          ? "overflow-hidden"
+          : "relative my-4 group rounded-xl overflow-hidden shadow-lg border border-slate-800 dark:border-slate-700"
+      }
+    >
+      {!minimal && (
+        <div className="flex items-center justify-between bg-slate-900 px-4 py-2 border-b border-slate-700">
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            {language}
+          </span>
+          <button
+            onClick={handleCopy}
+            className={cn(
+              "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium",
+              "transition-all duration-200",
+              copied
+                ? "bg-success/20 text-success border border-success/30"
+                : "bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600",
+            )}
+            title={copied ? t("ui.markdown.copied") : t("ui.markdown.copyCode")}
+          >
+            {copied ? (
+              <>
+                <Check className="h-3.5 w-3.5" />
+                {t("ui.markdown.copied")}
+              </>
+            ) : (
+              <>
+                <Copy className="h-3.5 w-3.5" />
+                {t("ui.markdown.copy")}
+              </>
+            )}
+          </button>
+        </div>
+      )}
       <SyntaxHighlighter
         language={language}
         style={atomDark}
@@ -587,11 +605,117 @@ export const CodeBlock = memo(function CodeBlock({
           border: "unset",
           borderRadius: "",
         }}
-        showLineNumbers
-        wrapLines
+        showLineNumbers={!minimal}
+        wrapLongLines={false}
       >
         {code}
       </SyntaxHighlighter>
+    </div>
+  );
+});
+
+// Clean code snippet — use on landing pages, docs, anywhere outside chat markdown.
+// variant="bare"  → syntax-highlighted code only, no wrapper chrome
+// variant="card"  → subtle dark card with optional copy button, no fake window
+// variant="file"  → filename tab + copy button, clean border — for multi-file viewers
+export const CodeSnippet = memo(function CodeSnippet({
+  code,
+  language,
+  filename,
+  variant = "card",
+  size = "sm",
+  noCopy = false,
+}: {
+  code: string;
+  language: string;
+  filename?: string;
+  variant?: "bare" | "card" | "file";
+  size?: "sm" | "md";
+  noCopy?: boolean;
+}): JSX.Element {
+  const { locale } = useTranslation();
+  const { t } = uiScopedTranslation.scopedT(locale);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (): Promise<void> => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // ignore
+    }
+  };
+
+  const fontSize = size === "md" ? "0.9rem" : "0.8rem";
+  const padding = variant === "bare" ? "0.75rem 1rem" : "0.9rem 1.25rem";
+
+  const highlighter = (
+    <SyntaxHighlighter
+      language={language}
+      style={atomDark}
+      customStyle={{
+        margin: 0,
+        padding,
+        fontSize,
+        background: "transparent",
+        lineHeight: "1.65",
+        border: "unset",
+        borderRadius: "",
+        // wrapLines adds span wrappers per line which breaks Enter-key formatting
+        // — we never enable it for CodeSnippet
+      }}
+      wrapLongLines={false}
+    >
+      {code}
+    </SyntaxHighlighter>
+  );
+
+  if (variant === "bare") {
+    return <div className="overflow-x-auto font-mono">{highlighter}</div>;
+  }
+
+  const copyBtn = !noCopy && (
+    <button
+      onClick={handleCopy}
+      className={cn(
+        "flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-all duration-150 shrink-0",
+        copied ? "text-emerald-400" : "text-slate-500 hover:text-slate-300",
+      )}
+      title={copied ? t("ui.markdown.copied") : t("ui.markdown.copyCode")}
+    >
+      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+    </button>
+  );
+
+  const showHeader = Boolean(filename) || !noCopy;
+
+  if (variant === "file") {
+    return (
+      <div className="overflow-hidden rounded-xl border border-border/60 bg-slate-950">
+        <div className="flex items-center justify-between border-b border-border/40 bg-slate-900/60 px-4 py-1.5">
+          <span className="font-mono text-[11px] text-slate-400">
+            {filename ?? language}
+          </span>
+          {copyBtn}
+        </div>
+        <div className="overflow-x-auto">{highlighter}</div>
+      </div>
+    );
+  }
+
+  // card
+  return (
+    <div className="overflow-hidden rounded-lg border border-border/40 bg-slate-950">
+      {showHeader && (
+        <div className="flex items-center justify-between border-b border-border/30 px-4 py-1.5">
+          <span className="font-mono text-[11px] text-slate-500">
+            {filename ?? ""}
+          </span>
+          {copyBtn}
+        </div>
+      )}
+      <div className="overflow-x-auto">{highlighter}</div>
     </div>
   );
 });

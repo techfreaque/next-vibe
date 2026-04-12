@@ -39,9 +39,10 @@ import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import characterDefinitions from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
-import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import type {
+  TtsModelId,
+  VoiceModelSelection,
+} from "@/app/api/[locale]/agent/text-to-speech/models";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
@@ -207,8 +208,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
 
   // Settings - pass SSR initialData so no client fetch on hydration
   const { settings } = useChatSettings(user, logger, initialSettingsData);
-  const env = useEnvAvailability();
-  const defaults = ChatSettingsRepositoryClient.getDefaults(user, env);
+  const defaults = ChatSettingsRepositoryClient.getDefaults(user);
   const effectiveSettings = settings ?? defaults;
   const viewMode = effectiveSettings.viewMode;
   const selectedSkill = effectiveSettings.selectedSkill;

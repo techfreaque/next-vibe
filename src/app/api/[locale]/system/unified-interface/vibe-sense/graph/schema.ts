@@ -19,7 +19,7 @@ const persistModeSchema = z.enum(["always", "never", "snapshot"]);
 // ─── Display Fields ──────────────────────────────────────────────────────────
 
 const displayFields = {
-  pane: z.number().int().min(0).max(10).optional(),
+  pane: z.number().int().min(0).max(10).nullable().optional(),
   color: z.string().max(50).optional(),
   visible: z.boolean().optional(),
   scale: z.enum(["left", "right"]).optional(),

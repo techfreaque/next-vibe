@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
       title: "Uruchom agenta AI",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
-        "Uruchom headless agenta AI i otrzymaj finalną odpowiedź tekstową. Ustaw model + prompt dla prostego wywołania, lub przekaż favoriteId aby załadować zapisany preset skill + model + narzędzia. Kredyty w zależności od modelu.",
+        "Deleguje zadanie do wyspecjalizowanego agenta AI i zwraca jego odpowiedź. Do tworzenia lub edycji umiejętności/person AI zawsze deleguj do skill='skill-creator' – nigdy nie próbuj samodzielnie. Podaj skill + prompt; agent zajmie się resztą. Kredyty zależne od modelu.",
       container: {
         title: "Uruchomienie agenta AI",
         description:
@@ -39,7 +39,7 @@ export const translations: typeof enTranslations = {
         skill: {
           label: "Umiejętność",
           description:
-            "ID umiejętności lub 'default'. Definiuje personę AI i prompt systemowy. Opcjonalny gdy ustawiono favoriteId. Nadpisuje umiejętność ulubionego.",
+            "ID umiejętności lub nazwa domyślna. Definiuje personę AI i prompt systemowy. Użyj 'skill-creator' do tworzenia/edycji umiejętności AI. Opcjonalny gdy ustawiono favoriteId.",
           placeholder: "default",
         },
         prompt: {
@@ -138,6 +138,8 @@ export const translations: typeof enTranslations = {
         text: "Tekst odpowiedzi AI (tagi think usunięte). Null jeśli model nie wygenerował wyjścia.",
         promptTokens: "Zużyte tokeny promptu (koszt wejścia)",
         completionTokens: "Wygenerowane tokeny odpowiedzi (koszt wyjścia)",
+        creditCost:
+          "Naliczone kredyty za to uruchomienie. Null dla trybów incognito.",
         threadId:
           "UUID wątku gdzie uruchomienie zostało zapisane. Null jeśli rootFolderId to 'incognito'. Użyj do kontynuacji konwersacji przez appendThreadId.",
         lastAiMessageId:
@@ -652,11 +654,11 @@ export const translations: typeof enTranslations = {
   onboarding: {
     back: "Wstecz",
     welcome: {
-      title: "Pomyśl o nas jak o swoim zespole AI.",
+      title: "Jedno AI do wszystkiego. Właściwe do każdego zadania.",
       line1:
-        "Twój towarzysz obsługuje codzienne rozmowy. Specjaliści wkraczają przy kodowaniu, badaniach, pisaniu - cokolwiek jest potrzebne.",
+        "Towarzysz do codziennych rozmów. Specjaliści do kodowania, badań, pisania - wybierasz jednego, gdy zadanie tego wymaga.",
       line2:
-        "AI przełącza się między nimi automatycznie. Ty po prostu rozmawiasz.",
+        "Ten sam czat. Przełączasz się, kiedy ma to znaczenie. Zajmuje sekundy.",
       line3: "Skonfigurujmy cię w mniej niż minutę.",
       continue: "Zaczynamy",
     },

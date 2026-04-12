@@ -60,6 +60,7 @@ import { IntFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/u
 import { JsonFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/json-field/cli";
 import { LanguageSelectFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/language-select-field/cli";
 import { MarkdownEditorWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/markdown-editor/cli";
+import { MarkdownTextareaFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/markdown-textarea-field/cli";
 import { MultiSelectFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/multiselect-field/cli";
 import { NumberFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/cli";
 import { PasswordFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/cli";
@@ -320,6 +321,10 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
         }
         case FieldDataType.TEXTAREA: {
           const W = TextareaFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.MARKDOWN_TEXTAREA: {
+          const W = MarkdownTextareaFieldWidgetInk as AnyInkWidget;
           return <W fieldName={fieldName} field={field} />;
         }
         case FieldDataType.NUMBER: {

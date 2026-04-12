@@ -11,7 +11,6 @@ import {
 import type { ReactElement } from "react";
 import { z } from "zod";
 
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -219,7 +218,7 @@ export const passwordResetConfirmEmailTemplate: EmailTemplateDefinition<
     const templateProps: PasswordResetConfirmProps = {
       publicName: user.publicName,
       userId: user.id,
-      totalModelCount: getAvailableModelCount(agentEnvAvailability, false),
+      totalModelCount: getAvailableModelCount(false),
     };
 
     return success({

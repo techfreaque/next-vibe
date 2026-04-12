@@ -14,9 +14,9 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "MAPP",
         {
-          mappUsername: data.mappUsername,
-          mappPassword: data.mappPassword,
-          mappDomain: data.mappDomain,
+          mappUsername: data.mappUsername || undefined,
+          mappPassword: data.mappPassword || undefined,
+          mappDomain: data.mappDomain || undefined,
         },
         {
           listId: data.listId ?? null,

@@ -115,7 +115,7 @@ export class ToolResultHandler {
         }
       | undefined;
     /** Stream context - used to detect waitingForRemoteResult for escalated tools */
-    streamContext?: ToolExecutionContext;
+    streamContext: ToolExecutionContext;
     threadId: string;
     model: ChatModelId;
     skill: string;

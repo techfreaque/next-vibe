@@ -1,20 +1,18 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import { AspectRatio } from "next-vibe-ui/ui/aspect-ratio";
+import { Details } from "next-vibe-ui/ui/details";
 import { Div } from "next-vibe-ui/ui/div";
-import { Label } from "next-vibe-ui/ui/label";
-import { NumberInput } from "next-vibe-ui/ui/number-input";
-import { PhoneField } from "next-vibe-ui/ui/phone-field";
-import { ResizableContainer } from "next-vibe-ui/ui/resizable";
-import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
+import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { Section } from "next-vibe-ui/ui/section";
+import { Summary } from "next-vibe-ui/ui/summary";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { Button } from "next-vibe-ui/ui/button";
+
 export function AdvancedPreview(): JSX.Element {
-  const [phoneValue, setPhoneValue] = useState("");
-  const [numberValue, setNumberValue] = useState(0);
+  const [showMotion, setShowMotion] = useState(true);
 
   return (
     <Div className="space-y-8">
@@ -22,73 +20,83 @@ export function AdvancedPreview(): JSX.Element {
         <H2 className="mb-4">Advanced Components</H2>
 
         <Div className="space-y-6">
+          {/* Details / Summary */}
           <Div className="space-y-2">
-            <H3>Resizable Container</H3>
-            <Div className="flex flex-row gap-0 min-h-[200px] rounded-lg border overflow-hidden">
-              <ResizableContainer
-                defaultWidth={300}
-                minWidth={200}
-                maxWidth={600}
-                storageId="design-test-advanced"
-                className="bg-muted"
+            <H3>Details / Summary (Native HTML)</H3>
+            <Div className="space-y-2">
+              <Details className="rounded-md border p-4">
+                <Summary className="cursor-pointer font-medium">
+                  Click to expand details
+                </Summary>
+                <P className="mt-2 text-muted-foreground">
+                  This is the expanded content inside the details element. It
+                  uses the native HTML details/summary pattern.
+                </P>
+              </Details>
+              <Details className="rounded-md border p-4" open>
+                <Summary className="cursor-pointer font-medium">
+                  Open by default
+                </Summary>
+                <P className="mt-2 text-muted-foreground">
+                  This details element starts in an expanded state.
+                </P>
+              </Details>
+            </Div>
+          </Div>
+
+          {/* Motion / Animation */}
+          <Div className="space-y-2">
+            <H3>Motion / Animation</H3>
+            <Div className="space-y-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowMotion(!showMotion)}
               >
-                <Div className="flex h-full items-center justify-center p-6">
-                  <P>Resizable Panel (drag edge →)</P>
-                </Div>
-              </ResizableContainer>
-              <Div className="flex-1 flex items-center justify-center p-6 bg-background">
-                <P>Main Content (auto-flexes)</P>
+                {showMotion ? "Hide" : "Show"} animated element
+              </Button>
+              <AnimatePresence>
+                {showMotion && (
+                  <MotionDiv
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="rounded-md border bg-muted p-6"
+                  >
+                    <P>This element animates in and out with framer-motion.</P>
+                  </MotionDiv>
+                )}
+              </AnimatePresence>
+
+              <Div className="grid gap-4 md:grid-cols-3">
+                <MotionDiv
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="rounded-md border bg-card p-4 cursor-pointer"
+                >
+                  <P className="text-center">Scale entrance</P>
+                </MotionDiv>
+                <MotionDiv
+                  animate={{ rotate: 5 }}
+                  transition={{
+                    duration: 2,
+                    repeat: Number.POSITIVE_INFINITY,
+                    repeatType: "reverse",
+                  }}
+                  className="rounded-md border bg-card p-4"
+                >
+                  <P className="text-center">Continuous wobble</P>
+                </MotionDiv>
+                <MotionDiv
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1, delay: 0.5 }}
+                  className="rounded-md border bg-card p-4"
+                >
+                  <P className="text-center">Delayed fade in</P>
+                </MotionDiv>
               </Div>
-            </Div>
-          </Div>
-
-          <Div className="space-y-2">
-            <H3>Scroll Area</H3>
-            <ScrollArea className="h-[200px] w-full rounded-md border p-4">
-              <Div className="space-y-4">
-                {
-                  // oxlint-disable-next-line no-unused-vars
-                  Array.from({ length: 20 }, (item, i) => {
-                    return (
-                      <P key={i}>
-                        Scrollable content item {i + 1}. This is a long piece of
-                        text to demonstrate scrolling behavior.
-                      </P>
-                    );
-                  })
-                }
-              </Div>
-            </ScrollArea>
-          </Div>
-
-          <Div className="space-y-2">
-            <H3>Aspect Ratio</H3>
-            <Div className="w-full max-w-md">
-              <AspectRatio ratio={16 / 9}>
-                <Div className="flex h-full w-full items-center justify-center rounded-md bg-muted">
-                  <P>16:9 Aspect Ratio</P>
-                </Div>
-              </AspectRatio>
-            </Div>
-          </Div>
-
-          <Div className="space-y-2">
-            <H3>Number Input</H3>
-            <Div className="max-w-md space-y-2">
-              <Label>Enter a number</Label>
-              <NumberInput value={numberValue} onChange={setNumberValue} />
-            </Div>
-          </Div>
-
-          <Div className="space-y-2">
-            <H3>Phone Field</H3>
-            <Div className="max-w-md space-y-2">
-              <Label>Phone number</Label>
-              <PhoneField
-                value={phoneValue}
-                onChange={setPhoneValue}
-                placeholder="Enter phone number"
-              />
             </Div>
           </Div>
         </Div>

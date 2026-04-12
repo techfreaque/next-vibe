@@ -139,7 +139,7 @@ export function LeadEngagementTrackingContainer({
         <Div className="rounded-lg border bg-card p-6 flex flex-col gap-5">
           {/* Status banner */}
           <Div className="flex items-center gap-3">
-            <CheckCircle className="h-8 w-8 text-green-500 flex-shrink-0" />
+            <CheckCircle className="h-8 w-8 text-success flex-shrink-0" />
             <Div>
               <Span className="font-semibold block">
                 {t("widget.post.successTitle")}
@@ -375,7 +375,7 @@ export function LeadClickTrackingContainer({
           <Div className="flex items-center gap-3">
             {data?.success ? (
               <>
-                <CheckCircle className="h-8 w-8 text-green-500 flex-shrink-0" />
+                <CheckCircle className="h-8 w-8 text-success flex-shrink-0" />
                 <Div>
                   <Span className="font-semibold block">
                     {t("widget.get.successTitle")}
@@ -387,7 +387,7 @@ export function LeadClickTrackingContainer({
               </>
             ) : (
               <>
-                <XCircle className="h-8 w-8 text-red-500 flex-shrink-0" />
+                <XCircle className="h-8 w-8 text-destructive flex-shrink-0" />
                 <Div>
                   <Span className="font-semibold block">
                     {t("widget.get.failTitle")}
@@ -410,7 +410,7 @@ export function LeadClickTrackingContainer({
                 className={cn(
                   "text-sm font-semibold",
                   data?.engagementRecorded
-                    ? "text-green-600 dark:text-green-400"
+                    ? "text-success"
                     : "text-muted-foreground",
                 )}
               >
@@ -427,7 +427,7 @@ export function LeadClickTrackingContainer({
                 className={cn(
                   "text-sm font-semibold",
                   data?.leadStatusUpdated
-                    ? "text-blue-600 dark:text-blue-400"
+                    ? "text-info"
                     : "text-muted-foreground",
                 )}
               >

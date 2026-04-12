@@ -1,8 +1,9 @@
 "use client";
 /* eslint-disable react-compiler/react-compiler -- Complex mount-only effect requires intentional dependency exclusion */
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Div } from "next-vibe-ui/ui/div";
 import { H3, P } from "next-vibe-ui/ui/typography";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { EventData } from "react-joyride";
 import { ACTIONS, EVENTS, Joyride, STATUS } from "react-joyride";
 
@@ -61,6 +62,7 @@ export function WelcomeTour({
 
   // Tour state management
   const setTourActive = useTourState((state) => state.setTourActive);
+  const modelSelectorOpen = useTourState((state) => state.modelSelectorOpen);
   const setModelSelectorOpen = useTourState(
     (state) => state.setModelSelectorOpen,
   );
@@ -221,6 +223,19 @@ export function WelcomeTour({
     };
   }, [run, setAdvanceTour, goToNextStep]);
 
+  // If user manually opens the selector while on the model selector tour step, treat it the same as clicking Next
+  useEffect(() => {
+    if (
+      modelSelectorOpen &&
+      run &&
+      stepIndex === MODEL_SELECTOR_STEP_INDEX &&
+      !waitingForSelectorRef.current
+    ) {
+      waitingForSelectorRef.current = true;
+      setRun(false);
+    }
+  }, [modelSelectorOpen, run, stepIndex]);
+
   // Resume tour after onboarding completes inside the selector
   useEffect(() => {
     if (onboardingComplete && waitingForSelectorRef.current) {
@@ -232,10 +247,17 @@ export function WelcomeTour({
         const companionStep: TourStepConfig = {
           target: getTourSelector(TOUR_DATA_ATTRS.FAVORITES_COMPANION_GROUP),
           content: (
-            <React.Fragment>
-              <H3>{t("components.welcomeTour.meetCompanion.title")}</H3>
-              <P>{t("components.welcomeTour.meetCompanion.description")}</P>
-            </React.Fragment>
+            <Div className="space-y-2">
+              <H3 className="text-lg font-semibold">
+                {t("components.welcomeTour.meetCompanion.title")}
+              </H3>
+              <P className="text-sm">
+                {t("components.welcomeTour.meetCompanion.description")}
+              </P>
+              <P className="text-xs text-muted-foreground">
+                {t("components.welcomeTour.meetCompanion.tip")}
+              </P>
+            </Div>
           ),
           placement: TOUR_PLACEMENTS.BOTTOM,
           skipBeacon: true,
@@ -364,6 +386,27 @@ export function WelcomeTour({
           }
           if (needsBottomSheetExpanded(target)) {
             setBottomSheetExpanded(true);
+            // Pause and wait for element to appear after bottom sheet expands
+            setRun(false);
+            setTimeout(() => setRun(true), 500);
+            return;
+          }
+          // New chat button or chat input missing - navigate to the right folder and wait for DOM
+          if (
+            target === getTourSelector(TOUR_DATA_ATTRS.NEW_CHAT_BUTTON) ||
+            target === getTourSelector(TOUR_DATA_ATTRS.CHAT_INPUT) ||
+            target === getTourSelector(TOUR_DATA_ATTRS.SPEECH_INPUT) ||
+            target === getTourSelector(TOUR_DATA_ATTRS.CALL_MODE_BUTTON)
+          ) {
+            setRun(false);
+            navigateForTarget(target);
+            setTimeout(() => setRun(true), 600);
+            return;
+          }
+          // For any other missing sidebar target, pause briefly then retry
+          if (isSidebarTarget(target)) {
+            setRun(false);
+            setTimeout(() => setRun(true), 400);
           }
         }
         return;

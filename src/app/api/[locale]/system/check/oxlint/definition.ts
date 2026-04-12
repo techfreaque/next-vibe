@@ -35,7 +35,8 @@ const { POST } = createEndpoint({
   path: ["system", "check", "oxlint"],
   title: "title",
   description: "description",
-  category: "endpointCategories.systemDevTools",
+  category: "endpointCategories.devTools",
+  subCategory: "endpointCategories.devToolsCheck",
   tags: ["tag"],
   icon: "shield",
   allowedRoles: [

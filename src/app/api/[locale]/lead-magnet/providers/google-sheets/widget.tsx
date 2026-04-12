@@ -144,8 +144,8 @@ export function GoogleSheetsWidget(): JSX.Element {
   if (!isConnected) {
     return (
       <Div className="flex flex-col items-center gap-6 px-4 py-10 text-center">
-        <Div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-          <Table className="h-8 w-8 text-green-600" />
+        <Div className="flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
+          <Table className="h-8 w-8 text-success" />
         </Div>
         <Div className="flex flex-col gap-2">
           <Span className="text-lg font-semibold">
@@ -169,9 +169,9 @@ export function GoogleSheetsWidget(): JSX.Element {
   return (
     <Div className="flex flex-col gap-6 p-4">
       {/* Connected badge */}
-      <Div className="flex items-center gap-3 rounded-lg border bg-green-50 px-4 py-3">
-        <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
-        <Span className="text-sm font-medium text-green-800">
+      <Div className="flex items-center gap-3 rounded-lg border border-success/30 bg-success/10 px-4 py-3">
+        <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
+        <Span className="text-sm font-medium text-success-foreground">
           {t("providers.googleSheets.connected.description")}
         </Span>
         <Button

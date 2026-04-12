@@ -9,5 +9,8 @@ export const skillFragment: SystemPromptFragment<SkillData> = {
   placement: "leading",
   priority: 600,
   condition: (data) => !!data.skillPrompt?.trim(),
-  build: (data) => `## Your Role\n\n${data.skillPrompt.trim()}`,
+  build: (data) =>
+    data.skillPrompt?.trim()
+      ? `## Your Role\n\n${data.skillPrompt.trim()}`
+      : null,
 };

@@ -73,7 +73,7 @@ export function AdminAddCreditsContainer({
         <FormAlertWidget field={{}} />
 
         {field.value?.message && (
-          <Div className="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 px-4 py-3 text-sm text-green-700 dark:text-green-300">
+          <Div className="rounded-lg bg-success/10 border border-success/30 px-4 py-3 text-sm text-success-foreground">
             {field.value.message}
           </Div>
         )}

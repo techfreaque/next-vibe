@@ -19,6 +19,10 @@ import { H3, P } from "next-vibe-ui/ui/typography";
 import { success } from "next-vibe/shared/types/response.schema";
 import { useCallback, useState, type JSX } from "react";
 
+import {
+  getBestChatModel,
+  type ChatModelSelection,
+} from "@/app/api/[locale]/agent/ai-stream/models";
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import { useFavoriteCreate } from "@/app/api/[locale]/agent/chat/favorites/create/hooks";
@@ -31,11 +35,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/skills/config";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
-import {
-  getBestChatModel,
-  type ChatModelSelection,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
@@ -45,8 +45,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { ChatModelId } from "../../../../models";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "../../../../constants";
+import { ChatModelId } from "../../../../models";
 
 export type UseCase =
   | "coding"
@@ -243,16 +243,14 @@ export function UsecasesStep({
   const logger = useWidgetLogger();
   const { settings, setActiveFavorite } = useChatSettings(user, logger);
   const { addFavorite } = useFavoriteCreate(user, logger);
-  const envAvailability = useEnvAvailability();
-
   const noProviderAvailable =
-    !envAvailability.claudeCode &&
-    !envAvailability.openRouter &&
-    !envAvailability.unbottled &&
-    !envAvailability.uncensoredAI &&
-    !envAvailability.freedomGPT &&
-    !envAvailability.gabAI &&
-    !envAvailability.veniceAI;
+    !agentEnvAvailability.claudeCode &&
+    !agentEnvAvailability.openRouter &&
+    !agentEnvAvailability.unbottled &&
+    !agentEnvAvailability.uncensoredAI &&
+    !agentEnvAvailability.freedomGPT &&
+    !agentEnvAvailability.gabAI &&
+    !agentEnvAvailability.veniceAI;
   const userRoles = user.roles;
 
   const toggleUseCase = useCallback((id: UseCase) => {
@@ -299,7 +297,6 @@ export function UsecasesStep({
           skillVoiceSel,
           locale,
           user,
-          envAvailability,
         );
       });
       apiClient.updateEndpointData(
@@ -320,7 +317,7 @@ export function UsecasesStep({
         },
       );
     },
-    [logger, locale, user, envAvailability],
+    [logger, locale, user],
   );
 
   const handleStart = useCallback(async () => {
@@ -342,17 +339,9 @@ export function UsecasesStep({
             sel?.selectionType === ModelSelectionType.MANUAL
               ? sel.manualModelId
               : sel
-                ? (getBestChatModel(sel, user, envAvailability)?.id ??
-                  getBestChatModel(
-                    DEFAULT_CHAT_MODEL_SELECTION,
-                    user,
-                    envAvailability,
-                  )?.id)
-                : getBestChatModel(
-                    DEFAULT_CHAT_MODEL_SELECTION,
-                    user,
-                    envAvailability,
-                  )?.id;
+                ? (getBestChatModel(sel, user)?.id ??
+                  getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user)?.id)
+                : getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user)?.id;
           const activeModelId: ChatModelId =
             (resolvedAnyId !== undefined
               ? Object.values(ChatModelId).find((id) => id === resolvedAnyId)
@@ -398,7 +387,6 @@ export function UsecasesStep({
     onDone,
     userRoles,
     logger,
-    envAvailability,
     user,
   ]);
 

@@ -5,7 +5,7 @@
  * Lightweight context for server-origin props that don't change after mount.
  * Replaces the old ChatProvider/ChatContext which aggregated everything.
  *
- * This context provides: user, logger, initialCredits, envAvailability, rootFolderPermissions.
+ * This context provides: user, logger, initialCredits, rootFolderPermissions.
  * All other chat state lives in scoped Zustand stores and hooks.
  */
 

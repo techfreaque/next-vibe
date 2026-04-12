@@ -44,6 +44,9 @@ export const translations: typeof enTranslations = {
     addAnother: "Weitere hinzufügen",
     addAnotherTooltip:
       "Eine weitere Instanz dieses Charakters zu deiner Sammlung hinzufügen",
+    variants: {
+      title: "Varianten",
+    },
     addToCollection: "Zu deiner Sammlung hinzufügen:",
     quickAdd: "Schnell hinzufügen",
     tweakAndAdd: "Anpassen & hinzufügen",
@@ -112,8 +115,6 @@ export const translations: typeof enTranslations = {
         maxPrice: { content: "Maximalpreis" },
         minContent: { content: "Minimale Inhaltsstufe" },
         maxContent: { content: "Maximale Inhaltsstufe" },
-        minSpeed: { content: "Minimale Geschwindigkeit" },
-        maxSpeed: { content: "Maximale Geschwindigkeit" },
         preferredStrengths: { content: "Bevorzugte Stärken" },
         ignoredWeaknesses: { content: "Ignorierte Schwächen" },
         manualModelId: { content: "Manuelles Modell" },
@@ -180,6 +181,40 @@ export const translations: typeof enTranslations = {
       copied: "Kopiert!",
       copyLink: "Link kopieren",
       close: "Schliessen",
+      authRequired:
+        "Erstelle ein kostenloses Konto, um deinen Empfehlungslink zu erhalten und loszuverdienen.",
+      signup: "Kostenlos registrieren",
+      login: "Schon ein Konto? Einloggen",
+    },
+    leadCapture: {
+      fallbackHeadline: "Bleib auf dem Laufenden",
+      namePlaceholder: "Dein Vorname",
+      emailPlaceholder: "Deine E-Mail",
+      fallbackButton: "Abonnieren",
+      sending: "...",
+      doneHeading: "Fertig.",
+      doneSub: "Du bist auf der Liste.",
+      error: "Etwas ist schiefgelaufen. Versuch es nochmal.",
+      finePrint: "Kein Spam. Jederzeit abmeldbar.",
+    },
+    landing: {
+      backToHome: "Startseite",
+      signIn: "Anmelden",
+      joinFree: "Kostenlos registrieren",
+      viewProfile: "Vollstaendiges Profil ansehen",
+      capabilities: "Faehigkeiten",
+      tools: "{{count}} Tools",
+      moreFromCreator: "Mehr von {{name}}",
+      tryCta: "{{name}} jetzt ausprobieren",
+      tryCtaSub:
+        "Kostenloses Konto. Keine Kreditkarte. In 30 Sekunden startklar.",
+      startFree: "Kostenlos starten",
+      alreadyHaveAccount: "Schon ein Konto?",
+      copyright: "\u00a9",
+      allSkills: "Alle Skills",
+      featuredSkill: "Vorgestellter Skill",
+      aboutSkill: "Ueber diesen Skill",
+      modelsVariants: "Modelle & Varianten",
     },
   },
   patch: {
@@ -318,6 +353,11 @@ export const translations: typeof enTranslations = {
     modelSelection: {
       label: "Modellauswahl",
       description: "Wie das KI-Modell für diesen Charakter ausgewählt wird",
+    },
+    variants: {
+      label: "Varianten",
+      description:
+        "Benannte Varianten mit eigener Modellauswahl. Jede Variante braucht: id, modelSelection (Pflicht), isDefault (genau eine true).",
     },
     preferredModel: {
       label: "Bevorzugtes Modell",

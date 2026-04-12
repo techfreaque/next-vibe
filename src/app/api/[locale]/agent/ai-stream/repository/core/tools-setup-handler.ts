@@ -9,7 +9,6 @@ import {
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { WAIT_FOR_TASK_ALIAS } from "../../../../system/unified-interface/tasks/wait-for-task/constants";
 import type { ToolExecutionContext } from "../../../chat/config";
 import { getDefaultToolIdsForUser } from "../../../chat/constants";
 import type { ToolCall } from "../../../chat/db";
@@ -142,13 +141,7 @@ export class ToolsSetupHandler {
       }
     }
 
-    const waitForTaskFullPath =
-      getFullPath(WAIT_FOR_TASK_ALIAS) ?? WAIT_FOR_TASK_ALIAS;
-    const visibleToolIds =
-      visibleToolIdsFromClient.includes(waitForTaskFullPath) ||
-      visibleToolIdsFromClient.includes(WAIT_FOR_TASK_ALIAS)
-        ? visibleToolIdsFromClient
-        : [...visibleToolIdsFromClient, waitForTaskFullPath];
+    const visibleToolIds = visibleToolIdsFromClient;
 
     const toolsResult = await loadTools({
       requestedTools: visibleToolIds,

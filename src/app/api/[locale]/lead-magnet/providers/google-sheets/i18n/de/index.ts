@@ -1,7 +1,7 @@
 export const translations = {
   title: "Google Sheets",
   description:
-    "Jeden neuen Lead automatisch als Zeile in dein Google Sheet eintragen. Google-Konto verbinden — keine API-Schlüssel nötig.",
+    "Jeden neuen Lead automatisch als Zeile in dein Google Sheet eintragen. Google-Konto verbinden - keine API-Schlüssel nötig.",
   connect: {
     label: "Google-Konto verbinden",
     description:

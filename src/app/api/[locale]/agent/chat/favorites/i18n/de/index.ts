@@ -49,18 +49,11 @@ export const translations: typeof enTranslations = {
       open: "Offen",
       uncensored: "Unzensiert",
     },
-    speed: {
-      any: "Beliebig",
-      fast: "Schnell",
-      balanced: "Ausgewogen",
-      thorough: "Gründlich",
-    },
   },
   modelSelection: {
     sort: {
       intelligence: "Nach Intelligenzstufe sortieren",
       price: "Nach Preis sortieren",
-      speed: "Nach Antwortgeschwindigkeit sortieren",
       content: "Nach Inhaltsrichtlinien sortieren",
     },
     sortDirection: {
@@ -69,7 +62,6 @@ export const translations: typeof enTranslations = {
     },
     sortField: {
       intelligence: "Intelligenz",
-      speed: "Geschwindigkeit",
       price: "Preis",
       content: "Inhalt",
     },
@@ -173,12 +165,6 @@ export const translations: typeof enTranslations = {
         },
         maxContent: {
           content: "Max. Inhaltsstufe: {{value}}",
-        },
-        minSpeed: {
-          content: "Min. Geschwindigkeit: {{value}}",
-        },
-        maxSpeed: {
-          content: "Max. Geschwindigkeit: {{value}}",
         },
         content: {
           content: "Inhaltsstufe: {{value}}",
@@ -339,12 +325,6 @@ export const translations: typeof enTranslations = {
       minLabel: "Min. Inhalt",
       maxLabel: "Max. Inhalt",
     },
-    speedRange: {
-      label: "Geschwindigkeitsbereich",
-      description: "Antwortgeschwindigkeit-Stufenbereich",
-      minLabel: "Min. Geschwindigkeit",
-      maxLabel: "Max. Geschwindigkeit",
-    },
     minPrice: {
       label: "Mindestpreis",
       description: "Minimale Kreditkosten pro Nachricht",
@@ -360,16 +340,6 @@ export const translations: typeof enTranslations = {
     maxContent: {
       label: "Maximale Inhaltsstufe",
       description: "Maximale Inhaltsmoderationsebene für das Modell",
-    },
-    minSpeed: {
-      label: "Minimale Geschwindigkeit",
-      description:
-        "Minimale Geschwindigkeitsstufe, die für das Modell erforderlich ist",
-    },
-    maxSpeed: {
-      label: "Maximale Geschwindigkeit",
-      description:
-        "Maximale Geschwindigkeitsstufe, die für das Modell zulässig ist",
     },
     content: {
       label: "Inhaltsstufe",

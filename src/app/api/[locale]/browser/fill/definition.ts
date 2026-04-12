@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   title: "fill.title",
   description: "fill.description",
   category: "endpointCategories.browser",
+  subCategory: "endpointCategories.browserInteraction",
   icon: "edit",
   tags: ["fill.tags.browserAutomation", "fill.tags.inputAutomation"],
 

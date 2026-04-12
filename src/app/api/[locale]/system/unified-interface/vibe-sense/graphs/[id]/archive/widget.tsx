@@ -77,7 +77,7 @@ export function ArchiveWidget({ field }: CustomWidgetProps): React.JSX.Element {
         <Card className="border-green-300 dark:border-green-700">
           <CardContent className="pt-4">
             <Div className="flex items-center gap-3">
-              <Check className="h-5 w-5 text-green-600 shrink-0" />
+              <Check className="h-5 w-5 text-success shrink-0" />
               <Div className="flex-1">
                 <P className="text-sm font-medium">{t("post.success.title")}</P>
                 <Div className="flex items-center gap-2 mt-1">

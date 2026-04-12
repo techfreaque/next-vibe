@@ -101,7 +101,6 @@ function renderDetailCli(items: ModelListItem[]): string {
     );
     lines.push(
       `  ${chalk.dim("Intel:")} ${intelligenceLabel(item.intelligence)}  ` +
-        `${chalk.dim("Speed:")} ${item.speed}  ` +
         `${chalk.dim("Content:")} ${contentLabel(item.content)}`,
     );
     if (item.contextWindow) {
@@ -131,7 +130,7 @@ function renderDetailMcp(items: ModelListItem[]): string {
     lines.push(`${item.name} (${item.provider}) - ${item.type}`);
     lines.push(`  ID: ${item.id}`);
     lines.push(
-      `  Intelligence: ${item.intelligence} | Speed: ${item.speed} | Content: ${item.content}`,
+      `  Intelligence: ${item.intelligence} | Content: ${item.content}`,
     );
     lines.push(
       `  Price: ${item.price === 0 ? "free" : `${String(item.price)} credits`}`,
@@ -248,7 +247,7 @@ export function ModelsListCliWidget({ field }: CliWidgetProps): JSX.Element {
 
   return (
     <Box flexDirection="column">
-      <Text wrap="end">{output}</Text>
+      <Text wrap="truncate-end">{output}</Text>
     </Box>
   );
 }

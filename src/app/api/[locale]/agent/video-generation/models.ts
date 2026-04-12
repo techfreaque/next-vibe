@@ -5,23 +5,23 @@ import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
-  SpeedLevel,
 } from "../chat/skills/enum";
-import {
-  filtersSelectionSchema,
-  sharedFilterPropsSchema,
-} from "../models/selection";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
+  buildModelOptionsIndex,
   defaultFeatures,
   filterRoleModels,
+  getModelForProvider,
   getProviderPrice,
   type ModelDefinition,
   type ModelOptionVideoBased,
   type ModelProviderConfigVideoBased,
-  type ModelProviderEnvAvailability,
 } from "../models/models";
+import {
+  filtersSelectionSchema,
+  sharedFilterPropsSchema,
+} from "../models/selection";
 
 export enum VideoGenModelId {
   WAN_2_7_T2V = "wan-2-7-t2v",
@@ -93,7 +93,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -139,7 +138,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -185,7 +183,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -223,7 +220,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -259,7 +255,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -303,7 +298,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -347,7 +341,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -389,7 +382,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -433,7 +425,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -475,7 +466,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -517,7 +507,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -561,7 +550,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -605,7 +593,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -649,7 +636,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -685,7 +671,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -727,7 +712,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -769,7 +753,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -813,7 +796,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -857,7 +839,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -913,7 +894,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -949,7 +929,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -993,7 +972,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -1037,7 +1015,6 @@ export const videoGenModelDefinitions: Record<
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -1050,12 +1027,53 @@ export type VideoGenModelOption = ModelOptionVideoBased & {
   id: VideoGenModelId;
 };
 
-function buildVideoGenModelOptions(): Record<
-  VideoGenModelId,
-  VideoGenModelOption
-> {
-  const result = {} as Record<VideoGenModelId, VideoGenModelOption>;
+function buildVideoGenOption(
+  modelId: VideoGenModelId,
+  def: ModelDefinition,
+  provider: ModelProviderConfigVideoBased,
+): VideoGenModelOption {
+  const p = provider satisfies ModelProviderConfigVideoBased;
+  return {
+    id: modelId,
+    name: def.name,
+    provider: def.by,
+    apiProvider: provider.apiProvider,
+    description: def.description,
+    parameterCount: def.parameterCount,
+    contextWindow: def.contextWindow,
+    icon: def.icon,
+    providerModel: provider.providerModel,
+    utilities: def.utilities,
+    supportsTools: def.supportsTools,
+    intelligence: def.intelligence,
+    content: def.content,
+    features: def.features,
+    weaknesses: def.weaknesses,
+    adminOnly: provider.adminOnly,
+    inputs: def.inputs,
+    outputs: def.outputs,
+    voiceMeta: def.voiceMeta,
+    creditCostPerSecond: p.creditCostPerSecond,
+    defaultDurationSeconds: p.defaultDurationSeconds,
+    supportedDurations: p.supportedDurations,
+    maxDurationSeconds: p.maxDurationSeconds,
+    minDurationSeconds: p.minDurationSeconds,
+    supportedResolutions: p.supportedResolutions,
+    supportedAspectRatios: p.supportedAspectRatios,
+    pricingByResolution: p.pricingByResolution,
+  };
+}
 
+// ============================================================
+// VIDEO GEN MODEL RESOLUTION
+// ============================================================
+
+/**
+ * All (model, provider) combinations sorted cheapest-first.
+ * Used by filterVideoGenModels for env-aware provider selection.
+ */
+function buildVideoGenModelOptionsPool(): VideoGenModelOption[] {
+  const pool: VideoGenModelOption[] = [];
   for (const modelId of Object.values(VideoGenModelId)) {
     const def = videoGenModelDefinitions[modelId];
     const sortedProviders = [...def.providers].toSorted(
@@ -1066,51 +1084,31 @@ function buildVideoGenModelOptions(): Record<
         provider.creditCostPerSecond !== undefined &&
         provider.defaultDurationSeconds !== undefined
       ) {
-        const p = provider satisfies ModelProviderConfigVideoBased;
-        result[modelId] = {
-          id: modelId,
-          name: def.name,
-          provider: def.by,
-          apiProvider: provider.apiProvider,
-          description: def.description,
-          parameterCount: def.parameterCount,
-          contextWindow: def.contextWindow,
-          icon: def.icon,
-          providerModel: provider.providerModel,
-          utilities: def.utilities,
-          supportsTools: def.supportsTools,
-          intelligence: def.intelligence,
-          speed: def.speed,
-          content: def.content,
-          features: def.features,
-          weaknesses: def.weaknesses,
-          adminOnly: provider.adminOnly,
-          inputs: def.inputs,
-          outputs: def.outputs,
-          voiceMeta: def.voiceMeta,
-          creditCostPerSecond: p.creditCostPerSecond,
-          defaultDurationSeconds: p.defaultDurationSeconds,
-          supportedDurations: p.supportedDurations,
-          maxDurationSeconds: p.maxDurationSeconds,
-          minDurationSeconds: p.minDurationSeconds,
-          supportedResolutions: p.supportedResolutions,
-          supportedAspectRatios: p.supportedAspectRatios,
-          pricingByResolution: p.pricingByResolution,
-        };
-        break; // use cheapest provider only
+        pool.push(
+          buildVideoGenOption(
+            modelId,
+            def,
+            provider satisfies ModelProviderConfigVideoBased,
+          ),
+        );
       }
     }
   }
-
-  return result;
+  return pool;
 }
 
-const videoGenModelOptionsIndex: Record<VideoGenModelId, VideoGenModelOption> =
-  buildVideoGenModelOptions();
+const videoGenModelOptionsPool: VideoGenModelOption[] =
+  buildVideoGenModelOptionsPool();
+
+const videoGenModelOptionsIndex: Partial<
+  Record<VideoGenModelId, VideoGenModelOption>
+> = buildModelOptionsIndex(videoGenModelOptionsPool) as Partial<
+  Record<VideoGenModelId, VideoGenModelOption>
+>;
 
 export const videoGenModelOptions: VideoGenModelOption[] = Object.values(
   videoGenModelOptionsIndex,
-);
+).filter((m): m is VideoGenModelOption => m !== undefined);
 
 export const VideoGenModelIdOptions = videoGenModelOptions.map((m) => ({
   value: m.id,
@@ -1125,62 +1123,19 @@ export function getVideoGenModelById(
 
 /**
  * Resolve a video gen model option using a specific API provider.
- * Picks the cheapest provider variant for `modelId` that matches `provider`.
+ * Picks the cheapest provider variant for `modelId` that matches `provider` from the pool.
  * Falls back to the default (cheapest overall) if no matching provider exists.
  */
 export function getVideoGenModelForProvider(
   modelId: VideoGenModelId,
   provider: ApiProvider,
 ): VideoGenModelOption | undefined {
-  const def = videoGenModelDefinitions[modelId];
-  if (!def) {
-    return undefined;
-  }
-  const matching = [...def.providers]
-    .filter((p) => p.apiProvider === provider)
-    .toSorted((a, b) => getProviderPrice(a) - getProviderPrice(b));
-
-  for (const p of matching) {
-    if (
-      p.creditCostPerSecond !== undefined &&
-      p.defaultDurationSeconds !== undefined
-    ) {
-      const typed = p satisfies ModelProviderConfigVideoBased;
-      return {
-        id: modelId,
-        name: def.name,
-        provider: def.by,
-        apiProvider: p.apiProvider,
-        description: def.description,
-        parameterCount: def.parameterCount,
-        contextWindow: def.contextWindow,
-        icon: def.icon,
-        providerModel: p.providerModel,
-        utilities: def.utilities,
-        supportsTools: def.supportsTools,
-        intelligence: def.intelligence,
-        speed: def.speed,
-        content: def.content,
-        features: def.features,
-        weaknesses: def.weaknesses,
-        adminOnly: p.adminOnly,
-        inputs: def.inputs,
-        outputs: def.outputs,
-        voiceMeta: def.voiceMeta,
-        creditCostPerSecond: typed.creditCostPerSecond,
-        defaultDurationSeconds: typed.defaultDurationSeconds,
-        supportedDurations: typed.supportedDurations,
-        maxDurationSeconds: typed.maxDurationSeconds,
-        minDurationSeconds: typed.minDurationSeconds,
-        supportedResolutions: typed.supportedResolutions,
-        supportedAspectRatios: typed.supportedAspectRatios,
-        pricingByResolution: typed.pricingByResolution,
-      };
-    }
-  }
-
-  // No matching provider - fall back to default
-  return getVideoGenModelById(modelId);
+  return getModelForProvider(
+    modelId,
+    provider,
+    videoGenModelOptionsPool,
+    getVideoGenModelById(modelId),
+  );
 }
 
 // ============================================================
@@ -1203,22 +1158,16 @@ export type VideoGenModelSelection = z.infer<
   typeof videoGenModelSelectionSchema
 >;
 
-// ============================================================
-// VIDEO GEN MODEL RESOLUTION
-// ============================================================
-
 export function filterVideoGenModels(
   selection: VideoGenModelSelection | null | undefined,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): VideoGenModelOption[] {
-  return filterRoleModels(videoGenModelOptions, selection, user, env);
+  return filterRoleModels(videoGenModelOptionsPool, selection, user);
 }
 
 export function getBestVideoGenModel(
   selection: VideoGenModelSelection,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): VideoGenModelOption | null {
-  return filterVideoGenModels(selection, user, env)[0] ?? null;
+  return filterVideoGenModels(selection, user)[0] ?? null;
 }

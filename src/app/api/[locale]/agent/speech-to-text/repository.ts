@@ -73,7 +73,7 @@ export class SpeechToTextRepository {
           manualModelId: sttModelId,
         } as SttModelSelection)
       : DEFAULT_STT_MODEL_SELECTION;
-    const modelOption = getBestSttModel(selection, user, agentEnvAvailability);
+    const modelOption = getBestSttModel(selection, user);
 
     if (!modelOption) {
       logger.error("[STT] No STT provider available", {

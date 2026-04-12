@@ -41,10 +41,10 @@ type StatVariant =
 
 const variantClasses: Record<StatVariant, string> = {
   default: "text-foreground",
-  success: "text-green-600 dark:text-green-400",
-  warning: "text-yellow-600 dark:text-yellow-400",
-  danger: "text-red-600 dark:text-red-400",
-  info: "text-blue-600 dark:text-blue-400",
+  success: "text-success",
+  warning: "text-warning",
+  danger: "text-destructive",
+  info: "text-info",
   muted: "text-muted-foreground",
 };
 
@@ -209,9 +209,9 @@ export function StatWidget<
           : null;
   const trendColorClass =
     trend === "up"
-      ? "text-green-500"
+      ? "text-success"
       : trend === "down"
-        ? "text-red-500"
+        ? "text-destructive"
         : "text-muted-foreground";
 
   return (

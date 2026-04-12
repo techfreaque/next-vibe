@@ -5,7 +5,6 @@
 
 "use client";
 
-import { Link } from "next-vibe-ui/ui/link";
 import { Badge } from "next-vibe-ui/ui/badge";
 import {
   Card,
@@ -20,10 +19,10 @@ import { Coins } from "next-vibe-ui/ui/icons/Coins";
 import { Gift } from "next-vibe-ui/ui/icons/Gift";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
+import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import {
   ProductIds,
@@ -70,10 +69,9 @@ export function CreditsBalanceContainer({
   const credits = field.value;
   const { locale } = useTranslation();
   const widgetUser = useWidgetUser();
-  const envAvailability = useEnvAvailability();
   const isAdmin =
     !widgetUser.isPublic && widgetUser.roles.includes(UserRole.ADMIN);
-  const totalModelCount = getAvailableModelCount(envAvailability, isAdmin);
+  const totalModelCount = getAvailableModelCount(isAdmin);
 
   const subscriptionProduct = productsRepository.getProduct(
     ProductIds.SUBSCRIPTION,
@@ -121,15 +119,15 @@ export function CreditsBalanceContainer({
           {/* Credit breakdown grid */}
           <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Expiring Credits */}
-            <Div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-              <Div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300 mb-2">
+            <Div className="p-4 rounded-lg bg-warning/10 border border-warning/30">
+              <Div className="flex items-center gap-2 text-sm text-warning mb-2">
                 <Calendar className="h-4 w-4" />
                 {t("get.balance.expiring.title")}
               </Div>
-              <Div className="text-2xl font-bold text-amber-900 dark:text-amber-100">
+              <Div className="text-2xl font-bold text-warning">
                 {formatCredits(credits?.expiring ?? 0)}
               </Div>
-              <Div className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+              <Div className="text-xs text-warning/70 mt-1">
                 {t("get.balance.expiring.description", {
                   subCredits: subscriptionProduct.credits,
                 })}
@@ -137,29 +135,29 @@ export function CreditsBalanceContainer({
             </Div>
 
             {/* Permanent Credits */}
-            <Div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-              <Div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-300 mb-2">
+            <Div className="p-4 rounded-lg bg-success/10 border border-success/30">
+              <Div className="flex items-center gap-2 text-sm text-success mb-2">
                 <Sparkles className="h-4 w-4" />
                 {t("get.balance.permanent.title")}
               </Div>
-              <Div className="text-2xl font-bold text-green-900 dark:text-green-100">
+              <Div className="text-2xl font-bold text-success">
                 {formatCredits(credits?.permanent ?? 0)}
               </Div>
-              <Div className="text-xs text-green-600 dark:text-green-400 mt-1">
+              <Div className="text-xs text-success/70 mt-1">
                 {t("get.balance.permanent.description")}
               </Div>
             </Div>
 
             {/* Free Credits */}
-            <Div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-              <Div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300 mb-2">
+            <Div className="p-4 rounded-lg bg-info/10 border border-info/30">
+              <Div className="flex items-center gap-2 text-sm text-info mb-2">
                 <Zap className="h-4 w-4" />
                 {t("get.balance.free.title")}
               </Div>
-              <Div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+              <Div className="text-2xl font-bold text-info">
                 {formatCredits(credits?.free ?? 0)}
               </Div>
-              <Div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+              <Div className="text-xs text-info/70 mt-1">
                 {t("get.balance.free.description", {
                   count: freeProduct.credits,
                 })}

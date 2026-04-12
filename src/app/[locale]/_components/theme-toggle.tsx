@@ -27,7 +27,7 @@ export function ThemeToggle({
       variant="ghost"
       size="icon"
       onClick={onToggleTheme}
-      className="my-auto transition-colors hover:text-blue-600 dark:hover:text-blue-400"
+      className="my-auto transition-colors hover:text-primary"
       suppressHydrationWarning
       aria-label={
         theme === "dark" || !isMounted

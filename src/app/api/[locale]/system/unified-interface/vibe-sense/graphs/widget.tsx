@@ -171,12 +171,16 @@ function GraphCard({
               <Div className="flex items-center justify-between min-w-0">
                 <Div className="flex items-center gap-1.5 text-muted-foreground">
                   {isSystem ? (
-                    <Shield className="h-3 w-3 text-blue-500" />
+                    <Shield className="h-3 w-3 text-primary" />
                   ) : (
                     <User className="h-3 w-3 text-orange-500" />
                   )}
                   <Span className="text-[11px] capitalize font-medium">
-                    {graph.ownerType}
+                    {graph.ownerType === GraphOwnerType.SYSTEM
+                      ? "System"
+                      : graph.ownerType === GraphOwnerType.ADMIN
+                        ? "Admin"
+                        : "User"}
                   </Span>
                 </Div>
                 <Div className="flex items-center gap-2 flex-shrink-0">
@@ -449,7 +453,7 @@ export function GraphListContainer({
           <StatCard
             label={t("widget.stats.system")}
             value={stats.system}
-            icon={<Shield className="h-4 w-4 text-blue-500" />}
+            icon={<Shield className="h-4 w-4 text-primary" />}
             accent="border-blue-500/20"
           />
           <StatCard

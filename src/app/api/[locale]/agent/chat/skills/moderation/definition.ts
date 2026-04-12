@@ -39,7 +39,8 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "shield",
-  category: "endpointCategories.ai",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.skillsModeration",
   tags: ["tags.moderation" as const],
 
   fields: customWidgetObject({
@@ -218,7 +219,8 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "shield",
-  category: "endpointCategories.ai",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.skillsModeration",
   tags: ["tags.moderation" as const],
 
   fields: objectField(scopedTranslation, {
@@ -229,11 +231,11 @@ const { PATCH } = createEndpoint({
     children: {
       id: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.TEXT,
         label: "patch.fields.id.label" as const,
         description: "patch.fields.id.description" as const,
         columns: 12,
-        schema: z.string().uuid(),
+        schema: z.string(),
       }),
       action: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

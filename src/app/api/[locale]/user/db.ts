@@ -46,6 +46,7 @@ export const users = pgTable("users", {
   avatarUrl: text("avatar_url"),
 
   // Creator profile fields
+  creatorSlug: text("creator_slug").unique(),
   bio: text("bio"),
   websiteUrl: text("website_url"),
   twitterUrl: text("twitter_url"),

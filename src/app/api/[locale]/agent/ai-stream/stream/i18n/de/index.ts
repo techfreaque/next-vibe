@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
       title: "KI-Agent ausführen",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
-        "Einen headless KI-Agenten ausführen und die finale Textantwort erhalten. Setze model + prompt für einen einfachen Einmal-Aufruf, oder übergib favoriteId um ein gespeichertes Skill + Modell + Tools Preset zu laden. Credits je nach Modell.",
+        "Delegiert eine Aufgabe an einen Spezialisten-KI-Agenten und gibt dessen Antwort zurück. Zum Erstellen oder Bearbeiten von KI-Skills/Personas immer an skill='skill-creator' delegieren – niemals selbst versuchen. skill + prompt übergeben; der Agent erledigt den Rest. Credits je nach Modell.",
       container: {
         title: "KI-Agent-Ausführung",
         description:
@@ -39,7 +39,7 @@ export const translations: typeof enTranslations = {
         skill: {
           label: "Skill",
           description:
-            "Skill-ID oder 'default'. Definiert KI-Persona und System-Prompt. Optional wenn favoriteId gesetzt. Überschreibt den Skill des Favoriten.",
+            "Skill-ID oder Standard-Skill-Name. Definiert KI-Persona und System-Prompt. 'skill-creator' zum Erstellen/Bearbeiten von KI-Skills verwenden. Optional wenn favoriteId gesetzt.",
           placeholder: "default",
         },
         prompt: {
@@ -137,6 +137,8 @@ export const translations: typeof enTranslations = {
         text: "Antworttext der KI (Think-Tags entfernt). Null wenn das Modell keine Ausgabe erzeugt hat.",
         promptTokens: "Verbrauchte Prompt-Token (Eingabekosten)",
         completionTokens: "Erzeugte Completion-Token (Ausgabekosten)",
+        creditCost:
+          "Abgerechnete Credits für diesen Lauf. Null bei Inkognito-Läufen.",
         threadId:
           "Thread-UUID wo der Lauf gespeichert wurde. Null wenn rootFolderId 'incognito' war. Verwende dies um die Konversation via appendThreadId fortzusetzen.",
         lastAiMessageId:
@@ -666,10 +668,11 @@ export const translations: typeof enTranslations = {
   onboarding: {
     back: "Zurück",
     welcome: {
-      title: "Stell dir uns als dein KI-Team vor.",
+      title: "Eine KI für alles. Die richtige für jeden Moment.",
       line1:
-        "Dein Begleiter kümmert sich um alltägliche Gespräche. Spezialisten übernehmen für Coding, Recherche, Schreiben - was auch immer gebraucht wird.",
-      line2: "Die KI wechselt automatisch zwischen ihnen. Du redest einfach.",
+        "Ein Begleiter für alltägliche Gespräche. Spezialisten für Coding, Recherche, Schreiben - du wählst einen, wenn die Aufgabe es verlangt.",
+      line2:
+        "Gleicher Chat. Du wechselst, wenn es drauf ankommt. Dauert Sekunden.",
       line3: "Lass uns dich in unter einer Minute einrichten.",
       continue: "Los geht's",
     },

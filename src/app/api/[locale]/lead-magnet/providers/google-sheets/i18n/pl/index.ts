@@ -1,7 +1,7 @@
 export const translations = {
   title: "Google Sheets",
   description:
-    "Automatycznie dodawaj każdego nowego leada jako wiersz w swoim arkuszu Google. Podłącz konto Google — bez kluczy API.",
+    "Automatycznie dodawaj każdego nowego leada jako wiersz w swoim arkuszu Google. Podłącz konto Google - bez kluczy API.",
   connect: {
     label: "Połącz konto Google",
     description: "Zaloguj się przez Google, aby autoryzować dostęp do arkuszy",

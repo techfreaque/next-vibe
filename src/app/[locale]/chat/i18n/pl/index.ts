@@ -769,9 +769,9 @@ export const translations: typeof enTranslations = {
     welcome: {
       title: "Pomyśl o nas jak o swoim zespole AI.",
       line1:
-        "Twój towarzysz obsługuje codzienne rozmowy. Specjaliści wkraczają przy kodowaniu, badaniach, pisaniu - cokolwiek jest potrzebne.",
+        "Towarzysz do codziennych rozmów. Specjaliści do kodowania, badań, pisania - wybierasz jednego, gdy zadanie tego wymaga.",
       line2:
-        "AI przełącza się między nimi automatycznie. Ty po prostu rozmawiasz.",
+        "Ten sam czat. Przełączasz się, kiedy ma to znaczenie. Zajmuje sekundy.",
       line3: "Skonfigurujmy cię w mniej niż minutę.",
       continue: "Zaczynamy",
     },

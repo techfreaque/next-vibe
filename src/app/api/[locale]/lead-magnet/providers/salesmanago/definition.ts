@@ -31,7 +31,8 @@ export const { POST } = createEndpoint({
   title: "providers.salesmanago.title" as const,
   description: "providers.salesmanago.description" as const,
   icon: "mail",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetIntegrations",
   tags: ["providers.shared.saveTag" as const],
   allowedRoles: ALLOWED_ROLES,
   fields: objectField(scopedTranslation, {
@@ -55,21 +56,19 @@ export const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "providers.salesmanago.salesManagoApiKey.label" as const,
-        description:
-          "providers.salesmanago.salesManagoApiKey.description" as const,
+        description: "providers.shared.secretKeepExisting" as const,
         placeholder:
           "providers.salesmanago.salesManagoApiKey.placeholder" as const,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       salesManagoSha: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "providers.salesmanago.salesManagoSha.label" as const,
-        description:
-          "providers.salesmanago.salesManagoSha.description" as const,
+        description: "providers.shared.secretKeepExisting" as const,
         placeholder:
           "providers.salesmanago.salesManagoSha.placeholder" as const,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       salesManagoDomain: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

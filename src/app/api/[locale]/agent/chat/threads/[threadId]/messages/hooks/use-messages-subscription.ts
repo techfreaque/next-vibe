@@ -340,9 +340,10 @@ export function useMessagesSubscription(
             optionsRef.current.onStreamFinished?.();
           }
 
-          // Clear any stuck isStreaming flags on messages in this thread.
-          // CONTENT_DONE normally clears them, but if it was missed (race, disconnect,
-          // or abort) the message stays stuck showing the loading animation forever.
+          // Clear any stuck isStreaming or isUploadingAttachments flags on messages.
+          // CONTENT_DONE normally clears isStreaming; FILES_UPLOADED clears isUploadingAttachments.
+          // If either event was missed (race, disconnect, or abort) the message stays stuck.
+          // By STREAM_FINISHED the AI response and file upload are both complete.
           apiClient.updateEndpointData(
             messagesDefinition.GET,
             logger,
@@ -351,7 +352,8 @@ export function useMessagesSubscription(
                 return old;
               }
               const hasStuck = old.data.messages.some(
-                (m) => m.metadata?.isStreaming,
+                (m) =>
+                  m.metadata?.isStreaming || m.metadata?.isUploadingAttachments,
               );
               if (!hasStuck) {
                 return old;
@@ -360,14 +362,22 @@ export function useMessagesSubscription(
                 ...old,
                 data: {
                   ...old.data,
-                  messages: old.data.messages.map((m) =>
-                    m.metadata?.isStreaming
-                      ? {
-                          ...m,
-                          metadata: { ...m.metadata, isStreaming: false },
-                        }
-                      : m,
-                  ),
+                  messages: old.data.messages.map((m) => {
+                    const needsPatch =
+                      m.metadata?.isStreaming ||
+                      m.metadata?.isUploadingAttachments;
+                    if (!needsPatch) {
+                      return m;
+                    }
+                    return {
+                      ...m,
+                      metadata: {
+                        ...m.metadata,
+                        isStreaming: false,
+                        isUploadingAttachments: false,
+                      },
+                    };
+                  }),
                 },
               };
             },

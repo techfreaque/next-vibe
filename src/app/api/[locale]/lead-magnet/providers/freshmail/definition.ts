@@ -31,7 +31,8 @@ export const { POST } = createEndpoint({
   title: "providers.freshmail.title" as const,
   description: "providers.freshmail.description" as const,
   icon: "mail",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetIntegrations",
   tags: ["providers.shared.saveTag" as const],
   allowedRoles: ALLOWED_ROLES,
   fields: objectField(scopedTranslation, {
@@ -45,19 +46,18 @@ export const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "providers.freshmail.freshmailApiKey.label" as const,
-        description: "providers.freshmail.freshmailApiKey.description" as const,
+        description: "providers.shared.secretKeepExisting" as const,
         placeholder: "providers.freshmail.freshmailApiKey.placeholder" as const,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       freshmailApiSecret: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "providers.freshmail.freshmailApiSecret.label" as const,
-        description:
-          "providers.freshmail.freshmailApiSecret.description" as const,
+        description: "providers.shared.secretKeepExisting" as const,
         placeholder:
           "providers.freshmail.freshmailApiSecret.placeholder" as const,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       listHash: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

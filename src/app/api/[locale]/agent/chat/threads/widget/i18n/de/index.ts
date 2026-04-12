@@ -105,12 +105,6 @@ export const translations: typeof enTranslations = {
           "Wählen Sie aus {{modelCount}} KI-Modellen, darunter Mainstream, Open-Source und zensurfreie Optionen.",
         tip: "Klicken Sie, um den Modellselektor zu öffnen und Ihren Begleiter auszuwählen.",
       },
-      companionVariants: {
-        title: "Ihre Begleiter-Varianten",
-        description:
-          "Ihr Begleiter hat mehrere Varianten - brilliant für tiefes Denken, smart für alltägliche Aufgaben und zensurfrei für ungefilterte Antworten. Tippen Sie auf eine Zeile, um sofort zu wechseln.",
-        tip: "Sie können die Reihenfolge per Drag ändern oder jederzeit weitere Varianten hinzufügen.",
-      },
       browseSkills: {
         title: "Weitere Skills entdecken",
         description:
@@ -118,9 +112,10 @@ export const translations: typeof enTranslations = {
         tip: "Skills geben deiner KI einen klaren Fokus und das passende Modell für die Aufgabe.",
       },
       meetCompanion: {
-        title: "Dein Begleiter ist bereit",
+        title: "Dein Begleiter ist da",
         description:
-          "Klicke auf eine Variante, um ein Gespräch zu starten — jede hat einen anderen Stil und ein anderes Modell dahinter.",
+          "Mehrere Varianten, ein Ziel - brilliant für komplexes Denken, smart für den Alltag, zensurfrei für ungefilterte Antworten. Klick auf eine, um loszulegen.",
+        tip: "Reihenfolge per Drag ändern oder jederzeit Varianten hinzufügen.",
       },
       rootFolders: {
         title: "Ihre Chat-Ordner",

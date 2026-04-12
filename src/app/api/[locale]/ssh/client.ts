@@ -17,7 +17,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { Client as Ssh2Client, ClientChannel } from "ssh2";
-import { Client } from "ssh2";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
@@ -186,6 +185,9 @@ export async function openSshClient(
   t: ClientT,
   acceptNewFingerprint = false,
 ): Promise<ResponseType<OpenClientResult>> {
+  // Dynamic import keeps ssh2 out of Turbopack's static NFT trace, preventing
+  // the tracer from scanning next.config.ts as a side-effect of the ssh2 package.
+  const { Client } = await import(/* turbopackIgnore: true */ "ssh2");
   return new Promise((resolve) => {
     const client = new Client();
     let capturedFingerprint = "";

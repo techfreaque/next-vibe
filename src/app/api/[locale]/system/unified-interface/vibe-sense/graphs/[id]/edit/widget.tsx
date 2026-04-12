@@ -53,10 +53,14 @@ import {
 import { Div, type DivDragEvent } from "next-vibe-ui/ui/div";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
+import { Check } from "next-vibe-ui/ui/icons/Check";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { Database } from "next-vibe-ui/ui/icons/Database";
+import { EyeOff } from "next-vibe-ui/ui/icons/EyeOff";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
 import { History } from "next-vibe-ui/ui/icons/History";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
@@ -91,6 +95,7 @@ import { cn } from "@/app/api/[locale]/shared/utils";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
   useWidgetForm,
+  useWidgetIsSubmitting,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetOnSubmit,
@@ -132,16 +137,104 @@ type NodeCategory =
   | "evaluator"
   | "other";
 
+/**
+ * Metadata for a non-TIME_SERIES param field extracted from the endpoint definition.
+ * Used to render proper form controls (number input, select, etc.) in the inspector.
+ */
+interface ParamFieldMeta {
+  fieldType: FieldDataType;
+  /** Human-readable label (derived from key if not resolvable from i18n) */
+  label: string;
+  /** Zod enum values for SELECT fields */
+  enumOptions?: string[];
+  /** Numeric constraint hints */
+  min?: number;
+  max?: number;
+  isInt?: boolean;
+}
+
 interface EndpointNodeInfo {
   handles: HandleInfo;
   category: NodeCategory;
+  /** Non-TIME_SERIES request param fields, keyed by field name */
+  paramFields: Record<string, ParamFieldMeta>;
+  /** All response field names (for outputField picker) */
+  outputFields: string[];
 }
 
 const DEFAULT_HANDLES: HandleInfo = { inputs: ["source"], outputs: ["result"] };
 const DEFAULT_INFO: EndpointNodeInfo = {
   handles: DEFAULT_HANDLES,
   category: "other",
+  paramFields: {},
+  outputFields: ["result"],
 };
+
+/**
+ * Humanize a camelCase or kebab-case field key into a readable label.
+ * e.g. "stdDev" → "Std Dev", "period" → "Period", "op" → "Op"
+ */
+function humanizeFieldKey(key: string): string {
+  return key
+    .replace(/([A-Z])/g, " $1")
+    .replace(/[-_]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^\w/, (c) => c.toUpperCase());
+}
+
+/**
+ * Attempt to extract constraints from a Zod schema using runtime introspection.
+ * This is safe - we only read `_def` properties, never mutate.
+ */
+function extractZodConstraints(schema: {
+  _def?: {
+    typeName?: string;
+    values?: string[];
+    checks?: Array<{ kind: string; value?: number }>;
+    innerType?: {
+      _def?: {
+        typeName?: string;
+        checks?: Array<{ kind: string; value?: number }>;
+      };
+    };
+  };
+}): { enumOptions?: string[]; min?: number; max?: number; isInt?: boolean } {
+  if (!schema?._def) {
+    return {};
+  }
+  // Unwrap ZodOptional / ZodNullable / ZodDefault wrappers
+  let def = schema._def;
+  while (
+    def.typeName === "ZodOptional" ||
+    def.typeName === "ZodNullable" ||
+    def.typeName === "ZodDefault"
+  ) {
+    def = def.innerType?._def ?? def;
+    break; // one level only
+  }
+
+  if (def.typeName === "ZodEnum") {
+    return { enumOptions: def.values ?? [] };
+  }
+  if (def.typeName === "ZodNumber") {
+    const checks = def.checks ?? [];
+    let min: number | undefined;
+    let max: number | undefined;
+    let isInt = false;
+    for (const check of checks) {
+      if (check.kind === "min") {
+        min = check.value;
+      } else if (check.kind === "max") {
+        max = check.value;
+      } else if (check.kind === "int") {
+        isInt = true;
+      }
+    }
+    return { min, max, isInt };
+  }
+  return {};
+}
 
 /**
  * Extract TIME_SERIES handles from an endpoint definition's field tree.
@@ -189,6 +282,88 @@ function extractHandles(
     outputs.push("result");
   }
   return { inputs, outputs };
+}
+
+/**
+ * Extract non-TIME_SERIES param fields and output field names from the endpoint field tree.
+ */
+function extractParamFields(
+  fields: Record<
+    string,
+    {
+      fieldType?: FieldDataType;
+      usage?: { request?: string; response?: boolean };
+      label?: string;
+      schema?: {
+        _def?: {
+          typeName?: string;
+          values?: string[];
+          checks?: Array<{ kind: string; value?: number }>;
+          innerType?: {
+            _def?: {
+              typeName?: string;
+              checks?: Array<{ kind: string; value?: number }>;
+            };
+          };
+        };
+      };
+    }
+  >,
+): { paramFields: Record<string, ParamFieldMeta>; outputFields: string[] } {
+  // Fields to skip - these are handled separately by the inspector
+  const SKIP_FIELDS = new Set([
+    "resolution",
+    "range",
+    "lookback",
+    "meta",
+    "source",
+    "result",
+    "signals",
+  ]);
+
+  const paramFields: Record<string, ParamFieldMeta> = {};
+  const outputFields: string[] = [];
+
+  for (const [name, field] of Object.entries(fields)) {
+    const usage = field.usage;
+
+    // Collect output field names
+    if (
+      usage?.response === true &&
+      field.fieldType !== FieldDataType.TIME_SERIES
+    ) {
+      if (!SKIP_FIELDS.has(name)) {
+        outputFields.push(name);
+      }
+    }
+    if (
+      usage?.response === true &&
+      field.fieldType === FieldDataType.TIME_SERIES
+    ) {
+      outputFields.push(name);
+    }
+
+    // Only param fields: request usage, not TIME_SERIES, not a system field
+    if (
+      field.fieldType === FieldDataType.TIME_SERIES ||
+      !usage?.request ||
+      SKIP_FIELDS.has(name)
+    ) {
+      continue;
+    }
+
+    const constraints = field.schema ? extractZodConstraints(field.schema) : {};
+    paramFields[name] = {
+      fieldType: field.fieldType ?? FieldDataType.TEXT,
+      label: humanizeFieldKey(name),
+      ...constraints,
+    };
+  }
+
+  return {
+    paramFields,
+    outputFields: outputFields.length > 0 ? outputFields : ["result"],
+  };
 }
 
 /** Infer category from the endpoint path (alias or route path segments) */
@@ -239,12 +414,37 @@ function useEndpointNodeInfo(
                   {
                     fieldType?: FieldDataType;
                     usage?: { request?: string; response?: boolean };
+                    label?: string;
+                    schema?: {
+                      _def?: {
+                        typeName?: string;
+                        values?: string[];
+                        checks?: Array<{ kind: string; value?: number }>;
+                        innerType?: {
+                          _def?: {
+                            typeName?: string;
+                            checks?: Array<{ kind: string; value?: number }>;
+                          };
+                        };
+                      };
+                    };
                   }
                 >)
               : undefined;
           const handles = children ? extractHandles(children) : DEFAULT_HANDLES;
+          const { paramFields, outputFields } = children
+            ? extractParamFields(children)
+            : { paramFields: {}, outputFields: ["result"] };
           const endpointCategory = categoryFromEndpoint(path);
-          return { path, info: { handles, category: endpointCategory } };
+          return {
+            path,
+            info: {
+              handles,
+              category: endpointCategory,
+              paramFields,
+              outputFields,
+            },
+          };
         }),
       );
       if (cancelled) {
@@ -317,15 +517,12 @@ const CATEGORY_VISUALS: Record<NodeCategory, NodeVisuals> = {
     icon: <Zap className="h-3 w-3" />,
   },
   other: {
-    badge:
-      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+    badge: "bg-success/10 text-success",
     border: "border-green-400/70 dark:border-green-600/70",
     header: "bg-green-500/10 border-b border-green-500/20",
     icon: <Globe className="h-3 w-3" />,
   },
 };
-
-const PALETTE_BADGE = "bg-muted text-muted-foreground";
 
 function getVisuals(category: NodeCategory): NodeVisuals {
   return CATEGORY_VISUALS[category];
@@ -335,7 +532,7 @@ function getVisuals(category: NodeCategory): NodeVisuals {
 
 interface DisplayOverride {
   color?: string;
-  pane?: number;
+  pane?: number | null;
 }
 
 function withDisplayOverride(
@@ -364,15 +561,43 @@ function autoLayout(
   return positions;
 }
 
+/**
+ * Generate a short, readable node ID from an endpoint alias or path.
+ * "vibe-sense-indicator-ema" → "ema_1"
+ * "/vibe-sense/indicator/ema" → "ema_1"
+ */
 function generateNodeId(
-  prefix: string,
+  endpointAlias: string,
   existing: Record<string, GraphNodeConfig>,
 ): string {
+  // Extract the last meaningful segment
+  const slug =
+    endpointAlias
+      .replace(
+        /^vibe-sense-(indicator|evaluator|transformer|data-source)-?/,
+        "",
+      )
+      .replace(/^.*\//, "") // take last path segment
+      .replace(/[^a-zA-Z0-9]/g, "_")
+      .replace(/_+/g, "_")
+      .replace(/^_|_$/g, "")
+      .toLowerCase()
+      .slice(0, 20) || "node";
+
   let idx = 1;
-  while (`${prefix}_${String(idx)}` in existing) {
+  while (`${slug}_${String(idx)}` in existing) {
     idx++;
   }
-  return `${prefix}_${String(idx)}`;
+  return `${slug}_${String(idx)}`;
+}
+
+/** Convert a display name to a URL-safe slug */
+function nameToSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 64);
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -552,14 +777,45 @@ const VibeNodeCard = React.memo(function VibeNodeCard({
         >
           {category}
         </Badge>
-        {resolution && (
-          <Badge
-            variant="outline"
-            className="text-[9px] px-1 py-0 leading-none h-4 ml-auto"
-          >
-            {formatResolution(resolution)}
-          </Badge>
-        )}
+        <Div className="flex items-center gap-1 ml-auto">
+          {resolution && (
+            <Badge
+              variant="outline"
+              className="text-[9px] px-1 py-0 leading-none h-4"
+            >
+              {formatResolution(resolution)}
+            </Badge>
+          )}
+          {/* Color dot */}
+          {data.nodeConfig.color && (
+            <Span
+              style={{
+                backgroundColor: data.nodeConfig.color,
+                width: "10px",
+                height: "10px",
+                borderRadius: "50%",
+                display: "inline-block",
+                flexShrink: 0,
+              }}
+            />
+          )}
+          {/* Pane badge or no-chart indicator */}
+          {data.nodeConfig.pane === null ? (
+            <Badge
+              variant="outline"
+              className="text-[9px] px-1 py-0 leading-none h-4 text-muted-foreground/50 border-muted-foreground/30"
+            >
+              <EyeOff className="h-2.5 w-2.5" />
+            </Badge>
+          ) : data.nodeConfig.pane !== undefined && data.nodeConfig.pane > 0 ? (
+            <Badge
+              variant="outline"
+              className="text-[9px] px-1 py-0 leading-none h-4"
+            >
+              P{String(data.nodeConfig.pane)}
+            </Badge>
+          ) : null}
+        </Div>
       </Div>
 
       {/* Body with handles */}
@@ -568,8 +824,19 @@ const VibeNodeCard = React.memo(function VibeNodeCard({
           {data.nodeId}
         </P>
         <P className="text-[10px] text-muted-foreground truncate mt-0.5 leading-tight">
-          {data.label}
+          {(pathToAliasMap as Record<string, string>)[data.label] ?? data.label}
         </P>
+        {/* Param summary - show up to 2 key params */}
+        {data.nodeConfig.params &&
+          Object.keys(data.nodeConfig.params).length > 0 && (
+            <P className="text-[9px] text-muted-foreground/60 truncate mt-0.5 font-mono leading-tight">
+              {Object.entries(data.nodeConfig.params)
+                .slice(0, 2)
+                .map(([k, v]) => `${k}:${String(v)}`)
+                .join(" · ")}
+              {Object.keys(data.nodeConfig.params).length > 2 && " …"}
+            </P>
+          )}
 
         {/* Handle labels */}
         {(inputs.length > 1 || outputs.length > 1) && (
@@ -744,6 +1011,37 @@ const PaletteSection = React.memo(function PaletteSection({
   );
 });
 
+const PaletteSubSection = React.memo(function PaletteSubSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}): React.JSX.Element {
+  const [open, setOpen] = useState(false);
+  return (
+    <Div className="ml-1 border-l border-border/30 pl-1 mb-0.5">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setOpen(!open)}
+        className="w-full justify-between px-2 py-1 h-auto text-[10px] font-medium hover:bg-accent/30"
+      >
+        <Span className="text-[10px] text-muted-foreground/70 uppercase tracking-wide">
+          {title}
+        </Span>
+        <ChevronDown
+          className={cn(
+            "h-2.5 w-2.5 text-muted-foreground/50 transition-transform",
+            !open && "-rotate-90",
+          )}
+        />
+      </Button>
+      {open && <Div className="flex flex-col gap-0.5 pb-1">{children}</Div>}
+    </Div>
+  );
+});
+
 const PaletteItem = React.memo(function PaletteItem({
   label,
   detail,
@@ -808,30 +1106,112 @@ function InspectorSection({
 }): React.JSX.Element {
   return (
     <Div>
-      <P className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-        {label}
-      </P>
+      <Div className="flex items-center gap-2 mb-2">
+        <P className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wider shrink-0">
+          {label}
+        </P>
+        <Div className="flex-1 h-px bg-border/40" />
+      </Div>
       {children}
     </Div>
   );
 }
 
-function InspectorField({
-  label,
+// ─── Smart Param Field Control ────────────────────────────────────────────────
+
+/**
+ * Renders the appropriate input widget for a single param field based on its type.
+ */
+function ParamFieldControl({
+  fieldName,
+  meta,
   value,
+  onChange,
 }: {
-  label: string;
-  value: string;
+  fieldName: string;
+  meta: ParamFieldMeta;
+  value: string | number | boolean | null | undefined;
+  onChange: (v: string | number | boolean | null) => void;
 }): React.JSX.Element {
+  if (meta.fieldType === FieldDataType.SELECT && meta.enumOptions) {
+    const strValue = value !== null && value !== undefined ? String(value) : "";
+    return (
+      <Select<string> value={strValue} onValueChange={(v) => onChange(v)}>
+        <SelectTrigger className="h-7 text-[11px]">
+          <SelectValue placeholder={`Select ${meta.label}`} />
+        </SelectTrigger>
+        <SelectContent>
+          {meta.enumOptions.map((opt) => (
+            <SelectItem key={opt} value={opt}>
+              {opt}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    );
+  }
+
+  if (meta.fieldType === FieldDataType.BOOLEAN) {
+    const boolValue = value === true || value === "true";
+    return (
+      <Div className="flex items-center gap-0.5 border rounded-md overflow-hidden bg-muted/30">
+        {([true, false] as const).map((opt) => (
+          <Button
+            key={String(opt)}
+            variant="ghost"
+            size="sm"
+            onClick={() => onChange(opt)}
+            className={cn(
+              "h-6 flex-1 text-[10px] rounded-none border-0 px-2 gap-0.5",
+              boolValue === opt
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {opt ? (
+              <Check className="h-3 w-3 mr-0.5" />
+            ) : (
+              <X className="h-3 w-3 mr-0.5" />
+            )}
+            {opt ? "Yes" : "No"}
+          </Button>
+        ))}
+      </Div>
+    );
+  }
+
+  // NUMBER / INT / TEXT fallthrough
+  const isNumeric =
+    meta.fieldType === FieldDataType.NUMBER ||
+    meta.fieldType === FieldDataType.INT;
+  const strValue = value !== null && value !== undefined ? String(value) : "";
+  const placeholder =
+    meta.min !== undefined && meta.max !== undefined
+      ? `${String(meta.min)}–${String(meta.max)}`
+      : meta.min !== undefined
+        ? `≥${String(meta.min)}`
+        : meta.max !== undefined
+          ? `≤${String(meta.max)}`
+          : fieldName;
+
   return (
-    <Div className="flex items-center gap-2">
-      <Label className="text-[10px] w-14 shrink-0 text-muted-foreground">
-        {label}
-      </Label>
-      <P className="text-[10px] font-mono text-muted-foreground truncate">
-        {value}
-      </P>
-    </Div>
+    <Input
+      value={strValue}
+      onChangeText={(v) => {
+        if (!isNumeric) {
+          onChange(v || null);
+          return;
+        }
+        if (v === "" || v === "-") {
+          onChange(null);
+          return;
+        }
+        const parsed = meta.isInt ? parseInt(v, 10) : parseFloat(v);
+        onChange(isNaN(parsed) ? null : parsed);
+      }}
+      className="h-7 text-[11px] font-mono"
+      placeholder={placeholder}
+    />
   );
 }
 
@@ -841,10 +1221,13 @@ const NodeInspector = React.memo(function NodeInspector({
   nodeId,
   nodeConfig,
   category,
+  endpointInfo,
+  edges,
   onUpdate,
   onDelete,
   onClose,
   onOpenEndpoint,
+  onSelectNode,
   t,
   deleteConfirmNodeId,
   setDeleteConfirmNodeId,
@@ -852,16 +1235,45 @@ const NodeInspector = React.memo(function NodeInspector({
   nodeId: string;
   nodeConfig: GraphNodeConfig;
   category: NodeCategory;
+  endpointInfo: EndpointNodeInfo;
+  edges: GraphEdge[];
   onUpdate: (nodeId: string, updated: GraphNodeConfig) => void;
   onDelete: (nodeId: string) => void;
   onClose: () => void;
   onOpenEndpoint: (endpointId: string) => void;
+  onSelectNode: (nodeId: string) => void;
   t: TFn;
   deleteConfirmNodeId: string | null;
   setDeleteConfirmNodeId: (id: string | null) => void;
 }): React.JSX.Element {
   const visuals = getVisuals(category);
   const isConfirmingDelete = deleteConfirmNodeId === nodeId;
+
+  const { paramFields, outputFields } = endpointInfo;
+
+  // Build connections map for this node
+  const incomingEdges = edges.filter((e) => e.to === nodeId);
+  const outgoingEdges = edges.filter((e) => e.from === nodeId);
+
+  // Determine which param keys exist in config but NOT in paramFields (legacy/manual)
+  const knownParamKeys = new Set(Object.keys(paramFields));
+  const manualParams = Object.entries(nodeConfig.params ?? {}).filter(
+    ([k]) => !knownParamKeys.has(k),
+  );
+
+  const updateParam = useCallback(
+    (key: string, val: string | number | boolean | null) => {
+      const newParams = { ...(nodeConfig.params ?? {}), [key]: val };
+      onUpdate(nodeId, { ...nodeConfig, params: newParams });
+    },
+    [nodeId, nodeConfig, onUpdate],
+  );
+
+  // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string
+  const extraParamsLabel =
+    Object.keys(paramFields).length > 0
+      ? "Extra Params"
+      : t("widget.inspector.params");
 
   return (
     <Div className="flex flex-col gap-0 h-full">
@@ -937,18 +1349,28 @@ const NodeInspector = React.memo(function NodeInspector({
       </Div>
 
       {/* Body */}
-      <Div className="flex flex-col gap-3 p-3 overflow-y-auto flex-1">
+      <Div className="flex flex-col gap-4 p-3 overflow-y-auto flex-1">
         {/* Endpoint info */}
         <InspectorSection label={t("widget.inspector.endpoint")}>
           <Div className="flex flex-col gap-1.5">
-            <InspectorField
-              label={t("widget.inspector.endpoint")}
-              value={nodeConfig.endpointPath ?? ""}
-            />
-            <InspectorField
-              label={t("widget.inspector.method")}
-              value={nodeConfig.method ?? "POST"}
-            />
+            <Div className="flex items-center gap-1.5 min-w-0">
+              <P className="text-[11px] font-mono text-muted-foreground truncate flex-1 bg-muted/40 rounded px-2 py-1 leading-tight">
+                {nodeConfig.endpointPath ?? ""}
+              </P>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 shrink-0"
+                onClick={() => {
+                  void navigator.clipboard.writeText(
+                    nodeConfig.endpointPath ?? "",
+                  );
+                }}
+                title="Copy path"
+              >
+                <Copy className="h-3 w-3" />
+              </Button>
+            </Div>
             <Button
               variant="outline"
               size="sm"
@@ -961,57 +1383,159 @@ const NodeInspector = React.memo(function NodeInspector({
           </Div>
         </InspectorSection>
 
-        {/* Resolution */}
-        <InspectorSection label={t("widget.inspector.resolution")}>
-          <Select<Resolution>
-            value={nodeConfig.resolution ?? GraphResolution.ONE_DAY}
-            onValueChange={(r) => {
-              onUpdate(nodeId, { ...nodeConfig, resolution: r });
-            }}
-          >
-            <SelectTrigger className="h-7 text-[11px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {ResolutionValues.map((r) => (
-                <SelectItem key={r} value={r}>
-                  {formatResolution(r)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </InspectorSection>
+        {/* Connections - read-only wiring map */}
+        {(incomingEdges.length > 0 || outgoingEdges.length > 0) && (
+          // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- section label is UI chrome
+          <InspectorSection label="Connections">
+            <Div className="flex flex-col gap-1">
+              {endpointInfo.handles.inputs.map((handle) => {
+                const connectedEdge = incomingEdges.find(
+                  (e) => (e.toHandle ?? "source") === handle,
+                );
+                return (
+                  <Div
+                    key={`in-${handle}`}
+                    className="flex items-center gap-1.5"
+                  >
+                    <Div className="w-1.5 h-1.5 rounded-full bg-primary/40 shrink-0" />
+                    <P className="text-[10px] font-mono text-muted-foreground w-12 shrink-0 truncate">
+                      {handle}
+                    </P>
+                    <ArrowLeft className="h-3 w-3 text-muted-foreground/50 shrink-0" />
+                    {connectedEdge ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 px-1 text-[10px] font-mono text-primary hover:text-primary hover:underline truncate max-w-[80px]"
+                        onClick={() => onSelectNode(connectedEdge.from)}
+                        title={connectedEdge.from}
+                      >
+                        {connectedEdge.from}
+                      </Button>
+                    ) : (
+                      // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- UI fallback
+                      <P className="text-[9px] text-muted-foreground/40 italic">
+                        {"unconnected"}
+                      </P>
+                    )}
+                  </Div>
+                );
+              })}
+              {endpointInfo.handles.outputs.map((handle) => {
+                const connectedTo = outgoingEdges
+                  .filter((e) => (e.fromHandle ?? "result") === handle)
+                  .map((e) => e.to);
+                return (
+                  <Div
+                    key={`out-${handle}`}
+                    className="flex items-center gap-1.5"
+                  >
+                    <Div className="w-1.5 h-1.5 rounded-full bg-sky-400/60 shrink-0" />
+                    <P className="text-[10px] font-mono text-muted-foreground w-12 shrink-0 truncate">
+                      {handle}
+                    </P>
+                    <ArrowRight className="h-3 w-3 text-muted-foreground/50 shrink-0" />
+                    {connectedTo.length > 0 ? (
+                      <Div className="flex flex-wrap gap-0.5">
+                        {connectedTo.map((toId) => (
+                          <Button
+                            key={toId}
+                            variant="ghost"
+                            size="sm"
+                            className="h-4 px-1 text-[10px] font-mono text-sky-500 hover:text-sky-400 hover:underline truncate max-w-[70px]"
+                            onClick={() => onSelectNode(toId)}
+                            title={toId}
+                          >
+                            {toId}
+                          </Button>
+                        ))}
+                      </Div>
+                    ) : (
+                      // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- UI fallback
+                      <P className="text-[9px] text-muted-foreground/40 italic">
+                        {"unconnected"}
+                      </P>
+                    )}
+                  </Div>
+                );
+              })}
+            </Div>
+          </InspectorSection>
+        )}
 
-        {/* Lookback */}
-        <InspectorSection label={t("widget.inspector.lookback")}>
-          <Input
-            value={String(nodeConfig.lookback ?? 0)}
-            onChangeText={(v) => {
-              const num = parseInt(v, 10);
-              onUpdate(nodeId, {
-                ...nodeConfig,
-                lookback: isNaN(num) ? 0 : num,
-              });
-            }}
-            className="h-7 text-[11px] font-mono"
-            placeholder="0"
-          />
-        </InspectorSection>
+        {/* Resolution - shown for data-sources and indicators that have time-series output */}
+        {(category === "data-source" ||
+          category === "indicator" ||
+          category === "transformer" ||
+          category === "other") && (
+          <InspectorSection label={t("widget.inspector.resolution")}>
+            <Select<Resolution>
+              value={nodeConfig.resolution ?? GraphResolution.ONE_DAY}
+              onValueChange={(r) => {
+                onUpdate(nodeId, { ...nodeConfig, resolution: r });
+              }}
+            >
+              <SelectTrigger className="h-7 text-[11px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ResolutionValues.map((r) => (
+                  <SelectItem key={r} value={r}>
+                    {formatResolution(r)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </InspectorSection>
+        )}
 
-        {/* Output field */}
-        <InspectorSection label={t("widget.inspector.output")}>
-          <Input
-            value={nodeConfig.outputField ?? "result"}
-            onChangeText={(v) => {
-              onUpdate(nodeId, {
-                ...nodeConfig,
-                outputField: v === "result" ? undefined : v || undefined,
-              });
-            }}
-            className="h-7 text-[11px] font-mono"
-            placeholder="result"
-          />
-        </InspectorSection>
+        {/* Lookback - only for indicators and transformers that consume a rolling window */}
+        {(category === "indicator" || category === "transformer") && (
+          <InspectorSection label={t("widget.inspector.lookback")}>
+            <Input
+              value={nodeConfig.lookback ? String(nodeConfig.lookback) : ""}
+              onChangeText={(v) => {
+                const num = parseInt(v, 10);
+                onUpdate(nodeId, {
+                  ...nodeConfig,
+                  lookback: v === "" || isNaN(num) ? undefined : num,
+                });
+              }}
+              className="h-7 text-[11px] font-mono"
+              placeholder="auto"
+            />
+          </InspectorSection>
+        )}
+
+        {/* Output field - select from known fields or text fallback */}
+        {outputFields.length > 1 && (
+          <InspectorSection label={t("widget.inspector.output")}>
+            <Select<string>
+              value={nodeConfig.outputField ?? "result"}
+              onValueChange={(v) => {
+                onUpdate(nodeId, {
+                  ...nodeConfig,
+                  outputField: v === "result" ? undefined : v,
+                });
+              }}
+            >
+              <SelectTrigger className="h-7 text-[11px] font-mono">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {outputFields.map((f) => (
+                  <SelectItem
+                    key={f}
+                    value={f}
+                    className="font-mono text-[11px]"
+                  >
+                    {f}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </InspectorSection>
+        )}
 
         {/* Persist */}
         <InspectorSection label={t("widget.inspector.persist")}>
@@ -1037,83 +1561,115 @@ const NodeInspector = React.memo(function NodeInspector({
           </Div>
         </InspectorSection>
 
-        {/* Parameters */}
-        <InspectorSection label={t("widget.inspector.params")}>
-          <Div className="flex flex-col gap-2">
-            {Object.entries(nodeConfig.params ?? {}).map(([field, value]) => (
-              <Div key={field} className="rounded-lg border bg-muted/20 p-2">
-                <Div className="flex items-center justify-between mb-1.5">
-                  <P className="text-[10px] font-mono font-semibold text-foreground">
-                    {field}
-                  </P>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-4 w-4 p-0"
-                    onClick={() => {
-                      const newParams = {
-                        ...(nodeConfig.params ?? {}),
-                      };
-                      delete newParams[field];
+        {/* Parameters - smart form from endpoint metadata */}
+        {Object.keys(paramFields).length > 0 && (
+          <InspectorSection label={t("widget.inspector.params")}>
+            <Div className="flex flex-col gap-2">
+              {Object.entries(paramFields).map(([key, meta]) => (
+                <Div key={key}>
+                  <Div className="flex items-center justify-between mb-0.5">
+                    <Label className="text-[10px] font-medium text-foreground">
+                      {meta.label}
+                    </Label>
+                    {(meta.min !== undefined || meta.max !== undefined) && (
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] px-1 py-0 h-4 font-mono leading-none text-muted-foreground/60"
+                      >
+                        {meta.min !== undefined && meta.max !== undefined
+                          ? `${String(meta.min)}-${String(meta.max)}`
+                          : meta.min !== undefined
+                            ? `min ${String(meta.min)}`
+                            : `max ${String(meta.max)}`}
+                      </Badge>
+                    )}
+                  </Div>
+                  <ParamFieldControl
+                    fieldName={key}
+                    meta={meta}
+                    value={nodeConfig.params?.[key]}
+                    onChange={(v) => updateParam(key, v)}
+                  />
+                </Div>
+              ))}
+            </Div>
+          </InspectorSection>
+        )}
+
+        {/* Manual params - for extra/legacy params not in schema */}
+        {(manualParams.length > 0 || Object.keys(paramFields).length === 0) && (
+          <InspectorSection label={extraParamsLabel}>
+            <Div className="flex flex-col gap-2">
+              {manualParams.map(([field, value]) => (
+                <Div key={field} className="rounded-lg border bg-muted/20 p-2">
+                  <Div className="flex items-center justify-between mb-1.5">
+                    <P className="text-[10px] font-mono font-semibold text-foreground">
+                      {field}
+                    </P>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-4 w-4 p-0"
+                      onClick={() => {
+                        const newParams = { ...(nodeConfig.params ?? {}) };
+                        delete newParams[field];
+                        onUpdate(nodeId, {
+                          ...nodeConfig,
+                          params:
+                            Object.keys(newParams).length > 0
+                              ? newParams
+                              : undefined,
+                        });
+                      }}
+                    >
+                      <X className="h-2.5 w-2.5 text-muted-foreground" />
+                    </Button>
+                  </Div>
+                  <Input
+                    value={value !== null ? String(value) : ""}
+                    onChangeText={(v) => {
+                      const parsed = Number(v);
+                      const typed: string | number | boolean | null =
+                        v === "true"
+                          ? true
+                          : v === "false"
+                            ? false
+                            : v === ""
+                              ? null
+                              : !isNaN(parsed) && v.trim() !== ""
+                                ? parsed
+                                : v;
                       onUpdate(nodeId, {
                         ...nodeConfig,
-                        params:
-                          Object.keys(newParams).length > 0
-                            ? newParams
-                            : undefined,
+                        params: {
+                          ...(nodeConfig.params ?? {}),
+                          [field]: typed,
+                        },
                       });
                     }}
-                  >
-                    <X className="h-2.5 w-2.5 text-muted-foreground" />
-                  </Button>
+                    className="h-6 text-[10px]"
+                    placeholder="value"
+                  />
                 </Div>
-                <Input
-                  value={value !== null ? String(value) : ""}
-                  onChangeText={(v) => {
-                    const parsed = Number(v);
-                    const typed: string | number | boolean | null =
-                      v === "true"
-                        ? true
-                        : v === "false"
-                          ? false
-                          : v === ""
-                            ? null
-                            : !isNaN(parsed) && v.trim() !== ""
-                              ? parsed
-                              : v;
-                    onUpdate(nodeId, {
-                      ...nodeConfig,
-                      params: {
-                        ...(nodeConfig.params ?? {}),
-                        [field]: typed,
-                      },
-                    });
-                  }}
-                  className="h-6 text-[10px]"
-                  placeholder="value"
-                />
-              </Div>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-6 text-[10px] w-full border-dashed"
-              onClick={() => {
-                const newParams = { ...(nodeConfig.params ?? {}) };
-                const fieldName = `param_${String(
-                  Object.keys(newParams).length + 1,
-                )}`;
-                newParams[fieldName] = "";
-                onUpdate(nodeId, {
-                  ...nodeConfig,
-                  params: newParams,
-                });
-              }}
-            >
-              {t("widget.addField")}
-            </Button>
-          </Div>
-        </InspectorSection>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-6 text-[10px] w-full border-dashed"
+                onClick={() => {
+                  const newParams = { ...(nodeConfig.params ?? {}) };
+                  const fieldName = `param_${String(
+                    Object.keys(newParams).length + 1,
+                  )}`;
+                  newParams[fieldName] = "";
+                  onUpdate(nodeId, { ...nodeConfig, params: newParams });
+                }}
+              >
+                {t("widget.addField")}
+              </Button>
+            </Div>
+          </InspectorSection>
+        )}
 
         {/* Display options */}
         <InspectorSection label={t("widget.inspector.display")}>
@@ -1150,14 +1706,36 @@ const NodeInspector = React.memo(function NodeInspector({
                 />
               </Div>
             </Div>
-            {/* Pane selector */}
+            {/* Pane selector - "–" = no chart, 0/1/2 = pane number */}
             <Div className="flex items-center gap-2">
               <Label className="text-[11px] w-14 text-muted-foreground shrink-0">
                 {t("widget.inspector.pane")}
               </Label>
               <Div className="flex items-center gap-0.5 border rounded-md overflow-hidden bg-muted/30">
+                {/* No-chart button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  title={t("widget.inspector.paneNone")}
+                  onClick={() =>
+                    onUpdate(
+                      nodeId,
+                      withDisplayOverride(nodeConfig, { pane: null }),
+                    )
+                  }
+                  className={cn(
+                    "h-6 w-7 p-0 text-[11px] rounded-none border-0",
+                    nodeConfig.pane === null
+                      ? "bg-destructive/20 text-destructive hover:bg-destructive/30"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <EyeOff className="h-3 w-3" />
+                </Button>
+                {/* Pane 0/1/2 */}
                 {[0, 1, 2].map((pane) => {
-                  const current = nodeConfig.pane ?? 0;
+                  const current =
+                    nodeConfig.pane === null ? null : (nodeConfig.pane ?? 0);
                   return (
                     <Button
                       key={pane}
@@ -1197,6 +1775,7 @@ const GraphSettingsPanel = React.memo(function GraphSettingsPanel({
   description,
   triggerType,
   cronSchedule,
+  isNew,
   onNameChange,
   onSlugChange,
   onDescriptionChange,
@@ -1209,6 +1788,7 @@ const GraphSettingsPanel = React.memo(function GraphSettingsPanel({
   description: string;
   triggerType: "manual" | "cron";
   cronSchedule: string;
+  isNew: boolean;
   onNameChange: (v: string) => void;
   onSlugChange: (v: string) => void;
   onDescriptionChange: (v: string) => void;
@@ -1216,6 +1796,8 @@ const GraphSettingsPanel = React.memo(function GraphSettingsPanel({
   onCronScheduleChange: (v: string) => void;
   t: TFn;
 }): React.JSX.Element {
+  const nameEmpty = name.trim().length === 0;
+
   return (
     <Div className="flex flex-col gap-0 h-full">
       {/* Header */}
@@ -1226,21 +1808,42 @@ const GraphSettingsPanel = React.memo(function GraphSettingsPanel({
         </P>
       </Div>
 
+      {/* First-time hint for new graphs */}
+      {isNew && (
+        <Div className="px-3 py-2 border-b bg-primary/5 border-primary/10">
+          <P className="text-[10px] text-primary/70 leading-relaxed">
+            {t("widget.graphSettingsHint")}
+          </P>
+        </Div>
+      )}
+
       <Div className="flex flex-col gap-4 p-3 overflow-y-auto flex-1">
-        {/* Name */}
+        {/* Name - required, highlighted when empty on new graph */}
         <Div className="flex flex-col gap-1.5">
-          <Label className="text-[11px] font-medium">
-            {t("widget.nameLabel")}
-          </Label>
+          <Div className="flex items-center gap-1">
+            <Label className="text-[11px] font-medium">
+              {t("widget.nameLabel")}
+            </Label>
+            {isNew && nameEmpty && (
+              <Span className="text-[9px] text-destructive font-medium leading-none">
+                *
+              </Span>
+            )}
+          </Div>
           <Input
             value={name}
             onChangeText={onNameChange}
-            className="h-8 text-xs"
+            className={cn(
+              "h-8 text-xs",
+              isNew &&
+                nameEmpty &&
+                "border-destructive/50 focus:border-destructive",
+            )}
             placeholder={t("widget.namePlaceholder")}
           />
         </Div>
 
-        {/* Slug */}
+        {/* Slug - auto-derived, editable */}
         <Div className="flex flex-col gap-1.5">
           <Label className="text-[11px] font-medium">
             {t("widget.slugLabel")}
@@ -1321,7 +1924,7 @@ const NodePalette = React.memo(function NodePalette({
 }: {
   paletteSearch: string;
   setPaletteSearch: (v: string) => void;
-  paletteGroups: Array<{ category: string; entries: PaletteEntry[] }>;
+  paletteGroups: PaletteGroup[];
   onAddNode: (alias: string) => void;
   t: TFn;
 }): React.JSX.Element {
@@ -1347,26 +1950,45 @@ const NodePalette = React.memo(function NodePalette({
         )}
       </Div>
 
-      {/* Dynamic category sections from endpointsMeta */}
-      {paletteGroups.map((group, idx) => (
-        <PaletteSection
-          key={group.category}
-          title={`${group.category} (${String(group.entries.length)})`}
-          badge={PALETTE_BADGE}
-          icon={<Globe className="h-3 w-3" />}
-          defaultOpen={idx < 3}
-        >
-          {group.entries.map((entry) => (
-            <PaletteItem
-              key={entry.alias}
-              label={entry.alias}
-              detail={entry.alias}
-              alias={entry.alias}
-              onClick={() => onAddNode(entry.alias)}
-            />
-          ))}
-        </PaletteSection>
-      ))}
+      {/* Two-level: category → subCategory → items, all start collapsed */}
+      {paletteGroups.map((group) => {
+        const visuals = getVisuals(group.nodeCategory);
+        const totalEntries = group.subGroups.reduce(
+          (n, sg) => n + sg.entries.length,
+          0,
+        );
+        if (totalEntries === 0) {
+          return null;
+        }
+        return (
+          <PaletteSection
+            key={group.category}
+            title={group.category}
+            badge={visuals.badge}
+            icon={visuals.icon}
+            defaultOpen={false}
+          >
+            {group.subGroups.map((sg) => (
+              <PaletteSubSection key={sg.subCategory} title={sg.subCategory}>
+                {sg.entries.map((entry) => (
+                  <PaletteItem
+                    key={entry.alias}
+                    label={entry.label}
+                    detail={entry.description}
+                    alias={entry.alias}
+                    onClick={() => onAddNode(entry.alias)}
+                  />
+                ))}
+              </PaletteSubSection>
+            ))}
+          </PaletteSection>
+        );
+      })}
+      {paletteGroups.length === 0 && (
+        <P className="text-[10px] text-muted-foreground/50 px-3 py-4 text-center">
+          {t("widget.palette.noIndicators")}
+        </P>
+      )}
     </Div>
   );
 });
@@ -1376,13 +1998,30 @@ const NodePalette = React.memo(function NodePalette({
 function CanvasEmptyHint({ t }: { t: TFn }): React.JSX.Element {
   return (
     <Div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-      <Div className="text-center">
-        <P className="text-sm text-muted-foreground/50 font-medium mb-1">
-          {t("widget.canvasEmpty")}
-        </P>
-        <P className="text-xs text-muted-foreground/40">
-          {t("widget.canvasEmptyHint")}
-        </P>
+      <Div className="flex flex-col items-center gap-3 select-none">
+        {/* Minimal node graph illustration */}
+        <Div className="relative">
+          {/* Node A */}
+          <Div className="absolute -top-6 -left-8 w-12 h-8 rounded-lg border-2 border-dashed border-muted-foreground/20 bg-background/60 flex items-center justify-center">
+            <Database className="h-3 w-3 text-muted-foreground/20" />
+          </Div>
+          {/* Node B */}
+          <Div className="absolute -top-6 right-0 w-12 h-8 rounded-lg border-2 border-dashed border-muted-foreground/20 bg-background/60 flex items-center justify-center">
+            <Activity className="h-3 w-3 text-muted-foreground/20" />
+          </Div>
+          {/* Center node */}
+          <Div className="w-14 h-9 rounded-xl border-2 border-dashed border-muted-foreground/30 bg-background/80 flex items-center justify-center mt-6">
+            <Zap className="h-4 w-4 text-muted-foreground/25" />
+          </Div>
+        </Div>
+        <Div className="text-center mt-2">
+          <P className="text-sm font-medium text-muted-foreground/50 mb-1">
+            {t("widget.canvasEmpty")}
+          </P>
+          <P className="text-xs text-muted-foreground/35">
+            {t("widget.canvasEmptyHint")}
+          </P>
+        </Div>
       </Div>
     </Div>
   );
@@ -1390,13 +2029,26 @@ function CanvasEmptyHint({ t }: { t: TFn }): React.JSX.Element {
 
 function KeyboardHints({ t }: { t: TFn }): React.JSX.Element {
   return (
-    <Div className="absolute bottom-12 right-2 flex flex-col items-end gap-0.5 pointer-events-none z-10">
-      <P className="text-[10px] text-muted-foreground/50 bg-background/80 px-1.5 py-0.5 rounded border border-border/30">
-        <Span className="font-mono">{t("widget.shortcutDelete")}</Span>
-      </P>
-      <P className="text-[10px] text-muted-foreground/50 bg-background/80 px-1.5 py-0.5 rounded border border-border/30">
-        <Span className="font-mono">{t("widget.shortcutSave")}</Span>
-      </P>
+    <Div className="absolute bottom-12 right-2 flex flex-col items-end gap-1 pointer-events-none z-10 select-none">
+      {[t("widget.shortcutDelete"), t("widget.shortcutSave")].map((hint) => (
+        <Div
+          key={hint}
+          className="flex items-center gap-0.5 opacity-50 hover:opacity-70 transition-opacity"
+        >
+          {hint.split(" - ").map((part, i, arr) => (
+            <React.Fragment key={part}>
+              <Span className="text-[9px] font-mono text-muted-foreground bg-muted/70 border border-border/50 rounded px-1 py-0 shadow-[0_1px_0_0_hsl(var(--border))]">
+                {part}
+              </Span>
+              {i < arr.length - 1 && (
+                <Span className="text-[9px] text-muted-foreground/50 mx-0.5">
+                  —
+                </Span>
+              )}
+            </React.Fragment>
+          ))}
+        </Div>
+      ))}
     </Div>
   );
 }
@@ -1405,48 +2057,173 @@ function KeyboardHints({ t }: { t: TFn }): React.JSX.Element {
 
 interface PaletteEntry {
   alias: string;
-  category: string; // Real endpoint category from endpointsMeta (e.g. "AI", "Credits")
+  category: string; // top-level translated category e.g. "Analytics"
+  subCategory: string; // sub-level translated category e.g. "Indicators"
+  nodeCategory: NodeCategory; // derived for visuals
+  label: string;
+  description: string;
 }
 
-/** Build alias → real category lookup from generated endpointsMeta */
-const aliasToCategory: Record<string, string> = (() => {
-  const map: Record<string, string> = {};
-  for (const meta of endpointsMeta) {
-    map[meta.toolName] = meta.category;
-    for (const alias of meta.aliases) {
-      map[alias] = meta.category;
+/**
+ * Derive a NodeCategory (for visuals) from the endpoint's category + subCategory strings.
+ */
+function nodeTypeFromCategory(
+  category: string,
+  subCategory: string,
+): NodeCategory {
+  const cat = category.toLowerCase();
+  const sub = subCategory.toLowerCase();
+  if (
+    sub.includes("indicator") ||
+    sub.includes("evaluator") ||
+    sub.includes("transformer")
+  ) {
+    if (sub.includes("evaluator")) {
+      return "evaluator";
     }
+    if (sub.includes("transformer")) {
+      return "transformer";
+    }
+    return "indicator";
   }
-  return map;
-})();
+  if (
+    cat.includes("data source") ||
+    sub.includes("data source") ||
+    cat.includes("analytics: data")
+  ) {
+    return "data-source";
+  }
+  if (cat.includes("analytics") || sub.includes("analytics")) {
+    return "indicator";
+  }
+  return "other";
+}
+
+/** Human-readable label derived from toolName: strip common prefix, prettify */
+function toolNameToLabel(toolName: string): string {
+  // e.g. "vibe-sense-indicator-ema" → "EMA"
+  //      "vibe-sense-transformer-window-avg" → "Window Avg"
+  const stripped = toolName
+    .replace(/^vibe-sense-(indicator|evaluator|transformer|data-source)-?/, "")
+    .replace(/-/g, " ")
+    .trim();
+  if (!stripped) {
+    return toolName;
+  }
+  return stripped.toUpperCase().length <= 5
+    ? stripped.toUpperCase()
+    : stripped.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+// Vibe-sense graph management endpoints to exclude from the palette
+const EXCLUDED_TOOL_SUBSTRINGS = [
+  "vibe-sense_graphs",
+  "vibe-sense_cleanup",
+  "vibe-sense-run-config",
+];
 
 function buildPaletteEntries(): PaletteEntry[] {
+  // Show ALL endpoints except vibe-sense graph management endpoints themselves
+  const metas = endpointsMeta.filter((m) => {
+    const tool = m.toolName.toLowerCase();
+    return !EXCLUDED_TOOL_SUBSTRINGS.some((p) => tool.includes(p));
+  });
+
   const seen = new Set<string>();
   const entries: PaletteEntry[] = [];
-  for (const [, alias] of Object.entries(pathToAliasMap)) {
+
+  for (const meta of metas) {
+    // Prefer the first alias; fall back to toolName
+    const alias =
+      meta.aliases.length > 0
+        ? (meta.aliases[0] ?? meta.toolName)
+        : meta.toolName;
     if (seen.has(alias)) {
       continue;
     }
     seen.add(alias);
-    const category = aliasToCategory[alias] ?? "System";
-    entries.push({ alias, category });
+
+    const category = meta.category ?? "Other";
+    const subCategory = meta.subCategory ?? category;
+    const nodeType = nodeTypeFromCategory(category, subCategory);
+    const label = meta.title
+      ? meta.title.replace(/^Vibe Sense\s*[-–]\s*/i, "")
+      : toolNameToLabel(meta.toolName);
+
+    entries.push({
+      alias,
+      category,
+      subCategory,
+      nodeCategory: nodeType,
+      label,
+      description: meta.description,
+    });
   }
-  return entries.toSorted((a, b) => a.alias.localeCompare(b.alias));
+  return entries.toSorted((a, b) => a.label.localeCompare(b.label));
 }
 
-/** Group palette entries by their real category, sorted alphabetically */
-function groupByCategory(
-  entries: PaletteEntry[],
-): Array<{ category: string; entries: PaletteEntry[] }> {
-  const groups = new Map<string, PaletteEntry[]>();
+interface PaletteSubGroup {
+  subCategory: string;
+  entries: PaletteEntry[];
+}
+
+interface PaletteGroup {
+  category: string;
+  nodeCategory: NodeCategory;
+  subGroups: PaletteSubGroup[];
+}
+
+function groupByCategory(entries: PaletteEntry[]): PaletteGroup[] {
+  // Top-level: keyed by category
+  const catMap = new Map<
+    string,
+    { nodeCategory: NodeCategory; subMap: Map<string, PaletteEntry[]> }
+  >();
+
   for (const entry of entries) {
-    const list = groups.get(entry.category) ?? [];
-    list.push(entry);
-    groups.set(entry.category, list);
+    let cat = catMap.get(entry.category);
+    if (!cat) {
+      cat = { nodeCategory: entry.nodeCategory, subMap: new Map() };
+      catMap.set(entry.category, cat);
+    }
+    const sub = cat.subMap.get(entry.subCategory) ?? [];
+    sub.push(entry);
+    cat.subMap.set(entry.subCategory, sub);
   }
-  return [...groups.entries()]
-    .map(([category, items]) => ({ category, entries: items }))
-    .toSorted((a, b) => a.category.localeCompare(b.category));
+
+  // Priority categories shown first (analytics primitives), rest alphabetical
+  const PRIORITY_CATEGORIES = [
+    "Analytics: Data Sources",
+    "Indicators",
+    "Transformers",
+    "Evaluators",
+  ];
+
+  return [...catMap.entries()]
+    .toSorted(([a], [b]) => {
+      const ia = PRIORITY_CATEGORIES.indexOf(a);
+      const ib = PRIORITY_CATEGORIES.indexOf(b);
+      if (ia !== -1 && ib !== -1) {
+        return ia - ib;
+      }
+      if (ia !== -1) {
+        return -1;
+      }
+      if (ib !== -1) {
+        return 1;
+      }
+      return a.localeCompare(b);
+    })
+    .map(([category, { nodeCategory, subMap }]) => ({
+      category,
+      nodeCategory,
+      subGroups: [...subMap.entries()]
+        .toSorted(([a], [b]) => a.localeCompare(b))
+        .map(([subCategory, subEntries]) => ({
+          subCategory,
+          entries: subEntries,
+        })),
+    }));
 }
 
 // ─── Edit Form Inner ──────────────────────────────────────────────────────────
@@ -1462,6 +2239,7 @@ function EditFormInner({
   const user = useWidgetUser();
   const form = useWidgetForm<typeof definition.PUT>();
   const onSubmit = useWidgetOnSubmit();
+  const isSubmitting = useWidgetIsSubmitting() ?? false;
   const reactFlow = useReactFlow();
 
   const [name, setName] = useState("");
@@ -1667,6 +2445,27 @@ function EditFormInner({
   const showNodeInspector =
     selectedNodeConfig !== null && selectedNodeId !== null;
 
+  // Derive GraphEdge[] from current React Flow edges for the connections display
+  const currentGraphEdges = useMemo<GraphEdge[]>(
+    () =>
+      edges.map((e) => ({
+        from: e.source,
+        to: e.target,
+        ...(e.sourceHandle ? { fromHandle: e.sourceHandle } : {}),
+        ...(e.targetHandle ? { toHandle: e.targetHandle } : {}),
+      })),
+    [edges],
+  );
+
+  const handleSelectNode = useCallback(
+    (nodeId: string): void => {
+      setSelectedNodeId(nodeId);
+      // Also select the node in React Flow for visual highlight
+      setNodes((nds) => nds.map((n) => ({ ...n, selected: n.id === nodeId })));
+    },
+    [setNodes],
+  );
+
   // ── Palette entries ──
   const allPaletteEntries = useMemo(() => buildPaletteEntries(), []);
 
@@ -1676,8 +2475,11 @@ function EditFormInner({
       return groupByCategory(allPaletteEntries);
     }
     const q = paletteSearch.toLowerCase();
-    const filtered = allPaletteEntries.filter((e) =>
-      e.alias.toLowerCase().includes(q),
+    const filtered = allPaletteEntries.filter(
+      (e) =>
+        e.label.toLowerCase().includes(q) ||
+        e.alias.toLowerCase().includes(q) ||
+        e.description.toLowerCase().includes(q),
     );
     return groupByCategory(filtered);
   }, [allPaletteEntries, paletteSearch]);
@@ -1743,13 +2545,16 @@ function EditFormInner({
   );
 
   const addNode = useCallback(
-    (endpointPath: string, position?: { x: number; y: number }) => {
-      const nodeId = generateNodeId(
-        endpointPath.replace(/[./]/g, "_"),
-        workingNodes,
-      );
+    (aliasOrPath: string, position?: { x: number; y: number }) => {
+      // Resolve alias → endpoint path. pathToAliasMap is path→alias, so we invert.
+      const resolvedPath =
+        Object.entries(pathToAliasMap).find(
+          ([, alias]) => alias === aliasOrPath,
+        )?.[0] ?? aliasOrPath;
+
+      const nodeId = generateNodeId(aliasOrPath, workingNodes);
       const nodeConfig: GraphNodeConfig = {
-        endpointPath,
+        endpointPath: resolvedPath,
         method: "POST",
       };
 
@@ -1764,7 +2569,7 @@ function EditFormInner({
         };
       }
 
-      const info = endpointInfoMap.get(endpointPath) ?? DEFAULT_INFO;
+      const info = endpointInfoMap.get(resolvedPath) ?? DEFAULT_INFO;
       const newNode: VibeNode = {
         id: nodeId,
         type: "vibeNode",
@@ -1772,7 +2577,7 @@ function EditFormInner({
         data: {
           nodeId,
           nodeConfig: nodeConfig as GraphConfig["nodes"][string],
-          label: endpointPath,
+          label: resolvedPath,
           handles: info.handles,
           category: info.category,
         },
@@ -1790,10 +2595,29 @@ function EditFormInner({
     setSelectedNodeId(null);
   }, []);
 
-  const handleNameChange = useCallback((v: string): void => {
-    setName(v);
-    setDirty(true);
-  }, []);
+  const handleNameChange = useCallback(
+    (v: string): void => {
+      setName(v);
+      // Auto-derive slug from name if slug is still the auto-generated one
+      // (i.e. user hasn't manually edited it)
+      if (isNewGraph) {
+        setSlug((prev) => {
+          const expectedSlug = nameToSlug(name);
+          // Only auto-update if slug matches the previous auto-derivation
+          if (
+            prev === "" ||
+            prev === expectedSlug ||
+            prev === nameToSlug(name)
+          ) {
+            return nameToSlug(v);
+          }
+          return prev;
+        });
+      }
+      setDirty(true);
+    },
+    [isNewGraph, name],
+  );
 
   const handleSlugChange = useCallback((v: string): void => {
     setSlug(v);
@@ -1907,6 +2731,11 @@ function EditFormInner({
     }
     if (navigation.canGoBack) {
       navigation.pop();
+    } else {
+      void (async (): Promise<void> => {
+        const listDef = await import("../../definition");
+        navigation.push(listDef.default.GET);
+      })();
     }
   }, [navigation, dirty]);
 
@@ -1938,6 +2767,11 @@ function EditFormInner({
     setConfirmBackOpen(false);
     if (navigation.canGoBack) {
       navigation.pop();
+    } else {
+      void (async (): Promise<void> => {
+        const listDef = await import("../../definition");
+        navigation.push(listDef.default.GET);
+      })();
     }
   }, [navigation]);
 
@@ -1988,8 +2822,30 @@ function EditFormInner({
 
   if (isLoading) {
     return (
-      <Div className="flex items-center justify-center h-full min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <Div className="flex flex-col h-[calc(100vh-12rem)] min-h-[500px] animate-pulse">
+        {/* Toolbar skeleton */}
+        <Div className="flex items-center gap-2 px-3 py-1.5 border-b bg-background shrink-0 h-11">
+          <Div className="h-6 w-16 bg-muted rounded" />
+          <Div className="h-6 w-6 bg-muted rounded" />
+          <Div className="flex-1" />
+          <Div className="h-6 w-20 bg-muted rounded" />
+          <Div className="h-7 w-24 bg-muted rounded" />
+        </Div>
+        {/* Three-panel skeleton */}
+        <Div className="flex flex-1 min-h-0">
+          <Div className="w-60 border-r bg-muted/10 flex flex-col gap-2 p-2 shrink-0">
+            <Div className="h-6 bg-muted rounded" />
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <Div key={i} className="h-7 bg-muted/60 rounded" />
+            ))}
+          </Div>
+          <Div className="flex-1 bg-muted/5" />
+          <Div className="w-70 border-l flex flex-col gap-3 p-3 shrink-0">
+            {[0, 1, 2, 3].map((i) => (
+              <Div key={i} className="h-12 bg-muted rounded" />
+            ))}
+          </Div>
+        </Div>
       </Div>
     );
   }
@@ -2043,7 +2899,7 @@ function EditFormInner({
           )}
         </Button>
         <Div className="flex-1" />
-        {/* Version history navigation */}
+        {/* Version history navigation - only when chain exists */}
         {versionChain.length > 1 && (
           <>
             <Div
@@ -2056,15 +2912,15 @@ function EditFormInner({
                 onClick={handleVersionUndo}
                 disabled={!prevVersionId}
                 className="h-7 w-7 p-0"
-                title="Undo to previous version"
+                title="Previous version"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
               </Button>
               <Div className="flex items-center gap-0.5 px-1">
                 <History className="h-3 w-3 text-muted-foreground/50" />
                 <Span className="text-[10px] text-muted-foreground/70 tabular-nums">
-                  {/* eslint-disable-next-line i18n/no-literal-string -- UI label */}
-                  {`${String(currentVersionIndex + 1)}/${String(versionChain.length)}`}
+                  {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+                  {`${String(currentVersionIndex >= 0 ? currentVersionIndex + 1 : versionChain.length)}/${String(versionChain.length)}`}
                 </Span>
               </Div>
               <Button
@@ -2073,7 +2929,7 @@ function EditFormInner({
                 onClick={handleVersionRedo}
                 disabled={!nextVersionId}
                 className="h-7 w-7 p-0"
-                title="Redo to next version"
+                title="Next version"
               >
                 <ChevronRight className="h-3.5 w-3.5" />
               </Button>
@@ -2089,18 +2945,30 @@ function EditFormInner({
             {t("widget.unsaved")}
           </Badge>
         )}
-        <Badge variant="outline" className="text-[10px] shrink-0">
-          {String(nodeCount)} {t("widget.nodes")}
-        </Badge>
+        {nodeCount > 0 && (
+          <Badge variant="outline" className="text-[10px] shrink-0">
+            {String(nodeCount)} {t("widget.nodes")}
+          </Badge>
+        )}
         <Button
           type="submit"
           variant="default"
           size="sm"
           onClick={syncFormValues}
+          disabled={isSubmitting || name.trim().length === 0}
+          title={name.trim().length === 0 ? t("widget.nameMissing") : undefined}
           className="gap-1 h-7 shrink-0"
         >
-          <Save className="h-3.5 w-3.5" />
-          {t("widget.save")}
+          {isSubmitting ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Save className="h-3.5 w-3.5" />
+          )}
+          {isSubmitting
+            ? t("widget.saving")
+            : isNewGraph
+              ? t("widget.saveNew")
+              : t("widget.save")}
         </Button>
       </Div>
 
@@ -2153,10 +3021,16 @@ function EditFormInner({
                 endpointInfoMap.get(selectedNodeConfig.endpointPath ?? "")
                   ?.category ?? "other"
               }
+              endpointInfo={
+                endpointInfoMap.get(selectedNodeConfig.endpointPath ?? "") ??
+                DEFAULT_INFO
+              }
+              edges={currentGraphEdges}
               onUpdate={updateNodeConfig}
               onDelete={deleteNode}
               onClose={handlePaneClick}
               onOpenEndpoint={handleOpenEndpoint}
+              onSelectNode={handleSelectNode}
               t={t}
               deleteConfirmNodeId={deleteConfirmNodeId}
               setDeleteConfirmNodeId={setDeleteConfirmNodeId}
@@ -2168,6 +3042,7 @@ function EditFormInner({
               description={description}
               triggerType={triggerType}
               cronSchedule={cronSchedule}
+              isNew={isNewGraph}
               onNameChange={handleNameChange}
               onSlugChange={handleSlugChange}
               onDescriptionChange={handleDescriptionChange}

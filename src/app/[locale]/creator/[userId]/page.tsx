@@ -23,13 +23,43 @@ interface Props {
   params: Promise<{ locale: CountryLanguage; userId: string }>;
 }
 
+/** Resolve userId param - accepts UUID or creatorSlug. Returns null if not found. */
+async function resolveUserId(param: string): Promise<string | null> {
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (uuidPattern.test(param)) {
+    return param;
+  }
+  const { eq, or, sql } = await import("drizzle-orm");
+  const { db } = await import("@/app/api/[locale]/system/db");
+  const { users } = await import("@/app/api/[locale]/user/db");
+  // Match by creatorSlug, or fall back to publicName converted to slug format
+  const result = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(
+      or(
+        eq(users.creatorSlug, param),
+        eq(sql`lower(replace(${users.publicName}, ' ', '-'))`, param),
+      ),
+    )
+    .limit(1);
+  return result[0]?.id ?? null;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale, userId } = await params;
+  const { locale, userId: rawParam } = await params;
+  const userId = await resolveUserId(rawParam);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
+
+  if (!userId) {
+    return { title: `Creator Not Found - ${appName}` };
+  }
+
   const { eq } = await import("drizzle-orm");
   const { db } = await import("@/app/api/[locale]/system/db");
   const { users } = await import("@/app/api/[locale]/user/db");
-  const { t: configT } = configScopedTranslation.scopedT(locale);
-  const appName = configT("appName");
 
   const results = await db.select().from(users).where(eq(users.id, userId));
   const user = results[0];
@@ -44,7 +74,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export async function tanstackLoader({
   params,
 }: Props): Promise<CreatorPageData> {
-  const { locale, userId } = await params;
+  const { locale, userId: rawParam } = await params;
+  const resolvedId = await resolveUserId(rawParam);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
+
+  if (!resolvedId) {
+    return {
+      locale,
+      userId: rawParam,
+      creator: null,
+      skills: [],
+      appName,
+      leadMagnetConfig: null,
+    };
+  }
+
+  const userId = resolvedId;
   const { and, count, eq } = await import("drizzle-orm");
   const { customSkills } =
     await import("@/app/api/[locale]/agent/chat/skills/db");
@@ -53,8 +99,6 @@ export async function tanstackLoader({
   const { referralCodes } = await import("@/app/api/[locale]/referral/db");
   const { db } = await import("@/app/api/[locale]/system/db");
   const { users } = await import("@/app/api/[locale]/user/db");
-  const { t: configT } = configScopedTranslation.scopedT(locale);
-  const appName = configT("appName");
 
   const [userResults, skillRows] = await Promise.all([
     db.select().from(users).where(eq(users.id, userId)),
@@ -153,7 +197,7 @@ export default async function CreatorPage({
   params,
 }: Props): Promise<JSX.Element> {
   const { locale } = await params;
-  const data = await tanstackLoader({ params });
+  const data = await tanstackLoader({ params: params });
   const { t } = scopedTranslation.scopedT(locale);
   return <CreatorProfilePage {...data} t={t} />;
 }

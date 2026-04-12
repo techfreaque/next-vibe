@@ -35,7 +35,8 @@ export const { POST } = createEndpoint({
   title: "providers.googleSheets.title" as const,
   description: "providers.googleSheets.description" as const,
   icon: "table",
-  category: "endpointCategories.leads",
+  category: "endpointCategories.leadMagnet",
+  subCategory: "endpointCategories.leadMagnetIntegrations",
   tags: ["providers.shared.saveTag" as const],
   allowedRoles: ALLOWED_ROLES,
 

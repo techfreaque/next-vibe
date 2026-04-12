@@ -21,6 +21,7 @@ const messagesEndpoint: MessagesEndpoint = { GET: messagesDefinition.GET };
 /**
  * Memoized embedded messages view.
  * Receives threadId as string (already narrowed by parent).
+ * WS subscription is handled by MessagesWidget → ReadOnlyMessages internally.
  */
 export function EmbeddedMessagesView({
   threadId,

@@ -37,7 +37,8 @@ const { POST } = createEndpoint({
   aliases: ["campaign-starter"],
   title: "post.title",
   description: "post.description",
-  category: "endpointCategories.leadsCampaigns",
+  category: "endpointCategories.emailCampaigns",
+  subCategory: "endpointCategories.emailCampaignsProcessing",
   icon: "play",
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
@@ -342,7 +343,8 @@ const { GET } = createEndpoint({
   icon: "rocket",
   title: "get.title",
   description: "get.description",
-  category: "endpointCategories.leadsCampaigns",
+  category: "endpointCategories.emailCampaigns",
+  subCategory: "endpointCategories.emailCampaignsProcessing",
   tags: ["tag"],
 
   fields: customWidgetObject({

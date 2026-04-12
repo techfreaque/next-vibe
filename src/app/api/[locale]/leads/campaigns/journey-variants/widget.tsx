@@ -184,7 +184,7 @@ export function JourneyVariantsWidget({
               {t("widget.weightLabel")}: {totalWeight}
             </Span>
             {totalWeight !== 100 && (
-              <Span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+              <Span className="text-xs text-warning flex items-center gap-1">
                 <AlertTriangle className="h-3 w-3" />
               </Span>
             )}
@@ -229,7 +229,7 @@ export function JourneyVariantsWidget({
 
                     {/* Check errors badge */}
                     {hasErrors && (
-                      <Span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-2 py-0.5 rounded flex items-center gap-1">
+                      <Span className="text-xs bg-destructive/10 text-destructive px-2 py-0.5 rounded flex items-center gap-1">
                         <AlertTriangle className="h-3 w-3" />
                         {item.checkErrors.length} {t("widget.checkErrorsLabel")}
                       </Span>

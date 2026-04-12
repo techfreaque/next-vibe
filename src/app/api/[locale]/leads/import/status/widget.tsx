@@ -52,14 +52,10 @@ type TFunc = ReturnType<typeof useWidgetTranslation>;
 // ---------------------------------------------------------------------------
 
 const STATUS_ICON_CLASS_MAP: Record<string, string> = {
-  [CsvImportJobStatus.PENDING]:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  [CsvImportJobStatus.PROCESSING]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  [CsvImportJobStatus.COMPLETED]:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  [CsvImportJobStatus.FAILED]:
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  [CsvImportJobStatus.PENDING]: "bg-warning/10 text-warning",
+  [CsvImportJobStatus.PROCESSING]: "bg-info/10 text-info",
+  [CsvImportJobStatus.COMPLETED]: "bg-success/10 text-success",
+  [CsvImportJobStatus.FAILED]: "bg-destructive/10 text-destructive",
 };
 
 function getStatusIcon(
@@ -219,22 +215,13 @@ function JobRow({
                 {job.totalRows ?? "?"}
               </Strong>
             </Span>
-            <Span
-              title="Processed rows"
-              className="text-blue-600 dark:text-blue-400"
-            >
+            <Span title="Processed rows" className="text-info">
               {t("widget.job.processed")} <Strong>{job.processedRows}</Strong>
             </Span>
-            <Span
-              title="Successful imports"
-              className="text-green-600 dark:text-green-400"
-            >
+            <Span title="Successful imports" className="text-success">
               {t("widget.job.ok")} <Strong>{job.successfulImports}</Strong>
             </Span>
-            <Span
-              title="Failed imports"
-              className="text-red-600 dark:text-red-400"
-            >
+            <Span title="Failed imports" className="text-destructive">
               {t("widget.job.fail")} <Strong>{job.failedImports}</Strong>
             </Span>
           </Div>
@@ -264,9 +251,7 @@ function JobRow({
 
       {/* Error message */}
       {job.error && (
-        <Span className="text-xs text-red-600 dark:text-red-400 mt-0.5">
-          {job.error}
-        </Span>
+        <Span className="text-xs text-destructive mt-0.5">{job.error}</Span>
       )}
     </Div>
   );

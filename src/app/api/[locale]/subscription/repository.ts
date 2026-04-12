@@ -5,7 +5,6 @@
 
 import "server-only";
 
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { desc, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -17,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 import type Stripe from "stripe";
 
 import { db } from "@/app/api/[locale]/system/db";
+import { configScopedTranslation } from "@/config/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -915,17 +915,18 @@ export class SubscriptionRepository {
                     userId,
                     leadId,
                     planName: subRecord.planId,
-                    totalModelCount: getAvailableModelCount(
-                      agentEnvAvailability,
-                      false,
-                    ),
+                    totalModelCount: getAvailableModelCount(false),
                   },
                   t,
                   locale: userLocale,
                   recipientEmail: fullUser.email,
                   tracking,
                 }),
-                subject: t("email.success.subject"),
+                subject: t("email.success.subject", {
+                  appName: configScopedTranslation
+                    .scopedT(userLocale)
+                    .t("appName"),
+                }),
                 toEmail: fullUser.email,
                 toName: fullUser.privateName,
                 leadId,
@@ -954,7 +955,9 @@ export class SubscriptionRepository {
                   recipientEmail: adminEmail,
                   tracking: createTrackingContext(userLocale),
                 }),
-                subject: adminT("email.admin_notification.subject"),
+                subject: adminT("email.admin_notification.subject", {
+                  planName: subRecord.planId,
+                }),
                 toEmail: adminEmail,
                 toName: adminEmail,
                 leadId,

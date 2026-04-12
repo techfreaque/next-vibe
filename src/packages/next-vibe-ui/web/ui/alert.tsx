@@ -8,13 +8,14 @@ const alertVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-blue-50 text-blue-900 border-blue-200 [&>svg]:text-blue-600 dark:bg-blue-950/50 dark:text-blue-100 dark:border-blue-800 dark:[&>svg]:text-blue-400",
+          "bg-card text-card-foreground border-border [&>svg]:text-foreground",
         destructive:
-          "border-red-500/50 text-red-600 dark:text-red-400 dark:border-red-500 [&>svg]:text-red-600 dark:[&>svg]:text-red-400 bg-red-50 dark:bg-red-950/50",
+          "border-destructive/50 text-foreground [&>svg]:text-destructive bg-destructive/5 dark:bg-destructive/10",
         success:
-          "border-green-500/50 text-green-700 dark:text-green-400 [&>svg]:text-green-700 dark:[&>svg]:text-green-400 bg-green-50 dark:bg-green-950/50",
+          "border-success/50 text-foreground [&>svg]:text-success bg-success/5 dark:bg-success/10",
         warning:
-          "border-yellow-500/50 text-yellow-700 dark:text-yellow-400 [&>svg]:text-yellow-700 dark:[&>svg]:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/50",
+          "border-warning/50 text-foreground [&>svg]:text-warning bg-warning/5 dark:bg-warning/10",
+        info: "border-info/50 text-foreground [&>svg]:text-info bg-info/5 dark:bg-info/10",
       },
     },
     defaultVariants: {
@@ -23,7 +24,12 @@ const alertVariants = cva(
   },
 );
 
-export type AlertVariant = "default" | "destructive" | "success" | "warning";
+export type AlertVariant =
+  | "default"
+  | "destructive"
+  | "success"
+  | "warning"
+  | "info";
 
 export interface AlertProps {
   variant?: AlertVariant;

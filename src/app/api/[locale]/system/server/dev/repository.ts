@@ -276,7 +276,7 @@ export class DevRepository {
     logger: EndpointLogger,
   ): Promise<never> {
     // Truncate dev log and enable file logging from line one - before any other output
-    truncateDevLog();
+    void truncateDevLog();
     enableDevFileLogging();
     // Guaranteed last-resort offline hint - process.on("exit") always fires, even on crash
     process.on("exit", writeDevLogOfflineHint);
@@ -929,16 +929,22 @@ export class DevRepository {
       // IMPORTANT: Start Vite BEFORE the proxy so early browser requests don't interfere with
       // Nitro's startup (requests arriving on the proxy while Vite is still initializing can
       // cause Nitro to hang mid-startup, resulting in the server never becoming ready).
+      // Mutable ref so the restart plugin can update the close fn after each restart.
+      // The shutdown handler always calls the current server's close, not the initial one.
+      const viteCloseRef: { fn: (() => Promise<void>) | undefined } = {
+        fn: undefined,
+      };
       const devResult = await viteCompiler.startTanstackDevServer(
         tanstackEntry,
         nextPort,
         disableProxy ? undefined : wsPort,
+        viteCloseRef,
       );
       if (!devResult.success) {
         logger.error(devResult.message ?? "TanStack Start dev server failed");
         process.exit(1);
       }
-      viteClose = devResult.close;
+      viteClose = (): Promise<void> => viteCloseRef.fn?.() ?? Promise.resolve();
 
       // Vite is now ready - start the proxy so it can forward requests to Vite
       if (!disableProxy) {
@@ -1002,7 +1008,7 @@ export class DevRepository {
             chunk.toString().replaceAll(String(nextPort), String(port)),
           );
           process.stdout.write(formatted);
-          devFileLog(formatted.trimEnd());
+          void devFileLog(formatted.trimEnd());
         };
         nextProcess.stdout?.on("data", rewritePort);
         nextProcess.stderr?.on("data", rewritePort);
@@ -1010,12 +1016,12 @@ export class DevRepository {
         nextProcess.stdout?.on("data", (chunk: Buffer) => {
           const formatted = formatNextjs(chunk.toString());
           process.stdout.write(formatted);
-          devFileLog(formatted.trimEnd());
+          void devFileLog(formatted.trimEnd());
         });
         nextProcess.stderr?.on("data", (chunk: Buffer) => {
           const formatted = formatNextjs(chunk.toString());
           process.stderr.write(formatted);
-          devFileLog(formatted.trimEnd());
+          void devFileLog(formatted.trimEnd());
         });
       }
 

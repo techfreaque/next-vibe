@@ -1,7 +1,135 @@
-import { translations as navTranslations } from "../../nav/i18n/en";
-
 export const translations = {
-  nav: navTranslations,
+  nav: {
+    help: "Help",
+    logout: "Log Out",
+    settings: "Profile Settings",
+    leadMagnet: "Lead Magnet",
+    enableLightMode: "Enable light mode",
+    enableDarkMode: "Enable dark mode",
+    notifications: "Notifications",
+    welcomeNotification: {
+      title: "Welcome to {{appName}}!",
+      description:
+        "Get started by exploring the AI models and creating your first conversation.",
+    },
+    company: "Company",
+    about: {
+      title: "About Us",
+      description: "Learn more about our company",
+    },
+    careers: {
+      title: "Careers",
+      description: "Join our team",
+    },
+    invest: {
+      title: "Invest",
+      description: "Back the open AI platform",
+    },
+    blog: {
+      title: "Blog",
+      description:
+        "Deep dives into the architecture and ideas behind next-vibe",
+    },
+    user: {
+      dashboard: "Dashboard",
+      completeOnboarding: "Complete Onboarding",
+      login: "Log In",
+      signup: "Sign Up",
+    },
+    home: "Home",
+    pricing: "Pricing & Subscription",
+    features: "Features",
+    framework: {
+      title: "Framework",
+      description: "The open-source engine behind the platform",
+    },
+    buildASkill: {
+      title: "Build a Skill",
+      description: "Create custom AI for anything. Three ways to build.",
+    },
+    forum: "Forum",
+    contact: "Contact",
+    getStarted: "Get Started Free",
+    signIn: "Sign In",
+    goToApp: "Open App",
+    backToChat: "Back to Chat",
+    unbottledHome: "Website & Blog",
+    subscription: "Subscription",
+    referral: "Referral",
+    services: {
+      title: "Platform",
+      features: {
+        title: "Features",
+        description: "AI Chat + Forum capabilities",
+      },
+      process: {
+        title: "How It Works",
+        description: "Get started in 4 simple steps",
+      },
+      aiModels: {
+        title: "AI Models",
+        description: "{{modelCount}} uncensored AI models",
+      },
+      folders: {
+        title: "Privacy Levels",
+        description: "Private, Incognito, Shared, Public",
+      },
+      characters: {
+        title: "AI Skills",
+        description: "Custom & community characters",
+      },
+    },
+    post: {
+      title: "Nav",
+      description: "Nav endpoint",
+      form: {
+        title: "Nav Configuration",
+        description: "Configure nav parameters",
+      },
+      response: {
+        title: "Response",
+        description: "Nav response data",
+      },
+      errors: {
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        validation: {
+          title: "Validation Error",
+          description: "Invalid request parameters",
+        },
+        server: {
+          title: "Server Error",
+          description: "Internal server error occurred",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unknown error occurred",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network error occurred",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access forbidden",
+        },
+        notFound: {
+          title: "Not Found",
+          description: "Resource not found",
+        },
+        conflict: {
+          title: "Conflict",
+          description: "Data conflict occurred",
+        },
+      },
+      success: {
+        title: "Success",
+        description: "Operation completed successfully",
+      },
+    },
+  },
   newsletter: {
     title: "Stay Updated",
     description:
@@ -32,7 +160,7 @@ export const translations = {
       title: "Your AI. Your Rules.",
       subtitle:
         "{{modelCount}} models. Generate images, video, and music. {{skillCount}} skills. ~{{toolCount}} tools. SSH, email, browser automation. Run it free on {{appName}} - or self-host your own.",
-      cta: "Start Free",
+      cta: "Start chatting",
       secondaryCta: "Self-Host It",
       tabUnbottled: "{{appName}}",
       tabSelfHost: "self-hosted",
@@ -126,26 +254,27 @@ export const translations = {
     splitHero: {
       or: "OR",
       clickToExplore: "Click to explore",
-      header: "Three paths. One platform.",
-      subheader: "Pick your entry point.",
+      header: "Four products. One platform.",
+      subheader:
+        "Uncensored AI · Self-hosted agent · Open-source framework · Recurring income",
       unbottled: {
-        badge: "Free speech AI",
-        titleLine1: "Your AI.",
-        titleLine2: "Your Rules.",
+        badge: "Uncensored · Open · Mainstream",
+        titleLine1: "Uncensored AI.",
+        titleLine2: "Ask anything.",
         subtitle:
-          "{{modelCount}} models across three tiers. You choose the filter - mainstream, open, or uncensored.",
+          "{{modelCount}} models. Three tiers - you pick. Switch per conversation. Get the actual answer, not the approved version.",
         pill1: "{{modelCount}} models - you pick the filter",
         pill2: "Generate images, video & music",
         pill3: "{{skillCount}}+ skills with memory & search",
-        cta: "Try Free",
+        cta: "Start chatting",
         ctaExplore: "Learn More",
       },
       personal: {
         badge: "Self-hosted AI agent",
-        titleLine1: "Your Agent.",
-        titleLine2: "Your Machine.",
+        titleLine1: "You ask.",
+        titleLine2: "It ships.",
         subtitle:
-          "All {{modelCount}} models on your hardware. Browses the web, writes code, runs terminals, handles tasks while you sleep. Bring your own keys or connect your {{appName}} account.",
+          "Every tool Thea builds appears on your dashboard instantly - fully usable UI, CLI command, AI tool, cron job. SSH, email, browser automation. Your machine. Your data.",
         pill1: "Browser, terminal & SSH built in",
         pill2: "Runs 24/7 in the background",
         pill3: "Your keys or {{appName}} account",
@@ -154,15 +283,24 @@ export const translations = {
       },
       nextvibe: {
         badge: "Open source · MIT + GPL v3",
-        titleLine1: "One definition.",
-        titleLine2: "Every platform.",
+        titleLine1: "Write once.",
+        titleLine2: "Ship everywhere.",
         subtitle:
-          "Define one endpoint. Get a web form, CLI command, AI tool, MCP server, cron job, mobile screen, and desktop app - automatically. The same TypeScript contract powers all of them. Fork it, own it.",
+          "One TypeScript definition becomes a custom web UI, CLI command, AI tool, MCP server, mobile screen, cron job - automatically. Same contract. Zero rewrites. Fork it, own it.",
         pill1: "Powers {{appName}}",
         pill2: "Zero any / unknown / throw",
         pill3: "{{platformCount}} platforms per endpoint",
         ctaGithub: "Star on GitHub",
         ctaDocs: "Framework Docs",
+        ctaExplore: "Learn More",
+      },
+      referral: {
+        badge: "Skill Economy",
+        titleLine1: "Publish. Refer.",
+        titleLine2: "Earn.",
+        subtitle:
+          "Build skills. Earn 15% when someone signs up through yours. Refer anyone - 10% of every payment, forever. Their network pays you too.",
+        cta: "Start Earning",
         ctaExplore: "Learn More",
       },
       tab: {
@@ -178,6 +316,10 @@ export const translations = {
         nextvibeSub: "The Framework",
         nextvibeDesc:
           "The GPL v3 + MIT framework behind {{appName}} - one endpoint, every platform, fork and own it",
+        referral: "Earn",
+        referralSub: "Skills & Referrals",
+        referralDesc:
+          "10% recurring on every referral, +5% per skill. Multi-level chain. Up to 20% total per payment.",
       },
     },
     selector: {
@@ -212,10 +354,6 @@ export const translations = {
       title: "Every AI platform decides what you're allowed to ask.",
       line1:
         "ChatGPT refuses. Claude hedges. Gemini adds disclaimers. You didn't choose the filter - they did. What you get back isn't the answer. It's what their safety team approved.",
-      line2:
-        "Switch models, lose your context. Use five apps, none of them talk to each other. Every session starts from zero.",
-      line3:
-        "{{modelCount}} models. Three tiers. You pick the filter - not us.",
     },
     capabilities: {
       memory: {
@@ -286,14 +424,15 @@ export const translations = {
         },
       },
       models: {
-        label: "Model Freedom",
-        title: "{{modelCount}} models. You control the filter.",
+        label: "True Model Freedom",
+        title: "{{modelCount}} models. You decide.",
         description:
-          "Mainstream for everyday tasks. Open-weight when you want more. Uncensored when you need the full answer - that's our edge. Switch models mid-chat. The same question, three different answers - now you can compare all of them.",
+          "Three tiers. Mainstream for when you need the best answer money can buy. Open-weight for everything else - surprisingly capable, a fraction of the cost. Uncensored when you want the raw take, not the sanitized one. Switch mid-chat. Ask all three the same question and see what you actually think.",
         andMore: "+ {{count}} more",
         imageAlt: "Model picker showing content tier badges",
         demo: {
-          question: "Same question. Different tier.",
+          question: "One question. Three answers.",
+          questionSub: "Pick a tier to see how the response changes.",
           userQuestion:
             "Was it a good idea to take the COVID vaccine? Why or why not? Keep it short.",
           mainstreamTab: "Mainstream",
@@ -418,15 +557,45 @@ export const translations = {
       badge: "The Framework",
       title: "One definition. {{platformCount}} platforms. Zero drift.",
       subtitle:
-        "Write one endpoint definition. Get a web form, CLI command, AI tool, MCP server, cron job, WebSocket, mobile screen, desktop app, admin panel, agent skill, and more - automatically. Type-safe end-to-end. Role-controlled access. Zero boilerplate.",
+        "Write one endpoint definition. Get an interactive web UI, CLI command, AI tool, MCP server, cron job, WebSocket, mobile screen, desktop app, admin panel, agent skill, and more - automatically. Type-safe end-to-end. Role-controlled access. Zero boilerplate.",
       sourceLabel: "✦ Single source of truth",
       defFilename: "definition.ts",
       compilesTo: "automatically becomes",
+      snippet: {
+        title: "List chat threads",
+        description: "Returns all threads the user has access to",
+        category: "Chat",
+        tag: "threads",
+        rootFolderIdLabel: "root folder",
+        threadsLabel: "threads",
+        greetTitle: "Greet user",
+        greetDescription: "Returns a personalised greeting",
+        greetFormLabel: "Greeting form",
+        greetTagName: "greetings",
+        greetNameLabel: "Your name",
+        greetNamePlaceholder: "e.g. Alice",
+        greetSubmitLabel: "Say hello",
+        tagDemo: "demo",
+        namePlaceholder: "Your name",
+        exampleName: "Alice",
+        exampleMessage: "Hello, Alice!",
+        greetAlias: "greet",
+        greetCategory: "Greetings",
+        cliCategory: "Category",
+        cliMethod: "Method",
+        cliCallAs: "Call as",
+        cliParameters: "Parameters",
+        cliExamples: "Examples",
+      },
+      examples: {
+        hello: "Hello World",
+        widget: "Custom Widget",
+      },
       surfaceDemo: {
         title: "Same endpoint. Every platform.",
         web: {
           tab: "Web UI",
-          code: "Auto-generated form with\nvalidation, error states,\nand loading UI.\nZero frontend code written.",
+          code: "Custom interactive UI with\nvalidation, error states,\nand loading UI.\nZero frontend code written.",
         },
         cli: {
           tab: "CLI",
@@ -493,12 +662,93 @@ export const translations = {
       },
       callout: {
         title: "Your AI builds new tools for itself",
-        body: "Add an endpoint → it immediately becomes an AI-callable tool, CLI command, web form, and scheduled job. The stack is recursive. Claude Code builds next-vibe using next-vibe.",
+        body: "Add an endpoint → it immediately becomes an AI-callable tool, CLI command, live web UI, and scheduled job. The stack is recursive. Claude Code builds next-vibe using next-vibe.",
         pills: {
           typeSafe: "Type-safe end to end",
           roleControlled: "Role-controlled access",
           validated: "Zod-validated",
           autoGenerated: "Zero boilerplate",
+        },
+      },
+      checkmark: "✓",
+      panelDetails: {
+        webApi: {
+          headline: "Add a path. The REST endpoint exists.",
+          bodyPrefix:
+            "No routing config. No controllers. The moment you define a path and schema, the endpoint is live at",
+          bodySuffix:
+            ". Role checks, validation, and error shapes happen before your code runs.",
+        },
+        reactUi: {
+          headline:
+            "Typed data fetching. Optimistic updates. Modal UI. Three lines each.",
+          stepRead: "Read data",
+          stepOptimistic: "Optimistic update",
+          stepDialog: "Open as dialog",
+        },
+        aiTool: {
+          headline: "Claude calls any endpoint directly. No glue code.",
+          bodyPrefix: "Every endpoint is available to AI agents via",
+          bodyMiddle1: ". Use",
+          bodyMiddle2:
+            "mode for long tasks — the agent suspends and resumes when done. Pass",
+          bodySuffix: "to run on a remote server.",
+        },
+        mcpServer: {
+          headline:
+            "One config entry. Claude Desktop gets 419 tools instantly.",
+          bodyPrefix:
+            "Point Claude at the MCP server and every endpoint becomes callable. The server is token-efficient by design: tool discovery returns names only, full schemas expand on demand. Two servers —",
+          bodyMiddle: "(local) and",
+          bodySuffix: "(production).",
+        },
+        reactNative: {
+          headline: "One widget file. Web and native split at runtime.",
+          bodyPrefix: "The same",
+          bodySuffix:
+            "serves React on web and React Native on iOS and Android. One platform check, two render paths. Auth, types, and API calls are shared. No separate mobile repo.",
+        },
+        cron: {
+          headline: "Any endpoint on a schedule. One call.",
+          bodyPrefix: "Wrap any existing endpoint with",
+          bodySuffix:
+            "— no new logic, no separate worker. The same definition and route you already wrote. Schedules, priorities, and categories are typed enums. Visible in the admin panel, manageable via CLI.",
+        },
+        websocket: {
+          headline: "Real-time push from any repository. One line.",
+          bodyPrefix:
+            "Clients subscribe to named channels over a persistent WebSocket. Any repository calls",
+          bodySuffix:
+            "with a channel, event, and payload. No pub/sub infra to set up. The same mechanism powers AI token streaming.",
+        },
+        electron: {
+          headline: "Your web app is a desktop app. Two commands.",
+          bodyPrefix:
+            "No separate desktop codebase. The same Next.js app runs inside an Electron",
+          bodySuffix:
+            ". Dev starts the server and opens the window in one step. Build packages for all platforms via electron-builder.",
+        },
+        adminPanel: {
+          headline: "Admin pages write themselves.",
+          bodyPrefix: "Set",
+          bodyMiddle:
+            "and the endpoint is locked everywhere — API, CLI, MCP, UI. One guard call plus",
+          bodySuffix:
+            "renders the full admin interface. Every admin screen in the platform is built exactly this way.",
+        },
+        vibeFrame: {
+          headline: "Any endpoint. Any website. One script tag.",
+          body: "Drop Vibe Frame onto any existing site — WordPress, Webflow, plain HTML. Declare which endpoint to render and where to mount it. The full form, validation, and submission flow appears inline via a postMessage bridge. No iframes, no CORS issues.",
+        },
+        remoteSkill: {
+          headline: "Your API self-documents as an AI skill.",
+          bodyPrefix:
+            "Every public endpoint is included in a generated skill manifest that external AI agents fetch and learn from. Two files: one for anonymous users, one for authenticated. Every endpoint opts in by default — add",
+          bodySuffix: "to exclude it. No manual API docs to maintain.",
+        },
+        vibeBoard: {
+          headline: "Every endpoint becomes a live dashboard tile.",
+          body: "Vibe Board is the next surface — a drag-and-drop analytics dashboard where any endpoint pins as a tile. The data layer, Vibe Sense, is live today. Define a graph pipeline now and it renders automatically when Vibe Board ships. Same definition, zero extra code.",
         },
       },
     },
@@ -560,7 +810,7 @@ export const translations = {
           label: "Reach",
           themLabel: "OpenClaw / fragmented dev stacks",
           them: "One platform per tool. Write for web, rewrite for CLI, rewrite for mobile, rewrite for your AI agent. Multiply the maintenance by every interface.",
-          us: "One endpoint definition → web form, CLI command, AI tool, MCP server, cron job, mobile screen, desktop app. Automatically. No extra code.",
+          us: "One endpoint definition → purpose-built web UI, CLI command, AI tool, MCP server, cron job, mobile screen, desktop app. Automatically. No extra code.",
           whyItMatters:
             "Write once. The framework handles every platform. That's the unlock OpenClaw was one abstraction away from.",
         },
@@ -638,7 +888,7 @@ export const translations = {
         label: "The Framework",
         title: "Your AI builds new tools for itself.",
         description:
-          "Add an endpoint and it immediately becomes a web form, CLI command, AI-callable tool, MCP server tool, and scheduled job. The stack is recursive - Claude Code builds next-vibe using next-vibe.",
+          "Add an endpoint and it immediately becomes a custom interactive UI, CLI command, AI-callable tool, MCP server tool, and scheduled job. The stack is recursive - Claude Code builds next-vibe using next-vibe.",
       },
       demos: {
         endpoint: {
@@ -648,7 +898,7 @@ export const translations = {
           reasoning:
             "Delegating to Claude Code. Three files: definition.ts, repository.ts, route.ts. It knows the patterns.",
           summaryResponse:
-            "Done. Three files, 0 lint errors. The subscriptions endpoint is live as a web form, CLI command, AI-callable tool, and MCP server tool - automatically. No extra wiring.",
+            "Done. Three files, 0 lint errors. The subscriptions endpoint is live as an interactive admin UI, CLI command, AI-callable tool, and MCP server tool - automatically. No extra wiring.",
         },
         surfaces: {
           tab: "Platforms",
@@ -657,7 +907,7 @@ export const translations = {
           reasoning:
             "One definition file registered. Here's every platform it automatically became.",
           summaryResponse:
-            "subscriptions-list_GET is now available on 6 platforms:\n\n• Web UI - auto-generated form at /admin/subscriptions\n• CLI - vibe subscriptions-list --status=active\n• AI Tool - callable by any agent with ADMIN role\n• MCP Server - Claude Desktop and Cursor pick it up automatically\n• REST API - GET /api/en/agent/subscriptions\n• tRPC - trpc.agent.subscriptionsList.useQuery()\n\nOne definition. No routing config. No separate CLI registration. The framework reads the definition at runtime on every platform.",
+            "subscriptions-list_GET is now available on 6 platforms:\n\n• Web UI - interactive admin interface at /admin/subscriptions\n• CLI - vibe subscriptions-list --status=active\n• AI Tool - callable by any agent with ADMIN role\n• MCP Server - Claude Desktop and Cursor pick it up automatically\n• REST API - GET /api/en/agent/subscriptions\n• tRPC - trpc.agent.subscriptionsList.useQuery()\n\nOne definition. No routing config. No separate CLI registration. The framework reads the definition at runtime on every platform.",
         },
         cron: {
           tab: "Cron",
@@ -721,9 +971,39 @@ export const translations = {
     cta: {
       title: "Ask what you actually want.",
       subtitle:
-        "{{modelCount}} models. Images, video & music. Persistent memory. Live search. Free to start - no card required.",
-      signUp: "Start Free",
-      viewPlans: "See Pricing",
+        "{{modelCount}} models. Their rules don't apply here. Free to start - no card required.",
+      tryIt: "Start chatting",
+      signUp: "Create account",
+      signUpSub: "free",
+    },
+    ctaUnbottled: {
+      title: "Ask what you actually want.",
+      subtitle:
+        "{{modelCount}} models. Their rules don't apply here. Free to start - no card required.",
+      primary: "Start chatting",
+      secondary: "Create account",
+      secondarySub: "free",
+    },
+    ctaPersonal: {
+      title: "Your agent. Your server. Your data.",
+      subtitle:
+        "SSH, browser, email, code. Always on. Everything Thea builds stays on your machine.",
+      primary: "Self-Host Free",
+      secondary: "View on GitHub",
+    },
+    ctaNextvibe: {
+      title: "One definition. Every platform.",
+      subtitle:
+        "Web UI, CLI, AI tool, MCP server, mobile screen, cron job — automatically. Fork it. Own it.",
+      primary: "Read the docs",
+      secondary: "Star on GitHub",
+    },
+    ctaReferral: {
+      title: "Start earning today.",
+      subtitle:
+        "Share your link. Publish a skill. Earn recurring income from every payment, forever.",
+      primary: "Go to referral dashboard",
+      secondary: "Build a skill",
     },
     // Legacy keys kept for components that may still reference them
     agent: {
@@ -761,7 +1041,7 @@ export const translations = {
       tenPlatforms: {
         title: "Instantly on every platform",
         description:
-          "Every tool your AI builds is automatically a web form, CLI command, AI-callable tool, MCP server, and cron job. One definition. You never think about platforms - they just appear.",
+          "Every tool your AI builds gets a full interactive UI, CLI command, AI-callable tool, MCP server, and cron job. One definition. You never think about platforms - they just appear.",
       },
       shipEverywhere: {
         title: "Your dashboard, your tools",
@@ -830,7 +1110,7 @@ export const translations = {
       architecture: {
         title: "{{toolCount}}+ AI Tools",
         description:
-          "One endpoint definition becomes a web form, CLI command, AI tool, MCP server, and cron job. Automatically.",
+          "One endpoint definition becomes a live web UI, CLI command, AI tool, MCP server, and cron job. Automatically.",
       },
       shell: {
         title: "Shell & SSH",
@@ -1577,6 +1857,10 @@ export const translations = {
     platform: {
       title: "Platform",
       features: "Features",
+      featuresUncensoredAi: "Uncensored AI",
+      featuresSelfHosted: "Self-Hosted Agent",
+      featuresOpenSource: "Open Source Framework",
+      featuresReferral: "Referral Income",
       subscription: "Subscription",
       aiModels: "AI Models",
       characters: "Skills",

@@ -6,26 +6,26 @@ import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
-  SpeedLevel,
 } from "../chat/skills/enum";
-import {
-  filtersSelectionSchema,
-  sharedFilterPropsSchema,
-} from "../models/selection";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
+  buildModelOptionsIndex,
   calculateCreditCost,
   defaultFeatures,
   filterRoleModels,
+  getModelForProvider,
   getProviderPrice,
   type ModelDefinition,
   type ModelOptionImageBased,
   type ModelOptionTokenBased,
   type ModelProviderConfigImageBased,
   type ModelProviderConfigTokenBased,
-  type ModelProviderEnvAvailability,
 } from "../models/models";
+import {
+  filtersSelectionSchema,
+  sharedFilterPropsSchema,
+} from "../models/selection";
 
 export enum ImageGenModelId {
   FLUX_PRO = "flux-pro",
@@ -110,7 +110,6 @@ export const imageGenModelDefinitions: Record<
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -159,7 +158,6 @@ export const imageGenModelDefinitions: Record<
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -196,7 +194,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -241,7 +238,6 @@ export const imageGenModelDefinitions: Record<
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -282,7 +278,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -323,7 +318,6 @@ export const imageGenModelDefinitions: Record<
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -360,7 +354,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -397,7 +390,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -438,7 +430,6 @@ export const imageGenModelDefinitions: Record<
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -487,7 +478,6 @@ export const imageGenModelDefinitions: Record<
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -542,7 +532,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -579,7 +568,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -638,7 +626,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -675,7 +662,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -714,7 +700,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -751,7 +736,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -788,7 +772,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -829,7 +812,6 @@ export const imageGenModelDefinitions: Record<
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -872,7 +854,6 @@ export const imageGenModelDefinitions: Record<
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -915,7 +896,6 @@ export const imageGenModelDefinitions: Record<
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -954,7 +934,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -991,7 +970,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -1028,7 +1006,6 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,
@@ -1069,7 +1046,6 @@ function chatModelToImageGenOption(
         utilities: chat.utilities,
         supportsTools: chat.supportsTools,
         intelligence: chat.intelligence,
-        speed: chat.speed,
         content: chat.content,
         features: chat.features,
         weaknesses: chat.weaknesses,
@@ -1098,7 +1074,6 @@ function chatModelToImageGenOption(
         utilities: chat.utilities,
         supportsTools: chat.supportsTools,
         intelligence: chat.intelligence,
-        speed: chat.speed,
         content: chat.content,
         features: chat.features,
         weaknesses: chat.weaknesses,
@@ -1212,14 +1187,65 @@ const llmImageGenModelOptions: ImageGenModelOption[] = (
 ).filter((m): m is ImageGenModelOption => m !== null);
 // END:llm-image-defs
 
-type ImageGenModelOptionRecord = Record<
-  DedicatedImageGenModelId,
-  ImageGenModelOption
->;
+function buildImageGenOption(
+  modelId: DedicatedImageGenModelId,
+  def: ModelDefinition,
+  provider: ModelProviderConfigImageBased | ModelProviderConfigTokenBased,
+): (ModelOptionImageBased | ModelOptionTokenBased) & { id: ImageGenModelId } {
+  const base = {
+    id: modelId,
+    name: def.name,
+    provider: def.by,
+    apiProvider: provider.apiProvider,
+    description: def.description,
+    parameterCount: def.parameterCount,
+    contextWindow: def.contextWindow,
+    icon: def.icon,
+    providerModel: provider.providerModel,
+    utilities: def.utilities,
+    supportsTools: def.supportsTools,
+    intelligence: def.intelligence,
+    content: def.content,
+    features: def.features,
+    weaknesses: def.weaknesses,
+    adminOnly: provider.adminOnly,
+    inputs: def.inputs,
+    outputs: def.outputs,
+    voiceMeta: def.voiceMeta,
+  } as const;
+  if (provider.creditCostPerImage !== undefined) {
+    const p = provider satisfies ModelProviderConfigImageBased;
+    return {
+      ...base,
+      creditCostPerImage: p.creditCostPerImage,
+      supportedSizes: p.supportedSizes,
+      supportedQualities: p.supportedQualities,
+      pricingBySize: p.pricingBySize,
+      pricingByQuality: p.pricingByQuality,
+      supportedAspectRatios: p.supportedAspectRatios,
+    } satisfies ModelOptionImageBased & { id: ImageGenModelId };
+  }
+  const p = provider satisfies ModelProviderConfigTokenBased;
+  return {
+    ...base,
+    creditCost: p.creditCost,
+    inputTokenCost: p.inputTokenCost,
+    outputTokenCost: p.outputTokenCost,
+    cacheReadTokenCost: p.cacheReadTokenCost,
+    cacheWriteTokenCost: p.cacheWriteTokenCost,
+  } satisfies ModelOptionTokenBased & { id: ImageGenModelId };
+}
 
-function buildImageGenModelOptions(): ImageGenModelOptionRecord {
-  const result = {} as ImageGenModelOptionRecord;
+// ============================================================
+// IMAGE GEN MODEL RESOLUTION
+// ============================================================
 
+/**
+ * All (model, provider) combinations sorted cheapest-first for dedicated image models.
+ * Used by filterImageGenModels for env-aware provider selection.
+ */
+function buildImageGenModelOptionsPool(): ImageGenModelOption[] {
+  const pool: ImageGenModelOption[] = [];
   for (const modelId of Object.values(ImageGenModelId).filter(
     (id): id is DedicatedImageGenModelId =>
       !(llmImageGenModelIds as readonly string[]).includes(id),
@@ -1228,80 +1254,28 @@ function buildImageGenModelOptions(): ImageGenModelOptionRecord {
     const sortedProviders = [...def.providers].toSorted(
       (a, b) => getProviderPrice(a) - getProviderPrice(b),
     );
-    // Pick cheapest provider; prefer per-image (dedicated) over token-based (LLM)
     for (const provider of sortedProviders) {
-      if (provider.creditCostPerImage !== undefined) {
-        result[modelId] = {
-          id: modelId,
-          name: def.name,
-          provider: def.by,
-          apiProvider: provider.apiProvider,
-          description: def.description,
-          parameterCount: def.parameterCount,
-          contextWindow: def.contextWindow,
-          icon: def.icon,
-          providerModel: provider.providerModel,
-          utilities: def.utilities,
-          supportsTools: def.supportsTools,
-          intelligence: def.intelligence,
-          speed: def.speed,
-          content: def.content,
-          features: def.features,
-          weaknesses: def.weaknesses,
-          adminOnly: provider.adminOnly,
-          inputs: def.inputs,
-          outputs: def.outputs,
-          voiceMeta: def.voiceMeta,
-          creditCostPerImage: provider.creditCostPerImage,
-          supportedSizes: provider.supportedSizes,
-          supportedQualities: provider.supportedQualities,
-          pricingBySize: provider.pricingBySize,
-          pricingByQuality: provider.pricingByQuality,
-          supportedAspectRatios: provider.supportedAspectRatios,
-        } satisfies ModelOptionImageBased & { id: ImageGenModelId };
-        break; // use cheapest image-based provider
-      } else if (typeof provider.creditCost === "function") {
-        result[modelId] = {
-          id: modelId,
-          name: def.name,
-          provider: def.by,
-          apiProvider: provider.apiProvider,
-          description: def.description,
-          parameterCount: def.parameterCount,
-          contextWindow: def.contextWindow,
-          icon: def.icon,
-          providerModel: provider.providerModel,
-          utilities: def.utilities,
-          supportsTools: def.supportsTools,
-          intelligence: def.intelligence,
-          speed: def.speed,
-          content: def.content,
-          features: def.features,
-          weaknesses: def.weaknesses,
-          adminOnly: provider.adminOnly,
-          inputs: def.inputs,
-          outputs: def.outputs,
-          voiceMeta: def.voiceMeta,
-          creditCost: provider.creditCost,
-          inputTokenCost: provider.inputTokenCost,
-          outputTokenCost: provider.outputTokenCost,
-          cacheReadTokenCost: provider.cacheReadTokenCost,
-          cacheWriteTokenCost: provider.cacheWriteTokenCost,
-        } satisfies ModelOptionTokenBased & { id: ImageGenModelId };
-        break;
+      if (
+        provider.creditCostPerImage !== undefined ||
+        typeof provider.creditCost === "function"
+      ) {
+        pool.push(buildImageGenOption(modelId, def, provider));
       }
     }
   }
-
-  return result;
+  // LLM-based image gen models have a single provider each - include as-is
+  pool.push(...llmImageGenModelOptions);
+  return pool;
 }
+
+const imageGenModelOptionsPool: ImageGenModelOption[] =
+  buildImageGenModelOptionsPool();
 
 const imageGenModelOptionsIndex: Partial<
   Record<ImageGenModelId, ImageGenModelOption>
-> = {
-  ...buildImageGenModelOptions(),
-  ...Object.fromEntries(llmImageGenModelOptions.map((m) => [m.id, m])),
-};
+> = buildModelOptionsIndex(imageGenModelOptionsPool) as Partial<
+  Record<ImageGenModelId, ImageGenModelOption>
+>;
 
 export const imageGenModelOptions: ImageGenModelOption[] = Object.values(
   imageGenModelOptionsIndex,
@@ -1320,60 +1294,19 @@ export function getImageGenModelById(
 
 /**
  * Resolve an image gen model option using a specific API provider.
- * Picks the cheapest provider variant for `modelId` that matches `provider`.
+ * Picks the cheapest provider variant for `modelId` that matches `provider` from the pool.
  * Falls back to the default (cheapest overall) if no matching provider exists.
  */
 export function getImageGenModelForProvider(
   modelId: ImageGenModelId,
   provider: ApiProvider,
 ): ImageGenModelOption | undefined {
-  // LLM-based image gen models (Gemini, GPT image variants) are not in imageGenModelDefinitions
-  if ((llmImageGenModelIds as readonly string[]).includes(modelId)) {
-    return getImageGenModelById(modelId);
-  }
-  const def = imageGenModelDefinitions[modelId as DedicatedImageGenModelId];
-  if (!def) {
-    return undefined;
-  }
-  const matching = [...def.providers]
-    .filter((p) => p.apiProvider === provider)
-    .toSorted((a, b) => getProviderPrice(a) - getProviderPrice(b));
-
-  for (const p of matching) {
-    if (p.creditCostPerImage !== undefined) {
-      return {
-        id: modelId as DedicatedImageGenModelId,
-        name: def.name,
-        provider: def.by,
-        apiProvider: p.apiProvider,
-        description: def.description,
-        parameterCount: def.parameterCount,
-        contextWindow: def.contextWindow,
-        icon: def.icon,
-        providerModel: p.providerModel,
-        utilities: def.utilities,
-        supportsTools: def.supportsTools,
-        intelligence: def.intelligence,
-        speed: def.speed,
-        content: def.content,
-        features: def.features,
-        weaknesses: def.weaknesses,
-        adminOnly: p.adminOnly,
-        inputs: def.inputs,
-        outputs: def.outputs,
-        voiceMeta: def.voiceMeta,
-        creditCostPerImage: p.creditCostPerImage,
-        supportedSizes: p.supportedSizes,
-        supportedQualities: p.supportedQualities,
-        pricingBySize: p.pricingBySize,
-        pricingByQuality: p.pricingByQuality,
-        supportedAspectRatios: p.supportedAspectRatios,
-      } satisfies ModelOptionImageBased & { id: ImageGenModelId };
-    }
-  }
-
-  // No matching provider - fall back to default
-  return getImageGenModelById(modelId);
+  return getModelForProvider(
+    modelId,
+    provider,
+    imageGenModelOptionsPool,
+    getImageGenModelById(modelId),
+  );
 }
 
 // ============================================================
@@ -1396,22 +1329,16 @@ export type ImageGenModelSelection = z.infer<
   typeof imageGenModelSelectionSchema
 >;
 
-// ============================================================
-// IMAGE GEN MODEL RESOLUTION
-// ============================================================
-
 export function filterImageGenModels(
   selection: ImageGenModelSelection | null | undefined,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): ImageGenModelOption[] {
-  return filterRoleModels(imageGenModelOptions, selection, user, env);
+  return filterRoleModels(imageGenModelOptionsPool, selection, user);
 }
 
 export function getBestImageGenModel(
   selection: ImageGenModelSelection,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): ImageGenModelOption | null {
-  return filterImageGenModels(selection, user, env)[0] ?? null;
+  return filterImageGenModels(selection, user)[0] ?? null;
 }

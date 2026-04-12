@@ -48,18 +48,11 @@ export const translations = {
       open: "Open",
       uncensored: "Uncensored",
     },
-    speed: {
-      any: "Any",
-      fast: "Fast",
-      balanced: "Balanced",
-      thorough: "Thorough",
-    },
   },
   modelSelection: {
     sort: {
       intelligence: "Sort by Intelligence Level",
       price: "Sort by Price",
-      speed: "Sort by Response Speed",
       content: "Sort by Content Policy",
     },
     sortDirection: {
@@ -68,7 +61,6 @@ export const translations = {
     },
     sortField: {
       intelligence: "Intelligence",
-      speed: "Speed",
       price: "Price",
       content: "Content",
     },
@@ -171,12 +163,6 @@ export const translations = {
         },
         maxContent: {
           content: "Max Content Level: {{value}}",
-        },
-        minSpeed: {
-          content: "Min Speed: {{value}}",
-        },
-        maxSpeed: {
-          content: "Max Speed: {{value}}",
         },
         content: {
           content: "Content Level: {{value}}",
@@ -349,20 +335,6 @@ export const translations = {
     maxContent: {
       label: "Maximum Content Level",
       description: "Maximum content moderation level for the model",
-    },
-    speedRange: {
-      label: "Speed Range",
-      description: "Response speed level range",
-      minLabel: "Min Speed",
-      maxLabel: "Max Speed",
-    },
-    minSpeed: {
-      label: "Minimum Speed",
-      description: "Minimum speed level required for the model",
-    },
-    maxSpeed: {
-      label: "Maximum Speed",
-      description: "Maximum speed level allowed for the model",
     },
     content: {
       label: "Content Level",

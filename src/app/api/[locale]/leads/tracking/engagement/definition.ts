@@ -81,6 +81,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   category: "endpointCategories.leads",
+  subCategory: "endpointCategories.leadsManagement",
   icon: "activity",
   tags: ["tags.tracking", "tags.engagement"],
   allowedRoles: [
@@ -330,6 +331,7 @@ const { GET } = createEndpoint({
   title: "get.title",
   description: "get.description",
   category: "endpointCategories.leads",
+  subCategory: "endpointCategories.leadsManagement",
   icon: "bar-chart",
   tags: ["tags.tracking", "tags.engagement"],
   allowedRoles: [

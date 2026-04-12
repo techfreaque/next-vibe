@@ -35,6 +35,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   category: "endpointCategories.ai",
+  subCategory: "endpointCategories.aiInference",
   tags: ["tags.models" as const],
   allowedRoles: [
     UserRole.ADMIN,

@@ -204,7 +204,10 @@ export function FormLabel({
 
   return (
     <Label
-      className={cn(error && "text-red-600 dark:text-red-400", className)}
+      className={cn(
+        error && "text-destructive dark:text-destructive",
+        className,
+      )}
       htmlFor={formItemId}
       {...props}
     />
@@ -259,7 +262,7 @@ export function FormMessage({
   return (
     <p
       id={formMessageId}
-      className="text-[0.8rem] font-medium text-red-600 dark:text-red-400"
+      className="text-[0.8rem] font-medium text-destructive dark:text-destructive"
     >
       {t(String(body))}
     </p>

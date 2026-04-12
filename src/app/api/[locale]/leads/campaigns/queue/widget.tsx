@@ -84,12 +84,10 @@ function Badge({
     <Span
       className={cn(
         "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-        variant === "blue" &&
-          "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300",
+        variant === "blue" && "bg-info/10 text-info",
         variant === "purple" &&
           "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300",
-        variant === "green" &&
-          "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300",
+        variant === "green" && "bg-success/10 text-success-foreground",
       )}
     >
       {children}
@@ -147,7 +145,7 @@ function LeadCard({
           </Span>
         </Div>
         <Div className="flex flex-col">
-          <Span className="text-lg font-bold tabular-nums text-green-600 dark:text-green-400">
+          <Span className="text-lg font-bold tabular-nums text-success">
             {item.emailsOpened}
           </Span>
           <Span className="text-xs text-muted-foreground">
@@ -155,7 +153,7 @@ function LeadCard({
           </Span>
         </Div>
         <Div className="flex flex-col">
-          <Span className="text-lg font-bold tabular-nums text-blue-600 dark:text-blue-400">
+          <Span className="text-lg font-bold tabular-nums text-info">
             {item.emailsClicked}
           </Span>
           <Span className="text-xs text-muted-foreground">
@@ -320,10 +318,10 @@ export function CampaignQueueWidget({
                 <Div className="px-3 py-2 text-sm tabular-nums text-center">
                   {item.emailsSent}
                 </Div>
-                <Div className="px-3 py-2 text-sm tabular-nums text-center text-green-600 dark:text-green-400">
+                <Div className="px-3 py-2 text-sm tabular-nums text-center text-success">
                   {item.emailsOpened}
                 </Div>
-                <Div className="px-3 py-2 text-sm tabular-nums text-center text-blue-600 dark:text-blue-400">
+                <Div className="px-3 py-2 text-sm tabular-nums text-center text-info">
                   {item.emailsClicked}
                 </Div>
                 <Div className="px-3 py-2 text-xs text-muted-foreground">

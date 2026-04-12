@@ -170,7 +170,7 @@ export function WidgetChatInput({
         "@container",
         "p-2 @sm:p-3 @md:p-4 backdrop-blur",
         "border border-border rounded-t-lg",
-        "bg-blue-200/70 dark:bg-blue-950/70",
+        "bg-primary/70",
         className,
       )}
     >

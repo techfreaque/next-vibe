@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   title: "hover.title",
   description: "hover.description",
   category: "endpointCategories.browser",
+  subCategory: "endpointCategories.browserInteraction",
   icon: "mouse-pointer",
   tags: ["hover.tags.browserAutomation", "hover.tags.inputAutomation"],
 

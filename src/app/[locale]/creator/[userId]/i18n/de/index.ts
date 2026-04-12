@@ -12,7 +12,8 @@ export const translations = {
   skills: {
     title: "Skills",
     empty: "Noch keine öffentlichen Skills.",
-    chat: "Chatten",
+    chat: "Jetzt chatten",
+    add: "Zur Sammlung hinzufügen",
   },
   referral: {
     label: "Empfehlungscode",

@@ -74,7 +74,7 @@ export class SshExecRepository {
     logger: EndpointLogger,
     user: JwtPayloadType,
     t: SshExecT,
-    streamContext?: ToolExecutionContext,
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<SshExecResponseOutput>> {
     const timeoutMs =
       data.timeoutMs ?? SshExecRepository.LOCAL_DEFAULT_TIMEOUT_MS;

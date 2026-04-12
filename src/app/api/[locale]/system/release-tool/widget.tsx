@@ -134,9 +134,9 @@ export function ReleaseResultWidget({ field }: CustomWidgetProps): JSX.Element {
 
       {/* Warnings */}
       {hasWarnings && (
-        <Div className="rounded-md bg-yellow-500/10 border border-yellow-500/20 p-3 flex flex-col gap-1">
+        <Div className="rounded-md bg-warning/10 border border-warning/20 p-3 flex flex-col gap-1">
           {value.warnings!.map((w, i) => (
-            <P key={i} className="text-xs text-yellow-700 dark:text-yellow-400">
+            <P key={i} className="text-xs text-warning">
               {w}
             </P>
           ))}

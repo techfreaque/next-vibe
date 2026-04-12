@@ -46,13 +46,20 @@ export const translations = {
   },
   widget: {
     loading: "Loading…",
+    pitch: {
+      headline: "Turn visitors into subscribers",
+      body: "When someone views your skill page or creator profile, they see a subscribe field. They enter their email - it lands directly in your list. No extra apps, no middleman, no monthly fee for basic capture.",
+      step1: "Someone visits your skill page or creator profile",
+      step2: "They submit the subscribe form",
+      step3: "Email lands in your list - on your platform of choice",
+    },
     noConfig:
-      "No email platform connected. Pick one below to start capturing leads.",
+      "Connect an email platform to start collecting subscribers from your skill pages and creator profile.",
     active: "Active",
     inactive: "Inactive",
-    choosePlatform: "Choose email platform",
+    choosePlatform: "Connect email platform",
     switchPlatform: "Switch platform",
-    selectPlaceholder: "Select a platform…",
+    selectPlaceholder: "Pick a platform…",
     providers: {
       GETRESPONSE: "GetResponse",
       KLAVIYO: "Klaviyo",

@@ -17,7 +17,6 @@ import { useMemo, useState } from "react";
 
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
@@ -72,7 +71,6 @@ export function MusicGenerationContainer({
   const result = field.value;
   const children = field.children;
   const prompt = form?.watch("prompt") ?? "";
-  const envAvailability = useEnvAvailability();
   const user = useWidgetUser();
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
@@ -95,16 +93,12 @@ export function MusicGenerationContainer({
   const defaultModelSelection = useMemo(():
     | MusicGenModelSelection
     | undefined => {
-    const m = getBestMusicGenModel(
-      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
-      user,
-      envAvailability,
-    );
+    const m = getBestMusicGenModel(DEFAULT_MUSIC_GEN_MODEL_SELECTION, user);
     if (!m) {
       return undefined;
     }
     return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [user, envAvailability]);
+  }, [user]);
 
   const resolvedModelId =
     currentModelId ??

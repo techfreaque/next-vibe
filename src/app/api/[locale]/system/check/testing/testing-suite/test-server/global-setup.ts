@@ -7,6 +7,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { closeDatabase } from "@/app/api/[locale]/system/db";
 import { SeedRepository } from "@/app/api/[locale]/system/db/seed/repository";
+import { loadEnvironment } from "@/app/api/[locale]/system/unified-interface/cli/runtime/environment";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import teardown from "./global-teardown";
@@ -16,6 +17,7 @@ export default async function setup(
   logger: EndpointLogger,
 ): Promise<() => Promise<void>> {
   try {
+    loadEnvironment();
     await startServer(logger);
     await SeedRepository.seed("test", logger);
 

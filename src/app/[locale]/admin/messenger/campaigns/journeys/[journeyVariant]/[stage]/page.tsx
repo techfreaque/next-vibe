@@ -5,6 +5,7 @@
 
 export const dynamic = "force-dynamic";
 
+import { render } from "@react-email/render";
 import { notFound } from "next-vibe-ui/lib/not-found";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -18,7 +19,6 @@ import type React from "react";
 
 import { EmailPreviewClient } from "@/app/[locale]/admin/messenger/campaigns/journeys/_components/email-preview-client";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import type { EmailTemplateResult } from "@/app/api/[locale]/leads/campaigns/emails";
 import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";
 import type {
   EmailCampaignStageValue,
@@ -55,7 +55,9 @@ export interface EmailPreviewPageData {
   user: JwtPayloadType;
   journeyVariant: typeof EmailJourneyVariantValue;
   stage: typeof EmailCampaignStageValue;
-  emailPreview: EmailTemplateResult;
+  emailTo: string;
+  emailSubject: string;
+  emailHtml: string;
   journeyName: string;
   allJourneyEntries: JourneyEntry[];
   currentJourneyStages: string[];
@@ -106,7 +108,7 @@ export async function tanstackLoader({
   }
 
   // Generate email preview server-side
-  const emailPreview = await emailService.generatePreview(
+  const emailPreviewResult = await emailService.generatePreview(
     journeyVariant,
     stage,
     {
@@ -116,9 +118,12 @@ export async function tanstackLoader({
     },
   );
 
-  if (!emailPreview) {
+  if (!emailPreviewResult) {
     notFound();
   }
+
+  // Render JSX to HTML string server-side for serialization
+  const emailHtml = await render(emailPreviewResult.jsx);
 
   // Get journey info for display
   const journeyInfo = emailService.getJourneyInfo(journeyVariant, locale);
@@ -149,7 +154,9 @@ export async function tanstackLoader({
     user,
     journeyVariant,
     stage,
-    emailPreview,
+    emailTo: emailPreviewResult.to,
+    emailSubject: emailPreviewResult.subject,
+    emailHtml,
     journeyName: journeyInfo.name,
     allJourneyEntries,
     currentJourneyStages,
@@ -177,7 +184,9 @@ export function TanstackPage({
   user,
   journeyVariant,
   stage,
-  emailPreview,
+  emailTo,
+  emailSubject,
+  emailHtml,
   journeyName,
   allJourneyEntries,
   currentJourneyStages,
@@ -226,7 +235,7 @@ export function TanstackPage({
             </Div>
             <Div className="text-sm text-gray-500 dark:text-gray-400">
               <Span className="font-medium">{subjectLabel}:</Span>{" "}
-              {emailPreview.subject}
+              {emailSubject}
             </Div>
           </Div>
         </Div>
@@ -335,7 +344,9 @@ export function TanstackPage({
       <EmailPreviewClient
         journeyVariant={journeyVariant}
         stage={stage}
-        emailPreview={emailPreview}
+        emailTo={emailTo}
+        emailSubject={emailSubject}
+        emailHtml={emailHtml}
         companyName={companyName}
         companyEmail={companyEmail}
         locale={locale}

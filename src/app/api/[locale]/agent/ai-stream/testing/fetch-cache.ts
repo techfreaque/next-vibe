@@ -270,18 +270,47 @@ function parseSseEvents(text: string): string[] {
     .filter((l) => l.length > 0);
 }
 
-/** Re-encode SSE events array back to wire format */
-function sseEventsToBytes(events: string[]): Uint8Array {
-  const wire = `${events.map((e) => `${e}\n`).join("\n")}\n`;
-  return new TextEncoder().encode(wire);
-}
-
 /** Wrap raw bytes as a ReadableStream so the AI SDK SSE parser gets a proper stream */
 function bytesToStream(bytes: Uint8Array): ReadableStream<Uint8Array> {
   return new ReadableStream<Uint8Array>({
     start(controller) {
       controller.enqueue(bytes);
       controller.close();
+    },
+  });
+}
+
+/**
+ * Wrap SSE events as a pull-based ReadableStream, yielding one event per pull.
+ * Each pull requires an async tick, which prevents the AI SDK from consuming
+ * the entire fixture burst synchronously before the for-await loop in
+ * stream-execution-handler processes pending tool results.
+ * Without this, in cached-fixture mode all SSE steps (F2, F3, F4 …) fire in
+ * one synchronous chain and waitingForRemoteResult can be set by F4 before
+ * tool-help:1's tool-result event is processed.
+ */
+function sseEventsToTickingStream(
+  events: string[],
+): ReadableStream<Uint8Array> {
+  let index = 0;
+  const encoder = new TextEncoder();
+  return new ReadableStream<Uint8Array>({
+    pull(controller): Promise<void> {
+      return new Promise<void>((resolve) => {
+        // Yield to the macrotask queue between events so the consumer's
+        // for-await loop gets a chance to run between SSE chunks.
+        setTimeout(() => {
+          if (index >= events.length) {
+            controller.close();
+          } else {
+            // Emit one SSE event (with its trailing newlines, matching wire format)
+            const line = events[index++];
+            // Each event is followed by \n (and events are separated by \n)
+            controller.enqueue(encoder.encode(`${line}\n\n`));
+          }
+          resolve();
+        }, 0);
+      });
     },
   });
 }
@@ -311,10 +340,18 @@ async function drainStream(
 // ── Cache hit replay ───────────────────────────────────────────────────────────
 
 function replayFromCache(cached: ResFile): Response {
-  let bytes: Uint8Array;
+  // SSE responses use a pull-based ticking stream to simulate async delivery.
+  // This prevents the fixture-replay burst from letting a later LLM step (F3/F4)
+  // set waitingForRemoteResult before the for-await loop processes earlier
+  // tool-result events (e.g. tool-help:1).
   if (cached.type === "sse") {
-    bytes = sseEventsToBytes(cached.events);
-  } else if (cached.type === "json") {
+    return new Response(sseEventsToTickingStream(cached.events), {
+      status: cached.status,
+      headers: cached.headers,
+    });
+  }
+  let bytes: Uint8Array;
+  if (cached.type === "json") {
     bytes = new TextEncoder().encode(JSON.stringify(cached.body));
   } else if (cached.type === "binary") {
     bytes = Uint8Array.from(Buffer.from(cached.body, "base64"));
@@ -429,6 +466,12 @@ export function installFetchCache(): void {
         index: callIndex,
       });
       const cached = JSON.parse(readFileSync(rp, "utf-8")) as ResFile;
+      // SSE responses use sseEventsToTickingStream (pull-based, one event per
+      // macrotask tick) — see replayFromCache. Non-SSE responses still need one
+      // yield so the caller's await-fetch itself is truly async.
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 0);
+      });
       return replayFromCache(cached);
     }
     // eslint-disable-next-line no-console

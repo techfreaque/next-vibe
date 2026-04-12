@@ -385,7 +385,7 @@ export function ThreadedMessage({
       {/* Thread connector line - vertical line on the left */}
       {depth > 0 && (
         <Div style={connectorStyle}>
-          <Div className="absolute left-0 top-0 bottom-0 bg-linear-to-b from-blue-500/30 via-blue-500/20 to-transparent" />
+          <Div className="absolute left-0 top-0 bottom-0 bg-linear-to-b from-primary/30 via-primary/20 to-transparent" />
         </Div>
       )}
 
@@ -404,8 +404,8 @@ export function ThreadedMessage({
                     "h-5 w-5 rounded",
                     "bg-card backdrop-blur-sm border border-border/60",
                     "flex items-center justify-center",
-                    "hover:bg-blue-500/10 hover:border-blue-500/40 transition-all",
-                    "text-muted-foreground hover:text-blue-400",
+                    "hover:bg-primary/10 hover:border-primary/40 transition-all",
+                    "text-muted-foreground hover:text-primary",
                     "shadow-sm",
                   )}
                   title={
@@ -591,7 +591,7 @@ export function ThreadedMessage({
                 variant="ghost"
                 size="unset"
                 onClick={(): void => setShowDeepReplies(true)}
-                className="mt-3 text-sm text-blue-500 hover:text-blue-600 cursor-pointer hover:underline transition-all flex items-center gap-1"
+                className="mt-3 text-sm text-primary hover:text-primary cursor-pointer hover:underline transition-all flex items-center gap-1"
               >
                 <CornerDownRight className="h-3.5 w-3.5" />
                 {t("widget.threadedView.continueThread", {

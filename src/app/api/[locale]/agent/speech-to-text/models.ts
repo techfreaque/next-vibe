@@ -1,27 +1,25 @@
 import { z } from "zod";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
-  SpeedLevel,
 } from "../chat/skills/enum";
-import {
-  filtersSelectionSchema,
-  sharedFilterPropsSchema,
-} from "../models/selection";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
   defaultFeatures,
   filterRoleModels,
+  getProviderPrice,
   type ModelDefinition,
   type ModelOptionSttBased,
   type ModelProviderConfigSttBased,
-  type ModelProviderEnvAvailability,
-  getProviderPrice,
 } from "../models/models";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import {
+  filtersSelectionSchema,
+  sharedFilterPropsSchema,
+} from "../models/selection";
 
 export enum SttModelId {
   OPENAI_WHISPER = "openai-whisper",
@@ -41,7 +39,6 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
     utilities: [ModelUtility.STT],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -81,7 +78,6 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
     utilities: [ModelUtility.STT, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -107,6 +103,35 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
 
 export type SttModelOption = ModelOptionSttBased & { id: SttModelId };
 
+function buildSttOption(
+  modelId: SttModelId,
+  def: ModelDefinition,
+  provider: ModelProviderConfigSttBased,
+): SttModelOption {
+  return {
+    id: modelId,
+    name: def.name,
+    provider: def.by,
+    apiProvider: provider.apiProvider,
+    description: def.description,
+    parameterCount: def.parameterCount,
+    contextWindow: def.contextWindow,
+    icon: def.icon,
+    providerModel: provider.providerModel,
+    utilities: def.utilities,
+    supportsTools: def.supportsTools,
+    intelligence: def.intelligence,
+    content: def.content,
+    features: def.features,
+    weaknesses: def.weaknesses,
+    adminOnly: provider.adminOnly,
+    inputs: def.inputs,
+    outputs: def.outputs,
+    voiceMeta: def.voiceMeta,
+    creditCostPerSecond: provider.creditCostPerSecond,
+  };
+}
+
 function buildSttModelOptions(): SttModelOption[] {
   const result: SttModelOption[] = [];
   for (const [modelId, def] of Object.entries(sttModelDefinitions)) {
@@ -118,30 +143,13 @@ function buildSttModelOptions(): SttModelOption[] {
         "creditCostPerSecond" in provider &&
         !("defaultDurationSeconds" in provider)
       ) {
-        const p = provider as ModelProviderConfigSttBased;
-        result.push({
-          id: modelId as SttModelId,
-          name: def.name,
-          provider: def.by,
-          apiProvider: provider.apiProvider,
-          description: def.description,
-          parameterCount: def.parameterCount,
-          contextWindow: def.contextWindow,
-          icon: def.icon,
-          providerModel: provider.providerModel,
-          utilities: def.utilities,
-          supportsTools: def.supportsTools,
-          intelligence: def.intelligence,
-          speed: def.speed,
-          content: def.content,
-          features: def.features,
-          weaknesses: def.weaknesses,
-          adminOnly: provider.adminOnly,
-          inputs: def.inputs,
-          outputs: def.outputs,
-          voiceMeta: def.voiceMeta,
-          creditCostPerSecond: p.creditCostPerSecond,
-        });
+        result.push(
+          buildSttOption(
+            modelId as SttModelId,
+            def,
+            provider as ModelProviderConfigSttBased,
+          ),
+        );
       }
     }
   }
@@ -177,15 +185,13 @@ export type SttModelSelection = z.infer<typeof sttModelSelectionSchema>;
 export function filterSttModels(
   selection: SttModelSelection | null | undefined,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): SttModelOption[] {
-  return filterRoleModels(sttModelOptions, selection, user, env);
+  return filterRoleModels(sttModelOptions, selection, user);
 }
 
 export function getBestSttModel(
   selection: SttModelSelection,
   user: JwtPayloadType,
-  env: ModelProviderEnvAvailability,
 ): SttModelOption | null {
-  return filterSttModels(selection, user, env)[0] ?? null;
+  return filterSttModels(selection, user)[0] ?? null;
 }

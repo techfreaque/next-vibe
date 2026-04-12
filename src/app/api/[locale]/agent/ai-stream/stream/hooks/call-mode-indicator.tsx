@@ -33,8 +33,8 @@ export function CallModeIndicator({
   return (
     <Div className="flex items-center justify-between mb-2 px-1">
       <Div className="flex items-center gap-2">
-        <Phone className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
-        <Span className="text-xs font-medium text-green-700 dark:text-green-300">
+        <Phone className="h-3.5 w-3.5 text-success" />
+        <Span className="text-xs font-medium text-success-foreground">
           {t("voiceMode.callMode")} - {t("voiceMode.callModeDescription")}
         </Span>
       </Div>

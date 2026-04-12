@@ -22,6 +22,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { SKILL_VERIFIED_VOTE_THRESHOLD } from "../../constants";
 import { customSkills, skillVotes } from "../../db";
 import { SkillOwnershipType, SkillTrustLevel } from "../../enum";
+import { SkillsRepository } from "../../repository";
 import type { SkillVotePostResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -44,6 +45,8 @@ export class SkillVoteRepository {
       }
 
       // Fetch the skill - must exist and be a published custom skill
+      // Resolve by UUID or slug
+      const idCondition = SkillsRepository.resolveSkillIdCondition(skillId);
       const [skill] = await db
         .select({
           id: customSkills.id,
@@ -52,7 +55,7 @@ export class SkillVoteRepository {
           trustLevel: customSkills.trustLevel,
         })
         .from(customSkills)
-        .where(eq(customSkills.id, skillId));
+        .where(idCondition);
 
       if (!skill) {
         return fail({
@@ -60,6 +63,9 @@ export class SkillVoteRepository {
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
+
+      // Use resolved UUID for all FK operations
+      const resolvedId = skill.id;
 
       // Only community/public skills can be voted on
       if (skill.ownershipType === SkillOwnershipType.SYSTEM) {
@@ -74,7 +80,10 @@ export class SkillVoteRepository {
         .select({ id: skillVotes.id })
         .from(skillVotes)
         .where(
-          and(eq(skillVotes.skillId, skillId), eq(skillVotes.userId, userId)),
+          and(
+            eq(skillVotes.skillId, resolvedId),
+            eq(skillVotes.userId, userId),
+          ),
         );
 
       let voted: boolean;
@@ -85,13 +94,16 @@ export class SkillVoteRepository {
         await db
           .delete(skillVotes)
           .where(
-            and(eq(skillVotes.skillId, skillId), eq(skillVotes.userId, userId)),
+            and(
+              eq(skillVotes.skillId, resolvedId),
+              eq(skillVotes.userId, userId),
+            ),
           );
         newVoteCount = Math.max(0, skill.voteCount - 1);
         voted = false;
       } else {
         // Add vote
-        await db.insert(skillVotes).values({ skillId, userId });
+        await db.insert(skillVotes).values({ skillId: resolvedId, userId });
         newVoteCount = skill.voteCount + 1;
         voted = true;
       }
@@ -109,7 +121,7 @@ export class SkillVoteRepository {
           trustLevel: newTrustLevel,
           updatedAt: new Date(),
         })
-        .where(eq(customSkills.id, skillId));
+        .where(eq(customSkills.id, resolvedId));
 
       return success({
         voted,

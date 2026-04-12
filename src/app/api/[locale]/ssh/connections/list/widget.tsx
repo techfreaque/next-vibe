@@ -93,7 +93,7 @@ export function ConnectionsListContainer({
                     {conn.label}
                   </Span>
                   {conn.isDefault && (
-                    <Span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                    <Span className="text-[10px] px-1.5 py-0.5 rounded bg-info/10 text-info">
                       {t("widget.defaultBadge")}
                     </Span>
                   )}

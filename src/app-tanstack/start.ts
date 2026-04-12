@@ -56,7 +56,7 @@ function logRequest(
   const pathStr = useColors ? `${C.cyan}${path}${C.reset}` : path;
   const line = `${ts} ${methodStr} ${pathStr} ${statusStr} in ${formatMs(totalMs)} (app: ${formatMs(appMs)})`;
   process.stdout.write(`${line}\n`);
-  devFileLog(line);
+  void devFileLog(line);
 }
 
 /**

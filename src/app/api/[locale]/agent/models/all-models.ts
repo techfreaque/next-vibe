@@ -52,10 +52,10 @@ import {
   type AnyModelOption,
   type ModelDefinition,
   type ModelOptionBase,
-  type ModelProviderEnvAvailability,
   apiProviderDisplayNames,
   calculateCreditCost,
   getModelPrice,
+  isApiProviderAvailable,
   isModelProviderAvailable,
   modelProviders,
 } from "./models";
@@ -119,10 +119,10 @@ export function getModelDisplayName(
   if (!def) {
     return model.name;
   }
-  const visibleProviders = isAdmin
-    ? def.providers
-    : def.providers.filter((p) => !p.adminOnly);
-  if (visibleProviders.length <= 1) {
+  const availableProviders = (
+    isAdmin ? def.providers : def.providers.filter((p) => !p.adminOnly)
+  ).filter((p) => isApiProviderAvailable(p.apiProvider));
+  if (availableProviders.length <= 1) {
     return model.name;
   }
   return `${model.name} (${apiProviderDisplayNames[model.apiProvider]})`;
@@ -166,10 +166,7 @@ export function getModelCost(
   );
 }
 
-export function getAvailableModelCount(
-  env: ModelProviderEnvAvailability,
-  isAdmin: boolean,
-): number {
+export function getAvailableModelCount(isAdmin: boolean): number {
   return allModelDefinitions.filter((def) => {
     const visibleProviders = isAdmin
       ? def.providers
@@ -182,15 +179,12 @@ export function getAvailableModelCount(
     }
     return visibleProviders.some((p) => {
       const option = allModelOptions.find((m) => m.id === p.id);
-      return option ? isModelProviderAvailable(option, env) : false;
+      return option ? isModelProviderAvailable(option) : false;
     });
   }).length;
 }
 
-export function getAvailableProviderCount(
-  env: ModelProviderEnvAvailability,
-  isAdmin: boolean,
-): number {
+export function getAvailableProviderCount(isAdmin: boolean): number {
   if (isAdmin) {
     return Object.keys(modelProviders).length;
   }
@@ -199,7 +193,7 @@ export function getAvailableProviderCount(
     const publicProviders = def.providers.filter((p) => !p.adminOnly);
     for (const p of publicProviders) {
       const option = allModelOptions.find((m) => m.id === p.id);
-      if (option && isModelProviderAvailable(option, env)) {
+      if (option && isModelProviderAvailable(option)) {
         availableProviderIds.add(def.by);
         break;
       }
@@ -215,7 +209,6 @@ export interface ModelCountsByContentLevel {
 }
 
 export function getAvailableModelCountsByContentLevel(
-  env: ModelProviderEnvAvailability,
   isAdmin: boolean,
 ): ModelCountsByContentLevel {
   const counts: ModelCountsByContentLevel = {
@@ -235,7 +228,7 @@ export function getAvailableModelCountsByContentLevel(
       !isAdmin &&
       !visibleProviders.some((p) => {
         const option = allModelOptions.find((m) => m.id === p.id);
-        return option ? isModelProviderAvailable(option, env) : false;
+        return option ? isModelProviderAvailable(option) : false;
       })
     ) {
       continue;

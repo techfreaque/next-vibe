@@ -14,9 +14,9 @@ export const { POST, tools } = endpointsHandler({
         user.id,
         "EMARSYS",
         {
-          emarsysUserName: data.emarsysUserName,
-          emarsysApiKey: data.emarsysApiKey,
-          emarsysSubDomain: data.emarsysSubDomain,
+          emarsysUserName: data.emarsysUserName || undefined,
+          emarsysApiKey: data.emarsysApiKey || undefined,
+          emarsysSubDomain: data.emarsysSubDomain || undefined,
         },
         {
           listId: data.listId ?? null,

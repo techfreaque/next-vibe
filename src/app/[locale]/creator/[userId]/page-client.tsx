@@ -1,18 +1,8 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "next-vibe-ui/ui/avatar";
-import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Globe } from "next-vibe-ui/ui/icons/Globe";
-import { Instagram } from "next-vibe-ui/ui/icons/Instagram";
-import { MessageCircle } from "next-vibe-ui/ui/icons/MessageCircle";
-import { Music } from "next-vibe-ui/ui/icons/Music";
-import { SiDiscord } from "next-vibe-ui/ui/icons/SiDiscord";
-import { SiGithub } from "next-vibe-ui/ui/icons/SiGithub";
-import { Twitter } from "next-vibe-ui/ui/icons/Twitter";
-import { Youtube } from "next-vibe-ui/ui/icons/Youtube";
-import { Image } from "next-vibe-ui/ui/image";
 import { Input } from "next-vibe-ui/ui/input";
 import { Link } from "next-vibe-ui/ui/link";
 import { Nav } from "next-vibe-ui/ui/nav";
@@ -24,34 +14,16 @@ import { useCallback, useState } from "react";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreatorGetResponseOutput } from "@/app/api/[locale]/user/public/creator/[userId]/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import {
+  DEFAULT_ACCENT,
+  ProfileBio,
+  ProfileHero,
+  ProfileSkillsSection,
+  ProfileSocialPills,
+  type ProfileSkillItem,
+} from "./_shared/profile-content";
 import type { CreatorPageT } from "./i18n";
-
-/**
- * Build a skill card href.
- * When the creator has a referral code, route through the /track endpoint so that:
- *   1. The referral is attributed to the creator
- *   2. The skillId is extracted from the destination URL and stored on the lead
- */
-function skillHref(
-  locale: CountryLanguage,
-  skillId: string,
-  referralCode: string | null | undefined,
-): string {
-  const skillPath = `/${locale}/skill/${skillId}`;
-  if (!referralCode) {
-    return skillPath;
-  }
-  return `/track?ref=${encodeURIComponent(referralCode)}&url=${encodeURIComponent(skillPath)}`;
-}
-
-export interface CreatorSkillItem {
-  id: string;
-  name: string;
-  tagline: string;
-  description: string;
-  icon: string;
-  category: string;
-}
 
 export interface CreatorLeadMagnetConfig {
   headline: string | null;
@@ -62,7 +34,7 @@ export interface CreatorPageData {
   locale: CountryLanguage;
   userId: string;
   creator: CreatorGetResponseOutput | null;
-  skills: CreatorSkillItem[];
+  skills: ProfileSkillItem[];
   appName: string;
   leadMagnetConfig: CreatorLeadMagnetConfig | null;
 }
@@ -120,8 +92,8 @@ function CreatorLeadCaptureForm({
         style={{
           padding: "32px 24px",
           borderRadius: 12,
-          border: "1px solid rgba(139,92,246,0.2)",
-          background: "rgba(139,92,246,0.05)",
+          border: "1px solid rgba(139,92,246,0.25)",
+          background: "rgba(139,92,246,0.08)",
           textAlign: "center",
           display: "flex",
           flexDirection: "column",
@@ -167,9 +139,7 @@ function CreatorLeadCaptureForm({
       >
         <Input
           value={firstName}
-          onChange={(e): void => {
-            setFirstName(e.target.value);
-          }}
+          onChange={(e): void => setFirstName(e.target.value)}
           placeholder={t("list.namePlaceholder")}
           disabled={state === "submitting"}
           className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-violet-500"
@@ -177,9 +147,7 @@ function CreatorLeadCaptureForm({
         <Input
           type="email"
           value={email}
-          onChange={(e): void => {
-            setEmail(e.target.value);
-          }}
+          onChange={(e): void => setEmail(e.target.value)}
           placeholder={t("list.emailPlaceholder")}
           disabled={state === "submitting"}
           className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-violet-500"
@@ -205,18 +173,6 @@ function CreatorLeadCaptureForm({
     </Div>
   );
 }
-
-const SOCIALS = [
-  { key: "twitterUrl", Icon: Twitter, label: "X" },
-  { key: "youtubeUrl", Icon: Youtube, label: "YouTube" },
-  { key: "instagramUrl", Icon: Instagram, label: "Instagram" },
-  { key: "tiktokUrl", Icon: Music, label: "TikTok" },
-  { key: "githubUrl", Icon: SiGithub, label: "GitHub" },
-  { key: "discordUrl", Icon: SiDiscord, label: "Discord" },
-  { key: "websiteUrl", Icon: Globe, label: "Website" },
-] as const;
-
-type SocialKey = (typeof SOCIALS)[number]["key"];
 
 export function CreatorProfilePage({
   locale,
@@ -253,21 +209,41 @@ export function CreatorProfilePage({
     );
   }
 
-  const accent = creator.creatorAccentColor ?? "#8b5cf6";
-  const initials = creator.publicName
-    .split(" ")
-    .map((w: string) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const accent = creator.creatorAccentColor ?? DEFAULT_ACCENT;
 
-  const activeSocials = SOCIALS.filter((s) => creator[s.key as SocialKey]);
+  const avatarNode = (
+    <Avatar className="h-full w-full">
+      {creator.avatarUrl && (
+        <AvatarImage src={creator.avatarUrl} alt={creator.publicName} />
+      )}
+      <AvatarFallback className="text-2xl font-bold bg-violet-900/60 text-violet-200">
+        {creator.publicName
+          .split(" ")
+          .map((w: string) => w[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2)}
+      </AvatarFallback>
+    </Avatar>
+  );
+
+  const nameSubline =
+    skills.length > 0
+      ? `${String(skills.length)} ${t("skills.title").toLowerCase()}`
+      : undefined;
+
+  const belowAvatarRow = (
+    <>
+      {creator.bio && <ProfileBio bio={creator.bio} />}
+      <ProfileSocialPills profile={creator} />
+    </>
+  );
 
   return (
     <Div
       style={{
         minHeight: "100vh",
-        background: "#16082a",
+        background: "#0f0520",
         color: "#fff",
         fontFamily: "inherit",
       }}
@@ -285,162 +261,28 @@ export function CreatorProfilePage({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          background: "rgba(22,8,42,0.85)",
+          background: "rgba(15,5,32,0.9)",
           backdropFilter: "blur(20px)",
           borderBottom: "1px solid rgba(255,255,255,0.05)",
         }}
       >
         <Link
           href={`/${locale}`}
-          className="text-xs no-underline text-white/60 hover:text-white/90 transition-colors"
+          className="text-xs no-underline text-white/50 hover:text-white/80 transition-colors"
         >
           {t("nav.backArrow")} {appName}
         </Link>
       </Nav>
 
       {/* ── HERO ── */}
-      <Div
-        style={{
-          position: "relative",
-          paddingTop: 52,
-          minHeight: 260,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-end",
-        }}
-      >
-        {/* Header image or gradient */}
-        {creator.creatorHeaderImageUrl ? (
-          <Div
-            style={{
-              position: "absolute",
-              inset: 0,
-              overflow: "hidden",
-            }}
-          >
-            <Image
-              src={creator.creatorHeaderImageUrl}
-              alt=""
-              fill
-              style={{ objectFit: "cover", opacity: 0.35 }}
-            />
-            <Div
-              style={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "linear-gradient(to bottom, transparent 30%, #16082a 100%)",
-              }}
-            />
-          </Div>
-        ) : (
-          <Div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: `radial-gradient(ellipse at 60% 0%, ${accent}33 0%, transparent 70%)`,
-            }}
-          />
-        )}
+      <ProfileHero
+        profile={creator}
+        avatarNode={avatarNode}
+        nameSubline={nameSubline}
+        belowAvatarRow={belowAvatarRow}
+      />
 
-        {/* Creator info */}
-        <Div
-          style={{
-            position: "relative",
-            maxWidth: 720,
-            margin: "0 auto",
-            width: "100%",
-            padding: "40px 24px 32px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 16,
-          }}
-        >
-          <Div style={{ display: "flex", alignItems: "flex-end", gap: 20 }}>
-            <Div
-              style={{
-                width: 80,
-                height: 80,
-                flexShrink: 0,
-                borderRadius: "50%",
-                border: `3px solid ${accent}66`,
-                overflow: "hidden",
-              }}
-            >
-              <Avatar className="h-full w-full">
-                {creator.avatarUrl && (
-                  <AvatarImage
-                    src={creator.avatarUrl}
-                    alt={creator.publicName}
-                  />
-                )}
-                <AvatarFallback className="text-2xl font-bold bg-violet-900/40 text-violet-200">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-            </Div>
-
-            <Div style={{ flex: 1, minWidth: 0 }}>
-              <H1
-                style={{
-                  fontSize: 28,
-                  fontWeight: 800,
-                  lineHeight: 1.1,
-                  color: "#fff",
-                  margin: 0,
-                }}
-              >
-                {creator.publicName}
-              </H1>
-              {skills.length > 0 && (
-                <Span
-                  style={{
-                    fontSize: 13,
-                    color: "rgba(255,255,255,0.4)",
-                    marginTop: 4,
-                    display: "block",
-                  }}
-                >
-                  {skills.length} {t("skills.title").toLowerCase()}
-                </Span>
-              )}
-            </Div>
-          </Div>
-
-          {creator.bio && (
-            <P
-              style={{
-                fontSize: 15,
-                color: "rgba(255,255,255,0.65)",
-                lineHeight: 1.6,
-                maxWidth: 520,
-                margin: 0,
-              }}
-            >
-              {creator.bio}
-            </P>
-          )}
-
-          {/* Social links */}
-          {activeSocials.length > 0 && (
-            <Div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {activeSocials.map(({ key, Icon: SIcon, label }) => (
-                <Link
-                  key={key}
-                  href={creator[key as SocialKey] as never}
-                  aria-label={label}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-white/60 text-xs no-underline transition-colors hover:text-white/90 hover:border-white/20"
-                >
-                  <SIcon className="h-3.5 w-3.5" />
-                  {label}
-                </Link>
-              ))}
-            </Div>
-          )}
-        </Div>
-      </Div>
-
-      {/* ── SKILLS GRID ── */}
+      {/* ── SKILLS + EXTRAS ── */}
       <Div
         style={{
           maxWidth: 720,
@@ -448,154 +290,25 @@ export function CreatorProfilePage({
           padding: "0 24px 80px",
         }}
       >
-        {skills.length > 0 ? (
-          <>
-            <H2
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                color: "rgba(255,255,255,0.35)",
-                margin: "0 0 16px",
-              }}
-            >
-              {t("skills.title")}
-            </H2>
+        <ProfileSkillsSection
+          skills={skills}
+          accent={accent}
+          skillHref={(id): string => {
+            const path = `/${locale}/skill/${id}`;
+            if (!creator.referralCode) {
+              return path;
+            }
+            return `/track?ref=${encodeURIComponent(creator.referralCode)}&url=${encodeURIComponent(path)}`;
+          }}
+          sectionLabel={t("skills.title")}
+          chatLabel={t("skills.chat")}
+          addLabel={t("skills.add")}
+          emptyLabel={t("skills.empty")}
+        />
 
-            <Div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                gap: 12,
-              }}
-            >
-              {skills.map((skill) => (
-                <Link
-                  key={skill.id}
-                  href={
-                    skillHref(locale, skill.id, creator.referralCode) as never
-                  }
-                  className="no-underline"
-                >
-                  <Div
-                    style={{
-                      padding: "16px 20px",
-                      borderRadius: 12,
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      background: "rgba(255,255,255,0.03)",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 10,
-                      cursor: "pointer",
-                      transition: "border-color 0.15s, background 0.15s",
-                    }}
-                  >
-                    <Div
-                      style={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        justifyContent: "space-between",
-                        gap: 12,
-                      }}
-                    >
-                      <Div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 10,
-                          minWidth: 0,
-                        }}
-                      >
-                        <Span
-                          style={{ fontSize: 24, lineHeight: 1, flexShrink: 0 }}
-                        >
-                          {skill.icon}
-                        </Span>
-                        <Div style={{ minWidth: 0 }}>
-                          <Span
-                            style={{
-                              display: "block",
-                              fontSize: 15,
-                              fontWeight: 600,
-                              color: "#fff",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                            }}
-                          >
-                            {skill.name}
-                          </Span>
-                          {skill.tagline && (
-                            <Span
-                              style={{
-                                display: "block",
-                                fontSize: 12,
-                                color: "rgba(255,255,255,0.45)",
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {skill.tagline}
-                            </Span>
-                          )}
-                        </Div>
-                      </Div>
-                      <Badge
-                        variant="outline"
-                        style={{
-                          borderColor: `${accent}55`,
-                          color: accent,
-                          fontSize: 11,
-                          flexShrink: 0,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 4,
-                        }}
-                      >
-                        <MessageCircle className="h-3 w-3" />
-                        {t("skills.chat")}
-                      </Badge>
-                    </Div>
-
-                    {skill.description && (
-                      <P
-                        style={{
-                          fontSize: 13,
-                          color: "rgba(255,255,255,0.45)",
-                          lineHeight: 1.5,
-                          margin: 0,
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                        }}
-                      >
-                        {skill.description}
-                      </P>
-                    )}
-                  </Div>
-                </Link>
-              ))}
-            </Div>
-          </>
-        ) : (
-          <P
-            style={{
-              color: "rgba(255,255,255,0.35)",
-              fontSize: 14,
-              textAlign: "center",
-              padding: "48px 0",
-            }}
-          >
-            {t("skills.empty")}
-          </P>
-        )}
-
-        {/* Lead capture form */}
+        {/* Lead capture */}
         {leadMagnetConfig && skills.length > 0 && (
-          <Div style={{ marginTop: 32 }}>
+          <Div style={{ marginTop: 36 }}>
             <CreatorLeadCaptureForm
               skillId={skills[0].id}
               config={leadMagnetConfig}
@@ -612,15 +325,15 @@ export function CreatorProfilePage({
               marginTop: 48,
               padding: "16px 20px",
               borderRadius: 12,
-              border: `1px solid ${accent}33`,
-              background: `${accent}0d`,
+              border: `1px solid ${accent}30`,
+              background: `${accent}08`,
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
               gap: 16,
             }}
           >
-            <Span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>
+            <Span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
               {t("referral.label")}
             </Span>
             <Span
@@ -629,7 +342,7 @@ export function CreatorProfilePage({
                 fontSize: 13,
                 color: accent,
                 fontWeight: 600,
-                letterSpacing: "0.05em",
+                letterSpacing: "0.06em",
               }}
             >
               {creator.referralCode}
@@ -642,9 +355,9 @@ export function CreatorProfilePage({
           style={{
             display: "block",
             textAlign: "center",
-            marginTop: 48,
+            marginTop: 56,
             fontSize: 12,
-            color: "rgba(255,255,255,0.2)",
+            color: "rgba(255,255,255,0.18)",
           }}
         >
           {t("nav.copyright")} {appName}

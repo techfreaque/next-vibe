@@ -113,6 +113,7 @@ export enum FieldDataType {
   DATETIME = "datetime",
   TIME = "time",
   TEXTAREA = "textarea",
+  MARKDOWN_TEXTAREA = "markdown_textarea",
   SELECT = "select",
   MULTISELECT = "multiselect",
   FILE = "file",

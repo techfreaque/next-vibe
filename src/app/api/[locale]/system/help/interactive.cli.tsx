@@ -2,13 +2,14 @@
  * Interactive Help Navigator (Ink-based)
  *
  * Full-screen terminal UI for browsing and executing endpoints.
- * Uses ink + ink-select-input for reactive navigation (replaces inquirer prompts).
+ * Uses ink + ink-select-input for reactive navigation.
  *
  * Views:
- *   1. Category list - grouped tool overview with counts
- *   2. Tool list - tools within a category (or all)
- *   3. Tool detail - full endpoint info rendered via InkEndpointRenderer
- *   4. Execution result - endpoint response rendered via InkEndpointRenderer
+ *   1. Category list     - top-level groups with sub-group counts
+ *   2. SubCategory list  - sub-groups within a category
+ *   3. Tool list         - tools within a sub-category (or all)
+ *   4. Tool detail       - full endpoint info rendered via InkEndpointRenderer
+ *   5. Execution result  - endpoint response rendered via InkEndpointRenderer
  */
 
 import { Box, render, Text, useApp, useInput } from "ink";
@@ -34,6 +35,12 @@ import type { InkEndpointRenderer } from "../unified-interface/unified-ui/render
 
 type InkEndpointRendererType = typeof InkEndpointRenderer;
 
+interface SelectItem<V> {
+  key?: string;
+  label: string;
+  value: V;
+}
+
 // Lazy imports to avoid server-only issues at module level
 let InkEndpointRendererModule: Awaited<
   ReturnType<typeof getInkEndpointRenderer>
@@ -53,7 +60,13 @@ async function getInkEndpointRenderer(): Promise<{
 
 interface CategoryInfo {
   name: string;
-  translatedName: string;
+  subCategories: SubCategoryInfo[];
+  totalCount: number;
+}
+
+interface SubCategoryInfo {
+  name: string;
+  category: string;
   count: number;
 }
 
@@ -61,18 +74,18 @@ interface ToolInfo {
   name: string;
   description: string;
   category: string;
+  subCategory: string;
   method: string;
-  /** toolName used for lazy-loading the full definition on detail view */
   toolName: string;
   credits?: number;
   aliases: string[];
-  /** Full definition - only populated after user clicks into detail view */
   endpoint?: CreateApiEndpointAny;
 }
 
 type View =
   | { type: "categories" }
-  | { type: "tools"; category: string | null } // null = all tools
+  | { type: "subcategories"; category: string }
+  | { type: "tools"; category: string | null; subCategory: string | null }
   | { type: "detail"; tool: ToolInfo }
   | { type: "result"; tool: ToolInfo; response: ResponseType<WidgetData> };
 
@@ -82,7 +95,7 @@ interface InteractiveHelpProps {
   platform: CliCompatiblePlatform;
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+// ── Data loading ───────────────────────────────────────────────────────────
 
 async function loadEndpointsMeta(): Promise<EndpointMeta[]> {
   const { endpointsMeta } =
@@ -96,16 +109,14 @@ async function getToolsForUser(
 ): Promise<{ tools: ToolInfo[]; categories: CategoryInfo[] }> {
   const allMeta = await loadEndpointsMeta();
   const tools: ToolInfo[] = [];
-  const categoryMap = new Map<
-    string,
-    { translatedName: string; count: number }
-  >();
+
+  // category → subCategory → count
+  const catMap = new Map<string, Map<string, number>>();
 
   for (const ep of allMeta) {
     const allowedRoles = ep.allowedRoles as Parameters<
       typeof permissionsRegistry.checkPlatformAccess
     >[0];
-    // Platform access check
     const platformAccess = permissionsRegistry.checkPlatformAccess(
       allowedRoles,
       platform,
@@ -113,7 +124,6 @@ async function getToolsForUser(
     if (!platformAccess.allowed) {
       continue;
     }
-    // User role check
     if (user.isPublic) {
       if (!allowedRoles.includes(UserRole.PUBLIC)) {
         continue;
@@ -124,41 +134,48 @@ async function getToolsForUser(
       }
     }
 
+    const cat = ep.category ?? "Other";
+    const sub = ep.subCategory ?? cat;
+
     tools.push({
       name: ep.toolName,
       description: ep.description,
-      category: ep.category,
+      category: cat,
+      subCategory: sub,
       method: ep.method,
       toolName: ep.toolName,
       credits: ep.credits,
       aliases: ep.aliases,
     });
 
-    const existing = categoryMap.get(ep.category);
-    if (existing) {
-      existing.count++;
-    } else {
-      categoryMap.set(ep.category, {
-        translatedName: ep.category,
-        count: 1,
-      });
-    }
+    const subMap = catMap.get(cat) ?? new Map<string, number>();
+    subMap.set(sub, (subMap.get(sub) ?? 0) + 1);
+    catMap.set(cat, subMap);
   }
 
   tools.sort((a, b) => a.name.localeCompare(b.name));
 
-  const categories = [...categoryMap.entries()]
-    .map(([name, info]) => ({
-      name,
-      translatedName: info.translatedName,
-      count: info.count,
-    }))
-    .toSorted((a, b) => b.count - a.count);
+  const categories: CategoryInfo[] = [...catMap.entries()]
+    .toSorted(([a], [b]) => a.localeCompare(b))
+    .map(([name, subMap]) => {
+      const subCategories: SubCategoryInfo[] = [...subMap.entries()]
+        .toSorted(([a], [b]) => a.localeCompare(b))
+        .map(([subName, count]) => ({
+          name: subName,
+          category: name,
+          count,
+        }));
+      return {
+        name,
+        subCategories,
+        totalCount: subCategories.reduce((n, s) => n + s.count, 0),
+      };
+    });
 
   return { tools, categories };
 }
 
-// ── Header ─────────────────────────────────────────────────────────────────
+// ── Shared UI components ───────────────────────────────────────────────────
 
 function Header({
   title,
@@ -177,8 +194,6 @@ function Header({
   );
 }
 
-// ── Breadcrumb ─────────────────────────────────────────────────────────────
-
 function Breadcrumb({ parts }: { parts: string[] }): JSX.Element {
   return (
     <Box marginBottom={1}>
@@ -191,8 +206,6 @@ function Breadcrumb({ parts }: { parts: string[] }): JSX.Element {
     </Box>
   );
 }
-
-// ── Footer ─────────────────────────────────────────────────────────────────
 
 function Footer({ hints }: { hints: string }): JSX.Element {
   return (
@@ -208,36 +221,38 @@ function CategoryView({
   categories,
   totalTools,
   onSelect,
+  onSelectAll,
   locale,
 }: {
   categories: CategoryInfo[];
   totalTools: number;
-  onSelect: (category: string | null) => void;
+  onSelect: (category: string) => void;
+  onSelectAll: () => void;
   locale: CountryLanguage;
 }): JSX.Element {
   const { t: cliT } = cliScopedTranslation.scopedT(locale);
-  const items: { label: string; value: string | null; key?: string }[] =
-    useMemo(
-      () => [
-        {
-          label: `All Tools (${totalTools})`,
-          value: null,
-          key: "__all__",
-        },
-        ...categories.map((cat) => ({
-          label: `${cat.translatedName} (${cat.count})`,
-          value: cat.name as string | null,
-          key: cat.name,
-        })),
-      ],
-      [categories, totalTools],
-    );
+
+  const items: SelectItem<string | null>[] = useMemo(
+    () => [
+      { label: `All Tools (${totalTools})`, value: null, key: "__all__" },
+      ...categories.map((cat) => ({
+        label: `${cat.name.padEnd(28)} ${cat.subCategories.length} groups · ${cat.totalCount} tools`,
+        value: cat.name,
+        key: cat.name,
+      })),
+    ],
+    [categories, totalTools],
+  );
 
   const handleSelect = useCallback(
-    (item: { label: string; value: string | null; key?: string }): void => {
-      onSelect(item.value);
+    (item: SelectItem<string | null>): void => {
+      if (item.value === null) {
+        onSelectAll();
+      } else {
+        onSelect(item.value);
+      }
     },
-    [onSelect],
+    [onSelect, onSelectAll],
   );
 
   return (
@@ -256,47 +271,42 @@ function CategoryView({
   );
 }
 
-// ── Tool List View ─────────────────────────────────────────────────────────
+// ── SubCategory View ───────────────────────────────────────────────────────
 
-function ToolListView({
-  tools,
+function SubCategoryView({
   category,
+  subCategories,
   onSelect,
+  onSelectAll,
   onBack,
   locale,
 }: {
-  tools: ToolInfo[];
-  category: string | null;
-  onSelect: (tool: ToolInfo) => void;
+  category: string;
+  subCategories: SubCategoryInfo[];
+  onSelect: (subCategory: string) => void;
+  onSelectAll: () => void;
   onBack: () => void;
   locale: CountryLanguage;
 }): JSX.Element {
   const { t: cliT } = cliScopedTranslation.scopedT(locale);
-  const filtered = useMemo(
-    () => (category ? tools.filter((t) => t.category === category) : tools),
-    [tools, category],
-  );
+  const total = subCategories.reduce((n, s) => n + s.count, 0);
 
-  const items: { label: string; value: ToolInfo | null; key?: string }[] =
-    useMemo(
-      () => [
-        { label: "< Back to categories", value: null, key: "__back__" },
-        ...filtered.map((tool) => {
-          const credits =
-            tool.credits && tool.credits > 0 ? ` (${tool.credits}cr)` : "";
-          const desc =
-            tool.description.length > 50
-              ? `${tool.description.slice(0, 47)}...`
-              : tool.description;
-          return {
-            label: `${tool.name.padEnd(25)} ${desc}${credits}`,
-            value: tool as ToolInfo | null,
-            key: `${tool.name}_${tool.method}`,
-          };
-        }),
-      ],
-      [filtered],
-    );
+  const items: SelectItem<string | null>[] = useMemo(
+    () => [
+      { label: "< Back to categories", value: "__back__", key: "__back__" },
+      {
+        label: `All in ${category} (${total})`,
+        value: null,
+        key: "__all__",
+      },
+      ...subCategories.map((sub) => ({
+        label: `${sub.name.padEnd(28)} ${sub.count} tools`,
+        value: sub.name,
+        key: sub.name,
+      })),
+    ],
+    [subCategories, category, total],
+  );
 
   // eslint-disable-next-line no-unused-vars -- useInput requires (input, key) signature
   useInput((_, key) => {
@@ -306,7 +316,93 @@ function ToolListView({
   });
 
   const handleSelect = useCallback(
-    (item: { label: string; value: ToolInfo | null; key?: string }): void => {
+    (item: SelectItem<string | null>): void => {
+      if (item.value === "__back__") {
+        onBack();
+      } else if (item.value === null) {
+        onSelectAll();
+      } else {
+        onSelect(item.value);
+      }
+    },
+    [onSelect, onSelectAll, onBack],
+  );
+
+  return (
+    <Box flexDirection="column">
+      <Breadcrumb parts={["Help", category]} />
+      <Header
+        title={`${category} - ${subCategories.length} groups · ${total} tools`}
+        subtitle={cliT("vibe.interactive.help.selectCategory")}
+      />
+      <SelectInput<string | null>
+        items={items}
+        onSelect={handleSelect}
+        limit={20}
+      />
+      <Footer hints={cliT("vibe.interactive.help.hintsNavSelectBack")} />
+    </Box>
+  );
+}
+
+// ── Tool List View ─────────────────────────────────────────────────────────
+
+function ToolListView({
+  tools,
+  category,
+  subCategory,
+  onSelect,
+  onBack,
+  locale,
+}: {
+  tools: ToolInfo[];
+  category: string | null;
+  subCategory: string | null;
+  onSelect: (tool: ToolInfo) => void;
+  onBack: () => void;
+  locale: CountryLanguage;
+}): JSX.Element {
+  const { t: cliT } = cliScopedTranslation.scopedT(locale);
+  const filtered = useMemo(() => {
+    let result = tools;
+    if (category) {
+      result = result.filter((t) => t.category === category);
+    }
+    if (subCategory) {
+      result = result.filter((t) => t.subCategory === subCategory);
+    }
+    return result;
+  }, [tools, category, subCategory]);
+
+  const items: SelectItem<ToolInfo | null>[] = useMemo(
+    () => [
+      { label: "< Back", value: null, key: "__back__" },
+      ...filtered.map((tool) => {
+        const credits =
+          tool.credits && tool.credits > 0 ? ` (${tool.credits}cr)` : "";
+        const desc =
+          tool.description.length > 50
+            ? `${tool.description.slice(0, 47)}...`
+            : tool.description;
+        return {
+          label: `${tool.name.padEnd(25)} ${desc}${credits}`,
+          value: tool as ToolInfo | null,
+          key: `${tool.name}_${tool.method}`,
+        };
+      }),
+    ],
+    [filtered],
+  );
+
+  // eslint-disable-next-line no-unused-vars -- useInput requires (input, key) signature
+  useInput((_, key) => {
+    if (key.escape) {
+      onBack();
+    }
+  });
+
+  const handleSelect = useCallback(
+    (item: SelectItem<ToolInfo | null>): void => {
       if (item.value === null) {
         onBack();
       } else {
@@ -316,10 +412,16 @@ function ToolListView({
     [onBack, onSelect],
   );
 
-  const title = category ?? "All Tools";
+  const breadcrumb = [
+    "Help",
+    ...(category ? [category] : []),
+    ...(subCategory ? [subCategory] : []),
+  ];
+  const title = subCategory ?? category ?? "All Tools";
 
   return (
     <Box flexDirection="column">
+      <Breadcrumb parts={breadcrumb} />
       <Header
         title={`${title} (${filtered.length} tools)`}
         subtitle={cliT("vibe.interactive.help.selectTool")}
@@ -360,7 +462,6 @@ function ToolDetailView({
   const [RendererComponent, setRendererComponent] =
     useState<InkEndpointRendererType | null>(null);
 
-  // Load InkEndpointRenderer dynamically
   useEffect(() => {
     void getInkEndpointRenderer().then((mod) => {
       setRendererComponent(() => mod.InkEndpointRenderer);
@@ -378,11 +479,11 @@ function ToolDetailView({
     }
   });
 
-  const aliases = tool.aliases;
-
   return (
     <Box flexDirection="column">
-      <Breadcrumb parts={["Help", tool.category, tool.name]} />
+      <Breadcrumb
+        parts={["Help", tool.category, tool.subCategory, tool.name]}
+      />
 
       <Box
         borderStyle="round"
@@ -393,8 +494,8 @@ function ToolDetailView({
       >
         <Text bold color="cyan">
           {tool.name}
-          {aliases && aliases.length > 0 && (
-            <Text dimColor>{` (${aliases.join(", ")})`}</Text>
+          {tool.aliases.length > 0 && (
+            <Text dimColor>{` (${tool.aliases.join(", ")})`}</Text>
           )}
         </Text>
         <Text>{tool.description}</Text>
@@ -403,17 +504,20 @@ function ToolDetailView({
           <Text>
             <Text dimColor>{cliT("vibe.interactive.help.category")}</Text>
             {tool.category}
+            {tool.subCategory !== tool.category ? ` › ${tool.subCategory}` : ""}
           </Text>
           <Text>
             <Text dimColor>{cliT("vibe.interactive.help.method")}</Text>
             <Text color="yellow">{tool.method}</Text>
           </Text>
-          {tool.credits && tool.credits > 0 && (
-            <Text>
-              <Text dimColor>{cliT("vibe.interactive.help.credits")}</Text>
-              <Text color="yellow">{String(tool.credits)}</Text>
-            </Text>
-          )}
+          {tool.credits !== null &&
+            tool.credits !== undefined &&
+            tool.credits > 0 && (
+              <Text>
+                <Text dimColor>{cliT("vibe.interactive.help.credits")}</Text>
+                <Text color="yellow">{String(tool.credits)}</Text>
+              </Text>
+            )}
         </Box>
         <Text>
           <Text dimColor>{"Call as   "}</Text>
@@ -421,7 +525,6 @@ function ToolDetailView({
         </Text>
       </Box>
 
-      {/* Render endpoint fields - only when full definition is loaded */}
       {RendererComponent && tool.endpoint && (
         <Box
           marginTop={1}
@@ -500,6 +603,7 @@ function ResultView({
         parts={[
           "Help",
           tool.category,
+          tool.subCategory,
           tool.name,
           cliT("vibe.interactive.help.result"),
         ]}
@@ -565,19 +669,33 @@ function InteractiveHelp({
     });
   }, [platform, user]);
 
-  // Global quit handler
+  // Global quit
   useInput((input) => {
     if (input === "q" && view.type !== "result") {
       exit();
     }
   });
 
-  const handleCategorySelect = useCallback((category: string | null): void => {
-    setView({ type: "tools", category });
+  const handleCategorySelect = useCallback((category: string): void => {
+    setView({ type: "subcategories", category });
+  }, []);
+
+  const handleSelectAllTools = useCallback((): void => {
+    setView({ type: "tools", category: null, subCategory: null });
+  }, []);
+
+  const handleSubCategorySelect = useCallback(
+    (category: string, subCategory: string): void => {
+      setView({ type: "tools", category, subCategory });
+    },
+    [],
+  );
+
+  const handleSelectAllInCategory = useCallback((category: string): void => {
+    setView({ type: "tools", category, subCategory: null });
   }, []);
 
   const handleToolSelect = useCallback((tool: ToolInfo): void => {
-    // Lazy-load the full endpoint definition when user navigates to detail
     void import("@/app/api/[locale]/system/generated/endpoint")
       .then(({ getEndpoint }) => getEndpoint(tool.toolName))
       .then((endpointDef) => {
@@ -592,18 +710,21 @@ function InteractiveHelp({
   const handleBack = useCallback((): void => {
     setView((current) => {
       switch (current.type) {
+        case "subcategories":
+          return { type: "categories" };
         case "tools":
+          if (current.subCategory && current.category) {
+            return { type: "subcategories", category: current.category };
+          }
           return { type: "categories" };
         case "detail":
           return {
             type: "tools",
             category: current.tool.category,
+            subCategory: current.tool.subCategory,
           };
         case "result":
-          return {
-            type: "detail",
-            tool: current.tool,
-          };
+          return { type: "detail", tool: current.tool };
         default:
           return current;
       }
@@ -617,11 +738,10 @@ function InteractiveHelp({
     const { tool } = view;
     setIsExecuting(true);
 
-    const toolName = tool.toolName;
     void import("../unified-interface/shared/endpoints/route/executor")
       .then(({ RouteExecutionExecutor }) =>
         RouteExecutionExecutor.executeGenericHandler<WidgetData>({
-          toolName,
+          toolName: tool.toolName,
           data: {},
           urlPathParams: {},
           user,
@@ -635,9 +755,9 @@ function InteractiveHelp({
             skillId: undefined,
             modelId: undefined,
             headless: undefined,
-            imageGenModelId: undefined,
-            musicGenModelId: undefined,
-            videoGenModelId: undefined,
+            imageGenModelSelection: undefined,
+            musicGenModelSelection: undefined,
+            videoGenModelSelection: undefined,
             isRevival: undefined,
             currentToolMessageId: undefined,
             callerToolCallId: undefined,
@@ -650,6 +770,7 @@ function InteractiveHelp({
             callerCallbackMode: undefined,
             onEscalatedTaskCancel: undefined,
             escalateToTask: undefined,
+            variantId: undefined,
           },
         }),
       )
@@ -664,6 +785,14 @@ function InteractiveHelp({
         },
       );
   }, [view, user, locale, platform]);
+
+  // Derive current category's sub-categories
+  const currentCategoryInfo = useMemo(() => {
+    if (view.type !== "subcategories") {
+      return null;
+    }
+    return categories.find((c) => c.name === view.category) ?? null;
+  }, [view, categories]);
 
   if (isExecuting) {
     return (
@@ -684,6 +813,22 @@ function InteractiveHelp({
           categories={categories}
           totalTools={tools.length}
           onSelect={handleCategorySelect}
+          onSelectAll={handleSelectAllTools}
+          locale={locale}
+        />
+      )}
+
+      {view.type === "subcategories" && currentCategoryInfo && (
+        <SubCategoryView
+          category={currentCategoryInfo.name}
+          subCategories={currentCategoryInfo.subCategories}
+          onSelect={(sub) =>
+            handleSubCategorySelect(currentCategoryInfo.name, sub)
+          }
+          onSelectAll={() =>
+            handleSelectAllInCategory(currentCategoryInfo.name)
+          }
+          onBack={handleBack}
           locale={locale}
         />
       )}
@@ -692,6 +837,7 @@ function InteractiveHelp({
         <ToolListView
           tools={tools}
           category={view.category}
+          subCategory={view.subCategory}
           onSelect={handleToolSelect}
           onBack={handleBack}
           locale={locale}
@@ -725,11 +871,6 @@ function InteractiveHelp({
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
-/**
- * Launch the interactive help navigator.
- * Renders to the terminal with Ink - takes over stdin/stdout.
- * Returns a promise that resolves when the user exits.
- */
 export async function startInteractiveHelp(
   user: JwtPayloadType,
   locale: CountryLanguage,

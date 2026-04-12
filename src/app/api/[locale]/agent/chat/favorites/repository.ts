@@ -23,7 +23,6 @@ import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { agentEnvAvailability } from "../../env-availability";
 import { DEFAULT_SKILLS } from "../skills/config";
 import { NO_SKILL_ID } from "../skills/constants";
 import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
@@ -111,19 +110,21 @@ export class ChatFavoritesRepository {
               characterDescription = skillResult.data.description;
               characterVoice = skillResult.data.voiceModelSelection ?? null;
               // Resolve variant's modelSelection from the skill's variants list
+              // If no variantId, use the default variant (mirrors headless.ts resolveFavorite logic)
               const variants = skillResult.data.variants;
               const variant = favorite.variantId
                 ? variants.find((v) => v.id === favorite.variantId)
-                : null;
+                : (variants.find((v) => v.isDefault) ?? variants[0] ?? null);
               characterModelSelection = variant?.modelSelection ?? null;
             }
           }
 
           // Use client repository's compute method for DRY
           // Map ChatFavorite to StoredLocalFavorite structure
+          // Use slug as the external ID (fall back to UUID for backcompat)
           return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
             {
-              id: favorite.id,
+              id: favorite.slug || favorite.id,
               skillId: favorite.skillId,
               variantId: favorite.variantId ?? null,
               customVariantName: favorite.customVariantName ?? null,
@@ -137,11 +138,14 @@ export class ChatFavoritesRepository {
             characterName,
             characterTagline,
             characterDescription,
-            activeFavoriteId,
+            // Match activeFavoriteId against both slug and UUID
+            favorite.slug === activeFavoriteId ||
+              favorite.id === activeFavoriteId
+              ? favorite.slug || favorite.id
+              : null,
             characterVoice,
             locale,
             user,
-            agentEnvAvailability,
           );
         }),
       );
@@ -272,14 +276,17 @@ export class ChatFavoritesRepository {
         const characterName = variantLabel
           ? `${baseName} - ${variantLabel}`
           : baseName;
+        // Use slug as external ID (fall back to UUID for backcompat)
+        const externalId = row.slug || row.id;
         return {
-          id: row.id,
+          id: externalId,
           name: row.customVariantName ?? characterName,
           skillId: row.skillId,
           characterName,
           modelId: null as string | null, // model resolved client-side; not stored server-side
           modelInfo: "",
-          isActive: row.id === activeFavoriteId,
+          isActive:
+            row.slug === activeFavoriteId || row.id === activeFavoriteId,
           position: row.position,
           useCount: row.useCount,
           lastUsedAt: row.lastUsedAt,
@@ -365,14 +372,16 @@ export class ChatFavoritesRepository {
       const characterName = variantLabel
         ? `${baseName} - ${variantLabel}`
         : baseName;
+      // Use slug as external ID (fall back to UUID for backcompat)
+      const externalId = row.slug || row.id;
       return {
-        id: row.id,
+        id: externalId,
         name: row.customVariantName ?? characterName,
         skillId: row.skillId,
         characterName,
         modelId: null,
         modelInfo: "",
-        isActive: row.id === activeFavoriteId,
+        isActive: row.slug === activeFavoriteId || row.id === activeFavoriteId,
         position: row.position,
         useCount: row.useCount,
         lastUsedAt: row.lastUsedAt,

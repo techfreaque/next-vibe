@@ -37,7 +37,8 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "move" as const,
-  category: "endpointCategories.chatFavorites",
+  category: "endpointCategories.skills",
+  subCategory: "endpointCategories.chatFavorites",
   tags: ["tags.favorites" as const],
 
   aliases: [FAVORITES_REORDER_ALIAS],
@@ -53,7 +54,7 @@ const { POST } = createEndpoint({
         label: "post.positions.label" as const,
         schema: z.array(
           z.object({
-            id: z.string().uuid(),
+            id: z.string(),
             position: z.number().int().min(0),
           }),
         ),

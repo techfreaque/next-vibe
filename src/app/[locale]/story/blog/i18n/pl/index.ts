@@ -83,11 +83,19 @@ export const translations: typeof enTranslations = {
       readTime: "5 min czytania",
     },
     skillSharingEconomy: {
-      title: "Twoje skille AI sa warte pieniedzy. Oto jak na nich zarobic.",
+      title: "Stwórz skill. Udostępnij link. Zarabiaj co miesiąc.",
       category: "Ekonomia Skilli",
       excerpt:
-        "Twórz wlasne skille AI, udostepniaj je ze swoim linkiem polecajacym i zarabiaj 10% prowizji od kazdego nowego uzytkownika, który zarejestruje sie przez Twoja strone skilla.",
-      readTime: "6 min czytania",
+        "Skille to wstępnie skonfigurowane ustawienia AI, które tworzysz raz i udostępniasz wszędzie. Link w URL skilla przynosi Ci 15% cyklicznie od każdej rejestracji przez niego.",
+      readTime: "7 min czytania",
+    },
+    referralLanding: {
+      title:
+        "10% bezpośrednio. 15% przez skill. 20% łącznie. Cyklicznie wiecznie.",
+      category: "Polecenia",
+      excerpt:
+        "Pełna mechanika programu poleceń i skilli - podział łańcucha, dokładne procenty na każdym poziomie, opcje wypłat i jak bonus za skill się nakłada.",
+      readTime: "4 min czytania",
     },
   },
   labels: {

@@ -45,7 +45,7 @@ export const translations = {
   },
   widget: {
     empty:
-      "Brak przechwyconych leadów. Udostępnij swoją stronę umiejętności, aby zacząć zbierać leady.",
+      "Brak subskrybentów. Udostępnij swoją stronę skilla - każda wizyta to szansa na powiększenie listy.",
     exportCsv: "Eksportuj CSV",
     columns: {
       date: "Data",

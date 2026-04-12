@@ -773,8 +773,9 @@ export const translations: typeof enTranslations = {
     welcome: {
       title: "Stell dir uns als dein KI-Team vor.",
       line1:
-        "Dein Begleiter kümmert sich um alltägliche Gespräche. Spezialisten übernehmen für Coding, Recherche, Schreiben - was auch immer gebraucht wird.",
-      line2: "Die KI wechselt automatisch zwischen ihnen. Du redest einfach.",
+        "Ein Begleiter für alltägliche Gespräche. Spezialisten für Coding, Recherche, Schreiben - du wählst einen, wenn die Aufgabe es verlangt.",
+      line2:
+        "Gleicher Chat. Du wechselst, wenn es drauf ankommt. Dauert Sekunden.",
       line3: "Lass uns dich in unter einer Minute einrichten.",
       continue: "Los geht's",
     },

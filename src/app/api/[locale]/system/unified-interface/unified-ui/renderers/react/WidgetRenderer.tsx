@@ -358,6 +358,9 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
           return createWidget("slider", props);
         case FieldDataType.TAGS:
           return createWidget("tags", props);
+        case FieldDataType.MARKDOWN_TEXTAREA:
+          return createWidget("markdown-textarea", props);
+
         case FieldDataType.TEXTAREA: {
           // Dispatch-boundary cast: switch discriminant guarantees type safety.
           // oxlint-disable-next-line typescript/no-explicit-any

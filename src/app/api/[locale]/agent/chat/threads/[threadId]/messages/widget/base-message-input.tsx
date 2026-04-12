@@ -29,17 +29,16 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useCallback, useState } from "react";
 
+import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
 import { CallModeIndicator } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/call-mode-indicator";
 import { FileUploadButton } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/file-upload-button";
 import { RecordingInputArea } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/recording-input-area";
 import { useVoiceRecording } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-voice-recording";
 import { Selector } from "@/app/api/[locale]/agent/ai-stream/stream/widget/selector";
 import { ToolsButton } from "@/app/api/[locale]/agent/ai-stream/stream/widget/tools-button";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
-import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -111,8 +110,7 @@ export function BaseMessageInput({
     logger,
     initialSettingsData,
   );
-  const env = useEnvAvailability();
-  const defaults = ChatSettingsRepositoryClient.getDefaults(user, env);
+  const defaults = ChatSettingsRepositoryClient.getDefaults(user);
   const selectedModel = settings?.selectedModel ?? defaults.selectedModel;
   const selectedSkill = settings?.selectedSkill ?? defaults.selectedSkill;
   const ttsAutoplay = settings?.ttsAutoplay ?? defaults.ttsAutoplay;
@@ -150,9 +148,7 @@ export function BaseMessageInput({
           "p-2 @sm:p-3 @md:p-4",
           "border border-border rounded-lg shadow-lg",
           "w-full",
-          ttsAutoplay
-            ? "bg-green-100/70 dark:bg-green-950/70 border-green-300 dark:border-green-800"
-            : "",
+          ttsAutoplay ? "bg-success/10 border-success/30" : "",
         )}
       >
         {/* Call mode indicator */}
@@ -189,13 +185,13 @@ export function BaseMessageInput({
 
             {/* Hint text */}
             {!content && (
-              <Div className="absolute pl-3 top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden @sm:block">
+              <Div className="absolute pl-3 top-2 left-0 pointer-events-none text-sm text-muted-foreground/80 hidden @sm:block">
                 {t("widget.input.keyboardShortcuts.press")}{" "}
-                <Kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
+                <Kbd className="px-1.5 py-0.5 rounded text-xs font-medium">
                   {t("widget.input.keyboardShortcuts.enter")}
                 </Kbd>{" "}
                 {t(hintKey as Parameters<typeof t>[0])},{" "}
-                <Kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
+                <Kbd className="px-1.5 py-0.5 rounded text-xs font-medium">
                   {t("widget.input.keyboardShortcuts.shiftEnter")}
                 </Kbd>{" "}
                 {t("widget.input.keyboardShortcuts.forNewLine")}
@@ -250,8 +246,7 @@ export function BaseMessageInput({
                     }}
                     className={cn(
                       "h-8 w-8 @sm:h-9 @sm:w-9",
-                      ttsAutoplay &&
-                        "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500",
+                      ttsAutoplay && "bg-success hover:bg-success/90",
                     )}
                   >
                     <Phone className="h-4 w-4" />

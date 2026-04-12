@@ -17,6 +17,7 @@ import {
   ChatModelIdOptions,
   getChatModelById,
 } from "@/app/api/[locale]/agent/ai-stream/models";
+import { MAX_TOOL_CALLS } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
 import { DEFAULT_SKILL_IDS } from "@/app/api/[locale]/system/generated/skills-index";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -74,8 +75,12 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
+  dynamicCredits: ({ response }) => response?.creditCost ?? undefined,
+  defaultExpanded: true,
+
   icon: "sparkles",
   category: "endpointCategories.ai",
+  subCategory: "endpointCategories.aiInference",
   cli: {
     firstCliArgKey: "prompt",
   },
@@ -265,7 +270,7 @@ const { POST } = createEndpoint({
         label: "run.post.fields.maxTurns.label",
         description: "run.post.fields.maxTurns.description",
         columns: 6,
-        schema: z.coerce.number().int().positive().optional(),
+        schema: z.coerce.number().int().positive().default(MAX_TOOL_CALLS),
       }),
 
       // ── Thread persistence ───────────────────────────────────────────────
@@ -357,6 +362,13 @@ const { POST } = createEndpoint({
       completionTokens: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.completionTokens",
+        columns: 6,
+        schema: z.number().nullable(),
+      }),
+
+      creditCost: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "run.post.response.creditCost",
         columns: 6,
         schema: z.number().nullable(),
       }),
@@ -473,13 +485,18 @@ const { POST } = createEndpoint({
 
   examples: {
     requests: {
+      // Create a skill: always use skill-creator
+      skillCreator: {
+        skill: "skill-creator",
+        prompt:
+          "Create a Python code reviewer skill. Personality: direct, zero-fluff. Focuses on correctness and idiomatic Python. Target: professional developers. Model: BRILLIANT.",
+      },
       // Simple: just prompt - no pre-calls, default skill
       simple: {
         model: ChatModelId["CLAUDE_HAIKU_4_5"],
         prompt: "Write a 3-sentence summary of what unbottled.ai is.",
         instructions: "Be concise and friendly.",
         maxTurns: 1,
-        rootFolderId: DefaultFolderId.CRON,
       },
       // Recommended: use a favorite to load skill + model + tools in one shot
       withFavorite: {
@@ -487,7 +504,6 @@ const { POST } = createEndpoint({
         prompt: "Analyse last week's signups and write a brief report.",
         instructions: "Use bullet points. Max 5 items.",
         maxTurns: 1,
-        rootFolderId: DefaultFolderId.CRON,
       },
       // Use a dedicated skill with custom system prompt
       withSkill: {
@@ -495,7 +511,6 @@ const { POST } = createEndpoint({
         prompt: "Analyse last week's signups and write a brief report.",
         instructions: "Use bullet points. Max 5 items.",
         maxTurns: 1,
-        rootFolderId: DefaultFolderId.CRON,
       },
       // Delegate: fetch data first via preCalls, then summarise
       withPreCall: {
@@ -514,7 +529,6 @@ const { POST } = createEndpoint({
           "Search for the latest news about AI assistants and write a brief report.",
         availableTools: [{ toolId: "web-search", requiresConfirmation: false }],
         maxTurns: 3,
-        rootFolderId: DefaultFolderId.CRON,
       },
       // Public bot: exclude memories so the bot doesn't inherit personal context
       publicBot: {
@@ -523,7 +537,6 @@ const { POST } = createEndpoint({
         prompt: "Answer this forum question concisely.",
         excludeMemories: true,
         maxTurns: 1,
-        rootFolderId: DefaultFolderId.CRON,
       },
       // Continue an existing thread
       continueThread: {
@@ -542,6 +555,7 @@ const { POST } = createEndpoint({
         threadCreatedAt: "2026-02-23T12:00:00.000Z",
         promptTokens: 412,
         completionTokens: 87,
+        creditCost: 0.3,
         preCallResults: [
           { routeId: "agent_chat_skills_GET", success: true, error: null },
         ],

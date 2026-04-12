@@ -115,15 +115,13 @@ const BatchConfirmationBanner = memo(function BatchConfirmationBanner({
   ).length;
 
   return (
-    <Div className="mb-3 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3">
+    <Div className="mb-3 rounded-lg border border-warning/20 bg-warning/10 p-3">
       <Div className="flex items-center justify-between">
-        <Span className="text-sm font-medium text-amber-600 dark:text-amber-500">
+        <Span className="text-sm font-medium text-warning">
           {t("widget.batchToolConfirmation.title")}
         </Span>
         <Div className="flex items-center gap-2 text-xs">
-          <Span className="text-green-600 dark:text-green-500">
-            ✓ {confirmedCount}
-          </Span>
+          <Span className="text-success">✓ {confirmedCount}</Span>
           <Span className="text-destructive">✕ {declinedCount}</Span>
           <Span className="text-muted-foreground">{pendingCount}</Span>
         </Div>
@@ -294,7 +292,7 @@ function MediaActions({
         className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs text-muted-foreground hover:text-foreground"
       >
         {copied ? (
-          <Check className="h-3.5 w-3.5 text-green-500" />
+          <Check className="h-3.5 w-3.5 text-success" />
         ) : (
           <Copy className="h-3.5 w-3.5" />
         )}
@@ -385,6 +383,7 @@ const AssistantContentMessage = memo(
             messageId={message.id}
             hasContentAfter={hasContentAfter}
             collapseState={collapseState ?? undefined}
+            isMessageStreaming={Boolean(message.metadata?.isStreaming)}
           />
         ) : null}
         {/* Generated Media (image / audio / video) */}
