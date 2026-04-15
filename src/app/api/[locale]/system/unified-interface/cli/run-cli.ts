@@ -116,7 +116,7 @@ interface CliOptions {
   remote?: boolean;
 }
 
-const CLI_VERSION = "3.0.7" as const;
+const CLI_VERSION = "3.2.0" as const;
 const DEFAULT_OUTPUT = "pretty" as const;
 
 export interface RunCliOptions {
