@@ -12,7 +12,6 @@ import type { JSX } from "react";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation } from "./i18n";
 import {
   CreatorProfilePage,
   type CreatorLeadMagnetConfig,
@@ -189,15 +188,12 @@ export async function tanstackLoader({
 }
 
 export function TanstackPage(data: CreatorPageData): JSX.Element {
-  const { t } = scopedTranslation.scopedT(data.locale);
-  return <CreatorProfilePage {...data} t={t} />;
+  return <CreatorProfilePage {...data} />;
 }
 
 export default async function CreatorPage({
   params,
 }: Props): Promise<JSX.Element> {
-  const { locale } = await params;
   const data = await tanstackLoader({ params: params });
-  const { t } = scopedTranslation.scopedT(locale);
-  return <CreatorProfilePage {...data} t={t} />;
+  return <CreatorProfilePage {...data} />;
 }

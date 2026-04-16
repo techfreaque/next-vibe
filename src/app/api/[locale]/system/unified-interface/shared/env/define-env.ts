@@ -143,7 +143,8 @@ export type EnvFieldType =
   | "number"
   | "select"
   | "url"
-  | "email";
+  | "email"
+  | "log-path";
 
 interface FieldDef<T extends z.ZodTypeAny = z.ZodTypeAny> {
   schema: T;

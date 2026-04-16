@@ -415,9 +415,22 @@ export const translations = {
     stt: {
       "endpoint-not-available": "Speech-to-text endpoint not available",
       "failed-to-start": "Failed to start recording",
-      "permission-denied": "Microphone permission denied",
-      "no-microphone": "No microphone found",
-      "microphone-in-use": "Microphone is in use",
+      "permission-denied":
+        "Microphone access blocked. Allow microphone in your browser settings and reload the page.",
+      "permission-denied-ios":
+        "Microphone blocked. Go to Settings → Safari → Microphone and allow access for this site.",
+      "permission-denied-android":
+        "Microphone blocked. Tap the lock icon in the address bar → Site settings → Microphone → Allow.",
+      "permission-denied-mac":
+        "Microphone blocked. Open System Settings → Privacy & Security → Microphone and enable your browser.",
+      "permission-denied-windows":
+        "Microphone blocked. Open Settings → Privacy → Microphone and make sure your browser is allowed.",
+      "no-microphone":
+        "No microphone found. Connect a microphone or headset and try again.",
+      "microphone-in-use":
+        "Your microphone is being used by another app. Close it and try again.",
+      "not-supported":
+        "Your browser doesn't support microphone access. Try Chrome, Firefox, or Safari.",
       "transcription-failed": "Failed to transcribe audio",
     },
     tts: {
@@ -474,7 +487,9 @@ export const translations = {
       claudeOpus45:
         "Claude Opus 4.5 - Most powerful Claude model with exceptional reasoning and creative capabilities",
       claudeOpus46:
-        "Claude Opus 4.6 - Latest and most powerful Claude model with exceptional reasoning and creative capabilities",
+        "Claude Opus 4.6 - Powerful Claude model with exceptional reasoning and creative capabilities",
+      claudeOpus47:
+        "Claude Opus 4.7 - Latest and most powerful Claude model with exceptional reasoning and creative capabilities",
       claudeSonnet46:
         "Claude Sonnet 4.6 - Anthropic's most capable Sonnet-class model with frontier performance across coding, agents, and professional work",
       claudeHaiku45:

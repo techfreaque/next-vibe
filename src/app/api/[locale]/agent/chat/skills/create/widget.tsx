@@ -24,16 +24,17 @@ import {
   useWidgetLocale,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
-import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/widget";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
+import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/widget";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
@@ -83,7 +84,6 @@ import { ModelSelectionType } from "../enum";
 import { scopedTranslation as skillIdTranslation } from "../[id]/i18n";
 import { ModelGroup } from "../[id]/widget";
 import type defintion from "./definition";
-import type { SkillCreateResponseOutput } from "./definition";
 
 type ActiveSelector =
   | "chat"
@@ -101,9 +101,7 @@ type ActiveSelector =
  * Props for custom widget - field with fully typed children
  */
 interface CustomWidgetProps {
-  field: {
-    value: SkillCreateResponseOutput | null | undefined;
-  } & (typeof defintion.POST)["fields"];
+  field: (typeof defintion.POST)["fields"];
 }
 
 /**
@@ -118,6 +116,7 @@ export function SkillCreateContainer({
   const user = useWidgetUser();
   const { t: tId } = skillIdTranslation.scopedT(locale);
   const t = useWidgetTranslation<typeof defintion.POST>();
+  const fieldValue = useWidgetValue<typeof defintion.POST>();
   const emptyField = useMemo(() => ({}), []);
 
   const [activeSelector, setActiveSelector] = useState<ActiveSelector>(null);
@@ -561,7 +560,7 @@ export function SkillCreateContainer({
             {/* Success message (response only) */}
             <AlertWidget
               fieldName="success"
-              field={withValue(children.success, field.value?.success, null)}
+              field={withValue(children.success, fieldValue?.success, null)}
             />
 
             {/* Render form fields */}

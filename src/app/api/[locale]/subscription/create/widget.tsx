@@ -53,22 +53,13 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 
-import FormAlertWidget from "../../system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import FormAlertWidget from "../../system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
 import type definition from "./definition";
-import type { SubscriptionCreatePostResponseOutput } from "./definition";
-
-/**
- * Props for custom widget
- */
-interface CustomWidgetProps {
-  field: {
-    value: SubscriptionCreatePostResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
-}
 
 /**
  * Format price with currency
@@ -84,12 +75,11 @@ function formatPrice(price: number, locale: string, currency: string): string {
 /**
  * Subscription Create Container Widget
  */
-export function SubscriptionCreateContainer({
-  field,
-}: CustomWidgetProps): JSX.Element {
+export function SubscriptionCreateContainer(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.POST>();
   const { locale } = useTranslation();
   const form = useWidgetForm();
+  const value = useWidgetValue<typeof definition.POST>();
   const onSubmit = useWidgetOnSubmit();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
@@ -159,10 +149,10 @@ export function SubscriptionCreateContainer({
 
   // Redirect when checkout URL is available
   useEffect(() => {
-    if (field.value?.checkoutUrl) {
-      window.location.href = field.value.checkoutUrl;
+    if (value?.checkoutUrl) {
+      window.location.href = value.checkoutUrl;
     }
-  }, [field.value]);
+  }, [value]);
   return (
     <>
       {/* Payment Provider Selection Modal */}

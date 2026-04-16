@@ -51,13 +51,13 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 import { useTranslation } from "@/i18n/core/client";
 
 import type definition from "./definition";
-import type { CreditsPurchasePostResponseOutput } from "./definition";
 
 const MIN_QTY = 1;
 const MIN_QTY_CRYPTO = 5;
@@ -66,9 +66,7 @@ const MIN_QTY_CRYPTO = 5;
  * Props for custom widget
  */
 interface CustomWidgetProps {
-  field: {
-    value: CreditsPurchasePostResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 /**
@@ -89,6 +87,7 @@ export function CreditsPurchaseContainer({
   field,
 }: CustomWidgetProps): JSX.Element {
   const t = useWidgetTranslation<typeof definition.POST>();
+  const value = useWidgetValue<typeof definition.POST>();
   const { locale } = useTranslation();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
@@ -131,10 +130,10 @@ export function CreditsPurchaseContainer({
 
   // Redirect to checkout URL on successful response
   useEffect(() => {
-    if (field.value?.checkoutUrl) {
-      window.location.href = field.value.checkoutUrl;
+    if (value?.checkoutUrl) {
+      window.location.href = value.checkoutUrl;
     }
-  }, [field.value?.checkoutUrl]);
+  }, [value?.checkoutUrl]);
 
   return (
     <>
@@ -296,14 +295,14 @@ export function CreditsPurchaseContainer({
               </Div>
 
               {/* Response - Checkout Link (fallback if redirect doesn't work) */}
-              {field.value?.checkoutUrl && (
+              {value?.checkoutUrl && (
                 <Div className="mt-4 p-4 rounded-lg bg-primary/10 border border-primary/20">
                   <Div className="text-sm font-medium mb-2">
                     {t("post.redirecting")}
                   </Div>
                   <Button variant="outline" className="w-full" asChild>
                     <ExternalLink
-                      href={field.value.checkoutUrl}
+                      href={value.checkoutUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2"

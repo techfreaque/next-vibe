@@ -37,26 +37,19 @@ import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { envClient } from "@/config/env-client";
 
 import type endpoints from "./definition";
-import type { RemoteConnectionsListResponseOutput } from "./definition";
-
-interface WidgetProps {
-  field: {
-    value: RemoteConnectionsListResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
-}
-
-type Connection = RemoteConnectionsListResponseOutput["connections"][number];
+import type { RemoteConnection } from "./definition";
 
 // ─── Shared action buttons ────────────────────────────────────────────────────
 
@@ -104,7 +97,7 @@ function ViewButton({
   conn,
   navigate,
 }: {
-  conn: Connection;
+  conn: RemoteConnection;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
 }): JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
@@ -143,7 +136,7 @@ function EditButton({
   conn,
   navigate,
 }: {
-  conn: Connection;
+  conn: RemoteConnection;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
 }): JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
@@ -221,7 +214,7 @@ function DisconnectButton({
   conn,
   navigate,
 }: {
-  conn: Connection;
+  conn: RemoteConnection;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
 }): JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
@@ -265,7 +258,7 @@ function ConnectionRow({
   navigate,
   t,
 }: {
-  conn: Connection;
+  conn: RemoteConnection;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
 }): JSX.Element {
@@ -342,7 +335,7 @@ function CloudView({
   navigate,
   t,
 }: {
-  connections: Connection[];
+  connections: RemoteConnection[];
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
 }): JSX.Element {
@@ -527,7 +520,7 @@ function LocalView({
   navigate,
   t,
 }: {
-  connections: Connection[];
+  connections: RemoteConnection[];
   selfInstanceId: string | null;
   syncEnabled: boolean | null;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
@@ -639,15 +632,14 @@ function LocalView({
 
 // ─── Root container ───────────────────────────────────────────────────────────
 
-export function RemoteConnectionsListContainer({
-  field,
-}: WidgetProps): JSX.Element {
+export function RemoteConnectionsListContainer(): JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const { push: navigate } = useWidgetNavigation();
+  const data = useWidgetValue<typeof endpoints.GET>();
 
-  const connections = field.value?.connections ?? [];
-  const selfInstanceId = field.value?.selfInstanceId ?? null;
-  const syncEnabled = field.value?.syncEnabled ?? null;
+  const connections = data?.connections ?? [];
+  const selfInstanceId = data?.selfInstanceId ?? null;
+  const syncEnabled = data?.syncEnabled ?? null;
   const isCloud = envClient.NEXT_PUBLIC_VIBE_IS_CLOUD;
 
   if (isCloud) {

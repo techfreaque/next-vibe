@@ -7,7 +7,7 @@ import "server-only";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { parseError } from "next-vibe/shared/utils";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 

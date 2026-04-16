@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
         model: {
           label: "Model",
           description:
-            "LLM do rozumowania tekstowego. Opcjonalny gdy ustawiono favoriteId lub skill. Szybki: claude-haiku-4.5, gemini-2.5-flash. Zbalansowany: claude-sonnet-4.6, gpt-5. Potężny: claude-opus-4.6. Darmowy: qwen3_235b-free. Nie do generowania obrazów/audio/wideo.",
+            "LLM do rozumowania tekstowego. Opcjonalny gdy ustawiono favoriteId lub skill. Szybki: claude-haiku-4.5, gemini-2.5-flash. Zbalansowany: claude-sonnet-4.6, gpt-5. Potężny: claude-opus-4.7. Darmowy: qwen3_235b-free. Nie do generowania obrazów/audio/wideo.",
         },
         skill: {
           label: "Umiejętność",

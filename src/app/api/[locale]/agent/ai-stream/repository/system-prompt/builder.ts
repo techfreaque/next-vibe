@@ -42,6 +42,7 @@ export async function buildSystemPrompt(params: {
   callMode: boolean | null | undefined;
   extraInstructions?: string;
   headless?: boolean;
+  subAgentDepth: number;
   excludeMemories?: boolean;
   memoryLimit?: number | null;
   mediaCapabilities?: MediaCapabilitiesParams;
@@ -61,6 +62,7 @@ export async function buildSystemPrompt(params: {
     callMode,
     extraInstructions,
     headless,
+    subAgentDepth,
     excludeMemories,
     memoryLimit,
     mediaCapabilities,
@@ -90,6 +92,7 @@ export async function buildSystemPrompt(params: {
     isExposedFolder,
     excludeMemories,
     headless: headless ?? false,
+    subAgentDepth,
     callMode: callMode ?? false,
     extraInstructions: extraInstructions ?? "",
     memoryLimit: memoryLimit ?? null,

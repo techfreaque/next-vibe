@@ -8,8 +8,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";
-import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
-import { MessageDbWriter } from "./message-db-writer";
+import { type WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
+import { type EmitThreadTitleFn, MessageDbWriter } from "./message-db-writer";
 
 export interface PendingToolData {
   messageId: string;
@@ -26,6 +26,9 @@ export interface PendingToolData {
 export class StreamContext {
   /** Centralised, throttled DB writer for all assistant message writes */
   readonly dbWriter: MessageDbWriter;
+  /** Typed WS emitter for this thread's messages channel. Use this from all stream handlers. */
+  readonly wsEmit: WsEmitCallback;
+  private readonly logger: EndpointLogger;
   // Pre-generated ASSISTANT message ID (for cache stability)
   // Used only for the FIRST assistant message in a stream
   private readonly initialAssistantMessageId: string;
@@ -95,20 +98,24 @@ export class StreamContext {
     logger: EndpointLogger;
     creditsT: ModuleT;
     locale: CountryLanguage;
-    wsEmit?: WsEmitCallback | null;
+    wsEmit: WsEmitCallback;
+    emitTitle: EmitThreadTitleFn;
   }) {
     this.sequenceId = params.sequenceId;
     this.currentParentId = params.initialParentId;
     this.lastParentId = params.initialParentId;
     this.lastSequenceId = params.sequenceId;
     this.locale = params.locale;
+    this.logger = params.logger;
     this.initialAssistantMessageId = params.initialAssistantMessageId;
+    this.wsEmit = params.wsEmit;
     this.dbWriter = new MessageDbWriter(
       params.isIncognito,
       params.logger,
       params.creditsT,
       params.locale,
-      params.wsEmit ?? null,
+      this.wsEmit,
+      params.emitTitle,
     );
   }
 
@@ -156,8 +163,15 @@ export class StreamContext {
    * Flushes any pending DB writes before clearing state.
    */
   cleanup(): void {
-    // Flush any remaining throttled writes (fire-and-forget; best effort at cleanup)
-    void this.dbWriter.flushAll();
+    // Flush any remaining throttled writes - log if it fails so we know messages were lost
+    void this.dbWriter.flushAll().catch((err: Error) => {
+      this.logger.warn(
+        "[StreamContext] flushAll failed during cleanup - some writes may be lost",
+        {
+          error: err.message,
+        },
+      );
+    });
     this.currentAssistantContent = "";
     this.currentAssistantMessageId = null;
     this.pendingToolMessages.clear();

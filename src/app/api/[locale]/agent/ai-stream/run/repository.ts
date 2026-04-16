@@ -24,14 +24,13 @@ import {
   type ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
 import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
-import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
 import { db } from "@/app/api/[locale]/system/db";
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -64,7 +63,7 @@ export class AiStreamRunRepository {
    */
   private static async executePreCall(
     routeId: string,
-    mergedArgs: CliRequestData,
+    mergedArgs: Record<string, WidgetData>,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -72,13 +71,15 @@ export class AiStreamRunRepository {
   ): Promise<
     ResponseType<{
       routeId: string;
-      args: CliRequestData;
-      data: CliRequestData;
+      args: Record<string, WidgetData>;
+      data: Record<string, WidgetData>;
     }>
   > {
     logger.debug("[AiStreamRun] Executing pre-call", { routeId });
 
-    const result = await RouteExecutionExecutor.executeGenericHandler({
+    const result = await RouteExecutionExecutor.executeGenericHandler<
+      Record<string, WidgetData>
+    >({
       toolName: routeId,
       data: mergedArgs,
       user,
@@ -99,7 +100,7 @@ export class AiStreamRunRepository {
     return success({
       routeId,
       args: mergedArgs,
-      data: result.data as CliRequestData,
+      data: result.data,
     });
   }
 
@@ -142,9 +143,9 @@ export class AiStreamRunRepository {
       // ── Step 1: Execute pre-calls sequentially ──────────────────────────
       const preCallResults: Array<{
         routeId: string;
-        args: CliRequestData;
+        args: Record<string, WidgetData>;
         success: boolean;
-        data?: CliRequestData;
+        data?: WidgetData;
         error?: string;
         executionTimeMs?: number;
       }> = [];
@@ -156,7 +157,7 @@ export class AiStreamRunRepository {
           const startTime = Date.now();
           const result = await AiStreamRunRepository.executePreCall(
             call.routeId,
-            call.args as CliRequestData,
+            call.args as Record<string, WidgetData>,
             user,
             locale,
             logger,
@@ -173,6 +174,7 @@ export class AiStreamRunRepository {
               modelId: undefined,
               favoriteId: undefined,
               headless: undefined,
+              subAgentDepth: streamContext.subAgentDepth ?? 0,
               imageGenModelSelection: undefined,
               musicGenModelSelection: undefined,
               videoGenModelSelection: undefined,
@@ -185,13 +187,14 @@ export class AiStreamRunRepository {
               onEscalatedTaskCancel: undefined,
               variantId: undefined,
               isRevival: false,
+              providerOverride: undefined,
             },
           );
           preCallResults.push({
             routeId: result.success ? result.data.routeId : call.routeId,
             args: result.success
               ? result.data.args
-              : (call.args as CliRequestData),
+              : (call.args as Record<string, WidgetData>),
             success: result.success,
             data: result.success ? result.data.data : undefined,
             error: result.success ? undefined : result.message,
@@ -207,14 +210,16 @@ export class AiStreamRunRepository {
       });
 
       // Map to HeadlessPreCall format for proper tool message injection
-      const headlessPreCalls: HeadlessPreCall[] = preCallResults.map((r) => ({
-        routeId: r.routeId,
-        args: r.args as Record<string, ToolCallResult>,
-        result: (r.data ?? null) as ToolCallResult,
-        success: r.success,
-        error: r.error,
-        executionTimeMs: r.executionTimeMs,
-      }));
+      const headlessPreCalls: HeadlessPreCall[] = preCallResults.map(
+        (r): HeadlessPreCall => ({
+          routeId: r.routeId,
+          args: r.args,
+          result: r.data ?? null,
+          success: r.success,
+          error: r.error,
+          executionTimeMs: r.executionTimeMs,
+        }),
+      );
 
       // ── Step 2: Resolve tool config from favorite if needed ────────────
       // When favoriteId is set and pinnedTools/availableTools are NOT provided in the request,
@@ -302,7 +307,7 @@ export class AiStreamRunRepository {
       // inherits that favorite's model + tool config instead of being isolated.
       // null = task isolation (default); set = power-user override.
       let effectiveFavoriteId = favoriteId;
-      if (streamContext?.favoriteId) {
+      if (streamContext.favoriteId) {
         const userId = user.isPublic ? undefined : user.id;
         if (userId) {
           const [invokingFavorite] = await db
@@ -333,7 +338,7 @@ export class AiStreamRunRepository {
       // Works at any nesting depth: each level's streamContext.skillId is the
       // immediate caller, so the soul always travels one hop at a time.
       let effectiveInstructions = instructions;
-      if (streamContext?.skillId) {
+      if (streamContext.skillId) {
         const companionPrompt = await SkillsRepository.getCompanionPrompt(
           streamContext.skillId,
         );
@@ -346,6 +351,9 @@ export class AiStreamRunRepository {
 
       // ── Step 3: Run headless AI stream ──────────────────────────────────
       // Pre-call results are injected as proper tool messages in the thread
+      // Increment sub-agent depth: parent's depth + 1
+      const parentDepth = streamContext.subAgentDepth ?? 0;
+
       const streamResult = await runHeadlessAiStream({
         favoriteId: effectiveFavoriteId,
         model,
@@ -358,6 +366,7 @@ export class AiStreamRunRepository {
         threadId: appendThreadId,
         subFolderId,
         rootFolderId,
+        subAgentDepth: parentDepth + 1,
         preCalls: headlessPreCalls.length > 0 ? headlessPreCalls : undefined,
         excludeMemories: excludeMemories ?? false,
         user,
@@ -366,7 +375,7 @@ export class AiStreamRunRepository {
         t,
         // Emit partial tool result with threadId so the parent UI can start
         // rendering sub-thread messages before the headless stream finishes.
-        onThreadCreated: streamContext?.emitPartialToolResult
+        onThreadCreated: streamContext.emitPartialToolResult
           ? async (subThreadId: string): Promise<void> => {
               await streamContext.emitPartialToolResult!({
                 threadId: subThreadId,

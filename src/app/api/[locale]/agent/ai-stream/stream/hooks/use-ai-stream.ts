@@ -9,7 +9,7 @@
  */
 
 import { toast } from "next-vibe-ui/hooks/use-toast";
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useMemo } from "react";
 
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
@@ -21,14 +21,13 @@ import {
 
 import { preWarmChannel } from "../../../../system/unified-interface/websocket/client";
 import { buildMessagesChannel } from "../../../chat/threads/[threadId]/messages/channel";
-import { addErrorMessageToChat } from "../../../chat/threads/[threadId]/messages/hooks/event-handlers";
+import { addErrorMessageToChat } from "../../../chat/threads/[threadId]/messages/hooks/update-messages";
 import cancelEndpoints from "../../cancel/definition";
 import { serializeError } from "../../repository/error-utils";
 import type { AiStreamPostRequestOutput } from "../definition";
 import definitions from "../definition";
 import { scopedTranslation } from "../i18n";
 import { getAudioQueue } from "./audio-queue";
-import type { StreamingThread } from "./store";
 import { useAIStreamStore } from "./store";
 
 /**
@@ -39,7 +38,6 @@ export interface UseAIStreamReturn {
   cancelStream: (threadId: string) => Promise<void>;
   isStreaming: boolean;
   isStreamingThread: (threadId: string) => boolean;
-  threads: Record<string, StreamingThread>;
 }
 
 /**
@@ -62,7 +60,6 @@ export function useAIStream(): UseAIStreamReturn {
   const storeSetAborting = useAIStreamStore((s) => s.setAborting);
   const isStreaming = useAIStreamStore((s) => s.isStreaming);
   const isStreamingThread = useAIStreamStore((s) => s.isStreamingThread);
-  const threads = useAIStreamStore((s) => s.threads);
   const streamMutation = useApiMutation(definitions.POST, logger, user);
   const cancelMutation = useApiMutation(cancelEndpoints.POST, logger, user);
 
@@ -117,15 +114,15 @@ export function useAIStream(): UseAIStreamReturn {
         });
       } catch (err) {
         // mutateAsync throws the full ErrorResponseType on non-success responses
-        const failResult = err as ErrorResponseType;
-        logger.error("Stream request failed", { message: failResult.message });
+        const failMessage = parseError(err).message;
+        logger.error("Stream request failed", { message: failMessage });
 
         const activeThreadId = data.threadId;
         if (activeThreadId) {
           addErrorMessageToChat(
             activeThreadId,
             data.rootFolderId,
-            serializeError(failResult),
+            failMessage,
             "HTTP_ERROR",
             null,
             null,
@@ -135,7 +132,7 @@ export function useAIStream(): UseAIStreamReturn {
 
         toast({
           title: t("error.title"),
-          description: failResult.message,
+          description: failMessage,
           variant: "destructive",
           duration: Infinity,
         });
@@ -239,6 +236,5 @@ export function useAIStream(): UseAIStreamReturn {
     cancelStream,
     isStreaming,
     isStreamingThread,
-    threads,
   };
 }

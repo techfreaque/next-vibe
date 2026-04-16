@@ -6,7 +6,7 @@
  * because in-process delivery is handled by the channel registry in server.ts.
  */
 
-import { broadcastLocal } from "../server";
+import { broadcastLocalToAll } from "../server";
 import type {
   PubSubAdapter,
   PubSubMessageData,
@@ -15,7 +15,7 @@ import type {
 
 export class LocalPubSubAdapter implements PubSubAdapter {
   publish(channel: string, event: string, data: PubSubMessageData): void {
-    broadcastLocal(channel, event, data);
+    broadcastLocalToAll(channel, event, data);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

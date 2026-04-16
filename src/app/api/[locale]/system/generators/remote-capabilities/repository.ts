@@ -466,7 +466,9 @@ export class RemoteCapabilitiesGeneratorRepository {
       value: RemoteToolCapability["fields"],
     ): RemoteToolCapability["fields"] => {
       const out: RemoteToolCapability["fields"] = {};
-      for (const [key, val] of Object.entries(value)) {
+      for (const [key, val] of Object.entries(
+        value as Record<string, RemoteToolCapability["fields"]>,
+      )) {
         if (
           TRANSLATABLE_KEYS.has(key) &&
           typeof val === "string" &&

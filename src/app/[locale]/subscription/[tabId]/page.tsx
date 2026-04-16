@@ -15,7 +15,7 @@ import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import {
@@ -129,7 +129,7 @@ export async function tanstackLoader({
   let initialCredits: CreditsGetResponseOutput | null = null;
   if (isAuthenticated) {
     const creditsResponse = await CreditRepository.getBalance(
-      { userId: user.id },
+      user,
       logger,
       creditsT,
       locale,

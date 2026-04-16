@@ -19,23 +19,23 @@
 import "server-only";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
 import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { and, eq, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
 import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import * as userSchema from "@/app/api/[locale]/user/db";
 import * as remoteConnectionSchema from "@/app/api/[locale]/user/remote-connection/db";
 import { remoteConnections } from "@/app/api/[locale]/user/remote-connection/db";
 import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
+import { RESUME_STREAM_ALIAS } from "../resume-stream/constants";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -257,6 +257,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
   const { cronTasks } =
     await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const pulseAbortController = new AbortController();
 
   // Find ALL pending remote execute-tool tasks for this thread.
   // For parallel tool calls, multiple tasks can be pending simultaneously.
@@ -275,6 +276,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
       wakeUpSkillId: cronTasks.wakeUpSkillId,
       wakeUpFavoriteId: cronTasks.wakeUpFavoriteId,
       wakeUpLeafMessageId: cronTasks.wakeUpLeafMessageId,
+      wakeUpSubAgentDepth: cronTasks.wakeUpSubAgentDepth,
       userId: cronTasks.userId,
     })
     .from(cronTasks)
@@ -330,7 +332,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
       {
         force: true,
         systemLocale: defaultLocale,
-        taskNames: ["resume-stream"],
+        taskNames: [RESUME_STREAM_ALIAS],
       },
       logger,
       defaultLocale,
@@ -524,7 +526,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
    */
   async function executeTaskHandler(
     task: (typeof remoteTasks)[number],
-  ): Promise<ToolCallResult | null> {
+  ): Promise<WidgetData | null> {
     if (!task.routeId) {
       return null;
     }
@@ -545,12 +547,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
       const { t: tC } = (
         await import("@/app/api/[locale]/credits/i18n")
       ).scopedTranslation.scopedT(defaultLocale);
-      const bal = await CR.getBalance(
-        { userId: taskUser.id, leadId: taskUser.leadId },
-        logger,
-        tC,
-        defaultLocale,
-      );
+      const bal = await CR.getBalance(taskUser, logger, tC, defaultLocale);
       // eslint-disable-next-line no-console
       console.log(
         `[triggerLocalPulse] generate_video data=${JSON.stringify(handlerData)} balance=${JSON.stringify(bal)}`,
@@ -568,6 +565,9 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
       // Without this, model fields fall back to schema defaults (WAN_2_7_T2V) instead of
       // the resolved model from streamContext.
       platform: Platform.AI,
+      // Pass the task's DB id as cronTaskId so interactive tools (e.g. coding-agent) can
+      // use path 2 (goroutine/cron context) and inject the taskId into the terminal prompt.
+      cronTaskId: task.id,
       streamContext: {
         rootFolderId: DefaultFolderId.CRON,
         // Pass the real wakeUp context so wait-for-task can register T5b as a waiter
@@ -585,6 +585,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
         skillId: task.wakeUpSkillId ?? undefined,
         modelId: (task.wakeUpModelId ?? undefined) as ChatModelId | undefined,
         headless: undefined,
+        subAgentDepth: task.wakeUpSubAgentDepth ?? 0,
         waitingForRemoteResult: undefined,
         abortSignal: abortController.signal,
         callerCallbackMode: undefined,
@@ -595,6 +596,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
         videoGenModelSelection: handlerVideoGenModelSelection,
         variantId: undefined,
         isRevival: undefined,
+        providerOverride: undefined,
       },
     }).catch((err: Error) => {
       logger.warn("[triggerLocalPulse] handler execution failed", {
@@ -604,14 +606,14 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
       return null;
     });
 
-    let taskOutput: ToolCallResult | null = null;
+    let taskOutput: WidgetData | null = null;
     if (
       handlerResult &&
       "success" in handlerResult &&
       handlerResult.success &&
       "data" in handlerResult
     ) {
-      taskOutput = handlerResult.data as ToolCallResult;
+      taskOutput = handlerResult.data;
     }
     // eslint-disable-next-line no-console
     console.log("[triggerLocalPulse] handler result", {
@@ -621,11 +623,17 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
         : null,
       videoGenModelSelectionType: handlerVideoGenModelSelection.selectionType,
       taskOutputWaiting:
-        taskOutput && typeof taskOutput === "object"
-          ? (taskOutput as Record<string, JsonValue>)["waiting"]
+        taskOutput &&
+        typeof taskOutput === "object" &&
+        !Array.isArray(taskOutput) &&
+        !(taskOutput instanceof Date)
+          ? taskOutput["waiting"]
           : "n/a",
       taskOutputKeys:
-        taskOutput && typeof taskOutput === "object"
+        taskOutput &&
+        typeof taskOutput === "object" &&
+        !Array.isArray(taskOutput) &&
+        !(taskOutput instanceof Date)
           ? Object.keys(taskOutput)
           : "n/a",
     });
@@ -669,7 +677,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
     const orderedTasks = [...nonWaitTasks, ...waitTasks];
 
     // Execute all tasks; collect outputs (in orderedTasks order)
-    const taskOutputs: (ToolCallResult | null)[] = [];
+    const taskOutputs: (WidgetData | null)[] = [];
     for (const task of orderedTasks) {
       // eslint-disable-next-line no-console
       console.log("[triggerLocalPulse] Executing parallel batch task", {
@@ -702,7 +710,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
           const toolCall = existing.metadata?.toolCall;
           const stableOutput =
             output !== null && output !== undefined
-              ? (JSON.parse(JSON.stringify(output)) as ToolCallResult)
+              ? (JSON.parse(JSON.stringify(output)) as WidgetData)
               : undefined;
           // eslint-disable-next-line no-await-in-loop
           await db
@@ -768,10 +776,11 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
       skillId: lastTask.wakeUpSkillId ?? null,
       favoriteId: lastTask.wakeUpFavoriteId ?? null,
       leafMessageId: lastTask.wakeUpLeafMessageId ?? null,
-      userId,
+      subAgentDepth: lastTask.wakeUpSubAgentDepth ?? 0,
+      ownerUser: taskUser,
       logger,
-      directResumeUser: taskUser,
       directResumeLocale: defaultLocale,
+      abortSignal: pulseAbortController.signal,
     });
 
     // Disable safety-net resume-stream cron tasks created by handleTaskCompletion
@@ -786,7 +795,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
       .where(
         and(
           eq(cronTasks.userId, userId),
-          eq(cronTasks.routeId, "resume-stream"),
+          eq(cronTasks.routeId, RESUME_STREAM_ALIAS),
           sql`${cronTasks.lastExecutionStatus} IS NULL`,
           eq(cronTasks.enabled, true),
           eq(cronTasks.runOnce, true),
@@ -802,7 +811,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
   }
 
   // Single-task flow (or non-WAIT parallel tasks): process just the first task.
-  let taskOutput: ToolCallResult | null = await executeTaskHandler(remoteTask);
+  let taskOutput: WidgetData | null = await executeTaskHandler(remoteTask);
 
   // wait-for-task(detach dependency): if the handler result is waiting=true, the
   // wait-for-task registered itself as a waiter on a detach task (e.g. generate_image).
@@ -835,15 +844,60 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
     return;
   }
 
+  // Interactive terminal pending: coding-agent spawned a real terminal, but in tests
+  // there is no real terminal. Re-run the same handler with interactiveMode=false to
+  // get the real batch output — so the result is identical to batch mode.
+  const isTerminalPending =
+    taskOutput &&
+    typeof taskOutput === "object" &&
+    "terminalPending" in taskOutput &&
+    (taskOutput as { terminalPending: boolean }).terminalPending === true;
+  if (isTerminalPending) {
+    // eslint-disable-next-line no-console
+    console.log(
+      "[triggerLocalPulse] Interactive terminal pending - re-running as batch to get real output",
+      { taskId: remoteTask.id, threadId },
+    );
+    // Re-run with interactiveMode=false so the actual CLI runs and returns real output.
+    const batchTask = {
+      ...remoteTask,
+      taskInput: { ...(remoteTask.taskInput ?? {}), interactiveMode: false },
+    };
+    taskOutput = await executeTaskHandler(batchTask);
+  }
+
+  // Re-fetch the task to pick up any DB updates made by the handler itself.
+  // wait-for-task (called inside the coding-agent goroutine context) updates
+  // wakeUpCallbackMode/wakeUpToolMessageId on the task row. We must use the
+  // updated values for handleTaskCompletion so the correct mode (WAIT vs WAKE_UP)
+  // and the correct tool message ID are used for backfill and revival.
+  const [refreshedTask] = await db
+    .select({
+      wakeUpCallbackMode: cronTasks.wakeUpCallbackMode,
+      wakeUpToolMessageId: cronTasks.wakeUpToolMessageId,
+      wakeUpModelId: cronTasks.wakeUpModelId,
+      wakeUpSkillId: cronTasks.wakeUpSkillId,
+      wakeUpFavoriteId: cronTasks.wakeUpFavoriteId,
+      wakeUpLeafMessageId: cronTasks.wakeUpLeafMessageId,
+      wakeUpSubAgentDepth: cronTasks.wakeUpSubAgentDepth,
+      taskInput: cronTasks.taskInput,
+    })
+    .from(cronTasks)
+    .where(eq(cronTasks.id, remoteTask.id));
+
+  const effectiveTask = refreshedTask
+    ? { ...remoteTask, ...refreshedTask }
+    : remoteTask;
+
   // Mark task as completed in hermes-dev's DB (simulating hermes /report).
   // For DETACH tasks: also store __result in taskInput so wait-for-task can read
   // it if called later. (The /report endpoint doesn't set __result; only the local
   // goroutine path does. triggerLocalPulse runs tasks in-process without /report,
   // so we must store __result manually for detach tasks.)
-  const isDetach = remoteTask.wakeUpCallbackMode === CM.DETACH;
+  const isDetach = effectiveTask.wakeUpCallbackMode === CM.DETACH;
   const existingTaskInput = (remoteTask.taskInput ?? {}) as Record<
     string,
-    JsonValue
+    WidgetData
   >;
   await db
     .update(cronTasks)
@@ -855,7 +909,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
         ? {
             taskInput: JSON.parse(
               JSON.stringify({ ...existingTaskInput, __result: taskOutput }),
-            ) as Record<string, JsonValue>,
+            ) as Record<string, WidgetData>,
           }
         : {}),
     })
@@ -870,31 +924,33 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
     await import("@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler");
 
   const callbackModeValue =
-    remoteTask.wakeUpCallbackMode === CM.WAIT
+    effectiveTask.wakeUpCallbackMode === CM.WAIT
       ? CM.WAIT
-      : remoteTask.wakeUpCallbackMode === CM.WAKE_UP
+      : effectiveTask.wakeUpCallbackMode === CM.WAKE_UP
         ? CM.WAKE_UP
-        : remoteTask.wakeUpCallbackMode === CM.DETACH
+        : effectiveTask.wakeUpCallbackMode === CM.DETACH
           ? CM.DETACH
-          : remoteTask.wakeUpCallbackMode === CM.END_LOOP
+          : effectiveTask.wakeUpCallbackMode === CM.END_LOOP
             ? CM.END_LOOP
             : null;
 
   await handleTaskCompletion({
-    toolMessageId: remoteTask.wakeUpToolMessageId,
+    toolMessageId:
+      effectiveTask.wakeUpToolMessageId ?? remoteTask.wakeUpToolMessageId ?? "",
     threadId,
     callbackMode: callbackModeValue,
     status: CronTaskStatus.COMPLETED,
     output: taskOutput,
     taskId: remoteTask.id,
-    modelId: remoteTask.wakeUpModelId ?? null,
-    skillId: remoteTask.wakeUpSkillId ?? null,
-    favoriteId: remoteTask.wakeUpFavoriteId ?? null,
-    leafMessageId: remoteTask.wakeUpLeafMessageId ?? null,
-    userId,
+    modelId: effectiveTask.wakeUpModelId ?? null,
+    skillId: effectiveTask.wakeUpSkillId ?? null,
+    favoriteId: effectiveTask.wakeUpFavoriteId ?? null,
+    leafMessageId: effectiveTask.wakeUpLeafMessageId ?? null,
+    subAgentDepth: effectiveTask.wakeUpSubAgentDepth ?? 0,
+    ownerUser: taskUser,
     logger,
-    directResumeUser: taskUser,
     directResumeLocale: defaultLocale,
+    abortSignal: pulseAbortController.signal,
   });
 
   // Disable the safety-net resume-stream cron task created by handleTaskCompletion.
@@ -913,7 +969,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
     .where(
       and(
         eq(cronTasks.userId, userId),
-        eq(cronTasks.routeId, "resume-stream"),
+        eq(cronTasks.routeId, RESUME_STREAM_ALIAS),
         sql`${cronTasks.lastExecutionStatus} IS NULL`,
         eq(cronTasks.enabled, true),
         eq(cronTasks.runOnce, true),

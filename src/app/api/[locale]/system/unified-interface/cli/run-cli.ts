@@ -10,7 +10,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
 import { DEFAULT_PROJECT_URL } from "@/config/constants";
-import { enableDebug, enableMcpSilentMode } from "@/config/debug";
+import { enableMcpSilentMode } from "@/config/debug";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -24,16 +24,16 @@ import {
   DefinitionsRegistry,
   type IDefinitionsRegistry,
 } from "../shared/endpoints/definitions/registry";
-import { createEndpointLogger } from "../shared/logger/endpoint";
+import { createEndpointLogger } from "../shared/logger/server-logger";
 import { Platform } from "../shared/types/platform";
 import { scopedTranslation as cliScopedTranslation } from "./i18n";
-import type { CliRequestData } from "./runtime/cli-request-data";
 import { type EnvironmentResult, loadEnvironment } from "./runtime/environment";
 import {
   ErrorHandler,
   setupGlobalErrorHandlers,
 } from "./runtime/execution-errors";
-import { CliInputParser, type ParsedCliData } from "./runtime/parsing";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { CliInputParser } from "./runtime/parsing";
 import {
   type CliCompatiblePlatform,
   RouteDelegationHandler,
@@ -271,13 +271,16 @@ export function runCli({
           options.locale,
         );
         const { t } = cliScopedTranslation.scopedT(options.locale);
-        setupGlobalErrorHandlers(logger);
+        // For MCP, the server sets up its own non-exit error handlers.
+        // The CLI's exit-on-error handlers would kill the process on any tool call error.
+        if (command !== "mcp") {
+          setupGlobalErrorHandlers(logger);
+        }
 
         if (debug) {
           logger.debug(
             `[CLI] Executing command: ${command} ${(args || []).join(" ")} (verbose: ${debug}, interactive: ${options.interactive ?? false})`,
           );
-          enableDebug();
         }
 
         const { cliResourceManager } = await import("./runtime/debug");
@@ -420,10 +423,13 @@ export function runCli({
               : args || [];
 
           performanceMonitor.mark("parseStart");
-          let parsedData: ParsedCliData | undefined;
+          let parsedData: Record<string, WidgetData> | undefined;
           if (options.data) {
             try {
-              parsedData = JSON.parse(options.data.trim()) as ParsedCliData;
+              parsedData = JSON.parse(options.data.trim()) as Record<
+                string,
+                WidgetData
+              >;
             } catch {
               parsedData = {};
             }
@@ -466,7 +472,7 @@ export function runCli({
           const result = await RouteDelegationHandler.executeRoute(
             command,
             {
-              data: parsedData as CliRequestData | undefined,
+              data: parsedData,
               urlPathParams: undefined,
               cliArgs: {
                 positionalArgs: parsedArgs.positionalArgs,

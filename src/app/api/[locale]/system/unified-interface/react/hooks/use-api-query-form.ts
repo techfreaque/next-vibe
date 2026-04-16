@@ -859,6 +859,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       submitForm,
       setErrorType,
       clearSavedForm,
+      cacheKey: query.cacheKey,
     }),
     // formMethods, submitForm, clearSavedForm, setErrorType are stable refs
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -873,6 +874,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       query.isFetching,
       query.isCachedData,
       query.status,
+      query.cacheKey,
       submitError,
       errorMessage,
     ],

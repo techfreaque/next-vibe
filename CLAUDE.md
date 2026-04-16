@@ -143,7 +143,7 @@ A claim about functionality is worthless without verification. The user should n
 
 ## Known Transient Issues (TODO: remove when fixed)
 
-- **TDZ `Cannot access '__vite_ssr_import_N__' before initialization`** - caused by other agents modifying files mid-compile. Not a real code bug. 1-3 page refreshes clears it. Do NOT waste time debugging unless it persists after 3 refreshes on a cold page load. This is a framework issue not an actualy circular dependency issue.
+- **TDZ `Cannot access '__vite_ssr_import_N__' before initialization`** - SSR browser only. Only dismiss this if you see it in the browser after a code change in SSR context. Never use this as an excuse to ignore errors in tests, CLI, type checks, or anything non-browser-SSR. This is not actually a circular issue rather a hmr issue in the tanstack server
 
 ## Memory & CLAUDE.md Hygiene
 

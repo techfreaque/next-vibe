@@ -27,7 +27,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { CronTaskStatus, TaskCategory, TaskCategoryDB } from "../enum";
 import type { TasksT } from "../i18n";
 import { scopedTranslation } from "../i18n";
-import type { JsonValue } from "../unified-runner/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   CronTaskDeleteResponseOutput,
   CronTaskGetResponseOutput,
@@ -39,7 +39,7 @@ import type {
   NewCronTask,
   NewCronTaskExecution,
 } from "./db";
-import { cronTaskExecutions, cronTasks } from "./db";
+import { cronTaskExecutions, cronTasks, dbUserIdToOwner } from "./db";
 import type { CronTaskResponseType as CronTaskResponse } from "./tasks/definition";
 
 /**
@@ -171,7 +171,7 @@ export class CronTasksRepository {
       consecutiveFailures: task.consecutiveFailures,
       targetInstance: task.targetInstance ?? null,
       tags: task.tags,
-      userId: task.userId ?? null,
+      owner: dbUserIdToOwner(task.userId),
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
     };
@@ -229,8 +229,13 @@ export class CronTasksRepository {
         });
       }
 
-      // Non-admins can only access their own tasks
-      if (!isAdmin && task.userId !== userId) {
+      // Non-admins can only access their own user tasks (system tasks are admin-only)
+      const taskOwner = dbUserIdToOwner(task.userId);
+      if (
+        !isAdmin &&
+        (taskOwner.type === "system" ||
+          (taskOwner.type === "user" && taskOwner.userId !== userId))
+      ) {
         return fail({
           message: t("errors.repositoryGetTaskForbidden"),
           errorType: ErrorResponseTypes.FORBIDDEN,
@@ -260,7 +265,7 @@ export class CronTasksRepository {
     }
   }
 
-  /** Find a system task (userId IS NULL) by its routeId */
+  /** Find a system task (owner.type === "system") by its routeId */
   static async getSystemTaskByRouteId(
     routeId: string,
     t: TasksT,
@@ -474,8 +479,14 @@ export class CronTasksRepository {
       }
 
       const canonicalId = existing[0].id;
+      const existingOwner = dbUserIdToOwner(existing[0].userId);
 
-      if (!isAdmin && existing[0].userId !== userId) {
+      // Non-admins cannot delete system tasks; can only delete their own user tasks
+      if (
+        !isAdmin &&
+        (existingOwner.type === "system" ||
+          (existingOwner.type === "user" && existingOwner.userId !== userId))
+      ) {
         return fail({
           message: t("errors.repositoryDeleteTaskForbidden"),
           errorType: ErrorResponseTypes.FORBIDDEN,
@@ -679,7 +690,7 @@ export class CronTasksRepository {
    * Summarise a task result JSONB value into a short human-readable string.
    */
   private static summariseResult(
-    result: Record<string, JsonValue> | null,
+    result: Record<string, WidgetData> | null,
   ): string | null {
     if (!result) {
       return null;

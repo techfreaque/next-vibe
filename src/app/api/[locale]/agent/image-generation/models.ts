@@ -1332,13 +1332,18 @@ export type ImageGenModelSelection = z.infer<
 export function filterImageGenModels(
   selection: ImageGenModelSelection | null | undefined,
   user: JwtPayloadType,
+  providerOverride?: ApiProvider,
 ): ImageGenModelOption[] {
-  return filterRoleModels(imageGenModelOptionsPool, selection, user);
+  const pool = providerOverride
+    ? imageGenModelOptionsPool.filter((m) => m.apiProvider === providerOverride)
+    : imageGenModelOptionsPool;
+  return filterRoleModels(pool, selection, user);
 }
 
 export function getBestImageGenModel(
   selection: ImageGenModelSelection,
   user: JwtPayloadType,
+  providerOverride?: ApiProvider,
 ): ImageGenModelOption | null {
-  return filterImageGenModels(selection, user)[0] ?? null;
+  return filterImageGenModels(selection, user, providerOverride)[0] ?? null;
 }

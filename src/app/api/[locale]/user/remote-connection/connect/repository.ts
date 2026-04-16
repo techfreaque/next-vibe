@@ -30,7 +30,10 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
+import {
+  BEARER_LEAD_ID_SEPARATOR,
+  LEAD_ID_COOKIE_NAME,
+} from "@/config/constants";
 import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
@@ -135,11 +138,8 @@ export class RemoteConnectionConnectRepository {
     try {
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}${BEARER_LEAD_ID_SEPARATOR}${leadId}`,
       };
-      if (leadId) {
-        headers.Cookie = `${LEAD_ID_COOKIE_NAME}=${leadId}`;
-      }
 
       const response = await fetch(registerUrl, {
         method: "POST",

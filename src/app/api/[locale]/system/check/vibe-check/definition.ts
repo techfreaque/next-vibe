@@ -22,14 +22,14 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { envClient } from "@/config/env-client";
 import { Environment } from "../../../shared/utils";
 import { UserRole } from "../../../user/user-roles/enum";
 import { VIBE_CHECK_ALIAS, VIBE_CHECK_ALIAS_SHORT } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-const CheckResultWidget = lazyCliWidget(() =>
+const CheckResultWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CheckResultWidget })),
 );
 

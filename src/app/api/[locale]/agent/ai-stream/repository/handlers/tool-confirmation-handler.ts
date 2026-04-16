@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { and, eq, gt, ne } from "drizzle-orm";
 import {
   type ErrorResponseType,
@@ -22,13 +22,11 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { db } from "../../../../system/db";
-import { publishWsEvent } from "../../../../system/unified-interface/websocket/emitter";
 import type { ToolExecutionContext } from "../../../chat/config";
-import type { ChatMessage, ToolCall, ToolCallResult } from "../../../chat/db";
+import type { ChatMessage, ToolCall } from "../../../chat/db";
 import { chatMessages } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
-import { buildMessagesChannel } from "../../../chat/threads/[threadId]/messages/channel";
-import { createStreamEvent } from "../../../chat/threads/[threadId]/messages/events";
+import { createMessagesEmitter } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { AiStreamT } from "../../stream/i18n";
 import { walkToLeafMessage } from "../core/branch-utils";
 
@@ -99,7 +97,7 @@ export class ToolConfirmationHandler {
       });
     }
 
-    const toolCall = toolMessage.metadata?.toolCall as ToolCall | undefined;
+    const toolCall = toolMessage.metadata?.toolCall;
     if (!toolCall) {
       logger.error("[Tool Confirmation] ToolCall metadata missing");
       return fail({
@@ -194,12 +192,12 @@ export class ToolConfirmationHandler {
         string,
         {
           execute?: (
-            args: ToolCallResult,
+            args: WidgetData,
             options: ToolExecuteOptions,
-          ) => Promise<ToolCallResult>;
+          ) => Promise<WidgetData>;
         },
       ];
-      let toolResult: ToolCallResult | undefined;
+      let toolResult: WidgetData | undefined;
       let toolError: ErrorResponseType | undefined;
 
       logger.debug("[Tool Confirmation] Executing tool", {
@@ -222,7 +220,7 @@ export class ToolConfirmationHandler {
             !Array.isArray(toolResult)
           ) {
             toolResult = {
-              ...(toolResult as Record<string, JsonValue>),
+              ...(toolResult as Record<string, WidgetData>),
               _hint:
                 "This tool required user confirmation (callbackMode=approve). The user confirmed execution, so the result is now available.",
             };
@@ -268,12 +266,11 @@ export class ToolConfirmationHandler {
         toolResult !== undefined &&
         typeof toolResult === "object" &&
         toolResult !== null &&
-        "status" in (toolResult as Record<string, ToolCallResult>) &&
-        (toolResult as Record<string, ToolCallResult>).status ===
-          CronTaskStatus.PENDING
+        "status" in toolResult &&
+        toolResult.status === CronTaskStatus.PENDING
       ) {
-        const pendingTaskId = (toolResult as Record<string, ToolCallResult>)
-          .taskId as string | undefined;
+        const pendingTaskId =
+          typeof toolResult.taskId === "string" ? toolResult.taskId : undefined;
 
         if (!isIncognito) {
           // Check whether the wakeUp result already landed (newer sequence present).
@@ -311,12 +308,15 @@ export class ToolConfirmationHandler {
             // Re-emit message-created so the client updates the existing bubble's badge
             // (waitingForConfirmation=false → shows "Running - result will wake up AI").
             // Do NOT emit tool-result - there is no result yet; resume-stream delivers it later.
-            publishWsEvent(
-              {
-                channel: buildMessagesChannel(toolMessage.threadId),
-                event: "message-created",
-                data: createStreamEvent.messageCreated({
-                  messageId: toolConfirmation.messageId,
+            createMessagesEmitter(
+              toolMessage.threadId,
+              null,
+              logger,
+              user,
+            )("message-created", {
+              messages: [
+                {
+                  id: toolConfirmation.messageId,
                   threadId: toolMessage.threadId,
                   role: ChatMessageRole.TOOL,
                   parentId: toolMessage.parentId ?? null,
@@ -324,11 +324,12 @@ export class ToolConfirmationHandler {
                   model: toolMessage.model,
                   skill: toolMessage.skill,
                   sequenceId: toolMessage.sequenceId ?? null,
-                  toolCall: clearedToolCall,
-                }).data,
-              },
-              logger,
-            );
+                  metadata: { toolCall: clearedToolCall },
+                  isAI: true,
+                },
+              ],
+              streamingState: "streaming",
+            });
 
             if (pendingTaskId) {
               try {
@@ -385,7 +386,7 @@ export class ToolConfirmationHandler {
         ...toolCall,
         // Keep original args (with original callbackMode='approve') so AI sees what it actually called.
         // finalArgs overrides callbackMode to 'wait' for execution only - don't expose that to AI.
-        args: baseArgs as ToolCallResult,
+        args: baseArgs,
         result: toolResult,
         error: toolError,
         isConfirmed: true,
@@ -495,12 +496,16 @@ export class ToolConfirmationHandler {
           metadata: { toolCall: deferredToolCall },
         });
         // Emit WS so the client has this message in cache before any revival stream events.
-        publishWsEvent(
-          {
-            channel: buildMessagesChannel(toolMessage.threadId),
-            event: "message-created",
-            data: createStreamEvent.messageCreated({
-              messageId: deferredId,
+        const confirmedEmitter = createMessagesEmitter(
+          toolMessage.threadId,
+          null,
+          logger,
+          user,
+        );
+        confirmedEmitter("message-created", {
+          messages: [
+            {
+              id: deferredId,
               threadId: toolMessage.threadId,
               role: ChatMessageRole.TOOL,
               parentId: confirmedDeferredParentId,
@@ -508,25 +513,20 @@ export class ToolConfirmationHandler {
               model: toolMessage.model,
               skill: toolMessage.skill,
               sequenceId: confirmedSeqId,
-              toolCall: deferredToolCall,
-            }).data,
-          },
-          logger,
-        );
-        publishWsEvent(
-          {
-            channel: buildMessagesChannel(toolMessage.threadId),
-            event: "tool-result",
-            data: createStreamEvent.toolResult({
-              messageId: deferredId,
-              toolName: deferredToolCall.toolName,
-              result: deferredToolCall.result,
-              error: deferredToolCall.error,
-              toolCall: deferredToolCall,
-            }).data,
-          },
-          logger,
-        );
+              metadata: { toolCall: deferredToolCall },
+              isAI: true,
+            },
+          ],
+          streamingState: "streaming",
+        });
+        confirmedEmitter("tool-result", {
+          messages: [
+            {
+              id: deferredId,
+              metadata: { toolCall: deferredToolCall },
+            },
+          ],
+        });
         logger.debug(
           "[Tool Confirmation] Tool executed - deferred confirm message inserted",
           {
@@ -654,12 +654,16 @@ export class ToolConfirmationHandler {
           metadata: { toolCall: deferredRejected },
         });
         // Emit WS so the client has this message in cache before any revival stream events.
-        publishWsEvent(
-          {
-            channel: buildMessagesChannel(toolMessage.threadId),
-            event: "message-created",
-            data: createStreamEvent.messageCreated({
-              messageId: deferredId,
+        const rejectedEmitter = createMessagesEmitter(
+          toolMessage.threadId,
+          null,
+          logger,
+          user,
+        );
+        rejectedEmitter("message-created", {
+          messages: [
+            {
+              id: deferredId,
               threadId: toolMessage.threadId,
               role: ChatMessageRole.TOOL,
               parentId: rejectedDeferredParentId,
@@ -667,25 +671,20 @@ export class ToolConfirmationHandler {
               model: toolMessage.model,
               skill: toolMessage.skill,
               sequenceId: rejectedSeqId,
-              toolCall: deferredRejected,
-            }).data,
-          },
-          logger,
-        );
-        publishWsEvent(
-          {
-            channel: buildMessagesChannel(toolMessage.threadId),
-            event: "tool-result",
-            data: createStreamEvent.toolResult({
-              messageId: deferredId,
-              toolName: deferredRejected.toolName,
-              result: deferredRejected.result,
-              error: deferredRejected.error,
-              toolCall: deferredRejected,
-            }).data,
-          },
-          logger,
-        );
+              metadata: { toolCall: deferredRejected },
+              isAI: true,
+            },
+          ],
+          streamingState: "streaming",
+        });
+        rejectedEmitter("tool-result", {
+          messages: [
+            {
+              id: deferredId,
+              metadata: { toolCall: deferredRejected },
+            },
+          ],
+        });
         logger.debug("[Tool Confirmation] Tool rejected - deferred inserted", {
           originalMessageId: toolConfirmation.messageId,
           deferredId,

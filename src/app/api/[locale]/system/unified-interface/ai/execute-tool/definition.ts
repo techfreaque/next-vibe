@@ -33,11 +33,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
 import { CallbackMode, EXECUTE_TOOL_ALIAS } from "./constants";
 
-const ExecuteToolWidget = lazyCliWidget(() =>
+const ExecuteToolWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ExecuteToolWidget })),
 );
 

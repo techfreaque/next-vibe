@@ -422,9 +422,22 @@ export const translations: typeof enTranslations = {
     stt: {
       "endpoint-not-available": "Sprache-zu-Text-Endpunkt nicht verfügbar",
       "failed-to-start": "Fehler beim Starten der Aufnahme",
-      "permission-denied": "Mikrofon-Berechtigung verweigert",
-      "no-microphone": "Kein Mikrofon gefunden",
-      "microphone-in-use": "Mikrofon wird verwendet",
+      "permission-denied":
+        "Mikrofon-Zugriff blockiert. Erlaube das Mikrofon in den Browser-Einstellungen und lade die Seite neu.",
+      "permission-denied-ios":
+        "Mikrofon blockiert. Gehe zu Einstellungen → Safari → Mikrofon und erlaube den Zugriff für diese Seite.",
+      "permission-denied-android":
+        "Mikrofon blockiert. Tippe auf das Schloss-Symbol in der Adressleiste → Website-Einstellungen → Mikrofon → Zulassen.",
+      "permission-denied-mac":
+        "Mikrofon blockiert. Öffne Systemeinstellungen → Datenschutz & Sicherheit → Mikrofon und aktiviere deinen Browser.",
+      "permission-denied-windows":
+        "Mikrofon blockiert. Öffne Einstellungen → Datenschutz → Mikrofon und stelle sicher, dass dein Browser zugelassen ist.",
+      "no-microphone":
+        "Kein Mikrofon gefunden. Schließe ein Mikrofon oder Headset an und versuche es erneut.",
+      "microphone-in-use":
+        "Dein Mikrofon wird von einer anderen App verwendet. Schließe sie und versuche es erneut.",
+      "not-supported":
+        "Dein Browser unterstützt keinen Mikrofon-Zugriff. Versuche Chrome, Firefox oder Safari.",
       "transcription-failed": "Fehler beim Transkribieren des Audios",
     },
     tts: {
@@ -481,7 +494,9 @@ export const translations: typeof enTranslations = {
       claudeOpus45:
         "Claude Opus 4.5 - Leistungsstärkstes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
       claudeOpus46:
-        "Claude Opus 4.6 - Neuestes und leistungsstärkstes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
+        "Claude Opus 4.6 - Leistungsstarkes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
+      claudeOpus47:
+        "Claude Opus 4.7 - Neuestes und leistungsstärkstes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
       claudeSonnet46:
         "Claude Sonnet 4.6 - Anthropics leistungsfähigstes Sonnet-Modell mit frontier-Leistung in Coding, Agenten und professioneller Arbeit",
       claudeHaiku45:

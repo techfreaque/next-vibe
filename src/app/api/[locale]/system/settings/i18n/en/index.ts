@@ -177,6 +177,7 @@ export const translations = {
     selectPlaceholder: "Select...",
     boolTrue: "on",
     boolFalse: "off",
+    logPathDisabled: "file logging disabled",
     restartWizard: "Setup Wizard",
     exportProd: "Export for Production",
     generate: "Generate",

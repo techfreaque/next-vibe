@@ -101,6 +101,7 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
@@ -624,12 +625,6 @@ interface VibeNodeData {
 
 type VibeNode = Node<VibeNodeData>;
 type VibeEdge = Edge;
-
-interface CustomWidgetProps {
-  field: {
-    value: EditResponseOutput | null | undefined;
-  } & (typeof definition.PUT)["fields"];
-}
 
 // ─── Config ↔ Flow ──────────────────────────────────────────────────────────
 
@@ -3059,12 +3054,11 @@ function EditFormInner({
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 
-export function EditGraphWidget({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
+export function EditGraphWidget(): React.JSX.Element {
+  const savedResponse = useWidgetValue<typeof definition.PUT>();
   return (
     <ReactFlowProvider>
-      <EditFormInner savedResponse={field.value} />
+      <EditFormInner savedResponse={savedResponse} />
     </ReactFlowProvider>
   );
 }

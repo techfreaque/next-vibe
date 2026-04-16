@@ -16,24 +16,18 @@ import React, { useCallback, useState } from "react";
 import {
   useWidgetContext,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type endpoints from "./definition";
-import type { FilesReadResponseOutput } from "./definition";
 
-interface WidgetProps {
-  field: {
-    value: FilesReadResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
-}
-
-export function FilesReadContainer({ field }: WidgetProps): React.JSX.Element {
+export function FilesReadContainer(): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const { endpointMutations } = useWidgetContext();
   const [editMode, setEditMode] = useState(false);
   const [editContent, setEditContent] = useState("");
 
-  const value = field.value;
+  const value = useWidgetValue<typeof endpoints.GET>();
   const isLoading = endpointMutations?.read?.isLoading ?? false;
 
   const handleEdit = useCallback((): void => {

@@ -23,6 +23,7 @@ import {
   FormLabel,
 } from "next-vibe-ui/ui/form/form";
 import { Pre } from "next-vibe-ui/ui/pre";
+import { useThemeToggle } from "next-vibe-ui/ui/theme-provider";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -31,11 +32,8 @@ import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import helpEndpoints from "@/app/api/[locale]/system/help/definition";
 import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
-import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetDisabled,
@@ -46,12 +44,12 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-frame/VibeFrameHost";
 import remoteConnectionListDefinition from "@/app/api/[locale]/user/remote-connection/list/definition";
 
 import type definition from "./definition";
-import type { RouteExecuteResponseInput } from "./definition";
 import { scopedTranslation as executeToolScopedTranslation } from "./i18n";
 
 interface EndpointMethods {
@@ -62,13 +60,7 @@ interface EndpointMethods {
   DELETE?: CreateApiEndpointAny;
 }
 
-interface CustomWidgetProps {
-  field: {
-    value: RouteExecuteResponseInput | null | undefined;
-  } & (typeof definition.POST)["fields"];
-}
-
-export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
+export function ExecuteToolWidget(): JSX.Element {
   const form = useWidgetForm<typeof definition.POST>();
   const locale = useWidgetLocale();
   const { t: tWidget } = executeToolScopedTranslation.scopedT(locale);
@@ -78,17 +70,12 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
   const disabled = useWidgetDisabled();
   const onSubmit = useWidgetOnSubmit();
   const onCancel = useWidgetOnCancel();
+  const { theme } = useThemeToggle();
 
-  // Get values from form (interactive mode) or field.value (read-only tool call display)
-  const fieldValue =
-    field.value &&
-    typeof field.value === "object" &&
-    !Array.isArray(field.value)
-      ? (field.value as Record<string, WidgetData>)
-      : null;
-  const rawToolName =
-    form.watch("toolName") ??
-    (typeof fieldValue?.toolName === "string" ? fieldValue.toolName : "");
+  // Get values from form (interactive mode) or widget value (read-only tool call display)
+  const fieldValue = useWidgetValue<typeof definition.POST>();
+
+  const rawToolName = form.watch("toolName");
   const resultData = fieldValue?.result;
 
   // Parse remote tool prefix: "hermes__ssh_exec_POST" → instanceId + toolName
@@ -172,16 +159,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
     });
   }, [helpState?.read?.response, tWidget]);
 
-  const formInputData = form.watch("input") as
-    | Record<string, WidgetData>
-    | undefined;
-  const inputData =
-    formInputData ??
-    (fieldValue?.input &&
-    typeof fieldValue.input === "object" &&
-    !Array.isArray(fieldValue.input)
-      ? (fieldValue.input as Record<string, WidgetData>)
-      : undefined);
+  const inputData = form.watch("input");
 
   const [resolvedEndpoint, setResolvedEndpoint] =
     useState<CreateApiEndpointAny | null>(null);
@@ -365,6 +343,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
           serverUrl={remoteConnection.remoteUrl}
           endpoint={toolName}
           locale={locale}
+          theme={theme}
           data={
             inputData
               ? Object.fromEntries(
@@ -428,31 +407,41 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
       )}
 
       {/* Response mode: render the target endpoint with merged input+result data (read-only) */}
-      {!isRemoteTool && resolvedEndpoint && resultData && (
-        <NavigationStackProvider>
-          <EndpointRenderer
-            endpoint={resolvedEndpoint}
-            locale={locale}
-            user={user}
-            logger={logger}
-            data={
-              (inputData &&
+      {!isRemoteTool && resolvedEndpoint && method && Boolean(resultData) && (
+        <EndpointsPage
+          endpoint={{ [method]: resolvedEndpoint }}
+          locale={locale}
+          user={user}
+          disabled={true}
+          endpointOptions={(() => {
+            const mergedResult =
+              inputData &&
               resultData &&
               typeof resultData === "object" &&
               !Array.isArray(resultData)
-                ? {
-                    ...inputData,
-                    ...(resultData as Record<string, WidgetData>),
-                  }
-                : resultData) as WidgetData
+                ? { ...inputData, ...resultData }
+                : resultData;
+            if (method === "GET") {
+              return { read: { initialData: mergedResult as never } };
             }
-            disabled={disabled}
-          />
-        </NavigationStackProvider>
+            if (method === "DELETE") {
+              return {
+                delete: {
+                  urlPathParams: mergedResult as never,
+                  autoPrefillData: mergedResult as never,
+                },
+              };
+            }
+            if (method === "PATCH") {
+              return { update: { autoPrefillData: mergedResult as never } };
+            }
+            return { create: { autoPrefillData: mergedResult as never } };
+          })()}
+        />
       )}
 
       {/* Remote tool response: render raw result data */}
-      {isRemoteTool && resultData && (
+      {isRemoteTool && Boolean(resultData) && (
         <Div className="rounded-md bg-muted/50 p-3 text-xs font-mono overflow-x-auto">
           <Pre>{JSON.stringify(resultData, null, 2)}</Pre>
         </Div>

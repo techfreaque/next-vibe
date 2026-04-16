@@ -55,6 +55,7 @@ function WidgetSidebar({
     () => ({
       read: {
         urlPathParams: { rootFolderId: currentRootFolderId },
+        subscribeToEvents: true,
         queryOptions: {
           refetchOnWindowFocus: false,
           staleTime: 30 * 1000,

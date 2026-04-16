@@ -5,13 +5,11 @@
  * and interactive mode toggle. Model is a text field in the form below.
  */
 
-/* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Mic } from "next-vibe-ui/ui/icons/Mic";
 import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
 import {
@@ -53,22 +51,27 @@ import {
   useWidgetLogger,
   useWidgetOnSubmit,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
-import type { RunResponseOutput } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 interface WidgetProps {
-  field: {
-    value: RunResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 const FAKE_BOOT_VALUE: ChatBootValue = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  initialCredits: null as any,
+  initialCredits: {
+    total: 0,
+    expiring: 0,
+    permanent: 0,
+    earned: 0,
+    free: 0,
+    expiresAt: null,
+  },
   rootFolderPermissions: { canCreateThread: false, canCreateFolder: false },
   initialFoldersData: null,
   initialThreadsData: null,
@@ -115,10 +118,16 @@ function makeUserMessage(content: string, id: string): ChatMessage {
   };
 }
 
+const PROVIDER_TO_MODEL: Record<string, ChatModelId> = {
+  "claude-code": ChatModelId.CLAUDE_CODE_SONNET,
+  "open-code": ChatModelId.CLAUDE_CODE_SONNET, // fallback until OpenCode model added
+};
+
 function makeAssistantMessage(
   content: string,
   id: string,
   isStreaming: boolean,
+  model: ChatModelId | null,
 ): ChatMessage {
   const now = new Date();
   return {
@@ -131,7 +140,7 @@ function makeAssistantMessage(
     authorId: null,
     authorName: null,
     isAI: true,
-    model: null,
+    model,
     skill: null,
     errorType: null,
     errorMessage: null,
@@ -213,6 +222,7 @@ function ProviderSelector({
 export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
   const form = useWidgetForm<typeof definition.POST>();
   const locale = useWidgetLocale();
+  const { t } = scopedTranslation.scopedT(locale);
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const onSubmit = useWidgetOnSubmit();
@@ -221,20 +231,45 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
   useWidgetContext();
 
   const children = field.children;
-  const result = field.value;
+  const result = useWidgetValue<typeof definition.POST>();
   const promptValue = form.watch("prompt") ?? "";
-  const providerValue = (form.watch("provider") ?? "claude-code") as
-    | "claude-code"
-    | "open-code";
+  const providerValue = form.watch("provider") ?? "claude-code";
   const interactiveMode = form.watch("interactiveMode") ?? false;
+
+  // In read-only (disabled) mode, data comes from form defaultValues (merged input+result).
+  // In read-only (disabled) mode, response fields are merged into form defaults by
+  // EndpointRenderer. The form schema only covers request fields so we access the raw
+  // values via a flat primitive record and narrow each field with typeof guards.
+  const effectiveResult = useMemo(() => {
+    if (result) {
+      return result;
+    }
+    if (!isDisabled) {
+      return undefined;
+    }
+    const vals: Record<string, string | number | boolean | null | undefined> =
+      form.getValues();
+    const output = vals["output"];
+    if (typeof output !== "string") {
+      return undefined;
+    }
+    const durationMs = vals["durationMs"];
+    const taskId = vals["taskId"];
+    return {
+      output,
+      durationMs: typeof durationMs === "number" ? durationMs : 0,
+      taskId: typeof taskId === "string" ? taskId : undefined,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result, isDisabled]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (result ?? isSubmitting) {
+    if (effectiveResult !== undefined || isSubmitting) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [result, isSubmitting]);
+  }, [effectiveResult, isSubmitting]);
 
   const userMsgIdRef = useRef<string>(makeMsgId());
   const assistantMsgIdRef = useRef<string>(makeMsgId());
@@ -268,8 +303,6 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
     [form],
   );
 
-  const noopDeduct = useCallback(() => undefined as void, []);
-
   const {
     isRecording,
     isPaused,
@@ -283,7 +316,6 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
   } = useVoiceRecording({
     currentValue: promptValue,
     onValueChange: handleContentChange,
-    deductCredits: noopDeduct,
     user,
     logger,
     locale,
@@ -295,32 +327,38 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
     [promptValue, userMsgIdRef.current],
   );
 
-  const isEscalated = !!result?.taskId && !result.output;
+  const isEscalated = !!effectiveResult?.taskId && !effectiveResult.output;
   const isInteractiveLaunched =
-    !!result?.taskId && result.durationMs === 0 && !!result.output;
+    !!effectiveResult?.taskId &&
+    effectiveResult.durationMs === 0 &&
+    !!effectiveResult.output;
 
   const assistantContent = useMemo(() => {
-    if (!result) {
+    if (!effectiveResult) {
       return "";
     }
     if (isEscalated) {
-      return `⟳ Running in background…\n\nTask ID: \`${result.taskId}\`${result.hint ? `\n\n${result.hint}` : ""}`;
+      return `⟳ Running in background…\n\nTask ID: \`${effectiveResult.taskId}\`${effectiveResult.hint ? `\n\n${effectiveResult.hint}` : ""}`;
     }
     if (isInteractiveLaunched) {
-      return `◆ Interactive session launched in terminal\n\nTask ID: \`${result.taskId}\`${result.output ? `\n\n${result.output}` : ""}`;
+      return `◆ Interactive session launched in terminal\n\nTask ID: \`${effectiveResult.taskId}\`${effectiveResult.output ? `\n\n${effectiveResult.output}` : ""}`;
     }
-    return result.output ?? "";
-  }, [result, isEscalated, isInteractiveLaunched]);
+    return effectiveResult.output ?? "";
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [effectiveResult, isEscalated, isInteractiveLaunched]);
+
+  const isAssistantLoading = (isSubmitting || isDisabled) && !effectiveResult;
 
   const assistantMessage = useMemo(
     () =>
       makeAssistantMessage(
         assistantContent,
         assistantMsgIdRef.current,
-        isSubmitting && !result,
+        isAssistantLoading,
+        PROVIDER_TO_MODEL[providerValue] ?? ChatModelId.CLAUDE_CODE_SONNET,
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [assistantContent, isSubmitting, result],
+    [assistantContent, isAssistantLoading],
   );
 
   const assistantGroup = useMemo(
@@ -353,7 +391,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
               >
                 <Terminal className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                 <Span className="hidden @md:inline text-muted-foreground">
-                  Interactive
+                  {t("codingAgent.run.post.widget.interactive")}
                 </Span>
                 <Span
                   className={cn(
@@ -387,6 +425,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
       interactiveMode,
       handleInteractiveToggle,
       isDisabled,
+      t,
     ],
   );
 
@@ -409,7 +448,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
     [startRecording, isDisabled],
   );
 
-  const hasSentMessage = isSubmitting || !!result;
+  const hasSentMessage = isSubmitting || !!effectiveResult || isDisabled;
 
   return (
     <ChatNavigationProvider
@@ -417,42 +456,42 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
       currentRootFolderId={DefaultFolderId.PRIVATE}
       currentSubFolderId={null}
       leafMessageId={null}
-      isEmbedded={false}
+      isEmbedded={true}
     >
       <ChatBootContext.Provider value={FAKE_BOOT_VALUE}>
-        <Div className="flex flex-col h-[520px] min-h-[320px]">
-          <Div className="flex items-center gap-2 px-2 pt-2">
-            <NavigateButtonWidget field={children.backButton} />
-            <SubmitButtonWidget<typeof definition.POST>
-              field={children.submitButton}
-            />
-          </Div>
-          <Div className="flex-1 overflow-y-auto min-h-0 py-2">
+        <Div
+          className={
+            isDisabled
+              ? "flex flex-col"
+              : "flex flex-col h-[520px] min-h-[320px]"
+          }
+        >
+          {!isDisabled && (
+            <Div className="flex items-center gap-2 px-2 pt-2">
+              <NavigateButtonWidget field={children.backButton} />
+              <SubmitButtonWidget<typeof definition.POST>
+                field={children.submitButton}
+              />
+            </Div>
+          )}
+          <Div
+            className={
+              isDisabled
+                ? "flex flex-col gap-1"
+                : "flex-1 overflow-y-auto min-h-0 py-2"
+            }
+          >
             {hasSentMessage && promptValue && (
               <UserMessageBubble
                 message={userMessage}
                 locale={locale}
                 logger={logger}
                 user={user}
-                deductCredits={null}
                 rootFolderId={DefaultFolderId.PRIVATE}
               />
             )}
 
-            {isSubmitting && !result && (
-              <Div className="flex items-start gap-3 px-2 mt-3">
-                <Div className="flex-1 max-w-full pl-2 py-1 flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground shrink-0" />
-                  <Span className="text-sm text-muted-foreground">
-                    {interactiveMode
-                      ? "Launching terminal session…"
-                      : "Running…"}
-                  </Span>
-                </Div>
-              </Div>
-            )}
-
-            {result && (
+            {hasSentMessage && (
               <GroupedAssistantMessage
                 group={assistantGroup}
                 locale={locale}
@@ -465,7 +504,6 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
                 rootFolderId={DefaultFolderId.PRIVATE}
                 user={user}
                 sendMessage={null}
-                deductCredits={noopDeduct}
                 ttsAutoplay={false}
                 voiceId={undefined}
                 onVote={null}
@@ -474,10 +512,10 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
               />
             )}
 
-            {!hasSentMessage && (
+            {!hasSentMessage && !isDisabled && (
               <Div className="flex items-center justify-center h-full">
                 <Span className="text-sm text-muted-foreground/50 select-none">
-                  Enter a prompt below to run the coding agent
+                  {t("codingAgent.run.post.widget.emptyPromptHint")}
                 </Span>
               </Div>
             )}
@@ -485,7 +523,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
             <Div ref={messagesEndRef} />
           </Div>
 
-          {isRecording && (
+          {!isDisabled && isRecording && (
             <RecordingInputArea
               isRecording={isRecording}
               isPaused={isPaused}
@@ -500,26 +538,28 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
             />
           )}
 
-          <WidgetChatInput
-            content={promptValue}
-            onContentChange={handleContentChange}
-            modelId={ChatModelId.CLAUDE_CODE_SONNET}
-            skillId={NO_SKILL_ID}
-            onModelChange={() => undefined}
-            onSkillChange={() => undefined}
-            locale={locale}
-            user={user}
-            logger={logger}
-            onSubmit={handleSubmit}
-            isSubmitting={isSubmitting}
-            disabled={isDisabled}
-            enabledTools={[]}
-            hideTools={true}
-            hideInputWhenSubmitting={hasSentMessage}
-            selectorSlot={selectorSlot}
-            micSlot={micSlot}
-            className="rounded-b-lg"
-          />
+          {!isDisabled && (
+            <WidgetChatInput
+              content={promptValue}
+              onContentChange={handleContentChange}
+              modelId={ChatModelId.CLAUDE_CODE_SONNET}
+              skillId={NO_SKILL_ID}
+              onModelChange={() => undefined}
+              onSkillChange={() => undefined}
+              locale={locale}
+              user={user}
+              logger={logger}
+              onSubmit={handleSubmit}
+              isSubmitting={isSubmitting}
+              disabled={isDisabled}
+              enabledTools={[]}
+              hideTools={true}
+              hideInputWhenSubmitting={hasSentMessage}
+              selectorSlot={selectorSlot}
+              micSlot={micSlot}
+              className="rounded-b-lg"
+            />
+          )}
         </Div>
       </ChatBootContext.Provider>
     </ChatNavigationProvider>

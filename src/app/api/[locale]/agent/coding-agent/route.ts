@@ -18,7 +18,7 @@ export const { POST, tools } = endpointsHandler({
       return runCodingAgent(
         data.provider === "open-code" ? openCodeConfig : claudeCodeConfig,
         data,
-        user,
+        user.id,
         logger,
         t,
         cronTaskId,

@@ -15,7 +15,7 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
     email: undefined,
     handler: ({ user, data, urlPathParams, logger, t }) =>
       MemoriesRepository.updateMemory({
-        userId: user.id,
+        user,
         memoryNumber: urlPathParams.id,
         content: data.content,
         tags: data.tags,
@@ -31,7 +31,7 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
     email: undefined,
     handler: ({ user, urlPathParams, logger, t }) =>
       MemoriesRepository.deleteMemory({
-        userId: user.id,
+        user,
         memoryNumber: urlPathParams.id,
         logger,
         t,

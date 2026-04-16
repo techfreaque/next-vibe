@@ -15,11 +15,9 @@ export const { POST, tools } = endpointsHandler({
   endpoint: resizePageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, user, request }) =>
+    handler: ({ data, t, logger }) =>
       BrowserSharedRepository.executeResizePage<ResizePageResponseOutput>(
         {
-          sessionId:
-            request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.RESIZE_PAGE,
           args: BrowserSharedRepository.filterUndefinedArgs({
             width: data.width,

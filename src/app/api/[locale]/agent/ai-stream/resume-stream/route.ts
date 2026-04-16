@@ -11,7 +11,15 @@ import { ResumeStreamRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger, t }) =>
-      ResumeStreamRepository.resume(data, user, locale, logger, t),
+    handler: ({ data, user, locale, logger, t, streamContext }) =>
+      ResumeStreamRepository.resume(
+        data,
+        user,
+        locale,
+        logger,
+        t,
+        streamContext.abortSignal,
+        streamContext.subAgentDepth,
+      ),
   },
 });

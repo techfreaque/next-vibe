@@ -5,19 +5,11 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
+import { useWidgetValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type definition from "./definition";
-import type { DescribeVideoPostResponseOutput } from "./definition";
 
-interface CustomWidgetProps {
-  field: {
-    value: DescribeVideoPostResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
-}
-
-export function DescribeVideoContainer({
-  field,
-}: CustomWidgetProps): JSX.Element {
-  const result = field.value;
+export function DescribeVideoContainer(): JSX.Element {
+  const result = useWidgetValue<typeof definition.POST>();
 
   return (
     <Div className="flex flex-col gap-3 p-4">

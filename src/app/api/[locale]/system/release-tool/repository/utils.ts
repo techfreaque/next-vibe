@@ -3,6 +3,7 @@
  * Type guards, retry logic, and helper functions
  */
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type {
   PackageJson,
@@ -15,15 +16,6 @@ import { MESSAGES, RETRY_DEFAULTS } from "./constants";
 // ============================================================================
 // Type Definitions for Type Guards
 // ============================================================================
-
-/**
- * Parsed JSON value type (result of JSON.parse)
- */
-type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
-interface JsonObject {
-  [key: string]: JsonValue;
-}
-type JsonArray = JsonValue[];
 
 /**
  * Error type from catch blocks - can be any value
@@ -55,12 +47,12 @@ interface ExecSyncError {
  * Returns the value typed as PackageJson if valid, otherwise undefined
  */
 export function parsePackageJson(
-  value: JsonValue | undefined,
+  value: WidgetData | undefined,
 ): PackageJson | undefined {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return undefined;
   }
-  const obj = value as JsonObject;
+  const obj = value as Record<string, WidgetData>;
   if (typeof obj.name === "string" && typeof obj.version === "string") {
     // Build a properly typed PackageJson object
     return {
@@ -80,11 +72,11 @@ export function parsePackageJson(
 }
 
 /**
- * Safe JSON parse that returns JsonValue type
+ * Safe JSON parse that returns WidgetData type
  */
-export function safeJsonParse(text: string): JsonValue | undefined {
+export function safeJsonParse(text: string): WidgetData | undefined {
   try {
-    return JSON.parse(text) as JsonValue;
+    return JSON.parse(text) as WidgetData;
   } catch {
     return undefined;
   }
@@ -522,7 +514,7 @@ export function deepClone<T>(obj: T): T {
 /**
  * Pick specific keys from an object
  */
-export function pick<T extends Record<string, JsonValue>, K extends keyof T>(
+export function pick<T extends Record<string, WidgetData>, K extends keyof T>(
   obj: T,
   keys: K[],
 ): Pick<T, K> {
@@ -538,7 +530,7 @@ export function pick<T extends Record<string, JsonValue>, K extends keyof T>(
 /**
  * Omit specific keys from an object
  */
-export function omit<T extends Record<string, JsonValue>, K extends keyof T>(
+export function omit<T extends Record<string, WidgetData>, K extends keyof T>(
   obj: T,
   keys: K[],
 ): Omit<T, K> {

@@ -5,11 +5,11 @@ import {
   getReferrer,
   getUserAgent,
 } from "next-vibe-ui/utils/browser";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import trackingEndpoints from "@/app/api/[locale]/leads/tracking/engagement/definition";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useLogger } from "@/hooks/use-logger";
 import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
@@ -35,10 +35,7 @@ const PUBLIC_USER = {
  */
 export function LeadTrackingProvider(): null {
   const { locale } = useTranslation();
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
   const hasTrackedRef = useRef(false);
   const lastTrackedTimeRef = useRef(0);
 

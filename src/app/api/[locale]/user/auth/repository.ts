@@ -8,18 +8,19 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
 import { redirect } from "next-vibe-ui/lib/redirect";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
   throwErrorResponse,
 } from "next-vibe/shared/types/response.schema";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { Environment, parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
+  BEARER_LEAD_ID_SEPARATOR,
   LEAD_ID_COOKIE_NAME,
 } from "@/config/constants";
 import { env } from "@/config/env";
@@ -42,12 +43,12 @@ import { scopedTranslation as sessionScopedTranslation } from "../private/sessio
 import { SessionRepository } from "../private/session/repository";
 import { UserRepository } from "../repository";
 import type { CompleteUserType } from "../types";
+import type { UserRoleValue } from "../user-roles/enum";
 import {
   filterUserPermissionRoles,
   UserPermissionRole,
   UserRole,
 } from "../user-roles/enum";
-import type { UserRoleValue } from "../user-roles/enum";
 import { UserRolesRepository } from "../user-roles/repository";
 import { scopedTranslation } from "./i18n";
 import type {
@@ -127,11 +128,13 @@ export class AuthRepository {
         maxAge: 365 * 24 * 60 * 60 * 10, // 10 years (effectively permanent)
       });
 
-      logger.info("Updated lead ID cookie after creating new lead", { leadId });
+      logger.debug("Updated lead ID cookie after creating new lead", {
+        leadId,
+      });
     } catch (error) {
       // Cookie update might fail in some contexts
       // This is not critical, the middleware will set it on next request
-      logger.debug("Could not update lead ID cookie", {
+      logger.warn("Could not update lead ID cookie", {
         leadId,
         error: parseError(error).message,
       });
@@ -158,6 +161,8 @@ export class AuthRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     platform: Platform | undefined,
+    /** leadId extracted from Bearer "####<leadId>" suffix - cross-origin callers only */
+    headerLeadId?: string,
   ): Promise<{ leadId: string | null; shouldUpdateCookie: boolean }> {
     if (userId) {
       const leadId = await AuthRepository.getLeadIdForUser(
@@ -168,11 +173,13 @@ export class AuthRepository {
       return { leadId, shouldUpdateCookie: false };
     }
 
-    // For public users, use the platform handler to check cookies first
-    // This prevents creating duplicate leads on every page load
+    // For public users, check Bearer ####<leadId> suffix first (cross-origin callers),
+    // then fall back to cookie (same-origin browser requests).
+    // This prevents creating duplicate leads on every page load.
     const { cookies } = await import("next-vibe-ui/lib/headers");
     const cookieStore = await cookies();
-    const existingLeadId = cookieStore.get(LEAD_ID_COOKIE_NAME)?.value;
+    const existingLeadId =
+      headerLeadId ?? cookieStore.get(LEAD_ID_COOKIE_NAME)?.value;
 
     // Use LeadAuthRepository to validate and reuse existing leadId
     if (existingLeadId) {
@@ -804,6 +811,25 @@ export class AuthRepository {
    * Contains all authentication business logic
    * Platform handlers only provide storage access
    */
+  /**
+   * Extract the leadId suffix from a Bearer token string.
+   * Format: "<jwtToken>####<leadId>" or "####<leadId>" (public, no JWT).
+   * Returns undefined if no suffix present (cookie-based callers).
+   */
+  private static extractBearerLeadId(
+    rawBearer: string | undefined,
+  ): string | undefined {
+    if (!rawBearer) {
+      return undefined;
+    }
+    const sepIdx = rawBearer.indexOf(BEARER_LEAD_ID_SEPARATOR);
+    if (sepIdx === -1) {
+      return undefined;
+    }
+    const leadId = rawBearer.slice(sepIdx + BEARER_LEAD_ID_SEPARATOR.length);
+    return leadId || undefined;
+  }
+
   static async authenticate(
     context: AuthContext,
     logger: EndpointLogger,
@@ -817,6 +843,11 @@ export class AuthRepository {
         logger.debug("Using provided JWT payload");
         return success(context.jwtPayload);
       }
+
+      // Extract leadId from Bearer suffix before getStoredAuthToken strips it.
+      // "Authorization: Bearer <jwt>####<leadId>" or "Bearer ####<leadId>"
+      const rawBearer = context.request?.headers.get("authorization")?.slice(7); // after "Bearer "
+      const bearerLeadId = AuthRepository.extractBearerLeadId(rawBearer);
 
       // Get token from platform-specific storage
       const token = await authHandler.getStoredAuthToken(context, logger);
@@ -842,6 +873,7 @@ export class AuthRepository {
             context.locale,
             logger,
             context.platform,
+            bearerLeadId,
           );
         if (shouldUpdateCookie && leadId) {
           await AuthRepository.updateLeadIdCookieIfPossible(
@@ -1028,6 +1060,10 @@ export class AuthRepository {
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
+    // Extract leadId suffix from Bearer header once - used in all fallback paths.
+    const rawBearer = context.request?.headers.get("authorization")?.slice(7);
+    const bearerLeadId = AuthRepository.extractBearerLeadId(rawBearer);
+
     try {
       const authResult = await AuthRepository.authenticate(context, logger);
 
@@ -1042,6 +1078,7 @@ export class AuthRepository {
             context.locale,
             logger,
             context.platform,
+            bearerLeadId,
           );
         if (!leadId) {
           logger.error("Failed to get lead ID for public user");
@@ -1093,6 +1130,7 @@ export class AuthRepository {
           context.locale,
           logger,
           context.platform,
+          bearerLeadId,
         );
       if (!leadId) {
         logger.error("Failed to get lead ID for public user");

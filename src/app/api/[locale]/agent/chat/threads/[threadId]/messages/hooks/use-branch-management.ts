@@ -205,8 +205,10 @@ export function useBranchManagement({
   const handleSwitchBranch = useCallback(
     (parentMessageId: string, branchIndex: number): void => {
       // Build children map (sorted by createdAt ascending)
+      // Use the ref so this callback stays stable across streaming deltas -
+      // it only needs a new identity when threadId or setLeafMessageId change.
       const childrenByParent = new Map<string | null, ChatMessage[]>();
-      for (const msg of activeThreadMessages) {
+      for (const msg of activeThreadMessagesRef.current) {
         const key = msg.parentId ?? null;
         const arr = childrenByParent.get(key) ?? [];
         arr.push(msg);
@@ -259,7 +261,7 @@ export function useBranchManagement({
 
       setLeafMessageId(trueLeafId);
     },
-    [activeThreadMessages, threadId, logger, setLeafMessageId], // eslint-disable-line react-hooks/exhaustive-deps
+    [threadId, logger, setLeafMessageId],
   );
 
   return { branchIndices, handleSwitchBranch };

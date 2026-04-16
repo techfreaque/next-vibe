@@ -24,18 +24,13 @@ import {
   useWidgetContext,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 
 import type definition from "./definition";
 
 type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
-
-interface CustomWidgetProps {
-  field: {
-    value: GetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
 
 // ── Stat card ────────────────────────────────────────────────────────────────
 
@@ -436,13 +431,11 @@ function CronHealthSection({
 
 // ── Main component ───────────────────────────────────────────────────────────
 
-export function CampaignStatsWidget({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
+export function CampaignStatsWidget(): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
   const t = useWidgetTranslation<typeof definition.GET>();
   const { push: navigate } = useWidgetNavigation();
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.GET>();
 
   const handleRun = React.useCallback(
     (taskId: string): void => {

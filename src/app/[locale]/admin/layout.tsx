@@ -10,7 +10,7 @@ import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type React from "react";
 import type { ReactNode } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { UserGetResponseOutput } from "@/app/api/[locale]/users/user/[id]/definition";

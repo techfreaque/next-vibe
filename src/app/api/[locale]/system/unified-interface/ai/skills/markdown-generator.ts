@@ -19,7 +19,7 @@ import { z } from "zod";
 import { zodSchemaToJsonSchema } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/endpoint-to-metadata";
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/shared/utils/error-types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { pathSegmentsToToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -78,17 +78,17 @@ interface JsonSchemaObject {
   properties?: Record<string, JsonSchemaObject>;
   required?: string[];
   items?: JsonSchemaObject;
-  enum?: JsonValue[];
+  enum?: WidgetData[];
   anyOf?: JsonSchemaObject[];
   description?: string;
-  default?: JsonValue;
+  default?: WidgetData;
 }
 
 /**
  * Returns true if a string looks like an i18n translation key (dotted path, no spaces).
  * Used to skip rendering raw translation key strings as default values.
  */
-function isTranslationKey(value: JsonValue): boolean {
+function isTranslationKey(value: WidgetData): boolean {
   return (
     typeof value === "string" &&
     value.includes(".") &&

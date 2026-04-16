@@ -20,10 +20,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { EndpointMeta } from "@/app/api/[locale]/system/generated/endpoints-meta/en";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -31,9 +31,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { scopedTranslation as cliScopedTranslation } from "../unified-interface/cli/i18n";
 import type { CliCompatiblePlatform } from "../unified-interface/cli/runtime/route-executor";
 import { permissionsRegistry } from "../unified-interface/shared/endpoints/permissions/registry";
-import type { InkEndpointRenderer } from "../unified-interface/unified-ui/renderers/cli/CliEndpointRenderer";
+import type { EndpointRenderer } from "../unified-interface/unified-ui/renderers/react/EndpointRenderer";
 
-type InkEndpointRendererType = typeof InkEndpointRenderer;
+type InkEndpointRendererType = typeof EndpointRenderer;
 
 interface SelectItem<V> {
   key?: string;
@@ -47,11 +47,11 @@ let InkEndpointRendererModule: Awaited<
 > | null = null;
 
 async function getInkEndpointRenderer(): Promise<{
-  InkEndpointRenderer: InkEndpointRendererType;
+  EndpointRenderer: InkEndpointRendererType;
 }> {
   if (!InkEndpointRendererModule) {
     InkEndpointRendererModule =
-      await import("../unified-interface/unified-ui/renderers/cli/CliEndpointRenderer");
+      await import("../unified-interface/unified-ui/renderers/react/EndpointRenderer");
   }
   return InkEndpointRendererModule;
 }
@@ -464,7 +464,7 @@ function ToolDetailView({
 
   useEffect(() => {
     void getInkEndpointRenderer().then((mod) => {
-      setRendererComponent(() => mod.InkEndpointRenderer);
+      setRendererComponent(() => mod.EndpointRenderer);
       return undefined;
     });
   }, []);
@@ -583,7 +583,7 @@ function ResultView({
 
   useEffect(() => {
     void getInkEndpointRenderer().then((mod) => {
-      setRendererComponent(() => mod.InkEndpointRenderer);
+      setRendererComponent(() => mod.EndpointRenderer);
       return undefined;
     });
   }, []);
@@ -755,10 +755,13 @@ function InteractiveHelp({
             skillId: undefined,
             modelId: undefined,
             headless: undefined,
+            subAgentDepth: 0,
             imageGenModelSelection: undefined,
             musicGenModelSelection: undefined,
             videoGenModelSelection: undefined,
             isRevival: undefined,
+
+            providerOverride: undefined,
             currentToolMessageId: undefined,
             callerToolCallId: undefined,
             pendingToolMessages: undefined,

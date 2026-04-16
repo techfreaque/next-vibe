@@ -632,7 +632,7 @@ export class SmtpRepository {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        logger.info("Attempting email send", {
+        logger.debug("Attempting email send", {
           to: params.to,
           accountId: account.id,
           accountName: account.name,
@@ -645,7 +645,7 @@ export class SmtpRepository {
 
         if (result.success) {
           if (attempt > 1) {
-            logger.info("Email send succeeded after retry", {
+            logger.debug("Email send succeeded after retry", {
               to: params.to,
               accountId: account.id,
               attempt,
@@ -659,7 +659,7 @@ export class SmtpRepository {
 
         const isRetryable = this.isRetryableError(result.message);
         if (!isRetryable || attempt === maxRetries) {
-          logger.info(
+          logger.error(
             "Email send failed - not retryable or max retries reached",
             {
               to: params.to,
@@ -674,7 +674,7 @@ export class SmtpRepository {
         }
 
         const delayMs = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
-        logger.info("Retrying email send after delay", {
+        logger.debug("Retrying email send after delay", {
           to: params.to,
           accountId: account.id,
           attempt,

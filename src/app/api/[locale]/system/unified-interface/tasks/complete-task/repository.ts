@@ -25,7 +25,8 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NewCronTask } from "../cron/db";
-import { cronTaskExecutions, cronTasks } from "../cron/db";
+import { cronTaskExecutions, cronTasks, dbUserIdToOwner } from "../cron/db";
+import { resolveTaskOwnerUser } from "../cron/resolve-task-user";
 import { CronTaskStatus } from "../enum";
 import type { TasksT } from "../i18n";
 import { handleTaskCompletion } from "../task-completion-handler";
@@ -42,6 +43,7 @@ export class CompleteTaskRepository {
     t: TasksT,
     user: JwtPayloadType,
     locale: CountryLanguage,
+    abortSignal: AbortSignal,
   ): Promise<ResponseType<CompleteTaskResponseOutput>> {
     const { taskId, response } = data;
     const status = CronTaskStatus.COMPLETED;
@@ -60,9 +62,25 @@ export class CompleteTaskRepository {
       });
     }
 
+    // Idempotency: if already completed (e.g. triggerLocalPulse in tests already handled it),
+    // return success without re-firing handleTaskCompletion. Prevents duplicate revivals.
+    if (task.lastExecutionStatus === CronTaskStatus.COMPLETED) {
+      logger.info(
+        "[complete-task] Task already completed - skipping duplicate",
+        { taskId },
+      );
+      return success({
+        completed: true,
+        pushedToRemote: false,
+        updatedAt: (task.lastExecutedAt ?? new Date()).toISOString(),
+      });
+    }
+
     // Ownership check: only the user who owns the task may complete it.
-    // Admin bypass is intentionally NOT provided - tasks are personal and scoped to the owner.
-    if (task.userId !== user.id) {
+    // System tasks (owner.type === "system") have no local owner —
+    // any authenticated user on this instance may complete them (e.g. remotely-delegated tasks).
+    const taskOwner = dbUserIdToOwner(task.userId);
+    if (taskOwner.type === "user" && taskOwner.userId !== user.id) {
       return fail({
         message: t("completeTask.post.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
@@ -141,23 +159,30 @@ export class CompleteTaskRepository {
                 ? CallbackMode.APPROVE
                 : null;
 
-    if (toolMessageId && task.userId) {
-      await handleTaskCompletion({
-        toolMessageId,
-        threadId,
-        callbackMode,
-        status,
-        output: response,
-        taskId,
-        modelId: task.wakeUpModelId ?? null,
-        skillId: task.wakeUpSkillId ?? null,
-        favoriteId: task.wakeUpFavoriteId ?? null,
-        leafMessageId: task.wakeUpLeafMessageId ?? null,
-        userId: task.userId,
-        logger,
-        directResumeUser: user,
-        directResumeLocale: locale,
-      });
+    const owner = dbUserIdToOwner(task.userId);
+
+    if (toolMessageId) {
+      // Always resolve the actual task owner — never use the API caller's identity.
+      const ownerContext = await resolveTaskOwnerUser(owner, locale, logger);
+      if (ownerContext) {
+        await handleTaskCompletion({
+          toolMessageId,
+          threadId,
+          callbackMode,
+          status,
+          output: response,
+          taskId,
+          modelId: task.wakeUpModelId ?? null,
+          skillId: task.wakeUpSkillId ?? null,
+          favoriteId: task.wakeUpFavoriteId ?? null,
+          leafMessageId: task.wakeUpLeafMessageId ?? null,
+          subAgentDepth: task.wakeUpSubAgentDepth ?? 0,
+          ownerUser: ownerContext.user,
+          logger,
+          directResumeLocale: ownerContext.locale,
+          abortSignal,
+        });
+      }
 
       try {
         await db.delete(cronTasks).where(eq(cronTasks.id, taskId));

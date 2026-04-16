@@ -27,24 +27,24 @@ import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import { LeadStatus } from "../enum";
 import type definition from "./definition";
 
-type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
-type Lead = NonNullable<GetResponseOutput["response"]>["leads"][number];
+type Lead = NonNullable<
+  (typeof definition.GET.types.ResponseOutput)["response"]
+>["leads"][number];
 
 interface CustomWidgetProps {
-  field: {
-    value: GetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 // ─── Colour maps ──────────────────────────────────────────────────────────────
@@ -216,7 +216,7 @@ export function LeadsSearchContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.GET>();
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const { push: navigate } = useWidgetNavigation();

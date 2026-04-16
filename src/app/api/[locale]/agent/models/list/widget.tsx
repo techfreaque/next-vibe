@@ -3,28 +3,24 @@
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Input } from "next-vibe-ui/ui/input";
 import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import { useWidgetLocale } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import type { AnyModelId } from "@/app/api/[locale]/agent/models/models";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
+import {
+  useWidgetLocale,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import type { ModelListGetResponseOutput, ModelListItem } from "./definition";
+import type definition from "./definition";
+import type { ModelListItem } from "./definition";
 import { scopedTranslation } from "./i18n";
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-interface CustomWidgetProps {
-  field: {
-    value: ModelListGetResponseOutput | null | undefined;
-  };
-}
 
 // ── Tier colors ───────────────────────────────────────────────────────────────
 
@@ -193,10 +189,10 @@ function ModelGrid({
 
 // ── Main Widget ───────────────────────────────────────────────────────────────
 
-export function ModelsListWidget({ field }: CustomWidgetProps): JSX.Element {
+export function ModelsListWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
-  const value = field.value;
+  const value = useWidgetValue<typeof definition.GET>();
 
   const [localQuery, setLocalQuery] = useState("");
   const [activeContent, setActiveContent] = useState<string | null>(null);
@@ -322,5 +318,5 @@ export function ModelsListWidget({ field }: CustomWidgetProps): JSX.Element {
   );
 }
 
-// Alias so lazyCliWidget factory (and definition.ts) resolves the right export
+// Alias so lazyWidget factory (and definition.ts) resolves the right export
 export { ModelsListWidget as ModelsListContainer };

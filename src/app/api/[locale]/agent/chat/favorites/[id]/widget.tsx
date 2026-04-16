@@ -44,12 +44,13 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
-import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/widget";
+import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import {
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
@@ -125,16 +126,13 @@ import { useSkill } from "../../skills/[id]/hooks";
 import { DEFAULT_SKILLS } from "../../skills/config";
 import { ModelSelectionType } from "../../skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "../../skills/i18n";
-import type { FavoriteUpdateResponseOutput } from "./definition";
 import definitionPatch from "./definition";
 
 /**
  * Props for PATCH custom widget
  */
 interface PatchWidgetProps {
-  field: {
-    value: FavoriteUpdateResponseOutput | null | undefined;
-  } & (typeof definitionPatch.PATCH)["fields"];
+  field: (typeof definitionPatch.PATCH)["fields"];
 }
 
 /**
@@ -149,6 +147,7 @@ export function FavoriteEditContainer({
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
+  const editResult = useWidgetValue<typeof definitionPatch.PATCH>();
   const { t: tId } = skillIdTranslation.scopedT(locale);
 
   const navigation = useWidgetNavigation();
@@ -913,7 +912,7 @@ export function FavoriteEditContainer({
 
             <AlertWidget
               fieldName="success"
-              field={withValue(children.success, field.value?.success, null)}
+              field={withValue(children.success, editResult?.success, null)}
             />
 
             <Div className="flex flex-col gap-4">

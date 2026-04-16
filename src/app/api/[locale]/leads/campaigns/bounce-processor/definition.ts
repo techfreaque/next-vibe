@@ -27,9 +27,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { BounceProcessorConfigWidget } from "./widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { BOUNCE_PROCESSOR_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+const BounceProcessorConfigWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.BounceProcessorConfigWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

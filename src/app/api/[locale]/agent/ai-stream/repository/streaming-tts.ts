@@ -16,15 +16,14 @@ import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availabilit
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { TTS_COST_PER_CHARACTER } from "@/app/api/[locale]/products/repository-client";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { ErrorResponseTypes } from "@/app/api/[locale]/shared/types/response.schema";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
+import { ChatMessageRole } from "../../chat/enum";
 import type { WsEmitCallback } from "../../chat/threads/[threadId]/messages/emitter";
-import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
 import {
   getBestTtsModel,
   type TtsModelOption,
@@ -66,7 +65,7 @@ export class StreamingTTSHandler {
   private isInsideThinkTag = false;
   private isInsideChatTag = false;
   private messageId: string | null = null;
-  private readonly wsEmit: WsEmitCallback | null;
+  private readonly wsEmit: WsEmitCallback;
   private readonly logger: EndpointLogger;
   private readonly locale: CountryLanguage;
   private readonly voiceModelSelection: VoiceModelSelection;
@@ -87,7 +86,7 @@ export class StreamingTTSHandler {
   private generationChain: Promise<void> = Promise.resolve();
 
   constructor(params: {
-    wsEmit: WsEmitCallback | null;
+    wsEmit: WsEmitCallback;
     logger: EndpointLogger;
     locale: CountryLanguage;
     voiceModelSelection: VoiceModelSelection;
@@ -267,16 +266,14 @@ export class StreamingTTSHandler {
       const audioDataUrl = await this.generateTTS(cleanText);
 
       if (audioDataUrl) {
-        const event = createStreamEvent.audioChunk({
-          messageId: this.messageId,
-          audioData: audioDataUrl,
-          chunkIndex: chunkIdx,
-          isFinal: false,
-          text: cleanText,
-        });
-
         if (this.wsEmit) {
-          this.wsEmit(event);
+          this.wsEmit("audio-chunk", {
+            audioMessageId: this.messageId,
+            audioData: audioDataUrl,
+            chunkIndex: chunkIdx,
+            audioIsFinal: false,
+            audioText: cleanText,
+          });
         }
 
         this.logger.debug("[Streaming TTS] Emitted audio chunk successfully", {
@@ -288,7 +285,6 @@ export class StreamingTTSHandler {
         // Track skill count for credit deduction
         this.totalSkillsProcessed += cleanText.length;
 
-        // Deduct credits for TTS
         const creditsNeeded = cleanText.length * TTS_COST_PER_CHARACTER;
         if (creditsNeeded > 0) {
           const { t: creditsT } = creditsScopedTranslation.scopedT(this.locale);
@@ -301,15 +297,6 @@ export class StreamingTTSHandler {
           );
 
           if (deductResult.success) {
-            const creditEvent = createStreamEvent.creditsDeducted({
-              amount: creditsNeeded,
-              feature: "tts",
-              type: "tool",
-              partial: deductResult.data.partialDeduction,
-            });
-            if (this.wsEmit) {
-              this.wsEmit(creditEvent);
-            }
             this.logger.debug("[Streaming TTS] Credits deducted", {
               skills: cleanText.length,
               credits: creditsNeeded,
@@ -363,13 +350,22 @@ export class StreamingTTSHandler {
           hint: "Configure OPENAI_API_KEY, ELEVENLABS_API_KEY, or EDEN_AI_API_KEY",
         });
         if (this.wsEmit) {
-          this.wsEmit(
-            createStreamEvent.error({
-              success: false,
-              message: message as TranslatedKeyType,
-              errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-            }),
-          );
+          this.wsEmit("error", {
+            messages: [
+              {
+                id: crypto.randomUUID(),
+                role: ChatMessageRole.ERROR,
+                content: message,
+                parentId: null,
+                sequenceId: null,
+                model: null,
+                skill: null,
+                metadata: null,
+                errorMessage: message,
+                errorCode: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR.errorKey,
+              },
+            ],
+          });
         }
         // Disable TTS for this session to avoid per-chunk error spam
         this.isEnabled = false;
@@ -643,18 +639,14 @@ export class StreamingTTSHandler {
     await this.generationChain;
 
     // Emit final chunk marker
-    if (this.chunkIndex > 0) {
-      const event = createStreamEvent.audioChunk({
-        messageId: this.messageId,
+    if (this.chunkIndex > 0 && this.wsEmit) {
+      this.wsEmit("audio-chunk", {
+        audioMessageId: this.messageId,
         audioData: "",
         chunkIndex: this.chunkIndex,
-        isFinal: true,
-        text: "",
+        audioIsFinal: true,
+        audioText: "",
       });
-
-      if (this.wsEmit) {
-        this.wsEmit(event);
-      }
     }
 
     // Reset state
@@ -750,7 +742,7 @@ export class StreamingTTSHandler {
  * Create a streaming TTS handler
  */
 export function createStreamingTTSHandler(params: {
-  wsEmit: WsEmitCallback | null;
+  wsEmit: WsEmitCallback;
   logger: EndpointLogger;
   locale: CountryLanguage;
   voiceModelSelection: VoiceModelSelection;

@@ -34,19 +34,6 @@ export interface LintConfigObject {
 
 export type LintConfigElement = Record<string, LintConfigValue>;
 
-/** JSON-compatible value type for settings files */
-export type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonObject
-  | JsonArray;
-export interface JsonObject {
-  [key: string]: JsonValue;
-}
-export type JsonArray = JsonValue[];
-
 // Forward declaration for circular reference
 export interface I18nPluginConfig {
   words?: {

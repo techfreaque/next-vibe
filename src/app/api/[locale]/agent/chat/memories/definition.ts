@@ -212,6 +212,44 @@ const { GET } = createEndpoint({
     description: "get.success.description" as const,
   },
 
+  // === WS EVENTS ===
+  // Emitted by MemoriesRepository after every mutation — keeps all open tabs in sync.
+  events: {
+    "memory-created": {
+      fields: {
+        memories: [
+          "id",
+          "content",
+          "tags",
+          "priority",
+          "isPublic",
+          "isArchived",
+          "isShared",
+          "createdAt",
+        ] as const,
+      },
+      operation: "merge" as const,
+    },
+    "memory-updated": {
+      fields: {
+        memories: [
+          "id",
+          "content",
+          "tags",
+          "priority",
+          "isPublic",
+          "isArchived",
+          "isShared",
+        ] as const,
+      },
+      operation: "merge" as const,
+    },
+    "memory-deleted": {
+      fields: { memories: ["id"] as const },
+      operation: "remove" as const,
+    },
+  },
+
   examples: {
     requests: {
       default: {},

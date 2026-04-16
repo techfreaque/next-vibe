@@ -224,6 +224,7 @@ const {
   Sun,
   Table,
   Tag,
+  TayLogo,
   Target,
   Terminal,
   TestTube,

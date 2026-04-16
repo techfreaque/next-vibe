@@ -9,12 +9,13 @@ import React, { createElement } from "react";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { InkEndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer";
+import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
+import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { RouteExecutionResult } from "../../../../cli/runtime/route-executor";
 import type { EndpointLogger } from "../../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import { Platform } from "../../../../shared/types/platform";
-import type { WidgetData } from "../../../../shared/widgets/widget-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { CliErrorFormatter } from "./error-formatter";
 import { renderToString as fastRenderToString } from "./fast-ink-renderer/renderer";
 
@@ -170,16 +171,20 @@ export class CliResultFormatter {
 
       // Create component
       const createStart = performance.now();
-      const component = createElement(InkEndpointRenderer, {
-        endpoint,
-        locale,
-        data,
-        logger,
-        user,
-        response: { success: true, data },
-        responseOnly: true,
-        platform: Platform.CLI,
-      });
+      const component = createElement(
+        NavigationStackProvider,
+        null,
+        createElement(EndpointRenderer, {
+          endpoint,
+          locale,
+          data,
+          logger,
+          user,
+          response: { success: true, data },
+          responseOnly: true,
+          platform: Platform.CLI,
+        }),
+      );
       const componentTime = performance.now() - createStart;
 
       // Use fast renderer (supports hooks via renderToStaticMarkup internally for function components)
@@ -198,13 +203,16 @@ export class CliResultFormatter {
 
       // Fall back to JSON if renderer produced empty output (reconciler failure)
       if (!output) {
-        logger.error("[Fast Renderer] Empty output, falling back to JSON");
+        logger.error(
+          "[Fast Renderer] Empty output, falling back to JSON",
+          undefined,
+          endpoint.path?.join("/"),
+        );
         return JSON.stringify(data, null, 2);
       }
 
       return output;
     } catch (error) {
-      // Fallback to JSON if rendering fails
       logger.warn("Fast rendering failed, falling back to JSON:", {
         error: parseError(error),
       });

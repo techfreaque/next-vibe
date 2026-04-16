@@ -52,7 +52,7 @@ import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
@@ -62,8 +62,8 @@ import { defaultLocale } from "@/i18n/core/config";
 import { and, eq, like, sql } from "drizzle-orm";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import {
   ContentLevel,
   ModelSelectionType,
@@ -183,6 +183,8 @@ function toolInstrWithArgs(
  * Find a tool message by its logical tool name, handling execute-tool wrapping.
  * Local: finds message where toolCall.toolName === toolName.
  * Remote (execute-tool): finds execute-tool message where args.toolName === toolName.
+ * Falls back to execute-tool wrapping even without remoteInstanceId (e.g. UNBOTTLED
+ * mode where hermes wraps non-native tools through execute-tool without instanceId).
  */
 function findToolMsg(
   messages: SlimMessage[],
@@ -197,9 +199,49 @@ function findToolMsg(
         toolResultRecord(m.toolCall.args)?.["toolName"] === toolName,
     );
   }
-  return messages.find(
+  // Direct match first
+  const direct = messages.find(
     (m) => m.role === "tool" && m.toolCall?.toolName === toolName,
   );
+  if (direct) {
+    return direct;
+  }
+  // Fallback: execute-tool wrapping without instanceId (e.g. UNBOTTLED/hermes)
+  return messages.find(
+    (m) =>
+      m.role === "tool" &&
+      m.toolCall?.toolName === "execute-tool" &&
+      toolResultRecord(m.toolCall.args)?.["toolName"] === toolName,
+  );
+}
+
+/**
+ * Extract the effective tool result from a tool message, unwrapping execute-tool
+ * when the model used it as an intermediary (e.g. UNBOTTLED/hermes mode).
+ * For direct tool calls: returns toolResultRecord(msg.toolCall?.result).
+ * For execute-tool wrappers: unwraps the inner { result: ... } and returns it.
+ */
+function resolveToolResult(
+  msg: SlimMessage | undefined,
+): Record<string, WidgetData> | null {
+  if (!msg) {
+    return null;
+  }
+  const raw = toolResultRecord(msg.toolCall?.result);
+  if (!raw) {
+    return null;
+  }
+  // If this was an execute-tool call, the inner result is nested under "result"
+  if (
+    msg.toolCall?.toolName === "execute-tool" &&
+    "result" in raw &&
+    raw["result"] !== null &&
+    typeof raw["result"] === "object" &&
+    !Array.isArray(raw["result"])
+  ) {
+    return raw["result"] as Record<string, WidgetData>;
+  }
+  return raw;
 }
 
 /**
@@ -863,7 +905,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                   },
                 }
               : firstResult.result;
-          return { result: revivedResult, messages: revivedMessages };
+          return {
+            result: revivedResult,
+            messages: revivedMessages,
+            pinnedToolCount: firstResult.pinnedToolCount,
+          };
         }
       }
 
@@ -990,7 +1036,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect(toolMsg.toolCall?.toolName).toBeTruthy();
           assertRemoteToolCall(toolMsg, "tool-help", cfg);
           assertNoMetaToolPrefix(messages, cfg);
-          const toolRes = toolResultRecord(toolMsg.toolCall?.result);
+          const toolRes = resolveToolResult(toolMsg);
           expect(toolRes).not.toBeNull();
           expect(toolMsg.isAI).toBe(true);
           expect(toolMsg.model).toBeTruthy();
@@ -1001,7 +1047,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             "T1: tools is not an array",
           ).toBe(true);
           expect(
-            (toolRes!["tools"] as ToolCallResult[]).length,
+            (toolRes!["tools"] as WidgetData[]).length,
             "T1: tools array is empty",
           ).toBeGreaterThan(0);
           expect(typeof toolRes!["totalCount"], "T1: totalCount missing").toBe(
@@ -1010,7 +1056,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect(toolRes!["totalCount"] as number).toBeGreaterThan(0);
           // First tool entry has name + description
           const firstTool = toolResultRecord(
-            (toolRes!["tools"] as ToolCallResult[])[0],
+            (toolRes!["tools"] as WidgetData[])[0],
           );
           expect(
             firstTool?.["name"],
@@ -1109,12 +1155,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           }
           assertNoMetaToolPrefix(added, cfg);
 
-          const toolRes = toolResultRecord(toolMsg!.toolCall?.result);
+          const toolRes = resolveToolResult(toolMsg);
           expect(toolRes, "T1b: tool result is null").not.toBeNull();
 
           // Detail mode returns single tool - check for name + description
           const entry = Array.isArray(toolRes!["tools"])
-            ? toolResultRecord((toolRes!["tools"] as ToolCallResult[])[0])
+            ? toolResultRecord((toolRes!["tools"] as WidgetData[])[0])
             : toolRes;
           expect(entry, "T1b: no tool entry in result").toBeDefined();
 
@@ -1175,7 +1221,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           }
           expect(toolMsg!.isAI).toBe(true);
 
-          const toolRes = toolResultRecord(toolMsg!.toolCall?.result);
+          const toolRes = resolveToolResult(toolMsg);
           expect(toolRes).not.toBeNull();
           expect(typeof toolRes!["imageUrl"]).toBe("string");
           expect(toolRes!["imageUrl"]).toBeTruthy();
@@ -1477,15 +1523,14 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         const musicToolMsgs = musicAdded.filter(
           (m) =>
             m.role === "tool" &&
-            (cfg.remoteInstanceId
-              ? m.toolCall?.toolName === "execute-tool" &&
+            (m.toolCall?.toolName === "generate_music" ||
+              (m.toolCall?.toolName === "execute-tool" &&
                 toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                  "generate_music"
-              : m.toolCall?.toolName === "generate_music"),
+                  "generate_music")),
         );
         expect(musicToolMsgs.length).toBeGreaterThanOrEqual(1);
         const musicToolMsg = musicToolMsgs.find(
-          (m) => toolResultRecord(m.toolCall?.result) !== null,
+          (m) => resolveToolResult(m) !== null,
         );
         expect(musicToolMsg).toBeDefined();
         if (musicToolMsg) {
@@ -1498,15 +1543,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         const musicArgs = toolResultRecord(musicToolMsg!.toolCall?.args);
         const musicPrompt =
           (musicArgs?.["prompt"] as string | undefined) ??
-          (toolResultRecord(musicArgs?.["input"] as ToolCallResult)?.[
-            "prompt"
-          ] as string | undefined);
+          (toolResultRecord(musicArgs?.["input"] as WidgetData)?.["prompt"] as
+            | string
+            | undefined);
         expect(
           typeof musicPrompt === "string" && musicPrompt.length > 3,
           `[T4a] generate_music args.prompt must be a meaningful string - got: ${JSON.stringify(musicPrompt)}`,
         ).toBe(true);
 
-        const musicRes = toolResultRecord(musicToolMsg!.toolCall?.result);
+        const musicRes = resolveToolResult(musicToolMsg);
         expect(musicRes).not.toBeNull();
         expect(typeof musicRes!["audioUrl"]).toBe("string");
         expect(musicRes!["audioUrl"]).toBeTruthy();
@@ -1599,7 +1644,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           assertRemoteToolCall(videoToolMsg, "generate_video", cfg);
         }
 
-        const videoRes = toolResultRecord(videoToolMsg!.toolCall?.result);
+        const videoRes = resolveToolResult(videoToolMsg);
         expect(videoRes).not.toBeNull();
         expect(typeof videoRes!["videoUrl"]).toBe("string");
         expect(videoRes!["videoUrl"]).toBeTruthy();
@@ -1687,7 +1732,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             assertRemoteToolCall(genImgMsg, "generate_image", cfg);
           }
 
-          const genImgRes = toolResultRecord(genImgMsg!.toolCall?.result);
+          const genImgRes = resolveToolResult(genImgMsg);
           expect(
             genImgRes,
             "[T5] generate_image result is null",
@@ -1804,7 +1849,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const waitAdded = newMessages(waitMsgs, prevCount);
 
-          const waitForTaskMsg = waitAdded.find(
+          // Per spec (wait, same-sequence path): if no user message arrived while waiting,
+          // the original wait-for-task tool message is backfilled in-place with the real result.
+          // No deferred message is created. Only 1 wait-for-task tool message must exist.
+          const allWftMsgs = waitAdded.filter(
             (m) =>
               m.role === "tool" &&
               (m.toolCall?.toolName === "wait-for-task" ||
@@ -1813,11 +1861,23 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                     "wait-for-task")),
           );
           expect(
+            allWftMsgs.length,
+            "[T5b] expected exactly 1 wait-for-task tool message (same-sequence: backfill in-place, no deferred)",
+          ).toBe(1);
+
+          const waitForTaskMsg = allWftMsgs[0]!;
+          expect(
             waitForTaskMsg,
             "[T5b] wait-for-task tool message not found",
           ).toBeDefined();
 
-          const wftRes = toolResultRecord(waitForTaskMsg!.toolCall?.result);
+          // Same-sequence: original message must NOT be marked as deferred.
+          expect(
+            waitForTaskMsg.toolCall?.isDeferred,
+            "[T5b] wait same-sequence: original tool message must NOT be deferred (backfill in-place)",
+          ).toBeFalsy();
+
+          const wftRes = resolveToolResult(waitForTaskMsg);
           expect(wftRes, "[T5b] wait-for-task result is null").not.toBeNull();
           // Two paths depending on race:
           // (A) task pending when called → backfilled with raw image result: { imageUrl, ... }
@@ -1897,60 +1957,50 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const endLoopAdded = newMessages(endLoopMsgs, prevCountEndLoop);
 
           // Exactly 1 tool-help call (endLoop stops the loop).
-          // Queue mode: handleTaskCompletion inserts a deferred message alongside the original,
-          // so there may be 1 (direct) or 2 (queue: original + deferred) matching messages.
+          // Per spec: endLoop ALWAYS backfills in-place regardless of transport.
+          // No deferred message is ever created for endLoop - the original message
+          // is updated with status="completed" and the real result directly.
           const toolHelpMsgs = endLoopAdded.filter(
             (m) =>
               m.role === "tool" &&
-              (cfg.remoteInstanceId
-                ? m.toolCall?.toolName === "execute-tool" &&
+              (m.toolCall?.toolName === "tool-help" ||
+                (m.toolCall?.toolName === "execute-tool" &&
                   toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                    "tool-help"
-                : m.toolCall?.toolName === "tool-help"),
+                    "tool-help")),
           );
           expect(
             toolHelpMsgs.length,
-            "T5a: expected 1 or 2 tool-help messages (direct=1, queue=2 with deferred)",
-          ).toBeGreaterThanOrEqual(1);
-          expect(
-            toolHelpMsgs.length,
-            "T5a: too many tool-help messages",
-          ).toBeLessThanOrEqual(2);
-          const nonDeferredMsg = toolHelpMsgs.find(
-            (m) => !m.toolCall?.isDeferred,
-          );
-          if (nonDeferredMsg) {
-            assertRemoteToolCall(nonDeferredMsg, "tool-help", cfg);
-          }
+            "T5a: expected exactly 1 tool-help message (endLoop always backfills in-place, never creates deferred)",
+          ).toBe(1);
 
-          // Result: direct mode → inline on original message; queue mode → on deferred message.
-          const resultMsg = toolHelpMsgs.find(
-            (m) => toolResultRecord(m.toolCall?.result) !== null,
-          );
+          const resultMsg = toolHelpMsgs[0]!;
+          assertRemoteToolCall(resultMsg, "tool-help", cfg);
+
+          // endLoop: original message MUST NOT be deferred - it's the backfilled in-place result.
           expect(
-            resultMsg,
-            "T5a: no tool-help message with a result found",
-          ).toBeDefined();
-          const endLoopToolRes = toolResultRecord(resultMsg!.toolCall?.result);
-          expect(endLoopToolRes).not.toBeNull();
+            resultMsg.toolCall?.isDeferred,
+            "T5a: endLoop must NOT produce a deferred tool message - must backfill original in-place",
+          ).toBeFalsy();
+
+          // Result must be present directly on the original (backfilled in-place).
+          const endLoopToolRes = resolveToolResult(resultMsg);
+          expect(
+            endLoopToolRes,
+            "T5a: backfilled result must not be null",
+          ).not.toBeNull();
           // tools array must be present and non-empty
           expect(
             Array.isArray(endLoopToolRes!["tools"]),
             "T5a: tools is not an array",
           ).toBe(true);
           expect(
-            (endLoopToolRes!["tools"] as ToolCallResult[]).length,
+            (endLoopToolRes!["tools"] as WidgetData[]).length,
             "T5a: tools array is empty",
           ).toBeGreaterThan(0);
 
-          // endLoop stops the stream after tool execution - AI may not write a full reply.
-          // Queue mode: use the deferred message as the leaf (it is the child of the original).
-          // Direct mode: use the original tool message as the leaf.
-          const leafMsg =
-            toolHelpMsgs.find((m) => m.toolCall?.isDeferred) ??
-            resultMsg ??
-            toolHelpMsgs[0]!;
-          lastMainAiMsgId = leafMsg.id;
+          // endLoop stops the stream after tool execution - leaf is the original tool message.
+          // No revival fires - thread goes idle after backfill.
+          lastMainAiMsgId = resultMsg.id;
 
           assertNoOrphans(endLoopMsgs, new Set([t2BranchParentId]), {
             expectedLeafId: lastMainAiMsgId,
@@ -1965,6 +2015,135 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             creditT,
           );
           assertDeducted(beforeEndLoop, afterEndLoop, 0, 5);
+        },
+        effectiveTestTimeout,
+      );
+
+      // ── T5d: wait callback mode - same-sequence backfill ──────────────────
+      // Per spec: when callbackMode='wait' and no user message arrives during waiting,
+      // the original tool message is backfilled IN-PLACE with the real result.
+      // No deferred message is created. AI sees result in the same turn.
+      fit(
+        "T5d: wait callback mode - original tool message backfilled in-place, no deferred created, AI gets result",
+        async () => {
+          setFetchCacheContext(`${cfg.cachePrefix}callback-wait-inline`);
+          await pinBalance(testUser.id, 20, creditLogger, creditT);
+          const before = await getBalance(testUser, creditLogger, creditT);
+          const prevToolMsgCountBefore = (
+            await fetchThreadMessages(threadId)
+          ).filter((m) => m.role === "tool").length;
+          const prevCount = (await fetchThreadMessages(threadId)).length;
+
+          const { result } = await runStream({
+            user: testUser,
+            prompt: `[T5d wait-inline] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wait-inline-test' and callbackMode='wait'")}. Check that the result has an imageUrl (not a taskId). End your reply with STEP_OK if imageUrl is present and non-empty, or FAILED: <reason> if anything is wrong.`,
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
+          });
+
+          expect(result.success).toBe(true);
+          if (!result.success) {
+            return;
+          }
+
+          // Queue mode (cfg.pulse): revival fires async. Poll for idle, then re-fetch.
+          if (result.success && result.data.threadId) {
+            const tid = result.data.threadId;
+            const [threadRow] = await db
+              .select({ streamingState: chatThreads.streamingState })
+              .from(chatThreads)
+              .where(eq(chatThreads.id, tid));
+            if (threadRow?.streamingState === "waiting") {
+              const REVIVAL_TIMEOUT_MS = 180_000;
+              const REVIVAL_POLL_INTERVAL_MS = 500;
+              const revivalStart = Date.now();
+              let revivalState: string | undefined = "waiting";
+              while (
+                revivalState !== "idle" &&
+                Date.now() - revivalStart < REVIVAL_TIMEOUT_MS
+              ) {
+                await new Promise<void>((resolve) => {
+                  setTimeout(resolve, REVIVAL_POLL_INTERVAL_MS);
+                });
+                const [revivalRow] = await db
+                  .select({ streamingState: chatThreads.streamingState })
+                  .from(chatThreads)
+                  .where(eq(chatThreads.id, tid));
+                revivalState = revivalRow?.streamingState;
+              }
+              expect(
+                revivalState,
+                "[T5d] Thread must return to 'idle' after wait revival",
+              ).toBe("idle");
+            }
+          }
+
+          const allMessages = await fetchThreadMessages(threadId);
+          const added = newMessages(allMessages, prevCount);
+
+          // ── Exactly 1 generate_image tool message (same-sequence: backfill in-place) ──
+          const imgToolMsgs = added.filter(
+            (m) =>
+              m.role === "tool" &&
+              (m.toolCall?.toolName === "generate_image" ||
+                (m.toolCall?.toolName === "execute-tool" &&
+                  toolResultRecord(m.toolCall.args)?.["toolName"] ===
+                    "generate_image")),
+          );
+          expect(
+            imgToolMsgs.length,
+            "T5d: expected exactly 1 generate_image tool message (wait same-sequence: backfill in-place, no deferred)",
+          ).toBe(1);
+
+          const imgToolMsg = imgToolMsgs[0]!;
+
+          // Original message must NOT be marked as deferred (backfill in-place = not deferred).
+          expect(
+            imgToolMsg.toolCall?.isDeferred,
+            "T5d: wait same-sequence must NOT produce a deferred tool message",
+          ).toBeFalsy();
+
+          // Result must be present on the original (backfilled in-place).
+          const imgRes = resolveToolResult(imgToolMsg);
+          expect(
+            imgRes,
+            "T5d: backfilled result must not be null",
+          ).not.toBeNull();
+          expect(
+            typeof imgRes!["imageUrl"],
+            `T5d: imageUrl not a string. Result: ${JSON.stringify(imgRes)}`,
+          ).toBe("string");
+          expect(
+            imgRes!["imageUrl"],
+            "T5d: imageUrl must be non-empty",
+          ).toBeTruthy();
+
+          // ── Total tool count must not have grown beyond +1 ──
+          const afterToolMsgCount = allMessages.filter(
+            (m) => m.role === "tool",
+          ).length;
+          expect(
+            afterToolMsgCount,
+            `T5d: extra tool message(s) created (was ${String(prevToolMsgCountBefore)}, now ${String(afterToolMsgCount)}) - wait backfill must not create extra messages`,
+          ).toBe(prevToolMsgCountBefore + 1);
+
+          const lastAi = allMessages.find(
+            (m) => m.id === result.data.lastAiMessageId,
+          );
+          expect(lastAi?.content).toBeTruthy();
+          assertStepOk(lastAi?.content, "T5d");
+          lastMainAiMsgId = result.data.lastAiMessageId!;
+
+          assertNoOrphans(allMessages, new Set([t2BranchParentId]), {
+            expectedLeafId: lastMainAiMsgId,
+            knownDeadEndLeaves: deadEndLeaves,
+          });
+          await assertThreadIdle(threadId);
+          await assertNoPendingTasks(threadId);
+
+          const after = await getBalance(testUser, creditLogger, creditT);
+          assertDeducted(before, after, 0.4, 15);
         },
         effectiveTestTimeout,
       );
@@ -2052,7 +2231,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // If imageUrl is here it means wakeUp ran synchronously, which violates semantics.
             // result may be null (local wakeUp - backfilled on revival) or { taskId, status }
             // (remote wakeUp via execute-tool). Both are valid; what matters is no imageUrl yet.
-            const phase1Res = toolResultRecord(toolMsg!.toolCall?.result);
+            const phase1Res = resolveToolResult(toolMsg);
             if (phase1Res) {
               expect(
                 phase1Res["imageUrl"],
@@ -2128,13 +2307,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 (m) =>
                   m.role === "tool" &&
                   m.toolCall?.isDeferred === true &&
-                  toolResultRecord(m.toolCall?.result)?.["imageUrl"] !==
-                    undefined &&
+                  resolveToolResult(m)?.["imageUrl"] !== undefined &&
                   (cfg.remoteInstanceId
                     ? m.toolCall.toolName === "execute-tool" &&
                       toolResultRecord(m.toolCall.args)?.["toolName"] ===
                         "generate_image"
-                    : m.toolCall.toolName === "generate_image"),
+                    : m.toolCall.toolName === "generate_image" ||
+                      (m.toolCall.toolName === "execute-tool" &&
+                        toolResultRecord(m.toolCall.args)?.["toolName"] ===
+                          "generate_image")),
               );
               if (deferredTool) {
                 revivalAi = messages.find(
@@ -2171,6 +2352,37 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               );
               expect(typeof deferredRes!["imageUrl"]).toBe("string");
               expect(deferredRes!["imageUrl"]).toBeTruthy();
+
+              // Deferred message must be marked isDeferred=true.
+              expect(
+                deferredTool.toolCall?.isDeferred,
+                "T6b: deferred tool message must have isDeferred=true",
+              ).toBe(true);
+
+              // Deferred message must link back to the original via originalToolCallId.
+              expect(
+                deferredTool.toolCall?.originalToolCallId,
+                "T6b: deferred tool message must have originalToolCallId linking to original",
+              ).toBeTruthy();
+            }
+
+            // ── Original tool message from phase1 must NOT be modified ──
+            // Per spec: wakeUp original message is never updated after creation.
+            // The result lives in the deferred message only.
+            const originalToolInDb = messages.find(
+              (m) => m.id === wakeupToolMsgId,
+            );
+            expect(
+              originalToolInDb,
+              "T6b: original wakeUp tool message must still exist in DB",
+            ).toBeDefined();
+            if (originalToolInDb) {
+              const origRes = resolveToolResult(originalToolInDb);
+              // Original should NOT have imageUrl - that's in the deferred message.
+              expect(
+                origRes?.["imageUrl"],
+                "T6b: wakeUp original tool message must NOT have imageUrl - result goes to deferred",
+              ).toBeUndefined();
             }
 
             // ── Revival AI: child of the deferred tool ──
@@ -2249,9 +2461,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               explicitParentMessageId: lastMainAiMsgId,
               availableTools: [
                 {
-                  toolId: cfg.remoteInstanceId
-                    ? "execute-tool"
-                    : "generate_image",
+                  // execute-tool wrapping: remoteInstanceId mode or unbottled/hermes mode
+                  toolId:
+                    (cfg.remoteInstanceId ?? cfg.providerOverride)
+                      ? "execute-tool"
+                      : "generate_image",
                   requiresConfirmation: true,
                 },
               ],
@@ -2265,15 +2479,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             const added = newMessages(messages, prevCount);
 
             // ── generate_image tool message - has waiting_for_confirmation placeholder ──
-            const approveToolMsg = added.find(
-              (m) =>
-                m.role === "tool" &&
-                (cfg.remoteInstanceId
-                  ? m.toolCall?.toolName === "execute-tool" &&
-                    toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                      "generate_image"
-                  : m.toolCall?.toolName === "generate_image"),
-            );
+            const approveToolMsg =
+              findToolMsg(added, "generate_image", cfg) ??
+              added.find(
+                (m) =>
+                  m.role === "tool" &&
+                  m.toolCall?.toolName === "generate_image",
+              );
             expect(
               approveToolMsg,
               "T7a: generate_image tool message not found",
@@ -2284,7 +2496,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             approveToolMsgId = approveToolMsg!.id;
             approveToolParentId = approveToolMsg!.parentId;
 
-            const toolRes = toolResultRecord(approveToolMsg!.toolCall?.result);
+            const toolRes = resolveToolResult(approveToolMsg);
             // Must NOT have executed - no imageUrl, must have waiting_for_confirmation
             expect(
               toolRes?.["imageUrl"],
@@ -2296,20 +2508,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             ).toBe("waiting_for_confirmation");
 
             // ── tool-help ran (parallel to generate_image) - has real result ──
-            const toolHelpMsg = added.find(
-              (m) =>
-                m.role === "tool" &&
-                (cfg.remoteInstanceId
-                  ? m.toolCall?.toolName === "execute-tool" &&
-                    toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                      "tool-help"
-                  : m.toolCall?.toolName === "tool-help"),
-            );
+            const toolHelpMsg = findToolMsg(added, "tool-help", cfg);
             expect(
               toolHelpMsg,
               "T7a: tool-help message not found in parallel step",
             ).toBeDefined();
-            const toolHelpRes = toolResultRecord(toolHelpMsg?.toolCall?.result);
+            const toolHelpRes = resolveToolResult(toolHelpMsg);
             expect(
               toolHelpRes,
               "T7a: tool-help should have returned a result",
@@ -2390,6 +2594,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               favoriteId: mainFavoriteId,
               threadId,
               rootFolderId: DefaultFolderId.CRON,
+              subAgentDepth: 0,
               toolConfirmations: [
                 { messageId: approveToolMsgId, confirmed: true },
               ],
@@ -2397,6 +2602,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               locale: defaultLocale,
               logger,
               t,
+              abortSignal: new AbortController().signal,
             });
 
             expect(confirmResult.success).toBe(true);
@@ -2452,7 +2658,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               `T7b: generate_image tool message not found by approveToolMsgId=${approveToolMsgId}. All msg IDs: [${allToolMsgIds.join(", ")}]. approveToolMsgInList role=${approveToolMsgInList?.role}`,
             ).toBeDefined();
 
-            const toolRes = toolResultRecord(toolMsg!.toolCall?.result);
+            const toolRes = resolveToolResult(toolMsg);
             const rawResult = toolMsg!.toolCall?.result;
             expect(
               toolRes,
@@ -2467,13 +2673,22 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               "T7b: imageUrl should be truthy",
             ).toBeTruthy();
 
-            // ── No extra tool message was created (in-place backfill only) ──
+            // ── Same-sequence: original backfilled in-place (no deferred) ──
+            // Different-sequence: user sent a follow-up before confirming → deferred message
+            // created instead, count +1. T7b runs with no interleaved user messages, so
+            // same-sequence path applies: count unchanged, original must NOT be deferred.
+            expect(
+              toolMsg?.toolCall?.isDeferred,
+              "T7b: approve same-sequence backfill must NOT mark original as deferred",
+            ).toBeFalsy();
+
+            // ── No extra tool message was created (same-sequence: in-place backfill only) ──
             const afterToolMsgCount = messages.filter(
               (m) => m.role === "tool",
             ).length;
             expect(
               afterToolMsgCount,
-              `T7b: extra tool message created (was ${String(prevToolMsgCount)}, now ${String(afterToolMsgCount)}) - should be same count, original backfilled in-place`,
+              `T7b: extra tool message created (was ${String(prevToolMsgCount)}, now ${String(afterToolMsgCount)}) - same-sequence approve must backfill in-place, not create deferred`,
             ).toBe(prevToolMsgCount);
 
             // ── AI responded with the confirmed result ──
@@ -2543,7 +2758,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // message (wakeUp). Check that each original tool call has a completed result
           // somewhere in the thread (either directly or via deferred).
           for (const toolMsg of toolMsgs) {
-            const toolRes = toolResultRecord(toolMsg.toolCall?.result);
+            const toolRes = resolveToolResult(toolMsg);
             // Either result is populated directly, OR this is a deferred message (isDeferred=true)
             // which always has a result, OR the result was populated in a wakeUp deferred sibling.
             // At minimum, result must not be null - skip deferred messages from the check below
@@ -2589,7 +2804,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             assertRemoteToolCall(imgTool, "generate_image", cfg);
           }
           // Resolve the effective result: original (WAIT) or deferred sibling (wakeUp)
-          const imgOriginalRes = toolResultRecord(imgTool?.toolCall?.result);
+          const imgOriginalRes = resolveToolResult(imgTool);
           const imgDeferredMsg = imgTool
             ? added.find(
                 (m) =>
@@ -2601,7 +2816,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const imgRes =
             imgOriginalRes?.["imageUrl"] !== undefined
               ? imgOriginalRes
-              : toolResultRecord(imgDeferredMsg?.toolCall?.result);
+              : resolveToolResult(imgDeferredMsg);
           expect(imgRes, "T8: generate_image result is null").not.toBeNull();
           expect(typeof imgRes!["imageUrl"]).toBe("string");
           expect(imgRes!["imageUrl"], "T8: imageUrl is empty").toBeTruthy();
@@ -2613,9 +2828,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             assertRemoteToolCall(toolHelpMsg, "tool-help", cfg);
           }
           // Resolve effective tool-help result
-          const toolHelpOrigRes = toolResultRecord(
-            toolHelpMsg?.toolCall?.result,
-          );
+          const toolHelpOrigRes = resolveToolResult(toolHelpMsg);
           const toolHelpDeferredMsg = toolHelpMsg
             ? added.find(
                 (m) =>
@@ -2627,7 +2840,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const toolHelpRes =
             toolHelpOrigRes?.["tools"] !== undefined
               ? toolHelpOrigRes
-              : toolResultRecord(toolHelpDeferredMsg?.toolCall?.result);
+              : resolveToolResult(toolHelpDeferredMsg);
           expect(toolHelpRes, "T8: tool-help result is null").not.toBeNull();
           expect(
             Array.isArray(toolHelpRes!["tools"]),
@@ -2674,22 +2887,26 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T9 preCalls] An image was already generated for you before this message. Look at the ${cfg.remoteInstanceId ? "execute-tool" : "generate_image"} tool result in your context and report the imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.`,
+            prompt: `[T9 preCalls] An image was already generated for you before this message. Look at the ${(cfg.remoteInstanceId ?? cfg.providerOverride) ? "execute-tool" : "generate_image"} tool result in your context and report the imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
             preCalls: [
               {
-                routeId: cfg.remoteInstanceId
-                  ? "execute-tool"
-                  : "generate_image",
-                args: cfg.remoteInstanceId
-                  ? {
-                      toolName: "generate_image",
-                      instanceId: cfg.remoteInstanceId,
-                      prompt: "mountain landscape at golden hour",
-                    }
-                  : { prompt: "mountain landscape at golden hour" },
+                routeId:
+                  (cfg.remoteInstanceId ?? cfg.providerOverride)
+                    ? "execute-tool"
+                    : "generate_image",
+                args:
+                  (cfg.remoteInstanceId ?? cfg.providerOverride)
+                    ? {
+                        toolName: "generate_image",
+                        ...(cfg.remoteInstanceId
+                          ? { instanceId: cfg.remoteInstanceId }
+                          : {}),
+                        prompt: "mountain landscape at golden hour",
+                      }
+                    : { prompt: "mountain landscape at golden hour" },
                 // Match the real generate_image return format: { imageUrl, creditCost }
                 // This is what the route actually returns and what the UI widget renders.
                 result: {
@@ -2717,7 +2934,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           }
           expect(toolMsg!.isAI).toBe(true);
 
-          const toolRes = toolResultRecord(toolMsg!.toolCall?.result);
+          const toolRes = resolveToolResult(toolMsg);
           expect(toolRes).not.toBeNull();
           // result must use imageUrl (matching generate_image's actual return format),
           // so the UI widget can render the image thumbnail.
@@ -3091,7 +3308,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           );
           expect(imageToolMsg).toBeDefined();
 
-          const toolRes = toolResultRecord(imageToolMsg!.toolCall?.result);
+          const toolRes = resolveToolResult(imageToolMsg);
           expect(toolRes).not.toBeNull();
           expect(typeof toolRes!["file"]).toBe("string");
           expect(toolRes!["creditCost"]).toBe(0);
@@ -3485,10 +3702,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             prompt: "[C2 incognito] Reply with exactly: INCOGNITO_TEST",
             favoriteId: mainFavoriteId,
             rootFolderId: DefaultFolderId.INCOGNITO,
+            subAgentDepth: 0,
             user: testUser,
             locale: defaultLocale,
             logger,
             t,
+            abortSignal: new AbortController().signal,
           });
 
           expect(result.success).toBe(true);
@@ -3712,6 +3931,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
         const kimiValues = {
           id: UNBOTTLED_FAV_ID,
+          slug: "test-unbottled-kimi",
           userId: testUser.id,
           skillId: QUALITY_TESTER_SKILL_ID,
           variantId: "kimi",
@@ -3739,6 +3959,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           .onConflictDoUpdate({
             target: chatFavorites.id,
             set: {
+              slug: kimiValues.slug,
               modelSelection: kimiValues.modelSelection,
               imageGenModelSelection: kimiValues.imageGenModelSelection,
               musicGenModelSelection: kimiValues.musicGenModelSelection,
@@ -3749,6 +3970,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
         const budgetValues = {
           id: BUDGET_FAV_ID,
+          slug: "test-unbottled-budget",
           userId: testUser.id,
           skillId: QUALITY_TESTER_SKILL_ID,
           variantId: "budget",
@@ -3776,6 +3998,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           .onConflictDoUpdate({
             target: chatFavorites.id,
             set: {
+              slug: budgetValues.slug,
               modelSelection: budgetValues.modelSelection,
               imageGenModelSelection: budgetValues.imageGenModelSelection,
               musicGenModelSelection: budgetValues.musicGenModelSelection,

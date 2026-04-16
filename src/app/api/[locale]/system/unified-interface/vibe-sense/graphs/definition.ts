@@ -22,10 +22,10 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { graphConfigSchema } from "../graph/schema";
 
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
 
-const GraphListContainer = lazyCliWidget(() =>
+const GraphListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.GraphListContainer })),
 );
 

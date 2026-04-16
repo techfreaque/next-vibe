@@ -36,6 +36,11 @@ export interface PromptContextData {
   isFreshUser: boolean;
   /** Resolved media generation capabilities (image-gen, music-gen, video-gen) */
   mediaCapabilities: MediaCapabilitiesParams | null;
+  /**
+   * Sub-agent nesting depth. 0 = top-level stream (user-facing or cron).
+   * 1 = spawned by ai-run from a top-level stream, 2 = spawned by a depth-1 sub-agent, etc.
+   */
+  subAgentDepth: number;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -175,6 +180,20 @@ ${folderNote}
 - Your **last message** (with no tool call) is the result. Everything before it is ignored by the requester.${extra}`;
     },
   };
+
+export const subAgentGuardFragment: SystemPromptFragment<PromptContextData> = {
+  id: "sub-agent-guard",
+  placement: "leading",
+  priority: 35,
+  condition: (data) => data.subAgentDepth > 0,
+  build: (data) => `## Sub-Agent Context (depth ${data.subAgentDepth})
+
+You were spawned by another AI agent via \`ai-run\`. You are a worker - do the actual work yourself.
+
+- **Depth ${data.subAgentDepth}** means ${data.subAgentDepth === 1 ? "a top-level agent spawned you" : `you are ${data.subAgentDepth} levels deep in a delegation chain`}.
+- You may spawn sub-agents via \`ai-run\` if genuinely needed for a subtask, but never to simply pass along the same task you received. Each level must add value.
+- If you can do the work with the tools available to you, do it directly - don't delegate.`,
+};
 
 export const languageFragment: SystemPromptFragment<PromptContextData> = {
   id: "language",

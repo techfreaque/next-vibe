@@ -131,6 +131,9 @@ export const translations: typeof enTranslations = {
             "Interaktywna sesja uruchomiona w terminalu.",
           copyOutput: "Kopiuj",
           copied: "Skopiowano!",
+          interactive: "Interaktywny",
+          emptyPromptHint:
+            "Wpisz prompt poniżej, aby uruchomić agenta kodowania",
         },
       },
     },

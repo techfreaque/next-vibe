@@ -18,12 +18,14 @@ import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import { useCallback, useState } from "react";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetSelector,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
 import { REFERRAL_CONFIG } from "../../config";
 import type definition from "./definition";
-import type { CodesListGetResponseOutput } from "./definition";
 
 /**
  * Matches all valid CountryLanguage locale path prefixes.
@@ -139,21 +141,12 @@ function LinkGenerator({
 }
 
 /**
- * Props for custom widget
- */
-interface CustomWidgetProps {
-  field: {
-    value: CodesListGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
-
-/**
  * Custom container widget for referral codes list
  */
-export function ReferralCodesListContainer({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
-  const codes = field.value?.codes ?? [];
+export function ReferralCodesListContainer(): React.JSX.Element {
+  const codes = useWidgetSelector<typeof definition.GET>()(
+    (data) => data?.codes ?? [],
+  );
   const t = useWidgetTranslation<typeof definition.GET>();
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 

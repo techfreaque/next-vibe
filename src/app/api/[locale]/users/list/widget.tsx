@@ -29,11 +29,12 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
@@ -49,9 +50,7 @@ import type { UsersListT } from "./i18n";
 type User = NonNullable<UserListResponseOutput["response"]>["users"][number];
 
 interface CustomWidgetProps {
-  field: {
-    value: UserListResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 function UserRow({
@@ -186,12 +185,13 @@ export function UsersListContainer({
     form.watch("searchFilters.status") ?? [];
   const activeRoles: (typeof UserRoleFilter)[keyof typeof UserRoleFilter][] =
     form.watch("searchFilters.role") ?? [];
-  const users = field.value?.response?.users ?? [];
-  const isLoading = field.value === null || field.value === undefined;
+  const data = useWidgetValue<typeof definition.GET>();
+  const users = data?.response?.users ?? [];
+  const isLoading = data === null || data === undefined;
 
-  const currentPage = field.value?.paginationInfo?.page ?? 1;
-  const totalPages = field.value?.paginationInfo?.pageCount ?? 1;
-  const totalCount = field.value?.paginationInfo?.totalCount ?? 0;
+  const currentPage = data?.paginationInfo?.page ?? 1;
+  const totalPages = data?.paginationInfo?.pageCount ?? 1;
+  const totalCount = data?.paginationInfo?.totalCount ?? 0;
 
   const handleToggleStatus = useCallback(
     (

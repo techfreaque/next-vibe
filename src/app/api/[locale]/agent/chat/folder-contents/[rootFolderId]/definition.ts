@@ -38,6 +38,13 @@ import { DefaultFolderId } from "../../config";
 import { ThreadStatusDB, ThreadStatusOptions } from "../../enum";
 import { lazy } from "react";
 
+import {
+  onEventUpdateIncognitoThread,
+  onEventDeleteIncognitoThread,
+  onEventUpdateIncognitoFolder,
+  onEventDeleteIncognitoFolder,
+} from "@/app/api/[locale]/agent/chat/incognito/event-persist";
+
 import { scopedTranslation } from "./i18n";
 
 const FolderContentsWidget = lazy(() =>
@@ -426,6 +433,105 @@ const { GET } = createEndpoint({
         },
         items: [],
       },
+    },
+  },
+
+  events: {
+    // Framework merges the partial into the items array by id (upsert).
+    // Emitted by messages/emitter.ts for thread-scoped events that affect the sidebar.
+    "thread-title-updated": {
+      fields: { items: ["id", "title"] as const },
+      operation: "merge" as const,
+      onEvent: onEventUpdateIncognitoThread({
+        source: "urlPathParams",
+        arrayField: "items",
+        pick: ["title"],
+      }),
+    },
+    "streaming-state-changed": {
+      fields: { items: ["id", "streamingState"] as const },
+      operation: "merge" as const,
+      onEvent: onEventUpdateIncognitoThread({
+        source: "urlPathParams",
+        arrayField: "items",
+        pick: ["streamingState"],
+      }),
+    },
+    "stream-finished": {
+      fields: {
+        items: ["id", "streamingState", "preview", "updatedAt"] as const,
+      },
+      operation: "merge" as const,
+      onEvent: onEventUpdateIncognitoThread({
+        source: "urlPathParams",
+        arrayField: "items",
+        pick: ["streamingState", "preview", "updatedAt"],
+      }),
+    },
+    // Thread CRUD — emitted by threads/[threadId]/repository.ts
+    "thread-updated": {
+      fields: {
+        items: [
+          "id",
+          "title",
+          "folderId",
+          "status",
+          "preview",
+          "rootFolderId",
+          "updatedAt",
+        ] as const,
+      },
+      operation: "merge" as const,
+      onEvent: onEventUpdateIncognitoThread({
+        source: "urlPathParams",
+        arrayField: "items",
+        pick: ["title", "folderId", "preview"],
+      }),
+    },
+    "thread-deleted": {
+      fields: { items: ["id"] as const },
+      operation: "remove" as const,
+      onEvent: onEventDeleteIncognitoThread({
+        source: "urlPathParams",
+        arrayField: "items",
+      }),
+    },
+    // Folder CRUD — emitted by folders/subfolders/[subFolderId]/repository.ts
+    "folder-created": {
+      fields: {
+        items: [
+          "id",
+          "type",
+          "sortOrder",
+          "name",
+          "icon",
+          "color",
+          "parentId",
+        ] as const,
+      },
+      operation: "merge" as const,
+    },
+    "folder-updated": {
+      fields: {
+        items: [
+          "id",
+          "name",
+          "icon",
+          "color",
+          "sortOrder",
+          "updatedAt",
+        ] as const,
+      },
+      operation: "merge" as const,
+      onEvent: onEventUpdateIncognitoFolder({
+        arrayField: "items",
+        pick: ["name", "icon", "color", "sortOrder"],
+      }),
+    },
+    "folder-deleted": {
+      fields: { items: ["id"] as const },
+      operation: "remove" as const,
+      onEvent: onEventDeleteIncognitoFolder({ arrayField: "items" }),
     },
   },
 });

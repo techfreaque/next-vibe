@@ -114,21 +114,22 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
-import { MarkdownWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/markdown/react";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
+import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/widget";
+import { MarkdownWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/markdown/widget";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
 import {
   Icon,
   type IconKey,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/widget";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 import type { CountryLanguage } from "@/i18n/core/config";
 import {
   ToolsConfigEdit,
@@ -151,7 +152,6 @@ import type {
   default as definitionGet,
   default as definitionPatch,
   SkillGetResponseOutput,
-  SkillUpdateResponseOutput,
 } from "./definition";
 import { useSkill } from "./hooks";
 
@@ -159,18 +159,14 @@ import { useSkill } from "./hooks";
  * Props for PATCH custom widget
  */
 interface PatchWidgetProps {
-  field: {
-    value: SkillUpdateResponseOutput | null | undefined;
-  } & (typeof definitionPatch.PATCH)["fields"];
+  field: (typeof definitionPatch.PATCH)["fields"];
 }
 
 /**
  * Props for GET custom widget
  */
 interface GetWidgetProps {
-  field: {
-    value: SkillGetResponseOutput | null | undefined;
-  } & (typeof definitionGet.GET)["fields"];
+  field: (typeof definitionGet.GET)["fields"];
 }
 
 /**
@@ -186,6 +182,7 @@ export function SkillEditContainer({
   const logger = useWidgetLogger();
   const t = useWidgetTranslation<typeof definitionPatch.PATCH>();
   const form = useWidgetForm<typeof definitionPatch.PATCH>();
+  const editResult = useWidgetValue<typeof definitionPatch.PATCH>();
   const skillId = form.watch("id");
   const skillHook = useSkill(skillId, user, logger);
   const skillOwnership = skillHook.read?.data?.skillOwnership;
@@ -734,7 +731,7 @@ export function SkillEditContainer({
             {/* Success message (response only) */}
             <AlertWidget
               fieldName="success"
-              field={withValue(children.success, field.value?.success, null)}
+              field={withValue(children.success, editResult?.success, null)}
             />
 
             <Div className="flex flex-col gap-4">
@@ -1270,15 +1267,14 @@ export function SkillViewContainer({
   const locale = useWidgetLocale();
   const viewDefaults = useViewDefaults();
   const t = useWidgetTranslation<typeof definitionGet.GET>();
-  const variants = field.value?.variants;
-  const skillOwnership = field.value?.skillOwnership;
+  const skillData = useWidgetValue<typeof definitionGet.GET>();
+  const variants = skillData?.variants;
+  const skillOwnership = skillData?.skillOwnership;
   const form = useWidgetForm<typeof definitionGet.GET>();
   const skillId =
     (navigation?.current?.params?.urlPathParams?.id as string | undefined) ??
     (form?.getValues?.("id") as string | undefined) ??
     undefined;
-
-  const skillData = field.value;
 
   // Check if skill is in favorites by fetching favorites list
   const { favorites } = useChatFavorites(logger, {
@@ -1299,12 +1295,12 @@ export function SkillViewContainer({
   };
 
   const isOwner = skillOwnership === SkillOwnershipType.USER;
-  const isLoading = !field.value;
+  const isLoading = !skillData;
 
   // System prompt collapsible section (shared across modes)
   const SystemPromptSection = (
     <>
-      {(field.value?.systemPrompt || !field.value) && (
+      {(skillData?.systemPrompt || !skillData) && (
         <Collapsible open={systemPromptOpen} onOpenChange={setSystemPromptOpen}>
           <Div className="rounded-lg border">
             <CollapsibleTrigger asChild>
@@ -1328,7 +1324,7 @@ export function SkillViewContainer({
                   fieldName="systemPrompt"
                   field={withValue(
                     children.systemPrompt,
-                    field.value?.systemPrompt,
+                    skillData?.systemPrompt,
                     null,
                   )}
                 />
@@ -1343,7 +1339,7 @@ export function SkillViewContainer({
   // Variants to render — always show at least the single variant
   const variantsToRender = variants ?? [];
 
-  const creator = field.value?.creatorProfile ?? null;
+  const creator = skillData?.creatorProfile ?? null;
   const accent = creator?.creatorAccentColor ?? "#8b5cf6";
 
   useEffect(() => {
@@ -1358,7 +1354,7 @@ export function SkillViewContainer({
       ? `/${locale}/user/signup?ref=${creator.referralCode}&skillId=${skillId ?? ""}`
       : `/${locale}/user/signup${skillId ? `?skillId=${skillId}` : ""}`;
 
-    const favCount = field.value?.favoritesCount ?? 0;
+    const favCount = skillData?.favoritesCount ?? 0;
 
     const cardStyle = {
       background: "rgba(255,255,255,0.03)",
@@ -1472,12 +1468,9 @@ export function SkillViewContainer({
                 boxShadow: `0 0 40px ${accent}20`,
               }}
             >
-              {field.value?.icon ? (
+              {skillData?.icon ? (
                 <Span style={{ color: `${accent}cc` }}>
-                  <Icon
-                    icon={field.value.icon as IconKey}
-                    className="w-9 h-9"
-                  />
+                  <Icon icon={skillData.icon as IconKey} className="w-9 h-9" />
                 </Span>
               ) : (
                 <Skeleton className="w-9 h-9 rounded-full" />
@@ -1486,7 +1479,7 @@ export function SkillViewContainer({
           </Div>
 
           {/* Name */}
-          {field.value?.name ? (
+          {skillData?.name ? (
             <Span
               style={{
                 display: "block",
@@ -1501,14 +1494,14 @@ export function SkillViewContainer({
                 marginBottom: 12,
               }}
             >
-              {field.value.name}
+              {skillData.name}
             </Span>
           ) : (
             <Skeleton className="h-12 w-48 mx-auto mb-3" />
           )}
 
           {/* Tagline */}
-          {field.value?.tagline && (
+          {skillData?.tagline && (
             <Span
               style={{
                 display: "block",
@@ -1518,7 +1511,7 @@ export function SkillViewContainer({
                 lineHeight: 1.4,
               }}
             >
-              {field.value.tagline}
+              {skillData.tagline}
             </Span>
           )}
 
@@ -1560,7 +1553,7 @@ export function SkillViewContainer({
               ) : (
                 <CustomizeAndAddButton
                   skillId={skillId ?? ""}
-                  field={field}
+                  skillData={skillData}
                   navigation={navigation}
                   logger={logger}
                   user={user}
@@ -1657,7 +1650,7 @@ export function SkillViewContainer({
           }}
         >
           {/* Description — open prose, no collapse */}
-          {field.value?.description && (
+          {skillData?.description && (
             <Span
               style={{
                 display: "block",
@@ -1667,7 +1660,7 @@ export function SkillViewContainer({
                 padding: "0 4px",
               }}
             >
-              {field.value.description}
+              {skillData.description}
             </Span>
           )}
 
@@ -1685,7 +1678,6 @@ export function SkillViewContainer({
                   user={user}
                   locale={locale}
                   favorites={favorites}
-                  field={field}
                   navigation={navigation}
                   t={t}
                   viewDefaults={viewDefaults}
@@ -1841,7 +1833,7 @@ export function SkillViewContainer({
           )}
 
           {/* System prompt — collapsible, only if present */}
-          {field.value?.systemPrompt && (
+          {skillData?.systemPrompt && (
             <Div style={cardStyle}>
               <Collapsible>
                 <CollapsibleTrigger asChild>
@@ -1909,7 +1901,7 @@ export function SkillViewContainer({
 
           {/* Bottom CTA (guest only) */}
           <LandingBottomCTA
-            skillName={field.value?.name ?? ""}
+            skillName={skillData?.name ?? ""}
             locale={locale}
             signupUrl={signupUrl}
             t={t}
@@ -1971,12 +1963,9 @@ export function SkillViewContainer({
                 boxShadow: `0 0 40px ${accent}20`,
               }}
             >
-              {field.value?.icon ? (
+              {skillData?.icon ? (
                 <Span style={{ color: `${accent}cc` }}>
-                  <Icon
-                    icon={field.value.icon as IconKey}
-                    className="w-9 h-9"
-                  />
+                  <Icon icon={skillData.icon as IconKey} className="w-9 h-9" />
                 </Span>
               ) : (
                 <Skeleton className="w-9 h-9 rounded-full" />
@@ -1985,7 +1974,7 @@ export function SkillViewContainer({
           </Div>
 
           {/* name */}
-          {field.value?.name ? (
+          {skillData?.name ? (
             <Span
               style={{
                 display: "block",
@@ -2000,31 +1989,31 @@ export function SkillViewContainer({
                 marginBottom: 10,
               }}
             >
-              {field.value.name}
+              {skillData.name}
             </Span>
           ) : (
             <Skeleton className="h-12 w-48 mx-auto mb-3" />
           )}
 
           {/* tagline */}
-          {field.value?.tagline ? (
+          {skillData?.tagline ? (
             <Span
               style={{
                 display: "block",
                 fontSize: 14,
                 opacity: 0.7,
                 lineHeight: 1.5,
-                marginBottom: field.value.description ? 16 : 4,
+                marginBottom: skillData.description ? 16 : 4,
               }}
             >
-              {field.value.tagline}
+              {skillData.tagline}
             </Span>
           ) : (
             <Skeleton className="h-4 w-40 mx-auto mb-2" />
           )}
 
           {/* description */}
-          {field.value?.description && (
+          {skillData?.description && (
             <Span
               style={{
                 display: "block",
@@ -2036,7 +2025,7 @@ export function SkillViewContainer({
                 textAlign: "center",
               }}
             >
-              {field.value.description}
+              {skillData.description}
             </Span>
           )}
         </Div>
@@ -2061,7 +2050,6 @@ export function SkillViewContainer({
                   user={user}
                   locale={locale}
                   favorites={favorites}
-                  field={field}
                   navigation={navigation}
                   t={t}
                   viewDefaults={viewDefaults}
@@ -2107,7 +2095,6 @@ function VariantCard({
   user,
   locale,
   favorites,
-  field,
   navigation,
   t,
   viewDefaults,
@@ -2123,7 +2110,6 @@ function VariantCard({
   user: ReturnType<typeof useWidgetContext>["user"];
   locale: CountryLanguage;
   favorites: FavoriteCard[];
-  field: { value: SkillGetResponseOutput | null | undefined };
   navigation: ReturnType<typeof useWidgetNavigation>;
   t: ReturnType<typeof useWidgetTranslation>;
   viewDefaults: ReturnType<typeof useViewDefaults>;
@@ -2198,10 +2184,14 @@ function VariantCard({
   const provider = resolved.chat
     ? modelProviders[resolved.chat.provider]
     : null;
+  const skillReferenceIds = skillData?.internalId
+    ? [skillId, skillData.internalId]
+    : [skillId];
 
   // Check if this specific variant is already in favorites
   const isFavorited = favorites.some(
-    (fav) => fav.skillId === skillId && fav.variantId === variant.id,
+    (fav) =>
+      skillReferenceIds.includes(fav.skillId) && fav.variantId === variant.id,
   );
 
   const charData: SkillDataForFavorite | undefined = skillData
@@ -2381,7 +2371,7 @@ function VariantCard({
             )}
             <CustomizeAndAddButton
               skillId={skillId}
-              field={field}
+              skillData={skillData}
               navigation={navigation}
               logger={logger}
               user={user}
@@ -2584,9 +2574,9 @@ function LeadCaptureForm({
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
           import("@/app/api/[locale]/lead-magnet/capture/definition"),
         ]);
-        const { createEndpointLogger } =
-          await import("@/app/api/[locale]/system/unified-interface/shared/logger/endpoint");
-        const logger = createEndpointLogger(false, Date.now(), locale);
+        const { createClientLogger } =
+          await import("@/app/api/[locale]/system/unified-interface/shared/logger/client-logger");
+        const logger = createClientLogger(false, Date.now(), locale);
         const result = await apiClient.mutate(
           captureDef.POST,
           logger,
@@ -2833,9 +2823,9 @@ function CreatorOtherSkills({
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
           import("@/app/api/[locale]/agent/chat/skills/definition"),
         ]);
-        const { createEndpointLogger } =
-          await import("@/app/api/[locale]/system/unified-interface/shared/logger/endpoint");
-        const logger = createEndpointLogger(false, Date.now(), locale);
+        const { createClientLogger } =
+          await import("@/app/api/[locale]/system/unified-interface/shared/logger/client-logger");
+        const logger = createClientLogger(false, Date.now(), locale);
         const result = await apiClient.fetch(
           listDef.default.GET,
           logger,
@@ -3155,7 +3145,7 @@ export function SkillCard({
           )}
           <CustomizeAndAddButton
             skillId={skillId}
-            field={field}
+            skillData={field.value}
             navigation={navigation}
             logger={logger}
             user={user}
@@ -3551,7 +3541,7 @@ function ShareEarnButton({
  */
 function CustomizeAndAddButton({
   skillId,
-  field,
+  skillData,
   navigation,
   logger,
   user,
@@ -3563,7 +3553,7 @@ function CustomizeAndAddButton({
   iconOnly = false,
 }: {
   skillId: string;
-  field: { value: SkillGetResponseOutput | null | undefined };
+  skillData: SkillGetResponseOutput | null | undefined;
   navigation: ReturnType<typeof useWidgetNavigation>;
   logger: ReturnType<typeof useWidgetContext>["logger"];
   user: ReturnType<typeof useWidgetContext>["user"];
@@ -3589,8 +3579,8 @@ function CustomizeAndAddButton({
       const editFavoriteDefinitions =
         await import("../../favorites/[id]/definition");
 
-      // Use field data if available, otherwise fetch
-      let fullChar = field.value;
+      // Use skillData if available, otherwise fetch
+      let fullChar = skillData;
 
       if (!fullChar) {
         const cachedData = apiClient.getEndpointData(

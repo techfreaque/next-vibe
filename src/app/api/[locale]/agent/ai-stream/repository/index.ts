@@ -15,18 +15,16 @@ import {
 
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
-import { buildMessagesChannel } from "../../chat/threads/[threadId]/messages/channel";
 import {
   createMessagesEmitter,
+  emitThreadTitleUpdated,
   type WsEmitCallback,
 } from "../../chat/threads/[threadId]/messages/emitter";
-import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
 import { MessagesRepository } from "../../chat/threads/[threadId]/messages/repository";
 import type { ImageGenModelSelection } from "../../image-generation/models";
 import { ApiProvider } from "../../models/models";
@@ -70,15 +68,12 @@ export class AiStreamRepository {
     request: NextRequest | undefined,
     headless: boolean,
   ): {
-    userId?: string;
-    leadId?: string;
+    userId: string | undefined;
+    leadId: string;
     ipAddress?: string;
   } {
-    const userId = !user.isPublic && "id" in user ? user.id : undefined;
-    const leadId =
-      "leadId" in user && typeof user.leadId === "string"
-        ? user.leadId
-        : undefined;
+    const userId = !user.isPublic && user.id ? user.id : undefined;
+
     const ipAddress = request
       ? request.headers.get("x-forwarded-for") ||
         request.headers.get("x-real-ip") ||
@@ -87,7 +82,7 @@ export class AiStreamRepository {
         ? "headless"
         : "cli";
 
-    return { userId, leadId, ipAddress };
+    return { userId, leadId: user.leadId, ipAddress };
   }
 
   /** Headless overload - returns structured result with threadId + lastAiMessageId */
@@ -104,6 +99,7 @@ export class AiStreamRepository {
     excludeMemories?: boolean;
     favoriteIdOverride?: string;
     sequenceIdOverride?: string;
+    subAgentDepth: number;
     mediaModelOverrides?: {
       musicGenModelSelection?: MusicGenModelSelection;
       videoGenModelSelection?: VideoGenModelSelection;
@@ -125,6 +121,7 @@ export class AiStreamRepository {
     t: AiStreamT;
     extraInstructions?: string;
     excludeMemories?: boolean;
+    subAgentDepth: number;
     sequenceIdOverride?: string;
     /** Override tools entirely (for API provider client-provided tools) */
     toolsOverride?: Record<string, CoreTool>;
@@ -143,6 +140,7 @@ export class AiStreamRepository {
     excludeMemories,
     favoriteIdOverride,
     sequenceIdOverride,
+    subAgentDepth,
     mediaModelOverrides,
     providerOverride,
     toolsOverride,
@@ -160,6 +158,7 @@ export class AiStreamRepository {
     excludeMemories?: boolean;
     favoriteIdOverride?: string;
     sequenceIdOverride?: string;
+    subAgentDepth: number;
     mediaModelOverrides?: {
       musicGenModelSelection?: MusicGenModelSelection;
       videoGenModelSelection?: VideoGenModelSelection;
@@ -187,6 +186,7 @@ export class AiStreamRepository {
       maxDuration: AiStreamRepository.maxDuration,
       request,
       headless,
+      subAgentDepth,
       isRevival,
       extraInstructions,
       excludeMemories,
@@ -198,6 +198,11 @@ export class AiStreamRepository {
     });
 
     if (!setupResult.success) {
+      logger.error("[AiStream] Setup failed", {
+        errorType: setupResult.errorType?.errorCode,
+        message: setupResult.message,
+        threadId: data.threadId,
+      });
       // Emit error to chat thread if we have a threadId - setup failures (e.g. insufficient
       // credits, bad model) should appear as error bubbles in the thread, not silently fail.
       const threadId = data.threadId;
@@ -217,18 +222,23 @@ export class AiStreamRepository {
               content: errorContent,
               errorType,
               parentId: data.parentMessageId ?? null,
-              userId: user.id,
+              user,
               sequenceId: null,
               logger,
             });
           }
           // Always emit via WS so the frontend can display the error (incognito stores it client-side)
-          publishWsEvent(
-            {
-              channel: buildMessagesChannel(threadId),
-              event: "message-created",
-              data: createStreamEvent.messageCreated({
-                messageId: errorMessageId,
+          const setupErrorEmit = createMessagesEmitter(
+            threadId,
+            data.rootFolderId,
+            logger,
+            user,
+          );
+          setupErrorEmit("message-created", {
+            streamingState: "idle",
+            messages: [
+              {
+                id: errorMessageId,
                 threadId,
                 role: ChatMessageRole.ERROR,
                 content: errorContent,
@@ -236,10 +246,11 @@ export class AiStreamRepository {
                 sequenceId: null,
                 model: null,
                 skill: null,
-              }).data,
-            },
-            logger,
-          );
+                metadata: {},
+                isAI: true,
+              },
+            ],
+          });
         } catch (emitErr) {
           logger.warn("[AiStream] Failed to emit setup error to chat", {
             threadId,
@@ -333,6 +344,7 @@ export class AiStreamRepository {
           threadResultThreadId,
           payload,
           logger,
+          user,
           batchSequenceId,
         );
         lastDeferredId = deferredId;
@@ -355,10 +367,12 @@ export class AiStreamRepository {
         sequenceIdOverride: batchSequenceId,
         threadId: threadResultThreadId,
         rootFolderId: data.rootFolderId,
+        subAgentDepth,
         user,
         locale,
         logger,
         t: aiStreamT,
+        abortSignal: streamAbortController.signal,
       }).catch((err: Error) => {
         logger.error("[WakeUp] Revival failed", {
           threadId: threadResultThreadId,
@@ -370,8 +384,13 @@ export class AiStreamRepository {
     // Create emitter on the messages channel - events are owned by messages endpoint.
     const wsEmit: WsEmitCallback = createMessagesEmitter(
       threadResultThreadId,
+      data.rootFolderId,
       logger,
+      user,
     );
+    const emitTitle = (threadId: string, title: string): void => {
+      emitThreadTitleUpdated(threadId, title, data.rootFolderId, logger, user);
+    };
 
     // Step 9: Start AI streaming (for all operations including answer-as-ai)
     try {
@@ -394,6 +413,7 @@ export class AiStreamRepository {
             user,
             logger,
             wsEmit,
+            emitTitle,
             sequenceIdOverride,
           });
 
@@ -765,7 +785,7 @@ export class AiStreamRepository {
                 parentMessageId: effectiveParentMessageId ?? null,
                 model: data.model,
                 skill: data.skill,
-                sequenceId: sequenceIdOverride ?? null,
+                sequenceId: sequenceIdOverride ?? crypto.randomUUID(),
                 userId,
                 user,
                 isIncognito,
@@ -776,6 +796,7 @@ export class AiStreamRepository {
                 t: aiStreamT,
                 dbWriter: ctx.dbWriter,
                 wsEmit,
+                streamContext,
               });
               // Capture dbWriter state for headless callers
               if (ctx.dbWriter.lastAssistantMessageId) {
@@ -857,7 +878,7 @@ export class AiStreamRepository {
               maxDuration: AiStreamRepository.maxDuration,
               model: data.model,
               threadId: threadResultThreadId,
-              userId,
+              user,
               logger,
               t: aiStreamT,
             });
@@ -870,7 +891,12 @@ export class AiStreamRepository {
         try {
           await runStream();
         } finally {
-          await clearStreamingState(threadResultThreadId, logger);
+          await clearStreamingState(
+            threadResultThreadId,
+            logger,
+            user,
+            capturedLastAiMessageContent,
+          );
           // wakeUp revival: insert deferred (single stream = no race) then revive.
           // Skip if stream was aborted (user cancel or timeout) - don't revive cancelled streams.
           // Also filter out payloads intercepted by wait-for-task (delivered inline).
@@ -972,17 +998,22 @@ export class AiStreamRepository {
 
           // clearStreamingState must run BEFORE STREAM_FINISHED is emitted so that
           // if it emits streaming-state-changed:waiting, clients receive it first.
-          void clearStreamingState(threadResultThreadId, logger)
-            .then(async (finalState) => {
+          void clearStreamingState(
+            threadResultThreadId,
+            logger,
+            user,
+            capturedLastAiMessageContent,
+          )
+            .then(async (result) => {
               // Emit STREAM_FINISHED with finalState so the client knows whether
               // to show the stop button (waiting) or go idle after stream ends.
-              wsEmit(
-                createStreamEvent.streamFinished({
-                  threadId: threadResultThreadId,
-                  reason: streamFinishReason,
-                  finalState,
-                }),
-              );
+              wsEmit.setStreamPreview({
+                preview: result.preview,
+                updatedAt: result.updatedAt,
+              });
+              wsEmit("stream-finished", {
+                streamingState: result.state,
+              });
 
               // wakeUp revival: if a pub/sub signal arrived mid-stream, insert the deferred
               // message now (stream is done, single-inserter guarantee holds) then fire revival.
@@ -1007,13 +1038,9 @@ export class AiStreamRepository {
               });
               // Still emit STREAM_FINISHED so the client doesn't stay stuck in
               // streaming/aborting state if the DB update failed.
-              wsEmit(
-                createStreamEvent.streamFinished({
-                  threadId: threadResultThreadId,
-                  reason: streamFinishReason,
-                  finalState: "idle",
-                }),
-              );
+              wsEmit("stream-finished", {
+                streamingState: "idle",
+              });
             });
         });
 
@@ -1040,7 +1067,12 @@ export class AiStreamRepository {
 
       // Safety net: clear streaming state if threadId is available
       if (threadResultThreadId) {
-        await clearStreamingState(threadResultThreadId, logger).catch((err) => {
+        await clearStreamingState(
+          threadResultThreadId,
+          logger,
+          user,
+          capturedLastAiMessageContent,
+        ).catch((err) => {
           logger.error(
             "[AI Stream] Failed to clear streaming state in outer catch",
             {
@@ -1051,33 +1083,43 @@ export class AiStreamRepository {
         });
       }
 
-      // Persist error to DB so it survives refresh and appears at correct branch position.
-      // Only for authenticated (non-incognito) threads where we have a threadId.
+      // Emit error to thread so the user always sees what went wrong.
+      // Chain as child of the last written message so it never creates a sibling branch.
       const errorThreadId = threadResultThreadId ?? data.threadId;
-      if (errorThreadId && !isIncognito && userId) {
+      if (errorThreadId) {
         try {
           const errorMessageId = crypto.randomUUID();
           const errorContent = aiStreamT("route.errors.streamCreationFailed");
-          // Place error at the same level as the user message (sibling, not child).
-          // The client's addErrorMessageToChat also uses data.parentMessageId so
-          // the WS-resolved parentId matches the client-optimistic parentId.
-          const errorParentId = data.parentMessageId ?? null;
-          await MessagesRepository.createErrorMessage({
-            messageId: errorMessageId,
-            threadId: errorThreadId,
-            content: errorContent,
-            errorType: "STREAM_ERROR",
-            parentId: errorParentId,
-            userId,
-            sequenceId: null,
+          // Chain error as child of the last message written during the stream (assistant/tool/user).
+          // Falls back to data.parentMessageId if the stream never wrote anything.
+          const errorParentId =
+            capturedLastAiMessageId !== aiMessageId
+              ? capturedLastAiMessageId
+              : (data.parentMessageId ?? null);
+          // Persist to DB for non-incognito threads (incognito has no DB row - WS event persists client-side).
+          if (!isIncognito && userId) {
+            await MessagesRepository.createErrorMessage({
+              messageId: errorMessageId,
+              threadId: errorThreadId,
+              content: errorContent,
+              errorType: "STREAM_ERROR",
+              parentId: errorParentId,
+              user,
+              sequenceId: null,
+              logger,
+            });
+          }
+          // Always emit via WS so every client (incognito or not) sees the error.
+          const outerErrorEmit = createMessagesEmitter(
+            errorThreadId,
+            data.rootFolderId,
             logger,
-          });
-          publishWsEvent(
-            {
-              channel: buildMessagesChannel(errorThreadId),
-              event: "message-created",
-              data: createStreamEvent.messageCreated({
-                messageId: errorMessageId,
+            user,
+          );
+          outerErrorEmit("message-created", {
+            messages: [
+              {
+                id: errorMessageId,
                 threadId: errorThreadId,
                 role: ChatMessageRole.ERROR,
                 content: errorContent,
@@ -1085,12 +1127,14 @@ export class AiStreamRepository {
                 sequenceId: null,
                 model: null,
                 skill: null,
-              }).data,
-            },
-            logger,
-          );
+                metadata: null,
+                isAI: true,
+              },
+            ],
+            streamingState: "idle",
+          });
         } catch (emitErr) {
-          logger.warn("[AiStream] Failed to persist stream error to DB", {
+          logger.warn("[AiStream] Failed to emit stream error to thread", {
             threadId: errorThreadId,
             error: emitErr instanceof Error ? emitErr.message : String(emitErr),
           });

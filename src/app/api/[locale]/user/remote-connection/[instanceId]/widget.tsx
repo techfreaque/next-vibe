@@ -31,20 +31,19 @@ import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
 import connectDefinitions from "../connect/definition";
 import disconnectDefinition from "./disconnect/definition";
 import reauthDefinition from "./reauth/definition";
 import renameDefinition from "./rename/definition";
-import type { RemoteConnectionByIdGetResponseOutput } from "./definition";
 import type definitions from "./definition";
 import { scopedTranslation } from "./i18n";
 
 interface RemoteConnectionByIdWidgetProps {
   field: {
-    value: RemoteConnectionByIdGetResponseOutput | null | undefined;
     urlPathParams?: { instanceId?: string };
     children: (typeof definitions.GET)["fields"]["children"];
   };
@@ -63,6 +62,7 @@ export function RemoteConnectionByIdWidget({
   const instanceId = field.urlPathParams?.instanceId ?? "";
 
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const status = useWidgetValue<typeof definitions.GET>();
 
   const handleDisconnect = async (e: ButtonMouseEvent): Promise<void> => {
     e.stopPropagation();
@@ -112,7 +112,6 @@ export function RemoteConnectionByIdWidget({
     );
   }
 
-  const status = field.value;
   const isConnected = status?.isConnected === true;
 
   if (isConnected && status) {

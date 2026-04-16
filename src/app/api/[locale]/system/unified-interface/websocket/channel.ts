@@ -28,6 +28,18 @@
  * buildWsChannel(["agent", "ai-stream"], {}, "thread-abc")
  * // → "agent/ai-stream/thread-abc"
  */
+/**
+ * Build the user-scoped channel for a single-connection-per-tab model.
+ * All endpoint events are routed through this channel; the `channel` field
+ * in each WsWireMessage still carries the original path-based channel so
+ * client-side routing (channels.get(msg.channel)) works transparently.
+ *
+ * userId is the authenticated user's ID, or leadId for anonymous users.
+ */
+export function buildUserChannel(userId: string): string {
+  return `user/${userId}`;
+}
+
 export function buildWsChannel(
   path: readonly string[],
   urlPathParams: Record<string, string>,

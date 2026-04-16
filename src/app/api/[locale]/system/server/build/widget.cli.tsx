@@ -8,9 +8,9 @@ import type { JSX } from "react";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
-  useInkWidgetPlatform,
-  useInkWidgetResponseOnly,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+  useWidgetPlatform,
+  useWidgetResponseOnly,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { BuildResponseOutput } from "./definition";
 
@@ -30,8 +30,8 @@ function formatDuration(ms: number): string {
 }
 
 export function BuildResultWidget({ field }: CliWidgetProps): JSX.Element {
-  const platform = useInkWidgetPlatform();
-  const responseOnly = useInkWidgetResponseOnly();
+  const platform = useWidgetPlatform();
+  const responseOnly = useWidgetResponseOnly();
   const isMcp = platform === Platform.MCP;
   const value = field.value;
 

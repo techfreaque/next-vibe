@@ -2,8 +2,6 @@
  * ToolCallHandler - Handles tool call events during streaming
  */
 
-import type { JSONValue } from "ai";
-
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   CallbackMode,
@@ -11,8 +9,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { ToolExecutionContext } from "../../../chat/config";
-import type { ToolCall, ToolCallResult } from "../../../chat/db";
+
+import type { ToolCall } from "../../../chat/db";
 import type { MessageDbWriter } from "../core/message-db-writer";
 import type { StreamContext } from "../core/stream-context";
 
@@ -25,7 +25,7 @@ export class ToolCallHandler {
       type: "tool-call";
       toolCallId: string;
       toolName: string;
-      input?: JSONValue;
+      input?: WidgetData;
     };
     ctx: StreamContext;
     currentAssistantMessageId: string | null;
@@ -143,7 +143,7 @@ export class ToolCallHandler {
     }
 
     // Get tool arguments from the AI SDK part.input
-    const toolCallArgs = (part.input as ToolCallResult) || {};
+    const toolCallArgs = part.input || {};
 
     // Read callbackMode from tool args - any tool can pass this to control loop behavior
     const callbackModeArg =
@@ -226,11 +226,7 @@ export class ToolCallHandler {
         },
       );
 
-      dbWriter.emitToolWaiting({
-        toolMessageId,
-        toolName: part.toolName,
-        toolCallId,
-      });
+      dbWriter.emitToolWaiting();
 
       logger.debug(
         "[AI Stream] Emitted TOOL_WAITING event - continuing to process more tool calls",

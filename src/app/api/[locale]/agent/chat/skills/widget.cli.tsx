@@ -16,7 +16,7 @@ import type { JSX } from "react";
 import { useMemo } from "react";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { useInkWidgetPlatform } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import { useWidgetPlatform } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { SkillListItem, SkillListResponseOutput } from "./definition";
 
@@ -163,7 +163,7 @@ function renderListMcp(data: SkillListResponseOutput): string {
 const DETAIL_THRESHOLD = 5;
 
 export function SkillsListCliWidget({ field }: CliWidgetProps): JSX.Element {
-  const platform = useInkWidgetPlatform();
+  const platform = useWidgetPlatform();
   const isMcp = platform === Platform.MCP;
 
   const output = useMemo(() => {
@@ -199,5 +199,5 @@ export function SkillsListCliWidget({ field }: CliWidgetProps): JSX.Element {
 
 SkillsListCliWidget.cliWidget = true as const;
 
-// Alias so the lazyCliWidget factory can use the same export name as widget.tsx
+// Alias so the lazyWidget factory can use the same export name as widget.tsx
 export { SkillsListCliWidget as SkillsListContainer };

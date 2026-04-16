@@ -14,19 +14,15 @@ import { Pre } from "next-vibe-ui/ui/pre";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetTranslation,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type endpoints from "./definition";
-import type { ExportEnvResponseOutput } from "./definition";
 
-interface WidgetProps {
-  field: {
-    value: ExportEnvResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
-}
-
-export function ExportEnvWidget({ field }: WidgetProps): JSX.Element {
-  const value = field.value;
+export function ExportEnvWidget(): JSX.Element {
+  const value = useWidgetValue<typeof endpoints.GET>();
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const [copied, setCopied] = useState(false);
 

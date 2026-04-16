@@ -68,11 +68,11 @@ export const translations: typeof enTranslations = {
     navigation: {
       subscription: "Subskrypcja i Kredyty",
       referral: "Program Poleceń",
-      settings: "Ustawienia profilu",
+      settings: "Mój profil",
       leadMagnet: "Lead Magnet",
       help: "Opinie i Wsparcie",
       about: "O nas",
-      websiteBlog: "Strona & Blog",
+      websiteBlog: "Artykuły",
       admin: "Panel Admina",
     },
     confirmations: {

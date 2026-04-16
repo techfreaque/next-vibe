@@ -27,6 +27,7 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import messengerAccountEditDefinition from "../edit/[id]/definition";
@@ -45,12 +46,6 @@ import { MessageChannel } from "../enum";
 type MessengerAccount = NonNullable<
   MessengerAccountsListGETResponseOutput["accounts"]
 >[number];
-
-interface CustomWidgetProps {
-  field: {
-    value: MessengerAccountsListGETResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
 
 const STATUS_COLORS: Record<string, string> = {
   [MessengerAccountStatus.ACTIVE]: "bg-success/10 text-success",
@@ -161,9 +156,7 @@ function AccountRow({
   );
 }
 
-export function MessengerAccountsListContainer({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
+export function MessengerAccountsListContainer(): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const locale = useWidgetLocale();
@@ -177,15 +170,16 @@ export function MessengerAccountsListContainer({
   const searchValue = form.watch("search") ?? "";
   const currentPage = form.watch("page") ?? 1;
   const limit = form.watch("limit") ?? 20;
+  const widgetData = useWidgetValue<typeof definition.GET>();
 
   const accounts = useMemo(
-    () => field.value?.accounts ?? [],
-    [field.value?.accounts],
+    () => widgetData?.accounts ?? [],
+    [widgetData?.accounts],
   );
-  const isLoading = field.value === null || field.value === undefined;
-  const total = field.value?.pagination?.total ?? 0;
+  const isLoading = widgetData === undefined;
+  const total = widgetData?.pagination?.total ?? 0;
   const totalPages =
-    field.value?.pagination?.totalPages ?? (Math.ceil(total / limit) || 1);
+    widgetData?.pagination?.totalPages ?? (Math.ceil(total / limit) || 1);
 
   const handleEdit = useCallback(
     (account: MessengerAccount): void => {

@@ -13,7 +13,7 @@
  * INTERACTIVE MODE (interactiveMode:true)
  *   Opens a terminal window. Three paths:
  *   1. streamContext.escalateToTask present → tracking task + wakeUp revival
- *   2. cronTaskId present (goroutine) → manual task creation with copied revival columns
+ *   2. cronTaskId present (goroutine) → reuse parent task ID for revival (exists on both instances)
  *   3. CLI/cron → detached spawn, no revival
  */
 
@@ -22,7 +22,6 @@ import "server-only";
 import { execSync, spawn } from "node:child_process";
 import { once } from "node:events";
 
-import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -32,20 +31,8 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { db } from "@/app/api/[locale]/system/db";
 import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import {
-  cronTasks,
-  type CronTaskRow,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import {
-  CronTaskPriority,
-  CronTaskStatus,
-  TaskCategory,
-  TaskOutputMode,
-} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { CodingAgentT } from "./i18n";
 import type { CodingAgentRequest, CodingAgentResponse } from "./types";
@@ -258,11 +245,10 @@ async function runBatch(
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-async function getMcpInstanceName(): Promise<string> {
+async function getMcpInstanceName(userId: string): Promise<string> {
   const { RemoteConnectionRepository } =
     await import("@/app/api/[locale]/user/remote-connection/repository");
-  const id = RemoteConnectionRepository.deriveDefaultSelfInstanceId();
-  return id === "hermes-dev" ? "vibe-dev" : "vibe-local";
+  return RemoteConnectionRepository.getLocalInstanceId(userId);
 }
 
 // ── Main entry point ───────────────────────────────────────────────────────────
@@ -270,7 +256,7 @@ async function getMcpInstanceName(): Promise<string> {
 export async function runCodingAgent(
   provider: ProviderConfig,
   data: CodingAgentRequest,
-  user: JwtPayloadType,
+  userId: string,
   logger: EndpointLogger,
   t: CodingAgentT,
   cronTaskId: string | undefined,
@@ -302,7 +288,7 @@ export async function runCodingAgent(
   const title = data.taskTitle || data.prompt.slice(0, 80).replace(/\n/g, " ");
 
   // Path 1: streaming context → escalateToTask
-  if (streamContext?.escalateToTask) {
+  if (streamContext.escalateToTask) {
     const callbackMode = streamContext.callerCallbackMode ?? CallbackMode.WAIT;
     const { taskId: trackingTaskId } = await streamContext.escalateToTask({
       callbackMode,
@@ -313,7 +299,7 @@ export async function runCodingAgent(
       ? provider.injectTaskContext(
           args,
           trackingTaskId,
-          await getMcpInstanceName(),
+          await getMcpInstanceName(userId),
         )
       : args;
 
@@ -342,94 +328,42 @@ export async function runCodingAgent(
       });
     }
 
+    // WAIT / END_LOOP: pause the stream — complete-task will revive it.
+    // Mirror the remote queue WAIT path: set waitingForRemoteResult, omit taskId.
+    if (
+      (callbackMode === CallbackMode.WAIT ||
+        callbackMode === CallbackMode.END_LOOP) &&
+      streamContext
+    ) {
+      streamContext.waitingForRemoteResult = true;
+      // No timeout — interactive sessions can take arbitrarily long.
+      streamContext.pendingTimeoutMs = 0;
+      return success({
+        output: `Interactive ${provider.bin} session launched. Waiting for completion.`,
+        durationMs: Date.now() - start,
+      });
+    }
+
     return success({
       output: `Interactive ${provider.bin} session launched. Task ID: ${trackingTaskId}.`,
       durationMs: Date.now() - start,
       taskId: trackingTaskId,
-      hint: "Interactive session launched. Result will be delivered when the agent calls complete-task.",
+      terminalPending: true,
+      hint: "Result will be injected automatically as a deferred message when complete. Do NOT call wait-for-task.",
     });
   }
 
-  // Path 2: goroutine context
+  // Path 2: goroutine / cron context — reuse the parent task ID directly.
+  // The parent cron task (cronTaskId) already has all wakeUp revival columns and
+  // exists on both Thea and Hermes. When Claude calls complete-task with cronTaskId,
+  // Hermes pushes the result to Thea using that same ID, Thea's /report finds the
+  // task and triggers handleTaskCompletion correctly.
   if (cronTaskId) {
-    const trackingTaskId = `${provider.routeId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-
-    type RevivalColumns = Pick<
-      CronTaskRow,
-      | "wakeUpCallbackMode"
-      | "wakeUpThreadId"
-      | "wakeUpToolMessageId"
-      | "wakeUpLeafMessageId"
-      | "wakeUpModelId"
-      | "wakeUpSkillId"
-      | "wakeUpFavoriteId"
-    >;
-    let revivalColumns: Partial<RevivalColumns> = {};
-
-    try {
-      const parentTask = await db
-        .select({
-          wakeUpCallbackMode: cronTasks.wakeUpCallbackMode,
-          wakeUpThreadId: cronTasks.wakeUpThreadId,
-          wakeUpToolMessageId: cronTasks.wakeUpToolMessageId,
-          wakeUpLeafMessageId: cronTasks.wakeUpLeafMessageId,
-          wakeUpModelId: cronTasks.wakeUpModelId,
-          wakeUpSkillId: cronTasks.wakeUpSkillId,
-          wakeUpFavoriteId: cronTasks.wakeUpFavoriteId,
-        })
-        .from(cronTasks)
-        .where(eq(cronTasks.id, cronTaskId))
-        .limit(1)
-        .then((rows) => rows[0] ?? null);
-
-      if (parentTask) {
-        revivalColumns = {
-          wakeUpCallbackMode: parentTask.wakeUpCallbackMode,
-          wakeUpThreadId: parentTask.wakeUpThreadId,
-          wakeUpToolMessageId: parentTask.wakeUpToolMessageId,
-          wakeUpLeafMessageId: parentTask.wakeUpLeafMessageId,
-          wakeUpModelId: parentTask.wakeUpModelId,
-          wakeUpSkillId: parentTask.wakeUpSkillId,
-          wakeUpFavoriteId: parentTask.wakeUpFavoriteId,
-        };
-      }
-
-      const { RemoteConnectionRepository } =
-        await import("@/app/api/[locale]/user/remote-connection/repository");
-      await db.insert(cronTasks).values({
-        id: trackingTaskId,
-        shortId: trackingTaskId,
-        routeId: provider.routeId,
-        displayName: title,
-        description: data.prompt.slice(0, 500),
-        category: TaskCategory.DEVELOPMENT,
-        schedule: "manual",
-        enabled: false,
-        priority: CronTaskPriority.LOW,
-        runOnce: true,
-        lastExecutionStatus: CronTaskStatus.RUNNING,
-        outputMode: TaskOutputMode.STORE_ONLY,
-        notificationTargets: [],
-        targetInstance:
-          RemoteConnectionRepository.deriveDefaultSelfInstanceId(),
-        tags: [provider.routeId, "interactive"],
-        userId: user.id,
-        ...revivalColumns,
-      });
-
-      logger.info("Interactive (goroutine): created tracking task", {
-        trackingTaskId,
-        wakeUpCallbackMode: revivalColumns.wakeUpCallbackMode,
-      });
-    } catch (err) {
-      logger.warn("Failed to create goroutine tracking task", parseError(err));
-    }
-
     const finalArgs = provider.injectTaskContext
       ? provider.injectTaskContext(
           args,
-          trackingTaskId,
-          await getMcpInstanceName(),
+          cronTaskId,
+          await getMcpInstanceName(userId),
         )
       : args;
 
@@ -449,19 +383,37 @@ export async function runCodingAgent(
     }
 
     logger.info("Interactive (goroutine): session launched", {
-      trackingTaskId,
+      cronTaskId,
       durationMs: Date.now() - start,
     });
 
     return success({
-      output: `Interactive ${provider.bin} session launched. Task ID: ${trackingTaskId}.`,
+      output: `Interactive ${provider.bin} session launched. Task ID: ${cronTaskId}.`,
       durationMs: Date.now() - start,
-      taskId: trackingTaskId,
-      hint: "Interactive session launched. Result will be delivered when the agent calls complete-task.",
+      taskId: cronTaskId,
+      // terminalPending signals triggerLocalPulse to skip handleTaskCompletion and wait
+      // for the real terminal to call complete-task with the actual output.
+      terminalPending: true,
+      hint: "Result will be injected automatically as a deferred message when complete. Do NOT call wait-for-task.",
     });
   }
 
-  // Path 3: CLI/cron - no revival
+  // Path 3: CLI/cron - no revival.
+  // If the provider supports task context injection (e.g. claude-code), reaching here
+  // means we have no taskId to inject — the spawned process can't call complete-task.
+  // Return an error so the caller knows the session can't be tracked.
+  if (provider.injectTaskContext) {
+    logger.error(
+      "Interactive mode requires a taskId (escalateToTask or cronTaskId) but none was provided",
+      { bin: provider.bin },
+    );
+    return fail({
+      message: t("codingAgent.run.post.errors.internal.title"),
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
+  }
+
+  // Provider doesn't support task context (e.g. TUI tools) — spawn without revival.
   logger.info("Interactive (CLI/cron): spawning detached, no revival");
   const terminal = detectTerminal(logger);
   if (terminal) {

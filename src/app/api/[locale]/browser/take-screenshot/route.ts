@@ -13,11 +13,9 @@ export const { POST, tools } = endpointsHandler({
   endpoint: takeScreenshotEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, user, request }) =>
+    handler: ({ data, t, logger }) =>
       BrowserSharedRepository.executeTakeScreenshot(
         {
-          sessionId:
-            request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.TAKE_SCREENSHOT,
           args: BrowserSharedRepository.filterUndefinedArgs({
             uid: data.uid,

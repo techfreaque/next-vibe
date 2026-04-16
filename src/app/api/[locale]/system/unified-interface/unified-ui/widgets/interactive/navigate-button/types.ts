@@ -9,7 +9,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { EndpointLogger } from "../../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { SpacingSize, WidgetType } from "../../../../shared/types/enums";
-import type { WidgetData } from "../../../../shared/widgets/widget-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   BasePrimitiveDisplayOnlyWidgetConfig,
   FieldUsageConfig,

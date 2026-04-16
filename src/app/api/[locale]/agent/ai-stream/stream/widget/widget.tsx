@@ -101,7 +101,11 @@ function AiStreamChatArea(): JSX.Element {
       return initialMessagesData;
     }
     if (initialPathData?.messages?.length) {
-      return { backgroundTasks: [], messages: initialPathData.messages };
+      return {
+        streamingState: "idle" as const,
+        backgroundTasks: [],
+        messages: initialPathData.messages,
+      };
     }
     return null;
   }, [threadIdToRender, initialThreadId, initialMessagesData, initialPathData]);
@@ -123,6 +127,7 @@ function AiStreamChatArea(): JSX.Element {
       create: {
         urlPathParams: { threadId: threadIdToRender ?? "" },
       },
+      subscribeToEvents: true,
     }),
     [threadIdToRender, rootFolderId, messagesInitialData],
   );
@@ -146,10 +151,7 @@ function AiStreamChatArea(): JSX.Element {
   );
 
   return (
-    <KeyboardAvoidingView
-      className="h-screen h-max-screen flex-1"
-      keyboardVerticalOffset={0}
-    >
+    <KeyboardAvoidingView className="h-dvh flex-1" keyboardVerticalOffset={0}>
       <Div
         style={
           platform.isReactNative ? { paddingTop: insets.top + 60 } : undefined
@@ -160,7 +162,7 @@ function AiStreamChatArea(): JSX.Element {
             className={
               platform.isReactNative
                 ? "flex-1 flex flex-col min-w-0 relative w-full"
-                : "w-full h-screen max-h-screen"
+                : "w-full h-dvh"
             }
           >
             {/* Toolbar */}
@@ -172,7 +174,7 @@ function AiStreamChatArea(): JSX.Element {
 
             {/* Messages area */}
             <ErrorBoundary locale={locale}>
-              <Div className="max-w-screen overflow-hidden h-screen h-max-screen">
+              <Div className="max-w-screen overflow-hidden h-dvh">
                 {threadIdToRender ? (
                   <EndpointsPage
                     key={threadIdToRender}

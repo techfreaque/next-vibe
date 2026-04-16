@@ -20,7 +20,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
-import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
+import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -48,7 +48,7 @@ export interface RemoteCallParams {
   urlPathParams?: RemoteCallData;
   /** Raw JWT token - sourced by caller (session file, user config, etc.) */
   token: string;
-  leadId?: string;
+  leadId: string;
   remoteUrl: string;
   locale: CountryLanguage;
   logger: EndpointLogger;
@@ -92,22 +92,20 @@ export function buildRemoteUrl(
 }
 
 /**
- * Build Authorization + Cookie headers from token and optional leadId.
+ * Build Authorization headers from token and leadId.
+ * leadId is always required - every caller has one.
  */
 export function buildRemoteHeaders(
   token: string,
-  leadId?: string,
+  leadId: string,
 ): Record<string, string> {
-  const headers: Record<string, string> = {
+  // Embed leadId as a suffix in the Bearer token so cross-origin servers can
+  // identify the caller without relying on cookies.
+  // Format: "Bearer <jwt>####<leadId>"
+  return {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${token}${BEARER_LEAD_ID_SEPARATOR}${leadId}`,
   };
-
-  if (leadId) {
-    headers.Cookie = `${LEAD_ID_COOKIE_NAME}=${leadId}`;
-  }
-
-  return headers;
 }
 
 interface RemoteResponseShape {

@@ -12,7 +12,6 @@ import { useCallback, useMemo } from "react";
 
 import { handleCheckoutRedirect } from "@/app/api/[locale]/payment/utils/redirect";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -27,20 +26,6 @@ import purchaseDefinitions, {
 } from "./purchase/definition";
 
 export interface UseCreditsReturn extends EndpointReturn<typeof definitions> {
-  /**
-   * Optimistically deduct credits from the balance
-   * IMPORTANT: This must match server-side deduction logic in repository.ts
-   *
-   * Deduction Priority Order:
-   * 1. Free credits (includes lead credits) - HIGHEST PRIORITY
-   * 2. Expiring credits (subscription)
-   * 3. Permanent credits - LOWEST PRIORITY
-   *
-   * @param creditCost - Number of credits to deduct
-   * @param feature - Feature name for logging (e.g., "chat_message", "tts", "stt", "brave_search")
-   */
-  deductCredits: (creditCost: number, feature: string) => void;
-
   /**
    * Refetch credits from server to sync with actual state
    */
@@ -77,76 +62,10 @@ export function useCredits(
           enabled: isEnabled,
         },
       },
+      subscribeToEvents: isEnabled,
     },
     logger,
     user,
-  );
-
-  /**
-   * Deduct credits optimistically following the correct priority order
-   */
-  const deductCredits = useCallback(
-    (creditCost: number) => {
-      if (creditCost <= 0) {
-        return;
-      }
-
-      apiClient.updateEndpointData(definitions.GET, logger, (oldData) => {
-        if (!oldData?.success) {
-          return oldData;
-        }
-
-        const data = oldData.data;
-
-        if (data.total < creditCost) {
-          return oldData;
-        }
-
-        // Deduct credits: free → expiring → permanent → earned
-        let remaining = creditCost;
-        let newFree = data.free;
-        let newExpiring = data.expiring;
-        let newPermanent = data.permanent;
-        let newEarned = data.earned;
-
-        if (remaining > 0 && newFree > 0) {
-          const deduction = Math.min(newFree, remaining);
-          newFree -= deduction;
-          remaining -= deduction;
-        }
-
-        if (remaining > 0 && newExpiring > 0) {
-          const deduction = Math.min(newExpiring, remaining);
-          newExpiring -= deduction;
-          remaining -= deduction;
-        }
-
-        if (remaining > 0 && newPermanent > 0) {
-          const deduction = Math.min(newPermanent, remaining);
-          newPermanent -= deduction;
-          remaining -= deduction;
-        }
-
-        if (remaining > 0 && newEarned > 0) {
-          const deduction = Math.min(newEarned, remaining);
-          newEarned -= deduction;
-          remaining -= deduction;
-        }
-
-        return {
-          success: true,
-          data: {
-            total: newFree + newExpiring + newPermanent + newEarned,
-            expiring: newExpiring,
-            permanent: newPermanent,
-            earned: newEarned,
-            free: newFree,
-            expiresAt: data.expiresAt,
-          },
-        };
-      });
-    },
-    [logger],
   );
 
   /**
@@ -163,10 +82,9 @@ export function useCredits(
   const result = useMemo(
     () => ({
       ...endpoint,
-      deductCredits,
       refetchCredits,
     }),
-    [endpoint, deductCredits, refetchCredits],
+    [endpoint, refetchCredits],
   );
 
   // Return null when disabled (no initial data provided) - after all hooks are called
@@ -217,7 +135,7 @@ export function useCreditPurchase(
   const handlePurchaseSuccess = useCallback(
     (data: {
       requestData: CreditsPurchasePostRequestOutput;
-      pathParams: Record<string, never>;
+      pathParams: undefined;
       responseData: CreditsPurchasePostResponseOutput;
     }) => {
       try {
@@ -258,7 +176,7 @@ export function useCreditPurchase(
     (data: {
       error: ErrorResponseType;
       requestData: CreditsPurchasePostRequestOutput;
-      pathParams: Record<string, never>;
+      pathParams: undefined;
     }) => {
       logger.error("Credits purchase endpoint error", parseError(data.error));
       // Toast is handled by useEndpoint's alert system

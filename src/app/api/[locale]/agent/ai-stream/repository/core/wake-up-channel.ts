@@ -15,18 +15,16 @@
  *   so we use a direct in-process handler map here instead.
  */
 
-import type {
-  ToolCall,
-  ToolCallResult,
-} from "@/app/api/[locale]/agent/chat/db";
+import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 export interface WakeUpPayload {
   toolMessageId: string;
   authorId: string | null;
   originalSequenceId: string | null;
   originalToolCall: ToolCall;
-  wakeUpResult: ToolCallResult | undefined;
+  wakeUpResult: WidgetData | undefined;
   wakeUpStatus: string | undefined;
   resolvedModel: ChatModelId;
   resolvedSkill: string;

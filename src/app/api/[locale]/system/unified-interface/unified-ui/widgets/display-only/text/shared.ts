@@ -9,7 +9,7 @@ import type z from "zod";
 import type { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { TParams } from "@/i18n/core/static-types";
 
-import type { WidgetData } from "../../../../shared/widgets/widget-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { TextFormat, TextWidgetSchema } from "./types";
 
 /**

@@ -11,10 +11,10 @@ import type { JSX } from "react";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
-  useInkWidgetPlatform,
-  useInkWidgetResponseOnly,
-  useInkWidgetTranslation,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+  useWidgetPlatform,
+  useWidgetResponseOnly,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type definition from "./definition";
 import type { ReleaseResponseType } from "./definition";
@@ -33,7 +33,7 @@ type PublishedPackage = NonNullable<
   ReleaseResponseType["publishedPackages"]
 >[number];
 type TranslateFn = ReturnType<
-  typeof useInkWidgetTranslation<typeof definition.POST>
+  typeof useWidgetTranslation<typeof definition.POST>
 >;
 
 function formatDuration(ms: number): string {
@@ -88,9 +88,9 @@ function PublishedRow({
 }
 
 export function ReleaseResultWidget({ field }: CliWidgetProps): JSX.Element {
-  const platform = useInkWidgetPlatform();
-  const responseOnly = useInkWidgetResponseOnly();
-  const t = useInkWidgetTranslation<typeof definition.POST>();
+  const platform = useWidgetPlatform();
+  const responseOnly = useWidgetResponseOnly();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const isMcp = platform === Platform.MCP;
   const value = field.value;
 

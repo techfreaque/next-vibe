@@ -31,6 +31,7 @@ import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
@@ -39,12 +40,6 @@ import type definition from "./definition";
 
 type GraphListResponseOutput = typeof definition.GET.types.ResponseOutput;
 type GraphSummary = NonNullable<GraphListResponseOutput>["graphs"][number];
-
-interface CustomWidgetProps {
-  field: {
-    value: GraphListResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 
@@ -271,9 +266,7 @@ function EmptyState({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function GraphListContainer({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
+export function GraphListContainer(): React.JSX.Element {
   const locale = useWidgetLocale();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -282,7 +275,7 @@ export function GraphListContainer({
 
   const search = form?.watch("search") ?? "";
 
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.GET>();
   const isLoading = data === null || data === undefined;
   const isError = data !== null && data !== undefined && !data.graphs;
   const isLoadingFresh = endpointMutations?.read?.isLoadingFresh ?? false;

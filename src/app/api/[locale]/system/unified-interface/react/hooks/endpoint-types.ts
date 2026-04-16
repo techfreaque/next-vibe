@@ -230,6 +230,8 @@ export interface UseEndpointOptionsBase<T> {
   update?: UpdateOptions<T>;
   delete?: DeleteOptions<T>;
   autoPrefill?: boolean;
+  /** Subscribe to definition-driven WS events for the GET endpoint. */
+  subscribeToEvents?: boolean;
 }
 
 // The exported type adds call-site enforcement: when a section has required fields,

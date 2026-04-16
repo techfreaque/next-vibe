@@ -16,7 +16,7 @@ import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { defaultLocale } from "@/i18n/core/config";
 import { env } from "@/config/env";
 import type { UnbottledCloudSession } from "@/app/api/[locale]/agent/env";

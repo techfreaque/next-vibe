@@ -1,8 +1,8 @@
 import "server-only";
 
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as appLocaleScopedTranslation } from "@/app/[locale]/i18n";
@@ -33,8 +33,8 @@ export interface SerializableToolMetadata {
   /** Raw examples from the endpoint definition (requests + urlPathParams merged, responses keyed by example name) */
   examples?: {
     /** Merged request data + url path params - what the caller passes as flat args */
-    inputs?: Record<string, CliRequestData>;
-    responses?: Record<string, CliRequestData>;
+    inputs?: Record<string, Record<string, WidgetData>>;
+    responses?: Record<string, Record<string, WidgetData>>;
   };
 }
 
@@ -88,7 +88,7 @@ async function loadAllDefinitions(
   return allDefinitionsCache;
 }
 
-// Bun TDZ race: dynamic imports may throw "Cannot access 'X' before initialization"
+// dynamic imports may throw "Cannot access 'X' before initialization"
 // on first load. Retry once with a short yield to let the module settle.
 async function getEndpointWithRetry(
   path: string,
@@ -102,7 +102,16 @@ async function getEndpointWithRetry(
       await new Promise<void>((resolve) => {
         setTimeout(resolve, 10);
       });
-      return getEndpoint(path);
+      try {
+        return await getEndpoint(path);
+      } catch (retryError) {
+        logger.error(
+          "[registry] Failed to load endpoint",
+          parseError(retryError),
+          path,
+        );
+        return null;
+      }
     }
     logger.error("[registry] Failed to load endpoint", parseError(error), path);
     return null;
@@ -168,9 +177,9 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
   }
 
   private static mergeExampleInputs(
-    requests: Record<string, CliRequestData> | undefined,
-    urlPathParams: Record<string, CliRequestData> | undefined,
-  ): Record<string, CliRequestData> | undefined {
+    requests: Record<string, Record<string, WidgetData>> | undefined,
+    urlPathParams: Record<string, Record<string, WidgetData>> | undefined,
+  ): Record<string, Record<string, WidgetData>> | undefined {
     if (!requests && !urlPathParams) {
       return undefined;
     }
@@ -178,7 +187,7 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
       ...Object.keys(requests ?? {}),
       ...Object.keys(urlPathParams ?? {}),
     ]);
-    const merged: Record<string, CliRequestData> = {};
+    const merged: Record<string, Record<string, WidgetData>> = {};
     for (const key of keys) {
       merged[key] = {
         ...(requests?.[key] ?? {}),
@@ -218,14 +227,14 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
           ? {
               inputs: DefinitionsRegistry.mergeExampleInputs(
                 definition.examples.requests as
-                  | Record<string, CliRequestData>
+                  | Record<string, Record<string, WidgetData>>
                   | undefined,
                 definition.examples.urlPathParams as
-                  | Record<string, CliRequestData>
+                  | Record<string, Record<string, WidgetData>>
                   | undefined,
               ),
               responses: definition.examples.responses as
-                | Record<string, CliRequestData>
+                | Record<string, Record<string, WidgetData>>
                 | undefined,
             }
           : undefined,

@@ -37,10 +37,18 @@ import {
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/shared/utils/error-types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { setClaudeCodeFixtureContext } from "./claude-code-fixture-store";
 
-const HTTP_CACHE_DIR = join(
+// Optional WS fixture context sync - registered by ws-fixture.ts via registerWsContextHook()
+let wsContextHook: ((testCase: string) => void) | null = null;
+
+/** Register a hook to sync WS fixture context when setFetchCacheContext is called. */
+export function registerWsContextHook(hook: (testCase: string) => void): void {
+  wsContextHook = hook;
+}
+
+export const HTTP_CACHE_DIR = join(
   dirname(fileURLToPath(import.meta.url)),
   "fixtures",
   "http-cache",
@@ -57,6 +65,8 @@ export function setFetchCacheContext(testCase: string): void {
   callCounters.clear();
   // Keep Claude Code fixture store in sync - it doesn't use fetch so needs its own context
   setClaudeCodeFixtureContext(testCase);
+  // Keep WS fixture store in sync (registered by ws-fixture.ts when installed)
+  wsContextHook?.(testCase);
   // eslint-disable-next-line no-console
   console.log(`[FetchCache] context set: ${currentTestCase}`);
 }
@@ -66,8 +76,16 @@ export function setFetchCacheContext(testCase: string): void {
  * will throw instead of making a real network request. Use this to prove
  * that a test suite runs entirely from fixtures with zero network access.
  */
+let wsStrictHook: ((strict: boolean) => void) | null = null;
+
+/** Register a hook to sync WS strict mode when setFetchCacheStrictMode is called. */
+export function registerWsStrictHook(hook: (strict: boolean) => void): void {
+  wsStrictHook = hook;
+}
+
 export function setFetchCacheStrictMode(strict: boolean): void {
   strictMode = strict;
+  wsStrictHook?.(strict);
 }
 
 /**
@@ -104,7 +122,7 @@ interface ReqFile {
   url: string;
   method: string;
   headers: Record<string, string>;
-  body: JsonValue;
+  body: WidgetData;
 }
 
 type ResFile =
@@ -120,7 +138,7 @@ type ResFile =
       url: string;
       status: number;
       headers: Record<string, string>;
-      body: JsonValue;
+      body: WidgetData;
     }
   | {
       type: "text";
@@ -194,15 +212,41 @@ function isExternal(url: string): boolean {
       return false;
     }
     const h = u.hostname;
-    return (
+    if (
       h !== "localhost" &&
       h !== "127.0.0.1" &&
       h !== "::1" &&
       !h.endsWith(".local")
+    ) {
+      return true;
+    }
+    // Also intercept specific localhost ports opted-in via addLocalhostPort()
+    const port = parseInt(
+      u.port || (u.protocol === "https:" ? "443" : "80"),
+      10,
     );
+    return localhostPorts.has(port);
   } catch {
     return false;
   }
+}
+
+/** Localhost ports that should also be intercepted (opt-in for remote server calls) */
+const localhostPorts = new Set<number>();
+
+/**
+ * Opt-in a specific localhost port for fetch caching.
+ * Use this in remote-mode tests where the "remote" server is localhost:PORT.
+ * Example: addLocalhostPort(3001) intercepts calls to localhost:3001.
+ * Call clearLocalhostPorts() in test teardown.
+ */
+export function addLocalhostPort(port: number): void {
+  localhostPorts.add(port);
+}
+
+/** Remove all opted-in localhost ports */
+export function clearLocalhostPorts(): void {
+  localhostPorts.clear();
 }
 
 const callCounters = new Map<string, number>();
@@ -251,12 +295,12 @@ function sanitiseRequestHeaders(
 }
 
 /** Parse request body for human-readable storage */
-function parseBodyForStorage(bodyStr: string): JsonValue {
+function parseBodyForStorage(bodyStr: string): WidgetData {
   if (!bodyStr) {
     return "";
   }
   try {
-    return JSON.parse(bodyStr) as JsonValue;
+    return JSON.parse(bodyStr) as WidgetData;
   } catch {
     return bodyStr;
   }
@@ -405,7 +449,7 @@ function buildResFile(
       url,
       status,
       headers,
-      body: JSON.parse(text) as JsonValue,
+      body: JSON.parse(text) as WidgetData,
     };
   } catch {
     return { type: "text", url, status, headers, body: text };

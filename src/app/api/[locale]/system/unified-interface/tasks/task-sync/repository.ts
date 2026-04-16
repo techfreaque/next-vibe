@@ -26,11 +26,12 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { RemoteToolCapability } from "@/app/api/[locale]/user/remote-connection/db";
 import { RemoteToolCapabilitySchema } from "@/app/api/[locale]/user/remote-connection/db";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
 import { env } from "@/config/env";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
-import type { NewCronTask } from "../cron/db";
-import { cronTasks } from "../cron/db";
+import type { NewCronTask, TaskOwner } from "../cron/db";
+import { cronTasks, toDbUserId, dbUserIdToOwner } from "../cron/db";
 import {
   type CronTaskPriorityDB,
   CronTaskStatus,
@@ -38,7 +39,8 @@ import {
   type TaskOutputModeDB,
 } from "../enum";
 import { scopedTranslation } from "../i18n";
-import type { JsonValue, NotificationTarget } from "../unified-runner/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { NotificationTarget } from "../unified-runner/types";
 import type { SyncRequestOutput, SyncResponseOutput } from "./definition";
 import type { TaskSyncPullPostResponseOutput } from "./pull/definition";
 
@@ -59,12 +61,13 @@ interface SyncedCronTask {
   timeout: number | null;
   retries: number | null;
   retryDelay: number | null;
-  taskInput: Record<string, JsonValue>;
+  taskInput: Record<string, WidgetData>;
   runOnce: boolean;
   outputMode: (typeof TaskOutputModeDB)[number];
   notificationTargets: NotificationTarget[];
   tags: string[];
   targetInstance: string | null;
+  owner: TaskOwner;
   /** Revival context - typed columns for wakeUp/wait callback flow */
   wakeUpCallbackMode: string | null;
   wakeUpThreadId: string | null;
@@ -73,6 +76,7 @@ interface SyncedCronTask {
   wakeUpModelId: string | null;
   wakeUpSkillId: string | null;
   wakeUpFavoriteId: string | null;
+  wakeUpSubAgentDepth: number | null;
 }
 
 /**
@@ -108,7 +112,7 @@ export class TaskSyncRepository {
    * Parse a sync field that may arrive as a JSON string OR as a pre-parsed array
    * (Next.js request parser auto-deserialises JSON-looking string values).
    */
-  private static parseSyncField<T>(value: string | T[] | JsonValue): T[] {
+  private static parseSyncField<T>(value: string | T[] | WidgetData): T[] {
     if (Array.isArray(value)) {
       return value as T[];
     }
@@ -151,6 +155,7 @@ export class TaskSyncRepository {
       notificationTargets: task.notificationTargets,
       tags: task.tags,
       targetInstance: task.targetInstance,
+      owner: dbUserIdToOwner(task.userId),
       wakeUpCallbackMode: task.wakeUpCallbackMode ?? null,
       wakeUpThreadId: task.wakeUpThreadId ?? null,
       wakeUpToolMessageId: task.wakeUpToolMessageId ?? null,
@@ -158,6 +163,7 @@ export class TaskSyncRepository {
       wakeUpModelId: task.wakeUpModelId ?? null,
       wakeUpSkillId: task.wakeUpSkillId ?? null,
       wakeUpFavoriteId: task.wakeUpFavoriteId ?? null,
+      wakeUpSubAgentDepth: task.wakeUpSubAgentDepth ?? null,
     };
   }
 
@@ -210,7 +216,7 @@ export class TaskSyncRepository {
         // Old remotes may not send newer fields - skip undefined to avoid
         // overwriting local values with null/defaults.
         const definitionFields: Partial<
-          NewCronTask<Record<string, JsonValue>>
+          NewCronTask<Record<string, WidgetData>>
         > & { updatedAt: Date } = {
           displayName: remoteTask.displayName,
           description: remoteTask.description,
@@ -220,6 +226,7 @@ export class TaskSyncRepository {
           taskInput: remoteTask.taskInput,
           tags: remoteTask.tags,
           targetInstance: remoteTask.targetInstance,
+          userId: toDbUserId(remoteTask.owner),
           updatedAt: new Date(),
           // Revival context - preserve typed columns for wakeUp/wait callback flow
           wakeUpCallbackMode: remoteTask.wakeUpCallbackMode ?? null,
@@ -229,6 +236,7 @@ export class TaskSyncRepository {
           wakeUpModelId: remoteTask.wakeUpModelId ?? null,
           wakeUpSkillId: remoteTask.wakeUpSkillId ?? null,
           wakeUpFavoriteId: remoteTask.wakeUpFavoriteId ?? null,
+          wakeUpSubAgentDepth: remoteTask.wakeUpSubAgentDepth ?? null,
         };
         // Only include fields the remote explicitly sent
         if (remoteTask.version !== undefined) {
@@ -456,11 +464,8 @@ export class TaskSyncRepository {
 
           const headers: Record<string, string> = {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${conn.token}`,
+            Authorization: `Bearer ${conn.token}${BEARER_LEAD_ID_SEPARATOR}${conn.leadId}`,
           };
-          if (conn.leadId) {
-            headers.Cookie = `lead_id=${conn.leadId}`;
-          }
 
           // Send our LOCAL capabilities version so cloud can diff and store the snapshot.
           // conn.capabilitiesVersion on the dev side = last LOCAL version we successfully
@@ -686,7 +691,7 @@ export class TaskSyncRepository {
     summary: string;
     durationMs: number | null;
     executionId?: string;
-    output?: Record<string, JsonValue>;
+    output?: Record<string, WidgetData>;
     startedAt?: string;
     serverTimezone: string;
     executedByInstance: string | null;
@@ -720,11 +725,8 @@ export class TaskSyncRepository {
           );
           const headers: Record<string, string> = {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${conn.token}`,
+            Authorization: `Bearer ${conn.token}${BEARER_LEAD_ID_SEPARATOR}${conn.leadId}`,
           };
-          if (conn.leadId) {
-            headers.Cookie = `lead_id=${conn.leadId}`;
-          }
 
           const response = await fetch(reportUrl, {
             method: "POST",

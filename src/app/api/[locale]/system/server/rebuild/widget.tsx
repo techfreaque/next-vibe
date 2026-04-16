@@ -15,15 +15,10 @@ import {
   useWidgetForm,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type definition from "./definition";
-
-interface CustomWidgetProps {
-  field: {
-    value: typeof definition.POST.types.ResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
-}
 
 function formatDuration(ms: number): string {
   if (ms < 1000) {
@@ -37,11 +32,11 @@ function formatDuration(ms: number): string {
   return `${m}m ${s}s`;
 }
 
-export function RebuildWidget({ field }: CustomWidgetProps): JSX.Element {
+export function RebuildWidget(): JSX.Element {
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
   const t = useWidgetTranslation<typeof definition.POST>();
-  const value = field.value;
+  const value = useWidgetValue<typeof definition.POST>();
 
   if (!value) {
     return (

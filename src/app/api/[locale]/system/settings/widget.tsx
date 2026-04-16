@@ -40,25 +40,19 @@ import {
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import { ServerFramework } from "../server/enum";
 import type endpoints from "./definition";
-import type { SystemSettingsGetResponseOutput } from "./definition";
 import exportEnvEndpoints from "./export-env/definition";
 
 const SettingsWizard = React.lazy(() =>
   import("./widget-wizard").then((m) => ({ default: m.SettingsWizard })),
 );
 
-type Module = SystemSettingsGetResponseOutput["modules"][number];
+type Module = (typeof endpoints.GET.types.ResponseOutput)["modules"][number];
 type Setting = Module["settings"][number];
-
-interface WidgetProps {
-  field: {
-    value: SystemSettingsGetResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
-}
 
 const MODULE_LABEL_KEYS: Record<string, string> = {
   env: "widget.moduleLabels.env",
@@ -176,6 +170,39 @@ function SettingFieldInput({
         <Span className="text-xs text-muted-foreground font-mono">
           {checked ? t("widget.boolTrue") : t("widget.boolFalse")}
         </Span>
+      </Div>
+    );
+  }
+
+  // Log path: switch to enable/disable + path input when enabled
+  if (setting.fieldType === "log-path") {
+    const enabled = displayValue !== "false";
+    const pathValue = enabled ? displayValue : ".tmp";
+    return (
+      <Div className="flex items-center gap-2 w-full">
+        <Switch
+          checked={enabled}
+          onCheckedChange={(v: boolean): void =>
+            onEdit(setting.key, v ? pathValue : "false")
+          }
+        />
+        {enabled ? (
+          <Input
+            className={cn(
+              "h-7 text-xs font-mono flex-1",
+              isEdited && "border-primary",
+            )}
+            value={pathValue}
+            placeholder=".tmp"
+            onChange={(e: InputChangeEvent): void =>
+              onEdit(setting.key, String(e.target.value ?? "") || ".tmp")
+            }
+          />
+        ) : (
+          <Span className="text-xs text-muted-foreground">
+            {t("widget.logPathDisabled")}
+          </Span>
+        )}
       </Div>
     );
   }
@@ -338,8 +365,8 @@ function ModuleCard({
   );
 }
 
-export function SystemSettingsWidget({ field }: WidgetProps): JSX.Element {
-  const value = field.value;
+export function SystemSettingsWidget(): JSX.Element {
+  const value = useWidgetValue<typeof endpoints.GET>();
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();

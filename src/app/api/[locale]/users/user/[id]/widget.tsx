@@ -29,38 +29,29 @@ import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
-import { EmailFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/email-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { UuidFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/uuid-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
+import { EmailFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/email-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { UuidFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/uuid-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";
 
-type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
-type PutResponseOutput = typeof definition.PUT.types.ResponseOutput;
-type DeleteResponseOutput = typeof definition.DELETE.types.ResponseOutput;
-
 interface GetWidgetProps {
-  field: {
-    value: GetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 interface PutWidgetProps {
-  field: {
-    value: PutResponseOutput | null | undefined;
-  } & (typeof definition.PUT)["fields"];
+  field: (typeof definition.PUT)["fields"];
 }
 
 interface DeleteWidgetProps {
-  field: {
-    value: DeleteResponseOutput | null | undefined;
-  } & (typeof definition.DELETE)["fields"];
+  field: (typeof definition.DELETE)["fields"];
 }
 
 const ROLE_COLORS: Record<string, string> = {
@@ -76,7 +67,7 @@ export function UserDetailContainer({
   field,
 }: GetWidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.GET>();
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
   const { push: navigate } = useWidgetNavigation();
@@ -448,7 +439,7 @@ export function UserEditContainer({
   field,
 }: PutWidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.PUT>();
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
   const { push: navigate } = useWidgetNavigation();
@@ -720,7 +711,7 @@ export function UserDeleteContainer({
   field,
 }: DeleteWidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.DELETE>();
   const t = useWidgetTranslation<typeof definition.DELETE>();
 
   return (

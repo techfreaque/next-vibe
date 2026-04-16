@@ -341,8 +341,14 @@ const { POST } = createEndpoint({
               updatedAt: dateSchema.nullable(),
               // Tool messages in incognito mode may send content as an array
               // (AI SDK multi-part content format). Accept and coerce to JSON string.
+              // Plain objects (e.g. {type:"text",text:"..."}) also need coercion.
               content: z
-                .union([z.string(), z.array(z.unknown()), z.null()])
+                .union([
+                  z.string(),
+                  z.array(z.unknown()),
+                  z.record(z.string(), z.unknown()),
+                  z.null(),
+                ])
                 .transform((v) =>
                   typeof v === "string" || v === null ? v : JSON.stringify(v),
                 )

@@ -12,6 +12,7 @@ import { Environment, parseError } from "next-vibe/shared/utils";
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
   AUTH_TOKEN_COOKIE_NAME,
+  BEARER_LEAD_ID_SEPARATOR,
   LEAD_ID_COOKIE_NAME,
 } from "@/config/constants";
 import { env } from "@/config/env";
@@ -31,8 +32,13 @@ import {
  */
 export class WebAuthHandler extends BaseAuthHandler {
   /**
-   * Get authentication token from web storage
-   * Checks: Authorization header → HTTP-only cookies
+   * Get authentication token from web storage.
+   * Checks: Authorization header → HTTP-only cookies.
+   *
+   * Bearer format supports an embedded leadId suffix for cross-origin callers:
+   *   "Bearer <jwtToken>####<leadId>"  — authenticated user
+   *   "Bearer ####<leadId>"            — public user (no JWT, leadId only)
+   * The suffix is stripped here; leadId extraction happens in authenticate().
    */
   async getStoredAuthToken(
     context: AuthContext,
@@ -42,9 +48,15 @@ export class WebAuthHandler extends BaseAuthHandler {
     if (context.request) {
       const authHeader = context.request.headers.get("authorization");
       if (authHeader?.startsWith("Bearer ")) {
-        const token = authHeader.slice(7); // Remove "Bearer " prefix
-        logger.debug("Found auth token in Authorization header");
-        return token;
+        const raw = authHeader.slice(7); // Remove "Bearer " prefix
+        // Strip optional ####<leadId> suffix - only the JWT part goes to verifyJwt
+        const token = raw.split(BEARER_LEAD_ID_SEPARATOR)[0];
+        if (token) {
+          logger.debug("Found auth token in Authorization header");
+          return token;
+        }
+        // "Bearer ####<leadId>" case - no JWT, public user with leadId only
+        return undefined;
       }
     }
 

@@ -4,25 +4,25 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
-import { useWidgetForm } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
-import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import {
+  useWidgetForm,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
+import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/widget";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import { SshAuthType } from "../../enum";
 import type endpoints from "./definition";
-import type { ConnectionDetailResponseOutput } from "./definition";
 
 interface CustomWidgetProps {
-  field: {
-    value: ConnectionDetailResponseOutput | null | undefined;
-  } & (typeof endpoints.PATCH)["fields"];
+  field: (typeof endpoints.PATCH)["fields"];
 }
 
 export function ConnectionDetailContainer({
@@ -31,10 +31,11 @@ export function ConnectionDetailContainer({
   const children = field.children;
   const form = useWidgetForm<typeof endpoints.PATCH>();
   const emptyField = useMemo(() => ({}), []);
+  const loadedData = useWidgetValue<typeof endpoints.GET>();
 
   // Watch authType reactively; fall back to loaded value before form initialises
   const watchedAuthType = form.watch("authType");
-  const authType = watchedAuthType ?? field.value?.authType;
+  const authType = watchedAuthType ?? loadedData?.authType;
   const isLocal = authType === SshAuthType.LOCAL;
   const isKeyAgent = authType === SshAuthType.KEY_AGENT;
 

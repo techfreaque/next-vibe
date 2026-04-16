@@ -11,7 +11,7 @@ import { H1, H2, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useLogger } from "@/hooks/use-logger";
 import type { CreatorGetResponseOutput } from "@/app/api/[locale]/user/public/creator/[userId]/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -23,7 +23,7 @@ import {
   ProfileSocialPills,
   type ProfileSkillItem,
 } from "./_shared/profile-content";
-import type { CreatorPageT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 
 export interface CreatorLeadMagnetConfig {
   headline: string | null;
@@ -45,13 +45,12 @@ function CreatorLeadCaptureForm({
   skillId,
   config,
   locale,
-  t,
 }: {
   skillId: string;
   config: CreatorLeadMagnetConfig;
   locale: CountryLanguage;
-  t: CreatorPageT;
 }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   const [state, setState] = useState<CaptureState>("idle");
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
@@ -67,7 +66,7 @@ function CreatorLeadCaptureForm({
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
           import("@/app/api/[locale]/lead-magnet/capture/definition"),
         ]);
-        const logger = createEndpointLogger(false, Date.now(), locale);
+        const logger = useLogger();
         const result = await apiClient.mutate(
           captureDef.POST,
           logger,
@@ -180,8 +179,8 @@ export function CreatorProfilePage({
   skills,
   appName,
   leadMagnetConfig,
-  t,
-}: CreatorPageData & { t: CreatorPageT }): JSX.Element {
+}: CreatorPageData): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   if (!creator) {
     return (
       <Div
@@ -313,7 +312,6 @@ export function CreatorProfilePage({
               skillId={skills[0].id}
               config={leadMagnetConfig}
               locale={locale}
-              t={t}
             />
           </Div>
         )}

@@ -15,13 +15,12 @@ import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
 import type { WidgetType } from "../../../shared/types/enums";
 import type { Platform } from "../../../shared/types/platform";
 import type { ServerDefaultContext } from "../../../shared/types/server-default";
-import type { JsonValue } from "../../../tasks/unified-runner/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   DisplayOnlyWidgetConfig,
   ObjectWidgetConfig,
   UnifiedField,
 } from "../../../shared/widgets/configs";
-import type { WidgetData } from "../../../shared/widgets/widget-data";
 
 /**
  * Base widget renderer props (before value is added to field)
@@ -120,13 +119,7 @@ export interface BaseWidgetContext<TEndpoint extends CreateApiEndpointAny> {
   user: JwtPayloadType;
   logger: EndpointLogger;
 
-  platform:
-    | typeof Platform.TRPC
-    | typeof Platform.NEXT_PAGE
-    | typeof Platform.NEXT_API
-    | typeof Platform.CLI
-    | typeof Platform.CLI_PACKAGE
-    | typeof Platform.MCP;
+  platform: Platform;
   endpointFields: TEndpoint["fields"]; // Original endpoint fields for nested path lookup
   disabled: boolean; // Disable all form inputs
   response: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined; // Full ResponseType from endpoint (includes success/error state)
@@ -179,15 +172,6 @@ export interface BaseWidgetContext<TEndpoint extends CreateApiEndpointAny> {
    * When true, container widgets should filter out request fields
    */
   responseOnly?: boolean;
-  /**
-   * Button rendering state - tracks if submit/back buttons have been rendered
-   * Used to prevent duplicate buttons in nested containers
-   * Containers check and set these flags to coordinate button rendering
-   */
-  buttonState?: {
-    hasRenderedSubmitButton: boolean;
-    hasRenderedBackButton: boolean;
-  };
 }
 
 export type SchemaTypes =
@@ -254,7 +238,7 @@ export interface BaseWidgetConfig<
    *
    * Co-locates the "resolve value when hidden" logic directly on the field.
    */
-  serverDefault?: (ctx: ServerDefaultContext) => JsonValue | undefined;
+  serverDefault?: (ctx: ServerDefaultContext) => WidgetData | undefined;
 }
 
 export interface BasePrimitiveWidgetConfig<

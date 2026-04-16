@@ -29,9 +29,10 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { DateFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/date-field/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { DateFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/date-field/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
 import { PulseExecutionStatus } from "../../enum";
 import type endpoints from "./definition";
@@ -40,9 +41,7 @@ import type { PulseHistoryResponseOutput } from "./definition";
 type Execution = PulseHistoryResponseOutput["executions"][number];
 
 interface WidgetProps {
-  field: {
-    value: PulseHistoryResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
+  field: (typeof endpoints.GET)["fields"];
 }
 
 // ---------------------------------------------------------------------------
@@ -355,15 +354,12 @@ export function PulseHistoryContainer({
   const statusFilter = form.watch("status") ?? "ALL";
   const offset = form.watch("offset") ?? 0;
 
-  const value = field.value;
-  const summary = value?.summary;
-  const totalCount = value?.totalCount ?? 0;
+  const data = useWidgetValue<typeof endpoints.GET>();
+  const summary = data?.summary;
+  const totalCount = data?.totalCount ?? 0;
   const isLoading = endpointMutations?.read?.isLoading;
 
-  const executions = useMemo(
-    () => value?.executions ?? [],
-    [value?.executions],
-  );
+  const executions = useMemo(() => data?.executions ?? [], [data?.executions]);
 
   const statusCounts = useMemo((): Record<StatusFilter, number> => {
     const counts: Record<StatusFilter, number> = {

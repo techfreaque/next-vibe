@@ -319,7 +319,7 @@ export class MessagesRepository {
     threadId: string;
     content: string;
     parentId: string | null;
-    userId: string | undefined;
+    user: JwtPayloadType;
     errorType: string;
     errorDetails?: Record<string, string | number | boolean | null>;
     sequenceId?: string | null;
@@ -346,7 +346,7 @@ export class MessagesRepository {
       role: ChatMessageRole.ERROR,
       content: params.content,
       parentId: params.parentId,
-      authorId: params.userId ?? null,
+      authorId: params.user.id ?? null,
       isAI: false,
       sequenceId: params.sequenceId ?? null,
       metadata,
@@ -356,7 +356,7 @@ export class MessagesRepository {
       messageId: params.messageId,
       threadId: params.threadId,
       errorType: params.errorType,
-      userId: params.userId ?? "public",
+      userId: params.user.id ?? "public",
     });
   }
 
@@ -612,7 +612,11 @@ export class MessagesRepository {
       });
 
       // Return messages directly - let type system handle transformations
-      return success({ messages, backgroundTasks });
+      return success({
+        streamingState: "idle" as const,
+        messages,
+        backgroundTasks,
+      });
     } catch (error) {
       logger.error("Error listing messages", parseError(error));
       return fail({

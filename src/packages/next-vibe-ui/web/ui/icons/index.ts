@@ -216,6 +216,7 @@ export { TrendingUpIcon } from "./TrendingUpIcon";
 export { Trophy } from "./Trophy";
 export { Tv } from "./Tv";
 export { Twitter } from "./Twitter";
+export { TayLogo } from "./TayLogo";
 export { Type } from "./Type";
 export { UncensoredAILogo } from "./UncensoredAILogo";
 export { Upload } from "./Upload";

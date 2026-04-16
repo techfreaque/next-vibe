@@ -236,8 +236,9 @@ export async function middleware(
     const isApiRoute = path.startsWith("/api/");
 
     if (isApiRoute) {
-      // If the request carries a Bearer token, the JWT inside already contains
-      // a leadId - the route handler will authenticate via the token. Pass through.
+      // If the request carries a Bearer token, the leadId is embedded either
+      // in the JWT payload or as a "####<leadId>" suffix after the token.
+      // The route handler extracts both - pass through without cookie check.
       const authHeader = request.headers.get("authorization");
       if (authHeader?.startsWith("Bearer ")) {
         const bearerResp = NextResponseClass.next();

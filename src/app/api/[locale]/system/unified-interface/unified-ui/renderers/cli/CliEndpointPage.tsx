@@ -1,31 +1,31 @@
 /**
  * Ink Endpoint Page
  *
- * Thin wrapper around InkEndpointRenderer for interactive terminal UI.
+ * Thin wrapper around EndpointsPage for interactive terminal UI.
  * Uses the exact same widget rendering system as non-interactive CLI,
  * but with real Ink render() instead of fastRenderToString().
  */
 
 import { Box, render, Text, useApp, useInput } from "ink";
 import type { JSX } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import { parseError } from "@/app/api/[locale]/shared/utils";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { scopedTranslation as cliScopedTranslation } from "../../../cli/i18n";
 import { Platform } from "../../../shared/types/platform";
-import type { WidgetData } from "../../../shared/widgets/widget-data";
-import { InkEndpointRenderer } from "./CliEndpointRenderer";
+import { QueryProvider } from "../../../react/hooks/query-provider";
+import { LoggerProvider } from "@/hooks/use-logger";
+import { EndpointsPage } from "../react/EndpointsPage";
 
 /**
  * Ink Endpoint Page Props
  */
-export interface InkEndpointPageProps<
+interface InkEndpointPageProps<
   T extends {
     GET?: CreateApiEndpointAny;
     POST?: CreateApiEndpointAny;
@@ -42,30 +42,8 @@ export interface InkEndpointPageProps<
   user: JwtPayloadType;
   /** Enable debug logging */
   debug?: boolean;
-  /** Submit handler - executes the endpoint */
-  onSubmit?: (data: WidgetData) => Promise<ResponseType<WidgetData>>;
   /** Initial data from CLI args to prefill request fields */
   initialData?: WidgetData;
-}
-
-/**
- * Check if a GET endpoint has auto-fetch enabled (default: true).
- * Endpoints like search set options.queryOptions.enabled = false to wait for user input.
- */
-function isAutoFetchEnabled(endpoint: CreateApiEndpointAny): boolean {
-  if (
-    "options" in endpoint &&
-    endpoint.options &&
-    typeof endpoint.options === "object" &&
-    "queryOptions" in endpoint.options &&
-    endpoint.options.queryOptions &&
-    typeof endpoint.options.queryOptions === "object" &&
-    "enabled" in endpoint.options.queryOptions &&
-    endpoint.options.queryOptions.enabled === false
-  ) {
-    return false;
-  }
-  return true;
 }
 
 /**
@@ -125,10 +103,9 @@ function buildExampleCommand(
 /**
  * Ink Endpoint Page Component
  *
- * Uses InkEndpointRenderer (same widget system as non-interactive CLI).
- * Only adds: endpoint header, submit execution, quit handling, auto-fetch.
+ * Wraps EndpointsPage with Ink chrome: header box, footer hints, quit handling.
  */
-export function InkEndpointPage<
+function InkEndpointPage<
   T extends {
     GET?: CreateApiEndpointAny;
     POST?: CreateApiEndpointAny;
@@ -141,16 +118,9 @@ export function InkEndpointPage<
   locale,
   user,
   debug = false,
-  onSubmit,
   initialData,
 }: InkEndpointPageProps<T>): JSX.Element {
   const { exit } = useApp();
-
-  const [response, setResponse] = useState<
-    ResponseType<WidgetData> | undefined
-  >(undefined);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formValues, setFormValues] = useState<Record<string, WidgetData>>({});
 
   const activeEndpoint =
     endpoint.GET ??
@@ -163,34 +133,6 @@ export function InkEndpointPage<
   const loggerRef = useRef(createEndpointLogger(debug, Date.now(), locale));
   const logger = loggerRef.current;
 
-  const handleSubmit = useCallback(
-    async (data: WidgetData): Promise<void> => {
-      if (!onSubmit) {
-        return;
-      }
-      setIsSubmitting(true);
-      try {
-        const result = await onSubmit(data);
-        setResponse(result);
-      } catch (error) {
-        logger.error("Submit failed", parseError(error));
-      } finally {
-        setIsSubmitting(false);
-      }
-    },
-    [onSubmit, logger],
-  );
-
-  // Auto-fetch: GET endpoints auto-submit unless queryOptions.enabled === false
-  const shouldAutoFetch = !!endpoint.GET && isAutoFetchEnabled(endpoint.GET);
-  const hasAutoFetched = useRef(false);
-  useEffect(() => {
-    if (shouldAutoFetch && !hasAutoFetched.current && onSubmit && !response) {
-      hasAutoFetched.current = true;
-      void handleSubmit(initialData ?? {});
-    }
-  }, [shouldAutoFetch, onSubmit, response, handleSubmit, initialData]);
-
   // Quit handler - Escape only (not "q" which would fire while typing in text fields)
   useInput(
     // eslint-disable-next-line no-unused-vars -- useInput requires (input, key) signature
@@ -199,15 +141,15 @@ export function InkEndpointPage<
         exit();
       }
     },
-    { isActive: !isSubmitting },
   );
 
-  // Example CLI command based on current form input - must be before early return
+  // Example CLI command based on endpoint path
   const exampleCommand = useMemo(
-    () =>
-      activeEndpoint ? buildExampleCommand(activeEndpoint, formValues) : "",
-    [activeEndpoint, formValues],
+    () => (activeEndpoint ? buildExampleCommand(activeEndpoint, {}) : ""),
+    [activeEndpoint],
   );
+
+  const { t: cliT } = cliScopedTranslation.scopedT(locale);
 
   if (!activeEndpoint) {
     return (
@@ -221,36 +163,7 @@ export function InkEndpointPage<
     );
   }
 
-  // Response data for widgets - mirrors React EndpointsPage pattern
-  const responseData = response?.success === true ? response.data : initialData;
-
-  // Full-takeover CLI widget: skip header/border, render directly
-  const rootRender = (
-    activeEndpoint.fields as { render?: { cliWidget?: boolean } }
-  ).render;
-  if (rootRender?.cliWidget === true) {
-    return (
-      <InkEndpointRenderer
-        endpoint={activeEndpoint}
-        locale={locale}
-        data={responseData}
-        isSubmitting={isSubmitting}
-        logger={logger}
-        user={user}
-        platform={Platform.CLI}
-        response={response}
-        onFormChange={setFormValues}
-        onSubmit={(data): void => {
-          void handleSubmit(data as WidgetData);
-        }}
-      />
-    );
-  }
-
   const { t } = activeEndpoint.scopedTranslation.scopedT(locale);
-  const { t: cliT } = cliScopedTranslation.scopedT(locale);
-
-  // Endpoint info
   const title = t(activeEndpoint.title);
   const description = t(activeEndpoint.description);
   const method = activeEndpoint.method;
@@ -281,57 +194,46 @@ export function InkEndpointPage<
         </Box>
       </Box>
 
-      {/* Endpoint fields - rendered by the widget system */}
+      {/* Endpoint fields - rendered by EndpointsPage */}
       <Box
         borderStyle="round"
-        borderColor={response?.success === false ? "red" : "green"}
+        borderColor="green"
         paddingX={1}
         paddingY={1}
         marginTop={1}
         flexDirection="column"
       >
-        <InkEndpointRenderer
-          endpoint={activeEndpoint}
+        <EndpointsPage
+          endpoint={endpoint as never}
           locale={locale}
-          data={responseData}
-          isSubmitting={isSubmitting}
-          logger={logger}
           user={user}
+          logger={logger}
           platform={Platform.CLI}
-          response={response}
-          onFormChange={setFormValues}
-          onSubmit={(data): void => {
-            void handleSubmit(data as WidgetData);
-          }}
+          endpointOptions={
+            initialData && activeEndpoint
+              ? activeEndpoint.method === "GET"
+                ? { read: { initialData: initialData as never } }
+                : activeEndpoint.method === "DELETE"
+                  ? {
+                      delete: {
+                        urlPathParams: initialData as never,
+                        autoPrefillData: initialData as never,
+                      },
+                    }
+                  : activeEndpoint.method === "PATCH"
+                    ? { update: { autoPrefillData: initialData as never } }
+                    : { create: { autoPrefillData: initialData as never } }
+              : undefined
+          }
         />
       </Box>
-
-      {/* Submitting indicator */}
-      {isSubmitting && (
-        <Box marginTop={1}>
-          <Text color="yellow">
-            {cliT(
-              "vibe.endpoints.renderers.cliUi.widgets.common.hints.executing",
-            )}
-          </Text>
-        </Box>
-      )}
-
-      {/* Error display */}
-      {response && !response.success && (
-        <Box marginTop={1}>
-          <Text color="red">{t(response.message, response.messageParams)}</Text>
-        </Box>
-      )}
 
       {/* Footer */}
       <Box marginTop={1}>
         <Text dimColor>
-          {response
-            ? `${cliT("response.success")} | enter: re-submit | esc: exit`
-            : cliT(
-                "vibe.endpoints.renderers.cliUi.widgets.common.hints.tabNextField",
-              )}
+          {cliT(
+            "vibe.endpoints.renderers.cliUi.widgets.common.hints.tabNextField",
+          )}
         </Text>
       </Box>
     </Box>
@@ -351,6 +253,12 @@ export async function renderInkEndpointPage<
     DELETE?: CreateApiEndpointAny;
   },
 >(props: InkEndpointPageProps<T>): Promise<void> {
-  const instance = render(<InkEndpointPage {...props} />);
+  const instance = render(
+    <LoggerProvider locale={props.locale}>
+      <QueryProvider>
+        <InkEndpointPage {...props} />
+      </QueryProvider>
+    </LoggerProvider>,
+  );
   await instance.waitUntilExit();
 }

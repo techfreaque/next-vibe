@@ -15,18 +15,16 @@ import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import { MessageStatus } from "../enum";
 import type definition from "./definition";
-import type { EmailGetResponseOutput } from "./definition";
 
 interface CustomWidgetProps {
-  field: {
-    value: EmailGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -63,11 +61,12 @@ export function EmailDetailContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const email = field.value?.email;
+  const value = useWidgetValue<typeof definition.GET>();
+  const email = value?.email;
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
   const { push: navigate } = useWidgetNavigation();
-  const isLoading = field.value === null || field.value === undefined;
+  const isLoading = value === null || value === undefined;
 
   const handleViewLead = (): void => {
     if (!email?.leadId) {

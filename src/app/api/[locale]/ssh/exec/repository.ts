@@ -74,7 +74,7 @@ export class SshExecRepository {
     logger: EndpointLogger,
     user: JwtPayloadType,
     t: SshExecT,
-    streamContext: ToolExecutionContext,
+    streamContext?: ToolExecutionContext,
   ): Promise<ResponseType<SshExecResponseOutput>> {
     const timeoutMs =
       data.timeoutMs ?? SshExecRepository.LOCAL_DEFAULT_TIMEOUT_MS;
@@ -95,7 +95,7 @@ export class SshExecRepository {
     // Only applies in streaming contexts where escalateToTask is available.
     if (
       timeoutMs > SshExecRepository.ESCALATE_THRESHOLD_MS &&
-      streamContext?.escalateToTask
+      streamContext.escalateToTask
     ) {
       const { taskId, onComplete } = await streamContext.escalateToTask();
       logger.info("[SshExec] Escalated long-running command to wakeUp task", {

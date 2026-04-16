@@ -26,7 +26,7 @@ export class AdminAddCreditsRepository {
   ): Promise<ResponseType<AdminAddCreditsPostResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     const result = await CreditRepository.addCredits(
-      { userId: data.targetUserId },
+      { userId: data.targetUserId, leadId: data.targetUserId },
       data.amount,
       "bonus",
       logger,

@@ -91,11 +91,15 @@ const { POST } = createEndpoint({
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
         schema: z.enum(VideoGenModelId).default(VideoGenModelId.WAN_2_7_T2V),
         serverDefault: (ctx) => {
-          const sel = ctx.streamContext?.videoGenModelSelection;
+          const sel = ctx.streamContext.videoGenModelSelection;
           if (!sel || !ctx.user) {
             return undefined;
           }
-          return getBestVideoGenModel(sel, ctx.user)?.id;
+          return getBestVideoGenModel(
+            sel,
+            ctx.user,
+            ctx.streamContext.providerOverride,
+          )?.id;
         },
       }),
       duration: requestField(scopedTranslation, {

@@ -43,20 +43,17 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
 import type definition from "./definition";
 
-type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
-
 interface CustomWidgetProps {
-  field: {
-    value: GetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 // ─── Trend computation ────────────────────────────────────────────────────────
@@ -367,7 +364,7 @@ function ConversionFunnel({
   funnelTitle,
   stageLabels,
 }: {
-  data: GetResponseOutput | null | undefined;
+  data: typeof definition.GET.types.ResponseOutput | null | undefined;
   funnelTitle: string;
   stageLabels: {
     totalLeads: string;
@@ -381,7 +378,7 @@ function ConversionFunnel({
   }
 
   const funnelStages: Array<{
-    key: keyof GetResponseOutput;
+    key: keyof typeof definition.GET.types.ResponseOutput;
     label: string;
     color: string;
   }> = [
@@ -563,7 +560,7 @@ export function LeadsStatsContainer({
   const form = useWidgetForm<typeof definition.GET>();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.GET>();
 
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();

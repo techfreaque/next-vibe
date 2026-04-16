@@ -10,10 +10,19 @@
 
 import type { LoggerMetadata } from "./endpoint";
 
-const _dot = process.env["DEBUG_DOT"] ?? ".";
-const DEBUG_DIR = `${_dot}tmp`;
+// File names — fixed
 const DEBUG_FILE = "vibe-mcp.log";
 const DEV_LOG_FILE = "vibe-dev.log";
+const START_LOG_FILE = "vibe-start.log";
+
+// Read VIBE_LOG_PATH at call time (not module init) so loadEnvironment() can set it first.
+function getLogDir(): string | null {
+  const p = process.env["VIBE_LOG_PATH"];
+  if (!p || p === "false") {
+    return null;
+  }
+  return p;
+}
 
 const _ESC = String.fromCodePoint(0x1b);
 const _ansiRe = new RegExp(`${_ESC}\\[[0-9;]*m`, "g");
@@ -34,20 +43,40 @@ void loadFs().then((m) => {
 const getFs = (): Promise<FsModule> =>
   _fsCache ? Promise.resolve(_fsCache) : loadFs();
 
-async function getLogFilePath(filename: string): Promise<string> {
+async function getLogFilePath(filename: string): Promise<string | null> {
+  const logDir = getLogDir();
+  if (!logDir) {
+    return null;
+  }
   const { existsSync, mkdirSync } = await getFs();
   const projectRoot = process.env["PROJECT_ROOT"] ?? process.cwd();
-  const debugDir = `${projectRoot}/${DEBUG_DIR}`;
+  const debugDir = logDir.startsWith("/") ? logDir : `${projectRoot}/${logDir}`;
   if (!existsSync(debugDir)) {
     try {
       mkdirSync(debugDir, { recursive: true });
     } catch (error) {
       process.stderr.write(
-        `Failed to create debug dir at ${debugDir}: ${String(error)}\n`,
+        `Failed to create log dir at ${debugDir}: ${String(error)}\n`,
       );
     }
   }
   return `${debugDir}/${filename}`;
+}
+
+function getLogDirSync(fs: {
+  existsSync: (p: string) => boolean;
+  mkdirSync: (p: string, opts: { recursive: boolean }) => void;
+}): string | null {
+  const logDir = getLogDir();
+  if (!logDir) {
+    return null;
+  }
+  const projectRoot = process.env["PROJECT_ROOT"] ?? process.cwd();
+  const debugDir = logDir.startsWith("/") ? logDir : `${projectRoot}/${logDir}`;
+  if (!fs.existsSync(debugDir)) {
+    fs.mkdirSync(debugDir, { recursive: true });
+  }
+  return debugDir;
 }
 
 /**
@@ -60,11 +89,15 @@ export async function fileLog(
 ): Promise<void> {
   try {
     const { appendFileSync } = await getFs();
+    const path = await getLogFilePath(DEBUG_FILE);
+    if (!path) {
+      return;
+    }
     const timestamp = new Date().toISOString();
     const logEntry = data
       ? `[${timestamp}] ${message}\n${JSON.stringify(data, null, 2)}\n\n`
       : `[${timestamp}] ${message}\n\n`;
-    appendFileSync(await getLogFilePath(DEBUG_FILE), logEntry, "utf-8");
+    appendFileSync(path, logEntry, "utf-8");
   } catch (error) {
     process.stderr.write(`File log failed: ${String(error)}\n`);
   }
@@ -79,12 +112,16 @@ export async function devFileLog(
   data?: Record<string, LoggerMetadata>,
 ): Promise<void> {
   try {
+    const path = await getLogFilePath(DEV_LOG_FILE);
+    if (!path) {
+      return;
+    }
     const { appendFileSync } = await getFs();
     const clean = stripAnsi(message);
     const logEntry = data
       ? `${clean}\n${JSON.stringify(data, null, 2)}\n`
       : `${clean}\n`;
-    appendFileSync(await getLogFilePath(DEV_LOG_FILE), logEntry, "utf-8");
+    appendFileSync(path, logEntry, "utf-8");
   } catch (error) {
     process.stderr.write(`Dev file log failed: ${String(error)}\n`);
   }
@@ -95,10 +132,75 @@ export async function devFileLog(
  */
 export async function truncateDevLog(): Promise<void> {
   try {
+    const path = await getLogFilePath(DEV_LOG_FILE);
+    if (!path) {
+      return;
+    }
     const { writeFileSync } = await getFs();
-    writeFileSync(await getLogFilePath(DEV_LOG_FILE), "", "utf-8");
+    writeFileSync(path, "", "utf-8");
   } catch (error) {
     process.stderr.write(`Failed to truncate dev log: ${String(error)}\n`);
+  }
+}
+
+/**
+ * Append a log entry to the production server log file (.tmp/vibe-start.log).
+ * Called additively alongside console output - never suppresses terminal output.
+ */
+export async function startFileLog(
+  message: string,
+  data?: Record<string, LoggerMetadata>,
+): Promise<void> {
+  try {
+    const path = await getLogFilePath(START_LOG_FILE);
+    if (!path) {
+      return;
+    }
+    const { appendFileSync } = await getFs();
+    const clean = stripAnsi(message);
+    const logEntry = data
+      ? `${clean}\n${JSON.stringify(data, null, 2)}\n`
+      : `${clean}\n`;
+    appendFileSync(path, logEntry, "utf-8");
+  } catch (error) {
+    process.stderr.write(`Start file log failed: ${String(error)}\n`);
+  }
+}
+
+/**
+ * Truncate (empty) the start log file - called at the start of each `vibe start` session.
+ */
+export async function truncateStartLog(): Promise<void> {
+  try {
+    const path = await getLogFilePath(START_LOG_FILE);
+    if (!path) {
+      return;
+    }
+    const { writeFileSync } = await getFs();
+    writeFileSync(path, "", "utf-8");
+  } catch (error) {
+    process.stderr.write(`Failed to truncate start log: ${String(error)}\n`);
+  }
+}
+
+/**
+ * Write an offline hint to the start log file - called on shutdown.
+ * Uses cached node:fs to work in synchronous process.on("exit") handlers.
+ */
+export function writeStartLogOfflineHint(): void {
+  try {
+    const fs = _fsCache;
+    if (!fs) {
+      return;
+    }
+    const debugDir = getLogDirSync(fs);
+    if (!debugDir) {
+      return;
+    }
+    const hint = `--- server offline --- run \`vibe start\` to restart\n`;
+    fs.appendFileSync(`${debugDir}/${START_LOG_FILE}`, hint, "utf-8");
+  } catch {
+    // Best effort - process is exiting anyway
   }
 }
 
@@ -112,11 +214,72 @@ export function writeDevLogOfflineHint(): void {
     if (!fs) {
       return;
     }
-    const projectRoot = process.env["PROJECT_ROOT"] ?? process.cwd();
-    const debugDir = `${projectRoot}/${DEBUG_DIR}`;
+    const debugDir = getLogDirSync(fs);
+    if (!debugDir) {
+      return;
+    }
     const hint = `--- server offline --- run \`vibe dev\` to restart\n`;
     fs.appendFileSync(`${debugDir}/${DEV_LOG_FILE}`, hint, "utf-8");
   } catch {
     // Best effort - process is exiting anyway
+  }
+}
+
+/**
+ * Append a log entry to a per-tab client log file (.tmp/vibe-client-{tabId}.log).
+ * Called from the client-log API endpoint when a browser tab reports an error/warn.
+ */
+export async function clientFileLog(
+  tabId: string,
+  message: string,
+  data?: Record<string, LoggerMetadata>,
+): Promise<void> {
+  try {
+    const path = await getLogFilePath(`vibe-client-${tabId}.log`);
+    if (!path) {
+      return;
+    }
+    const { appendFileSync } = await getFs();
+    const clean = stripAnsi(message);
+    const logEntry = data
+      ? `${clean}\n${JSON.stringify(data, null, 2)}\n`
+      : `${clean}\n`;
+    appendFileSync(path, logEntry, "utf-8");
+  } catch (error) {
+    process.stderr.write(`Client file log failed: ${String(error)}\n`);
+  }
+}
+
+/**
+ * Delete all vibe-client-*.log files — called on server start to clean up stale tab logs.
+ */
+export async function truncateClientLogs(): Promise<void> {
+  try {
+    const logDir = getLogDir();
+    if (!logDir) {
+      return;
+    }
+    const { readdirSync, unlinkSync } = await getFs();
+    const projectRoot = process.env["PROJECT_ROOT"] ?? process.cwd();
+    const debugDir = logDir.startsWith("/")
+      ? logDir
+      : `${projectRoot}/${logDir}`;
+    let files: string[];
+    try {
+      files = readdirSync(debugDir);
+    } catch {
+      return; // dir doesn't exist yet — nothing to clean
+    }
+    for (const file of files) {
+      if (file.startsWith("vibe-client-") && file.endsWith(".log")) {
+        try {
+          unlinkSync(`${debugDir}/${file}`);
+        } catch {
+          // best effort
+        }
+      }
+    }
+  } catch (error) {
+    process.stderr.write(`Failed to truncate client logs: ${String(error)}\n`);
   }
 }

@@ -29,11 +29,12 @@ import {
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { DateFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/date-field/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import { DateFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/date-field/widget";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
 
 import type endpoints from "./definition";
 import type { ErrorLogsResponseOutput } from "./definition";
@@ -41,9 +42,7 @@ import type { ErrorLogsResponseOutput } from "./definition";
 type ErrorLog = ErrorLogsResponseOutput["logs"][number];
 
 interface WidgetProps {
-  field: {
-    value: ErrorLogsResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
+  field: (typeof endpoints.GET)["fields"];
 }
 
 const LIMIT = 50;
@@ -228,7 +227,7 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
     null,
   );
 
-  const value = field.value;
+  const value = useWidgetValue<typeof endpoints.GET>();
   const totalCount = value?.totalCount ?? 0;
   const logs = value?.logs ?? [];
 

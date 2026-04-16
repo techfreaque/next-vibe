@@ -10,6 +10,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   EndpointErrorTypes,
@@ -23,25 +24,9 @@ import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { callApi, containsFile, objectToFormData } from "./api-utils";
 
 /**
- * JSON-serializable value type for request/response data
+ * Type guard to check if a value is a Record<string, WidgetData>
  */
-type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | undefined
-  | JsonValue[]
-  | { [key: string]: JsonValue };
-
-interface JsonObject {
-  [key: string]: JsonValue;
-}
-
-/**
- * Type guard to check if a value is a JsonObject
- */
-function isJsonObject(value: JsonValue): value is JsonObject {
+function isJsonObject(value: WidgetData): value is Record<string, WidgetData> {
   return (
     value !== null &&
     value !== undefined &&
@@ -262,7 +247,10 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
         const searchParams = new URLSearchParams();
 
         // Helper function to flatten nested objects into dot notation
-        function flattenObject(obj: JsonObject, prefix = ""): void {
+        function flattenObject(
+          obj: Record<string, WidgetData>,
+          prefix = "",
+        ): void {
           for (const [key, value] of Object.entries(obj)) {
             const fullKey = prefix ? `${prefix}.${key}` : key;
 

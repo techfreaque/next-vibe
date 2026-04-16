@@ -39,7 +39,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import helpEndpoints from "@/app/api/[locale]/system/help/definition";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useLogger } from "@/hooks/use-logger";
 import type {
   FrameDisplayMode,
   FrameError,
@@ -762,10 +762,7 @@ export function VibeFrameTestPageClient({
 
   // ── Fetch endpoints from help ─────────────────────────────────────────
 
-  const endpointLogger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const endpointLogger = useLogger();
 
   const helpState = useEndpoint(
     helpEndpoints,

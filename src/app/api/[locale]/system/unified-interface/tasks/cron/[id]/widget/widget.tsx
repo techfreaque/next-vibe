@@ -21,16 +21,13 @@ import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
-import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetContext,
@@ -41,14 +38,15 @@ import {
   useWidgetResponse,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import { CronTaskPriority, CronTaskStatus } from "../../../enum";
 import type endpoints from "../definition";
@@ -62,9 +60,7 @@ import { ScheduleAutocomplete } from "./schedule-autocomplete";
 type Task = CronTaskGetResponseOutput["task"];
 
 interface WidgetProps {
-  field: {
-    value: CronTaskGetResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
+  field: (typeof endpoints.GET)["fields"];
 }
 
 // ---------------------------------------------------------------------------
@@ -251,11 +247,6 @@ function TaskInputViewSection({
   const user = useWidgetUser();
   const { definition, isLoading, error } = useResolvedEndpoint(routeId);
 
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
-
   const hasInput = Object.keys(taskInput).length > 0;
 
   if (!hasInput) {
@@ -293,16 +284,20 @@ function TaskInputViewSection({
       )}
 
       {definition && (
-        <NavigationStackProvider>
-          <EndpointRenderer
-            endpoint={definition}
-            locale={locale}
-            data={taskInput}
-            disabled={true}
-            logger={logger}
-            user={user}
-          />
-        </NavigationStackProvider>
+        <EndpointsPage
+          endpoint={{
+            [definition.method]: definition,
+          }}
+          locale={locale}
+          user={user}
+          disabled={true}
+          endpointOptions={{
+            read: { initialData: taskInput as never },
+            create: { autoPrefillData: taskInput as never },
+            delete: { autoPrefillData: taskInput as never },
+            update: { autoPrefillData: taskInput as never },
+          }}
+        />
       )}
     </Div>
   );
@@ -558,7 +553,8 @@ export function CronTaskDetailContainer({
   const children = field.children;
 
   const isLoading = endpointMutations?.read?.isLoading;
-  const task: Task | null | undefined = field.value?.task;
+  const fieldValue = useWidgetValue<typeof endpoints.GET>();
+  const task: Task | null | undefined = fieldValue?.task;
 
   // ── Refresh ──
   const handleRefresh = useCallback((): void => {
@@ -638,7 +634,7 @@ export function CronTaskDetailContainer({
   }
 
   // ── Not found state ──
-  if (field.value && !task) {
+  if (fieldValue && !task) {
     return (
       <Div className="flex flex-col items-center justify-center py-16 text-center gap-3">
         <XCircle className="h-8 w-8 text-muted-foreground" />
@@ -834,7 +830,7 @@ export function CronTaskDetailContainer({
               </InfoRow>
             )}
             <InfoRow label={t("widget.owner")}>
-              {task.userId === null ? (
+              {task.owner.type === "system" ? (
                 <Badge
                   label={t("widget.ownerSystem")}
                   className="bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300"

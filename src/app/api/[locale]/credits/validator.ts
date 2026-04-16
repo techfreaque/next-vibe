@@ -10,6 +10,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { AnyModelId } from "../agent/models/models";
+import type { JwtPrivatePayloadType } from "../user/auth/types";
 import type { CreditsT } from "./i18n";
 import { CreditRepository } from "./repository";
 
@@ -28,7 +29,7 @@ export interface CreditValidationResult {
  */
 export interface CreditValidatorInterface {
   validateUserCredits(
-    userId: string,
+    user: JwtPrivatePayloadType,
     modelId: AnyModelId,
     modelCost: number,
     logger: EndpointLogger,
@@ -65,7 +66,7 @@ export interface CreditValidatorInterface {
  */
 class CreditValidator implements CreditValidatorInterface {
   async validateUserCredits(
-    userId: string,
+    user: JwtPrivatePayloadType,
     modelId: AnyModelId,
     modelCost: number,
     logger: EndpointLogger,
@@ -74,7 +75,7 @@ class CreditValidator implements CreditValidatorInterface {
   ): Promise<ResponseType<CreditValidationResult>> {
     try {
       const balanceResult = await CreditRepository.getBalance(
-        { userId },
+        user,
         logger,
         t,
         locale,
@@ -92,7 +93,7 @@ class CreditValidator implements CreditValidatorInterface {
       const hasCredits = balance >= modelCost;
 
       logger.debug("Validated user credits", {
-        userId,
+        userId: user.id,
         modelId,
         cost: modelCost,
         balance,
@@ -107,7 +108,7 @@ class CreditValidator implements CreditValidatorInterface {
       });
     } catch (error) {
       logger.error("Failed to validate user credits", parseError(error), {
-        userId,
+        userId: user.id,
         modelId,
       });
       return fail({

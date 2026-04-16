@@ -16,7 +16,11 @@ import {
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import {
+  cronTasks,
+  dbUserIdToOwner,
+} from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import type { TaskOwner } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { scopedTranslation as executeTranslation } from "@/app/api/[locale]/system/unified-interface/tasks/execute/i18n";
 import { TaskExecuteRepository } from "@/app/api/[locale]/system/unified-interface/tasks/execute/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -36,6 +40,7 @@ export class CronBulkRepository {
     locale: CountryLanguage,
     t: CronBulkT,
     logger: EndpointLogger,
+    abortSignal: AbortSignal,
   ): Promise<ResponseType<CronBulkResponseOutput>> {
     const isAdmin =
       !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
@@ -48,11 +53,11 @@ export class CronBulkRepository {
     interface ResolvedRow {
       id: string;
       shortId: string;
-      userId: string | null;
+      owner: TaskOwner;
     }
     let resolvedRows: ResolvedRow[] = [];
     try {
-      resolvedRows = await db
+      const rawRows = await db
         .select({
           id: cronTasks.id,
           shortId: cronTasks.shortId,
@@ -60,6 +65,11 @@ export class CronBulkRepository {
         })
         .from(cronTasks)
         .where(or(inArray(cronTasks.id, ids), inArray(cronTasks.shortId, ids)));
+      resolvedRows = rawRows.map((row) => ({
+        id: row.id,
+        shortId: row.shortId,
+        owner: dbUserIdToOwner(row.userId),
+      }));
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to resolve task IDs for bulk action", {
@@ -100,7 +110,11 @@ export class CronBulkRepository {
           continue;
         }
 
-        if (!isAdmin && row.userId !== userId) {
+        if (
+          !isAdmin &&
+          (row.owner.type === "system" ||
+            (row.owner.type === "user" && row.owner.userId !== userId))
+        ) {
           errors.push({
             id: requestedId,
             message: "Not authorized to delete this task",
@@ -136,7 +150,11 @@ export class CronBulkRepository {
           continue;
         }
 
-        if (!isAdmin && row.userId !== userId) {
+        if (
+          !isAdmin &&
+          (row.owner.type === "system" ||
+            (row.owner.type === "user" && row.owner.userId !== userId))
+        ) {
           errors.push({
             id: requestedId,
             message: `Not authorized to ${action} this task`,
@@ -188,6 +206,7 @@ export class CronBulkRepository {
             locale,
             logger,
             executeT,
+            abortSignal,
           );
           if (result.success) {
             succeeded++;

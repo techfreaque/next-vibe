@@ -6,7 +6,7 @@
 import { parseError } from "next-vibe/shared/utils";
 import type { z } from "zod";
 
-import type { CliRequestData } from "./cli-request-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 import { isEmptySchema } from "../../../../shared/utils/validation";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
@@ -32,7 +32,7 @@ export class CliInputParser {
    * Example: setNestedValue(obj, "user.name", "John") -> { user: { name: "John" } }
    */
   private static setNestedValue(
-    obj: CliObject,
+    obj: Record<string, WidgetData>,
     path: string,
     value: string | number | boolean,
   ): void {
@@ -46,7 +46,7 @@ export class CliInputParser {
     }
 
     // Navigate to the nested object, creating objects as needed
-    let current: CliObject = obj;
+    let current: Record<string, WidgetData> = obj;
     for (let i = 0; i < keys.length - 1; i++) {
       const key = keys[i];
       const existing = current[key];
@@ -54,15 +54,16 @@ export class CliInputParser {
       if (
         !existing ||
         typeof existing !== "object" ||
-        Array.isArray(existing)
+        Array.isArray(existing) ||
+        existing instanceof Date
       ) {
         // Create a new object if it doesn't exist or is not an object
-        const newObj: CliObject = {};
+        const newObj: Record<string, WidgetData> = {};
         current[key] = newObj;
         current = newObj;
       } else {
         // Navigate into existing object
-        current = existing as CliObject;
+        current = existing;
       }
     }
 
@@ -168,10 +169,10 @@ export class CliInputParser {
     booleanFields: Set<string> = new Set(),
   ): {
     positionalArgs: string[];
-    namedArgs: CliObject;
+    namedArgs: Record<string, WidgetData>;
   } {
     const positionalArgs: string[] = [];
-    const namedArgs: CliObject = {};
+    const namedArgs: Record<string, WidgetData> = {};
     let i = 0;
 
     while (i < tokens.length) {
@@ -232,7 +233,7 @@ export class CliInputParser {
     endpoint?: CreateApiEndpointAny | null,
   ): {
     positionalArgs: string[];
-    namedArgs: CliObject;
+    namedArgs: Record<string, WidgetData>;
   } {
     return this.parseTokens(
       args,
@@ -252,7 +253,7 @@ export class CliInputParser {
     endpoint?: CreateApiEndpointAny | null,
   ): {
     positionalArgs: string[];
-    namedArgs: CliObject;
+    namedArgs: Record<string, WidgetData>;
   } {
     // Safety checks for input parameters
     if (!Array.isArray(args)) {
@@ -304,8 +305,8 @@ export class CliInputParser {
   private static buildOptionsData(
     interactive: boolean,
     dryRun: boolean,
-  ): Partial<CliRequestData> {
-    const optionsData: Partial<CliRequestData> = {};
+  ): Partial<Record<string, WidgetData>> {
+    const optionsData: Partial<Record<string, WidgetData>> = {};
     if (interactive) {
       optionsData.interactive = true;
     }
@@ -490,10 +491,10 @@ export class CliInputParser {
    * Expand single-letter shortcuts to full field names
    */
   private static expandNamedArgs(
-    namedArgs: CliObject,
+    namedArgs: Record<string, WidgetData>,
     shortcuts: Map<string, string>,
-  ): CliObject {
-    const expanded: CliObject = {};
+  ): Record<string, WidgetData> {
+    const expanded: Record<string, WidgetData> = {};
 
     for (const [key, value] of Object.entries(namedArgs)) {
       const expandedKey =
@@ -508,11 +509,9 @@ export class CliInputParser {
    * Convert CLI string values to appropriate types.
    * Arrays are passed through with each element normalized.
    */
-  private static normalizeCliValue(
-    value: CliValue | null | undefined,
-  ): CliValue | null | undefined {
+  private static normalizeCliValue(value: WidgetData): WidgetData {
     if (Array.isArray(value)) {
-      return value.map((v) => this.normalizeCliValue(v) as CliValue);
+      return value.map((v) => this.normalizeCliValue(v));
     }
     if (typeof value !== "string") {
       return value;
@@ -533,13 +532,13 @@ export class CliInputParser {
   private static buildDataFromCliArgs(
     endpoint: CreateApiEndpointAny | null,
     positionalArgs: string[],
-    namedArgs: CliObject,
-  ): CliRequestData | null {
+    namedArgs: Record<string, WidgetData>,
+  ): Record<string, WidgetData> | null {
     if (positionalArgs.length === 0 && Object.keys(namedArgs).length === 0) {
       return null;
     }
 
-    const data: CliRequestData = {};
+    const data: Record<string, WidgetData> = {};
 
     // Build single-letter shortcuts for this endpoint
     const shortcuts = this.buildSingleLetterShortcuts(endpoint);
@@ -564,14 +563,21 @@ export class CliInputParser {
         continue;
       }
 
-      // kebab-case → camelCase (assignValues already did this, but expandNamedArgs may not)
-      const camelCaseKey = this.kebabToCamelCase(key);
-
       // Convert string boolean values to actual booleans (arrays pass through).
       // Cast is safe - Zod strips incompatible shapes at final parse.
-      data[camelCaseKey] = this.normalizeCliValue(
-        value,
-      ) as CliRequestData[string];
+      const normalizedValue = this.normalizeCliValue(value);
+
+      // Use setNestedValue to expand dot-notation keys (e.g. response.output → { response: { output } })
+      if (key.includes(".")) {
+        this.setNestedValue(
+          data as Record<string, WidgetData>,
+          key,
+          normalizedValue as string | number | boolean,
+        );
+      } else {
+        const camelCaseKey = this.kebabToCamelCase(key);
+        data[camelCaseKey] = normalizedValue;
+      }
     }
 
     // Handle firstCliArgKey: merge positional args with any named value already set
@@ -596,10 +602,10 @@ export class CliInputParser {
   static async collectCliRequestData(
     endpoint: CreateApiEndpointAny | null,
     params: {
-      data?: CliRequestData;
+      data?: Record<string, WidgetData>;
       urlPathParams?: CliUrlParams;
       positionalArgs: string[];
-      namedArgs: CliObject;
+      namedArgs: Record<string, WidgetData>;
       /** Raw tokens after the command - used to re-parse with endpoint boolean field knowledge */
       rawTokens?: string[];
       interactive: boolean;
@@ -706,7 +712,7 @@ export class CliInputParser {
 
         if (
           parsed.success &&
-          Object.keys(parsed.data as CliRequestData).length > 0
+          Object.keys(parsed.data as Record<string, WidgetData>).length > 0
         ) {
           inputData.urlPathParams = parsed.data as CliUrlParams;
         } else {
@@ -745,7 +751,7 @@ export class CliInputParser {
   private static async generateFormFromEndpoint(
     endpoint: CreateApiEndpointAny,
     formType: "request" | "urlPathParams" = "request",
-  ): Promise<CliRequestData> {
+  ): Promise<Record<string, WidgetData>> {
     const schema =
       formType === "request"
         ? endpoint.requestSchema
@@ -771,7 +777,7 @@ export class CliInputParser {
  * Collected CLI request data with optional URL parameters
  */
 interface CollectedCliRequestData {
-  data?: CliRequestData;
+  data?: Record<string, WidgetData>;
   urlPathParams?: CliUrlParams;
 }
 
@@ -781,20 +787,3 @@ interface CollectedCliRequestData {
 export interface CliUrlParams {
   [key: string]: string | number | boolean | null | undefined;
 }
-
-/**
- * Type for nested CLI objects
- */
-export interface CliObject {
-  [key: string]: CliValue;
-}
-
-/**
- * Type for CLI argument values - supports primitives, arrays, and nested objects
- */
-type CliValue = string | number | boolean | CliObject | CliValue[];
-
-/**
- * Type for parsed CLI data - supports nested objects
- */
-export type ParsedCliData = Record<string, CliValue | null>;

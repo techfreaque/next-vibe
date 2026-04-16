@@ -22,7 +22,7 @@ import { CountryLanguageValues } from "@/i18n/core/config";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Methods } from "../../types/enums";
 import { isAgentPlatform, isCliPlatform, Platform } from "../../types/platform";
-import type { WidgetData } from "../../widgets/widget-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 /**
  * Validate locale using the standard schema
@@ -173,7 +173,6 @@ export function validateHandlerRequestData<
     }
 
     // Normalize: AI models sometimes send object fields as JSON strings - parse them
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Request data from AI tools is WidgetData at runtime despite generic typing
     const normalizedRequestData = deepParseJsonStrings(
       context.requestData as WidgetData,
     );

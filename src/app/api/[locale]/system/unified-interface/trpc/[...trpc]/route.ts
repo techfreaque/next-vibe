@@ -10,7 +10,7 @@ import { validateData } from "next-vibe/shared/utils";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { createTRPCContext } from "@/app/api/[locale]/system/unified-interface/trpc/setup";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";

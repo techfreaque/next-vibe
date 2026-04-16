@@ -12,10 +12,45 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import type { BunPlugin } from "bun";
 
 import type { PackageManifest } from "../../packages/types";
+
+// Absolute path to next-vibe-ui/cli — resolved relative to this file
+const CLI_UI_DIR = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  "../../../../../packages/next-vibe-ui/cli",
+);
+
+// ============================================================================
+// next-vibe-ui CLI resolver
+// ============================================================================
+
+/**
+ * Resolves next-vibe-ui/* imports through cli/ first, then falls back to
+ * the normal module resolution (web/ via tsconfig). Mirrors the Vite
+ * tanstack/ → web/ resolver pattern for Bun package builds.
+ */
+export const nextVibeUiCliResolverPlugin: BunPlugin = {
+  // eslint-disable-next-line i18next/no-literal-string
+  name: "next-vibe-ui-cli-resolver",
+  setup(build) {
+    build.onResolve({ filter: /^next-vibe-ui\// }, ({ path }) => {
+      // eslint-disable-next-line i18next/no-literal-string
+      const sub = path.slice("next-vibe-ui/".length);
+      // eslint-disable-next-line i18next/no-literal-string
+      for (const ext of ["", ".ts", ".tsx", "/index.ts", "/index.tsx"]) {
+        const candidate = resolve(CLI_UI_DIR, sub + ext);
+        if (existsSync(candidate)) {
+          return { path: candidate };
+        }
+      }
+      return null;
+    });
+  },
+};
 
 // ============================================================================
 // Scoped generated redirect

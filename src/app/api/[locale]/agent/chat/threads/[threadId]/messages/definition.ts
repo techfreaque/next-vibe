@@ -25,10 +25,17 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { EmitEventNamed } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { lazy } from "react";
 import { DefaultFolderId } from "../../../config";
 import type { MessageMetadata } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
+
+import {
+  onEventPersistMessage,
+  persistMessageIfIncognito,
+  finishIncognitoThreadIfIncognito,
+} from "@/app/api/[locale]/agent/chat/incognito/event-persist";
 
 import { scopedTranslation } from "./i18n";
 
@@ -43,6 +50,7 @@ const MessagesWidget = lazy(() =>
  * Note: PUBLIC role is allowed for anonymous users to view public threads
  * The repository layer filters results based on thread permissions
  */
+
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
@@ -56,155 +64,284 @@ const { GET } = createEndpoint({
   subCategory: "endpointCategories.messagesModerating",
   tags: ["tags.messages" as const],
 
-  // WebSocket events for real-time message streaming.
-  // Emitted by ai-stream repository, consumed by clients subscribed to this channel.
-  // All 16 StreamEventType events - kebab-case keys match enqueue() directly.
   events: {
-    "message-created": z.object({
-      messageId: z.string(),
-      threadId: z.string(),
-      role: z.string(),
-      parentId: z.string().nullable(),
-      content: z.string().nullable(),
-      model: z.string().nullable(),
-      character: z.string().nullable(),
-      sequenceId: z.string().nullable().optional(),
-      toolCall: z
-        .object({
-          toolCallId: z.string(),
-          toolName: z.string(),
-          args: z.unknown(),
-          result: z.unknown().optional(),
-          error: z.record(z.string(), z.unknown()).optional(),
-          executionTime: z.number().optional(),
-          creditsUsed: z.number().optional(),
-          requiresConfirmation: z.boolean().optional(),
-          isConfirmed: z.boolean().optional(),
-          waitingForConfirmation: z.boolean().optional(),
-        })
-        .optional(),
-      metadata: z.record(z.string(), z.unknown()).optional(),
-    }),
-    "content-delta": z.object({
-      messageId: z.string(),
-      delta: z.string(),
-    }),
-    "content-done": z.object({
-      messageId: z.string(),
-      content: z.string(),
-      totalTokens: z.number().nullable(),
-      finishReason: z.string().nullable(),
-    }),
-    "reasoning-delta": z.object({
-      messageId: z.string(),
-      delta: z.string(),
-    }),
-    "reasoning-done": z.object({
-      messageId: z.string(),
-      content: z.string(),
-    }),
-    "tool-call": z.object({
-      messageId: z.string(),
-      toolName: z.string(),
-      args: z.unknown(),
-    }),
-    "tool-waiting": z.object({
-      messageId: z.string(),
-      toolName: z.string(),
-      toolCallId: z.string(),
-    }),
-    "tool-result": z.object({
-      messageId: z.string(),
-      toolName: z.string(),
-      result: z.unknown().optional(),
-      error: z.record(z.string(), z.unknown()).optional(),
-      toolCall: z
-        .object({
-          toolCallId: z.string(),
-          toolName: z.string(),
-          args: z.unknown(),
-          result: z.unknown().optional(),
-          error: z.record(z.string(), z.unknown()).optional(),
-          executionTime: z.number().optional(),
-          creditsUsed: z.number().optional(),
-          requiresConfirmation: z.boolean().optional(),
-          isConfirmed: z.boolean().optional(),
-          waitingForConfirmation: z.boolean().optional(),
-        })
-        .optional(),
-    }),
-    error: z.object({
-      success: z.literal(false),
-      message: z.string(),
-      messageParams: z.record(z.string(), z.unknown()).optional(),
-      errorType: z.object({
-        errorKey: z.string(),
-        errorCode: z.number(),
-      }),
-      cause: z.unknown().optional(),
-    }),
-    "voice-transcribed": z.object({
-      messageId: z.string(),
-      text: z.string(),
-      confidence: z.number().nullable(),
-      durationSeconds: z.number().nullable(),
-    }),
-    "audio-chunk": z.object({
-      messageId: z.string(),
-      audioData: z.string(),
-      chunkIndex: z.number(),
-      isFinal: z.boolean(),
-      text: z.string(),
-    }),
-    "files-uploaded": z.object({
-      messageId: z.string(),
-      attachments: z.array(
-        z.object({
-          id: z.string(),
-          url: z.string(),
-          filename: z.string(),
-          mimeType: z.string(),
-          size: z.number(),
-        }),
-      ),
-    }),
-    "credits-deducted": z.object({
-      amount: z.number(),
-      feature: z.string(),
-      type: z.enum(["tool", "model"]),
-      partial: z.boolean().optional(),
-    }),
-    "tokens-updated": z.object({
-      messageId: z.string(),
-      promptTokens: z.number(),
-      completionTokens: z.number(),
-      totalTokens: z.number(),
-      finishReason: z.string().nullable(),
-      creditCost: z.number(),
-    }),
-    "compacting-delta": z.object({
-      messageId: z.string(),
-      delta: z.string(),
-    }),
-    "compacting-done": z.object({
-      messageId: z.string(),
-      content: z.string(),
-      metadata: z.object({
-        isCompacting: z.literal(true),
-        compactedMessageCount: z.number(),
-      }),
-    }),
-    // Thread metadata update
-    "thread-title-updated": z.object({
-      threadId: z.string(),
-      title: z.string(),
-    }),
-    // Stream lifecycle - definitive "stream is completely done" signal
-    "stream-finished": z.object({
-      threadId: z.string(),
-      reason: z.enum(["completed", "cancelled", "error", "timeout"]),
-      finalState: z.enum(["idle", "waiting"]),
-    }),
+    // ── message-created ──────────────────────────────────────────────────────
+    // Framework merges the new message (upsert by id) and sets streamingState.
+    // onEvent: clear input store on confirmed user message; remove optimistic
+    // assistant placeholder when real server message arrives (same parentId).
+    // Also: persist the confirmed message to localStorage for incognito.
+    "message-created": {
+      fields: {
+        messages: [
+          "id",
+          "threadId",
+          "role",
+          "isAI",
+          "content",
+          "parentId",
+          "sequenceId",
+          "model",
+          "skill",
+          "metadata",
+        ] as const,
+        streamingState: true as const,
+      },
+      operation: "merge" as const,
+      onEvent: async (ctx) => {
+        const {
+          partial,
+          urlPathParams: { threadId },
+          logger,
+        } = ctx;
+        const arrived = partial.messages?.[0];
+        if (!arrived) {
+          return;
+        }
+        if (arrived.role === ChatMessageRole.USER) {
+          const { useChatInputStore } =
+            await import("@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store");
+          useChatInputStore.getState().reset();
+        } else {
+          // Real assistant message arrived — remove optimistic placeholder(s)
+          // with matching parentId across all folder caches.
+          const newParentId = arrived.parentId;
+          if (newParentId) {
+            const { removeOptimisticByParentId } =
+              await import("./hooks/update-messages");
+            removeOptimisticByParentId(threadId, newParentId, logger);
+          }
+        }
+        // Incognito: persist confirmed message to localStorage.
+        const rootFolderId =
+          typeof ctx.requestData["rootFolderId"] === "string"
+            ? ctx.requestData["rootFolderId"]
+            : "";
+        if (arrived.id) {
+          await persistMessageIfIncognito(
+            threadId,
+            arrived.id,
+            rootFolderId,
+            logger,
+          );
+        }
+      },
+    },
+
+    // ── content-delta ────────────────────────────────────────────────────────
+    // Framework appends delta.content to the matching message.
+    "content-delta": {
+      fields: { messages: ["id", "content"] as const },
+      operation: "append" as const,
+    },
+
+    // ── content-done ─────────────────────────────────────────────────────────
+    // onEvent: persist the final message content to localStorage for incognito.
+    "content-done": {
+      fields: { messages: ["id", "content", "metadata"] as const },
+      operation: "merge" as const,
+      onEvent: onEventPersistMessage(),
+    },
+
+    // ── reasoning-delta ──────────────────────────────────────────────────────
+    // Framework appends delta to message.content (reasoning block).
+    "reasoning-delta": {
+      fields: { messages: ["id", "content"] as const },
+      operation: "append" as const,
+    },
+
+    // ── reasoning-done ───────────────────────────────────────────────────────
+    // onEvent: persist final reasoning content to localStorage for incognito.
+    "reasoning-done": {
+      fields: { messages: ["id", "content"] as const },
+      operation: "merge" as const,
+      onEvent: onEventPersistMessage(),
+    },
+
+    // ── tool-result ──────────────────────────────────────────────────────────
+    // onEvent: persist tool result metadata to localStorage for incognito.
+    "tool-result": {
+      fields: { messages: ["id", "metadata"] as const },
+      operation: "merge" as const,
+      onEvent: onEventPersistMessage(),
+    },
+
+    // ── tool-result-updated ──────────────────────────────────────────────────
+    // onEvent: persist updated tool result metadata to localStorage for incognito.
+    "tool-result-updated": {
+      fields: { messages: ["id", "metadata"] as const },
+      operation: "merge" as const,
+      onEvent: onEventPersistMessage(),
+    },
+
+    // ── error ────────────────────────────────────────────────────────────────
+    // Framework merges the error message (emitter sends full messages partial).
+    // onEvent: clear ?message= URL param so the active branch resets to latest.
+    // Also: persist the error message to localStorage for incognito.
+    error: {
+      fields: {
+        messages: [
+          "id",
+          "role",
+          "content",
+          "parentId",
+          "sequenceId",
+          "model",
+          "skill",
+          "metadata",
+          "errorMessage",
+          "errorCode",
+        ] as const,
+      },
+      operation: "merge" as const,
+      onEvent: async (ctx) => {
+        if (typeof window !== "undefined") {
+          const url = new URL(window.location.href);
+          url.searchParams.delete("message");
+          window.history.replaceState(null, "", url.toString());
+        }
+        const rootFolderId =
+          typeof ctx.requestData["rootFolderId"] === "string"
+            ? ctx.requestData["rootFolderId"]
+            : "";
+        const msgId = ctx.partial.messages?.[0]?.id;
+        if (msgId) {
+          await persistMessageIfIncognito(
+            ctx.urlPathParams["threadId"] ?? "",
+            msgId,
+            rootFolderId,
+            ctx.logger,
+            false,
+          );
+        }
+      },
+    },
+
+    // ── voice-transcribed ────────────────────────────────────────────────────
+    // Framework merges the transcribed message content.
+    // onEvent: reset input store and clear draft.
+    "voice-transcribed": {
+      fields: { messages: ["id", "content", "metadata"] as const },
+      operation: "merge" as const,
+      onEvent: async () => {
+        const { useChatInputStore } =
+          await import("@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store");
+        useChatInputStore.getState().reset();
+      },
+    },
+
+    // ── audio-chunk ──────────────────────────────────────────────────────────
+    // Enqueues TTS audio for sequential playback — payload typed via response fields.
+    "audio-chunk": {
+      fields: {
+        audioData: true as const,
+        chunkIndex: true as const,
+        audioMessageId: true as const,
+        audioIsFinal: true as const,
+        audioText: true as const,
+      },
+      operation: "merge" as const,
+      onEvent: async (ctx) => {
+        const { partial, logger } = ctx;
+        const audioData = partial.audioData;
+        const chunkIndex = partial.chunkIndex;
+        if (typeof audioData !== "string" || typeof chunkIndex !== "number") {
+          return;
+        }
+        const { getAudioQueue } =
+          await import("@/app/api/[locale]/agent/ai-stream/stream/hooks/audio-queue");
+        getAudioQueue().enqueue(audioData, chunkIndex, logger);
+      },
+    },
+
+    // ── files-uploaded ───────────────────────────────────────────────────────
+    "files-uploaded": {
+      fields: { messages: ["id", "metadata"] as const },
+      operation: "merge" as const,
+    },
+
+    // ── tokens-updated ───────────────────────────────────────────────────────
+    "tokens-updated": {
+      fields: { messages: ["id", "metadata"] as const },
+      operation: "merge" as const,
+    },
+
+    // ── compacting-delta ─────────────────────────────────────────────────────
+    // Framework appends delta to message.content.
+    "compacting-delta": {
+      fields: { messages: ["id", "content", "metadata"] as const },
+      operation: "append" as const,
+    },
+
+    // ── compacting-done ──────────────────────────────────────────────────────
+    // onEvent: persist compacted message content to localStorage for incognito.
+    "compacting-done": {
+      fields: { messages: ["id", "content", "metadata"] as const },
+      operation: "merge" as const,
+      onEvent: onEventPersistMessage(),
+    },
+    // ── stream-finished ──────────────────────────────────────────────────────
+    // Framework merges streamingState → "idle" + final messages.
+    // Sidebar caches (threads + folder-contents) are updated via their own channels.
+    // onEvent: clear pending-create state. isStreaming in input.tsx is now derived
+    // from the cache streamingState field, so no nav store update needed here.
+    "stream-finished": {
+      fields: {
+        streamingState: true as const,
+      },
+      operation: "merge" as const,
+      onEvent: async (ctx) => {
+        const { useChatStore } = await import("../../../hooks/store");
+        useChatStore
+          .getState()
+          .clearThreadPendingCreate(ctx.urlPathParams.threadId);
+        const rootFolderId =
+          typeof ctx.requestData["rootFolderId"] === "string"
+            ? ctx.requestData["rootFolderId"]
+            : "";
+        await finishIncognitoThreadIfIncognito(
+          ctx.urlPathParams["threadId"] ?? "",
+          rootFolderId,
+        );
+      },
+    },
+
+    // ── task-completed ───────────────────────────────────────────────────────
+    // Framework removes the completed task from backgroundTasks (remove by id).
+    "task-completed": {
+      fields: { backgroundTasks: ["id"] as const },
+      operation: "remove" as const,
+    },
+
+    // ── streaming-state-changed ──────────────────────────────────────────────
+    // Framework merges streamingState on messages cache.
+    // Sidebar caches (threads + folder-contents) are updated via their own channels.
+    "streaming-state-changed": {
+      fields: ["streamingState"] as const,
+      operation: "merge" as const,
+    },
+
+    // ── generated-media-added ────────────────────────────────────────────────
+    // onEvent: persist media metadata to localStorage for incognito.
+    "generated-media-added": {
+      fields: { messages: ["id", "metadata"] as const },
+      operation: "merge" as const,
+      onEvent: onEventPersistMessage(),
+    },
+
+    // ── gap-fill-started ─────────────────────────────────────────────────────
+    "gap-fill-started": {
+      fields: { messages: ["id", "metadata"] as const },
+      operation: "merge" as const,
+    },
+
+    // ── gap-fill-completed ───────────────────────────────────────────────────
+    // Framework merge handles metadata.variants update via applyPartialToCache.
+    // onEvent: persist variants metadata to localStorage for incognito.
+    "gap-fill-completed": {
+      fields: { messages: ["id", "metadata"] as const },
+      operation: "merge" as const,
+      onEvent: onEventPersistMessage(),
+    },
   },
 
   errorTypes: {
@@ -280,6 +417,10 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE ===
+      streamingState: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        schema: z.enum(["idle", "streaming", "waiting", "aborting"]),
+      }),
       backgroundTasks: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         child: objectField(scopedTranslation, {
@@ -391,6 +532,28 @@ const { GET } = createEndpoint({
           },
         }),
       }),
+
+      // TTS streaming — audio-chunk event payload (not persisted, event-only transport)
+      audioData: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().nullable().optional(),
+      }),
+      chunkIndex: responseField(scopedTranslation, {
+        type: WidgetType.STAT,
+        schema: z.number().nullable().optional(),
+      }),
+      audioMessageId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().uuid().nullable().optional(),
+      }),
+      audioIsFinal: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        schema: z.boolean().nullable().optional(),
+      }),
+      audioText: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().nullable().optional(),
+      }),
     },
   }),
 
@@ -411,6 +574,7 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
+        streamingState: "idle" as const,
         backgroundTasks: [],
         messages: [
           {
@@ -660,13 +824,13 @@ export type MessageListUrlParamsTypeOutput =
   typeof GET.types.UrlVariablesOutput;
 export type MessageListResponseOutput = typeof GET.types.ResponseOutput;
 
+/** Typed emit callback for the messages WS channel — payload types from GET.types.EventPayloads. */
+export type MessagesWsEmit = EmitEventNamed<typeof GET.types.EventPayloads>;
+
 export type MessageCreateRequestOutput = typeof POST.types.RequestOutput;
 export type MessageCreateUrlParamsTypeOutput =
   typeof POST.types.UrlVariablesOutput;
 export type MessageCreateResponseOutput = typeof POST.types.ResponseOutput;
-
-// Extract WS event types for typed emit/subscribe - owned by messages, used by ai-stream
-export type MessagesWsEvents = typeof GET.types.Events;
 
 /**
  * Export definitions

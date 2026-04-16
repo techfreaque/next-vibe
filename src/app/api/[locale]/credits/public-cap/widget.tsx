@@ -26,26 +26,11 @@ import {
   useWidgetForm,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
 
 import type definition from "./definition";
-import type {
-  PublicCapGetResponseOutput,
-  PublicCapPostResponseOutput,
-} from "./definition";
-
-interface GetWidgetProps {
-  field: {
-    value: PublicCapGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
-
-interface PostWidgetProps {
-  field: {
-    value: PublicCapPostResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
-}
 
 function usageColor(percent: number): string {
   return percent >= 90
@@ -55,9 +40,9 @@ function usageColor(percent: number): string {
       : "text-success";
 }
 
-export function PublicCapContainer({ field }: GetWidgetProps): JSX.Element {
+export function PublicCapContainer(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
-  const cap = field.value;
+  const cap = useWidgetValue<typeof definition.GET>();
 
   const spendToday = cap?.spendToday ?? 0;
   const capAmount = cap?.capAmount ?? 0;
@@ -155,12 +140,11 @@ export function PublicCapContainer({ field }: GetWidgetProps): JSX.Element {
   );
 }
 
-export function PublicCapUpdateContainer({
-  field,
-}: PostWidgetProps): JSX.Element {
+export function PublicCapUpdateContainer(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.POST>();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
+  const postValue = useWidgetValue<typeof definition.POST>();
 
   const capAmount = form.watch("capAmount") ?? 500;
 
@@ -181,9 +165,9 @@ export function PublicCapUpdateContainer({
       <CardContent className="flex flex-col gap-4">
         <FormAlertWidget field={{}} />
 
-        {field.value?.message && (
+        {postValue?.message && (
           <Div className="rounded-lg bg-success/10 border border-success/30 px-4 py-3 text-sm text-success-foreground">
-            {field.value.message}
+            {postValue.message}
           </Div>
         )}
 

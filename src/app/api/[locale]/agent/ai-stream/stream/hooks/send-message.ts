@@ -193,7 +193,13 @@ export async function sendMessage(
         apiClient.updateEndpointData(
           messagesDefinition.GET,
           logger,
-          (old) => old ?? success({ backgroundTasks: [], messages: [] }),
+          (old) =>
+            old ??
+            success({
+              streamingState: "idle" as const,
+              backgroundTasks: [],
+              messages: [],
+            }),
           {
             urlPathParams: { threadId: newThreadId },
             requestData: { rootFolderId: currentRootFolderId },

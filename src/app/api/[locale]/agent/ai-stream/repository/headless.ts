@@ -23,7 +23,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "../../chat/config";
-import type { MessageMetadata, ToolCallResult } from "../../chat/db";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+
+import type { MessageMetadata } from "../../chat/db";
 import { chatMessages } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
 import { chatFavorites } from "../../chat/favorites/db";
@@ -46,8 +48,8 @@ import { AiStreamRepository } from "./index";
 /** A pre-fetched tool call result to inject into the thread before the AI runs */
 export interface HeadlessPreCall {
   routeId: string;
-  args: Record<string, ToolCallResult>;
-  result: ToolCallResult;
+  args: Record<string, WidgetData>;
+  result: WidgetData;
   success: boolean;
   error?: string;
   executionTimeMs?: number;
@@ -161,6 +163,8 @@ export interface HeadlessAiStreamParams {
    * Used by UNBOTTLED self-relay to route all inference through the UNBOTTLED provider.
    */
   providerOverride?: ApiProvider;
+  /** Sub-agent nesting depth (0 = top-level, incremented by ai-run) */
+  subAgentDepth: number;
   /** File attachments to include with the user message (images, audio, PDFs, video) */
   attachments?: File[];
   /**
@@ -236,6 +240,7 @@ export async function resolveFavorite(
   user: JwtPayloadType,
   logger: EndpointLogger,
   locale: CountryLanguage,
+  providerOverride?: ApiProvider,
 ): Promise<{ model: ChatModelId; skill: string } | null> {
   const favoriteIdCondition = isUuid(favoriteId)
     ? eq(chatFavorites.id, favoriteId)
@@ -262,7 +267,7 @@ export async function resolveFavorite(
     };
   }
   if (sel && isFiltersSelection(sel)) {
-    const best = getBestChatModel(sel, user);
+    const best = getBestChatModel(sel, user, providerOverride);
     if (best) {
       return { model: best.id, skill };
     }
@@ -286,7 +291,7 @@ export async function resolveFavorite(
         : null;
       const varSel = variant?.modelSelection;
       if (varSel && (isManualSelection(varSel) || isFiltersSelection(varSel))) {
-        const best = getBestChatModel(varSel, user);
+        const best = getBestChatModel(varSel, user, providerOverride);
         if (best) {
           return { model: best.id, skill };
         }
@@ -350,6 +355,7 @@ export async function runHeadlessAiStream(
           user,
           logger,
           locale,
+          providerOverride,
         );
         if (!resolved) {
           return fail({
@@ -383,7 +389,7 @@ export async function runHeadlessAiStream(
           if (isManualSelection(varSel) && "manualModelId" in varSel) {
             model = varSel.manualModelId;
           } else if (isFiltersSelection(varSel)) {
-            const best = getBestChatModel(varSel, user);
+            const best = getBestChatModel(varSel, user, providerOverride);
             if (best) {
               model = best.id;
             }
@@ -594,6 +600,7 @@ export async function runHeadlessAiStream(
       excludeMemories,
       favoriteIdOverride: favoriteId,
       sequenceIdOverride,
+      subAgentDepth: params.subAgentDepth,
       mediaModelOverrides,
       providerOverride,
       parentAbortSignal,

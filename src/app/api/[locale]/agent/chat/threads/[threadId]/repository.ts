@@ -16,9 +16,11 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import threadsDefinitions from "../definition";
 import { chatFolders, chatThreads } from "../../db";
 import {
   canDeleteThread,
@@ -201,6 +203,49 @@ export class ThreadByIdRepository {
         threadId: updatedThread.id,
       });
 
+      // Emit WS events so all open tabs update the thread in their lists immediately
+      const emitThreads = createEndpointEmitter(
+        threadsDefinitions.GET,
+        logger,
+        user,
+      );
+      emitThreads("thread-updated", {
+        threads: [
+          {
+            id: updatedThread.id,
+            title: updatedThread.title,
+            folderId: updatedThread.folderId,
+            status: updatedThread.status,
+            preview: updatedThread.preview,
+            rootFolderId: updatedThread.rootFolderId,
+            updatedAt: updatedThread.updatedAt,
+          },
+        ],
+      });
+      if (updatedThread.rootFolderId) {
+        const { default: folderContentsDefinitions } =
+          await import("../../folder-contents/[rootFolderId]/definition");
+        const emitFolderContents = createEndpointEmitter(
+          folderContentsDefinitions.GET,
+          logger,
+          user,
+          { rootFolderId: updatedThread.rootFolderId },
+        );
+        emitFolderContents("thread-updated", {
+          items: [
+            {
+              id: updatedThread.id,
+              title: updatedThread.title,
+              folderId: updatedThread.folderId,
+              status: updatedThread.status,
+              preview: updatedThread.preview,
+              rootFolderId: updatedThread.rootFolderId,
+              updatedAt: updatedThread.updatedAt,
+            },
+          ],
+        });
+      }
+
       return success({
         updatedAt: updatedThread.updatedAt,
       });
@@ -294,6 +339,25 @@ export class ThreadByIdRepository {
         .returning();
 
       logger.debug("Thread deleted successfully", { threadId });
+
+      // Emit WS events so all open tabs remove the thread from their lists immediately
+      const emitThreads = createEndpointEmitter(
+        threadsDefinitions.GET,
+        logger,
+        user,
+      );
+      emitThreads("thread-deleted", { threads: [{ id: threadId }] });
+      if (deletedThread.rootFolderId) {
+        const { default: folderContentsDefinitions } =
+          await import("../../folder-contents/[rootFolderId]/definition");
+        const emitFolderContents = createEndpointEmitter(
+          folderContentsDefinitions.GET,
+          logger,
+          user,
+          { rootFolderId: deletedThread.rootFolderId },
+        );
+        emitFolderContents("thread-deleted", { items: [{ id: threadId }] });
+      }
 
       return success({
         userId: deletedThread.userId,

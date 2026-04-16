@@ -100,9 +100,15 @@ export class RemoteConnectionRegisterRepository {
     // reverseToken: JWT from the connecting instance, encrypted before storage. Enables
     // this instance to call /report on the connector (push task completion status back).
     // Reconnect is allowed - update localUrl/isActive if the record already exists.
-    const encryptedReverseToken = reverseToken
-      ? RemoteConnectionRepository.encryptToken(reverseToken)
-      : null;
+    if (!reverseToken || !reverseLeadId) {
+      return fail({
+        message: t("post.errors.validation.title"),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    const encryptedReverseToken =
+      RemoteConnectionRepository.encryptToken(reverseToken);
 
     await db
       .insert(remoteConnections)
@@ -112,7 +118,7 @@ export class RemoteConnectionRegisterRepository {
         remoteUrl: localUrl, // from cloud's perspective, the local IS the remote
         localUrl,
         token: encryptedReverseToken,
-        leadId: reverseLeadId ?? null,
+        leadId: reverseLeadId,
         isActive: true,
         remoteInstanceId: instanceId,
         updatedAt: new Date(),
@@ -124,8 +130,8 @@ export class RemoteConnectionRegisterRepository {
           remoteUrl: localUrl,
           isActive: true,
           remoteInstanceId: instanceId,
-          ...(encryptedReverseToken ? { token: encryptedReverseToken } : {}),
-          ...(reverseLeadId ? { leadId: reverseLeadId } : {}),
+          token: encryptedReverseToken,
+          leadId: reverseLeadId,
           updatedAt: new Date(),
         },
       });

@@ -17,60 +17,46 @@ import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
-import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import {
   useWidgetDisabled,
   useWidgetLocale,
-  useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type definition from "./definition";
-import type { WaitForTaskResponseOutput } from "./definition";
 
-interface CustomWidgetProps {
-  field: {
-    value: WaitForTaskResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+function toRecord(
+  value: WidgetData | undefined,
+): Record<string, WidgetData> | null {
+  if (
+    value !== null &&
+    value !== undefined &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    !(value instanceof Date)
+  ) {
+    return value;
+  }
+  return null;
 }
 
-export function WaitForTaskWidget({ field }: CustomWidgetProps): JSX.Element {
+export function WaitForTaskWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
-  const logger = useWidgetLogger();
   const t = useWidgetTranslation<typeof definition.POST>();
   const disabled = useWidgetDisabled();
 
-  const fieldValue =
-    field.value &&
-    typeof field.value === "object" &&
-    !Array.isArray(field.value)
-      ? (field.value as Record<string, WidgetData>)
-      : null;
+  const responseData = useWidgetValue<typeof definition.POST>();
 
-  const originalToolName =
-    typeof fieldValue?.originalToolName === "string"
-      ? fieldValue.originalToolName
-      : null;
-
-  const originalArgs =
-    fieldValue?.originalArgs &&
-    typeof fieldValue.originalArgs === "object" &&
-    !Array.isArray(fieldValue.originalArgs)
-      ? (fieldValue.originalArgs as Record<string, WidgetData>)
-      : null;
-
-  const resultData =
-    fieldValue?.result &&
-    typeof fieldValue.result === "object" &&
-    !Array.isArray(fieldValue.result)
-      ? (fieldValue.result as Record<string, WidgetData>)
-      : null;
+  const originalToolName = responseData?.originalToolName ?? null;
+  const originalArgs = toRecord(responseData?.originalArgs);
+  const resultData = toRecord(responseData?.result);
 
   const [resolvedEndpoint, setResolvedEndpoint] =
     useState<CreateApiEndpointAny | null>(null);
@@ -112,17 +98,17 @@ export function WaitForTaskWidget({ field }: CustomWidgetProps): JSX.Element {
   }, [originalToolName, t]);
 
   // Merged data for EndpointRenderer: originalArgs + result (same as execute-tool)
-  const mergedData = useMemo((): WidgetData => {
+  const mergedData = useMemo((): Record<string, WidgetData> => {
     if (originalArgs && resultData) {
-      return { ...originalArgs, ...resultData } as WidgetData;
+      return { ...originalArgs, ...resultData };
     }
     if (resultData) {
-      return resultData as WidgetData;
+      return resultData;
     }
     if (originalArgs) {
-      return originalArgs as WidgetData;
+      return originalArgs;
     }
-    return {} as WidgetData;
+    return {};
   }, [originalArgs, resultData]);
 
   if (!originalToolName) {
@@ -153,18 +139,35 @@ export function WaitForTaskWidget({ field }: CustomWidgetProps): JSX.Element {
     );
   }
 
+  const resolvedMethod = resolvedEndpoint.method;
+  const displayOptions = useMemo(() => {
+    if (resolvedMethod === "GET") {
+      return { read: { initialData: mergedData as never } };
+    }
+    if (resolvedMethod === "DELETE") {
+      return {
+        delete: {
+          urlPathParams: mergedData as never,
+          autoPrefillData: mergedData as never,
+        },
+      };
+    }
+    if (resolvedMethod === "PATCH") {
+      return { update: { autoPrefillData: mergedData as never } };
+    }
+    // POST or PUT
+    return { create: { autoPrefillData: mergedData as never } };
+  }, [resolvedMethod, mergedData]);
+
   return (
     <Div className={disabled ? "flex flex-col gap-0" : "flex flex-col gap-2"}>
-      <NavigationStackProvider>
-        <EndpointRenderer
-          endpoint={resolvedEndpoint}
-          locale={locale}
-          user={user}
-          logger={logger}
-          data={mergedData}
-          disabled={true}
-        />
-      </NavigationStackProvider>
+      <EndpointsPage
+        endpoint={{ [resolvedMethod]: resolvedEndpoint }}
+        locale={locale}
+        user={user}
+        disabled={true}
+        endpointOptions={displayOptions}
+      />
     </Div>
   );
 }

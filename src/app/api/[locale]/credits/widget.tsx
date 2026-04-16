@@ -29,6 +29,7 @@ import {
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
 import {
+  useWidgetSelector,
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -36,16 +37,6 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 
 import type definition from "./definition";
-import type { CreditsGetResponseOutput } from "./definition";
-
-/**
- * Props for custom widget
- */
-interface CustomWidgetProps {
-  field: {
-    value: CreditsGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
 
 /**
  * Format credit amount for display
@@ -60,27 +51,141 @@ function formatCredits(amount: number): string {
 }
 
 /**
- * Credits Balance Container Widget
+ * Credits total badge — subscribes only to `total`
  */
-export function CreditsBalanceContainer({
-  field,
-}: CustomWidgetProps): JSX.Element {
+function CreditsBadge(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
-  const credits = field.value;
-  const { locale } = useTranslation();
-  const widgetUser = useWidgetUser();
-  const isAdmin =
-    !widgetUser.isPublic && widgetUser.roles.includes(UserRole.ADMIN);
-  const totalModelCount = getAvailableModelCount(isAdmin);
+  const total = useWidgetSelector<typeof definition.GET>()(
+    (data) => data?.total ?? 0,
+  );
+  return (
+    <Badge className="text-lg font-bold px-4 py-2">
+      {total === 1
+        ? t("get.balance.credit", { count: formatCredits(total) })
+        : t("get.balance.credits", { count: formatCredits(total) })}
+    </Badge>
+  );
+}
 
+/**
+ * Expiring credits cell — re-renders only when `expiring` changes
+ */
+function ExpiringCell(): JSX.Element {
+  const t = useWidgetTranslation<typeof definition.GET>();
+  const { locale } = useTranslation();
+  const expiring = useWidgetSelector<typeof definition.GET>()(
+    (data) => data?.expiring ?? 0,
+  );
   const subscriptionProduct = productsRepository.getProduct(
     ProductIds.SUBSCRIPTION,
     locale,
+  );
+  return (
+    <Div className="p-4 rounded-lg bg-warning/10 border border-warning/30">
+      <Div className="flex items-center gap-2 text-sm text-warning mb-2">
+        <Calendar className="h-4 w-4" />
+        {t("get.balance.expiring.title")}
+      </Div>
+      <Div className="text-2xl font-bold text-warning">
+        {formatCredits(expiring)}
+      </Div>
+      <Div className="text-xs text-warning/70 mt-1">
+        {t("get.balance.expiring.description", {
+          subCredits: subscriptionProduct.credits,
+        })}
+      </Div>
+    </Div>
+  );
+}
+
+/**
+ * Permanent credits cell — re-renders only when `permanent` changes
+ */
+function PermanentCell(): JSX.Element {
+  const t = useWidgetTranslation<typeof definition.GET>();
+  const permanent = useWidgetSelector<typeof definition.GET>()(
+    (data) => data?.permanent ?? 0,
+  );
+  return (
+    <Div className="p-4 rounded-lg bg-success/10 border border-success/30">
+      <Div className="flex items-center gap-2 text-sm text-success mb-2">
+        <Sparkles className="h-4 w-4" />
+        {t("get.balance.permanent.title")}
+      </Div>
+      <Div className="text-2xl font-bold text-success">
+        {formatCredits(permanent)}
+      </Div>
+      <Div className="text-xs text-success/70 mt-1">
+        {t("get.balance.permanent.description")}
+      </Div>
+    </Div>
+  );
+}
+
+/**
+ * Free credits cell — re-renders only when `free` changes
+ */
+function FreeCell(): JSX.Element {
+  const t = useWidgetTranslation<typeof definition.GET>();
+  const { locale } = useTranslation();
+  const free = useWidgetSelector<typeof definition.GET>()(
+    (data) => data?.free ?? 0,
   );
   const freeProduct = productsRepository.getProduct(
     ProductIds.FREE_TIER,
     locale,
   );
+  return (
+    <Div className="p-4 rounded-lg bg-info/10 border border-info/30">
+      <Div className="flex items-center gap-2 text-sm text-info mb-2">
+        <Zap className="h-4 w-4" />
+        {t("get.balance.free.title")}
+      </Div>
+      <Div className="text-2xl font-bold text-info">{formatCredits(free)}</Div>
+      <Div className="text-xs text-info/70 mt-1">
+        {t("get.balance.free.description", { count: freeProduct.credits })}
+      </Div>
+    </Div>
+  );
+}
+
+/**
+ * Earned credits cell — re-renders only when `earned` changes
+ */
+function EarnedCell(): JSX.Element {
+  const t = useWidgetTranslation<typeof definition.GET>();
+  const { locale } = useTranslation();
+  const earned = useWidgetSelector<typeof definition.GET>()(
+    (data) => data?.earned ?? 0,
+  );
+  return (
+    <Link href={`/${locale}/user/referral`} className="block">
+      <Div className="p-4 rounded-lg bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-colors cursor-pointer h-full">
+        <Div className="flex items-center gap-2 text-sm text-violet-700 dark:text-violet-300 mb-2">
+          <Gift className="h-4 w-4" />
+          {t("get.balance.earned.title")}
+        </Div>
+        <Div className="text-2xl font-bold text-violet-900 dark:text-violet-100">
+          {formatCredits(earned)}
+        </Div>
+        <Div className="text-xs text-violet-600 dark:text-violet-400 mt-1">
+          {t("get.balance.earned.description")}
+        </Div>
+      </Div>
+    </Link>
+  );
+}
+
+/**
+ * Credits Balance Container Widget
+ * The container itself subscribes to nothing — only sub-components re-render on data changes
+ */
+export function CreditsBalanceContainer(): JSX.Element {
+  const t = useWidgetTranslation<typeof definition.GET>();
+  const widgetUser = useWidgetUser();
+  const isAdmin =
+    !widgetUser.isPublic && widgetUser.roles.includes(UserRole.ADMIN);
+  const totalModelCount = getAvailableModelCount(isAdmin);
 
   return (
     <MotionDiv
@@ -104,81 +209,15 @@ export function CreditsBalanceContainer({
                 })}
               </CardDescription>
             </Div>
-            <Badge className="text-lg font-bold px-4 py-2">
-              {(credits?.total ?? 0) === 1
-                ? t("get.balance.credit", {
-                    count: formatCredits(credits?.total ?? 0),
-                  })
-                : t("get.balance.credits", {
-                    count: formatCredits(credits?.total ?? 0),
-                  })}
-            </Badge>
+            <CreditsBadge />
           </Div>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
-          {/* Credit breakdown grid */}
           <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Expiring Credits */}
-            <Div className="p-4 rounded-lg bg-warning/10 border border-warning/30">
-              <Div className="flex items-center gap-2 text-sm text-warning mb-2">
-                <Calendar className="h-4 w-4" />
-                {t("get.balance.expiring.title")}
-              </Div>
-              <Div className="text-2xl font-bold text-warning">
-                {formatCredits(credits?.expiring ?? 0)}
-              </Div>
-              <Div className="text-xs text-warning/70 mt-1">
-                {t("get.balance.expiring.description", {
-                  subCredits: subscriptionProduct.credits,
-                })}
-              </Div>
-            </Div>
-
-            {/* Permanent Credits */}
-            <Div className="p-4 rounded-lg bg-success/10 border border-success/30">
-              <Div className="flex items-center gap-2 text-sm text-success mb-2">
-                <Sparkles className="h-4 w-4" />
-                {t("get.balance.permanent.title")}
-              </Div>
-              <Div className="text-2xl font-bold text-success">
-                {formatCredits(credits?.permanent ?? 0)}
-              </Div>
-              <Div className="text-xs text-success/70 mt-1">
-                {t("get.balance.permanent.description")}
-              </Div>
-            </Div>
-
-            {/* Free Credits */}
-            <Div className="p-4 rounded-lg bg-info/10 border border-info/30">
-              <Div className="flex items-center gap-2 text-sm text-info mb-2">
-                <Zap className="h-4 w-4" />
-                {t("get.balance.free.title")}
-              </Div>
-              <Div className="text-2xl font-bold text-info">
-                {formatCredits(credits?.free ?? 0)}
-              </Div>
-              <Div className="text-xs text-info/70 mt-1">
-                {t("get.balance.free.description", {
-                  count: freeProduct.credits,
-                })}
-              </Div>
-            </Div>
-
-            {/* Earned Credits (from referrals) */}
-            <Link href={`/${locale}/user/referral`} className="block">
-              <Div className="p-4 rounded-lg bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-colors cursor-pointer h-full">
-                <Div className="flex items-center gap-2 text-sm text-violet-700 dark:text-violet-300 mb-2">
-                  <Gift className="h-4 w-4" />
-                  {t("get.balance.earned.title")}
-                </Div>
-                <Div className="text-2xl font-bold text-violet-900 dark:text-violet-100">
-                  {formatCredits(credits?.earned ?? 0)}
-                </Div>
-                <Div className="text-xs text-violet-600 dark:text-violet-400 mt-1">
-                  {t("get.balance.earned.description")}
-                </Div>
-              </Div>
-            </Link>
+            <ExpiringCell />
+            <PermanentCell />
+            <FreeCell />
+            <EarnedCell />
           </Div>
         </CardContent>
       </Card>

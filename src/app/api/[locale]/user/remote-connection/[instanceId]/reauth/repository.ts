@@ -17,7 +17,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
+import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import loginEndpoints, {
@@ -145,11 +145,8 @@ export class RemoteConnectionReauthRepository {
         const registerUrl = `${remoteUrl}/api/${locale}/${registerEndpoints.POST.path.join("/")}`;
         const headers: Record<string, string> = {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}${BEARER_LEAD_ID_SEPARATOR}${newLeadId}`,
         };
-        if (newLeadId) {
-          headers.Cookie = `${LEAD_ID_COOKIE_NAME}=${newLeadId}`;
-        }
         await fetch(registerUrl, {
           method: "POST",
           headers,
@@ -178,7 +175,7 @@ export class RemoteConnectionReauthRepository {
       .update(remoteConnections)
       .set({
         token: encryptedToken,
-        leadId: newLeadId || null,
+        leadId: newLeadId,
         isActive: true,
         updatedAt: new Date(),
       })

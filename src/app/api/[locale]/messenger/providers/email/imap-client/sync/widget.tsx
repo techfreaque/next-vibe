@@ -13,23 +13,21 @@ import {
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Label } from "next-vibe-ui/ui/label";
 
 import { useMessengerAccountsList } from "@/app/api/[locale]/messenger/accounts/list/hooks";
 import type { MessengerAccountsListGETResponseOutput } from "@/app/api/[locale]/messenger/accounts/list/definition";
 import type definition from "./definition";
-import type { ImapSyncPostResponseOutput } from "./definition";
 
 interface CustomWidgetProps {
-  field: {
-    value: ImapSyncPostResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 export function ImapSyncContainer({
@@ -37,7 +35,7 @@ export function ImapSyncContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const t = useWidgetTranslation<typeof definition.POST>();
-  const result = field.value;
+  const result = useWidgetValue<typeof definition.POST>();
   const form = useWidgetForm();
   const user = useWidgetUser();
   const logger = useWidgetLogger();

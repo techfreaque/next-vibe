@@ -32,7 +32,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead) => {
   const jsx = React.createElement(LeadNotificationEmail, props);
 
   const { createEndpointLogger } =
-    await import("@/app/api/[locale]/system/unified-interface/shared/logger/endpoint");
+    await import("@/app/api/[locale]/system/unified-interface/shared/logger/server-logger");
   const logger = createEndpointLogger(false, Date.now(), "en-GLOBAL");
 
   await EmailSendingRepository.sendEmail(

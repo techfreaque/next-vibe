@@ -159,7 +159,7 @@ export class MusicGenerationRepository {
     let { audioUrl } = generationResult.data;
 
     // Upload to our storage so the URL is persistent and access-controlled
-    if (streamContext?.threadId) {
+    if (streamContext.threadId) {
       try {
         const storage = getStorageAdapter();
         const arrayBuf = await fetch(audioUrl).then((r) => r.arrayBuffer());

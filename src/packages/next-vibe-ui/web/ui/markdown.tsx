@@ -65,7 +65,8 @@ function extractThinkingSections(content: string): {
 
   // Extract all complete thinking sections
   while ((match = completeThinkRegex.exec(content)) !== null) {
-    thinkingSections.push(match[1].trim());
+    // Strip any nested <think> tags that leaked into the captured content
+    thinkingSections.push(match[1].replace(/<\/?think>/gi, "").trim());
   }
 
   // Remove all complete <think>...</think> tags from content
@@ -75,7 +76,11 @@ function extractThinkingSections(content: string): {
   // Check for incomplete <think> tag (streaming case)
   const incompleteThinkMatch = processedContent.match(/<think>([\s\S]*)$/i);
   if (incompleteThinkMatch) {
-    incompleteThinking = incompleteThinkMatch[1].trim();
+    // Strip any nested/repeated <think> tags from the captured content
+    // (can occur when model emits <think> as literal text inside reasoning)
+    incompleteThinking = incompleteThinkMatch[1]
+      .replace(/<\/?think>/gi, "")
+      .trim();
     // Remove the incomplete <think> tag and its content from processedContent
     processedContent = processedContent.replace(/<think>[\s\S]*$/i, "");
   }

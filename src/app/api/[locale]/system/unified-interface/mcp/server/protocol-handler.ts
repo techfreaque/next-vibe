@@ -7,10 +7,10 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
 
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { IDefinitionLoader } from "../../shared/endpoints/definition/loader";
 import {
   definitionsRegistry,
@@ -19,7 +19,6 @@ import {
 import { permissionsRegistry } from "../../shared/endpoints/permissions/registry";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { Platform } from "../../shared/types/platform";
-import type { WidgetData } from "../../shared/widgets/widget-data";
 import { endpointToMCPTool } from "../converter";
 import { MCPRegistry, mcpRegistry } from "../registry";
 import type {
@@ -313,7 +312,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       const result = await this.registry.executeTool(
         {
           toolName: params.name,
-          data: (params.arguments || {}) as CliRequestData,
+          data: params.arguments || {},
           user: this.user,
           locale: this.locale,
           requestId: callId,

@@ -6,23 +6,23 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
+import type { ChatModelOption } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   DEFAULT_INPUT_TOKENS,
   DEFAULT_OUTPUT_TOKENS,
 } from "@/app/api/[locale]/agent/models/constants";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
-import type { ChatModelOption } from "@/app/api/[locale]/agent/ai-stream/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { creditValidator } from "@/app/api/[locale]/credits/validator";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { AiStreamT } from "../../stream/i18n";
 
 export class CreditValidatorHandler {
   static async validateCredits(params: {
-    userId: string | undefined;
-    leadId: string | undefined;
+    user: JwtPayloadType;
     ipAddress: string | undefined;
     modelInfo: ChatModelOption;
     locale: CountryLanguage;
@@ -30,11 +30,12 @@ export class CreditValidatorHandler {
     t: AiStreamT;
   }): Promise<
     ResponseType<{
-      effectiveLeadId: string | undefined;
+      effectiveLeadId: string;
       modelCost: number;
     }>
   > {
-    const { userId, leadId, ipAddress, modelInfo, locale, logger, t } = params;
+    const { user, ipAddress, modelInfo, locale, logger, t } = params;
+    const leadId = user.leadId;
     const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
     const modelCost = calculateCreditCost(
@@ -45,9 +46,9 @@ export class CreditValidatorHandler {
     let validationResult;
     let effectiveLeadId = leadId;
 
-    if (userId) {
+    if (!user.isPublic) {
       validationResult = await creditValidator.validateUserCredits(
-        userId,
+        user,
         modelInfo.id,
         modelCost,
         logger,
@@ -102,8 +103,7 @@ export class CreditValidatorHandler {
 
     if (!validationResult.data.canUseModel) {
       logger.warn("Insufficient credits", {
-        userId,
-        leadId: effectiveLeadId,
+        user,
         modelId: modelInfo.id,
         cost: modelCost,
         balance: validationResult.data.balance,
@@ -119,8 +119,7 @@ export class CreditValidatorHandler {
     }
 
     logger.debug("Credit validation passed", {
-      userId,
-      leadId: effectiveLeadId,
+      user,
       cost: modelCost,
       balance: validationResult.data.balance,
     });

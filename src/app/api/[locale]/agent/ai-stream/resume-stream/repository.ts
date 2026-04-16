@@ -27,7 +27,7 @@
 
 import "server-only";
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, gt, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -39,17 +39,14 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import {
   type ToolCall,
-  type ToolCallResult,
   chatMessages,
   chatThreads,
 } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { buildMessagesChannel } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/channel";
-import { createStreamEvent } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/events";
+import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -70,6 +67,8 @@ export class ResumeStreamRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: AiStreamT,
+    abortSignal: AbortSignal,
+    subAgentDepth: number,
   ): Promise<ResponseType<ResumeStreamResponseOutput>> {
     const {
       threadId,
@@ -322,17 +321,12 @@ export class ResumeStreamRepository {
                         sql`${chatThreads.streamingState} = 'streaming'`,
                       ),
                     );
-                  publishWsEvent(
-                    {
-                      channel: buildMessagesChannel(effectiveThreadId),
-                      event: "streaming-state-changed",
-                      data: createStreamEvent.streamingStateChanged({
-                        threadId: effectiveThreadId,
-                        state: "idle",
-                      }).data,
-                    },
+                  createMessagesEmitter(
+                    effectiveThreadId,
+                    threadRootFolderId,
                     logger,
-                  );
+                    user,
+                  )("streaming-state-changed", { streamingState: "idle" });
                   logger.debug(
                     "[ResumeStream] wakeUp - cleared stuck streaming state (idempotency path)",
                     { threadId: effectiveThreadId },
@@ -414,24 +408,20 @@ export class ResumeStreamRepository {
                 sequenceIdOverride: existingDeferred.sequenceId ?? undefined,
                 threadId: effectiveThreadId,
                 rootFolderId: threadRootFolderId,
+                subAgentDepth,
                 user,
                 locale,
                 logger,
                 t,
+                abortSignal,
               })
                 .then(async (result) => {
-                  publishWsEvent(
-                    {
-                      channel: buildMessagesChannel(threadId),
-                      event: "stream-finished",
-                      data: createStreamEvent.streamFinished({
-                        threadId,
-                        reason: "completed",
-                        finalState: "idle",
-                      }).data,
-                    },
+                  createMessagesEmitter(
+                    threadId,
+                    threadRootFolderId,
                     logger,
-                  );
+                    user,
+                  )("stream-finished", { streamingState: "idle" });
                   logger.debug(
                     "[ResumeStream] wakeUp revival (from existing deferred) complete",
                     {
@@ -439,19 +429,24 @@ export class ResumeStreamRepository {
                       success: result.success,
                     },
                   );
-                  const taskIdsToDelete = [wakeUpTaskId, resumeTaskId].filter(
-                    Boolean,
-                  ) as string[];
-                  if (taskIdsToDelete.length > 0) {
-                    await Promise.all(
-                      taskIdsToDelete.map((id) =>
-                        db.delete(cronTasks).where(eq(cronTasks.id, id)),
-                      ),
-                    ).catch((cleanupErr: Error) => {
-                      logger.warn("[ResumeStream] Cleanup failed (non-fatal)", {
-                        error: cleanupErr.message,
+                  // Only delete wakeUpTaskId (terminal escalated task, not managed by pulse).
+                  if (wakeUpTaskId) {
+                    await db
+                      .delete(cronTasks)
+                      .where(
+                        and(
+                          eq(cronTasks.id, wakeUpTaskId),
+                          gt(cronTasks.executionCount, 0),
+                        ),
+                      )
+                      .catch((cleanupErr: Error) => {
+                        logger.warn(
+                          "[ResumeStream] Cleanup failed (non-fatal)",
+                          {
+                            error: cleanupErr.message,
+                          },
+                        );
                       });
-                    });
                   }
                   return result;
                 })
@@ -465,10 +460,7 @@ export class ResumeStreamRepository {
             }
 
             // wakeUpResult arrives as a parsed object (deepParseJsonStrings in request-validator
-            // auto-parses the JSON string from taskInput). Use it directly as ToolCallResult.
-            const parsedResult = wakeUpResultObj
-              ? (wakeUpResultObj as ToolCallResult)
-              : undefined;
+            const parsedResult = wakeUpResultObj ? wakeUpResultObj : undefined;
             const deferredStatus =
               wakeUpStatus === "completed"
                 ? ("completed" as const)
@@ -521,31 +513,23 @@ export class ResumeStreamRepository {
                   { threadId: effectiveThreadId, toolMessageId },
                 );
 
-                // Cleanup cron tasks - live stream handles insertion + revival, these are no longer needed.
-                const liveWakeUpCleanupIds = [
-                  wakeUpTaskId,
-                  resumeTaskId,
-                ].filter(Boolean) as string[];
-                if (liveWakeUpCleanupIds.length > 0) {
-                  try {
-                    await Promise.all(
-                      liveWakeUpCleanupIds.map((id) =>
-                        db.delete(cronTasks).where(eq(cronTasks.id, id)),
+                // Cleanup: only delete wakeUpTaskId (terminal escalated task, not managed by pulse).
+                // resumeTaskId is a pulse run-once task - pulse handles its own row lifecycle;
+                // deleting it here causes a FK violation when pulse tries to insert cron_task_executions.
+                if (wakeUpTaskId) {
+                  db.delete(cronTasks)
+                    .where(
+                      and(
+                        eq(cronTasks.id, wakeUpTaskId),
+                        gt(cronTasks.executionCount, 0),
                       ),
-                    );
-                    logger.debug(
-                      "[ResumeStream] Cleaned up cron tasks (live wakeUp signal)",
-                      { deletedIds: liveWakeUpCleanupIds },
-                    );
-                  } catch (cleanupErr) {
-                    logger.warn(
-                      "[ResumeStream] Live wakeUp cleanup failed (non-fatal)",
-                      {
-                        liveWakeUpCleanupIds,
-                        error: parseError(cleanupErr).message,
-                      },
-                    );
-                  }
+                    )
+                    .catch((cleanupErr: Error) => {
+                      logger.warn(
+                        "[ResumeStream] Live wakeUp cleanup failed (non-fatal)",
+                        { wakeUpTaskId, error: cleanupErr.message },
+                      );
+                    });
                 }
 
                 return success({ resumed: false, lastAiMessageId: null });
@@ -637,12 +621,16 @@ export class ResumeStreamRepository {
               metadata: { toolCall: deferredToolCall },
             });
 
-            publishWsEvent(
-              {
-                channel: buildMessagesChannel(effectiveThreadId),
-                event: "message-created",
-                data: createStreamEvent.messageCreated({
-                  messageId: deferredId,
+            createMessagesEmitter(
+              effectiveThreadId,
+              threadRootFolderId,
+              logger,
+              user,
+            )("message-created", {
+              streamingState: "streaming",
+              messages: [
+                {
+                  id: deferredId,
                   threadId: effectiveThreadId,
                   role: ChatMessageRole.TOOL,
                   parentId: leafId,
@@ -650,26 +638,25 @@ export class ResumeStreamRepository {
                   model: resolvedModel,
                   skill: resolvedSkill,
                   sequenceId: deferredSequenceId,
-                  toolCall: deferredToolCall,
-                }).data,
-              },
-              logger,
-            );
+                  metadata: { toolCall: deferredToolCall },
+                  isAI: true,
+                },
+              ],
+            });
 
-            publishWsEvent(
-              {
-                channel: buildMessagesChannel(effectiveThreadId),
-                event: "tool-result",
-                data: createStreamEvent.toolResult({
-                  messageId: deferredId,
-                  toolName: deferredToolCall.toolName,
-                  result: deferredToolCall.result,
-                  error: deferredToolCall.error,
-                  toolCall: deferredToolCall,
-                }).data,
-              },
+            createMessagesEmitter(
+              effectiveThreadId,
+              threadRootFolderId,
               logger,
-            );
+              user,
+            )("tool-result", {
+              messages: [
+                {
+                  id: deferredId,
+                  metadata: { toolCall: deferredToolCall },
+                },
+              ],
+            });
 
             const revivalParentId = deferredId;
 
@@ -695,24 +682,20 @@ export class ResumeStreamRepository {
               sequenceIdOverride: deferredSequenceId,
               threadId: effectiveThreadId,
               rootFolderId: threadRootFolderId,
+              subAgentDepth,
               user,
               locale,
               logger,
               t,
+              abortSignal,
             })
               .then(async (result) => {
-                publishWsEvent(
-                  {
-                    channel: buildMessagesChannel(threadId),
-                    event: "stream-finished",
-                    data: createStreamEvent.streamFinished({
-                      threadId,
-                      reason: "completed",
-                      finalState: "idle",
-                    }).data,
-                  },
+                createMessagesEmitter(
+                  threadId,
+                  threadRootFolderId,
                   logger,
-                );
+                  user,
+                )("stream-finished", { streamingState: "idle" });
                 logger.debug("[ResumeStream] wakeUp revival complete", {
                   threadId,
                   success: result.success,
@@ -721,23 +704,25 @@ export class ResumeStreamRepository {
                     : null,
                 });
 
-                // Cleanup: delete the wakeUp task and this resume-stream task.
-                const taskIdsToDelete = [wakeUpTaskId, resumeTaskId].filter(
-                  Boolean,
-                ) as string[];
-                if (taskIdsToDelete.length > 0) {
+                // Cleanup: only delete wakeUpTaskId (terminal escalated task, not managed by pulse).
+                // resumeTaskId is a pulse run-once task - pulse owns its row lifecycle;
+                // deleting it here races with pulse's createExecution FK insert.
+                if (wakeUpTaskId) {
                   try {
-                    await Promise.all(
-                      taskIdsToDelete.map((id) =>
-                        db.delete(cronTasks).where(eq(cronTasks.id, id)),
-                      ),
-                    );
-                    logger.debug("[ResumeStream] Cleaned up cron tasks", {
-                      deletedIds: taskIdsToDelete,
+                    await db
+                      .delete(cronTasks)
+                      .where(
+                        and(
+                          eq(cronTasks.id, wakeUpTaskId),
+                          gt(cronTasks.executionCount, 0),
+                        ),
+                      );
+                    logger.debug("[ResumeStream] Cleaned up wakeUp cron task", {
+                      wakeUpTaskId,
                     });
                   } catch (cleanupErr) {
                     logger.warn("[ResumeStream] Cleanup failed (non-fatal)", {
-                      taskIdsToDelete,
+                      wakeUpTaskId,
                       error: parseError(cleanupErr).message,
                     });
                   }
@@ -760,17 +745,12 @@ export class ResumeStreamRepository {
                     ),
                   )
                   .catch(() => undefined);
-                publishWsEvent(
-                  {
-                    channel: buildMessagesChannel(effectiveThreadId),
-                    event: "streaming-state-changed",
-                    data: createStreamEvent.streamingStateChanged({
-                      threadId: effectiveThreadId,
-                      state: "idle",
-                    }).data,
-                  },
+                createMessagesEmitter(
+                  effectiveThreadId,
+                  threadRootFolderId,
                   logger,
-                );
+                  user,
+                )("streaming-state-changed", { streamingState: "idle" });
               });
 
             return success({ resumed: true, lastAiMessageId: null });
@@ -783,20 +763,19 @@ export class ResumeStreamRepository {
           if (isLive && !isWaitMode) {
             // Stream still running - live loop will pick up the backfilled result.
             // Emit TOOL_RESULT WS so the UI bubble updates immediately.
-            publishWsEvent(
-              {
-                channel: buildMessagesChannel(effectiveThreadId),
-                event: "tool-result",
-                data: createStreamEvent.toolResult({
-                  messageId: toolMessageId,
-                  toolName: toolCall.toolName,
-                  result: toolCall.result,
-                  error: toolCall.error,
-                  toolCall,
-                }).data,
-              },
+            createMessagesEmitter(
+              effectiveThreadId,
+              threadRootFolderId,
               logger,
-            );
+              user,
+            )("tool-result", {
+              messages: [
+                {
+                  id: toolMessageId,
+                  metadata: { toolCall },
+                },
+              ],
+            });
 
             logger.debug(
               "[ResumeStream] Stream live - emitted TOOL_RESULT WS, live loop picks up result",
@@ -804,26 +783,38 @@ export class ResumeStreamRepository {
             );
 
             // Cleanup cron tasks - live stream handles the result, these are no longer needed.
-            const liveCleanupIds = [wakeUpTaskId, resumeTaskId].filter(
-              Boolean,
-            ) as string[];
-            if (liveCleanupIds.length > 0) {
-              try {
-                await Promise.all(
-                  liveCleanupIds.map((id) =>
-                    db.delete(cronTasks).where(eq(cronTasks.id, id)),
-                  ),
+            try {
+              const cleanupOps = [];
+              if (resumeTaskId) {
+                cleanupOps.push(
+                  db.delete(cronTasks).where(eq(cronTasks.id, resumeTaskId)),
                 );
+              }
+              if (wakeUpTaskId) {
+                cleanupOps.push(
+                  db
+                    .delete(cronTasks)
+                    .where(
+                      and(
+                        eq(cronTasks.id, wakeUpTaskId),
+                        gt(cronTasks.executionCount, 0),
+                      ),
+                    ),
+                );
+              }
+              if (cleanupOps.length > 0) {
+                await Promise.all(cleanupOps);
                 logger.debug(
                   "[ResumeStream] Cleaned up cron tasks (live stream)",
-                  { deletedIds: liveCleanupIds },
+                  { wakeUpTaskId, resumeTaskId },
                 );
-              } catch (cleanupErr) {
-                logger.warn("[ResumeStream] Live cleanup failed (non-fatal)", {
-                  liveCleanupIds,
-                  error: parseError(cleanupErr).message,
-                });
               }
+            } catch (cleanupErr) {
+              logger.warn("[ResumeStream] Live cleanup failed (non-fatal)", {
+                wakeUpTaskId,
+                resumeTaskId,
+                error: parseError(cleanupErr).message,
+              });
             }
 
             return success({ resumed: false, lastAiMessageId: null });
@@ -834,20 +825,19 @@ export class ResumeStreamRepository {
           // Emit tool-result WS so UI updates, then fire headless stream.
           if (isWaitMode) {
             // Emit tool-result WS so the UI bubble shows the real result.
-            publishWsEvent(
-              {
-                channel: buildMessagesChannel(effectiveThreadId),
-                event: "tool-result",
-                data: createStreamEvent.toolResult({
-                  messageId: toolMessageId,
-                  toolName: toolCall.toolName,
-                  result: toolCall.result,
-                  error: toolCall.error,
-                  toolCall,
-                }).data,
-              },
+            createMessagesEmitter(
+              effectiveThreadId,
+              threadRootFolderId,
               logger,
-            );
+              user,
+            )("tool-result", {
+              messages: [
+                {
+                  id: toolMessageId,
+                  metadata: { toolCall },
+                },
+              ],
+            });
 
             logger.debug(
               "[ResumeStream] WAIT mode - emitted tool-result WS, firing headless stream",
@@ -918,10 +908,12 @@ export class ResumeStreamRepository {
               sequenceIdOverride: resolvedExisting?.sequenceId ?? undefined,
               threadId: effectiveThreadId,
               rootFolderId: threadRootFolderId,
+              subAgentDepth,
               user,
               locale,
               logger,
               t,
+              abortSignal,
             })
               .then(async (result) => {
                 logger.debug("[ResumeStream] WAIT revival complete", {
@@ -945,30 +937,19 @@ export class ResumeStreamRepository {
                       ),
                     )
                     .catch(() => undefined);
-                  publishWsEvent(
-                    {
-                      channel: buildMessagesChannel(effectiveThreadId),
-                      event: "streaming-state-changed",
-                      data: createStreamEvent.streamingStateChanged({
-                        threadId: effectiveThreadId,
-                        state: "idle",
-                      }).data,
-                    },
+                  createMessagesEmitter(
+                    effectiveThreadId,
+                    threadRootFolderId,
                     logger,
-                  );
+                    user,
+                  )("streaming-state-changed", { streamingState: "idle" });
                 } else {
-                  publishWsEvent(
-                    {
-                      channel: buildMessagesChannel(threadId),
-                      event: "stream-finished",
-                      data: createStreamEvent.streamFinished({
-                        threadId,
-                        reason: "completed",
-                        finalState: "idle",
-                      }).data,
-                    },
+                  createMessagesEmitter(
+                    threadId,
+                    threadRootFolderId,
                     logger,
-                  );
+                    user,
+                  )("stream-finished", { streamingState: "idle" });
                   // Clean up any error messages that are children of the tool message.
                   // These can appear if a previous revival attempt failed (e.g. due to a
                   // stale module cache in the MCP process) and createAiStream inserted an
@@ -984,27 +965,41 @@ export class ResumeStreamRepository {
 
                   // Cleanup cron tasks - only on success. On failure, leave the cron task
                   // intact so the cron pulse can retry the revival with fresh code.
-                  // Stale MCP module caches may fail direct-fire revival and delete the
-                  // task prematurely; keeping it alive here ensures the cron path recovers.
-                  const taskIdsToDelete = [wakeUpTaskId, resumeTaskId].filter(
-                    Boolean,
-                  ) as string[];
-                  if (taskIdsToDelete.length > 0) {
-                    try {
-                      await Promise.all(
-                        taskIdsToDelete.map((id) =>
-                          db.delete(cronTasks).where(eq(cronTasks.id, id)),
-                        ),
+                  // Only delete wakeUpTaskId if consumed (executionCount > 0).
+                  try {
+                    const cleanupOps = [];
+                    if (resumeTaskId) {
+                      cleanupOps.push(
+                        db
+                          .delete(cronTasks)
+                          .where(eq(cronTasks.id, resumeTaskId)),
                       );
+                    }
+                    if (wakeUpTaskId) {
+                      cleanupOps.push(
+                        db
+                          .delete(cronTasks)
+                          .where(
+                            and(
+                              eq(cronTasks.id, wakeUpTaskId),
+                              gt(cronTasks.executionCount, 0),
+                            ),
+                          ),
+                      );
+                    }
+                    if (cleanupOps.length > 0) {
+                      await Promise.all(cleanupOps);
                       logger.debug("[ResumeStream] Cleaned up cron tasks", {
-                        deletedIds: taskIdsToDelete,
-                      });
-                    } catch (cleanupErr) {
-                      logger.warn("[ResumeStream] Cleanup failed (non-fatal)", {
-                        taskIdsToDelete,
-                        error: parseError(cleanupErr).message,
+                        wakeUpTaskId,
+                        resumeTaskId,
                       });
                     }
+                  } catch (cleanupErr) {
+                    logger.warn("[ResumeStream] Cleanup failed (non-fatal)", {
+                      wakeUpTaskId,
+                      resumeTaskId,
+                      error: parseError(cleanupErr).message,
+                    });
                   }
                 }
                 return;
@@ -1024,17 +1019,12 @@ export class ResumeStreamRepository {
                     ),
                   )
                   .catch(() => undefined);
-                publishWsEvent(
-                  {
-                    channel: buildMessagesChannel(effectiveThreadId),
-                    event: "streaming-state-changed",
-                    data: createStreamEvent.streamingStateChanged({
-                      threadId: effectiveThreadId,
-                      state: "idle",
-                    }).data,
-                  },
+                createMessagesEmitter(
+                  effectiveThreadId,
+                  threadRootFolderId,
                   logger,
-                );
+                  user,
+                )("streaming-state-changed", { streamingState: "idle" });
               });
 
             return success({ resumed: true, lastAiMessageId: null });
@@ -1071,17 +1061,12 @@ export class ResumeStreamRepository {
                 sql`${chatThreads.streamingState} = 'waiting'`,
               ),
             );
-          publishWsEvent(
-            {
-              channel: buildMessagesChannel(threadId),
-              event: "streaming-state-changed",
-              data: createStreamEvent.streamingStateChanged({
-                threadId,
-                state: "idle",
-              }).data,
-            },
+          createMessagesEmitter(
+            threadId,
+            threadRootFolderId,
             logger,
-          );
+            user,
+          )("streaming-state-changed", { streamingState: "idle" });
           logger.debug(
             "[ResumeStream] Cleared thread from waiting to idle (no-op path)",
             { threadId },

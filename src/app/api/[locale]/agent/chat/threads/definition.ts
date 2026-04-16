@@ -29,6 +29,11 @@ import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
 import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
 
+import {
+  onEventUpdateIncognitoThread,
+  onEventDeleteIncognitoThread,
+} from "@/app/api/[locale]/agent/chat/incognito/event-persist";
+
 import { scopedTranslation } from "./i18n";
 
 const ThreadsListContainer = lazy(() =>
@@ -391,6 +396,68 @@ const { GET } = createEndpoint({
   },
 
   useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
+
+  events: {
+    // Framework merges the partial into the threads array by id (upsert).
+    // Emitted by messages/emitter.ts for thread-scoped events that affect the sidebar.
+    "thread-title-updated": {
+      fields: { threads: ["id", "title"] as const },
+      operation: "merge" as const,
+      onEvent: onEventUpdateIncognitoThread({
+        source: "requestData",
+        arrayField: "threads",
+        pick: ["title"],
+      }),
+    },
+    "streaming-state-changed": {
+      fields: { threads: ["id", "streamingState"] as const },
+      operation: "merge" as const,
+      onEvent: onEventUpdateIncognitoThread({
+        source: "requestData",
+        arrayField: "threads",
+        pick: ["streamingState"],
+      }),
+    },
+    "stream-finished": {
+      fields: {
+        threads: ["id", "streamingState", "preview", "updatedAt"] as const,
+      },
+      operation: "merge" as const,
+      onEvent: onEventUpdateIncognitoThread({
+        source: "requestData",
+        arrayField: "threads",
+        pick: ["streamingState", "preview", "updatedAt"],
+      }),
+    },
+    // Emitted by threads/[threadId]/repository.ts on PATCH and DELETE.
+    "thread-updated": {
+      fields: {
+        threads: [
+          "id",
+          "title",
+          "folderId",
+          "status",
+          "preview",
+          "rootFolderId",
+          "updatedAt",
+        ] as const,
+      },
+      operation: "merge" as const,
+      onEvent: onEventUpdateIncognitoThread({
+        source: "requestData",
+        arrayField: "threads",
+        pick: ["title", "folderId", "preview"],
+      }),
+    },
+    "thread-deleted": {
+      fields: { threads: ["id"] as const },
+      operation: "remove" as const,
+      onEvent: onEventDeleteIncognitoThread({
+        source: "requestData",
+        arrayField: "threads",
+      }),
+    },
+  },
 
   examples: {
     requests: {

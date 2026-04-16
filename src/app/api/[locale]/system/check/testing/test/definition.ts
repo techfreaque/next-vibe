@@ -17,12 +17,12 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 
 import { UserRole } from "../../../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
-const TestResultWidget = lazyCliWidget(() =>
+const TestResultWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.TestResultWidget })),
 );
 

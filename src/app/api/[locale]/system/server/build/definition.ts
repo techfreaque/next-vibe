@@ -25,10 +25,10 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { BUILD_ALIAS, BUILD_SERVER_ALIAS } from "./constants";
 
-const BuildResultWidget = lazyCliWidget(() =>
+const BuildResultWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.BuildResultWidget })),
 );
 

@@ -26,24 +26,22 @@ import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetSelector,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/react";
-import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/widget";
+import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 
 import { cn } from "../../../shared/utils";
 import type definition from "./definition";
-import type { MemoriesListResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
 /**
  * Props for custom widget
  */
 interface CustomWidgetProps {
-  field: {
-    value: MemoriesListResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 /**
@@ -156,9 +154,8 @@ export function MemoriesListContainer({
   const searchQuery = form.watch("search") ?? "";
   const selectedTag = form.watch("tag") ?? null;
 
-  const memories = useMemo(
-    () => field.value?.memories ?? [],
-    [field.value?.memories],
+  const memories = useWidgetSelector<typeof definition.GET>()(
+    (d) => d?.memories ?? [],
   );
 
   // Get all unique tags from current result set (for filter chip UI)

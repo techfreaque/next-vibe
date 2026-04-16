@@ -43,10 +43,12 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { MessageVariant } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import { leads } from "@/app/api/[locale]/leads/db";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 import { type UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
@@ -67,22 +69,11 @@ interface ThreadMetadata {
   }[];
 }
 
-/**
- * Tool call result type
- */
-export type ToolCallResult =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: ToolCallResult }
-  | ToolCallResult[];
-
 export interface ToolCall {
   toolCallId: string; // AI SDK tool call ID (e.g., "toolu_bdrk_01X8QxqpkW7HVqYiChTpDLzN")
   toolName: string;
-  args: ToolCallResult;
-  result?: ToolCallResult;
+  args: WidgetData;
+  result?: WidgetData;
   error?: ErrorResponseType; // Structured error with translation key, params, errorType, and optional nested cause
   executionTime?: number;
   creditsUsed?: number;
@@ -131,8 +122,8 @@ export interface ReasoningMetadata {
 export interface ToolCallMetadata {
   toolCallId: string; // AI SDK tool call ID (e.g., "toolu_bdrk_01X8QxqpkW7HVqYiChTpDLzN")
   toolName: string;
-  args: ToolCallResult;
-  result?: ToolCallResult;
+  args: WidgetData;
+  result?: WidgetData;
   error?: ErrorResponseType; // Structured error with translation key, params, errorType, and optional nested cause
   executionTime?: number;
   creditsUsed?: number;
@@ -238,13 +229,7 @@ export interface MessageMetadata {
   }>;
 
   // Gap-fill translations: each modality gap produces a variant stored here
-  variants?: Array<{
-    modality: Modality;
-    content: string; // text content or storage URL
-    modelId?: ChatModelId; // which bridge model produced this
-    creditCost?: number;
-    createdAt: string; // ISO timestamp
-  }>;
+  variants?: MessageVariant[];
 
   // Real-time gap-fill status - set on GAP_FILL_STARTED, cleared on GAP_FILL_COMPLETED.
   // Used to show labeled status chips ("Transcribing audio…", "Analyzing image…", etc.)

@@ -1,10 +1,13 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import type { z } from "zod";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import type {
+  CreateApiEndpoint,
+  InferResponseOutput,
+} from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import type { EndpointEventsMap } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EventSchemas } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
@@ -26,13 +29,20 @@ export interface TestEndpointOptions<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
+  TEvents extends EndpointEventsMap<InferResponseOutput<TFields>>,
 > {
   /**
    * Custom test cases to run in addition to (or instead of) example tests
    */
   customTests?: {
     [testName: string]: (
-      test: TestRunner<TMethod, TUserRoleValue, TScopedTranslationKey, TFields>,
+      test: TestRunner<
+        TMethod,
+        TUserRoleValue,
+        TScopedTranslationKey,
+        TFields,
+        TEvents
+      >,
     ) => Promise<void> | void;
   };
 
@@ -56,6 +66,7 @@ export interface TestRunner<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
+  TEvents extends EndpointEventsMap<InferResponseOutput<TFields>>,
 > {
   /**
    * Execute the endpoint with the given data and URL params
@@ -67,14 +78,14 @@ export interface TestRunner<
       TUserRoleValue,
       TScopedTranslationKey,
       TFields,
-      EventSchemas
+      TEvents
     >["types"]["RequestOutput"];
     urlPathParams: CreateApiEndpoint<
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
       TFields,
-      EventSchemas
+      TEvents
     >["types"]["UrlVariablesOutput"];
     user: JwtPayloadType;
   }) => Promise<
@@ -84,7 +95,7 @@ export interface TestRunner<
         TUserRoleValue,
         TScopedTranslationKey,
         TFields,
-        EventSchemas
+        TEvents
       >["types"]["ResponseOutput"]
     >
   >;
@@ -97,6 +108,6 @@ export interface TestRunner<
     TUserRoleValue,
     TScopedTranslationKey,
     TFields,
-    EventSchemas
+    TEvents
   >;
 }

@@ -49,8 +49,9 @@ import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
 import type definition from "./definition";
 import type { UserViewResponseOutput } from "./definition";
@@ -59,9 +60,7 @@ import type { UserViewResponseOutput } from "./definition";
  * Props for custom widget
  */
 interface CustomWidgetProps {
-  field: {
-    value: UserViewResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 type TabId = "overview" | "credits" | "referrals" | "earnings" | "connections";
@@ -148,7 +147,7 @@ export function UserViewContainer({
   const locale = useWidgetLocale();
   const { user } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.GET>();
   const children = field.children;
 
   const [activeTab, setActiveTab] = useState<TabId>("overview");

@@ -28,16 +28,16 @@ import {
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { iconSchema } from "../../../shared/types/common.schema";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { iconSchema } from "../../../shared/types/common.schema";
 import { FAVORITES_LIST_ALIAS } from "./constants";
 import type { FavoritesTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 
-const FavoritesListContainer = lazyCliWidget(() =>
+const FavoritesListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.FavoritesListContainer })),
 );
 
@@ -313,6 +313,64 @@ const { GET } = createEndpoint({
     description: "get.success.description" as const,
   },
 
+  // === WS EVENTS ===
+  // Emitted by favorites mutation repositories — keeps sidebar in sync across all tabs.
+  // Framework merges/removes from React Query cache automatically. No client code needed.
+  events: {
+    "favorite-created": {
+      fields: {
+        favorites: [
+          "id",
+          "skillId",
+          "variantId",
+          "customVariantName",
+          "modelId",
+          "voiceId",
+          "position",
+          "icon",
+          "name",
+          "tagline",
+          "activeBadge",
+          "description",
+          "modelIcon",
+          "modelInfo",
+          "modelProvider",
+        ] as const,
+      },
+      operation: "merge" as const,
+    },
+    "favorite-updated": {
+      fields: {
+        favorites: [
+          "id",
+          "skillId",
+          "variantId",
+          "customVariantName",
+          "modelId",
+          "voiceId",
+          "position",
+          "icon",
+          "name",
+          "tagline",
+          "activeBadge",
+          "description",
+          "modelIcon",
+          "modelInfo",
+          "modelProvider",
+        ] as const,
+      },
+      operation: "merge" as const,
+    },
+    "favorite-deleted": {
+      fields: { favorites: ["id"] as const },
+      operation: "remove" as const,
+    },
+    "favorites-reordered": {
+      fields: { favorites: ["id", "position"] as const },
+      operation: "merge" as const,
+    },
+  },
+
   examples: {
     requests: {
       ownFavorites: {},
@@ -339,7 +397,7 @@ const { GET } = createEndpoint({
             icon: "sparkles",
             name: "Thea",
             tagline: "Greek goddess of light",
-            activeBadge: "app.chat.selector.active",
+            activeBadge: "active",
             description: "Devoted companion with ancient wisdom",
             modelIcon: "sparkles",
             modelInfo: "Claude Sonnet 4.5",

@@ -429,7 +429,7 @@ export class StripeProvider implements PaymentProvider {
             details.subscription.length > 0
           ) {
             webhookData.subscription = details.subscription;
-            logger.info(
+            logger.debug(
               "Extracted subscription from parent.subscription_details",
               {
                 subscription: details.subscription,
@@ -451,7 +451,7 @@ export class StripeProvider implements PaymentProvider {
         eventData.parent !== null
       ) {
         webhookData.parent = eventData.parent;
-        logger.info("Extracted parent from webhook event", {
+        logger.debug("Extracted parent from webhook event", {
           eventType: event.type,
           hasParent: true,
           parentKeys: Object.keys(eventData.parent),

@@ -26,19 +26,13 @@ import {
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import { LeadMagnetProviderDB } from "../enum";
 import type endpoints from "./definition";
-import type { LeadMagnetConfigGetResponseOutput } from "./definition";
 
 type ProviderKey = (typeof LeadMagnetProviderDB)[number];
-
-interface WidgetProps {
-  field: {
-    value: LeadMagnetConfigGetResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
-}
 
 interface ProviderModule {
   default: { POST: CreateApiEndpointAny };
@@ -99,14 +93,15 @@ function ProviderForm({
   );
 }
 
-export function LeadMagnetConfigContainer({ field }: WidgetProps): JSX.Element {
+export function LeadMagnetConfigContainer(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const { endpointMutations } = useWidgetContext();
   const t = useWidgetTranslation<typeof endpoints.GET>();
+  const widgetData = useWidgetValue<typeof endpoints.GET>();
 
-  const config = field.value?.config ?? null;
+  const config = widgetData?.config ?? null;
   const currentProvider = config?.provider;
 
   // null = no explicit user selection yet, fall through to currentProvider

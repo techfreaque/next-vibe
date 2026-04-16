@@ -35,6 +35,8 @@ export interface SystemPromptServerParams {
   excludeMemories?: boolean;
   /** Whether running in headless mode (no human present) */
   headless?: boolean;
+  /** Sub-agent nesting depth (0 = top-level, 1+ = sub-agent) */
+  subAgentDepth: number;
   /** Whether in voice call mode (TTS autoplay) */
   callMode?: boolean;
   /** Extra per-request instructions to append */
@@ -82,6 +84,8 @@ export interface SystemPromptClientParams {
   extraInstructions?: string;
   /** Whether running headless */
   headless?: boolean;
+  /** Sub-agent nesting depth (0 = top-level, 1+ = sub-agent) */
+  subAgentDepth: number;
 }
 
 /**

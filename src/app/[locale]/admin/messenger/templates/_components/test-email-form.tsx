@@ -17,7 +17,7 @@ import type { ReactElement } from "react";
 import { useMemo, useState } from "react";
 
 import { useEmailPreviewSendTest } from "@/app/api/[locale]/messenger/preview/send-test/hooks/hooks";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useLogger } from "@/hooks/use-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { scopedTranslation } from "@/app/[locale]/admin/messenger/templates/i18n";
 import { useTranslation } from "@/i18n/core/client";
@@ -40,10 +40,7 @@ export function TestEmailForm({
   const { locale: currentLocale } = useTranslation();
   const { t } = scopedTranslation.scopedT(currentLocale);
   const [recipientEmail, setRecipientEmail] = useState("");
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
 
   const { language, country } = getLanguageAndCountryFromLocale(locale);
 

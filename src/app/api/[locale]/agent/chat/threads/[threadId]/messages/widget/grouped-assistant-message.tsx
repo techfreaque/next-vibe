@@ -43,6 +43,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { CollapseStateStore } from "../hooks/use-collapse-state";
 import { scopedTranslation } from "../i18n";
+import type messagesDefinition from "../definition";
+import { useWidgetItem } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { AssistantMessageActions } from "./assistant-message-actions";
 import { CompactingMessage } from "./compacting-message";
 import { useMessageGroupName } from "./embedded-context";
@@ -71,8 +73,6 @@ interface GroupedAssistantMessageProps {
   user: JwtPayloadType;
   /** Send message callback for tool confirmations (null in read-only mode) */
   sendMessage: ((params: SendMessageParams) => void) | null;
-  /** Credit deduction callback (null in read-only mode) */
-  deductCredits: ((creditCost: number, feature: string) => void) | null;
   /** TTS autoplay setting */
   ttsAutoplay: boolean;
   /** TTS voice preference */
@@ -201,10 +201,12 @@ const ToolMessage = memo(
 );
 
 /**
- * Assistant Content Message - memoized to prevent re-renders
+ * Assistant Content Message - subscribes to this message via useWidgetItem.
+ * Accepts messageId to break the prop-drilling re-render cascade:
+ * during streaming only this specific message re-renders, not all N messages.
  */
 interface AssistantContentMessageProps {
-  message: ChatMessage;
+  messageId: string;
   hasContentAfter: boolean;
   collapseState: CollapseStateStore | null;
   locale: CountryLanguage;
@@ -361,90 +363,78 @@ function GeneratedImageWithPrompt({
   );
 }
 
-const AssistantContentMessage = memo(
-  function AssistantContentMessage({
-    message,
-    hasContentAfter,
-    collapseState,
-    locale,
-  }: AssistantContentMessageProps): JSX.Element | null {
-    const content = message.content ?? "";
-    const generatedMedia = message.metadata?.generatedMedia;
+const AssistantContentMessage = memo(function AssistantContentMessage({
+  messageId,
+  hasContentAfter,
+  collapseState,
+  locale,
+}: AssistantContentMessageProps): JSX.Element | null {
+  // Subscribe to this specific message in widget context — re-renders only when THIS message changes.
+  // Breaks the prop-drilling cascade: deltas on other messages don't trigger a re-render here.
+  const message = useWidgetItem<typeof messagesDefinition.GET>()(
+    (d) => d?.messages ?? [],
+    (m) => m.id,
+    messageId,
+  );
 
-    if (!content.trim() && !generatedMedia) {
-      return null;
-    }
+  const content = message?.content ?? "";
+  const generatedMedia = message?.metadata?.generatedMedia;
 
-    return (
-      <Div className="mb-3 last:mb-0">
-        {content.trim() ? (
-          <Markdown
-            content={content}
-            messageId={message.id}
-            hasContentAfter={hasContentAfter}
-            collapseState={collapseState ?? undefined}
-            isMessageStreaming={Boolean(message.metadata?.isStreaming)}
+  if (!content.trim() && !generatedMedia) {
+    return null;
+  }
+
+  return (
+    <Div className="mb-3 last:mb-0">
+      {content.trim() ? (
+        <Markdown
+          content={content}
+          messageId={messageId}
+          hasContentAfter={hasContentAfter}
+          collapseState={collapseState ?? undefined}
+          isMessageStreaming={Boolean(message?.metadata?.isStreaming)}
+        />
+      ) : null}
+      {/* Generated Media (image / audio / video) */}
+      {generatedMedia ? (
+        generatedMedia.type === "image" && generatedMedia.url ? (
+          <GeneratedImageWithPrompt
+            url={generatedMedia.url}
+            prompt={generatedMedia.prompt ?? ""}
+            locale={locale}
           />
-        ) : null}
-        {/* Generated Media (image / audio / video) */}
-        {generatedMedia ? (
-          generatedMedia.type === "image" && generatedMedia.url ? (
-            <GeneratedImageWithPrompt
+        ) : generatedMedia.type === "audio" && generatedMedia.url ? (
+          <Div className="mt-2 w-full">
+            <Audio src={generatedMedia.url} controls className="w-full" />
+            <MediaActions
               url={generatedMedia.url}
-              prompt={generatedMedia.prompt ?? ""}
+              type="audio"
               locale={locale}
             />
-          ) : generatedMedia.type === "audio" && generatedMedia.url ? (
-            <Div className="mt-2 w-full">
-              <Audio src={generatedMedia.url} controls className="w-full" />
-              <MediaActions
-                url={generatedMedia.url}
-                type="audio"
-                locale={locale}
-              />
-            </Div>
-          ) : generatedMedia.type === "video" && generatedMedia.url ? (
-            <Div className="mt-2 max-w-lg">
-              <Video
-                src={generatedMedia.url}
-                controls
-                className="rounded-lg w-full h-auto"
-              />
-              <MediaActions
-                url={generatedMedia.url}
-                type="video"
-                locale={locale}
-              />
-            </Div>
-          ) : null
-        ) : null}
-        {/* File Attachments */}
-        {message.metadata?.attachments &&
-          message.metadata.attachments.length > 0 && (
-            <FileAttachments attachments={message.metadata.attachments} />
-          )}
-      </Div>
-    );
-  },
-  (prevProps, nextProps) => {
-    // Custom comparison for better performance
-    return (
-      prevProps.message.id === nextProps.message.id &&
-      prevProps.message.content === nextProps.message.content &&
-      prevProps.message.metadata?.attachments ===
-        nextProps.message.metadata?.attachments &&
-      prevProps.message.metadata?.generatedMedia ===
-        nextProps.message.metadata?.generatedMedia &&
-      prevProps.message.metadata?.isCompacting ===
-        nextProps.message.metadata?.isCompacting &&
-      prevProps.message.metadata?.compactedMessageCount ===
-        nextProps.message.metadata?.compactedMessageCount &&
-      prevProps.hasContentAfter === nextProps.hasContentAfter &&
-      prevProps.locale === nextProps.locale &&
-      prevProps.collapseState === nextProps.collapseState
-    );
-  },
-);
+          </Div>
+        ) : generatedMedia.type === "video" && generatedMedia.url ? (
+          <Div className="mt-2 max-w-lg">
+            <Video
+              src={generatedMedia.url}
+              controls
+              className="rounded-lg w-full h-auto"
+            />
+            <MediaActions
+              url={generatedMedia.url}
+              type="video"
+              locale={locale}
+            />
+          </Div>
+        ) : null
+      ) : null}
+      {/* File Attachments */}
+      {message?.metadata?.attachments &&
+        message.metadata.attachments.length > 0 && (
+          <FileAttachments attachments={message.metadata.attachments} />
+        )}
+    </Div>
+  );
+});
 
 /**
  * Messages List with Tool Confirmation - handles all tool confirmation logic
@@ -692,12 +682,23 @@ const MessagesList = memo(function MessagesList({
     );
   }, [allMessages]);
 
+  // Precompute hasContentAfter for every index in O(N) rather than O(N²)
+  const hasContentAfterMap = useMemo(() => {
+    const map = new Map<string, boolean>();
+    let hasContent = false;
+    for (let i = allMessages.length - 1; i >= 0; i--) {
+      map.set(allMessages[i].id, hasContent);
+      if ((allMessages[i].content ?? "").trim().length > 0) {
+        hasContent = true;
+      }
+    }
+    return map;
+  }, [allMessages]);
+
   return (
     <>
       {allMessages.map((message, index) => {
-        const hasContentAfter = allMessages
-          .slice(index + 1)
-          .some((m) => (m.content ?? "").trim().length > 0);
+        const hasContentAfter = hasContentAfterMap.get(message.id) ?? false;
 
         if (message.role === "tool" && message.metadata?.toolCall) {
           const decision = hasToolWaitingForConfirmation
@@ -772,7 +773,7 @@ const MessagesList = memo(function MessagesList({
           return (
             <AssistantContentMessage
               key={message.id}
-              message={message}
+              messageId={message.id}
               hasContentAfter={hasContentAfter}
               collapseState={collapseState}
               locale={locale}
@@ -800,6 +801,8 @@ interface MessageActionsWrapperProps {
   primaryId: string;
   primaryThreadId: string;
   allMessages: ChatMessage[];
+  /** True when any message in the group is still streaming — suppresses content processing */
+  isGroupStreaming: boolean;
   locale: CountryLanguage;
   onAnswerAsModel: ((messageId: string) => void) | null;
   rootFolderId: DefaultFolderId;
@@ -816,7 +819,6 @@ interface MessageActionsWrapperProps {
   user: JwtPayloadType;
   ttsAutoplay: boolean;
   voiceId: TtsModelId | undefined;
-  deductCredits: ((creditCost: number, feature: string) => void) | null;
   onVote: ((messageId: string, vote: 1 | -1 | 0) => Promise<void>) | null;
   userVote: "up" | "down" | null;
   voteScore: number;
@@ -826,6 +828,7 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
   primaryId,
   primaryThreadId,
   allMessages,
+  isGroupStreaming,
   locale,
   onAnswerAsModel,
   rootFolderId,
@@ -841,17 +844,22 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
   user,
   ttsAutoplay,
   voiceId,
-  deductCredits,
   onVote,
   userVote,
   voteScore,
 }: MessageActionsWrapperProps): JSX.Element {
-  // Process content for actions - only runs in this component
+  // Process content for actions — skip while streaming: the actions bar is hidden
+  // during streaming and these async calls (TTS/copy processing) are expensive.
+  // They run once when streaming completes (isGroupStreaming flips to false).
   const [allContent, setAllContent] = useState<string>("");
   const [contentMarkdown, setContentMarkdown] = useState<string>("");
   const [contentText, setContentText] = useState<string>("");
 
   useEffect(() => {
+    if (isGroupStreaming) {
+      return;
+    }
+
     // Process for TTS (used by speech)
     void processMessageGroupForTTS(allMessages, locale, logger, user).then(
       setAllContent,
@@ -874,7 +882,7 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
       logger,
       user,
     ).then(setContentText);
-  }, [allMessages, locale, logger, user]);
+  }, [isGroupStreaming, allMessages, locale, logger, user]);
 
   // Use server-computed credit cost when available (correctly accounts for cache pricing).
   // Fall back to client-side calculation for older persisted messages that pre-date this feature.
@@ -932,7 +940,6 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
       user={user}
       ttsAutoplay={ttsAutoplay}
       voiceId={voiceId}
-      deductCredits={deductCredits}
       onVote={onVote}
       userVote={userVote}
       voteScore={voteScore}
@@ -1073,7 +1080,6 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
   rootFolderId,
   user,
   sendMessage,
-  deductCredits,
   ttsAutoplay,
   voiceId,
   className: extraClassName,
@@ -1183,6 +1189,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
             primaryId={primary.id}
             primaryThreadId={primary.threadId}
             allMessages={allMessages}
+            isGroupStreaming={isGroupStreaming}
             locale={locale}
             onAnswerAsModel={onAnswerAsModel}
             rootFolderId={rootFolderId}
@@ -1198,7 +1205,6 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
             user={user}
             ttsAutoplay={ttsAutoplay}
             voiceId={voiceId}
-            deductCredits={deductCredits}
             onVote={onVote}
             userVote={userVote}
             voteScore={voteScore}

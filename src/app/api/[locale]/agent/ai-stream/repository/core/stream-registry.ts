@@ -10,20 +10,17 @@ import "server-only";
 import { and, eq, ne } from "drizzle-orm";
 
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import { buildMessagesChannel } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/channel";
-import { createStreamEvent } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/events";
+import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { AbortReason, StreamAbortError } from "./constants";
 
 interface StreamEntry {
   controller: AbortController;
-  userId: string | undefined;
-  leadId: string | undefined;
   registeredAt: number;
 }
 
@@ -33,12 +30,7 @@ export const StreamRegistry = {
   /**
    * Register a new stream. Aborts any existing stream for the same thread.
    */
-  register(
-    threadId: string,
-    controller: AbortController,
-    userId: string | undefined,
-    leadId: string | undefined,
-  ): void {
+  register(threadId: string, controller: AbortController): void {
     const existing = activeStreams.get(threadId);
     if (existing) {
       existing.controller.abort(new StreamAbortError(AbortReason.SUPERSEDED));
@@ -55,8 +47,6 @@ export const StreamRegistry = {
 
     activeStreams.set(threadId, {
       controller,
-      userId,
-      leadId,
       registeredAt: Date.now(),
     });
   },
@@ -111,10 +101,40 @@ export async function setStreamingStateAborting(
     .where(eq(chatThreads.id, threadId));
 }
 
+/** Maximum preview length (chars) stored on the thread. */
+const PREVIEW_MAX_CHARS = 120;
+
+/**
+ * Compute a short plain-text preview from the last assistant message content.
+ * Strips leading markdown headings/bullets and truncates to PREVIEW_MAX_CHARS.
+ */
+function computePreview(content: string): string {
+  const stripped = content
+    .replace(/^#{1,6}\s+/gm, "") // headings
+    .replace(/^\s*[-*+]\s+/gm, "") // bullets
+    .replace(/\*\*(.+?)\*\*/g, "$1") // bold
+    .replace(/\*(.+?)\*/g, "$1") // italic
+    .replace(/`(.+?)`/g, "$1") // inline code
+    .replace(/\n+/g, " ")
+    .trim();
+  return stripped.length > PREVIEW_MAX_CHARS
+    ? `${stripped.slice(0, PREVIEW_MAX_CHARS).trimEnd()}…`
+    : stripped;
+}
+
+export interface ClearStreamingResult {
+  state: "idle" | "waiting";
+  preview: string | null;
+  updatedAt: Date;
+}
+
 export async function clearStreamingState(
   threadId: string,
   logger: EndpointLogger,
-): Promise<"idle" | "waiting"> {
+  user: JwtPayloadType,
+  lastContent?: string | null,
+): Promise<ClearStreamingResult> {
+  const wsEmit = createMessagesEmitter(threadId, null, logger, user);
   StreamRegistry.unregister(threadId);
   const now = new Date();
 
@@ -132,10 +152,18 @@ export async function clearStreamingState(
     .limit(1);
 
   const nextState = activeTask ? "waiting" : "idle";
+  const preview =
+    lastContent && lastContent.trim().length > 0
+      ? computePreview(lastContent)
+      : null;
 
   const [thread] = await db
     .update(chatThreads)
-    .set({ streamingState: nextState, updatedAt: now })
+    .set({
+      streamingState: nextState,
+      updatedAt: now,
+      ...(preview !== null ? { preview } : {}),
+    })
     .where(
       and(
         eq(chatThreads.id, threadId),
@@ -157,20 +185,10 @@ export async function clearStreamingState(
   // escalateToTask may have already set DB to "waiting" (skipping the update),
   // but the frontend still needs this event to show the stop button.
   if (nextState === "waiting") {
-    publishWsEvent(
-      {
-        channel: buildMessagesChannel(threadId),
-        event: "streaming-state-changed",
-        data: createStreamEvent.streamingStateChanged({
-          threadId,
-          state: "waiting",
-        }).data,
-      },
-      logger,
-    );
+    wsEmit("streaming-state-changed", { streamingState: "waiting" });
   }
 
-  return nextState;
+  return { state: nextState, preview, updatedAt: now };
 }
 
 /**

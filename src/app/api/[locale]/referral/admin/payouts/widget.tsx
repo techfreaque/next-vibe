@@ -13,10 +13,10 @@ import { Span } from "next-vibe-ui/ui/span";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type definition from "./definition";
-import type { AdminPayoutsGetResponseOutput } from "./definition";
 
 const STATUS_COLORS: Record<string, string> = {
   "enums.payoutStatus.pending": "bg-warning/10 text-warning",
@@ -29,16 +29,8 @@ const STATUS_COLORS: Record<string, string> = {
   "enums.payoutStatus.failed": "bg-destructive/10 text-destructive",
 };
 
-interface CustomWidgetProps {
-  field: {
-    value: AdminPayoutsGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
-
-export function AdminPayoutsContainer({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
-  const data = field.value;
+export function AdminPayoutsContainer(): React.JSX.Element {
+  const data = useWidgetValue<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
 

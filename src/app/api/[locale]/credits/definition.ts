@@ -131,6 +131,23 @@ const { GET } = createEndpoint({
     },
   },
 
+  // === WS EVENTS ===
+  // Emitted by CreditRepository after every deduction — carries actual server balance.
+  // Framework merges partial into GET response cache. No client-side math needed.
+  events: {
+    "credits-balance-updated": {
+      fields: [
+        "total",
+        "expiring",
+        "permanent",
+        "earned",
+        "free",
+        "expiresAt",
+      ] as const,
+      operation: "merge" as const,
+    },
+  },
+
   // === EXAMPLES ===
   examples: {
     responses: {

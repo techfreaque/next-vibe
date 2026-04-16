@@ -1,6 +1,9 @@
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
-import { SKILLS_LIST_ALIAS } from "@/app/api/[locale]/agent/chat/skills/constants";
+import {
+  SKILL_CREATOR_ID,
+  SKILLS_LIST_ALIAS,
+} from "@/app/api/[locale]/agent/chat/skills/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 
 import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
@@ -33,7 +36,7 @@ import {
 } from "../../enum";
 
 export const skillCreatorSkill: Skill = {
-  id: "skill-creator",
+  id: SKILL_CREATOR_ID,
   name: "skills.skillCreator.name" as const,
   tagline: "skills.skillCreator.tagline" as const,
   description: "skills.skillCreator.description" as const,

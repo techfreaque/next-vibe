@@ -9,17 +9,15 @@ import { useCallback, useMemo, useState } from "react";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type {
-  ChatMessage,
-  ToolCallResult,
-} from "@/app/api/[locale]/agent/chat/db";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { useLogger } from "@/hooks/use-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { MockChatProvider } from "../../_components/mock-chat-provider";
@@ -63,8 +61,8 @@ function mkToolMsg(
   seq: string,
   toolCallId: string,
   toolName: string,
-  args: ToolCallResult,
-  result: ToolCallResult,
+  args: WidgetData,
+  result: WidgetData,
   executionTime: number,
 ): ChatMessage {
   return baseMockMsg({
@@ -287,10 +285,7 @@ export function VibeFrameDemo({
 }: {
   locale: CountryLanguage;
 }): JSX.Element {
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
   const [activeId, setActiveId] = useState<DemoId>("embed");
   const handleSelect = useCallback((id: DemoId) => setActiveId(id), []);
 
@@ -353,7 +348,6 @@ export function VibeFrameDemo({
               id: "00000000-0000-0000-0000-000000000000",
               roles: [UserPermissionRole.ADMIN],
             }}
-            deductCredits={null}
           />
           <AnimatePresence mode="wait">
             <MotionDiv
@@ -380,7 +374,6 @@ export function VibeFrameDemo({
                   roles: [UserPermissionRole.ADMIN],
                 }}
                 sendMessage={null}
-                deductCredits={null}
                 ttsAutoplay={false}
                 voiceId={undefined}
                 onVote={null}

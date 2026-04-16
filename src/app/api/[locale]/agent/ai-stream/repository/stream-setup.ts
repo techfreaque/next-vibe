@@ -44,7 +44,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { AiStreamT } from "../stream/i18n";
 
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import {
   FOLDER_DENIED_TOOL_IDS,
   type ToolExecutionContext,
@@ -56,6 +56,7 @@ import { chatSettings } from "../../chat/settings/db";
 import { DEFAULT_SKILLS } from "../../chat/skills/config";
 import { customSkills } from "../../chat/skills/db";
 import { isUuid } from "../../chat/slugify";
+import { createMessagesEmitter } from "../../chat/threads/[threadId]/messages/emitter";
 import { ThreadsRepository } from "../../chat/threads/repository";
 import { type AiStreamPostRequestOutput } from "../stream/definition";
 import { AbortControllerSetup } from "./core/abort-controller-setup";
@@ -181,7 +182,7 @@ export async function setupAiStream(params: {
   logger: EndpointLogger;
   user: JwtPayloadType;
   userId: string | undefined;
-  leadId: string | undefined;
+  leadId: string;
   ipAddress: string | undefined;
   aiStreamT: AiStreamT;
   maxDuration: number;
@@ -189,6 +190,7 @@ export async function setupAiStream(params: {
   extraInstructions: string | undefined;
   excludeMemories: boolean | undefined;
   headless: boolean | undefined;
+  subAgentDepth: number;
   /** Whether this is a revival stream (resume-stream after wakeUp task completed). */
   isRevival: boolean | undefined;
   /** Override the favoriteId stored in streamContext (used by headless runs with explicit favoriteId) */
@@ -361,8 +363,10 @@ export async function setupAiStream(params: {
         imageGenModelSelection: confirmMediaModels.imageGenModelSelection,
         musicGenModelSelection: confirmMediaModels.musicGenModelSelection,
         videoGenModelSelection: confirmMediaModels.videoGenModelSelection,
+        providerOverride,
         favoriteId: params.favoriteIdOverride,
         headless: params.headless,
+        subAgentDepth: params.subAgentDepth,
         isRevival: params.isRevival,
         waitingForRemoteResult: undefined,
         onEscalatedTaskCancel: undefined,
@@ -476,8 +480,7 @@ export async function setupAiStream(params: {
   }
 
   const creditValidation = await CreditValidatorHandler.validateCredits({
-    userId,
-    leadId,
+    user,
     ipAddress,
     modelInfo: modelConfig,
     locale,
@@ -1056,17 +1059,22 @@ export async function setupAiStream(params: {
     ModalityResolver.resolveVideoGenSelection(bridgeContext);
 
   // Resolve models once for system-prompt mediaCapabilities (name display only)
+  // Pass providerOverride so media gen models are constrained to the same provider
+  // as the chat model (e.g. UNBOTTLED routes image/music/video through hermes too).
   const effectiveImageGenModel = getBestImageGenModel(
     effectiveImageGenSelection,
     user,
+    providerOverride,
   );
   const effectiveMusicGenModel = getBestMusicGenModel(
     effectiveMusicGenSelection,
     user,
+    providerOverride,
   );
   const effectiveVideoGenModel = getBestVideoGenModel(
     effectiveVideoGenSelection,
     user,
+    providerOverride,
   );
 
   logger.debug("[Setup] Bridge models resolved via cascade", {
@@ -1095,6 +1103,7 @@ export async function setupAiStream(params: {
           .filter(Boolean)
           .join("\n\n") || undefined,
       headless: params.headless,
+      subAgentDepth: params.subAgentDepth,
       excludeMemories: params.excludeMemories,
       memoryLimit: resolvedToolConfig.memoryLimit,
       mediaCapabilities: {
@@ -1139,7 +1148,9 @@ export async function setupAiStream(params: {
     imageGenModelSelection: effectiveImageGenSelection,
     musicGenModelSelection: effectiveMusicGenSelection,
     videoGenModelSelection: effectiveVideoGenSelection,
+    providerOverride,
     headless: params.headless,
+    subAgentDepth: params.subAgentDepth,
     isRevival: params.isRevival,
     // favoriteId: from headless override (run endpoint) - lets resume-stream reload full context
     favoriteId: params.favoriteIdOverride,
@@ -1342,7 +1353,7 @@ export async function setupAiStream(params: {
     taskId: string;
     onComplete: (result: {
       success: boolean;
-      data?: Record<string, JsonValue>;
+      data?: Record<string, WidgetData>;
       message?: string;
     }) => Promise<void>;
   }> => {
@@ -1384,6 +1395,7 @@ export async function setupAiStream(params: {
       wakeUpModelId: streamContext.modelId ?? null,
       wakeUpSkillId: streamContext.skillId ?? null,
       wakeUpFavoriteId: streamContext.favoriteId ?? null,
+      wakeUpSubAgentDepth: streamContext.subAgentDepth,
       outputMode: TaskOutputMode.STORE_ONLY,
       notificationTargets: [],
       tags: ["escalated", "local"],
@@ -1417,23 +1429,12 @@ export async function setupAiStream(params: {
           .update(chatThreadsTable)
           .set({ streamingState: "waiting" })
           .where(drizzleEq(chatThreadsTable.id, taskThreadId));
-        const { publishWsEvent: pubWs } =
-          await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-        const { buildMessagesChannel: buildChan } =
-          await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/channel");
-        const { createStreamEvent: cse } =
-          await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/events");
-        pubWs(
-          {
-            channel: buildChan(taskThreadId),
-            event: "streaming-state-changed",
-            data: cse.streamingStateChanged({
-              threadId: taskThreadId,
-              state: "waiting",
-            }).data,
-          },
+        createMessagesEmitter(
+          taskThreadId,
+          data.rootFolderId,
           logger,
-        );
+          user,
+        )("streaming-state-changed", { streamingState: "waiting" });
       } catch (err) {
         logger.warn("[StreamSetup] Failed to set thread waiting state", {
           taskThreadId,
@@ -1483,7 +1484,7 @@ export async function setupAiStream(params: {
 
     const onComplete = async (result: {
       success: boolean;
-      data?: Record<string, JsonValue>;
+      data?: Record<string, WidgetData>;
       message?: string;
     }): Promise<void> => {
       streamContext.onEscalatedTaskCancel = undefined; // task done, no cancel needed
@@ -1498,7 +1499,7 @@ export async function setupAiStream(params: {
       const finalStatus = result.success
         ? CronStatus.COMPLETED
         : CronStatus.FAILED;
-      const finalOutput: Record<string, JsonValue> | null =
+      const finalOutput: Record<string, WidgetData> | null =
         result.success && result.data ? result.data : null;
 
       // Determine effective callbackMode - default to WAKE_UP for backward compat
@@ -1523,10 +1524,11 @@ export async function setupAiStream(params: {
           skillId: streamContext.skillId ?? null,
           favoriteId: streamContext.favoriteId ?? null,
           leafMessageId: taskLeafMessageId ?? null,
-          userId: user.id,
+          subAgentDepth: streamContext.subAgentDepth,
+          ownerUser: user,
           logger,
-          directResumeUser: user,
           directResumeLocale: locale,
+          abortSignal: streamContext.abortSignal,
         });
       }
 
@@ -1544,12 +1546,7 @@ export async function setupAiStream(params: {
   };
 
   // Register in stream registry so the cancel endpoint can find and abort it
-  StreamRegistry.register(
-    threadResult.data.threadId,
-    streamAbortController,
-    userId,
-    leadId,
-  );
+  StreamRegistry.register(threadResult.data.threadId, streamAbortController);
 
   // When the user cancels the stream, propagate cancellation to any escalated task.
   // The abort signal fires synchronously when StreamRegistry.cancel() is called.

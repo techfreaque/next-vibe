@@ -17,6 +17,7 @@ import { SeedRepository } from "@/app/api/[locale]/system/db/seed/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   devFileLog,
+  truncateClientLogs,
   truncateDevLog,
   writeDevLogOfflineHint,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
@@ -36,7 +37,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import { UnifiedTaskRunnerRepository } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/repository";
 import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
-import { enableDevFileLogging } from "@/config/debug";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -275,9 +275,9 @@ export class DevRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<never> {
-    // Truncate dev log and enable file logging from line one - before any other output
+    // Truncate log files at session start (VIBE_LOG_PATH controls whether active)
     void truncateDevLog();
-    enableDevFileLogging();
+    void truncateClientLogs();
     // Guaranteed last-resort offline hint - process.on("exit") always fires, even on crash
     process.on("exit", writeDevLogOfflineHint);
 

@@ -19,24 +19,17 @@ import React, { useCallback } from "react";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
 
-type PromoteResponseOutput = typeof definition.POST.types.ResponseOutput;
-
-interface CustomWidgetProps {
-  field: {
-    value: PromoteResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
-}
-
-export function PromoteWidget({ field }: CustomWidgetProps): React.JSX.Element {
+export function PromoteWidget(): React.JSX.Element {
   const t = useWidgetTranslation<typeof definition.POST>();
   const navigation = useWidgetNavigation();
-  const response = field.value;
+  const response = useWidgetValue<typeof definition.POST>();
 
   const handleNavigateToPromoted = useCallback((): void => {
     if (!response?.promotedId) {

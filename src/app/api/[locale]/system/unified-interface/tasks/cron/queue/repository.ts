@@ -30,7 +30,7 @@ import {
   TaskCategoryDB,
   TaskOutputMode,
 } from "../../enum";
-import { cronTasks } from "../db";
+import { cronTasks, dbUserIdToOwner } from "../db";
 import { CronTasksRepository } from "../repository";
 import type {
   CronQueueListRequestOutput,
@@ -57,6 +57,7 @@ export class CronQueueRepository {
 
     return {
       id: task.id,
+      shortId: task.shortId,
       routeId: task.routeId,
       displayName: task.displayName,
       description: task.description ?? null,
@@ -72,7 +73,12 @@ export class CronQueueRepository {
       timeout: task.timeout ?? null,
       retries: task.retries ?? null,
       retryDelay: task.retryDelay ?? null,
+      taskInput: task.taskInput,
+      runOnce: task.runOnce,
       outputMode: task.outputMode ?? TaskOutputMode.STORE_ONLY,
+      notificationTargets: task.notificationTargets,
+      targetInstance: task.targetInstance ?? null,
+      tags: task.tags,
       lastExecutedAt: task.lastExecutedAt?.toISOString() ?? null,
       lastExecutionStatus: task.lastExecutionStatus ?? null,
       lastExecutionError: null, // populated by caller from execution history
@@ -83,7 +89,7 @@ export class CronQueueRepository {
       errorCount: task.errorCount,
       averageExecutionTime: task.averageExecutionTime ?? null,
       consecutiveFailures: task.consecutiveFailures,
-      userId: task.userId ?? null,
+      owner: dbUserIdToOwner(task.userId),
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
     };

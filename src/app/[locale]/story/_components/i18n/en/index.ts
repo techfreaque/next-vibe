@@ -2,7 +2,7 @@ export const translations = {
   nav: {
     help: "Help",
     logout: "Log Out",
-    settings: "Profile Settings",
+    settings: "My Profile",
     leadMagnet: "Lead Magnet",
     enableLightMode: "Enable light mode",
     enableDarkMode: "Enable dark mode",
@@ -53,7 +53,7 @@ export const translations = {
     signIn: "Sign In",
     goToApp: "Open App",
     backToChat: "Back to Chat",
-    unbottledHome: "Website & Blog",
+    unbottledHome: "Stories",
     subscription: "Subscription",
     referral: "Referral",
     services: {
@@ -299,7 +299,7 @@ export const translations = {
         titleLine1: "Publish. Refer.",
         titleLine2: "Earn.",
         subtitle:
-          "Build skills. Earn 15% when someone signs up through yours. Refer anyone - 10% of every payment, forever. Their network pays you too.",
+          "Referral link: 10% of every payment, forever. Your skill as their entry point: +5% — even when others share it.",
         cta: "Start Earning",
         ctaExplore: "Learn More",
       },

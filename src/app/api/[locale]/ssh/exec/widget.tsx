@@ -25,16 +25,10 @@ import {
   useWidgetForm,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type endpoints from "./definition";
-import type { SshExecResponseOutput } from "./definition";
-
-interface WidgetProps {
-  field: {
-    value: SshExecResponseOutput | null | undefined;
-  } & (typeof endpoints.POST)["fields"];
-}
 
 interface HistoryEntry {
   command: string;
@@ -67,7 +61,7 @@ function ExitCodeBadge({ code }: { code: number | null }): React.JSX.Element {
   );
 }
 
-export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
+export function SshExecContainer(): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.POST>();
   const form = useWidgetForm<typeof endpoints.POST>();
   const onSubmit = useWidgetOnSubmit();
@@ -76,7 +70,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [showHistory, setShowHistory] = useState(false);
 
-  const value = field.value;
+  const value = useWidgetValue<typeof endpoints.POST>();
   const isLoading = endpointMutations?.read?.isLoading ?? false;
 
   const command = form.watch("command") ?? "";

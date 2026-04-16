@@ -68,7 +68,7 @@ import {
   type MessageOperationsDeps,
 } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-operations";
 import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { useCredits } from "@/app/api/[locale]/credits/hooks";
+
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-query";
@@ -143,15 +143,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const ttsAutoplay = effectiveSettings.ttsAutoplay;
   const selectedSkill = effectiveSettings.selectedSkill;
   const selectedModel = effectiveSettings.selectedModel;
-
-  // Credits
-  const creditsHook = useCredits(user, logger, bootContext.initialCredits);
-  const noopDeduct = useCallback(
-    // No-op when credits hook unavailable
-    () => undefined as void,
-    [],
-  );
-  const deductCredits = creditsHook?.deductCredits ?? noopDeduct;
 
   // Draft key - unique per thread/folder context
   const draftKey = getDraftKey(
@@ -239,9 +230,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   // AI stream - destructure callbacks directly so they are stable useCallback refs
   const { startStream: aiStartStream, cancelStream: aiCancelStream } =
     useAIStream();
-
-  // Streaming state from navigation store
-  const isStreaming = useChatNavigationStore((s) => s.isStreaming);
 
   // leafMessageId from nav store (set by messages widget on branch switch, syncs URL)
   const leafMessageId = useChatNavigationStore((s) => s.leafMessageId);
@@ -459,11 +447,11 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   );
 
   // Show stop button when streaming OR when TTS is playing OR when aborting OR when waiting.
-  // isStreaming from navigation store is the authoritative signal.
-  const isActivelyStreaming = isLoading || isStreaming;
-  const isWaiting = useAIStreamStore((s) =>
-    activeThreadId ? s.isWaiting(activeThreadId) : false,
-  );
+  // streamingState from messages cache is the authoritative signal (driven by WS events).
+  // "waiting" = stream ended but a background task is still in flight (set by streaming-state-changed WS event).
+  const cacheStreamingState = messagesQuery.data?.streamingState;
+  const isActivelyStreaming = isLoading || cacheStreamingState === "streaming";
+  const isWaiting = cacheStreamingState === "waiting";
   const showStopButton =
     isActivelyStreaming || isAborting || isWaiting || voiceRuntime.isSpeaking;
 
@@ -474,7 +462,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     onValueChange: setInput,
     onSubmitText: submitWithContent,
     onSubmitAudio: submitWithAudio,
-    deductCredits,
     logger,
     locale,
   });

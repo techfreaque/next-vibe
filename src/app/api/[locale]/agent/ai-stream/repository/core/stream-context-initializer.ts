@@ -10,6 +10,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";
 import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
+import type { EmitThreadTitleFn } from "./message-db-writer";
 import { StreamContext } from "./stream-context";
 
 export class StreamContextInitializer {
@@ -28,7 +29,8 @@ export class StreamContextInitializer {
     isIncognito: boolean;
     logger: EndpointLogger;
     locale: CountryLanguage;
-    wsEmit?: WsEmitCallback | null;
+    wsEmit: WsEmitCallback;
+    emitTitle: EmitThreadTitleFn;
     /** Force a specific sequenceId - used by wakeUp revival to share sequence with deferred tool pair */
     sequenceIdOverride?: string;
   }): StreamContext {
@@ -41,6 +43,7 @@ export class StreamContextInitializer {
       logger,
       locale,
       wsEmit,
+      emitTitle,
       sequenceIdOverride,
     } = params;
     const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
@@ -74,6 +77,7 @@ export class StreamContextInitializer {
       creditsT,
       locale,
       wsEmit,
+      emitTitle,
     });
 
     // Update last known values for error handling (accessible in catch blocks)

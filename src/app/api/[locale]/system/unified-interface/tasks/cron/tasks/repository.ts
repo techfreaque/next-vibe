@@ -35,7 +35,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { cronTasks } from "../../cron/db";
+import { cronTasks, dbUserIdToOwner } from "../../cron/db";
 import { CronTasksRepository } from "../../cron/repository";
 import {
   CronTaskEnabledFilter,
@@ -142,7 +142,7 @@ export class CronTasksListRepository {
       consecutiveFailures: task.consecutiveFailures,
       targetInstance: task.targetInstance ?? null,
       tags: task.tags,
-      userId: task.userId ?? null,
+      owner: dbUserIdToOwner(task.userId),
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
     };

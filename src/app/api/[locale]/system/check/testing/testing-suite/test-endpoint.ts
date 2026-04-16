@@ -4,10 +4,13 @@ import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { describe, expect, it } from "vitest";
 import type { z } from "zod";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import type {
+  CreateApiEndpoint,
+  InferResponseOutput,
+} from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import type { EndpointEventsMap } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EventSchemas } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   UserPermissionRole,
@@ -58,19 +61,21 @@ export function testEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
+  TEvents extends EndpointEventsMap<InferResponseOutput<TFields>>,
 >(
   endpoint: CreateApiEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
     TFields,
-    EventSchemas
+    TEvents
   >,
   options: TestEndpointOptions<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TFields
+    TFields,
+    TEvents
   > = {},
 ): void {
   const { customTests = {}, skipExampleTests = false } = options;
@@ -81,7 +86,8 @@ export function testEndpoint<
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
-      TFields
+      TFields,
+      TEvents
     > = {
       endpoint,
       executeWith: async ({ data, urlPathParams, user }) => {
@@ -89,7 +95,8 @@ export function testEndpoint<
           TMethod,
           TUserRoleValue,
           TScopedTranslationKey,
-          TFields
+          TFields,
+          TEvents
         >({
           endpoint,
           data,

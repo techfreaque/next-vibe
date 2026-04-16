@@ -17,27 +17,21 @@ Renamed to **`routeId`**. It serves one purpose: tells the executor which regist
 
 ### `routeId` Resolution
 
-`routeId` is resolved through two registries in order:
-
-1. **`pathToAliasMap`** (in `system/generated/endpoint.ts`) - resolves any endpoint alias or full path key (e.g. `"cron:stats"` → `"system_unified-interface_tasks_cron_stats_GET"`, or the full key verbatim). Use `getFullPath(routeId)` - if non-null, this is an API endpoint call.
-
-2. **`taskRegistry.tasksByName`** (in `system/generated/tasks-index.ts`) - resolves registered cron task handler names (e.g. `"lead-email-campaigns"`, `"imap-sync"`). If found here, call the task's `run()` directly.
-
-3. **`"cron-steps"`** - reserved literal for the dynamic steps executor. No lookup needed.
-
-If `routeId` resolves in neither registry: execution fails with `INVALID_ROUTE_ID` error, execution record status set to `ERROR`.
+`routeId` is resolved via `getFullPath(routeId)` from `system/generated/endpoint.ts`. This resolves any endpoint alias or full path key (e.g. `"cron:stats"` → `"system_unified-interface_tasks_cron_stats_GET"`).
 
 ```typescript
-function resolveRouteId(
-  routeId: string,
-):
-  | { kind: "endpoint"; path: EndpointPath }
-  | { kind: "task"; task: CronTask }
-  | { kind: "steps" }
-  | { kind: "unknown" };
+static async resolveRouteId(routeId: string): Promise<ResolveRouteIdResult> {
+  const path = getFullPath(routeId);
+  if (path !== null) {
+    return { kind: "endpoint", path };
+  }
+  return { kind: "unknown" };
+}
 ```
 
-This means `routeId` accepts: short aliases (`"cron:stats"`), full endpoint paths (`"system_unified-interface_tasks_cron_stats_GET"`), task names (`"lead-email-campaigns"`), or `"cron-steps"`. One field, consistent resolution.
+If `routeId` resolves to `unknown`: execution fails with `INVALID_ROUTE_ID` error, execution record status set to `ERROR`.
+
+**Planned extensions** (not yet implemented): resolving registered `task.ts` handlers by name (`tasksByName`) and a reserved `"cron-steps"` literal for user-created dynamic task pipelines.
 
 ---
 
@@ -58,20 +52,13 @@ This means `routeId` accepts: short aliases (`"cron:stats"`), full endpoint path
 
 ## Route Types
 
-### System task routes (existing `task.ts` files - refactored)
+### System task routes (`task.ts` files)
 
-Each `task.ts` file exports a `CronTask` with a `name` (e.g. `"lead-email-campaigns"`). That name becomes the `routeId` in DB. Each task additionally gets:
+Each `task.ts` file exports a `CronTask` with a `name` (e.g. `"lead-email-campaigns"`). That name becomes the `routeId` in DB. The executor currently resolves `routeId` only through the endpoint alias map — direct `run()` dispatch by task name is planned but not yet implemented.
 
-- a `configSchema` (Zod) describing its `defaultConfig` shape - already partially present in some tasks
-- a `widget.tsx` rendering a settings form from that schema - new, auto-generated from the schema
+### `cron-steps` route (planned)
 
-The executor calls `tasksByName[routeId].run()` directly. No HTTP. No legacy wrapper.
-
-### `cron-steps` route (new, user-facing)
-
-Path: `src/app/api/[locale]/system/unified-interface/tasks/cron/steps/`
-
-`routeId = "cron-steps"` for all user-created dynamic tasks. `defaultConfig = { steps: Step[] }`. Its widget is the steps builder. The executor handles this case specially - no `run()` function, just step dispatch.
+A reserved `routeId = "cron-steps"` for user-created dynamic step pipelines is planned. `defaultConfig = { steps: Step[] }`. The steps builder widget and executor step dispatch are not yet implemented.
 
 ---
 
@@ -127,26 +114,14 @@ Pulse tick → isCronTaskDue(task)?
        ├─ Create cronTaskExecution (RUNNING)
        ├─ resolved = resolveRouteId(task.routeId)
        │    ├─ "endpoint" → getFullPath(routeId) → call endpoint handler(defaultConfig, ownerJwt)
-       │    ├─ "task"     → tasksByName[routeId].run({ logger, locale, cronUser: ownerJwt })
-       │    ├─ "steps"    → execute steps[] (see below)
        │    └─ "unknown"  → fail(INVALID_ROUTE_ID)
        │
-       └─ steps execution:
-            ├─ type: "call"
-            │    ├─ resolveRouteId(step.routeId) → "endpoint" | "task"
-            │    ├─ validate step.args against resolved schema
-            │    └─ call handler → result stored as $step_N_result
-            └─ type: "ai_agent"
-                 ├─ substitute $step_N_result refs in preSeededToolCalls
-                 ├─ threadMode "none"   → ephemeral
-                 ├─ threadMode "new"    → ensureThread() [autoAppend: write threadId back to config]
-                 ├─ threadMode "append" → load thread [fallback to "new" if deleted]
-                 └─ setupAiStream → run to completion → store (threadId, finishReason, tokenCount)
-
-       └─ Update cronTaskExecution (COMPLETED | FAILED, stepResults, durationMs)
+       └─ Update cronTaskExecution (COMPLETED | FAILED, durationMs)
 ```
 
-All calls are direct (no HTTP). Handlers called via repository pattern, `run()` called directly.
+All calls are direct (no HTTP). Endpoint handlers called via `RouteExecutionExecutor.executeGenericHandler()`.
+
+**Planned**: `"task"` kind (direct `run()` dispatch) and `"steps"` kind (step pipeline execution) are described in the Steps section below but not yet implemented.
 
 ---
 

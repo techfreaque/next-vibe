@@ -23,18 +23,21 @@ import http from "node:http";
 import type { ServerWebSocket } from "bun";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   AUTH_TOKEN_COOKIE_NAME,
   LEAD_ID_COOKIE_NAME,
 } from "@/config/constants";
 
-import type { PubSubAdapter } from "./pubsub/types";
-import type { WsClientMessage, WsConnectionData, WsWireMessage } from "./types";
-
-/** Type for the lazy-required pubsub module to avoid inline import() annotations */
-interface PubSubModule {
-  getPubSubAdapter: () => PubSubAdapter;
-}
+import { getPubSubAdapter } from "./pubsub";
+import type {
+  WsBatchEvent,
+  WsClientMessage,
+  WsConnectionData,
+  WsWireMessage,
+} from "./types";
+import { wsIdentityKey } from "./types";
 
 // ============================================================================
 // CHANNEL REGISTRY (singleton)
@@ -49,11 +52,20 @@ let globalSeq = 0;
 /** Set to true during shutdown to suppress expected proxy errors */
 let shuttingDown = false;
 
+
+
 /**
  * Broadcast an event to LOCAL subscribers of a channel (this process only).
  * Called directly by the emitter (same process - no HTTP POST needed).
+ *
+ * When `identity` is provided, only the connection matching that user receives
+ * the event. userId takes priority; leadId is the fallback for anonymous users.
  */
-export function broadcastLocal(
+/**
+ * Broadcast to all subscribers on a channel (no user filter).
+ * Used by pub/sub adapters that relay events from other processes.
+ */
+export function broadcastLocalToAll(
   channel: string,
   event: string,
   data: WsWireMessage["data"],
@@ -81,6 +93,103 @@ export function broadcastLocal(
   }
 }
 
+export function broadcastLocal(
+  channel: string,
+  event: string,
+  data: WsWireMessage["data"],
+  user: JwtPayloadType,
+  logger: EndpointLogger,
+): void {
+  const subscribers = channels.get(channel);
+  if (!subscribers || subscribers.size === 0) {
+    return;
+  }
+
+  globalSeq++;
+  const message: WsWireMessage = {
+    channel,
+    event,
+    data,
+    seq: globalSeq,
+  };
+
+  const targetKey = wsIdentityKey(user);
+  const payload = JSON.stringify(message);
+  let sent = 0;
+  for (const ws of subscribers) {
+    const wsKey = wsIdentityKey(ws.data.user);
+    if (wsKey !== targetKey) {
+      logger.error("[WS] Identity mismatch - event not delivered", {
+        wsIdentity: wsKey,
+        emitterIdentity: targetKey,
+        cookieName: AUTH_TOKEN_COOKIE_NAME,
+        wsIsPublic: ws.data.user.isPublic,
+        emitterIsPublic: user.isPublic,
+        channel,
+        event,
+      });
+      continue;
+    }
+    try {
+      ws.send(payload);
+      sent++;
+    } catch {
+      // Socket may be closing - silently skip
+    }
+  }
+}
+
+/**
+ * Broadcast multiple events to LOCAL subscribers in a single WS frame per socket.
+ * More efficient than calling broadcastLocal() N times when emitting a batch.
+ */
+export function broadcastLocalBatch(
+  events: WsBatchEvent[],
+  user: JwtPayloadType,
+  logger: EndpointLogger,
+): void {
+  if (events.length === 0) {
+    return;
+  }
+
+  // Collect union of all channels referenced
+  const channelNames = [...new Set(events.map((e) => e.channel))];
+
+  // Find sockets subscribed to at least one of those channels matching the user
+  const targetKey = wsIdentityKey(user);
+  const socketsToSend = new Set<ServerWebSocket<WsConnectionData>>();
+  for (const ch of channelNames) {
+    const subs = channels.get(ch);
+    if (!subs) {
+      continue;
+    }
+    for (const ws of subs) {
+      if (wsIdentityKey(ws.data.user) === targetKey) {
+        socketsToSend.add(ws);
+      }
+    }
+  }
+
+  if (socketsToSend.size === 0) {
+    return;
+  }
+
+  // Assign seq numbers and build batch payload
+  const eventsWithSeq = events.map((e) => {
+    globalSeq++;
+    return { ...e, seq: globalSeq };
+  });
+  const payload = JSON.stringify({ type: "batch", events: eventsWithSeq });
+
+  for (const ws of socketsToSend) {
+    try {
+      ws.send(payload);
+    } catch {
+      // Socket may be closing - silently skip
+    }
+  }
+}
+
 /**
  * Publish an event through the pub/sub adapter.
  * NOTE: Route handlers should use createEmitter() from emitter.ts instead.
@@ -90,9 +199,6 @@ export function publish(
   event: string,
   data: WsWireMessage["data"],
 ): void {
-  // Lazy import to avoid circular dependency at module load time
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { getPubSubAdapter } = require("./pubsub") as PubSubModule;
   getPubSubAdapter().publish(channel, event, data);
 }
 
@@ -121,10 +227,8 @@ function subscribeToChannel(
   ws.data.channels.add(channel);
 
   if (isNewChannel) {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { getPubSubAdapter } = require("./pubsub") as PubSubModule;
     getPubSubAdapter().subscribe(channel, (event, data) => {
-      broadcastLocal(channel, event, data);
+      broadcastLocalToAll(channel, event, data);
     });
   }
 }
@@ -138,8 +242,6 @@ function unsubscribeFromChannel(
     set.delete(ws);
     if (set.size === 0) {
       channels.delete(channel);
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { getPubSubAdapter } = require("./pubsub") as PubSubModule;
       getPubSubAdapter().unsubscribe(channel);
     }
   }
@@ -175,29 +277,45 @@ function parseCookieValue(
 async function authenticateFromCookies(
   req: Request,
   logger: EndpointLogger,
-): Promise<{ userId: string | null; leadId: string | null }> {
+): Promise<JwtPayloadType | null> {
   const cookieHeader = req.headers.get("cookie") ?? "";
+  const url = new URL(req.url);
 
-  const token = parseCookieValue(cookieHeader, AUTH_TOKEN_COOKIE_NAME);
-  const leadId = parseCookieValue(cookieHeader, LEAD_ID_COOKIE_NAME) ?? null;
+  // Accept token and leadId from query params (used by server-side WS clients
+  // like unbottled-stream-handler which cannot set Cookie headers).
+  const token =
+    parseCookieValue(cookieHeader, AUTH_TOKEN_COOKIE_NAME) ??
+    url.searchParams.get("token") ??
+    null;
+  const leadId =
+    parseCookieValue(cookieHeader, LEAD_ID_COOKIE_NAME) ??
+    url.searchParams.get("leadId") ??
+    null;
 
-  if (!token) {
-    return { userId: null, leadId };
+  if (!leadId) {
+    return null;
   }
 
-  try {
-    const { AuthRepository } =
-      await import("@/app/api/[locale]/user/auth/repository");
-    const result = await AuthRepository.verifyJwt(token, logger, "en-US");
+  if (token) {
+    try {
+      const { AuthRepository } =
+        await import("@/app/api/[locale]/user/auth/repository");
+      const result = await AuthRepository.verifyJwt(token, logger, "en-US");
 
-    if (result.success) {
-      return { userId: result.data.id, leadId: result.data.leadId ?? leadId };
+      if (result.success) {
+        return result.data;
+      }
+    } catch {
+      logger.debug("[WS] JWT verification failed during upgrade");
     }
-  } catch {
-    logger.debug("[WS] JWT verification failed during upgrade");
   }
 
-  return { userId: null, leadId };
+  // Public (unauthenticated) connection
+  return {
+    isPublic: true,
+    leadId,
+    roles: [UserPermissionRole.PUBLIC],
+  };
 }
 
 // ============================================================================
@@ -269,12 +387,34 @@ export function startWebSocketServer(
       // so it POSTs here and the proxy calls broadcastLocal() in-process.
       if (url.pathname === "/ws/broadcast" && req.method === "POST") {
         try {
-          const body = (await req.json()) as {
-            channel: string;
-            event: string;
-            data: WsWireMessage["data"];
-          };
-          broadcastLocal(body.channel, body.event, body.data);
+          const body = await req.json();
+          if (
+            body !== null &&
+            typeof body === "object" &&
+            "type" in body &&
+            (body as { type: string }).type === "batch"
+          ) {
+            const batchBody = body as {
+              type: "batch";
+              events: WsBatchEvent[];
+              user: JwtPayloadType;
+            };
+            broadcastLocalBatch(batchBody.events, batchBody.user, logger);
+          } else {
+            const singleBody = body as {
+              channel: string;
+              event: string;
+              data: WsWireMessage["data"];
+              user: JwtPayloadType;
+            };
+            broadcastLocal(
+              singleBody.channel,
+              singleBody.event,
+              singleBody.data,
+              singleBody.user,
+              logger,
+            );
+          }
           return new Response("ok", { status: 200 });
         } catch {
           return new Response("Bad Request", { status: 400 });
@@ -298,8 +438,11 @@ export function startWebSocketServer(
         );
         const upgraded = bunServer.upgrade(req, {
           data: {
-            userId: null,
-            leadId: "__proxy__",
+            user: {
+              isPublic: true,
+              leadId: "__proxy__",
+              roles: [UserPermissionRole.PUBLIC],
+            } satisfies JwtPayloadType,
             channels: new Set<string>(),
             connectedAt: Date.now(),
             proxyWs: upstream,
@@ -319,20 +462,19 @@ export function startWebSocketServer(
       ) {
         const channel = url.searchParams.get("channel");
 
-        const { userId, leadId } = await authenticateFromCookies(req, logger);
+        const user = await authenticateFromCookies(req, logger);
 
-        if (!leadId) {
+        if (!user) {
           logger.warn("[WS] Rejected upgrade - missing lead_id cookie");
           return new Response("Missing lead_id cookie", { status: 401 });
         }
 
         const upgraded = bunServer.upgrade(req, {
           data: {
-            userId,
-            leadId,
+            user,
             channels: new Set(channel ? [channel] : []),
             connectedAt: Date.now(),
-          },
+          } satisfies WsConnectionData,
         });
 
         if (!upgraded) {

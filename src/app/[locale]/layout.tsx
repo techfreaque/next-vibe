@@ -129,9 +129,16 @@ export function TanstackPage({
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="manifest" href={`/api/${locale}/manifest`} />
+        {/* Sync cookie → localStorage before next-themes reads it, preventing theme flash */}
+        <Script
+          id="theme-sync"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var m=document.cookie.match(/(?:^|;\\s*)theme=(light|dark)/);if(m)localStorage.setItem('theme',m[1]);}catch(e){}})();`,
+          }}
+        />
       </Head>
       <Body className={inter.className}>
-        <RootProviders locale={locale}>
+        <RootProviders locale={locale} theme={theme}>
           <Outlet>{children}</Outlet>
         </RootProviders>
         <Scripts />

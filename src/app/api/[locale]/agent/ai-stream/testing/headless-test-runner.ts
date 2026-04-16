@@ -15,10 +15,7 @@ import type {
 } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
 import { runHeadlessAiStream } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type {
-  MessageMetadata,
-  ToolCallResult,
-} from "@/app/api/[locale]/agent/chat/db";
+import type { MessageMetadata } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
@@ -27,7 +24,8 @@ import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-gene
 import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { defaultLocale } from "@/i18n/core/config";
 import { scopedTranslation } from "../stream/i18n";
@@ -102,6 +100,8 @@ export interface TestStreamParams {
    * Used by UNBOTTLED self-relay tests to route all inference through the UNBOTTLED provider.
    */
   providerOverride?: ApiProvider;
+  /** Abort signal to cancel the stream. Defaults to a never-aborting signal. */
+  abortSignal?: AbortSignal;
 }
 
 /** Slim message shape - only fields we assert on */
@@ -116,8 +116,8 @@ export interface SlimMessage {
   isAI: boolean;
   toolCall: {
     toolName?: string;
-    args?: ToolCallResult;
-    result?: ToolCallResult;
+    args?: WidgetData;
+    result?: WidgetData;
     isDeferred?: boolean;
     toolCallId?: string;
     originalToolCallId?: string;
@@ -153,15 +153,16 @@ export interface TestStreamResult {
  * Returns null if the result is not a non-array object.
  */
 export function toolResultRecord(
-  result: ToolCallResult | undefined,
-): Record<string, ToolCallResult> | null {
+  result: WidgetData | undefined,
+): Record<string, WidgetData> | null {
   if (
     result !== null &&
     result !== undefined &&
     typeof result === "object" &&
-    !Array.isArray(result)
+    !Array.isArray(result) &&
+    !(result instanceof Date)
   ) {
-    return result as Record<string, ToolCallResult>;
+    return result;
   }
   return null;
 }
@@ -311,6 +312,7 @@ export async function runTestStream(
     providerOverride,
     availableTools,
     operationOverride: callerOperationOverride,
+    abortSignal = new AbortController().signal,
   } = params;
 
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -338,6 +340,7 @@ export async function runTestStream(
     threadId,
     operationOverride: resolvedOperationOverride,
     rootFolderId: DefaultFolderId.CRON,
+    subAgentDepth: 0,
     user,
     locale: defaultLocale,
     logger,
@@ -350,6 +353,7 @@ export async function runTestStream(
     mediaModelOverrides,
     providerOverride,
     availableTools: availableTools ?? null,
+    abortSignal,
   });
 
   let messages: SlimMessage[] = [];

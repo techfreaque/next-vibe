@@ -30,7 +30,6 @@ interface UseTTSAudioOptions {
   onError?: (error: string) => void;
   user: JwtPayloadType;
   logger: EndpointLogger;
-  deductCredits: (creditCost: number, feature: string) => void;
   /** Stable identifier for persisting state across unmounts */
   messageId: string;
 }
@@ -53,7 +52,6 @@ export function useTTSAudio({
   onError,
   user,
   logger,
-  deductCredits,
   messageId,
 }: UseTTSAudioOptions): UseTTSAudioReturn {
   const { t } = chatScopedTranslation.scopedT(locale);
@@ -172,12 +170,6 @@ export function useTTSAudio({
               urlLength: audioDataUrl.length,
             });
 
-            // Optimistically update credit balance in UI using actual cost from server
-            const creditCost = responseData.creditCost ?? 0;
-            if (creditCost > 0) {
-              deductCredits(creditCost, "tts");
-            }
-
             const audio = new Audio(audioDataUrl);
             resolve(audio);
           },
@@ -203,16 +195,7 @@ export function useTTSAudio({
         });
       });
     },
-    [
-      ttsForm,
-      logger,
-      messageId,
-      t,
-      onError,
-      deductCredits,
-      voicePreference,
-      setStore,
-    ],
+    [ttsForm, logger, messageId, t, onError, voicePreference, setStore],
   );
 
   // Play next chunk in the queue - defined as a stable ref-based function

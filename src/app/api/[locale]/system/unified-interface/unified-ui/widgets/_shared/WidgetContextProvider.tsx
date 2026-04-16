@@ -6,7 +6,7 @@
 "use client";
 
 import type { ReactElement, ReactNode } from "react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
@@ -42,24 +42,21 @@ export function WidgetContextProvider<TEndpoint extends CreateApiEndpointAny>({
     >
   > | null>(null);
 
-  // Initialize store with current context
+  // Initialize store once on first render
   if (!storeRef.current) {
     storeRef.current = createWidgetContextStore<
       CreateApiEndpointAny,
       ReactWidgetContext<CreateApiEndpointAny>
     >(context as ReactWidgetContext<CreateApiEndpointAny>);
-  } else {
-    // Update the store's internal state directly without triggering subscriptions during render
-    // This is safe because we're just updating the store's state object, not calling setState
-    const currentState = storeRef.current.getState();
-    if (currentState.context !== context) {
-      // Use Object.assign to update the internal state without triggering listeners
-      Object.assign(currentState, {
-        context: context as ReactWidgetContext<CreateApiEndpointAny>,
-      });
-    }
   }
   const store = storeRef.current;
+
+  // Sync context updates after render to avoid setState-during-render
+  useEffect(() => {
+    store
+      .getState()
+      .setContext(context as ReactWidgetContext<CreateApiEndpointAny>);
+  });
 
   return (
     <WidgetContextStoreContext.Provider value={store}>

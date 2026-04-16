@@ -10,12 +10,12 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
-  useInkWidgetLocale,
-  useInkWidgetPlatform,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+  useWidgetLocale,
+  useWidgetPlatform,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type {
   HelpGetResponseOutput,
@@ -69,11 +69,9 @@ function formatCredits(credits: number | undefined): string {
  * e.g. { intelligenceRange: { min: "quick", max: "smart" } }
  *   → ['--key.intelligenceRange.min="quick"', '--key.intelligenceRange.max="smart"']
  */
-type CliValue = CliRequestData[string];
-
 function flattenValue(
   keyPath: string,
-  value: CliValue,
+  value: WidgetData,
   prefix: string,
   isMcp = false,
 ): string[] {
@@ -85,7 +83,9 @@ function flattenValue(
   }
   if (typeof value === "object") {
     const results: string[] = [];
-    for (const [sk, sv] of Object.entries(value as CliRequestData)) {
+    for (const [sk, sv] of Object.entries(
+      value as Record<string, WidgetData>,
+    )) {
       results.push(...flattenValue(`${keyPath}.${sk}`, sv, prefix, isMcp));
     }
     return results;
@@ -107,7 +107,7 @@ function flattenValue(
  * Undefined and null values are omitted.
  */
 function serializeExampleArgs(
-  exData: CliRequestData,
+  exData: Record<string, WidgetData>,
   prefix = "--",
   isMcp = false,
 ): string {
@@ -454,7 +454,9 @@ function renderDetailCli(tool: HelpToolItem): string {
       lines.push(chalk.bold("Examples"));
       for (const [exName, exData] of exampleEntries) {
         const flags: string[] = [];
-        for (const [k, v] of Object.entries(exData)) {
+        for (const [k, v] of Object.entries(
+          exData as Record<string, WidgetData>,
+        )) {
           for (const flag of flattenValue(k, v, "--", false)) {
             flags.push(flag);
           }
@@ -510,7 +512,11 @@ function renderDetailMcp(tool: HelpToolItem): string {
       lines.push("");
       lines.push("Examples:");
       for (const [exName, exData] of exampleEntries) {
-        const args = serializeExampleArgs(exData, "--", true);
+        const args = serializeExampleArgs(
+          exData as Record<string, WidgetData>,
+          "--",
+          true,
+        );
         lines.push(`  ${exName}: vibe ${tool.name} ${args}`);
       }
     }
@@ -690,9 +696,9 @@ function renderToolListMcp(
 // ── Main Widget ──────────────────────────────────────────────────────────
 
 export function HelpToolsWidget({ field }: CliWidgetProps): JSX.Element {
-  const platform = useInkWidgetPlatform();
+  const platform = useWidgetPlatform();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const locale = useInkWidgetLocale();
+  const locale = useWidgetLocale();
   const isMcp = platform === Platform.MCP;
 
   const output = useMemo(() => {

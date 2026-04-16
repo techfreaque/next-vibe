@@ -11,6 +11,8 @@ import type { JSX, ReactNode } from "react";
 import { TranslationProvider } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { LoggerProvider } from "@/hooks/use-logger";
+
 import { ErrorBoundary } from "./_components/error-boundary";
 import { LeadTrackingProvider } from "./_components/lead-tracking-provider";
 /**
@@ -19,18 +21,26 @@ import { LeadTrackingProvider } from "./_components/lead-tracking-provider";
  */
 export function RootProviders({
   locale,
+  theme,
   children,
 }: {
   locale: CountryLanguage;
+  theme?: "light" | "dark";
   children: ReactNode;
 }): JSX.Element {
   return (
     <QueryProvider>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme={theme ?? "dark"}
+        enableSystem={false}
+      >
         <TranslationProvider currentLocale={locale}>
-          <LeadTrackingProvider />
-          <ErrorBoundary locale={locale}>{children}</ErrorBoundary>
-          <Toaster />
+          <LoggerProvider locale={locale}>
+            <ErrorBoundary locale={locale}>{children}</ErrorBoundary>
+            <LeadTrackingProvider />
+            <Toaster />
+          </LoggerProvider>
         </TranslationProvider>
       </ThemeProvider>
     </QueryProvider>

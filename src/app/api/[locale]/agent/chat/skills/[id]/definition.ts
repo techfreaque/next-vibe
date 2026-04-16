@@ -47,6 +47,7 @@ import {
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
 import { ChatModelId, getBestChatModel } from "../../../ai-stream/models";
 import { TtsModelId } from "../../../text-to-speech/models";
@@ -69,12 +70,11 @@ import type { SkillListResponseOutput } from "../definition";
 import { CategoryOptions, SkillCategory } from "../enum";
 import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "./i18n";
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 
-const SkillEditContainer = lazyCliWidget(() =>
+const SkillEditContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillEditContainer })),
 );
-const SkillViewContainer = lazyCliWidget(() =>
+const SkillViewContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillViewContainer })),
 );
 
@@ -113,6 +113,7 @@ const { DELETE } = createEndpoint({
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         const skillsDefinition = await import("../definition");
+        const removedSkillIds = [data.pathParams.id];
 
         // Optimistically remove the deleted skill from the list
         apiClient.updateEndpointData(
@@ -127,9 +128,25 @@ const { DELETE } = createEndpoint({
               ...oldData.data,
               sections: oldData.data.sections.map((section) => ({
                 ...section,
-                skills: section.skills.filter(
-                  (char) => char.id !== data.pathParams.id,
-                ),
+                skills: section.skills.filter((char) => {
+                  const isMatch =
+                    char.id === data.pathParams.id ||
+                    char.internalId === data.pathParams.id;
+
+                  if (isMatch) {
+                    if (!removedSkillIds.includes(char.id)) {
+                      removedSkillIds.push(char.id);
+                    }
+                    if (
+                      char.internalId &&
+                      !removedSkillIds.includes(char.internalId)
+                    ) {
+                      removedSkillIds.push(char.internalId);
+                    }
+                  }
+
+                  return !isMatch;
+                }),
               })),
             });
           },
@@ -150,7 +167,7 @@ const { DELETE } = createEndpoint({
               data: {
                 ...oldData.data,
                 favorites: oldData.data.favorites.filter(
-                  (fav) => fav.skillId !== data.pathParams.id,
+                  (fav) => !removedSkillIds.includes(fav.skillId),
                 ),
               },
             };
@@ -284,7 +301,7 @@ const { DELETE } = createEndpoint({
 
   examples: {
     urlPathParams: {
-      delete: { id: "550e8400-e29b-41d4-a716-446655440000" },
+      delete: { id: "code-reviewer" },
     },
     responses: {
       delete: {
@@ -337,6 +354,7 @@ const { PATCH } = createEndpoint({
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         const skillsDefinition = await import("../definition");
         const skillSingleDefinitions = await import("./definition");
+        const updatedSkillIds = [data.pathParams.id];
 
         // Optimistically update the skill GET endpoint cache
         apiClient.updateEndpointData(
@@ -400,8 +418,22 @@ const { PATCH } = createEndpoint({
                 sections: oldData.data.sections.map((section) => ({
                   ...section,
                   skills: section.skills.map((char) => {
-                    if (char.id !== data.pathParams.id) {
+                    const isMatch =
+                      char.id === data.pathParams.id ||
+                      char.internalId === data.pathParams.id;
+
+                    if (!isMatch) {
                       return char;
+                    }
+
+                    if (!updatedSkillIds.includes(char.id)) {
+                      updatedSkillIds.push(char.id);
+                    }
+                    if (
+                      char.internalId &&
+                      !updatedSkillIds.includes(char.internalId)
+                    ) {
+                      updatedSkillIds.push(char.internalId);
                     }
 
                     // Update the skill with new data from the request
@@ -456,7 +488,7 @@ const { PATCH } = createEndpoint({
               data: {
                 ...oldData.data,
                 favorites: oldData.data.favorites.map((fav) => {
-                  if (fav.skillId !== data.pathParams.id) {
+                  if (!updatedSkillIds.includes(fav.skillId)) {
                     return fav;
                   }
                   return {
@@ -870,7 +902,7 @@ const { PATCH } = createEndpoint({
       },
     },
     urlPathParams: {
-      update: { id: "550e8400-e29b-41d4-a716-446655440000" },
+      update: { id: "code-reviewer" },
     },
   },
 });
@@ -946,6 +978,11 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         size: "base",
         schema: z.string().min(1).max(500).nullable(),
+      }),
+      internalId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().nullable(),
       }),
       category: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
@@ -1143,10 +1180,43 @@ const { GET } = createEndpoint({
     description: "get.success.description" as const,
   },
 
+  // === WS EVENTS ===
+  // Emitted by SkillsRepository after skill mutations — keeps skill detail view in sync.
+  // Uses fields + merge so the framework applies the payload directly into the cache.
+  events: {
+    "skill-updated": {
+      fields: [
+        "name",
+        "icon",
+        "tagline",
+        "description",
+        "category",
+        "isPublic",
+        "skillOwnership",
+        "systemPrompt",
+        "compactTrigger",
+        "variants",
+        "availableTools",
+        "pinnedTools",
+        "voiceModelSelection",
+        "sttModelSelection",
+        "imageVisionModelSelection",
+        "videoVisionModelSelection",
+        "audioVisionModelSelection",
+        "imageGenModelSelection",
+        "musicGenModelSelection",
+        "videoGenModelSelection",
+        "defaultChatMode",
+      ] as const,
+      operation: "merge" as const,
+    },
+  },
+
   examples: {
     responses: {
       getDefault: {
         icon: "🤖",
+        internalId: null,
         name: "Default",
         tagline: "Pure AI, No Personality",
         description: "The models unmodified behavior",
@@ -1188,6 +1258,7 @@ const { GET } = createEndpoint({
       },
       getCustom: {
         icon: "👨‍💻",
+        internalId: "550e8400-e29b-41d4-a716-446655440000",
         name: "Code Reviewer",
         tagline: "Code Review Expert",
         description: "Expert at reviewing code",
@@ -1233,7 +1304,7 @@ const { GET } = createEndpoint({
     },
     urlPathParams: {
       getDefault: { id: "default" },
-      getCustom: { id: "550e8400-e29b-41d4-a716-446655440000" },
+      getCustom: { id: "code-reviewer" },
     },
   },
 });

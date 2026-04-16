@@ -36,6 +36,7 @@ export enum ImageVisionModelId {
   CLAUDE_SONNET_4_6 = "claude-sonnet-4.6",
   CLAUDE_OPUS_4_5 = "claude-opus-4.5",
   CLAUDE_OPUS_4_6 = "claude-opus-4.6",
+  CLAUDE_OPUS_4_7 = "claude-opus-4.7",
   GLM_4_5V = "glm-4.5v",
   GEMINI_3_1_FLASH_IMAGE_PREVIEW = "gemini-3.1-flash-image-preview",
   GEMINI_3_PRO_IMAGE_PREVIEW = "gemini-3-pro-image-preview",

@@ -14,8 +14,14 @@ import "server-only";
 import type { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { EventSchemas, TypedEmit, WsWireMessage } from "./types";
+import type {
+  EventSchemas,
+  TypedEmit,
+  WsBatchEvent,
+  WsWireMessage,
+} from "./types";
 
 /**
  * Derive the proxy's internal broadcast URL.
@@ -38,16 +44,18 @@ function getBroadcastUrl(): string {
 /**
  * Publish a WS event - POST to the Bun proxy's internal broadcast endpoint.
  * Fire-and-forget: errors are logged but not thrown.
+ * Only the connection matching the user's identity receives the event.
  */
-export function publishWsEvent(
-  msg: Omit<WsWireMessage, "seq">,
+export function publishWsEvent<T>(
+  msg: Omit<WsWireMessage<T>, "seq">,
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): void {
   const url = getBroadcastUrl();
   fetch(url, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(msg),
+    body: JSON.stringify({ ...msg, user }),
   }).catch((err) => {
     if (!shuttingDown) {
       logger.warn("[WS Emitter] Failed to broadcast event", {
@@ -57,6 +65,121 @@ export function publishWsEvent(
       });
     }
   });
+}
+
+/**
+ * Publish a WS event to multiple channels simultaneously.
+ * Calls publishWsEvent once per channel — fire-and-forget.
+ * Only the connection matching the user's identity receives events on each channel.
+ */
+export function publishWsEventToChannels<T>(
+  channels: string[],
+  msg: Omit<WsWireMessage<T>, "seq" | "channel">,
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): void {
+  for (const channel of channels) {
+    publishWsEvent(
+      { ...msg, channel } as Omit<WsWireMessage<T>, "seq">,
+      logger,
+      user,
+    );
+  }
+}
+
+/**
+ * Publish multiple WS events in a single HTTP POST to the proxy.
+ * The proxy unpacks and broadcasts each event individually,
+ * but packs them into a single WS frame per socket (WsWireBatch).
+ * Use this instead of multiple publishWsEvent() calls when emitting
+ * related events together (e.g. stream-finished + sidebar updates).
+ */
+export function publishWsEventBatch(
+  events: WsBatchEvent[],
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): void {
+  if (events.length === 0) {
+    return;
+  }
+  if (events.length === 1) {
+    // Single event — use the simpler path
+    publishWsEvent(
+      {
+        channel: events[0]!.channel,
+        event: events[0]!.event,
+        data: events[0]!.data,
+      },
+      logger,
+      user,
+    );
+    return;
+  }
+  const url = getBroadcastUrl();
+  fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ type: "batch", events, user }),
+  }).catch((err) => {
+    if (!shuttingDown) {
+      logger.warn("[WS Emitter] Failed to broadcast batch", {
+        error: err instanceof Error ? err.message : String(err),
+        count: events.length,
+      });
+    }
+  });
+}
+
+/**
+ * Create a batching emitter that accumulates events and flushes them in a single
+ * HTTP POST to the proxy (which packs them into one WS frame per socket).
+ *
+ * Use this for high-frequency event streams (e.g. content-delta during LLM streaming)
+ * where sending a separate HTTP POST for every chunk would be wasteful.
+ *
+ * @param logger - Endpoint logger for error reporting
+ * @param user - Authenticated user (determines which WS connection receives events)
+ * @param flushMs - Flush interval in milliseconds (default: 16ms ≈ one animation frame)
+ */
+export function createBatchingEmitter(
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+  flushMs = 16,
+): {
+  emit: (channel: string, event: string, data: WsWireMessage["data"]) => void;
+  flush: () => void;
+} {
+  const queue: WsBatchEvent[] = [];
+  let timer: ReturnType<typeof setTimeout> | null = null;
+
+  function flush(): void {
+    if (timer !== null) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    if (queue.length === 0) {
+      return;
+    }
+    publishWsEventBatch([...queue], logger, user);
+    queue.length = 0;
+  }
+
+  function emit(
+    channel: string,
+    event: string,
+    data: WsWireMessage["data"],
+  ): void {
+    queue.push({ channel, event, data });
+    if (timer === null) {
+      timer = setTimeout(flush, flushMs);
+    }
+    // Safety cap: flush immediately if queue is large
+    if (queue.length >= 50) {
+      flush();
+    }
+  }
+
+  return { emit, flush };
 }
 
 /** Set to true during shutdown to suppress expected broadcast errors */
@@ -77,6 +200,7 @@ export function createEmitter<TEvents extends EventSchemas | never>(
   channel: string,
   eventSchemas: TEvents,
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): TypedEmit<TEvents> {
   return (<K extends keyof TEvents & string>(
     event: K,
@@ -109,6 +233,7 @@ export function createEmitter<TEvents extends EventSchemas | never>(
         data: result.data,
       },
       logger,
+      user,
     );
   }) as TypedEmit<TEvents>;
 }

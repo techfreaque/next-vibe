@@ -29,11 +29,12 @@ import {
   useWidgetForm,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { DateFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/date-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { DateFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/date-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
 import { CronTaskStatus, type CronTaskStatusValue } from "../../enum";
 import type endpoints from "./definition";
@@ -42,9 +43,7 @@ import type { CronHistoryResponseOutput } from "./definition";
 type Execution = CronHistoryResponseOutput["executions"][number];
 
 interface WidgetProps {
-  field: {
-    value: CronHistoryResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
+  field: (typeof endpoints.GET)["fields"];
 }
 
 // ---------------------------------------------------------------------------
@@ -360,7 +359,7 @@ export function CronHistoryContainer({
     form.watch("status") ?? "ALL";
   const offset = form.watch("offset") ?? 0;
 
-  const value = field.value;
+  const value = useWidgetValue<typeof endpoints.GET>();
   const summary = value?.summary;
   const totalCount = value?.totalCount ?? 0;
 

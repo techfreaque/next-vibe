@@ -1,6 +1,5 @@
 "use client";
 
-import type { QueryKey } from "@tanstack/react-query";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type {
   ErrorResponseType,
@@ -108,7 +107,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
 
   // State key: endpoint.path + endpoint.method + urlPathParams + includeInCacheKey fields
   // Shared across all calls with same urlPathParams + cacheKey request data
-  const queryKey: QueryKey = useMemo(() => {
+  const queryKey: [string] = useMemo(() => {
     if (customQueryKey) {
       // Custom key is a string, wrap it in array for React Query
       return [customQueryKey];
@@ -360,6 +359,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
       refetch,
       remove,
       setErrorType,
+      cacheKey: queryKey[0],
     };
   }, [
     query.data,
@@ -373,5 +373,6 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     refetch,
     remove,
     setErrorType,
+    queryKey,
   ]);
 }

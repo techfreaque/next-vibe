@@ -1161,13 +1161,18 @@ export type VideoGenModelSelection = z.infer<
 export function filterVideoGenModels(
   selection: VideoGenModelSelection | null | undefined,
   user: JwtPayloadType,
+  providerOverride?: ApiProvider,
 ): VideoGenModelOption[] {
-  return filterRoleModels(videoGenModelOptionsPool, selection, user);
+  const pool = providerOverride
+    ? videoGenModelOptionsPool.filter((m) => m.apiProvider === providerOverride)
+    : videoGenModelOptionsPool;
+  return filterRoleModels(pool, selection, user);
 }
 
 export function getBestVideoGenModel(
   selection: VideoGenModelSelection,
   user: JwtPayloadType,
+  providerOverride?: ApiProvider,
 ): VideoGenModelOption | null {
-  return filterVideoGenModels(selection, user)[0] ?? null;
+  return filterVideoGenModels(selection, user, providerOverride)[0] ?? null;
 }

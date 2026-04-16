@@ -30,7 +30,7 @@ import type { CreateApiEndpointAny } from "../types/endpoint-base";
 import { FieldUsage, type SpacingSize, WidgetType } from "../types/enums";
 import type { Platform } from "../types/platform";
 import type { ServerDefaultContext } from "../types/server-default";
-import type { JsonValue } from "../../tasks/unified-runner/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   ArrayWidgetConfig,
   DisplayOnlyWidgetConfig,
@@ -1057,10 +1057,10 @@ export function collectServerDefaults<F>(
   fields: F,
   userRoles?: readonly (typeof UserPermissionRoleValue)[],
   platform?: Platform,
-): Record<string, (ctx: ServerDefaultContext) => JsonValue | undefined> {
+): Record<string, (ctx: ServerDefaultContext) => WidgetData | undefined> {
   const result: Record<
     string,
-    (ctx: ServerDefaultContext) => JsonValue | undefined
+    (ctx: ServerDefaultContext) => WidgetData | undefined
   > = {};
 
   if (!fields || typeof fields !== "object") {
@@ -1073,7 +1073,7 @@ export function collectServerDefaults<F>(
     children?: Record<string, FieldLike>;
     visibleFor?: readonly (typeof UserPermissionRoleValue)[];
     hiddenForPlatforms?: readonly Platform[];
-    serverDefault?: (ctx: ServerDefaultContext) => JsonValue | undefined;
+    serverDefault?: (ctx: ServerDefaultContext) => WidgetData | undefined;
   }
 
   const typed = fields as F & FieldLike;

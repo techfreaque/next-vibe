@@ -5,6 +5,7 @@
  */
 
 import type { z } from "zod";
+import type { JwtPayloadType } from "../../../user/auth/types";
 
 // ============================================================================
 // EVENT TYPE INFERENCE
@@ -48,6 +49,30 @@ export interface WsWireMessage<T = z.infer<z.ZodType>> {
 }
 
 /**
+ * A single event entry inside a batch frame.
+ * Same as WsWireMessage but without seq (assigned by broadcastLocalBatch).
+ */
+export interface WsBatchEvent {
+  readonly channel: string;
+  readonly event: string;
+  readonly data: WsWireMessage["data"];
+}
+
+/**
+ * Batch frame: multiple events packed into a single WS message.
+ * Sent by publishWsEventBatch / broadcastLocalBatch for efficiency.
+ */
+export interface WsWireBatch {
+  readonly type: "batch";
+  readonly events: ReadonlyArray<WsBatchEvent & { readonly seq: number }>;
+}
+
+/**
+ * Any frame that can arrive over the WebSocket wire.
+ */
+export type WsWireFrame = WsWireMessage | WsWireBatch;
+
+/**
  * Client→server subscribe/unsubscribe messages.
  */
 export interface WsSubscribeMessage {
@@ -70,13 +95,19 @@ export type WsClientMessage = WsSubscribeMessage | WsUnsubscribeMessage;
 // ============================================================================
 
 /**
+ * Extract the identity key for matching WS connections.
+ * userId takes priority; leadId is the fallback for anonymous users.
+ * Single source of truth for the matching logic — never inline this elsewhere.
+ */
+export function wsIdentityKey(user: JwtPayloadType): string {
+  return user.isPublic ? user.leadId : user.id;
+}
+
+/**
  * Data attached to each WebSocket connection (Bun's ws.data).
  */
 export interface WsConnectionData {
-  /** Authenticated user ID (null if public/unauthenticated) */
-  userId: string | null;
-  /** Lead ID for anonymous tracking (from lead_id cookie) */
-  leadId: string;
+  user: JwtPayloadType;
   /** Set of channels this connection is subscribed to */
   channels: Set<string>;
   /** Connection timestamp */

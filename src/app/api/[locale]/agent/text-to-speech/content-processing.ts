@@ -3,11 +3,9 @@
  * Utilities for preparing message content for text-to-speech
  */
 
-import type {
-  ChatMessage,
-  ToolCallResult,
-} from "@/app/api/[locale]/agent/chat/db";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { getTranslatorFromEndpoint } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
@@ -246,8 +244,8 @@ export async function processMessageGroupForTTS(
  */
 async function formatToolCallForCopy(
   toolName: string,
-  args: ToolCallResult,
-  result: ToolCallResult | undefined,
+  args: WidgetData,
+  result: WidgetData | undefined,
   locale: CountryLanguage,
   asMarkdown: boolean,
   logger: EndpointLogger,

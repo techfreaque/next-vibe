@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   nav: {
     help: "Pomoc",
     logout: "Wyloguj",
-    settings: "Ustawienia profilu",
+    settings: "Mój profil",
     leadMagnet: "Lead Magnet",
     enableLightMode: "Włącz tryb jasny",
     enableDarkMode: "Włącz tryb ciemny",
@@ -54,7 +54,7 @@ export const translations: typeof enTranslations = {
     signIn: "Zaloguj się",
     goToApp: "Otwórz aplikację",
     backToChat: "Wróć do czatu",
-    unbottledHome: "Website & Blog",
+    unbottledHome: "Artykuły",
     subscription: "Subskrypcja",
     referral: "Polecenia",
     services: {
@@ -253,7 +253,7 @@ export const translations: typeof enTranslations = {
       clickToExplore: "Kliknij, aby odkryć",
       header: "Cztery produkty. Jedna platforma.",
       subheader:
-        "Uncensored AI · Własny agent · Framework open-source · Stały dochód",
+        "AI bez cenzury · Własny agent · Framework open source · Stały dochód",
       unbottled: {
         badge: "Bez cenzury · Otwarty · Mainstream",
         titleLine1: "AI bez cenzury.",
@@ -296,7 +296,7 @@ export const translations: typeof enTranslations = {
         titleLine1: "Publikuj. Polecaj.",
         titleLine2: "Zarabiaj.",
         subtitle:
-          "Twórz skille. Zarabiaj 15% gdy ktoś zapisze się przez twój. Polecaj kogokolwiek - 10% z każdej płatności, na zawsze. Ich sieć też na ciebie pracuje.",
+          "Link polecający: 10% z każdej płatności, na zawsze. Twój skill jako strona wejścia: +5% — nawet gdy inni go udostępniają.",
         cta: "Zacznij zarabiać",
         ctaExplore: "Dowiedz się więcej",
       },

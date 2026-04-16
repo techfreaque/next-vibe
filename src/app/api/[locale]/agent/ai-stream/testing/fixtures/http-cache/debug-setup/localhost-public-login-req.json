@@ -1,0 +1,11 @@
+{
+  "url": "http://localhost:3001/api/en-US/user/public/login",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "email": "max@a42.ch",
+    "password": "password123"
+  }
+}

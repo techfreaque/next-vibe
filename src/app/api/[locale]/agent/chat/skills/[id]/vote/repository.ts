@@ -17,12 +17,14 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { SKILL_VERIFIED_VOTE_THRESHOLD } from "../../constants";
 import { customSkills, skillVotes } from "../../db";
 import { SkillOwnershipType, SkillTrustLevel } from "../../enum";
 import { SkillsRepository } from "../../repository";
+import skillsDefinitions from "../../definition";
 import type { SkillVotePostResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -50,6 +52,7 @@ export class SkillVoteRepository {
       const [skill] = await db
         .select({
           id: customSkills.id,
+          slug: customSkills.slug,
           ownershipType: customSkills.ownershipType,
           voteCount: customSkills.voteCount,
           trustLevel: customSkills.trustLevel,
@@ -122,6 +125,21 @@ export class SkillVoteRepository {
           updatedAt: new Date(),
         })
         .where(eq(customSkills.id, resolvedId));
+
+      // Emit WS event so all open tabs see updated vote count immediately
+      const emitSkills = createEndpointEmitter(
+        skillsDefinitions.GET,
+        logger,
+        user,
+      );
+      emitSkills("skill-updated", {
+        wsEvent: {
+          type: "updated",
+          id: skill.slug ?? skill.id,
+          voteCount: newVoteCount,
+          trustLevel: newTrustLevel,
+        },
+      });
 
       return success({
         voted,

@@ -26,9 +26,10 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
 
 import type { MessengerChannelFilterValue } from "../../accounts/enum";
 import {
@@ -49,9 +50,7 @@ import type { EmailsListResponseOutput } from "./definition";
 type EmailItem = NonNullable<EmailsListResponseOutput["emails"]>[number];
 
 interface CustomWidgetProps {
-  field: {
-    value: EmailsListResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 const STATUS_STYLE: Record<string, string> = {
@@ -187,6 +186,7 @@ export function EmailsListContainer({
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const value = useWidgetValue<typeof definition.GET>();
   const messagesT = messagesScopedTranslation.scopedT(locale).t;
   const { push: navigate } = useWidgetNavigation();
   const form = useWidgetForm();
@@ -195,12 +195,9 @@ export function EmailsListContainer({
   const activeStatus: typeof MessageStatusFilterValue =
     form.watch("filters.status") ?? MessageStatusFilter.ANY;
 
-  const emails = useMemo(
-    () => field.value?.emails ?? [],
-    [field.value?.emails],
-  );
-  const pagination = field.value?.pagination;
-  const isLoading = field.value === null || field.value === undefined;
+  const emails = useMemo(() => value?.emails ?? [], [value?.emails]);
+  const pagination = value?.pagination;
+  const isLoading = value === null || value === undefined;
 
   const statusCounts = useMemo((): Record<string, number> => {
     const counts: Record<string, number> = {};
@@ -267,8 +264,8 @@ export function EmailsListContainer({
   );
 
   const handleTypeFilter = useCallback(
-    (value: string): void => {
-      form.setValue("filters.type", value);
+    (typeVal: string): void => {
+      form.setValue("filters.type", typeVal);
       if (onSubmit) {
         onSubmit();
       }
@@ -277,8 +274,8 @@ export function EmailsListContainer({
   );
 
   const handleChannelFilter = useCallback(
-    (value: string): void => {
-      form.setValue("filters.channel", value);
+    (channelVal: string): void => {
+      form.setValue("filters.channel", channelVal);
       if (onSubmit) {
         onSubmit();
       }

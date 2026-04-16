@@ -20,8 +20,8 @@ import { validateData } from "next-vibe/shared/utils";
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { Platform } from "../shared/types/platform";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
+import { Platform } from "../shared/types/platform";
 import { formatValidationErrorCompact } from "../shared/utils/format-validation-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
@@ -96,6 +96,7 @@ export function wrapErrorResponse(
 
   // Log the full error chain for debugging
   logger.error(`API Error:\n${logChain.join("\n")}`, {
+    endpoint: endpoint?.aliases?.[0] ?? endpoint?.path?.join("/"),
     messageParams: error.messageParams,
     errorKey: error.errorType.errorKey,
     errorCode: error.errorType.errorCode,

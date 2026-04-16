@@ -31,7 +31,7 @@ import {
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { CliCompatiblePlatform } from "../unified-interface/cli/runtime/route-executor";
 import { generateSchemaForUsage } from "../unified-interface/shared/field/utils";
 import {
@@ -71,8 +71,8 @@ interface EndpointMeta {
   credits?: number;
   requiresConfirmation?: boolean;
   examples?: {
-    inputs?: Record<string, CliRequestData>;
-    responses?: Record<string, CliRequestData>;
+    inputs?: Record<string, Record<string, WidgetData>>;
+    responses?: Record<string, Record<string, WidgetData>>;
   };
 }
 

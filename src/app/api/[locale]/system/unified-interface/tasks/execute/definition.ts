@@ -7,8 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   requestResponseField,
   responseField,
   submitButton,
@@ -22,11 +22,11 @@ import {
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { TASK_EXECUTE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 
-const TaskExecuteContainer = lazyCliWidget(() =>
+const TaskExecuteContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.TaskExecuteContainer })),
 );
 

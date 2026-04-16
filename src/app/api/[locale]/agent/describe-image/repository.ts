@@ -66,11 +66,7 @@ export class DescribeImageRepository {
 
     // Check balance
     const balanceResult = await CreditRepository.getBalance(
-      user.isPublic && user.leadId
-        ? { leadId: user.leadId }
-        : user.id
-          ? { userId: user.id, leadId: user.leadId }
-          : { leadId: user.leadId! },
+      user,
       logger,
       tCredits,
       locale,

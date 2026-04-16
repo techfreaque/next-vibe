@@ -14,21 +14,19 @@ import { useCallback, useMemo, useState } from "react";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type {
-  ChatMessage,
-  ToolCallResult,
-} from "@/app/api/[locale]/agent/chat/db";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
-import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { useLogger } from "@/hooks/use-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { configScopedTranslation } from "@/config/i18n";
 
+import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
 
@@ -93,8 +91,8 @@ function toolMsg(
   model: ChatMessage["model"],
   toolCallId: string,
   toolName: string,
-  args: ToolCallResult,
-  result: ToolCallResult,
+  args: WidgetData,
+  result: WidgetData,
   executionTime: number,
 ): ChatMessage {
   return baseMockMessage({
@@ -185,11 +183,11 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
     "mc-claude",
     tid,
     seq,
-    ChatModelId.CLAUDE_OPUS_4_6,
+    ChatModelId.CLAUDE_OPUS_4_7,
     "toolu_claude",
     "ai-run",
     {
-      model: "claude-opus-4-6",
+      model: "claude-opus-4-7",
       prompt: t("home.hero.demos.modelComparison.userMessage"),
       instructions: "Be concise and analytical.",
       maxTurns: 1,
@@ -785,10 +783,7 @@ const Hero = ({
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
 
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
 
   const [activeDemoId, setActiveDemoId] = useState<DemoId>("modelComparison");
 
@@ -910,7 +905,7 @@ const Hero = ({
             {/* Message area - real components, mock data */}
             <MockChatProvider>
               <Div className="p-4 space-y-1">
-                <UserMessageBubble
+                <StaticUserMessageBubble
                   message={activeDemo.userMessage}
                   locale={locale}
                   logger={logger}
@@ -921,7 +916,6 @@ const Hero = ({
                     id: "00000000-0000-0000-0000-000000000000",
                     roles: [UserPermissionRole.ADMIN],
                   }}
-                  deductCredits={null}
                 />
                 <GroupedAssistantMessage
                   group={activeDemo.assistantGroup}
@@ -940,7 +934,6 @@ const Hero = ({
                     roles: [UserPermissionRole.ADMIN],
                   }}
                   sendMessage={null}
-                  deductCredits={null}
                   ttsAutoplay={false}
                   voiceId={undefined}
                   onVote={null}

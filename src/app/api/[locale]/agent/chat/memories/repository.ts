@@ -15,6 +15,8 @@ import { db } from "@/app/api/[locale]/system/db";
 import { getRemoteSession } from "@/app/api/[locale]/system/unified-interface/cli/auth/remote-session-cache";
 import { fireAndForgetRemote } from "@/app/api/[locale]/system/unified-interface/remote/remote-call";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { defaultLocale } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../config";
@@ -23,6 +25,7 @@ import type { MemoryByIdT } from "./[id]/i18n";
 import type { MemoryAddResponseOutput } from "./create/definition";
 import { memories, type Memory } from "./db";
 import type { MemoriesListResponseOutput } from "./definition";
+import memoriesDefinitions from "./definition";
 import { formatMemorySummary } from "./formatter";
 
 export class MemoriesRepository {
@@ -159,7 +162,7 @@ export class MemoriesRepository {
   static async addMemory(params: {
     content: string;
     tags: string[] | undefined;
-    userId: string;
+    user: JwtPrivatePayloadType;
     priority: number | undefined;
     isPublic: boolean;
     isShared: boolean;
@@ -168,12 +171,13 @@ export class MemoriesRepository {
     const {
       content,
       tags = [],
-      userId,
+      user,
       priority = 0,
       isPublic,
       isShared = false,
       logger,
     } = params;
+    const userId = user.id;
 
     // Get next memory number for this user (starts at 0)
     const nextMemoryNumber = await MemoriesRepository.getNextMemoryNumber({
@@ -205,6 +209,27 @@ export class MemoriesRepository {
       memoryId: memory.id,
       memoryNumber: memory.memoryNumber,
       userId,
+    });
+
+    // Emit WS event so all open tabs see the new memory immediately
+    const emitMemories = createEndpointEmitter(
+      memoriesDefinitions.GET,
+      logger,
+      user,
+    );
+    emitMemories("memory-created", {
+      memories: [
+        {
+          id: memory.memoryNumber,
+          content: memory.content,
+          tags: memory.tags ?? [],
+          priority: memory.priority,
+          isPublic: memory.isPublic,
+          isArchived: memory.isArchived,
+          isShared: memory.isShared,
+          createdAt: memory.createdAt,
+        },
+      ],
     });
 
     // Mirror to remote if shared
@@ -244,7 +269,7 @@ export class MemoriesRepository {
     isPublic?: boolean;
     isArchived?: boolean;
     isShared?: boolean;
-    userId: string;
+    user: JwtPrivatePayloadType;
     logger: EndpointLogger;
     t: MemoryByIdT;
   }): Promise<ResponseType<MemoryUpdateResponseOutput>> {
@@ -256,10 +281,11 @@ export class MemoriesRepository {
       isPublic,
       isArchived,
       isShared,
-      userId,
+      user,
       logger,
       t,
     } = params;
+    const userId = user.id;
 
     const updateData: Partial<typeof memories.$inferInsert> = {
       updatedAt: new Date(),
@@ -342,6 +368,27 @@ export class MemoriesRepository {
     }
 
     logger.info("Updated memory", { memoryNumber });
+
+    // Emit WS event so all open tabs see the updated memory immediately
+    const emitMemories = createEndpointEmitter(
+      memoriesDefinitions.GET,
+      logger,
+      user,
+    );
+    emitMemories("memory-updated", {
+      memories: [
+        {
+          id: updated.memoryNumber,
+          content: updated.content,
+          tags: updated.tags ?? [],
+          priority: updated.priority,
+          isPublic: updated.isPublic,
+          isArchived: updated.isArchived,
+          isShared: updated.isShared,
+        },
+      ],
+    });
+
     return success({ success: true });
   }
 
@@ -350,7 +397,7 @@ export class MemoriesRepository {
    */
   static async deleteMemory(params: {
     memoryNumber: number;
-    userId: string;
+    user: JwtPrivatePayloadType;
     logger: EndpointLogger;
     t: MemoryByIdT;
   }): Promise<
@@ -362,7 +409,8 @@ export class MemoriesRepository {
       updatedAt: Date;
     }>
   > {
-    const { memoryNumber, userId, logger, t } = params;
+    const { memoryNumber, user, logger, t } = params;
+    const userId = user.id;
 
     const result = await db
       .delete(memories)
@@ -383,6 +431,14 @@ export class MemoriesRepository {
 
     const deleted = result[0];
     logger.info("Deleted memory", { memoryNumber });
+
+    // Emit WS event so all open tabs remove the deleted memory immediately
+    const emitMemories = createEndpointEmitter(
+      memoriesDefinitions.GET,
+      logger,
+      user,
+    );
+    emitMemories("memory-deleted", { memories: [{ id: memoryNumber }] });
 
     // Mirror delete to remote if memory was shared
     if (deleted.isShared) {

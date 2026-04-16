@@ -19,6 +19,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { ERROR_LOGS_ALIAS } from "./constants";
 import {
@@ -27,9 +28,8 @@ import {
   ErrorLogStatusFilterOptions,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 
-const ErrorLogsContainer = lazyCliWidget(() =>
+const ErrorLogsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ErrorLogsContainer })),
 );
 

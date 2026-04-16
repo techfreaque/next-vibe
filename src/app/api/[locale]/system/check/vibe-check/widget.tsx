@@ -6,24 +6,17 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 
+import { useWidgetValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+
 import {
   CodeQualityFilesList,
   CodeQualityIssueList,
   CodeQualitySummary,
 } from "../_shared/widget-components";
 import type definition from "./definition";
-import type { VibeCheckResponseOutput } from "./definition";
 
-interface CustomWidgetProps {
-  field: {
-    value: VibeCheckResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
-}
-
-export function CheckResultWidget({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
-  const value = field.value;
+export function CheckResultWidget(): React.JSX.Element {
+  const value = useWidgetValue<typeof definition.POST>();
   if (!value) {
     return <Div />;
   }

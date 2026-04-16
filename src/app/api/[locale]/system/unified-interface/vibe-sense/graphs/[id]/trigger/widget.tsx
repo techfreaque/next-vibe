@@ -15,19 +15,12 @@ import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetForm,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
-
-type TriggerResponseOutput = typeof definition.POST.types.ResponseOutput;
-
-interface CustomWidgetProps {
-  field: {
-    value: TriggerResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
-}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -49,10 +42,10 @@ function toDatetimeLocal(iso: string): string {
 
 // ─── Widget ──────────────────────────────────────────────────────────────────
 
-export function TriggerWidget({ field }: CustomWidgetProps): React.JSX.Element {
+export function TriggerWidget(): React.JSX.Element {
   const t = useWidgetTranslation<typeof definition.POST>();
   const form = useWidgetForm<typeof definition.POST>();
-  const response = field.value;
+  const response = useWidgetValue<typeof definition.POST>();
 
   const defaultFrom = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const defaultTo = new Date();

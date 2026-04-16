@@ -31,7 +31,7 @@ export const translations = {
         model: {
           label: "Model",
           description:
-            "LLM for text reasoning. Optional when favoriteId or skill is set. Fast: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.6. Free: qwen3_235b-free. Not for image/audio/video generation.",
+            "LLM for text reasoning. Optional when favoriteId or skill is set. Fast: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.7. Free: qwen3_235b-free. Not for image/audio/video generation.",
         },
         skill: {
           label: "Skill",

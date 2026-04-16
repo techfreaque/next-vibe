@@ -22,6 +22,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -33,6 +34,7 @@ import type {
   FolderListResponseOutput,
   FolderListUrlVariablesOutput,
 } from "./definition";
+import folderContentsDefinitions from "../../folder-contents/[rootFolderId]/definition";
 import type { FolderByIdT } from "./i18n";
 import { scopedTranslation } from "./i18n";
 
@@ -338,6 +340,27 @@ export class ChatFoldersRepository {
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
+
+      // Emit WS event so all open tabs see the new folder in the sidebar immediately
+      const emitFolderContents = createEndpointEmitter(
+        folderContentsDefinitions.GET,
+        logger,
+        user,
+        { rootFolderId: newFolder.rootFolderId },
+      );
+      emitFolderContents("folder-created", {
+        items: [
+          {
+            id: newFolder.id,
+            type: "folder" as const,
+            name: newFolder.name,
+            icon: newFolder.icon,
+            color: newFolder.color,
+            parentId: newFolder.parentId,
+            sortOrder: newFolder.sortOrder,
+          },
+        ],
+      });
 
       return success({
         folderId: newFolder.id,

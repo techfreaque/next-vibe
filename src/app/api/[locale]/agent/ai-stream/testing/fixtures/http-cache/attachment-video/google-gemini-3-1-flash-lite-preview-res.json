@@ -1,0 +1,73 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "9ec465650ab3dca0-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 14 Apr 2026 17:23:05 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1776187382-r11cWfL1J0YPQ0XzaTWE"
+  },
+  "body": {
+    "id": "gen-1776187382-r11cWfL1J0YPQ0XzaTWE",
+    "object": "chat.completion",
+    "created": 1776187382,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video features a high-definition, close-up shot focused on a pair of hands skillfully manipulating a standard 3x3 Rubik’s Cube. The person is holding the cube, rotating its layers with quick, precise movements, while a vast collection of other solved and unsolved Rubik's Cubes covers the surface underneath them, creating an out-of-focus, vibrant, and chaotic background of geometric patterns and primary colors.\n\n**Visual details:**\n*   **The Subject:** A man’s hands, with visible skin texture, are the central focus. He is actively solving or scrambling a Rubik's Cube.\n*   **The Cube:** A classic 3x3 model. You can clearly see the white, red, blue, green, and orange plastic stickers. There is a small, black \"X\" or cross-like symbol printed on the center white square of the primary cube being held.\n*   **The Background:** The background is densely packed with dozens of other Rubik’s Cubes, creating a sea of color. Because of the shallow depth of field, the cubes closest to the hands are somewhat sharp, while those further away blur into a colorful mosaic of reds, yellows, and whites.\n*   **Lighting and Style:** The lighting is soft and professional, highlighting the texture of the plastic and the hands. The visual style is cinematic, likely intended for a video essay, tutorial, or documentary snippet about puzzle solving. The color palette is bright, saturated, and energetic.\n\n**Actions:**\n*   The video shows the hands performing rapid, rhythmic twists and turns on the primary cube, demonstrating proficiency and speed-cubing techniques.\n\n**Notable Elements:**\n*   The contrast between the sharp focus on the central cube and the busy, bokeh-heavy background emphasizes the theme of puzzles and complexity.\n*   The specific \"X\" mark on the center square serves as a unique identifying feature of this particular cube.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "EjQKMgG+Pvb7q/VvLiWPPRzUCfpoBPrtmvqb9p4oJSVtFlR3Ceixe6vBb3xg36jnj6bgPo5o",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 107,
+      "completion_tokens": 403,
+      "total_tokens": 510,
+      "cost": 0.00063125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00063125,
+        "upstream_inference_prompt_cost": 0.00002675,
+        "upstream_inference_completions_cost": 0.0006045
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

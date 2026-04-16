@@ -420,9 +420,22 @@ export const translations: typeof enTranslations = {
     stt: {
       "endpoint-not-available": "Punkt końcowy mowy na tekst niedostępny",
       "failed-to-start": "Nie udało się rozpocząć nagrywania",
-      "permission-denied": "Odmowa dostępu do mikrofonu",
-      "no-microphone": "Nie znaleziono mikrofonu",
-      "microphone-in-use": "Mikrofon jest w użyciu",
+      "permission-denied":
+        "Dostęp do mikrofonu zablokowany. Zezwól na mikrofon w ustawieniach przeglądarki i odśwież stronę.",
+      "permission-denied-ios":
+        "Mikrofon zablokowany. Przejdź do Ustawienia → Safari → Mikrofon i zezwól na dostęp dla tej strony.",
+      "permission-denied-android":
+        "Mikrofon zablokowany. Dotknij ikony kłódki na pasku adresu → Ustawienia witryny → Mikrofon → Zezwól.",
+      "permission-denied-mac":
+        "Mikrofon zablokowany. Otwórz Ustawienia systemowe → Prywatność i ochrona → Mikrofon i włącz przeglądarkę.",
+      "permission-denied-windows":
+        "Mikrofon zablokowany. Otwórz Ustawienia → Prywatność → Mikrofon i upewnij się, że przeglądarka ma dostęp.",
+      "no-microphone":
+        "Nie znaleziono mikrofonu. Podłącz mikrofon lub słuchawki z mikrofonem i spróbuj ponownie.",
+      "microphone-in-use":
+        "Mikrofon jest używany przez inną aplikację. Zamknij ją i spróbuj ponownie.",
+      "not-supported":
+        "Twoja przeglądarka nie obsługuje dostępu do mikrofonu. Spróbuj Chrome, Firefox lub Safari.",
       "transcription-failed": "Nie udało się transkrybować audio",
     },
     tts: {
@@ -479,7 +492,9 @@ export const translations: typeof enTranslations = {
       claudeOpus45:
         "Claude Opus 4.5 - Najpotężniejszy model Claude z wyjątkowymi możliwościami rozumowania i kreatywnymi",
       claudeOpus46:
-        "Claude Opus 4.6 - Najnowszy i najpotężniejszy model Claude z wyjątkowymi możliwościami rozumowania i kreatywnymi",
+        "Claude Opus 4.6 - Potężny model Claude z wyjątkowymi możliwościami rozumowania i kreatywnymi",
+      claudeOpus47:
+        "Claude Opus 4.7 - Najnowszy i najpotężniejszy model Claude z wyjątkowymi możliwościami rozumowania i kreatywnymi",
       claudeSonnet46:
         "Claude Sonnet 4.6 - Najpotężniejszy model Sonnet od Anthropic z najwyższą wydajnością w kodowaniu, agentach i pracy profesjonalnej",
       claudeHaiku45:

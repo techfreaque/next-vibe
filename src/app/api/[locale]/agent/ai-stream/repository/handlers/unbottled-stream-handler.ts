@@ -18,10 +18,13 @@
 import "server-only";
 
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
+import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 import {
@@ -30,21 +33,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { ChatMessageRole } from "../../../chat/enum";
 import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
-import {
-  StreamEventType,
-  createStreamEvent,
-  type ContentDeltaEventData,
-  type ContentDoneEventData,
-  type CreditsDeductedEventData,
-  type GeneratedMediaAddedEventData,
-  type MessageCreatedEventData,
-  type ReasoningDeltaEventData,
-  type ReasoningDoneEventData,
-  type StreamFinishedEventData,
-  type TokensUpdatedEventData,
-  type ToolCallEventData,
-  type ToolResultEventData,
-} from "../../../chat/threads/[threadId]/messages/events";
+import type { ToolCall } from "../../../chat/db";
 import type { UnbottledCloudSession } from "../../../env";
 import type { ChatModelId, ChatModelOption } from "../../models";
 import type { AiStreamT } from "../../stream/i18n";
@@ -71,6 +60,8 @@ interface UnbottledStreamParams {
   t: AiStreamT;
   dbWriter: MessageDbWriter;
   wsEmit: WsEmitCallback;
+  /** Stream context for local tool execution (used when remote sends TOOL_EXECUTE_REQUEST) */
+  streamContext: ToolExecutionContext;
 }
 
 /**
@@ -88,7 +79,6 @@ export async function executeUnbottledStream(
     threadId,
     aiMessageId,
     userMessageId,
-    parentMessageId,
     model,
     skill,
     sequenceId,
@@ -98,9 +88,11 @@ export async function executeUnbottledStream(
     streamAbortController,
     logger,
     timezone,
+    locale,
     t,
     dbWriter,
     wsEmit,
+    streamContext,
   } = params;
 
   // Self-relay: when the remote URL points at ourselves, run the AI stream
@@ -136,14 +128,17 @@ export async function executeUnbottledStream(
       headers: {
         "Content-Type": "application/json",
         // eslint-disable-next-line i18next/no-literal-string
-        Authorization: `Bearer ${session.token}`,
-        Cookie: `${LEAD_ID_COOKIE_NAME}=${session.leadId}`,
+        Authorization: `Bearer ${session.token}${BEARER_LEAD_ID_SEPARATOR}${session.leadId}`,
       },
       body: JSON.stringify({
         content,
         model: modelConfig.providerModel,
         skill,
         timezone,
+        // Pass the local thread ID as the remote thread ID so all turns
+        // (T1–T12) share a single thread on the remote side.
+        // The remote creates the thread on first use; subsequent calls append.
+        threadId,
         instanceId: threadId,
       }),
       signal: streamAbortController.signal,
@@ -209,13 +204,87 @@ export async function executeUnbottledStream(
   const wsHost = session.remoteUrl.replace(/^https?:\/\//, "");
   const wsUrl = `${wsProtocol}//${wsHost}/ws?channel=${encodeURIComponent(remoteChannel)}&token=${encodeURIComponent(session.token)}&leadId=${encodeURIComponent(session.leadId)}`;
 
+  /**
+   * Execute a tool locally and broadcast the result back to the remote /ws/broadcast.
+   * Defined outside the Promise constructor so the linter doesn't mistake fetch() for
+   * a Promise resolve call (eslint-plugin-promise/no-multiple-resolved false positive).
+   */
+  async function executeAndBroadcastToolResult(
+    callId: string,
+    toolName: string,
+    args: WidgetData,
+    remoteBroadcastUrl: string,
+    channel: string,
+  ): Promise<void> {
+    let toolResult: WidgetData;
+    let toolError: string | undefined;
+    try {
+      const { RouteExecutionExecutor } =
+        await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
+      const result = await RouteExecutionExecutor.executeGenericHandler<
+        Record<string, WidgetData>
+      >({
+        toolName,
+        data: (args as Record<string, WidgetData>) ?? {},
+        user,
+        locale,
+        logger,
+        platform: Platform.AI,
+        streamContext,
+      });
+      if (result.success) {
+        toolResult = result.data ?? {};
+      } else {
+        toolResult = {};
+        toolError = result.message ?? "Tool execution failed";
+      }
+    } catch (execErr) {
+      toolResult = {};
+      toolError = execErr instanceof Error ? execErr.message : String(execErr);
+    }
+
+    const resultData: { callId: string; result: WidgetData; error?: string } =
+      toolError
+        ? { callId, result: toolResult, error: toolError }
+        : { callId, result: toolResult };
+
+    try {
+      await fetch(remoteBroadcastUrl, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          // eslint-disable-next-line i18next/no-literal-string
+          Authorization: `Bearer ${session.token}${BEARER_LEAD_ID_SEPARATOR}${session.leadId}`,
+        },
+        body: JSON.stringify({
+          channel,
+          event: "tool-execute-result",
+          data: resultData,
+        }),
+      });
+      logger.debug("[Unbottled] Tool result broadcast to remote", {
+        toolName,
+        callId,
+      });
+    } catch (broadcastErr) {
+      logger.warn("[Unbottled] Failed to broadcast tool result to remote", {
+        toolName,
+        callId,
+        error:
+          broadcastErr instanceof Error
+            ? broadcastErr.message
+            : String(broadcastErr),
+      });
+    }
+  }
+
   return new Promise<void>((resolve) => {
-    // Maps remote message IDs → local IDs (assistant + tool messages)
-    const remoteToLocalId = new Map<string, string>();
+    // Server-provided IDs are used verbatim — no local remapping.
+    // The remote generates all message and tool call IDs; clients store them as-is.
+    // Sync is trivial: identical IDs mean identical state across platforms.
+    const seenMessageIds = new Set<string>();
 
     // Multi-turn state: tracks the current assistant message in tool loops.
-    // In a tool loop the cloud sends: assistant1 → tool1 → assistant2 → tool2 → ...
-    // Each new assistant message gets a fresh local ID with correct parentage.
     let currentAssistantId = aiMessageId;
     let currentAssistantContent = "";
     let firstAssistantCreated = false;
@@ -224,13 +293,36 @@ export async function executeUnbottledStream(
 
     const ws = new WebSocket(wsUrl);
 
+    // Serialize async event handlers so CREDITS_DEDUCTED always completes
+    // before STREAM_FINISHED calls finish(). Without this, fire-and-forget
+    // void calls can race: stream-finished resolves while credit deduction
+    // is still awaiting the DB, leaving totalCreditsDeducted = 0.
+    let eventQueue = Promise.resolve();
+    const enqueueEvent = (msg: WsWireMessage): void => {
+      eventQueue = eventQueue
+        .then(() => handleRemoteEvent(msg))
+        .catch((err) => {
+          logger.warn("[Unbottled] Event handler error", {
+            event: msg.event,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        });
+    };
+
+    let finished = false;
     const finish = (): void => {
       try {
         ws.close();
       } catch {
         // Already closed
       }
-      resolve();
+      if (finished) {
+        return;
+      }
+      finished = true;
+      // Drain the event queue before resolving so all async handlers
+      // (e.g. CREDITS_DEDUCTED DB write) complete before the stream ends.
+      void eventQueue.then(resolve);
     };
 
     // Abort handler
@@ -268,7 +360,7 @@ export async function executeUnbottledStream(
           return;
         }
 
-        void handleRemoteEvent(msg);
+        enqueueEvent(msg);
       } catch (parseErr) {
         logger.warn("[Unbottled] Failed to parse WS message", {
           error:
@@ -295,14 +387,12 @@ export async function executeUnbottledStream(
      * Used for the first assistant message and each subsequent one in tool loops.
      */
     async function createAssistantMessage(
-      remoteMessageId: string,
-      localMessageId: string,
+      messageId: string,
       localParentId: string | null,
     ): Promise<void> {
-      remoteToLocalId.set(remoteMessageId, localMessageId);
       if (!isIncognito) {
         await dbWriter.emitMessageCreated({
-          messageId: localMessageId,
+          messageId,
           threadId,
           content: "",
           parentId: localParentId ?? userMessageId,
@@ -313,218 +403,271 @@ export async function executeUnbottledStream(
         });
       } else {
         // Incognito: emit WS event only, no DB write
-        wsEmit(
-          createStreamEvent.messageCreated({
-            messageId: localMessageId,
-            threadId,
-            role: ChatMessageRole.ASSISTANT,
-            content: "",
-            parentId: localParentId ?? userMessageId,
-            sequenceId,
-            model,
-            skill,
-          }),
-        );
+        wsEmit("message-created", {
+          messages: [
+            {
+              id: messageId,
+              threadId,
+              role: ChatMessageRole.ASSISTANT,
+              isAI: true,
+              content: "",
+              parentId: localParentId ?? userMessageId,
+              sequenceId,
+              model,
+              skill,
+              metadata: null,
+            },
+          ],
+          streamingState: "streaming",
+        });
       }
     }
 
     async function handleRemoteEvent(msg: WsWireMessage): Promise<void> {
-      switch (msg.event) {
-        case StreamEventType.MESSAGE_CREATED: {
-          const data = msg.data as MessageCreatedEventData;
+      // The remote emitter wraps all events in response-shaped partials.
+      // We extract data from the wrapper before processing.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const raw = msg.data as Record<string, any>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      type RawRecord = Record<string, any>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const firstMsg: RawRecord | undefined = Array.isArray(raw.messages)
+        ? (raw.messages[0] as RawRecord)
+        : undefined;
 
-          if (data.role === ChatMessageRole.ASSISTANT) {
+      switch (msg.event) {
+        case "message-created": {
+          // Remote shape: { streamingState, messages: [{ id, threadId, role, content, parentId, sequenceId, model, skill, metadata: { toolCall? } }] }
+          if (!firstMsg) {
+            break;
+          }
+          const remoteId = firstMsg.id as string;
+          const role = firstMsg.role as ChatMessageRole;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const toolCall = firstMsg.metadata?.toolCall as ToolCall | undefined;
+          // Deduplicate: skip if we already processed this ID
+          if (seenMessageIds.has(remoteId)) {
+            break;
+          }
+          seenMessageIds.add(remoteId);
+          if (role === ChatMessageRole.ASSISTANT) {
             if (!firstAssistantCreated) {
-              // First assistant message - uses pre-generated aiMessageId
+              // First assistant message — use server-provided ID directly.
               firstAssistantCreated = true;
-              currentAssistantId = aiMessageId;
+              currentAssistantId = remoteId;
               currentAssistantContent = "";
-              await createAssistantMessage(
-                data.messageId,
-                aiMessageId,
-                parentMessageId ?? userMessageId,
-              );
+              await createAssistantMessage(remoteId, userMessageId);
             } else {
-              // Subsequent assistant in a tool loop - fresh ID, parent = last tool message
-              const newLocalId = crypto.randomUUID();
-              currentAssistantId = newLocalId;
+              // Subsequent assistant in a tool loop — server ID, parent = last tool message
+              currentAssistantId = remoteId;
               currentAssistantContent = "";
               await createAssistantMessage(
-                data.messageId,
-                newLocalId,
+                remoteId,
                 lastToolMessageId ?? currentAssistantId,
               );
             }
-          } else if (data.role === ChatMessageRole.TOOL && data.toolCall) {
-            // Tool message from cloud - parent is the current assistant message
-            const localToolMessageId = crypto.randomUUID();
-            remoteToLocalId.set(data.messageId, localToolMessageId);
-            lastToolMessageId = localToolMessageId;
+          } else if (role === ChatMessageRole.TOOL && toolCall) {
+            // Tool message from cloud — use server-provided ID directly.
+            lastToolMessageId = remoteId;
 
             if (!isIncognito) {
               await dbWriter.emitToolCall({
-                toolMessageId: localToolMessageId,
+                toolMessageId: remoteId,
                 threadId,
                 parentId: currentAssistantId,
                 userId,
                 model,
                 skill,
                 sequenceId,
-                toolCall: data.toolCall,
+                toolCall,
               });
             } else {
-              // Incognito: emit WS event only
-              wsEmit(
-                createStreamEvent.toolCall({
-                  messageId: localToolMessageId,
-                  toolName: data.toolCall.toolName,
-                  args: data.toolCall.args,
-                }),
-              );
+              // Incognito: emit message-created for tool role
+              wsEmit("message-created", {
+                streamingState: "streaming",
+                messages: [
+                  {
+                    id: remoteId,
+                    threadId,
+                    role: ChatMessageRole.TOOL,
+                    isAI: true,
+                    content: null,
+                    parentId: currentAssistantId,
+                    sequenceId,
+                    model,
+                    skill,
+                    metadata: { toolCall },
+                  },
+                ],
+              });
             }
           }
           break;
         }
 
-        case StreamEventType.CONTENT_DELTA: {
-          const data = msg.data as ContentDeltaEventData;
-          const localId =
-            remoteToLocalId.get(data.messageId) ?? currentAssistantId;
-          currentAssistantContent += data.delta;
+        case "content-delta": {
+          // Remote shape: { messages: [{ id: messageId, content: delta }] }
+          if (!firstMsg) {
+            break;
+          }
+          const remoteId = firstMsg.id as string;
+          const delta = (firstMsg.content ?? "") as string;
+          currentAssistantContent += delta;
 
           // If we get a delta before MESSAGE_CREATED (rare edge case), create the message
           if (!firstAssistantCreated) {
             firstAssistantCreated = true;
-            currentAssistantId = aiMessageId;
-            currentAssistantContent = data.delta;
-            await createAssistantMessage(
-              data.messageId,
-              aiMessageId,
-              parentMessageId ?? userMessageId,
-            );
+            currentAssistantId = remoteId;
+            currentAssistantContent = delta;
+            await createAssistantMessage(remoteId, userMessageId);
           }
 
           // Emit CONTENT_DELTA SSE + schedule throttled DB update
           dbWriter.emitDeltaAndSchedule(
-            localId,
-            data.delta,
+            remoteId,
+            delta,
             currentAssistantContent,
           );
           break;
         }
 
-        case StreamEventType.CONTENT_DONE: {
-          const data = msg.data as ContentDoneEventData;
-          const localId =
-            remoteToLocalId.get(data.messageId) ?? currentAssistantId;
-          currentAssistantContent = data.content;
+        case "content-done": {
+          // Remote shape: { messages: [{ id, content, metadata: { totalTokens, finishReason, isStreaming } }] }
+          if (!firstMsg) {
+            break;
+          }
+          const remoteId = firstMsg.id as string;
+          const doneContent = (firstMsg.content ?? "") as string;
+          const totalTokens =
+            (firstMsg.metadata?.totalTokens as number | null | undefined) ??
+            null;
+          const finishReason =
+            (firstMsg.metadata?.finishReason as string | null | undefined) ??
+            null;
+          currentAssistantContent = doneContent;
 
           // Emit CONTENT_DONE SSE + flush DB + write token metadata
           await dbWriter.emitContentDone({
-            messageId: localId,
-            content: data.content,
-            totalTokens: data.totalTokens,
-            finishReason: data.finishReason,
+            messageId: remoteId,
+            content: doneContent,
+            totalTokens,
+            finishReason,
             promptTokens: null,
             completionTokens: null,
           });
           break;
         }
 
-        case StreamEventType.TOOL_CALL: {
-          // Already handled in MESSAGE_CREATED for TOOL role.
-          // This is just a real-time UX event - re-emit with local ID.
-          const data = msg.data as ToolCallEventData;
-          const localId = remoteToLocalId.get(data.messageId);
-          if (localId) {
-            wsEmit(
-              createStreamEvent.toolCall({
-                messageId: localId,
-                toolName: data.toolName,
-                args: data.args,
-              }),
-            );
-          }
+        case "tool-call": {
+          // Remote shape: {} (empty — informational only, no message data available)
+          // Tool call handling is done in MESSAGE_CREATED for TOOL role.
           break;
         }
 
-        case StreamEventType.TOOL_RESULT: {
-          const data = msg.data as ToolResultEventData;
-          const localId = remoteToLocalId.get(data.messageId);
-          if (localId && data.toolCall) {
+        case "tool-execute-request": {
+          // Bidirectional tool execution: remote asks local to execute a tool.
+          // Remote shape: { callId, toolName, args }
+          const execData = raw as {
+            callId: string;
+            toolName: string;
+            args: WidgetData;
+          };
+          const { callId, toolName, args } = execData;
+          if (!callId || !toolName) {
+            logger.warn(
+              "[Unbottled] TOOL_EXECUTE_REQUEST missing callId/toolName",
+              { callId, toolName },
+            );
+            break;
+          }
+          logger.debug("[Unbottled] Executing tool locally for remote", {
+            toolName,
+            callId,
+          });
+
+          // Execute async outside the event queue so other events aren't blocked.
+          void executeAndBroadcastToolResult(
+            callId,
+            toolName,
+            args,
+            `${session.remoteUrl}/ws/broadcast`,
+            remoteChannel,
+          );
+          break;
+        }
+
+        case "tool-result": {
+          // Remote shape: { messages: [{ id, metadata: { toolCall } }] } or {}
+          if (!firstMsg) {
+            break;
+          }
+          const remoteId = firstMsg.id as string;
+          const toolCall = firstMsg.metadata?.toolCall as ToolCall | undefined;
+          if (toolCall) {
             if (!isIncognito) {
               // Use dbWriter: updates DB + emits TOOL_RESULT SSE
               await dbWriter.emitToolResult({
-                toolMessageId: localId,
+                toolMessageId: remoteId,
                 threadId,
                 parentId: currentAssistantId,
                 userId,
                 model,
                 skill,
                 sequenceId,
-                toolCall: data.toolCall,
-                toolName: data.toolName,
-                result: data.result,
-                error: data.error,
+                toolCall,
+                toolName: toolCall.toolName,
+                result: toolCall.result,
+                error: undefined,
                 user,
               });
             } else {
-              wsEmit(
-                createStreamEvent.toolResult({
-                  messageId: localId,
-                  toolName: data.toolName,
-                  result: data.result,
-                  error: data.error,
-                }),
-              );
+              wsEmit("tool-result", {
+                messages: [
+                  {
+                    id: remoteId,
+                    metadata: { toolCall },
+                  },
+                ],
+              });
             }
-          } else if (localId) {
-            // Fallback: emit raw event if no full toolCall data
-            wsEmit(
-              createStreamEvent.toolResult({
-                messageId: localId,
-                toolName: data.toolName,
-                result: data.result,
-                error: data.error,
-              }),
-            );
           }
           break;
         }
 
-        case StreamEventType.REASONING_DELTA: {
-          const data = msg.data as ReasoningDeltaEventData;
-          const localId =
-            remoteToLocalId.get(data.messageId) ?? currentAssistantId;
-          wsEmit(
-            createStreamEvent.reasoningDelta({
-              messageId: localId,
-              delta: data.delta,
-            }),
-          );
+        case "reasoning-delta": {
+          // Remote shape: { messages: [{ id, content: delta }] }
+          if (!firstMsg) {
+            break;
+          }
+          const remoteId = firstMsg.id as string;
+          const delta = (firstMsg.content ?? "") as string;
+          wsEmit("reasoning-delta", {
+            messages: [{ id: remoteId, content: delta }],
+          });
           break;
         }
 
-        case StreamEventType.REASONING_DONE: {
-          const data = msg.data as ReasoningDoneEventData;
-          const localId =
-            remoteToLocalId.get(data.messageId) ?? currentAssistantId;
-          wsEmit(
-            createStreamEvent.reasoningDone({
-              messageId: localId,
-              content: data.content,
-            }),
-          );
+        case "reasoning-done": {
+          // Remote shape: { messages: [{ id, content }] }
+          if (!firstMsg) {
+            break;
+          }
+          const remoteId = firstMsg.id as string;
+          const reasoningContent = (firstMsg.content ?? "") as string;
+          wsEmit("reasoning-done", {
+            messages: [{ id: remoteId, content: reasoningContent }],
+          });
           break;
         }
 
-        case StreamEventType.CREDITS_DEDUCTED: {
-          const data = msg.data as CreditsDeductedEventData;
+        case "credits-deducted": {
+          // Remote shape: { amount, feature, type, partial } (raw fields, no messages wrapper)
+          const amount = (raw.amount as number | undefined) ?? 0;
           // Deduct credits locally - the cloud already charged its own credits,
           // but the self-hosted instance needs to track local credit usage too.
           await dbWriter.deductAndEmitCredits({
             user,
-            amount: data.amount,
+            amount,
             feature: model,
             type: "model",
             model,
@@ -532,55 +675,98 @@ export async function executeUnbottledStream(
           break;
         }
 
-        case StreamEventType.TOKENS_UPDATED: {
-          const data = msg.data as TokensUpdatedEventData;
-          const localId =
-            remoteToLocalId.get(data.messageId) ?? currentAssistantId;
+        case "tokens-updated": {
+          // Remote shape: { messages: [{ id, metadata: { promptTokens, completionTokens, ... } }] }
+          if (!firstMsg) {
+            break;
+          }
+          const remoteId = firstMsg.id as string;
+          const meta = (firstMsg.metadata ?? {}) as Record<
+            string,
+            number | null | undefined
+          >;
+          const promptTokens = (meta.promptTokens as number | undefined) ?? 0;
+          const completionTokens =
+            (meta.completionTokens as number | undefined) ?? 0;
+          const totalTokens = (meta.totalTokens as number | undefined) ?? 0;
+          const cachedInputTokens =
+            (meta.cachedInputTokens as number | undefined) ?? 0;
+          const cacheWriteTokens =
+            (meta.cacheWriteTokens as number | undefined) ?? 0;
+          const timeToFirstToken =
+            (meta.timeToFirstToken as number | null | undefined) ?? null;
+          const finishReason =
+            (meta.finishReason as string | null | undefined) ?? null;
+          const creditCost = (meta.creditCost as number | undefined) ?? 0;
 
           // Write token metadata to local DB
           if (!isIncognito) {
-            await dbWriter.writeTokenMetadataOnly(localId, {
-              promptTokens: data.promptTokens ?? 0,
-              completionTokens: data.completionTokens ?? 0,
-              finishReason: data.finishReason ?? null,
-              cachedInputTokens: data.cachedInputTokens ?? 0,
-              cacheWriteTokens: data.cacheWriteTokens ?? 0,
-              timeToFirstToken: data.timeToFirstToken ?? null,
-              creditCost: data.creditCost ?? 0,
+            await dbWriter.writeTokenMetadataOnly(remoteId, {
+              promptTokens,
+              completionTokens,
+              finishReason,
+              cachedInputTokens,
+              cacheWriteTokens,
+              timeToFirstToken,
+              creditCost,
             });
           }
 
-          wsEmit(
-            createStreamEvent.tokensUpdated({
-              ...data,
-              messageId: localId,
-            }),
-          );
+          wsEmit("tokens-updated", {
+            messages: [
+              {
+                id: remoteId,
+                metadata: {
+                  promptTokens,
+                  completionTokens,
+                  totalTokens,
+                  cachedInputTokens,
+                  cacheWriteTokens,
+                  timeToFirstToken: timeToFirstToken ?? undefined,
+                  finishReason: finishReason ?? undefined,
+                  creditCost,
+                },
+              },
+            ],
+          });
           break;
         }
 
-        case StreamEventType.GENERATED_MEDIA_ADDED: {
-          const data = msg.data as GeneratedMediaAddedEventData;
-          const localId =
-            remoteToLocalId.get(data.messageId) ?? currentAssistantId;
-          if (!isIncognito) {
-            // Use dbWriter: emits SSE + updates DB metadata
-            await dbWriter.emitGeneratedMediaOnExistingMessage({
-              messageId: localId,
-              generatedMedia: data.generatedMedia,
-            });
-          } else {
-            wsEmit(
-              createStreamEvent.generatedMediaAdded({
-                messageId: localId,
-                generatedMedia: data.generatedMedia,
-              }),
-            );
+        case "generated-media-added": {
+          // Remote shape: { messages: [{ id, metadata: { generatedMedia } }] }
+          if (!firstMsg) {
+            break;
+          }
+          const remoteId = firstMsg.id as string;
+          const generatedMedia = firstMsg.metadata?.generatedMedia as
+            | {
+                type: "image" | "audio" | "video";
+                url: string | undefined;
+                prompt: string;
+                modelId: string;
+                mimeType: string;
+                creditCost: number;
+                status: "complete" | "pending" | "failed";
+              }
+            | undefined;
+          if (generatedMedia) {
+            if (!isIncognito) {
+              // Use dbWriter: emits SSE + updates DB metadata
+              await dbWriter.emitGeneratedMediaOnExistingMessage({
+                messageId: remoteId,
+                generatedMedia,
+              });
+            } else {
+              wsEmit("generated-media-added", {
+                messages: [{ id: remoteId, metadata: { generatedMedia } }],
+              });
+            }
           }
           break;
         }
 
-        case StreamEventType.ERROR: {
+        case "error": {
+          // Remote shape: { message, errorType } (raw fields)
           const data = msg.data as ErrorResponseType;
           logger.error("[Unbottled] Error from cloud", {
             error: data.message,
@@ -593,7 +779,7 @@ export async function executeUnbottledStream(
               error: data,
               parentId: currentAssistantId,
               sequenceId,
-              userId,
+              user,
             });
           } else {
             dbWriter.emitError(data);
@@ -601,11 +787,12 @@ export async function executeUnbottledStream(
           break;
         }
 
-        case StreamEventType.STREAM_FINISHED: {
-          const data = msg.data as StreamFinishedEventData;
-          logger.debug("[Unbottled] Cloud stream finished", {
-            reason: data.reason,
-          });
+        case "stream-finished": {
+          // Remote shape: { threadId, reason, finalState, streamingState } (raw fields)
+          const reason =
+            (raw.reason as "completed" | "cancelled" | "error" | "timeout") ??
+            "completed";
+          logger.debug("[Unbottled] Cloud stream finished", { reason });
 
           // Flush all pending throttled DB writes
           if (!isIncognito) {
@@ -696,10 +883,12 @@ async function executeSelfRelay(params: UnbottledStreamParams): Promise<void> {
       skill: skill || NO_SKILL_ID,
       prompt: content,
       rootFolderId: DefaultFolderId.INCOGNITO,
+      subAgentDepth: params.streamContext.subAgentDepth,
       user,
       locale,
       logger,
       t,
+      abortSignal: params.streamAbortController.signal,
     });
   } finally {
     // Restore the UNBOTTLED routing fields
@@ -723,7 +912,7 @@ async function executeSelfRelay(params: UnbottledStreamParams): Promise<void> {
       error: result,
       parentId: aiMessageId,
       sequenceId,
-      userId,
+      user,
     });
     return;
   }
@@ -746,18 +935,23 @@ async function executeSelfRelay(params: UnbottledStreamParams): Promise<void> {
       sequenceId,
     });
   } else {
-    wsEmit(
-      createStreamEvent.messageCreated({
-        messageId: aiMessageId,
-        threadId: params.threadId,
-        role: ChatMessageRole.ASSISTANT,
-        content: "",
-        parentId: userMessageId,
-        sequenceId,
-        model,
-        skill,
-      }),
-    );
+    wsEmit("message-created", {
+      messages: [
+        {
+          id: aiMessageId,
+          threadId: params.threadId,
+          role: ChatMessageRole.ASSISTANT,
+          isAI: true,
+          content: "",
+          parentId: userMessageId,
+          sequenceId,
+          model,
+          skill,
+          metadata: null,
+        },
+      ],
+      streamingState: "streaming",
+    });
   }
 
   // Emit content done with full response

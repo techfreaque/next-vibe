@@ -9,6 +9,7 @@ import {
   count,
   desc,
   eq,
+  gt,
   inArray,
   isNull,
   ne,
@@ -26,10 +27,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { LeadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import {
   CronTaskStatus,
   type CronTaskStatusValue,
@@ -38,9 +39,6 @@ import {
   PulseHealthStatus,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { users as usersTable } from "@/app/api/[locale]/user/db";
-import { UserRolesRepository } from "@/app/api/[locale]/user/user-roles/repository";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { CallbackModeValue } from "../../ai/execute-tool/constants";
@@ -48,15 +46,15 @@ import { Platform } from "../../shared/types/platform";
 import { getFullPath } from "../../shared/utils/path";
 import { isCronTaskDue } from "../cron-formatter";
 import { splitTaskArgs } from "../cron/arg-splitter";
-import { cronTasks as cronTasksTable } from "../cron/db";
+import { cronTasks as cronTasksTable, dbUserIdToOwner } from "../cron/db";
 import { CronTasksRepository } from "../cron/repository";
+import { resolveTaskOwnerUser } from "../cron/resolve-task-user";
 import {
   scopedTranslation,
   scopedTranslation as tasksScopedTranslation,
 } from "../i18n";
 import { handleTaskCompletion } from "../task-completion-handler";
 import { TaskSyncRepository } from "../task-sync/repository";
-import type { JsonValue } from "../unified-runner/types";
 import type {
   NewPulseExecution,
   NewPulseHealth,
@@ -358,66 +356,6 @@ export class PulseHealthRepository {
     }
   }
   /**
-   * Resolve the user context for a task execution.
-   * System tasks (no userId) use the cached admin auth result.
-   * User tasks fetch real roles and leadId from the DB.
-   */
-  private static async resolveTaskUser(
-    userId: string | null,
-    adminAuthResult: ResponseType<JwtPrivatePayloadType> | null,
-    systemLocale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<{
-    user: JwtPrivatePayloadType;
-    locale: CountryLanguage;
-  } | null> {
-    if (!userId) {
-      // System task - use the cached admin user
-      if (!adminAuthResult?.success || !adminAuthResult.data) {
-        return null;
-      }
-      return { user: adminAuthResult.data, locale: systemLocale };
-    }
-
-    // User task - resolve locale, roles, and leadId
-    let userLocale: CountryLanguage = systemLocale;
-    const ownerRow = await db
-      .select({ locale: usersTable.locale })
-      .from(usersTable)
-      .where(eq(usersTable.id, userId))
-      .limit(1);
-    if (ownerRow[0]?.locale) {
-      userLocale = ownerRow[0].locale;
-    }
-
-    const rolesResult = await UserRolesRepository.getUserRoles(
-      userId,
-      logger,
-      userLocale,
-    );
-    if (!rolesResult.success) {
-      return null;
-    }
-
-    const { leadId } = await LeadAuthRepository.getAuthenticatedUserLeadId(
-      userId,
-      undefined,
-      userLocale,
-      logger,
-    );
-
-    return {
-      user: {
-        id: userId,
-        leadId,
-        isPublic: false as const,
-        roles: rolesResult.data,
-      },
-      locale: userLocale,
-    };
-  }
-
-  /**
    * Execute a pulse cycle with the given options
    * Merged functionality from old system
    */
@@ -486,453 +424,200 @@ export class PulseHealthRepository {
           inArray(cronTasksTable.routeId, options.taskNames),
         );
       }
-      const allTasks = await db
-        .select()
-        .from(cronTasksTable)
-        .where(and(...whereConditions));
+      const seenTaskIds = new Set<string>();
 
-      // Sort by priority: CRITICAL first, BACKGROUND last
-      allTasks.sort(
-        (a, b) => getPriorityWeight(b.priority) - getPriorityWeight(a.priority),
-      );
+      // Two-pass approach: run scheduled tasks first, then pick up any tasks
+      // that were inserted during this pulse cycle (e.g. by task-sync/pull).
+      // Pass 1: tasks that existed before the pulse started (respect schedule).
+      // Pass 2: tasks created after pulseStart with no execution status yet
+      //         (run-once delegated tasks - these are always due immediately).
+      const passes = [
+        // Pass 1: normal scheduled tasks
+        await db
+          .select()
+          .from(cronTasksTable)
+          .where(and(...whereConditions)),
+        // Pass 2: tasks created during this pulse (inserted by task-sync/pull etc.)
+        // Fetched after pass 1 runs, so they exist in DB by the time we process them.
+        // Using a lazy getter so it only executes after the first pass completes.
+      ] as (typeof cronTasksTable.$inferSelect)[][];
 
-      // Discover which tasks are due
-      for (const dbTask of allTasks) {
-        // Instance routing: null targetInstance = runs on any instance,
-        // specific targetInstance = only on that named instance
-        const taskTarget = dbTask.targetInstance ?? null;
-        if (taskTarget !== null && taskTarget !== instanceId) {
-          tasksSkipped.push(dbTask.displayName);
-          continue;
-        }
+      const allTasks = passes[0];
 
-        const isDue =
-          options.force || isCronTaskDue(logger, dbTask.schedule, now);
-        if (!isDue) {
-          tasksSkipped.push(dbTask.displayName);
-          continue;
-        }
-
-        // Overlap prevention: skip if this task is still running from a previous pulse
-        if (dbTask.lastExecutionStatus === CronTaskStatus.RUNNING) {
-          tasksSkipped.push(dbTask.displayName);
-          logger.debug(
-            `Pulse: skipping task "${dbTask.displayName}" - still running from previous pulse`,
-          );
-          continue;
-        }
-
-        tasksDue.push(dbTask.displayName);
-
-        if (options.dryRun) {
-          continue;
-        }
-
-        // Atomically claim the task using FOR UPDATE SKIP LOCKED
-        // This prevents two instances from executing the same task simultaneously
-        const claimed = await db.transaction(async (tx) => {
-          const [row] = await tx
+      for (let pass = 0; pass < 2; pass++) {
+        let passTasks: (typeof cronTasksTable.$inferSelect)[];
+        if (pass === 0) {
+          passTasks = allTasks;
+        } else {
+          // Fetch tasks that appeared during this pulse cycle
+          passTasks = await db
             .select()
             .from(cronTasksTable)
             .where(
               and(
-                eq(cronTasksTable.id, dbTask.id),
-                // NULL != 'running' is NULL in SQL (three-value logic) - must explicitly handle NULL
-                or(
-                  isNull(cronTasksTable.lastExecutionStatus),
-                  ne(
-                    cronTasksTable.lastExecutionStatus,
-                    CronTaskStatus.RUNNING,
+                eq(cronTasksTable.enabled, true),
+                isNull(cronTasksTable.lastExecutionStatus),
+                gt(cronTasksTable.createdAt, now),
+                ...(options.taskNames && options.taskNames.length > 0
+                  ? [inArray(cronTasksTable.routeId, options.taskNames)]
+                  : []),
+              ),
+            );
+          if (passTasks.length > 0) {
+            logger.debug(
+              `Pulse pass 2: executing ${passTasks.length} tasks inserted during this cycle`,
+            );
+          }
+        }
+
+        // Sort by priority: CRITICAL first, BACKGROUND last
+        passTasks.sort(
+          (a, b) =>
+            getPriorityWeight(b.priority) - getPriorityWeight(a.priority),
+        );
+
+        // Discover which tasks are due
+        for (const dbTask of passTasks) {
+          if (seenTaskIds.has(dbTask.id)) {
+            continue;
+          }
+          seenTaskIds.add(dbTask.id);
+          // Instance routing: null targetInstance = runs on any instance,
+          // specific targetInstance = only on that named instance
+          const taskTarget = dbTask.targetInstance ?? null;
+          if (taskTarget !== null && taskTarget !== instanceId) {
+            tasksSkipped.push(dbTask.displayName);
+            continue;
+          }
+
+          const isDue =
+            options.force || isCronTaskDue(logger, dbTask.schedule, now);
+          if (!isDue) {
+            tasksSkipped.push(dbTask.displayName);
+            continue;
+          }
+
+          // Overlap prevention: skip if this task is still running from a previous pulse
+          if (dbTask.lastExecutionStatus === CronTaskStatus.RUNNING) {
+            tasksSkipped.push(dbTask.displayName);
+            logger.debug(
+              `Pulse: skipping task "${dbTask.displayName}" - still running from previous pulse`,
+            );
+            continue;
+          }
+
+          tasksDue.push(dbTask.displayName);
+
+          if (options.dryRun) {
+            continue;
+          }
+
+          // Atomically claim the task using FOR UPDATE SKIP LOCKED
+          // This prevents two instances from executing the same task simultaneously
+          const claimed = await db.transaction(async (tx) => {
+            const [row] = await tx
+              .select()
+              .from(cronTasksTable)
+              .where(
+                and(
+                  eq(cronTasksTable.id, dbTask.id),
+                  // NULL != 'running' is NULL in SQL (three-value logic) - must explicitly handle NULL
+                  or(
+                    isNull(cronTasksTable.lastExecutionStatus),
+                    ne(
+                      cronTasksTable.lastExecutionStatus,
+                      CronTaskStatus.RUNNING,
+                    ),
                   ),
                 ),
-              ),
-            )
-            .for("update", { skipLocked: true })
-            .limit(1);
+              )
+              .for("update", { skipLocked: true })
+              .limit(1);
 
-          if (!row) {
-            return null;
-          }
-
-          await tx
-            .update(cronTasksTable)
-            .set({
-              lastExecutionStatus: CronTaskStatus.RUNNING,
-              ...(dbTask.runOnce ? { enabled: false } : {}),
-              updatedAt: new Date(),
-            })
-            .where(eq(cronTasksTable.id, dbTask.id));
-
-          return row;
-        });
-
-        if (!claimed) {
-          tasksSkipped.push(dbTask.displayName);
-          logger.debug(
-            `Pulse: skipping task "${dbTask.displayName}" - claimed by another instance`,
-          );
-          continue;
-        }
-
-        if (dbTask.runOnce) {
-          logger.debug(
-            `[run-once] Task "${dbTask.displayName}" disabled before execution`,
-          );
-        }
-
-        tasksExecuted.push(dbTask.displayName);
-        logger.debug(
-          `Pulse executing task: ${dbTask.displayName} (routeId: ${dbTask.routeId})`,
-        );
-
-        // Resolve user context with real roles from DB
-        const taskUserContext = await PulseHealthRepository.resolveTaskUser(
-          dbTask.userId,
-          adminAuthResult,
-          options.systemLocale,
-          logger,
-        );
-
-        if (!taskUserContext) {
-          tasksFailed.push(dbTask.displayName);
-          logger.error(
-            `Pulse: failed to resolve user context for task "${dbTask.displayName}"${
-              dbTask.userId
-                ? ` (userId: ${dbTask.userId})`
-                : " (check VIBE_ADMIN_USER_EMAIL)"
-            }`,
-          );
-          continue;
-        }
-
-        const { user: cronUser, locale: userLocale } = taskUserContext;
-        const { t: tTask } = scopedTranslation.scopedT(userLocale);
-        const startedAt = new Date();
-
-        // Resolve routeId → endpoint path → handler
-        const path = getFullPath(dbTask.routeId);
-        const handler = path
-          ? await import("../../../generated/route-handlers").then((m) =>
-              m.getRouteHandler(path),
-            )
-          : null;
-        let taskSucceeded = false;
-
-        if (!path || !handler) {
-          tasksFailed.push(dbTask.displayName);
-          logger.error(
-            `Pulse: ${!path ? "unknown routeId" : "no handler"} "${dbTask.routeId}" for task "${dbTask.displayName}"`,
-          );
-        } else {
-          // Fire-and-forget: notify remote that task is now RUNNING
-          if (dbTask.targetInstance) {
-            void TaskSyncRepository.pushStatusToRemote({
-              taskId: dbTask.id,
-              status: CronTaskStatus.RUNNING,
-              summary: "",
-              durationMs: null,
-              startedAt: startedAt.toISOString(),
-              serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-              executedByInstance: instanceId,
-              logger,
-            }).catch((err) => {
-              logger.warn("pushStatusToRemote (RUNNING) failed", {
-                taskId: dbTask.id,
-                error: String(err),
-              });
-            });
-          }
-
-          try {
-            const taskInput = dbTask.taskInput ?? {};
-            const { urlPathParams, data } = await splitTaskArgs(
-              path,
-              taskInput,
-            );
-            const timeoutMs = dbTask.timeout ?? 300000;
-            const maxRetries = dbTask.retries ?? 0;
-            const retryDelayMs = dbTask.retryDelay ?? 30000;
-
-            let firstExecutionId: string | null = null;
-            let finalStatus: typeof CronTaskStatusValue = CronTaskStatus.FAILED;
-            let finalMessage: string | null = null;
-            let finalDurationMs = 0;
-            let didLogHistory = false;
-            let finalOutput: Record<string, JsonValue> | null = null;
-
-            for (let attempt = 0; attempt <= maxRetries; attempt++) {
-              if (attempt > 0) {
-                logger.debug(
-                  `Pulse: retrying task "${dbTask.displayName}" (attempt ${attempt + 1}/${maxRetries + 1}) after ${retryDelayMs}ms`,
-                );
-                await new Promise<void>((resolve) => {
-                  setTimeout(resolve, retryDelayMs);
-                });
-              }
-
-              const attemptStart = Date.now();
-              const taskAbortController = new AbortController();
-              let typedResult: ResponseType<
-                Record<string, string | number | boolean>
-              >;
-
-              try {
-                // Execute with timeout
-                const result = await Promise.race([
-                  handler({
-                    data,
-                    urlPathParams,
-                    user: cronUser,
-                    locale: userLocale,
-                    logger,
-                    platform: Platform.CRON,
-                    streamContext: {
-                      rootFolderId: DefaultFolderId.CRON,
-                      threadId: undefined,
-                      aiMessageId: undefined,
-                      currentToolMessageId: undefined,
-                      callerToolCallId: undefined,
-                      pendingToolMessages: undefined,
-                      pendingTimeoutMs: undefined,
-                      leafMessageId: undefined,
-                      skillId: undefined,
-                      modelId: undefined,
-                      favoriteId: undefined,
-                      headless: undefined,
-                      imageGenModelSelection: undefined,
-                      musicGenModelSelection: undefined,
-                      videoGenModelSelection: undefined,
-                      isRevival: undefined,
-                      waitingForRemoteResult: undefined,
-                      abortSignal: taskAbortController.signal,
-                      callerCallbackMode: undefined,
-                      escalateToTask: undefined,
-                      variantId: undefined,
-                      onEscalatedTaskCancel: undefined,
-                    },
-                  }),
-                  new Promise<never>((...[, reject]) => {
-                    setTimeout(
-                      () => reject(new Error("TASK_TIMEOUT")),
-                      timeoutMs,
-                    );
-                  }),
-                ]);
-
-                // Normalize non-standard responses
-                typedResult =
-                  isStreamingResponse(result) ||
-                  isFileResponse(result) ||
-                  isContentResponse(result)
-                    ? fail({
-                        message: tTask("errors.repositoryInternalError"),
-                        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                      })
-                    : result;
-              } catch (err) {
-                const isTimeout =
-                  err instanceof Error && err.message === "TASK_TIMEOUT";
-                typedResult = fail({
-                  message: isTimeout
-                    ? tTask("errors.repositoryInternalError")
-                    : tTask("errors.repositoryInternalError"),
-                  errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                });
-                finalStatus = isTimeout
-                  ? CronTaskStatus.TIMEOUT
-                  : CronTaskStatus.FAILED;
-              }
-
-              const attemptDuration = Date.now() - attemptStart;
-              const attemptStatus: typeof CronTaskStatusValue =
-                typedResult.success
-                  ? CronTaskStatus.COMPLETED
-                  : finalStatus === CronTaskStatus.TIMEOUT
-                    ? CronTaskStatus.TIMEOUT
-                    : CronTaskStatus.FAILED;
-
-              // History throttle: skip logging successful runs when within historyInterval
-              const shouldLogHistory =
-                !typedResult.success ||
-                !dbTask.historyInterval ||
-                !dbTask.lastHistoryLoggedAt ||
-                Date.now() - dbTask.lastHistoryLoggedAt.getTime() >=
-                  dbTask.historyInterval;
-
-              // Record execution for this attempt (unless throttled)
-              if (shouldLogHistory) {
-                const execResponse = await CronTasksRepository.createExecution(
-                  {
-                    taskId: dbTask.id,
-                    taskName: dbTask.displayName,
-                    executionId: crypto.randomUUID(),
-                    status: attemptStatus,
-                    priority: dbTask.priority,
-                    startedAt: new Date(attemptStart),
-                    completedAt: new Date(),
-                    durationMs: attemptDuration,
-                    config: taskInput,
-                    result: typedResult.success
-                      ? (typedResult.data ?? null)
-                      : null,
-                    error: !typedResult.success ? typedResult : null,
-                    retryAttempt: attempt,
-                    parentExecutionId: firstExecutionId,
-                    triggeredBy: "pulse",
-                  },
-                  tTask,
-                  logger,
-                );
-
-                // Track first execution ID for retry chain
-                if (attempt === 0 && execResponse.success) {
-                  firstExecutionId = execResponse.data.id;
-                }
-                didLogHistory = true;
-              }
-
-              finalDurationMs += attemptDuration;
-
-              if (typedResult.success) {
-                taskSucceeded = true;
-                finalStatus = CronTaskStatus.COMPLETED;
-                finalMessage = null;
-                finalOutput = typedResult.data ?? null;
-                break;
-              }
-
-              finalStatus = attemptStatus;
-              finalMessage = typedResult.message ?? null;
-
-              if (attempt < maxRetries) {
-                logger.warn(
-                  `Pulse: task "${dbTask.displayName}" failed (attempt ${attempt + 1}/${maxRetries + 1}), will retry`,
-                  { message: finalMessage },
-                );
-              } else {
-                logger.error(
-                  `Pulse: task "${dbTask.displayName}" failed after ${maxRetries + 1} attempt(s)`,
-                  { message: finalMessage },
-                );
-              }
+            if (!row) {
+              return null;
             }
 
-            if (taskSucceeded) {
-              tasksSucceeded.push(dbTask.displayName);
-            } else {
-              tasksFailed.push(dbTask.displayName);
-            }
-
-            // Update task stats (once, after all attempts)
-            const newConsecutiveFailures = taskSucceeded
-              ? 0
-              : (dbTask.consecutiveFailures ?? 0) + 1;
-
-            // Use atomic SQL increments to avoid lost updates across instances
-            await db
+            await tx
               .update(cronTasksTable)
               .set({
-                lastExecutedAt: startedAt,
-                lastExecutionStatus: finalStatus,
-                lastExecutionDuration: finalDurationMs,
-                executionCount: sql`${cronTasksTable.executionCount} + 1`,
-                consecutiveFailures: newConsecutiveFailures,
-                ...(taskSucceeded
-                  ? {
-                      successCount: sql`${cronTasksTable.successCount} + 1`,
-                    }
-                  : { errorCount: sql`${cronTasksTable.errorCount} + 1` }),
-                ...(didLogHistory ? { lastHistoryLoggedAt: new Date() } : {}),
+                lastExecutionStatus: CronTaskStatus.RUNNING,
+                ...(dbTask.runOnce ? { enabled: false } : {}),
                 updatedAt: new Date(),
               })
               .where(eq(cronTasksTable.id, dbTask.id));
 
-            // If task has callback context (set by wait-for-task or execute-tool AI path),
-            // emit TASK_COMPLETED WS event + backfill tool message + schedule resume-stream.
-            // Read from typed wakeUp* columns - not from untyped taskInput JSON blob.
-            const taskCallbackMode =
-              (dbTask.wakeUpCallbackMode as CallbackModeValue | null) ?? null;
-            const taskThreadId = dbTask.wakeUpThreadId ?? null;
-            const taskToolMessageId = dbTask.wakeUpToolMessageId ?? null;
-            const completionUserId = cronUser.id;
+            return row;
+          });
 
-            if (taskToolMessageId && completionUserId) {
-              await handleTaskCompletion({
-                toolMessageId: taskToolMessageId,
-                threadId: taskThreadId,
-                callbackMode: taskCallbackMode,
-                status: finalStatus,
-                output: taskSucceeded
-                  ? ((finalOutput as JsonValue) ?? null)
-                  : null,
-                taskId: dbTask.id,
-                modelId: dbTask.wakeUpModelId ?? null,
-                skillId: dbTask.wakeUpSkillId ?? null,
-                favoriteId: dbTask.wakeUpFavoriteId ?? null,
-                leafMessageId: dbTask.wakeUpLeafMessageId ?? null,
-                userId: completionUserId,
-                logger,
-                directResumeUser: cronUser,
-                directResumeLocale: userLocale,
-              }).catch((completionErr: Error) => {
-                logger.error("handleTaskCompletion failed in pulse", {
-                  taskId: dbTask.id,
-                  error: completionErr.message,
-                });
-              });
-            }
-
-            // Fire-and-forget: push final status to remote
-            if (dbTask.targetInstance) {
-              void TaskSyncRepository.pushStatusToRemote({
-                taskId: dbTask.id,
-                status: finalStatus,
-                summary: finalMessage ?? "",
-                durationMs: finalDurationMs,
-                executionId: firstExecutionId ?? undefined,
-                startedAt: startedAt.toISOString(),
-                serverTimezone:
-                  Intl.DateTimeFormat().resolvedOptions().timeZone,
-                executedByInstance: instanceId,
-                ...(finalOutput ? { output: finalOutput } : {}),
-                logger,
-              }).catch((err) => {
-                logger.warn("pushStatusToRemote (final) failed", {
-                  taskId: dbTask.id,
-                  status: finalStatus,
-                  error: String(err),
-                });
-              });
-            }
-          } catch (unexpectedError) {
-            // Catch-all: if something goes wrong outside the retry loop,
-            // ensure the task doesn't stay stuck in RUNNING state forever
-            logger.error(
-              `Pulse: unexpected error for task "${dbTask.displayName}"`,
-              parseError(unexpectedError),
+          if (!claimed) {
+            tasksSkipped.push(dbTask.displayName);
+            logger.debug(
+              `Pulse: skipping task "${dbTask.displayName}" - claimed by another instance`,
             );
+            continue;
+          }
+
+          if (dbTask.runOnce) {
+            logger.debug(
+              `[run-once] Task "${dbTask.displayName}" disabled before execution`,
+            );
+          }
+
+          tasksExecuted.push(dbTask.displayName);
+          logger.debug(
+            `Pulse executing task: ${dbTask.displayName} (routeId: ${dbTask.routeId})`,
+          );
+
+          // Resolve user context with real roles from DB
+          const cachedAdmin = adminAuthResult?.success
+            ? adminAuthResult.data
+            : null;
+          const taskUserContext = await resolveTaskOwnerUser(
+            dbUserIdToOwner(dbTask.userId),
+            options.systemLocale,
+            logger,
+            cachedAdmin,
+          );
+
+          if (!taskUserContext) {
             tasksFailed.push(dbTask.displayName);
-            const catchConsecutiveFailures =
-              (dbTask.consecutiveFailures ?? 0) + 1;
+            const failedOwner = dbUserIdToOwner(dbTask.userId);
+            logger.error(
+              `Pulse: failed to resolve user context for task "${dbTask.displayName}"${
+                failedOwner.type === "user"
+                  ? ` (userId: ${failedOwner.userId})`
+                  : " (check VIBE_ADMIN_USER_EMAIL)"
+              }`,
+            );
+            continue;
+          }
 
-            // Use atomic SQL increments to avoid lost updates across instances
-            await db
-              .update(cronTasksTable)
-              .set({
-                lastExecutionStatus: CronTaskStatus.FAILED,
-                executionCount: sql`${cronTasksTable.executionCount} + 1`,
-                errorCount: sql`${cronTasksTable.errorCount} + 1`,
-                consecutiveFailures: catchConsecutiveFailures,
-                updatedAt: new Date(),
-              })
-              .where(eq(cronTasksTable.id, dbTask.id));
+          const { user: cronUser, locale: userLocale } = taskUserContext;
+          const { t: tTask } = scopedTranslation.scopedT(userLocale);
+          const startedAt = new Date();
 
-            // Fire-and-forget: push FAILED to remote so it doesn't stay stuck on RUNNING
+          // Resolve routeId → endpoint path → handler
+          const path = getFullPath(dbTask.routeId);
+          const handler = path
+            ? await import("../../../generated/route-handlers").then((m) =>
+                m.getRouteHandler(path),
+              )
+            : null;
+          let taskSucceeded = false;
+
+          if (!path || !handler) {
+            tasksFailed.push(dbTask.displayName);
+            logger.error(
+              `Pulse: ${!path ? "unknown routeId" : "no handler"} "${dbTask.routeId}" for task "${dbTask.displayName}"`,
+            );
+          } else {
+            // Fire-and-forget: notify remote that task is now RUNNING
             if (dbTask.targetInstance) {
               void TaskSyncRepository.pushStatusToRemote({
                 taskId: dbTask.id,
-                status: CronTaskStatus.FAILED,
-                summary: parseError(unexpectedError).message,
+                status: CronTaskStatus.RUNNING,
+                summary: "",
                 durationMs: null,
                 startedAt: startedAt.toISOString(),
                 serverTimezone:
@@ -940,15 +625,325 @@ export class PulseHealthRepository {
                 executedByInstance: instanceId,
                 logger,
               }).catch((err) => {
-                logger.warn("pushStatusToRemote (FAILED catch-all) failed", {
+                logger.warn("pushStatusToRemote (RUNNING) failed", {
                   taskId: dbTask.id,
                   error: String(err),
                 });
               });
             }
+
+            try {
+              const taskInput = dbTask.taskInput ?? {};
+              const { urlPathParams, data } = await splitTaskArgs(
+                path,
+                taskInput,
+              );
+              const timeoutMs = dbTask.timeout ?? 300000;
+              const maxRetries = dbTask.retries ?? 0;
+              const retryDelayMs = dbTask.retryDelay ?? 30000;
+
+              let firstExecutionId: string | null = null;
+              let finalStatus: typeof CronTaskStatusValue =
+                CronTaskStatus.FAILED;
+              let finalMessage: string | null = null;
+              let finalDurationMs = 0;
+              let didLogHistory = false;
+              let finalOutput: Record<string, WidgetData> | null = null;
+              const pulseAbortController = new AbortController();
+
+              for (let attempt = 0; attempt <= maxRetries; attempt++) {
+                if (attempt > 0) {
+                  logger.debug(
+                    `Pulse: retrying task "${dbTask.displayName}" (attempt ${attempt + 1}/${maxRetries + 1}) after ${retryDelayMs}ms`,
+                  );
+                  await new Promise<void>((resolve) => {
+                    setTimeout(resolve, retryDelayMs);
+                  });
+                }
+
+                const attemptStart = Date.now();
+                const taskAbortController = new AbortController();
+                let typedResult: ResponseType<
+                  Record<string, string | number | boolean>
+                >;
+
+                try {
+                  // Execute with timeout
+                  const result = await Promise.race([
+                    handler({
+                      data,
+                      urlPathParams,
+                      user: cronUser,
+                      locale: userLocale,
+                      logger,
+                      platform: Platform.CRON,
+                      cronTaskId: dbTask.id,
+                      streamContext: {
+                        rootFolderId: DefaultFolderId.CRON,
+                        threadId: undefined,
+                        aiMessageId: undefined,
+                        currentToolMessageId: undefined,
+                        callerToolCallId: undefined,
+                        pendingToolMessages: undefined,
+                        pendingTimeoutMs: undefined,
+                        leafMessageId: undefined,
+                        skillId: undefined,
+                        modelId: undefined,
+                        favoriteId: undefined,
+                        headless: undefined,
+                        subAgentDepth: 0,
+                        imageGenModelSelection: undefined,
+                        musicGenModelSelection: undefined,
+                        videoGenModelSelection: undefined,
+                        isRevival: undefined,
+
+                        providerOverride: undefined,
+                        waitingForRemoteResult: undefined,
+                        abortSignal: taskAbortController.signal,
+                        callerCallbackMode: undefined,
+                        escalateToTask: undefined,
+                        variantId: undefined,
+                        onEscalatedTaskCancel: undefined,
+                      },
+                    }),
+                    new Promise<never>((...[, reject]) => {
+                      setTimeout(
+                        () => reject(new Error("TASK_TIMEOUT")),
+                        timeoutMs,
+                      );
+                    }),
+                  ]);
+
+                  // Normalize non-standard responses
+                  typedResult =
+                    isStreamingResponse(result) ||
+                    isFileResponse(result) ||
+                    isContentResponse(result)
+                      ? fail({
+                          message: tTask("errors.repositoryInternalError"),
+                          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                        })
+                      : result;
+                } catch (err) {
+                  const isTimeout =
+                    err instanceof Error && err.message === "TASK_TIMEOUT";
+                  typedResult = fail({
+                    message: isTimeout
+                      ? tTask("errors.repositoryInternalError")
+                      : tTask("errors.repositoryInternalError"),
+                    errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  });
+                  finalStatus = isTimeout
+                    ? CronTaskStatus.TIMEOUT
+                    : CronTaskStatus.FAILED;
+                }
+
+                const attemptDuration = Date.now() - attemptStart;
+                const attemptStatus: typeof CronTaskStatusValue =
+                  typedResult.success
+                    ? CronTaskStatus.COMPLETED
+                    : finalStatus === CronTaskStatus.TIMEOUT
+                      ? CronTaskStatus.TIMEOUT
+                      : CronTaskStatus.FAILED;
+
+                // History throttle: skip logging successful runs when within historyInterval
+                const shouldLogHistory =
+                  !typedResult.success ||
+                  !dbTask.historyInterval ||
+                  !dbTask.lastHistoryLoggedAt ||
+                  Date.now() - dbTask.lastHistoryLoggedAt.getTime() >=
+                    dbTask.historyInterval;
+
+                // Record execution for this attempt (unless throttled)
+                if (shouldLogHistory) {
+                  const execResponse =
+                    await CronTasksRepository.createExecution(
+                      {
+                        taskId: dbTask.id,
+                        taskName: dbTask.displayName,
+                        executionId: crypto.randomUUID(),
+                        status: attemptStatus,
+                        priority: dbTask.priority,
+                        startedAt: new Date(attemptStart),
+                        completedAt: new Date(),
+                        durationMs: attemptDuration,
+                        config: taskInput,
+                        result: typedResult.success
+                          ? (typedResult.data ?? null)
+                          : null,
+                        error: !typedResult.success ? typedResult : null,
+                        retryAttempt: attempt,
+                        parentExecutionId: firstExecutionId,
+                        triggeredBy: "pulse",
+                      },
+                      tTask,
+                      logger,
+                    );
+
+                  // Track first execution ID for retry chain
+                  if (attempt === 0 && execResponse.success) {
+                    firstExecutionId = execResponse.data.id;
+                  }
+                  didLogHistory = true;
+                }
+
+                finalDurationMs += attemptDuration;
+
+                if (typedResult.success) {
+                  taskSucceeded = true;
+                  finalStatus = CronTaskStatus.COMPLETED;
+                  finalMessage = null;
+                  finalOutput = typedResult.data ?? null;
+                  break;
+                }
+
+                finalStatus = attemptStatus;
+                finalMessage = typedResult.message ?? null;
+
+                if (attempt < maxRetries) {
+                  logger.warn(
+                    `Pulse: task "${dbTask.displayName}" failed (attempt ${attempt + 1}/${maxRetries + 1}), will retry`,
+                    { message: finalMessage },
+                  );
+                } else {
+                  logger.error(
+                    `Pulse: task "${dbTask.displayName}" failed after ${maxRetries + 1} attempt(s)`,
+                    { message: finalMessage },
+                  );
+                }
+              }
+
+              if (taskSucceeded) {
+                tasksSucceeded.push(dbTask.displayName);
+              } else {
+                tasksFailed.push(dbTask.displayName);
+              }
+
+              // Update task stats (once, after all attempts)
+              const newConsecutiveFailures = taskSucceeded
+                ? 0
+                : (dbTask.consecutiveFailures ?? 0) + 1;
+
+              // Use atomic SQL increments to avoid lost updates across instances
+              await db
+                .update(cronTasksTable)
+                .set({
+                  lastExecutedAt: startedAt,
+                  lastExecutionStatus: finalStatus,
+                  lastExecutionDuration: finalDurationMs,
+                  executionCount: sql`${cronTasksTable.executionCount} + 1`,
+                  consecutiveFailures: newConsecutiveFailures,
+                  ...(taskSucceeded
+                    ? {
+                        successCount: sql`${cronTasksTable.successCount} + 1`,
+                      }
+                    : { errorCount: sql`${cronTasksTable.errorCount} + 1` }),
+                  ...(didLogHistory ? { lastHistoryLoggedAt: new Date() } : {}),
+                  updatedAt: new Date(),
+                })
+                .where(eq(cronTasksTable.id, dbTask.id));
+
+              // If task has callback context (set by wait-for-task or execute-tool AI path),
+              // emit TASK_COMPLETED WS event + backfill tool message + schedule resume-stream.
+              // Read from typed wakeUp* columns - not from untyped taskInput JSON blob.
+              const taskCallbackMode =
+                (dbTask.wakeUpCallbackMode as CallbackModeValue | null) ?? null;
+              const taskThreadId = dbTask.wakeUpThreadId ?? null;
+              const taskToolMessageId = dbTask.wakeUpToolMessageId ?? null;
+
+              if (taskToolMessageId) {
+                await handleTaskCompletion({
+                  toolMessageId: taskToolMessageId,
+                  threadId: taskThreadId,
+                  callbackMode: taskCallbackMode,
+                  status: finalStatus,
+                  output: taskSucceeded ? (finalOutput ?? null) : null,
+                  taskId: dbTask.id,
+                  modelId: dbTask.wakeUpModelId ?? null,
+                  skillId: dbTask.wakeUpSkillId ?? null,
+                  favoriteId: dbTask.wakeUpFavoriteId ?? null,
+                  leafMessageId: dbTask.wakeUpLeafMessageId ?? null,
+                  subAgentDepth: dbTask.wakeUpSubAgentDepth ?? 0,
+                  ownerUser: cronUser,
+                  logger,
+                  directResumeLocale: userLocale,
+                  abortSignal: pulseAbortController.signal,
+                }).catch((completionErr: Error) => {
+                  logger.error("handleTaskCompletion failed in pulse", {
+                    taskId: dbTask.id,
+                    error: completionErr.message,
+                  });
+                });
+              }
+
+              // Fire-and-forget: push final status to remote
+              if (dbTask.targetInstance) {
+                void TaskSyncRepository.pushStatusToRemote({
+                  taskId: dbTask.id,
+                  status: finalStatus,
+                  summary: finalMessage ?? "",
+                  durationMs: finalDurationMs,
+                  executionId: firstExecutionId ?? undefined,
+                  startedAt: startedAt.toISOString(),
+                  serverTimezone:
+                    Intl.DateTimeFormat().resolvedOptions().timeZone,
+                  executedByInstance: instanceId,
+                  ...(finalOutput ? { output: finalOutput } : {}),
+                  logger,
+                }).catch((err) => {
+                  logger.warn("pushStatusToRemote (final) failed", {
+                    taskId: dbTask.id,
+                    status: finalStatus,
+                    error: String(err),
+                  });
+                });
+              }
+            } catch (unexpectedError) {
+              // Catch-all: if something goes wrong outside the retry loop,
+              // ensure the task doesn't stay stuck in RUNNING state forever
+              logger.error(
+                `Pulse: unexpected error for task "${dbTask.displayName}"`,
+                parseError(unexpectedError),
+              );
+              tasksFailed.push(dbTask.displayName);
+              const catchConsecutiveFailures =
+                (dbTask.consecutiveFailures ?? 0) + 1;
+
+              // Use atomic SQL increments to avoid lost updates across instances
+              await db
+                .update(cronTasksTable)
+                .set({
+                  lastExecutionStatus: CronTaskStatus.FAILED,
+                  executionCount: sql`${cronTasksTable.executionCount} + 1`,
+                  errorCount: sql`${cronTasksTable.errorCount} + 1`,
+                  consecutiveFailures: catchConsecutiveFailures,
+                  updatedAt: new Date(),
+                })
+                .where(eq(cronTasksTable.id, dbTask.id));
+
+              // Fire-and-forget: push FAILED to remote so it doesn't stay stuck on RUNNING
+              if (dbTask.targetInstance) {
+                void TaskSyncRepository.pushStatusToRemote({
+                  taskId: dbTask.id,
+                  status: CronTaskStatus.FAILED,
+                  summary: parseError(unexpectedError).message,
+                  durationMs: null,
+                  startedAt: startedAt.toISOString(),
+                  serverTimezone:
+                    Intl.DateTimeFormat().resolvedOptions().timeZone,
+                  executedByInstance: instanceId,
+                  logger,
+                }).catch((err) => {
+                  logger.warn("pushStatusToRemote (FAILED catch-all) failed", {
+                    taskId: dbTask.id,
+                    error: String(err),
+                  });
+                });
+              }
+            }
           }
-        }
-      }
+        } // end for dbTask
+      } // end for pass
 
       const summary = {
         pulseId,

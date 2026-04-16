@@ -430,6 +430,9 @@ export const ICON_REGISTRY = {
   // Special: 1A icon (custom component)
   "1a": OneAIcon,
 
+  // Provider image logos
+  "tay-logo": "TayLogo",
+
   // Emoji Icons (AI Model Providers & Skills)
   whale: createEmojiIcon("🐋"),
   ocean: createEmojiIcon("🌊"),
@@ -883,6 +886,7 @@ export const ICON_CATEGORIES = {
       "freedom-gpt-logo",
       "gab-ai-logo",
       "venice-ai-logo",
+      "tay-logo",
     ],
   },
   media: {

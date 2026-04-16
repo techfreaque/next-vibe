@@ -21,7 +21,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useLogger } from "@/hooks/use-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useLogout } from "@/app/api/[locale]/user/private/logout/hooks";
 import type { StandardUserType } from "@/app/api/[locale]/user/types";
@@ -42,7 +42,7 @@ export function UserMenu({
   locale,
 }: UserMenuProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = useLogger();
   const logout = useLogout(logger, user);
 
   return (

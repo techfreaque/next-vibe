@@ -23,9 +23,8 @@ import { scopedTranslation as systemScopedTranslation } from "@/app/api/[locale]
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CliRequestData } from "../../../cli/runtime/cli-request-data";
 import type { CliCompatiblePlatform } from "../../../cli/runtime/route-executor";
-import type { JsonValue } from "../../../tasks/unified-runner/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Platform } from "../../types/platform";
 import { splitArgs } from "../../utils/split-args";
@@ -57,9 +56,9 @@ export class RouteExecutionExecutor {
    */
   public static async executeGenericHandler<TResult>(params: {
     toolName: string;
-    data: CliRequestData | Record<string, JsonValue>;
+    data: Record<string, WidgetData>;
     /** Pre-split URL path params. If omitted, auto-split from data. */
-    urlPathParams?: CliRequestData | Record<string, JsonValue>;
+    urlPathParams?: Record<string, WidgetData>;
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
@@ -89,17 +88,12 @@ export class RouteExecutionExecutor {
 
       // Split args: if urlPathParams was not provided by the caller, derive it
       // automatically from data using the endpoint schema.
-      // Cast to CliRequestData at the boundary - both CliRequestData and
-      // Record<string, JsonValue> are structurally compatible at runtime.
-      let resolvedData: CliRequestData = params.data as CliRequestData;
-      let resolvedUrlPathParams: CliRequestData =
-        (params.urlPathParams as CliRequestData) ?? {};
+      let resolvedData: Record<string, WidgetData> = params.data;
+      let resolvedUrlPathParams: Record<string, WidgetData> =
+        params.urlPathParams ?? {};
 
       if (params.urlPathParams === undefined) {
-        const split = await splitArgs(
-          params.toolName,
-          params.data as CliRequestData,
-        );
+        const split = await splitArgs(params.toolName, params.data);
         resolvedData = split.data;
         resolvedUrlPathParams = split.urlPathParams;
       }

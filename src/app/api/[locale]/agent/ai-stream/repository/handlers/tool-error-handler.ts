@@ -18,7 +18,6 @@ import {
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import { collectServerDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -26,8 +25,10 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { ToolExecutionContext } from "../../../chat/config";
-import { type ToolCall, type ToolCallResult } from "../../../chat/db";
+
+import { type ToolCall } from "../../../chat/db";
 import type { AiStreamT } from "../../stream/i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
@@ -208,11 +209,7 @@ export class ToolErrorHandler {
         user,
       });
 
-      dbWriter.emitToolWaiting({
-        toolMessageId,
-        toolName: part.toolName,
-        toolCallId: part.toolCallId,
-      });
+      dbWriter.emitToolWaiting();
 
       return {
         currentParentId: toolMessageId,
@@ -241,7 +238,7 @@ export class ToolErrorHandler {
 
       const toolCallWithResult: ToolCall = {
         ...toolCallData.toolCall,
-        result: fallbackResult.data as ToolCallResult,
+        result: fallbackResult.data,
         creditsUsed: toolsConfig.get(part.toolName)?.credits ?? 0,
       };
 
@@ -255,7 +252,7 @@ export class ToolErrorHandler {
         sequenceId,
         toolCall: toolCallWithResult,
         toolName: part.toolName,
-        result: fallbackResult.data as ToolCallResult,
+        result: fallbackResult.data,
         error: undefined,
         skipSseEmit: false,
         user,
@@ -334,12 +331,12 @@ export class ToolErrorHandler {
    */
   private static async executeTool(params: {
     toolName: string;
-    args: ToolCallResult | undefined;
+    args: WidgetData | undefined;
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
     streamContext: ToolExecutionContext;
-  }): Promise<{ data: JSONValue } | { error: string } | null> {
+  }): Promise<{ data: WidgetData } | { error: string } | null> {
     const { toolName, args, user, locale, logger } = params;
 
     try {
@@ -379,15 +376,16 @@ export class ToolErrorHandler {
       const { RouteExecutionExecutor } =
         await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
 
-      const result = await RouteExecutionExecutor.executeGenericHandler({
-        toolName,
-        data: (patchedArgs ?? {}) as CliRequestData,
-        user,
-        locale,
-        logger,
-        platform: Platform.AI,
-        streamContext: params.streamContext,
-      });
+      const result =
+        await RouteExecutionExecutor.executeGenericHandler<JSONValue>({
+          toolName,
+          data: (patchedArgs ?? {}) as Record<string, WidgetData>,
+          user,
+          locale,
+          logger,
+          platform: Platform.AI,
+          streamContext: params.streamContext,
+        });
 
       if (!result.success) {
         logger.warn("[AI Stream] Fallback tool execution failed", {
@@ -402,7 +400,7 @@ export class ToolErrorHandler {
         return { error: errorMsg };
       }
 
-      return { data: result.data as JSONValue };
+      return { data: result.data };
     } catch (error) {
       logger.warn("[AI Stream] Fallback tool execution threw", {
         toolName,

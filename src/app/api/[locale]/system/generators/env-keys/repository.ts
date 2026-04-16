@@ -205,7 +205,8 @@ export type EnvFieldType =
   | "number"
   | "select"
   | "url"
-  | "email";
+  | "email"
+  | "log-path";
 
 export interface EnvKeyMeta {
   key: string;

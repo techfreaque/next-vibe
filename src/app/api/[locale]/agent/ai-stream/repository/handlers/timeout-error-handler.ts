@@ -11,6 +11,8 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+
 import type { AiStreamT } from "../../stream/i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
@@ -22,7 +24,7 @@ export class TimeoutErrorHandler {
     maxDuration: number;
     model: string;
     threadId: string;
-    userId: string | undefined;
+    user: JwtPayloadType;
     lastParentId: string | null;
     lastSequenceId: string | null;
     dbWriter: MessageDbWriter;
@@ -33,7 +35,7 @@ export class TimeoutErrorHandler {
       maxDuration,
       model,
       threadId,
-      userId,
+      user,
       lastParentId,
       lastSequenceId,
       dbWriter,
@@ -46,6 +48,7 @@ export class TimeoutErrorHandler {
       maxDuration: `${maxDuration} seconds`,
       model,
       threadId,
+      userId: user.isPublic ? null : user.id,
       hasContent: !!lastSequenceId,
     });
 
@@ -61,7 +64,7 @@ export class TimeoutErrorHandler {
       error: timeoutError,
       parentId: lastParentId,
       sequenceId: lastSequenceId,
-      userId,
+      user,
     });
   }
 }

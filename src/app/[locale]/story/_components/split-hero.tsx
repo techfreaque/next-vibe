@@ -168,14 +168,65 @@ export function SplitHero({
           {t("home.splitHero.subheader")}
         </Div>
       </Div>
-      <Div className="relative flex flex-col md:grid md:grid-cols-2">
-        {/*
-        Desktop dividers: four lines meeting at the center point.
-        We draw them as four half-lines rather than two full-lines
-        so there's a single "OR" badge at the intersection.
-      */}
+      {/* Mobile: flex-col with dividers interleaved */}
+      <Div className="flex flex-col md:hidden">
+        <Panel
+          bg="bg-[#0d0014]"
+          glow={UNBOTTLED_GLOW}
+          grid={UNBOTTLED_GRID}
+          onClick={() => handleClick("unbottled")}
+        >
+          <UnbottledContent
+            locale={locale}
+            t={t}
+            onSideChange={onSideChange}
+            totalModelCount={totalModelCount}
+          />
+        </Panel>
+        <HorizontalDivider label={orLabel} />
+        <Panel
+          bg="bg-[#000d1b]"
+          glow={PERSONAL_GLOW}
+          grid={PERSONAL_GRID}
+          onClick={() => handleClick("personal")}
+        >
+          <PersonalContent
+            locale={locale}
+            t={t}
+            onSideChange={onSideChange}
+            appName={appName}
+            totalModelCount={totalModelCount}
+          />
+        </Panel>
+        <HorizontalDivider label={orLabel} />
+        <Panel
+          bg="bg-[#020c1b]"
+          glow={NEXTVIBE_GLOW}
+          grid={NEXTVIBE_GRID}
+          onClick={() => handleClick("nextvibe")}
+        >
+          <NextVibeContent
+            locale={locale}
+            totalToolCount={totalToolCount}
+            t={t}
+            onSideChange={onSideChange}
+          />
+        </Panel>
+        <HorizontalDivider label={orLabel} />
+        <Panel
+          bg="bg-[#1a000d]"
+          glow={REFERRAL_GLOW}
+          grid={REFERRAL_GRID}
+          onClick={() => handleClick("referral")}
+        >
+          <ReferralContent locale={locale} t={t} onSideChange={onSideChange} />
+        </Panel>
+      </Div>
+
+      {/* Desktop: pure 2×2 grid — no extra children that would skew row heights */}
+      <Div className="relative hidden md:grid md:grid-cols-2">
         {/* Center badge */}
-        <Div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex z-30">
+        <Div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex z-30">
           <Div className="w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center shrink-0">
             <Span className="text-xs font-bold text-muted-foreground">
               {orLabel}
@@ -183,13 +234,13 @@ export function SplitHero({
           </Div>
         </Div>
         {/* Vertical line top half */}
-        <Div className="absolute top-0 left-1/2 h-[calc(50%-20px)] w-px bg-white/20 hidden md:block -translate-x-1/2 z-20" />
+        <Div className="absolute top-0 left-1/2 h-[calc(50%-20px)] w-px bg-white/20 -translate-x-1/2 z-20" />
         {/* Vertical line bottom half */}
-        <Div className="absolute bottom-0 left-1/2 h-[calc(50%-20px)] w-px bg-white/20 hidden md:block -translate-x-1/2 z-20" />
+        <Div className="absolute bottom-0 left-1/2 h-[calc(50%-20px)] w-px bg-white/20 -translate-x-1/2 z-20" />
         {/* Horizontal line left half */}
-        <Div className="absolute top-1/2 left-0 w-[calc(50%-20px)] h-px bg-white/20 hidden md:block -translate-y-1/2 z-20" />
+        <Div className="absolute top-1/2 left-0 w-[calc(50%-20px)] h-px bg-white/20 -translate-y-1/2 z-20" />
         {/* Horizontal line right half */}
-        <Div className="absolute top-1/2 right-0 w-[calc(50%-20px)] h-px bg-white/20 hidden md:block -translate-y-1/2 z-20" />
+        <Div className="absolute top-1/2 right-0 w-[calc(50%-20px)] h-px bg-white/20 -translate-y-1/2 z-20" />
 
         {/* unbottled.ai - top-left */}
         <Panel
@@ -205,8 +256,6 @@ export function SplitHero({
             totalModelCount={totalModelCount}
           />
         </Panel>
-
-        <HorizontalDivider label={orLabel} />
 
         {/* personal self-host - top-right */}
         <Panel
@@ -224,8 +273,6 @@ export function SplitHero({
           />
         </Panel>
 
-        <HorizontalDivider label={orLabel} />
-
         {/* next-vibe framework - bottom-left */}
         <Panel
           bg="bg-[#020c1b]"
@@ -240,8 +287,6 @@ export function SplitHero({
             onSideChange={onSideChange}
           />
         </Panel>
-
-        <HorizontalDivider label={orLabel} />
 
         {/* referral + skills - bottom-right */}
         <Panel

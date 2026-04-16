@@ -10,14 +10,17 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
-import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type {
+  CreateApiEndpoint,
+  InferResponseOutput,
+} from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import type { EndpointEventsMap } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { EventSchemas } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -42,6 +45,7 @@ export async function sendTestRequest<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
+  TEvents extends EndpointEventsMap<InferResponseOutput<TFields>>,
 >({
   endpoint,
   data,
@@ -53,21 +57,21 @@ export async function sendTestRequest<
     TUserRoleValue,
     TScopedTranslationKey,
     TFields,
-    EventSchemas
+    TEvents
   >;
   data?: CreateApiEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
     TFields,
-    EventSchemas
+    TEvents
   >["types"]["RequestOutput"];
   urlPathParams?: CreateApiEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
     TFields,
-    EventSchemas
+    TEvents
   >["types"]["UrlVariablesOutput"];
   user: JwtPayloadType;
 }): Promise<
@@ -77,7 +81,7 @@ export async function sendTestRequest<
       TUserRoleValue,
       TScopedTranslationKey,
       TFields,
-      EventSchemas
+      TEvents
     >["types"]["ResponseOutput"]
   >
 > {
@@ -109,8 +113,8 @@ export async function sendTestRequest<
       typeof endpoint.types.ResponseOutput
     >({
       toolName,
-      data: data as CliRequestData,
-      urlPathParams: urlPathParams as CliRequestData | undefined,
+      data: data as Record<string, WidgetData>,
+      urlPathParams: urlPathParams as Record<string, WidgetData> | undefined,
       user: testUser,
       locale: defaultLocale,
       logger,
@@ -122,6 +126,7 @@ export async function sendTestRequest<
         skillId: undefined,
         modelId: undefined,
         headless: undefined,
+        subAgentDepth: 0,
         currentToolMessageId: undefined,
         callerToolCallId: undefined,
         pendingToolMessages: undefined,
@@ -138,6 +143,8 @@ export async function sendTestRequest<
         videoGenModelSelection: undefined,
         variantId: undefined,
         isRevival: undefined,
+
+        providerOverride: undefined,
       },
     });
 

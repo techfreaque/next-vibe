@@ -8,4 +8,7 @@ export interface CodingAgentRequest {
 export interface CodingAgentResponse {
   output: string;
   durationMs: number;
+  taskId?: string;
+  hint?: string;
+  terminalPending?: boolean;
 }

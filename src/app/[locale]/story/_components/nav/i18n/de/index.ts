@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   help: "Hilfe",
   logout: "Abmelden",
-  settings: "Profileinstellungen",
+  settings: "Mein Profil",
   leadMagnet: "Lead Magnet",
   enableLightMode: "Hellen Modus aktivieren",
   enableDarkMode: "Dunklen Modus aktivieren",
@@ -49,7 +49,7 @@ export const translations: typeof enTranslations = {
   signIn: "Anmelden",
   goToApp: "App öffnen",
   backToChat: "Zurück zum Chat",
-  unbottledHome: "Website & Blog",
+  unbottledHome: "Geschichten",
   subscription: "Abonnement",
   referral: "Empfehlungsprogramm",
   services: {

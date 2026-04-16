@@ -21,12 +21,9 @@ import {
   useEndpoint,
   type UseEndpointOptions,
 } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import { endpoints as cronTaskEndpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
-import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetContext,
@@ -35,23 +32,21 @@ import {
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import { CronTaskStatus } from "../enum";
 import type endpoints from "./definition";
-import type { TaskExecuteResponseOutput } from "./definition";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 interface WidgetProps {
-  field: {
-    value: TaskExecuteResponseOutput | null | undefined;
-  } & (typeof endpoints.POST)["fields"];
+  field: (typeof endpoints.POST)["fields"];
 }
 
 interface EndpointMethods {
@@ -122,7 +117,7 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
   const children = field.children;
 
   const isSubmitting = endpointMutations?.create?.isSubmitting;
-  const result = field.value;
+  const result = useWidgetValue<typeof endpoints.POST>();
 
   // Watch taskId from form
   const taskId = form.watch("taskId") ?? "";
@@ -315,17 +310,27 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
         </Div>
 
         {/* Tool result rendered via its own endpoint UI */}
-        {toolEndpoint && (
-          <NavigationStackProvider>
-            <EndpointRenderer
-              endpoint={toolEndpoint}
-              locale={locale}
-              user={user}
-              logger={logger}
-              data={taskInput as WidgetData}
-              disabled={true}
-            />
-          </NavigationStackProvider>
+        {toolEndpoint && toolMethod && (
+          <EndpointsPage
+            endpoint={{ [toolMethod]: toolEndpoint }}
+            locale={locale}
+            user={user}
+            disabled={true}
+            endpointOptions={
+              toolMethod === "GET"
+                ? { read: { initialData: taskInput as never } }
+                : toolMethod === "DELETE"
+                  ? {
+                      delete: {
+                        urlPathParams: taskInput as never,
+                        autoPrefillData: taskInput as never,
+                      },
+                    }
+                  : toolMethod === "PATCH"
+                    ? { update: { autoPrefillData: taskInput as never } }
+                    : { create: { autoPrefillData: taskInput as never } }
+            }
+          />
         )}
       </Div>
     );

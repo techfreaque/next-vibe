@@ -17,12 +17,14 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { customSkills } from "../../db";
 import type { SkillStatusValue } from "../../enum";
 import { SkillOwnershipType, SkillStatus } from "../../enum";
 import { SkillsRepository } from "../../repository";
+import skillsDefinitions from "../../definition";
 import type { SkillPublishPatchResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -49,6 +51,7 @@ export class SkillPublishRepository {
       const [skill] = await db
         .select({
           id: customSkills.id,
+          slug: customSkills.slug,
           userId: customSkills.userId,
           ownershipType: customSkills.ownershipType,
           status: customSkills.status,
@@ -103,6 +106,24 @@ export class SkillPublishRepository {
           updatedAt: new Date(),
         })
         .where(eq(customSkills.id, skill.id));
+
+      // Emit WS event so all open tabs see the updated skill status immediately
+      const emitSkills = createEndpointEmitter(
+        skillsDefinitions.GET,
+        logger,
+        user,
+      );
+      const newOwnershipType =
+        newStatus === SkillStatus.PUBLISHED
+          ? SkillOwnershipType.PUBLIC
+          : SkillOwnershipType.USER;
+      emitSkills("skill-updated", {
+        wsEvent: {
+          type: "updated",
+          id: skill.slug ?? skill.id,
+          ownershipType: newOwnershipType,
+        },
+      });
 
       return success({
         status_response: newStatus,

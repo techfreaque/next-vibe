@@ -8,12 +8,14 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { Platform } from "../../shared/types/platform";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { scopedTranslation as authScopedTranslation } from "@/app/api/[locale]/user/auth/i18n";
 import { authClientRepository } from "@/app/api/[locale]/user/auth/repository-client";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
+  BEARER_LEAD_ID_SEPARATOR,
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
 } from "@/config/constants";
@@ -45,27 +47,9 @@ const MUTATING_METHODS = new Set([
 ]);
 
 /**
- * JSON-serializable value type for request/response data
+ * Type guard to check if a value is a Record<string, WidgetData>
  */
-type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | undefined
-  | File
-  | Blob
-  | JsonValue[]
-  | { [key: string]: JsonValue };
-
-interface JsonObject {
-  [key: string]: JsonValue;
-}
-
-/**
- * Type guard to check if a value is a JsonObject
- */
-function isJsonObject(value: JsonValue): value is JsonObject {
+function isJsonObject(value: WidgetData): value is Record<string, WidgetData> {
   return (
     value !== null &&
     value !== undefined &&
@@ -80,7 +64,7 @@ function isJsonObject(value: JsonValue): value is JsonObject {
 /**
  * Check if an object contains File instances (recursively)
  */
-export function containsFile(obj: JsonValue): boolean {
+export function containsFile(obj: WidgetData): boolean {
   if (obj instanceof File) {
     return true;
   }
@@ -101,7 +85,7 @@ export function containsFile(obj: JsonValue): boolean {
  * Used to separate files from JSON-serializable data when building mixed FormData.
  */
 function extractFiles(
-  obj: JsonValue,
+  obj: WidgetData,
   parentKey = "",
   result: Array<[string, File | Blob]> = [],
 ): Array<[string, File | Blob]> {
@@ -123,7 +107,7 @@ function extractFiles(
  * Strip File/Blob instances from an object, replacing them with null.
  * The result is safe to JSON.stringify.
  */
-function stripFiles(obj: JsonValue): JsonValue {
+function stripFiles(obj: WidgetData): WidgetData {
   if (obj instanceof File || obj instanceof Blob) {
     return null;
   }
@@ -131,7 +115,7 @@ function stripFiles(obj: JsonValue): JsonValue {
     return obj.map(stripFiles);
   }
   if (isJsonObject(obj)) {
-    const result: JsonObject = {};
+    const result: Record<string, WidgetData> = {};
     for (const [key, value] of Object.entries(obj)) {
       result[key] = stripFiles(value);
     }
@@ -147,7 +131,7 @@ function stripFiles(obj: JsonValue): JsonValue {
  *
  * The server-side request-parser already handles this pattern (checks for "data" field first).
  */
-export function objectToFormData(obj: JsonObject): FormData {
+export function objectToFormData(obj: Record<string, WidgetData>): FormData {
   const formData = new FormData();
 
   // Serialize all non-file data as JSON in "data" field - preserves booleans, numbers, nulls
@@ -270,20 +254,27 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
       }
     }
 
-    // For React Native and mobile platforms, check for stored token and add Authorization header
-    // This allows React Native apps to authenticate using Bearer tokens stored in AsyncStorage
-    // Web apps will continue to use httpOnly cookies automatically sent with credentials: "include"
-    if (platform.isReactNative && endpoint.requiresAuthentication()) {
+    // For React Native and mobile platforms, check for stored token and add Authorization header.
+    // Format: "Bearer <jwtToken>####<leadId>" - embeds both values so the server can identify
+    // the caller without relying on cookies (which don't work cross-origin).
+    // Web apps on the same origin continue to use httpOnly cookies via credentials: "include".
+    if (platform.isReactNative) {
       const { t: authT } = authScopedTranslation.scopedT(locale);
       const storedToken = await authClientRepository.getAuthToken(
         logger,
         authT,
       );
-      if (storedToken.success && storedToken.data) {
-        headers.Authorization = `Bearer ${storedToken.data}`;
+      const leadId = user?.leadId;
+      if (storedToken.success && storedToken.data && leadId) {
+        // Authenticated: embed JWT + leadId suffix
+        headers.Authorization = `Bearer ${storedToken.data}${BEARER_LEAD_ID_SEPARATOR}${leadId}`;
         logger.debug(
           "Added Authorization header for React Native authentication",
         );
+      } else if (leadId) {
+        // Public user: no JWT, leadId-only suffix
+        headers.Authorization = `Bearer ${BEARER_LEAD_ID_SEPARATOR}${leadId}`;
+        logger.debug("Added public leadId-only Authorization header");
       }
     }
 

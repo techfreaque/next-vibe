@@ -5,16 +5,13 @@
  * This file must NOT import from widgets/configs.ts
  */
 
-import type { z } from "zod";
-
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type {
-  AnyChildrenConstrain,
-  FieldUsageConfig,
-} from "../../unified-ui/widgets/_shared/types";
-import type { EventSchemas } from "../../websocket/types";
+import type { z } from "zod";
+import type { FieldUsageConfig } from "../../unified-ui/widgets/_shared/cli-types";
+import type { AnyChildrenConstrain } from "../../unified-ui/widgets/_shared/types";
 import type { CreateApiEndpoint } from "../endpoints/definition/create";
+import type { EndpointEventsMap } from "../../websocket/structured-events";
 import type { UnifiedField } from "./endpoint";
 import type { Methods } from "./enums";
 
@@ -36,7 +33,8 @@ export type CreateApiEndpointAny = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
   >,
-  EventSchemas, // TEvents
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  EndpointEventsMap<any>, // TEvents — accepts both never and any events map; with out (covariant) TEvents, any EndpointEventsMap<X> and never are both subtypes
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any, // RequestInput
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

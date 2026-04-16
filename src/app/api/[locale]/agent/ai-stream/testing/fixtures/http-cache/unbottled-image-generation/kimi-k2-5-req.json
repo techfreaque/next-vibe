@@ -1,0 +1,16 @@
+{
+  "url": "http://localhost:3001/api/en-GLOBAL/agent/ai-stream/ws-provider/stream",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "[redacted]",
+    "Cookie": "lead_id_3000=53706876-6f2e-4dfc-859c-53da467ebb8e"
+  },
+  "body": {
+    "content": "[T2 image-gen] Call the generate_image tool with prompt='red circle'. Check that the result contains a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.",
+    "model": "kimi_k2_5",
+    "skill": "quality-tester",
+    "timezone": "UTC",
+    "instanceId": "552a3b53-bb91-4a28-b4b0-2318b9999cb1"
+  }
+}

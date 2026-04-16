@@ -19,32 +19,9 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
+import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+
 import { users } from "@/app/api/[locale]/user/db";
-
-/** Recursive JSON-serializable Zod schemas */
-const JsonPrimitiveSchema = z.union([
-  z.string(),
-  z.number(),
-  z.boolean(),
-  z.null(),
-]);
-type JsonPrimitive = z.infer<typeof JsonPrimitiveSchema>;
-
-export const JsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
-  z.union([JsonPrimitiveSchema, JsonObjectSchema, JsonArraySchema]),
-);
-export const JsonObjectSchema: z.ZodType<JsonObject> = z.lazy(() =>
-  z.record(z.string(), JsonValueSchema),
-);
-const JsonArraySchema: z.ZodType<JsonArray> = z.lazy(() =>
-  z.array(JsonValueSchema),
-);
-
-export interface JsonObject {
-  [key: string]: JsonValue;
-}
-type JsonArray = JsonValue[];
-export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
 
 /**
  * Zod schema for a serialized tool manifest entry - one per tool on the remote instance.
@@ -58,7 +35,7 @@ export const RemoteToolCapabilitySchema = z.object({
   toolName: z.string(),
   title: z.string(),
   description: z.string(),
-  fields: JsonObjectSchema,
+  fields: WidgetDataSchema,
   executionMode: z.literal("via-execute-route"),
   isAsync: z.literal(true),
   instanceId: z.string(),
@@ -155,10 +132,10 @@ export const remoteConnections = pgTable(
     remoteUrl: text("remote_url").notNull(),
 
     // JWT token from remote login (encrypted with AES-256-GCM)
-    token: text("token"),
+    token: text("token").notNull(),
 
     // Lead cookie ID preserved across token refreshes
-    leadId: text("lead_id"),
+    leadId: text("lead_id").notNull(),
 
     // URL of the local instance (cloud-side records: so cloud knows where local lives)
     localUrl: text("local_url"),
