@@ -11,7 +11,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
-import { Brain } from "next-vibe-ui/ui/icons/Brain";
+
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Coins } from "next-vibe-ui/ui/icons/Coins";
 import { Frame } from "next-vibe-ui/ui/icons/Frame";
@@ -148,13 +148,6 @@ export function AdminLayoutClient({
       href: `/${locale}/admin/vibe-frame` as const,
       icon: Frame,
       current: pathname.startsWith(`/${locale}/admin/vibe-frame`),
-      hidden: false,
-    },
-    {
-      name: t("navigation.memories"),
-      href: `/${locale}/admin/memories` as const,
-      icon: Brain,
-      current: pathname.startsWith(`/${locale}/admin/memories`),
       hidden: false,
     },
     {

@@ -4,33 +4,15 @@
  */
 
 import { relations } from "drizzle-orm";
-import {
-  integer,
-  jsonb,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { jsonb, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
 import { users } from "@/app/api/[locale]/user/db";
 
-import type { ChatMode } from "../../models/enum";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type {
-  AudioVisionModelSelection,
-  ImageVisionModelSelection,
-  VideoVisionModelSelection,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
-import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
-import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
-import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import type { ViewModeValue } from "../enum";
-import type { ToolConfigItem } from "./definition";
+import type { SearchProviderValue } from "@/app/api/[locale]/agent/search/enum";
 
 /**
  * Chat Settings Table
@@ -55,55 +37,32 @@ export const chatSettings = pgTable("chat_settings", {
   // TTS settings - only store if different from default
   ttsAutoplay: jsonb("tts_autoplay").$type<boolean>(),
 
-  // Voice model selection (null = system default)
-  voiceModelSelection: jsonb(
-    "voice_model_selection",
-  ).$type<VoiceModelSelection>(),
-
-  // STT model selection (null = system default)
-  sttModelSelection: jsonb("stt_model_selection").$type<SttModelSelection>(),
-
-  // Vision model selections per modality (null = system default)
-  imageVisionModelSelection: jsonb(
-    "image_vision_model_selection",
-  ).$type<ImageVisionModelSelection>(),
-  videoVisionModelSelection: jsonb(
-    "video_vision_model_selection",
-  ).$type<VideoVisionModelSelection>(),
-  audioVisionModelSelection: jsonb(
-    "audio_vision_model_selection",
-  ).$type<AudioVisionModelSelection>(),
-
-  // Default chat mode (null = "text")
-  defaultChatMode: text("default_chat_mode").$type<ChatMode>(),
-
-  // Image/music/video gen model selections (null = system default)
-  imageGenModelSelection: jsonb(
-    "image_gen_model_selection",
-  ).$type<ImageGenModelSelection>(),
-  musicGenModelSelection: jsonb(
-    "music_gen_model_selection",
-  ).$type<MusicGenModelSelection>(),
-  videoGenModelSelection: jsonb(
-    "video_gen_model_selection",
-  ).$type<VideoGenModelSelection>(),
-
   // UI preferences - only store if different from default
   viewMode: jsonb("view_mode").$type<typeof ViewModeValue>(),
 
-  // Tool configuration - DB columns are active_tools/visible_tools
-  // null = default (all allowed, default pinned set); array = user customized
-  availableTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
-  pinnedTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
-
-  // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
-  compactTrigger: jsonb("compact_trigger").$type<number>(),
-
-  // Memory budget in tokens (null = use DEFAULT_MEMORY_BUDGET_TOKENS; cascades to skill → favorite → subagent)
-  memoryLimit: integer("memory_limit"),
+  // Preferred web search provider. null = auto-detect (cheapest available)
+  searchProvider: jsonb("search_provider").$type<SearchProviderValue | null>(),
 
   // Coding agent provider preference (admin-only). null = "claude-code" (default)
   codingAgent: jsonb("coding_agent").$type<"claude-code" | "open-code">(),
+
+  // Dreaming pulse — AI reorganizes cortex on a schedule. null = disabled (false)
+  dreamerEnabled: jsonb("dreamer_enabled").$type<boolean>(),
+  // Favorite slot to power the dreaming session. null = system default (Thea)
+  dreamerFavoriteId: jsonb("dreamer_favorite_id").$type<string | null>(),
+  // Cron schedule for dreaming. null = system default ("0 2 * * *")
+  dreamerSchedule: jsonb("dreamer_schedule").$type<string>(),
+  // Custom user message to kick off each dreaming session. null = skill default
+  dreamerPrompt: jsonb("dreamer_prompt").$type<string | null>(),
+
+  // Autopilot pulse — AI works your queue while you're away. null = disabled (false)
+  autopilotEnabled: jsonb("autopilot_enabled").$type<boolean>(),
+  // Favorite slot to power the autopilot session. null = system default (Thea)
+  autopilotFavoriteId: jsonb("autopilot_favorite_id").$type<string | null>(),
+  // Cron schedule for autopilot. null = system default ("0 8 * * 1-5")
+  autopilotSchedule: jsonb("autopilot_schedule").$type<string>(),
+  // Custom user message to kick off each autopilot session. null = skill default
+  autopilotPrompt: jsonb("autopilot_prompt").$type<string | null>(),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),

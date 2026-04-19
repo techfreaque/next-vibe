@@ -271,7 +271,6 @@ export class TaskExecuteRepository {
               leafMessageId: undefined,
               favoriteId: undefined,
               skillId: undefined,
-              modelId: undefined,
               headless: undefined,
               subAgentDepth: 0,
               waitingForRemoteResult: undefined,
@@ -279,10 +278,6 @@ export class TaskExecuteRepository {
               callerCallbackMode: undefined,
               onEscalatedTaskCancel: undefined,
               escalateToTask: undefined,
-              imageGenModelSelection: undefined,
-              musicGenModelSelection: undefined,
-              videoGenModelSelection: undefined,
-              variantId: undefined,
               isRevival: undefined,
 
               providerOverride: undefined,

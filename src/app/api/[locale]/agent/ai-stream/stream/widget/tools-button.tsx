@@ -6,32 +6,34 @@ import { Wrench } from "next-vibe-ui/ui/icons/Wrench";
 import { Span } from "next-vibe-ui/ui/span";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
-import React from "react";
+import { useMemo } from "react";
 
-import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
-import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
-import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
+import helpDefinitions from "@/app/api/[locale]/system/help/definition";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { useToolsModalStore } from "@/app/api/[locale]/agent/tools/store";
 import {
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 interface ToolsButtonProps {
   disabled?: boolean;
   locale: CountryLanguage;
-  /** Optional: pass enabledTools directly to use outside ChatBootProvider */
+  /** Pass enabledTools to show the actual count of available tools.
+   *  When null/undefined, resolves from help endpoint. */
   enabledTools?: EnabledTool[] | null;
 }
 
 /**
  * Tools Button Component
- * Shows the number of active tools and opens the tool selector modal.
- * Works both inside ChatBootProvider (reads settings) and standalone (via props).
+ * Shows the number of available tools and opens the tool selector modal.
+ *
+ * Count shows total available tools for the user (role-filtered).
+ * When enabledTools is passed: shows enabledTools.length
+ * When not passed: reads totalCount from help endpoint (all tools available to user's role)
  */
 export function ToolsButton({
   disabled = false,
@@ -40,46 +42,35 @@ export function ToolsButton({
 }: ToolsButtonProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  const { settings } = useChatSettings(user, logger);
-  const defaults = ChatSettingsRepositoryClient.getDefaults(user);
-  const effectiveSettings = settings ?? defaults;
-
-  // Compute enabledTools from settings (same logic as the old useChat hook)
-  const computedEnabledTools = React.useMemo((): EnabledTool[] | null => {
-    const { availableTools, pinnedTools } = effectiveSettings;
-    if (availableTools === null && pinnedTools === null) {
-      return null;
-    }
-    const allIds = new Set([
-      ...(availableTools ?? []).map((t) => t.toolId),
-      ...(pinnedTools ?? []).map((t) => t.toolId),
-    ]);
-    return [...allIds].map((id) => {
-      const allowed = availableTools?.find((t) => t.toolId === id);
-      const pinned = pinnedTools?.find((t) => t.toolId === id);
-      return {
-        id,
-        requiresConfirmation:
-          allowed?.requiresConfirmation ??
-          pinned?.requiresConfirmation ??
-          false,
-        pinned:
-          pinnedTools !== null
-            ? pinnedTools.some((t) => t.toolId === id)
-            : true,
-      };
-    });
-  }, [effectiveSettings]);
-
-  const enabledTools = enabledToolsProp ?? computedEnabledTools;
   const openToolsModal = useToolsModalStore((state) => state.open);
-  // null = default: role-appropriate DEFAULT_TOOL_IDS are pinned (active)
-  // customized: count tools with active=true
-  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
-  const isCustomer = !user.isPublic && !isAdmin;
-  const activeToolCount = enabledTools
-    ? enabledTools.filter((tool) => tool.pinned).length
-    : getDefaultToolIds(isAdmin, isCustomer).length;
+
+  // Fetch tool count from help endpoint — cached with long staleTime
+  const helpEndpoint = useEndpoint(
+    helpDefinitions,
+    useMemo(
+      () => ({
+        read: {
+          queryOptions: {
+            staleTime: 5 * 60 * 1000,
+            refetchOnWindowFocus: false,
+          },
+        },
+      }),
+      [],
+    ),
+    logger,
+    user,
+  );
+
+  const totalToolCount = helpEndpoint.read?.data?.totalCount ?? 0;
+
+  const activeToolCount = useMemo(() => {
+    if (enabledToolsProp) {
+      return enabledToolsProp.length;
+    }
+    return totalToolCount;
+  }, [enabledToolsProp, totalToolCount]);
+
   const { t } = aiStreamScopedTranslation.scopedT(locale);
 
   return (

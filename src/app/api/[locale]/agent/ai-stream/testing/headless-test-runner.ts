@@ -15,6 +15,7 @@ import type {
 } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
 import { runHeadlessAiStream } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import type { MessageMetadata } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
@@ -90,11 +91,8 @@ export interface TestStreamParams {
     musicGenModelSelection?: MusicGenModelSelection;
     videoGenModelSelection?: VideoGenModelSelection;
   };
-  /**
-   * Tools available to the AI for execution (permission layer).
-   * Useful for setting requiresConfirmation=true to test approve mode.
-   */
-  availableTools?: Array<{ toolId: string; requiresConfirmation: boolean }>;
+  /** Favorite config override for the headless stream */
+  favoriteConfig?: FavoriteConfig | null;
   /**
    * Force all model resolution (chat + image/music/video gen) to a specific API provider.
    * Used by UNBOTTLED self-relay tests to route all inference through the UNBOTTLED provider.
@@ -310,7 +308,7 @@ export async function runTestStream(
     wakeUpRevival,
     mediaModelOverrides,
     providerOverride,
-    availableTools,
+    favoriteConfig: paramFavoriteConfig,
     operationOverride: callerOperationOverride,
     abortSignal = new AbortController().signal,
   } = params;
@@ -352,7 +350,7 @@ export async function runTestStream(
     wakeUpRevival,
     mediaModelOverrides,
     providerOverride,
-    availableTools: availableTools ?? null,
+    favoriteConfig: paramFavoriteConfig ?? null,
     abortSignal,
   });
 

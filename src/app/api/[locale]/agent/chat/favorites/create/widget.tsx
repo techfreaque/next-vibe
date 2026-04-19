@@ -41,6 +41,7 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { scopedTranslation as skillIdTranslation } from "@/app/api/[locale]/agent/chat/skills/[id]/i18n";
 import { ModelGroup } from "@/app/api/[locale]/agent/chat/skills/[id]/widget";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
@@ -281,9 +282,9 @@ export function FavoriteCreateContainer({
 
   const favoriteModelSelection: ChatModelSelection | undefined =
     form.watch("modelSelection") ?? undefined;
-  const variantId = form.watch("variantId");
+  const { skillId: plainSkillId, variantId } = parseSkillId(skillId ?? "");
 
-  const characterEndpoint = useSkill(skillId ?? "", user, logger);
+  const characterEndpoint = useSkill(plainSkillId, user, logger);
   const characterData = characterEndpoint.read?.data;
   const characterVariant = variantId
     ? characterData?.variants?.find((v) => v.id === variantId)
@@ -320,10 +321,6 @@ export function FavoriteCreateContainer({
         activeFavoriteId: null,
         selectedSkill: skillId,
         selectedModel,
-        voiceModelSelection:
-          voiceModelSelection ??
-          characterData?.voiceModelSelection ??
-          undefined,
       });
 
       // Navigate back

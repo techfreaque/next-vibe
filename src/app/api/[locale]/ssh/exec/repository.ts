@@ -74,7 +74,7 @@ export class SshExecRepository {
     logger: EndpointLogger,
     user: JwtPayloadType,
     t: SshExecT,
-    streamContext?: ToolExecutionContext,
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<SshExecResponseOutput>> {
     const timeoutMs =
       data.timeoutMs ?? SshExecRepository.LOCAL_DEFAULT_TIMEOUT_MS;
@@ -105,12 +105,16 @@ export class SshExecRepository {
       });
 
       void (async (): Promise<void> => {
+        const noEscalateContext: ToolExecutionContext = {
+          ...streamContext,
+          escalateToTask: undefined,
+        };
         const result = await SshExecRepository.exec(
           data,
           logger,
           user,
           t,
-          // No streamContext - run inline without escalation loop
+          noEscalateContext,
         );
         await onComplete({
           success: result.success,

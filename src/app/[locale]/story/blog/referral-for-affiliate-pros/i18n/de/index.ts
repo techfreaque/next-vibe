@@ -51,9 +51,9 @@ export const translations: typeof enTranslations = {
   structure: {
     title: "Die vollständige Provisionsstruktur",
     p1: "Direkte Empfehlung: 10 % jeder Zahlung von Leuten, die du direkt empfiehlst. Das gehört dir immer, für immer, unabhängig von allem anderen.",
-    p2: "Skill-Bonus: Wenn sich jemand über einen Skill anmeldet, den du veröffentlicht hast, verdienst du zusätzlich 5 % auf ihre Zahlungen - 15 % total von diesem Nutzer. Skills sind teilbare KI-Setups, die jeder erstellen und veröffentlichen kann.",
+    p2: "Skill-Bonus: Wenn sich jemand über ein Skill anmeldet, das du veröffentlicht hast, verdienst du zusätzlich 5 % auf ihre Zahlungen - 15 % total von diesem Nutzer. Skills sind teilbare KI-Setups, die jeder erstellen und veröffentlichen kann. Entscheidend für Affiliate-Profis: Du verdienst die 5 % als Skill-Autor, auch wenn jemand anderes deinen Skill-Link teilt. Ein Nutzer entdeckt deinen Skill im Verzeichnis und schickt ihn weiter - du wirst trotzdem gutgeschrieben. Die Plattform trackt Skill-Autorenschaft, nicht wer den Link verteilt hat. Passive Attribution, die du nicht aktiv managen musst.",
     p3: "Mehrstufige Kette: Ein zusätzlicher 10 %-Pool wird über bis zu 5 Ebenen deiner Empfehlungskette verteilt, mit geometrischem Abfall - jede Ebene verdient halb so viel wie die darüber. Empfehlungen deiner Empfehlungen bringen dir ~5 %, deren Empfehlungen ~2,5 % usw. Maximale Gesamtausschüttung über alle Empfänger: ~20 % einer einzelnen Zahlung.",
-    p4: "Ehrliche Einschätzung: Die Ketten-Boni werden schnell klein. Die 10 % direkt + 5 % Skill sind das eigentliche Einkommen. Bau keine Strategie auf mehrstufige Tiefe - bau auf qualitativ hochwertige direkte Empfehlungen.",
+    p4: "Ehrliche Einschätzung: Die Ketten-Boni werden schnell klein. Die 10 % direkt + 5 % Skill sind das eigentliche Einkommen. Bau keine Strategie auf mehrstufige Tiefe - bau auf qualitativ hochwertige direkte Empfehlungen und publizierbare Skills.",
   },
   audience: {
     title: "Wer konvertiert auf dieser Plattform",

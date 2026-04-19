@@ -1,6 +1,8 @@
 services:
   postgres:
-    image: sibedge/postgres-plv8:16.10-3.2.3-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
     container_name: dev-postgres
     restart: unless-stopped
     environment:

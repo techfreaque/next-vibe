@@ -9,7 +9,14 @@ import { DescribeVideoRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger, t }) =>
-      DescribeVideoRepository.describeVideo(data, user, locale, logger, t),
+    handler: ({ data, user, locale, logger, t, streamContext }) =>
+      DescribeVideoRepository.describeVideo(
+        data,
+        user,
+        locale,
+        logger,
+        t,
+        streamContext.favoriteId,
+      ),
   },
 });

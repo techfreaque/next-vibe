@@ -12,6 +12,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Mic } from "next-vibe-ui/ui/icons/Mic";
 import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
+import { Markdown } from "next-vibe-ui/ui/markdown";
 import {
   Popover,
   PopoverContent,
@@ -41,7 +42,7 @@ import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
-import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
+import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import {
   useWidgetContext,
   useWidgetDisabled,
@@ -50,6 +51,7 @@ import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetOnSubmit,
+  useWidgetResponse,
   useWidgetUser,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -232,21 +234,39 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
 
   const children = field.children;
   const result = useWidgetValue<typeof definition.POST>();
+  const rawResponse = useWidgetResponse();
   const promptValue = form.watch("prompt") ?? "";
   const providerValue = form.watch("provider") ?? "claude-code";
   const interactiveMode = form.watch("interactiveMode") ?? false;
 
-  // In read-only (disabled) mode, data comes from form defaultValues (merged input+result).
-  // In read-only (disabled) mode, response fields are merged into form defaults by
-  // EndpointRenderer. The form schema only covers request fields so we access the raw
-  // values via a flat primitive record and narrow each field with typeof guards.
+  // Derive response data from multiple sources (context store, raw response, form defaults).
+  // useWidgetValue uses useShallow which can miss on initial render in some cases,
+  // so we also check the raw response and form defaults as fallbacks.
   const effectiveResult = useMemo(() => {
     if (result) {
       return result;
     }
+    // Fallback: read response data directly from context (bypasses useShallow)
+    if (rawResponse?.success && rawResponse.data) {
+      const d: Record<string, string | number | boolean | null | undefined> =
+        rawResponse.data;
+      if (typeof d["output"] === "string") {
+        return {
+          output: d["output"],
+          durationMs: typeof d["durationMs"] === "number" ? d["durationMs"] : 0,
+          taskId: typeof d["taskId"] === "string" ? d["taskId"] : undefined,
+          hint: typeof d["hint"] === "string" ? d["hint"] : undefined,
+          terminalPending:
+            typeof d["terminalPending"] === "boolean"
+              ? d["terminalPending"]
+              : undefined,
+        };
+      }
+    }
     if (!isDisabled) {
       return undefined;
     }
+    // Last resort: response fields are merged into form defaults by EndpointRenderer
     const vals: Record<string, string | number | boolean | null | undefined> =
       form.getValues();
     const output = vals["output"];
@@ -261,7 +281,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
       taskId: typeof taskId === "string" ? taskId : undefined,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result, isDisabled]);
+  }, [result, rawResponse, isDisabled]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -482,7 +502,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
             }
           >
             {hasSentMessage && promptValue && (
-              <UserMessageBubble
+              <StaticUserMessageBubble
                 message={userMessage}
                 locale={locale}
                 logger={logger}
@@ -491,7 +511,16 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
               />
             )}
 
-            {hasSentMessage && (
+            {hasSentMessage && isDisabled && assistantContent ? (
+              <Div
+                className={cn(
+                  "prose prose-sm dark:prose-invert max-w-none prose-headings:text-slate-900 dark:prose-headings:text-slate-100 prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-code:text-blue-600 dark:prose-code:text-blue-400",
+                  "pl-2 py-2.5 sm:py-3",
+                )}
+              >
+                <Markdown content={assistantContent} />
+              </Div>
+            ) : hasSentMessage && !isDisabled ? (
               <GroupedAssistantMessage
                 group={assistantGroup}
                 locale={locale}
@@ -510,7 +539,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
                 userVote={null}
                 voteScore={0}
               />
-            )}
+            ) : null}
 
             {!hasSentMessage && !isDisabled && (
               <Div className="flex items-center justify-center h-full">

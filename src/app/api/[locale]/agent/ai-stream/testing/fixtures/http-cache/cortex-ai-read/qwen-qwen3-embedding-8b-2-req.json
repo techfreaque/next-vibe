@@ -1,0 +1,13 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/use-the-cortex-write-tool-to-create-a-file-at----25607000-94e5-4696-87dd-62e508a2a299.md\n\n# Use the cortex-write tool to create a file at...\nFolder: cron\n\nuser: Use the cortex-write tool to create a file at /documents/ai-test/notes.md with this exact content:\n\n\"# AI Test Notes\n\nThis document was created by an AI to test cortex tool integration.\nKey topics: testing, automation, cortex-write verification.\"\n\nAfter writing, confirm what you did.\nassistant: <think> The user wants me to create a file at /documents/ai-test/notes.md with specific content. Let me use the cortex-write tool to do this.</think>\ntool: \nassistant: <think> The file was created successfully. I can see from the result:\n- `created`: true - the file was created\n- `responsePath`: \"/documents/ai-test/notes.md\" - the path matches what was requested\n- `size`: 144 bytes\n- `updatedAt`: timestamp shows when it was created\n\nNow I need to confirm what I did as requested by the user.</think> **File created successfully.**\n\n- **Path:** `/documents/ai-test/notes.md`\n- **Size:** 144 bytes\n- **Content:** Created with the exact markdown content provided, inc\nuser: Use cortex-read to read the file at /documents/ai-test/notes.md. Tell me what's in it.\nassistant: <think> The user wants me to read the file I just created at /documents/ai-test/notes.md using cortex-read and tell them what's in it.</think>\ntool:",
+    "encoding_format": "float"
+  }
+}

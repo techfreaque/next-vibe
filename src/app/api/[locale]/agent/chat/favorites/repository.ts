@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { asc, eq, inArray, or } from "drizzle-orm";
+import { and, asc, eq, inArray, or } from "drizzle-orm";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -30,7 +30,12 @@ import { SkillsRepository } from "../skills/repository";
 import { chatSettings } from "../settings/db";
 import { scopedTranslation as settingsScopedTranslation } from "../settings/i18n";
 import { ChatSettingsRepository } from "../settings/repository";
-import { chatFavorites } from "./db";
+import { formatSkillId, isUuid } from "../slugify";
+import {
+  chatFavorites,
+  FAVORITE_CONFIG_COLUMNS,
+  type FavoriteConfig,
+} from "./db";
 import type { FavoritesListResponseOutput } from "./definition";
 import {
   formatEmptyFavoritesGuidance,
@@ -39,6 +44,51 @@ import {
 import type { FavoriteSummaryItem } from "./system-prompt/prompt";
 import type { FavoritesT } from "./i18n";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
+
+export function buildFavoriteConfig(
+  overrides: Partial<FavoriteConfig> & Pick<FavoriteConfig, "id" | "skillId">,
+): FavoriteConfig {
+  return {
+    modelSelection: null,
+    voiceModelSelection: null,
+    sttModelSelection: null,
+    imageVisionModelSelection: null,
+    videoVisionModelSelection: null,
+    audioVisionModelSelection: null,
+    imageGenModelSelection: null,
+    musicGenModelSelection: null,
+    videoGenModelSelection: null,
+    availableTools: null,
+    pinnedTools: null,
+    deniedTools: null,
+    compactTrigger: null,
+    memoryLimit: null,
+    promptAppend: null,
+    ...overrides,
+  };
+}
+
+export async function resolveFavoriteConfig(
+  favoriteId: string | undefined,
+  userId: string | undefined,
+): Promise<FavoriteConfig | null> {
+  if (!favoriteId || !userId) {
+    return null;
+  }
+  const [row] = await db
+    .select(FAVORITE_CONFIG_COLUMNS)
+    .from(chatFavorites)
+    .where(
+      and(
+        isUuid(favoriteId)
+          ? eq(chatFavorites.id, favoriteId)
+          : eq(chatFavorites.slug, favoriteId),
+        eq(chatFavorites.userId, userId),
+      ),
+    )
+    .limit(1);
+  return row ?? null;
+}
 
 /** Chat Favorites Repository */
 export class ChatFavoritesRepository {
@@ -125,8 +175,10 @@ export class ChatFavoritesRepository {
           return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
             {
               id: favorite.slug || favorite.id,
-              skillId: favorite.skillId,
-              variantId: favorite.variantId ?? null,
+              skillId: formatSkillId(
+                favorite.skillId,
+                favorite.variantId ?? null,
+              ),
               customVariantName: favorite.customVariantName ?? null,
               customIcon: favorite.customIcon,
               voiceModelSelection: favorite.voiceModelSelection ?? null,

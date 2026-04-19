@@ -16,10 +16,6 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { skillVariantSchema } from "@/app/api/[locale]/agent/chat/skills/db";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
-import {
-  CHAT_MODE_IDS,
-  ChatModeOptions,
-} from "@/app/api/[locale]/agent/models/enum";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
@@ -123,8 +119,7 @@ const { POST } = createEndpoint({
             }
 
             const newSkill: SkillListItem = {
-              id: data.responseData.id,
-              internalId: null,
+              skillId: data.responseData.id,
               icon: data.requestData.icon,
               category: data.requestData.category,
               modelId: bestModel.id,
@@ -137,7 +132,6 @@ const { POST } = createEndpoint({
               ownershipType: SkillOwnershipType.USER,
               trustLevel: null,
               voteCount: null,
-              variantId: null,
               variantName: null,
               isVariant: false,
               isDefault: false,
@@ -383,19 +377,6 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "post.videoGenModel.label" as const,
         description: "post.videoGenModel.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-      }),
-      defaultChatMode: requestField(scopedTranslation, {
-        schema: z.enum(CHAT_MODE_IDS).nullable().optional(),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: ChatModeOptions,
-        label: "post.defaultChatMode.label" as const,
-        description: "post.defaultChatMode.description" as const,
         columns: 6,
         theme: {
           descriptionStyle: "inline",

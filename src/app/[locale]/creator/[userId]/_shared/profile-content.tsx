@@ -8,24 +8,24 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "next-vibe-ui/ui/avatar";
 import { Div } from "next-vibe-ui/ui/div";
+import { Facebook } from "next-vibe-ui/ui/icons/Facebook";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
-import {
-  Icon,
-  type IconKey,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { Instagram } from "next-vibe-ui/ui/icons/Instagram";
-import { MessageCircle } from "next-vibe-ui/ui/icons/MessageCircle";
-import { Music } from "next-vibe-ui/ui/icons/Music";
 import { SiDiscord } from "next-vibe-ui/ui/icons/SiDiscord";
+import { SiGab } from "next-vibe-ui/ui/icons/SiGab";
 import { SiGithub } from "next-vibe-ui/ui/icons/SiGithub";
+import { SiNostr } from "next-vibe-ui/ui/icons/SiNostr";
+import { SiOdysee } from "next-vibe-ui/ui/icons/SiOdysee";
+import { SiRumble } from "next-vibe-ui/ui/icons/SiRumble";
+import { SiTiktok } from "next-vibe-ui/ui/icons/SiTiktok";
+import { SiTribe } from "next-vibe-ui/ui/icons/SiTribe";
 import { Twitter } from "next-vibe-ui/ui/icons/Twitter";
 import { Youtube } from "next-vibe-ui/ui/icons/Youtube";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
-import { H1, H2, P } from "next-vibe-ui/ui/typography";
+import { H1 } from "next-vibe-ui/ui/typography";
 import type { JSX, ReactNode } from "react";
-import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
@@ -36,21 +36,19 @@ export const PROFILE_SOCIALS = [
   { key: "twitterUrl" as const, Icon: Twitter, label: "X" },
   { key: "youtubeUrl" as const, Icon: Youtube, label: "YouTube" },
   { key: "instagramUrl" as const, Icon: Instagram, label: "Instagram" },
-  { key: "tiktokUrl" as const, Icon: Music, label: "TikTok" },
+  { key: "facebookUrl" as const, Icon: Facebook, label: "Facebook" },
+  { key: "tiktokUrl" as const, Icon: SiTiktok, label: "TikTok" },
+  { key: "rumbleUrl" as const, Icon: SiRumble, label: "Rumble" },
+  { key: "odyseeUrl" as const, Icon: SiOdysee, label: "Odysee" },
+  { key: "nostrUrl" as const, Icon: SiNostr, label: "Nostr" },
+  { key: "gabUrl" as const, Icon: SiGab, label: "Gab" },
   { key: "githubUrl" as const, Icon: SiGithub, label: "GitHub" },
   { key: "discordUrl" as const, Icon: SiDiscord, label: "Discord" },
+  { key: "tribeUrl" as const, Icon: SiTribe, label: "Tribe" },
   { key: "websiteUrl" as const, Icon: Globe, label: "Website" },
 ] as const;
 
 export type ProfileSocialKey = (typeof PROFILE_SOCIALS)[number]["key"];
-
-export interface ProfileSkillItem {
-  id: string;
-  name: string;
-  tagline: string;
-  description: string;
-  icon: IconKey;
-}
 
 export interface ProfileData {
   publicName: string;
@@ -62,8 +60,14 @@ export interface ProfileData {
   youtubeUrl?: string | null;
   instagramUrl?: string | null;
   tiktokUrl?: string | null;
+  rumbleUrl?: string | null;
+  odyseeUrl?: string | null;
+  nostrUrl?: string | null;
+  gabUrl?: string | null;
   githubUrl?: string | null;
+  facebookUrl?: string | null;
   discordUrl?: string | null;
+  tribeUrl?: string | null;
   websiteUrl?: string | null;
 }
 
@@ -282,300 +286,5 @@ export function ProfileSocialPills({
         </Link>
       ))}
     </Div>
-  );
-}
-
-// ── SKILLS LIST ────────────────────────────────────────────────────────────────
-
-function ProfileSkillCard({
-  skill,
-  accent,
-  href,
-  chatLabel,
-  addLabel,
-}: {
-  skill: ProfileSkillItem;
-  accent: string;
-  href: string;
-  chatLabel: string;
-  addLabel: string;
-}): JSX.Element {
-  const [showActions, setShowActions] = useState(false);
-
-  return (
-    <Div
-      style={{
-        borderRadius: 10,
-        border: "1px solid rgba(255,255,255,0.08)",
-        background: "rgba(255,255,255,0.02)",
-        overflow: "hidden",
-        transition: "border-color 0.15s, box-shadow 0.15s",
-      }}
-      onMouseEnter={() => setShowActions(true)}
-      onMouseLeave={() => setShowActions(false)}
-    >
-      {/* Main content - click goes to skill page */}
-      <Link href={href as never} className="no-underline block">
-        <Div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            gap: 12,
-            padding: "12px 16px",
-            cursor: "pointer",
-          }}
-        >
-          {/* Icon box */}
-          <Div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 9,
-              background: `${accent}18`,
-              border: `1px solid ${accent}28`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-              marginTop: 2,
-            }}
-          >
-            <Icon icon={skill.icon} className="h-5 w-5" />
-          </Div>
-
-          {/* Text content */}
-          <Div style={{ flex: 1, minWidth: 0 }}>
-            {/* Name + tagline row */}
-            <Div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                flexWrap: "wrap" as const,
-                marginBottom: 2,
-              }}
-            >
-              <Span
-                style={{
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: "#fff",
-                  lineHeight: 1.3,
-                }}
-              >
-                {skill.name}
-              </Span>
-              {skill.tagline && (
-                <Span
-                  style={{
-                    fontSize: 12,
-                    color: "rgba(255,255,255,0.35)",
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {skill.tagline}
-                </Span>
-              )}
-            </Div>
-
-            {/* Description */}
-            {skill.description && (
-              <Span
-                style={{
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
-                  fontSize: 12,
-                  color: "rgba(255,255,255,0.35)",
-                  lineHeight: 1.5,
-                }}
-              >
-                {skill.description}
-              </Span>
-            )}
-          </Div>
-        </Div>
-      </Link>
-
-      {/* Action bar - slides in on hover */}
-      <Div
-        style={{
-          overflow: "hidden",
-          maxHeight: showActions ? 48 : 0,
-          transition: "max-height 0.18s ease-out",
-        }}
-      >
-        <Div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "8px 12px",
-            borderTop: "1px solid rgba(255,255,255,0.06)",
-            background: "rgba(255,255,255,0.02)",
-          }}
-        >
-          {/* Left label */}
-          <Span
-            style={{
-              fontSize: 11,
-              color: "rgba(255,255,255,0.3)",
-              flexShrink: 0,
-            }}
-          >
-            {addLabel}
-          </Span>
-
-          {/* Right actions */}
-          <Div
-            style={{
-              marginLeft: "auto",
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-            }}
-          >
-            {/* Chat Now - primary */}
-            <Span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                borderRadius: 6,
-                overflow: "hidden",
-                background: accent,
-              }}
-            >
-              <Link
-                href={href as never}
-                className="no-underline inline-flex items-center gap-1.5 text-xs font-medium px-3 h-7 text-white"
-              >
-                <MessageCircle className="h-3 w-3" />
-                {chatLabel}
-              </Link>
-            </Span>
-          </Div>
-        </Div>
-      </Div>
-    </Div>
-  );
-}
-
-export function ProfileSkillsGrid({
-  skills,
-  accent,
-  skillHref: getHref,
-  chatLabel,
-  addLabel,
-  emptyLabel,
-}: {
-  skills: ProfileSkillItem[];
-  accent: string;
-  skillHref: (id: string) => string;
-  chatLabel: string;
-  addLabel: string;
-  emptyLabel?: string;
-}): JSX.Element {
-  if (skills.length === 0) {
-    if (!emptyLabel) {
-      return <></>;
-    }
-    return (
-      <P
-        style={{
-          color: "rgba(255,255,255,0.3)",
-          fontSize: 14,
-          textAlign: "center",
-          padding: "56px 0",
-        }}
-      >
-        {emptyLabel}
-      </P>
-    );
-  }
-
-  return (
-    <Div style={{ display: "flex", flexDirection: "column" as const, gap: 6 }}>
-      {skills.map((skill) => (
-        <ProfileSkillCard
-          key={skill.id}
-          skill={skill}
-          accent={accent}
-          href={getHref(skill.id)}
-          chatLabel={chatLabel}
-          addLabel={addLabel}
-        />
-      ))}
-    </Div>
-  );
-}
-
-// ── SKILLS SECTION (label + list) ─────────────────────────────────────────────
-
-export function ProfileSkillsSection({
-  skills,
-  accent,
-  skillHref: getHref,
-  sectionLabel,
-  chatLabel,
-  addLabel,
-  emptyLabel,
-}: {
-  skills: ProfileSkillItem[];
-  accent: string;
-  skillHref: (id: string) => string;
-  sectionLabel: string;
-  chatLabel: string;
-  addLabel: string;
-  emptyLabel?: string;
-}): JSX.Element {
-  return (
-    <>
-      {(skills.length > 0 || emptyLabel) && (
-        <Div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            marginBottom: 12,
-          }}
-        >
-          <H2
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: "0.12em",
-              color: "rgba(255,255,255,0.3)",
-              margin: 0,
-            }}
-          >
-            {sectionLabel}
-          </H2>
-          {skills.length > 0 && (
-            <Span
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                color: "rgba(255,255,255,0.2)",
-                background: "rgba(255,255,255,0.06)",
-                borderRadius: 4,
-                padding: "1px 6px",
-              }}
-            >
-              {skills.length}
-            </Span>
-          )}
-        </Div>
-      )}
-      <ProfileSkillsGrid
-        skills={skills}
-        accent={accent}
-        skillHref={getHref}
-        chatLabel={chatLabel}
-        addLabel={addLabel}
-        emptyLabel={emptyLabel}
-      />
-    </>
   );
 }

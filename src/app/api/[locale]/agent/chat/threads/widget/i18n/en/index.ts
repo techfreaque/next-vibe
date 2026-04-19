@@ -60,6 +60,7 @@ export const translations = {
       },
     },
     credits: {
+      label: "Credits",
       credit: "{{count}} credit",
       credits: "{{count}} credits",
     },

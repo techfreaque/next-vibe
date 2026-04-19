@@ -175,7 +175,7 @@ export const translations = {
     newCta: "Zdobądź swój link polecający",
     proTitle: "Link do skilla — {{skillPct}} na użytkownika",
     proBody:
-      "Zbuduj skill. Udostępnij link. Każdy, kto przez niego wejdzie, płaci Ci {{directPct}} bezpośrednio + {{skillBonusPct}} bonus za skill = {{skillPct}} od użytkownika, cyklicznie. Bez potrzeby followersów.",
+      "Zbuduj skill. Udostępnij link. Każdy, kto przez niego wejdzie, płaci Ci {{directPct}} bezpośrednio + {{skillBonusPct}} bonus za skill = {{skillPct}} od użytkownika, cyklicznie. Co więcej: {{skillBonusPct}} należy do Ciebie jako autora skilla, nawet gdy ktoś inny go udostępnia. Platforma śledzi autorstwo skilla - pasywna atrybucja bez dodatkowego wysiłku.",
     proCta: "Zbuduj skill",
   },
   discord: {

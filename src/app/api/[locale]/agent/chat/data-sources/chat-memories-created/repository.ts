@@ -22,7 +22,9 @@ import type {
   Resolution,
   TimeRange,
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { memories } from "../../memories/db";
+import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
+import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
+import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
 
 export class QueryChatMemoriesCreatedRepository {
   static async queryChatMemoriesCreated(data: {
@@ -36,18 +38,21 @@ export class QueryChatMemoriesCreatedRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
+    const { like, eq } = await import("drizzle-orm");
     const rows = await db
       .select({
-        bucket: resolutionBucketExpr(resolution, memories.createdAt).as(
+        bucket: resolutionBucketExpr(resolution, cortexNodes.createdAt).as(
           "bucket",
         ),
         cnt: count(),
       })
-      .from(memories)
+      .from(cortexNodes)
       .where(
         and(
-          gte(memories.createdAt, range.from),
-          lte(memories.createdAt, range.to),
+          eq(cortexNodes.nodeType, CortexNodeType.FILE),
+          like(cortexNodes.path, `${MEMORIES_PREFIX}/%`),
+          gte(cortexNodes.createdAt, range.from),
+          lte(cortexNodes.createdAt, range.to),
         ),
       )
       .groupBy(sql`1`)

@@ -28,13 +28,17 @@ import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/sha
 import type { MessageMetadata } from "../../chat/db";
 import { chatMessages } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
-import { chatFavorites } from "../../chat/favorites/db";
+import {
+  chatFavorites,
+  FAVORITE_CONFIG_COLUMNS,
+  type FavoriteConfig,
+} from "../../chat/favorites/db";
 import { NO_SKILL_ID } from "../../chat/skills/constants";
 import {
   isFiltersSelection,
   isManualSelection,
 } from "../../chat/skills/create/definition";
-import { isUuid } from "../../chat/slugify";
+import { isUuid, parseSkillId } from "../../chat/slugify";
 import { ThreadsRepository } from "../../chat/threads/repository";
 import type { ImageGenModelSelection } from "../../image-generation/models";
 import type { ApiProvider } from "../../models/models";
@@ -74,25 +78,8 @@ export interface HeadlessAiStreamParams {
   skill?: string;
   /** User prompt - the main question/instruction */
   prompt: string;
-  /**
-   * Pinned tools - tools loaded into the AI context window (visible to model).
-   * null/undefined = agent mode (all tools visible).
-   * [] = no tools visible.
-   * Array of { toolId, requiresConfirmation } = specific tools pinned to context.
-   */
-  pinnedTools?: Array<{
-    toolId: string;
-    requiresConfirmation: boolean;
-  }> | null;
-  /**
-   * Available tools - permission layer controlling which tools the model may execute.
-   * null/undefined = all tools permitted.
-   * Array = restrict execution to listed toolIds.
-   */
-  availableTools?: Array<{
-    toolId: string;
-    requiresConfirmation: boolean;
-  }> | null;
+  /** Full favorite config for model/tool/context resolution. null = use skill/system defaults. */
+  favoriteConfig: FavoriteConfig | null;
   /**
    * Extra text injected into the headless system prompt section.
    * Use this to prime the model with task-specific context:
@@ -241,12 +228,16 @@ export async function resolveFavorite(
   logger: EndpointLogger,
   locale: CountryLanguage,
   providerOverride?: ApiProvider,
-): Promise<{ model: ChatModelId; skill: string } | null> {
+): Promise<{
+  model: ChatModelId;
+  skill: string;
+  favoriteConfig: FavoriteConfig;
+} | null> {
   const favoriteIdCondition = isUuid(favoriteId)
     ? eq(chatFavorites.id, favoriteId)
     : eq(chatFavorites.slug, favoriteId);
   const [favorite] = await db
-    .select()
+    .select(FAVORITE_CONFIG_COLUMNS)
     .from(chatFavorites)
     .where(and(favoriteIdCondition, eq(chatFavorites.userId, userId)))
     .limit(1);
@@ -260,16 +251,18 @@ export async function resolveFavorite(
 
   // Resolve model from modelSelection
   const sel = favorite.modelSelection;
+
   if (sel && isManualSelection(sel) && "manualModelId" in sel) {
     return {
       model: sel.manualModelId,
       skill,
+      favoriteConfig: favorite,
     };
   }
   if (sel && isFiltersSelection(sel)) {
     const best = getBestChatModel(sel, user, providerOverride);
     if (best) {
-      return { model: best.id, skill };
+      return { model: best.id, skill, favoriteConfig: favorite };
     }
   }
 
@@ -284,16 +277,17 @@ export async function resolveFavorite(
     );
     if (skillResult.success) {
       const variants = skillResult.data.variants;
+      const { variantId: favoriteVariantId } = parseSkillId(favorite.skillId);
       const variant = variants
-        ? favorite.variantId
-          ? variants.find((v) => v.id === favorite.variantId)
+        ? favoriteVariantId
+          ? variants.find((v) => v.id === favoriteVariantId)
           : (variants.find((v) => v.isDefault) ?? variants[0])
         : null;
       const varSel = variant?.modelSelection;
       if (varSel && (isManualSelection(varSel) || isFiltersSelection(varSel))) {
         const best = getBestChatModel(varSel, user, providerOverride);
         if (best) {
-          return { model: best.id, skill };
+          return { model: best.id, skill, favoriteConfig: favorite };
         }
       }
     }
@@ -317,8 +311,7 @@ export async function runHeadlessAiStream(
     model: modelOverride,
     skill: skillOverride,
     prompt,
-    pinnedTools,
-    availableTools,
+    favoriteConfig: favoriteConfigOverride,
     headlessInstructions,
     threadId: existingThreadId,
     subFolderId,
@@ -342,9 +335,11 @@ export async function runHeadlessAiStream(
   } = params;
 
   try {
-    // ── Resolve model + skill ─────────────────────────────────────────────────
+    // ── Resolve model + skill + favorite config ───────────────────────────────
     let model = modelOverride;
     let skill = skillOverride;
+    let resolvedFavoriteConfig: FavoriteConfig | null =
+      favoriteConfigOverride ?? null;
 
     if (favoriteId) {
       const userId = "id" in user ? (user.id as string) : undefined;
@@ -366,6 +361,10 @@ export async function runHeadlessAiStream(
         // Explicit params override favorite values
         model = modelOverride ?? resolved.model;
         skill = skillOverride ?? resolved.skill;
+        // Use resolved favorite config if caller didn't provide one
+        if (!resolvedFavoriteConfig) {
+          resolvedFavoriteConfig = resolved.favoriteConfig;
+        }
       }
     }
 
@@ -576,8 +575,7 @@ export async function runHeadlessAiStream(
       role: ChatMessageRole.USER,
       model,
       skill: skill,
-      availableTools: availableTools ?? null,
-      pinnedTools: pinnedTools ?? null,
+      favoriteConfig: resolvedFavoriteConfig,
       toolConfirmations: headlessToolConfirmations ?? null,
       messageHistory: [] as AiStreamPostRequestOutput["messageHistory"],
       voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },

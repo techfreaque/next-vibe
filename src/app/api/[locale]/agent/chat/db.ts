@@ -53,8 +53,11 @@ import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unifie
 import { users } from "@/app/api/[locale]/user/db";
 import { type UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { TtsModelId } from "../text-to-speech/models";
+
 import type { DefaultFolderId } from "./config";
 import { ChatMessageRoleDB, ThreadStatusDB } from "./enum";
+import type { FavoriteConfig } from "./favorites/db";
 
 /**
  * Thread metadata structure
@@ -237,6 +240,19 @@ export interface MessageMetadata {
     bridgeType: "stt" | "vision" | "translation" | "tts";
     modality: Modality;
   } | null;
+
+  // Queue metadata (for USER messages waiting to be processed while AI is streaming)
+  isQueued?: boolean;
+  /** Settings snapshot for queued messages - used when auto-processing from queue */
+  queuedSettings?: {
+    model: ChatModelId;
+    skill: string;
+    rootFolderId: DefaultFolderId;
+    subFolderId: string | null;
+    voiceMode: { enabled: boolean; voice: TtsModelId };
+    favoriteConfig: FavoriteConfig | null;
+    timezone: string;
+  };
 }
 
 /**

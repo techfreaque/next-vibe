@@ -5,22 +5,10 @@
 
 import { z } from "zod";
 
-import {
-  CHAT_MODE_IDS,
-  ChatModeOptions,
-} from "@/app/api/[locale]/agent/models/enum";
-import {
-  audioVisionModelSelectionSchema,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
-import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseField,
@@ -32,15 +20,21 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ChatModelId, ChatModelIdOptions } from "../../ai-stream/models";
+import { SearchProviderDB, SearchProviderOptions } from "../../search/enum";
 import { ViewMode, ViewModeDB, ViewModeOptions } from "../enum";
 import {
   CHAT_SETTINGS_GET_ALIAS,
   CHAT_SETTINGS_UPDATE_ALIAS,
 } from "./constants";
 import { scopedTranslation } from "./i18n";
+
+const ChatSettingsWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.ChatSettingsWidget })),
+);
 
 /**
  * Get Chat Settings Endpoint (GET)
@@ -87,93 +81,17 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.boolean(),
       }),
-      voiceModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: voiceModelSelectionSchema.nullable(),
-      }),
-      sttModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: sttModelSelectionSchema.nullable().optional(),
-      }),
-      imageVisionModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: imageVisionModelSelectionSchema.nullable().optional(),
-      }),
-      videoVisionModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: videoVisionModelSelectionSchema.nullable().optional(),
-      }),
-      audioVisionModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: audioVisionModelSelectionSchema.nullable().optional(),
-      }),
-      imageGenModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: imageGenModelSelectionSchema.nullable().optional(),
-      }),
-      musicGenModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: musicGenModelSelectionSchema.nullable().optional(),
-      }),
-      videoGenModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: videoGenModelSelectionSchema.nullable().optional(),
-      }),
-      defaultChatMode: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.enum(CHAT_MODE_IDS).optional(),
-      }),
       viewMode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(ViewModeDB),
       }),
-      availableTools: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z
-          .array(
-            z.object({
-              toolId: z.string(),
-              requiresConfirmation: z.boolean().default(false),
-            }),
-          )
-          .nullable(),
-      }),
-      pinnedTools: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z
-          .array(
-            z.object({
-              toolId: z.string(),
-              requiresConfirmation: z.boolean().default(false),
-            }),
-          )
-          .nullable(),
-      }),
 
-      // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
-      compactTrigger: responseField(scopedTranslation, {
+      // Preferred web search provider. null = auto-detect
+      searchProvider: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.number().int().nullable(),
-      }),
-
-      // Memory budget limit (null = use DEFAULT_MEMORY_BUDGET = 4000 chars)
-      memoryLimit: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.number().int().nullable(),
+        schema: z.enum(SearchProviderDB).nullable(),
       }),
 
       // Coding agent provider (admin-only). null = "claude-code"
@@ -181,6 +99,50 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(["claude-code", "open-code"]).nullable(),
+      }),
+
+      // Dreaming pulse settings
+      dreamerEnabled: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean(),
+      }),
+      dreamerFavoriteId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().nullable(),
+      }),
+      dreamerSchedule: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string(),
+      }),
+      dreamerPrompt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().nullable(),
+      }),
+
+      // Autopilot pulse settings
+      autopilotEnabled: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean(),
+      }),
+      autopilotFavoriteId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().nullable(),
+      }),
+      autopilotSchedule: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string(),
+      }),
+      autopilotPrompt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().nullable(),
       }),
     },
   }),
@@ -236,13 +198,17 @@ const { GET } = createEndpoint({
         selectedSkill: "default",
         activeFavoriteId: null,
         ttsAutoplay: false,
-        voiceModelSelection: null,
         viewMode: ViewMode.LINEAR,
-        availableTools: null,
-        pinnedTools: null,
-        compactTrigger: null,
-        memoryLimit: null,
+        searchProvider: null,
         codingAgent: null,
+        dreamerEnabled: false,
+        dreamerFavoriteId: null,
+        dreamerSchedule: "0 2 * * *",
+        dreamerPrompt: null,
+        autopilotEnabled: false,
+        autopilotFavoriteId: null,
+        autopilotSchedule: "0 8 * * 1-5",
+        autopilotPrompt: null,
       },
     },
   },
@@ -268,12 +234,14 @@ const { POST } = createEndpoint({
 
   aliases: [CHAT_SETTINGS_UPDATE_ALIAS],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.container.title" as const,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "data" },
+  fields: customWidgetObject({
+    render: ChatSettingsWidget,
+    noFormElement: true,
+    usage: { request: "data" } as const,
     children: {
+      backButton: backButton(scopedTranslation, {
+        usage: { request: "data" },
+      }),
       selectedModel: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -303,70 +271,6 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.boolean().optional(),
       }),
-      voiceModelSelection: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.ttsVoice.label" as const,
-        columns: 6,
-        schema: voiceModelSelectionSchema.nullable().optional(),
-      }),
-      sttModelSelection: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.sttModel.label" as const,
-        columns: 6,
-        schema: sttModelSelectionSchema.nullable().optional(),
-      }),
-      imageVisionModelSelection: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.imageVisionModel.label" as const,
-        columns: 6,
-        schema: imageVisionModelSelectionSchema.nullable().optional(),
-      }),
-      videoVisionModelSelection: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.videoVisionModel.label" as const,
-        columns: 6,
-        schema: videoVisionModelSelectionSchema.nullable().optional(),
-      }),
-      audioVisionModelSelection: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.audioVisionModel.label" as const,
-        columns: 6,
-        schema: audioVisionModelSelectionSchema.nullable().optional(),
-      }),
-      imageGenModelSelection: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.imageGenModel.label" as const,
-        columns: 6,
-        schema: imageGenModelSelectionSchema.nullable().optional(),
-      }),
-      musicGenModelSelection: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.musicGenModel.label" as const,
-        columns: 6,
-        schema: musicGenModelSelectionSchema.nullable().optional(),
-      }),
-      videoGenModelSelection: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.videoGenModel.label" as const,
-        columns: 6,
-        schema: videoGenModelSelectionSchema.nullable().optional(),
-      }),
-      defaultChatMode: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "post.defaultChatMode.label" as const,
-        options: ChatModeOptions,
-        columns: 6,
-        schema: z.enum(CHAT_MODE_IDS).optional(),
-      }),
       viewMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -375,57 +279,15 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.enum(ViewModeDB).optional(),
       }),
-      availableTools: requestField(scopedTranslation, {
+      // Preferred web search provider. null = auto-detect
+      searchProvider: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.availableTools.label" as const,
-        columns: 12,
-        schema: z
-          .array(
-            z.object({
-              toolId: z.string(),
-              requiresConfirmation: z.boolean().default(false),
-            }),
-          )
-          .nullable()
-          .optional(),
-      }),
-      pinnedTools: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.pinnedTools.label" as const,
-        columns: 12,
-        schema: z
-          .array(
-            z.object({
-              toolId: z.string(),
-              requiresConfirmation: z.boolean().default(false),
-            }),
-          )
-          .nullable()
-          .optional(),
-      }),
-
-      // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
-      // Hidden from default widget - rendered via CompactTriggerEdit in custom UI
-      compactTrigger: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.NUMBER,
-        label: "post.compactTrigger.label" as const,
-        hidden: true,
+        fieldType: FieldDataType.SELECT,
+        label: "post.searchProvider.label" as const,
+        description: "post.searchProvider.description" as const,
         columns: 6,
-        schema: z.number().int().min(1000).max(200000).nullable().optional(),
-      }),
-
-      // Memory budget limit (null = use DEFAULT_MEMORY_BUDGET = 4000 chars)
-      memoryLimit: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.NUMBER,
-        label: "post.memoryLimit.label" as const,
-        description: "post.memoryLimit.description" as const,
-        hidden: true,
-        columns: 6,
-        schema: z.number().int().min(100).max(100000).nullable().optional(),
+        options: SearchProviderOptions,
+        schema: z.enum(SearchProviderDB).nullable().optional(),
       }),
 
       // Coding agent provider (admin-only). null = "claude-code" (default)
@@ -447,6 +309,66 @@ const { POST } = createEndpoint({
           },
         ],
         schema: z.enum(["claude-code", "open-code"]).nullable().optional(),
+      }),
+
+      // Dreaming pulse settings
+      dreamerEnabled: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.dreaming.toggle.label" as const,
+        columns: 12,
+        schema: z.boolean().optional(),
+      }),
+      dreamerFavoriteId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.dreaming.favoriteId.label" as const,
+        columns: 6,
+        schema: z.string().nullable().optional(),
+      }),
+      dreamerSchedule: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.dreaming.schedule.label" as const,
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+      dreamerPrompt: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.dreaming.prompt.label" as const,
+        columns: 12,
+        schema: z.string().nullable().optional(),
+      }),
+
+      // Autopilot pulse settings
+      autopilotEnabled: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.autopilot.toggle.label" as const,
+        columns: 12,
+        schema: z.boolean().optional(),
+      }),
+      autopilotFavoriteId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.autopilot.favoriteId.label" as const,
+        columns: 6,
+        schema: z.string().nullable().optional(),
+      }),
+      autopilotSchedule: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.autopilot.schedule.label" as const,
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+      autopilotPrompt: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.autopilot.prompt.label" as const,
+        columns: 12,
+        schema: z.string().nullable().optional(),
       }),
     },
   }),
@@ -499,11 +421,6 @@ const { POST } = createEndpoint({
     requests: {
       update: {
         ttsAutoplay: true,
-        sttModelSelection: undefined,
-        imageVisionModelSelection: undefined,
-        videoVisionModelSelection: undefined,
-        audioVisionModelSelection: undefined,
-        defaultChatMode: undefined,
       },
     },
   },
@@ -517,8 +434,9 @@ export type ChatSettingsGetResponseOutput = typeof GET.types.ResponseOutput;
 export type ChatSettingsUpdateRequestInput = typeof POST.types.RequestInput;
 export type ChatSettingsUpdateRequestOutput = typeof POST.types.RequestOutput;
 export type ChatSettingsUpdateResponseOutput = typeof POST.types.ResponseOutput;
-export type ToolConfigItem = NonNullable<
-  ChatSettingsUpdateRequestInput["availableTools"]
->[number];
+export interface ToolConfigItem {
+  toolId: string;
+  requiresConfirmation: boolean;
+}
 const definitions = { GET, POST };
 export default definitions;

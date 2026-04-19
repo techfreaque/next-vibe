@@ -2592,6 +2592,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             const confirmResult = await runHeadlessAiStream({
               prompt: "",
               favoriteId: mainFavoriteId,
+              favoriteConfig: null,
               threadId,
               rootFolderId: DefaultFolderId.CRON,
               subAgentDepth: 0,
@@ -3701,6 +3702,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const result = await runHeadlessAiStream({
             prompt: "[C2 incognito] Reply with exactly: INCOGNITO_TEST",
             favoriteId: mainFavoriteId,
+            favoriteConfig: null,
             rootFolderId: DefaultFolderId.INCOGNITO,
             subAgentDepth: 0,
             user: testUser,

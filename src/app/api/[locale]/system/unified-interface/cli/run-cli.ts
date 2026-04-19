@@ -8,6 +8,11 @@
 import { Command } from "commander";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+// environment must be imported BEFORE @/config/constants — it sets NODE_ENV=production
+// at module load time for preview mode (vibe start/build/rebuild), and constants.ts
+// reads NODE_ENV to compute cookie name suffixes.
+import { type EnvironmentResult, loadEnvironment } from "./runtime/environment";
+
 import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
 import { DEFAULT_PROJECT_URL } from "@/config/constants";
 import { enableMcpSilentMode } from "@/config/debug";
@@ -27,7 +32,6 @@ import {
 import { createEndpointLogger } from "../shared/logger/server-logger";
 import { Platform } from "../shared/types/platform";
 import { scopedTranslation as cliScopedTranslation } from "./i18n";
-import { type EnvironmentResult, loadEnvironment } from "./runtime/environment";
 import {
   ErrorHandler,
   setupGlobalErrorHandlers,
@@ -495,6 +499,14 @@ export function runCli({
             process.off("SIGINT", sigintHandler);
           });
           performanceMonitor.mark("routeEnd");
+
+          // If aborted (Ctrl+C), skip rendering and exit cleanly with no output
+          if (cliAbortController.signal.aborted) {
+            await cliResourceManager.cleanupAndExit(logger, debug ?? false, {
+              success: true,
+            });
+            return;
+          }
 
           performanceMonitor.mark("renderStart");
           if (result.formattedOutput && command !== "mcp") {

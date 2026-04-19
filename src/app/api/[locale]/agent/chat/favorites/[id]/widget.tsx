@@ -58,6 +58,7 @@ import {
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
 } from "@/app/api/[locale]/agent/ai-stream/constants";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import {
   getBestChatModel,
   type ChatModelId,
@@ -199,8 +200,8 @@ export function FavoriteEditContainer({
   const favoriteCharacterModelSelection: ChatModelSelection | undefined =
     favoriteGetEndpoint.read?.data?.characterModelSelection ?? undefined;
 
-  const variantId = favoriteGetEndpoint.read?.data?.variantId;
-  const characterEndpoint = useSkill(skillId ?? "", user, logger);
+  const { skillId: baseSkillId, variantId } = parseSkillId(skillId ?? "");
+  const characterEndpoint = useSkill(baseSkillId, user, logger);
   const characterData = characterEndpoint.read?.data;
   const characterVariant = variantId
     ? characterData?.variants?.find((v) => v.id === variantId)
@@ -452,7 +453,6 @@ export function FavoriteEditContainer({
       favoriteId: activatingFavoriteId,
       modelId,
       skillId: currentSkillId,
-      voiceId: favorite?.voiceId ?? null,
       logger,
       locale,
       user,
@@ -1240,6 +1240,7 @@ export function FavoriteEditContainer({
                   }
                   label={t("patch.slotOverride.label")}
                   user={user}
+                  locale={locale}
                 />
               )}
 
@@ -1532,7 +1533,6 @@ function SaveAndUseButton({
           favoriteId,
           modelId,
           skillId: favoriteData.skillId || null,
-          voiceId: favoriteData.voiceId ?? null,
           logger,
           locale,
           user,

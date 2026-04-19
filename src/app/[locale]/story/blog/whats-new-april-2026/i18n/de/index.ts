@@ -103,7 +103,7 @@ export const translations = {
 
   skills: {
     title: "{{skillCount}} Skills. Jeder Geschmack. Für jede Aufgabe.",
-    p1: "Ein Skill ist ein vollständiges AI-Setup auf Knopfdruck: Persönlichkeit, Anweisungen, welches Modell welche Aufgabe übernimmt, Stimme, Bildgenerierungs-Einstellungen. Du wählst einen Skill, alles konfiguriert sich selbst.",
+    p1: "Ein Skill ist ein vollständiges AI-Setup auf Knopfdruck: Persönlichkeit, Anweisungen, welches Modell welche Aufgabe übernimmt, Stimme, Bildgenerierungs-Einstellungen. Du wählst ein Skill, alles konfiguriert sich selbst.",
     p2: "Das Angebot ist breit - medizinisches Reasoning, unzensierte Debatte, kreatives Schreiben, Geschäftsanalyse, Coding. Jedes Skill hat mehrere Varianten: für Geschwindigkeit, Tiefe, Budget oder ohne jede Einschränkung.",
     p3: "Drei Wege, deinen eigenen zu bauen: manuell auf der Skill-Seite, Thea oder Hermes beim Brainstorming fragen, oder - als Entwickler - deinen Agenten eine skill.ts direkt generieren lassen.",
   },
@@ -111,11 +111,11 @@ export const translations = {
   skillEconomy: {
     title: "Skill bauen. Link teilen. Monatlich verdienen.",
     p1: "Skills sind teilbar. Wer über deinen Link ein Konto eröffnet, zahlt dir 10 % wiederkehrend - jeden Monat, solange er abonniert ist.",
-    p2: '"Hier ist eine KI, die mit dir spricht wie ein erfahrener Arzt-Kollege" ist ein viel besserer Grund, einen Link zu teilen als "hier ist eine AI-Plattform." Der Skill ist konkret, nützlich und persönlich. Deshalb wird er geteilt.',
+    p2: '"Hier ist eine KI, die mit dir spricht wie ein erfahrener Arzt-Kollege" ist ein viel besserer Grund, einen Link zu teilen als "hier ist eine AI-Plattform." Das Skill ist konkret, nützlich und persönlich. Deshalb wird es geteilt.',
     examplesLabel: "Skills, die wirklich Geld einbringen könnten",
     example1Title: "Der Lernbegleiter fürs Medizinstudium",
     example1Body:
-      "Ein Medizinstudent baut einen Skill, der wie ein erfahrener Kollege spricht - Fälle, Differentialdiagnosen, klinisches Denken, kein Vorbeten. In Medizin-Foren geteilt. Jede Anmeldung zahlt monatlich.",
+      "Ein Medizinstudent baut ein Skill, das wie ein erfahrener Kollege spricht - Fälle, Differentialdiagnosen, klinisches Denken, kein Vorbeten. In Medizin-Foren geteilt. Jede Anmeldung zahlt monatlich.",
     example2Title: "Das eigentliche Produkt des Wissensverkäufers",
     example2Body:
       "Coaches, Berater, Kursersteller haben PDFs und Zoom-Calls verkauft. Ein gut gestalteter Skill mit echtem Fachwissen bringt wiederkehrendes Einkommen ohne den Aufwand. Besser als ein Kurs.",

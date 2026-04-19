@@ -119,6 +119,7 @@ function ReadOnlyMessages(): React.JSX.Element {
         onStartAnswer={null}
         answerAsAI={null}
         onCancelAction={null}
+        onCancelQueued={null}
         editingMessageId={null}
         retryingMessageId={null}
         answeringMessageId={null}

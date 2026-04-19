@@ -1,0 +1,11 @@
+{
+  "type": "text",
+  "url": "http://127.0.0.1:3001/ws/broadcast",
+  "status": 200,
+  "headers": {
+    "content-length": "2",
+    "content-type": "text/plain;charset=utf-8",
+    "date": "Sun, 19 Apr 2026 15:51:30 GMT"
+  },
+  "body": "ok"
+}

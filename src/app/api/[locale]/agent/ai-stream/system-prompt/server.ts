@@ -1,11 +1,13 @@
 import "server-only";
 
-import { count, eq } from "drizzle-orm";
+import { and, count, eq, like } from "drizzle-orm";
 
 import { FEATURED_MODELS } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
-import { memories as memoriesTable } from "@/app/api/[locale]/agent/chat/memories/db";
+import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
+import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
+import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import {
   ProductIds,
@@ -92,8 +94,14 @@ export async function loadPromptContextData(
           .limit(1),
         db
           .select({ count: count() })
-          .from(memoriesTable)
-          .where(eq(memoriesTable.userId, userId)),
+          .from(cortexNodes)
+          .where(
+            and(
+              eq(cortexNodes.userId, userId),
+              eq(cortexNodes.nodeType, CortexNodeType.FILE),
+              like(cortexNodes.path, `${MEMORIES_PREFIX}/%`),
+            ),
+          ),
         db
           .select({ count: count() })
           .from(cronTasksTable)

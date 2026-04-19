@@ -5,9 +5,8 @@
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -27,11 +26,9 @@ export interface RetryMessageDeps {
   settings: {
     selectedModel: ChatModelId;
     selectedSkill: string;
-    availableTools: ToolConfigItem[] | null;
-    pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
-    voiceModelSelection: VoiceModelSelection | null | undefined;
   };
+  favoriteConfig: FavoriteConfig | null;
   setLeafMessageId?: (messageId: string) => void;
   locale: CountryLanguage;
 }

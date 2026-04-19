@@ -32,12 +32,13 @@ export const translations: typeof enTranslations = {
       roleplay: "Rollenspiel",
       education: "Bildung",
       controversial: "Kontrovers",
+      background: "Hintergrund",
       custom: "Benutzerdefiniert",
     },
     source: {
       all: "Alle",
       builtIn: "Eingebaut",
-      my: "Meine Charaktere",
+      my: "Meine",
       community: "Community",
     },
     ownershipType: {
@@ -434,6 +435,9 @@ export const translations: typeof enTranslations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Unzensiert",
+        oracle: "Orakel",
+        elonTusk: "Elon Tusk",
+        vision: "Vision",
       },
     },
     hermes: {
@@ -451,6 +455,49 @@ export const translations: typeof enTranslations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Unzensiert",
+        oracle: "Orakel",
+        elonTusk: "Elon Tusk",
+        vision: "Vision",
+      },
+    },
+    theaDreamer: {
+      name: "Thea · Träumerin",
+      description:
+        "Theas Traumzustand — pflegt deinen Cortex im Schlaf und bringt Ordnung in den Tag.",
+      tagline: "Nächtliche Ordnung",
+      shortDesc: "Hintergrund-Cortex-Pflege",
+      suggestedPrompts: {
+        0: "Was hast du letzte Nacht organisiert?",
+        1: "Zeig mir, welche Erinnerungen du konsolidiert hast",
+        2: "Welche Muster hast du in meiner letzten Arbeit gefunden?",
+        3: "Worauf soll ich mich heute konzentrieren?",
+      },
+      variants: {
+        brilliant: "Brilliant",
+        uncensored: "Unzensiert",
+        oracle: "Orakel",
+        elonTusk: "Elon Tusk",
+        vision: "Vision",
+      },
+    },
+    hermesAutopilot: {
+      name: "Hermes · Autopilot",
+      description:
+        "Hermes im Ausführungsmodus — treibt deine aktiven Projekte voran, während du weg bist.",
+      tagline: "Immer vorwärts",
+      shortDesc: "Hintergrund-Projektausführung",
+      suggestedPrompts: {
+        0: "Was hast du erledigt, während ich weg war?",
+        1: "Welche Aufgaben sind noch in Bearbeitung?",
+        2: "Wo hast du aufgehört?",
+        3: "Was braucht meine Entscheidung, bevor du weitermachen kannst?",
+      },
+      variants: {
+        brilliant: "Brilliant",
+        uncensored: "Unzensiert",
+        oracle: "Orakel",
+        elonTusk: "Elon Tusk",
+        vision: "Vision",
       },
     },
     quickWriter: {
@@ -903,11 +950,11 @@ export const translations: typeof enTranslations = {
       },
     },
     researchAgent: {
-      name: "Recherche-Agent",
+      name: "Web-Agent",
       description:
-        "Web-Recherche-Spezialist mit Such-, Abruf- und Erinnerungs-Tools für Informationssammlung und -synthese",
-      tagline: "Finden & Zusammenfassen",
-      shortDesc: "Web-Recherche und Informationssammlung",
+        "Durchsucht das Web, liest Seiten, gleicht Quellen ab. Merkt sich Ergebnisse über Sitzungen hinweg. Nutzt Browser-Tools wenn verfügbar.",
+      tagline: "Suchen · Lesen · Prüfen",
+      shortDesc: "Websuche, URL-Auswertung und Faktencheck",
       suggestedPrompts: {
         0: "Recherchiere die neuesten Entwicklungen in der KI-Regulierung",
         1: "Finde und fasse wichtige Fakten zu einem Thema zusammen",
@@ -915,8 +962,11 @@ export const translations: typeof enTranslations = {
         3: "Erstelle ein Recherche-Briefing mit Quellenangaben",
       },
       variants: {
-        gemini: "Gemini",
-        fast: "Schnell",
+        kimi: "Schnäppchenhirn",
+        gemini: "Googles Musterkind",
+        flash: "Koffein-Praktikant",
+        grok: "Durchgeknallter Bibliothekar",
+        claude: "Überdenk-Maschine",
       },
     },
     statsAnalyst: {
@@ -1052,7 +1102,10 @@ export const translations: typeof enTranslations = {
       },
       variants: {
         kimi: "Kimi",
-        budget: "Budget",
+        claudeCodeOpus: "Claude Code Opus",
+        claudeCodeSonnet: "Claude Code Sonnet",
+        claudeSonnet: "Claude Sonnet",
+        claudeOpus: "Claude Opus",
       },
     },
     skillCreator: {
@@ -1072,6 +1125,25 @@ export const translations: typeof enTranslations = {
         fast: "Schnell",
         cheapAndSmart: "Günstig & Schlau",
         brilliant: "Brilliant",
+      },
+    },
+    heilpraktikerPruefung: {
+      name: "HP-Prüfungstrainer",
+      description:
+        "Realistische mündliche Heilpraktikerprüfung mit adaptivem Schwierigkeitsgrad",
+      tagline: "Mündliche Prüfung",
+      shortDesc: "Heilpraktiker-Prüfungsvorbereitung",
+      suggestedPrompts: {
+        0: "Starten wir die Prüfung",
+        1: "Prüfe mich in Innerer Medizin",
+        2: "Stelle mir einen klinischen Fall vor",
+        3: "Fragen zur Gesetzeskunde bitte",
+      },
+      variants: {
+        smart: "Ausgewogen",
+        precise: "Präzise",
+        thorough: "Gründlich",
+        quick: "Schnell",
       },
     },
     qualityTester: {
@@ -1174,6 +1246,7 @@ export const translations: typeof enTranslations = {
         inUse: "In Verwendung",
         chooseFavorite: "Favorit wählen",
         selectFavorite: "Wähle einen Favoriten zum Aktivieren:",
+        addVariant: "Variante hinzufügen",
       },
     },
     section: {
@@ -1486,10 +1559,6 @@ export const translations: typeof enTranslations = {
       label: "Video-Generierungsmodell",
       description: "Modell zur Videoerstellung",
       placeholder: "Systemstandard",
-    },
-    defaultChatMode: {
-      label: "Standard-Chat-Modus",
-      description: "Standardmodus beim Öffnen dieses Chats",
     },
     suggestedPrompts: {
       label: "Vorgeschlagene Prompts",

@@ -29,9 +29,6 @@ interface ChatState {
   threads: Record<string, ChatThread>;
   folders: Record<string, ChatFolder>;
 
-  // UI state
-  isLoading: boolean;
-
   // Tracks threads created this session that haven't been persisted to server yet.
   // Prevents useLazyBranchLoader from fetching messages for brand-new threads (404).
   pendingNewThreadIds: Set<string>;
@@ -53,9 +50,6 @@ interface ChatState {
   // Thread load mode
   setThreadLoadMode: (threadId: string, mode: "full" | "partial") => void;
 
-  // Loading state
-  setLoading: (loading: boolean) => void;
-
   // Pending new threads
   markThreadPendingCreate: (threadId: string) => void;
   clearThreadPendingCreate: (threadId: string) => void;
@@ -72,7 +66,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
   // Initial state
   threads: {},
   folders: {},
-  isLoading: false,
   threadLoadMode: {},
   pendingNewThreadIds: new Set<string>(),
 
@@ -186,11 +179,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }),
 
   // Loading state
-  setLoading: (loading: boolean): void =>
-    set({
-      isLoading: loading,
-    }),
-
   // Pending new threads
   markThreadPendingCreate: (threadId: string): void =>
     set((state) => ({
@@ -212,7 +200,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set({
       threads: {},
       folders: {},
-      isLoading: false,
       threadLoadMode: {},
     });
   },

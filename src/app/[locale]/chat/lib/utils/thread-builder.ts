@@ -65,11 +65,9 @@ export function buildMessagePath(
   const byId = new Map<string, ChatMessage>(messages.map((m) => [m.id, m]));
 
   // Build a map of children for each message (sorted by timestamp).
-  // Exclude optimistic placeholders — they are ephemeral and must not create
-  // false branches while the real server message arrives with the same parentId.
   const childrenMap = new Map<string, ChatMessage[]>();
   for (const msg of messages) {
-    if (msg.parentId && !msg.metadata?.isOptimistic) {
+    if (msg.parentId) {
       const siblings = childrenMap.get(msg.parentId) ?? [];
       siblings.push(msg);
       childrenMap.set(msg.parentId, siblings);
@@ -101,6 +99,19 @@ export function buildMessagePath(
     }
     reversePath.reverse();
 
+    // Continue walking DOWN from the leaf to include children (e.g. optimistic
+    // assistant placeholder). Uses the same latest-child logic as the fallback path.
+    let downCur = leafMessageId;
+    while (downCur) {
+      const children = childrenMap.get(downCur);
+      if (!children || children.length === 0) {
+        break;
+      }
+      const child = children[children.length - 1]!;
+      reversePath.push(child);
+      downCur = child.id;
+    }
+
     // Build branchInfo so the branch navigator renders correctly.
     // Only record real branches - parallel tool calls in a single AI step share
     // the same sequenceId and must NOT trigger the branch navigator.
@@ -122,11 +133,7 @@ export function buildMessagePath(
     const oldest = reversePath[0];
     if (oldest) {
       const rootMessages = messages
-        .filter(
-          (msg) =>
-            !msg.metadata?.isOptimistic &&
-            (!msg.parentId || !messageIds.has(msg.parentId)),
-        )
+        .filter((msg) => !msg.parentId || !messageIds.has(msg.parentId))
         .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
       if (rootMessages.length > 1 && isRealBranch(rootMessages)) {
         const rootIdx = rootMessages.findIndex((r) => r.id === oldest.id);
@@ -142,13 +149,8 @@ export function buildMessagePath(
 
   // Fallback: no leafMessageId - traverse DOWN from roots using branchIndices.
   // Find ALL root messages: messages with no parent OR whose parent is not in the current window.
-  // Exclude optimistic placeholders from root detection too.
   const rootMessages = messages
-    .filter(
-      (msg) =>
-        !msg.metadata?.isOptimistic &&
-        (!msg.parentId || !messageIds.has(msg.parentId)),
-    )
+    .filter((msg) => !msg.parentId || !messageIds.has(msg.parentId))
     .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
   if (rootMessages.length === 0) {

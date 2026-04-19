@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
     emptyState: {
       title: "Skill oder Favorit auswählen",
       description:
-        "Wähle unten einen Skill oder lade einen gespeicherten Favoriten. Das Modell wird automatisch aufgelöst.",
+        "Wähle unten ein Skill oder lade einen gespeicherten Favoriten. Das Modell wird automatisch aufgelöst.",
     },
   },
 };

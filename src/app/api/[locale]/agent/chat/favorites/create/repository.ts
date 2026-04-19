@@ -26,7 +26,12 @@ import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-
 import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { ensureUniqueSlug, generateFavoriteSlug } from "../../slugify";
+import {
+  ensureUniqueSlug,
+  formatSkillId,
+  generateFavoriteSlug,
+  parseSkillId,
+} from "../../slugify";
 import { DEFAULT_SKILLS } from "../../skills/config";
 import { SkillsRepository } from "../../skills/repository";
 import favoritesDefinitions from "../definition";
@@ -136,11 +141,16 @@ export class FavoritesCreateRepository {
         });
       }
 
+      // Parse merged "skillSlug__variantId" format into separate parts
+      const { skillId: resolvedSkillId, variantId: parsedVariantId } =
+        parseSkillId(data.skillId);
+      const effectiveVariantId = parsedVariantId;
+
       // Get character to compare defaults
       let character = null;
-      if (data.skillId) {
+      if (resolvedSkillId) {
         const characterResult = await SkillsRepository.getSkillById(
-          { id: data.skillId },
+          { id: resolvedSkillId },
           user,
           logger,
           locale,
@@ -173,24 +183,19 @@ export class FavoritesCreateRepository {
       );
       let musicGenModelSelectionToStore = data.musicGenModelSelection ?? null;
       let videoGenModelSelectionToStore = data.videoGenModelSelection ?? null;
-      let defaultChatModeToStore =
-        character && data.defaultChatMode === character.defaultChatMode
-          ? null
-          : (data.defaultChatMode ?? null);
-
-      // If a variantId is provided, resolve model selections from the variant.
+      // If a variantId is provided (from merged skillId), resolve model selections from the variant.
       // Explicit fields from the request override variant defaults.
       let modelSelectionToStore = data.modelSelection;
-      if (data.variantId && data.skillId) {
+      if (effectiveVariantId && resolvedSkillId) {
         const skillResult = await SkillsRepository.getSkillById(
-          { id: data.skillId },
+          { id: resolvedSkillId },
           user,
           logger,
           locale,
         );
         if (skillResult.success) {
           const variant = skillResult.data.variants.find(
-            (v) => v.id === data.variantId,
+            (v) => v.id === effectiveVariantId,
           );
           if (variant) {
             if (!modelSelectionToStore) {
@@ -246,9 +251,6 @@ export class FavoritesCreateRepository {
             ) {
               videoGenModelSelectionToStore = variant.videoGenModelSelection;
             }
-            if (!defaultChatModeToStore && variant.defaultChatMode) {
-              defaultChatModeToStore = variant.defaultChatMode;
-            }
           }
         }
       }
@@ -263,13 +265,13 @@ export class FavoritesCreateRepository {
 
       // Generate slug for this favorite
       const skillSlug = FavoritesCreateRepository.resolveSkillSlug(
-        data.skillId,
+        resolvedSkillId,
         character?.name ?? null,
       );
       const baseSlug = generateFavoriteSlug({
         customVariantName: data.customVariantName,
         skillSlug,
-        variantId: data.variantId,
+        variantId: effectiveVariantId,
       });
       // Ensure uniqueness within this user's favorites
       const existingSlugs = await db
@@ -291,8 +293,8 @@ export class FavoritesCreateRepository {
         .values({
           userId,
           slug,
-          skillId: data.skillId,
-          variantId: data.variantId ?? null,
+          skillId: resolvedSkillId,
+          variantId: effectiveVariantId ?? null,
           customVariantName: data.customVariantName || null,
           customIcon: null,
           voiceModelSelection: voiceToStore,
@@ -303,7 +305,6 @@ export class FavoritesCreateRepository {
           imageGenModelSelection: imageGenModelSelectionToStore,
           musicGenModelSelection: musicGenModelSelectionToStore,
           videoGenModelSelection: videoGenModelSelectionToStore,
-          defaultChatMode: defaultChatModeToStore,
           modelSelection: modelSelectionToStore,
           compactTrigger: data.compactTrigger ?? null,
           availableTools: data.availableTools ?? null,
@@ -327,8 +328,8 @@ export class FavoritesCreateRepository {
         logger,
         user,
       );
-      const variantForDisplay = data.variantId
-        ? character?.variants?.find((v) => v.id === data.variantId)
+      const variantForDisplay = effectiveVariantId
+        ? character?.variants?.find((v) => v.id === effectiveVariantId)
         : (character?.variants?.find((v) => v.isDefault) ??
           character?.variants?.[0] ??
           null);
@@ -336,8 +337,10 @@ export class FavoritesCreateRepository {
         ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
           {
             id: favorite.slug || favorite.id,
-            skillId: favorite.skillId,
-            variantId: favorite.variantId ?? null,
+            skillId: formatSkillId(
+              favorite.skillId,
+              favorite.variantId ?? null,
+            ),
             customVariantName: favorite.customVariantName ?? null,
             customIcon: null,
             voiceModelSelection: voiceToStore,

@@ -346,7 +346,6 @@ export class UnifiedTaskRunnerRepository {
           pendingTimeoutMs: undefined,
           leafMessageId: undefined,
           skillId: undefined,
-          modelId: undefined,
           favoriteId: undefined,
           headless: undefined,
           subAgentDepth: 0,
@@ -355,10 +354,6 @@ export class UnifiedTaskRunnerRepository {
           callerCallbackMode: undefined,
           onEscalatedTaskCancel: undefined,
           escalateToTask: undefined,
-          imageGenModelSelection: undefined,
-          musicGenModelSelection: undefined,
-          videoGenModelSelection: undefined,
-          variantId: undefined,
           isRevival: undefined,
 
           providerOverride: undefined,

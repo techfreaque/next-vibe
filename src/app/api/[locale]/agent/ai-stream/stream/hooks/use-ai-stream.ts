@@ -6,6 +6,9 @@
  *
  * All WS event handling (deltas, stream lifecycle, etc.) is owned
  * by useMessagesSubscription in the messages widget.
+ *
+ * Streaming state is derived from the framework's cache (streamingState
+ * on messagesDefinition.GET), NOT from this hook.
  */
 
 import { toast } from "next-vibe-ui/hooks/use-toast";
@@ -36,8 +39,6 @@ import { useAIStreamStore } from "./store";
 export interface UseAIStreamReturn {
   startStream: (data: AiStreamPostRequestOutput) => Promise<boolean>;
   cancelStream: (threadId: string) => Promise<void>;
-  isStreaming: boolean;
-  isStreamingThread: (threadId: string) => boolean;
 }
 
 /**
@@ -54,23 +55,20 @@ export function useAIStream(): UseAIStreamReturn {
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const { t } = useMemo(() => scopedTranslation.scopedT(locale), [locale]);
-  // Select only actions (stable across renders) and the minimal state needed
-  const storeStartStream = useAIStreamStore((s) => s.startStream);
-  const storeStopStream = useAIStreamStore((s) => s.stopStream);
   const storeSetAborting = useAIStreamStore((s) => s.setAborting);
-  const isStreaming = useAIStreamStore((s) => s.isStreaming);
-  const isStreamingThread = useAIStreamStore((s) => s.isStreamingThread);
+  const storeClearThread = useAIStreamStore((s) => s.clearThread);
   const streamMutation = useApiMutation(definitions.POST, logger, user);
   const cancelMutation = useApiMutation(cancelEndpoints.POST, logger, user);
 
   /**
    * Start an AI stream.
    *
-   * 1. Registers stream in store (so isStreaming becomes true)
+   * 1. Pre-warms WS channel
    * 2. Makes the POST request (fire-and-forget on server)
    * 3. On HTTP error, adds error message to chat and cleans up
    *
    * WS subscription is handled by useMessagesSubscription (always-on).
+   * Streaming state is tracked by the framework via WS events — not here.
    */
   const startStream = useCallback(
     async (data: AiStreamPostRequestOutput): Promise<boolean> => {
@@ -80,26 +78,16 @@ export function useAIStream(): UseAIStreamReturn {
       const audioQueue = getAudioQueue();
       audioQueue.stop();
 
-      // Generate stream ID and register in store (per-thread)
-      const streamId = crypto.randomUUID();
-      storeStartStream(threadId, streamId);
-
-      // ================================================================
       // Pre-warm the WS channel BEFORE the POST so the connection is
       // established by the time the server starts emitting events.
-      // Without this, the first WS event arrives before the client has
-      // opened the socket, causing a ~1s reconnect delay.
-      // ================================================================
       if (threadId) {
         preWarmChannel(buildMessagesChannel(threadId));
       }
 
-      // ================================================================
       // Make the POST request via useApiMutation (type-safe, handles
       // FormData automatically when File objects are present).
       // The server fires-and-forgets the stream - POST returns immediately.
       // WS events (handled by useMessagesSubscription) drive all UI updates.
-      // ================================================================
       logger.info("Making AI stream request", {
         operation: data.operation,
         model: data.model,
@@ -137,7 +125,6 @@ export function useAIStream(): UseAIStreamReturn {
           duration: Infinity,
         });
 
-        storeStopStream(threadId);
         return false;
       }
 
@@ -166,18 +153,17 @@ export function useAIStream(): UseAIStreamReturn {
           duration: Infinity,
         });
 
-        storeStopStream(threadId);
         return false;
       }
 
       // POST returned successfully - stream is now running on the server.
-      // WS events will drive all UI updates. STREAM_FINISHED will clean up.
+      // WS events will drive all UI updates. stream-finished will clean up.
       logger.info("Stream triggered successfully (fire-and-forget)", {
         threadId,
       });
       return true;
     },
-    [logger, storeStartStream, storeStopStream, t, streamMutation],
+    [logger, t, streamMutation],
   );
 
   /**
@@ -185,8 +171,8 @@ export function useAIStream(): UseAIStreamReturn {
    *
    * 1. Calls the server-side cancel endpoint (triggers AbortErrorHandler for credits).
    * 2. Stops audio playback immediately.
-   * 3. Sets drain mode in store so delta events are suppressed.
-   * 4. WS STREAM_FINISHED event (handled by useMessagesSubscription) does final cleanup.
+   * 3. Sets aborting state so the stop button shows a spinner.
+   * 4. WS stream-finished event (handled by framework + onEvent) does final cleanup.
    */
   const cancelStream = useCallback(
     async (threadId: string): Promise<void> => {
@@ -195,7 +181,7 @@ export function useAIStream(): UseAIStreamReturn {
       // Stop audio immediately
       getAudioQueue().stop();
 
-      // Set aborting + drain mode - shows spinner on stop button, suppresses deltas
+      // Set aborting - shows spinner on stop button until stream-finished arrives
       storeSetAborting(threadId, true);
 
       // Call server-side cancel endpoint via typesafe mutation
@@ -212,8 +198,8 @@ export function useAIStream(): UseAIStreamReturn {
             threadId,
           });
 
-          // Even if cancel endpoint fails, stop the UI
-          storeStopStream(threadId);
+          // Even if cancel endpoint fails, clear aborting UI
+          storeClearThread(threadId);
         }
       } catch (error) {
         logger.error("Failed to call cancel endpoint", {
@@ -221,20 +207,18 @@ export function useAIStream(): UseAIStreamReturn {
           threadId,
         });
 
-        // Even if cancel endpoint fails, stop the UI
-        storeStopStream(threadId);
+        // Even if cancel endpoint fails, clear aborting UI
+        storeClearThread(threadId);
       }
 
-      // Server will send STREAM_FINISHED which triggers final cleanup
-      // via useMessagesSubscription.
+      // Server will send stream-finished which triggers final cleanup
+      // via useMessagesSubscription + onEvent handler.
     },
-    [logger, storeSetAborting, storeStopStream, cancelMutation],
+    [logger, storeSetAborting, storeClearThread, cancelMutation],
   );
 
   return {
     startStream,
     cancelStream,
-    isStreaming,
-    isStreamingThread,
   };
 }

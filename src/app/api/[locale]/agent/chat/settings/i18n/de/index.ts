@@ -74,60 +74,38 @@ export const translations: typeof enTranslations = {
     ttsAutoplay: {
       label: "TTS Autoplay",
     },
-    ttsVoice: {
-      label: "TTS Stimme",
-    },
-    voiceModelSelection: {
-      label: "Sprachmodell",
-      placeholder: "Systemstandard",
-    },
-    sttModel: {
-      label: "Sprache-zu-Text-Modell",
-      placeholder: "Systemstandard",
-    },
-    imageVisionModel: {
-      label: "Bild-Vision-Modell",
-      placeholder: "Systemstandard",
-    },
-    videoVisionModel: {
-      label: "Video-Vision-Modell",
-      placeholder: "Systemstandard",
-    },
-    audioVisionModel: {
-      label: "Audio-Vision-Modell",
-      placeholder: "Systemstandard",
-    },
-    imageGenModel: {
-      label: "Bildgenerierungsmodell",
-      placeholder: "Systemstandard",
-    },
-    musicGenModel: {
-      label: "Musikgenerierungsmodell",
-      placeholder: "Systemstandard",
-    },
-    videoGenModel: {
-      label: "Video-Generierungsmodell",
-      placeholder: "Systemstandard",
-    },
-    defaultChatMode: {
-      label: "Standard-Chat-Modus",
-    },
     viewMode: {
       label: "Ansichtsmodus",
     },
-    availableTools: {
-      label: "Erlaubte Tools",
-    },
-    pinnedTools: {
-      label: "Angeheftete Tools",
-    },
-    compactTrigger: {
-      label: "Komprimierungsauslöser (Token)",
-    },
-    memoryLimit: {
-      label: "Speicherlimit (Token)",
+    contextMemory: {
+      title: "Kontextgedächtnis",
       description:
-        "Maximale Gesamttoken des Speicherinhalts pro Runde. Leer lassen für den Systemstandard (1000 Token).",
+        "Wie weit die KI sich im Gespräch zurückerinnert, bevor ältere Nachrichten zusammengefasst werden.",
+      costNote: "Weniger = günstiger",
+      costExplain:
+        "(bis zu einem gewissen Punkt) – du tauschst etwas Gedächtnis gegen niedrigere Kosten pro Nachricht.",
+      tooltipTitle: "Wie viel Gesprächsverlauf die KI behält",
+      tooltipBody:
+        "Wenn das Gespräch dieses Limit überschreitet, werden ältere Nachrichten automatisch zusammengefasst. Die KI bleibt kohärent, verbraucht aber weniger Token – und spart Kosten.",
+      tooltipModelCap: "Das aktuelle Modell unterstützt bis zu {cap} Token.",
+      default: "Standard",
+      tokens: "Token",
+      modelMax: "Modell-Maximum",
+      resetToDefault: "Auf Standard zurücksetzen ({value})",
+      cheaper: "günstiger",
+      moreMemory: "mehr Gedächtnis",
+      barCheap: "Niedrigere Kosten · kürzeres Gedächtnis",
+      barBalanced: "Ausgewogene Kosten & Gedächtnis",
+      barRich: "Reicheres Gedächtnis · höhere Kosten",
+      barMax: "Maximales Gedächtnis · höchste Kosten",
+      tools: "Tools",
+      toolsInherited: "geerbt",
+    },
+    searchProvider: {
+      label: "Suchanbieter",
+      description:
+        "Deine bevorzugte Suchmaschine. Auto wählt den günstigsten verfügbaren Anbieter.",
+      auto: "Automatisch",
     },
     codingAgent: {
       label: "Coding-Agent",
@@ -137,6 +115,68 @@ export const translations: typeof enTranslations = {
         claudeCode: "Claude Code (Standard)",
         openCode: "OpenCode",
       },
+    },
+    dreaming: {
+      title: "Träumen",
+      description:
+        "Die KI sortiert deinen Kopf im Schlaf — konsolidiert Erinnerungen, räumt Dokumente auf, hebt hervor, was zählt.",
+      toggle: {
+        label: "Träumen aktivieren",
+      },
+      schedule: {
+        label: "Zeitplan",
+        options: {
+          nightlyAt2: "2:00 Uhr täglich",
+          weekdaysAt2: "2:00 Uhr werktags",
+          weekdaysAt8: "8:00 Uhr werktags",
+          every6h: "Alle 6 Stunden",
+          every12h: "Alle 12 Stunden",
+        },
+      },
+      favoriteId: {
+        label: "Favoriten-Slot",
+        defaultOption: "Standard (Thea)",
+      },
+      prompt: {
+        label: "Session-Anweisung",
+        placeholder:
+          "Worauf soll sich Thea in dieser Session konzentrieren? Leer lassen für den Standard.",
+        defaultPrompt:
+          "Starte deine Träum-Session. Reorganisiere und konsolidiere den Cortex — Erinnerungen, Dokumente, Threads. Hinterlasse alles sauberer und geordneter.",
+      },
+      lastRun: "Letzter Lauf:",
+      neverRun: "Noch nie ausgeführt",
+    },
+    autopilot: {
+      title: "Autopilot",
+      description:
+        "Die KI arbeitet deine Warteschlange ab, während du weg bist — nächste Schritte, laufende Projekte, Aufgaben im Rückstand.",
+      toggle: {
+        label: "Autopilot aktivieren",
+      },
+      schedule: {
+        label: "Zeitplan",
+        options: {
+          nightlyAt2: "2:00 Uhr täglich",
+          weekdaysAt2: "2:00 Uhr werktags",
+          weekdaysAt8: "8:00 Uhr werktags",
+          every6h: "Alle 6 Stunden",
+          every12h: "Alle 12 Stunden",
+        },
+      },
+      favoriteId: {
+        label: "Favoriten-Slot",
+        defaultOption: "Standard (Thea)",
+      },
+      prompt: {
+        label: "Session-Anweisung",
+        placeholder:
+          "Worauf soll sich Hermes in dieser Session konzentrieren? Leer lassen für den Standard.",
+        defaultPrompt:
+          "Starte deine Autopilot-Session. Mach weiter, wo aktive Projekte stehen — nächste Schritte vorantreiben, Warteschlange abarbeiten, Dinge in Bewegung halten.",
+      },
+      lastRun: "Letzter Lauf:",
+      neverRun: "Noch nie ausgeführt",
     },
     errors: {
       validation: {

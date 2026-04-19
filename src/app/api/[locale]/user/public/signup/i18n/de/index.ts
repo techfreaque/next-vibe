@@ -95,6 +95,18 @@ export const translations: typeof enTranslations = {
       descriptionPrefilled:
         "Dein Freund wird belohnt, wenn du ein Konto erstellst.",
     },
+    supportedSkillId: {
+      label: "Creator unterstützen",
+      description:
+        "Deine Registrierung bringt dem Ersteller dieses Skills +5% auf deine Abonnements.",
+      selectorTitle: "Creator unterstützen",
+      selectorDescription:
+        "Du hast Skills von unabhängigen Creators in deine Favoriten aufgenommen. Wähle einen zum Unterstützen — er erhält +5% aus deinen Abonnements. Du kannst das jederzeit ändern.",
+      selectorNone: "Keinen (überspringen)",
+    },
+    localFavorites: {
+      label: "Lokale Favoriten",
+    },
   },
   form: {
     title: "Willkommen bei Uncensored AI",
@@ -343,7 +355,8 @@ export const translations: typeof enTranslations = {
     },
     free: {
       title: "Was du kostenlos bekommst, für immer:",
-      credits: "{{freeCredits}} Credits pro Monat - keine Karte, kein Ablaufdatum",
+      credits:
+        "{{freeCredits}} Credits pro Monat - keine Karte, kein Ablaufdatum",
       allModels: "Zugriff auf alle {{modelCount}} KI-Modelle",
       uncensored:
         "4 unzensierte Modelle, die deine Fragen wirklich beantworten",

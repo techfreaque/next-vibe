@@ -104,8 +104,8 @@ export async function sendTestRequest<
     const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
     // Build the tool name from endpoint path and method
-    // Format: "user/public/login/POST"
-    const toolName = `${endpoint.path.join("/")}/${endpoint.method}`;
+    // Format: "user_public_login_POST" (underscores match generated route-handlers.ts)
+    const toolName = `${endpoint.path.join("_")}_${endpoint.method}`;
 
     // Execute using the shared route execution executor
     // This is the same infrastructure used by CLI, MCP, and AI tools
@@ -124,7 +124,6 @@ export async function sendTestRequest<
         threadId: undefined,
         aiMessageId: undefined,
         skillId: undefined,
-        modelId: undefined,
         headless: undefined,
         subAgentDepth: 0,
         currentToolMessageId: undefined,
@@ -138,10 +137,6 @@ export async function sendTestRequest<
         callerCallbackMode: undefined,
         onEscalatedTaskCancel: undefined,
         escalateToTask: undefined,
-        imageGenModelSelection: undefined,
-        musicGenModelSelection: undefined,
-        videoGenModelSelection: undefined,
-        variantId: undefined,
         isRevival: undefined,
 
         providerOverride: undefined,

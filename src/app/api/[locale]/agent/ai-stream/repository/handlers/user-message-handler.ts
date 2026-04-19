@@ -211,7 +211,7 @@ export class UserMessageHandler {
         threadId,
         role: effectiveRole,
         content: effectiveContent,
-        parentId: effectiveParentMessageId ?? null,
+        parentId: effectiveParentMessageId || null,
         userId,
         authorName,
         logger,

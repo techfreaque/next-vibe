@@ -60,6 +60,8 @@ import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
+import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
@@ -93,6 +95,7 @@ import {
 import { useVoiceRecording } from "../hooks/use-voice-recording";
 import { useVoiceRuntimeState } from "../hooks/voice-mode/store";
 import { Selector } from "./selector";
+import { CortexButton } from "@/app/api/[locale]/agent/cortex/widget/cortex-button";
 import { ToolsButton } from "./tools-button";
 import { useInputHandlers } from "./use-input-handlers";
 
@@ -125,7 +128,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   );
 
   // Chat store
-  const isLoading = useChatStore((s) => s.isLoading);
   const threads = useChatStore((s) => s.threads);
   const folders = useChatStore((s) => s.folders);
   const activeThread = activeThreadId
@@ -240,20 +242,31 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       ({
         selectedModel: effectiveSettings.selectedModel ?? null,
         selectedSkill: effectiveSettings.selectedSkill,
-        availableTools: effectiveSettings.availableTools,
-        pinnedTools: effectiveSettings.pinnedTools,
         ttsAutoplay: effectiveSettings.ttsAutoplay,
-        voiceModelSelection: effectiveSettings.voiceModelSelection,
       }) satisfies MessageOperationsDeps["settings"],
     [
       effectiveSettings.selectedModel,
       effectiveSettings.selectedSkill,
-      effectiveSettings.availableTools,
-      effectiveSettings.pinnedTools,
       effectiveSettings.ttsAutoplay,
-      effectiveSettings.voiceModelSelection,
     ],
   );
+
+  // Build FavoriteConfig for public users from localStorage
+  // Signed-in users: server loads from DB via activeFavoriteId, so send null
+  const favoriteConfig = useMemo((): FavoriteConfig | null => {
+    if (!user.isPublic) {
+      return null;
+    }
+    const activeFavId = effectiveSettings.activeFavoriteId;
+    if (!activeFavId) {
+      return null;
+    }
+    const stored = ChatFavoritesRepositoryClient.loadLocalFavorite(activeFavId);
+    if (!stored) {
+      return null;
+    }
+    return ChatFavoritesRepositoryClient.buildLocalFavoriteConfig(stored);
+  }, [user.isPublic, effectiveSettings.activeFavoriteId]);
 
   const messageOpsDeps = useMemo(() => {
     return {
@@ -264,6 +277,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       currentSubFolderId,
       leafMessageId,
       settings: messageOpSettings,
+      favoriteConfig,
     } satisfies MessageOperationsDeps;
   }, [
     aiStartStream,
@@ -273,6 +287,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     currentSubFolderId,
     leafMessageId,
     messageOpSettings,
+    favoriteConfig,
   ]);
 
   // Message operations
@@ -285,7 +300,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const inputHandlers = useInputHandlers({
     input,
     attachments,
-    isLoading,
     sendMessage: sendMessageWithStreamNotify,
     setInput,
     locale,
@@ -316,7 +330,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
 
   const currentModel = getChatModelById(selectedModel);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
-  const isInputDisabled = isLoading || !canPost;
+  // Allow typing during streaming — queued messages can be sent while AI is active
+  const isInputDisabled = !canPost;
 
   // Model-type-aware UI
   // Chat stream pipeline only handles chat models; image/audio go through separate endpoints.
@@ -338,21 +353,21 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const canAcceptImages =
     currentModel?.inputs?.includes("image") === true ||
     !!getBestImageVisionModel(
-      effectiveSettings.imageVisionModelSelection ??
+      favoriteConfig?.imageVisionModelSelection ??
         DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       user,
     );
   const canAcceptVideo =
     currentModel?.inputs?.includes("video") === true ||
     !!getBestVideoVisionModel(
-      effectiveSettings.videoVisionModelSelection ??
+      favoriteConfig?.videoVisionModelSelection ??
         DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       user,
     );
   const canAcceptAudio =
     currentModel?.inputs?.includes("audio") === true ||
     !!getBestAudioVisionModel(
-      effectiveSettings.audioVisionModelSelection ??
+      favoriteConfig?.audioVisionModelSelection ??
         DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       user,
     );
@@ -450,7 +465,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   // streamingState from messages cache is the authoritative signal (driven by WS events).
   // "waiting" = stream ended but a background task is still in flight (set by streaming-state-changed WS event).
   const cacheStreamingState = messagesQuery.data?.streamingState;
-  const isActivelyStreaming = isLoading || cacheStreamingState === "streaming";
+  const isActivelyStreaming = cacheStreamingState === "streaming";
   const isWaiting = cacheStreamingState === "waiting";
   const showStopButton =
     isActivelyStreaming || isAborting || isWaiting || voiceRuntime.isSpeaking;
@@ -528,6 +543,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
         isProcessing={voice.isProcessing}
         stream={voice.stream}
         hasExistingInput={voice.hasExistingInput}
+        existingInputText={input}
         onCancel={voice.cancelRecording}
         onTogglePause={voice.togglePause}
         onTranscribeToInput={voice.transcribeToInput}
@@ -724,8 +740,10 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           />
 
           {modelSupportsTools && (
-            <ToolsButton disabled={isLoading} locale={locale} />
+            <ToolsButton disabled={false} locale={locale} />
           )}
+
+          <CortexButton disabled={isInputDisabled} locale={locale} />
 
           {showFileUpload && (
             <FileUploadButton
@@ -829,8 +847,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
             </TooltipProvider>
           )}
 
-          {/* Send / Stop button */}
-          {showStopButton ? (
+          {/* Stop button (visible when streaming) */}
+          {showStopButton && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -856,30 +874,29 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          ) : (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="default"
-                    disabled={
-                      !canPost ||
-                      (!input.trim() &&
-                        !voice.isRecording &&
-                        !voice.isProcessing)
-                    }
-                    onClick={handleSmartSend}
-                    className="h-8 w-8 @sm:h-9 @sm:w-9"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{t("actions.sendMessage")}</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
           )}
+
+          {/* Send button (always visible when input has content) */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="default"
+                  disabled={
+                    !canPost ||
+                    (!input.trim() && !voice.isRecording && !voice.isProcessing)
+                  }
+                  onClick={handleSmartSend}
+                  className="h-8 w-8 @sm:h-9 @sm:w-9"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t("actions.sendMessage")}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </Div>
       </Div>
 

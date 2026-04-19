@@ -153,6 +153,32 @@ export class RouteExecuteRepository {
 
       const { input } = data;
 
+      // Resolve the active chat model from the favorite/skill cascade.
+      // Stored in wakeUpModelId so resume-stream can use it for revival.
+      const userId = !user.isPublic && "id" in user ? user.id : undefined;
+      const { resolveFavoriteConfig } =
+        await import("@/app/api/[locale]/agent/chat/favorites/repository");
+      const { resolveSkillVariant } =
+        await import("@/app/api/[locale]/agent/chat/skills/resolver");
+      const { resolveChatModelId } =
+        await import("@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver");
+      const execFav = await resolveFavoriteConfig(
+        streamContext.favoriteId,
+        userId,
+      );
+      const { parseSkillId } =
+        await import("@/app/api/[locale]/agent/chat/slugify");
+      const execSkill = await resolveSkillVariant(
+        streamContext.skillId,
+        execFav ? parseSkillId(execFav.skillId).variantId : null,
+      );
+      const resolvedModelId = resolveChatModelId(
+        execFav?.modelSelection ?? undefined,
+        execSkill?.modelSelection ?? undefined,
+        user,
+        streamContext.providerOverride,
+      );
+
       // Remote execution path - create a one-shot task for the target instance
       // Circuit breaker: headless streams (resume-stream revival) must not create
       // new remote WAIT tasks - this causes an infinite loop where each revival
@@ -390,7 +416,7 @@ export class RouteExecuteRepository {
                 wakeUpThreadId: effectiveThreadId,
                 wakeUpToolMessageId: effectiveToolMessageId ?? null,
                 wakeUpLeafMessageId: streamContext.leafMessageId ?? null,
-                wakeUpModelId: streamContext.modelId ?? null,
+                wakeUpModelId: resolvedModelId,
                 wakeUpSkillId: streamContext.skillId ?? null,
                 wakeUpFavoriteId: streamContext.favoriteId ?? null,
                 wakeUpSubAgentDepth: streamContext.subAgentDepth ?? 0,
@@ -438,7 +464,7 @@ export class RouteExecuteRepository {
                   status: CronTaskStatus.COMPLETED,
                   output: directResult,
                   taskId: directTaskId,
-                  modelId: streamContext.modelId ?? null,
+                  modelId: resolvedModelId,
                   skillId: streamContext.skillId ?? null,
                   favoriteId: streamContext.favoriteId ?? null,
                   leafMessageId: streamContext.leafMessageId ?? null,
@@ -496,7 +522,7 @@ export class RouteExecuteRepository {
           wakeUpCallbackMode: callbackMode,
           wakeUpThreadId: effectiveThreadId ?? null,
           wakeUpToolMessageId: effectiveToolMessageId ?? null,
-          wakeUpModelId: streamContext.modelId ?? null,
+          wakeUpModelId: resolvedModelId,
           wakeUpSkillId: streamContext.skillId ?? null,
           wakeUpFavoriteId: streamContext.favoriteId ?? null,
           wakeUpLeafMessageId: streamContext.leafMessageId ?? null,
@@ -952,7 +978,7 @@ export class RouteExecuteRepository {
           wakeUpCallbackMode: CallbackMode.WAKE_UP,
           wakeUpThreadId: effectiveThreadId ?? null,
           wakeUpToolMessageId: effectiveToolMessageId ?? null,
-          wakeUpModelId: streamContext.modelId ?? null,
+          wakeUpModelId: resolvedModelId,
           wakeUpSkillId: streamContext.skillId ?? null,
           wakeUpFavoriteId: streamContext.favoriteId ?? null,
           wakeUpLeafMessageId: effectiveLeafMessageId,
@@ -1129,10 +1155,7 @@ export class RouteExecuteRepository {
                         : CronTaskStatus.FAILED,
                     output: wakeUpFinalResult,
                     taskId,
-                    modelId:
-                      latestTask?.wakeUpModelId ??
-                      streamContext.modelId ??
-                      null,
+                    modelId: latestTask?.wakeUpModelId ?? null,
                     skillId:
                       latestTask?.wakeUpSkillId ??
                       streamContext.skillId ??
@@ -1227,7 +1250,6 @@ export class RouteExecuteRepository {
           pendingTimeoutMs: undefined,
           leafMessageId: undefined,
           skillId: undefined,
-          modelId: undefined,
           favoriteId: undefined,
           headless: undefined,
           subAgentDepth: 0,

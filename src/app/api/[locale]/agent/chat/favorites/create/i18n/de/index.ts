@@ -30,11 +30,8 @@ export const translations: typeof enTranslations = {
     },
     skillId: {
       label: "Charakter",
-      description: "Wählen Sie den Charakter für diesen Favoriten",
-    },
-    variantId: {
-      label: "Variante",
-      description: "Skill-Variante (z.B. brilliant, günstig, unzensiert)",
+      description:
+        'Skill-ID im kombinierten Format: „skillSlug" für die Standardvariante, „skillSlug__variantId" für eine bestimmte Variante (z.B. „thea__brilliant"). Skill-Liste abfragen, um verfügbare IDs zu sehen.',
     },
     customVariantName: {
       label: "Benutzerdefinierter Name",
@@ -88,10 +85,6 @@ export const translations: typeof enTranslations = {
       label: "Video-Generierungsmodell",
       description: "Modell zur Videoerstellung",
       placeholder: "Von Skill erben",
-    },
-    defaultChatMode: {
-      label: "Standard-Chat-Modus",
-      description: "Standardmodus beim Öffnen dieses Chats",
     },
     mode: {
       label: "Auswahlmodus",

@@ -14,6 +14,8 @@ export const translations = {
     empty: "Brak publicznych umiejętności.",
     chat: "Czatuj teraz",
     add: "Dodaj do kolekcji",
+    public: "Społeczność",
+    showLess: "Pokaż mniej",
   },
   referral: {
     label: "Kod polecający",

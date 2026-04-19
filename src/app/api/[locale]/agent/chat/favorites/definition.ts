@@ -170,11 +170,6 @@ const { GET } = createEndpoint({
               hidden: true,
               schema: z.string(),
             }),
-            variantId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              hidden: true,
-              schema: z.string().nullable(),
-            }),
             customVariantName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
@@ -322,7 +317,6 @@ const { GET } = createEndpoint({
         favorites: [
           "id",
           "skillId",
-          "variantId",
           "customVariantName",
           "modelId",
           "voiceId",
@@ -344,7 +338,6 @@ const { GET } = createEndpoint({
         favorites: [
           "id",
           "skillId",
-          "variantId",
           "customVariantName",
           "modelId",
           "voiceId",
@@ -389,7 +382,6 @@ const { GET } = createEndpoint({
           {
             id: "550e8400-e29b-41d4-a716-446655440000",
             skillId: "default",
-            variantId: null,
             customVariantName: null,
             modelId: ChatModelId.CLAUDE_SONNET_4_5,
             voiceId: DEFAULT_TTS_VOICE_ID,

@@ -585,7 +585,34 @@ export class GenerateAllRepository {
         generatorsSkipped++;
       }
 
-      // 9. Graph Seeds Index Generator
+      // 9. Agent Docs Generator (CLAUDE.md + AGENTS.md from vibe-coder skill)
+      generatorPromises.push(
+        (async (): Promise<string | null> => {
+          try {
+            const { AgentDocsGeneratorRepository } =
+              await import("../agent-docs/repository");
+
+            const result =
+              await AgentDocsGeneratorRepository.generateAgentDocs(logger);
+
+            if (result.success) {
+              generatorsRun++;
+              return "agent-docs";
+            }
+            outputLines.push(
+              `❌ Agent docs generation failed: ${result.message || "Unknown error"}`,
+            );
+            return null;
+          } catch (error) {
+            outputLines.push(
+              `❌ Agent docs generator failed: ${parseError(error).message}`,
+            );
+            return null;
+          }
+        })(),
+      );
+
+      // 10. Graph Seeds Index Generator
       generatorPromises.push(
         (async (): Promise<string | null> => {
           try {
@@ -620,6 +647,35 @@ export class GenerateAllRepository {
         })(),
       );
 
+      // 11. Skill Embeddings Generator (pre-compute embeddings for built-in skills)
+      generatorPromises.push(
+        (async (): Promise<string | null> => {
+          try {
+            const { SkillEmbeddingsGeneratorRepository } =
+              await import("../skill-embeddings/repository");
+
+            const result =
+              await SkillEmbeddingsGeneratorRepository.generateSkillEmbeddings(
+                logger,
+              );
+
+            if (result.success) {
+              generatorsRun++;
+              return "skill-embeddings";
+            }
+            outputLines.push(
+              `❌ Skill embeddings generation failed: ${result.message || "Unknown error"}`,
+            );
+            return null;
+          } catch (error) {
+            outputLines.push(
+              `❌ Skill embeddings generator failed: ${parseError(error).message}`,
+            );
+            return null;
+          }
+        })(),
+      );
+
       // Wait for parallel generators to complete
       const results = await Promise.allSettled(generatorPromises);
       const completedGenerators: string[] = defScanResults.filter(
@@ -639,7 +695,7 @@ export class GenerateAllRepository {
         generationCompleted: true,
         output: outputLines.join("\n"),
         generationStats: {
-          totalGenerators: 11,
+          totalGenerators: 12,
           generatorsRun,
           generatorsSkipped,
           outputDirectory:

@@ -35,14 +35,13 @@ import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
+import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import characterDefinitions from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import type {
-  TtsModelId,
-  VoiceModelSelection,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
 import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
@@ -71,19 +70,6 @@ import { LinearMessageView } from "./linear-view/view";
 import { DebugLinearMessageView } from "./linear-view/view-debug";
 import { groupMessagesBySequence } from "./message-grouping";
 import { ThreadedMessage } from "./threaded-view/view";
-/**
- * Resolve a VoiceModelSelection voice selection to a TtsModelId.
- * Returns the manualModelId for MANUAL selections, undefined otherwise.
- */
-function resolveVoiceId(
-  sel: VoiceModelSelection | null | undefined,
-): TtsModelId | undefined {
-  if (sel?.selectionType === ModelSelectionType.MANUAL) {
-    return sel.manualModelId;
-  }
-  return undefined;
-}
-
 /**
  * Find compaction point indices in a message path.
  * Returns indices where messages have isCompacting = true, sorted ascending.
@@ -231,6 +217,31 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     [messagesForm, navSetLeafMessageId],
   );
 
+  // Build FavoriteConfig for public users from localStorage
+  const favoriteConfig = useMemo((): FavoriteConfig | null => {
+    if (!user.isPublic) {
+      return null;
+    }
+    const activeFavId = effectiveSettings.activeFavoriteId;
+    if (!activeFavId) {
+      return null;
+    }
+    const stored = ChatFavoritesRepositoryClient.loadLocalFavorite(activeFavId);
+    if (!stored) {
+      return null;
+    }
+    return ChatFavoritesRepositoryClient.buildLocalFavoriteConfig(stored);
+  }, [user.isPublic, effectiveSettings.activeFavoriteId]);
+
+  // Resolve voiceId from favoriteConfig for TTS playback
+  const resolvedVoiceId = useMemo((): TtsModelId | undefined => {
+    const sel = favoriteConfig?.voiceModelSelection;
+    if (sel?.selectionType === ModelSelectionType.MANUAL && sel.manualModelId) {
+      return sel.manualModelId;
+    }
+    return undefined;
+  }, [favoriteConfig?.voiceModelSelection]);
+
   // Message operations
   const messageOps = useMessageOperations({
     startStream: aiStream.startStream,
@@ -242,15 +253,28 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     settings: {
       selectedModel,
       selectedSkill: effectiveSettings.selectedSkill,
-      availableTools: effectiveSettings.availableTools,
-      pinnedTools: effectiveSettings.pinnedTools,
       ttsAutoplay: effectiveSettings.ttsAutoplay,
-      voiceModelSelection: effectiveSettings.voiceModelSelection,
     },
+    favoriteConfig,
   });
 
-  const { retryMessage, branchMessage, answerAsAI, sendMessage, voteMessage } =
-    messageOps;
+  const {
+    retryMessage,
+    branchMessage,
+    answerAsAI,
+    sendMessage,
+    deleteMessage,
+    voteMessage,
+  } = messageOps;
+
+  /** Cancel a queued message: delete it and restore its content to the input field */
+  const cancelQueuedMessage = useCallback(
+    (messageId: string, content: string) => {
+      void deleteMessage(messageId);
+      setInput(content);
+    },
+    [deleteMessage, setInput],
+  );
 
   // Loading states for branch/history operations
   const [isLoadingBranch, setIsLoadingBranch] = useState(false);
@@ -1067,9 +1091,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                     onVoteMessage={voteMessage}
                     user={user}
                     ttsAutoplay={effectiveSettings.ttsAutoplay}
-                    voiceId={resolveVoiceId(
-                      effectiveSettings.voiceModelSelection,
-                    )}
+                    voiceId={resolvedVoiceId}
                   />
                 </ErrorBoundary>
               ))
@@ -1185,11 +1207,10 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                           sendMessage={sendMessage}
                           onLoadNewerHistory={loadNewerHistory}
                           isLoadingNewerHistory={isLoadingNewerHistory}
+                          onCancelQueued={cancelQueuedMessage}
                           onVoteMessage={voteMessage}
                           ttsAutoplay={effectiveSettings.ttsAutoplay}
-                          voiceId={resolveVoiceId(
-                            effectiveSettings.voiceModelSelection,
-                          )}
+                          voiceId={resolvedVoiceId}
                         />
                       ) : (
                         <LinearMessageView
@@ -1222,11 +1243,10 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                           sendMessage={sendMessage}
                           onLoadNewerHistory={loadNewerHistory}
                           isLoadingNewerHistory={isLoadingNewerHistory}
+                          onCancelQueued={cancelQueuedMessage}
                           onVoteMessage={voteMessage}
                           ttsAutoplay={effectiveSettings.ttsAutoplay}
-                          voiceId={resolveVoiceId(
-                            effectiveSettings.voiceModelSelection,
-                          )}
+                          voiceId={resolvedVoiceId}
                         />
                       )}
                     </ErrorBoundary>

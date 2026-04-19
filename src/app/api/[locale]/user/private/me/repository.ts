@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -14,6 +14,13 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
+import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
+import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";
+import { SkillOwnershipType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import { formatSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
+import { modelProviders } from "@/app/api/[locale]/agent/models/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -31,6 +38,69 @@ import type {
   MePostResponseOutput,
 } from "./definition";
 import type { MeT } from "./i18n";
+
+/** Fetch public skills for a user, enriched with model display info */
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- inferred from complex mapped return
+async function fetchUserSkills(userId: string, viewer: JwtPayloadType) {
+  const skillRows = await db
+    .select({
+      id: customSkills.id,
+      name: customSkills.name,
+      tagline: customSkills.tagline,
+      description: customSkills.description,
+      icon: customSkills.icon,
+      category: customSkills.category,
+      modelSelection: customSkills.modelSelection,
+      ownershipType: customSkills.ownershipType,
+      voteCount: customSkills.voteCount,
+      trustLevel: customSkills.trustLevel,
+    })
+    .from(customSkills)
+    .where(
+      and(
+        eq(customSkills.userId, userId),
+        eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
+      ),
+    );
+
+  return skillRows.map((row) => {
+    const selection = row.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
+    const bestModel = getBestChatModel(selection, viewer);
+    const modelId = bestModel?.id ?? null;
+    const modelRow = bestModel
+      ? {
+          modelIcon: bestModel.icon,
+          modelInfo: getModelDisplayName(bestModel, false),
+          modelProvider:
+            modelProviders[bestModel.provider]?.name ?? bestModel.provider,
+        }
+      : {
+          modelIcon: "sparkles" as const,
+          modelInfo: "Unknown Model",
+          modelProvider: "Unknown",
+        };
+
+    return {
+      id: row.id,
+      internalId: null,
+      skillId: formatSkillId(row.id, null),
+      category: row.category,
+      icon: row.icon ?? "sparkles",
+      modelId,
+      name: row.name,
+      description: row.description,
+      tagline: row.tagline,
+      ownershipType: row.ownershipType,
+      voteCount: row.voteCount,
+      trustLevel: row.trustLevel,
+      variantId: null,
+      variantName: null,
+      isVariant: false,
+      isDefault: false,
+      ...modelRow,
+    };
+  });
+}
 
 /**
  * User Profile Repository - Static class pattern
@@ -88,10 +158,17 @@ export class UserProfileRepository {
         });
       }
 
-      logger.debug("Successfully retrieved user profile", { userId });
+      // Fetch user's public skills
+      const skills = await fetchUserSkills(userId, user);
+
+      logger.debug("Successfully retrieved user profile", {
+        userId,
+        skillCount: skills.length,
+      });
       return success({
         ...userResponse.data,
         isPublic: false as const,
+        skills,
       } as MeGetResponseOutput);
     } catch (error) {
       logger.error("Error getting user profile", parseError(error));
@@ -151,6 +228,7 @@ export class UserProfileRepository {
             createdAt: new Date(),
             updatedAt: new Date(),
             stripeCustomerId: null,
+            skills: [],
             changesSummary: {
               totalChanges: 1,
               changedFields: ["locale"],
@@ -283,8 +361,26 @@ export class UserProfileRepository {
         if (p.githubUrl !== undefined) {
           updateData.githubUrl = p.githubUrl;
         }
+        if (p.facebookUrl !== undefined) {
+          updateData.facebookUrl = p.facebookUrl;
+        }
         if (p.discordUrl !== undefined) {
           updateData.discordUrl = p.discordUrl;
+        }
+        if (p.tribeUrl !== undefined) {
+          updateData.tribeUrl = p.tribeUrl;
+        }
+        if (p.rumbleUrl !== undefined) {
+          updateData.rumbleUrl = p.rumbleUrl;
+        }
+        if (p.odyseeUrl !== undefined) {
+          updateData.odyseeUrl = p.odyseeUrl;
+        }
+        if (p.nostrUrl !== undefined) {
+          updateData.nostrUrl = p.nostrUrl;
+        }
+        if (p.gabUrl !== undefined) {
+          updateData.gabUrl = p.gabUrl;
         }
         if (p.creatorAccentColor !== undefined) {
           updateData.creatorAccentColor = p.creatorAccentColor;
@@ -351,6 +447,9 @@ export class UserProfileRepository {
         (key) => key !== "updatedAt",
       );
 
+      // Fetch user's public skills
+      const skills = await fetchUserSkills(userId, user);
+
       // Return the correct response structure with flattened user fields
       return success({
         response: {
@@ -358,6 +457,7 @@ export class UserProfileRepository {
           message: t("update.response.message"),
           ...updatedUserResponse.data,
           leadId: updatedUserResponse.data.leadId ?? null,
+          skills,
           changesSummary: {
             totalChanges: changedFields.length,
             changedFields: changedFields,

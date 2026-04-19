@@ -22,10 +22,7 @@ import {
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import {
-  getBestVideoGenModel,
-  VideoGenModelId,
-} from "@/app/api/[locale]/agent/video-generation/models";
+import { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
 import { lazy } from "react";
 
 import { VIDEO_GEN_ALIAS } from "./constants";
@@ -90,17 +87,6 @@ const { POST } = createEndpoint({
         options: [],
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
         schema: z.enum(VideoGenModelId).default(VideoGenModelId.WAN_2_7_T2V),
-        serverDefault: (ctx) => {
-          const sel = ctx.streamContext.videoGenModelSelection;
-          if (!sel || !ctx.user) {
-            return undefined;
-          }
-          return getBestVideoGenModel(
-            sel,
-            ctx.user,
-            ctx.streamContext.providerOverride,
-          )?.id;
-        },
       }),
       duration: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

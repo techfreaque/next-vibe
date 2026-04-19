@@ -169,7 +169,6 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           threadId: undefined,
           aiMessageId: undefined,
           skillId: undefined,
-          modelId: undefined,
           headless: undefined,
           subAgentDepth: 0,
           currentToolMessageId: undefined,
@@ -183,10 +182,6 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           callerCallbackMode: undefined,
           onEscalatedTaskCancel: undefined,
           escalateToTask: undefined,
-          imageGenModelSelection: undefined,
-          musicGenModelSelection: undefined,
-          videoGenModelSelection: undefined,
-          variantId: undefined,
           isRevival: undefined,
 
           providerOverride: undefined,

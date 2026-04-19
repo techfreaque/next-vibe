@@ -20,6 +20,7 @@ import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context"
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import { ChatEmptyState } from "@/app/api/[locale]/agent/chat/threads/widget/new-thread/empty-state";
+import { CortexModal } from "@/app/api/[locale]/agent/cortex/widget/cortex-modal";
 import { AIToolsModal } from "@/app/api/[locale]/agent/tools/widget/ai-tools-modal";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
@@ -199,6 +200,11 @@ function AiStreamChatArea(): JSX.Element {
             {/* AI Tools Modal */}
             <ErrorBoundary locale={locale}>
               <AIToolsModal locale={locale} user={user} />
+            </ErrorBoundary>
+
+            {/* Cortex Modal */}
+            <ErrorBoundary locale={locale}>
+              <CortexModal locale={locale} user={user} />
             </ErrorBoundary>
           </Div>
         </InputHeightProvider>

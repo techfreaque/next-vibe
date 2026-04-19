@@ -8,13 +8,13 @@ export const translations = {
   get: {
     title: "Get Creator Profile",
     description:
-      "Get public creator profile with bio, social links, and skill count",
+      "Get public creator profile with bio, social links, and skills",
     form: {
       title: "Creator Profile",
       description: "Public profile for a skill creator",
-      userId: {
-        label: "User ID",
-        description: "The creator's user ID",
+      creatorId: {
+        label: "Creator ID",
+        description: "The creator's ID or slug",
       },
     },
     response: {
@@ -29,11 +29,20 @@ export const translations = {
       instagramUrl: "Instagram",
       tiktokUrl: "TikTok",
       githubUrl: "GitHub",
+      facebookUrl: "Facebook",
       discordUrl: "Discord",
+      tribeUrl: "Tribe",
+      rumbleUrl: "Rumble",
+      odyseeUrl: "Odysee",
+      nostrUrl: "Nostr",
+      gabUrl: "Gab",
       creatorAccentColor: "Accent Color",
       creatorHeaderImageUrl: "Header Image",
-      skillCount: "Skills",
       referralCode: "Referral Code",
+      appName: "App Name",
+      leadMagnetHeadline: "Lead Magnet Headline",
+      leadMagnetButtonText: "Lead Magnet Button",
+      skills: "Skills",
     },
     errors: {
       validation: { title: "Validation Error", description: "Invalid request" },
@@ -52,6 +61,34 @@ export const translations = {
     success: {
       title: "Creator Profile",
       description: "Creator profile retrieved",
+    },
+  },
+  widget: {
+    notFound: {
+      title: "Creator not found",
+      description: "This profile doesn't exist or has been removed.",
+      back: "Back to home",
+    },
+    skills: {
+      title: "Skills",
+    },
+    referral: {
+      label: "Referral code",
+    },
+    nav: {
+      backArrow: "\u2190",
+      copyright: "\u00a9",
+    },
+    lead: {
+      headline: "Stay in the loop",
+      namePlaceholder: "Your first name",
+      emailPlaceholder: "Your email",
+      send: "Subscribe",
+      sending: "...",
+      doneHeading: "Done.",
+      doneSub: "You're on the list.",
+      finePrint: "No spam. Unsubscribe any time.",
+      error: "Something went wrong. Try again.",
     },
   },
 };

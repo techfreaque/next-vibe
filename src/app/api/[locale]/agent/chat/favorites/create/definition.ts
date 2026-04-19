@@ -12,10 +12,6 @@ import {
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
-import {
-  CHAT_MODE_IDS,
-  ChatModeOptions,
-} from "@/app/api/[locale]/agent/models/enum";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import {
@@ -47,6 +43,7 @@ import type {
   ManualModelSelection,
 } from "../../skills/create/definition";
 import { IntelligenceLevel, ModelSelectionType } from "../../skills/enum";
+import { parseSkillId } from "../../slugify";
 import { FAVORITE_CREATE_ALIAS } from "../constants";
 
 import { scopedTranslation } from "./i18n";
@@ -94,10 +91,14 @@ const { POST } = createEndpoint({
           await import("../repository-client");
 
         const characterIcon = requestData.icon;
+        // Parse merged skillId to get base skillId and variantId
+        const { skillId: resolvedSkillId, variantId: resolvedVariantId } =
+          parseSkillId(requestData.skillId ?? "");
+
         const character = apiClient.getEndpointData(
           characterSingleDefinitions.default.GET,
           logger,
-          { urlPathParams: { id: requestData.skillId } },
+          { urlPathParams: { id: resolvedSkillId } },
         );
 
         // Fall back to DEFAULT_SKILLS for built-in skills not yet in the single-fetch cache
@@ -111,14 +112,14 @@ const { POST } = createEndpoint({
           characterDescription = character.data.description ?? null;
           // Resolve modelSelection from the specific variant
           const variants = character.data.variants;
-          const variant = requestData.variantId
-            ? variants?.find((v) => v.id === requestData.variantId)
+          const variant = resolvedVariantId
+            ? variants?.find((v) => v.id === resolvedVariantId)
             : variants?.[0];
           characterModelSelection = variant?.modelSelection ?? null;
         } else {
           logger.error(
             "Failed to fetch character data in create favorite onSuccess",
-            { skillId: requestData.skillId },
+            { skillId: resolvedSkillId },
           );
           return;
         }
@@ -126,8 +127,7 @@ const { POST } = createEndpoint({
         // Create new favorite config for optimistic update
         const newFavoriteConfig = {
           id: responseData.id,
-          skillId: requestData.skillId ?? "default",
-          variantId: requestData.variantId ?? null,
+          skillId: requestData.skillId ?? "default", // merged format
           customVariantName: requestData.customVariantName ?? null,
           customIcon: null,
           voiceModelSelection: requestData.voiceModelSelection ?? null,
@@ -184,7 +184,7 @@ const { POST } = createEndpoint({
                 sections: oldData.data.sections.map((section) => ({
                   ...section,
                   skills: section.skills.map((char) =>
-                    char.id === requestData.skillId
+                    parseSkillId(char.skillId).skillId === resolvedSkillId
                       ? { ...char, addedToFav: true }
                       : char,
                   ),
@@ -212,18 +212,10 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.skillId.label" as const,
+        description: "post.skillId.description" as const,
         columns: 6,
         hidden: true,
         schema: z.string(),
-      }),
-
-      variantId: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.variantId.label" as const,
-        columns: 6,
-        hidden: true,
-        schema: z.string().nullable().optional(),
       }),
 
       customVariantName: requestField(scopedTranslation, {
@@ -309,20 +301,6 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: videoGenModelSelectionSchema.nullable().optional(),
       }),
-      defaultChatMode: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: ChatModeOptions,
-        label: "post.defaultChatMode.label" as const,
-        description: "post.defaultChatMode.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-        schema: z.enum(CHAT_MODE_IDS).nullable().optional(),
-      }),
-
       modelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,

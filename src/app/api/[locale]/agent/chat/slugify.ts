@@ -58,6 +58,53 @@ export function isUuid(value: string): boolean {
   return UUID_REGEX.test(value);
 }
 
+// ============================================================
+// SKILL ID MERGED FORMAT: "skillSlug__variantId"
+// Double-underscore separator — URL-safe, can't appear in a slug
+// ============================================================
+
+export const SKILL_VARIANT_SEPARATOR = "__";
+
+/**
+ * Split a merged skill ID ("skillSlug__variantId") into its parts.
+ * If no separator is present, variantId is null (use default variant).
+ *
+ * Examples:
+ *   "thea"             → { skillId: "thea", variantId: null }
+ *   "thea__brilliant"  → { skillId: "thea", variantId: "brilliant" }
+ */
+export function parseSkillId(raw: string): {
+  skillId: string;
+  variantId: string | null;
+} {
+  const idx = raw.indexOf(SKILL_VARIANT_SEPARATOR);
+  if (idx === -1) {
+    return { skillId: raw, variantId: null };
+  }
+  return {
+    skillId: raw.slice(0, idx),
+    variantId: raw.slice(idx + SKILL_VARIANT_SEPARATOR.length) || null,
+  };
+}
+
+/**
+ * Compose a merged skill ID from skill and variant parts.
+ * Returns just skillId if no variantId.
+ *
+ * Examples:
+ *   ("thea", null)        → "thea"
+ *   ("thea", "brilliant") → "thea__brilliant"
+ */
+export function formatSkillId(
+  skillId: string,
+  variantId?: string | null,
+): string {
+  if (!variantId) {
+    return skillId;
+  }
+  return `${skillId}${SKILL_VARIANT_SEPARATOR}${variantId}`;
+}
+
 /**
  * Generate a favorite slug from skill + variant info
  * Format: "{skillSlug}-{variantSlug}" or just "{customName}" slugified

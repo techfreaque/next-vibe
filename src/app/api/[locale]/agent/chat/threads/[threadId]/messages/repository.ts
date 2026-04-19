@@ -191,11 +191,16 @@ export class MessagesRepository {
       mimeType: string;
       size: number;
     }>;
+    /** Extra metadata to merge into the message (e.g. isQueued, queuedSettings) */
+    extraMetadata?: Partial<NonNullable<ChatMessage["metadata"]>>;
   }): Promise<void> {
-    const metadata =
-      params.attachments && params.attachments.length > 0
+    const metadata = {
+      ...(params.attachments && params.attachments.length > 0
         ? { attachments: params.attachments }
-        : undefined;
+        : {}),
+      ...(params.extraMetadata ?? {}),
+    };
+    const hasMetadata = Object.keys(metadata).length > 0;
 
     // Verify parent exists - the client may reference an optimistic message that was never
     // committed (e.g. stream interrupted mid-flight). Fall back to the actual last committed
@@ -238,7 +243,7 @@ export class MessagesRepository {
       authorId: params.userId ?? null,
       authorName: params.authorName ?? null,
       isAI: false,
-      metadata,
+      metadata: hasMetadata ? metadata : undefined,
     });
 
     // Update thread's updatedAt and bubble activity to parent folder
@@ -612,8 +617,17 @@ export class MessagesRepository {
       });
 
       // Return messages directly - let type system handle transformations
+      // Use the DB streamingState so clients reconnecting mid-stream see the real state
+      // instead of always "idle" (which hides active sub-agent streams after page refresh).
+      const dbStreamingState = thread.streamingState;
+      // Only expose "idle" or "streaming" from the GET endpoint.
+      // "aborting" is a transient server-side state that maps to "streaming" for the client.
+      // "waiting" stays as-is since it means a background task is in flight.
+      const effectiveStreamingState =
+        dbStreamingState === "aborting" ? "streaming" : dbStreamingState;
+
       return success({
-        streamingState: "idle" as const,
+        streamingState: effectiveStreamingState,
         messages,
         backgroundTasks,
       });

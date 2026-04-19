@@ -21,6 +21,7 @@ import type {
   ChatModelSelection,
 } from "../../../ai-stream/models";
 import type { VoiceModelSelection } from "../../../text-to-speech/models";
+import { parseSkillId } from "../../slugify";
 import characterSingleDefinitions from "../../skills/[id]/definition";
 import { ChatFavoritesRepositoryClient } from "../repository-client";
 import favoritesDefinition, {
@@ -84,9 +85,8 @@ export interface SkillDataForFavorite {
 }
 
 export interface UseAddToFavoritesOptions {
+  /** Skill ID, optionally merged with variant: "skillSlug" or "skillSlug__variantId" */
   skillId: string;
-  /** Variant id to store alongside skillId (null/undefined = skill default) */
-  variantId?: string | null;
   logger: EndpointLogger;
   user: JwtPayloadType;
   locale: CountryLanguage;
@@ -112,7 +112,6 @@ export interface UseAddToFavoritesReturn {
  */
 export function useAddToFavorites({
   skillId,
-  variantId,
   logger,
   user,
   locale,
@@ -126,6 +125,9 @@ export function useAddToFavorites({
     setIsLoading(true);
 
     try {
+      // Parse merged skillId ("skillSlug" or "skillSlug__variantId") to get plain skillId for lookups
+      const { skillId: plainSkillId } = parseSkillId(skillId);
+
       // Get character data - use provided data, cache, or fetch
       let fullChar: SkillDataForFavorite | undefined = characterData;
 
@@ -135,13 +137,13 @@ export function useAddToFavorites({
           characterSingleDefinitions.GET,
           logger,
           {
-            urlPathParams: { id: skillId },
+            urlPathParams: { id: plainSkillId },
           },
         );
 
         if (cachedData?.success) {
           fullChar = {
-            id: skillId,
+            id: plainSkillId,
             icon: cachedData.data.icon,
             name: cachedData.data.name,
             tagline: cachedData.data.tagline,
@@ -156,7 +158,7 @@ export function useAddToFavorites({
             logger,
             user,
             undefined,
-            { id: skillId },
+            { id: plainSkillId },
             locale,
           );
 
@@ -166,7 +168,7 @@ export function useAddToFavorites({
           }
 
           fullChar = {
-            id: skillId,
+            id: plainSkillId,
             icon: characterResponse.data.icon,
             name: characterResponse.data.name,
             tagline: characterResponse.data.tagline,
@@ -187,7 +189,7 @@ export function useAddToFavorites({
       // Capture for closure
       const charData = fullChar;
 
-      // Create the favorite
+      // Create the favorite — pass skillId as-is (merged format handled server-side)
       const createFavoriteDefinition = await import("./definition");
       const createResponse = await apiClient.mutate(
         createFavoriteDefinition.default.POST,
@@ -195,7 +197,6 @@ export function useAddToFavorites({
         user,
         {
           skillId: skillId,
-          variantId: variantId ?? null,
           icon: charData.icon ?? undefined,
           voiceModelSelection: null,
           modelSelection: null,
@@ -209,12 +210,36 @@ export function useAddToFavorites({
         return;
       }
 
-      // Optimistically update favorites list
+      // For public users: attribute UUID skillId on their lead + track last in localStorage
+      if (
+        user.isPublic &&
+        /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(
+          plainSkillId,
+        )
+      ) {
+        // Track last favorited UUID skill with name (last wins before signup)
+        const { ChatFavoritesRepositoryClient: FavClient } =
+          await import("../repository-client");
+        FavClient.setLastAttributedSkillId(plainSkillId, charData.name ?? null);
+
+        void (async (): Promise<void> => {
+          const leadSkillDef =
+            await import("@/app/api/[locale]/leads/skill/definition");
+          void apiClient.mutate(
+            leadSkillDef.default.PATCH,
+            logger,
+            user,
+            { skillId: plainSkillId },
+            undefined,
+            locale,
+          );
+        })();
+      }
+
       const favoritesListDefinition = await import("../definition");
       const newFavoriteConfig = {
         id: createResponse.data.id,
-        skillId: skillId,
-        variantId: variantId ?? null,
+        skillId, // merged format
         customIcon: null,
         voiceModelSelection: null,
         modelSelection: null,

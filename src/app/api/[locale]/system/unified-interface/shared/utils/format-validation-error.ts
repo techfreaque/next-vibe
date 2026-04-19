@@ -66,7 +66,7 @@ export interface ValidationErrorData {
   /** Raw example values from endpoint definition */
   exampleValues: Record<string, WidgetData>;
   /** Already-provided input values (for --interactive pre-fill) */
-  inputData: Record<string, string>;
+  inputData: Record<string, WidgetData>;
 }
 
 /**
@@ -76,7 +76,7 @@ export interface ValidationErrorData {
 export function parseValidationError(
   messageParams: Record<string, string | number> | undefined,
   endpoint?: CreateApiEndpointAny | null,
-  inputData?: Record<string, string>,
+  inputData?: Record<string, WidgetData>,
 ): ValidationErrorData | null {
   if (
     !messageParams ||
@@ -159,7 +159,7 @@ export function formatValidationErrorDetails(
   messageParams: Record<string, string | number> | undefined,
   endpoint: CreateApiEndpointAny | null | undefined,
   /** Already-provided input values - used to pre-fill the --interactive hint */
-  inputData?: Record<string, string> | undefined,
+  inputData?: Record<string, WidgetData> | undefined,
 ): string | null {
   const data = parseValidationError(messageParams, endpoint, inputData);
   if (!data) {

@@ -173,7 +173,7 @@ export const translations = {
     newCta: "Deinen Empfehlungslink holen",
     proTitle: "Skill-Link — {{skillPct}} pro Nutzer",
     proBody:
-      "Skill bauen. Link teilen. Jeder, der sich darüber anmeldet, zahlt dir {{directPct}} direkt + {{skillBonusPct}} Skill-Bonus = {{skillPct}} pro Nutzer, wiederkehrend. Keine Follower nötig.",
+      "Skill bauen. Link teilen. Jeder, der sich darüber anmeldet, zahlt dir {{directPct}} direkt + {{skillBonusPct}} Skill-Bonus = {{skillPct}} pro Nutzer, wiederkehrend. Noch besser: Die {{skillBonusPct}} gehören dir als Skill-Autor, auch wenn jemand anderes deinen Skill teilt. Die Plattform trackt Skill-Autorenschaft - passive Attribution ohne extra Aufwand.",
     proCta: "Skill bauen",
   },
   discord: {

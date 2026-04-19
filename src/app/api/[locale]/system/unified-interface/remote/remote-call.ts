@@ -151,7 +151,6 @@ export async function executeRemote<T>(
       headers,
       body:
         definition.method === Methods.GET ? undefined : JSON.stringify(data),
-      redirect: "manual",
     });
 
     const { t } = sharedScopedTranslation.scopedT(locale);

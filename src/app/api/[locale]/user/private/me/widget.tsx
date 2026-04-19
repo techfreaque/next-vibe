@@ -4,7 +4,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "next-vibe-ui/ui/avatar";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Input } from "next-vibe-ui/ui/input";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { Camera } from "next-vibe-ui/ui/icons/Camera";
 import { Check } from "next-vibe-ui/ui/icons/Check";
@@ -19,6 +18,7 @@ import { SiDiscord } from "next-vibe-ui/ui/icons/SiDiscord";
 import { SiGithub } from "next-vibe-ui/ui/icons/SiGithub";
 import { Twitter } from "next-vibe-ui/ui/icons/Twitter";
 import { Youtube } from "next-vibe-ui/ui/icons/Youtube";
+import { Input } from "next-vibe-ui/ui/input";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { H2, P } from "next-vibe-ui/ui/typography";
@@ -31,24 +31,25 @@ import {
   useState,
 } from "react";
 
-import { envClient } from "@/config/env-client";
-import configDef from "@/app/api/[locale]/lead-magnet/config/definition";
-import {
-  SkillOwnershipType,
-  SkillSourceFilter,
-} from "@/app/api/[locale]/agent/chat/skills/enum";
-import skillsDef from "@/app/api/[locale]/agent/chat/skills/definition";
+import { buildScopedPaletteStyle } from "@/app/[locale]/creator/[userId]/_shared/palette-generator";
 import {
   DEFAULT_ACCENT,
   ProfileBio,
   ProfileHero,
-  ProfileSkillsSection,
   ProfileSocialPills,
 } from "@/app/[locale]/creator/[userId]/_shared/profile-content";
+import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import skillsDef from "@/app/api/[locale]/agent/chat/skills/definition";
+import { SkillOwnershipType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
+import { CollapsibleSkillSection } from "@/app/api/[locale]/agent/chat/skills/widget";
+import configDef from "@/app/api/[locale]/lead-magnet/config/definition";
 import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetNavigation,
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -60,9 +61,10 @@ import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { UrlFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/url-field/widget";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+import { envClient } from "@/config/env-client";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 
 import { apiClient } from "../../../system/unified-interface/react/hooks/store";
-import { useApiQuery } from "../../../system/unified-interface/react/hooks/use-api-query";
 import { EndpointsPage } from "../../../system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { scopedTranslation as userRoleScopedTranslation } from "../../user-roles/i18n";
 import avatarDef from "./avatar/definition";
@@ -187,23 +189,56 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
   const [liveAvatarUrl, setLiveAvatarUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Fetch user's own skills
-  const { data: skillsData } = useApiQuery({
-    endpoint: skillsDef.GET,
-    logger,
-    user,
-    requestData: { pageSize: 100, sourceFilter: SkillSourceFilter.ALL },
-    options: { enabled: !!user && !user.isPublic },
-  });
-
+  // Skills come from the me GET endpoint response (server-side enriched)
   const mySkills = useMemo(() => {
-    if (!skillsData?.sections) {
+    if (!profile) {
       return [];
     }
-    return skillsData.sections
-      .flatMap((s) => s.skills ?? [])
-      .filter((s) => s.ownershipType === SkillOwnershipType.PUBLIC);
-  }, [skillsData]);
+    return profile.skills.filter(
+      (s: { ownershipType: string }) =>
+        s.ownershipType === SkillOwnershipType.PUBLIC,
+    );
+  }, [profile]);
+
+  // Skills list context — reuse the real components from skills/widget.tsx
+  const { push: navigate } = useWidgetNavigation();
+  const isTouch = useTouchDevice();
+  const skillsT = skillsScopedTranslation.scopedT(locale).t;
+  const skillsFieldChildren = skillsDef.GET.fields.children;
+
+  // Favorites for skill status indicators
+  const { favorites, activeFavoriteId } = useChatFavorites(logger, {
+    activeFavoriteId: null,
+  });
+
+  const favoritesBySkill = useMemo(() => {
+    const map: Record<string, string[]> = {};
+    if (favorites) {
+      for (const fav of favorites) {
+        if (!map[fav.skillId]) {
+          map[fav.skillId] = [];
+        }
+        map[fav.skillId].push(fav.id);
+      }
+    }
+    return map;
+  }, [favorites]);
+
+  const favoritesByVariant = useMemo(() => {
+    const map: Record<string, string[]> = {};
+    if (favorites) {
+      for (const fav of favorites) {
+        if (parseSkillId(fav.skillId).variantId) {
+          const key = fav.skillId;
+          if (!map[key]) {
+            map[key] = [];
+          }
+          map[key].push(fav.id);
+        }
+      }
+    }
+    return map;
+  }, [favorites]);
 
   useEffect(() => {
     if (profile?.avatarUrl) {
@@ -610,12 +645,18 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
     </>
   );
 
+  const scopedPaletteStyle = useMemo(
+    () => buildScopedPaletteStyle(accent, true),
+    [accent],
+  );
+
   return (
     <Div
       style={{
         background: "#0f0520",
         color: "#fff",
         fontFamily: "inherit",
+        ...scopedPaletteStyle,
       }}
     >
       <FormAlertWidget field={emptyField} />
@@ -637,14 +678,57 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
           padding: "0 24px 48px",
         }}
       >
-        <ProfileSkillsSection
+        {/* Skills section header */}
+        {mySkills.length > 0 && (
+          <Div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              marginBottom: 12,
+            }}
+          >
+            <H2
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                color: "rgba(255,255,255,0.3)",
+                margin: 0,
+              }}
+            >
+              {t("widget.skills.title")}
+            </H2>
+            <Span
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.2)",
+                background: "rgba(255,255,255,0.06)",
+                borderRadius: 4,
+                padding: "1px 6px",
+              }}
+            >
+              {mySkills.length}
+            </Span>
+          </Div>
+        )}
+        <CollapsibleSkillSection
           skills={mySkills}
-          accent={accent}
-          skillHref={(id): string => `/${locale}/skill/${id}`}
-          sectionLabel={t("widget.skills.title")}
-          chatLabel={t("widget.skills.chat")}
-          addLabel={t("widget.skills.add")}
-        />
+          idx={0}
+          navigate={navigate}
+          logger={logger}
+          user={user}
+          locale={locale}
+          isTouch={isTouch}
+          t={skillsT}
+          favoritesBySkill={favoritesBySkill}
+          favoritesByVariant={favoritesByVariant}
+          activeFavoriteId={activeFavoriteId}
+        >
+          {skillsFieldChildren}
+        </CollapsibleSkillSection>
       </Div>
 
       {/* ── EMAIL LIST ── */}

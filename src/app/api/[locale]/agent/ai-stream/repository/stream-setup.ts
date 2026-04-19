@@ -6,7 +6,7 @@
 import "server-only";
 
 import type { ModelMessage } from "ai";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { NextRequest } from "next-vibe-ui/lib/request";
 import {
   ErrorResponseTypes,
@@ -51,11 +51,15 @@ import {
 } from "../../chat/config";
 import { chatThreads, type ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
-import { chatFavorites } from "../../chat/favorites/db";
+import {
+  chatFavorites,
+  FAVORITE_CONFIG_COLUMNS,
+  type FavoriteConfig,
+} from "../../chat/favorites/db";
 import { chatSettings } from "../../chat/settings/db";
 import { DEFAULT_SKILLS } from "../../chat/skills/config";
 import { customSkills } from "../../chat/skills/db";
-import { isUuid } from "../../chat/slugify";
+import { isUuid, parseSkillId } from "../../chat/slugify";
 import { createMessagesEmitter } from "../../chat/threads/[threadId]/messages/emitter";
 import { ThreadsRepository } from "../../chat/threads/repository";
 import { type AiStreamPostRequestOutput } from "../stream/definition";
@@ -86,6 +90,76 @@ function normalizeToolConfig(
     toolId: item.toolId,
     requiresConfirmation: item.requiresConfirmation ?? false,
   }));
+}
+
+/**
+ * Load the active favorite ONCE per stream setup.
+ * Priority: 1) client-provided favoriteConfig, 2) DB lookup via activeFavoriteId, 3) null.
+ * Returns a FavoriteConfig that all downstream resolution blocks can use.
+ */
+async function loadFavoriteOnce(
+  userId: string | undefined,
+  clientFavoriteConfig: FavoriteConfig | null | undefined,
+  favoriteIdOverride: string | undefined,
+  logger: EndpointLogger,
+): Promise<FavoriteConfig | null> {
+  // 1. Client-provided config takes precedence (public users, or pre-loaded by client)
+  if (clientFavoriteConfig) {
+    logger.debug("[Setup] Using client-provided favoriteConfig", {
+      favoriteId: clientFavoriteConfig.id,
+      skillId: clientFavoriteConfig.skillId,
+    });
+    return clientFavoriteConfig;
+  }
+
+  // 2. For authenticated users, load from DB
+  if (userId) {
+    // favoriteIdOverride (from headless callers) takes precedence over settings
+    let effectiveFavoriteId = favoriteIdOverride;
+    if (!effectiveFavoriteId) {
+      const [settingsRow] = await db
+        .select({ activeFavoriteId: chatSettings.activeFavoriteId })
+        .from(chatSettings)
+        .where(eq(chatSettings.userId, userId))
+        .limit(1);
+      effectiveFavoriteId = settingsRow?.activeFavoriteId ?? undefined;
+    }
+
+    if (effectiveFavoriteId) {
+      const [favRow] = await db
+        .select(FAVORITE_CONFIG_COLUMNS)
+        .from(chatFavorites)
+        .where(
+          and(
+            isUuid(effectiveFavoriteId)
+              ? eq(chatFavorites.id, effectiveFavoriteId)
+              : eq(chatFavorites.slug, effectiveFavoriteId),
+            eq(chatFavorites.userId, userId),
+          ),
+        )
+        .limit(1);
+
+      if (favRow) {
+        logger.debug("[Setup] Loaded favorite from DB", {
+          favoriteId: favRow.id,
+          skillId: favRow.skillId,
+        });
+        return favRow;
+      }
+
+      logger.debug("[Setup] Favorite not found in DB", {
+        effectiveFavoriteId,
+        userId,
+      });
+    }
+
+    logger.debug("[Setup] No activeFavoriteId set for authenticated user", {
+      userId,
+    });
+  }
+
+  // 3. No favorite available — downstream cascade resolves skill → system defaults
+  return null;
 }
 
 export interface StreamSetupResult {
@@ -159,7 +233,7 @@ export interface StreamSetupResult {
   toolsConfig: Map<string, { requiresConfirmation: boolean; credits: number }>;
   /** Set of tool names the model is allowed to execute (permission layer). null = all allowed. */
   activeToolNames: Set<string> | null;
-  /** Effective compact trigger token threshold (cascade: favorite → skill → settings → global) */
+  /** Effective compact trigger token threshold (cascade: favorite → skill → global) */
   effectiveCompactTrigger: number;
   /** Provider for AI streaming */
   provider: ReturnType<typeof ProviderFactoryClass.getProviderForModel>;
@@ -174,6 +248,8 @@ export interface StreamSetupResult {
   skipAiTurn?: boolean;
   /** Resolved bridge models for STT, TTS, vision, and translation */
   bridgeContext: BridgeContext;
+  // resolvedFavoriteConfig lives inside streamContext.resolvedFavoriteConfig
+  // — no top-level duplicate needed.
 }
 
 export async function setupAiStream(params: {
@@ -262,6 +338,14 @@ export async function setupAiStream(params: {
     parentSignal: params.parentAbortSignal,
   });
 
+  // ── Load favorite ONCE for all downstream resolution ──────────────────
+  const resolvedFavoriteConfig = await loadFavoriteOnce(
+    userId,
+    data.favoriteConfig,
+    params.favoriteIdOverride,
+    logger,
+  );
+
   // Handle tool confirmations if present - execute tools and update messages
   let toolConfirmationResults: Array<{
     messageId: string;
@@ -270,74 +354,6 @@ export async function setupAiStream(params: {
   }> = [];
 
   if (data.toolConfirmations && data.toolConfirmations.length > 0) {
-    // Resolve media model selections early for the confirmation context.
-    // The full bridge context is built later (after thread/credits), but confirmations
-    // need media model selections NOW so tool serverDefaults (e.g. image gen model) resolve correctly.
-    const confirmMediaModels = await (async (): Promise<{
-      imageGenModelSelection: ImageGenModelSelection | undefined;
-      musicGenModelSelection: MusicGenModelSelection | undefined;
-      videoGenModelSelection: VideoGenModelSelection | undefined;
-    }> => {
-      // 1. Explicit overrides (provided by callers such as integration tests)
-      if (mediaModelOverrides) {
-        return {
-          imageGenModelSelection: mediaModelOverrides.imageGenModelSelection,
-          musicGenModelSelection: mediaModelOverrides.musicGenModelSelection,
-          videoGenModelSelection: mediaModelOverrides.videoGenModelSelection,
-        };
-      }
-      // 2. Resolve from favorite via ModalityResolver cascade
-      const effectiveFavoriteId = params.favoriteIdOverride;
-      if (effectiveFavoriteId && userId) {
-        const [favRow] = await db
-          .select()
-          .from(chatFavorites)
-          .where(
-            isUuid(effectiveFavoriteId)
-              ? eq(chatFavorites.id, effectiveFavoriteId)
-              : eq(chatFavorites.slug, effectiveFavoriteId),
-          )
-          .limit(1);
-        if (favRow) {
-          // Include the skill in the mini bridge so skill-level model defaults
-          // (e.g. quality-tester.imageGenModelSelection) are respected when the favorite
-          // has no explicit model selection.
-          const uuidPattern =
-            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-          const favSkill = uuidPattern.test(favRow.skillId)
-            ? null
-            : (DEFAULT_SKILLS.find((c) => c.id === favRow.skillId) ?? null);
-          const favVariantId = favRow.variantId ?? null;
-          const favActiveVariant = favSkill
-            ? ((favVariantId
-                ? (favSkill.variants.find((v) => v.id === favVariantId) ??
-                  favSkill.variants.find((v) => v.isDefault) ??
-                  favSkill.variants[0])
-                : (favSkill.variants.find((v) => v.isDefault) ??
-                  favSkill.variants[0])) ?? null)
-            : null;
-          const miniBridgeCtx: BridgeContext = {
-            skill: favActiveVariant,
-            favorite: favRow,
-            userSettings: null,
-          };
-          return {
-            imageGenModelSelection:
-              ModalityResolver.resolveImageGenSelection(miniBridgeCtx),
-            musicGenModelSelection:
-              ModalityResolver.resolveMusicGenSelection(miniBridgeCtx),
-            videoGenModelSelection:
-              ModalityResolver.resolveVideoGenSelection(miniBridgeCtx),
-          };
-        }
-      }
-      return {
-        imageGenModelSelection: undefined,
-        musicGenModelSelection: undefined,
-        videoGenModelSelection: undefined,
-      };
-    })();
-
     const confirmationResult = await ToolConfirmationProcessor.processAll({
       toolConfirmations: data.toolConfirmations,
       messageHistory: data.messageHistory ?? undefined,
@@ -358,11 +374,6 @@ export async function setupAiStream(params: {
         // Pass leafMessageId from request so deferred confirm inserts use the correct branch tip
         leafMessageId: data.leafMessageId ?? undefined,
         skillId: data.skill,
-        variantId: undefined,
-        modelId: data.model,
-        imageGenModelSelection: confirmMediaModels.imageGenModelSelection,
-        musicGenModelSelection: confirmMediaModels.musicGenModelSelection,
-        videoGenModelSelection: confirmMediaModels.videoGenModelSelection,
         providerOverride,
         favoriteId: params.favoriteIdOverride,
         headless: params.headless,
@@ -607,63 +618,32 @@ export async function setupAiStream(params: {
     ? { attachments: userMessageResult.data.attachmentMetadata }
     : undefined;
 
-  // Resolve effective compact trigger: favorite → skill → settings → global default
+  // Resolve effective compact trigger: favorite → skill → global default
   const effectiveCompactTrigger = await (async (): Promise<number> => {
-    if (userId) {
-      // 1. Check active favorite compactTrigger (look up activeFavoriteId from settings)
-      const [settings] = await db
-        .select({
-          compactTrigger: chatSettings.compactTrigger,
-          activeFavoriteId: chatSettings.activeFavoriteId,
-        })
-        .from(chatSettings)
-        .where(eq(chatSettings.userId, userId))
+    // 1. Check favorite compactTrigger
+    if (
+      resolvedFavoriteConfig?.compactTrigger !== null &&
+      resolvedFavoriteConfig?.compactTrigger !== undefined
+    ) {
+      return resolvedFavoriteConfig.compactTrigger;
+    }
+
+    // 2. Check skill compactTrigger (custom skills by UUID or slug)
+    if (data.skill) {
+      const skillIdCondition = isUuid(data.skill)
+        ? eq(customSkills.id, data.skill)
+        : eq(customSkills.slug, data.skill);
+      const [char] = await db
+        .select({ compactTrigger: customSkills.compactTrigger })
+        .from(customSkills)
+        .where(skillIdCondition)
         .limit(1);
-
-      if (settings?.activeFavoriteId) {
-        const [fav] = await db
-          .select({ compactTrigger: chatFavorites.compactTrigger })
-          .from(chatFavorites)
-          .where(
-            isUuid(settings.activeFavoriteId)
-              ? eq(chatFavorites.id, settings.activeFavoriteId)
-              : eq(chatFavorites.slug, settings.activeFavoriteId),
-          )
-          .limit(1);
-        if (fav?.compactTrigger !== null && fav?.compactTrigger !== undefined) {
-          return fav.compactTrigger;
-        }
-      }
-
-      // 2. Check skill compactTrigger (custom skills only - UUIDs)
-      if (data.skill) {
-        // Only query DB for UUIDs (custom skills); default/config skills have no DB row
-        const uuidPattern =
-          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-        if (uuidPattern.test(data.skill)) {
-          const [char] = await db
-            .select({ compactTrigger: customSkills.compactTrigger })
-            .from(customSkills)
-            .where(eq(customSkills.id, data.skill))
-            .limit(1);
-          if (
-            char?.compactTrigger !== null &&
-            char?.compactTrigger !== undefined
-          ) {
-            return char.compactTrigger;
-          }
-        }
-      }
-
-      // 3. Use settings compactTrigger
-      if (
-        settings?.compactTrigger !== null &&
-        settings?.compactTrigger !== undefined
-      ) {
-        return settings.compactTrigger;
+      if (char?.compactTrigger !== null && char?.compactTrigger !== undefined) {
+        return char.compactTrigger;
       }
     }
-    // 4. Fall back to global constant
+
+    // 3. Fall back to global constant
     return COMPACT_TRIGGER;
   })();
 
@@ -673,8 +653,8 @@ export async function setupAiStream(params: {
     userId,
   });
 
-  // Resolve tool config cascade: favorite → skill → settings → client-provided → null (all allowed)
-  // null means "no restriction" - model can call any tool
+  // Resolve tool config cascade: favorite → skill → null (all allowed)
+  // Uses resolvedFavoriteConfig loaded once above — no additional DB queries for favorites.
   const resolvedToolConfig = await (async (): Promise<{
     availableTools: Array<{
       toolId: string;
@@ -688,96 +668,64 @@ export async function setupAiStream(params: {
     deniedToolIds: Set<string>;
     /** Text from the active favorite's promptAppend - appended to system prompt. */
     promptAppend: string | null;
-    /** Resolved memory token limit from cascade: favorite → skill → settings → null */
+    /** Resolved memory token limit from cascade: favorite → skill → null */
     memoryLimit: number | null;
   }> => {
-    if (!userId) {
-      return {
-        availableTools: null,
-        pinnedTools: null,
-        deniedToolIds: new Set(),
-        promptAppend: null,
-        memoryLimit: null,
-      };
-    }
-
-    // 1. Load user settings (activeFavoriteId + tool overrides + memory limit)
-    const [userSettings] = await db
-      .select({
-        activeFavoriteId: chatSettings.activeFavoriteId,
-        availableTools: chatSettings.availableTools,
-        pinnedTools: chatSettings.pinnedTools,
-        memoryLimit: chatSettings.memoryLimit,
-      })
-      .from(chatSettings)
-      .where(eq(chatSettings.userId, userId))
-      .limit(1);
-
     // Build denied tool IDs from skill + favorite (both stack; order doesn't matter)
     const deniedToolIds = new Set<string>();
     let promptAppend: string | null = null;
-    // memoryLimit cascade: favorite → skill → settings → null
     let memoryLimit: number | null = null;
 
     // Collect skill-level deniedTools regardless of where tool config is resolved from
     if (data.skill) {
-      const uuidPattern =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (uuidPattern.test(data.skill)) {
-        const [skillRow] = await db
-          .select({ deniedTools: customSkills.deniedTools })
-          .from(customSkills)
-          .where(eq(customSkills.id, data.skill))
-          .limit(1);
-        for (const t of skillRow?.deniedTools ?? []) {
+      const defaultChar = DEFAULT_SKILLS.find((c) => c.id === data.skill);
+      if (defaultChar) {
+        for (const t of defaultChar.deniedTools ?? []) {
           deniedToolIds.add(t.toolId);
         }
       } else {
-        const defaultChar = DEFAULT_SKILLS.find((c) => c.id === data.skill);
-        for (const t of defaultChar?.deniedTools ?? []) {
+        const skillIdCondition = isUuid(data.skill)
+          ? eq(customSkills.id, data.skill)
+          : eq(customSkills.slug, data.skill);
+        const [skillRow] = await db
+          .select({ deniedTools: customSkills.deniedTools })
+          .from(customSkills)
+          .where(skillIdCondition)
+          .limit(1);
+        for (const t of skillRow?.deniedTools ?? []) {
           deniedToolIds.add(t.toolId);
         }
       }
     }
 
-    // 1a. Check active favorite for tool config + deniedTools + promptAppend + memoryLimit
-    if (userSettings?.activeFavoriteId) {
-      const [fav] = await db
-        .select({
-          availableTools: chatFavorites.availableTools,
-          pinnedTools: chatFavorites.pinnedTools,
-          deniedTools: chatFavorites.deniedTools,
-          promptAppend: chatFavorites.promptAppend,
-          memoryLimit: chatFavorites.memoryLimit,
-        })
-        .from(chatFavorites)
-        .where(
-          isUuid(userSettings.activeFavoriteId)
-            ? eq(chatFavorites.id, userSettings.activeFavoriteId)
-            : eq(chatFavorites.slug, userSettings.activeFavoriteId),
-        )
-        .limit(1);
-
+    // 1. Check favorite for tool config + deniedTools + promptAppend + memoryLimit
+    if (resolvedFavoriteConfig) {
       // Stack favorite deniedTools on top of skill's
-      for (const t of fav?.deniedTools ?? []) {
+      for (const t of resolvedFavoriteConfig.deniedTools ?? []) {
         deniedToolIds.add(t.toolId);
       }
 
-      // Capture promptAppend from favorite (carried through all subsequent returns)
-      promptAppend = fav?.promptAppend ?? null;
+      promptAppend = resolvedFavoriteConfig.promptAppend ?? null;
 
-      // Favorite memory limit takes highest priority
-      if (fav?.memoryLimit !== null && fav?.memoryLimit !== undefined) {
-        memoryLimit = fav.memoryLimit;
+      if (
+        resolvedFavoriteConfig.memoryLimit !== null &&
+        resolvedFavoriteConfig.memoryLimit !== undefined
+      ) {
+        memoryLimit = resolvedFavoriteConfig.memoryLimit;
       }
 
-      if (fav && (fav.availableTools !== null || fav.pinnedTools !== null)) {
-        logger.debug("[Setup] Tool config resolved from active favorite", {
-          activeFavoriteId: userSettings.activeFavoriteId,
+      if (
+        resolvedFavoriteConfig.availableTools !== null ||
+        resolvedFavoriteConfig.pinnedTools !== null
+      ) {
+        logger.debug("[Setup] Tool config resolved from favorite", {
+          favoriteId: resolvedFavoriteConfig.id,
         });
         return {
-          availableTools: normalizeToolConfig(fav.availableTools),
-          pinnedTools: normalizeToolConfig(fav.pinnedTools),
+          availableTools: normalizeToolConfig(
+            resolvedFavoriteConfig.availableTools,
+          ),
+          pinnedTools: normalizeToolConfig(resolvedFavoriteConfig.pinnedTools),
           deniedToolIds,
           promptAppend,
           memoryLimit,
@@ -787,10 +735,27 @@ export async function setupAiStream(params: {
 
     // 2. Check skill tool config (and skill-level memoryLimit for custom skills)
     if (data.skill) {
-      const uuidPattern =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (uuidPattern.test(data.skill)) {
-        // Custom skill (DB-stored, UUID) - availableTools/pinnedTools only (deniedTools already fetched above)
+      const defaultChar = DEFAULT_SKILLS.find((c) => c.id === data.skill);
+      if (defaultChar) {
+        if (defaultChar.availableTools) {
+          logger.debug(
+            "[Setup] Tool config resolved from default skill config",
+            {
+              skillId: data.skill,
+            },
+          );
+          return {
+            availableTools: normalizeToolConfig(defaultChar.availableTools),
+            pinnedTools: normalizeToolConfig(defaultChar.pinnedTools ?? null),
+            deniedToolIds,
+            promptAppend,
+            memoryLimit,
+          };
+        }
+      } else {
+        const skillIdCondition = isUuid(data.skill)
+          ? eq(customSkills.id, data.skill)
+          : eq(customSkills.slug, data.skill);
         const [char] = await db
           .select({
             availableTools: customSkills.availableTools,
@@ -798,10 +763,9 @@ export async function setupAiStream(params: {
             memoryLimit: customSkills.memoryLimit,
           })
           .from(customSkills)
-          .where(eq(customSkills.id, data.skill))
+          .where(skillIdCondition)
           .limit(1);
 
-        // Skill memoryLimit used only if favorite didn't set one
         if (
           memoryLimit === null &&
           char?.memoryLimit !== null &&
@@ -825,52 +789,10 @@ export async function setupAiStream(params: {
             memoryLimit,
           };
         }
-      } else {
-        // Default skill (config-based, string ID)
-        const defaultChar = DEFAULT_SKILLS.find((c) => c.id === data.skill);
-        if (defaultChar?.availableTools) {
-          logger.debug(
-            "[Setup] Tool config resolved from default skill config",
-            {
-              skillId: data.skill,
-            },
-          );
-          return {
-            availableTools: normalizeToolConfig(defaultChar.availableTools),
-            pinnedTools: normalizeToolConfig(defaultChar.pinnedTools ?? null),
-            deniedToolIds,
-            promptAppend,
-            memoryLimit,
-          };
-        }
       }
     }
 
-    // 3. Check user's personal settings (customised tool config + memoryLimit fallback)
-    if (
-      memoryLimit === null &&
-      userSettings?.memoryLimit !== null &&
-      userSettings?.memoryLimit !== undefined
-    ) {
-      memoryLimit = userSettings.memoryLimit;
-    }
-
-    if (
-      userSettings &&
-      (userSettings.availableTools !== null ||
-        userSettings.pinnedTools !== null)
-    ) {
-      logger.debug("[Setup] Tool config resolved from user settings");
-      return {
-        availableTools: normalizeToolConfig(userSettings.availableTools),
-        pinnedTools: normalizeToolConfig(userSettings.pinnedTools),
-        deniedToolIds,
-        promptAppend,
-        memoryLimit,
-      };
-    }
-
-    // 4. Fall back to null (all tools allowed / default visible set)
+    // 3. Fall back to null (all tools allowed / default visible set)
     return {
       availableTools: null,
       pinnedTools: null,
@@ -886,62 +808,24 @@ export async function setupAiStream(params: {
     resolvedToolConfig.deniedToolIds.add(toolId);
   }
 
-  // Resolve bridge models via cascade: skill variant → favorite → userSettings → system default
-  // This wires the ModalityResolver into the stream pipeline so all downstream
-  // handlers (STT, TTS, vision bridge, translation) use the correct models.
+  // Resolve bridge models via cascade: skill variant → favorite → system default
+  // Uses resolvedFavoriteConfig loaded once above — no additional DB queries for favorites.
   const bridgeContext = await (async (): Promise<BridgeContext> => {
     let skillConfig: BridgeContext["skill"] = null;
-    let favoriteConfig: BridgeContext["favorite"] = null;
-    let userSettingsConfig: BridgeContext["userSettings"] = null;
-
-    // Resolve favorite and userSettings first so we know the active variantId
-    if (userId) {
-      const [userSettingsRow] = await db
-        .select({
-          activeFavoriteId: chatSettings.activeFavoriteId,
-          voiceModelSelection: chatSettings.voiceModelSelection,
-          sttModelSelection: chatSettings.sttModelSelection,
-          imageVisionModelSelection: chatSettings.imageVisionModelSelection,
-          videoVisionModelSelection: chatSettings.videoVisionModelSelection,
-          audioVisionModelSelection: chatSettings.audioVisionModelSelection,
-          defaultChatMode: chatSettings.defaultChatMode,
-          imageGenModelSelection: chatSettings.imageGenModelSelection,
-          musicGenModelSelection: chatSettings.musicGenModelSelection,
-          videoGenModelSelection: chatSettings.videoGenModelSelection,
-        })
-        .from(chatSettings)
-        .where(eq(chatSettings.userId, userId))
-        .limit(1);
-
-      if (userSettingsRow) {
-        userSettingsConfig = userSettingsRow;
-      }
-
-      // Explicit favoriteId from request → use that favorite for bridge context
-      const effectiveFavoriteId =
-        params.favoriteIdOverride ?? userSettingsRow?.activeFavoriteId;
-      if (effectiveFavoriteId) {
-        const [favRow] = await db
-          .select()
-          .from(chatFavorites)
-          .where(
-            isUuid(effectiveFavoriteId)
-              ? eq(chatFavorites.id, effectiveFavoriteId)
-              : eq(chatFavorites.slug, effectiveFavoriteId),
-          )
-          .limit(1);
-        if (favRow) {
-          favoriteConfig = favRow;
-        }
-      }
-    }
+    // FavoriteConfig is structurally compatible with BridgeFavorite
+    const bridgeFavorite: BridgeContext["favorite"] =
+      resolvedFavoriteConfig ?? null;
 
     // Resolve skill: default skills come from config (variant-aware), custom skills from DB
     if (data.skill) {
-      const uuidPattern =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (uuidPattern.test(data.skill)) {
-        // Custom skills: resolve variant-aware model selections
+      const defaultSkillForBridge = DEFAULT_SKILLS.find(
+        (c) => c.id === data.skill,
+      );
+      if (!defaultSkillForBridge) {
+        // Custom skills: resolve variant-aware model selections (by UUID or slug)
+        const skillIdCondition = isUuid(data.skill)
+          ? eq(customSkills.id, data.skill)
+          : eq(customSkills.slug, data.skill);
         const [customSkillRow] = await db
           .select({
             voiceModelSelection: customSkills.voiceModelSelection,
@@ -949,15 +833,16 @@ export async function setupAiStream(params: {
             imageVisionModelSelection: customSkills.imageVisionModelSelection,
             videoVisionModelSelection: customSkills.videoVisionModelSelection,
             audioVisionModelSelection: customSkills.audioVisionModelSelection,
-            defaultChatMode: customSkills.defaultChatMode,
             variants: customSkills.variants,
           })
           .from(customSkills)
-          .where(eq(customSkills.id, data.skill))
+          .where(skillIdCondition)
           .limit(1);
         if (customSkillRow) {
-          // Try to resolve active variant from favorite's variantId
-          const activeVariantId = favoriteConfig?.variantId ?? null;
+          // Try to resolve active variant from favorite's merged skillId
+          const activeVariantId = bridgeFavorite
+            ? parseSkillId(bridgeFavorite.skillId).variantId
+            : null;
           const variants = customSkillRow.variants;
           const activeVariant =
             variants && activeVariantId
@@ -970,6 +855,7 @@ export async function setupAiStream(params: {
 
           skillConfig = activeVariant
             ? {
+                modelSelection: activeVariant.modelSelection,
                 voiceModelSelection:
                   activeVariant.voiceModelSelection ??
                   customSkillRow.voiceModelSelection ??
@@ -990,10 +876,6 @@ export async function setupAiStream(params: {
                   activeVariant.audioVisionModelSelection ??
                   customSkillRow.audioVisionModelSelection ??
                   undefined,
-                defaultChatMode:
-                  activeVariant.defaultChatMode ??
-                  customSkillRow.defaultChatMode ??
-                  undefined,
                 imageGenModelSelection:
                   activeVariant.imageGenModelSelection ?? undefined,
                 musicGenModelSelection:
@@ -1002,6 +884,7 @@ export async function setupAiStream(params: {
                   activeVariant.videoGenModelSelection ?? undefined,
               }
             : {
+                modelSelection: undefined,
                 voiceModelSelection:
                   customSkillRow.voiceModelSelection ?? undefined,
                 sttModelSelection:
@@ -1012,32 +895,31 @@ export async function setupAiStream(params: {
                   customSkillRow.videoVisionModelSelection ?? undefined,
                 audioVisionModelSelection:
                   customSkillRow.audioVisionModelSelection ?? undefined,
-                defaultChatMode: customSkillRow.defaultChatMode ?? undefined,
                 imageGenModelSelection: undefined,
                 musicGenModelSelection: undefined,
                 videoGenModelSelection: undefined,
               };
         }
       } else {
-        // Default skill: resolve the active variant and use its model selections
-        const defaultSkill = DEFAULT_SKILLS.find((c) => c.id === data.skill);
-        if (defaultSkill) {
-          const activeVariantId = favoriteConfig?.variantId ?? null;
-          const activeVariant = activeVariantId
-            ? (defaultSkill.variants.find((v) => v.id === activeVariantId) ??
-              defaultSkill.variants.find((v) => v.isDefault) ??
-              defaultSkill.variants[0])
-            : (defaultSkill.variants.find((v) => v.isDefault) ??
-              defaultSkill.variants[0]);
-          skillConfig = activeVariant ?? null;
-        }
+        // Default skill: resolve the active variant from favorite's merged skillId
+        const activeVariantId = bridgeFavorite
+          ? parseSkillId(bridgeFavorite.skillId).variantId
+          : null;
+        const activeVariant = activeVariantId
+          ? (defaultSkillForBridge.variants.find(
+              (v) => v.id === activeVariantId,
+            ) ??
+            defaultSkillForBridge.variants.find((v) => v.isDefault) ??
+            defaultSkillForBridge.variants[0])
+          : (defaultSkillForBridge.variants.find((v) => v.isDefault) ??
+            defaultSkillForBridge.variants[0]);
+        skillConfig = activeVariant ?? null;
       }
     }
 
     return {
       skill: skillConfig,
-      favorite: favoriteConfig,
-      userSettings: userSettingsConfig,
+      favorite: bridgeFavorite,
     };
   })();
 
@@ -1106,6 +988,7 @@ export async function setupAiStream(params: {
       subAgentDepth: params.subAgentDepth,
       excludeMemories: params.excludeMemories,
       memoryLimit: resolvedToolConfig.memoryLimit,
+      lastUserMessage: effectiveContent,
       mediaCapabilities: {
         nativeOutputs: modelConfig.outputs ?? [],
         imageGenModelName: effectiveImageGenModel?.name ?? null,
@@ -1143,17 +1026,13 @@ export async function setupAiStream(params: {
     threadId: threadResult.data.threadId,
     aiMessageId,
     skillId: data.skill,
-    variantId: bridgeContext.favorite?.variantId ?? undefined,
-    modelId: data.model,
-    imageGenModelSelection: effectiveImageGenSelection,
-    musicGenModelSelection: effectiveMusicGenSelection,
-    videoGenModelSelection: effectiveVideoGenSelection,
     providerOverride,
     headless: params.headless,
     subAgentDepth: params.subAgentDepth,
     isRevival: params.isRevival,
-    // favoriteId: from headless override (run endpoint) - lets resume-stream reload full context
-    favoriteId: params.favoriteIdOverride,
+    // favoriteId: from headless override OR favorite config — lets resume-stream reload full context
+    favoriteId:
+      params.favoriteIdOverride ?? resolvedFavoriteConfig?.id ?? undefined,
     currentToolMessageId: undefined,
     callerToolCallId: undefined,
     callerCallbackMode: undefined,
@@ -1291,19 +1170,15 @@ export async function setupAiStream(params: {
       }
     : await ToolsSetupHandler.setupStreamingTools({
         modelConfig,
-        // Tool config cascade: cascade-resolved (favorite/skill) takes precedence over client-provided.
+        // Tool config cascade: resolvedToolConfig (from favorite/skill) is authoritative.
         // deniedTools are stripped from both sets before reaching the AI SDK.
-        // requiresConfirmation from data.availableTools always takes precedence:
-        // cascade determines which tools are permitted; client specifies confirmation per-tool.
         pinnedTools: filterUnavailableMediaTools(
-          applyDeniedFilter(resolvedToolConfig.pinnedTools ?? data.pinnedTools),
+          applyDeniedFilter(resolvedToolConfig.pinnedTools),
         ),
         availableTools: filterUnavailableMediaTools(
-          applyDeniedFilter(
-            resolvedToolConfig.availableTools ?? data.availableTools,
-          ),
+          applyDeniedFilter(resolvedToolConfig.availableTools),
         ),
-        confirmationOverrides: data.availableTools,
+        confirmationOverrides: resolvedToolConfig.availableTools,
         user,
         locale,
         logger,
@@ -1330,8 +1205,8 @@ export async function setupAiStream(params: {
     model: data.model,
     hasTools: !!tools,
     toolCount: tools ? Object.keys(tools).length : 0,
-    pinnedTools: data.pinnedTools,
-    availableTools: data.availableTools,
+    hasFavoriteConfig: !!data.favoriteConfig,
+    favoriteId: data.favoriteConfig?.id ?? null,
     supportsTools: modelConfig?.supportsTools,
   });
 
@@ -1392,7 +1267,7 @@ export async function setupAiStream(params: {
       wakeUpThreadId: taskThreadId ?? null,
       wakeUpToolMessageId: taskToolMessageId ?? null,
       wakeUpLeafMessageId: taskLeafMessageId ?? null,
-      wakeUpModelId: streamContext.modelId ?? null,
+      wakeUpModelId: data.model ?? null,
       wakeUpSkillId: streamContext.skillId ?? null,
       wakeUpFavoriteId: streamContext.favoriteId ?? null,
       wakeUpSubAgentDepth: streamContext.subAgentDepth,
@@ -1520,7 +1395,7 @@ export async function setupAiStream(params: {
           status: finalStatus,
           output: finalOutput,
           taskId: escalatedTaskId,
-          modelId: streamContext.modelId ?? null,
+          modelId: data.model ?? null,
           skillId: streamContext.skillId ?? null,
           favoriteId: streamContext.favoriteId ?? null,
           leafMessageId: taskLeafMessageId ?? null,

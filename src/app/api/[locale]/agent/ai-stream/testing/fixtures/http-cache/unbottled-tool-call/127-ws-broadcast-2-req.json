@@ -1,0 +1,31 @@
+{
+  "url": "http://127.0.0.1:3001/ws/broadcast",
+  "method": "POST",
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": {
+    "event": "thread-title-updated",
+    "data": {
+      "threads": [
+        {
+          "id": "f495b106-ab71-49db-b7c6-e2b1d836efc1",
+          "title": "[T1 thread-create+tool-call] Use the tool-help too"
+        }
+      ],
+      "items": [
+        {
+          "id": "f495b106-ab71-49db-b7c6-e2b1d836efc1",
+          "title": "[T1 thread-create+tool-call] Use the tool-help too"
+        }
+      ]
+    },
+    "channel": "agent/chat/folder-contents/cron",
+    "user": {
+      "isPublic": false,
+      "id": "27111963-4352-474a-82f3-5f6619fa1719",
+      "leadId": "75aad929-34f0-4e9a-bb4c-9f25471b4aa3",
+      "roles": ["enums.userRole.admin"]
+    }
+  }
+}

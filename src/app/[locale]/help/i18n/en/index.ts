@@ -24,8 +24,8 @@ export const translations = {
       info: {
         title: "Contact Information",
         supportEmail: "Support Email",
-        website: "Website",
-        websiteUrl: "Visit our website",
+        discord: "Discord",
+        discordUrl: "Join our Discord community",
       },
       faq: {
         title: "Frequently Asked Questions",

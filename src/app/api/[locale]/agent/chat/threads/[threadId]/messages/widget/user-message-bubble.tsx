@@ -4,11 +4,13 @@ import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Film } from "next-vibe-ui/ui/icons/Film";
 import { Image as ImageIcon } from "next-vibe-ui/ui/icons/Image";
 import { Music } from "next-vibe-ui/ui/icons/Music";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
-import { memo, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import type { JSX } from "react";
 
 import {
@@ -39,6 +41,7 @@ interface UserMessageBubbleSharedProps {
   user: JwtPayloadType;
   onBranch?: (messageId: string) => void;
   onRetry?: (message: ChatMessage) => Promise<void>;
+  onCancelQueued?: (messageId: string, content: string) => void;
   showAuthor?: boolean;
   rootFolderId: DefaultFolderId;
   currentUserId?: string;
@@ -53,6 +56,7 @@ function UserMessageBubbleInner({
   user,
   onBranch,
   onRetry,
+  onCancelQueued,
   showAuthor,
   rootFolderId,
   currentUserId,
@@ -60,6 +64,11 @@ function UserMessageBubbleInner({
   const { t } = scopedTranslation.scopedT(locale);
   const { group } = useMessageGroupName();
   const [showVariant, setShowVariant] = useState(false);
+  const isQueued = message.metadata?.isQueued === true;
+
+  const handleCancelQueued = useCallback(() => {
+    onCancelQueued?.(message.id, message.content ?? "");
+  }, [onCancelQueued, message.id, message.content]);
 
   const character =
     message.role === "user" || message.role === "assistant"
@@ -67,7 +76,7 @@ function UserMessageBubbleInner({
       : undefined;
 
   return (
-    <Div className="flex justify-end">
+    <Div className={cn("flex justify-end", isQueued && "opacity-60")}>
       <Div className={cn("md:max-w-[75%]", group)}>
         {showAuthor && (
           <Div className="mb-2 flex justify-end">
@@ -93,6 +102,7 @@ function UserMessageBubbleInner({
             chatColors.message.user,
             chatShadows.sm,
             chatTransitions.default,
+            isQueued && "border border-dashed border-muted-foreground/30",
           )}
         >
           {message.metadata?.isTranscribing ? (
@@ -139,17 +149,37 @@ function UserMessageBubbleInner({
             )}
         </Div>
 
-        <Div className="h-10 sm:h-8 flex items-center justify-end">
-          <UserMessageActions
-            message={message}
-            locale={locale}
-            logger={logger}
-            user={user}
-            onBranch={onBranch}
-            onRetry={onRetry}
-            rootFolderId={rootFolderId}
-          />
-        </Div>
+        {isQueued ? (
+          <Div className="h-10 sm:h-8 flex items-center justify-end gap-2">
+            <Div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              <Span>{t("widget.queue.badge")}</Span>
+            </Div>
+            {onCancelQueued && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCancelQueued}
+                className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                title={t("widget.queue.cancelTooltip")}
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            )}
+          </Div>
+        ) : (
+          <Div className="h-10 sm:h-8 flex items-center justify-end">
+            <UserMessageActions
+              message={message}
+              locale={locale}
+              logger={logger}
+              user={user}
+              onBranch={onBranch}
+              onRetry={onRetry}
+              rootFolderId={rootFolderId}
+            />
+          </Div>
+        )}
       </Div>
     </Div>
   );

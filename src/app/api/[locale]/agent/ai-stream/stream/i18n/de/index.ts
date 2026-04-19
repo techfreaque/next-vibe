@@ -321,28 +321,10 @@ export const translations: typeof enTranslations = {
       label: "Musikdauer",
       description: "Dauer des generierten Audioclips",
     },
-    availableTools: {
-      label: "Ausführbar",
+    favoriteConfig: {
+      label: "Favoriten-Konfiguration",
       description:
-        "Ausführungs-Berechtigungsschicht - welche Tools die KI tatsächlich ausführen darf. null = alle erlaubt. Array = nur diese Tools.",
-      toolId: {
-        label: "Tool-ID",
-        description: "Alias oder vollständiger Name des erlaubten Tools",
-      },
-    },
-    pinnedTools: {
-      label: "Im Kontext (KI sieht diese)",
-      description:
-        "Tools im Kontextfenster des Modells - was die KI kennt. null = Standard-Set des Benutzers. availableTools steuert die tatsächliche Ausführung.",
-      toolId: {
-        label: "Tool-ID",
-        description: "Alias oder vollständiger Name des Tools im Kontext",
-      },
-      requiresConfirmation: {
-        label: "Benötigt Bestätigung",
-        description:
-          "Ob dieses Tool eine Benutzerbestätigung vor der Ausführung benötigt",
-      },
+        "Vollständige Konfiguration des aktiven Favoriten — Modellauswahl, Tool-Konfiguration, Kontexteinstellungen. null = kein Favorit aktiv, Skill-/Systemstandards werden verwendet.",
     },
     resumeToken: {
       label: "Wiederaufnahme-Token",

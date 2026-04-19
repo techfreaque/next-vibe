@@ -16,7 +16,7 @@ export const translations = {
     subline: "So siehst du für andere aus.",
     editButton: "Profil bearbeiten",
     viewCreatorPage: "Deine öffentliche Creator-Seite ansehen →",
-    noSkills: "Veröffentliche einen Skill, um deine Creator-Seite zu erhalten.",
+    noSkills: "Veröffentliche ein Skill, um deine Creator-Seite zu erhalten.",
   },
   presence: {
     heading: "Deine Präsenz",

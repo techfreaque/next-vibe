@@ -8,14 +8,13 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStatus } from "@/app/api/[locale]/agent/chat/enum";
 import folderContentsDefinition from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
-import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import pathDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/definition";
 import threadsDefinition from "@/app/api/[locale]/agent/chat/threads/definition";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -54,11 +53,9 @@ export interface SendMessageDeps {
   settings: {
     selectedModel: ChatModelId;
     selectedSkill: string;
-    availableTools: ToolConfigItem[] | null;
-    pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
-    voiceModelSelection: VoiceModelSelection | null | undefined;
   };
+  favoriteConfig: FavoriteConfig | null;
   locale: CountryLanguage;
 }
 
@@ -80,6 +77,7 @@ export async function sendMessage(
     leafMessageId,
     user,
     settings,
+    favoriteConfig,
     locale,
   } = deps;
   const { content } = params;
@@ -357,7 +355,8 @@ export async function sendMessage(
       onThreadCreated(finalThreadId, currentRootFolderId, currentSubFolderId);
     }
 
-    // Use shared function for message creation and sending
+    // Use shared function for message creation and sending.
+    // If the thread is already streaming, the server auto-queues the message.
     const streamStarted = await createAndSendUserMessage(
       {
         content,
@@ -379,6 +378,7 @@ export async function sendMessage(
         currentSubFolderId,
         user,
         settings,
+        favoriteConfig,
         locale,
       },
     );

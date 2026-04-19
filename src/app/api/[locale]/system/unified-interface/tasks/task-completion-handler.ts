@@ -185,6 +185,7 @@ export async function handleTaskCompletion(params: {
                       ...toolCall,
                       status: toolStatus,
                       result: stableResult,
+                      isPartial: false,
                     }
                   : undefined,
               },

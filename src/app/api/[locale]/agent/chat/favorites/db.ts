@@ -15,7 +15,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-import type { ChatMode } from "@/app/api/[locale]/agent/models/enum";
 import type {
   AudioVisionModelSelection,
   ImageVisionModelSelection,
@@ -83,9 +82,6 @@ export const chatFavorites = pgTable(
     audioVisionModelSelection: jsonb(
       "audio_vision_model_selection",
     ).$type<AudioVisionModelSelection>(),
-
-    // Default chat mode for this favorite (null = cascade to skill → user settings → "text")
-    defaultChatMode: text("default_chat_mode").$type<ChatMode>(),
 
     // Image/music/video gen model selections (null = cascade to skill → user settings → system default)
     imageGenModelSelection: jsonb(
@@ -163,12 +159,49 @@ export const insertChatFavoriteSchema = createInsertSchema(chatFavorites, {
   customIcon: iconSchema.nullable(),
 });
 
-/**
- * Type for favorite model - uses Drizzle's $inferSelect to respect .$type annotations
- */
 export type ChatFavorite = typeof chatFavorites.$inferSelect;
+export type NewChatFavorite = typeof chatFavorites.$inferInsert;
 
 /**
- * Type for new favorite model - uses Drizzle's $inferInsert to respect .$type annotations
+ * Config subset of ChatFavorite — everything the server needs for cascade resolution.
  */
-export type NewChatFavorite = typeof chatFavorites.$inferInsert;
+export type FavoriteConfig = Pick<
+  ChatFavorite,
+  | "id"
+  | "skillId"
+  | "modelSelection"
+  | "voiceModelSelection"
+  | "sttModelSelection"
+  | "imageVisionModelSelection"
+  | "videoVisionModelSelection"
+  | "audioVisionModelSelection"
+  | "imageGenModelSelection"
+  | "musicGenModelSelection"
+  | "videoGenModelSelection"
+  | "availableTools"
+  | "pinnedTools"
+  | "deniedTools"
+  | "compactTrigger"
+  | "memoryLimit"
+  | "promptAppend"
+>;
+
+export const FAVORITE_CONFIG_COLUMNS = {
+  id: chatFavorites.id,
+  skillId: chatFavorites.skillId,
+  modelSelection: chatFavorites.modelSelection,
+  voiceModelSelection: chatFavorites.voiceModelSelection,
+  sttModelSelection: chatFavorites.sttModelSelection,
+  imageVisionModelSelection: chatFavorites.imageVisionModelSelection,
+  videoVisionModelSelection: chatFavorites.videoVisionModelSelection,
+  audioVisionModelSelection: chatFavorites.audioVisionModelSelection,
+  imageGenModelSelection: chatFavorites.imageGenModelSelection,
+  musicGenModelSelection: chatFavorites.musicGenModelSelection,
+  videoGenModelSelection: chatFavorites.videoGenModelSelection,
+  availableTools: chatFavorites.availableTools,
+  pinnedTools: chatFavorites.pinnedTools,
+  deniedTools: chatFavorites.deniedTools,
+  compactTrigger: chatFavorites.compactTrigger,
+  memoryLimit: chatFavorites.memoryLimit,
+  promptAppend: chatFavorites.promptAppend,
+} as const;

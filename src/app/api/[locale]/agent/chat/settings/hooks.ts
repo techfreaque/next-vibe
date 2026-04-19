@@ -9,7 +9,6 @@ import { useCallback, useMemo } from "react";
 
 import type { ViewModeValue } from "@/app/api/[locale]/agent/chat/enum";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -33,15 +32,9 @@ interface UseChatSettingsReturn {
     favoriteId: string,
     skillId: string,
     modelId: ChatModelId,
-    voiceModelSelection: VoiceModelSelection | null,
   ) => void;
   setTTSAutoplay: (autoplay: boolean) => void;
   setViewMode: (mode: typeof ViewModeValue) => void;
-  setTools: (
-    availableTools: ChatSettingsUpdateRequestOutput["availableTools"],
-    pinnedTools: ChatSettingsUpdateRequestOutput["pinnedTools"],
-  ) => void;
-  setCompactTrigger: (value: number | null) => void;
 }
 
 /**
@@ -123,23 +116,8 @@ export function useChatSettings(
       if (updates.ttsAutoplay !== undefined) {
         endpoint.create?.setValue("ttsAutoplay", updates.ttsAutoplay);
       }
-      if (updates.voiceModelSelection !== undefined) {
-        endpoint.create?.setValue(
-          "voiceModelSelection",
-          updates.voiceModelSelection,
-        );
-      }
       if (updates.viewMode !== undefined) {
         endpoint.create?.setValue("viewMode", updates.viewMode);
-      }
-      if (updates.availableTools !== undefined) {
-        endpoint.create?.setValue("availableTools", updates.availableTools);
-      }
-      if (updates.pinnedTools !== undefined) {
-        endpoint.create?.setValue("pinnedTools", updates.pinnedTools);
-      }
-      if (updates.compactTrigger !== undefined) {
-        endpoint.create?.setValue("compactTrigger", updates.compactTrigger);
       }
       // Submit through endpoint (endpoint handles API vs localStorage based on config)
       await endpoint.create?.onSubmit();
@@ -161,35 +139,12 @@ export function useChatSettings(
     [updateSettings],
   );
 
-  const setTools = useCallback(
-    (
-      availableTools: ChatSettingsUpdateRequestOutput["availableTools"],
-      pinnedTools: ChatSettingsUpdateRequestOutput["pinnedTools"],
-    ) => {
-      void updateSettings({ availableTools, pinnedTools });
-    },
-    [updateSettings],
-  );
-
-  const setCompactTrigger = useCallback(
-    (value: number | null) => {
-      void updateSettings({ compactTrigger: value });
-    },
-    [updateSettings],
-  );
-
   const setActiveFavorite = useCallback(
-    (
-      favoriteId: string,
-      skillId: string,
-      modelId: ChatModelId,
-      voiceModelSelection: VoiceModelSelection | null,
-    ) => {
+    (favoriteId: string, skillId: string, modelId: ChatModelId) => {
       void updateSettings({
         activeFavoriteId: favoriteId,
         selectedSkill: skillId,
         selectedModel: modelId,
-        voiceModelSelection,
       });
     },
     [updateSettings],
@@ -203,7 +158,5 @@ export function useChatSettings(
     setActiveFavorite,
     setTTSAutoplay,
     setViewMode,
-    setTools,
-    setCompactTrigger,
   };
 }

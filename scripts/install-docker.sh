@@ -7,15 +7,18 @@ COMPOSE=compose
 git stash
 git pull
 
-# Build NEW image with a distinct tag so the old container keeps running
-$COMPOSE build
+# Build postgres image first (includes plv8 + pgvector via Dockerfile.postgres)
+$COMPOSE build postgres
 
-# Ensure postgres is running and healthy
+# Ensure postgres is running and healthy (restarts if image changed)
 $COMPOSE up -d postgres
 echo "Waiting for postgres..."
 until $COMPOSE exec -T postgres pg_isready -U "${POSTGRES_USER:-postgres}" > /dev/null 2>&1; do
   sleep 1
 done
+
+# Build app image (old container keeps running while new image builds)
+$COMPOSE build app
 
 # Run migrations using the new image (separate one-off container, old app still serving)
 echo "Running migrations..."
@@ -31,10 +34,13 @@ echo "Starting new app container..."
 $COMPOSE up -d app
 
 # Wait for the new container to be healthy (up to 180s)
+# Check from the host via the mapped port - not inside the container.
+# The app runs a Bun proxy on port 3000 which proxies to Next.js on 3100 internally;
+# only the host-side port reliably reflects when both layers are ready.
 echo "Waiting for new app to respond..."
 TRIES=0
 MAX_TRIES=90
-until $COMPOSE exec -T app wget -q --server-response -O /dev/null http://localhost:3000 2>&1 | grep -q "HTTP/"; do
+until curl -sf --max-time 3 http://localhost:3000 > /dev/null 2>&1; do
   # Bail early if container has already exited
   STATUS=$($COMPOSE ps -q app | xargs docker inspect --format='{{.State.Status}}' 2>/dev/null || echo "missing")
   if [ "$STATUS" = "exited" ] || [ "$STATUS" = "missing" ]; then

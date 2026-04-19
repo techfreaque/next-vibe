@@ -9,14 +9,20 @@ import {
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { Coins } from "next-vibe-ui/ui/icons/Coins";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
 import { HelpCircle } from "next-vibe-ui/ui/icons/HelpCircle";
 import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { ShoppingCart } from "next-vibe-ui/ui/icons/ShoppingCart";
 import { User } from "next-vibe-ui/ui/icons/User";
 import { Link } from "next-vibe-ui/ui/link";
+import { Progress, ProgressIndicator } from "next-vibe-ui/ui/progress";
 import { Span } from "next-vibe-ui/ui/span";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
@@ -75,32 +81,56 @@ export function SidebarFooter({
             suppressHydrationWarning
           >
             <Span className="flex flex-row items-center gap-2 min-w-0 flex-1">
-              {/* Credits display */}
-              {credits && (
-                <>
-                  <Coins className="h-4 w-4 text-primary shrink-0" />
-                  <Span
-                    className="text-sm font-medium truncate"
-                    suppressHydrationWarning
-                  >
-                    {credits.total === 1
-                      ? t("components.credits.credit", { count: 1 })
-                      : t("components.credits.credits", {
-                          count: `${Math.floor(credits.total * 100) / 100}`,
-                        })}
-                  </Span>
-                  <Span className="text-muted-foreground text-sm">•</Span>
-                </>
-              )}
-              {/* Account status */}
-              <Span className="flex flex-row items-center gap-1.5 min-w-0">
-                <User className="h-3.5 w-3.5 text-primary shrink-0" />
-                <Span className="text-sm truncate">
-                  {isLoggedIn
-                    ? t("components.sidebar.footer.account")
-                    : t("components.sidebar.login")}
-                </Span>
-              </Span>
+              <User className="h-4 w-4 text-muted-foreground shrink-0" />
+              {/* Credits label + bar */}
+              {credits
+                ? (() => {
+                    const max =
+                      credits.expiring > 0
+                        ? 800
+                        : credits.free > 0
+                          ? 20
+                          : Math.max(credits.total, 1);
+                    const pct = Math.min(credits.total / max, 1) * 100;
+                    const indicatorColor =
+                      pct > 50
+                        ? "bg-green-500"
+                        : pct > 20
+                          ? "bg-amber-500"
+                          : "bg-destructive";
+                    const tooltipLabel =
+                      credits.total === 1
+                        ? t("components.credits.credit", { count: 1 })
+                        : t("components.credits.credits", {
+                            count: `${Math.floor(credits.total * 100) / 100}`,
+                          });
+                    return (
+                      <TooltipProvider delayDuration={300}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Span className="flex flex-row items-center gap-1.5 min-w-0 flex-1">
+                              <Span className="text-xs text-muted-foreground shrink-0">
+                                {t("components.credits.label")}
+                              </Span>
+                              <Progress
+                                className="h-1.5 flex-1 min-w-0"
+                                value={pct}
+                              >
+                                <ProgressIndicator
+                                  value={pct}
+                                  className={indicatorColor}
+                                />
+                              </Progress>
+                            </Span>
+                          </TooltipTrigger>
+                          <TooltipContent side="top">
+                            {tooltipLabel}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    );
+                  })()
+                : null}
             </Span>
             {/* Chevron icon */}
             {isExpanded ? (

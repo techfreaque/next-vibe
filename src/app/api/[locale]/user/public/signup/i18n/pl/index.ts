@@ -93,6 +93,18 @@ export const translations: typeof enTranslations = {
       descriptionPrefilled:
         "Twoj znajomy dostanie nagrodę, gdy założysz konto.",
     },
+    supportedSkillId: {
+      label: "Wesprzyj twórcę",
+      description:
+        "Twoja rejestracja daje twórcy tego skilla +5% z Twoich subskrypcji.",
+      selectorTitle: "Wesprzyj twórcę",
+      selectorDescription:
+        "Masz w ulubionych skille od niezależnych twórców. Wybierz jednego do wsparcia — dostanie +5% z Twoich subskrypcji. Możesz to zmienić w każdej chwili.",
+      selectorNone: "Żaden (pomiń)",
+    },
+    localFavorites: {
+      label: "Lokalne ulubione",
+    },
   },
   form: {
     title: "Witamy w Uncensored AI",
@@ -339,7 +351,8 @@ export const translations: typeof enTranslations = {
     },
     free: {
       title: "Co dostajesz za darmo, na zawsze:",
-      credits: "{{freeCredits}} creditów miesięcznie - bez karty, bez daty wygaśnięcia",
+      credits:
+        "{{freeCredits}} creditów miesięcznie - bez karty, bez daty wygaśnięcia",
       allModels: "Dostęp do wszystkich {{modelCount}} modeli AI",
       uncensored:
         "4 niecenzurowane modele, które naprawdę odpowiadają na pytania",

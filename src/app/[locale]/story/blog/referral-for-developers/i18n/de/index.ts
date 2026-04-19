@@ -33,9 +33,10 @@ export const translations: typeof enTranslations = {
   },
   skillAngle: {
     title: "Skill veröffentlichen - 5 % obendrauf",
-    p1: "Jeder Skill, den du veröffentlichst, hat einen teilbaren Link. Wenn jemand sich über deinen Skill-Link anmeldet, verdienst du zusätzlich 5 % auf alle Zahlungen - on top der 10 % direkten Provision. Das macht 15 % von einem einzigen Nutzer, für immer.",
-    p2: "Bettet deinen Skill-Link in ein GitHub README ein. Post ihn in einem Entwickler-Discord. Jede Person, die sich dadurch anmeldet, bringt dir beide Provisionen gleichzeitig. Du musst nicht wählen - der Skill-Link trägt beides.",
-    p3: "Skills sind kostenlos zu erstellen. Kein bezahltes Abo nötig. Wenn du ein nützliches KI-Setup gebaut hast - ein Code-Reviewer, der deinen Stack kennt, oder ein Docs-Writer auf deinen Stil abgestimmt - teil es. Der Link erledigt den Rest.",
+    p1: "Jedes Skill, das du veröffentlichst, hat einen teilbaren Link. Wenn jemand sich über deinen Skill-Link anmeldet, verdienst du zusätzlich 5 % auf alle Zahlungen - on top der 10 % direkten Provision. Das macht 15 % von einem einzigen Nutzer, für immer.",
+    p2: "Was die meisten übersehen: Du verdienst die 5 % als Skill-Autor auch dann, wenn jemand anderes deinen Skill teilt. Ein Nutzer entdeckt deinen Skill im Verzeichnis, schickt den Link an einen Freund - der meldet sich an, und du bekommst 5 % seiner Zahlungen. Automatisch. Die Plattform trackt die Skill-Autorenschaft, nicht wer den Link verbreitet hat. Dein Skill arbeitet für dich, auch wenn du gerade nicht aktiv promtest.",
+    p3: "Bettet deinen Skill-Link in ein GitHub README ein. Post ihn in einem Entwickler-Discord. Jede Person, die sich dadurch anmeldet, bringt dir beide Provisionen gleichzeitig. Du musst nicht wählen - der Skill-Link trägt beides.",
+    p4: "Skills sind kostenlos zu erstellen. Kein bezahltes Abo nötig. Wenn du ein nützliches KI-Setup gebaut hast - ein Code-Reviewer, der deinen Stack kennt, oder ein Docs-Writer auf deinen Stil abgestimmt - teil es. Der Link erledigt den Rest.",
   },
   math: {
     title: "Die Rechnung (echte Zahlen)",

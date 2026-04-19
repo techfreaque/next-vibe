@@ -55,6 +55,12 @@ export const users = pgTable("users", {
   tiktokUrl: text("tiktok_url"),
   githubUrl: text("github_url"),
   discordUrl: text("discord_url"),
+  facebookUrl: text("facebook_url"),
+  rumbleUrl: text("rumble_url"),
+  odyseeUrl: text("odysee_url"),
+  nostrUrl: text("nostr_url"),
+  gabUrl: text("gab_url"),
+  tribeUrl: text("tribe_url"),
   creatorAccentColor: text("creator_accent_color"),
   creatorHeaderImageUrl: text("creator_header_image_url"),
 

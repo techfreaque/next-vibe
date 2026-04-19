@@ -5,4 +5,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   brave: braveTranslations,
   kagi: kagiTranslations,
+  enums: {
+    provider: {
+      BRAVE: "Brave Search",
+      KAGI: "Kagi FastGPT",
+    },
+  },
 };

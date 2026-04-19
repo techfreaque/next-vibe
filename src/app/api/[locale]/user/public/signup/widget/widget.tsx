@@ -21,11 +21,13 @@ import {
 } from "next-vibe-ui/ui/form/form";
 import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
 import { Gift } from "next-vibe-ui/ui/icons/Gift";
+import { Heart } from "next-vibe-ui/ui/icons/Heart";
 import { Label } from "next-vibe-ui/ui/label";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
 import leadCurrentReferralDefinition, {
   type LeadCurrentReferralGetResponseOutput,
 } from "@/app/api/[locale]/referral/lead/current/definition";
@@ -114,6 +116,53 @@ export function SignupFormContainer({
   const prefillCode = referralData?.referralCode ?? null;
   const prefillLabel = referralData?.referralLabel ?? null;
   const displayLabel = prefillLabel ?? prefillCode;
+
+  // UUID skills from localStorage for creator-support selector
+  const [uuidSkills, setUuidSkills] = useState(() =>
+    ChatFavoritesRepositoryClient.getLocalUuidSkillsForAttribution(),
+  );
+  const hasUuidSkills = uuidSkills.length > 0;
+
+  // Async-resolve names for UUID skills that don't have one yet
+  useEffect(() => {
+    const missing = uuidSkills.filter((s) => !s.name);
+    if (missing.length === 0) {
+      return;
+    }
+    void (async () => {
+      const resolved = await Promise.allSettled(
+        missing.map(async (s) => {
+          const res = await fetch(
+            `/api/${locale}/agent/chat/skills/${s.skillId}`,
+          );
+          if (!res.ok) {
+            return s;
+          }
+          const json = (await res.json()) as {
+            data?: { name?: string | null };
+          };
+          return { skillId: s.skillId, name: json.data?.name ?? null };
+        }),
+      );
+      const updates = new Map<string, string | null>();
+      for (const r of resolved) {
+        if (r.status === "fulfilled") {
+          updates.set(r.value.skillId, r.value.name);
+        }
+      }
+      if (updates.size > 0) {
+        setUuidSkills((prev) =>
+          prev.map((s) =>
+            updates.has(s.skillId)
+              ? { ...s, name: updates.get(s.skillId) ?? null }
+              : s,
+          ),
+        );
+      }
+    })();
+    // Only run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Card>
@@ -222,6 +271,72 @@ export function SignupFormContainer({
           <TextFieldWidget
             fieldName="referralCode"
             field={children.referralCode}
+          />
+        )}
+
+        {/* Creator support selector — only shown when user has UUID skills in localStorage */}
+        {hasUuidSkills && (
+          <FormField
+            control={form.control}
+            name="supportedSkillId"
+            render={({ field: formField }) => (
+              <FormItem className="space-y-3">
+                <Div className="flex items-center gap-2">
+                  <Heart className="h-4 w-4 text-pink-500 shrink-0" />
+                  <Label className="text-sm font-medium">
+                    {t("fields.supportedSkillId.selectorTitle")}
+                  </Label>
+                </Div>
+                <p className="text-sm text-muted-foreground">
+                  {t("fields.supportedSkillId.selectorDescription")}
+                </p>
+                <Div className="flex flex-col gap-2">
+                  {uuidSkills.map(({ skillId, name }) => (
+                    <Div
+                      key={skillId}
+                      className={`flex items-center gap-3 rounded-md border px-3 py-2 cursor-pointer transition-colors ${
+                        formField.value === skillId
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-muted-foreground/50"
+                      }`}
+                      onClick={() => formField.onChange(skillId)}
+                    >
+                      <FormControl>
+                        <input
+                          type="radio"
+                          className="accent-primary"
+                          checked={formField.value === skillId}
+                          onChange={() => formField.onChange(skillId)}
+                        />
+                      </FormControl>
+                      <Span className="text-sm">
+                        {name ?? skillId.slice(0, 8) + "…"}
+                      </Span>
+                    </Div>
+                  ))}
+                  <Div
+                    className={`flex items-center gap-3 rounded-md border px-3 py-2 cursor-pointer transition-colors ${
+                      !formField.value
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-muted-foreground/50"
+                    }`}
+                    onClick={() => formField.onChange(undefined)}
+                  >
+                    <FormControl>
+                      <input
+                        type="radio"
+                        className="accent-primary"
+                        checked={!formField.value}
+                        onChange={() => formField.onChange(undefined)}
+                      />
+                    </FormControl>
+                    <Span className="text-sm text-muted-foreground">
+                      {t("fields.supportedSkillId.selectorNone")}
+                    </Span>
+                  </Div>
+                </Div>
+              </FormItem>
+            )}
           />
         )}
 

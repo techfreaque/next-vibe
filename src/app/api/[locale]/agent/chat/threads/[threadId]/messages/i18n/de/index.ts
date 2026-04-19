@@ -25,6 +25,20 @@ export const translations: typeof enTranslations = {
     hideAnalysis: "Analyse ausblenden",
   },
   errorCode: "Fehlercode",
+  errorFeedback: {
+    autoReported: "Fehler wurde automatisch gemeldet",
+    helpFix: "Hilf uns, das zu beheben",
+    hideDetails: "Ausblenden",
+    feedbackHelps: "Dein Feedback hilft uns, das schneller zu fixen.",
+    reportCta: "Feedback senden",
+    threadShared: "Thread-ID wird mitgeschickt",
+    incognitoNote: "Inkognito - keine Thread-Daten verfügbar",
+    incognitoThread: "Inkognito-Thread (keine Daten gespeichert)",
+    autoContext: "[Automatisch generierter Fehlerbericht]",
+    errorLabel: "Fehler",
+    userContextLabel: "Dein Kontext (optional)",
+    separator: "·",
+  },
   compacting: {
     title: "Verlauf komprimiert",
     loading: "Verlauf wird komprimiert...",
@@ -504,6 +518,11 @@ export const translations: typeof enTranslations = {
     },
     batchToolConfirmation: {
       title: "Batch-Tool-Aufrufe bestätigen",
+    },
+    queue: {
+      badge: "Warteschlange",
+      cancelTooltip:
+        "Aus der Warteschlange entfernen und in Eingabe zurückholen",
     },
   },
   flatView: {

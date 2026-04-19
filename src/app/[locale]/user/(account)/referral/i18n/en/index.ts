@@ -173,7 +173,7 @@ export const translations = {
     newCta: "Get your referral link",
     proTitle: "Skill link — {{skillPct}} per user",
     proBody:
-      "Build a skill. Share its link. Everyone who signs up through it pays you {{directPct}} direct + {{skillBonusPct}} skill bonus = {{skillPct}} per user, recurring. No followers required.",
+      "Build a skill. Share its link. Everyone who signs up through it pays you {{directPct}} direct + {{skillBonusPct}} skill bonus = {{skillPct}} per user, recurring. Even better: you earn the {{skillBonusPct}} as the skill author even when someone else shares your skill. The platform tracks skill authorship - passive attribution with no extra work.",
     proCta: "Build a skill",
   },
   discord: {

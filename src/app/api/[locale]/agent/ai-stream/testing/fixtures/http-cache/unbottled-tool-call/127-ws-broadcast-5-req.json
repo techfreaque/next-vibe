@@ -1,0 +1,46 @@
+{
+  "url": "http://127.0.0.1:3001/ws/broadcast",
+  "method": "POST",
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": {
+    "type": "batch",
+    "events": [
+      {
+        "channel": "agent/chat/threads/f495b106-ab71-49db-b7c6-e2b1d836efc1/messages",
+        "event": "message-created",
+        "data": {
+          "streamingState": "streaming",
+          "messages": [
+            {
+              "id": "65cdff8e-54f2-484d-a9f4-a810d40b7915",
+              "threadId": "f495b106-ab71-49db-b7c6-e2b1d836efc1",
+              "role": "user",
+              "isAI": false,
+              "content": "[T1 thread-create+tool-call] Use the tool-help tool to list available tools. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if everything worked, or FAILED: <reason> if anything was wrong.",
+              "parentId": null,
+              "sequenceId": null,
+              "model": "kimi_k2_5",
+              "skill": "quality-tester",
+              "metadata": {}
+            }
+          ]
+        }
+      },
+      {
+        "channel": "agent/chat/threads/f495b106-ab71-49db-b7c6-e2b1d836efc1/messages",
+        "event": "streaming-state-changed",
+        "data": {
+          "streamingState": "streaming"
+        }
+      }
+    ],
+    "user": {
+      "isPublic": false,
+      "id": "27111963-4352-474a-82f3-5f6619fa1719",
+      "leadId": "75aad929-34f0-4e9a-bb4c-9f25471b4aa3",
+      "roles": ["enums.userRole.admin"]
+    }
+  }
+}

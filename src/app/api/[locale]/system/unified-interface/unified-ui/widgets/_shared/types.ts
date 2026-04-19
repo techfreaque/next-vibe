@@ -238,7 +238,9 @@ export interface BaseWidgetConfig<
    *
    * Co-locates the "resolve value when hidden" logic directly on the field.
    */
-  serverDefault?: (ctx: ServerDefaultContext) => WidgetData | undefined;
+  serverDefault?: (
+    ctx: ServerDefaultContext,
+  ) => WidgetData | undefined | Promise<WidgetData | undefined>;
 }
 
 export interface BasePrimitiveWidgetConfig<

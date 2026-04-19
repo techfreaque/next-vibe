@@ -956,15 +956,14 @@ async function renderAdminNotificationByEmail(
 
   // Fetch credit balances (non-blocking - omit from email if unavailable)
   const [userBalanceResult, leadBalanceResult] = await Promise.all([
-    CreditRepository.getBalance(
-      jwtUser,
-      logger,
-      creditsT,
-      locale,
-    ),
+    CreditRepository.getBalance(jwtUser, logger, creditsT, locale),
     user.leadId
       ? CreditRepository.getBalance(
-          { isPublic: true, leadId: user.leadId, roles: [UserPermissionRole.PUBLIC] },
+          {
+            isPublic: true,
+            leadId: user.leadId,
+            roles: [UserPermissionRole.PUBLIC],
+          },
           logger,
           creditsT,
           locale,

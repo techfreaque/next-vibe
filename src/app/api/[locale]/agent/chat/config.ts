@@ -4,10 +4,7 @@
  */
 
 import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -15,7 +12,6 @@ import {
   type UserPermissionRoleValue,
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import type { VideoGenModelSelection } from "../video-generation/models";
 
 /**
  * Default folder IDs
@@ -154,18 +150,12 @@ export interface ToolExecutionContext {
    * model + character config when restarting a dead stream after a remote tool result.
    */
   favoriteId: string | undefined;
-  /** The character/persona driving the conversation */
+
+  /**
+   * The effective resolved skill for this stream.
+   * This is the post-resolution value (from favorite or explicit override).
+   */
   skillId: string | undefined;
-  /** The active variant within the skill */
-  variantId: string | undefined;
-  /** The model being used */
-  modelId: ChatModelId | undefined;
-  /** Cascaded image gen model selection - resolved to actual model at tool execution time */
-  imageGenModelSelection: ImageGenModelSelection | undefined;
-  /** Cascaded music gen model selection - resolved to actual model at tool execution time */
-  musicGenModelSelection: MusicGenModelSelection | undefined;
-  /** Cascaded video gen model selection - resolved to actual model at tool execution time */
-  videoGenModelSelection: VideoGenModelSelection | undefined;
   /**
    * When set, all media gen tools (image/music/video) must use this provider.
    * Mirrors the chat model providerOverride so the full stream uses one provider.

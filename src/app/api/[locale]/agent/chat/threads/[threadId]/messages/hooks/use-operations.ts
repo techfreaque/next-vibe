@@ -13,9 +13,9 @@ import { answerAsAI as answerAsAIOp } from "@/app/api/[locale]/agent/ai-stream/s
 import { branchMessage as branchMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/branch-message";
 import { retryMessage as retryMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/retry-message";
 import { sendMessage as sendMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import messageIdDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition";
 import voteDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import {
@@ -28,7 +28,6 @@ import type { StartStreamFn } from "../../../../../ai-stream/stream/hooks/shared
 import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
 import { DefaultFolderId } from "../../../../config";
 import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
-import type { ToolConfigItem } from "../../../../settings/definition";
 import messagesDefinition from "../definition";
 import { patchMessage, removeMessage } from "./update-messages";
 
@@ -100,11 +99,10 @@ export interface MessageOperationsDeps {
   settings: {
     selectedModel: ChatModelId | null;
     selectedSkill: string;
-    availableTools: ToolConfigItem[] | null;
-    pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
-    voiceModelSelection: VoiceModelSelection | null | undefined;
   };
+  /** Active favorite config for model/tool resolution */
+  favoriteConfig: FavoriteConfig | null;
 }
 
 /**
@@ -121,6 +119,7 @@ export function useMessageOperations(
     currentSubFolderId,
     leafMessageId,
     settings,
+    favoriteConfig,
   } = deps;
 
   const user = useWidgetUser();
@@ -181,6 +180,7 @@ export function useMessageOperations(
           leafMessageId,
           user,
           settings: { ...settings, selectedModel: settings.selectedModel },
+          favoriteConfig,
           locale,
         },
         onThreadCreated,
@@ -195,6 +195,7 @@ export function useMessageOperations(
       leafMessageId,
       user,
       settings,
+      favoriteConfig,
       locale,
     ],
   );
@@ -221,6 +222,7 @@ export function useMessageOperations(
         activeThreadId,
         user,
         settings: { ...settings, selectedModel: settings.selectedModel },
+        favoriteConfig,
         setLeafMessageId,
         locale,
       });
@@ -233,6 +235,7 @@ export function useMessageOperations(
       activeThreadId,
       user,
       settings,
+      favoriteConfig,
       setLeafMessageId,
       locale,
     ],
@@ -262,6 +265,7 @@ export function useMessageOperations(
         activeThreadId,
         user,
         settings: { ...settings, selectedModel: settings.selectedModel },
+        favoriteConfig,
         setLeafMessageId,
         locale,
       });
@@ -274,6 +278,7 @@ export function useMessageOperations(
       activeThreadId,
       user,
       settings,
+      favoriteConfig,
       setLeafMessageId,
       locale,
     ],
@@ -301,6 +306,7 @@ export function useMessageOperations(
         currentSubFolderId,
         activeThreadId,
         settings: { ...settings, selectedModel: settings.selectedModel },
+        favoriteConfig,
       });
     },
     [
@@ -310,6 +316,7 @@ export function useMessageOperations(
       currentSubFolderId,
       activeThreadId,
       settings,
+      favoriteConfig,
     ],
   );
 

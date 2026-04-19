@@ -2,7 +2,7 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Globe } from "next-vibe-ui/ui/icons/Globe";
+import { SiDiscord } from "next-vibe-ui/ui/icons/SiDiscord";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { Link } from "next-vibe-ui/ui/link";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
@@ -13,7 +13,6 @@ import contactDefinitions from "@/app/api/[locale]/contact/definition";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -85,18 +84,18 @@ export default function HelpPageClient({
               </Div>
               <Div>
                 <Div className="flex items-start mb-2">
-                  <Globe className="h-5 w-5 text-primary mt-0.5 mr-3" />
+                  <SiDiscord className="h-5 w-5 text-primary mt-0.5 mr-3" />
                   <H3 className="font-medium">
-                    {t("pages.help.info.website")}
+                    {t("pages.help.info.discord")}
                   </H3>
                 </Div>
                 <Link
-                  href={envClient.NEXT_PUBLIC_APP_URL}
+                  href={configT("social.discordInvite")}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary hover:underline ml-8"
                 >
-                  {t("pages.help.info.websiteUrl")}
+                  {t("pages.help.info.discordUrl")}
                 </Link>
               </Div>
             </Div>

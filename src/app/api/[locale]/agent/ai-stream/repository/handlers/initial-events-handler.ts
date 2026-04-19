@@ -145,7 +145,7 @@ export class InitialEventsHandler {
       messageId: userMessageId,
       threadId,
       content: isVoiceMode ? "" : effectiveContent,
-      parentId: effectiveParentMessageId ?? null,
+      parentId: effectiveParentMessageId || null,
       model,
       skill: skill,
       metadata: Object.keys(metadata).length > 0 ? metadata : undefined,

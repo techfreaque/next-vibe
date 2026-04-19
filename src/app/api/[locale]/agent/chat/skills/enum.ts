@@ -255,6 +255,7 @@ export const {
   ROLEPLAY: "enums.category.roleplay",
   EDUCATION: "enums.category.education",
   CONTROVERSIAL: "enums.category.controversial",
+  BACKGROUND: "enums.category.background",
 });
 
 /**
@@ -270,6 +271,7 @@ export const SkillCategoryDB = [
   SkillCategory.ROLEPLAY,
   SkillCategory.EDUCATION,
   SkillCategory.CONTROVERSIAL,
+  SkillCategory.BACKGROUND,
 ] as const;
 
 /**
@@ -446,6 +448,12 @@ export const CATEGORY_CONFIG = {
     icon: "fire" as const,
     task: ModelUtility.CHAT,
     order: 8,
+  },
+  [SkillCategory.BACKGROUND]: {
+    category: SkillCategory.BACKGROUND,
+    icon: "moon" as const,
+    task: ModelUtility.CHAT,
+    order: 9,
   },
 } as const;
 

@@ -5,6 +5,8 @@
 
 import { z } from "zod";
 
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+
 import {
   chatModelSelectionSchema,
   filterChatModels,
@@ -17,10 +19,6 @@ import {
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
-import {
-  CHAT_MODE_IDS,
-  ChatModeOptions,
-} from "@/app/api/[locale]/agent/models/enum";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
@@ -163,7 +161,8 @@ const { DELETE } = createEndpoint({
                   sections: oldData.data.sections.map((section) => ({
                     ...section,
                     skills: section.skills.map((char) =>
-                      char.id === deletedSkillId
+                      parseSkillId(char.skillId).skillId ===
+                      parseSkillId(deletedSkillId ?? "").skillId
                         ? { ...char, addedToFav: false }
                         : char,
                     ),
@@ -362,7 +361,7 @@ const { PATCH } = createEndpoint({
               : (settingsData.data.selectedModel ?? undefined);
           }
 
-          // Optimistically update settings cache with new model and voice
+          // Optimistically update settings cache with new model
           apiClient.updateEndpointData(
             settingsDefinition.default.GET,
             logger,
@@ -375,9 +374,6 @@ const { PATCH } = createEndpoint({
                 data: {
                   ...prevData.data,
                   selectedModel: modelId,
-                  voiceModelSelection:
-                    requestData.voiceModelSelection ??
-                    prevData.data.voiceModelSelection,
                 },
               };
             },
@@ -391,9 +387,6 @@ const { PATCH } = createEndpoint({
               user,
               {
                 selectedModel: modelId,
-                voiceModelSelection:
-                  requestData.voiceModelSelection ??
-                  settingsData.data.voiceModelSelection,
               },
               undefined,
               locale,
@@ -433,19 +426,23 @@ const { PATCH } = createEndpoint({
                 (f) => f.id === pathParams.id,
               )
             : undefined;
-          if (currentFav?.skillId && currentFav.variantId) {
-            const skillDefinitions =
-              await import("../../skills/[id]/definition");
-            const skillData = apiClient.getEndpointData(
-              skillDefinitions.default.GET,
-              logger,
-              { urlPathParams: { id: currentFav.skillId } },
-            );
-            if (skillData?.success) {
-              const variant = skillData.data.variants.find(
-                (v) => v.id === currentFav.variantId,
+          if (currentFav?.skillId) {
+            const { skillId: baseSkillId, variantId: parsedVariantId } =
+              parseSkillId(currentFav.skillId);
+            if (baseSkillId && parsedVariantId) {
+              const skillDefinitions =
+                await import("../../skills/[id]/definition");
+              const skillData = apiClient.getEndpointData(
+                skillDefinitions.default.GET,
+                logger,
+                { urlPathParams: { id: baseSkillId } },
               );
-              cachedCharacterModelSelection = variant?.modelSelection ?? null;
+              if (skillData?.success) {
+                const variant = skillData.data.variants.find(
+                  (v) => v.id === parsedVariantId,
+                );
+                cachedCharacterModelSelection = variant?.modelSelection ?? null;
+              }
             }
           }
         }
@@ -481,7 +478,6 @@ const { PATCH } = createEndpoint({
                       {
                         id: pathParams.id,
                         skillId: fav.skillId,
-                        variantId: fav.variantId ?? null,
                         customVariantName:
                           requestData.customVariantName ??
                           fav.customVariantName,
@@ -581,17 +577,10 @@ const { PATCH } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.skillId.label" as const,
+        description: "patch.skillId.description" as const,
         columns: 6,
         hidden: true,
         schema: z.string().optional(),
-      }),
-      variantId: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "patch.variantId.label" as const,
-        columns: 6,
-        hidden: true,
-        schema: z.string().nullable().optional(),
       }),
 
       customVariantName: requestField(scopedTranslation, {
@@ -677,20 +666,6 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: videoGenModelSelectionSchema.nullable().optional(),
       }),
-      defaultChatMode: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: ChatModeOptions,
-        label: "patch.defaultChatMode.label" as const,
-        description: "patch.defaultChatMode.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-        schema: z.enum(CHAT_MODE_IDS).nullable().optional(),
-      }),
-
       modelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -961,12 +936,6 @@ const { GET } = createEndpoint({
         hidden: true,
       }),
 
-      variantId: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        schema: z.string().nullable(),
-        hidden: true,
-      }),
-
       customVariantName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string().nullable(),
@@ -1046,12 +1015,6 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         hidden: true,
         schema: videoGenModelSelectionSchema.nullable().optional(),
-      }),
-
-      defaultChatMode: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.enum(CHAT_MODE_IDS).optional(),
       }),
 
       modelSelection: responseField(scopedTranslation, {
@@ -1171,7 +1134,6 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         skillId: "thea",
-        variantId: null,
         customVariantName: null,
         icon: "sun" as const,
         name: "fallbacks.unknownSkill" as const,

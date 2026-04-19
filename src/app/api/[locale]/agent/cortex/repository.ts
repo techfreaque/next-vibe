@@ -1,0 +1,346 @@
+import "server-only";
+
+/**
+ * Cortex Shared Repository
+ * Path utilities and common operations for the virtual filesystem
+ */
+
+import { and, eq, like, sql } from "drizzle-orm";
+
+import { db } from "@/app/api/[locale]/system/db";
+
+import { cortexNodes, type CortexNode } from "./db";
+import { CortexNodeType } from "./enum";
+
+/** Maximum path length */
+const MAX_PATH_LENGTH = 1024;
+
+/** Maximum nesting depth */
+const MAX_DEPTH = 20;
+
+/** Reserved mount prefixes — these paths resolve to existing tables, not cortex_nodes */
+export const VIRTUAL_MOUNTS = [
+  "/threads",
+  "/skills",
+  "/tasks",
+  "/uploads",
+  "/searches",
+] as const;
+
+/** Virtual mounts that support write-through (write/edit/delete/move) */
+export const WRITABLE_MOUNTS = ["/skills"] as const;
+
+/** The document workspace prefix — always writable, stored in cortex_nodes */
+export const DOCUMENTS_PREFIX = "/documents";
+
+/** The memories prefix — writable, stored natively in cortex_nodes */
+export const MEMORIES_PREFIX = "/memories";
+
+/** All native writable prefixes (stored in cortex_nodes, not virtual mounts) */
+export const NATIVE_WRITABLE_PREFIXES = [
+  DOCUMENTS_PREFIX,
+  MEMORIES_PREFIX,
+] as const;
+
+/**
+ * Normalize a path: resolve "..", ensure leading "/", remove trailing "/", collapse "//"
+ */
+export function normalizePath(raw: string): string {
+  // Ensure leading slash
+  let path = raw.startsWith("/") ? raw : `/${raw}`;
+
+  // Collapse multiple slashes
+  path = path.replace(/\/+/g, "/");
+
+  // Remove trailing slash (except for root)
+  if (path.length > 1 && path.endsWith("/")) {
+    path = path.slice(0, -1);
+  }
+
+  // Resolve ".." segments
+  const segments = path.split("/").filter(Boolean);
+  const resolved: string[] = [];
+  for (const seg of segments) {
+    if (seg === "..") {
+      resolved.pop();
+    } else if (seg !== ".") {
+      resolved.push(seg);
+    }
+  }
+
+  return `/${resolved.join("/")}`;
+}
+
+/**
+ * Validate a path is safe and well-formed
+ */
+export function isValidPath(path: string): boolean {
+  if (path.length > MAX_PATH_LENGTH) {
+    return false;
+  }
+  if (!path.startsWith("/")) {
+    return false;
+  }
+  if (path.includes("..")) {
+    return false;
+  }
+  if (path.includes("//")) {
+    return false;
+  }
+
+  const segments = path.split("/").filter(Boolean);
+  if (segments.length > MAX_DEPTH) {
+    return false;
+  }
+
+  // No empty or whitespace-only segments
+  for (const seg of segments) {
+    if (seg.trim().length === 0) {
+      return false;
+    }
+    // No control characters — intentional use of control char regex
+    // eslint-disable-next-line no-control-regex
+    if (/[\x00-\x1f\x7f]/.test(seg)) {
+      return false;
+    }
+    // No SQL LIKE wildcards in path segments
+    if (/[%_]/.test(seg)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Check if a path is writable (under /documents/ or /memories/)
+ */
+export function isWritablePath(path: string): boolean {
+  return NATIVE_WRITABLE_PREFIXES.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+  );
+}
+
+/**
+ * Check if a path is under a writable virtual mount (write-through to native repo)
+ */
+export function isVirtualWritable(path: string): boolean {
+  return WRITABLE_MOUNTS.some(
+    (mount) => path === mount || path.startsWith(`${mount}/`),
+  );
+}
+
+/**
+ * Check if a path is a virtual mount (resolved from existing tables)
+ */
+export function isVirtualMount(path: string): boolean {
+  if (path === "/") {
+    return true;
+  }
+  return VIRTUAL_MOUNTS.some(
+    (mount) => path === mount || path.startsWith(`${mount}/`),
+  );
+}
+
+/**
+ * Get the mount prefix for a path, or null if unrecognized
+ */
+export function getMountPrefix(
+  path: string,
+):
+  | (typeof VIRTUAL_MOUNTS)[number]
+  | (typeof NATIVE_WRITABLE_PREFIXES)[number]
+  | null {
+  for (const prefix of NATIVE_WRITABLE_PREFIXES) {
+    if (path === prefix || path.startsWith(`${prefix}/`)) {
+      return prefix;
+    }
+  }
+  for (const mount of VIRTUAL_MOUNTS) {
+    if (path === mount || path.startsWith(`${mount}/`)) {
+      return mount;
+    }
+  }
+  return null;
+}
+
+/**
+ * Get parent path: "/documents/notes/meeting.md" -> "/documents/notes"
+ */
+export function parentPath(path: string): string {
+  const lastSlash = path.lastIndexOf("/");
+  if (lastSlash <= 0) {
+    return "/";
+  }
+  return path.slice(0, lastSlash);
+}
+
+/**
+ * Get basename: "/documents/notes/meeting.md" -> "meeting.md"
+ */
+export function basename(path: string): string {
+  const lastSlash = path.lastIndexOf("/");
+  return path.slice(lastSlash + 1);
+}
+
+/**
+ * Get depth: "/" = 0, "/a" = 1, "/a/b" = 2
+ */
+export function pathDepth(path: string): number {
+  if (path === "/") {
+    return 0;
+  }
+  return path.split("/").filter(Boolean).length;
+}
+
+/**
+ * Parse YAML-style frontmatter from markdown content.
+ * Returns the extracted key-value pairs and the body without frontmatter.
+ */
+export function parseFrontmatter(content: string): {
+  frontmatter: Record<string, string | number | boolean | null>;
+  body: string;
+} {
+  const match = content.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  if (!match) {
+    return { frontmatter: {}, body: content };
+  }
+
+  const yamlBlock = match[1];
+  const body = match[2];
+  const frontmatter: Record<string, string | number | boolean | null> = {};
+
+  for (const line of yamlBlock.split("\n")) {
+    const colonIdx = line.indexOf(":");
+    if (colonIdx === -1) {
+      continue;
+    }
+    const key = line.slice(0, colonIdx).trim();
+    const rawValue = line.slice(colonIdx + 1).trim();
+
+    if (!key) {
+      continue;
+    }
+
+    // Parse value types
+    if (rawValue === "true") {
+      frontmatter[key] = true;
+    } else if (rawValue === "false") {
+      frontmatter[key] = false;
+    } else if (rawValue === "null" || rawValue === "") {
+      frontmatter[key] = null;
+    } else if (/^-?\d+(\.\d+)?$/.test(rawValue)) {
+      frontmatter[key] = Number(rawValue);
+    } else {
+      // Strip surrounding quotes
+      frontmatter[key] =
+        rawValue.startsWith('"') && rawValue.endsWith('"')
+          ? rawValue.slice(1, -1)
+          : rawValue;
+    }
+  }
+
+  return { frontmatter, body };
+}
+
+/**
+ * Get a Cortex node by user + path
+ */
+export async function getNode(
+  userId: string,
+  path: string,
+): Promise<CortexNode | null> {
+  const rows = await db
+    .select()
+    .from(cortexNodes)
+    .where(and(eq(cortexNodes.userId, userId), eq(cortexNodes.path, path)))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+/**
+ * Check if a path exists for a user
+ */
+export async function pathExists(
+  userId: string,
+  path: string,
+): Promise<boolean> {
+  const rows = await db
+    .select({ id: cortexNodes.id })
+    .from(cortexNodes)
+    .where(and(eq(cortexNodes.userId, userId), eq(cortexNodes.path, path)))
+    .limit(1);
+  return rows.length > 0;
+}
+
+/**
+ * List direct children of a directory path
+ */
+export async function listChildren(
+  userId: string,
+  dirPath: string,
+): Promise<CortexNode[]> {
+  const prefix = dirPath === "/" ? "/" : `${dirPath}/`;
+  const targetDepth = pathDepth(dirPath) + 1;
+
+  const rows = await db
+    .select()
+    .from(cortexNodes)
+    .where(
+      and(
+        eq(cortexNodes.userId, userId),
+        dirPath === "/" ? sql`true` : like(cortexNodes.path, `${prefix}%`),
+        // Filter to exact depth in SQL (count slashes = target depth)
+        sql`(LENGTH(${cortexNodes.path}) - LENGTH(REPLACE(${cortexNodes.path}, '/', ''))) = ${targetDepth}`,
+      ),
+    )
+    .orderBy(cortexNodes.sortOrder, cortexNodes.path);
+
+  return rows;
+}
+
+/**
+ * Ensure all parent directories exist for a path, creating them if needed.
+ * Returns the number of directories created.
+ */
+export async function ensureParentDirs(
+  userId: string,
+  filePath: string,
+): Promise<number> {
+  const parent = parentPath(filePath);
+
+  // Find the root prefix for this path
+  const rootPrefix = NATIVE_WRITABLE_PREFIXES.find(
+    (prefix) => filePath === prefix || filePath.startsWith(`${prefix}/`),
+  );
+  if (!rootPrefix || parent === "/" || parent === rootPrefix) {
+    return 0;
+  }
+
+  // Collect all ancestor paths that need to exist
+  const ancestors: string[] = [];
+  let current = parent;
+  while (current !== "/" && current.length > rootPrefix.length) {
+    ancestors.unshift(current);
+    current = parentPath(current);
+  }
+
+  let created = 0;
+  for (const ancestorPath of ancestors) {
+    const result = await db
+      .insert(cortexNodes)
+      .values({
+        userId,
+        path: ancestorPath,
+        nodeType: CortexNodeType.DIR,
+        content: null,
+        size: 0,
+      })
+      .onConflictDoNothing()
+      .returning({ id: cortexNodes.id });
+    if (result.length > 0) {
+      created++;
+    }
+  }
+  return created;
+}

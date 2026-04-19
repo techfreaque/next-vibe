@@ -1,0 +1,1888 @@
+{
+  "url": "http://127.0.0.1:3001/ws/broadcast",
+  "method": "POST",
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": {
+    "type": "batch",
+    "events": [
+      {
+        "channel": "agent/chat/threads/90a65083-3943-466d-9b04-8f0ffa460cfe/messages",
+        "event": "message-created",
+        "data": {
+          "streamingState": "streaming",
+          "messages": [
+            {
+              "id": "a784143d-8b09-4574-a5b4-5cfa0c4b68f5",
+              "threadId": "90a65083-3943-466d-9b04-8f0ffa460cfe",
+              "role": "tool",
+              "isAI": true,
+              "content": null,
+              "parentId": "9892ea6b-89e4-4f91-9d55-b9007d67ec5e",
+              "sequenceId": "ffc6c482-e824-465b-870b-fcd041e2d2c6",
+              "model": "kimi_k2_5",
+              "skill": "quality-tester",
+              "metadata": {
+                "toolCall": {
+                  "toolCallId": "functions.tool-help:0",
+                  "toolName": "tool-help",
+                  "args": {},
+                  "creditsUsed": 0,
+                  "requiresConfirmation": false,
+                  "isConfirmed": false,
+                  "waitingForConfirmation": false,
+                  "result": {
+                    "categories": [
+                      {
+                        "count": 24,
+                        "name": "AI",
+                        "subCategories": [
+                          {
+                            "count": 3,
+                            "name": "Generation"
+                          },
+                          {
+                            "count": 2,
+                            "name": "Inference"
+                          },
+                          {
+                            "count": 3,
+                            "name": "Search"
+                          },
+                          {
+                            "count": 16,
+                            "name": "Tools"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 11,
+                        "name": "Analytics"
+                      },
+                      {
+                        "count": 89,
+                        "name": "Analytics: Data Sources",
+                        "subCategories": [
+                          {
+                            "count": 13,
+                            "name": "Chat"
+                          },
+                          {
+                            "count": 17,
+                            "name": "Credits"
+                          },
+                          {
+                            "count": 15,
+                            "name": "Leads"
+                          },
+                          {
+                            "count": 6,
+                            "name": "Messages"
+                          },
+                          {
+                            "count": 6,
+                            "name": "Monitoring"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Newsletter"
+                          },
+                          {
+                            "count": 8,
+                            "name": "Payments"
+                          },
+                          {
+                            "count": 5,
+                            "name": "Referral"
+                          },
+                          {
+                            "count": 6,
+                            "name": "Subscriptions"
+                          },
+                          {
+                            "count": 9,
+                            "name": "Users"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 26,
+                        "name": "Browser",
+                        "subCategories": [
+                          {
+                            "count": 8,
+                            "name": "DevTools"
+                          },
+                          {
+                            "count": 3,
+                            "name": "Inspection"
+                          },
+                          {
+                            "count": 8,
+                            "name": "Interaction"
+                          },
+                          {
+                            "count": 7,
+                            "name": "Pages"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 13,
+                        "name": "Chat",
+                        "subCategories": [
+                          {
+                            "count": 11,
+                            "name": "Organization"
+                          },
+                          {
+                            "count": 2,
+                            "name": "Settings"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 5,
+                        "name": "Credits",
+                        "subCategories": [
+                          {
+                            "count": 1,
+                            "name": "Credits"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Management"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 2,
+                        "name": "Dev Tools"
+                      },
+                      {
+                        "count": 13,
+                        "name": "Email Campaigns",
+                        "subCategories": [
+                          {
+                            "count": 3,
+                            "name": "Journeys"
+                          },
+                          {
+                            "count": 8,
+                            "name": "Processing"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Queue"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Stats"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 6,
+                        "name": "Evaluators"
+                      },
+                      {
+                        "count": 10,
+                        "name": "Indicators"
+                      },
+                      {
+                        "count": 1,
+                        "name": "Interfaces"
+                      },
+                      {
+                        "count": 25,
+                        "name": "Lead Magnet",
+                        "subCategories": [
+                          {
+                            "count": 4,
+                            "name": "Capture"
+                          },
+                          {
+                            "count": 21,
+                            "name": "Integrations"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 20,
+                        "name": "Leads",
+                        "subCategories": [
+                          {
+                            "count": 8,
+                            "name": "Import"
+                          },
+                          {
+                            "count": 12,
+                            "name": "Management"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 9,
+                        "name": "Messages",
+                        "subCategories": [
+                          {
+                            "count": 7,
+                            "name": "Moderating"
+                          },
+                          {
+                            "count": 2,
+                            "name": "Search"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 17,
+                        "name": "Messenger",
+                        "subCategories": [
+                          {
+                            "count": 5,
+                            "name": "Accounts"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Inbox"
+                          },
+                          {
+                            "count": 6,
+                            "name": "Messages"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Providers"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Users"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 3,
+                        "name": "Newsletter"
+                      },
+                      {
+                        "count": 5,
+                        "name": "Payments",
+                        "subCategories": [
+                          {
+                            "count": 4,
+                            "name": "Management"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Transactions"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 8,
+                        "name": "Referral",
+                        "subCategories": [
+                          {
+                            "count": 4,
+                            "name": "Payouts"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Program"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 8,
+                        "name": "Remote Connections",
+                        "subCategories": [
+                          {
+                            "count": 7,
+                            "name": "Instances"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Self"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 1,
+                        "name": "Server"
+                      },
+                      {
+                        "count": 3,
+                        "name": "Settings",
+                        "subCategories": [
+                          {
+                            "count": 2,
+                            "name": "Environment"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Keys"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 16,
+                        "name": "Skills",
+                        "subCategories": [
+                          {
+                            "count": 3,
+                            "name": "Community"
+                          },
+                          {
+                            "count": 6,
+                            "name": "Favorites"
+                          },
+                          {
+                            "count": 5,
+                            "name": "Management"
+                          },
+                          {
+                            "count": 2,
+                            "name": "Moderation"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 18,
+                        "name": "SSH",
+                        "subCategories": [
+                          {
+                            "count": 6,
+                            "name": "Connections"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Execution"
+                          },
+                          {
+                            "count": 3,
+                            "name": "Files"
+                          },
+                          {
+                            "count": 5,
+                            "name": "Terminal"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 20,
+                        "name": "Tasks",
+                        "subCategories": [
+                          {
+                            "count": 13,
+                            "name": "Cron"
+                          },
+                          {
+                            "count": 3,
+                            "name": "Monitoring"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Sync"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 13,
+                        "name": "Threads",
+                        "subCategories": [
+                          {
+                            "count": 8,
+                            "name": "Management"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Search"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Sharing"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 5,
+                        "name": "Transformers"
+                      },
+                      {
+                        "count": 4,
+                        "name": "User Account",
+                        "subCategories": [
+                          {
+                            "count": 2,
+                            "name": "Directory"
+                          },
+                          {
+                            "count": 2,
+                            "name": "Profile"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 9,
+                        "name": "User Admin",
+                        "subCategories": [
+                          {
+                            "count": 8,
+                            "name": "Management"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Stats"
+                          }
+                        ]
+                      }
+                    ],
+                    "currentEnv": "production",
+                    "currentPage": 1,
+                    "currentPlatform": "ai",
+                    "effectivePageSize": 25,
+                    "hint": "384 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\"<name>\" for detail on one tool. To call any tool: execute-tool toolName=\"<name>\". Page 1/16 - pass page=2 to continue.",
+                    "matchedCount": 384,
+                    "tools": [
+                      {
+                        "aliases": ["run-ai"],
+                        "category": "AI",
+                        "description": "Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.",
+                        "name": "ai-run",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Inference",
+                        "title": "Run AI Agent"
+                      },
+                      {
+                        "category": "AI",
+                        "credits": 0.65,
+                        "description": "Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.",
+                        "name": "brave-search",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Search",
+                        "title": "Search the Web"
+                      },
+                      {
+                        "aliases": ["claude-code"],
+                        "category": "AI",
+                        "description": "Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.",
+                        "name": "coding-agent",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Run Coding Agent"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Remove a file or folder. Gone forever.",
+                        "name": "cortex-delete",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Delete"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Change part of a file. Find text and replace it, or edit specific lines.",
+                        "name": "cortex-edit",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Edit File"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Generate embeddings for all cortex nodes missing them.",
+                        "name": "cortex-embed-backfill",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Backfill Embeddings"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "See what's in a folder.",
+                        "name": "cortex-list",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "List Folder"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Create a folder.",
+                        "name": "cortex-mkdir",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "New Folder"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Move or rename a file or folder.",
+                        "name": "cortex-move",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Move"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Open any file — your notes, threads, memories, skills, or tasks.",
+                        "name": "cortex-read",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Read File"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Find files by name or content. Searches everything.",
+                        "name": "cortex-search",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Search"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "See the full folder structure at a glance.",
+                        "name": "cortex-tree",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Show Tree"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Save a file. Give it a path and content — done.",
+                        "name": "cortex-write",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Write File"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Describe the contents of an image using a vision AI model",
+                        "name": "describe_image",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Describe Image"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Describe the contents of a video using a vision AI model",
+                        "name": "describe_video",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Describe Video"
+                      },
+                      {
+                        "aliases": ["execute"],
+                        "category": "AI",
+                        "description": "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
+                        "name": "execute-tool",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Execute Tool"
+                      },
+                      {
+                        "aliases": ["fetch"],
+                        "category": "AI",
+                        "credits": 0.13,
+                        "description": "Fetch and extract content from any URL, converting it to readable markdown format. Use this when you need to read or analyze web page content.",
+                        "name": "fetch-url-content",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Fetch URL Content"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Generate an image from a text prompt using AI",
+                        "name": "generate_image",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Generation",
+                        "title": "Generate Image"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Generate music from a text prompt using AI",
+                        "name": "generate_music",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Generation",
+                        "title": "Generate Music"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Generate a video from a text prompt using AI",
+                        "name": "generate_video",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Generation",
+                        "title": "Generate Video"
+                      },
+                      {
+                        "category": "AI",
+                        "credits": 1.95,
+                        "description": "Search the internet or get AI-powered answers using Kagi. FastGPT mode provides comprehensive answers with sources, while search mode returns direct results.",
+                        "name": "kagi-search",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Search",
+                        "title": "Search with Kagi"
+                      },
+                      {
+                        "aliases": ["list-models"],
+                        "category": "AI",
+                        "description": "Browse and search all available AI models. Filter by type, content level, intelligence, price, or capabilities. Use this to find the right model for your task.",
+                        "name": "models",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "cron"
+                        ],
+                        "subCategory": "Inference",
+                        "title": "List AI Models"
+                      },
+                      {
+                        "aliases": ["help"],
+                        "category": "AI",
+                        "description": "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.",
+                        "name": "tool-help",
+                        "platforms": [
+                          "cli",
+                          "cli-package",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Tool Help - Discover Available Tools"
+                      },
+                      {
+                        "category": "AI",
+                        "credits": 0.65,
+                        "description": "Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider.",
+                        "name": "web-search",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Search",
+                        "title": "Search the Web"
+                      },
+                      {
+                        "category": "Analytics",
+                        "description": "Run retention cleanup for datapoints and expire snapshots",
+                        "name": "system_unified-interface_vibe-sense_cleanup_POST",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Vibe Sense",
+                        "title": "Vibe Sense Cleanup"
+                      }
+                    ],
+                    "totalCount": 384,
+                    "totalPages": 16
+                  },
+                  "isPartial": false,
+                  "status": "completed"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "channel": "agent/chat/threads/90a65083-3943-466d-9b04-8f0ffa460cfe/messages",
+        "event": "tool-result",
+        "data": {
+          "messages": [
+            {
+              "id": "a784143d-8b09-4574-a5b4-5cfa0c4b68f5",
+              "metadata": {
+                "toolCall": {
+                  "toolCallId": "functions.tool-help:0",
+                  "toolName": "tool-help",
+                  "args": {},
+                  "creditsUsed": 0,
+                  "requiresConfirmation": false,
+                  "isConfirmed": false,
+                  "waitingForConfirmation": false,
+                  "result": {
+                    "categories": [
+                      {
+                        "count": 24,
+                        "name": "AI",
+                        "subCategories": [
+                          {
+                            "count": 3,
+                            "name": "Generation"
+                          },
+                          {
+                            "count": 2,
+                            "name": "Inference"
+                          },
+                          {
+                            "count": 3,
+                            "name": "Search"
+                          },
+                          {
+                            "count": 16,
+                            "name": "Tools"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 11,
+                        "name": "Analytics"
+                      },
+                      {
+                        "count": 89,
+                        "name": "Analytics: Data Sources",
+                        "subCategories": [
+                          {
+                            "count": 13,
+                            "name": "Chat"
+                          },
+                          {
+                            "count": 17,
+                            "name": "Credits"
+                          },
+                          {
+                            "count": 15,
+                            "name": "Leads"
+                          },
+                          {
+                            "count": 6,
+                            "name": "Messages"
+                          },
+                          {
+                            "count": 6,
+                            "name": "Monitoring"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Newsletter"
+                          },
+                          {
+                            "count": 8,
+                            "name": "Payments"
+                          },
+                          {
+                            "count": 5,
+                            "name": "Referral"
+                          },
+                          {
+                            "count": 6,
+                            "name": "Subscriptions"
+                          },
+                          {
+                            "count": 9,
+                            "name": "Users"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 26,
+                        "name": "Browser",
+                        "subCategories": [
+                          {
+                            "count": 8,
+                            "name": "DevTools"
+                          },
+                          {
+                            "count": 3,
+                            "name": "Inspection"
+                          },
+                          {
+                            "count": 8,
+                            "name": "Interaction"
+                          },
+                          {
+                            "count": 7,
+                            "name": "Pages"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 13,
+                        "name": "Chat",
+                        "subCategories": [
+                          {
+                            "count": 11,
+                            "name": "Organization"
+                          },
+                          {
+                            "count": 2,
+                            "name": "Settings"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 5,
+                        "name": "Credits",
+                        "subCategories": [
+                          {
+                            "count": 1,
+                            "name": "Credits"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Management"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 2,
+                        "name": "Dev Tools"
+                      },
+                      {
+                        "count": 13,
+                        "name": "Email Campaigns",
+                        "subCategories": [
+                          {
+                            "count": 3,
+                            "name": "Journeys"
+                          },
+                          {
+                            "count": 8,
+                            "name": "Processing"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Queue"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Stats"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 6,
+                        "name": "Evaluators"
+                      },
+                      {
+                        "count": 10,
+                        "name": "Indicators"
+                      },
+                      {
+                        "count": 1,
+                        "name": "Interfaces"
+                      },
+                      {
+                        "count": 25,
+                        "name": "Lead Magnet",
+                        "subCategories": [
+                          {
+                            "count": 4,
+                            "name": "Capture"
+                          },
+                          {
+                            "count": 21,
+                            "name": "Integrations"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 20,
+                        "name": "Leads",
+                        "subCategories": [
+                          {
+                            "count": 8,
+                            "name": "Import"
+                          },
+                          {
+                            "count": 12,
+                            "name": "Management"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 9,
+                        "name": "Messages",
+                        "subCategories": [
+                          {
+                            "count": 7,
+                            "name": "Moderating"
+                          },
+                          {
+                            "count": 2,
+                            "name": "Search"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 17,
+                        "name": "Messenger",
+                        "subCategories": [
+                          {
+                            "count": 5,
+                            "name": "Accounts"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Inbox"
+                          },
+                          {
+                            "count": 6,
+                            "name": "Messages"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Providers"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Users"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 3,
+                        "name": "Newsletter"
+                      },
+                      {
+                        "count": 5,
+                        "name": "Payments",
+                        "subCategories": [
+                          {
+                            "count": 4,
+                            "name": "Management"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Transactions"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 8,
+                        "name": "Referral",
+                        "subCategories": [
+                          {
+                            "count": 4,
+                            "name": "Payouts"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Program"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 8,
+                        "name": "Remote Connections",
+                        "subCategories": [
+                          {
+                            "count": 7,
+                            "name": "Instances"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Self"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 1,
+                        "name": "Server"
+                      },
+                      {
+                        "count": 3,
+                        "name": "Settings",
+                        "subCategories": [
+                          {
+                            "count": 2,
+                            "name": "Environment"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Keys"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 16,
+                        "name": "Skills",
+                        "subCategories": [
+                          {
+                            "count": 3,
+                            "name": "Community"
+                          },
+                          {
+                            "count": 6,
+                            "name": "Favorites"
+                          },
+                          {
+                            "count": 5,
+                            "name": "Management"
+                          },
+                          {
+                            "count": 2,
+                            "name": "Moderation"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 18,
+                        "name": "SSH",
+                        "subCategories": [
+                          {
+                            "count": 6,
+                            "name": "Connections"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Execution"
+                          },
+                          {
+                            "count": 3,
+                            "name": "Files"
+                          },
+                          {
+                            "count": 5,
+                            "name": "Terminal"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 20,
+                        "name": "Tasks",
+                        "subCategories": [
+                          {
+                            "count": 13,
+                            "name": "Cron"
+                          },
+                          {
+                            "count": 3,
+                            "name": "Monitoring"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Sync"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 13,
+                        "name": "Threads",
+                        "subCategories": [
+                          {
+                            "count": 8,
+                            "name": "Management"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Search"
+                          },
+                          {
+                            "count": 4,
+                            "name": "Sharing"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 5,
+                        "name": "Transformers"
+                      },
+                      {
+                        "count": 4,
+                        "name": "User Account",
+                        "subCategories": [
+                          {
+                            "count": 2,
+                            "name": "Directory"
+                          },
+                          {
+                            "count": 2,
+                            "name": "Profile"
+                          }
+                        ]
+                      },
+                      {
+                        "count": 9,
+                        "name": "User Admin",
+                        "subCategories": [
+                          {
+                            "count": 8,
+                            "name": "Management"
+                          },
+                          {
+                            "count": 1,
+                            "name": "Stats"
+                          }
+                        ]
+                      }
+                    ],
+                    "currentEnv": "production",
+                    "currentPage": 1,
+                    "currentPlatform": "ai",
+                    "effectivePageSize": 25,
+                    "hint": "384 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\"<name>\" for detail on one tool. To call any tool: execute-tool toolName=\"<name>\". Page 1/16 - pass page=2 to continue.",
+                    "matchedCount": 384,
+                    "tools": [
+                      {
+                        "aliases": ["run-ai"],
+                        "category": "AI",
+                        "description": "Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.",
+                        "name": "ai-run",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Inference",
+                        "title": "Run AI Agent"
+                      },
+                      {
+                        "category": "AI",
+                        "credits": 0.65,
+                        "description": "Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.",
+                        "name": "brave-search",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Search",
+                        "title": "Search the Web"
+                      },
+                      {
+                        "aliases": ["claude-code"],
+                        "category": "AI",
+                        "description": "Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.",
+                        "name": "coding-agent",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Run Coding Agent"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Remove a file or folder. Gone forever.",
+                        "name": "cortex-delete",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Delete"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Change part of a file. Find text and replace it, or edit specific lines.",
+                        "name": "cortex-edit",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Edit File"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Generate embeddings for all cortex nodes missing them.",
+                        "name": "cortex-embed-backfill",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Backfill Embeddings"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "See what's in a folder.",
+                        "name": "cortex-list",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "List Folder"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Create a folder.",
+                        "name": "cortex-mkdir",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "New Folder"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Move or rename a file or folder.",
+                        "name": "cortex-move",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Move"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Open any file — your notes, threads, memories, skills, or tasks.",
+                        "name": "cortex-read",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Read File"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Find files by name or content. Searches everything.",
+                        "name": "cortex-search",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Search"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "See the full folder structure at a glance.",
+                        "name": "cortex-tree",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Show Tree"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Save a file. Give it a path and content — done.",
+                        "name": "cortex-write",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Write File"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Describe the contents of an image using a vision AI model",
+                        "name": "describe_image",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Describe Image"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Describe the contents of a video using a vision AI model",
+                        "name": "describe_video",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Describe Video"
+                      },
+                      {
+                        "aliases": ["execute"],
+                        "category": "AI",
+                        "description": "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
+                        "name": "execute-tool",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Execute Tool"
+                      },
+                      {
+                        "aliases": ["fetch"],
+                        "category": "AI",
+                        "credits": 0.13,
+                        "description": "Fetch and extract content from any URL, converting it to readable markdown format. Use this when you need to read or analyze web page content.",
+                        "name": "fetch-url-content",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Fetch URL Content"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Generate an image from a text prompt using AI",
+                        "name": "generate_image",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Generation",
+                        "title": "Generate Image"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Generate music from a text prompt using AI",
+                        "name": "generate_music",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Generation",
+                        "title": "Generate Music"
+                      },
+                      {
+                        "category": "AI",
+                        "description": "Generate a video from a text prompt using AI",
+                        "name": "generate_video",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Generation",
+                        "title": "Generate Video"
+                      },
+                      {
+                        "category": "AI",
+                        "credits": 1.95,
+                        "description": "Search the internet or get AI-powered answers using Kagi. FastGPT mode provides comprehensive answers with sources, while search mode returns direct results.",
+                        "name": "kagi-search",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Search",
+                        "title": "Search with Kagi"
+                      },
+                      {
+                        "aliases": ["list-models"],
+                        "category": "AI",
+                        "description": "Browse and search all available AI models. Filter by type, content level, intelligence, price, or capabilities. Use this to find the right model for your task.",
+                        "name": "models",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "cron"
+                        ],
+                        "subCategory": "Inference",
+                        "title": "List AI Models"
+                      },
+                      {
+                        "aliases": ["help"],
+                        "category": "AI",
+                        "description": "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.",
+                        "name": "tool-help",
+                        "platforms": [
+                          "cli",
+                          "cli-package",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Tools",
+                        "title": "Tool Help - Discover Available Tools"
+                      },
+                      {
+                        "category": "AI",
+                        "credits": 0.65,
+                        "description": "Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider.",
+                        "name": "web-search",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Search",
+                        "title": "Search the Web"
+                      },
+                      {
+                        "category": "Analytics",
+                        "description": "Run retention cleanup for datapoints and expire snapshots",
+                        "name": "system_unified-interface_vibe-sense_cleanup_POST",
+                        "platforms": [
+                          "cli",
+                          "ai",
+                          "mcp",
+                          "remote-skill",
+                          "trpc",
+                          "next-page",
+                          "next-api",
+                          "cron",
+                          "electron",
+                          "frame"
+                        ],
+                        "subCategory": "Vibe Sense",
+                        "title": "Vibe Sense Cleanup"
+                      }
+                    ],
+                    "totalCount": 384,
+                    "totalPages": 16
+                  },
+                  "isPartial": false,
+                  "status": "completed"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "channel": "agent/chat/threads/90a65083-3943-466d-9b04-8f0ffa460cfe/messages",
+        "event": "content-done",
+        "data": {
+          "messages": [
+            {
+              "id": "9892ea6b-89e4-4f91-9d55-b9007d67ec5e",
+              "content": "<think> The user wants me to use the tool-help tool to list available tools and verify that:\n1. The result contains a non-empty tools array\n2. Each tool has a name and description\n\nI need to call tool-help with no parameters to list all tools, then check the result.</think>",
+              "metadata": {
+                "isStreaming": false
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "user": {
+      "isPublic": false,
+      "id": "27111963-4352-474a-82f3-5f6619fa1719",
+      "leadId": "75aad929-34f0-4e9a-bb4c-9f25471b4aa3",
+      "roles": ["enums.userRole.admin"]
+    }
+  }
+}

@@ -18,58 +18,25 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
-import { getDefaultToolIdsForUser } from "../constants";
 import { chatSettings } from "./db";
 import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,
   ChatSettingsUpdateResponseOutput,
-  ToolConfigItem,
 } from "./definition";
 import type { SettingsT } from "./i18n";
 import { ChatSettingsRepositoryClient } from "./repository-client";
+import {
+  AUTOPILOT_DEFAULT_SCHEDULE,
+  DREAM_DEFAULT_SCHEDULE,
+  ensureAutopilotTask,
+  ensureDreamTask,
+} from "./pulse/repository";
 
 /**
  * Chat Settings Repository
  */
 export class ChatSettingsRepository {
-  /**
-   * Returns null if the tool list equals the given defaultIds set (i.e. it IS the default),
-   * otherwise returns the normalized list (sorted, only toolId + requiresConfirmation).
-   *
-   * - For availableTools: defaultIds = full available set (null = all tools allowed)
-   * - For pinnedTools: defaultIds = DEFAULT_TOOL_IDS (null = load the standard 9 tools)
-   */
-  private static normalizeToolsOrNull(
-    tools: ToolConfigItem[] | null | undefined,
-    defaultIds: readonly string[] | null,
-  ): ToolConfigItem[] | null {
-    if (tools === null || tools === undefined) {
-      return null;
-    }
-    const normalized = tools
-      .map(({ toolId, requiresConfirmation }) => ({
-        toolId,
-        requiresConfirmation: requiresConfirmation ?? false,
-      }))
-      .toSorted((a, b) => a.toolId.localeCompare(b.toolId));
-
-    if (defaultIds !== null) {
-      const submittedIds = new Set(normalized.map((t) => t.toolId));
-      const defaultSet = new Set(defaultIds);
-      const sameIds =
-        submittedIds.size === defaultSet.size &&
-        [...submittedIds].every((id) => defaultSet.has(id));
-      const noConfirmations = normalized.every((t) => !t.requiresConfirmation);
-      if (sameIds && noConfirmations) {
-        return null;
-      }
-    }
-
-    return normalized;
-  }
-
   /**
    * Get user's chat settings
    */
@@ -100,39 +67,18 @@ export class ChatSettingsRepository {
         selectedSkill: setting.selectedSkill ?? defaults.selectedSkill,
         activeFavoriteId: setting.activeFavoriteId ?? defaults.activeFavoriteId,
         ttsAutoplay: setting.ttsAutoplay ?? defaults.ttsAutoplay,
-        voiceModelSelection:
-          setting.voiceModelSelection ?? defaults.voiceModelSelection,
-        sttModelSelection:
-          setting.sttModelSelection ?? defaults.sttModelSelection,
-        imageVisionModelSelection:
-          setting.imageVisionModelSelection ??
-          defaults.imageVisionModelSelection,
-        videoVisionModelSelection:
-          setting.videoVisionModelSelection ??
-          defaults.videoVisionModelSelection,
-        audioVisionModelSelection:
-          setting.audioVisionModelSelection ??
-          defaults.audioVisionModelSelection,
-        imageGenModelSelection:
-          setting.imageGenModelSelection ?? defaults.imageGenModelSelection,
-        musicGenModelSelection:
-          setting.musicGenModelSelection ?? defaults.musicGenModelSelection,
-        videoGenModelSelection: setting.videoGenModelSelection ?? undefined,
-        defaultChatMode: setting.defaultChatMode ?? defaults.defaultChatMode,
         viewMode: setting.viewMode ?? defaults.viewMode,
-        availableTools:
-          (setting.availableTools ?? defaults.availableTools)?.map((tool) => ({
-            toolId: tool.toolId,
-            requiresConfirmation: tool.requiresConfirmation ?? false,
-          })) ?? null,
-        pinnedTools:
-          (setting.pinnedTools ?? defaults.pinnedTools)?.map((tool) => ({
-            toolId: tool.toolId,
-            requiresConfirmation: tool.requiresConfirmation ?? false,
-          })) ?? null,
-        compactTrigger: setting.compactTrigger ?? defaults.compactTrigger,
-        memoryLimit: setting.memoryLimit ?? defaults.memoryLimit,
+        searchProvider: setting.searchProvider ?? defaults.searchProvider,
         codingAgent: setting.codingAgent ?? defaults.codingAgent,
+        dreamerEnabled: setting.dreamerEnabled ?? false,
+        dreamerFavoriteId: setting.dreamerFavoriteId ?? null,
+        dreamerSchedule: setting.dreamerSchedule ?? DREAM_DEFAULT_SCHEDULE,
+        dreamerPrompt: setting.dreamerPrompt ?? null,
+        autopilotEnabled: setting.autopilotEnabled ?? false,
+        autopilotFavoriteId: setting.autopilotFavoriteId ?? null,
+        autopilotSchedule:
+          setting.autopilotSchedule ?? AUTOPILOT_DEFAULT_SCHEDULE,
+        autopilotPrompt: setting.autopilotPrompt ?? null,
       };
 
       return success(result);
@@ -166,23 +112,6 @@ export class ChatSettingsRepository {
         .where(eq(chatSettings.userId, userId));
 
       const defaults = ChatSettingsRepositoryClient.getDefaults(user);
-
-      // Normalize tools - null passthrough means "all allowed"
-      const availableToolsToStore =
-        data.availableTools !== undefined
-          ? ChatSettingsRepository.normalizeToolsOrNull(
-              data.availableTools,
-              null,
-            )
-          : undefined;
-      // pinnedTools: null = load the role-appropriate DEFAULT_TOOL_IDS set → compare against those
-      const pinnedToolsToStore =
-        data.pinnedTools !== undefined
-          ? ChatSettingsRepository.normalizeToolsOrNull(
-              data.pinnedTools,
-              getDefaultToolIdsForUser(user),
-            )
-          : undefined;
 
       let result: typeof existing;
 
@@ -220,63 +149,48 @@ export class ChatSettingsRepository {
                 : data.ttsAutoplay === defaults.ttsAutoplay
                   ? null
                   : undefined,
-            voiceModelSelection:
-              data.voiceModelSelection !== undefined
-                ? (data.voiceModelSelection ?? null)
-                : undefined,
-            sttModelSelection:
-              data.sttModelSelection !== undefined
-                ? (data.sttModelSelection ?? null)
-                : undefined,
-            imageVisionModelSelection:
-              data.imageVisionModelSelection !== undefined
-                ? (data.imageVisionModelSelection ?? null)
-                : undefined,
-            videoVisionModelSelection:
-              data.videoVisionModelSelection !== undefined
-                ? (data.videoVisionModelSelection ?? null)
-                : undefined,
-            audioVisionModelSelection:
-              data.audioVisionModelSelection !== undefined
-                ? (data.audioVisionModelSelection ?? null)
-                : undefined,
-            imageGenModelSelection:
-              data.imageGenModelSelection !== undefined
-                ? (data.imageGenModelSelection ?? null)
-                : undefined,
-            musicGenModelSelection:
-              data.musicGenModelSelection !== undefined
-                ? (data.musicGenModelSelection ?? null)
-                : undefined,
-            videoGenModelSelection:
-              data.videoGenModelSelection !== undefined
-                ? (data.videoGenModelSelection ?? null)
-                : undefined,
-            defaultChatMode:
-              data.defaultChatMode !== undefined
-                ? (data.defaultChatMode ?? null)
-                : undefined,
             viewMode:
               data.viewMode && data.viewMode !== defaults.viewMode
                 ? data.viewMode
                 : data.viewMode === defaults.viewMode
                   ? null
                   : undefined,
-            availableTools: availableToolsToStore,
-            pinnedTools: pinnedToolsToStore,
-            compactTrigger:
-              data.compactTrigger !== undefined &&
-              data.compactTrigger !== null &&
-              data.compactTrigger !== COMPACT_TRIGGER
-                ? data.compactTrigger
-                : data.compactTrigger === COMPACT_TRIGGER ||
-                    data.compactTrigger === null
-                  ? null
-                  : undefined,
-            memoryLimit:
-              data.memoryLimit !== undefined ? data.memoryLimit : undefined,
+            searchProvider:
+              data.searchProvider !== undefined
+                ? data.searchProvider
+                : undefined,
             codingAgent:
               data.codingAgent !== undefined ? data.codingAgent : undefined,
+            dreamerEnabled:
+              data.dreamerEnabled !== undefined
+                ? data.dreamerEnabled
+                : undefined,
+            dreamerFavoriteId:
+              data.dreamerFavoriteId !== undefined
+                ? data.dreamerFavoriteId
+                : undefined,
+            dreamerSchedule:
+              data.dreamerSchedule !== undefined
+                ? data.dreamerSchedule
+                : undefined,
+            dreamerPrompt:
+              data.dreamerPrompt !== undefined ? data.dreamerPrompt : undefined,
+            autopilotEnabled:
+              data.autopilotEnabled !== undefined
+                ? data.autopilotEnabled
+                : undefined,
+            autopilotFavoriteId:
+              data.autopilotFavoriteId !== undefined
+                ? data.autopilotFavoriteId
+                : undefined,
+            autopilotSchedule:
+              data.autopilotSchedule !== undefined
+                ? data.autopilotSchedule
+                : undefined,
+            autopilotPrompt:
+              data.autopilotPrompt !== undefined
+                ? data.autopilotPrompt
+                : undefined,
           })
           .where(eq(chatSettings.userId, userId))
           .returning();
@@ -306,31 +220,38 @@ export class ChatSettingsRepository {
               data.ttsAutoplay !== defaults.ttsAutoplay
                 ? data.ttsAutoplay
                 : null,
-            voiceModelSelection: data.voiceModelSelection ?? null,
-            sttModelSelection: data.sttModelSelection ?? null,
-            imageVisionModelSelection: data.imageVisionModelSelection ?? null,
-            videoVisionModelSelection: data.videoVisionModelSelection ?? null,
-            audioVisionModelSelection: data.audioVisionModelSelection ?? null,
-            imageGenModelSelection: data.imageGenModelSelection ?? null,
-            musicGenModelSelection: data.musicGenModelSelection ?? null,
-            videoGenModelSelection: data.videoGenModelSelection ?? null,
-            defaultChatMode: data.defaultChatMode ?? null,
             viewMode:
               data.viewMode && data.viewMode !== defaults.viewMode
                 ? data.viewMode
                 : null,
-            availableTools: availableToolsToStore ?? null,
-            pinnedTools: pinnedToolsToStore ?? null,
-            compactTrigger:
-              data.compactTrigger !== undefined &&
-              data.compactTrigger !== null &&
-              data.compactTrigger !== COMPACT_TRIGGER
-                ? data.compactTrigger
-                : null,
-            memoryLimit:
-              data.memoryLimit !== undefined ? data.memoryLimit : null,
+            searchProvider:
+              data.searchProvider !== undefined ? data.searchProvider : null,
             codingAgent:
               data.codingAgent !== undefined ? data.codingAgent : null,
+            dreamerEnabled:
+              data.dreamerEnabled !== undefined ? data.dreamerEnabled : null,
+            dreamerFavoriteId:
+              data.dreamerFavoriteId !== undefined
+                ? data.dreamerFavoriteId
+                : null,
+            dreamerSchedule:
+              data.dreamerSchedule !== undefined ? data.dreamerSchedule : null,
+            dreamerPrompt:
+              data.dreamerPrompt !== undefined ? data.dreamerPrompt : null,
+            autopilotEnabled:
+              data.autopilotEnabled !== undefined
+                ? data.autopilotEnabled
+                : null,
+            autopilotFavoriteId:
+              data.autopilotFavoriteId !== undefined
+                ? data.autopilotFavoriteId
+                : null,
+            autopilotSchedule:
+              data.autopilotSchedule !== undefined
+                ? data.autopilotSchedule
+                : null,
+            autopilotPrompt:
+              data.autopilotPrompt !== undefined ? data.autopilotPrompt : null,
           })
           .returning();
       }
@@ -339,6 +260,41 @@ export class ChatSettingsRepository {
         return fail({
           message: t("post.errors.server.title") ?? "post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+
+      // Side-effects: sync pulse tasks when dreamer/autopilot settings change
+      const savedRow = result[0];
+      if (
+        savedRow &&
+        (data.dreamerEnabled !== undefined ||
+          data.dreamerFavoriteId !== undefined ||
+          data.dreamerSchedule !== undefined ||
+          data.dreamerPrompt !== undefined)
+      ) {
+        void ensureDreamTask(userId, {
+          dreamerEnabled: savedRow.dreamerEnabled ?? false,
+          dreamerFavoriteId: savedRow.dreamerFavoriteId ?? null,
+          dreamerSchedule: savedRow.dreamerSchedule ?? undefined,
+          dreamerPrompt: savedRow.dreamerPrompt ?? null,
+        }).catch(() => {
+          // Best-effort — don't fail settings save if task sync fails
+        });
+      }
+      if (
+        savedRow &&
+        (data.autopilotEnabled !== undefined ||
+          data.autopilotFavoriteId !== undefined ||
+          data.autopilotSchedule !== undefined ||
+          data.autopilotPrompt !== undefined)
+      ) {
+        void ensureAutopilotTask(userId, {
+          autopilotEnabled: savedRow.autopilotEnabled ?? false,
+          autopilotFavoriteId: savedRow.autopilotFavoriteId ?? null,
+          autopilotSchedule: savedRow.autopilotSchedule ?? undefined,
+          autopilotPrompt: savedRow.autopilotPrompt ?? null,
+        }).catch(() => {
+          // Best-effort — don't fail settings save if task sync fails
         });
       }
 

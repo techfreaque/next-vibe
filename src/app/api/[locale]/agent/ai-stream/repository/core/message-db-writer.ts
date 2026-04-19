@@ -65,6 +65,8 @@ export class MessageDbWriter {
   lastAssistantMessageId: string | null = null;
   /** Tracks the final text content of the last assistant message - populated even in incognito */
   lastAssistantContent: string | null = null;
+  /** Tracks the thread ID of the last assistant message - used for embedding sync */
+  private lastThreadId: string | null = null;
   /** Tracks the URL of the last generated media (image/audio/video) - used by headless callers */
   lastGeneratedMediaUrl: string | null = null;
   /** Running total of credits deducted during this stream - used by headless callers to report cost */
@@ -107,6 +109,7 @@ export class MessageDbWriter {
       params;
 
     this.lastAssistantMessageId = messageId;
+    this.lastThreadId = threadId;
 
     // Emit MESSAGE_CREATED (always - even incognito needs this for the UI)
     this.wsEmit("message-created", {
@@ -223,6 +226,11 @@ export class MessageDbWriter {
         finishReason,
         cachedInputTokens: cachedInputTokens ?? null,
         timeToFirstToken: timeToFirstToken ?? null,
+      });
+
+      // Fire-and-forget: sync thread embedding for vector search
+      void this.syncThreadEmbedding().catch(() => {
+        // Intentional no-op: embedding sync is fire-and-forget
       });
     }
   }
@@ -351,6 +359,7 @@ export class MessageDbWriter {
     const { messageId, threadId, parentId, model, skill, sequenceId } = params;
 
     this.lastAssistantMessageId = messageId;
+    this.lastThreadId = threadId;
 
     // SSE: MESSAGE_CREATED with empty content
     this.wsEmit("message-created", {
@@ -1397,6 +1406,78 @@ export class MessageDbWriter {
         },
       ],
     });
+  }
+
+  // ─── Embedding sync ──────────────────────────────────────────────────────
+
+  /**
+   * Sync the current thread to cortex_nodes for vector search.
+   * Uses dynamic imports to avoid circular dependencies.
+   * Fire-and-forget safe - errors are silently caught by the caller.
+   */
+  private async syncThreadEmbedding(): Promise<void> {
+    if (!this.lastThreadId) {
+      return;
+    }
+
+    const { syncVirtualNodeToEmbedding } =
+      await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+    const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
+    const { desc } = await import("drizzle-orm");
+
+    // Get thread info
+    const [thread] = await db
+      .select({
+        id: chatThreads.id,
+        userId: chatThreads.userId,
+        title: chatThreads.title,
+        rootFolderId: chatThreads.rootFolderId,
+      })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, this.lastThreadId))
+      .limit(1);
+
+    if (!thread?.userId) {
+      return;
+    }
+
+    // Get last 20 messages for context
+    const messages = await db
+      .select({
+        role: chatMessages.role,
+        content: chatMessages.content,
+      })
+      .from(chatMessages)
+      .where(eq(chatMessages.threadId, thread.id))
+      .orderBy(desc(chatMessages.createdAt))
+      .limit(20);
+
+    if (messages.length === 0) {
+      return;
+    }
+
+    const messageLines = messages
+      .toReversed()
+      .map((m) => `${m.role}: ${(m.content ?? "").slice(0, 500)}`)
+      .join("\n");
+
+    const content = [
+      `# ${thread.title ?? "Untitled"}`,
+      `Folder: ${thread.rootFolderId}`,
+      "",
+      messageLines,
+    ].join("\n");
+
+    const slug = (thread.title ?? "thread")
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, "-")
+      .slice(0, 50);
+
+    await syncVirtualNodeToEmbedding(
+      thread.userId,
+      `/threads/${thread.rootFolderId}/${slug}-${thread.id}.md`,
+      content,
+    );
   }
 
   // ─── Low-level helpers (used internally and by flush paths) ───────────────

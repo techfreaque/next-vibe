@@ -37,6 +37,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import {
   type ToolCall,
   chatMessages,
@@ -51,6 +52,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { NO_SKILL_ID } from "../../chat/skills/constants";
+import { parseSkillId } from "../../chat/slugify";
 import { walkToLeafMessage } from "../repository/core/branch-utils";
 import { publishWakeUpSignal } from "../repository/core/wake-up-channel";
 import { resolveFavorite, runHeadlessAiStream } from "../repository/headless";
@@ -261,10 +263,12 @@ export class ResumeStreamRepository {
           const isWaitMode = callbackMode === "wait";
 
           // Resolve model + skill (needed for deferred insertion and revival).
+          // Priority: explicit modelId hint → favorite cascade → skill cascade.
           const userId = !user.isPublic ? user.id : undefined;
           let resolvedModel = modelId;
           let resolvedSkill = skillId ?? NO_SKILL_ID;
 
+          let resolvedFavoriteConfig: FavoriteConfig | null = null;
           if (favoriteId && userId) {
             const resolved = await resolveFavorite(
               favoriteId,
@@ -274,9 +278,36 @@ export class ResumeStreamRepository {
               locale,
             );
             if (resolved) {
-              resolvedModel = resolvedModel ?? resolved.model;
               resolvedSkill = skillId ?? resolved.skill;
+              resolvedFavoriteConfig = resolved.favoriteConfig;
             }
+          }
+
+          // Resolve model from favorite + skill cascade (fresh from DB).
+          {
+            const { resolveSkillVariant } =
+              await import("@/app/api/[locale]/agent/chat/skills/resolver");
+            const { resolveChatModelId } =
+              await import("../repository/core/modality-resolver");
+            const skillVariant = await resolveSkillVariant(
+              skillId,
+              resolvedFavoriteConfig
+                ? parseSkillId(resolvedFavoriteConfig.skillId).variantId
+                : null,
+            );
+            const cascadeModel = resolveChatModelId(
+              resolvedFavoriteConfig?.modelSelection ?? undefined,
+              skillVariant?.modelSelection ?? undefined,
+              user,
+            );
+            if (cascadeModel) {
+              resolvedModel = cascadeModel;
+            }
+          }
+
+          // Ultimate fallback: use stored modelId from task row (favorite/skill may have been deleted).
+          if (!resolvedModel) {
+            resolvedModel = modelId;
           }
 
           if (!resolvedModel) {
@@ -400,6 +431,7 @@ export class ResumeStreamRepository {
               }
               void runHeadlessAiStream({
                 favoriteId: favoriteId ?? undefined,
+                favoriteConfig: resolvedFavoriteConfig,
                 model: resolvedModel,
                 skill: resolvedSkill,
                 prompt: "",
@@ -674,6 +706,7 @@ export class ResumeStreamRepository {
             // works correctly if the AI calls it during revival.
             void runHeadlessAiStream({
               favoriteId: favoriteId ?? undefined,
+              favoriteConfig: resolvedFavoriteConfig,
               model: resolvedModel,
               skill: resolvedSkill,
               prompt: "",
@@ -900,6 +933,7 @@ export class ResumeStreamRepository {
 
             void runHeadlessAiStream({
               favoriteId: favoriteId ?? undefined,
+              favoriteConfig: resolvedFavoriteConfig,
               model: resolvedModel,
               skill: resolvedSkill,
               prompt: "",

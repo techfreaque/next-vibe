@@ -203,7 +203,8 @@ const { GET } = createEndpoint({
           typeof ctx.requestData["rootFolderId"] === "string"
             ? ctx.requestData["rootFolderId"]
             : "";
-        const msgId = ctx.partial.messages?.[0]?.id;
+        const msg = ctx.partial.messages?.[0];
+        const msgId = msg?.id;
         if (msgId) {
           await persistMessageIfIncognito(
             ctx.urlPathParams["threadId"] ?? "",
@@ -211,6 +212,23 @@ const { GET } = createEndpoint({
             rootFolderId,
             ctx.logger,
             false,
+          );
+        }
+        // When the server queued a message (thread was already streaming),
+        // remove the optimistic assistant placeholder the client created.
+        if (
+          msg?.metadata &&
+          typeof msg.metadata === "object" &&
+          "isQueued" in msg.metadata &&
+          msg.metadata.isQueued === true &&
+          msgId
+        ) {
+          const { removeOptimisticByParentId } =
+            await import("./hooks/update-messages");
+          removeOptimisticByParentId(
+            ctx.urlPathParams["threadId"] ?? "",
+            msgId,
+            ctx.logger,
           );
         }
       },
@@ -294,6 +312,11 @@ const { GET } = createEndpoint({
         useChatStore
           .getState()
           .clearThreadPendingCreate(ctx.urlPathParams.threadId);
+        // Clear aborting state — the framework already merged
+        // streamingState: "idle" into the cache; clear the cancel spinner.
+        const { useAIStreamStore } =
+          await import("../../../../ai-stream/stream/hooks/store");
+        useAIStreamStore.getState().clearThread(ctx.urlPathParams.threadId);
         const rootFolderId =
           typeof ctx.requestData["rootFolderId"] === "string"
             ? ctx.requestData["rootFolderId"]

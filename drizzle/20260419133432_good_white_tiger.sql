@@ -1,0 +1,1 @@
+ALTER TABLE "cortex_nodes" ADD COLUMN "content_hash" text;

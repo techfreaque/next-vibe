@@ -57,8 +57,6 @@ export class ToolErrorHandler {
         }
       | undefined;
     threadId: string;
-    model: ChatModelId;
-    skill: string;
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
@@ -71,6 +69,8 @@ export class ToolErrorHandler {
       string,
       { requiresConfirmation: boolean; credits: number }
     >;
+    model: ChatModelId;
+    skill: string;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
     t: AiStreamT;
@@ -82,8 +82,6 @@ export class ToolErrorHandler {
       part,
       pendingToolMessage,
       threadId,
-      model,
-      skill,
       sequenceId,
       isIncognito,
       userId,
@@ -95,6 +93,8 @@ export class ToolErrorHandler {
       logger,
       t,
     } = params;
+
+    const { model, skill } = params;
 
     if (!pendingToolMessage) {
       return null;
@@ -143,6 +143,7 @@ export class ToolErrorHandler {
       const toolCallWithError: ToolCall = {
         ...toolCallData.toolCall,
         error: disabledError,
+        isPartial: false,
       };
 
       await dbWriter.emitToolResult({
@@ -240,6 +241,7 @@ export class ToolErrorHandler {
         ...toolCallData.toolCall,
         result: fallbackResult.data,
         creditsUsed: toolsConfig.get(part.toolName)?.credits ?? 0,
+        isPartial: false,
       };
 
       await dbWriter.emitToolResult({
@@ -284,6 +286,7 @@ export class ToolErrorHandler {
           }),
           errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         }),
+        isPartial: false,
       };
 
       await dbWriter.emitToolResult({
@@ -489,6 +492,7 @@ export class ToolErrorHandler {
     const toolCallWithError: ToolCall = {
       ...toolCallData.toolCall,
       error,
+      isPartial: false,
     };
 
     await dbWriter.emitToolResult({

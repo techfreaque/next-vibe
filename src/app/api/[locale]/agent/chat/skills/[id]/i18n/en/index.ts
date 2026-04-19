@@ -26,6 +26,7 @@ export const translations = {
     backButton: {
       label: "Back to skills",
     },
+    openFullPage: "Open full page",
     editButton: {
       label: "Edit skill",
     },
@@ -39,6 +40,8 @@ export const translations = {
       label: "Add to Favorites",
     },
     inCollection: "In collection",
+    useNow: "Use Now",
+    goToChat: "Go to Chat",
     addAnother: "Add another",
     addAnotherTooltip: "Add another instance of this skill to your collection",
     variants: {
@@ -59,6 +62,7 @@ export const translations = {
       c: "C: Card Hero",
       d: "D: Two-Row",
     },
+    addVariant: "Add Variant",
     yourskill: "Your skill",
     signupPrompt: {
       title: "Customize this skill",
@@ -74,6 +78,9 @@ export const translations = {
     },
     systemPrompt: {
       label: "System Prompt",
+      copy: "Copy",
+      copied: "Copied!",
+      view: "View full prompt",
     },
     models: {
       brain: "Brain",
@@ -331,10 +338,6 @@ export const translations = {
       description: "Model used for generating videos",
       placeholder: "System default",
     },
-    defaultChatMode: {
-      label: "Default Chat Mode",
-      description: "Default mode when opening this chat",
-    },
     systemPrompt: {
       label: "System Prompt",
       description:
@@ -358,6 +361,13 @@ export const translations = {
       label: "Variants",
       description:
         "Named variants with per-variant model selections. Each variant needs: id (unique string), modelSelection (required), isDefault (exactly one must be true). Optional: displayName, voice/vision/gen model overrides.",
+      addButton: "Add Variant",
+      setDefault: "Set as Default",
+      remove: "Remove",
+      defaultBadge: "Default",
+      namePlaceholder: "Variant name (optional)",
+      skillDefaults: "Skill-level defaults",
+      skillDefaultsHint: "Fallback when a variant doesn't configure a modality",
     },
     preferredModel: {
       label: "Preferred Model",

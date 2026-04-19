@@ -1,0 +1,13 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/use-the-cortex-write-tool-to-create-a-file-at----25607000-94e5-4696-87dd-62e508a2a299.md\n\n# Use the cortex-write tool to create a file at...\nFolder: cron\n\nuser: Use the cortex-write tool to create a file at /documents/ai-test/notes.md with this exact content:\n\n\"# AI Test Notes\n\nThis document was created by an AI to test cortex tool integration.\nKey topics: testing, automation, cortex-write verification.\"\n\nAfter writing, confirm what you did.\nassistant: <think> The user wants me to create a file at /documents/ai-test/notes.md with specific content. Let me use the cortex-write tool to do this.</think>\ntool:",
+    "encoding_format": "float"
+  }
+}

@@ -24,7 +24,6 @@ import type {
   VideoVisionModelSelection,
 } from "../../ai-stream/vision-models";
 import type { ImageGenModelSelection } from "../../image-generation/models";
-import type { ChatMode } from "../../models/enum";
 import type { MusicGenModelSelection } from "../../music-generation/models";
 import type { SttModelSelection } from "../../speech-to-text/models";
 import type { VoiceModelSelection } from "../../text-to-speech/models";
@@ -72,8 +71,6 @@ export interface SkillVariant {
   variantName: SkillsTranslationKey;
   /** Chat model selection for this variant - required, drives model resolution */
   modelSelection: ChatModelSelection;
-  /** Default chat mode for this variant (text/voice/call). */
-  defaultChatMode?: ChatMode;
   /** Which variant is the default when none is specified */
   isDefault?: boolean;
   /** TTS voice selection for this variant. Falls back to platform default if not set. */
@@ -139,6 +136,10 @@ export interface Skill {
   publishedAt?: Date | null;
   /** Short description of the last change (for published skills). */
   changeNote?: string | null;
+  /** Pre-computed embedding vector (written by `vibe gen`). */
+  embedding?: number[];
+  /** SHA-256 hash of embedded content — skip re-embedding when unchanged. */
+  embeddingHash?: string;
 }
 
 /**

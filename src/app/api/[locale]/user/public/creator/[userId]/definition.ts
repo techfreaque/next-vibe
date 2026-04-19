@@ -6,9 +6,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
+  customWidgetObject,
+  requestUrlPathParamsField,
+  responseArrayField,
   responseField,
+  objectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -17,14 +19,26 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
+import {
+  SkillCategoryDB,
+  SkillOwnershipTypeDB,
+  SkillTrustLevelDB,
+} from "@/app/api/[locale]/agent/chat/skills/enum";
 import { UserRole } from "../../../user-roles/enum";
 import { scopedTranslation } from "./i18n";
+
+const CreatorProfileWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.CreatorProfileWidget })),
+);
 
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["user", "public", "creator", ":userId"],
+  path: ["user", "public", "creator", ":creatorId"],
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "user",
@@ -39,20 +53,17 @@ export const { GET } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "get.form.title" as const,
-    description: "get.form.description" as const,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "urlPath", response: true },
+  fields: customWidgetObject({
+    render: CreatorProfileWidget,
+    usage: { request: "urlPathParams", response: true } as const,
     children: {
-      userId: requestField(scopedTranslation, {
+      creatorId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "get.form.userId.label" as const,
-        description: "get.form.userId.description" as const,
-        schema: z.uuid(),
-        usage: { request: "urlPath" },
+        label: "get.form.creatorId.label" as const,
+        description: "get.form.creatorId.description" as const,
+        hidden: true,
+        schema: z.string(),
       }),
       publicName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -99,9 +110,39 @@ export const { GET } = createEndpoint({
         content: "get.response.githubUrl" as const,
         schema: z.string().nullable(),
       }),
+      facebookUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.facebookUrl" as const,
+        schema: z.string().nullable(),
+      }),
       discordUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.discordUrl" as const,
+        schema: z.string().nullable(),
+      }),
+      tribeUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.tribeUrl" as const,
+        schema: z.string().nullable(),
+      }),
+      rumbleUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.rumbleUrl" as const,
+        schema: z.string().nullable(),
+      }),
+      odyseeUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.odyseeUrl" as const,
+        schema: z.string().nullable(),
+      }),
+      nostrUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.nostrUrl" as const,
+        schema: z.string().nullable(),
+      }),
+      gabUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.gabUrl" as const,
         schema: z.string().nullable(),
       }),
       creatorAccentColor: responseField(scopedTranslation, {
@@ -114,15 +155,141 @@ export const { GET } = createEndpoint({
         content: "get.response.creatorHeaderImageUrl" as const,
         schema: z.string().nullable(),
       }),
-      skillCount: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "get.response.skillCount" as const,
-        schema: z.number(),
-      }),
       referralCode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.referralCode" as const,
         schema: z.string().nullable(),
+      }),
+      appName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.appName" as const,
+        schema: z.string(),
+      }),
+      leadMagnetHeadline: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.leadMagnetHeadline" as const,
+        schema: z.string().nullable(),
+      }),
+      leadMagnetButtonText: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.leadMagnetButtonText" as const,
+        schema: z.string().nullable(),
+      }),
+      skills: responseArrayField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.INLINE,
+          gap: "4",
+          alignItems: "start",
+          noCard: true,
+          usage: { response: true },
+          children: {
+            id: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.string(),
+            }),
+            internalId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.string().nullable(),
+            }),
+            skillId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.string(),
+            }),
+            category: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.enum(SkillCategoryDB),
+            }),
+            variantName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.string().nullable(),
+            }),
+            isVariant: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.boolean(),
+            }),
+            isDefault: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.boolean(),
+            }),
+            modelId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.enum(ChatModelId).nullable(),
+            }),
+            icon: responseField(scopedTranslation, {
+              type: WidgetType.ICON,
+              containerSize: "lg",
+              iconSize: "base",
+              borderRadius: "lg",
+              schema: iconSchema,
+            }),
+            name: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              size: "base",
+              emphasis: "bold",
+              inline: true,
+              schema: z.string(),
+            }),
+            tagline: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              size: "xs",
+              variant: "muted",
+              inline: true,
+              schema: z.string(),
+            }),
+            description: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              size: "xs",
+              variant: "muted",
+              schema: z.string(),
+            }),
+            modelIcon: responseField(scopedTranslation, {
+              type: WidgetType.ICON,
+              iconSize: "xs",
+              inline: true,
+              noHover: true,
+              schema: iconSchema,
+            }),
+            modelInfo: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              size: "xs",
+              inline: true,
+              variant: "muted",
+              schema: z.string(),
+            }),
+            modelProvider: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              size: "xs",
+              variant: "muted",
+              inline: true,
+              schema: z.string(),
+            }),
+            ownershipType: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.enum(SkillOwnershipTypeDB),
+            }),
+            trustLevel: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.enum(SkillTrustLevelDB).nullable(),
+            }),
+            voteCount: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.number().int().nonnegative().nullable(),
+            }),
+          },
+        }),
       }),
     },
   }),
@@ -172,9 +339,11 @@ export const { GET } = createEndpoint({
   },
 
   examples: {
+    urlPathParams: {
+      default: { creatorId: "thea-ai" },
+    },
     responses: {
       default: {
-        userId: "550e8400-e29b-41d4-a716-446655440000",
         publicName: "Thea AI",
         avatarUrl: null,
         bio: "I build AI tools for creators.",
@@ -184,11 +353,20 @@ export const { GET } = createEndpoint({
         instagramUrl: null,
         tiktokUrl: null,
         githubUrl: null,
+        facebookUrl: null,
         discordUrl: null,
+        tribeUrl: null,
+        rumbleUrl: null,
+        odyseeUrl: null,
+        nostrUrl: null,
+        gabUrl: null,
         creatorAccentColor: null,
         creatorHeaderImageUrl: null,
-        skillCount: 5,
         referralCode: "thea2024",
+        appName: "unbottled.ai",
+        leadMagnetHeadline: null,
+        leadMagnetButtonText: null,
+        skills: [],
       },
     },
   },

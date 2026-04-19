@@ -25,6 +25,10 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
+import {
+  formatSkillId,
+  parseSkillId,
+} from "@/app/api/[locale]/agent/chat/slugify";
 import { useFavoriteCreate } from "@/app/api/[locale]/agent/chat/favorites/create/hooks";
 import favoritesDefinition from "@/app/api/[locale]/agent/chat/favorites/definition";
 import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
@@ -36,7 +40,6 @@ import {
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
 import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
@@ -99,8 +102,8 @@ const USE_CASE_SKILL_IDS: Record<UseCase, string[]> = {
 
 interface SeededEntry {
   id: string;
+  /** Merged format: "skillSlug" or "skillSlug__variantId" */
   skillId: string;
-  variantId: string | null;
   modelSelection: ChatModelSelection | null;
 }
 
@@ -132,8 +135,7 @@ async function seedFavorites(
     const companionDefaultVariant =
       companion.variants.find((v) => v.isDefault) ?? companion.variants[0];
     const id = await addFavorite({
-      skillId: companionId,
-      variantId: variant.id,
+      skillId: formatSkillId(companionId, variant.id),
       icon: companion.icon,
       voiceModelSelection: companionDefaultVariant?.voiceModelSelection,
       modelSelection: resolvedModelSelection,
@@ -144,8 +146,7 @@ async function seedFavorites(
       }
       entries.push({
         id,
-        skillId: companionId,
-        variantId: variant.id,
+        skillId: formatSkillId(companionId, variant.id),
         modelSelection: resolvedModelSelection,
       });
     }
@@ -189,15 +190,13 @@ async function seedFavorites(
             ? variant.modelSelection
             : null;
           const id = await addFavorite({
-            skillId,
-            variantId: variant.id,
+            skillId: formatSkillId(skillId, variant.id),
             modelSelection: resolvedModelSelection,
           });
           if (id) {
             entries.push({
               id,
-              skillId,
-              variantId: variant.id,
+              skillId: formatSkillId(skillId, variant.id),
               modelSelection: resolvedModelSelection,
             });
           }
@@ -211,7 +210,6 @@ async function seedFavorites(
           entries.push({
             id,
             skillId,
-            variantId: null,
             modelSelection: null,
           });
         }
@@ -241,7 +239,7 @@ export function UsecasesStep({
 
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  const { settings, setActiveFavorite } = useChatSettings(user, logger);
+  const { setActiveFavorite } = useChatSettings(user, logger);
   const { addFavorite } = useFavoriteCreate(user, logger);
   const noProviderAvailable =
     !agentEnvAvailability.claudeCode &&
@@ -269,9 +267,11 @@ export function UsecasesStep({
     (entries: SeededEntry[], firstId: string | null) => {
       const { t: tSkill } = skillsScopedTranslation.scopedT(locale);
       const cards = entries.map((entry, index) => {
-        const skill = DEFAULT_SKILLS.find((s) => s.id === entry.skillId);
-        const variant = entry.variantId
-          ? skill?.variants?.find((v) => v.id === entry.variantId)
+        const { skillId: entryBaseId, variantId: entryVariantId } =
+          parseSkillId(entry.skillId);
+        const skill = DEFAULT_SKILLS.find((s) => s.id === entryBaseId);
+        const variant = entryVariantId
+          ? skill?.variants?.find((v) => v.id === entryVariantId)
           : undefined;
         const effectiveModelSelection = variant?.modelSelection ?? null;
         const skillDefaultVariant = skill
@@ -281,8 +281,7 @@ export function UsecasesStep({
         return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
           {
             id: entry.id,
-            skillId: entry.skillId,
-            variantId: entry.variantId,
+            skillId: entry.skillId, // merged format
             customIcon: skill?.icon ?? null,
             voiceModelSelection: skillVoiceSel,
             modelSelection: entry.modelSelection,
@@ -346,22 +345,7 @@ export function UsecasesStep({
             (resolvedAnyId !== undefined
               ? Object.values(ChatModelId).find((id) => id === resolvedAnyId)
               : undefined) ?? ChatModelId.KIMI_K2_5;
-          const companion = COMPANION_SKILLS.find((c) => c.id === companionId);
-          const companionVariant = companion
-            ? (companion.variants.find((v) => v.isDefault) ??
-              companion.variants[0])
-            : null;
-          // Use stored voiceModelSelection from settings, or from companion skill's default variant
-          const voiceSel: VoiceModelSelection | null =
-            settings?.voiceModelSelection ??
-            companionVariant?.voiceModelSelection ??
-            null;
-          setActiveFavorite(
-            firstCompanionId,
-            companionId,
-            activeModelId,
-            voiceSel,
-          );
+          setActiveFavorite(firstCompanionId, companionId, activeModelId);
         }
       } catch (e) {
         logger.error(
@@ -383,7 +367,6 @@ export function UsecasesStep({
     addFavorite,
     applyOptimisticFavorites,
     setActiveFavorite,
-    settings?.voiceModelSelection,
     onDone,
     userRoles,
     logger,

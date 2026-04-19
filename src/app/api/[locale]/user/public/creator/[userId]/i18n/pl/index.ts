@@ -7,14 +7,13 @@ export const translations = {
   },
   get: {
     title: "Pobierz profil twórcy",
-    description:
-      "Publiczny profil twórcy skilla z bio, linkami i liczba skilli",
+    description: "Publiczny profil twórcy skilla z bio, linkami i skillami",
     form: {
       title: "Profil twórcy",
       description: "Publiczny profil twórcy skilla",
-      userId: {
-        label: "ID uzytkownika",
-        description: "ID uzytkownika twórcy",
+      creatorId: {
+        label: "ID twórcy",
+        description: "ID lub slug twórcy",
       },
     },
     response: {
@@ -29,11 +28,20 @@ export const translations = {
       instagramUrl: "Instagram",
       tiktokUrl: "TikTok",
       githubUrl: "GitHub",
+      facebookUrl: "Facebook",
       discordUrl: "Discord",
+      tribeUrl: "Tribe",
+      rumbleUrl: "Rumble",
+      odyseeUrl: "Odysee",
+      nostrUrl: "Nostr",
+      gabUrl: "Gab",
       creatorAccentColor: "Kolor akcentu",
       creatorHeaderImageUrl: "Obraz naglówka",
-      skillCount: "Skille",
       referralCode: "Kod polecajacy",
+      appName: "Nazwa aplikacji",
+      leadMagnetHeadline: "Naglówek lead magnet",
+      leadMagnetButtonText: "Przycisk lead magnet",
+      skills: "Skille",
     },
     errors: {
       validation: {
@@ -61,6 +69,34 @@ export const translations = {
     success: {
       title: "Profil twórcy",
       description: "Profil twórcy pobrany",
+    },
+  },
+  widget: {
+    notFound: {
+      title: "Twórca nie znaleziony",
+      description: "Ten profil nie istnieje lub został usunięty.",
+      back: "Wróć na stronę główną",
+    },
+    skills: {
+      title: "Umiejętności",
+    },
+    referral: {
+      label: "Kod polecający",
+    },
+    nav: {
+      backArrow: "\u2190",
+      copyright: "\u00a9",
+    },
+    lead: {
+      headline: "Bądź na bieżąco",
+      namePlaceholder: "Twoje imię",
+      emailPlaceholder: "Twój e-mail",
+      send: "Subskrybuj",
+      sending: "...",
+      doneHeading: "Gotowe.",
+      doneSub: "Jesteś na liście.",
+      finePrint: "Żadnego spamu. Wypisz się w dowolnej chwili.",
+      error: "Coś poszło nie tak. Spróbuj ponownie.",
     },
   },
 };

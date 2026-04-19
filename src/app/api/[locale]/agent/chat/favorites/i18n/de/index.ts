@@ -106,6 +106,7 @@ export const translations: typeof enTranslations = {
       companion: "Begleiter",
       skills: "Skills",
       model: "Direkte Modelle",
+      background: "Hintergrund-Agenten",
     },
     container: {
       title: "Ihre Favoriten",
@@ -123,9 +124,6 @@ export const translations: typeof enTranslations = {
         },
         skillId: {
           content: "Charakter: {{value}}",
-        },
-        variantId: {
-          content: "Variante: {{value}}",
         },
         customVariantName: {
           content: "Benutzerdefinierter Name: {{value}}",

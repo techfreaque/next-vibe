@@ -314,6 +314,16 @@ export interface ApiEndpoint<
   readonly icon: IconKey;
 
   /**
+   * Optional function that returns a context-specific icon based on request/response data.
+   * Called on every render - return undefined to fall back to the static `icon`.
+   * Follows the same pattern as `dynamicTitle`.
+   */
+  readonly dynamicIcon?: (data: {
+    request?: Partial<InferRequestInput<TFields>>;
+    response?: Partial<InferResponseInput<TFields>>;
+  }) => IconKey | undefined;
+
+  /**
    * WebSocket event schemas for this endpoint.
    * When defined, the handler receives a typed `emit()` function that broadcasts
    * events to all connected clients subscribed to this endpoint's channel.
@@ -695,6 +705,7 @@ export function createEndpoint<
     defaultExpanded: config.defaultExpanded,
     events: config.events,
     icon: config.icon,
+    dynamicIcon: config.dynamicIcon,
     options: config.options,
     requestSchema,
     responseSchema,

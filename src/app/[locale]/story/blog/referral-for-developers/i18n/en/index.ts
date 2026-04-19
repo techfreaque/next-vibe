@@ -31,8 +31,9 @@ export const translations = {
   skillAngle: {
     title: "Publish a skill - add 5% on top",
     p1: "Every skill you publish has a shareable link. When someone signs up through your skill link, you earn an extra 5% on all their payments - on top of the 10% direct referral commission. That's 15% total from one user, forever.",
-    p2: "Embed your skill link in a GitHub README. Post it in a developer Discord. Every person who signs up through it earns you both commissions simultaneously. You don't need to choose - the skill link carries both.",
-    p3: "Skills are free to create. No paid subscription required. If you've built a useful AI setup - a code reviewer that knows your stack, a docs writer tuned to your style - share it. The link does the rest.",
+    p2: "Here's what most people miss: you earn the 5% as the skill creator even when someone else shares your skill. A user finds your skill in the directory, shares the link with a friend - that friend signs up, you get 5% of their payments. Automatically. The platform tracks skill authorship, not who shared the link. Your skill works for you even when you're not the one promoting it.",
+    p3: "Embed your skill link in a GitHub README. Post it in a developer Discord. Every person who signs up through it earns you both commissions simultaneously. You don't need to choose - the skill link carries both.",
+    p4: "Skills are free to create. No paid subscription required. If you've built a useful AI setup - a code reviewer that knows your stack, a docs writer tuned to your style - share it. The link does the rest.",
   },
   math: {
     title: "The math (actual numbers)",

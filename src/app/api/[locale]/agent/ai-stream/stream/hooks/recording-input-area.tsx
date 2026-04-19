@@ -33,6 +33,8 @@ interface RecordingModalProps {
   stream: MediaStream | null;
   /** Whether there's existing input (hides send voice button) */
   hasExistingInput: boolean;
+  /** The existing input text to show as read-only preview */
+  existingInputText?: string;
   /** Cancel recording */
   onCancel: () => void;
   /** Toggle pause/resume */
@@ -51,6 +53,7 @@ export function RecordingInputArea({
   isProcessing,
   stream,
   hasExistingInput,
+  existingInputText,
   onCancel,
   onTogglePause,
   onTranscribeToInput,
@@ -66,6 +69,13 @@ export function RecordingInputArea({
 
   return (
     <Div className="mb-3 p-4 bg-background border border-border rounded-lg shadow-lg">
+      {/* Show existing input text as read-only preview while recording */}
+      {hasExistingInput && existingInputText && (
+        <Div className="mb-3 px-3 py-2 bg-muted/50 border border-border rounded-md text-sm text-muted-foreground whitespace-pre-wrap break-words max-h-24 overflow-y-auto">
+          {existingInputText}
+        </Div>
+      )}
+
       {isRecording && stream ? (
         <Div className="flex flex-col items-center gap-4">
           {/* Status indicator */}

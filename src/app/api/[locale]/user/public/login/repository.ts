@@ -17,6 +17,7 @@ import { verifyPassword } from "next-vibe/shared/utils/password";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import { type CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as creditsScopedTranslation } from "../../../credits/i18n";
@@ -384,10 +385,11 @@ export class LoginRepository {
         });
       }
 
-      // Set session duration based on rememberMe flag
-      // Remember me: 30 days, Regular session: 7 days
-      const sessionDurationDays = rememberMe ? 30 : 7;
-      const sessionDurationSeconds = sessionDurationDays * 24 * 60 * 60;
+      // Session duration matches JWT cookie lifetime so both expire together.
+      // rememberMe=false → 7-day session (browser-session cookie, shorter DB row)
+      const sessionDurationSeconds = rememberMe
+        ? AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS
+        : 7 * 24 * 60 * 60;
 
       // Fetch user roles from DB to include in JWT
       const rolesResult = await UserRolesRepository.getUserRoles(
