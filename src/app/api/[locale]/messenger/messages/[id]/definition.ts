@@ -25,7 +25,12 @@ import { dateSchema } from "../../../shared/types/common.schema";
 import { UserRole } from "../../../user/user-roles/enum";
 import { MessageStatus, MessageType } from "../enum";
 import { scopedTranslation } from "./i18n";
-import { EmailDetailContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const EmailDetailContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.EmailDetailContainer })),
+);
 
 const { GET } = createEndpoint({
   scopedTranslation,

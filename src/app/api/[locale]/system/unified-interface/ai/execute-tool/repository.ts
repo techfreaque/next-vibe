@@ -301,9 +301,7 @@ export class RouteExecuteRepository {
             const { videoGenModelSelectionSchema, filterVideoGenModels } =
               await import("@/app/api/[locale]/agent/video-generation/models");
             const { ModelSelectionType } =
-              await import(
-                "@/app/api/[locale]/agent/chat/skills/enum"
-              );
+              await import("@/app/api/[locale]/agent/chat/skills/enum");
             const sel =
               execSkill?.videoGenModelSelection ??
               execFav?.videoGenModelSelection;

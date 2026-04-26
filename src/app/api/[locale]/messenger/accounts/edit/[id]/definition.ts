@@ -62,7 +62,14 @@ import {
   MessengerProviderOptions,
 } from "../../enum";
 import { scopedTranslation } from "./i18n";
-import { MessengerAccountEditContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const MessengerAccountEditContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({
+    default: m.MessengerAccountEditContainer,
+  })),
+);
 
 // Shared response fields shape
 const accountResponseFields = {

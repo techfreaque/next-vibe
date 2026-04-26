@@ -777,6 +777,9 @@ export class HelpRepository {
 
     // When admin filters by a specific platform, additionally filter
     let platformFilteredMeta = filteredByPlatform;
+    // Keep an unfiltered copy for detail-mode lookups (detail should search all accessible tools,
+    // not just the active pinned/allowed subset chosen for list display).
+    const allAccessibleMeta = filteredByPlatform;
     if (platformFilter) {
       platformFilteredMeta = filteredByPlatform.filter((m) =>
         HelpRepository.getMetaPlatforms(m.allowedRoles).includes(
@@ -936,7 +939,9 @@ export class HelpRepository {
     // Detail mode - single tool with full parameter schema
     if (data.toolName) {
       const needle = data.toolName.toLowerCase().trim();
-      const matchedTool = platformFilteredMeta.find(
+      // Use allAccessibleMeta (pre-statsFilter) so detail lookups work for any accessible tool,
+      // not just the ones currently pinned/allowed in the active list view.
+      const matchedTool = allAccessibleMeta.find(
         (m) =>
           m.toolName.toLowerCase() === needle ||
           (m.aliases.length > 0 && m.aliases[0].toLowerCase() === needle) ||

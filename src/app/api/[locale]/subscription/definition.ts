@@ -19,7 +19,14 @@ import { PaymentProvider, PaymentProviderDB } from "../payment/enum";
 import { UserRole } from "../user/user-roles/enum";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
-import { SubscriptionOverviewContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const SubscriptionOverviewContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({
+    default: m.SubscriptionOverviewContainer,
+  })),
+);
 
 /**
  * GET endpoint for retrieving subscription

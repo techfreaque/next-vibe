@@ -49,7 +49,12 @@ import {
 } from "../enum";
 import { LEADS_STATS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { LeadsStatsContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const LeadsStatsContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LeadsStatsContainer })),
+);
 
 // ========== Zod Schemas for Complex Response Types ==========
 

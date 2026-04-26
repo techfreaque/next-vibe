@@ -21,7 +21,12 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SshAuthType, SshAuthTypeDB, SshAuthTypeOptions } from "../../enum";
 import { scopedTranslation } from "./i18n";
-import { ConnectionDetailContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const ConnectionDetailContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.ConnectionDetailContainer })),
+);
 
 export const { GET } = createEndpoint({
   scopedTranslation,

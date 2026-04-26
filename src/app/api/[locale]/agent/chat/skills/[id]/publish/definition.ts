@@ -32,7 +32,12 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { SKILL_PUBLISH_ALIAS } from "../../constants";
 import { SkillStatus, SkillStatusOptions } from "../../enum";
 import { scopedTranslation } from "./i18n";
-import { SkillPublishContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const SkillPublishContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.SkillPublishContainer })),
+);
 
 const { PATCH } = createEndpoint({
   scopedTranslation,

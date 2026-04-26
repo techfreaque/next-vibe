@@ -763,6 +763,7 @@ export const translations: typeof enTranslations = {
       cancel: "Anuluj",
       toInput: "Do wpisywania",
       sendVoice: "Wyślij głos",
+      retry: "Spróbuj ponownie",
     },
   },
   actions: {

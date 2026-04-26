@@ -441,6 +441,8 @@ export const translations: typeof enTranslations = {
       "not-supported":
         "Dein Browser unterstützt keinen Mikrofon-Zugriff. Versuche Chrome, Firefox oder Safari.",
       "transcription-failed": "Fehler beim Transkribieren des Audios",
+      "audio-too-short":
+        "Aufnahme zu kurz. Halte das Mikrofon und sprich deutlich, dann erneut versuchen.",
     },
     tts: {
       "endpoint-not-available": "Text-zu-Sprache-Endpunkt nicht verfügbar",
@@ -524,6 +526,8 @@ export const translations: typeof enTranslations = {
         "GLM-4 7B Flash - Ultraschnelles chinesisch-englisches Modell optimiert für schnelle Antworten",
       kimiK2:
         "Kimi K2 - Leistungsstarkes chinesisches KI-Modell mit ausgezeichnetem Kontextverständnis",
+      kimiK2_5:
+        "Kimi K2.5 - Moonshot AIs Vorgängermodell mit starkem Langkontext-Reasoning und Coding-Fähigkeiten",
       kimiK2_6:
         "Kimi K2.6 - Moonshot AIs Multimodal-Modell der nächsten Generation für langfristige Coding-Aufgaben, UI/UX-Generierung aus Prompts und Bildern sowie Multi-Agenten-Orchestrierung mit Agentenschwarm-Architektur für Hunderte paralleler Unteragenten",
       claudeSonnet45:

@@ -39,7 +39,12 @@ import {
 } from "../enum";
 import type { CsvImportJobStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
-import { LeadsImportContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const LeadsImportContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LeadsImportContainer })),
+);
 
 /**
  * Import Leads from CSV Endpoint (POST)

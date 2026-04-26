@@ -22,7 +22,14 @@ import { ConnectionHealthSchema } from "@/app/api/[locale]/user/remote-connectio
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
-import { RemoteConnectionsListContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const RemoteConnectionsListContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({
+    default: m.RemoteConnectionsListContainer,
+  })),
+);
 
 export const { GET } = createEndpoint({
   scopedTranslation,

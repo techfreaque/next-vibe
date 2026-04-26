@@ -26,7 +26,12 @@ import {
   SubscriptionStatus,
 } from "../enum";
 import { scopedTranslation } from "../i18n";
-import { SubscriptionUpdateContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const SubscriptionUpdateContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.SubscriptionUpdateContainer })),
+);
 
 /**
  * PUT endpoint for updating subscription

@@ -24,9 +24,14 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
 import { KAGI_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { KagiSearchResultsContainer } from "./widget";
+
+const KagiSearchResultsContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.KagiSearchResultsContainer })),
+);
 
 /**
  * GET /kagi - Get AI-powered answers with Kagi FastGPT

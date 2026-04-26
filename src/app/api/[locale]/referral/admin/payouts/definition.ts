@@ -28,7 +28,12 @@ import {
   PayoutStatusOptions,
 } from "../../enum";
 import { scopedTranslation } from "../../i18n";
-import { AdminPayoutsContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const AdminPayoutsContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.AdminPayoutsContainer })),
+);
 
 /**
  * GET: list all payout requests

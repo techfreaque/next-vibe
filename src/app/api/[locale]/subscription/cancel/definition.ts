@@ -19,7 +19,12 @@ import {
 
 import { UserRole } from "../../user/user-roles/enum";
 import { scopedTranslation } from "../i18n";
-import { SubscriptionCancelContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const SubscriptionCancelContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.SubscriptionCancelContainer })),
+);
 
 /**
  * DELETE endpoint for canceling subscription

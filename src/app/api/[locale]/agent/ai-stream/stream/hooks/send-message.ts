@@ -320,6 +320,8 @@ export async function sendMessage(
         canCreateThread: null,
         rolesManage: null,
         rolesCreateThread: null,
+        activeShareCount: null,
+        lastSharedAt: null,
       };
       apiClient.updateEndpointData(
         folderContentsDefinition.GET,

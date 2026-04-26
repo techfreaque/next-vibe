@@ -37,7 +37,12 @@ import {
   MimeType,
 } from "../enum";
 import { scopedTranslation } from "./i18n";
-import { LeadsExportContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const LeadsExportContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LeadsExportContainer })),
+);
 
 /**
  * Export Leads Endpoint (GET)

@@ -28,7 +28,12 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SKILL_VOTE_ALIAS } from "../../constants";
 import { scopedTranslation } from "./i18n";
-import { SkillVoteContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const SkillVoteContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.SkillVoteContainer })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

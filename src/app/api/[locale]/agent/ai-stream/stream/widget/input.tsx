@@ -544,10 +544,13 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
         stream={voice.stream}
         hasExistingInput={voice.hasExistingInput}
         existingInputText={input}
+        error={voice.error}
+        hasSavedAudio={voice.hasSavedAudio}
         onCancel={voice.cancelRecording}
         onTogglePause={voice.togglePause}
         onTranscribeToInput={voice.transcribeToInput}
         onSendVoice={handleSendVoice}
+        onRetry={voice.retryTranscription}
         locale={locale}
       />
 
@@ -903,13 +906,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           </TooltipProvider>
         </Div>
       </Div>
-
-      {/* Error display */}
-      {voice.error && (
-        <Div className="mt-2 px-2 py-1 bg-destructive/10 border border-destructive/20 rounded text-sm text-destructive">
-          {voice.error}
-        </Div>
-      )}
     </Form>
   );
 }

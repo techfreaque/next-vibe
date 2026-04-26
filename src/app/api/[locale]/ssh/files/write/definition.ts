@@ -21,7 +21,12 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SSH_FILES_WRITE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { FilesWriteContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const FilesWriteContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.FilesWriteContainer })),
+);
 
 export const { POST } = createEndpoint({
   scopedTranslation,

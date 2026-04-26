@@ -37,7 +37,15 @@ import {
 } from "../enum";
 import { leadsBatchFilterFields } from "../shared-filter-fields";
 import { scopedTranslation } from "./i18n";
-import { LeadsBatchDeleteContainer, LeadsBatchUpdateContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const LeadsBatchDeleteContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LeadsBatchDeleteContainer })),
+);
+const LeadsBatchUpdateContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LeadsBatchUpdateContainer })),
+);
 
 /**
  * Batch Update Endpoint (PATCH)

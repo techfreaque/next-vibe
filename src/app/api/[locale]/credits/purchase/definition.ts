@@ -27,7 +27,12 @@ import {
   PaymentProviderOptions,
 } from "../../payment/enum";
 import { scopedTranslation } from "./i18n";
-import { CreditsPurchaseContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const CreditsPurchaseContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.CreditsPurchaseContainer })),
+);
 
 /**
  * Purchase Credits Endpoint (POST)

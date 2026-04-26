@@ -32,7 +32,12 @@ import {
   LeadStatusDB,
 } from "../enum";
 import { scopedTranslation } from "./i18n";
-import { LeadsSearchContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const LeadsSearchContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LeadsSearchContainer })),
+);
 
 // Inline schema to avoid deprecated schema.ts imports
 const leadResponseSchema = z.object({

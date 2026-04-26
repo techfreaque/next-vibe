@@ -28,7 +28,12 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId, isDefaultFolderId } from "../../../config";
 import { scopedTranslation } from "./i18n";
-import { FolderCreateContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const FolderCreateContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.FolderCreateContainer })),
+);
 
 /**
  * Create Folder Endpoint (POST)

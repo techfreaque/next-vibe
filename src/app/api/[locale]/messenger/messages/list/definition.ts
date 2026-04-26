@@ -44,7 +44,12 @@ import {
   SortOrderOptions,
 } from "../enum";
 import { scopedTranslation } from "./i18n";
-import { EmailsListContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const EmailsListContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.EmailsListContainer })),
+);
 
 /**
  * Get Emails List Endpoint (GET)

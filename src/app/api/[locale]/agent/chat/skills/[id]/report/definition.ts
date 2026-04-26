@@ -29,7 +29,12 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SKILL_REPORT_ALIAS } from "../../constants";
 import { scopedTranslation } from "./i18n";
-import { SkillReportContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const SkillReportContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.SkillReportContainer })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

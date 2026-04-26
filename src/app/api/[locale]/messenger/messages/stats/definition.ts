@@ -53,7 +53,12 @@ import {
   TimePeriodOptions,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
-import { EmailStatsContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const EmailStatsContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.EmailStatsContainer })),
+);
 
 /**
  * Get Email Stats Endpoint (GET)

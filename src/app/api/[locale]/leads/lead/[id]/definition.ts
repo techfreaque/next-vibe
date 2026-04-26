@@ -44,7 +44,15 @@ import {
   LeadStatusOptions,
 } from "../../enum";
 import { scopedTranslation } from "./i18n";
-import { LeadDetailContainer, LeadEditContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const LeadDetailContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LeadDetailContainer })),
+);
+const LeadEditContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LeadEditContainer })),
+);
 
 /**
  * Delete Lead Endpoint (DELETE)

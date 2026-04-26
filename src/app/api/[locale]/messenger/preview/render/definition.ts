@@ -27,7 +27,12 @@ import {
 } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../../i18n";
-import { EmailPreviewRenderContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const EmailPreviewRenderContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.EmailPreviewRenderContainer })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

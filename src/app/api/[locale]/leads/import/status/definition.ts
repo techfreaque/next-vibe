@@ -30,7 +30,12 @@ import {
   CsvImportJobStatusOptions,
 } from "../enum";
 import { scopedTranslation } from "../i18n";
-import { ImportStatusContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const ImportStatusContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.ImportStatusContainer })),
+);
 
 /**
  * List Import Jobs Endpoint (GET)

@@ -122,14 +122,14 @@ export const documentsSyncProvider: SyncProvider = {
           continue;
         }
 
-        // Match by syncId
+        // Match by syncId OR path (path wins if syncId not found — handles local docs without syncId)
         const [existing] = await db
           .select({ id: cortexNodes.id, updatedAt: cortexNodes.updatedAt })
           .from(cortexNodes)
           .where(
             and(
               eq(cortexNodes.userId, userId),
-              eq(cortexNodes.syncId, remoteDoc.syncId),
+              sql`(${cortexNodes.syncId} = ${remoteDoc.syncId} OR ${cortexNodes.path} = ${remoteDoc.path})`,
             ),
           )
           .limit(1);
@@ -142,6 +142,7 @@ export const documentsSyncProvider: SyncProvider = {
             await db
               .update(cortexNodes)
               .set({
+                syncId: remoteDoc.syncId,
                 path: remoteDoc.path,
                 content: remoteDoc.content,
                 size: remoteDoc.size,
@@ -153,7 +154,7 @@ export const documentsSyncProvider: SyncProvider = {
               .where(eq(cortexNodes.id, existing.id));
           }
         } else {
-          // New document
+          // Genuinely new document
           await db.insert(cortexNodes).values({
             userId,
             syncId: remoteDoc.syncId,
@@ -180,9 +181,11 @@ export const documentsSyncProvider: SyncProvider = {
 
         synced++;
       } catch (error) {
+        const parsed = parseError(error);
         logger.error("Failed to upsert shared document", {
           syncId: remoteDoc.syncId,
-          ...parseError(error),
+          message: parsed.message,
+          name: parsed.name,
         });
       }
     }

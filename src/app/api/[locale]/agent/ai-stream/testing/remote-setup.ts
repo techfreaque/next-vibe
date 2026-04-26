@@ -132,7 +132,9 @@ export async function ensureProdUserCredits(
           AND (cp.expires_at IS NULL OR cp.expires_at > NOW())`,
   );
   const current = parseFloat(packRows.rows[0]?.total ?? "0");
-  if (current >= minCredits) { return; }
+  if (current >= minCredits) {
+    return;
+  }
 
   const toAdd = minCredits - current;
 
@@ -140,7 +142,9 @@ export async function ensureProdUserCredits(
   const userRows = await pdb.execute<{ id: string }>(
     sql`SELECT id FROM users WHERE id = ${prodUserId} LIMIT 1`,
   );
-  if (!userRows.rows[0]) { return; }
+  if (!userRows.rows[0]) {
+    return;
+  }
 
   // Ensure the wallet exists; get its id
   await pdb.execute(
@@ -152,7 +156,9 @@ export async function ensureProdUserCredits(
     sql`SELECT id FROM credit_wallets WHERE user_id = ${prodUserId} LIMIT 1`,
   );
   const walletId = walletRows.rows[0]?.id;
-  if (!walletId) { return; }
+  if (!walletId) {
+    return;
+  }
 
   // Insert a permanent pack and bump the wallet balance
   await pdb.execute(

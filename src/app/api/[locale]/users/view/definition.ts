@@ -22,7 +22,12 @@ import {
 
 import { UserRole } from "../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
-import { UserViewContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const UserViewContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.UserViewContainer })),
+);
 
 /**
  * GET endpoint for viewing detailed user information

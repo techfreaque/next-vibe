@@ -41,8 +41,15 @@ import {
   MessengerAccountStatusFilter,
 } from "../enum";
 import { scopedTranslation } from "./i18n";
-import { MessengerAccountsListContainer } from "./widget";
 import { MessageChannel, MessageChannelDB } from "../enum";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const MessengerAccountsListContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({
+    default: m.MessengerAccountsListContainer,
+  })),
+);
 
 const { GET } = createEndpoint({
   scopedTranslation,

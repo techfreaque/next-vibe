@@ -13,10 +13,10 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { NewCronTask } from "./cron/db";
 import { cronTasks } from "./cron/db";
 import { CronTaskPriority } from "./enum";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 /**
  * Upsert all cron tasks from the task registry into the DB.
@@ -68,7 +68,6 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
 
   // Upsert by id (primary key).
   // Do NOT overwrite enabled/schedule/priority/timeout/taskInput - those are user-overridable.
-  // Preserve displayName if DB already has one (may be a translated string vs code's translation key).
   for (const row of taskRows) {
     await db
       .insert(cronTasks)
@@ -78,7 +77,7 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
         set: {
           routeId: sql`excluded.route_id`,
           shortId: sql`excluded.short_id`,
-          displayName: sql`COALESCE(NULLIF(${cronTasks.displayName}, ''), excluded.display_name)`,
+          displayName: sql`excluded.display_name`,
           description: sql`excluded.description`,
           category: sql`excluded.category`,
           historyInterval: sql`excluded.history_interval`,

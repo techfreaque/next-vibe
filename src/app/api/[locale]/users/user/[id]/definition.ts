@@ -29,11 +29,18 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../../shared/types/common.schema";
 import { scopedTranslation } from "./i18n";
-import {
-  UserDeleteContainer,
-  UserDetailContainer,
-  UserEditContainer,
-} from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const UserDeleteContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.UserDeleteContainer })),
+);
+const UserDetailContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.UserDetailContainer })),
+);
+const UserEditContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.UserEditContainer })),
+);
 
 /**
  * Get User Endpoint Definition

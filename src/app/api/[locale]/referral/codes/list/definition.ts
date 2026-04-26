@@ -19,7 +19,12 @@ import {
 
 import { UserRole } from "../../../user/user-roles/enum";
 import { scopedTranslation } from "../../i18n";
-import { ReferralCodesListContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const ReferralCodesListContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.ReferralCodesListContainer })),
+);
 
 /**
  * GET endpoint for listing user's referral codes

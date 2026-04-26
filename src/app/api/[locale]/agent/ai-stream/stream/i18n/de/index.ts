@@ -777,6 +777,7 @@ export const translations: typeof enTranslations = {
       cancel: "Abbrechen",
       toInput: "Zur Eingabe",
       sendVoice: "Sprachnachricht senden",
+      retry: "Erneut versuchen",
     },
   },
   actions: {

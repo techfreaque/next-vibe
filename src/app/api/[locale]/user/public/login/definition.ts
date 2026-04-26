@@ -21,7 +21,12 @@ import {
 
 import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../user-roles/enum";
-import { LoginFormContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const LoginFormContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LoginFormContainer }))
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

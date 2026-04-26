@@ -45,6 +45,10 @@ interface UseEdenAISpeechReturn {
   transcript: string | null;
   stream: MediaStream | null;
   clearError: () => void;
+  /** Whether there is a saved audio file available to retry */
+  hasSavedAudio: boolean;
+  /** Retry transcription using the saved audio file from the last failed attempt */
+  retryTranscription: () => Promise<void>;
 }
 
 /**
@@ -129,10 +133,13 @@ export function useEdenAISpeech({
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [transcript, setTranscript] = useState<string | null>(null);
+  const [hasSavedAudio, setHasSavedAudio] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
+  // Saved audio file retained on failure so the user can retry without re-recording
+  const savedAudioFileRef = useRef<File | null>(null);
 
   // Use endpoint for type-safe API calls
   // Use a ref so processRecording doesn't need endpoint in its dep array
@@ -175,49 +182,21 @@ export function useEdenAISpeech({
     audioChunksRef.current = [];
   }, []);
 
-  const processRecording = useCallback(async (): Promise<void> => {
-    const currentEndpoint = endpointRef.current;
-    logger.debug("STT: Processing recording", {
-      hasEndpointCreate: !!currentEndpoint?.create,
-    });
-
-    if (!currentEndpoint?.create) {
-      const errorMsg = t("hooks.stt.endpoint-not-available");
-      logger.error("STT: Endpoint not available", errorMsg);
-      setError(errorMsg);
-      onError?.(errorMsg);
-      return;
-    }
-
-    try {
-      setIsProcessing(true);
-      setError(null);
-      logger.debug("STT: Starting processing");
-
-      // Create audio blob
-      const audioBlob = new Blob(audioChunksRef.current, {
-        type: mediaRecorderRef.current?.mimeType || "audio/webm",
-      });
-
-      // Bail out if blob is too small (silent/empty recording)
-      if (audioBlob.size < 1000) {
-        logger.debug("STT: Audio too short/silent, skipping transcription", {
-          blobSize: audioBlob.size,
-        });
+  /**
+   * Submit a specific audio file for transcription.
+   * Shared by processRecording (fresh recording) and retryTranscription (saved file).
+   */
+  const submitAudioFile = useCallback(
+    async (audioFile: File): Promise<void> => {
+      const currentEndpoint = endpointRef.current;
+      if (!currentEndpoint?.create) {
+        const errorMsg = t("hooks.stt.endpoint-not-available");
+        logger.error("STT: Endpoint not available", errorMsg);
+        setError(errorMsg);
+        onError?.(errorMsg);
         setIsProcessing(false);
         return;
       }
-
-      // Create a File object from the blob
-      const audioFile = new File([audioBlob], "recording.webm", {
-        type: audioBlob.type,
-      });
-
-      // Set form values and submit
-      logger.debug("STT: Submitting audio", {
-        fileSize: audioFile.size,
-        provider: "openai",
-      });
 
       // Set form values - set the nested object structure directly
       currentEndpoint.create.form.setValue("fileUpload", { file: audioFile });
@@ -237,6 +216,9 @@ export function useEdenAISpeech({
               textLength: transcribedText.length,
             });
 
+            // Success: discard saved audio
+            savedAudioFileRef.current = null;
+            setHasSavedAudio(false);
             setTranscript(transcribedText);
             onTranscript?.(transcribedText);
             setIsProcessing(false);
@@ -244,10 +226,10 @@ export function useEdenAISpeech({
           } else {
             const errorMessage = t("hooks.stt.transcription-failed");
             logger.error("STT: Transcription failed", errorMessage);
+            // Keep savedAudioFileRef so user can retry
             setError(errorMessage);
             onError?.(errorMessage);
             setIsProcessing(false);
-            cleanup();
           }
         },
         onError: ({ error: apiError }) => {
@@ -259,12 +241,57 @@ export function useEdenAISpeech({
             errorMessage: apiError.message,
             translatedMessage: errorMessage,
           });
+          // Keep savedAudioFileRef so user can retry
           setError(errorMessage);
           onError?.(errorMessage);
           setIsProcessing(false);
-          cleanup();
         },
       });
+    },
+    [logger, t, onTranscript, onError, cleanup],
+  );
+
+  const processRecording = useCallback(async (): Promise<void> => {
+    logger.debug("STT: Processing recording");
+
+    try {
+      setIsProcessing(true);
+      setError(null);
+      logger.debug("STT: Starting processing");
+
+      // Create audio blob
+      const audioBlob = new Blob(audioChunksRef.current, {
+        type: mediaRecorderRef.current?.mimeType || "audio/webm",
+      });
+
+      // Bail out if blob is too small (silent/empty recording) — show error so user knows
+      if (audioBlob.size < 1000) {
+        logger.debug("STT: Audio too short/silent", {
+          blobSize: audioBlob.size,
+        });
+        const errorMsg = t("hooks.stt.audio-too-short");
+        setError(errorMsg);
+        onError?.(errorMsg);
+        setIsProcessing(false);
+        cleanup();
+        return;
+      }
+
+      // Create a File object from the blob
+      const audioFile = new File([audioBlob], "recording.webm", {
+        type: audioBlob.type,
+      });
+
+      // Save the file so we can retry on failure
+      savedAudioFileRef.current = audioFile;
+      setHasSavedAudio(true);
+
+      logger.debug("STT: Submitting audio", {
+        fileSize: audioFile.size,
+        provider: "openai",
+      });
+
+      await submitAudioFile(audioFile);
     } catch (err) {
       const errorMsg =
         err instanceof Error
@@ -274,9 +301,22 @@ export function useEdenAISpeech({
       setError(errorMsg);
       onError?.(errorMsg);
       setIsProcessing(false);
-      cleanup();
+      // Don't cleanup so savedAudioFileRef is preserved for retry
     }
-  }, [logger, t, onTranscript, onError, cleanup]);
+  }, [logger, t, onError, cleanup, submitAudioFile]);
+
+  /** Retry transcription using the saved audio file from the last failed attempt */
+  const retryTranscription = useCallback(async (): Promise<void> => {
+    const audioFile = savedAudioFileRef.current;
+    if (!audioFile) {
+      logger.warn("STT: retryTranscription called but no saved audio");
+      return;
+    }
+    logger.debug("STT: Retrying transcription", { fileSize: audioFile.size });
+    setIsProcessing(true);
+    setError(null);
+    await submitAudioFile(audioFile);
+  }, [logger, submitAudioFile]);
 
   const startRecording = useCallback(async (): Promise<void> => {
     try {
@@ -420,7 +460,7 @@ export function useEdenAISpeech({
   }, [isPaused, pauseRecording, resumeRecording]);
 
   /**
-   * Cancel recording and discard all audio data
+   * Cancel recording and discard all audio data (including any saved retry file)
    * Does not trigger transcription or any processing
    */
   const cancelRecording = useCallback((): void => {
@@ -433,10 +473,15 @@ export function useEdenAISpeech({
       };
     }
 
+    // Discard saved audio too
+    savedAudioFileRef.current = null;
+    setHasSavedAudio(false);
+
     // Clean up everything
     cleanup();
     setIsRecording(false);
     setIsPaused(false);
+    setError(null);
   }, [cleanup, logger]);
 
   const toggleRecording = useCallback(async (): Promise<void> => {
@@ -467,5 +512,7 @@ export function useEdenAISpeech({
     transcript,
     stream: streamRef.current,
     clearError,
+    hasSavedAudio,
+    retryTranscription,
   };
 }

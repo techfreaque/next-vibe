@@ -142,8 +142,10 @@ export const { POST, tools } = endpointsHandler({
       // Only non-ok status causes a failure - the task history shows the warnings.
       if (status !== "ok") {
         return fail({
-          message: t("dbHealth.post.errors.systemAlert"),
-          messageParams: { status, warnings: warnings.join("; ") },
+          message: t("dbHealth.post.errors.systemAlert", {
+            status,
+            warnings: warnings.join("; "),
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }

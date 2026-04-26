@@ -18,7 +18,12 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
-import { TerminalContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const TerminalContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.TerminalContainer })),
+);
 
 export const { GET } = createEndpoint({
   scopedTranslation,

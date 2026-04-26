@@ -48,7 +48,12 @@ import {
 } from "../shared-filter-fields";
 import { LEADS_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { LeadsListContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const LeadsListContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LeadsListContainer })),
+);
 
 /**
  * Get Leads List Endpoint (GET)

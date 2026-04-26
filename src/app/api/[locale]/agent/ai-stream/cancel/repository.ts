@@ -69,6 +69,7 @@ export class cancelRepository {
           id: chatThreads.id,
           userId: chatThreads.userId,
           leadId: chatThreads.leadId,
+          rootFolderId: chatThreads.rootFolderId,
         })
         .from(chatThreads)
         .where(eq(chatThreads.id, threadId))
@@ -155,7 +156,7 @@ export class cancelRepository {
 
               createMessagesEmitter(
                 threadId,
-                null,
+                thread.rootFolderId,
                 logger,
                 user,
               )("tool-result", {
@@ -212,7 +213,7 @@ export class cancelRepository {
         await clearStreamingState(threadId, logger, user);
         createMessagesEmitter(
           threadId,
-          null,
+          thread.rootFolderId,
           logger,
           user,
         )("stream-finished", { streamingState: "idle" });

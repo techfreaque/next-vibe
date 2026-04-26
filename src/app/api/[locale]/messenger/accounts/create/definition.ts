@@ -48,13 +48,20 @@ import {
   EmailSecurityTypeDB,
   EmailSecurityTypeOptions,
 } from "../../providers/email/enum";
-import { scopedTranslation } from "./i18n";
-import { MessengerAccountCreateContainer } from "./widget";
 import {
   MessageChannel,
   MessageChannelDB,
   MessageChannelOptions,
 } from "../enum";
+import { scopedTranslation } from "./i18n";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const MessengerAccountCreateContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({
+    default: m.MessengerAccountCreateContainer,
+  })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

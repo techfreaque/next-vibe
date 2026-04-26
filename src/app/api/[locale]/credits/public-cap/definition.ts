@@ -21,7 +21,15 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
-import { PublicCapContainer, PublicCapUpdateContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const PublicCapContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.PublicCapContainer })),
+);
+const PublicCapUpdateContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.PublicCapUpdateContainer })),
+);
 
 // ── GET ───────────────────────────────────────────────────────────────────
 

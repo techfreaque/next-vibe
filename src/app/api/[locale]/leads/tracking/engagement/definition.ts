@@ -31,10 +31,17 @@ import {
   LeadSourceOptions,
 } from "../../enum";
 import { scopedTranslation } from "./i18n";
-import {
-  LeadClickTrackingContainer,
-  LeadEngagementTrackingContainer,
-} from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const LeadClickTrackingContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LeadClickTrackingContainer })),
+);
+const LeadEngagementTrackingContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({
+    default: m.LeadEngagementTrackingContainer,
+  })),
+);
 
 /**
  * Metadata schema for engagement tracking

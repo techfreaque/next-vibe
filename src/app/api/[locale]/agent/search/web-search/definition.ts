@@ -24,10 +24,15 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
 import { SearchProvider, SearchProviderDB } from "../enum";
 import { WEB_SEARCH_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { WebSearchResultsContainer } from "./widget";
+
+const WebSearchResultsContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.WebSearchResultsContainer })),
+);
 
 /**
  * Freshness options for search results (Brave only)

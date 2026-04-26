@@ -782,6 +782,7 @@ export const translations = {
       cancel: "Cancel",
       toInput: "To Input",
       sendVoice: "Send Voice",
+      retry: "Retry",
     },
   },
   actions: {

@@ -27,7 +27,12 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { SKILL_MODERATION_ALIAS } from "../constants";
 import { SkillStatus, SkillStatusDB } from "../enum";
 import { scopedTranslation } from "./i18n";
-import { SkillModerationContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const SkillModerationContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.SkillModerationContainer })),
+);
 
 const { GET } = createEndpoint({
   scopedTranslation,

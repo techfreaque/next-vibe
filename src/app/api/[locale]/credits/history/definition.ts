@@ -27,7 +27,12 @@ import { dateSchema } from "../../shared/types/common.schema";
 import { paginationField } from "../../system/unified-interface/unified-ui/widgets/containers/pagination/types";
 import { CreditTransactionType } from "../enum";
 import { scopedTranslation } from "../i18n";
-import { CreditHistoryContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const CreditHistoryContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.CreditHistoryContainer })),
+);
 /**
  * Get Credit History Endpoint (GET)
  * Retrieves paginated credit transaction history

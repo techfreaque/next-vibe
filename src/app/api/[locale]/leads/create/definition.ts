@@ -34,7 +34,12 @@ import { dateSchema } from "../../shared/types/common.schema";
 import { UserRole } from "../../user/user-roles/enum";
 import { LeadSource, LeadSourceOptions, LeadStatus } from "../enum";
 import { scopedTranslation } from "./i18n";
-import { LeadCreateContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const LeadCreateContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LeadCreateContainer })),
+);
 
 /**
  * Create Lead Endpoint (POST)

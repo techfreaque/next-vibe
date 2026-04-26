@@ -20,7 +20,12 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
-import { ConnectionTestContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const ConnectionTestContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.ConnectionTestContainer })),
+);
 
 export const { POST } = createEndpoint({
   scopedTranslation,

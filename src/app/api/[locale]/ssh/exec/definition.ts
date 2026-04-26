@@ -27,7 +27,12 @@ import {
 } from "../enum";
 import { SSH_EXEC_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { SshExecContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const SshExecContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.SshExecContainer })),
+);
 
 export const { POST } = createEndpoint({
   scopedTranslation,

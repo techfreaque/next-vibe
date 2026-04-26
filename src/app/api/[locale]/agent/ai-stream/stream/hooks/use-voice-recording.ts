@@ -61,6 +61,10 @@ export interface UseVoiceRecordingReturn {
   clearError: () => void;
   /** Whether there's existing input (affects UI) */
   hasExistingInput: boolean;
+  /** Whether a saved audio file is available to retry transcription */
+  hasSavedAudio: boolean;
+  /** Retry the last failed transcription */
+  retryTranscription: () => Promise<void>;
 }
 
 /**
@@ -124,6 +128,8 @@ export function useVoiceRecording({
     stream,
     clearError,
     startRecording: startSTT,
+    hasSavedAudio,
+    retryTranscription,
   } = useEdenAISpeech({
     onTranscript,
     onError,
@@ -209,6 +215,8 @@ export function useVoiceRecording({
       togglePause,
       clearError,
       hasExistingInput,
+      hasSavedAudio,
+      retryTranscription,
     }),
     [
       isRecording,
@@ -224,6 +232,8 @@ export function useVoiceRecording({
       togglePause,
       clearError,
       hasExistingInput,
+      hasSavedAudio,
+      retryTranscription,
     ],
   );
 }

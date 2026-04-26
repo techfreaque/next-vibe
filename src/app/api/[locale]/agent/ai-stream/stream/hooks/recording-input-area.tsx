@@ -15,6 +15,7 @@ import { Pause } from "next-vibe-ui/ui/icons/Pause";
 import { Play } from "next-vibe-ui/ui/icons/Play";
 import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Type } from "next-vibe-ui/ui/icons/Type";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
@@ -35,6 +36,10 @@ interface RecordingModalProps {
   hasExistingInput: boolean;
   /** The existing input text to show as read-only preview */
   existingInputText?: string;
+  /** Current error message (shown with retry option if hasSavedAudio) */
+  error: string | null;
+  /** Whether a saved audio file exists to retry */
+  hasSavedAudio: boolean;
   /** Cancel recording */
   onCancel: () => void;
   /** Toggle pause/resume */
@@ -43,6 +48,8 @@ interface RecordingModalProps {
   onTranscribeToInput: () => void;
   /** Stop and send voice directly */
   onSendVoice: () => void;
+  /** Retry the last failed transcription */
+  onRetry: () => void;
   /** User locale */
   locale: CountryLanguage;
 }
@@ -54,16 +61,19 @@ export function RecordingInputArea({
   stream,
   hasExistingInput,
   existingInputText,
+  error,
+  hasSavedAudio,
   onCancel,
   onTogglePause,
   onTranscribeToInput,
   onSendVoice,
+  onRetry,
   locale,
 }: RecordingModalProps): JSX.Element | null {
   const { t } = aiStreamScopedTranslation.scopedT(locale);
 
-  // Don't render if not recording/processing
-  if (!isRecording && !isProcessing) {
+  // Don't render if not recording/processing and no error to show
+  if (!isRecording && !isProcessing && !error) {
     return null;
   }
 
@@ -167,6 +177,35 @@ export function RecordingInputArea({
               >
                 <Send className="h-4 w-4" />
                 {t("voiceMode.actions.sendVoice")}
+              </Button>
+            )}
+          </Div>
+        </Div>
+      ) : error ? (
+        // Error state — show message and retry/cancel buttons
+        <Div className="flex flex-col items-center gap-3 py-2">
+          <Span className="text-sm text-destructive text-center">{error}</Span>
+          <Div className="flex items-center gap-2">
+            <Button
+              type="button"
+              size="default"
+              variant="ghost"
+              onClick={onCancel}
+              className="gap-2 text-muted-foreground hover:text-destructive"
+            >
+              <X className="h-4 w-4" />
+              {t("voiceMode.actions.cancel")}
+            </Button>
+            {hasSavedAudio && (
+              <Button
+                type="button"
+                size="default"
+                variant="outline"
+                onClick={onRetry}
+                className="gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                {t("voiceMode.actions.retry")}
               </Button>
             )}
           </Div>

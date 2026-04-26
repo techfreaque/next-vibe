@@ -51,6 +51,7 @@ import { createTaskEmitters } from "../cron/emitter";
 import { CronTasksRepository } from "../cron/repository";
 import { resolveTaskOwnerUser } from "../cron/resolve-task-user";
 import {
+  resolveTaskDisplayName,
   scopedTranslation,
   scopedTranslation as tasksScopedTranslation,
 } from "../i18n";
@@ -596,8 +597,10 @@ export class PulseHealthRepository {
 
           const { user: cronUser, locale: userLocale } = taskUserContext;
           const { t: tTask } = scopedTranslation.scopedT(userLocale);
-          // Resolve displayName: may be a translation key (e.g. "dbHealthCheck.name") or plain string
-          const resolvedTaskName = tTask(dbTask.displayName);
+          const resolvedTaskName = resolveTaskDisplayName(
+            dbTask.displayName,
+            userLocale,
+          );
           const startedAt = new Date();
 
           // Emit task-updated (RUNNING) to WS subscribers

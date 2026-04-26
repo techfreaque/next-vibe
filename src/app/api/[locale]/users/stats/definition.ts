@@ -51,7 +51,12 @@ import {
 } from "../enum";
 import { USERS_STATS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { UsersStatsContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const UsersStatsContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.UsersStatsContainer })),
+);
 
 const { GET } = createEndpoint({
   scopedTranslation,

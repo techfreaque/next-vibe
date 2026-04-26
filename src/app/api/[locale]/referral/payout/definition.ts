@@ -27,7 +27,12 @@ import {
 import { UserRole } from "../../user/user-roles/enum";
 import { PayoutCurrency, PayoutCurrencyDB, PayoutStatusDB } from "../enum";
 import { scopedTranslation } from "../i18n";
-import { ReferralPayoutContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const ReferralPayoutContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.ReferralPayoutContainer })),
+);
 
 const allowedRoles = [
   UserRole.CUSTOMER,

@@ -35,7 +35,12 @@ import {
 
 import { dateSchema } from "../../shared/types/common.schema";
 import { scopedTranslation } from "./i18n";
-import { UserCreateContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const UserCreateContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.UserCreateContainer })),
+);
 
 /**
  * Users Create Endpoint Definition

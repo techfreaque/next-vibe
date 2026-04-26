@@ -29,7 +29,12 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
-import { DeleteFolderContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const DeleteFolderContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.DeleteFolderContainer })),
+);
 
 /**
  * Get Subfolder by ID Endpoint (GET)

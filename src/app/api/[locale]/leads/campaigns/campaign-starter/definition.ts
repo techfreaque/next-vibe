@@ -28,7 +28,14 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
-import { CampaignStarterConfigContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const CampaignStarterConfigContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({
+    default: m.CampaignStarterConfigContainer,
+  })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

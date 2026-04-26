@@ -21,7 +21,12 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SSH_FILES_READ_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { FilesReadContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const FilesReadContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.FilesReadContainer })),
+);
 
 export const { GET } = createEndpoint({
   scopedTranslation,

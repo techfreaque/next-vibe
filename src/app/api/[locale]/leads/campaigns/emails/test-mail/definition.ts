@@ -44,7 +44,12 @@ import {
 } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
-import { TestEmailContainer } from "./widget";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const TestEmailContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.TestEmailContainer })),
+);
 
 /**
  * Send Test Email Endpoint (POST)
