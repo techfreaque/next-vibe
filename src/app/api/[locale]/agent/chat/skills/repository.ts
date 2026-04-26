@@ -50,6 +50,7 @@ import {
   generateSlug,
   isUuid,
   parseSkillId,
+  resolveIdAlias,
 } from "../slugify";
 import type {
   SkillDeleteResponseOutput,
@@ -112,8 +113,34 @@ export class SkillsRepository {
     if (isUuid(skillId)) {
       return eq(customSkills.id, skillId);
     }
-    // Treat as slug
-    return eq(customSkills.slug, skillId);
+    // Resolve legacy alias before slug lookup
+    return eq(customSkills.slug, resolveIdAlias(skillId));
+  }
+
+  /**
+   * Resolve a skill identifier (UUID or slug) to its canonical slug form.
+   * Default skill IDs are already friendly strings — returned as-is.
+   * Custom skill UUIDs are looked up and resolved to the slug.
+   * If the skill has no slug or isn't found, returns the original identifier.
+   */
+  static async resolveCanonicalSkillId(skillId: string): Promise<string> {
+    // Resolve legacy aliases (camelCase → slug) first
+    const resolved = resolveIdAlias(skillId);
+    // Default skills already have friendly IDs
+    if (DEFAULT_SKILLS.some((s) => s.id === resolved)) {
+      return resolved;
+    }
+    // If it's not a UUID, it's already a slug
+    if (!isUuid(resolved)) {
+      return resolved;
+    }
+    // UUID → look up the slug
+    const [row] = await db
+      .select({ slug: customSkills.slug })
+      .from(customSkills)
+      .where(eq(customSkills.id, resolved))
+      .limit(1);
+    return row?.slug || resolved;
   }
 
   /**
@@ -660,16 +687,20 @@ export class SkillsRepository {
   ): Promise<ResponseType<SkillGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const { id: skillId } = urlPathParams;
+      const { id: rawSkillId } = urlPathParams;
+      const { skillId, variantId } = parseSkillId(rawSkillId);
       const userId = user.id;
 
-      logger.debug("Getting skill by ID", { skillId, userId });
+      logger.debug("Getting skill by ID", { skillId, variantId, userId });
 
       // Check default skills first
       const defaultSkill = DEFAULT_SKILLS.find((p) => p.id === skillId);
       if (defaultSkill) {
-        // Use the default variant's model selections as skill-level defaults
+        // Use the requested variant if specified, otherwise fall back to default
         const defaultVariant =
+          (variantId
+            ? defaultSkill.variants.find((v) => v.id === variantId)
+            : null) ??
           defaultSkill.variants.find((v) => v.isDefault) ??
           defaultSkill.variants[0];
         return success<SkillGetResponseOutput>({
@@ -839,11 +870,13 @@ export class SkillsRepository {
             .where(eq(leadMagnetConfigs.userId, customSkill.userId))
             .limit(1);
 
+          const resolvedCreatorSlug =
+            creatorUser.creatorSlug ??
+            creatorUser.publicName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
           creatorProfile = {
-            userId: creatorUser.id,
-            creatorSlug:
-              creatorUser.creatorSlug ??
-              creatorUser.publicName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+            // Use creatorSlug as public identifier (never expose raw UUID)
+            userId: resolvedCreatorSlug,
+            creatorSlug: resolvedCreatorSlug,
             publicName: creatorUser.publicName,
             avatarUrl: creatorUser.avatarUrl ?? null,
             bio: creatorUser.bio ?? null,
@@ -988,6 +1021,17 @@ export class SkillsRepository {
               },
             ];
 
+      // Validate variant IDs are unique within the skill
+      if (data.variants && data.variants.length > 0) {
+        const variantIds = data.variants.map((v) => v.id);
+        if (new Set(variantIds).size !== variantIds.length) {
+          return fail({
+            message: t("post.errors.server.title"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+      }
+
       // Generate a unique slug from the skill name
       const slug = await SkillsRepository.generateUniqueSkillSlug(data.name);
 
@@ -1124,10 +1168,18 @@ export class SkillsRepository {
         });
       }
 
-      // Validate: if variants provided, exactly one must be isDefault
+      // Validate: if variants provided, exactly one must be isDefault + all IDs unique
       if (data.variants && data.variants.length > 0) {
         const defaultCount = data.variants.filter((v) => v.isDefault).length;
         if (defaultCount !== 1) {
+          return fail({
+            message: t("id.patch.errors.validation.title"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+        const variantIds = data.variants.map((v) => v.id);
+        const uniqueVariantIds = new Set(variantIds);
+        if (uniqueVariantIds.size !== variantIds.length) {
           return fail({
             message: t("id.patch.errors.validation.title"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,

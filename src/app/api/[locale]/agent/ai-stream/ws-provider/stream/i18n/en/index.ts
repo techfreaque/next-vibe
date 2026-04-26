@@ -26,6 +26,11 @@ export const translations = {
           "UUID of an existing thread to continue. Omit to start a new thread.",
         placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
       },
+      rootFolderId: {
+        label: "Root Folder",
+        description:
+          "Folder to create the thread in. Defaults to 'private'. Use 'support' for support sessions.",
+      },
       skill: {
         label: "Skill",
         description:

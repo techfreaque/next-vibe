@@ -31,6 +31,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { RESUME_STREAM_ALIAS } from "../../../agent/ai-stream/resume-stream/constants";
 import { cronTasks } from "./cron/db";
+import { createTaskEmitters } from "./cron/emitter";
 import {
   CronTaskPriority,
   CronTaskStatus,
@@ -225,13 +226,34 @@ export async function handleTaskCompletion(params: {
       null,
       logger,
       ownerUser,
-    )("task-completed", { backgroundTasks: [{ id: toolMessageId }] });
+    )("task-completed", { backgroundTasks: [{ id: taskId }] });
 
     logger.debug("[TaskCompletion] Emitted TASK_COMPLETED WS event", {
       threadId,
       taskId,
       toolMessageId,
     });
+  }
+
+  // 2a. Emit task-updated to task list/queue WS channels
+  {
+    const { emitTaskList, emitTaskQueue } = createTaskEmitters(
+      logger,
+      ownerUser,
+    );
+    const taskPayload = {
+      tasks: [
+        {
+          id: taskId,
+          lastExecutionStatus:
+            toolStatus === "completed"
+              ? CronTaskStatus.COMPLETED
+              : CronTaskStatus.FAILED,
+        },
+      ],
+    };
+    emitTaskList("task-updated", taskPayload);
+    emitTaskQueue("task-updated", taskPayload);
   }
 
   // 2b. For endLoop: task is done, no AI continuation - clear thread from "waiting" → "idle".
@@ -293,19 +315,22 @@ export async function handleTaskCompletion(params: {
         ...(leafMessageId ? { leafMessageId } : {}),
         // wakeUp: pass the task result so resume-stream can create the deferred TOOL message
         // without touching the original. Stored as object in taskInput JSONB.
-        // Only pass wakeUpResult when output is a non-null object (z.record schema rejects null).
-        ...(callbackMode === CallbackMode.WAKE_UP &&
-        output !== undefined &&
-        output !== null &&
-        typeof output === "object" &&
-        !Array.isArray(output)
+        // For failures with no output, synthesize a minimal failure result so the deferred
+        // message has real data and the revival AI can confirm the failure.
+        ...(callbackMode === CallbackMode.WAKE_UP
           ? {
-              wakeUpResult: output,
               wakeUpStatus: toolStatus,
+              wakeUpResult:
+                output !== undefined &&
+                output !== null &&
+                typeof output === "object" &&
+                !Array.isArray(output)
+                  ? output
+                  : toolStatus === "failed"
+                    ? { success: false, status: "failed" }
+                    : undefined,
             }
-          : callbackMode === CallbackMode.WAKE_UP
-            ? { wakeUpStatus: toolStatus }
-            : {}),
+          : {}),
         // Cleanup: pass both task IDs so resume-stream can delete them after revival.
         wakeUpTaskId: taskId,
         resumeTaskId,

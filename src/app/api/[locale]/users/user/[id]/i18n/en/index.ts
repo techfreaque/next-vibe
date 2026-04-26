@@ -103,6 +103,22 @@ export const translations = {
             content: "Updated At",
           },
         },
+        referralInfo: {
+          title: "Referral Info",
+          description: "Referral chain and earnings",
+          referredByUserId: {
+            content: "Referred By (User ID)",
+          },
+          referredByCode: {
+            content: "Referral Code Used",
+          },
+          totalReferrals: {
+            content: "Users Referred",
+          },
+          totalEarnedCents: {
+            content: "Total Earned (cents)",
+          },
+        },
         leadId: {
           content: "Associated Lead ID",
         },

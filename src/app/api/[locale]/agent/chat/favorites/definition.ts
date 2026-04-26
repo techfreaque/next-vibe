@@ -380,7 +380,7 @@ const { GET } = createEndpoint({
         hint: null,
         favorites: [
           {
-            id: "550e8400-e29b-41d4-a716-446655440000",
+            id: "thea",
             skillId: "default",
             customVariantName: null,
             modelId: ChatModelId.CLAUDE_SONNET_4_5,

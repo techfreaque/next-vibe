@@ -6,6 +6,7 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
+
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -31,6 +32,7 @@ import {
   ensureUniqueSlug,
   formatSkillId,
   generateFavoriteSlug,
+  isSkillVariantId,
   isUuid,
   parseSkillId,
 } from "../../slugify";
@@ -95,9 +97,15 @@ function normalizeImageGenSelection(
  */
 export class SingleFavoriteRepository {
   /**
-   * Resolve a favorite by slug or UUID within a user's favorites.
+   * Resolve a favorite by slug, UUID, or merged skillSlug__variantId within a user's favorites.
+   *
+   * Supported formats:
+   *   - UUID: direct DB id lookup
+   *   - "thea-brilliant": favorite's own slug lookup
+   *   - "thea__brilliant": look up by skillId+variantId (merged skill format)
+   *   - "thea": look up by skillId with null variantId
    */
-  private static resolveFavoriteCondition(
+  static resolveFavoriteCondition(
     favoriteId: string,
     userId: string,
   ): ReturnType<typeof and> {
@@ -107,6 +115,18 @@ export class SingleFavoriteRepository {
         eq(chatFavorites.userId, userId),
       );
     }
+    // Merged "skillSlug__variantId" format — look up by the skill identity
+    if (isSkillVariantId(favoriteId)) {
+      const { skillId, variantId } = parseSkillId(favoriteId);
+      return and(
+        eq(chatFavorites.skillId, skillId),
+        variantId !== null
+          ? eq(chatFavorites.variantId, variantId)
+          : sql`${chatFavorites.variantId} IS NULL`,
+        eq(chatFavorites.userId, userId),
+      );
+    }
+    // Plain slug — favorite's own slug
     return and(
       eq(chatFavorites.slug, favoriteId),
       eq(chatFavorites.userId, userId),
@@ -192,16 +212,23 @@ export class SingleFavoriteRepository {
       // Resolve characterModelSelection from the specific variant via skill's variants list
       const variant = favorite.variantId
         ? character.variants?.find((v) => v.id === favorite.variantId)
-        : character.variants?.[0];
+        : (character.variants?.find((v) => v.isDefault) ??
+          character.variants?.[0] ??
+          null);
       const characterModelSelection: FavoriteGetResponseOutput["characterModelSelection"] =
         variant?.modelSelection ?? null;
 
       // Merge customIcon with character icon (customIcon takes precedence)
       const displayIcon = favorite.customIcon ?? character?.icon ?? "bot";
 
+      // Normalize skillId to canonical slug (legacy rows may store UUIDs)
+      const canonicalSkillId = await SkillsRepository.resolveCanonicalSkillId(
+        favorite.skillId,
+      );
+
       // Flattened response
       return success<FavoriteGetResponseOutput>({
-        skillId: formatSkillId(favorite.skillId, favorite.variantId ?? null),
+        skillId: formatSkillId(canonicalSkillId, favorite.variantId ?? null),
         customVariantName: favorite.customVariantName ?? null,
         icon: displayIcon,
         name: character?.name ?? charactersT("skills.default.name"),
@@ -362,16 +389,18 @@ export class SingleFavoriteRepository {
           ? data.customVariantName || null
           : existing.customVariantName;
 
+      // Normalize skillId to its canonical slug form (never store UUIDs)
+      const canonicalNewSkillId =
+        await SkillsRepository.resolveCanonicalSkillId(newSkillId);
+
       let slugUpdate: string | undefined;
       if (
-        newSkillId !== existing.skillId ||
+        canonicalNewSkillId !== existing.skillId ||
         newVariantId !== existing.variantId ||
         newCustomVariantName !== existing.customVariantName
       ) {
-        const skillSlug = FavoritesCreateRepository.resolveSkillSlug(
-          newSkillId,
-          character?.name ?? null,
-        );
+        const skillSlug =
+          FavoritesCreateRepository.resolveSkillSlug(canonicalNewSkillId);
         const baseSlug = generateFavoriteSlug({
           customVariantName: newCustomVariantName,
           skillSlug,
@@ -398,7 +427,7 @@ export class SingleFavoriteRepository {
         .update(chatFavorites)
         .set({
           ...(slugUpdate !== undefined ? { slug: slugUpdate } : {}),
-          skillId: parsedSkillId,
+          skillId: parsedSkillId ? canonicalNewSkillId : undefined,
           variantId: data.skillId !== undefined ? newVariantId : undefined,
           customVariantName:
             data.customVariantName !== undefined
@@ -472,7 +501,10 @@ export class SingleFavoriteRepository {
         ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
           {
             id: updated.slug || updated.id,
-            skillId: formatSkillId(updated.skillId, updated.variantId ?? null),
+            skillId: formatSkillId(
+              await SkillsRepository.resolveCanonicalSkillId(updated.skillId),
+              updated.variantId ?? null,
+            ),
             customVariantName: updated.customVariantName ?? null,
             customIcon: updated.customIcon,
             voiceModelSelection: updated.voiceModelSelection ?? null,
@@ -560,7 +592,9 @@ export class SingleFavoriteRepository {
       });
 
       return success({
-        skillId: deleted.skillId,
+        skillId: await SkillsRepository.resolveCanonicalSkillId(
+          deleted.skillId,
+        ),
         modelSelection: deleted.modelSelection,
         createdAt: deleted.createdAt,
         updatedAt: deleted.updatedAt,

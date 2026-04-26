@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
         favoriteId: {
           label: "Favoriten-ID",
           description:
-            "UUID eines gespeicherten Favoriten. Lädt Skill, Modell und Tool-Konfiguration als Standardwerte. Explizite Felder überschreiben Favoriten-Werte.",
+            "Slug oder ID eines gespeicherten Favoriten. Lädt Skill, Modell und Tool-Konfiguration als Standardwerte. Explizite Felder überschreiben Favoriten-Werte.",
           placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         model: {
@@ -112,10 +112,10 @@ export const translations: typeof enTranslations = {
         rootFolderId: {
           label: "Speicherordner",
           description:
-            "Wo der Thread gespeichert wird. 'cron' (Standard) = persistierte Agent-Läufe. 'incognito' = kein Speicher, kein Verlauf. 'private' = privater Ordner des Benutzers. 'shared' = Team-zugänglich.",
-          placeholder: "cron",
+            "Wo der Thread gespeichert wird. Hintergrund = alle automatisierten Läufe (Dreamer, Autopilot, geplante Aufgaben). Privat = dein Ordner. Geteilt = Team. Inkognito = kein Speicher.",
+          placeholder: "background",
           options: {
-            cron: "Cron (Agent-Läufe)",
+            background: "Hintergrund",
             private: "Privat",
             shared: "Geteilt",
             incognito: "Inkognito (kein Speicher)",

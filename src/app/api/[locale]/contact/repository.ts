@@ -16,10 +16,11 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { contacts, type NewContact } from "./db";
-import type { ContactRequestOutput, ContactResponseOutput } from "./definition";
+import type { ContactRequest, ContactResponse } from "./definition";
 import { ContactStatus } from "./enum";
 import type { ContactT } from "./i18n";
 import { sendAdminNotificationSms, sendConfirmationSms } from "./sms";
@@ -33,18 +34,32 @@ export class ContactRepository {
    * Submit contact form
    */
   static async submitContactForm(
-    data: ContactRequestOutput,
+    data: ContactRequest,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: ContactT,
-  ): Promise<ResponseType<ContactResponseOutput>> {
+  ): Promise<ResponseType<ContactResponse>> {
     try {
       // Get leadId from user prop (JWT payload) - always present
       const leadId = user.leadId;
 
+      // Resolve email: use provided value, fall back to DB email for logged-in users
+      let email = data.email;
+      if (!email && !user.isPublic) {
+        const userRecord = await UserRepository.getUserById(
+          user.id,
+          undefined,
+          locale,
+          logger,
+        );
+        if (userRecord.success) {
+          email = userRecord.data.email ?? undefined;
+        }
+      }
+
       logger.debug(t("repository.create.start"), {
-        email: data.email,
+        email,
         subject: data.subject,
         userId: user && !user.isPublic ? user.id : null,
         leadId,
@@ -54,7 +69,7 @@ export class ContactRepository {
       try {
         logger.debug(t("repository.lead.conversion.start"), {
           leadId,
-          email: data.email,
+          email,
           name: data.name,
         });
 
@@ -67,7 +82,7 @@ export class ContactRepository {
         // Log error but don't fail the contact form submission
         logger.error(t("repository.lead.conversion.error"), parseError(error), {
           leadId,
-          email: data.email,
+          email,
         });
       }
 
@@ -76,7 +91,7 @@ export class ContactRepository {
         .insert(contacts)
         .values({
           name: data.name,
-          email: data.email,
+          email: email ?? null,
           subject: data.subject,
           message: data.message,
           status: ContactStatus.NEW,
@@ -92,35 +107,38 @@ export class ContactRepository {
         return fail({
           message: t("errors.repositoryCreateFailed"),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: { email: data.email },
+          messageParams: { email: email ?? "unknown" },
         });
       }
 
       logger.debug(t("repository.create.success"), {
         contactId: contact.id,
-        email: data.email,
+        email,
         leadId,
       });
 
       // Send optional SMS notifications (non-blocking)
-      sendAdminNotificationSms(data, user, locale, logger, t).catch(
+      const smsData = { ...data, email };
+      sendAdminNotificationSms(smsData, user, locale, logger, t).catch(
         (smsError) => {
           logger.warn(t("route.sms.admin.failed"), {
             error:
               smsError instanceof Error ? smsError.message : String(smsError),
-            contactEmail: data.email,
+            contactEmail: email,
           });
         },
       );
 
-      sendConfirmationSms(data, user, locale, logger, t).catch((smsError) => {
-        logger.warn(t("route.sms.confirmation.failed"), {
-          error:
-            smsError instanceof Error ? smsError.message : String(smsError),
-          contactEmail: data.email,
-          userId: user?.id,
-        });
-      });
+      sendConfirmationSms(smsData, user, locale, logger, t).catch(
+        (smsError) => {
+          logger.warn(t("route.sms.confirmation.failed"), {
+            error:
+              smsError instanceof Error ? smsError.message : String(smsError),
+            contactEmail: email,
+            userId: user?.id,
+          });
+        },
+      );
 
       return success({
         success: "response.success",
@@ -134,7 +152,6 @@ export class ContactRepository {
         message: t("errors.repositoryCreateFailed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: {
-          email: data.email,
           error: parsedError.message,
           details: t("errors.repositoryCreateDetails"),
         },
@@ -149,7 +166,7 @@ export class ContactRepository {
     data: NewContact,
     logger: EndpointLogger,
     t: ContactT,
-  ): Promise<ResponseType<ContactResponseOutput>> {
+  ): Promise<ResponseType<ContactResponse>> {
     try {
       logger.debug(t("repository.seed.create.start"), {
         email: data.email,
@@ -177,7 +194,6 @@ export class ContactRepository {
           message: t("errors.repositoryCreateFailed"),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
           messageParams: {
-            email: data.email,
             error: t("errors.noContactReturned"),
           },
         });
@@ -195,7 +211,6 @@ export class ContactRepository {
         message: t("errors.repositoryCreateFailed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: {
-          email: data.email,
           error: parsedError.message,
         },
       });

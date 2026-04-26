@@ -580,11 +580,11 @@ const { POST } = createEndpoint({
     responses: {
       createManual: {
         success: "post.success.title",
-        id: "550e8400-e29b-41d4-a716-446655440000",
+        id: "code-reviewer",
       },
       createFilters: {
         success: "post.success.title",
-        id: "550e8400-e29b-41d4-a716-446655440001",
+        id: "research-agent",
       },
     },
   },

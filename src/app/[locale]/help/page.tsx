@@ -15,6 +15,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { configScopedTranslation } from "@/config/i18n";
@@ -33,6 +34,7 @@ interface Props {
 export interface HelpPageData {
   locale: CountryLanguage;
   jwtUser: JwtPayloadType;
+  userEmail?: string;
   subPrice: string;
   subCredits: number;
   packPrice: string;
@@ -89,9 +91,23 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
   const isAdmin = !jwtUser.isPublic && jwtUser.roles.includes(UserRole.ADMIN);
   const modelCount = getAvailableModelCount(isAdmin);
 
+  let userEmail: string | undefined;
+  if (!jwtUser.isPublic) {
+    const userRecord = await UserRepository.getUserById(
+      jwtUser.id,
+      undefined,
+      locale,
+      logger,
+    );
+    if (userRecord.success) {
+      userEmail = userRecord.data.email ?? undefined;
+    }
+  }
+
   return {
     locale,
     jwtUser,
+    userEmail,
     subPrice: `${currencySymbol}${subPrice}`,
     subCredits,
     packPrice: `${currencySymbol}${packPrice}`,
@@ -103,6 +119,7 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
 export function TanstackPage({
   locale,
   jwtUser,
+  userEmail,
   subPrice,
   subCredits,
   packPrice,
@@ -128,6 +145,7 @@ export function TanstackPage({
       <HelpPageClient
         locale={locale}
         user={jwtUser}
+        userEmail={userEmail}
         modelCount={modelCount}
         subPrice={subPrice}
         subCredits={subCredits}

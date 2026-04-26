@@ -416,6 +416,7 @@ export class MessageConverter {
     rootFolderId: DefaultFolderId,
     locale: CountryLanguage,
     modelConfig?: ChatModelOption,
+    isRevival?: boolean,
   ): Promise<ModelMessage[]> {
     const result: ModelMessage[] = [];
 
@@ -425,19 +426,19 @@ export class MessageConverter {
     // that share a sequenceId don't produce redundant system messages between each pair.
     const emittedMetadataSequenceIds = new Set<string>();
 
-    // Pre-pass: collect toolCallIds that have been superseded by a deferred result message.
-    // When a background/wakeUp result arrives, a deferred TOOL message is inserted with
-    // originalToolCallId pointing back to the original call. The original must be
-    // suppressed from AI context so the AI sees the deferred result as authoritative.
+    // Pre-pass (non-revival only): collect toolCallIds superseded by a deferred result.
+    // In revival context we show the full history instead of suppressing the original.
     const supersededToolCallIds = new Set<string>();
-    for (const msg of messages) {
-      if (
-        msg.role === ChatMessageRole.TOOL &&
-        "metadata" in msg &&
-        msg.metadata?.toolCall?.originalToolCallId &&
-        msg.metadata.toolCall.isDeferred
-      ) {
-        supersededToolCallIds.add(msg.metadata.toolCall.originalToolCallId);
+    if (!isRevival) {
+      for (const msg of messages) {
+        if (
+          msg.role === ChatMessageRole.TOOL &&
+          "metadata" in msg &&
+          msg.metadata?.toolCall?.originalToolCallId &&
+          msg.metadata.toolCall.isDeferred
+        ) {
+          supersededToolCallIds.add(msg.metadata.toolCall.originalToolCallId);
+        }
       }
     }
 
@@ -453,11 +454,10 @@ export class MessageConverter {
         // Look ahead to find all TOOL messages in this step.
         // Empty placeholder ASSISTANT messages (no content) between tools do NOT
         // break the group - they are just DB artifacts from sequential tool calls.
-        // Non-empty ASSISTANT messages are also skipped when all tools seen so far
-        // are superseded - this handles the wakeUp case where the AI emits a
-        // "dispatched" response after the pending tool, before the deferred result.
-        // A group ends at: a USER message, or an ASSISTANT with text when we already
-        // have at least one non-superseded tool.
+        // Non-revival: non-empty ASSISTANT between a fully-superseded group and a deferred
+        // result is also skipped (handles "dispatched" intermediate response).
+        // Revival: non-empty ASSISTANT is a hard boundary — the AI needs to see the full
+        // prior-turn context (e.g. STEP_OK) before the deferred result.
         const toolMessages: ChatMessage[] = [msg];
         let j = i + 1;
         while (j < messages.length) {
@@ -477,6 +477,7 @@ export class MessageConverter {
             // Empty placeholder ASSISTANT - skip over it (don't add to toolMessages)
             j++;
           } else if (
+            !isRevival &&
             next?.role === ChatMessageRole.ASSISTANT &&
             next.content?.trim() &&
             toolMessages.every(
@@ -486,9 +487,7 @@ export class MessageConverter {
                 !t.metadata!.toolCall!.isDeferred,
             )
           ) {
-            // Non-empty ASSISTANT between a fully-superseded group and a deferred result.
-            // This is the AI's "dispatched" response that preceded the wakeUp result —
-            // skip it so the deferred tool is included in the same group.
+            // Non-revival: skip intermediate "dispatched" assistant so deferred joins the group.
             j++;
           } else {
             // Real content boundary - stop
@@ -524,31 +523,23 @@ export class MessageConverter {
         for (const toolMsg of toolMessages) {
           const toolCall = toolMsg.metadata!.toolCall!;
 
-          // Skip original tool calls that have been superseded by a deferred result.
-          // The deferred message (isDeferred=true) is the authoritative one with the
-          // real async result. The original stays in DB for UI display but is excluded
-          // from AI context.
-          if (
-            supersededToolCallIds.has(toolCall.toolCallId) &&
-            !toolCall.isDeferred
-          ) {
-            logger.debug(
-              "[MessageConverter] Skipping superseded tool call - deferred result takes over",
-              {
-                toolCallId: toolCall.toolCallId,
-                toolName: toolCall.toolName,
-              },
-            );
-            continue;
-          }
+          // In revival context: use a fresh synthetic toolCallId for deferred results so the
+          // AI SDK doesn't see duplicate IDs (the original pending call already used this ID).
+          // This lets revival AI see: [original pending call] → [STEP_OK response] → [deferred final result]
+          // giving it full context about the async lifecycle.
+          // In non-revival context: original is superseded (stripped), so deferred uses its real ID.
+          const effectiveToolCallId =
+            isRevival && toolCall.isDeferred && toolCall.originalToolCallId
+              ? `deferred-${toolCall.toolCallId}`
+              : toolCall.toolCallId;
 
           // Skip duplicate toolCallIds - keep the first occurrence
           // Duplicates can occur when a tool call fails and is retried with the same ID
-          if (seenToolCallIds.has(toolCall.toolCallId)) {
+          if (seenToolCallIds.has(effectiveToolCallId)) {
             logger.warn(
               "[MessageConverter] Skipping duplicate toolCallId in batch",
               {
-                toolCallId: toolCall.toolCallId,
+                toolCallId: effectiveToolCallId,
                 toolName: toolCall.toolName,
                 messageId: MessageConverter.isChatMessage(toolMsg)
                   ? toolMsg.id
@@ -557,21 +548,15 @@ export class MessageConverter {
             );
             continue;
           }
-          seenToolCallIds.add(toolCall.toolCallId);
+
+          seenToolCallIds.add(effectiveToolCallId);
 
           // Add tool call to assistant message content.
-          // For deferred wakeUp results: replace args with a short hint so the AI isn't
-          // confused by seeing the full args again. Full args are preserved in DB/UI.
-          // For all other cases: use original args.
-          const inputForAi =
-            toolCall.isDeferred && toolCall.originalToolCallId
-              ? { hint: "args omitted - see result below" }
-              : toolCall.args;
           toolCallContent.push({
             type: "tool-call",
-            toolCallId: toolCall.toolCallId,
+            toolCallId: effectiveToolCallId,
             toolName: toolCall.toolName,
-            input: inputForAi,
+            input: toolCall.args,
           });
 
           // Create tool result message.
@@ -625,7 +610,7 @@ export class MessageConverter {
               content: [
                 {
                   type: "tool-result",
-                  toolCallId: toolCall.toolCallId,
+                  toolCallId: effectiveToolCallId,
                   toolName: toolCall.toolName,
                   output,
                 },

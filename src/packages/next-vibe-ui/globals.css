@@ -8,6 +8,24 @@
 @source not "../../**/*.gen.ts";
 @source not "../../**/*.route.ts";
 @source not "../../api/**/test-files/**";
+@source not "../../**/testing/**";
+@source not "../../**/repository.ts";
+@source not "../../**/repository/**";
+@source not "../../**/route.ts";
+@source not "../../**/models.ts";
+@source not "../../**/hooks.ts";
+@source not "../../**/hooks/**";
+@source not "../../**/enum.ts";
+@source not "../../**/types.ts";
+@source not "../../**/constants.ts";
+@source not "../../**/definition.ts";
+@source not "../../**/schema.ts";
+@source not "../../**/*.test.ts";
+@source not "../../**/*.test.tsx";
+@source not "../../**/*.spec.ts";
+@source not "../../**/*.spec.tsx";
+@source not "../../config/**";
+@source not "../../drizzle/**";
 
 @plugin 'tailwindcss-animate';
 

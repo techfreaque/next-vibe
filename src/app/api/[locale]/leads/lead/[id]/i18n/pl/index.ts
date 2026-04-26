@@ -215,6 +215,19 @@ export const translations: typeof enTranslations = {
           content: "Wyświetlana nazwa",
         },
       },
+      referralHistory: {
+        title: "Historia poleceń",
+        description: "Kody polecające, które lead kliknął przed rejestracją",
+        code: {
+          content: "Kod polecający",
+        },
+        ownerUserId: {
+          content: "Właściciel kodu",
+        },
+        clickedAt: {
+          content: "Kliknięty dnia",
+        },
+      },
     },
     errors: {
       validation: {

@@ -17,7 +17,10 @@ import {
   type ChatModelOption,
 } from "../../models";
 import { COMPACT_TRIGGER, COMPACT_TRIGGER_PERCENTAGE } from "../core/constants";
-import { formatAbsoluteTimestamp } from "../system-prompt/message-metadata";
+import {
+  CONTEXT_LINE_PREFIX,
+  formatAbsoluteTimestamp,
+} from "../system-prompt/message-metadata";
 import { MessageConverter } from "./message-converter";
 
 /**
@@ -436,6 +439,7 @@ export class MessageContextBuilder {
             params.rootFolderId,
             params.locale,
             params.modelConfig,
+            params.operation === "wakeup-resume",
           )
         : [];
 
@@ -487,8 +491,16 @@ export class MessageContextBuilder {
         },
       );
     }
-    // wakeup-resume: no CONTINUE_CONVERSATION_PROMPT - AI sees the deferred tool result
-    // as the last message in the thread and responds naturally without extra prompting.
+    if (params.operation === "wakeup-resume") {
+      messages.push({
+        role: "system",
+        content:
+          "The async background task dispatched earlier has finished. The tool result above is the final outcome. Resume the conversation naturally, following any instructions in the original user message.",
+      });
+      params.logger.debug(
+        "[BuildMessageContext] Added wakeup-resume revival hint",
+      );
+    }
 
     // Build [Context:] line for the trailing messages
     let contextLine: string | null = null;
@@ -504,7 +516,7 @@ export class MessageContextBuilder {
         params.timezone,
       );
       metadataParts.push(`Posted:${timestamp}`);
-      contextLine = `[Context: ${metadataParts.join(" | ")}]`;
+      contextLine = `${CONTEXT_LINE_PREFIX}${metadataParts.join(" | ")}]`;
     }
 
     // Trailing system message (STT + tasks + memories + favorites), pre-built in builder.ts
@@ -839,7 +851,6 @@ export class MessageContextBuilder {
     logger.debug("[Compacting] Token calculation", {
       totalTokens,
       compactTriggerAbsolute: absoluteTrigger,
-      compactTriggerOverride: compactTrigger ?? null,
       compactTriggerPercentage: COMPACT_TRIGGER_PERCENTAGE,
       modelContextWindow: modelConfig.contextWindow,
       modelContextLimit,
@@ -963,7 +974,7 @@ export class MessageContextBuilder {
       params.timezone,
     );
     metadataParts.push(`Posted:${timestamp}`);
-    const contextLine = `[Context: ${metadataParts.join(" | ")}]`;
+    const contextLine = `${CONTEXT_LINE_PREFIX}${metadataParts.join(" | ")}]`;
 
     const finalMessages = messages.filter(Boolean) as ModelMessage[];
     if (params.trailingSystemMessage.trim()) {

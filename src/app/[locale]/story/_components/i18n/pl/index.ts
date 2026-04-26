@@ -250,37 +250,55 @@ export const translations: typeof enTranslations = {
     },
     splitHero: {
       or: "LUB",
-      clickToExplore: "Kliknij, aby odkryć",
-      header: "Nie jesteśmy laboratorium za miliardy.",
+      clickToExplore: "Odkryj",
+      badge: "Mały zespół · Open source · Rozwijamy otwarcie",
+      header: "AI, które nie mówi ci, co masz myśleć.",
       subheader:
-        "Jesteśmy twórcami, którzy uważają, że AI nie powinno mieć opinii politycznych.",
-      introBody:
-        "To oznacza szorstkie krawędzie. Modele padają. Funkcje wychodzą surowe. Naprawiamy szybko i nie udajemy, że jesteśmy idealni. Czym jesteśmy: jedyną platformą, na której to Ty wybierasz poziom filtra - nie komisja ds. bezpieczeństwa.",
-      introGuide: "Wybierz co do Ciebie pasuje:",
-      introOption1:
-        "Chcesz po prostu rozmawiać z AI bez cenzury? Zacznij tutaj - większość tak robi.",
-      introOption2:
-        "Chcesz uruchomić to na własnym sprzęcie? Hostuj całość samodzielnie.",
-      introOption3:
-        "Jesteś programistą? Framework jest open source. Sforkuj go.",
-      introOption4:
-        "Chcesz zarabiać? Polecaj użytkowników lub publikuj skille AI za stały dochód.",
-      introHelp: "Nie wiesz co wybrać?",
+        "Żadnych odmów. Nikt nie czyta twoich rozmów. Twoja AI — nie nasza.",
+      chipChat: "Czat",
+      chipSelfHost: "Własny serwer",
+      chipBuild: "Buduj",
+      chipEarn: "Zarabiaj",
+      introGuide: "Cztery drogi — wybierz swoją:",
+      introOption1: "",
+      introOption2: "",
+      introOption3: "",
+      introOption4: "",
+      introBody: "",
+      introHelp: "Naprawiamy szybko. Coś nie gra?",
       introHelpCta: "Napisz do nas",
+      card: {
+        chat: {
+          label: "Po prostu pogadaj",
+          desc: "Pytaj o wszystko — łącznie z tym, czego ChatGPT odmawia. Bez rejestracji.",
+        },
+        personal: {
+          label: "Twoja własna AI",
+          desc: "Działa na twoim sprzęcie. Mówisz jej czego potrzebujesz — dostosowuje się do twojego życia.",
+        },
+        nextvibe: {
+          label: "Własny biznes AI",
+          desc: "Jak WordPress, ale dla AI. Startujesz z gotową platformą, rozwijasz w swoją niszę.",
+        },
+        referral: {
+          label: "Zarabiaj",
+          desc: "Polecaj znajomym albo sprzedawaj własne narzędzia AI. Pasywny dochód.",
+        },
+      },
       unbottled: {
         badge: "Bez cenzury · Otwarty · Mainstream",
         titleLine1: "AI bez cenzury.",
         titleLine2: "Zapytaj o wszystko.",
         subtitle:
-          "{{modelCount}} modeli. Trzy poziomy - Ty wybierasz. Zmieniaj per rozmowa. Prawdziwa odpowiedź, nie zatwierdzona wersja.",
+          "{{modelCount}} modeli. Trzy poziomy — Ty wybierasz. Zmieniaj w każdej rozmowie. Prawdziwa odpowiedź, nie zatwierdzona wersja.",
         pill1: "{{modelCount}} modeli - Ty wybierasz filtr",
         pill2: "Generuj obrazy, wideo i muzykę",
-        pill3: "{{skillCount}}+ skilli z pamięcią i wyszukiwarką",
+        pill3: "{{skillCount}}+ skillów z pamięcią i wyszukiwarką",
         cta: "Zacznij rozmawiać",
         ctaExplore: "Dowiedz się więcej",
       },
       personal: {
-        badge: "Self-hosted agent AI",
+        badge: "Twój własny agent AI",
         titleLine1: "Pytasz.",
         titleLine2: "Dostarcza.",
         subtitle:
@@ -296,11 +314,11 @@ export const translations: typeof enTranslations = {
         titleLine1: "Piszesz raz.",
         titleLine2: "Działa wszędzie.",
         subtitle:
-          "Jedna definicja TypeScript staje się automatycznie dedykowanym interfejsem web, poleceniem CLI, narzędziem AI, serwerem MCP, ekranem mobilnym i cron jobem. Ten sam kontrakt. Zero przepisywania. Sforkuj, posiadaj.",
+          "Jedna definicja TypeScript staje się automatycznie dedykowanym interfejsem web, poleceniem CLI, narzędziem AI, serwerem MCP, ekranem mobilnym i cron jobem. Ten sam kontrakt. Zero przepisywania. Sforkuj i rozwijaj po swojemu.",
         pill1: "Napędza {{appName}}",
         pill2: "Zero any / unknown / throw",
         pill3: "{{platformCount}} platform na endpoint",
-        ctaGithub: "Star na GitHub",
+        ctaGithub: "Dodaj gwiazdkę na GitHub",
         ctaDocs: "Odkryj framework",
         ctaExplore: "Dowiedz się więcej",
       },
@@ -318,7 +336,7 @@ export const translations: typeof enTranslations = {
         unbottledSub: "AI dla użytkowników",
         unbottledDesc:
           "{{modelCount}} modeli, generowanie obrazów/wideo/muzyki, trwała pamięć, wyszukiwanie na żywo - żaden filtr, którego nie wybrałeś",
-        personal: "Self-Host",
+        personal: "Własny hosting",
         personalSub: "Twój Agent AI",
         personalDesc:
           "Wszystkie modele na Twoim sprzęcie - przegląda, koduje, terminale 24/7. Własne klucze lub konto {{appName}}.",
@@ -327,7 +345,7 @@ export const translations: typeof enTranslations = {
         nextvibeDesc:
           "Framework MIT za {{appName}} - jeden endpoint, każda platforma, sforkuj i posiadaj",
         referral: "Zarabiaj",
-        referralSub: "Skille i polecenia",
+        referralSub: "Skille i rekomendacje",
         referralDesc:
           "10% cyklicznie z każdego polecenia, +5% za skill. Wielopoziomowy łańcuch. Do 20% łącznie z każdej płatności.",
       },
@@ -342,7 +360,7 @@ export const translations: typeof enTranslations = {
       personal: {
         title: "Self-Hosting",
         description:
-          "Twój własny agent AI na Twojej maszynie. Always-on, własne klucze, Twoje dane zostają u Ciebie.",
+          "Twój własny agent AI na Twojej maszynie. Działa non-stop, własne klucze, Twoje dane zostają u Ciebie.",
       },
       nextvibe: {
         title: "Framework",

@@ -18,7 +18,7 @@ import { ContactStatus, ContactStatusDB } from "./enum";
 export const contacts = pgTable("contact", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
-  email: text("email").notNull(),
+  email: text("email"),
   company: text("company"),
   subject: text("subject").notNull(),
   message: text("message").notNull(),

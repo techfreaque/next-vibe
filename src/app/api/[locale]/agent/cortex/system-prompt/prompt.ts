@@ -2,99 +2,74 @@
 
 import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 
-import { stripFrontmatter as stripMemoryFrontmatter } from "../_shared/text-utils";
+import { stripFrontmatter } from "../_shared/text-utils";
 import {
-  CORTEX_DELETE_ALIAS,
-  CORTEX_EDIT_ALIAS,
   CORTEX_LIST_ALIAS,
-  CORTEX_MKDIR_ALIAS,
-  CORTEX_MOVE_ALIAS,
   CORTEX_READ_ALIAS,
   CORTEX_SEARCH_ALIAS,
-  CORTEX_TREE_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "../constants";
 
-export interface CortexMemory {
-  /** Path in cortex filesystem, e.g. /memories/identity/name.md */
-  path: string;
-  /** Memory content */
-  content: string;
-  /** Priority (higher = more important, default 0) */
-  priority: number;
-  /** Tags for categorization */
-  tags: string[];
-  /** Creation timestamp ISO string */
-  createdAt: string;
-}
+// ─── Data Types ───────────────────────────────────────────────────────────────
 
-/** A cortex node matched by vector search for context injection */
-export interface CortexRelevantNode {
-  /** File path in cortex */
+/** A single file entry in the cortex tree */
+export interface CortexFileEntry {
+  kind: "file";
+  /** Canonical path e.g. /memories/identity/name.md */
   path: string;
-  /** Content excerpt */
+  /** Display name — basename without extension */
+  displayName: string;
+  /** Content to show inline below the filename (empty = filename only) */
   excerpt: string;
-  /** Similarity score 0-1 */
-  score: number;
+  /** Adjusted similarity score 0-1 (from vector search) */
+  score?: number;
+  /** From cortexNodes frontmatter pinned:true */
+  pinned?: boolean;
+  /** Skill is in chatFavorites for this user */
+  favored?: boolean;
+  /** Skill is user-authored (customSkills) */
+  created?: boolean;
 }
 
-/**
- * One top-level /documents/ subdirectory with even-spread file trimming.
- * Prevents context explosion for heavy users.
- */
-export interface TrimmedDirNode {
-  /** Path of the directory, e.g. /documents/inbox */
+/** A directory entry in the cortex tree */
+export interface CortexDirEntry {
+  kind: "dir";
+  /** Canonical path e.g. /memories or /documents/inbox */
   path: string;
-  /** Total file count under this dir (any depth) */
-  fileCount: number;
-  /** Most-recently-updated files up to the per-dir slot limit */
-  shownFiles: string[];
-  /** Files beyond the slot limit, not shown */
+  /** Display name shown as header e.g. "memories/" */
+  displayName: string;
+  /** Total file count in this mount/dir */
+  totalCount: number;
+  /** Files/subdirs to show (pinned + relevant + recent up to budget) */
+  children: CortexEntry[];
+  /** Items beyond budget not shown */
   hiddenCount: number;
-  /** Purpose label from frontmatter, if set */
-  purpose?: string;
+  /** For threads: archived/background count note */
+  countNote?: string;
 }
+
+export type CortexEntry = CortexFileEntry | CortexDirEntry;
 
 export interface CortexData {
-  /** Compact tree string showing document files (legacy, used as fallback) */
-  compactTree: string;
-  /** Number of document workspace files */
-  documentCount: number;
-  /** Thread counts by root folder */
+  /** Root-level dirs: memories, documents, threads, skills, tasks, favorites */
+  tree: CortexEntry[];
+  /** Thread counts by root folder id */
   threadCounts: Record<string, number>;
-  /** Total thread count */
+  /** Total thread count across all folders */
   totalThreads: number;
-  /** Active memory count */
-  activeMemories: number;
-  /** Archived memory count */
-  archivedMemories: number;
-  /** Skill count */
-  skillCount: number;
-  /** Task count */
-  taskCount: number;
-  /** Total chat upload count */
+  /** Total upload count */
   uploadCount: number;
-  /** Total web search result count */
+  /** Total web search count */
   searchCount: number;
-  /** User memories loaded from /memories/ */
-  memories: CortexMemory[];
-  /** Whether memory usage is near the token limit */
-  nearLimit?: boolean;
-  /** Current total token usage for memories */
-  totalTokens?: number;
-  /** Vector-matched relevant nodes for context injection */
-  relevantContext?: CortexRelevantNode[];
-  /** Even-spread trimmed document tree */
-  trimmedDirs: TrimmedDirNode[];
-  /** Top 6 user skill names for inline display */
-  skillNames: string[];
-  /** Map of /documents/ subdir path → purpose label */
-  dirPurposes: Record<string, string>;
+  /** Total AI-generated media count */
+  genCount: number;
+  /** User-authored cron task count */
+  taskCount: number;
+  languageName?: string;
+  localeRoots?: { memories: string; documents: string };
 }
 
-/** Default total char budget for memories (~2000 tokens — more room now that files are atomic) */
-const DEFAULT_MEMORY_BUDGET_TOKENS = 2000;
-const CHARS_PER_TOKEN = 4;
+// ─── Fragment ─────────────────────────────────────────────────────────────────
 
 export const cortexFragment: SystemPromptFragment<CortexData> = {
   id: "cortex",
@@ -102,356 +77,211 @@ export const cortexFragment: SystemPromptFragment<CortexData> = {
   priority: 190,
   build: (data) => {
     const {
-      documentCount,
+      tree,
+      uploadCount,
+      searchCount,
       totalThreads,
-      threadCounts,
-      activeMemories,
-      archivedMemories,
-      skillCount,
-      skillNames,
-      taskCount,
-      memories,
-      nearLimit,
-      totalTokens,
-      relevantContext,
-      trimmedDirs,
-      compactTree,
+      languageName,
+      localeRoots,
     } = data;
 
+    const memoriesPath = localeRoots?.memories ?? "/memories";
+    const documentsPath = localeRoots?.documents ?? "/documents";
+
+    const memDir = tree.find(
+      (e) => e.kind === "dir" && e.path === memoriesPath,
+    ) as CortexDirEntry | undefined;
+    const docDir = tree.find(
+      (e) => e.kind === "dir" && e.path === documentsPath,
+    ) as CortexDirEntry | undefined;
+    const skillDir = tree.find(
+      (e) => e.kind === "dir" && e.path === "/skills",
+    ) as CortexDirEntry | undefined;
+    const favDir = tree.find(
+      (e) => e.kind === "dir" && e.path === "/favorites",
+    ) as CortexDirEntry | undefined;
+
     const isEmptyWorkspace =
-      documentCount === 0 &&
-      activeMemories === 0 &&
+      (memDir?.totalCount ?? 0) === 0 &&
+      (docDir?.totalCount ?? 0) === 0 &&
       totalThreads === 0 &&
-      skillCount === 0 &&
-      data.uploadCount === 0 &&
-      data.searchCount === 0;
+      (skillDir?.totalCount ?? 0) === 0 &&
+      (favDir?.totalCount ?? 0) === 0 &&
+      uploadCount === 0 &&
+      searchCount === 0;
 
-    // Build filesystem overview
-    const tree = buildWorkspaceTree({
-      trimmedDirs,
-      compactTree,
-      documentCount,
-      totalThreads,
-      threadCounts,
-      activeMemories,
-      archivedMemories,
-      skillCount,
-      skillNames,
-      taskCount,
-      uploadCount: data.uploadCount,
-      searchCount: data.searchCount,
-    });
-
-    // Build memory section
-    const memorySection = buildMemorySection(memories, nearLimit, totalTokens);
-
-    // Build relevant context section (vector-matched nodes)
-    const contextSection = buildRelevantContextSection(relevantContext);
-
-    const emptyNotice = isEmptyWorkspace
-      ? `\n🌱 Empty workspace — scaffold is ready.\nFirst task: learn the user's name, role, and what they're working on. Write atomic files to /memories/identity/ immediately.\n`
+    const langNote = languageName
+      ? `**Language:** Write all content in ${languageName} — the user's language.\n`
       : "";
 
-    return `## Your Memory System (Cortex)
-Persistent brain shared between you and the user. Grows with every conversation.
-Everything important — identity, projects, knowledge, preferences — lives here as files you read and write directly.
-Treat it like a second brain: capture fast, organize always, never let it go stale.
-${emptyNotice}
-${tree}
+    const emptyNotice = isEmptyWorkspace
+      ? `\n> Empty workspace — learn the user's name, role, goals. Write to ${memoriesPath}/identity/ right now.\n`
+      : "";
 
-**Tools:**
-- \`${CORTEX_WRITE_ALIAS}\` — create/overwrite a file
-- \`${CORTEX_EDIT_ALIAS}\` — find/replace or line-range edit
-- \`${CORTEX_READ_ALIAS}\` — read a file
-- \`${CORTEX_LIST_ALIAS}\` / \`${CORTEX_TREE_ALIAS}\` — browse directories
-- \`${CORTEX_SEARCH_ALIAS}\` — find by name, content, or meaning
-- \`${CORTEX_MOVE_ALIAS}\` — rename or relocate
-- \`${CORTEX_DELETE_ALIAS}\` — remove files or folders
-- \`${CORTEX_MKDIR_ALIAS}\` — create a directory
+    const treeStr = renderCortexTree(data);
 
-**How to use this brain:**
-- Capture now, organize immediately — never defer
-- One file per atomic idea. Short files (< 200 words). Split when growing.
-- Naming: specific-kebab-case.md (not "notes.md" → "react-query-caching-issue.md")
-- New user info → /memories/<topic>/<specific>.md — one concept per file
-- Active work → /documents/projects/<project-name>/
-- Things to look up again → /documents/knowledge/
-- Memory priority: 100=identity/critical, 50=useful context, 0=low signal
-- Memory file > 200 words? Split into subfolder with atomic files
-- Consolidate duplicates proactively. Archive (\`archived: true\` in frontmatter) — never delete unless truly junk.
+    return `## Cortex (Your Persistent Brain)
+Shared memory between you and the user. Persists across conversations. You read and write files directly.
+${langNote}${emptyNotice}
+${treeStr}
 
-${memorySection}
-${contextSection}`;
+**Tools:** \`${CORTEX_WRITE_ALIAS}\` · \`${CORTEX_READ_ALIAS}\` · \`${CORTEX_SEARCH_ALIAS}\` · \`${CORTEX_LIST_ALIAS}\` (+ edit/move/delete/mkdir/tree — \`tool-help query="cortex"\`)
+**Rules:** One idea per file. <200 words. Names: \`specific-kebab-case.md\`. Write proactively. Consolidate duplicates. Archive (\`archived: true\` frontmatter) over deleting. Pin critical files (\`pinned: true\`) — always shown, never trimmed.
+**Paths:** ${memoriesPath}/ = knowledge · ${documentsPath}/ = working files · /threads/ = conversations`;
   },
 };
 
-// ─── Workspace Tree ───────────────────────────────────────────────────────────
+// ─── Shared Utilities ─────────────────────────────────────────────────────────
 
-interface WorkspaceTreeParams {
-  trimmedDirs: TrimmedDirNode[];
-  compactTree: string;
-  documentCount: number;
-  totalThreads: number;
-  threadCounts: Record<string, number>;
-  activeMemories: number;
-  archivedMemories: number;
-  skillCount: number;
-  skillNames: string[];
-  taskCount: number;
-  uploadCount: number;
-  searchCount: number;
+/** Clean an excerpt for inline display: strip heading, collapse newlines, trim */
+export function cleanExcerpt(text: string): string {
+  return stripFrontmatter(text)
+    .replace(/^#+\s+[^\n]*\n?/, "") // strip leading heading
+    .replace(/\n+/g, " · ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-function buildWorkspaceTree(params: WorkspaceTreeParams): string {
-  const {
-    trimmedDirs,
-    compactTree,
-    documentCount,
-    totalThreads,
-    threadCounts,
-    activeMemories,
-    archivedMemories,
-    skillCount,
-    skillNames,
-    taskCount,
-    uploadCount,
-    searchCount,
-  } = params;
+// ─── Tree Renderer ────────────────────────────────────────────────────────────
 
-  const lines: string[] = [];
+const TREE_BRANCH = "├──";
+const TREE_LAST = "└──";
+const TREE_PIPE = "│   ";
+const TREE_SPACE = "    ";
 
-  // /documents/ — trimmed tree with per-dir purpose labels
-  if (documentCount > 0 || trimmedDirs.length > 0) {
-    if (trimmedDirs.length > 0) {
-      lines.push(`/documents/ (${documentCount} files)`);
-      for (const dir of trimmedDirs) {
-        const dirName = dir.path.replace("/documents/", "");
-        const purposeNote = dir.purpose
-          ? ` ← ${dir.purpose.split(":")[0]}`
-          : "";
-        const countNote =
-          dir.fileCount === 0
-            ? " (empty)"
-            : dir.hiddenCount > 0
-              ? ` (${dir.fileCount} files)`
-              : dir.fileCount > 0
-                ? ` (${dir.fileCount} files)`
-                : "";
-        lines.push(`  ${dirName}/${purposeNote}${countNote}`);
-        for (const filePath of dir.shownFiles) {
-          const fileName = filePath.replace(`${dir.path}/`, "");
-          lines.push(`    ${fileName}`);
+/**
+ * Render the unified cortex folder tree.
+ * Files with content show it on a second line below the filename:
+ *   ├── name.md [📌]
+ *   │   Full content excerpt here...
+ * Files without content show just the filename:
+ *   ├── name.md [80%]
+ */
+export function renderCortexTree(data: CortexData): string {
+  const { tree, uploadCount, searchCount, genCount } = data;
+
+  // Only show non-empty dirs
+  const visibleDirs = tree.filter(
+    (e): e is CortexDirEntry =>
+      e.kind === "dir" && (e.totalCount > 0 || e.children.length > 0),
+  );
+
+  // Append uploads/searches/gens as leaf summary lines at root level
+  const extraLeafs: string[] = [];
+  if (uploadCount > 0) {
+    extraLeafs.push(
+      `/uploads/ (${uploadCount} — images, documents, audio, video)`,
+    );
+  }
+  if (searchCount > 0) {
+    extraLeafs.push(`/searches/ (${searchCount} — by month)`);
+  }
+  if (genCount > 0) {
+    extraLeafs.push(`/gens/ (${genCount} — images, audio, video)`);
+  }
+
+  const lines: string[] = ["/ (cortex)"];
+
+  for (let i = 0; i < visibleDirs.length; i++) {
+    const dir = visibleDirs[i]!;
+    const isLast = i === visibleDirs.length - 1 && extraLeafs.length === 0;
+    const branch = isLast ? TREE_LAST : TREE_BRANCH;
+    const childIndent = isLast ? TREE_SPACE : TREE_PIPE;
+
+    // Dir header line: "├── memories/ (48 · 4 archived)"
+    const countStr = dir.countNote ?? String(dir.totalCount);
+    lines.push(`${branch} ${dir.displayName} (${countStr})`);
+
+    // Children
+    const children = dir.children;
+    const hasHiddenAfter = dir.hiddenCount > 0;
+    for (let j = 0; j < children.length; j++) {
+      const child = children[j]!;
+      const childIsLast = j === children.length - 1 && !hasHiddenAfter;
+      const childBranch = childIsLast ? TREE_LAST : TREE_BRANCH;
+      const contentIndent =
+        childIndent + (childIsLast ? TREE_SPACE : TREE_PIPE);
+
+      if (child.kind === "file") {
+        const fileLines = renderFileEntryLines(child);
+        lines.push(`${childIndent}${childBranch} ${fileLines[0]}`);
+        for (let l = 1; l < fileLines.length; l++) {
+          lines.push(`${contentIndent}${fileLines[l]}`);
         }
-        if (dir.hiddenCount > 0) {
-          lines.push(`    (+${dir.hiddenCount} more)`);
+      } else {
+        // Sub-directory (e.g. documents/inbox/, documents/templates/)
+        const subHeader = renderSubDirHeader(child);
+        lines.push(`${childIndent}${childBranch} ${subHeader}`);
+        const subIndent = childIndent + (childIsLast ? TREE_SPACE : TREE_PIPE);
+        const subHasHidden = child.hiddenCount > 0;
+        for (let k = 0; k < child.children.length; k++) {
+          const subChild = child.children[k]!;
+          const subChildIsLast =
+            k === child.children.length - 1 && !subHasHidden;
+          const subChildBranch = subChildIsLast ? TREE_LAST : TREE_BRANCH;
+          const subContentIndent =
+            subIndent + (subChildIsLast ? TREE_SPACE : TREE_PIPE);
+          if (subChild.kind === "file") {
+            const subFileLines = renderFileEntryLines(subChild);
+            lines.push(`${subIndent}${subChildBranch} ${subFileLines[0]}`);
+            for (let l = 1; l < subFileLines.length; l++) {
+              lines.push(`${subContentIndent}${subFileLines[l]}`);
+            }
+          }
+        }
+        if (subHasHidden) {
+          lines.push(`${subIndent}${TREE_LAST} +${child.hiddenCount} more`);
         }
       }
-    } else if (compactTree) {
-      // Fallback: compact tree (no subdirs in DB yet)
-      const truncNote =
-        documentCount > 20 ? `, ${documentCount - 20} more` : "";
-      lines.push(
-        `/documents/ (${documentCount} files${truncNote})\n${compactTree}`,
-      );
-    } else {
-      lines.push(`/documents/ (${documentCount} files)`);
     }
-  } else {
-    lines.push(
-      "/documents/  (empty — /inbox, /projects, /knowledge, /journal, /templates ready)",
-    );
+
+    // Hidden count
+    if (hasHiddenAfter) {
+      lines.push(`${childIndent}${TREE_LAST} +${dir.hiddenCount} more`);
+    }
   }
 
-  // /memories/
-  if (activeMemories > 0 || archivedMemories > 0) {
-    const archive =
-      archivedMemories > 0 ? `, ${archivedMemories} archived` : "";
-    lines.push(`/memories/ (${activeMemories} active${archive})`);
-  } else {
-    lines.push(
-      "/memories/  (empty — /identity, /expertise, /context scaffold ready)",
-    );
-  }
-
-  // /threads/
-  if (totalThreads > 0) {
-    const parts = Object.entries(threadCounts)
-      .filter(([, c]) => c > 0)
-      .map(([root, c]) => `${root}: ${c}`);
-    lines.push(
-      `/threads/ (${totalThreads}${parts.length > 0 ? ` — ${parts.join(", ")}` : ""})`,
-    );
-  }
-
-  // /skills/
-  if (skillCount > 0) {
-    const nameStr = skillNames.length > 0 ? ` — ${skillNames.join(" · ")}` : "";
-    lines.push(`/skills/ (${skillCount}${nameStr})`);
-  }
-
-  // /tasks/
-  if (taskCount > 0) {
-    lines.push(`/tasks/ (${taskCount})`);
-  }
-
-  // /uploads/
-  if (uploadCount > 0) {
-    lines.push(
-      `/uploads/ (${uploadCount} — images, documents, audio, video, other)`,
-    );
-  }
-
-  // /searches/
-  if (searchCount > 0) {
-    lines.push(`/searches/ (${searchCount} — by month)`);
+  // Extra leaf entries at root level
+  for (let i = 0; i < extraLeafs.length; i++) {
+    const isLast = i === extraLeafs.length - 1;
+    const branch = isLast ? TREE_LAST : TREE_BRANCH;
+    lines.push(`${branch} ${extraLeafs[i]}`);
   }
 
   return lines.join("\n");
 }
 
-// ─── Memory Section ───────────────────────────────────────────────────────────
-
-/**
- * Build the memories subsection grouped by subfolder.
- * Short atomic files = full content fits in budget.
- * Groups by the first path segment under /memories/.
- */
-function buildMemorySection(
-  memories: CortexMemory[],
-  nearLimit?: boolean,
-  totalTokens?: number,
-): string {
-  const nearLimitNotice =
-    nearLimit && totalTokens !== undefined
-      ? `\n⚠️ **Memory near limit** (~${totalTokens.toLocaleString()} tokens). Consolidate or archive before adding more.\n`
-      : "";
-
-  const management = `**Memory management:** \`${CORTEX_WRITE_ALIAS} --path="/memories/identity/name.md"\` · \`${CORTEX_EDIT_ALIAS}\` · \`${CORTEX_READ_ALIAS}\`
-**Store proactively:** don't wait to be asked — write immediately when you learn something important.`;
-
-  if (memories.length === 0) {
-    return `## Memories (0)
-No memories yet. Start writing atomic files to /memories/identity/ — name, role, goals, communication style.
-
-${management}`;
-  }
-
-  // Sort: priority desc, then newest first
-  const sorted = [...memories].toSorted((a, b) => {
-    const pDiff = b.priority - a.priority;
-    if (pDiff !== 0) {
-      return pDiff;
-    }
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
-
-  // Token budget — shared across all memories
-  const totalBudgetChars = DEFAULT_MEMORY_BUDGET_TOKENS * CHARS_PER_TOKEN;
-
-  // Group by subfolder (first segment under /memories/)
-  const groups = new Map<string, CortexMemory[]>();
-  for (const m of sorted) {
-    const relPath = m.path.replace("/memories/", "");
-    const parts = relPath.split("/");
-    // If there's a subfolder (e.g. identity/name.md), group by it; else "."
-    const groupKey = parts.length > 1 ? (parts[0] ?? ".") : ".";
-    const g = groups.get(groupKey);
-    if (g) {
-      g.push(m);
-    } else {
-      groups.set(groupKey, [m]);
-    }
-  }
-
-  const totalCount = memories.length;
-  const perMemoryBudget = Math.floor(
-    totalBudgetChars / Math.max(1, totalCount),
-  );
-
-  const sections: string[] = [];
-
-  for (const [groupKey, groupMemories] of groups) {
-    const groupHeader =
-      groupKey === "."
-        ? `/memories/ (${groupMemories.length} files)`
-        : `/memories/${groupKey}/ (${groupMemories.length} files)`;
-
-    const lines = groupMemories.map((m) => {
-      const fileName = m.path.split("/").pop() ?? m.path;
-      const tagStr = m.tags.length > 0 ? ` [${m.tags.join(",")}]` : "";
-      const prefix = `  [${fileName}|P:${m.priority}] `;
-      const suffix = tagStr;
-      const contentBudget = perMemoryBudget - prefix.length - suffix.length - 1;
-      const stripped = stripMemoryFrontmatter(m.content);
-      const content =
-        contentBudget > 0 && stripped.length > contentBudget
-          ? `${stripped.slice(0, contentBudget - 1)}…`
-          : stripped;
-      return `${prefix}${content}${suffix}`;
-    });
-
-    sections.push(`${groupHeader}\n${lines.join("\n")}`);
-  }
-
-  const tokenInfo =
-    totalTokens !== undefined
-      ? `, ~${totalTokens.toLocaleString()} tokens`
-      : "";
-
-  return `## Memories (${memories.length} active${tokenInfo})
-${nearLimitNotice}${sections.join("\n\n")}
-
-${management}`;
+function renderSubDirHeader(dir: CortexDirEntry): string {
+  return `${dir.displayName} (${dir.totalCount} files)`;
 }
 
-// ─── Relevant Context ─────────────────────────────────────────────────────────
+/**
+ * Render a file entry as 1 or 2 lines.
+ * Line 1: filename with badges/score
+ * Line 2 (optional): inline content excerpt
+ */
+function renderFileEntryLines(entry: CortexFileEntry): string[] {
+  const pinMark = entry.pinned ? "[📌] " : "";
 
-/** Mount type labels for grouped display */
-const MOUNT_LABELS: Record<string, string> = {
-  memories: "Memories",
-  documents: "Documents",
-  skills: "Skills",
-  threads: "Threads",
-  tasks: "Tasks",
-  uploads: "Uploads",
-  searches: "Searches",
-};
-
-function buildRelevantContextSection(nodes?: CortexRelevantNode[]): string {
-  if (!nodes || nodes.length === 0) {
-    return "";
+  let scoreSuffix = "";
+  if (entry.score !== undefined && !entry.pinned) {
+    scoreSuffix = ` [${Math.round(entry.score * 100)}%]`;
   }
 
-  // Group nodes by mount type for scanability
-  const groups = new Map<string, CortexRelevantNode[]>();
-  for (const node of nodes) {
-    const mount = node.path.replace(/^\//, "").split("/")[0] ?? "other";
-    const group = groups.get(mount);
-    if (group) {
-      group.push(node);
-    } else {
-      groups.set(mount, [node]);
-    }
+  let badge = "";
+  if (entry.favored && entry.created) {
+    badge = " (★ created)";
+  } else if (entry.favored) {
+    badge = " (★)";
+  } else if (entry.created) {
+    badge = " (created)";
   }
 
-  const sections: string[] = [];
-  for (const [mount, groupNodes] of groups) {
-    const label = MOUNT_LABELS[mount] ?? mount;
-    const lines = groupNodes.map((n) => {
-      const pathShort = n.path.replace(/^\//, "");
-      const maxExcerpt = 200;
-      const excerpt =
-        n.excerpt.length > maxExcerpt
-          ? `${n.excerpt.slice(0, maxExcerpt - 1)}…`
-          : n.excerpt;
-      return `- **${pathShort}** (${Math.round(n.score * 100)}%): ${excerpt}`;
-    });
-    sections.push(`**${label}:**\n${lines.join("\n")}`);
+  const firstLine = `${pinMark}${entry.displayName}${scoreSuffix}${badge}`;
+
+  if (!entry.excerpt) {
+    return [firstLine];
   }
 
-  return `
-## Relevant Context
-Semantically related to current message. Use to inform your response — read full file with \`${CORTEX_READ_ALIAS}\` if needed.
-${sections.join("\n\n")}
-`;
+  return [firstLine, entry.excerpt];
 }

@@ -22,7 +22,7 @@ import { AUDIO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/music-generation/c
 import { VIDEO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/video-generation/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { MessageMetadata, ToolCall } from "../../../chat/db";
+import type { ToolCall } from "../../../chat/db";
 import type { StreamContext } from "../core/stream-context";
 
 export class FilePartHandler {
@@ -110,19 +110,9 @@ export class FilePartHandler {
       // Continue without URL - generatedMedia.url will be undefined
     }
 
-    const generatedMedia: MessageMetadata["generatedMedia"] = {
-      type: generatedType,
-      url: mediaUrl,
-      prompt,
-      modelId: model,
-      mimeType: mediaType,
-      creditCost,
-      status: "complete",
-    };
-
     if (ctx.currentAssistantMessageId) {
-      // LLM already emitted text before this file part → attach media to the existing
-      // text message (one bubble). Close any unclosed <think> block first.
+      // LLM already emitted text before this file part (e.g. Gemini native image gen
+      // outputs text + image in the same turn). Close any unclosed <think> block first.
       let closedContent = ctx.currentAssistantContent;
       if (/<think>/i.test(closedContent) && !/<\/think>/i.test(closedContent)) {
         closedContent += "</think>";
@@ -130,11 +120,8 @@ export class FilePartHandler {
         ctx.currentAssistantContent = closedContent;
       }
 
-      // Attach media to the existing message via GENERATED_MEDIA_ADDED SSE + DB merge
-      await ctx.dbWriter.emitGeneratedMediaOnExistingMessage({
-        messageId: ctx.currentAssistantMessageId,
-        generatedMedia,
-      });
+      // Do NOT attach media to the text assistant message - the synthetic tool message
+      // below is the canonical image bubble. Attaching to both causes duplicate rendering.
 
       // Write synthetic TOOL message so next turn sees the file URL in tool-result context
       if (mediaUrl) {
@@ -154,6 +141,10 @@ export class FilePartHandler {
           sequenceId: ctx.sequenceId,
           toolCall: syntheticToolCall,
         });
+        // Track the URL so headless callers (generateViaHeadless) can retrieve it.
+        // emitGeneratedMediaMessage sets this automatically for the standalone path,
+        // but this branch skips that call - set it explicitly here.
+        ctx.dbWriter.lastGeneratedMediaUrl = mediaUrl;
       }
 
       // Close the message - CONTENT_DONE clears isStreaming on the frontend
@@ -164,26 +155,40 @@ export class FilePartHandler {
         finishReason: "stop",
       });
     } else {
-      // No preceding text - create a standalone media message (existing behavior)
+      // No preceding text - create an assistant message WITHOUT generatedMedia, then a
+      // synthetic TOOL message as the canonical image bubble. The synthetic tool is the
+      // only place generatedMedia lives; the assistant message must stay clean so that
+      // any text the model emits after the file part can be appended without creating a
+      // duplicate media bubble on the frontend.
       const messageId = ctx.getNextAssistantMessageId();
       ctx.currentAssistantMessageId = messageId;
       ctx.lastAssistantMessageId = messageId;
 
       const parentId = ctx.currentParentId;
 
-      await ctx.dbWriter.emitGeneratedMediaMessage({
+      // Track URL for headless callers (generateViaHeadless retrieves this).
+      if (mediaUrl) {
+        ctx.dbWriter.lastGeneratedMediaUrl = mediaUrl;
+      }
+
+      // Create a plain assistant message with no generatedMedia
+      await ctx.dbWriter.emitMessageCreated({
         messageId,
         threadId,
+        content: "",
         parentId,
         userId,
         model,
         skill,
         sequenceId: ctx.sequenceId,
-        generatedMedia,
       });
 
-      // Write synthetic TOOL message so next turn sees the file URL in tool-result context
+      // Write synthetic TOOL message so next turn sees the file URL in tool-result context.
+      // It is a child of the assistant message; the parent pointer advances to the tool
+      // message so subsequent text creates a sibling-free chain (avoids branch violations).
+      let syntheticToolMessageId: string | null = null;
       if (mediaUrl) {
+        syntheticToolMessageId = crypto.randomUUID();
         const syntheticToolCall = FilePartHandler.buildSyntheticToolCall(
           generatedType,
           mediaType,
@@ -191,7 +196,7 @@ export class FilePartHandler {
           creditCost,
         );
         await ctx.dbWriter.emitSyntheticToolMessage({
-          messageId: crypto.randomUUID(),
+          messageId: syntheticToolMessageId,
           threadId,
           parentId: messageId,
           userId,
@@ -202,9 +207,12 @@ export class FilePartHandler {
         });
       }
 
-      ctx.currentParentId = messageId;
-      ctx.lastParentId = messageId;
+      // Advance parent pointer to synthetic tool (if present) so text that follows
+      // becomes its child rather than a sibling of the tool message.
+      ctx.currentParentId = syntheticToolMessageId ?? messageId;
+      ctx.lastParentId = syntheticToolMessageId ?? messageId;
 
+      // Close the empty assistant message (clears isStreaming on the frontend).
       ctx.dbWriter.emitContentDoneRaw({
         messageId,
         content: "",
@@ -212,6 +220,8 @@ export class FilePartHandler {
         finishReason: "stop",
       });
 
+      // Clear so that any text emitted after the file part creates a fresh assistant message.
+      ctx.currentAssistantMessageId = null;
       ctx.currentAssistantContent = "";
     }
   }

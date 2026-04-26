@@ -3,3 +3,6 @@ export const DREAM_DEFAULT_SCHEDULE = "0 2 * * *";
 
 /** Default cron schedule for Autopilot: 8:00 AM weekdays */
 export const AUTOPILOT_DEFAULT_SCHEDULE = "0 8 * * 1-5";
+
+/** Default cron schedule for Mama heartbeat: every 4 hours */
+export const MAMA_DEFAULT_SCHEDULE = "0 */4 * * *";

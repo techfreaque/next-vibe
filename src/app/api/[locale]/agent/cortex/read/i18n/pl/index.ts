@@ -14,7 +14,8 @@ export const translations = {
     fields: {
       path: {
         label: "Ścieżka",
-        description: "Który plik, np. /documents/notatki/pomysly.md",
+        description:
+          "Który plik. Polskie korzenie: /wspomnienia/, /dokumenty/. Przykład: /dokumenty/notatki/pomysly.md",
       },
       maxLines: {
         label: "Max linii",

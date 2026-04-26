@@ -14,7 +14,8 @@ export const translations = {
     fields: {
       path: {
         label: "Path",
-        description: "Which file, e.g. /documents/notes/ideas.md",
+        description:
+          "Which file. Use your locale's root (e.g. /erinnerungen/ for DE, /wspomnienia/ for PL). Example: /documents/notes/ideas.md",
       },
       maxLines: {
         label: "Max Lines",

@@ -69,10 +69,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
-        schema: z
-          .union([z.literal(""), z.string().uuid()])
-          .optional()
-          .transform((v) => (v === "" ? undefined : v)),
+        schema: z.string(),
       }),
 
       // ── Explicit model / skill (override or use instead of favorite) ─
@@ -223,6 +220,7 @@ const { POST } = createEndpoint({
       },
       withExplicit: {
         threadId: "550e8400-e29b-41d4-a716-446655440000",
+        favoriteId: "660e8400-e29b-41d4-a716-446655440002",
         modelId: ChatModelId.CLAUDE_HAIKU_4_5,
         skillId: "default",
       },

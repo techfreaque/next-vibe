@@ -96,8 +96,6 @@ const { GET } = createEndpoint({
     UserRole.CLI_AUTH_BYPASS,
   ] as const,
 
-  allowedLocalModeRoles: [] as const,
-
   cli: {
     firstCliArgKey: "query",
   },

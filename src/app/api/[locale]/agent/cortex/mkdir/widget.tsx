@@ -16,10 +16,11 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+import { CortexNav } from "../_shared/cortex-nav";
 
 import type definition from "./definition";
 
@@ -37,9 +38,23 @@ export function CortexMkdirWidget({
 
   return (
     <Div className="flex flex-col gap-4">
+      {/* Top nav */}
+      <CortexNav
+        path={value?.responsePath}
+        actions={value ? ["list", "write"] : ["list"]}
+        actionData={
+          value
+            ? {
+                list: { path: value.responsePath },
+                write: { path: `${value.responsePath}/` },
+              }
+            : {}
+        }
+      />
+
       {/* Form */}
       {!isDisabled && (
-        <Div className="flex flex-col gap-3 p-4 border rounded-lg bg-card">
+        <Div className="flex flex-col gap-3 p-4 border rounded-lg bg-card mx-4">
           <TextFieldWidget fieldName="path" field={children.path} />
           <BooleanFieldWidget
             fieldName="createParents"
@@ -61,25 +76,30 @@ export function CortexMkdirWidget({
 
       {/* Response */}
       {value && (
-        <Card className="border-cyan-500/20 bg-cyan-500/5">
-          <CardContent className="p-4">
-            <Div className="flex items-center gap-3">
-              <Div className="rounded-full bg-cyan-500/10 p-2">
-                <FolderPlus className="h-4 w-4 text-cyan-500" />
+        <Div className="px-4 pb-4">
+          <Card className="border-cyan-500/20 bg-cyan-500/5">
+            <CardContent className="p-4">
+              <Div className="flex items-center gap-3">
+                <Div className="rounded-full bg-cyan-500/10 p-2">
+                  <FolderPlus className="h-4 w-4 text-cyan-500" />
+                </Div>
+                <Div className="flex-1 min-w-0">
+                  <Span className="font-mono text-sm font-medium block truncate">
+                    {value.responsePath}
+                  </Span>
+                </Div>
+                <Badge
+                  variant={value.created ? "default" : "secondary"}
+                  className="shrink-0"
+                >
+                  {value.created
+                    ? t("post.response.created.text")
+                    : t("post.response.alreadyExists.text")}
+                </Badge>
               </Div>
-              <Div className="flex-1">
-                <Span className="font-mono text-sm font-medium block">
-                  {value.responsePath}
-                </Span>
-              </Div>
-              <Badge variant={value.created ? "default" : "secondary"}>
-                {value.created
-                  ? t("post.response.created.text")
-                  : t("post.response.alreadyExists.text")}
-              </Badge>
-            </Div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </Div>
       )}
     </Div>
   );

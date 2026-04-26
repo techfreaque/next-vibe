@@ -37,12 +37,12 @@ export async function splitArgs(
 ): Promise<SplitArgsResult> {
   const path = getFullPath(toolName);
   if (path === null) {
-    return { urlPathParams: {}, data: mergedArgs };
+    return { urlPathParams: {}, data: mergedArgs ?? {} };
   }
 
   const definition = await getEndpoint(path);
   if (!definition) {
-    return { urlPathParams: {}, data: mergedArgs };
+    return { urlPathParams: {}, data: mergedArgs ?? {} };
   }
 
   const urlParseResult =
@@ -53,7 +53,7 @@ export async function splitArgs(
 
   const urlKeySet = new Set(Object.keys(urlPathParams));
   const data: Record<string, WidgetData> = {};
-  for (const [key, value] of Object.entries(mergedArgs)) {
+  for (const [key, value] of Object.entries(mergedArgs ?? {})) {
     if (!urlKeySet.has(key)) {
       data[key] = value;
     }

@@ -16,6 +16,7 @@ import { Home } from "next-vibe-ui/ui/icons/Home";
 import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { SquareCheck } from "next-vibe-ui/ui/icons/SquareCheck";
 import { Upload } from "next-vibe-ui/ui/icons/Upload";
+import { Wand2 } from "next-vibe-ui/ui/icons/Wand2";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
 
@@ -26,13 +27,10 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { CortexNav } from "../_shared/cortex-nav";
 import { formatBytes } from "../_shared/format-bytes";
 
 import type definition from "./definition";
-
-interface CustomWidgetProps {
-  field: (typeof definition.GET)["fields"];
-}
 
 const MOUNT_ICONS: Record<
   string,
@@ -85,6 +83,12 @@ const MOUNT_ICONS: Record<
     bg: "bg-orange-500/10",
     textColor: "text-orange-300",
   },
+  gens: {
+    icon: Wand2,
+    color: "text-pink-400",
+    bg: "bg-pink-500/10",
+    textColor: "text-pink-300",
+  },
 };
 
 function getMountStyle(entryPath: string): {
@@ -106,6 +110,43 @@ function getMountStyle(entryPath: string): {
   };
 }
 
+const FOLDER_NAME_KEYS: Record<
+  string,
+  | "get.folderNames.memories"
+  | "get.folderNames.documents"
+  | "get.folderNames.threads"
+  | "get.folderNames.skills"
+  | "get.folderNames.tasks"
+  | "get.folderNames.uploads"
+  | "get.folderNames.searches"
+  | "get.folderNames.gens"
+  | "get.folderNames.inbox"
+  | "get.folderNames.projects"
+  | "get.folderNames.knowledge"
+  | "get.folderNames.journal"
+  | "get.folderNames.templates"
+  | "get.folderNames.identity"
+  | "get.folderNames.expertise"
+  | "get.folderNames.context"
+> = {
+  memories: "get.folderNames.memories",
+  documents: "get.folderNames.documents",
+  threads: "get.folderNames.threads",
+  skills: "get.folderNames.skills",
+  tasks: "get.folderNames.tasks",
+  uploads: "get.folderNames.uploads",
+  searches: "get.folderNames.searches",
+  gens: "get.folderNames.gens",
+  inbox: "get.folderNames.inbox",
+  projects: "get.folderNames.projects",
+  knowledge: "get.folderNames.knowledge",
+  journal: "get.folderNames.journal",
+  templates: "get.folderNames.templates",
+  identity: "get.folderNames.identity",
+  expertise: "get.folderNames.expertise",
+  context: "get.folderNames.context",
+};
+
 function buildBreadcrumbs(path: string): { label: string; path: string }[] {
   if (path === "/") {
     return [{ label: "/", path: "/" }];
@@ -120,10 +161,7 @@ function buildBreadcrumbs(path: string): { label: string; path: string }[] {
   return crumbs;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function CortexListWidget({
-  field: _field,
-}: CustomWidgetProps): React.JSX.Element {
+export function CortexListWidget(): React.JSX.Element {
   const value = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
@@ -141,13 +179,24 @@ export function CortexListWidget({
 
   async function openFile(filePath: string): Promise<void> {
     const readDef = await import("../read/definition");
-    navigation.push(readDef.default.GET, {
-      data: { path: filePath },
-    });
+    navigation.push(readDef.default.GET, { data: { path: filePath } });
   }
 
   return (
     <Div className="flex flex-col">
+      {/* Top nav */}
+      <CortexNav
+        path={currentPath !== "/" ? currentPath : undefined}
+        actions={["search", "tree", "write"]}
+        actionData={{
+          search: { path: currentPath },
+          tree: { path: currentPath },
+          write: {
+            path: currentPath === "/" ? "/" : `${currentPath}/new-file.md`,
+          },
+        }}
+      />
+
       {/* Breadcrumb */}
       <Div className="flex items-center gap-1 px-4 py-3 border-b border-border/50 text-sm overflow-x-auto">
         {crumbs.map((crumb, i) => (
@@ -189,7 +238,7 @@ export function CortexListWidget({
       {!value ? (
         <Div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-2">
           <Brain className="h-8 w-8 opacity-30" />
-          <Span className="text-sm">Lade...</Span>
+          <Span className="text-sm">{t("get.submitButton.loadingText")}</Span>
         </Div>
       ) : entries.length === 0 ? (
         <Div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-2">
@@ -199,7 +248,9 @@ export function CortexListWidget({
       ) : (
         <Div className="divide-y divide-border/40">
           {entries.map((entry) => {
-            const isDir = entry.nodeType === "dir";
+            const isDir =
+              entry.nodeType === "dir" ||
+              entry.nodeType === "enums.nodeType.dir";
             const {
               icon: Icon,
               color,
@@ -239,7 +290,9 @@ export function CortexListWidget({
                   <Div
                     className={`text-sm font-medium truncate ${isMount && isDir ? textColor : "text-foreground"}`}
                   >
-                    {entry.name}
+                    {FOLDER_NAME_KEYS[entry.name]
+                      ? t(FOLDER_NAME_KEYS[entry.name]!)
+                      : entry.name}
                   </Div>
                   {!isMount && (
                     <Div className="text-xs text-muted-foreground truncate font-mono">

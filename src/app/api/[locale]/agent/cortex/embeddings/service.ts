@@ -19,15 +19,14 @@ export const EMBEDDING_DIMENSIONS = 3072;
 export const EMBEDDING_CREDIT_COST = 0.1;
 
 /**
- * Compute a SHA-256 hash of the text that would be embedded.
- * Used to skip redundant embedding API calls when content hasn't changed.
+ * Compute a SHA-256 hash of the text that would be embedded (path + content).
+ * Used to skip redundant embedding API calls when nothing changed.
+ * v2: prefix invalidates all pre-v2 embeddings (content-only era) so they
+ * are regenerated with the new path+content strategy on next write/backfill.
  */
 export function computeEmbeddingHash(path: string, content: string): string {
-  return createHash("sha256").update(`${path}\n\n${content}`).digest("hex");
+  return createHash("sha256").update(`v2:${path}\n\n${content}`).digest("hex");
 }
-
-/** Max tokens per embedding request (~8k tokens ≈ 32k chars) */
-const MAX_CHARS_PER_CHUNK = 32000;
 
 interface EmbeddingResponse {
   data?: { embedding: number[]; index: number }[];
@@ -52,16 +51,19 @@ export async function generateEmbedding(
     return null;
   }
 
+  // Max tokens per embedding request (~8k tokens ≈ 32k chars)
+  const maxCharsPerChunk = 32000;
+
   try {
     // Short text — single call
-    if (trimmed.length <= MAX_CHARS_PER_CHUNK) {
+    if (trimmed.length <= maxCharsPerChunk) {
       return callEmbeddingApi(apiKey, trimmed);
     }
 
     // Long text — chunk and average
     const chunks: string[] = [];
-    for (let i = 0; i < trimmed.length; i += MAX_CHARS_PER_CHUNK) {
-      chunks.push(trimmed.slice(i, i + MAX_CHARS_PER_CHUNK));
+    for (let i = 0; i < trimmed.length; i += maxCharsPerChunk) {
+      chunks.push(trimmed.slice(i, i + maxCharsPerChunk));
     }
 
     const embeddings = await Promise.all(
@@ -113,6 +115,8 @@ async function callEmbeddingApi(
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
+      "HTTP-Referer": "https://unbottled.ai",
+      "X-Title": "Unbottled AI",
     },
     body: JSON.stringify({
       model: "qwen/qwen3-embedding-8b",

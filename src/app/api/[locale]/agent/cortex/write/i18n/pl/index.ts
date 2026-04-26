@@ -13,7 +13,8 @@ export const translations = {
     fields: {
       path: {
         label: "Ścieżka",
-        description: "Gdzie zapisać, np. /documents/notatki/pomysly.md",
+        description:
+          "Gdzie zapisać. Polskie korzenie: /wspomnienia/, /dokumenty/. Przykład: /dokumenty/notatki/pomysly.md",
       },
       content: {
         label: "Treść",
@@ -34,6 +35,7 @@ export const translations = {
       created: { text: "Nowy plik" },
       updated: { text: "Zaktualizowano" },
       updatedAt: { content: "Zaktualizowano" },
+      content: { content: "Treść" },
     },
     errors: {
       validation: {

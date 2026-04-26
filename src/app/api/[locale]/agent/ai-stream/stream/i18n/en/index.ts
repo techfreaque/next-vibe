@@ -25,7 +25,7 @@ export const translations = {
         favoriteId: {
           label: "Favorite ID",
           description:
-            "UUID of a saved favorite. Loads skill, model, and tool config as defaults. Explicit fields in this request override favorite values.",
+            "Slug or ID of a saved favorite. Loads skill, model, and tool config as defaults. Explicit fields in this request override favorite values.",
           placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         model: {
@@ -109,10 +109,10 @@ export const translations = {
         rootFolderId: {
           label: "Storage Folder",
           description:
-            "Where to persist the thread. 'cron' (default) = persisted agent runs. 'incognito' = no storage, no history. 'private' = user's private folder. 'shared' = team-accessible.",
-          placeholder: "cron",
+            "Where to store the thread. Background = all automated runs (Dreamer, Autopilot, scheduled tasks). Private = your folder. Shared = team. Incognito = no storage.",
+          placeholder: "background",
           options: {
-            cron: "Cron (agent runs)",
+            background: "Background",
             private: "Private",
             shared: "Shared",
             incognito: "Incognito (no storage)",

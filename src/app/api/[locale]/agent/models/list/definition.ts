@@ -25,6 +25,7 @@ import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ContentLevel, IntelligenceLevel } from "../../chat/skills/enum";
+import { MODEL_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
 const ModelsListContainer = lazyWidget(() =>
@@ -57,7 +58,7 @@ const { GET } = createEndpoint({
   category: "endpointCategories.ai",
   subCategory: "endpointCategories.aiInference",
   tags: ["tags.models" as const],
-  aliases: ["models", "list-models"],
+  aliases: [MODEL_LIST_ALIAS, "list-models"],
 
   cli: {
     firstCliArgKey: "modelType",

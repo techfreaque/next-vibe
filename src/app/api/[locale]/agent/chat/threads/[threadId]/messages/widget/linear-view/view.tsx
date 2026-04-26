@@ -376,6 +376,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                       <ErrorMessageBubble
                         message={message}
                         rootFolderId={rootFolderId}
+                        messages={messages}
                       />
                     )}
                   </>

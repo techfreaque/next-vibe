@@ -32,7 +32,7 @@ export interface SystemPromptResult {
   trailingSystemMessage: string;
 }
 
-export async function buildSystemPrompt(params: {
+export interface SystemPromptParams {
   skillId: string | null | undefined;
   user: JwtPayloadType;
   logger: EndpointLogger;
@@ -52,7 +52,11 @@ export async function buildSystemPrompt(params: {
     wasTranscribed: boolean;
     confidence: number | null;
   } | null;
-}): Promise<SystemPromptResult> {
+}
+
+export async function buildSystemPrompt(
+  params: SystemPromptParams,
+): Promise<SystemPromptResult> {
   const {
     skillId,
     user,

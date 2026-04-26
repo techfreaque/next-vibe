@@ -3,9 +3,9 @@
  */
 
 export const translations = {
-  title: "Contact Us",
+  title: "Talk to a Human",
   description:
-    "Send a message to the team - for questions, feedback, support requests, or partnership inquiries. You'll receive a confirmation email and we'll reply within 24 hours.",
+    "Something isn't working, or you just want to talk to a real person. We're here. Describe what you need and a human on our team will read it and reply.",
   category: "System",
   summary: "Process contact form submissions with lead tracking",
   tags: {
@@ -16,8 +16,9 @@ export const translations = {
   },
 
   form: {
-    label: "Contact Form",
-    description: "Fill out the form to get in touch with our team",
+    label: "Contact Us",
+    description:
+      "A real person will read this and reply. No bots, no runaround.",
     fields: {
       name: {
         label: "Your Name",
@@ -28,7 +29,7 @@ export const translations = {
       email: {
         label: "Email Address",
         description:
-          "Valid email address for our team to reply to. Must be a well-formed email.",
+          "Where we should reply. Leave blank if you're logged in — we'll use your account email.",
         placeholder: "john.doe@example.com",
       },
       company: {
@@ -135,6 +136,7 @@ export const translations = {
       description: "Please check your input and try again",
       nameMinLength: "Name must be at least 2 characters long",
       emailInvalid: "Please enter a valid email address",
+      emailRequired: "Please provide an email address so we can reply to you",
       subjectRequired: "Subject is required",
       messageMinLength: "Message must be at least 10 characters long",
       priorityInvalid: "Please select a valid priority level",
@@ -258,8 +260,17 @@ export const translations = {
   },
 
   success: {
-    title: "Success",
-    description: "Your contact form has been submitted successfully",
+    title: "Message sent",
+    description: "Your message has been received. A real person will reply.",
+  },
+
+  aiPrompt: {
+    confirmBeforeSend:
+      "Always confirm with the user before submitting a contact form on their behalf.",
+    humanHelp:
+      "If the user seems frustrated, upset, or stuck — proactively offer to connect them with a human on our support team via the contact form.",
+    emailFallback:
+      "If the user is logged in, their email is already on file — they don't need to provide it again.",
   },
 
   email: {

@@ -147,8 +147,8 @@ export const translations: typeof enTranslations = {
           "Konfiguruj automatyczne ustawienia startera kampanii i harmonogram",
         form: {
           cronSettings: {
-            label: "Ustawienia Zadania Cron",
-            description: "Konfiguruj ustawienia wykonywania zadania cron",
+            label: "Ustawienia zadania w tle",
+            description: "Konfiguruj ustawienia wykonywania zadania w tle",
             schedule: {
               label: "Harmonogram",
               placeholder: "Wprowadź wyrażenie cron (np. */3 * * * *)",
@@ -232,7 +232,7 @@ export const translations: typeof enTranslations = {
         },
         settings: {
           title: "Ustawienia Startera Kampanii",
-          description: "Konfiguruj ustawienia zadania cron startera kampanii",
+          description: "Konfiguruj ustawienia zadania w tle startera kampanii",
         },
       },
       emails: {
@@ -846,7 +846,7 @@ export const translations: typeof enTranslations = {
         description: "Wyczyść stare kampanie",
         schedule: "Co tydzień w niedzielę",
       },
-      info: "Zarządzanie kampaniami jest obsługiwane automatycznie przez system cron. Odwiedź stronę administracyjną cron, aby uzyskać szczegółowe monitorowanie.",
+      info: "Zarządzanie kampaniami jest obsługiwane automatycznie przez zadania w tle. Odwiedź stronę administracyjną zadań w tle, aby uzyskać szczegółowe monitorowanie.",
     },
     constants: {
       unknown: "nieznany",

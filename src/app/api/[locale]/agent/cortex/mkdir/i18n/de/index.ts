@@ -13,7 +13,8 @@ export const translations = {
     fields: {
       path: {
         label: "Pfad",
-        description: "Ordnerpfad, z.B. /documents/projekte/meine-app",
+        description:
+          "Ordnerpfad. Deutsche Wurzel: /dokumente/. Beispiel: /dokumente/projekte/meine-app",
       },
       viewType: {
         label: "Ansicht",

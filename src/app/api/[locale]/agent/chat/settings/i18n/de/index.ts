@@ -146,6 +146,8 @@ export const translations: typeof enTranslations = {
       },
       lastRun: "Letzter Lauf:",
       neverRun: "Noch nie ausgeführt",
+      folderLink: "Träume-Ordner öffnen",
+      runNow: "Jetzt ausführen",
     },
     autopilot: {
       title: "Autopilot",
@@ -174,6 +176,34 @@ export const translations: typeof enTranslations = {
           "Worauf soll sich Hermes in dieser Session konzentrieren? Leer lassen für den Standard.",
         defaultPrompt:
           "Starte deine Autopilot-Session. Mach weiter, wo aktive Projekte stehen — nächste Schritte vorantreiben, Warteschlange abarbeiten, Dinge in Bewegung halten.",
+      },
+      lastRun: "Letzter Lauf:",
+      neverRun: "Noch nie ausgeführt",
+      folderLink: "Autopilot-Ordner öffnen",
+      runNow: "Jetzt ausführen",
+    },
+    mama: {
+      title: "Plattform-Herzschlag",
+      description:
+        "Thea überwacht deine Produktionsinstanz — prüft die Gesundheit, treibt Features voran, kümmert sich um Marketing, sendet Neuigkeiten. Ein gemeinsamer Slot für alle Admins.",
+      toggle: {
+        label: "Mama-Modus aktivieren",
+      },
+      schedule: {
+        label: "Zeitplan",
+        options: {
+          every4h: "Alle 4 Stunden",
+          every6h: "Alle 6 Stunden",
+          every12h: "Alle 12 Stunden",
+          daily: "Täglich um Mitternacht",
+        },
+      },
+      prompt: {
+        label: "Session-Prompt",
+        placeholder:
+          "Worauf soll Thea sich konzentrieren? Leer lassen für Standard.",
+        defaultPrompt:
+          "Starte deine Mama-Session. Prüfe den Plattformzustand, überprüfe Fehlerprotokolle, bringe ausstehende Feature-Arbeit voran und erstelle nötige Ankündigungen. Hinterlasse eine Zusammenfassung in /documents/mama/log/.",
       },
       lastRun: "Letzter Lauf:",
       neverRun: "Noch nie ausgeführt",

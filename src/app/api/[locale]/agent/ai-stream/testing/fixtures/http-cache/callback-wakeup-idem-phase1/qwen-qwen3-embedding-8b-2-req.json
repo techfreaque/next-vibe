@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:380b867f | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:24]\n\nAssistant: WAKEUP_OK\n\nSystem: [Context: ID:22b66b2a | Posted:Apr 26, 13:27]\n\nUser: [T6d-phase1 wakeUp-idem-setup] Call the generate_image tool with prompt='idempotency-test' and callbackMode='wakeUp'. In this phase you should receive a taskId (no imageUrl). End with STEP_OK if you see taskId.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English — the user's language.\n\n/ (cortex)\n├── documents/ (5)\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (private: 1 · 15 background)\n├── skills/ (4 created)\n│   ├── [TEST SKILL] Unlisted Skill (created)\n│   ├── [TEST SKILL] Minimal Draft (created)\n│   ├── [TEST SKILL] Layout Preview Bot (created)\n│   │   If someone is chatting with you, something has gone wrong. Apolog\n\nSystem: [Context: ID:b21b77e5 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:27]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_image\",\"input\":{\"prompt\":\"idempotency-test\"},\"callbackMode\":\"wakeUp\"}\n\nTool: [result:execute-tool] {\"taskId\":\"local-wu-1777210028930-xigjs7\",\"status\":\"status.pending\",\"hint\":\"Result/return will be injected when complete and wakes up the thread. Call wait-for-task only if you need the result before continuing.\"}",
+    "encoding_format": "float"
+  }
+}

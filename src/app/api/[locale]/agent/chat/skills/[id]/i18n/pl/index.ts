@@ -75,8 +75,8 @@ export const translations: typeof enTranslations = {
       loginButton: "Zaloguj się",
     },
     id: {
-      label: "ID postaciy",
-      description: "Unikalny identyfikator postaciy",
+      label: "ID postaci",
+      description: "Slug lub przyjazne ID postaci",
     },
     models: {
       brain: "Mózg",
@@ -247,8 +247,8 @@ export const translations: typeof enTranslations = {
       },
     },
     id: {
-      label: "ID postaciy",
-      description: "Unikalny identyfikator postaciy do aktualizacji",
+      label: "ID postaci",
+      description: "Slug lub przyjazne ID postaci do aktualizacji",
     },
     name: {
       label: "Nazwa",
@@ -445,7 +445,7 @@ export const translations: typeof enTranslations = {
     },
     id: {
       label: "ID postaci",
-      description: "Unikalny identyfikator postaci do usunięcia",
+      description: "Slug lub przyjazne ID postaci do usunięcia",
     },
     errors: {
       validation: {

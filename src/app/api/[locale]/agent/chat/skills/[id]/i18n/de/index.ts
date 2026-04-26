@@ -77,7 +77,7 @@ export const translations: typeof enTranslations = {
     },
     id: {
       label: "Charakter-ID",
-      description: "Die eindeutige Kennung der Charakter",
+      description: "Der Slug oder die lesbare ID des Charakters",
     },
     models: {
       brain: "Gehirn",
@@ -252,7 +252,8 @@ export const translations: typeof enTranslations = {
     },
     id: {
       label: "Charakter-ID",
-      description: "Die eindeutige Kennung der zu aktualisierenden Charakter",
+      description:
+        "Der Slug oder die lesbare ID des zu aktualisierenden Charakters",
     },
     name: {
       label: "Name",
@@ -455,7 +456,7 @@ export const translations: typeof enTranslations = {
     },
     id: {
       label: "Charakter-ID",
-      description: "Die eindeutige Kennung des zu löschenden Charakters",
+      description: "Der Slug oder die lesbare ID des zu löschenden Charakters",
     },
     errors: {
       validation: {

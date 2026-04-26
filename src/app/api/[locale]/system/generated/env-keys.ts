@@ -320,7 +320,7 @@ export const ENV_KEYS = [
     key: "VIBE_TEST_AI_MODEL",
     module: "agent",
     comment:
-      "AI model to use in integration tests. Defaults to claude-code-haiku when CLAUDE_CODE_ENABLED resolves true, otherwise kimi_k2_5.",
+      "AI model to use in integration tests. Defaults to claude-code-haiku when CLAUDE_CODE_ENABLED resolves true, otherwise the platform default chat model.",
     example: "claude-code-haiku",
     sensitive: false,
     fieldType: "text",

@@ -48,7 +48,7 @@ export async function checkMediaBalance(
 
   if (balanceResult.data.total < creditCost) {
     return fail({
-      message: tCredits("errors.insufficientCredits"),
+      message: tCredits("errors.insufficientCredits", { cost: creditCost }),
       errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
     });
   }

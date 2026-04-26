@@ -18,6 +18,7 @@ interface ModelsLabMusicResponse {
   id?: number;
   output?: string[];
   fetch_result?: string;
+  future_links?: string[];
   eta?: number;
   generationTime?: number;
   message?: string;
@@ -63,8 +64,6 @@ export async function generateMusicWithModelsLab(params: {
           model_id: providerModel,
           prompt,
           duration: durationSeconds,
-          // eslint-disable-next-line i18next/no-literal-string
-          output_format: "mp3",
         }),
         signal,
       },
@@ -93,8 +92,10 @@ export async function generateMusicWithModelsLab(params: {
     // Async processing - poll fetch_result URL
     if (result.status === "processing" && result.fetch_result) {
       const fetchUrl = result.fetch_result;
+      const futureUrl = result.future_links?.[0];
       logger.debug("[ModelsLab Music] Request queued, polling", {
         fetchUrl,
+        futureUrl,
         eta: result.eta,
       });
 
@@ -126,9 +127,10 @@ export async function generateMusicWithModelsLab(params: {
         const pollResult =
           (await pollResponse.json()) as ModelsLabMusicResponse;
 
-        if (pollResult.status === "success" && pollResult.output?.[0]) {
+        const audioUrl = pollResult.output?.[0] ?? pollResult.future_links?.[0];
+        if (pollResult.status === "success" && audioUrl) {
           logger.debug("[ModelsLab Music] Music generated successfully");
-          return success({ audioUrl: pollResult.output[0] });
+          return success({ audioUrl });
         }
 
         if (pollResult.status === "error") {
@@ -144,6 +146,17 @@ export async function generateMusicWithModelsLab(params: {
         });
       }
 
+      // Timed out polling — if we have a future_links URL from the initial response, use it.
+      // ModelsLab provides this pre-known URL where the file will be written once ready.
+      if (futureUrl) {
+        logger.error(
+          "[ModelsLab Music] Poll timed out, using future_links URL",
+          { futureUrl },
+        );
+        return success({ audioUrl: futureUrl });
+      }
+
+      logger.error("[ModelsLab Music] Poll timed out, no future_links");
       return fail({
         message: t("post.errors.requestTimedOut"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,

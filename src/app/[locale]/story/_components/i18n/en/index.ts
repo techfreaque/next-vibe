@@ -254,22 +254,39 @@ export const translations = {
     splitHero: {
       or: "OR",
       clickToExplore: "Click to explore",
-      header: "We're not a billion-dollar lab.",
-      subheader:
-        "We're builders who think AI shouldn't have a political opinion.",
-      introBody:
-        "That means rough edges sometimes. Models go down. Features ship half-baked. We fix things fast and we don't pretend to be perfect. What we are: the only platform where you pick the filter level - not some safety committee.",
-      introGuide: "Pick what fits you:",
-      introOption1:
-        "Just want to chat with uncensored AI? Start here - most people do.",
-      introOption2:
-        "Want to run it on your own hardware? Self-host the whole thing.",
-      introOption3:
-        "You're a developer? The framework is open source. Fork it.",
-      introOption4:
-        "Want to earn? Refer users or publish AI skills for recurring income.",
-      introHelp: "Lost or confused?",
-      introHelpCta: "Talk to us",
+      badge: "Small team · Open source · Built in public",
+      header: "AI that doesn't tell you what to think.",
+      subheader: "No refusals. No one reads your chats. Your AI — not ours.",
+      chipChat: "Chat",
+      chipSelfHost: "Self-host",
+      chipBuild: "Build",
+      chipEarn: "Earn",
+      introGuide: "Four ways in — pick yours:",
+      introOption1: "",
+      introOption2: "",
+      introOption3: "",
+      introOption4: "",
+      introBody: "",
+      introHelp: "We fix fast. Something off?",
+      introHelpCta: "Tell us",
+      card: {
+        chat: {
+          label: "Just chat",
+          desc: "Ask anything — including what ChatGPT refuses. No account needed to try.",
+        },
+        personal: {
+          label: "Your own AI",
+          desc: "Runs on your machine. Tell it what you need — it builds around your life, grows with you.",
+        },
+        nextvibe: {
+          label: "Start a business",
+          desc: "Like WordPress but for AI. Launch your own platform and customize it into your niche.",
+        },
+        referral: {
+          label: "Make money",
+          desc: "Refer friends or sell AI tools you create. Recurring income.",
+        },
+      },
       unbottled: {
         badge: "Uncensored · Open · Mainstream",
         titleLine1: "Uncensored AI.",

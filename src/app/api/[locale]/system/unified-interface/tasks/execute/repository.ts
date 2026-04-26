@@ -29,6 +29,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTasksRepository } from "@/app/api/[locale]/system/unified-interface/tasks/cron/repository";
 import { resolveTaskOwnerUser } from "@/app/api/[locale]/system/unified-interface/tasks/cron/resolve-task-user";
+import { createTaskEmitters } from "@/app/api/[locale]/system/unified-interface/tasks/cron/emitter";
 import {
   CronTaskStatus,
   type CronTaskStatusValue,
@@ -142,6 +143,22 @@ export class TaskExecuteRepository {
         message: t("errors.alreadyRunning"),
         errorType: ErrorResponseTypes.CONFLICT,
       });
+    }
+
+    // Emit task-updated (RUNNING) to WS subscribers
+    {
+      const { emitTaskList, emitTaskQueue } = createTaskEmitters(logger, user);
+      const runningPayload = {
+        tasks: [
+          {
+            id: task.id,
+            lastExecutionStatus: CronTaskStatus.RUNNING,
+            enabled: task.runOnce ? false : task.enabled,
+          },
+        ],
+      };
+      emitTaskList("task-updated", runningPayload);
+      emitTaskQueue("task-updated", runningPayload);
     }
 
     // 5. Resolve execution user context — always the task owner, never the caller
@@ -261,7 +278,7 @@ export class TaskExecuteRepository {
             platform: Platform.CRON,
             cronTaskId: task.id,
             streamContext: {
-              rootFolderId: DefaultFolderId.CRON,
+              rootFolderId: DefaultFolderId.BACKGROUND,
               threadId: undefined,
               aiMessageId: undefined,
               currentToolMessageId: undefined,
@@ -383,6 +400,24 @@ export class TaskExecuteRepository {
         updatedAt: new Date(),
       })
       .where(eq(cronTasks.id, task.id));
+
+    // Emit task-updated (final status) to WS subscribers
+    {
+      const { emitTaskList, emitTaskQueue } = createTaskEmitters(logger, user);
+      const completedPayload = {
+        tasks: [
+          {
+            id: task.id,
+            lastExecutionStatus: finalStatus,
+            lastExecutedAt: startedAt.toISOString(),
+            lastExecutionDuration: finalDurationMs,
+            consecutiveFailures: newConsecutiveFailures,
+          },
+        ],
+      };
+      emitTaskList("task-updated", completedPayload);
+      emitTaskQueue("task-updated", completedPayload);
+    }
 
     // 8. If task has callback context (set by execute-tool AI path), emit
     //    TASK_COMPLETED WS event + insert deferred result message for endLoop,

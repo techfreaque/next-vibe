@@ -172,6 +172,14 @@ export interface HeadlessAiStreamParams {
     confirmed: boolean;
     updatedArgs?: Record<string, string | number | boolean | null>;
   }> | null;
+  /**
+   * Override available tools with custom requiresConfirmation settings.
+   * Used in integration tests to configure confirmation gates for specific tools.
+   */
+  availableTools?: Array<{
+    toolId: string;
+    requiresConfirmation: boolean;
+  }> | null;
   /** System user context for execution */
   user: JwtPayloadType;
   /** Locale for i18n */
@@ -366,6 +374,20 @@ export async function runHeadlessAiStream(
           resolvedFavoriteConfig = resolved.favoriteConfig;
         }
       }
+    }
+
+    // ── Apply availableTools override to favoriteConfig ──────────────
+    // Lets integration tests inject requiresConfirmation settings without
+    // needing a pre-configured favorite that has those settings saved.
+    if (
+      params.availableTools !== null &&
+      params.availableTools !== undefined &&
+      resolvedFavoriteConfig
+    ) {
+      resolvedFavoriteConfig = {
+        ...resolvedFavoriteConfig,
+        availableTools: params.availableTools,
+      };
     }
 
     // ── Resolve model from skill if only skill is provided ────────────

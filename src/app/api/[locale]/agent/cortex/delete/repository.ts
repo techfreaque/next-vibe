@@ -24,6 +24,7 @@ import {
   isValidPath,
   isVirtualWritable,
   isWritablePath,
+  normalizeToCanonicalPath,
   normalizePath,
 } from "../repository";
 
@@ -49,7 +50,7 @@ export class CortexDeleteRepository {
   }: DeleteParams): Promise<
     ResponseType<{ responsePath: string; nodesDeleted: number }>
   > {
-    const path = normalizePath(rawPath);
+    const path = normalizeToCanonicalPath(normalizePath(rawPath), locale);
 
     if (!isValidPath(path)) {
       return fail({
@@ -70,7 +71,7 @@ export class CortexDeleteRepository {
 
     // Virtual writable mount — delegate to mount handler
     if (isVirtualWritable(path)) {
-      const mountPrefix = getMountPrefix(path);
+      const mountPrefix = getMountPrefix(path, locale);
       if (!mountPrefix) {
         return fail({
           message: t("delete.errors.forbidden.title"),
@@ -102,7 +103,7 @@ export class CortexDeleteRepository {
       }
     }
 
-    if (!isWritablePath(path)) {
+    if (!isWritablePath(path, locale)) {
       return fail({
         message: t("delete.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,

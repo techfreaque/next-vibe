@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: WAKEUP_OK\n\nUser: [T6d-phase1 wakeUp-idem-setup] Call the generate_image tool with prompt='idempotency-test' and callbackMode='wakeUp'. In this phase you should receive a taskId (no imageUrl). End with STEP_OK if you see taskId.\n\nAssistant: STEP_OK\n\n**Phase 1 Verification:**\n- `taskId`: \"local-wu-1777210028930-xigjs7\" ✓\n- `status`: \"status.pending\" ✓\n- `imageUrl`: NOT present (as expected for wakeUp phase 1) ✓\n\nUser:",
+    "encoding_format": "float"
+  }
+}

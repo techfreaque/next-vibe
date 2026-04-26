@@ -24,14 +24,16 @@ export const translations = {
       shared: "Shared",
       public: "Public",
       incognito: "Incognito",
-      cron: "Cron",
+      background: "Background",
+      support: "Support",
     },
     foldersShort: {
       private: "Private",
       shared: "Shared",
       public: "Public",
       incognito: "Incognito",
-      cron: "Cron",
+      background: "Background",
+      support: "Support",
     },
   },
   enums: {
@@ -464,6 +466,14 @@ export const translations = {
         "Google Gemini 3 Flash - Fast, efficient multimodal AI model optimized for quick responses",
       deepseekV32:
         "DeepSeek V3.2 - High-performance reasoning model with advanced coding capabilities",
+      deepseekV4Pro:
+        "DeepSeek V4 Pro - 1.6T parameter MoE powerhouse with 1M context. Built for full-codebase analysis, complex reasoning, and multi-step agent workflows.",
+      deepseekV4Flash:
+        "DeepSeek V4 Flash - 284B MoE at near-zero cost. 1M context, fast inference, strong coding. The efficient choice for high-throughput workloads.",
+      gpt55:
+        "GPT-5.5 - OpenAI's frontier model for complex professional workloads. Stronger reasoning, higher reliability, improved token efficiency. 1M+ context with text and image inputs.",
+      gpt55Pro:
+        "GPT-5.5 Pro - OpenAI's highest-capability model for deep reasoning on complex, high-stakes workloads. 1M+ context, long-horizon problem solving, agentic coding, precise multi-step execution.",
       gpt54Pro:
         "GPT-5.4 Pro - OpenAI's most advanced model with enhanced reasoning, 1M+ context window, and superior performance for complex, high-stakes tasks",
       gpt54:
@@ -494,6 +504,8 @@ export const translations = {
         "Claude Sonnet 4.6 - Anthropic's most capable Sonnet-class model with frontier performance across coding, agents, and professional work",
       claudeHaiku45:
         "Claude Haiku 4.5 - Fast and efficient Claude model optimized for speed and cost-effectiveness",
+      glm5_1:
+        "GLM-5.1 - Z.AI's next-generation coding model built for long-horizon tasks. Works autonomously for 8+ hours on a single task - planning, executing, and self-improving until it delivers engineering-grade results.",
       glm5: "GLM-5 - Z.AI's flagship open-source foundation model engineered for complex systems design and long-horizon agent workflows, rivaling leading closed-source models",
       glm5Turbo:
         "GLM-5 Turbo - Z.AI's next-generation model deeply optimized for agent-driven environments with fast inference, improved complex instruction decomposition, and extended task stability",
@@ -505,8 +517,8 @@ export const translations = {
         "GLM-4 7B Flash - Ultra-fast Chinese-English model optimized for quick responses",
       kimiK2:
         "Kimi K2 - Powerful Chinese AI model with excellent context understanding",
-      kimiK2_5:
-        "Kimi K2.5 - Enhanced Chinese AI model with improved reasoning and creative capabilities",
+      kimiK2_6:
+        "Kimi K2.6 - Moonshot AI's next-generation multimodal model for long-horizon coding, UI/UX generation from prompts and images, and multi-agent orchestration with agent swarm architecture scaling to hundreds of parallel sub-agents",
       claudeSonnet45:
         "Claude Sonnet 4.5 - Anthropic's previous-generation Sonnet model with strong coding and analytical capabilities",
       claudeAgentSonnet:
@@ -598,6 +610,8 @@ export const translations = {
         "GPT-5 Image Mini - OpenAI's efficient multimodal image generation model combining GPT-5 Mini language capabilities with fast, affordable image generation",
       gpt5Image:
         "GPT-5 Image - OpenAI's flagship multimodal model combining GPT-5 language capabilities with state-of-the-art image generation and editing",
+      gpt54Image2:
+        "GPT-5.4 Image 2 - OpenAI's next-generation multimodal model combining GPT-5.4 reasoning with GPT Image 2 generation. Moves seamlessly between coding, analysis, and visual creation in a single conversation.",
       seedream45:
         "Seedream 4.5 - ByteDance's latest image generation model with comprehensive improvements in editing consistency, portrait refinement, and multi-image composition",
       sdxl: "Stable Diffusion XL - Stability AI's high-quality open image generation model",

@@ -1,9 +1,9 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Kontakt",
+  title: "Porozmawiaj z człowiekiem",
   description:
-    "Wyślij wiadomość do zespołu - w sprawie pytań, opinii, wsparcia lub współpracy. Otrzymasz e-mail potwierdzający, a my odpowiemy w ciągu 24 godzin.",
+    "Coś nie działa, albo po prostu chcesz pogadać z prawdziwą osobą. Jesteśmy tu. Napisz, czego potrzebujesz – ktoś z naszego zespołu to przeczyta i odpowie.",
   category: "System",
   summary: "Przetwarzaj przesłania formularzy kontaktowych z śledzeniem leadów",
   tags: {
@@ -14,8 +14,9 @@ export const translations: typeof enTranslations = {
   },
 
   form: {
-    label: "Formularz kontaktowy",
-    description: "Wypełnij formularz, aby skontaktować się z naszym zespołem",
+    label: "Skontaktuj się z nami",
+    description:
+      "Prawdziwa osoba to przeczyta i odpowie. Bez botów, bez runaround.",
     fields: {
       name: {
         label: "Twoje imię i nazwisko",
@@ -24,7 +25,8 @@ export const translations: typeof enTranslations = {
       },
       email: {
         label: "Adres e-mail",
-        description: "Wprowadź swój adres e-mail",
+        description:
+          "Adres, pod który mamy odpowiedzieć. Jeśli jesteś zalogowany, możesz zostawić puste – użyjemy e-maila z Twojego konta.",
         placeholder: "jan.kowalski@przyklad.pl",
       },
       company: {
@@ -128,6 +130,7 @@ export const translations: typeof enTranslations = {
       description: "Sprawdź swoje dane i spróbuj ponownie",
       nameMinLength: "Imię i nazwisko musi mieć co najmniej 2 znaki",
       emailInvalid: "Wprowadź prawidłowy adres e-mail",
+      emailRequired: "Podaj adres e-mail, żebyśmy mogli Ci odpowiedzieć",
       subjectRequired: "Temat jest wymagany",
       messageMinLength: "Wiadomość musi mieć co najmniej 10 znaków",
       priorityInvalid: "Wybierz prawidłowy poziom priorytetu",
@@ -258,8 +261,17 @@ export const translations: typeof enTranslations = {
   },
 
   success: {
-    title: "Sukces",
-    description: "Twój formularz kontaktowy został pomyślnie przesłany",
+    title: "Wiadomość wysłana",
+    description: "Twoja wiadomość dotarła. Prawdziwa osoba odpowie.",
+  },
+
+  aiPrompt: {
+    confirmBeforeSend:
+      "Przed wysłaniem formularza kontaktowego w imieniu użytkownika zawsze poproś o potwierdzenie.",
+    humanHelp:
+      "Jeśli użytkownik wydaje się sfrustrowany, zdenerwowany lub utknął w miejscu – zaproponuj proaktywnie połączenie z człowiekiem z naszego zespołu wsparcia przez formularz kontaktowy.",
+    emailFallback:
+      "Jeśli użytkownik jest zalogowany, jego e-mail jest już w systemie – nie musi go podawać ponownie.",
   },
 
   email: {

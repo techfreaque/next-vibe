@@ -40,7 +40,7 @@ export class ToolCallHandler {
     userId: string | undefined;
     toolsConfig: Map<
       string,
-      { requiresConfirmation: boolean; credits: number }
+      { requiresConfirmation: boolean; credits: number; label: string }
     >;
     streamAbortController: AbortController;
     dbWriter: MessageDbWriter;

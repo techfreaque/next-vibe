@@ -227,7 +227,7 @@ export class MCPRegistry {
       platform: Platform.MCP,
       preloadedHandler: freshHandler,
       streamContext: {
-        rootFolderId: DefaultFolderId.CRON,
+        rootFolderId: DefaultFolderId.BACKGROUND,
         threadId: undefined,
         aiMessageId: undefined,
         skillId: undefined,

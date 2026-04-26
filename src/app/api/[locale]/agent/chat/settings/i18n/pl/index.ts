@@ -145,6 +145,8 @@ export const translations: typeof enTranslations = {
       },
       lastRun: "Ostatnie uruchomienie:",
       neverRun: "Nigdy nie uruchomiono",
+      folderLink: "Otwórz folder Śnienia",
+      runNow: "Uruchom teraz",
     },
     autopilot: {
       title: "Autopilot",
@@ -173,6 +175,34 @@ export const translations: typeof enTranslations = {
           "Na czym ma się skupić Hermes w tej sesji? Pozostaw puste, aby użyć domyślnego.",
         defaultPrompt:
           "Uruchom sesję autopilota. Kontynuuj aktywne projekty — realizuj kolejne kroki, obsługuj zaległą pracę, nie zatrzymuj się.",
+      },
+      lastRun: "Ostatnie uruchomienie:",
+      neverRun: "Nigdy nie uruchomiono",
+      folderLink: "Otwórz folder Autopilota",
+      runNow: "Uruchom teraz",
+    },
+    mama: {
+      title: "Tętno platformy",
+      description:
+        "Thea monitoruje twoją instancję produkcyjną — sprawdza stan, posuwa funkcje do przodu, zajmuje się marketingiem, wysyła nowości. Jeden wspólny slot dla wszystkich adminów.",
+      toggle: {
+        label: "Włącz tryb Mama",
+      },
+      schedule: {
+        label: "Harmonogram",
+        options: {
+          every4h: "Co 4 godziny",
+          every6h: "Co 6 godzin",
+          every12h: "Co 12 godzin",
+          daily: "Codziennie o północy",
+        },
+      },
+      prompt: {
+        label: "Prompt sesji",
+        placeholder:
+          "Na czym ma skupić się Thea? Pozostaw puste dla domyślnego.",
+        defaultPrompt:
+          "Uruchom sesję mamy. Sprawdź stan platformy, przejrzyj logi błędów, posuń do przodu oczekujące prace nad funkcjami i przygotuj potrzebne ogłoszenia. Zostaw podsumowanie w /documents/mama/log/.",
       },
       lastRun: "Ostatnie uruchomienie:",
       neverRun: "Nigdy nie uruchomiono",

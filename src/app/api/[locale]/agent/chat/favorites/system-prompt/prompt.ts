@@ -53,7 +53,8 @@ export const favoritesFragment: SystemPromptFragment<FavoritesData> = {
   id: "favorites",
   placement: "trailing",
   priority: 300,
-  condition: (data) => data.favorites !== null,
+  // Suppressed — favorites are now shown in the unified cortex tree fragment
+  condition: () => false,
   build: (data) => {
     const favorites = data.favorites ?? [];
 

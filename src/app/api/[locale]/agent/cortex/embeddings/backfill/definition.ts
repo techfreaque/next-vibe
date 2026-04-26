@@ -8,10 +8,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
+  requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
+  FieldDataType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -52,9 +54,29 @@ const { POST } = createEndpoint({
 
   fields: customWidgetObject({
     render: CortexBackfillWidget,
-    usage: { response: true } as const,
+    usage: { request: "data", response: true } as const,
     children: {
-      // === RESPONSE ONLY ===
+      // === REQUEST ===
+      force: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.force.label" as const,
+        description: "post.fields.force.description" as const,
+        schema: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe(
+            "Clear all existing embeddings first and regenerate (use when embedding format changed)",
+          ),
+      }),
+
+      // === RESPONSE ===
+      materialized: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        text: "post.response.materialized.text" as const,
+        schema: z.number(),
+      }),
       processed: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "post.response.processed.text" as const,
@@ -118,8 +140,13 @@ const { POST } = createEndpoint({
   },
 
   examples: {
+    requests: {
+      normal: { force: false },
+      force: { force: true },
+    },
     responses: {
       done: {
+        materialized: 150,
         processed: 42,
         failed: 1,
         skipped: 3,

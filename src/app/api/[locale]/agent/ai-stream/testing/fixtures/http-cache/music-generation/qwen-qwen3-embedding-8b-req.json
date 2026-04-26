@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\n\nAssistant: STEP_OK\n\n**Verification:**\n- `name`: \"generate_image\" ✓\n- `description`: \"Generate an image from a text prompt using AI\" ✓\n- `parameters` schema: Present with properties `prompt`, `model`, `quality`, `size`, `aspectRatio` ✓\n\nUser: [T3a retry-branch] Say exactly: RETRY_RESPONSE STEP_OK\n\nAssistant: RETRY_RESPONSE STEP_OK\n\nUser: [T4a music-gen] Call the generate_music tool with prompt='upbeat piano melody'. Check that the result has a non-empty audioUrl, a positive creditCost, and durationSeconds between 8 and 120. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

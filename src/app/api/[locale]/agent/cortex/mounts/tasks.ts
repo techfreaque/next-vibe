@@ -93,6 +93,51 @@ export async function listTaskPath(
   }));
 }
 
+export interface VirtualSearchHit {
+  path: string;
+  excerpt: string;
+  updatedAt: Date;
+}
+
+/**
+ * Direct keyword search across cron tasks — one DB query.
+ */
+export async function searchTasks(
+  userId: string,
+  query: string,
+  limit: number,
+): Promise<VirtualSearchHit[]> {
+  const rows = await db
+    .select({
+      id: cronTasks.id,
+      displayName: cronTasks.displayName,
+      description: cronTasks.description,
+      updatedAt: cronTasks.updatedAt,
+    })
+    .from(cronTasks)
+    .where(eq(cronTasks.userId, userId))
+    .limit(limit * 10); // fetch more, filter client-side since ilike on two cols
+
+  const lq = query.toLowerCase();
+  const hits: VirtualSearchHit[] = [];
+  for (const t of rows) {
+    const text = `${t.displayName ?? ""} ${t.description ?? ""}`.toLowerCase();
+    if (!text.includes(lq)) {
+      continue;
+    }
+    const excerpt = (t.description ?? t.displayName ?? "").slice(0, 150);
+    hits.push({
+      path: `/tasks/${t.id}`,
+      excerpt,
+      updatedAt: t.updatedAt,
+    });
+    if (hits.length >= limit) {
+      break;
+    }
+  }
+  return hits;
+}
+
 /**
  * Get task count
  */

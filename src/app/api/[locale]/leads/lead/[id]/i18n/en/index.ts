@@ -213,6 +213,19 @@ export const translations = {
           content: "Display Name",
         },
       },
+      referralHistory: {
+        title: "Referral History",
+        description: "Referral codes this lead clicked before signing up",
+        code: {
+          content: "Referral Code",
+        },
+        ownerUserId: {
+          content: "Code Owner",
+        },
+        clickedAt: {
+          content: "Clicked At",
+        },
+      },
     },
     errors: {
       validation: {

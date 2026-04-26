@@ -1,9 +1,9 @@
 /**
  * Filesystem Populate — lazy export of DB data to disk on first access
  *
- * When a mount directory doesn't exist on disk, this module exports all
- * entries from the DB (via virtual mount handlers) as .md files.
- * A `.populated` marker prevents re-export on subsequent accesses.
+ * Only /memories and /documents are filesystem-backed (NATIVE_WRITABLE_PREFIXES).
+ * All other mounts (threads, skills, tasks, uploads, searches, gens) are virtual-only
+ * and never written to disk.
  */
 
 import "server-only";
@@ -17,7 +17,8 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { DATA_ROOT } from ".";
 
 /**
- * Ensure a mount directory exists and has been populated from DB.
+ * Ensure a native mount directory exists and has been populated from DB.
+ * Only works for /memories and /documents — virtual mounts are skipped.
  * Idempotent — checks for `.populated` marker file.
  */
 export async function ensureMountPopulated(
@@ -25,6 +26,16 @@ export async function ensureMountPopulated(
   userId: string,
   logger: EndpointLogger,
 ): Promise<void> {
+  const { NATIVE_WRITABLE_PREFIXES } = await import("../repository");
+  const isNative = (NATIVE_WRITABLE_PREFIXES as readonly string[]).includes(
+    mountPrefix,
+  );
+
+  // Only filesystem-backed mounts get populated on disk
+  if (!isNative) {
+    return;
+  }
+
   const mountName = mountPrefix.replace(/^\//, "");
   const mountDir = join(DATA_ROOT, mountName);
   const markerPath = join(mountDir, ".populated");
@@ -41,31 +52,30 @@ export async function ensureMountPopulated(
   await mkdir(mountDir, { recursive: true });
 
   try {
-    // Dynamic import to avoid pulling mount code at module load
-    const { resolveVirtualList, resolveVirtualRead } =
-      await import("../mounts/resolver");
-
-    // List all entries in this mount
-    const entries = await resolveVirtualList(userId, mountPrefix, mountPrefix);
+    const { CortexNodeType } = await import("../enum");
+    const { db } = await import("@/app/api/[locale]/system/db");
+    const { cortexNodes } = await import("../db");
+    const { and, eq, like } = await import("drizzle-orm");
+    const nodes = await db
+      .select()
+      .from(cortexNodes)
+      .where(
+        and(
+          eq(cortexNodes.userId, userId),
+          like(cortexNodes.path, `${mountPrefix}/%`),
+        ),
+      )
+      .orderBy(cortexNodes.path);
 
     let count = 0;
-    for (const entry of entries) {
-      if (entry.nodeType === "file") {
-        // Read the full content
-        const readResult = await resolveVirtualRead(
-          userId,
-          entry.path,
-          mountPrefix,
-        );
-
-        if (readResult) {
-          const filePath = join(DATA_ROOT, entry.path.slice(1));
-          await mkdir(join(filePath, ".."), { recursive: true });
-          await writeFile(filePath, readResult.content, "utf8");
-          count++;
-        }
-      } else if (entry.nodeType === "dir") {
-        const dirPath = join(DATA_ROOT, entry.path.slice(1));
+    for (const node of nodes) {
+      if (node.nodeType === CortexNodeType.FILE && node.content) {
+        const filePath = join(DATA_ROOT, node.path.slice(1));
+        await mkdir(join(filePath, ".."), { recursive: true });
+        await writeFile(filePath, node.content, "utf8");
+        count++;
+      } else if (node.nodeType === CortexNodeType.DIR) {
+        const dirPath = join(DATA_ROOT, node.path.slice(1));
         await mkdir(dirPath, { recursive: true });
       }
     }
@@ -86,12 +96,11 @@ export async function ensureMountPopulated(
 }
 
 /**
- * Ensure the entire data/ directory structure exists.
- * Creates mount directories that don't exist yet.
+ * Ensure the data/ directory structure exists for filesystem-backed mounts only.
+ * Only /memories and /documents are stored on disk.
  */
 export async function ensureDataRoot(): Promise<void> {
-  const mounts = ["documents", "threads", "memories", "skills", "tasks"];
-  for (const mount of mounts) {
+  for (const mount of ["memories", "documents"]) {
     await mkdir(join(DATA_ROOT, mount), { recursive: true });
   }
 }

@@ -1,7 +1,7 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import type { z } from "zod";
 
 import type {
@@ -11,7 +11,10 @@ import type {
 import type { EndpointEventsMap } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+} from "@/app/api/[locale]/user/auth/types";
 import {
   UserPermissionRole,
   UserRole,
@@ -24,6 +27,7 @@ import type {
 } from "../../../unified-interface/unified-ui/widgets/_shared/types";
 import { sendTestRequest } from "./send-test-request";
 import type { TestEndpointOptions, TestRunner } from "./types";
+import { resolveTestAdminUser } from "./resolve-test-user";
 
 /**
  * Type for example entry
@@ -78,9 +82,15 @@ export function testEndpoint<
     TEvents
   > = {},
 ): void {
-  const { customTests = {}, skipExampleTests = false } = options;
+  const { customTests = {}, skipExampleTests = false, testTimeout } = options;
 
   describe(`API: ${endpoint.method} ${endpoint.path.join("/")}`, () => {
+    let adminUser: JwtPrivatePayloadType | null = null;
+
+    beforeAll(async () => {
+      adminUser = await resolveTestAdminUser();
+    });
+
     // Create a test runner that can be reused
     const testRunner: TestRunner<
       TMethod,
@@ -133,66 +143,65 @@ export function testEndpoint<
         ) as ExampleEntry<TRequestOutput>[];
 
         payloadEntries.forEach(([exampleName, payload]) => {
-          it(`should handle ${exampleName} example`, async () => {
-            const exampleUrlPathParams = urlPathParams
-              ? (urlPathParams as Record<string, TUrlVariablesOutput>)[
-                  exampleName
-                ]
-              : undefined;
+          it(
+            `should handle ${exampleName} example`,
+            async () => {
+              const exampleUrlPathParams = urlPathParams
+                ? (urlPathParams as Record<string, TUrlVariablesOutput>)[
+                    exampleName
+                  ]
+                : undefined;
 
-            // Test with a user that has the endpoint's allowed roles
-            // Use valid UUID format to avoid database errors
-            const mockUser: JwtPayloadType = endpoint.requiresAuthentication()
-              ? {
-                  isPublic: false,
-                  id: "00000000-0000-0000-0000-000000000001",
-                  leadId: "00000000-0000-0000-0000-000000000002",
-                  roles: [UserPermissionRole.ADMIN],
+              // Use the real admin user for authenticated endpoints
+              const mockUser: JwtPayloadType =
+                endpoint.requiresAuthentication() && adminUser
+                  ? adminUser
+                  : {
+                      isPublic: true,
+                      leadId: "00000000-0000-0000-0000-000000000002",
+                      roles: [UserPermissionRole.PUBLIC],
+                    };
+
+              const response = await testRunner.executeWith({
+                data: payload,
+                urlPathParams: exampleUrlPathParams as TUrlVariablesOutput,
+                user: mockUser,
+              });
+
+              // Payload example tests verify that the endpoint processes requests correctly
+              // They don't always expect success because:
+              // 1. Some examples demonstrate failure scenarios (e.g., "failed", "accountLocked")
+              // 2. Tests may not have database state required for success
+              // The key assertion is that we get a valid response (not internal error)
+              if (!response.success) {
+                // Verify it's a proper error response, not an internal error from test infrastructure
+                expect(response.errorType).toBeDefined();
+                // Internal errors indicate test infrastructure problems
+                if (
+                  response.errorType?.errorCode ===
+                    ErrorResponseTypes.INTERNAL_ERROR.errorCode &&
+                  response.messageParams?.error
+                ) {
+                  // Only fail if it's a test infrastructure error (route not found, handler missing, etc.)
+                  const errorMsg = String(response.messageParams.error);
+                  const isInfraError =
+                    errorMsg.includes("Route module not found") ||
+                    errorMsg.includes("Handler not found") ||
+                    errorMsg.includes("Streaming responses are not supported");
+                  expect(isInfraError).toBe(false);
                 }
-              : {
-                  isPublic: true,
-                  leadId: "00000000-0000-0000-0000-000000000002",
-                  roles: [UserPermissionRole.PUBLIC],
-                };
-
-            const response = await testRunner.executeWith({
-              data: payload,
-              urlPathParams: exampleUrlPathParams as TUrlVariablesOutput,
-              user: mockUser,
-            });
-
-            // Payload example tests verify that the endpoint processes requests correctly
-            // They don't always expect success because:
-            // 1. Some examples demonstrate failure scenarios (e.g., "failed", "accountLocked")
-            // 2. Tests may not have database state required for success
-            // The key assertion is that we get a valid response (not internal error)
-            if (!response.success) {
-              // Verify it's a proper error response, not an internal error from test infrastructure
-              expect(response.errorType).toBeDefined();
-              // Internal errors indicate test infrastructure problems
-              if (
-                response.errorType?.errorCode ===
-                  ErrorResponseTypes.INTERNAL_ERROR.errorCode &&
-                response.messageParams?.error
-              ) {
-                // Only fail if it's a test infrastructure error (route not found, handler missing, etc.)
-                const errorMsg = String(response.messageParams.error);
-                const isInfraError =
-                  errorMsg.includes("Route module not found") ||
-                  errorMsg.includes("Handler not found") ||
-                  errorMsg.includes("Streaming responses are not supported");
-                expect(isInfraError).toBe(false);
               }
-            }
 
-            // Validate response data against schema when successful
-            if (response.success && response.data) {
-              const validation = endpoint.responseSchema.safeParse(
-                response.data,
-              );
-              expect(validation.success).toBe(true);
-            }
-          });
+              // Validate response data against schema when successful
+              if (response.success && response.data) {
+                const validation = endpoint.responseSchema.safeParse(
+                  response.data,
+                );
+                expect(validation.success).toBe(true);
+              }
+            },
+            testTimeout,
+          );
         });
       });
     }
@@ -205,14 +214,21 @@ export function testEndpoint<
           const exampleKey = payloads
             ? (Object.keys(payloads)[0] as keyof typeof payloads)
             : undefined;
+          // For URL path params, try the request example key first,
+          // then fall back to the first urlPathParams key (for GET endpoints with no body)
+          const urlParamKey =
+            exampleKey ??
+            (urlPathParams
+              ? (Object.keys(urlPathParams)[0] as keyof typeof urlPathParams)
+              : undefined);
           const response = await testRunner.executeWith({
             data:
               exampleKey && payloads
                 ? (payloads[exampleKey] as TRequestOutput)
                 : (undefined as TRequestOutput),
             urlPathParams:
-              exampleKey && urlPathParams
-                ? (urlPathParams[exampleKey] as TUrlVariablesOutput)
+              urlParamKey && urlPathParams
+                ? (urlPathParams[urlParamKey] as TUrlVariablesOutput)
                 : (undefined as TUrlVariablesOutput),
             // Use public user (unauthorized) for this test with valid UUID format
             user: {
@@ -226,8 +242,14 @@ export function testEndpoint<
           // Public users get FORBIDDEN (403) - they are authenticated but lack permissions
           // Unauthenticated requests get AUTH_ERROR (401)
           // Note: INTERNAL_ERROR may occur if route handler is not registered (skip this check)
+          // Note: Endpoints with allowedClientRoles including PUBLIC may legitimately
+          // return success for public users (e.g., favorites list with client-side fallback)
+          const allowsPublicViaClientRoles =
+            endpoint.allowedClientRoles?.includes(UserPermissionRole.PUBLIC);
           if (response.success) {
-            expect(response.success).toBe(false);
+            if (!allowsPublicViaClientRoles) {
+              expect(response.success).toBe(false);
+            }
           } else {
             // Accept either AUTH_ERROR (401) or FORBIDDEN (403) as valid rejection
             // Also skip internal errors which indicate route registration issues, not auth failures
@@ -243,7 +265,10 @@ export function testEndpoint<
               errorCode === ErrorResponseTypes.AUTH_ERROR.errorCode ||
               errorCode === ErrorResponseTypes.FORBIDDEN.errorCode ||
               errorCode === ErrorResponseTypes.INTERNAL_ERROR.errorCode;
-            expect(isValidRejection).toBe(true);
+            expect(
+              isValidRejection,
+              `Expected auth rejection but got errorCode=${String(errorCode)} message=${String(response.message)}`,
+            ).toBe(true);
           }
         });
 
@@ -260,6 +285,13 @@ export function testEndpoint<
               const exampleKey = payloads
                 ? (Object.keys(payloads)[0] as keyof typeof payloads)
                 : undefined;
+              const urlParamKey =
+                exampleKey ??
+                (urlPathParams
+                  ? (Object.keys(
+                      urlPathParams,
+                    )[0] as keyof typeof urlPathParams)
+                  : undefined);
 
               const response = await testRunner.executeWith({
                 data:
@@ -267,16 +299,11 @@ export function testEndpoint<
                     ? (payloads[exampleKey] as TRequestOutput)
                     : (undefined as TRequestOutput),
                 urlPathParams:
-                  exampleKey && urlPathParams
-                    ? (urlPathParams[exampleKey] as TUrlVariablesOutput)
+                  urlParamKey && urlPathParams
+                    ? (urlPathParams[urlParamKey] as TUrlVariablesOutput)
                     : (undefined as TUrlVariablesOutput),
-                // Use authorized private user for this test with valid UUID format
-                user: {
-                  isPublic: false,
-                  id: "00000000-0000-0000-0000-000000000001",
-                  leadId: "00000000-0000-0000-0000-000000000002",
-                  roles: [UserPermissionRole.ADMIN],
-                },
+                // Use the real admin user resolved from DB
+                user: adminUser!,
               });
 
               // This test verifies authorization passes, not business success

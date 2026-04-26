@@ -207,6 +207,21 @@ const { GET } = createEndpoint({
                   content: "get.response.users.id" as const,
                   schema: z.string(),
                 }),
+                referralCode: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.users.referralCode" as const,
+                  schema: z.string().nullable(),
+                }),
+                referredByUserId: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.users.referredByUserId" as const,
+                  schema: z.string().nullable(),
+                }),
+                totalReferrals: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.users.totalReferrals" as const,
+                  schema: z.coerce.number(),
+                }),
               },
             }),
           }),

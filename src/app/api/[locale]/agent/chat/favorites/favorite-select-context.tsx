@@ -10,6 +10,8 @@ interface FavoriteSelectContextValue {
   activeSkillId: string | null;
   /** Current modelId in the local form — used to compute active state client-side */
   activeModelId: string | null;
+  /** When true, hides the tab bar and settings gear (for embedding in other panels) */
+  hideChrome: boolean;
 }
 
 const FavoriteSelectContext = createContext<FavoriteSelectContextValue | null>(
@@ -20,16 +22,18 @@ export function FavoriteSelectProvider({
   onSelectFavorite,
   activeSkillId,
   activeModelId,
+  hideChrome = false,
   children,
 }: {
   onSelectFavorite: (item: FavoriteCard) => void;
   activeSkillId: string | null;
   activeModelId: string | null;
+  hideChrome?: boolean;
   children: ReactNode;
 }): React.JSX.Element {
   return (
     <FavoriteSelectContext.Provider
-      value={{ onSelectFavorite, activeSkillId, activeModelId }}
+      value={{ onSelectFavorite, activeSkillId, activeModelId, hideChrome }}
     >
       {children}
     </FavoriteSelectContext.Provider>

@@ -1,44 +1,61 @@
 import "server-only";
 
-import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { ModelMessage } from "ai";
 
+import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+import type { FavoriteSummaryItem } from "@/app/api/[locale]/agent/chat/favorites/system-prompt/prompt";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CronTaskItem } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
+import { languageConfig } from "@/i18n";
+import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { stripFrontmatter, truncateContent } from "../_shared/text-utils";
 import type {
   CortexData,
-  CortexMemory,
-  CortexRelevantNode,
-  TrimmedDirNode,
+  CortexDirEntry,
+  CortexEntry,
+  CortexFileEntry,
 } from "./prompt";
-import {
-  stripFrontmatter,
-  truncateContent as truncateForContext,
-} from "../_shared/text-utils";
+import { cleanExcerpt } from "./prompt";
+
+// ─── Budget (chars, ~4 chars/token) ──────────────────────────────────────────
+
+const CHAR_BUDGET = {
+  memories: 16000,
+  documents: 12000,
+  threads: 12000,
+  skills: 8000,
+  tasks: 4000,
+} as const;
 
 /**
  * Load Cortex data for the system prompt fragment.
- * Fetches document tree + counts from all virtual mounts + memories content.
+ * Single vector search → partition by mount → parallel DB loads → build unified tree.
  */
 export async function loadCortexData(
   params: SystemPromptServerParams,
 ): Promise<CortexData> {
-  const { user, logger, isIncognito, memoryLimit, lastUserMessage } = params;
+  const { user, logger, isIncognito, lastUserMessage, locale } = params;
+
+  const { country } = getLanguageAndCountryFromLocale(locale);
+  const countryInfo = languageConfig.countryInfo[country];
+  const languageName = countryInfo?.langName;
   const userId = user.isPublic ? undefined : user.id;
 
+  const { getLocaleRoots } = await import("../seeds/templates");
+  const localeRoots = getLocaleRoots(locale);
+
   const empty: CortexData = {
-    compactTree: "",
-    documentCount: 0,
+    tree: [],
     threadCounts: {},
     totalThreads: 0,
-    activeMemories: 0,
-    archivedMemories: 0,
-    skillCount: 0,
-    taskCount: 0,
     uploadCount: 0,
     searchCount: 0,
-    memories: [],
-    trimmedDirs: [],
-    skillNames: [],
-    dirPurposes: {},
+    genCount: 0,
+    taskCount: 0,
+    languageName,
+    localeRoots,
   };
 
   // No Cortex data for incognito or unauthenticated users
@@ -48,45 +65,100 @@ export async function loadCortexData(
 
   try {
     const { getVirtualMountCounts } = await import("../mounts/resolver");
-    const counts = await getVirtualMountCounts(userId);
 
-    // Parallel: build doc tree + load memories + vector context + skill names + dir purposes
+    // 1. Single vector search across all paths (no path filter)
+    const allRelevant = lastUserMessage
+      ? await vectorSearch({
+          userId,
+          query: lastUserMessage,
+          limit: 40,
+          threshold: 0.4,
+          excerptLen: 200,
+          logger,
+        })
+      : [];
+
+    // Partition by mount with per-mount thresholds
+    const memRelevant = allRelevant.filter((n) =>
+      n.path.startsWith("/memories"),
+    );
+    const docRelevant = allRelevant.filter((n) =>
+      n.path.startsWith("/documents"),
+    );
+    const threadRelevant = allRelevant.filter(
+      (n) =>
+        /^\/threads\/(private|shared|public)\//.test(n.path) && n.score >= 0.65,
+    );
+    const skillRelevant = allRelevant.filter(
+      (n) => n.path.startsWith("/skills") && n.score >= 0.7,
+    );
+
+    // Pre-warm skills/db so it's in the module cache before getVirtualMountCounts
+    // calls getSkillCount — otherwise we hit a TDZ circular-dep crash.
+    await import("@/app/api/[locale]/agent/chat/skills/db").catch(() => null);
+
+    // 2. Parallel loads — all mounts independent
     const [
-      trimmedDirs,
-      compactTree,
-      memoriesResult,
-      relevantContext,
-      skillNames,
-      dirPurposes,
+      counts,
+      memCtx,
+      docTree,
+      threadPinned,
+      skillsFaved,
+      skillsCreated,
+      tasks,
+      favs,
     ] = await Promise.all([
-      buildTrimmedDocTree(userId),
-      buildCompactDocTree(userId, counts.documents),
-      loadMemoriesFromCortex(userId, memoryLimit ?? null),
-      lastUserMessage
-        ? loadRelevantContext(userId, lastUserMessage, logger)
-        : Promise.resolve([]),
-      loadSkillNames(userId),
-      loadDirPurposes(userId),
+      getVirtualMountCounts(userId),
+      loadMemoryContext(userId, localeRoots.memories, locale),
+      buildTrimmedDocTree(userId, localeRoots.documents, locale),
+      loadPinnedThreads(userId),
+      loadFavedSkills(userId),
+      loadCreatedSkills(userId),
+      loadTasksForCortex(userId, logger),
+      loadFavoritesForCortex(userId, locale, logger),
     ]);
 
+    const uploadCount = counts.uploads;
+    const searchCount = counts.searches;
+    const genCount = counts.gens ?? 0;
+    const taskCount = tasks.totalCount;
+
+    // 3. Build unified tree
+    const tree: CortexEntry[] = [
+      buildMemoriesDir(
+        memCtx,
+        memRelevant,
+        CHAR_BUDGET.memories,
+        localeRoots.memories,
+      ),
+      buildDocumentsDir(
+        docRelevant,
+        docTree,
+        CHAR_BUDGET.documents,
+        localeRoots.documents,
+        counts.documents ?? 0,
+      ),
+      buildThreadsDir(threadPinned, threadRelevant, counts.threads),
+      buildSkillsDir(
+        skillsFaved,
+        skillsCreated,
+        skillRelevant,
+        CHAR_BUDGET.skills,
+      ),
+      buildTasksDir(tasks),
+      buildFavoritesDir(favs.items, favs.activeId),
+    ];
+
     return {
-      compactTree,
-      documentCount: counts.documents,
+      tree,
       threadCounts: counts.threads.byRoot,
       totalThreads: counts.threads.total,
-      activeMemories: memoriesResult.activeCount,
-      archivedMemories: memoriesResult.archivedCount,
-      skillCount: counts.skills,
-      taskCount: counts.tasks,
-      uploadCount: counts.uploads,
-      searchCount: counts.searches,
-      memories: memoriesResult.memories,
-      nearLimit: memoriesResult.nearLimit,
-      totalTokens: memoriesResult.totalTokens,
-      relevantContext: relevantContext.length > 0 ? relevantContext : undefined,
-      trimmedDirs,
-      skillNames,
-      dirPurposes,
+      uploadCount,
+      searchCount,
+      genCount,
+      taskCount,
+      languageName,
+      localeRoots,
     };
   } catch (error) {
     logger.error("Failed to load Cortex data for system prompt", {
@@ -97,134 +169,90 @@ export async function loadCortexData(
   }
 }
 
-/**
- * Build a compact tree of /documents/ file paths for the system prompt.
- */
-async function buildCompactDocTree(
-  userId: string,
-  docCount: number,
-): Promise<string> {
-  if (docCount === 0) {
-    return "";
+// ─── Embedding Query Builder ──────────────────────────────────────────────────
+
+const EMBEDDING_QUERY_MAX_MESSAGES = 8;
+const EMBEDDING_QUERY_PER_MESSAGE_BUDGET = 800;
+
+function extractTextFromMessage(msg: ModelMessage): string {
+  if (msg.role === "system") {
+    return msg.content;
   }
-
-  const { db } = await import("@/app/api/[locale]/system/db");
-  const { cortexNodes } = await import("../db");
-  const { CortexNodeType } = await import("../enum");
-  const { eq, and, like } = await import("drizzle-orm");
-  const { basename } = await import("../repository");
-
-  const docFiles = await db
-    .select({ path: cortexNodes.path })
-    .from(cortexNodes)
-    .where(
-      and(
-        eq(cortexNodes.userId, userId),
-        eq(cortexNodes.nodeType, CortexNodeType.FILE),
-        like(cortexNodes.path, "/documents/%"),
-      ),
-    )
-    .orderBy(cortexNodes.updatedAt)
-    .limit(20);
-
-  const lines = docFiles.map((f) => {
-    const parts = f.path.replace("/documents/", "").split("/");
-    return parts.length > 1
-      ? `  ${parts.slice(0, -1).join("/")}/${basename(f.path)}`
-      : `  ${basename(f.path)}`;
-  });
-
-  return lines.join("\n");
-}
-
-/**
- * Load memory files from /memories/ in cortex_nodes.
- * Parses frontmatter for priority, tags, archived status.
- */
-async function loadMemoriesFromCortex(
-  userId: string,
-  memoryLimit: number | null,
-): Promise<{
-  memories: CortexMemory[];
-  activeCount: number;
-  archivedCount: number;
-  nearLimit: boolean;
-  totalTokens: number;
-}> {
-  const { db } = await import("@/app/api/[locale]/system/db");
-  const { cortexNodes } = await import("../db");
-  const { CortexNodeType } = await import("../enum");
-  const { MEMORIES_PREFIX } = await import("../repository");
-  const { eq, and, like } = await import("drizzle-orm");
-
-  const allMemoryFiles = await db
-    .select({
-      path: cortexNodes.path,
-      content: cortexNodes.content,
-      frontmatter: cortexNodes.frontmatter,
-      createdAt: cortexNodes.createdAt,
-    })
-    .from(cortexNodes)
-    .where(
-      and(
-        eq(cortexNodes.userId, userId),
-        eq(cortexNodes.nodeType, CortexNodeType.FILE),
-        like(cortexNodes.path, `${MEMORIES_PREFIX}/%`),
-      ),
-    )
-    .orderBy(cortexNodes.createdAt);
-
-  let archivedCount = 0;
-  const activeMemories: CortexMemory[] = [];
-
-  for (const file of allMemoryFiles) {
-    const fm = file.frontmatter as Record<
-      string,
-      string | number | boolean | string[]
-    > | null;
-    const isArchived = fm?.archived === true || fm?.isArchived === true;
-
-    if (isArchived) {
-      archivedCount++;
-      continue;
+  if (msg.role === "user" || msg.role === "assistant") {
+    const c = msg.content;
+    if (typeof c === "string") {
+      return c;
     }
-
-    const priority = typeof fm?.priority === "number" ? fm.priority : 0;
-    const tags = Array.isArray(fm?.tags) ? (fm.tags as string[]) : [];
-
-    activeMemories.push({
-      path: file.path,
-      content: file.content ?? "",
-      priority,
-      tags,
-      createdAt: file.createdAt?.toISOString() ?? new Date().toISOString(),
-    });
+    if (!Array.isArray(c)) {
+      return "";
+    }
+    const parts: string[] = [];
+    for (const part of c) {
+      if (part.type === "text") {
+        parts.push(part.text);
+      } else if (part.type === "tool-call") {
+        parts.push(
+          `[tool:${part.toolName}] ${JSON.stringify(part.input).slice(0, 200)}`,
+        );
+      } else if (part.type === "tool-result") {
+        const output = part.output;
+        if (output.type === "text") {
+          parts.push(`[result:${part.toolName}] ${output.value}`);
+        } else if (output.type === "json") {
+          parts.push(
+            `[result:${part.toolName}] ${JSON.stringify(output.value).slice(0, 300)}`,
+          );
+        }
+      }
+    }
+    return parts.join(" ");
   }
-
-  // Token counting
-  const totalChars = activeMemories.reduce(
-    (sum, m) => sum + m.content.length,
-    0,
-  );
-  const totalTokens = Math.ceil(totalChars / 4);
-  const limit = memoryLimit ?? 10000;
-  const nearLimit = totalTokens >= limit * 0.9;
-
-  return {
-    memories: activeMemories,
-    activeCount: activeMemories.length,
-    archivedCount,
-    nearLimit,
-    totalTokens,
-  };
+  if (msg.role === "tool") {
+    const parts: string[] = [];
+    for (const part of msg.content) {
+      if (part.type === "tool-result") {
+        const output = part.output;
+        if (output.type === "text") {
+          parts.push(`[result:${part.toolName}] ${output.value}`);
+        } else if (output.type === "json") {
+          parts.push(
+            `[result:${part.toolName}] ${JSON.stringify(output.value).slice(0, 300)}`,
+          );
+        }
+      }
+    }
+    return parts.join(" ");
+  }
+  return "";
 }
 
-/**
- * Load relevant cortex nodes via vector search based on the user's message.
- * Returns top 5 most similar nodes across all of cortex (documents, memories, skills, tasks).
- * Gracefully returns empty if embeddings aren't available.
- */
-/** Path-type weighting boosts for context relevance */
+const ROLE_LABELS: Record<string, string> = {
+  user: "User",
+  assistant: "Assistant",
+  tool: "Tool",
+  system: "System",
+};
+
+export function buildEmbeddingQuery(
+  messages: ReadonlyArray<ModelMessage>,
+): string {
+  return messages
+    .slice(-EMBEDDING_QUERY_MAX_MESSAGES)
+    .map((m) => {
+      const text = extractTextFromMessage(m).trim();
+      if (!text) {
+        return null;
+      }
+      const label = ROLE_LABELS[m.role] ?? m.role;
+      return `${label}: ${text.slice(0, EMBEDDING_QUERY_PER_MESSAGE_BUDGET)}`;
+    })
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+// ─── Shared Vector Search ─────────────────────────────────────────────────────
+
+/** Path-type weighting — memories and skills are higher signal */
 const PATH_TYPE_WEIGHTS: Record<string, number> = {
   memories: 1.2,
   skills: 1.1,
@@ -233,38 +261,79 @@ const PATH_TYPE_WEIGHTS: Record<string, number> = {
   tasks: 1.0,
 };
 
-/** Get path-type weight for a cortex path */
 function getPathTypeWeight(path: string): number {
   const mount = path.replace(/^\//, "").split("/")[0] ?? "";
   return PATH_TYPE_WEIGHTS[mount] ?? 1.0;
 }
 
-/** Calculate recency factor: 1.0 for today, decaying over 30 days to 0.0 */
 function getRecencyFactor(updatedAt: Date): number {
-  const ageMs = Date.now() - updatedAt.getTime();
-  const ageDays = ageMs / (1000 * 60 * 60 * 24);
+  const ageDays = (Date.now() - updatedAt.getTime()) / (1000 * 60 * 60 * 24);
   return Math.max(0, 1 - ageDays / 30);
 }
 
-async function loadRelevantContext(
-  userId: string,
-  userMessage: string,
-  logger: EndpointLogger,
-): Promise<CortexRelevantNode[]> {
+interface RelevantNode {
+  path: string;
+  excerpt: string;
+  score: number;
+}
+
+interface VectorSearchOpts {
+  userId: string;
+  query: string;
+  pathPrefix?: string;
+  pathPrefixes?: string[];
+  excludePrefixes?: string[];
+  limit?: number;
+  threshold?: number;
+  excerptLen?: number;
+  logger: EndpointLogger;
+}
+
+/**
+ * Run a vector similarity search within cortex_nodes.
+ * Returns ranked results with adjusted scores (recency + path weight).
+ */
+async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
+  const {
+    userId,
+    query,
+    pathPrefix,
+    pathPrefixes,
+    excludePrefixes = [],
+    limit = 10,
+    threshold = 0.4,
+    excerptLen = 150,
+    logger,
+  } = opts;
+
   try {
     const { generateEmbedding } = await import("../embeddings/service");
-    const queryEmbedding = await generateEmbedding(userMessage);
-
+    const queryEmbedding = await generateEmbedding(query);
     if (!queryEmbedding) {
-      return []; // No API key or embedding failed
+      return [];
     }
 
     const { db } = await import("@/app/api/[locale]/system/db");
     const { cortexNodes } = await import("../db");
     const { CortexNodeType } = await import("../enum");
-    const { eq, and, isNotNull, sql } = await import("drizzle-orm");
+    const { eq, and, isNotNull, notLike, like, or, sql } =
+      await import("drizzle-orm");
 
     const embeddingStr = `[${queryEmbedding.join(",")}]`;
+
+    // Build path filter conditions
+    const pathConditions = [];
+    if (pathPrefix) {
+      pathConditions.push(like(cortexNodes.path, `${pathPrefix}/%`));
+    } else if (pathPrefixes && pathPrefixes.length > 0) {
+      pathConditions.push(
+        or(...pathPrefixes.map((p) => like(cortexNodes.path, `${p}/%`))),
+      );
+    }
+
+    const excludeConditions = excludePrefixes.map((p) =>
+      notLike(cortexNodes.path, `${p}/%`),
+    );
 
     const rows = await db
       .select({
@@ -279,208 +348,941 @@ async function loadRelevantContext(
           eq(cortexNodes.userId, userId),
           eq(cortexNodes.nodeType, CortexNodeType.FILE),
           isNotNull(cortexNodes.embedding),
+          ...pathConditions,
+          ...excludeConditions,
         ),
       )
       .orderBy(
         sql`${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)}`,
       )
-      .limit(12);
+      .limit(limit * 3); // fetch extra, filter after scoring
 
-    // Apply recency boost and path-type weighting, then filter and rank
     return rows
+      .filter((r) => r.similarity > threshold) // filter on raw similarity before boosts
       .map((r) => {
-        const baseSimilarity = r.similarity;
         const recencyBoost = 0.1 * getRecencyFactor(r.updatedAt);
         const pathWeight = getPathTypeWeight(r.path);
-        const adjustedScore = (baseSimilarity + recencyBoost) * pathWeight;
+        const adjustedScore = (r.similarity + recencyBoost) * pathWeight;
+        const rawExcerpt = truncateContent(
+          stripFrontmatter(r.content ?? ""),
+          excerptLen,
+        );
         return {
           path: r.path,
-          excerpt: truncateForContext(stripFrontmatter(r.content ?? ""), 300),
+          excerpt: rawExcerpt,
           score: Math.round(adjustedScore * 100) / 100,
         };
       })
-      .filter((r) => r.score > 0.2)
       .toSorted((a, b) => b.score - a.score)
-      .slice(0, 8);
+      .slice(0, limit);
   } catch (error) {
-    logger.warn("Vector context injection failed — skipping", {
+    logger.warn("Vector search failed — skipping", {
       error: error instanceof Error ? error.message : String(error),
     });
     return [];
   }
 }
 
-// ─── New loaders ──────────────────────────────────────────────────────────────
+// ─── Memory Context ───────────────────────────────────────────────────────────
 
-/**
- * Max total file rows shown across all subdirs in the document tree.
- * Spread evenly per top-level subdir so heavy users don't explode context.
- */
-const DOC_TREE_MAX_ROWS = 40;
+interface MemoryFile {
+  path: string;
+  content: string;
+  priority: number;
+  pinned: boolean;
+}
 
-/**
- * Build a trimmed document tree: top-level subdirs with even slot allocation.
- * Returns structured nodes so prompt.ts can render them flexibly.
- */
-async function buildTrimmedDocTree(userId: string): Promise<TrimmedDirNode[]> {
+async function loadMemoryContext(
+  userId: string,
+  memoriesPath: string,
+  locale: string,
+): Promise<{
+  pinned: MemoryFile[];
+  recent: MemoryFile[];
+  totalCount: number;
+  archivedCount: number;
+}> {
   const { db } = await import("@/app/api/[locale]/system/db");
   const { cortexNodes } = await import("../db");
   const { CortexNodeType } = await import("../enum");
-  const { eq, and, like, sql, asc } = await import("drizzle-orm");
+  const { eq, and, like, sql } = await import("drizzle-orm");
 
-  // Get all top-level /documents/ subdirs
-  const topDirs = await db
+  const allFiles = await db
     .select({
       path: cortexNodes.path,
+      content: cortexNodes.content,
       frontmatter: cortexNodes.frontmatter,
+      updatedAt: cortexNodes.updatedAt,
     })
     .from(cortexNodes)
     .where(
       and(
         eq(cortexNodes.userId, userId),
-        eq(cortexNodes.nodeType, CortexNodeType.DIR),
-        // direct children of /documents only: exactly one more path segment
-        sql`${cortexNodes.path} ~ '^/documents/[^/]+$'`,
+        eq(cortexNodes.nodeType, CortexNodeType.FILE),
+        like(cortexNodes.path, `${memoriesPath}/%`),
       ),
     )
-    .orderBy(asc(cortexNodes.sortOrder), asc(cortexNodes.path));
+    .orderBy(sql`${cortexNodes.updatedAt} DESC`);
 
-  if (topDirs.length === 0) {
-    return [];
+  let archivedCount = 0;
+  const pinned: MemoryFile[] = [];
+  const active: MemoryFile[] = [];
+  const existingPaths = new Set<string>();
+
+  for (const file of allFiles) {
+    existingPaths.add(file.path);
+    const fm = file.frontmatter as Record<
+      string,
+      string | number | boolean | string[]
+    > | null;
+    if (fm?.archived === true || fm?.isArchived === true) {
+      archivedCount++;
+      continue;
+    }
+    const rawContent = file.content ?? "";
+    // Skip files that are pure placeholder templates (only headings + HTML comments, no real content)
+    const strippedContent = rawContent
+      .replace(/<!--[\s\S]*?-->/g, "")
+      .replace(/^#{1,6}\s+.+$/gm, "")
+      .replace(/^---[\s\S]*?---/m, "")
+      .trim();
+    if (strippedContent.length < 20 && rawContent.length > 0) {
+      continue;
+    }
+    const mem: MemoryFile = {
+      path: file.path,
+      content: rawContent,
+      priority: typeof fm?.priority === "number" ? fm.priority : 0,
+      pinned: fm?.pinned === true,
+    };
+    if (mem.pinned) {
+      pinned.push(mem);
+    } else {
+      active.push(mem);
+    }
   }
 
-  const perDirSlots = Math.max(
-    2,
-    Math.floor(DOC_TREE_MAX_ROWS / topDirs.length),
+  // Overlay virtual template files — only if they have meaningful content (not pure placeholders)
+  try {
+    const { getMemoryTemplates } = await import("../seeds/templates");
+    const templates = getMemoryTemplates(
+      locale as Parameters<typeof getMemoryTemplates>[0],
+    );
+    for (const tpl of templates) {
+      // Only inject if not in DB yet and it's a direct file under memoriesPath/*/*.md
+      if (existingPaths.has(tpl.path)) {
+        continue;
+      }
+      // Only inject templates whose canonical path starts with /memories/
+      if (!tpl.path.startsWith("/memories/")) {
+        continue;
+      }
+      // Skip deep sub-paths (only identity/expertise/context/life direct files)
+      const segments = tpl.path.split("/").filter(Boolean);
+      if (segments.length !== 3) {
+        continue;
+      }
+      // Skip templates that are pure placeholder shells — no real content yet
+      const strippedContent = tpl.content
+        .replace(/<!--[\s\S]*?-->/g, "")
+        .replace(/^#{1,6}\s+.+$/gm, "")
+        .replace(/^---[\s\S]*?---/m, "")
+        .trim();
+      if (strippedContent.length < 20) {
+        continue;
+      }
+      active.push({
+        path: tpl.path,
+        content: tpl.content,
+        priority: 0,
+        pinned: false,
+      });
+      existingPaths.add(tpl.path);
+    }
+  } catch {
+    // Templates optional — don't fail memory load
+  }
+
+  const recent = active.toSorted(
+    (a, b) => (b.priority ?? 0) - (a.priority ?? 0),
   );
 
-  const results: TrimmedDirNode[] = [];
+  return {
+    pinned,
+    recent,
+    totalCount: pinned.length + active.length,
+    archivedCount,
+  };
+}
 
-  for (const dir of topDirs) {
-    // Count total files under this dir (any depth)
-    const countResult = await db
-      .select({ count: sql<number>`COUNT(*)` })
-      .from(cortexNodes)
+// ─── Document Tree ─────────────────────────────────────────────────────────────
+
+interface TrimmedDocDir {
+  path: string;
+  fileCount: number;
+  shownFiles: string[];
+  hiddenCount: number;
+}
+
+const DOC_TREE_MAX_SHOWN_PER_DIR = 6;
+
+async function buildTrimmedDocTree(
+  userId: string,
+  documentsPath: string,
+  locale: string,
+): Promise<TrimmedDocDir[]> {
+  const { db } = await import("@/app/api/[locale]/system/db");
+  const { cortexNodes } = await import("../db");
+  const { CortexNodeType } = await import("../enum");
+  const { sql } = await import("drizzle-orm");
+
+  // Escape documentsPath for regex (e.g. /documents → \/documents)
+  const escapedDocsPath = documentsPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  // Single query: get top-level dirs + their file counts + recent files via window function
+  const rows = await db.execute(sql`
+    WITH top_dirs AS (
+      SELECT path
+      FROM ${cortexNodes}
+      WHERE user_id = ${userId}
+        AND node_type = ${CortexNodeType.DIR}
+        AND path ~ ${`^${escapedDocsPath}/[^/]+$`}
+      ORDER BY sort_order ASC, path ASC
+    ),
+    files AS (
+      SELECT
+        f.path AS file_path,
+        regexp_replace(f.path, '/[^/]+$', '') AS parent_dir,
+        COUNT(*) OVER (PARTITION BY regexp_replace(f.path, '/[^/]+$', '')) AS dir_count,
+        ROW_NUMBER() OVER (PARTITION BY regexp_replace(f.path, '/[^/]+$', '') ORDER BY f.updated_at DESC) AS rn
+      FROM ${cortexNodes} f
+      WHERE f.user_id = ${userId}
+        AND f.node_type = ${CortexNodeType.FILE}
+        AND f.path ~ ${`^${escapedDocsPath}/[^/]+/`}
+    )
+    SELECT
+      d.path AS dir_path,
+      COALESCE(f.dir_count, 0)::int AS file_count,
+      f.file_path,
+      f.rn
+    FROM top_dirs d
+    LEFT JOIN files f ON f.parent_dir = d.path AND f.rn <= ${DOC_TREE_MAX_SHOWN_PER_DIR}
+    ORDER BY d.path ASC, f.rn ASC
+  `);
+
+  // Group rows by dir_path
+  const dirMap = new Map<string, { fileCount: number; files: string[] }>();
+  for (const row of rows.rows) {
+    const dirPath = String(row.dir_path);
+    const fileCount = Number(row.file_count ?? 0);
+    if (!dirMap.has(dirPath)) {
+      dirMap.set(dirPath, { fileCount, files: [] });
+    }
+    if (row.file_path) {
+      dirMap.get(dirPath)!.files.push(String(row.file_path));
+    }
+  }
+
+  const result: TrimmedDocDir[] = [...dirMap.entries()].map(
+    ([dirPath, { fileCount, files }]) => ({
+      path: dirPath,
+      fileCount,
+      shownFiles: files,
+      hiddenCount: Math.max(0, fileCount - files.length),
+    }),
+  );
+
+  // Overlay virtual document templates subdir if not already in DB
+  try {
+    const { getDocumentTemplates } = await import("../seeds/templates");
+    const localeParam = locale as Parameters<typeof getDocumentTemplates>[0];
+    const docTemplates = getDocumentTemplates(localeParam);
+    const templateDirPath = `${documentsPath}/templates`;
+
+    // NOTE: Do NOT inject empty default subdirs — they're clutter until the user has files there.
+
+    // Inject template files into the templates subdir
+    const templateDirEntry = result.find((d) => d.path === templateDirPath);
+    const existingTemplatePaths = new Set(templateDirEntry?.shownFiles ?? []);
+    const virtualTemplateFiles = docTemplates
+      .filter((t) => !existingTemplatePaths.has(t.path))
+      .map((t) => t.path);
+
+    if (virtualTemplateFiles.length > 0) {
+      if (templateDirEntry) {
+        templateDirEntry.shownFiles.push(...virtualTemplateFiles);
+        templateDirEntry.fileCount += virtualTemplateFiles.length;
+      } else {
+        result.push({
+          path: templateDirPath,
+          fileCount: virtualTemplateFiles.length,
+          shownFiles: virtualTemplateFiles.slice(0, DOC_TREE_MAX_SHOWN_PER_DIR),
+          hiddenCount: Math.max(
+            0,
+            virtualTemplateFiles.length - DOC_TREE_MAX_SHOWN_PER_DIR,
+          ),
+        });
+      }
+    }
+  } catch {
+    // Templates optional — don't fail doc tree
+  }
+
+  return result;
+}
+
+// ─── Thread Pinned ─────────────────────────────────────────────────────────────
+
+interface PinnedThread {
+  id: string;
+  title: string;
+  preview: string | null;
+  rootFolderId: string;
+}
+
+async function loadPinnedThreads(userId: string): Promise<PinnedThread[]> {
+  try {
+    const { db } = await import("@/app/api/[locale]/system/db");
+    const { chatThreads } = await import("../../chat/db");
+    const { eq, and } = await import("drizzle-orm");
+
+    const rows = await db
+      .select({
+        id: chatThreads.id,
+        title: chatThreads.title,
+        preview: chatThreads.preview,
+        rootFolderId: chatThreads.rootFolderId,
+      })
+      .from(chatThreads)
+      .where(and(eq(chatThreads.userId, userId), eq(chatThreads.pinned, true)))
+      .limit(5);
+
+    return rows;
+  } catch {
+    return [];
+  }
+}
+
+// ─── Skills: Faved + Created ───────────────────────────────────────────────────
+
+interface SkillRecord {
+  id: string;
+  name: string;
+  slug: string;
+  systemPrompt: string | null;
+}
+
+async function loadFavedSkills(userId: string): Promise<SkillRecord[]> {
+  try {
+    const { db } = await import("@/app/api/[locale]/system/db");
+    const { chatFavorites } = await import("../../chat/favorites/db");
+    const { eq } = await import("drizzle-orm");
+
+    // Step 1: get skillIds from favorites — filter to UUID-format only (custom skills)
+    const favRows = await db
+      .select({ skillId: chatFavorites.skillId })
+      .from(chatFavorites)
+      .where(eq(chatFavorites.userId, userId))
+      .limit(30);
+
+    if (favRows.length === 0) {
+      return [];
+    }
+
+    // System skill IDs are slugs (e.g. "quality-tester"), custom skill IDs are UUIDs
+    const UUID_RE =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const skillIds = favRows
+      .map((r) => r.skillId)
+      .filter((id) => UUID_RE.test(id));
+
+    // Step 2: fetch skill details separately (avoids TDZ circular init with join)
+    const { customSkills } = await import("../../chat/skills/db");
+    const { inArray } = await import("drizzle-orm");
+
+    const skillRows = await db
+      .select({
+        id: customSkills.id,
+        name: customSkills.name,
+        slug: customSkills.slug,
+        systemPrompt: customSkills.systemPrompt,
+      })
+      .from(customSkills)
+      .where(inArray(customSkills.id, skillIds))
+      .limit(20);
+
+    return skillRows;
+  } catch {
+    return [];
+  }
+}
+
+async function loadCreatedSkills(userId: string): Promise<SkillRecord[]> {
+  try {
+    const { db } = await import("@/app/api/[locale]/system/db");
+    const { customSkills } = await import("../../chat/skills/db");
+    const { SkillOwnershipType } = await import("../../chat/skills/enum");
+    const { eq, and, ne, sql } = await import("drizzle-orm");
+
+    const rows = await db
+      .select({
+        id: customSkills.id,
+        name: customSkills.name,
+        slug: customSkills.slug,
+        systemPrompt: customSkills.systemPrompt,
+      })
+      .from(customSkills)
       .where(
         and(
-          eq(cortexNodes.userId, userId),
-          eq(cortexNodes.nodeType, CortexNodeType.FILE),
-          like(cortexNodes.path, `${dir.path}/%`),
-        ),
-      );
-    const fileCount = Number(countResult[0]?.count ?? 0);
-
-    // Fetch the most-recently-updated files up to perDirSlots
-    const recentFiles = await db
-      .select({ path: cortexNodes.path })
-      .from(cortexNodes)
-      .where(
-        and(
-          eq(cortexNodes.userId, userId),
-          eq(cortexNodes.nodeType, CortexNodeType.FILE),
-          like(cortexNodes.path, `${dir.path}/%`),
+          eq(customSkills.userId, userId),
+          ne(customSkills.ownershipType, SkillOwnershipType.SYSTEM),
         ),
       )
-      .orderBy(sql`${cortexNodes.updatedAt} DESC`)
-      .limit(perDirSlots);
+      .orderBy(sql`${customSkills.updatedAt} DESC`)
+      .limit(10);
 
-    const fm = dir.frontmatter as Record<
-      string,
-      string | number | boolean | null
-    > | null;
-    const purpose = typeof fm?.purpose === "string" ? fm.purpose : undefined;
+    return rows;
+  } catch {
+    return [];
+  }
+}
 
-    results.push({
+// ─── Task Summary ─────────────────────────────────────────────────────────────
+
+async function loadTasksForCortex(
+  userId: string,
+  logger: EndpointLogger,
+): Promise<{ items: CronTaskItem[]; totalCount: number }> {
+  try {
+    const { CronTasksRepository } =
+      await import("@/app/api/[locale]/system/unified-interface/tasks/cron/repository");
+    const items = await CronTasksRepository.loadTaskItems({ userId, logger });
+    return { items, totalCount: items.length };
+  } catch {
+    return { items: [], totalCount: 0 };
+  }
+}
+
+// ─── Favorites Summary ────────────────────────────────────────────────────────
+
+async function loadFavoritesForCortex(
+  userId: string,
+  locale: CountryLanguage,
+  logger: EndpointLogger,
+): Promise<{ items: FavoriteSummaryItem[]; activeId: string | null }> {
+  try {
+    const { ChatFavoritesRepository } =
+      await import("@/app/api/[locale]/agent/chat/favorites/repository");
+    const items = await ChatFavoritesRepository.loadFavoritesItems({
+      userId,
+      locale,
+      logger,
+    });
+    const activeItem = items.find((f) => f.isActive);
+    return { items, activeId: activeItem?.id ?? null };
+  } catch {
+    return { items: [], activeId: null };
+  }
+}
+
+// ─── Tree Builders ────────────────────────────────────────────────────────────
+
+function buildMemoriesDir(
+  memCtx: Awaited<ReturnType<typeof loadMemoryContext>>,
+  relevant: RelevantNode[],
+  budgetChars: number,
+  memoriesPath: string,
+): CortexDirEntry {
+  const { pinned, recent, totalCount, archivedCount } = memCtx;
+
+  const countNote =
+    archivedCount > 0 ? `${totalCount} · ${archivedCount} archived` : undefined;
+
+  // Build ordered list of ALL files (structure), then assign content by priority within budget
+  // Priority for content: pinned > relevant > recency (by priority desc)
+  const relevantPaths = new Set(relevant.map((n) => n.path));
+  const pinnedPaths = new Set(pinned.map((m) => m.path));
+
+  // Ordered list: pinned first, then relevant (not pinned), then recent (not pinned/relevant)
+  const orderedForContent: Array<{
+    path: string;
+    kind: "pinned" | "relevant" | "recent";
+  }> = [
+    ...pinned.map((m) => ({ path: m.path, kind: "pinned" as const })),
+    ...relevant
+      .filter((n) => !pinnedPaths.has(n.path))
+      .map((n) => ({ path: n.path, kind: "relevant" as const })),
+    ...recent
+      .filter((m) => !pinnedPaths.has(m.path) && !relevantPaths.has(m.path))
+      .map((m) => ({ path: m.path, kind: "recent" as const })),
+  ];
+
+  // Assign content budget
+  const contentMap = new Map<string, string>(); // path → excerpt
+  let usedChars = 0;
+  let remainingRecentItems = orderedForContent.filter(
+    (x) => x.kind === "recent",
+  ).length;
+
+  for (const item of orderedForContent) {
+    if (usedChars >= budgetChars) {
+      break;
+    }
+    const remaining = budgetChars - usedChars;
+    let excerpt = "";
+    if (item.kind === "pinned") {
+      const m = pinned.find((x) => x.path === item.path)!;
+      excerpt = cleanExcerpt(m.content).slice(0, Math.min(300, remaining));
+    } else if (item.kind === "relevant") {
+      const n = relevant.find((x) => x.path === item.path)!;
+      excerpt = cleanExcerpt(n.excerpt).slice(0, Math.min(200, remaining));
+    } else {
+      const m = recent.find((x) => x.path === item.path)!;
+      // Per-file budget = remaining / unprocessed recent items (tracked incrementally)
+      const perBudget =
+        remainingRecentItems > 0
+          ? Math.floor(remaining / remainingRecentItems)
+          : remaining;
+      remainingRecentItems--;
+      excerpt = cleanExcerpt(m.content).slice(
+        0,
+        Math.min(400, Math.max(40, perBudget)),
+      );
+    }
+    contentMap.set(item.path, excerpt);
+    usedChars += excerpt.length + 30;
+  }
+
+  // Show all files that fit within budget — no arbitrary hard cap
+  const shownPaths = orderedForContent
+    .filter((x) => contentMap.has(x.path))
+    .map((x) => x.path);
+  const hiddenCount = Math.max(0, orderedForContent.length - shownPaths.length);
+
+  const children: CortexFileEntry[] = shownPaths.map((path) => {
+    const isPinned = pinnedPaths.has(path);
+    const relevantNode = relevant.find((n) => n.path === path);
+    const score = relevantNode?.score;
+    return {
+      kind: "file",
+      path,
+      displayName: baseName(path),
+      excerpt: contentMap.get(path) ?? "",
+      pinned: isPinned || undefined,
+      score,
+    };
+  });
+
+  return {
+    kind: "dir",
+    path: memoriesPath,
+    displayName: `${memoriesPath.replace(/^\//, "")}/`,
+    totalCount,
+    children,
+    hiddenCount,
+    countNote,
+  };
+}
+
+function buildDocumentsDir(
+  relevant: RelevantNode[],
+  docTree: TrimmedDocDir[],
+  budgetChars: number,
+  documentsPath: string,
+  totalCount: number,
+): CortexDirEntry {
+  // Build content map for relevant docs (budget-limited)
+  const contentMap = new Map<string, { excerpt: string; score: number }>();
+  let usedChars = 0;
+  for (const n of relevant) {
+    if (usedChars >= budgetChars) {
+      break;
+    }
+    const excerpt = cleanExcerpt(n.excerpt).slice(0, 150);
+    contentMap.set(n.path, { excerpt, score: n.score });
+    usedChars += excerpt.length + 30;
+  }
+
+  // Dir tree — each top-level subdir with its files, content for relevant. Skip empty dirs.
+  const children: CortexEntry[] = [];
+  for (const dir of docTree) {
+    if (dir.fileCount === 0 && dir.shownFiles.length === 0) {
+      continue; // Don't show empty subdirs — clutter
+    }
+    const dirName = dir.path.split("/").pop() ?? dir.path;
+    const subChildren: CortexFileEntry[] = dir.shownFiles.map((filePath) => {
+      const hit = contentMap.get(filePath);
+      return {
+        kind: "file",
+        path: filePath,
+        displayName: baseName(filePath),
+        excerpt: hit?.excerpt ?? "",
+        score: hit?.score,
+      };
+    });
+
+    children.push({
+      kind: "dir",
       path: dir.path,
-      fileCount,
-      shownFiles: recentFiles.map((f) => f.path),
-      hiddenCount: Math.max(0, fileCount - recentFiles.length),
-      purpose,
+      displayName: `${dirName}/`,
+      totalCount: dir.fileCount,
+      children: subChildren,
+      hiddenCount: dir.hiddenCount,
     });
   }
 
-  return results;
+  // Use actual shown file count if DB count is 0 (e.g. only virtual template files shown)
+  const effectiveTotal =
+    totalCount > 0
+      ? totalCount
+      : docTree.reduce((sum, d) => sum + d.fileCount, 0);
+
+  return {
+    kind: "dir",
+    path: documentsPath,
+    displayName: `${documentsPath.replace(/^\//, "")}/`,
+    totalCount: effectiveTotal,
+    children,
+    hiddenCount: 0,
+  };
 }
 
-/**
- * Load top skill names for inline display in the workspace tree.
- * Queries materialized cortex_nodes for /skills/ files and extracts the name
- * from frontmatter (set during virtual mount materialization).
- */
-async function loadSkillNames(userId: string): Promise<string[]> {
-  try {
-    const { db } = await import("@/app/api/[locale]/system/db");
-    const { cortexNodes } = await import("../db");
-    const { CortexNodeType } = await import("../enum");
-    const { eq, and, like, sql } = await import("drizzle-orm");
+function buildThreadsDir(
+  pinned: PinnedThread[],
+  relevant: RelevantNode[],
+  threadCounts: { total: number; byRoot: Record<string, number> },
+): CortexDirEntry {
+  const { total, byRoot } = threadCounts;
 
-    const rows = await db
-      .select({ frontmatter: cortexNodes.frontmatter })
-      .from(cortexNodes)
-      .where(
-        and(
-          eq(cortexNodes.userId, userId),
-          eq(cortexNodes.nodeType, CortexNodeType.FILE),
-          like(cortexNodes.path, "/skills/%"),
-          // Exclude built-in default skills — too many, not personal
-          sql`${cortexNodes.path} NOT LIKE '/skills/default/%'`,
-        ),
-      )
-      .limit(6);
+  const USER_FOLDERS = new Set(["private", "shared", "public"]);
+  const userCounts = Object.entries(byRoot).filter(
+    ([root, c]) => c > 0 && USER_FOLDERS.has(root),
+  );
+  const systemTotal = Object.entries(byRoot)
+    .filter(([root, c]) => c > 0 && !USER_FOLDERS.has(root))
+    .reduce((sum, [, c]) => sum + c, 0);
+  const userTotal = userCounts.reduce((sum, [, c]) => sum + c, 0);
+  const parts = userCounts.map(([root, c]) => `${root}: ${c}`);
+  const sysNote = systemTotal > 0 ? ` · ${systemTotal} background` : "";
+  const countNote = userTotal > 0 ? `${parts.join(", ")}${sysNote}` : undefined;
 
-    const names: string[] = [];
-    for (const row of rows) {
-      const fm = row.frontmatter as Record<
-        string,
-        string | number | boolean | null
-      > | null;
-      const name = typeof fm?.name === "string" ? fm.name : null;
-      if (name) {
-        names.push(name);
-      }
-    }
-    return names;
-  } catch {
-    return [];
+  const children: CortexFileEntry[] = [];
+  const shownPaths = new Set<string>();
+
+  // Pinned threads
+  for (const t of pinned) {
+    const excerpt = t.preview ? cleanExcerpt(t.preview).slice(0, 150) : "";
+    children.push({
+      kind: "file",
+      path: `/threads/${t.rootFolderId}/${t.id}`,
+      displayName: t.title,
+      excerpt,
+      pinned: true,
+    });
+    shownPaths.add(t.id);
   }
+
+  // Relevant threads (from vector search on cortexNodes)
+  for (const n of relevant) {
+    const slug = n.path.replace(/^\/threads\/[^/]+\//, "").replace(/\.md$/, "");
+    if (shownPaths.has(slug)) {
+      continue;
+    }
+    const excerpt = cleanExcerpt(n.excerpt)
+      .replace(/^(Folder|user|assistant|tool):[^·]*·?\s*/i, "")
+      .slice(0, 120);
+    children.push({
+      kind: "file",
+      path: n.path,
+      displayName: slug,
+      excerpt,
+      score: n.score,
+    });
+    shownPaths.add(slug);
+  }
+
+  return {
+    kind: "dir",
+    path: "/threads",
+    displayName: "threads/",
+    totalCount: total,
+    children,
+    hiddenCount: 0,
+    countNote,
+  };
 }
 
-/**
- * Load purpose labels for /documents/ subdirectories.
- * Returns a map of path → purpose string for inline display.
- */
-async function loadDirPurposes(
+function buildSkillsDir(
+  faved: SkillRecord[],
+  created: SkillRecord[],
+  relevant: RelevantNode[],
+  budgetChars: number,
+): CortexDirEntry {
+  const favedIds = new Set(faved.map((s) => s.id));
+  const createdIds = new Set(created.map((s) => s.id));
+
+  const children: CortexFileEntry[] = [];
+  let usedChars = 0;
+  const shownIds = new Set<string>();
+
+  // Faved skills first
+  for (const s of faved) {
+    if (usedChars >= budgetChars) {
+      break;
+    }
+    const excerpt = s.systemPrompt ? skillExcerpt(s.systemPrompt) : "";
+    const slug = s.slug || s.id;
+    children.push({
+      kind: "file",
+      path: `/skills/${slug}`,
+      displayName: `${s.name} (${slug})`,
+      excerpt,
+      favored: true,
+      created: createdIds.has(s.id),
+    });
+    usedChars += excerpt.length + 50;
+    shownIds.add(s.id);
+  }
+
+  // Created-only skills (not faved)
+  for (const s of created) {
+    if (shownIds.has(s.id)) {
+      continue;
+    }
+    if (usedChars >= budgetChars) {
+      break;
+    }
+    const excerpt = s.systemPrompt ? skillExcerpt(s.systemPrompt) : "";
+    const slug = s.slug || s.id;
+    children.push({
+      kind: "file",
+      path: `/skills/${slug}`,
+      displayName: `${s.name} (${slug})`,
+      excerpt,
+      created: true,
+      favored: favedIds.has(s.id),
+    });
+    usedChars += excerpt.length + 50;
+    shownIds.add(s.id);
+  }
+
+  // Relevant from vector search (user skills in cortexNodes — skip default/ system skills)
+  for (const n of relevant) {
+    if (n.path.startsWith("/skills/default/")) {
+      continue;
+    }
+    // Extract skill ID from path (e.g. /skills/<uuid>.md or /skills/<uuid>/...)
+    const pathParts = n.path.replace(/^\/skills\//, "").split("/");
+    const maybeId = pathParts[0]?.replace(/\.md$/, "") ?? "";
+    if (shownIds.has(maybeId)) {
+      continue;
+    }
+    if (usedChars >= budgetChars) {
+      break;
+    }
+    const skillBasename =
+      n.path.split("/").pop()?.replace(/\.md$/, "") ?? n.path;
+    const excerpt = cleanExcerpt(n.excerpt).slice(0, 100);
+    children.push({
+      kind: "file",
+      path: n.path,
+      displayName: skillBasename,
+      excerpt,
+      score: n.score,
+    });
+    usedChars += excerpt.length + 50;
+    shownIds.add(maybeId);
+  }
+
+  const favedCount = faved.length;
+  const createdCount = created.length;
+  // Show user-visible count (faved + created-only), not total cortexNodes count
+  const visibleCount =
+    favedCount + created.filter((s) => !favedIds.has(s.id)).length;
+
+  return {
+    kind: "dir",
+    path: "/skills",
+    displayName: "skills/",
+    totalCount: visibleCount,
+    children,
+    hiddenCount: 0,
+    countNote:
+      createdCount > 0 && favedCount > 0
+        ? `${createdCount} created · ${favedCount} faved`
+        : createdCount > 0
+          ? `${createdCount} created`
+          : favedCount > 0
+            ? `${favedCount} faved`
+            : undefined,
+  };
+}
+
+function buildTasksDir(tasks: {
+  items: CronTaskItem[];
+  totalCount: number;
+}): CortexDirEntry {
+  const { items, totalCount } = tasks;
+
+  const MAX_TASKS_SHOWN = 8;
+  // Deduplicate by shortId (loadTaskItems may return duplicates)
+  const seen = new Set<string>();
+  const deduped = items.filter((t) => {
+    if (seen.has(t.shortId)) {
+      return false;
+    }
+    seen.add(t.shortId);
+    return true;
+  });
+  const shown = deduped.slice(0, MAX_TASKS_SHOWN);
+
+  const children: CortexFileEntry[] = shown.map((t) => {
+    const shortName = t.displayName
+      .replace(/\s*—.*$/, "")
+      .replace(/\s+-\s+.+$/, "")
+      .trim()
+      .slice(0, 50);
+    const statusFlag = t.enabled ? "" : " [disabled]";
+    const errorNote =
+      t.consecutiveFailures > 0
+        ? ` ⚠ ${t.consecutiveFailures} consecutive failure${t.consecutiveFailures === 1 ? "" : "s"}`
+        : t.errorCount > 0
+          ? ` ⚠ ${t.errorCount} error${t.errorCount === 1 ? "" : "s"}`
+          : "";
+    const lastRun = t.lastExecutedAt
+      ? ` last:${t.lastExecutionStatus ?? "?"}@${t.lastExecutedAt.slice(0, 10)}`
+      : "";
+    const excerpt =
+      `${t.schedule ?? ""}${statusFlag}${lastRun}${errorNote}`.trim();
+    return {
+      kind: "file",
+      path: `/tasks/${t.shortId}`,
+      displayName: `${shortName}`,
+      excerpt,
+    };
+  });
+
+  return {
+    kind: "dir",
+    path: "/tasks",
+    displayName: "tasks/",
+    totalCount,
+    children,
+    hiddenCount: Math.max(0, totalCount - MAX_TASKS_SHOWN),
+  };
+}
+
+function buildFavoritesDir(
+  items: FavoriteSummaryItem[],
+  activeId: string | null,
+): CortexDirEntry {
+  const MAX_FAVS_SHOWN = 10;
+  const shown = items.slice(0, MAX_FAVS_SHOWN);
+
+  const children: CortexFileEntry[] = shown.map((f) => {
+    const activeFlag = f.isActive ? " [ACTIVE]" : "";
+    const model = f.modelId ?? f.modelInfo;
+    const skillNote = f.skillId ? ` skill:${f.skillId}` : "";
+    const uses = f.useCount > 0 ? ` uses:${f.useCount}` : "";
+    const excerpt = `model:${model}${skillNote}${uses}${activeFlag}`.trim();
+    return {
+      kind: "file",
+      path: `/favorites/${f.id}`,
+      displayName: f.name,
+      excerpt,
+    };
+  });
+
+  const activeItem = items.find((f) => f.id === activeId);
+  const countNote = activeItem ? `active: ${activeItem.name}` : undefined;
+
+  return {
+    kind: "dir",
+    path: "/favorites",
+    displayName: "favorites/",
+    totalCount: items.length,
+    children,
+    hiddenCount: Math.max(0, items.length - MAX_FAVS_SHOWN),
+    countNote,
+  };
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function baseName(path: string): string {
+  return path.split("/").pop() ?? path;
+}
+
+/** Extract a short excerpt from a skill system prompt, stripping "You are X," opener */
+function skillExcerpt(systemPrompt: string): string {
+  const cleaned = cleanExcerpt(systemPrompt)
+    // Strip "You are X, ..." opener — the name already shown in displayName
+    .replace(/^you are [^,.]+[,.]?\s*/i, "")
+    .trim();
+  return cleaned.slice(0, 100);
+}
+
+// ─── Debug: Raw Embedding Scores ─────────────────────────────────────────────
+
+export interface RawEmbeddingScore {
+  path: string;
+  baseSimilarity: number;
+  recencyBoost: number;
+  pathWeight: number;
+  adjustedScore: number;
+  passesThreshold: boolean;
+}
+
+export async function loadRawEmbeddingScores(
   userId: string,
-): Promise<Record<string, string>> {
-  try {
-    const { db } = await import("@/app/api/[locale]/system/db");
-    const { cortexNodes } = await import("../db");
-    const { CortexNodeType } = await import("../enum");
-    const { eq, and, sql } = await import("drizzle-orm");
-
-    const rows = await db
-      .select({ path: cortexNodes.path, frontmatter: cortexNodes.frontmatter })
-      .from(cortexNodes)
-      .where(
-        and(
-          eq(cortexNodes.userId, userId),
-          eq(cortexNodes.nodeType, CortexNodeType.DIR),
-          sql`${cortexNodes.path} ~ '^/documents/[^/]+$'`,
-        ),
-      );
-
-    const result: Record<string, string> = {};
-    for (const row of rows) {
-      const fm = row.frontmatter as Record<
-        string,
-        string | number | boolean | null
-      > | null;
-      if (typeof fm?.purpose === "string") {
-        result[row.path] = fm.purpose;
-      }
-    }
-    return result;
-  } catch {
-    return {};
+  userMessage: string,
+): Promise<{ scores: RawEmbeddingScore[]; embeddingGenerated: boolean }> {
+  const { generateEmbedding } = await import("../embeddings/service");
+  const queryEmbedding = await generateEmbedding(userMessage);
+  if (!queryEmbedding) {
+    return { scores: [], embeddingGenerated: false };
   }
+
+  const { db } = await import("@/app/api/[locale]/system/db");
+  const { cortexNodes } = await import("../db");
+  const { CortexNodeType } = await import("../enum");
+  const { eq, and, isNotNull, sql } = await import("drizzle-orm");
+
+  const embeddingStr = `[${queryEmbedding.join(",")}]`;
+
+  const rows = await db
+    .select({
+      path: cortexNodes.path,
+      updatedAt: cortexNodes.updatedAt,
+      similarity: sql<number>`1 - (${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)})`,
+    })
+    .from(cortexNodes)
+    .where(
+      and(
+        eq(cortexNodes.userId, userId),
+        eq(cortexNodes.nodeType, CortexNodeType.FILE),
+        isNotNull(cortexNodes.embedding),
+      ),
+    )
+    .orderBy(
+      sql`${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)}`,
+    )
+    .limit(20);
+
+  const scores: RawEmbeddingScore[] = rows.map((r) => {
+    const baseSimilarity = r.similarity;
+    const recencyBoost = 0.1 * getRecencyFactor(r.updatedAt);
+    const pathWeight = getPathTypeWeight(r.path);
+    const adjustedScore = (baseSimilarity + recencyBoost) * pathWeight;
+    return {
+      path: r.path,
+      baseSimilarity: Math.round(baseSimilarity * 1000) / 1000,
+      recencyBoost: Math.round(recencyBoost * 1000) / 1000,
+      pathWeight,
+      adjustedScore: Math.round(adjustedScore * 1000) / 1000,
+      passesThreshold: adjustedScore > 0.4,
+    };
+  });
+
+  return { scores, embeddingGenerated: true };
 }

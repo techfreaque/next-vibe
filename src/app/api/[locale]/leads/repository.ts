@@ -28,6 +28,7 @@ import {
 
 import { newsletterSubscriptions } from "../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../newsletter/enum";
+import { leadReferrals, referralCodes } from "../referral/db";
 import { users } from "../user/db";
 import type { BatchUpdateRequestOutput } from "./batch/definition";
 import type { LeadCreateRequestTypeOutput } from "./create/definition";
@@ -846,13 +847,56 @@ export class LeadsRepository {
       updatedAt: lead.updatedAt,
       linkedLeadsCount: lead.linkedLeadsCount ?? 0,
       hasLinkedUser: lead.hasLinkedUser ?? false,
+      referralCode: lead.referralCode ?? null,
     };
+  }
+
+  /**
+   * Get referral codes used by a lead (pre-signup history from lead_referrals table)
+   */
+  static async getLeadReferralHistory(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<LeadDetailResponse["lead"]["referralHistory"]> {
+    try {
+      const rows = await db
+        .select({
+          code: referralCodes.code,
+          ownerUserId: referralCodes.ownerUserId,
+          clickedAt: leadReferrals.createdAt,
+        })
+        .from(leadReferrals)
+        .leftJoin(
+          referralCodes,
+          eq(leadReferrals.referralCodeId, referralCodes.id),
+        )
+        .where(eq(leadReferrals.leadId, leadId))
+        .orderBy(desc(leadReferrals.createdAt));
+
+      return rows
+        .filter(
+          (r): r is { code: string; ownerUserId: string; clickedAt: Date } =>
+            r.code !== null && r.ownerUserId !== null,
+        )
+        .map((r) => ({
+          code: r.code,
+          ownerUserId: r.ownerUserId,
+          clickedAt: r.clickedAt,
+        }));
+    } catch (error) {
+      logger.error("Error fetching lead referral history", {
+        leadId,
+        ...parseError(error),
+      });
+      return [];
+    }
   }
 
   private static formatLeadDetailResponse(
     lead: Lead,
     linkedLeads: LeadDetailResponse["lead"]["linkedLeads"] = [],
     linkedUsers: LeadDetailResponse["lead"]["linkedUsers"] = [],
+    referralHistory: LeadDetailResponse["lead"]["referralHistory"] = [],
   ): LeadDetailResponse {
     return {
       lead: {
@@ -909,6 +953,7 @@ export class LeadsRepository {
         },
         linkedLeads,
         linkedUsers,
+        referralHistory,
       },
     };
   }
@@ -1166,9 +1211,10 @@ export class LeadsRepository {
         });
       }
 
-      const [linkedLeads, linkedUsers] = await Promise.all([
+      const [linkedLeads, linkedUsers, referralHistory] = await Promise.all([
         LeadsRepository.getLinkedLeads(id, logger),
         LeadsRepository.getLinkedUsers(id, logger),
+        LeadsRepository.getLeadReferralHistory(id, logger),
       ]);
 
       return success(
@@ -1176,6 +1222,7 @@ export class LeadsRepository {
           lead,
           linkedLeads,
           linkedUsers,
+          referralHistory,
         ),
       );
     } catch (error) {

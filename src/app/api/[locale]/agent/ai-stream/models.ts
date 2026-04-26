@@ -24,6 +24,8 @@ import {
 } from "../models/selection";
 
 export enum ChatModelId {
+  GPT_5_5 = "gpt-55",
+  GPT_5_5_PRO = "gpt-55-pro",
   GPT_5_4 = "gpt-54",
   GPT_5_4_PRO = "gpt-54-pro",
   GPT_5_4_MINI = "gpt-5.4-mini",
@@ -46,7 +48,6 @@ export enum ChatModelId {
   GEMINI_2_5_PRO = "gemini-2.5-pro",
   GEMINI_2_5_FLASH = "gemini-2.5-flash",
   GEMINI_2_5_FLASH_LITE = "gemini-2.5-flash-lite",
-  KIMI_K2_5 = "kimi_k2_5",
   GROK_4_FAST = "grok-4-fast",
   GROK_4 = "grok-4",
   GROK_4_20 = "grok-4.20",
@@ -72,6 +73,7 @@ export enum ChatModelId {
   FREEDOMGPT_LIBERTY = "freedomgpt-liberty",
   GAB_AI_ARYA = "gab-ai-arya",
   UNCENSORED_LM_V1_2 = "uncensored-lm-v1.2",
+  GLM_5_1 = "glm-5.1",
   GLM_5 = "glm-5",
   GLM_5_TURBO = "glm-5-turbo",
   GLM_4_7 = "glm-4.7",
@@ -86,6 +88,10 @@ export enum ChatModelId {
   GEMINI_3_PRO_IMAGE_PREVIEW = "gemini-3-pro-image-preview",
   GPT_5_IMAGE_MINI = "gpt-5-image-mini",
   GPT_5_IMAGE = "gpt-5-image",
+  GPT_5_4_IMAGE_2 = "gpt-5.4-image-2",
+  KIMI_K2_6 = "kimi-k2.6",
+  DEEPSEEK_V4_PRO = "deepseek-v4-pro",
+  DEEPSEEK_V4_FLASH = "deepseek-v4-flash",
 }
 
 export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
@@ -813,6 +819,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
 
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.CREATIVE,
@@ -1042,6 +1049,78 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     },
     weaknesses: [ModelUtility.ROLEPLAY],
   },
+  [ChatModelId.GPT_5_5]: {
+    name: "GPT-5.5",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt55",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-openai",
+    inputs: ["text", "image"], // released: 2026-04-24 from openrouter-api
+    outputs: ["text"], // released: 2026-04-24 from openrouter-api
+    providers: [
+      {
+        id: ChatModelId.GPT_5_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 5, // released: 2026-04-24 from openrouter-api
+        outputTokenCost: 30, // released: 2026-04-24 from openrouter-api
+      },
+    ],
+
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.CREATIVE,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      toolCalling: true,
+    },
+    weaknesses: [ModelUtility.ROLEPLAY],
+  },
+  [ChatModelId.GPT_5_5_PRO]: {
+    name: "GPT-5.5 Pro",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt55Pro",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-openai",
+    inputs: ["text", "image"], // released: 2026-04-24 from openrouter-api
+    outputs: ["text"], // released: 2026-04-24 from openrouter-api
+    providers: [
+      {
+        id: ChatModelId.GPT_5_5_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.5-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 30, // released: 2026-04-24 from openrouter-api
+        outputTokenCost: 180, // released: 2026-04-24 from openrouter-api
+      },
+    ],
+
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.CREATIVE,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      toolCalling: true,
+    },
+    weaknesses: [ModelUtility.ROLEPLAY],
+  },
   [ChatModelId.GPT_5_4]: {
     name: "GPT-5.4",
     by: "openAI",
@@ -1073,6 +1152,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
 
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.CREATIVE,
@@ -1453,36 +1533,26 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
-  [ChatModelId.KIMI_K2_5]: {
-    name: "Kimi K2.5",
+  // eslint-disable-next-line i18next/no-literal-string
+  [ChatModelId.KIMI_K2_6]: {
+    name: "Kimi K2.6",
     by: "moonshotAI",
-    description: "chat.models.descriptions.kimiK2_5",
-    parameterCount: 1000,
+    description: "chat.models.descriptions.kimiK2_6",
+    parameterCount: undefined,
     contextWindow: 262144,
     icon: "moon",
-    inputs: ["text", "image"], // updated: 2026-04-03 from openrouter-api
-    outputs: ["text"], // updated: 2026-04-03 from openrouter-api
+    inputs: ["text", "image"], // released: 2026-04-20
+    outputs: ["text"], // released: 2026-04-20
     providers: [
       {
-        id: ChatModelId.KIMI_K2_5,
+        id: ChatModelId.KIMI_K2_6,
         apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "moonshotai/kimi-k2.5",
+        providerModel: "moonshotai/kimi-k2.6",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.38, // updated: 2026-04-03 from openrouter-api
-        outputTokenCost: 1.72, // updated: 2026-04-03 from openrouter-api
-        cacheReadTokenCost: 0.19, // updated: 2026-04-03 from openrouter-api
-      },
-      {
-        id: ChatModelId.KIMI_K2_5,
-        apiProvider: ApiProvider.UNBOTTLED,
-        providerModel: "kimi_k2_5",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 0.494, // updated: 2026-04-07 from unbottled.ai
-        outputTokenCost: 2.236, // updated: 2026-04-07 from unbottled.ai
-        cacheReadTokenCost: 0.247, // updated: 2026-04-07 from unbottled.ai
+        inputTokenCost: 0.8, // released: 2026-04-20 from openrouter
+        outputTokenCost: 3.5, // released: 2026-04-20 from openrouter
       },
     ],
-
     utilities: [
       ModelUtility.SMART,
       ModelUtility.FAST,
@@ -1583,6 +1653,37 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
 
+  // eslint-disable-next-line i18next/no-literal-string
+  [ChatModelId.GLM_5_1]: {
+    name: "GLM-5.1",
+    by: "zAi",
+    description: "chat.models.descriptions.glm5_1",
+    parameterCount: undefined,
+    contextWindow: 202752,
+    icon: "si-zendesk",
+    inputs: ["text"], // released: 2026-04-07
+    outputs: ["text"], // released: 2026-04-07
+    providers: [
+      {
+        id: ChatModelId.GLM_5_1,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "z-ai/glm-5.1",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.05, // released: 2026-04-07 from openrouter
+        outputTokenCost: 3.5, // released: 2026-04-07 from openrouter
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
   [ChatModelId.GLM_5]: {
     name: "GLM-5",
     by: "zAi",
@@ -2238,6 +2339,63 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
   //   features: { ...defaultFeatures, toolCalling: true },
   //   weaknesses: [ModelUtility.ANALYSIS, ModelUtility.CODING],
   // },
+  [ChatModelId.DEEPSEEK_V4_PRO]: {
+    name: "DeepSeek V4 Pro",
+    by: "deepSeek",
+    description: "chat.models.descriptions.deepseekV4Pro",
+    parameterCount: 1600,
+    contextWindow: 1048576,
+    icon: "whale",
+    inputs: ["text"], // updated: 2026-04-25 from openrouter-api
+    outputs: ["text"], // updated: 2026-04-25 from openrouter-api
+    providers: [
+      {
+        id: ChatModelId.DEEPSEEK_V4_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "deepseek/deepseek-v4-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.74, // updated: 2026-04-25 from openrouter-api
+        outputTokenCost: 3.48, // updated: 2026-04-25 from openrouter-api
+      },
+    ],
+
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+  [ChatModelId.DEEPSEEK_V4_FLASH]: {
+    name: "DeepSeek V4 Flash",
+    by: "deepSeek",
+    description: "chat.models.descriptions.deepseekV4Flash",
+    parameterCount: 284,
+    contextWindow: 1048576,
+    icon: "whale",
+    inputs: ["text"], // updated: 2026-04-25 from openrouter-api
+    outputs: ["text"], // updated: 2026-04-25 from openrouter-api
+    providers: [
+      {
+        id: ChatModelId.DEEPSEEK_V4_FLASH,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "deepseek/deepseek-v4-flash",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.14, // updated: 2026-04-25 from openrouter-api
+        outputTokenCost: 0.28, // updated: 2026-04-25 from openrouter-api
+      },
+    ],
+
+    utilities: [ModelUtility.FAST, ModelUtility.CODING, ModelUtility.ANALYSIS],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
   [ChatModelId.DEEPSEEK_V32]: {
     name: "DeepSeek V3.2",
     by: "deepSeek",
@@ -2266,7 +2424,12 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       },
     ],
 
-    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS],
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+    ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
@@ -2665,7 +2828,11 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, streaming: false },
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      supportsTemperature: false,
+    },
   },
   // eslint-disable-next-line i18next/no-literal-string
   [ChatModelId.GPT_5_IMAGE]: {
@@ -2698,6 +2865,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       },
     ],
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.IMAGE_GEN,
       ModelUtility.CREATIVE,
       ModelUtility.SMART,
@@ -2705,7 +2873,46 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, streaming: false },
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      supportsTemperature: false,
+    },
+  },
+  // eslint-disable-next-line i18next/no-literal-string
+  [ChatModelId.GPT_5_4_IMAGE_2]: {
+    name: "GPT-5.4 Image 2",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt54Image2",
+    parameterCount: undefined,
+    contextWindow: 272000,
+    icon: "si-openai",
+    inputs: ["text", "image"], // released: 2026-04-21
+    outputs: ["text", "image"], // released: 2026-04-21
+    providers: [
+      {
+        id: ChatModelId.GPT_5_4_IMAGE_2,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.4-image-2",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 8, // released: 2026-04-21 from openrouter
+        outputTokenCost: 15, // released: 2026-04-21 from openrouter
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      supportsTemperature: false,
+    },
   },
 };
 
@@ -2723,13 +2930,13 @@ export const FEATURED_MODELS = {
   // Representative picks per category - used in marketing content and emails
   mainstream: [
     chatModelDefinitions[ChatModelId.CLAUDE_OPUS_4_7].name,
-    chatModelDefinitions[ChatModelId.GPT_5_4_PRO].name,
+    chatModelDefinitions[ChatModelId.GPT_5_5_PRO].name,
     chatModelDefinitions[ChatModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS].name,
     chatModelDefinitions[ChatModelId.GROK_4_20].name,
   ],
   open: [
     chatModelDefinitions[ChatModelId.DEEPSEEK_R1].name,
-    chatModelDefinitions[ChatModelId.KIMI_K2_5].name,
+    chatModelDefinitions[ChatModelId.DEEPSEEK_V4_PRO].name,
     chatModelDefinitions[ChatModelId.GLM_5].name,
   ],
   uncensored: [

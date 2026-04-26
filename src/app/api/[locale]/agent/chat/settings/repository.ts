@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, count, eq, isNull } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -14,6 +14,8 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -29,8 +31,10 @@ import { ChatSettingsRepositoryClient } from "./repository-client";
 import {
   AUTOPILOT_DEFAULT_SCHEDULE,
   DREAM_DEFAULT_SCHEDULE,
+  MAMA_DEFAULT_SCHEDULE,
   ensureAutopilotTask,
   ensureDreamTask,
+  ensureMamaTask,
 } from "./pulse/repository";
 
 /**
@@ -55,9 +59,80 @@ export class ChatSettingsRepository {
         .from(chatSettings)
         .where(eq(chatSettings.userId, userId));
 
+      // Query pulse subfolders and thread counts in parallel
+      const [dreamerFolderRow, autopilotFolderRow] = await Promise.all([
+        db
+          .select({ id: chatFolders.id })
+          .from(chatFolders)
+          .where(
+            and(
+              eq(chatFolders.userId, userId),
+              eq(chatFolders.rootFolderId, DefaultFolderId.BACKGROUND),
+              eq(chatFolders.name, "Dreams"),
+              isNull(chatFolders.parentId),
+            ),
+          )
+          .limit(1),
+        db
+          .select({ id: chatFolders.id })
+          .from(chatFolders)
+          .where(
+            and(
+              eq(chatFolders.userId, userId),
+              eq(chatFolders.rootFolderId, DefaultFolderId.BACKGROUND),
+              eq(chatFolders.name, "Autopilot"),
+              isNull(chatFolders.parentId),
+            ),
+          )
+          .limit(1),
+      ]);
+
+      const dreamerSubFolderId = dreamerFolderRow[0]?.id ?? null;
+      const autopilotSubFolderId = autopilotFolderRow[0]?.id ?? null;
+
+      const [dreamerCountRow, autopilotCountRow] = await Promise.all([
+        dreamerSubFolderId
+          ? db
+              .select({ n: count() })
+              .from(chatThreads)
+              .where(
+                and(
+                  eq(chatThreads.userId, userId),
+                  eq(chatThreads.folderId, dreamerSubFolderId),
+                ),
+              )
+          : Promise.resolve([{ n: 0 }]),
+        autopilotSubFolderId
+          ? db
+              .select({ n: count() })
+              .from(chatThreads)
+              .where(
+                and(
+                  eq(chatThreads.userId, userId),
+                  eq(chatThreads.folderId, autopilotSubFolderId),
+                ),
+              )
+          : Promise.resolve([{ n: 0 }]),
+      ]);
+
+      const dreamerThreadCount = dreamerCountRow[0]?.n ?? 0;
+      const autopilotThreadCount = autopilotCountRow[0]?.n ?? 0;
+
       if (settings.length === 0) {
         logger.debug("No settings found for user, returning defaults");
-        return success(ChatSettingsRepositoryClient.getDefaults(user));
+        const defaults = ChatSettingsRepositoryClient.getDefaults(user);
+        return success({
+          ...defaults,
+          dreamerPrompt:
+            t("post.dreaming.prompt.defaultPrompt") ?? defaults.dreamerPrompt,
+          autopilotPrompt:
+            t("post.autopilot.prompt.defaultPrompt") ??
+            defaults.autopilotPrompt,
+          dreamerSubFolderId,
+          dreamerThreadCount,
+          autopilotSubFolderId,
+          autopilotThreadCount,
+        });
       }
 
       const setting = settings[0];
@@ -73,12 +148,25 @@ export class ChatSettingsRepository {
         dreamerEnabled: setting.dreamerEnabled ?? false,
         dreamerFavoriteId: setting.dreamerFavoriteId ?? null,
         dreamerSchedule: setting.dreamerSchedule ?? DREAM_DEFAULT_SCHEDULE,
-        dreamerPrompt: setting.dreamerPrompt ?? null,
+        dreamerPrompt:
+          setting.dreamerPrompt ??
+          t("post.dreaming.prompt.defaultPrompt") ??
+          null,
         autopilotEnabled: setting.autopilotEnabled ?? false,
         autopilotFavoriteId: setting.autopilotFavoriteId ?? null,
         autopilotSchedule:
           setting.autopilotSchedule ?? AUTOPILOT_DEFAULT_SCHEDULE,
-        autopilotPrompt: setting.autopilotPrompt ?? null,
+        autopilotPrompt:
+          setting.autopilotPrompt ??
+          t("post.autopilot.prompt.defaultPrompt") ??
+          null,
+        mamaEnabled: setting.mamaEnabled ?? false,
+        mamaSchedule: setting.mamaSchedule ?? MAMA_DEFAULT_SCHEDULE,
+        mamaPrompt: setting.mamaPrompt ?? null,
+        dreamerSubFolderId,
+        dreamerThreadCount,
+        autopilotSubFolderId,
+        autopilotThreadCount,
       };
 
       return success(result);
@@ -174,7 +262,12 @@ export class ChatSettingsRepository {
                 ? data.dreamerSchedule
                 : undefined,
             dreamerPrompt:
-              data.dreamerPrompt !== undefined ? data.dreamerPrompt : undefined,
+              data.dreamerPrompt !== undefined
+                ? data.dreamerPrompt === null ||
+                  data.dreamerPrompt === t("post.dreaming.prompt.defaultPrompt")
+                  ? null
+                  : data.dreamerPrompt
+                : undefined,
             autopilotEnabled:
               data.autopilotEnabled !== undefined
                 ? data.autopilotEnabled
@@ -189,8 +282,18 @@ export class ChatSettingsRepository {
                 : undefined,
             autopilotPrompt:
               data.autopilotPrompt !== undefined
-                ? data.autopilotPrompt
+                ? data.autopilotPrompt === null ||
+                  data.autopilotPrompt ===
+                    t("post.autopilot.prompt.defaultPrompt")
+                  ? null
+                  : data.autopilotPrompt
                 : undefined,
+            mamaEnabled:
+              data.mamaEnabled !== undefined ? data.mamaEnabled : undefined,
+            mamaSchedule:
+              data.mamaSchedule !== undefined ? data.mamaSchedule : undefined,
+            mamaPrompt:
+              data.mamaPrompt !== undefined ? data.mamaPrompt : undefined,
           })
           .where(eq(chatSettings.userId, userId))
           .returning();
@@ -237,7 +340,12 @@ export class ChatSettingsRepository {
             dreamerSchedule:
               data.dreamerSchedule !== undefined ? data.dreamerSchedule : null,
             dreamerPrompt:
-              data.dreamerPrompt !== undefined ? data.dreamerPrompt : null,
+              data.dreamerPrompt !== undefined
+                ? data.dreamerPrompt === null ||
+                  data.dreamerPrompt === t("post.dreaming.prompt.defaultPrompt")
+                  ? null
+                  : data.dreamerPrompt
+                : null,
             autopilotEnabled:
               data.autopilotEnabled !== undefined
                 ? data.autopilotEnabled
@@ -251,7 +359,18 @@ export class ChatSettingsRepository {
                 ? data.autopilotSchedule
                 : null,
             autopilotPrompt:
-              data.autopilotPrompt !== undefined ? data.autopilotPrompt : null,
+              data.autopilotPrompt !== undefined
+                ? data.autopilotPrompt === null ||
+                  data.autopilotPrompt ===
+                    t("post.autopilot.prompt.defaultPrompt")
+                  ? null
+                  : data.autopilotPrompt
+                : null,
+            mamaEnabled:
+              data.mamaEnabled !== undefined ? data.mamaEnabled : null,
+            mamaSchedule:
+              data.mamaSchedule !== undefined ? data.mamaSchedule : null,
+            mamaPrompt: data.mamaPrompt !== undefined ? data.mamaPrompt : null,
           })
           .returning();
       }
@@ -293,6 +412,20 @@ export class ChatSettingsRepository {
           autopilotFavoriteId: savedRow.autopilotFavoriteId ?? null,
           autopilotSchedule: savedRow.autopilotSchedule ?? undefined,
           autopilotPrompt: savedRow.autopilotPrompt ?? null,
+        }).catch(() => {
+          // Best-effort — don't fail settings save if task sync fails
+        });
+      }
+      if (
+        savedRow &&
+        (data.mamaEnabled !== undefined ||
+          data.mamaSchedule !== undefined ||
+          data.mamaPrompt !== undefined)
+      ) {
+        void ensureMamaTask(userId, {
+          mamaEnabled: savedRow.mamaEnabled ?? false,
+          mamaSchedule: savedRow.mamaSchedule ?? undefined,
+          mamaPrompt: savedRow.mamaPrompt ?? null,
         }).catch(() => {
           // Best-effort — don't fail settings save if task sync fails
         });

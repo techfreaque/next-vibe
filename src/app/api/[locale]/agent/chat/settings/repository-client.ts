@@ -22,6 +22,7 @@ import type {
 import {
   AUTOPILOT_DEFAULT_SCHEDULE,
   DREAM_DEFAULT_SCHEDULE,
+  MAMA_DEFAULT_SCHEDULE,
 } from "./pulse/constants";
 
 /**
@@ -96,6 +97,13 @@ export class ChatSettingsRepositoryClient {
       autopilotFavoriteId: null,
       autopilotSchedule: AUTOPILOT_DEFAULT_SCHEDULE,
       autopilotPrompt: null,
+      mamaEnabled: false,
+      mamaSchedule: MAMA_DEFAULT_SCHEDULE,
+      mamaPrompt: null,
+      dreamerSubFolderId: null,
+      dreamerThreadCount: 0,
+      autopilotSubFolderId: null,
+      autopilotThreadCount: 0,
     };
   }
 
@@ -159,6 +167,17 @@ export class ChatSettingsRepositoryClient {
           "autopilotPrompt" in overrides
             ? overrides.autopilotPrompt
             : defaults.autopilotPrompt,
+        mamaEnabled: overrides.mamaEnabled ?? defaults.mamaEnabled,
+        mamaSchedule: overrides.mamaSchedule ?? defaults.mamaSchedule,
+        mamaPrompt:
+          "mamaPrompt" in overrides
+            ? overrides.mamaPrompt
+            : defaults.mamaPrompt,
+        // These are server-computed, never persisted in localStorage
+        dreamerSubFolderId: null,
+        dreamerThreadCount: 0,
+        autopilotSubFolderId: null,
+        autopilotThreadCount: 0,
       };
     } catch {
       return this.getDefaults(user);
@@ -224,6 +243,15 @@ export class ChatSettingsRepositoryClient {
     }
     if (settings.autopilotPrompt !== defaults.autopilotPrompt) {
       overrides.autopilotPrompt = settings.autopilotPrompt;
+    }
+    if (settings.mamaEnabled !== defaults.mamaEnabled) {
+      overrides.mamaEnabled = settings.mamaEnabled;
+    }
+    if (settings.mamaSchedule !== defaults.mamaSchedule) {
+      overrides.mamaSchedule = settings.mamaSchedule;
+    }
+    if (settings.mamaPrompt !== defaults.mamaPrompt) {
+      overrides.mamaPrompt = settings.mamaPrompt;
     }
 
     if (Object.keys(overrides).length === 0) {
@@ -293,6 +321,23 @@ export class ChatSettingsRepositoryClient {
         updates.autopilotPrompt !== undefined
           ? updates.autopilotPrompt
           : current.autopilotPrompt,
+      mamaEnabled:
+        updates.mamaEnabled !== undefined
+          ? updates.mamaEnabled
+          : current.mamaEnabled,
+      mamaSchedule:
+        updates.mamaSchedule !== undefined
+          ? updates.mamaSchedule
+          : current.mamaSchedule,
+      mamaPrompt:
+        updates.mamaPrompt !== undefined
+          ? updates.mamaPrompt
+          : current.mamaPrompt,
+      // Server-computed fields — preserved from current, never written to localStorage
+      dreamerSubFolderId: current.dreamerSubFolderId,
+      dreamerThreadCount: current.dreamerThreadCount,
+      autopilotSubFolderId: current.autopilotSubFolderId,
+      autopilotThreadCount: current.autopilotThreadCount,
     };
 
     this.saveLocalSettings(updated, user);

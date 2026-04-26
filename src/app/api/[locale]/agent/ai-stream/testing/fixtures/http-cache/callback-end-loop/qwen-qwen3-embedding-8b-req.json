@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: STEP_OK taskId=local-bg-1777209383133-1lbj8v\n\nUser: [T5b wait-for-task] Call the wait-for-task tool with taskId='local-bg-1777209383133-1lbj8v'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.\n\nAssistant: STEP_OK\n\nUser: [T5a endLoop] Call the tool-help tool with callbackMode='endLoop'. After receiving the result, try to call the tool-help tool again. Check that only ONE tool-help call was executed (the loop should have stopped) and the result had a non-empty tools array. End your reply with STEP_OK if exactly one call ran and the result was correct, or FAILED: <reason> if the loop continued or the result was wrong.",
+    "encoding_format": "float"
+  }
+}

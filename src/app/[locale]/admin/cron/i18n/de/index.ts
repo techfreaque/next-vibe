@@ -35,12 +35,12 @@ export const translations: typeof enTranslations = {
     status_description: "Überwachen Sie den Systemstatus und aktive Aufgaben",
     stats: "Statistiken",
     stats_description:
-      "Zeigen Sie Statistiken und Leistungsmetriken für Cron-Aufgaben an",
+      "Zeigen Sie Statistiken und Leistungsmetriken für Hintergrundaufgaben an",
     tasks: "Aufgaben",
-    tasks_description: "Verwalten und konfigurieren Sie Cron-Aufgaben",
+    tasks_description: "Verwalten und konfigurieren Sie Hintergrundaufgaben",
     history: "Verlauf",
     history_description:
-      "Zeigen Sie den Ausführungsverlauf von Cron-Aufgaben an",
+      "Zeigen Sie den Ausführungsverlauf von Hintergrundaufgaben an",
   },
   buttons: {
     previous: "Zurück",

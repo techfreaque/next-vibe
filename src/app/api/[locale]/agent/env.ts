@@ -11,6 +11,7 @@ import "server-only";
 import { z } from "zod";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { DEFAULT_CHAT_MODEL_ID } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 
 // Resolved once at module load - used by both CLAUDE_CODE_ENABLED and VIBE_TEST_AI_MODEL
@@ -58,11 +59,11 @@ const baseFields = {
       .default(
         claudeCodeEnabled
           ? ChatModelId.CLAUDE_CODE_HAIKU
-          : ChatModelId.KIMI_K2_5,
+          : DEFAULT_CHAT_MODEL_ID,
       ),
     example: "claude-code-haiku",
     comment:
-      "AI model to use in integration tests. Defaults to claude-code-haiku when CLAUDE_CODE_ENABLED resolves true, otherwise kimi_k2_5.",
+      "AI model to use in integration tests. Defaults to claude-code-haiku when CLAUDE_CODE_ENABLED resolves true, otherwise the platform default chat model.",
     commented: true,
   },
   OPENROUTER_API_KEY: {

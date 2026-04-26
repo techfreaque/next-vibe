@@ -432,7 +432,7 @@ export const translations: typeof enTranslations = {
     },
     id: {
       label: "ID ulubionego",
-      description: "Unikatowy identyfikator ulubionego do usunięcia",
+      description: "Slug lub przyjazne ID ulubionego do usunięcia",
     },
     response: {
       success: {

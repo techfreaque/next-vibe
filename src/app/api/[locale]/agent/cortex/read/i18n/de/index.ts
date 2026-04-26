@@ -14,7 +14,8 @@ export const translations = {
     fields: {
       path: {
         label: "Pfad",
-        description: "Welche Datei, z.B. /documents/notizen/ideen.md",
+        description:
+          "Welche Datei. Deutsche Wurzel: /erinnerungen/, /dokumente/. Beispiel: /dokumente/notizen/ideen.md",
       },
       maxLines: {
         label: "Max. Zeilen",

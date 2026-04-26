@@ -104,6 +104,22 @@ export const translations: typeof enTranslations = {
             content: "Zaktualizowano",
           },
         },
+        referralInfo: {
+          title: "Info o poleceniach",
+          description: "Łańcuch poleceń i zarobki",
+          referredByUserId: {
+            content: "Polecony przez (ID użytkownika)",
+          },
+          referredByCode: {
+            content: "Użyty kod polecający",
+          },
+          totalReferrals: {
+            content: "Poleceni użytkownicy",
+          },
+          totalEarnedCents: {
+            content: "Łączne zarobki (centy)",
+          },
+        },
         leadId: {
           content: "ID powiązanego leada",
         },

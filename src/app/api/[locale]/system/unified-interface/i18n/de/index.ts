@@ -42,6 +42,7 @@ export const translations: typeof enTranslations = {
     systemTasks: "System: Aufgaben",
     userAuth: "Benutzer-Authentifizierung",
     userManagement: "Benutzerverwaltung",
+    support: "Support",
   },
   shared: {
     permissions: {

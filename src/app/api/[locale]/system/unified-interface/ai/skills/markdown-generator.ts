@@ -406,7 +406,7 @@ function renderInlineAiRunSection(opts: {
   runUrl: string;
   skillId?: string;
   exampleModel: string;
-  exampleFolder: "cron" | "incognito";
+  exampleFolder: "background" | "incognito";
   exampleMaxTurns: number;
   requiresAuth: boolean;
 }): string {
@@ -426,7 +426,7 @@ function renderInlineAiRunSection(opts: {
   const folderNote =
     exampleFolder === "incognito"
       ? "> 💡 `incognito` - no thread stored, context-saving for stateless queries."
-      : "> 💡 `cron` - thread persisted for auditing agentic tool calls.";
+      : "> 💡 `background` - thread persisted for auditing agentic tool calls.";
 
   const delegateTarget = skillId ? "this skill" : "an AI skill";
 
@@ -522,7 +522,7 @@ export async function generateTierAiRunMarkdown(
     `  "skill": "research-agent",`,
     `  "prompt": "Find the latest news on AI regulation and summarise key points",`,
     `  "model": "claude-sonnet-4-6",`,
-    `  "rootFolderId": "cron",`,
+    `  "rootFolderId": "background",`,
     `  "maxTurns": 5`,
     "}",
     "```",
@@ -599,7 +599,7 @@ export async function generateSkillAiRunMarkdown(
   const exampleModel = pickExampleModel(
     modelSelection as Parameters<typeof pickExampleModel>[0],
   );
-  const exampleFolder = hasTools ? "cron" : "incognito";
+  const exampleFolder = hasTools ? "background" : "incognito";
   const exampleMaxTurns = hasTools ? 5 : 1;
   const authLine = charInfo.requiresAuth
     ? "\nAuthorization: Bearer <YOUR_JWT_TOKEN>"
@@ -632,7 +632,7 @@ export async function generateSkillAiRunMarkdown(
     "",
     exampleFolder === "incognito"
       ? "> 💡 `incognito` - no thread stored, context-saving for stateless queries."
-      : "> 💡 `cron` - thread persisted for auditing agentic tool calls.",
+      : "> 💡 `background` - thread persisted for auditing agentic tool calls.",
     ...(hasTools && charInfo.availableTools
       ? [
           "",
@@ -1107,7 +1107,7 @@ export async function generateSkillSkillMarkdown(
       runUrl: `${apiBase}/agent/ai-stream/run`,
       skillId,
       exampleModel,
-      exampleFolder: hasTools ? "cron" : "incognito",
+      exampleFolder: hasTools ? "background" : "incognito",
       exampleMaxTurns: hasTools ? 5 : 1,
       requiresAuth: charInfo.requiresAuth,
     }),

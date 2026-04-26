@@ -25,7 +25,9 @@ export const translations: typeof enTranslations = {
     sharedChats: "Udostępnione czaty",
     publicChats: "Publiczne czaty",
     incognitoChats: "Czaty incognito",
-    cronChats: "Wątki cron",
+    cronChats: "Wątki w tle",
+    backgroundChats: "W tle",
+    supportChats: "Wsparcie",
     search: "Szukaj",
     delete: "Usuń",
     cancel: "Anuluj",
@@ -944,8 +946,11 @@ export const translations: typeof enTranslations = {
     sharedDescription: "Rozmowy udostępnione innym",
     publicDescription: "Rozmowy publiczne",
     incognitoDescription: "Rozmowy w trybie prywatnym",
-    cronDescription:
-      "Automatyczne rozmowy tworzone przez zaplanowane zadania cron.",
+    cronDescription: "Automatyczne rozmowy tworzone przez zadania w tle.",
+    backgroundDescription:
+      "Zadania AI działające w tle w twoim imieniu. Wyniki pojawiają się tutaj po zakończeniu.",
+    supportDescription:
+      "Wątki wsparcia z administratorami zdalnymi przez ws-provider.",
     accessModal: {
       title: "Wymagane konto",
       privateTitle: "Wątki prywatne",
@@ -1246,8 +1251,8 @@ export const translations: typeof enTranslations = {
       glm45Air: "GLM 4.5 AIR - ultraszybki lekki model z dużym oknem kontekstu",
       glm45v:
         "GLM 4.5v - multimodalny model z obsługą wizji i dużym oknem kontekstu",
-      kimiK2_5:
-        "Kimi K2.5 - Rozszerzona wersja z ulepszonymi możliwościami rozumowania i pisania kreatywnego",
+      kimiK2_6:
+        "Kimi K2.6 - Długoterminowe kodowanie, generowanie UI/UX i orkiestracja wielu agentów z architekturą roju",
       uncensoredLmV11:
         "Niecenzurowany model językowy bez filtrowania treści - model premium",
       freedomgptLiberty:
@@ -1280,6 +1285,10 @@ export const translations: typeof enTranslations = {
         "Google Gemini 3 Flash - Szybki, wydajny multimodalny model AI zoptymalizowany pod kątem szybkich odpowiedzi",
       deepseekV32:
         "DeepSeek V3.2 - Wysokowydajny model rozumowania z zaawansowanymi możliwościami kodowania",
+      deepseekV4Pro:
+        "DeepSeek V4 Pro - 1,6T parametrów MoE z kontekstem 1M. Do analizy całych baz kodu, złożonego rozumowania i wieloetapowych agentów.",
+      deepseekV4Flash:
+        "DeepSeek V4 Flash - 284B MoE za grosze. Kontekst 1M, szybka inferecja, solidne kodowanie. Wydajny wybór do zadań wymagających wysokiej przepustowości.",
     },
   },
   tones: {

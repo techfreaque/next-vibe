@@ -676,6 +676,35 @@ export class GenerateAllRepository {
         })(),
       );
 
+      // 12. Cortex Seeds Embeddings Generator (pre-compute embeddings for all cortex seeds)
+      generatorPromises.push(
+        (async (): Promise<string | null> => {
+          try {
+            const { CortexTemplatesEmbeddingsGeneratorRepository } =
+              await import("../cortex-templates/repository");
+
+            const result =
+              await CortexTemplatesEmbeddingsGeneratorRepository.generateCortexTemplateEmbeddings(
+                logger,
+              );
+
+            if (result.success) {
+              generatorsRun++;
+              return "cortex-seeds";
+            }
+            outputLines.push(
+              `❌ Cortex seeds embeddings generation failed: ${result.message || "Unknown error"}`,
+            );
+            return null;
+          } catch (error) {
+            outputLines.push(
+              `❌ Cortex seeds embeddings generator failed: ${parseError(error).message}`,
+            );
+            return null;
+          }
+        })(),
+      );
+
       // Wait for parallel generators to complete
       const results = await Promise.allSettled(generatorPromises);
       const completedGenerators: string[] = defScanResults.filter(
@@ -695,7 +724,7 @@ export class GenerateAllRepository {
         generationCompleted: true,
         output: outputLines.join("\n"),
         generationStats: {
-          totalGenerators: 12,
+          totalGenerators: 13,
           generatorsRun,
           generatorsSkipped,
           outputDirectory:

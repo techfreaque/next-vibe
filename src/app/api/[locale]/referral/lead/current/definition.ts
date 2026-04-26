@@ -35,7 +35,6 @@ export const { GET } = createEndpoint({
     UserRole.ADMIN,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  allowedLocalModeRoles: [UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
     usage: { response: true } as const,

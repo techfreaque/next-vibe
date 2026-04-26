@@ -102,7 +102,13 @@ export class ImageGenerationRepository {
     t: ImageGenerationT,
     streamContext: MediaGenStreamContext,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
-    // model is resolved via serverDefault on the field definition (from ToolExecutionContext.imageGenModelId)
+    // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
+    if (!data.model) {
+      return fail({
+        message: t("post.errors.not_found.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
     const modelConfig = getImageGenModelById(data.model);
 
     if (!modelConfig) {
@@ -333,7 +339,7 @@ export class ImageGenerationRepository {
     const deductResult = await deductMediaCredits(
       user,
       creditCost,
-      "image-generation",
+      t("post.title"),
       locale,
       logger,
       tCredits,

@@ -14,7 +14,8 @@ export const translations = {
     fields: {
       path: {
         label: "Pfad",
-        description: "Wohin, z.B. /documents/notizen/ideen.md",
+        description:
+          "Zielort. Deutsche Wurzel: /erinnerungen/, /dokumente/. Beispiel: /dokumente/notizen/ideen.md",
       },
       content: {
         label: "Inhalt",
@@ -35,6 +36,7 @@ export const translations = {
       created: { text: "Neue Datei" },
       updated: { text: "Aktualisiert" },
       updatedAt: { content: "Aktualisiert" },
+      content: { content: "Inhalt" },
     },
     errors: {
       validation: {

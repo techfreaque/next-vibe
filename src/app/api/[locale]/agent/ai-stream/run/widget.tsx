@@ -73,16 +73,16 @@ import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import { platform } from "@/config/env-client";
 import { CortexModal } from "../../../agent/cortex/widget/cortex-modal";
-import { AIToolsModal } from "../../tools/widget/ai-tools-modal";
 import { DefaultFolderId } from "../../chat/config";
 import { ChatMessageRole } from "../../chat/enum";
+import type { EnabledTool } from "../../chat/hooks/store";
 import {
   ChatNavigationProvider,
   useChatNavigationStore,
 } from "../../chat/hooks/use-chat-navigation-store";
-import messagesDefinition from "../../chat/threads/[threadId]/messages/definition";
-import type { EnabledTool } from "../../chat/hooks/store";
 import { useSkill } from "../../chat/skills/[id]/hooks";
+import messagesDefinition from "../../chat/threads/[threadId]/messages/definition";
+import { AIToolsModal } from "../../tools/widget/ai-tools-modal";
 
 import type { FavoriteCard } from "../../chat/favorites/definition";
 import cancelEndpoints from "../cancel/definition";
@@ -702,7 +702,8 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
     responseData?.threadId ??
     contextThreadId ??
     (isSubmitting ? appendThreadId : undefined);
-  const rootFolderValue = form.watch("rootFolderId") ?? "cron";
+  const rootFolderValue =
+    form.watch("rootFolderId") ?? DefaultFolderId.BACKGROUND;
   const threadHref = displayThreadId
     ? `/${locale}/threads/${rootFolderValue}/${displayThreadId}`
     : undefined;

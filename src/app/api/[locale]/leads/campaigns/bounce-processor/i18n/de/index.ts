@@ -109,7 +109,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Bounce-Verarbeitung-Konfiguration abrufen",
-    description: "Bounce-Verarbeitung-Cron-Konfiguration laden",
+    description: "Bounce-Verarbeitung-Hintergrundaufgaben-Konfiguration laden",
     errors: {
       unauthorized: {
         title: "Nicht autorisiert",
@@ -162,10 +162,12 @@ export const translations: typeof enTranslations = {
   },
   put: {
     title: "Bounce-Verarbeitung-Konfiguration",
-    description: "Bounce-Verarbeitung-Cron-Konfiguration aktualisieren",
+    description:
+      "Bounce-Verarbeitung-Hintergrundaufgaben-Konfiguration aktualisieren",
     enabled: {
       label: "Aktiviert",
-      description: "Bounce-Verarbeitung-Cron-Task aktivieren oder deaktivieren",
+      description:
+        "Bounce-Verarbeitung-Hintergrundaufgabe aktivieren oder deaktivieren",
     },
     dryRun: {
       label: "Testmodus",
@@ -213,7 +215,7 @@ export const translations: typeof enTranslations = {
     titleSaved: "Konfiguration gespeichert",
     saving: "Speichern...",
     save: "Einstellungen speichern",
-    guidanceTitle: "Bounce-Verarbeitung-Cron konfigurieren",
+    guidanceTitle: "Bounce-Verarbeitung-Hintergrundaufgabe konfigurieren",
     guidanceDescription:
       "Bounce-Verarbeitung-Cron-Task aktivieren/deaktivieren und Zeitplan sowie Batch-Einstellungen konfigurieren.",
     runButton: "Jetzt ausführen",

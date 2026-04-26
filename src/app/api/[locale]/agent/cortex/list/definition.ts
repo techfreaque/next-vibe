@@ -36,7 +36,7 @@ const { GET } = createEndpoint({
   path: ["agent", "cortex", "list"],
   aliases: [CORTEX_LIST_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-
+  cli: { firstCliArgKey: "path" },
   title: "get.title" as const,
   description: "get.description" as const,
   dynamicTitle: ({ request }) => {

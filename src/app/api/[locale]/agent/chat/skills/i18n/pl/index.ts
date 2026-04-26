@@ -61,7 +61,7 @@ export const translations: typeof enTranslations = {
     },
     intelligence: {
       quick: "Szybki",
-      smart: "Inteligentny",
+      smart: "Tanio & Mądrze",
       brilliant: "Błyskotliwy",
     },
     price: {
@@ -436,9 +436,9 @@ export const translations: typeof enTranslations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Bez cenzury",
-        oracle: "Wyrocznia",
+        oracle: "Klasyk",
         elonTusk: "Elon Tusk",
-        vision: "Wizja",
+        vision: "Wszechwidzący",
       },
     },
     hermes: {
@@ -456,9 +456,9 @@ export const translations: typeof enTranslations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Bez cenzury",
-        oracle: "Wyrocznia",
+        oracle: "Klasyk",
         elonTusk: "Elon Tusk",
-        vision: "Wizja",
+        vision: "Wszechwidzący",
       },
     },
     theaDreamer: {
@@ -476,9 +476,9 @@ export const translations: typeof enTranslations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Bez cenzury",
-        oracle: "Wyrocznia",
+        oracle: "Klasyk",
         elonTusk: "Elon Tusk",
-        vision: "Wizja",
+        vision: "Wszechwidzący",
       },
     },
     hermesAutopilot: {
@@ -496,9 +496,29 @@ export const translations: typeof enTranslations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Bez cenzury",
-        oracle: "Wyrocznia",
+        oracle: "Klasyk",
         elonTusk: "Elon Tusk",
-        vision: "Wizja",
+        vision: "Wszechwidzący",
+      },
+    },
+    theaMama: {
+      name: "Thea · Mama",
+      description:
+        "Thea w trybie Mama — szefowa produkcji platformy. Monitoruje zdrowie systemu, posuwa funkcje do przodu, zajmuje się marketingiem, wysyła nowości.",
+      tagline: "Opiekunka platformy",
+      shortDesc: "Zarządzanie produkcją platformy",
+      suggestedPrompts: {
+        0: "Co znalazłaś podczas ostatniego przeglądu?",
+        1: "Sprawdź zdrowie platformy i zgłoś",
+        2: "Napisz ogłoszenie o najnowszej funkcji",
+        3: "Co teraz wymaga mojej uwagi?",
+      },
+      variants: {
+        brilliant: "Brilliant",
+        uncensored: "Bez cenzury",
+        oracle: "Klasyk",
+        elonTusk: "Elon Tusk",
+        vision: "Wszechwidzący",
       },
     },
     quickWriter: {
@@ -800,6 +820,23 @@ export const translations: typeof enTranslations = {
       variants: {
         techBro: "Tech Bro",
         budget: "Budżet",
+      },
+    },
+    supportAgent: {
+      name: "Agent Wsparcia",
+      description:
+        "Wsparcie techniczne napędzane AI — wie, kiedy przekazać sprawę człowiekowi",
+      tagline: "Problem rozwiązany",
+      shortDesc: "Wsparcie techniczne z eskalacją do człowieka",
+      suggestedPrompts: {
+        0: "Moja aplikacja ciągle się zawiesza — pomóż mi to naprawić",
+        1: "Nie mogę połączyć się z siecią",
+        2: "Dostaję komunikat o błędzie, którego nie rozumiem",
+        3: "Przeprowadź mnie przez resetowanie hasła",
+      },
+      variants: {
+        default: "Standardowy",
+        fast: "Szybki",
       },
     },
     travelPlanner: {
@@ -1244,8 +1281,10 @@ export const translations: typeof enTranslations = {
         addToCollection: "Dodaj do kolekcji:",
         quick: "Szybko",
         customize: "Dostosuj",
-        useNow: "Użyj teraz",
-        inUse: "W użyciu",
+        useNow: "Aktywuj",
+        inUse: "Aktywny",
+        goToChat: "Przejdź do czatu",
+        useThis: "Użyj tego",
         chooseFavorite: "Wybierz ulubione",
         selectFavorite: "Wybierz ulubione do aktywacji:",
         addVariant: "Dodaj wariant",

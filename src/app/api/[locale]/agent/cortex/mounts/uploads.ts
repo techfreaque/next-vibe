@@ -7,7 +7,7 @@ import "server-only";
  * Organized by MIME type: images/, documents/, audio/, video/, other/
  */
 
-import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, or, sql } from "drizzle-orm";
 
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
@@ -75,10 +75,14 @@ function slugify(value: string): string {
 
 interface AttachmentRow {
   id: string;
+  /** Public download URL (may be empty for base64-embedded uploads) */
   url: string;
   filename: string;
   mimeType: string;
   size: number;
+  hasData: boolean;
+  /** User's message text when they uploaded the file */
+  messageText: string;
   threadId: string;
   threadTitle: string;
   uploadedAt: Date;
@@ -92,6 +96,7 @@ async function loadUserAttachments(userId: string): Promise<AttachmentRow[]> {
   const rows = await db
     .select({
       metadata: chatMessages.metadata,
+      content: chatMessages.content,
       createdAt: chatMessages.createdAt,
       threadId: chatMessages.threadId,
       threadTitle: chatThreads.title,
@@ -114,11 +119,14 @@ async function loadUserAttachments(userId: string): Promise<AttachmentRow[]> {
   for (const row of rows) {
     const meta = row.metadata as {
       attachments?: {
-        id: string;
-        url: string;
-        filename: string;
-        mimeType: string;
-        size: number;
+        id?: string;
+        url?: string;
+        data?: string;
+        filename?: string;
+        name?: string;
+        mimeType?: string;
+        type?: string;
+        size?: number;
       }[];
     } | null;
     if (!meta?.attachments) {
@@ -126,15 +134,25 @@ async function loadUserAttachments(userId: string): Promise<AttachmentRow[]> {
     }
 
     for (const att of meta.attachments) {
-      if (!att.url || !att.filename) {
+      // Support both url-hosted and base64-embedded attachments
+      const filename = att.filename ?? att.name ?? "";
+      if (!filename) {
+        continue;
+      }
+      const hasData = Boolean(att.data);
+      const url = att.url ?? "";
+      // Skip attachments with neither URL nor data
+      if (!url && !hasData) {
         continue;
       }
       attachments.push({
-        id: att.id,
-        url: att.url,
-        filename: att.filename,
-        mimeType: att.mimeType || "application/octet-stream",
-        size: att.size || 0,
+        id: att.id ?? filename,
+        url,
+        filename,
+        mimeType: att.mimeType ?? att.type ?? "application/octet-stream",
+        size: att.size ?? 0,
+        hasData,
+        messageText: typeof row.content === "string" ? row.content : "",
         threadId: row.threadId,
         threadTitle: row.threadTitle ?? "Untitled",
         uploadedAt: row.createdAt,
@@ -202,7 +220,7 @@ export async function readUploadPath(
   const frontmatterLines = [
     "---",
     `filename: "${attachment.filename.replace(/"/g, '\\"')}"`,
-    `url: "${attachment.url}"`,
+    ...(attachment.url ? [`url: "${attachment.url}"`] : [`embedded: true`]),
     `mimeType: "${attachment.mimeType}"`,
     `size: "${formatBytes(attachment.size)}"`,
     `threadId: "${attachment.threadId}"`,
@@ -211,12 +229,16 @@ export async function readUploadPath(
     "---",
   ];
 
+  const downloadLine = attachment.url
+    ? `**Download:** [${attachment.filename}](${attachment.url})`
+    : `**Stored:** base64-embedded (no public URL)`;
+
   const lines = [
     frontmatterLines.join("\n"),
     "",
     `# ${attachment.filename}`,
     "",
-    `**Download:** [${attachment.filename}](${attachment.url})`,
+    downloadLine,
     "",
     `| Field | Value |`,
     `| --- | --- |`,
@@ -224,6 +246,9 @@ export async function readUploadPath(
     `| Size | ${formatBytes(attachment.size)} |`,
     `| Thread | ${attachment.threadTitle} |`,
     `| Uploaded | ${attachment.uploadedAt.toISOString().slice(0, 10)} |`,
+    ...(attachment.messageText
+      ? ["", "## Message Context", "", attachment.messageText.slice(0, 1000)]
+      : []),
   ];
 
   return {
@@ -321,6 +346,87 @@ export async function listUploadPath(
   }
 
   return [];
+}
+
+export interface VirtualSearchHit {
+  path: string;
+  excerpt: string;
+  updatedAt: Date;
+}
+
+/**
+ * Direct keyword search across uploads — one DB query, no file-by-file reads.
+ * Matches against filename and user message context.
+ */
+export async function searchUploads(
+  userId: string,
+  query: string,
+  limit: number,
+): Promise<VirtualSearchHit[]> {
+  const pattern = `%${query}%`;
+  const rows = await db
+    .select({
+      metadata: chatMessages.metadata,
+      content: chatMessages.content,
+      createdAt: chatMessages.createdAt,
+      threadId: chatMessages.threadId,
+      threadTitle: chatThreads.title,
+    })
+    .from(chatMessages)
+    .innerJoin(chatThreads, eq(chatMessages.threadId, chatThreads.id))
+    .where(
+      and(
+        eq(chatThreads.userId, userId),
+        isNotNull(chatMessages.metadata),
+        sql`${chatMessages.metadata}->'attachments' IS NOT NULL`,
+        sql`jsonb_array_length((${chatMessages.metadata}->'attachments')::jsonb) > 0`,
+        or(
+          sql`${chatMessages.content}::text ILIKE ${pattern}`,
+          sql`${chatMessages.metadata}::text ILIKE ${pattern}`,
+        ),
+      ),
+    )
+    .orderBy(desc(chatMessages.createdAt))
+    .limit(limit);
+
+  const hits: VirtualSearchHit[] = [];
+  for (const row of rows) {
+    const meta = row.metadata as {
+      attachments?: {
+        id?: string;
+        url?: string;
+        data?: string;
+        filename?: string;
+        name?: string;
+        mimeType?: string;
+        type?: string;
+        size?: number;
+      }[];
+    } | null;
+    if (!meta?.attachments) {
+      continue;
+    }
+    for (const att of meta.attachments) {
+      const filename = att.filename ?? att.name ?? "";
+      if (!filename) {
+        continue;
+      }
+      const mimeType = att.mimeType ?? att.type ?? "application/octet-stream";
+      const typeFolder = getMimeTypeFolder(mimeType);
+      const threadSlug = `${slugify(row.threadTitle ?? "untitled")}-${row.threadId}`;
+      const safeFilename = filename
+        .replace(/[^a-z0-9.\-_]/gi, "-")
+        .replace(/-+/g, "-")
+        .replace(/^\./, "");
+      const path = `/uploads/${typeFolder}/${threadSlug}/${safeFilename}.md`;
+      const excerpt = (
+        typeof row.content === "string" ? row.content : filename
+      ).slice(0, 150);
+      hits.push({ path, excerpt, updatedAt: row.createdAt });
+      break; // one hit per message is enough
+    }
+  }
+  return hits;
 }
 
 /**

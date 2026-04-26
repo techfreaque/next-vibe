@@ -21,6 +21,7 @@ import { scopedTranslation as pageT } from "./i18n";
 interface HelpPageClientProps {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  userEmail?: string;
   modelCount: number;
   subPrice: string;
   subCredits: number;
@@ -31,6 +32,7 @@ interface HelpPageClientProps {
 export default function HelpPageClient({
   locale,
   user,
+  userEmail,
   modelCount,
   subPrice,
   subCredits,
@@ -57,6 +59,11 @@ export default function HelpPageClient({
           endpoint={contactDefinitions}
           locale={locale}
           user={user}
+          endpointOptions={
+            userEmail
+              ? { create: { autoPrefillData: { email: userEmail } } }
+              : undefined
+          }
         />
 
         {/* Contact Info */}

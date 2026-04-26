@@ -23,7 +23,9 @@ export const translations = {
     sharedChats: "Shared Threads",
     publicChats: "Public 1A Threads",
     incognitoChats: "Incognito Threads",
-    cronChats: "Cron Threads",
+    cronChats: "Background Threads",
+    backgroundChats: "Background",
+    supportChats: "Support",
     search: "Search",
     delete: "Delete",
     cancel: "Cancel",
@@ -942,7 +944,10 @@ export const translations = {
     publicDescription:
       "Public US First Amendment protected forum for people and AI.",
     incognitoDescription: "Conversations are only stored in your browser.",
-    cronDescription: "Automated conversations created by scheduled cron tasks.",
+    cronDescription: "Automated conversations created by background tasks.",
+    backgroundDescription:
+      "AI tasks running in the background on your behalf. Results appear here when done.",
+    supportDescription: "Support threads with remote admins via ws-provider.",
     accessModal: {
       title: "Account Required",
       privateTitle: "Private Threads",
@@ -1276,8 +1281,8 @@ export const translations = {
         "GLM 4.5 AIR - ultra-fast lightweight model with large context window",
       glm45v:
         "GLM 4.5v - vision-capable multimodal model with large context window",
-      kimiK2_5:
-        "Kimi K2.5 - Enhanced version with improved reasoning and creative writing capabilities",
+      kimiK2_6:
+        "Kimi K2.6 - Long-horizon coding, UI/UX generation, and multi-agent orchestration with swarm architecture",
       uncensoredLmV11:
         "Uncensored language model without content filtering - premium model",
       freedomgptLiberty:
@@ -1310,6 +1315,10 @@ export const translations = {
         "Google Gemini 3 Flash - Fast, efficient multimodal AI model optimized for quick responses",
       deepseekV32:
         "DeepSeek V3.2 - High-performance reasoning model with advanced coding capabilities",
+      deepseekV4Pro:
+        "DeepSeek V4 Pro - 1.6T parameter MoE powerhouse with 1M context. Built for full-codebase analysis, complex reasoning, and multi-step agent workflows.",
+      deepseekV4Flash:
+        "DeepSeek V4 Flash - 284B MoE at near-zero cost. 1M context, fast inference, strong coding. The efficient choice for high-throughput workloads.",
     },
   },
   tones: {

@@ -9,22 +9,31 @@
 
 "use client";
 
+import cronBulkEndpoints from "@/app/api/[locale]/system/unified-interface/tasks/cron/bulk/definition";
+import favoritesEndpoint from "@/app/api/[locale]/agent/chat/favorites/definition";
+import { FavoriteSelectProvider } from "@/app/api/[locale]/agent/chat/favorites/favorite-select-context";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
+import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/widget/schedule-autocomplete";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 import { Badge } from "next-vibe-ui/ui/badge";
-import { Textarea } from "next-vibe-ui/ui/textarea";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Link } from "next-vibe-ui/ui/link";
 import { Bot } from "next-vibe-ui/ui/icons/Bot";
 import { Brain } from "next-vibe-ui/ui/icons/Brain";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
 import { Info } from "next-vibe-ui/ui/icons/Info";
+import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Monitor } from "next-vibe-ui/ui/icons/Monitor";
 import { Moon } from "next-vibe-ui/ui/icons/Moon";
+import { Play } from "next-vibe-ui/ui/icons/Play";
 import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
 import { Settings } from "next-vibe-ui/ui/icons/Settings";
-import { Switch } from "next-vibe-ui/ui/switch";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 import {
   Select,
   SelectContent,
@@ -39,6 +48,8 @@ import {
   SliderTrack,
 } from "next-vibe-ui/ui/slider";
 import { Span } from "next-vibe-ui/ui/span";
+import { Switch } from "next-vibe-ui/ui/switch";
+import { Textarea } from "next-vibe-ui/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
@@ -48,6 +59,10 @@ import {
 import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
+
+import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 
 import {
   getChatModelById,
@@ -60,6 +75,12 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { useFavoriteCreate } from "@/app/api/[locale]/agent/chat/favorites/create/hooks";
+import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
+import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
+import { DEFAULT_SKILLS } from "@/app/api/[locale]/agent/chat/skills/config";
+import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { SearchProviderOptions } from "@/app/api/[locale]/agent/search/enum";
 import { scopedTranslation as searchScopedTranslation } from "@/app/api/[locale]/agent/search/i18n";
 import {
@@ -67,10 +88,8 @@ import {
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
-import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
-import type { ChatSettingsUpdateRequestOutput } from "./definition";
 import type definition from "./definition";
+import type { ChatSettingsUpdateRequestOutput } from "./definition";
 import { useChatSettings } from "./hooks";
 import { scopedTranslation } from "./i18n";
 import {
@@ -506,63 +525,218 @@ function SettingsRow({
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// Schedule options for pulse tasks
+// FavSlotCollapsed - compact card showing the selected favorite
 // ---------------------------------------------------------------------------
 
-interface ScheduleOption {
-  value: string;
-  labelKey:
-    | "nightlyAt2"
-    | "weekdaysAt2"
-    | "weekdaysAt8"
-    | "every6h"
-    | "every12h";
-}
-
-const DREAM_SCHEDULE_OPTIONS: ScheduleOption[] = [
-  { value: "0 2 * * *", labelKey: "nightlyAt2" },
-  { value: "0 2 * * 1-5", labelKey: "weekdaysAt2" },
-  { value: "0 */6 * * *", labelKey: "every6h" },
-  { value: "0 */12 * * *", labelKey: "every12h" },
-];
-
-const AUTOPILOT_SCHEDULE_OPTIONS: ScheduleOption[] = [
-  { value: "0 8 * * 1-5", labelKey: "weekdaysAt8" },
-  { value: "0 2 * * 1-5", labelKey: "weekdaysAt2" },
-  { value: "0 2 * * *", labelKey: "nightlyAt2" },
-  { value: "0 */6 * * *", labelKey: "every6h" },
-  { value: "0 */12 * * *", labelKey: "every12h" },
-];
-
-/** Translate schedule option labels - avoids dynamic template string in t() */
-function getScheduleLabel(
-  opt: ScheduleOption,
-  mode: "dreaming" | "autopilot",
+function getVariantLabelForFav(
+  item: FavoriteCard,
   locale: CountryLanguage,
-): string {
-  const { t } = scopedTranslation.scopedT(locale);
-  if (mode === "dreaming") {
-    const map = {
-      nightlyAt2: t("post.dreaming.schedule.options.nightlyAt2"),
-      weekdaysAt2: t("post.dreaming.schedule.options.weekdaysAt2"),
-      weekdaysAt8: t("post.dreaming.schedule.options.weekdaysAt8"),
-      every6h: t("post.dreaming.schedule.options.every6h"),
-      every12h: t("post.dreaming.schedule.options.every12h"),
-    } as const;
-    return map[opt.labelKey];
+): string | null {
+  if (item.customVariantName) {
+    return item.customVariantName;
   }
-  const map = {
-    nightlyAt2: t("post.autopilot.schedule.options.nightlyAt2"),
-    weekdaysAt2: t("post.autopilot.schedule.options.weekdaysAt2"),
-    weekdaysAt8: t("post.autopilot.schedule.options.weekdaysAt8"),
-    every6h: t("post.autopilot.schedule.options.every6h"),
-    every12h: t("post.autopilot.schedule.options.every12h"),
-  } as const;
-  return map[opt.labelKey];
+  const { skillId: baseSkillId, variantId } = parseSkillId(item.skillId);
+  if (!variantId) {
+    return null;
+  }
+  const skill = DEFAULT_SKILLS.find((s) => s.id === baseSkillId);
+  const variant = skill?.variants?.find((v) => v.id === variantId);
+  if (!variant) {
+    return null;
+  }
+  return variant.variantName
+    ? skillsScopedTranslation.scopedT(locale).t(variant.variantName)
+    : null;
 }
 
-/** Sentinel value for the "Default" favorite option (no custom favorite) */
-const FAVORITE_DEFAULT_VALUE = "__default__";
+function FavSlotCollapsed({
+  fav,
+  open,
+  onToggleOpen,
+  disabled,
+  locale,
+  placeholder,
+}: {
+  fav: FavoriteCard | null;
+  open: boolean;
+  onToggleOpen: () => void;
+  disabled: boolean;
+  locale: CountryLanguage;
+  placeholder: string;
+}): JSX.Element {
+  const variantLabel = fav ? getVariantLabelForFav(fav, locale) : null;
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      className={cn(
+        "w-full h-auto py-2.5 px-3 justify-start gap-3 text-left",
+        disabled && "opacity-50 pointer-events-none",
+        open && "border-primary/40 bg-primary/5",
+      )}
+      onClick={onToggleOpen}
+      disabled={disabled}
+    >
+      {fav ? (
+        <>
+          <Div className="flex items-center justify-center rounded-lg bg-primary/10 w-9 h-9 shrink-0">
+            <Icon icon={fav.icon} className="h-5 w-5" />
+          </Div>
+          <Div className="flex-1 min-w-0">
+            <Div className="flex items-center gap-1.5 flex-wrap">
+              <Span className="text-sm font-semibold truncate">{fav.name}</Span>
+              {variantLabel && (
+                <Span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">
+                  {variantLabel}
+                </Span>
+              )}
+              {fav.tagline && (
+                <Span className="text-xs text-muted-foreground truncate">
+                  {fav.tagline}
+                </Span>
+              )}
+            </Div>
+            <Div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
+              {fav.modelIcon && (
+                <Icon icon={fav.modelIcon} className="h-3 w-3 shrink-0" />
+              )}
+              {fav.modelInfo && (
+                <Span className="truncate">{fav.modelInfo}</Span>
+              )}
+              {fav.modelProvider && (
+                <>
+                  <Div className="h-1 w-1 rounded-full bg-muted-foreground/40 shrink-0" />
+                  <Span className="truncate">{fav.modelProvider}</Span>
+                </>
+              )}
+              {fav.modelId && (
+                <>
+                  <Div className="h-1 w-1 rounded-full bg-muted-foreground/40 shrink-0" />
+                  <ModelCreditDisplay
+                    modelId={fav.modelId}
+                    variant="text"
+                    className="text-xs text-muted-foreground"
+                    locale={locale}
+                  />
+                </>
+              )}
+            </Div>
+          </Div>
+        </>
+      ) : (
+        <Span className="text-sm text-muted-foreground flex-1">
+          {placeholder}
+        </Span>
+      )}
+      <ChevronDown
+        className={cn(
+          "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+          open && "rotate-180",
+        )}
+      />
+    </Button>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// PulseFavSlot - collapsible fav picker: compact card + full fav list
+// ---------------------------------------------------------------------------
+
+function PulseFavSlot({
+  favoriteId,
+  onFavoriteChange,
+  disabled,
+  locale,
+  label,
+  placeholder,
+  defaultSkillId,
+}: {
+  favoriteId: string | null;
+  onFavoriteChange: (id: string | null) => void;
+  disabled: boolean;
+  locale: CountryLanguage;
+  label: string;
+  placeholder: string;
+  /** Fallback skill to display when no favorite is selected */
+  defaultSkillId: string;
+}): JSX.Element {
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const [open, setOpen] = useState(false);
+
+  const { favorites } = useChatFavorites(logger, { activeFavoriteId: null });
+  const selectedFav = useMemo(
+    () => favorites.find((f) => f.id === favoriteId) ?? null,
+    [favorites, favoriteId],
+  );
+
+  // When no favorite is selected, synthesize a display card from the default skill
+  const { t: tSkills } = skillsScopedTranslation.scopedT(locale);
+  const displayFav = useMemo((): FavoriteCard | null => {
+    if (selectedFav) {
+      return selectedFav;
+    }
+    const skill = DEFAULT_SKILLS.find((s) => s.id === defaultSkillId);
+    if (!skill) {
+      return null;
+    }
+    return {
+      id: "",
+      skillId: skill.id,
+      name: tSkills(skill.name),
+      tagline: tSkills(skill.tagline),
+      description: null,
+      icon: skill.icon,
+      position: 0,
+      activeBadge: null,
+      modelId: null,
+      modelIcon: "sparkles" as const,
+      modelInfo: "",
+      modelProvider: "",
+      voiceId: null,
+      customVariantName: null,
+    } satisfies FavoriteCard;
+  }, [selectedFav, defaultSkillId, tSkills]);
+
+  const handleSelect = useCallback(
+    (item: FavoriteCard) => {
+      onFavoriteChange(item.id);
+      setOpen(false);
+    },
+    [onFavoriteChange],
+  );
+
+  return (
+    <Div className="flex flex-col gap-1.5">
+      <Span className="text-sm font-medium">{label}</Span>
+      <FavSlotCollapsed
+        fav={displayFav}
+        open={open}
+        onToggleOpen={() => setOpen((v) => !v)}
+        disabled={disabled}
+        locale={locale}
+        placeholder={placeholder}
+      />
+      {open && (
+        <Div className="rounded-xl border overflow-hidden">
+          <FavoriteSelectProvider
+            onSelectFavorite={handleSelect}
+            activeSkillId={selectedFav?.skillId ?? null}
+            activeModelId={selectedFav?.modelId ?? null}
+            hideChrome
+          >
+            <EndpointsPage
+              endpoint={favoritesEndpoint}
+              locale={locale}
+              user={user}
+            />
+          </FavoriteSelectProvider>
+        </Div>
+      )}
+    </Div>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // PulseSection component — shared between Dreaming and Autopilot
@@ -574,9 +748,9 @@ interface PulseSectionProps {
   favoriteId: string | null;
   schedule: string;
   prompt: string | null;
-  favorites: FavoriteCard[];
-  scheduleOptions: ScheduleOption[];
-  defaultSchedule: string;
+  subFolderId: string | null;
+  threadCount: number;
+  taskId: string;
   onToggle: (enabled: boolean) => void;
   onScheduleChange: (schedule: string) => void;
   onFavoriteChange: (favoriteId: string | null) => void;
@@ -589,8 +763,9 @@ function PulseSectionDreaming({
   favoriteId,
   schedule,
   prompt,
-  favorites,
-  scheduleOptions,
+  subFolderId,
+  threadCount,
+  taskId,
   onToggle,
   onScheduleChange,
   onFavoriteChange,
@@ -598,6 +773,30 @@ function PulseSectionDreaming({
   locale,
 }: Omit<PulseSectionProps, "mode">): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const [isRunning, setIsRunning] = useState(false);
+
+  const folderUrl = subFolderId
+    ? buildFolderUrl(locale, DefaultFolderId.BACKGROUND, subFolderId)
+    : null;
+
+  const handleRunNow = useCallback(async (): Promise<void> => {
+    setIsRunning(true);
+    try {
+      await apiClient.mutate(
+        cronBulkEndpoints.POST,
+        logger,
+        user,
+        { ids: [taskId], action: "run" },
+        undefined,
+        locale,
+      );
+    } finally {
+      setIsRunning(false);
+    }
+  }, [taskId, logger, user, locale]);
+
   return (
     <SettingsSection
       icon={<Moon className="h-4 w-4 text-primary" />}
@@ -607,50 +806,46 @@ function PulseSectionDreaming({
       <SettingsRow label={t("post.dreaming.toggle.label")}>
         <Switch checked={enabled} onCheckedChange={onToggle} />
       </SettingsRow>
+      {(folderUrl ?? threadCount > 0) && (
+        <Div className="flex items-center gap-2">
+          {folderUrl && (
+            <Link
+              href={folderUrl}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ExternalLink className="h-3 w-3" />
+              {t("post.dreaming.folderLink")}
+            </Link>
+          )}
+          {threadCount > 0 && (
+            <Badge variant="secondary" className="text-xs px-1.5 py-0">
+              {threadCount}
+            </Badge>
+          )}
+        </Div>
+      )}
       <SettingsRow label={t("post.dreaming.schedule.label")}>
-        <Select
+        <ScheduleAutocomplete
           value={schedule}
-          onValueChange={onScheduleChange}
+          onChange={onScheduleChange}
           disabled={!enabled}
-        >
-          <SelectTrigger className="w-[180px] h-8 text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {scheduleOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {getScheduleLabel(opt, "dreaming", locale)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          locale={locale}
+        />
       </SettingsRow>
-      <SettingsRow label={t("post.dreaming.favoriteId.label")}>
-        <Select
-          value={favoriteId ?? FAVORITE_DEFAULT_VALUE}
-          onValueChange={(value) =>
-            onFavoriteChange(value === FAVORITE_DEFAULT_VALUE ? null : value)
-          }
+      <Div className="py-1">
+        <PulseFavSlot
+          favoriteId={favoriteId}
+          onFavoriteChange={onFavoriteChange}
           disabled={!enabled}
-        >
-          <SelectTrigger className="w-[180px] h-8 text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={FAVORITE_DEFAULT_VALUE}>
-              {t("post.dreaming.favoriteId.defaultOption")}
-            </SelectItem>
-            {favorites.map((fav) => (
-              <SelectItem key={fav.id} value={fav.id}>
-                {fav.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </SettingsRow>
+          locale={locale}
+          label={t("post.dreaming.favoriteId.label")}
+          placeholder={t("post.dreaming.favoriteId.defaultOption")}
+          defaultSkillId="thea-dreamer"
+        />
+      </Div>
       <SettingsRow label={t("post.dreaming.prompt.label")}>
         <Textarea
-          value={prompt ?? ""}
+          value={prompt ?? t("post.dreaming.prompt.defaultPrompt")}
           onChange={(e) =>
             onPromptChange(e.target.value.trim() === "" ? null : e.target.value)
           }
@@ -659,6 +854,20 @@ function PulseSectionDreaming({
           className="text-sm min-h-[80px] resize-none"
         />
       </SettingsRow>
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={!enabled || isRunning}
+        onClick={() => void handleRunNow()}
+        className="self-start"
+      >
+        {isRunning ? (
+          <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+        ) : (
+          <Play className="h-3.5 w-3.5 mr-1.5" />
+        )}
+        {t("post.dreaming.runNow")}
+      </Button>
     </SettingsSection>
   );
 }
@@ -668,8 +877,9 @@ function PulseSectionAutopilot({
   favoriteId,
   schedule,
   prompt,
-  favorites,
-  scheduleOptions,
+  subFolderId,
+  threadCount,
+  taskId,
   onToggle,
   onScheduleChange,
   onFavoriteChange,
@@ -677,6 +887,30 @@ function PulseSectionAutopilot({
   locale,
 }: Omit<PulseSectionProps, "mode">): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const [isRunning, setIsRunning] = useState(false);
+
+  const folderUrl = subFolderId
+    ? buildFolderUrl(locale, DefaultFolderId.BACKGROUND, subFolderId)
+    : null;
+
+  const handleRunNow = useCallback(async (): Promise<void> => {
+    setIsRunning(true);
+    try {
+      await apiClient.mutate(
+        cronBulkEndpoints.POST,
+        logger,
+        user,
+        { ids: [taskId], action: "run" },
+        undefined,
+        locale,
+      );
+    } finally {
+      setIsRunning(false);
+    }
+  }, [taskId, logger, user, locale]);
+
   return (
     <SettingsSection
       icon={<Bot className="h-4 w-4 text-primary" />}
@@ -686,50 +920,46 @@ function PulseSectionAutopilot({
       <SettingsRow label={t("post.autopilot.toggle.label")}>
         <Switch checked={enabled} onCheckedChange={onToggle} />
       </SettingsRow>
+      {(folderUrl ?? threadCount > 0) && (
+        <Div className="flex items-center gap-2">
+          {folderUrl && (
+            <Link
+              href={folderUrl}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ExternalLink className="h-3 w-3" />
+              {t("post.autopilot.folderLink")}
+            </Link>
+          )}
+          {threadCount > 0 && (
+            <Badge variant="secondary" className="text-xs px-1.5 py-0">
+              {threadCount}
+            </Badge>
+          )}
+        </Div>
+      )}
       <SettingsRow label={t("post.autopilot.schedule.label")}>
-        <Select
+        <ScheduleAutocomplete
           value={schedule}
-          onValueChange={onScheduleChange}
+          onChange={onScheduleChange}
           disabled={!enabled}
-        >
-          <SelectTrigger className="w-[180px] h-8 text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {scheduleOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {getScheduleLabel(opt, "autopilot", locale)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          locale={locale}
+        />
       </SettingsRow>
-      <SettingsRow label={t("post.autopilot.favoriteId.label")}>
-        <Select
-          value={favoriteId ?? FAVORITE_DEFAULT_VALUE}
-          onValueChange={(value) =>
-            onFavoriteChange(value === FAVORITE_DEFAULT_VALUE ? null : value)
-          }
+      <Div className="py-1">
+        <PulseFavSlot
+          favoriteId={favoriteId}
+          onFavoriteChange={onFavoriteChange}
           disabled={!enabled}
-        >
-          <SelectTrigger className="w-[180px] h-8 text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={FAVORITE_DEFAULT_VALUE}>
-              {t("post.autopilot.favoriteId.defaultOption")}
-            </SelectItem>
-            {favorites.map((fav) => (
-              <SelectItem key={fav.id} value={fav.id}>
-                {fav.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </SettingsRow>
+          locale={locale}
+          label={t("post.autopilot.favoriteId.label")}
+          placeholder={t("post.autopilot.favoriteId.defaultOption")}
+          defaultSkillId="hermes-autopilot"
+        />
+      </Div>
       <SettingsRow label={t("post.autopilot.prompt.label")}>
         <Textarea
-          value={prompt ?? ""}
+          value={prompt ?? t("post.autopilot.prompt.defaultPrompt")}
           onChange={(e) =>
             onPromptChange(e.target.value.trim() === "" ? null : e.target.value)
           }
@@ -738,6 +968,20 @@ function PulseSectionAutopilot({
           className="text-sm min-h-[80px] resize-none"
         />
       </SettingsRow>
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={!enabled || isRunning}
+        onClick={() => void handleRunNow()}
+        className="self-start"
+      >
+        {isRunning ? (
+          <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+        ) : (
+          <Play className="h-3.5 w-3.5 mr-1.5" />
+        )}
+        {t("post.autopilot.runNow")}
+      </Button>
     </SettingsSection>
   );
 }
@@ -763,6 +1007,7 @@ export function ChatSettingsWidget({
   const { favorites } = useChatFavorites(logger, {
     activeFavoriteId: settings?.activeFavoriteId ?? null,
   });
+  const { addFavorite } = useFavoriteCreate(user, logger);
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -778,6 +1023,73 @@ export function ChatSettingsWidget({
       }
     },
     [updateSettings],
+  );
+
+  /**
+   * Ensure a background skill favorite exists when enabling dream/autopilot.
+   * Returns the existing or newly created favoriteId.
+   */
+  const ensureBackgroundFavorite = useCallback(
+    async (skillId: string): Promise<string | null> => {
+      const existing = favorites.find(
+        (f) => parseSkillId(f.skillId).skillId === skillId,
+      );
+      if (existing) {
+        return existing.id;
+      }
+      const skill = DEFAULT_SKILLS.find((s) => s.id === skillId);
+      return addFavorite({
+        skillId,
+        icon: skill?.icon,
+        modelSelection: null,
+        voiceModelSelection: null,
+      });
+    },
+    [favorites, addFavorite],
+  );
+
+  const handleDreamerToggle = useCallback(
+    async (val: boolean): Promise<void> => {
+      if (val) {
+        const favId = await ensureBackgroundFavorite("thea-dreamer");
+        await updateSettings({
+          dreamerEnabled: true,
+          ...(favId && !settings?.dreamerFavoriteId
+            ? { dreamerFavoriteId: favId }
+            : {}),
+        });
+      } else {
+        void handleUpdate({ dreamerEnabled: false });
+      }
+    },
+    [
+      ensureBackgroundFavorite,
+      updateSettings,
+      settings?.dreamerFavoriteId,
+      handleUpdate,
+    ],
+  );
+
+  const handleAutopilotToggle = useCallback(
+    async (val: boolean): Promise<void> => {
+      if (val) {
+        const favId = await ensureBackgroundFavorite("hermes-autopilot");
+        await updateSettings({
+          autopilotEnabled: true,
+          ...(favId && !settings?.autopilotFavoriteId
+            ? { autopilotFavoriteId: favId }
+            : {}),
+        });
+      } else {
+        void handleUpdate({ autopilotEnabled: false });
+      }
+    },
+    [
+      ensureBackgroundFavorite,
+      updateSettings,
+      settings?.autopilotFavoriteId,
+      handleUpdate,
+    ],
   );
 
   const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
@@ -880,10 +1192,10 @@ export function ChatSettingsWidget({
           favoriteId={settings.dreamerFavoriteId ?? null}
           schedule={settings.dreamerSchedule ?? DREAM_DEFAULT_SCHEDULE}
           prompt={settings.dreamerPrompt ?? null}
-          favorites={favorites}
-          scheduleOptions={DREAM_SCHEDULE_OPTIONS}
-          defaultSchedule={DREAM_DEFAULT_SCHEDULE}
-          onToggle={(val) => void handleUpdate({ dreamerEnabled: val })}
+          subFolderId={settings.dreamerSubFolderId ?? null}
+          threadCount={settings.dreamerThreadCount ?? 0}
+          taskId={`dream-${user.id.slice(0, 8)}`}
+          onToggle={(val) => void handleDreamerToggle(val)}
           onScheduleChange={(val) =>
             void handleUpdate({ dreamerSchedule: val })
           }
@@ -902,10 +1214,10 @@ export function ChatSettingsWidget({
           favoriteId={settings.autopilotFavoriteId ?? null}
           schedule={settings.autopilotSchedule ?? AUTOPILOT_DEFAULT_SCHEDULE}
           prompt={settings.autopilotPrompt ?? null}
-          favorites={favorites}
-          scheduleOptions={AUTOPILOT_SCHEDULE_OPTIONS}
-          defaultSchedule={AUTOPILOT_DEFAULT_SCHEDULE}
-          onToggle={(val) => void handleUpdate({ autopilotEnabled: val })}
+          subFolderId={settings.autopilotSubFolderId ?? null}
+          threadCount={settings.autopilotThreadCount ?? 0}
+          taskId={`autopilot-${user.id.slice(0, 8)}`}
+          onToggle={(val) => void handleAutopilotToggle(val)}
           onScheduleChange={(val) =>
             void handleUpdate({ autopilotSchedule: val })
           }

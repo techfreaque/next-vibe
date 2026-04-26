@@ -24,7 +24,6 @@ import {
   TtsModelId,
   TtsModelIdOptions,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -74,7 +73,7 @@ const { POST } = createEndpoint({
         description: "post.voice.description",
         columns: 12,
         options: TtsModelIdOptions,
-        schema: z.enum(TtsModelId).default(DEFAULT_TTS_VOICE_ID),
+        schema: z.enum(TtsModelId).optional(),
       }),
 
       audioUrl: responseField(scopedTranslation, {

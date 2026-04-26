@@ -18,16 +18,16 @@ import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type { CronTaskRecentExecution } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/definition";
-import { formatTasksSummary } from "@/app/api/[locale]/system/unified-interface/tasks/cron/system-prompt/prompt";
 import type { CronTaskItem } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
+import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { CronTaskStatus, TaskCategory, TaskCategoryDB } from "../enum";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { TaskCategory, TaskCategoryDB } from "../enum";
 import type { TasksT } from "../i18n";
 import { scopedTranslation } from "../i18n";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   CronTaskDeleteResponseOutput,
   CronTaskGetResponseOutput,
@@ -40,6 +40,7 @@ import type {
   NewCronTaskExecution,
 } from "./db";
 import { cronTaskExecutions, cronTasks, dbUserIdToOwner } from "./db";
+import { createTaskEmitters } from "./emitter";
 import type { CronTaskResponseType as CronTaskResponse } from "./tasks/definition";
 
 /**
@@ -479,6 +480,34 @@ export class CronTasksRepository {
         task.id,
       ]);
       serialized.lastExecutionError = summaries.get(task.id) ?? null;
+
+      // Emit task-updated to WS subscribers (cross-tab sync)
+      if (user && !user.isPublic) {
+        const { emitTaskList, emitTaskQueue } = createTaskEmitters(
+          logger,
+          user,
+        );
+        const updatedPayload = {
+          tasks: [
+            {
+              id: serialized.id,
+              lastExecutionStatus: serialized.lastExecutionStatus,
+              lastExecutedAt: serialized.lastExecutedAt,
+              lastExecutionDuration: serialized.lastExecutionDuration,
+              consecutiveFailures: serialized.consecutiveFailures,
+              executionCount: serialized.executionCount,
+              successCount: serialized.successCount,
+              errorCount: serialized.errorCount,
+              averageExecutionTime: serialized.averageExecutionTime,
+              enabled: serialized.enabled,
+              nextExecutionAt: serialized.nextExecutionAt,
+            },
+          ],
+        };
+        emitTaskList("task-updated", updatedPayload);
+        emitTaskQueue("task-updated", updatedPayload);
+      }
+
       return success({
         task: await CronTasksRepository.translateTaskFields(serialized, locale),
         success: true,
@@ -542,6 +571,13 @@ export class CronTasksRepository {
       logger.debug("Deleting cron task", { id: canonicalId });
       await db.delete(cronTasks).where(eq(cronTasks.id, canonicalId));
       logger.info("Successfully deleted cron task", { id });
+
+      // Emit task-removed to WS subscribers
+      const { emitTaskList, emitTaskQueue } = createTaskEmitters(logger, user);
+      const removedPayload = { tasks: [{ id: canonicalId }] };
+      emitTaskList("task-removed", removedPayload);
+      emitTaskQueue("task-removed", removedPayload);
+
       return success({ success: true, message: "Task deleted successfully" });
     } catch (error) {
       const parsedError = parseError(error);
@@ -896,17 +932,5 @@ export class CronTasksRepository {
       });
       return [];
     }
-  }
-
-  /**
-   * Generate a concise tasks summary string for injection into the AI system prompt.
-   * @deprecated Prefer loadTaskItems() + formatTasksSummary() - keeps data and formatting separate.
-   */
-  static async generateTasksSummary(params: {
-    userId: string;
-    logger: EndpointLogger;
-  }): Promise<string> {
-    const items = await CronTasksRepository.loadTaskItems(params);
-    return formatTasksSummary(items);
   }
 }

@@ -13,7 +13,8 @@ export const translations = {
     fields: {
       path: {
         label: "Path",
-        description: "Where to save, e.g. /documents/notes/ideas.md",
+        description:
+          "Where to save. Use your locale's root (e.g. /dokumente/ for DE, /dokumenty/ for PL). Example: /documents/notes/ideas.md",
       },
       content: {
         label: "Content",
@@ -34,6 +35,7 @@ export const translations = {
       created: { text: "New File" },
       updated: { text: "Updated" },
       updatedAt: { content: "Updated" },
+      content: { content: "Content" },
     },
     errors: {
       validation: { title: "Bad Input", description: "Check path and content" },

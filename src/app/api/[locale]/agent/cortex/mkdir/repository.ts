@@ -11,6 +11,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CortexMkdirT } from "./i18n";
 import { cortexNodes } from "../db";
@@ -19,6 +20,7 @@ import {
   ensureParentDirs,
   isValidPath,
   isWritablePath,
+  normalizeToCanonicalPath,
   normalizePath,
   pathExists,
 } from "../repository";
@@ -26,6 +28,7 @@ import {
 interface MkdirParams {
   userId: string;
   user: JwtPrivatePayloadType;
+  locale: CountryLanguage;
   path: string;
   viewType?: CortexViewTypeValue;
   createParents?: boolean;
@@ -37,6 +40,7 @@ export class CortexMkdirRepository {
   static async createDirectory({
     userId,
     user,
+    locale,
     path: rawPath,
     viewType,
     createParents = true,
@@ -45,7 +49,7 @@ export class CortexMkdirRepository {
   }: MkdirParams): Promise<
     ResponseType<{ responsePath: string; created: boolean }>
   > {
-    const path = normalizePath(rawPath);
+    const path = normalizeToCanonicalPath(normalizePath(rawPath), locale);
 
     if (!isValidPath(path)) {
       return fail({
@@ -63,7 +67,7 @@ export class CortexMkdirRepository {
       }
     }
 
-    if (!isWritablePath(path)) {
+    if (!isWritablePath(path, locale)) {
       return fail({
         message: t("post.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,

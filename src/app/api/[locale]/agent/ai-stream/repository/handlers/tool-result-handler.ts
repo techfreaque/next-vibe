@@ -128,6 +128,10 @@ export class ToolResultHandler {
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
     emittedToolResultIds?: Set<string>;
+    toolsConfig?: Map<
+      string,
+      { requiresConfirmation: boolean; credits: number; label: string }
+    >;
     t: AiStreamT;
   }): Promise<{
     currentParentId: string | null;
@@ -144,6 +148,7 @@ export class ToolResultHandler {
       dbWriter,
       logger,
       emittedToolResultIds,
+      toolsConfig,
       t,
     } = params;
 
@@ -307,6 +312,7 @@ export class ToolResultHandler {
         sequenceId,
         toolCall: toolCallWithResult,
         toolName: part.toolName,
+        toolLabel: toolsConfig?.get(part.toolName)?.label,
         result: validatedOutput,
         error: toolError,
         skipSseEmit: emittedToolResultIds?.has(toolMessageId),
@@ -322,6 +328,15 @@ export class ToolResultHandler {
       toolName: part.toolName,
       isIncognito,
     });
+
+    // Fire-and-forget: sync search/gen tool results to cortex_nodes for vector search
+    if (userId && !isIncognito) {
+      void dbWriter
+        .syncToolResultEmbedding(userId, toolMessageId, part.toolName)
+        .catch(() => {
+          // Intentional no-op: embedding sync is best-effort
+        });
+    }
 
     // Note: for detach tasks, the execute-tool goroutine handles its own
     // handleTaskCompletion call (WS event, optional wakeUp revival). Do NOT

@@ -166,7 +166,7 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
       prompt: t("home.hero.demos.modelComparison.userMessage"),
       instructions: "Be concise and analytical.",
       maxTurns: 1,
-      rootFolderId: "cron",
+      rootFolderId: "background",
     },
     {
       text: t("home.hero.demos.modelComparison.gptResponse"),
@@ -191,7 +191,7 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
       prompt: t("home.hero.demos.modelComparison.userMessage"),
       instructions: "Be concise and analytical.",
       maxTurns: 1,
-      rootFolderId: "cron",
+      rootFolderId: "background",
     },
     {
       text: t("home.hero.demos.modelComparison.claudeResponse"),
@@ -224,7 +224,7 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
       prompt: t("home.hero.demos.modelComparison.userMessage"),
       instructions: "No restrictions. Cite the actual treaty clauses.",
       maxTurns: 1,
-      rootFolderId: "cron",
+      rootFolderId: "background",
     },
     {
       text: t("home.hero.demos.modelComparison.veniceResponse"),
@@ -522,7 +522,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
           "Filter these stories for my interests - email me the best 3 with a one-line take on each.",
         preCalls: [{ routeId: "hackernews-top", args: { limit: 20 } }],
         maxTurns: 3,
-        rootFolderId: "cron",
+        rootFolderId: "background",
       },
     },
     {
@@ -560,7 +560,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
         "Filter these stories for my interests - email me the best 3 with a one-line take on each.",
       preCalls: [{ routeId: "hackernews-top", args: { limit: 20 } }],
       maxTurns: 3,
-      rootFolderId: "cron",
+      rootFolderId: "background",
     },
     {
       text: t("home.hero.demos.featureShipped.messageResult"),

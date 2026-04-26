@@ -435,7 +435,6 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
   describe(cfg.label, () => {
     let testUser: JwtPrivatePayloadType;
     let mainFavoriteId: string;
-
     beforeAll(async () => {
       const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
       expect(

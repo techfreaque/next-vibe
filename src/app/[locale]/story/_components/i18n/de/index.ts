@@ -250,25 +250,43 @@ export const translations: typeof enTranslations = {
     },
     splitHero: {
       or: "ODER",
-      clickToExplore: "Klicken zum Erkunden",
-      header: "Wir sind kein Milliarden-Konzern.",
+      clickToExplore: "Entdecken",
+      badge: "Kleines Team · Open Source · Offen entwickelt",
+      header: "KI, die dir nicht vorschreibt, was du denken sollst.",
       subheader:
-        "Wir sind Entwickler, die finden: KI sollte keine politische Meinung haben.",
-      introBody:
-        "Das heißt: Ecken und Kanten. Modelle fallen aus. Features kommen roh raus. Wir fixen schnell und tun nicht so, als wären wir perfekt. Was wir sind: die einzige Plattform, auf der du den Filterlevel wählst - kein Sicherheits-Komitee.",
-      introGuide: "Wähle, was zu dir passt:",
-      introOption1:
-        "Einfach mit unzensierter KI chatten? Fang hier an - die meisten tun das.",
-      introOption2:
-        "Willst du es auf deiner eigenen Hardware laufen lassen? Hoste alles selbst.",
-      introOption3:
-        "Du bist Entwickler? Das Framework ist Open Source. Fork es.",
-      introOption4:
-        "Willst du verdienen? Empfiehl Nutzer oder veröffentliche KI-Skills für wiederkehrende Einnahmen.",
-      introHelp: "Orientierungslos?",
-      introHelpCta: "Schreib uns",
+        "Keine Verweigerungen. Niemand liest deine Chats. Deine KI — nicht unsere.",
+      chipChat: "Chatten",
+      chipSelfHost: "Selbst hosten",
+      chipBuild: "Aufbauen",
+      chipEarn: "Verdienen",
+      introGuide: "Vier Wege — such dir deinen aus:",
+      introOption1: "",
+      introOption2: "",
+      introOption3: "",
+      introOption4: "",
+      introBody: "",
+      introHelp: "Wir fixen schnell. Etwas stimmt nicht?",
+      introHelpCta: "Sag's uns",
+      card: {
+        chat: {
+          label: "Einfach chatten",
+          desc: "Frag alles — auch was ChatGPT ablehnt. Kein Account nötig.",
+        },
+        personal: {
+          label: "Deine eigene KI",
+          desc: "Läuft auf deinem Rechner. Sag ihr, was du brauchst — sie passt sich deinem Leben an.",
+        },
+        nextvibe: {
+          label: "Eigene Plattform aufbauen",
+          desc: "Wie WordPress, aber für KI. Sofort startklar — bau es zu deiner Nische aus.",
+        },
+        referral: {
+          label: "Verdiene Geld",
+          desc: "Empfiehl es weiter oder verkaufe eigene KI-Tools. Wiederkehrende Einnahmen.",
+        },
+      },
       unbottled: {
-        badge: "Unzensiert · Open · Mainstream",
+        badge: "Unzensiert · Offen · Mainstream",
         titleLine1: "Unzensierte KI.",
         titleLine2: "Frag alles.",
         subtitle:
@@ -280,7 +298,7 @@ export const translations: typeof enTranslations = {
         ctaExplore: "Mehr erfahren",
       },
       personal: {
-        badge: "Self-hosted KI-Agent",
+        badge: "Eigener KI-Agent",
         titleLine1: "Du fragst.",
         titleLine2: "Es liefert.",
         subtitle:
@@ -296,11 +314,11 @@ export const translations: typeof enTranslations = {
         titleLine1: "Einmal schreiben.",
         titleLine2: "Überall deployen.",
         subtitle:
-          "Eine TypeScript-Definition wird automatisch zur maßgeschneiderten Web-UI, CLI-Befehl, KI-Tool, MCP-Server, Mobile-Screen und Cron-Job. Gleicher Vertrag. Null Rewrites. Fork es, besitz es.",
+          "Eine TypeScript-Definition wird automatisch zur maßgeschneiderten Web-UI, CLI-Befehl, KI-Tool, MCP-Server, Mobile-Screen und Cron-Job. Gleicher Vertrag. Kein Umschreiben. Fork es, mach es zu deinem.",
         pill1: "Treibt {{appName}} an",
         pill2: "Zero any / unknown / throw",
         pill3: "{{platformCount}} Plattformen pro Endpoint",
-        ctaGithub: "Auf GitHub starten",
+        ctaGithub: "GitHub Star geben",
         ctaDocs: "Framework entdecken",
         ctaExplore: "Mehr erfahren",
       },
@@ -309,7 +327,7 @@ export const translations: typeof enTranslations = {
         titleLine1: "Veröffentlichen. Empfehlen.",
         titleLine2: "Verdienen.",
         subtitle:
-          "Empfehlungslink: 10% jeder Zahlung, dauerhaft. Das Skill als Einstiegsseite: +5% — auch wenn andere es teilen.",
+          "Empfehlungslink: 10% jeder Zahlung, dauerhaft. Dein Skill als Einstiegspunkt: +5% — auch wenn andere ihn teilen.",
         cta: "Jetzt verdienen",
         ctaExplore: "Mehr erfahren",
       },
@@ -318,7 +336,7 @@ export const translations: typeof enTranslations = {
         unbottledSub: "Consumer-KI",
         unbottledDesc:
           "{{modelCount}} Modelle, Bild/Video/Musik-Generierung, persistentes Gedächtnis, Live-Suche - kein Filter den du nicht gewählt hast",
-        personal: "Self-Host",
+        personal: "Selbst hosten",
         personalSub: "Dein KI-Agent",
         personalDesc:
           "Alle Modelle auf deiner Hardware - surft, codet, bedient Terminals 24/7. Eigene Keys oder {{appName}}-Konto.",
@@ -342,7 +360,7 @@ export const translations: typeof enTranslations = {
       personal: {
         title: "Self-Hosting",
         description:
-          "Dein eigener KI-Agent auf deiner Maschine. Always-on, eigene Keys, deine Daten bleiben bei dir.",
+          "Dein eigener KI-Agent auf deiner Maschine. Läuft rund um die Uhr, eigene Keys, deine Daten bleiben bei dir.",
       },
       nextvibe: {
         title: "Das Framework",

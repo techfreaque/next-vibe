@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:7b6f0882 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:14]\n\nAssistant: BRANCH_RESPONSE STEP_OK\n\nSystem: [Context: ID:8d62643b | Posted:Apr 26, 13:15]\n\nUser: [T4b video-gen] Call the generate_video tool with prompt='spinning cube'. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English — the user's language.\n\n/ (cortex)\n├── memories/ (6)\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · \n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nu\n│   \n\nSystem: [Context: ID:5c2e1434 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:15]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_video\",\"input\":{\"prompt\":\"spinning cube\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"videoUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/ea36c307-def6-46c6-87ed-19f59c712051/def2549d-483a-4809-be6d-426b641df90a.mp4\",\"creditCost\":124.8,\"durationSeconds\":4}}",
+    "encoding_format": "float"
+  }
+}

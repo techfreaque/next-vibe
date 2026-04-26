@@ -1,7 +1,7 @@
 export const translations = {
   category: "Task Management",
 
-  description: "Executes cron tasks and manages side tasks",
+  description: "Executes background tasks and manages side tasks",
   common: {
     taskName: "Task Name",
     taskNamesDescription: "Names of tasks to filter",
@@ -18,11 +18,12 @@ export const translations = {
   },
   post: {
     title: "Unified Task Runner",
-    description: "Manage unified task runner for cron tasks and side tasks",
+    description:
+      "Manage unified task runner for background tasks and side tasks",
     container: {
       title: "Unified Task Runner Management",
       description:
-        "Control the unified task runner that manages both cron tasks and side tasks",
+        "Control the unified task runner that manages both background tasks and side tasks",
     },
     fields: {
       action: {

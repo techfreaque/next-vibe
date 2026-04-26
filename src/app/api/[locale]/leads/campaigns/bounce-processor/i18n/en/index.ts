@@ -104,7 +104,7 @@ export const translations = {
   },
   get: {
     title: "Get Bounce Processor Config",
-    description: "Retrieve bounce processor cron task configuration",
+    description: "Retrieve bounce processor background task configuration",
     errors: {
       unauthorized: {
         title: "Unauthorized",
@@ -154,10 +154,10 @@ export const translations = {
   },
   put: {
     title: "Bounce Processor Config",
-    description: "Update bounce processor cron task configuration",
+    description: "Update bounce processor background task configuration",
     enabled: {
       label: "Enabled",
-      description: "Enable or disable the bounce processor cron task",
+      description: "Enable or disable the bounce processor background task",
     },
     dryRun: {
       label: "Dry Run Mode",
@@ -204,7 +204,7 @@ export const translations = {
     titleSaved: "Configuration Saved",
     saving: "Saving...",
     save: "Save Settings",
-    guidanceTitle: "Configure Bounce Processor Cron",
+    guidanceTitle: "Configure Bounce Processor Background Task",
     guidanceDescription:
       "Enable or disable the bounce processor cron task and configure its schedule and batch settings.",
     runButton: "Run Now",

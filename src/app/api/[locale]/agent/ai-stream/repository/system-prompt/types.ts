@@ -88,6 +88,8 @@ export interface SystemPromptClientParams {
   headless?: boolean;
   /** Sub-agent nesting depth (0 = top-level, 1+ = sub-agent) */
   subAgentDepth: number;
+  /** Last user message content — used for vector search context injection (debug panel) */
+  lastUserMessage?: string;
 }
 
 /**

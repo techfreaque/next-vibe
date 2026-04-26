@@ -48,6 +48,8 @@ import { type Modality, type ModelUtilityValue } from "./enum";
 export interface ModelFeatures {
   streaming: boolean;
   toolCalling: boolean;
+  /** When false, temperature must not be sent (e.g. gpt-5-image via OpenRouter rejects it) */
+  supportsTemperature?: boolean;
 }
 
 /**
@@ -977,9 +979,10 @@ export function filterRoleModels<
   const isAdmin =
     !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
   if (!selection) {
-    return pool.filter(
+    const available = pool.filter(
       (m) => (!m.adminOnly || isAdmin) && isModelProviderAvailable(m),
     );
+    return deduplicateCheapestPerModel(available, isAdmin);
   }
   if (selection.selectionType === ModelSelectionType.MANUAL) {
     if (selection.manualModelId) {
@@ -989,7 +992,11 @@ export function filterRoleModels<
       if (candidates[0]?.adminOnly && !isAdmin) {
         return [];
       }
-      // Pick the cheapest available provider for this model ID.
+      if (isAdmin) {
+        // Admins can see all available providers for this model.
+        return candidates.filter((m) => isModelProviderAvailable(m));
+      }
+      // Non-admins: pick the cheapest available provider for this model ID.
       const available = candidates.find((m) => isModelProviderAvailable(m));
       if (available) {
         return [available];
@@ -1016,10 +1023,11 @@ export function filterRoleModels<
       meetsRangeConstraint(modelPrice, selection.priceRange, PriceLevelDB)
     );
   });
+  const deduped = deduplicateCheapestPerModel(filtered, isAdmin);
   if (!selection.sortBy) {
-    return filtered;
+    return deduped;
   }
-  return filtered.toSorted((a, b) => {
+  return deduped.toSorted((a, b) => {
     const dir1 = selection.sortDirection ?? ModelSortDirection.DESC;
     const v1a = getRoleModelSortValue(a, selection.sortBy);
     const v1b = getRoleModelSortValue(b, selection.sortBy);
@@ -1052,6 +1060,28 @@ function getRoleModelSortValue(
     default:
       return 0;
   }
+}
+
+/**
+ * Deduplicate a cheapest-first pool to one entry per model ID.
+ * Non-admins see only the cheapest available provider per model.
+ * Admins see all provider variants (cheapest-first within each model).
+ */
+export function deduplicateCheapestPerModel<TOption extends ModelOptionBase>(
+  options: TOption[],
+  isAdmin: boolean,
+): TOption[] {
+  if (isAdmin) {
+    return options;
+  }
+  const seen = new Set<string>();
+  return options.filter((m) => {
+    if (seen.has(m.id)) {
+      return false;
+    }
+    seen.add(m.id);
+    return true;
+  });
 }
 
 /**

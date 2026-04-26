@@ -10,15 +10,15 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cortexNodes } from "../db";
-import { CortexCreditFeature } from "../enum";
 import type { CortexCreditFeatureValue } from "../enum";
+import { CortexCreditFeature } from "../enum";
 
 import {
   computeEmbeddingHash,
@@ -33,7 +33,7 @@ export interface EmbedOptions {
   /** User context for credit deduction */
   user?: JwtPayloadType;
   /** Locale for credit translation strings */
-  locale?: CountryLanguage;
+  locale: CountryLanguage;
   /** Logger for credit deduction */
   logger?: EndpointLogger;
   /** Feature name for usage history */
@@ -68,6 +68,9 @@ async function embedNode(
   options?: EmbedOptions,
 ): Promise<void> {
   try {
+    // Embed path + content combined — path tokens (e.g. "projects/auth/decision-log")
+    // are high-signal for retrieval, especially for sparse or newly-created files.
+    // Re-embedding on rename/move is now meaningful since path changes the text.
     const textToEmbed = `${path}\n\n${content}`;
     const newHash = computeEmbeddingHash(path, content);
 
@@ -126,11 +129,15 @@ async function deductEmbeddingCredits(options: EmbedOptions): Promise<void> {
     const { scopedTranslation: creditsScopedTranslation } =
       await import("@/app/api/[locale]/credits/i18n");
     const { t: tCredits } = creditsScopedTranslation.scopedT(options.locale!);
+    const { scopedTranslation: cortexScopedTranslation } =
+      await import("@/app/api/[locale]/agent/cortex/i18n");
+    const { t: tCortex } = cortexScopedTranslation.scopedT(options.locale!);
+    const featureKey = options.feature ?? CortexCreditFeature.EMBEDDING;
 
     await CreditRepository.deductCreditsForFeature(
       options.user!,
       EMBEDDING_CREDIT_COST,
-      options.feature ?? CortexCreditFeature.EMBEDDING,
+      tCortex(featureKey),
       options.logger!,
       tCredits,
       options.locale!,

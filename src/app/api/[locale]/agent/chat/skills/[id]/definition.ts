@@ -1066,7 +1066,7 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z
           .object({
-            userId: z.uuid(),
+            userId: z.string(),
             creatorSlug: z.string(),
             publicName: z.string(),
             avatarUrl: z.string().nullable(),
@@ -1219,7 +1219,7 @@ const { GET } = createEndpoint({
       },
       getCustom: {
         icon: "👨‍💻",
-        internalId: "550e8400-e29b-41d4-a716-446655440000",
+        internalId: null,
         name: "Code Reviewer",
         tagline: "Code Review Expert",
         description: "Expert at reviewing code",

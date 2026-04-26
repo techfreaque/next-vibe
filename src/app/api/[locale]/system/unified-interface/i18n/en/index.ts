@@ -41,6 +41,7 @@ export const translations = {
     systemTasks: "System: Tasks",
     userAuth: "User Authentication",
     userManagement: "User Management",
+    support: "Support",
   },
   shared: {
     permissions: {

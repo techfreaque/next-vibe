@@ -28,7 +28,7 @@ export function CreatorProfilePage({
       user={viewer}
       endpointOptions={{
         read: {
-          urlPathParams: { creatorId },
+          urlPathParams: { userId: creatorId },
           initialData,
         },
       }}

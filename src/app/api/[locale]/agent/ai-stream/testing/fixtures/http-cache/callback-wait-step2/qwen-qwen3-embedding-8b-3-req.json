@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Tool: [result:execute-tool] {\"hint\":\"Task detached. Use wait-for-task with this taskId if you need the result.\",\"status\":\"status.pending\",\"taskId\":\"T5B_TASK_ID_PLACEHOLDER\"}\n\nAssistant: STEP_OK taskId=T5B_TASK_ID_PLACEHOLDER\n\nSystem: [Context: ID:c787e888 | Posted:Apr 26, 13:16]\n\nUser: [T5b wait-for-task] Call the wait-for-task tool with taskId='T5B_TASK_ID_PLACEHOLDER'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English — the user's language.\n\n/ (cortex)\n├── memories/ (6)\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · \n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nu\n│   \n\nSystem: [Context: ID:3651467e | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:16]\n\nAssistant: [tool:wait-for-task] {\"taskId\":\"T5B_TASK_ID_PLACEHOLDER\"}\n\nTool: [result:wait-for-task] {\"status\":\"status.pending\",\"waiting\":true,\"originalToolName\":\"generate_image\",\"originalArgs\":{\"prompt\":\"wait-for-task-test\"}}",
+    "encoding_format": "float"
+  }
+}

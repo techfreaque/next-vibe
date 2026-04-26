@@ -12,12 +12,19 @@ export const translations = {
     widget: {
       hint: "Wygeneruj embeddingi dla wszystkich węzłów, które ich nie mają. To może chwilę potrwać.",
     },
-    fields: {},
+    fields: {
+      force: {
+        label: "Wymuś ponowne osadzanie",
+        description:
+          "Wyczyść wszystkie embeddingi i wygeneruj od nowa (tylko treść). Użyj gdy format się zmienił.",
+      },
+    },
     submitButton: {
       label: "Rozpocznij",
       loadingText: "Przetwarzanie...",
     },
     response: {
+      materialized: { text: "Zmaterializowane" },
       processed: { text: "Osadzone" },
       failed: { text: "Nieudane" },
       skipped: { text: "Pominięte" },

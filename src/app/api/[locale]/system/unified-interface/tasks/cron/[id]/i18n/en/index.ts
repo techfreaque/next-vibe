@@ -288,7 +288,7 @@ export const translations = {
     high: "High",
     medium: "Medium",
     low: "Low",
-    background: "Background",
+    background: "Cron",
   },
   status: {
     pending: "Pending",

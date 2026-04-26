@@ -31,6 +31,7 @@ import {
   ChatModelId,
   FEATURED_MODELS,
 } from "@/app/api/[locale]/agent/ai-stream/models";
+import { DEFAULT_CHAT_MODEL_ID } from "@/app/api/[locale]/agent/ai-stream/constants";
 import type { ModelCountsByContentLevel } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
 
@@ -724,9 +725,9 @@ function buildModelsDemoGroup(
   const seq = `models-${activeId}-seq`;
   const model =
     activeId === "mainstream"
-      ? ChatModelId.GPT_5_4
+      ? ChatModelId.GPT_5_5
       : activeId === "open"
-        ? ChatModelId.KIMI_K2_5
+        ? DEFAULT_CHAT_MODEL_ID
         : ChatModelId.UNCENSORED_LM_V1_2;
   const content =
     activeId === "mainstream"

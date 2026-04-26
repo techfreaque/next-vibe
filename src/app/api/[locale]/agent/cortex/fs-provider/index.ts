@@ -42,15 +42,19 @@ export const DATA_ROOT = resolve(process.cwd(), "data");
 
 /**
  * Returns true when Cortex should use the filesystem backend.
- * Conditions: IS_PREVIEW_MODE=true AND user is admin.
+ * Conditions: admin user AND one of:
+ *   - IS_PREVIEW_MODE=true  (set by `vibe --local`)
+ *   - NEXT_PUBLIC_LOCAL_MODE=true  (explicit local mode flag)
+ *   - NODE_ENV=development  (local dev server)
  */
 export function isFilesystemMode(user: JwtPrivatePayloadType): boolean {
-  // Dynamic import of envServer would create a top-level dependency
-  // on server config — instead we read the env var directly since
-  // IS_PREVIEW_MODE is always set as a process env var.
-  const isPreview = process.env["IS_PREVIEW_MODE"] === "true";
+  if (user.isPublic || !user.roles.includes(UserPermissionRole.ADMIN)) {
+    return false;
+  }
   return (
-    isPreview && !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN)
+    process.env["IS_PREVIEW_MODE"] === "true" ||
+    process.env["NEXT_PUBLIC_LOCAL_MODE"] === "true" ||
+    process.env["NODE_ENV"] === "development"
   );
 }
 

@@ -366,7 +366,7 @@ export const translations: typeof enTranslations = {
       shared: "Udostępnione czaty",
       public: "Publiczne czaty",
       incognito: "Czaty incognito",
-      cron: "Wątki cron",
+      background: "Wątki w tle",
     },
   },
 };

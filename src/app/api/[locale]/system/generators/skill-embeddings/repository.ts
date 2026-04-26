@@ -2,8 +2,8 @@
  * Skill Embeddings Generator
  *
  * Pre-computes embeddings for built-in skills at `vibe gen` time.
- * Writes embedding + embeddingHash directly into each skill.ts file
- * so the file is the single source of truth — committed to git.
+ * Writes embedding + embeddingHash to a sibling `skill.embedding.ts` file
+ * so the skill.ts stays clean — committed to git.
  *
  * Only regenerates embeddings when skill content changes (SHA-256 hash check).
  */
@@ -11,7 +11,7 @@
 import "server-only";
 
 import { readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 import {
   type ResponseType as BaseResponseType,
@@ -57,13 +57,10 @@ export class SkillEmbeddingsGeneratorRepository {
       const apiDir = join(process.cwd(), "src", "app", "api", "[locale]");
       const skillFiles = findFilesRecursively(apiDir, "skill.ts");
 
-      // Build a map of export name → { skillId, systemPrompt } from resolved data
-      const skillByExportName = new Map<
-        string,
-        { id: string; systemPrompt: string }
-      >();
+      // Build a map of skillId → { id, systemPrompt } from resolved data
+      const skillById = new Map<string, { id: string; systemPrompt: string }>();
       for (const skill of DEFAULT_SKILLS) {
-        skillByExportName.set(skill.id, {
+        skillById.set(skill.id, {
           id: skill.id,
           systemPrompt: skill.systemPrompt,
         });
@@ -80,26 +77,21 @@ export class SkillEmbeddingsGeneratorRepository {
         if (!exportMatch) {
           continue;
         }
-        // Extract skill id the same way as skills-index generator
+        // Extract skill id directly
         const idMatch = /\bid:\s*"([^"]*)"/.exec(content);
-        const matchedSkill = idMatch
-          ? skillByExportName.get(idMatch[1])
-          : undefined;
+        const matchedSkill = idMatch ? skillById.get(idMatch[1]) : undefined;
         if (matchedSkill) {
           fileSkillMap.set(filePath, matchedSkill);
         } else {
-          // ID is a constant reference (e.g. `id: SKILL_CREATOR_ID`)
-          // Resolve by finding the constant's import and reading its value
+          // ID is a constant reference — resolve via import
           const constIdMatch = /\bid:\s*([A-Z_][A-Z_0-9]*)\b/.exec(content);
           if (constIdMatch) {
             const constName = constIdMatch[1];
-            // Find the import path for this constant
             const importMatch = new RegExp(
               `import\\s*\\{[^}]*\\b${constName}\\b[^}]*\\}\\s*from\\s*["']([^"']+)["']`,
             ).exec(content);
             if (importMatch) {
               const importPath = importMatch[1];
-              // Resolve import path — handle @/ alias and relative paths
               let constFile: string;
               if (importPath.startsWith("@/")) {
                 constFile = join(
@@ -108,10 +100,7 @@ export class SkillEmbeddingsGeneratorRepository {
                   `${importPath.slice(2)}.ts`,
                 );
               } else {
-                const skillDir = filePath.slice(
-                  0,
-                  filePath.lastIndexOf("/") + 1,
-                );
+                const skillDir = dirname(filePath);
                 constFile = join(skillDir, `${importPath}.ts`);
               }
               try {
@@ -120,7 +109,7 @@ export class SkillEmbeddingsGeneratorRepository {
                   `${constName}\\s*=\\s*["']([^"']+)["']`,
                 ).exec(constContent);
                 if (valueMatch) {
-                  const skill = skillByExportName.get(valueMatch[1]);
+                  const skill = skillById.get(valueMatch[1]);
                   if (skill) {
                     fileSkillMap.set(filePath, skill);
                   }
@@ -143,7 +132,6 @@ export class SkillEmbeddingsGeneratorRepository {
           continue;
         }
 
-        const fileContent = readFileSync(filePath, "utf-8");
         const { id: skillId, systemPrompt } = skill;
         total++;
 
@@ -152,8 +140,11 @@ export class SkillEmbeddingsGeneratorRepository {
         const content = `# ${skillId}\n\n${systemPrompt}`;
         const hash = computeEmbeddingHash(path, content);
 
-        // Check existing embeddingHash in file
-        const existingHash = extractEmbeddingHash(fileContent);
+        // Check existing hash in the sibling .embedding.ts file
+        const embeddingFile = join(dirname(filePath), "skill.embedding.ts");
+        const existingFileContent = readFileSafe(embeddingFile);
+        const existingHash = extractHash(existingFileContent);
+
         if (existingHash === hash) {
           skipped++;
           continue;
@@ -169,9 +160,10 @@ export class SkillEmbeddingsGeneratorRepository {
           continue;
         }
 
-        // Write embedding + hash back into the skill.ts file
-        const updated = writeEmbeddingToFile(fileContent, hash, embedding);
-        writeFileSync(filePath, updated, "utf-8");
+        // Write to sibling skill.embedding.ts
+        const embeddingStr = `[${embedding.map((v) => Number(v.toPrecision(15))).join(",")}]`;
+        const newContent = buildSkillEmbeddingFile(skillId, hash, embeddingStr);
+        writeFileSync(embeddingFile, newContent, "utf-8");
 
         generated++;
         logger.debug(`  embedded: ${skillId}`);
@@ -206,45 +198,32 @@ export class SkillEmbeddingsGeneratorRepository {
   }
 }
 
-/**
- * Extract the existing embeddingHash value from a skill.ts file.
- */
-function extractEmbeddingHash(fileContent: string): string | null {
-  const match = /embeddingHash:\s*\n?\s*["']([a-f0-9]+)["']/.exec(fileContent);
+function readFileSafe(path: string): string {
+  try {
+    return readFileSync(path, "utf-8");
+  } catch {
+    return "";
+  }
+}
+
+function extractHash(fileContent: string): string | null {
+  const match = /embeddingHash:\s*["']([a-f0-9]+)["']/.exec(fileContent);
   return match?.[1] ?? null;
 }
 
-/**
- * Write/replace embedding and embeddingHash fields in a skill.ts file.
- * Inserts before the closing `};` of the skill export.
- */
-function writeEmbeddingToFile(
-  fileContent: string,
+function buildSkillEmbeddingFile(
+  skillId: string,
   hash: string,
-  embedding: number[],
+  embeddingStr: string,
 ): string {
-  // Remove existing embedding/embeddingHash (may span multiple lines due to prettier)
-  let cleaned = fileContent
-    .replace(/\s*embeddingHash:\s*\n?\s*["'][^"']*["'],?\n?/g, "")
-    .replace(/\s*\/\/ prettier-ignore\n/g, "")
-    .replace(/\s*embedding:\s*\[[\s\S]*?\],?\n?/g, "")
-    // Clean up any double blank lines from removal
-    .replace(/\n{3,}/g, "\n\n");
+  return `import type { SkillEmbedding } from "../../embedding-type";
 
-  // Serialize embedding as compact array — limit precision to avoid no-loss-of-precision lint errors
-  const embeddingStr = `[${embedding.map((v) => Number(v.toPrecision(15))).join(",")}]`;
-
-  // Find the last `};` which closes the skill export
-  const closingIdx = cleaned.lastIndexOf("};");
-  if (closingIdx === -1) {
-    return cleaned;
-  }
-
-  // Ensure there's a newline before the closing `};`
-  const before = cleaned.slice(0, closingIdx);
-  const after = cleaned.slice(closingIdx);
-  const needsNewline = !before.endsWith("\n");
-  const insertion = `${needsNewline ? "\n" : ""}  embeddingHash: "${hash}",\n  // prettier-ignore\n  embedding: ${embeddingStr},\n`;
-
-  return `${before}${insertion}${after}`;
+/** Generated by \`vibe gen\` — do not edit manually */
+export const embedding: SkillEmbedding = {
+  skillId: "${skillId}",
+  embeddingHash: "${hash}",
+  // prettier-ignore
+  embedding: ${embeddingStr},
+};
+`;
 }

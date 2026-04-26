@@ -51,8 +51,10 @@ export class StateMutation extends React.Component<object, { count: number }> {
 export function NotSelfClosing(): React.ReactElement {
   return (
     <div>
-      <br />
-      <img src="test.png" alt="test" />
+      <br></br>
+      <img src="test.png" alt="test"></img>
+      <input type="text"></input>
+      <hr></hr>
     </div>
   );
 }

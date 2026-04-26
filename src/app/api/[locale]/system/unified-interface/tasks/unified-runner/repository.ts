@@ -337,7 +337,7 @@ export class UnifiedTaskRunnerRepository {
         platform: Platform.CRON,
         cronTaskId: dbTask?.id,
         streamContext: {
-          rootFolderId: DefaultFolderId.CRON,
+          rootFolderId: DefaultFolderId.BACKGROUND,
           threadId: undefined,
           aiMessageId: undefined,
           currentToolMessageId: undefined,

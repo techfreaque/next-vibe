@@ -93,7 +93,7 @@ const { POST } = createEndpoint({
         description: "post.model.description",
         columns: 6,
         options: MusicGenModelIdOptions,
-        schema: z.enum(MusicGenModelId).default(MusicGenModelId.LYRIA_3),
+        schema: z.enum(MusicGenModelId).optional(),
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
       }),
       duration: requestField(scopedTranslation, {

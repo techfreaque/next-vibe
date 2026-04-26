@@ -743,7 +743,11 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
             <ToolsButton disabled={false} locale={locale} />
           )}
 
-          <CortexButton disabled={isInputDisabled} locale={locale} />
+          <CortexButton
+            disabled={isInputDisabled}
+            locale={locale}
+            folderId={currentRootFolderId}
+          />
 
           {showFileUpload && (
             <FileUploadButton

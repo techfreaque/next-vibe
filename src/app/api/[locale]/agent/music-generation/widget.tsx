@@ -24,6 +24,7 @@ import {
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
@@ -65,6 +66,7 @@ export function MusicGenerationContainer({
   field,
 }: CustomWidgetProps): JSX.Element {
   const isSubmitting = useWidgetIsSubmitting();
+  const isDisabled = useWidgetDisabled();
   const form = useWidgetForm<typeof definition.POST>();
   const result = useWidgetValue<typeof definition.POST>();
   const children = field.children;
@@ -178,6 +180,7 @@ export function MusicGenerationContainer({
             className="w-full min-h-[80px] resize-none"
             placeholder={t("post.prompt.placeholder")}
             value={prompt}
+            disabled={isDisabled}
             onChange={(e) => form?.setValue("prompt", e.target.value)}
           />
           {/* Style chips */}
@@ -189,6 +192,7 @@ export function MusicGenerationContainer({
                 variant="outline"
                 size="sm"
                 className="h-6 px-2 text-[10px] rounded-full"
+                disabled={isDisabled}
                 onClick={() => appendStyle(style)}
               >
                 {style}
@@ -212,6 +216,7 @@ export function MusicGenerationContainer({
                 }
                 size="sm"
                 className="flex-1 h-auto py-2 flex flex-col gap-0.5"
+                disabled={isDisabled}
                 onClick={() => form?.setValue("duration", preset.value)}
               >
                 <Span className="text-xs font-medium">{preset.label}</Span>
@@ -244,7 +249,7 @@ export function MusicGenerationContainer({
             allowedRoles={["audio-gen"]}
             defaultModelSelection={defaultModelSelection}
             placeholder={t("post.model.label")}
-            onClick={() => setShowModelSelector(true)}
+            onClick={isDisabled ? undefined : () => setShowModelSelector(true)}
             locale={locale}
             user={user}
           />

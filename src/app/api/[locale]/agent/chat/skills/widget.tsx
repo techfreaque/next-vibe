@@ -7,12 +7,12 @@
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 import { Maximize } from "next-vibe-ui/ui/icons/Maximize";
-import { MoreHorizontal } from "next-vibe-ui/ui/icons/MoreHorizontal";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Search } from "next-vibe-ui/ui/icons/Search";
@@ -47,6 +47,7 @@ import { SeparatorWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/widget";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 
 import { cn } from "../../../shared/utils";
 import { Icon } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -55,6 +56,7 @@ import { useSelectorOnboardingContext } from "../../ai-stream/stream/widget/sele
 import { parseSkillId } from "../slugify";
 import { useAddToFavorites } from "../favorites/create/hooks";
 import { useChatFavorites } from "../favorites/hooks/hooks";
+import { useChatSettings } from "../settings/hooks";
 import skillDetailDefinitions from "./[id]/definition";
 import { COMPANION_SKILLS } from "./config";
 import type definition from "./definition";
@@ -96,10 +98,15 @@ export function SkillsListContainer({
     (state) => state.setModelSelectorOpen,
   );
 
+  // Read active favorite from settings so activate state reflects correctly
+  const { settings } = useChatSettings(user, logger);
+  const settingsActiveFavoriteId = settings?.activeFavoriteId ?? null;
+
   // Fetch favorites to calculate favoriteIds for each skill
-  const { favorites, activeFavoriteId } = useChatFavorites(logger, {
-    activeFavoriteId: null,
+  const { favorites } = useChatFavorites(logger, {
+    activeFavoriteId: settingsActiveFavoriteId,
   });
+  const activeFavoriteId = settingsActiveFavoriteId;
 
   // Group favorites by base skill ID (for skill-level indicators)
   // fav.skillId is merged format "slug" or "slug__variantId" — extract base slug
@@ -1035,12 +1042,12 @@ export function VariantRow({
       <Div
         className={cn(
           "transition-all duration-200 ease-out overflow-hidden",
-          showActions || (isTouch && showActions) ? "max-h-12" : "max-h-0",
-          !isTouch && "group-hover:max-h-12",
+          showActions || (isTouch && showActions) ? "max-h-20" : "max-h-0",
+          !isTouch && "group-hover:max-h-20",
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <Div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 border-t ml-9">
+        <Div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 border-t ml-9 min-h-[2.5rem]">
           {isInCollection ? (
             <SkillFavoriteActions
               char={char}
@@ -1058,17 +1065,31 @@ export function VariantRow({
               <Span className="text-xs text-muted-foreground flex-shrink-0">
                 {t("get.card.actions.addToCollection")}
               </Span>
-              <AddToFavoritesButton
-                char={char}
-                logger={logger}
-                user={user}
-                locale={locale}
-                variant="default"
-                className="ml-auto h-6 gap-1 text-xs px-2"
-              >
-                <Zap className="h-3 w-3" />
-                {t("get.card.actions.quick")}
-              </AddToFavoritesButton>
+              <Div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
+                <EditFavBeforeAddButton
+                  char={char}
+                  navigate={navigate}
+                  logger={logger}
+                  user={user}
+                  locale={locale}
+                  variant="ghost"
+                  className="h-6 gap-1 text-xs px-2"
+                >
+                  <Pencil className="h-3 w-3" />
+                  {t("get.card.actions.customize")}
+                </EditFavBeforeAddButton>
+                <AddToFavoritesButton
+                  char={char}
+                  logger={logger}
+                  user={user}
+                  locale={locale}
+                  variant="default"
+                  className="h-6 gap-1 text-xs px-2"
+                >
+                  <Zap className="h-3 w-3" />
+                  {t("get.card.actions.quick")}
+                </AddToFavoritesButton>
+              </Div>
             </>
           )}
         </Div>
@@ -1117,7 +1138,6 @@ export function SkillCard({
   const isActive =
     activeFavoriteId !== null && favoriteIds.includes(activeFavoriteId);
   const [showActions, setShowActions] = useState(false);
-  const [customizeOpen, setCustomizeOpen] = useState(false);
 
   return (
     <Div
@@ -1131,7 +1151,7 @@ export function SkillCard({
             : "hover:shadow-sm",
       )}
       onMouseEnter={() => !isTouch && setShowActions(true)}
-      onMouseLeave={() => !isTouch && !customizeOpen && setShowActions(false)}
+      onMouseLeave={() => !isTouch && setShowActions(false)}
     >
       {/* Main content - always visible, clickable */}
       <Div
@@ -1299,9 +1319,7 @@ export function SkillCard({
       <Div
         className={cn(
           "transition-all duration-200 ease-out",
-          showActions || isTouch || customizeOpen
-            ? "max-h-20"
-            : "max-h-0 overflow-hidden",
+          showActions || isTouch ? "max-h-20" : "max-h-0 overflow-hidden",
           !isTouch && "group-hover:max-h-20",
         )}
         onClick={(e) => {
@@ -1327,6 +1345,40 @@ export function SkillCard({
                 {t("get.card.actions.addToCollection")}
               </Div>
               <Div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
+                <EditFavBeforeAddButton
+                  char={char}
+                  navigate={navigate}
+                  logger={logger}
+                  user={user}
+                  locale={locale}
+                  variant="ghost"
+                  className="h-7 gap-1.5 text-xs px-2"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  {t("get.card.actions.customize")}
+                </EditFavBeforeAddButton>
+                {char.ownershipType === SkillOwnershipType.USER && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 gap-1.5 text-xs px-2"
+                    onClick={(e): void => {
+                      e.stopPropagation();
+                      void (async (): Promise<void> => {
+                        const def = await import("./[id]/definition");
+                        navigate(def.default.PATCH, {
+                          urlPathParams: { id: charBaseId },
+                          prefillFromGet: true,
+                          getEndpoint: def.default.GET,
+                        });
+                      })();
+                    }}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    {t("get.card.actions.addVariant")}
+                  </Button>
+                )}
                 <AddToFavoritesButton
                   char={char}
                   logger={logger}
@@ -1339,67 +1391,6 @@ export function SkillCard({
                   <Zap className="h-3.5 w-3.5" />
                   {t("get.card.actions.quick")}
                 </AddToFavoritesButton>
-                <Popover
-                  open={customizeOpen}
-                  onOpenChange={(open) => {
-                    setCustomizeOpen(open);
-                    if (!open) {
-                      setShowActions(false);
-                    }
-                  }}
-                >
-                  <PopoverTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 w-7 p-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCustomizeOpen((prev) => !prev);
-                      }}
-                    >
-                      <MoreHorizontal className="h-3.5 w-3.5" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-48 p-1" align="end">
-                    <EditFavBeforeAddButton
-                      char={char}
-                      navigate={navigate}
-                      logger={logger}
-                      user={user}
-                      locale={locale}
-                      variant="ghost"
-                      className="w-full justify-start gap-2 h-8 px-2 cursor-pointer"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                      {t("get.card.actions.customize")}
-                    </EditFavBeforeAddButton>
-                    {char.ownershipType === SkillOwnershipType.USER && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="w-full justify-start gap-2 h-8 px-2"
-                        onClick={(e): void => {
-                          e.stopPropagation();
-                          setCustomizeOpen(false);
-                          void (async (): Promise<void> => {
-                            const def = await import("./[id]/definition");
-                            navigate(def.default.PATCH, {
-                              urlPathParams: { id: charBaseId },
-                              prefillFromGet: true,
-                              getEndpoint: def.default.GET,
-                            });
-                          })();
-                        }}
-                      >
-                        <Plus className="h-3.5 w-3.5" />
-                        {t("get.card.actions.addVariant")}
-                      </Button>
-                    )}
-                  </PopoverContent>
-                </Popover>
               </Div>
             </>
           )}
@@ -1462,6 +1453,30 @@ export function EditFavBeforeAddButton({
 
       const fullChar = skillResponse.data;
 
+      // Resolve model selections — prefer the specific variant if one is selected
+      const { variantId } = parseSkillId(char.skillId);
+      const matchedVariant = variantId
+        ? fullChar.variants.find((v) => v.id === variantId)
+        : undefined;
+
+      const modelSelection = matchedVariant?.modelSelection;
+      const voiceModelSelection =
+        (matchedVariant ?? fullChar).voiceModelSelection ?? undefined;
+      const sttModelSelection =
+        (matchedVariant ?? fullChar).sttModelSelection ?? undefined;
+      const imageVisionModelSelection =
+        (matchedVariant ?? fullChar).imageVisionModelSelection ?? undefined;
+      const videoVisionModelSelection =
+        (matchedVariant ?? fullChar).videoVisionModelSelection ?? undefined;
+      const audioVisionModelSelection =
+        (matchedVariant ?? fullChar).audioVisionModelSelection ?? undefined;
+      const imageGenModelSelection =
+        (matchedVariant ?? fullChar).imageGenModelSelection ?? undefined;
+      const musicGenModelSelection =
+        (matchedVariant ?? fullChar).musicGenModelSelection ?? undefined;
+      const videoGenModelSelection =
+        (matchedVariant ?? fullChar).videoGenModelSelection ?? undefined;
+
       // Navigate to create favorite with skill data
       const editFavoriteDefinitions =
         await import("../favorites/[id]/definition");
@@ -1470,8 +1485,16 @@ export function EditFavBeforeAddButton({
         data: {
           skillId: char.skillId,
           icon: fullChar.icon ?? undefined,
-          voiceModelSelection: undefined,
-          modelSelection: null,
+          customVariantName: matchedVariant?.displayName ?? null,
+          modelSelection,
+          voiceModelSelection,
+          sttModelSelection,
+          imageVisionModelSelection,
+          videoVisionModelSelection,
+          audioVisionModelSelection,
+          imageGenModelSelection,
+          musicGenModelSelection,
+          videoGenModelSelection,
         },
         replaceOnSuccess: {
           endpoint: editFavoriteDefinitions.default.PATCH,
@@ -1600,6 +1623,11 @@ export function SkillFavoriteActions({
   const [popoverOpen, setPopoverOpen] = useState(false);
   const isCurrentlyActive =
     activeFavoriteId !== null && favoriteIds.includes(activeFavoriteId);
+  const pathname = usePathname();
+  const isOnThreads = pathname?.includes("/threads/") ?? false;
+  const setModelSelectorOpen = useTourState(
+    (state) => state.setModelSelectorOpen,
+  );
 
   const handleActivateSingleFavorite = async (
     e: ButtonMouseEvent,
@@ -1754,12 +1782,36 @@ export function SkillFavoriteActions({
     const editFavoriteDefinitions =
       await import("../favorites/[id]/definition");
 
+    const { variantId: addVarId } = parseSkillId(char.skillId);
+    const addMatchedVariant = addVarId
+      ? fullChar.variants.find((v) => v.id === addVarId)
+      : undefined;
+
     navigate(createFavoriteDefinitions.default.POST, {
       data: {
         skillId: char.skillId,
         icon: fullChar.icon ?? undefined,
-        voiceModelSelection: undefined,
-        modelSelection: null,
+        customVariantName: addMatchedVariant?.displayName ?? null,
+        modelSelection: addMatchedVariant?.modelSelection,
+        voiceModelSelection:
+          (addMatchedVariant ?? fullChar).voiceModelSelection ?? undefined,
+        sttModelSelection:
+          (addMatchedVariant ?? fullChar).sttModelSelection ?? undefined,
+        imageVisionModelSelection:
+          (addMatchedVariant ?? fullChar).imageVisionModelSelection ??
+          undefined,
+        videoVisionModelSelection:
+          (addMatchedVariant ?? fullChar).videoVisionModelSelection ??
+          undefined,
+        audioVisionModelSelection:
+          (addMatchedVariant ?? fullChar).audioVisionModelSelection ??
+          undefined,
+        imageGenModelSelection:
+          (addMatchedVariant ?? fullChar).imageGenModelSelection ?? undefined,
+        musicGenModelSelection:
+          (addMatchedVariant ?? fullChar).musicGenModelSelection ?? undefined,
+        videoGenModelSelection:
+          (addMatchedVariant ?? fullChar).videoGenModelSelection ?? undefined,
       },
       replaceOnSuccess: {
         endpoint: editFavoriteDefinitions.default.PATCH,
@@ -1773,31 +1825,59 @@ export function SkillFavoriteActions({
   };
 
   if (favoriteCount === 1) {
-    // Single favorite - show "Use Now" or "In Use" button
+    // Single favorite - show "Activate" or "Go to Chat" button
     return (
       <>
         <Div className="text-xs text-muted-foreground flex-shrink-0">
           {t("get.card.actions.inCollection")}
         </Div>
         <Div className="flex items-center gap-2 ml-auto flex-shrink-0">
-          <Button
-            variant={isCurrentlyActive ? "secondary" : "default"}
-            size="sm"
-            className="h-7 gap-1.5 text-xs"
-            onClick={handleActivateSingleFavorite}
-            disabled={isActivating || isCurrentlyActive}
-          >
-            {isActivating ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : isCurrentlyActive ? (
-              <Star className="h-3.5 w-3.5 fill-current" />
+          {isCurrentlyActive ? (
+            isOnThreads ? (
+              <Button
+                variant="default"
+                size="sm"
+                className="h-7 gap-1.5 text-xs"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setModelSelectorOpen(false);
+                }}
+              >
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                {t("get.card.actions.useThis")}
+              </Button>
             ) : (
-              <Zap className="h-3.5 w-3.5" />
-            )}
-            {isCurrentlyActive
-              ? t("get.card.actions.inUse")
-              : t("get.card.actions.useNow")}
-          </Button>
+              <Button
+                variant="default"
+                size="sm"
+                className="h-7 gap-1.5 text-xs"
+                asChild
+              >
+                <Link
+                  href={`/${locale}/threads/private/new`}
+                  className="no-underline"
+                >
+                  <ArrowRight className="h-3.5 w-3.5" />
+                  {t("get.card.actions.goToChat")}
+                </Link>
+              </Button>
+            )
+          ) : (
+            <Button
+              variant="default"
+              size="sm"
+              className="h-7 gap-1.5 text-xs"
+              onClick={handleActivateSingleFavorite}
+              disabled={isActivating}
+            >
+              {isActivating ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Zap className="h-3.5 w-3.5" />
+              )}
+              {t("get.card.actions.useNow")}
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="sm"
@@ -1819,10 +1899,40 @@ export function SkillFavoriteActions({
         {t("get.card.actions.inCollection")}
       </Div>
       <Div className="flex items-center gap-2 ml-auto flex-shrink-0">
+        {isCurrentlyActive &&
+          (isOnThreads ? (
+            <Button
+              variant="default"
+              size="sm"
+              className="h-7 gap-1.5 text-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                setModelSelectorOpen(false);
+              }}
+            >
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              {t("get.card.actions.useThis")}
+            </Button>
+          ) : (
+            <Button
+              variant="default"
+              size="sm"
+              className="h-7 gap-1.5 text-xs"
+              asChild
+            >
+              <Link
+                href={`/${locale}/threads/private/new`}
+                className="no-underline"
+              >
+                <ArrowRight className="h-3.5 w-3.5" />
+                {t("get.card.actions.goToChat")}
+              </Link>
+            </Button>
+          ))}
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
             <Button
-              variant="default"
+              variant={isCurrentlyActive ? "ghost" : "default"}
               size="sm"
               className="h-7 gap-1.5 text-xs"
               onClick={(e) => {

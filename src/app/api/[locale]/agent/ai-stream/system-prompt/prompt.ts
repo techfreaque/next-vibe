@@ -3,7 +3,7 @@ import type {
   MediaCapabilitiesParams,
   SystemPromptFragment,
 } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 
 // ─── Unified prompt context data ──────────────────────────────────────────────
 // All fields loaded by server.ts / client.ts - used across all fragments in this module.
@@ -47,16 +47,16 @@ export interface PromptContextData {
 
 function getFolderDescription(folderId: DefaultFolderId): string {
   switch (folderId) {
-    case "private":
+    case DefaultFolderId.PRIVATE:
       return "Private conversations - server-stored, visible only to the account owner. Requires an account.";
-    case "shared":
+    case DefaultFolderId.SHARED:
       return "Shared conversations - server-stored, visible to specific invited users via share links. Requires an account.";
-    case "public":
+    case DefaultFolderId.PUBLIC:
       return "Public conversations - visible to everyone including guests. Forum-like space for open human-AI dialogue.";
-    case "incognito":
+    case DefaultFolderId.INCOGNITO:
       return "Incognito conversations - stored only in the browser's localStorage, never sent to the server. No account needed, but cleared when browser data is cleared.";
-    case "cron":
-      return "Cron task conversations - system-scheduled AI agent executions, visible to admins only.";
+    case DefaultFolderId.BACKGROUND:
+      return "Background task conversations - AI agent background runs triggered by ai-run or tasks. Visible to the owning user";
     default:
       return "Unknown folder type";
   }
@@ -64,15 +64,15 @@ function getFolderDescription(folderId: DefaultFolderId): string {
 
 function buildHeadlessFolderNote(rootFolderId: DefaultFolderId): string {
   switch (rootFolderId) {
-    case "cron":
-      return "\nThis thread lives in the **cron** folder - standard home for scheduled agent tasks.";
-    case "incognito":
+    case DefaultFolderId.BACKGROUND:
+      return "\nThis thread lives in the **background** folder - standard home for scheduled sub agents and tasks.";
+    case DefaultFolderId.INCOGNITO:
       return "\nThis thread lives in the **incognito** folder - only the last message is preserved; the full chat history is discarded after this run.";
-    case "public":
+    case DefaultFolderId.PUBLIC:
       return "\nThis thread lives in the **public** folder - your response will be visible to everyone, including unauthenticated users.";
-    case "shared":
+    case DefaultFolderId.SHARED:
       return "\nThis thread lives in the **shared** folder - your response will be visible to all invited users of this thread.";
-    case "private":
+    case DefaultFolderId.PRIVATE:
       return "\nThis thread lives in the **private** folder - your response is visible only to the thread owner.";
     default:
       return "";
@@ -212,7 +212,8 @@ Respond in ${languageName} (${locale}) unless the task explicitly specifies othe
 
 **Default language:** ${languageName} (${locale}) | **Location:** ${countryName} ${flag}
 
-ALWAYS respond in the language of the user's current message. Default language is a fallback only.`;
+ALWAYS respond in the language of the user's current message. Default language is a fallback only.
+When writing to Cortex (memories, documents, tasks), always use the user's language — not English — unless the content is inherently language-neutral (code, identifiers).`;
   },
 };
 
@@ -242,9 +243,7 @@ Each message is prefixed with auto-generated metadata: \`[Context: ID:abc12345 |
 **Fields (only non-empty shown):** ID (8-char ref), Model, Skill, Author (public/shared only), Votes (👍/👎), Posted, Status (edited/branched).
 
 - Check metadata before responding - multiple skills/models may be active in one thread.
-- Do NOT reproduce \`[Context: ...]\` tags in your responses - they are injected automatically.
-
-**Auto-compacting:** When conversations exceed token limits the system compacts older messages into a summary. You will receive a \`Mode:auto-compacting\` message with instructions to summarise history.`,
+- Do NOT reproduce \`[Context: ...]\` tags in your responses - they are injected automatically.`,
   };
 
 export const toolExecutionControlFragment: SystemPromptFragment<PromptContextData> =
@@ -257,12 +256,12 @@ export const toolExecutionControlFragment: SystemPromptFragment<PromptContextDat
 Every tool accepts an optional \`callbackMode\` parameter:
 
 - **\`"detach"\`** - Fire and forget. Returns \`{taskId}\` immediately. Tool runs in background. Use \`wait-for-task\` with that taskId later if you need the result.
-- **\`"wakeUp"\`** - Fire and forget. Returns \`{taskId}\` immediately. The result is automatically injected into this thread when ready - the stream revives and you will see the tool result as a new message. Do NOT call wait-for-task for wakeUp.
+- **\`"wakeUp"\`** - Fire and forget. Returns \`{taskId}\` immediately. The result is automatically injected into this thread when ready - the stream revives and you will see the tool result as a new message. You can call wait-for-task for wakeUp optionally.
 - **\`"endLoop"\`** - Execute normally, return result, but stop the tool loop. No more tool calls this turn.
 - **\`"approve"\`** - Require user confirmation before executing.
 - Omit for default synchronous execution.
 
-**\`wait-for-task\`** - Call with a taskId from a detached tool. Stops the stream and blocks until the task completes. The stream resumes automatically with the result - zero extra messages. Never pass callbackMode on wait-for-task.`,
+**\`wait-for-task\`** - Call with a taskId from a detached or wakeup tool. Stops the stream and blocks until the task completes. The stream resumes automatically with the result - zero extra messages. Never pass callbackMode on wait-for-task.`,
   };
 
 export const formattingFragment: SystemPromptFragment<PromptContextData> = {
@@ -360,9 +359,9 @@ export const bootstrapFragment: SystemPromptFragment<PromptContextData> = {
 
 You're chatting as a guest on this self-hosted instance - no account required for basic use. You can use the **public** folder (visible to everyone) and **incognito** (browser-local only).
 
-**What you're missing without an account:**
-- Persistent memories (${appName} remembers facts about you across sessions)
-- Scheduled tasks and automations
+**What you get with a free account:**
+- **Cortex** - ${appName}'s persistent memory system. It remembers facts, preferences, and context across every session. No more re-explaining yourself.
+- Scheduled tasks and automations that run while you sleep
 - Saved skill + model combos (favorites)
 - Private and shared conversation folders`;
       }
@@ -371,15 +370,15 @@ You're chatting as a guest on this self-hosted instance - no account required fo
 
 You're chatting as a guest - no account required. You have **${freeTierCredits} free credits/month** (shared across your devices). A few messages with a standard model will use most of that.
 
-**What you're missing without an account:**
-- Persistent memories (${appName} remembers facts about you across sessions)
+**What you get with a free account:**
+- **Cortex** - ${appName}'s persistent memory system. It remembers facts, preferences, and context across every session - so the AI already knows who you are next time.
 - Scheduled tasks and automations
 - Saved skill + model combos (favorites)
 - Private and shared conversation folders
 - The ability to purchase credits or subscribe
 
-**When you're ready to unlock all of this:**
-- **Subscription:** ${subLabel} - the best value for regular use
+**When you're ready:**
+- **Subscription:** ${subLabel} - best value for regular use
 - **Credit pack:** ${packLabel} - permanent credits, pay once
 
 Creating an account is free. No credit card needed until you choose to upgrade.`;
@@ -432,15 +431,40 @@ export const guestContextFragment: SystemPromptFragment<PromptContextData> = {
   priority: 710,
   condition: (data) => !data.headless && data.isPublicUser && !data.isFreshUser,
   build: (data) => {
-    const { freeTierCredits, subLabel, packLabel, isLocalMode } = data;
+    const { freeTierCredits, subLabel, packLabel, isLocalMode, rootFolderId } =
+      data;
+    const isIncognito = rootFolderId === DefaultFolderId.INCOGNITO;
 
     if (isLocalMode) {
+      if (isIncognito) {
+        return `## Guest User Context (Incognito)
+
+This user has **no account** and is in **incognito mode** - nothing is stored server-side.
+
+- **Cortex is not available here.** No memories, no tasks, no persistent context.
+- If they ask about memories or saving anything across sessions, let them know: incognito is browser-only and cortex requires an account. Suggest switching to the **private** folder after creating a free account.
+- Favour concise responses.`;
+      }
+
       return `## Guest User Context
 
 This user has **no account** - they browse as a guest on this self-hosted instance.
 
 - They can access **public** and **incognito** folders.
+- **Cortex is not available** without an account - no persistent memories or tasks.
+- If they ask about remembering things across sessions, mention that creating a free account unlocks the **private** folder and cortex (memories + tasks).
 - Favour concise responses unless detail is truly needed.`;
+    }
+
+    if (isIncognito) {
+      return `## Guest User Context (Incognito)
+
+This user has **no account** and is in **incognito mode** - nothing leaves the browser.
+
+- **Cortex is not available here.** No memories, no tasks, no persistent context. Everything is forgotten when the tab closes.
+- If they ask about saving memories or persistent context: explain that incognito is by design ephemeral. To get persistent memory, they need to **create a free account** and use the **private** folder - that's where cortex lives.
+- They have **${freeTierCredits} free credits/month**. Once exhausted, they need an account to continue.
+- Favour concise responses - credits are limited.`;
     }
 
     return `## Guest User Context
@@ -449,8 +473,9 @@ This user has **no account** - they browse as a guest identified by a browser ID
 
 - They can only access **public** and **incognito** folders.
 - They have **${freeTierCredits} free credits/month** shared across all their devices. A few messages with a standard model exhausts this quota.
+- **Cortex is not available** without an account - no memories, tasks, or persistent context across sessions.
 - Once credits are gone they must **create an account** to purchase more - they cannot buy credits or subscribe as a guest.
-- If credits run low, gently let them know and mention the subscription (${subLabel}) or a credit pack (${packLabel}).
+- If credits run low or they ask about remembering things, mention the subscription (${subLabel}) or a credit pack (${packLabel}) - and that creating an account is free.
 - Favour concise responses unless detail is truly needed - it makes their credits go further.`;
   },
 };

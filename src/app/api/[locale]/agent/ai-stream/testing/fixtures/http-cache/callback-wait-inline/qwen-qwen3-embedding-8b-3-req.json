@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-the-tool-help----ea36c307-def6-46c6-87ed-19f59c712051.md\n\n# [T1 thread-create+tool-call] Use the tool-help...\nFolder: cron\n\nassistant: STEP_OK\n\n**Verification:**\n- `audioUrl`: non-empty URL present ✓\n- `creditCost`: 10.4 (positive) ✓\n- `durationSeconds`: 8 (within 8-120 range) ✓\nuser: [T4b video-gen] Call the generate_video tool with prompt='spinning cube'. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK\n\n**Verification:**\n- `videoUrl`: non-empty URL present ✓\n- `creditCost`: 124.8 (positive) ✓\n- `durationSeconds`: 4 (positive) ✓\nuser: [T5 detach-dispatch] Call the generate_image tool with prompt='wait-for-task-test' and callbackMode='detach'. Check that the result has a taskId string and status field, and does NOT have an imageUrl. End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK taskId=local-bg-1777209383133-1lbj8v\nuser: [T5b wait-for-task] Call the wait-for-task tool with taskId='local-bg-1777209383133-1lbj8v'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK\nuser: [T5a endLoop] Call the tool-help tool with callbackMode='endLoop'. After receiving the result, try to call the tool-help tool again. Check that only ONE tool-help call was executed (the loop should have stopped) and the result had a non-empty tools array. End your reply with STEP_OK if exactly one call ran and the result was correct, or FAILED: <reason> if the loop continued or the result was wrong.\nassistant: \ntool: \nuser: [T5d wait-inline] Call the generate_image tool with prompt='wait-inline-test' and callbackMode='wait'. Check that the result has an imageUrl (not a taskId). End your reply with STEP_OK if imageUrl is present and non-empty, or FAILED: <reason> if anything is wrong.\nassistant: \ntool: \nassistant: STEP_OK\n\n**Verification:**\n- `imageUrl`: present and non-empty ✓\n- `creditCost`: 2.8 (positive) ✓",
+    "encoding_format": "float"
+  }
+}

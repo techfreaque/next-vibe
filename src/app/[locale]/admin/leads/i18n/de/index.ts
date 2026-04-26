@@ -148,9 +148,9 @@ export const translations: typeof enTranslations = {
           "Konfigurieren Sie automatisierte Kampagnen-Starter-Einstellungen und Planung",
         form: {
           cronSettings: {
-            label: "Cron-Aufgaben-Einstellungen",
+            label: "Hintergrundaufgaben-Einstellungen",
             description:
-              "Konfigurieren Sie die Ausführungseinstellungen des Cron-Jobs",
+              "Konfigurieren Sie die Ausführungseinstellungen der Hintergrundaufgabe",
             schedule: {
               label: "Zeitplan",
               placeholder: "Cron-Ausdruck eingeben (z.B. */3 * * * *)",
@@ -237,7 +237,7 @@ export const translations: typeof enTranslations = {
         settings: {
           title: "Kampagnen-Starter-Einstellungen",
           description:
-            "Konfigurieren Sie die Kampagnen-Starter-Cron-Job-Einstellungen",
+            "Konfigurieren Sie die Kampagnen-Starter-Hintergrundaufgaben-Einstellungen",
         },
       },
       emails: {
@@ -860,7 +860,7 @@ export const translations: typeof enTranslations = {
         description: "Bereinigen Sie alte Kampagnen",
         schedule: "Wöchentlich am Sonntag",
       },
-      info: "Die Kampagnenverwaltung wird automatisch vom Cron-System durchgeführt. Besuchen Sie die Cron-Admin-Seite für detaillierte Überwachung.",
+      info: "Die Kampagnenverwaltung wird automatisch von Hintergrundaufgaben durchgeführt. Besuchen Sie die Hintergrundaufgaben-Admin-Seite für detaillierte Überwachung.",
     },
     constants: {
       unknown: "unbekannt",

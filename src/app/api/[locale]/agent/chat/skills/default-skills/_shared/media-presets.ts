@@ -17,15 +17,18 @@
  *   sttModelSelection: STT.cheap
  */
 
+import type { AudioVisionModelSelection } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { AudioVisionModelId } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import { ImageGenModelId } from "@/app/api/[locale]/agent/image-generation/models";
 import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
+import { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
 import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { SttModelId } from "@/app/api/[locale]/agent/speech-to-text/models";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
-import type { AudioVisionModelSelection } from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
 
 import {
   ContentLevel,
@@ -59,19 +62,18 @@ export const IMAGE_GEN = {
     sortDirection2: ModelSortDirection.ASC,
   } satisfies ImageGenModelSelection,
 
-  /** Cheapest mainstream-only image model. Use for family-safe / professional skills. */
+  /** GPT-5 Image Mini — fast, cheap mainstream image model for most skills. */
   mainstreamCheap: {
-    selectionType: ModelSelectionType.FILTERS,
-    contentRange: { max: ContentLevel.MAINSTREAM },
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ImageGenModelId.GPT_5_IMAGE_MINI,
     sortBy: ModelSortField.PRICE,
     sortDirection: ModelSortDirection.ASC,
   } satisfies ImageGenModelSelection,
 
-  /** Best-quality mainstream-only image model. Use for professional / business skills. */
+  /** GPT-5.4 Image 2 — best non-legacy mainstream image model, falls back by intelligence then price. */
   mainstreamSmart: {
-    selectionType: ModelSelectionType.FILTERS,
-    contentRange: { max: ContentLevel.MAINSTREAM },
-    intelligenceRange: { min: IntelligenceLevel.SMART },
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ImageGenModelId.GPT_5_4_IMAGE_2,
     sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
     sortBy2: ModelSortField.PRICE,
@@ -118,19 +120,18 @@ export const MUSIC_GEN = {
     sortDirection2: ModelSortDirection.ASC,
   } satisfies MusicGenModelSelection,
 
-  /** Cheapest mainstream-only music model. */
+  /** Sonauto Song (ModelsLab) — cheapest available mainstream music model. */
   mainstreamCheap: {
-    selectionType: ModelSelectionType.FILTERS,
-    contentRange: { max: ContentLevel.MAINSTREAM },
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: MusicGenModelId.SONAUTO_SONG,
     sortBy: ModelSortField.PRICE,
     sortDirection: ModelSortDirection.ASC,
   } satisfies MusicGenModelSelection,
 
-  /** Best-quality mainstream-only music model. */
+  /** Sonauto Song (ModelsLab) — best mainstream music model with intelligence/price fallback. */
   mainstreamSmart: {
-    selectionType: ModelSelectionType.FILTERS,
-    contentRange: { max: ContentLevel.MAINSTREAM },
-    intelligenceRange: { min: IntelligenceLevel.SMART },
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: MusicGenModelId.SONAUTO_SONG,
     sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
     sortBy2: ModelSortField.PRICE,
@@ -150,17 +151,18 @@ export const MUSIC_GEN = {
 // Cheap/smart distinction is the main differentiator.
 
 export const VIDEO_GEN = {
-  /** Cheapest available video model. */
+  /** VEO_3_1_FAST — cheapest high-quality video model. Falls back by price if unavailable. */
   cheap: {
-    selectionType: ModelSelectionType.FILTERS,
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: VideoGenModelId.VEO_3_1_FAST,
     sortBy: ModelSortField.PRICE,
     sortDirection: ModelSortDirection.ASC,
   } satisfies VideoGenModelSelection,
 
-  /** Best-quality video model, price as tiebreaker. */
+  /** Veo 3.1 — best-quality video model with intelligence/price fallback. */
   smart: {
-    selectionType: ModelSelectionType.FILTERS,
-    intelligenceRange: { min: IntelligenceLevel.SMART },
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: VideoGenModelId.VEO_3_1,
     sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
     sortBy2: ModelSortField.PRICE,

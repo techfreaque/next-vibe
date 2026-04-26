@@ -8,6 +8,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { StreamContext } from "../core/stream-context";
 import { clearStreamingState } from "../core/stream-registry";
 import type { StreamingTTSHandler } from "../streaming-tts";
@@ -38,6 +39,7 @@ export class StreamCompletionHandler {
     modelCost: number;
     model: ChatModelId;
     threadId: string;
+    locale: CountryLanguage;
     logger: EndpointLogger;
   }): Promise<void> {
     const {
@@ -88,7 +90,13 @@ export class StreamCompletionHandler {
       ctx.lastAssistantMessageId || ctx.currentAssistantMessageId;
 
     if (messageIdForTokens) {
+      // True TTFT: time from request sent to first token received
       const timeToFirstToken =
+        ctx.requestStartTime !== null && ctx.streamStartTime !== null
+          ? ctx.streamStartTime - ctx.requestStartTime
+          : null;
+      // Total streaming duration: time from first token to stream end
+      const streamingTime =
         ctx.streamStartTime !== null ? Date.now() - ctx.streamStartTime : null;
 
       // Write token metadata to DB. This is a no-op if finalizeAssistantMessage already wrote
@@ -101,6 +109,7 @@ export class StreamCompletionHandler {
         cachedInputTokens: usage.cachedInputTokens,
         cacheWriteTokens: usage.cacheWriteTokens,
         timeToFirstToken,
+        streamingTime,
         creditCost: modelCost,
       });
 
@@ -112,6 +121,7 @@ export class StreamCompletionHandler {
         cachedInputTokens: usage.cachedInputTokens,
         cacheWriteTokens: usage.cacheWriteTokens,
         timeToFirstToken,
+        streamingTime,
         finishReason: finishReason ?? null,
         creditCost: modelCost,
       });
@@ -138,6 +148,11 @@ export class StreamCompletionHandler {
 
     // Clear streaming state in DB + registry
     await clearStreamingState(threadId, logger, user);
+
+    // Fire-and-forget: sync thread embedding once at stream end with full conversation
+    void ctx.dbWriter.syncThreadEmbedding().catch(() => {
+      // Intentional no-op: embedding sync is best-effort
+    });
 
     // Cleanup stream context
     ctx.cleanup();

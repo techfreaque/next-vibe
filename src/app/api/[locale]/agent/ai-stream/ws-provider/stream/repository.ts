@@ -334,7 +334,7 @@ export class WsProviderStreamRepository {
       //    server-assigned ID that flows to the client via MESSAGE_CREATED.
       const aiStreamData: AiStreamPostRequestOutput = {
         operation: "send",
-        rootFolderId: DefaultFolderId.PRIVATE,
+        rootFolderId: data.rootFolderId ?? DefaultFolderId.PRIVATE,
         subFolderId: null,
         threadId,
         userMessageId: crypto.randomUUID(),

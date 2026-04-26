@@ -6,7 +6,7 @@
 "use client";
 
 import { Badge } from "next-vibe-ui/ui/badge";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { Search } from "next-vibe-ui/ui/icons/Search";
@@ -14,13 +14,15 @@ import { Span } from "next-vibe-ui/ui/span";
 
 import {
   useWidgetDisabled,
+  useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
 import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+import { CortexNav } from "../_shared/cortex-nav";
 
 import type definition from "./definition";
 
@@ -35,14 +37,23 @@ export function CortexSearchWidget({
   const children = field.children;
   const t = useWidgetTranslation<typeof definition.GET>();
   const isDisabled = useWidgetDisabled();
+  const navigation = useWidgetNavigation();
 
   const results = value?.results ?? [];
 
+  async function openFile(filePath: string): Promise<void> {
+    const readDef = await import("../read/definition");
+    navigation.push(readDef.default.GET, { data: { path: filePath } });
+  }
+
   return (
     <Div className="flex flex-col gap-4">
+      {/* Top nav */}
+      <CortexNav actions={["list", "tree", "write"]} />
+
       {/* Form */}
       {!isDisabled && (
-        <Div className="flex flex-col gap-3 p-4 border rounded-lg bg-card">
+        <Div className="flex flex-col gap-3 p-4 border rounded-lg bg-card mx-4">
           <TextFieldWidget fieldName="query" field={children.query} />
           <Div className="grid grid-cols-12 gap-4">
             <Div className="col-span-8">
@@ -71,9 +82,9 @@ export function CortexSearchWidget({
 
       {/* Response */}
       {value && (
-        <Div className="flex flex-col gap-3">
+        <Div className="flex flex-col gap-3 px-4 pb-4">
           {/* Header */}
-          <Div className="flex items-center justify-between px-1">
+          <Div className="flex items-center justify-between">
             <Span className="text-sm text-muted-foreground">
               &quot;{value.responseQuery}&quot;
             </Span>
@@ -91,29 +102,27 @@ export function CortexSearchWidget({
           ) : (
             <Div className="flex flex-col gap-2">
               {results.map((result, i) => (
-                <Card
+                <Button
                   key={i}
-                  className="overflow-hidden hover:border-primary/50 transition-colors"
+                  variant="ghost"
+                  onClick={() => void openFile(result.resultPath)}
+                  className="w-full h-auto flex items-start gap-2 p-3 justify-start rounded-md border border-border hover:border-primary/50 transition-colors"
                 >
-                  <CardContent className="p-3">
-                    <Div className="flex items-start gap-2">
-                      <FileText className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                      <Div className="flex-1 min-w-0">
-                        <Span className="font-mono text-sm font-medium block">
-                          {result.resultPath}
-                        </Span>
-                        {result.excerpt && (
-                          <Span className="text-xs text-muted-foreground line-clamp-2 mt-1 block">
-                            {result.excerpt}
-                          </Span>
-                        )}
-                      </Div>
-                      <Span className="text-xs text-muted-foreground shrink-0">
-                        {new Date(result.updatedAt).toLocaleDateString()}
+                  <FileText className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                  <Div className="flex-1 min-w-0 text-left">
+                    <Span className="font-mono text-sm font-medium block truncate">
+                      {result.resultPath}
+                    </Span>
+                    {result.excerpt && (
+                      <Span className="text-xs text-muted-foreground line-clamp-2 mt-1 block">
+                        {result.excerpt}
                       </Span>
-                    </Div>
-                  </CardContent>
-                </Card>
+                    )}
+                  </Div>
+                  <Span className="text-xs text-muted-foreground shrink-0">
+                    {new Date(result.updatedAt).toLocaleDateString()}
+                  </Span>
+                </Button>
               ))}
             </Div>
           )}

@@ -295,7 +295,12 @@ export type NewCustomSkill = typeof customSkills.$inferInsert;
 // ============================================================
 
 export const skillVariantSchema = z.object({
-  id: z.string(),
+  id: z
+    .string()
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Variant ID must be a slug (lowercase letters, numbers, hyphens only)",
+    ),
   displayName: z.string().max(50).optional(),
   modelSelection: chatModelSelectionSchema,
   imageGenModelSelection: imageGenModelSelectionSchema.optional(),

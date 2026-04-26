@@ -363,7 +363,7 @@ export const translations = {
       shared: "Shared Chats",
       public: "Public Chats",
       incognito: "Incognito Chats",
-      cron: "Cron Threads",
+      background: "Background Threads",
     },
   },
 };

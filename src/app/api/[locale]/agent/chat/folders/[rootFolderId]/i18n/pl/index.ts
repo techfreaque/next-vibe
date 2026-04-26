@@ -12,7 +12,8 @@ export const translations: typeof enTranslations = {
         shared: "Udostępniony",
         public: "Publiczny",
         incognito: "Incognito",
-        cron: "Cron",
+        cron: "W tle",
+        support: "Wsparcie",
       },
     },
     folderList: {
@@ -107,8 +108,9 @@ export const translations: typeof enTranslations = {
       private: "Prywatny",
       shared: "Udostępniony",
       public: "Publiczny",
-      cron: "Cron",
+      background: "W tle",
       incognito: "Incognito",
+      support: "Wsparcie",
     },
   },
   errors: {
@@ -121,7 +123,7 @@ export const translations: typeof enTranslations = {
     rootFolderId: {
       label: "Folder główny",
       description:
-        "Folder główny do pobrania (prywatny, udostępniony, publiczny, cron, incognito)",
+        "Folder główny do pobrania (prywatny, udostępniony, publiczny, w tle, incognito)",
     },
     container: {
       title: "Szczegóły folderu",

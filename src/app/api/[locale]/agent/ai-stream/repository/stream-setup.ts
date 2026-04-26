@@ -49,7 +49,7 @@ import {
   FOLDER_DENIED_TOOL_IDS,
   type ToolExecutionContext,
 } from "../../chat/config";
-import { chatThreads, type ToolCall } from "../../chat/db";
+import { chatMessages, chatThreads, type ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
 import {
   chatFavorites,
@@ -74,7 +74,10 @@ import { MessageContextBuilder } from "./handlers/message-context-builder";
 import { OperationHandler } from "./handlers/operation-handler";
 import { ToolConfirmationProcessor } from "./handlers/tool-confirmation-processor";
 import { UserMessageHandler } from "./handlers/user-message-handler";
-import { buildSystemPrompt } from "./system-prompt/builder";
+import {
+  buildSystemPrompt,
+  type SystemPromptParams,
+} from "./system-prompt/builder";
 
 /** Normalize DB tool config items - ensures requiresConfirmation is always boolean */
 function normalizeToolConfig(
@@ -162,6 +165,91 @@ async function loadFavoriteOnce(
   return null;
 }
 
+/** Max messages to walk up the parent chain for embedding context */
+const EMBEDDING_RECENT_MESSAGE_COUNT = 6;
+/** Max characters per DB message in the embedding query */
+const EMBEDDING_PER_MESSAGE_BUDGET = 800;
+
+/** Role label for embedding query prefix */
+const ROLE_LABELS: Record<string, string> = {
+  user: "User",
+  assistant: "Assistant",
+  tool: "Tool",
+  system: "System",
+};
+
+/**
+ * Build an embedding query string from DB message rows.
+ * Concatenates recent messages with role prefixes for semantic signal.
+ */
+function dbRowsToEmbeddingQuery(
+  rows: ReadonlyArray<{ role: string; content: string | null }>,
+): string {
+  return rows
+    .filter((r) => r.content && r.content.length > 0)
+    .map((r) => {
+      const label = ROLE_LABELS[r.role] ?? r.role;
+      return `${label}: ${r.content!.slice(0, EMBEDDING_PER_MESSAGE_BUDGET)}`;
+    })
+    .join("\n\n");
+}
+
+/**
+ * Fetch the last N messages from the conversation and build an embedding
+ * query string. Lightweight: walks up the parent chain with PK lookups.
+ * Returns a concatenated string ready for `lastUserMessage`.
+ */
+async function buildInitialEmbeddingQuery(
+  parentMessageId: string | null | undefined,
+  messageHistory:
+    | Array<{ role: string; content: string | null }>
+    | null
+    | undefined,
+  isIncognito: boolean,
+): Promise<string> {
+  // Incognito: extract from in-memory history (no DB)
+  if (isIncognito && messageHistory) {
+    return dbRowsToEmbeddingQuery(
+      messageHistory.slice(-EMBEDDING_RECENT_MESSAGE_COUNT),
+    );
+  }
+
+  // Server threads: walk up parent chain via PK lookups
+  if (!parentMessageId) {
+    return ""; // New conversation — no prior context
+  }
+
+  const results: Array<{
+    role: string;
+    content: string | null;
+    parentId: string | null;
+  }> = [];
+  let currentId: string | null = parentMessageId;
+
+  for (let i = 0; i < EMBEDDING_RECENT_MESSAGE_COUNT && currentId; i++) {
+    const [row] = await db
+      .select({
+        role: chatMessages.role,
+        content: chatMessages.content,
+        parentId: chatMessages.parentId,
+      })
+      .from(chatMessages)
+      .where(eq(chatMessages.id, currentId))
+      .limit(1);
+
+    if (!row) {
+      break;
+    }
+
+    results.push(row);
+    currentId = row.parentId;
+  }
+
+  // Collected newest-first, reverse for chronological order
+  results.reverse();
+  return dbRowsToEmbeddingQuery(results);
+}
+
 export interface StreamSetupResult {
   userId: string | undefined;
   leadId: string | undefined;
@@ -230,7 +318,10 @@ export interface StreamSetupResult {
   /** AI SDK tools configuration */
   tools: Record<string, CoreTool> | undefined;
   /** Tools metadata for confirmation checks */
-  toolsConfig: Map<string, { requiresConfirmation: boolean; credits: number }>;
+  toolsConfig: Map<
+    string,
+    { requiresConfirmation: boolean; credits: number; label: string }
+  >;
   /** Set of tool names the model is allowed to execute (permission layer). null = all allowed. */
   activeToolNames: Set<string> | null;
   /** Effective compact trigger token threshold (cascade: favorite → skill → global) */
@@ -248,6 +339,8 @@ export interface StreamSetupResult {
   skipAiTurn?: boolean;
   /** Resolved bridge models for STT, TTS, vision, and translation */
   bridgeContext: BridgeContext;
+  /** Params used to build the system prompt — stored for compacting refresh */
+  systemPromptParams: SystemPromptParams;
   // resolvedFavoriteConfig lives inside streamContext.resolvedFavoriteConfig
   // — no top-level duplicate needed.
 }
@@ -352,8 +445,35 @@ export async function setupAiStream(params: {
     sequenceId: string;
     toolCall: ToolCall;
   }> = [];
+  // Track if any confirmed tool set waitingForRemoteResult (queue WAIT mode).
+  // If true, the main stream must also abort without creating an AI response.
+  let confirmationSetWaitingForRemote = false;
 
   if (data.toolConfirmations && data.toolConfirmations.length > 0) {
+    const confirmationStreamContext: ToolExecutionContext = {
+      rootFolderId: data.rootFolderId,
+      threadId: data.threadId ?? undefined,
+      aiMessageId: undefined,
+      currentToolMessageId: undefined,
+      callerToolCallId: undefined,
+      callerCallbackMode: undefined,
+      pendingToolMessages: undefined,
+      pendingTimeoutMs: undefined,
+      // Pass leafMessageId from request so deferred confirm inserts use the correct branch tip
+      leafMessageId: data.leafMessageId ?? undefined,
+      skillId: data.skill,
+      providerOverride,
+      favoriteId: params.favoriteIdOverride,
+      headless: params.headless,
+      subAgentDepth: params.subAgentDepth,
+      isRevival: params.isRevival,
+      waitingForRemoteResult: undefined,
+      onEscalatedTaskCancel: undefined,
+      pendingEscalatedTaskId: undefined,
+      cancelPendingStreamTimer: undefined,
+      abortSignal: streamAbortController.signal,
+      escalateToTask: undefined,
+    };
     const confirmationResult = await ToolConfirmationProcessor.processAll({
       toolConfirmations: data.toolConfirmations,
       messageHistory: data.messageHistory ?? undefined,
@@ -362,30 +482,7 @@ export async function setupAiStream(params: {
       logger,
       user,
       t: aiStreamT,
-      streamContext: {
-        rootFolderId: data.rootFolderId,
-        threadId: data.threadId ?? undefined,
-        aiMessageId: undefined,
-        currentToolMessageId: undefined,
-        callerToolCallId: undefined,
-        callerCallbackMode: undefined,
-        pendingToolMessages: undefined,
-        pendingTimeoutMs: undefined,
-        // Pass leafMessageId from request so deferred confirm inserts use the correct branch tip
-        leafMessageId: data.leafMessageId ?? undefined,
-        skillId: data.skill,
-        providerOverride,
-        favoriteId: params.favoriteIdOverride,
-        headless: params.headless,
-        subAgentDepth: params.subAgentDepth,
-        isRevival: params.isRevival,
-        waitingForRemoteResult: undefined,
-        onEscalatedTaskCancel: undefined,
-        pendingEscalatedTaskId: undefined,
-        cancelPendingStreamTimer: undefined,
-        abortSignal: streamAbortController.signal,
-        escalateToTask: undefined,
-      },
+      streamContext: confirmationStreamContext,
     });
 
     if (!confirmationResult.success) {
@@ -393,6 +490,12 @@ export async function setupAiStream(params: {
     }
 
     toolConfirmationResults = confirmationResult.data;
+    // If execute-tool (queue WAIT) set waitingForRemoteResult during confirmation,
+    // propagate to the main stream so it aborts without creating an AI response.
+    // Without this, the main streamContext starts with waitingForRemoteResult=undefined
+    // and the AI turn runs, creating a response before the revival fires - branch violation.
+    confirmationSetWaitingForRemote =
+      confirmationStreamContext.waitingForRemoteResult === true;
   }
 
   if (!userId && !leadId && !isIncognito) {
@@ -970,45 +1073,59 @@ export async function setupAiStream(params: {
     videoGenModelId: effectiveVideoGenModel?.id ?? null,
   });
 
+  // Build multi-message embedding query for cortex vector search.
+  // Combines recent conversation history + current user message into a single
+  // string for `generateEmbedding()`. Per-step refresh in prepareStep uses
+  // the full ModelMessage[] from the AI SDK instead.
+  const priorContext = await buildInitialEmbeddingQuery(
+    data.parentMessageId,
+    data.messageHistory,
+    isIncognito,
+  );
+  const embeddingQuery = priorContext
+    ? `${priorContext}\n\nUser: ${effectiveContent.slice(0, 800)}`
+    : effectiveContent;
+
   // Build complete system prompt from skill and formatting instructions
+  const systemPromptParams: SystemPromptParams = {
+    skillId: data.skill,
+    user,
+    logger,
+    locale,
+    rootFolderId: data.rootFolderId,
+    subFolderId: data.subFolderId ?? null,
+    callMode: data.voiceMode?.enabled,
+    extraInstructions:
+      [params.extraInstructions, resolvedToolConfig.promptAppend]
+        .filter(Boolean)
+        .join("\n\n") || undefined,
+    headless: params.headless,
+    subAgentDepth: params.subAgentDepth,
+    excludeMemories: params.excludeMemories,
+    memoryLimit: resolvedToolConfig.memoryLimit,
+    lastUserMessage: embeddingQuery,
+    mediaCapabilities: {
+      nativeOutputs: modelConfig.outputs ?? [],
+      imageGenModelName: effectiveImageGenModel?.name ?? null,
+      musicGenModelName: effectiveMusicGenModel?.name ?? null,
+      videoGenModelName: effectiveVideoGenModel?.name ?? null,
+      imageGenIsSameAsChatModel:
+        !!effectiveImageGenModel && modelConfig.outputs.includes("image"),
+      musicGenIsSameAsChatModel:
+        !!effectiveMusicGenModel && modelConfig.outputs.includes("audio"),
+      videoGenIsSameAsChatModel:
+        !!effectiveVideoGenModel && modelConfig.outputs.includes("video"),
+    },
+    threadId: threadResult.data.threadId,
+    voiceTranscription: voiceTranscription
+      ? {
+          wasTranscribed: voiceTranscription.wasTranscribed,
+          confidence: voiceTranscription.confidence,
+        }
+      : null,
+  };
   const { systemPrompt: builtSystemPrompt, trailingSystemMessage } =
-    await buildSystemPrompt({
-      skillId: data.skill,
-      user,
-      logger,
-      locale,
-      rootFolderId: data.rootFolderId,
-      subFolderId: data.subFolderId ?? null,
-      callMode: data.voiceMode?.enabled,
-      extraInstructions:
-        [params.extraInstructions, resolvedToolConfig.promptAppend]
-          .filter(Boolean)
-          .join("\n\n") || undefined,
-      headless: params.headless,
-      subAgentDepth: params.subAgentDepth,
-      excludeMemories: params.excludeMemories,
-      memoryLimit: resolvedToolConfig.memoryLimit,
-      lastUserMessage: effectiveContent,
-      mediaCapabilities: {
-        nativeOutputs: modelConfig.outputs ?? [],
-        imageGenModelName: effectiveImageGenModel?.name ?? null,
-        musicGenModelName: effectiveMusicGenModel?.name ?? null,
-        videoGenModelName: effectiveVideoGenModel?.name ?? null,
-        imageGenIsSameAsChatModel:
-          !!effectiveImageGenModel && modelConfig.outputs.includes("image"),
-        musicGenIsSameAsChatModel:
-          !!effectiveMusicGenModel && modelConfig.outputs.includes("audio"),
-        videoGenIsSameAsChatModel:
-          !!effectiveVideoGenModel && modelConfig.outputs.includes("video"),
-      },
-      threadId: threadResult.data.threadId,
-      voiceTranscription: voiceTranscription
-        ? {
-            wasTranscribed: voiceTranscription.wasTranscribed,
-            confidence: voiceTranscription.confidence,
-          }
-        : null,
-    });
+    await buildSystemPrompt(systemPromptParams);
 
   logger.debug("System prompt built", {
     systemPromptLength: builtSystemPrompt.length,
@@ -1040,7 +1157,12 @@ export async function setupAiStream(params: {
     pendingToolMessages: undefined,
     pendingTimeoutMs: undefined,
     leafMessageId: undefined,
-    waitingForRemoteResult: undefined,
+    // Propagate waitingForRemoteResult from confirmation setup: if a confirmed
+    // execute-tool (queue WAIT) already created a remote task, the main stream
+    // must also abort immediately without creating an AI response. Otherwise the
+    // stream runs an AI turn that creates an assistant message, then the WAIT
+    // revival creates a second one - branch violation.
+    waitingForRemoteResult: confirmationSetWaitingForRemote ? true : undefined,
     onEscalatedTaskCancel: undefined,
     pendingEscalatedTaskId: undefined,
     cancelPendingStreamTimer: undefined,
@@ -1163,7 +1285,7 @@ export async function setupAiStream(params: {
         tools: params.toolsOverride,
         toolsConfig: new Map<
           string,
-          { requiresConfirmation: boolean; credits: number }
+          { requiresConfirmation: boolean; credits: number; label: string }
         >(),
         activeToolNames: new Set<string>(Object.keys(params.toolsOverride)),
         systemPrompt: builtSystemPrompt,
@@ -1467,8 +1589,14 @@ export async function setupAiStream(params: {
       trailingSystemMessage,
       toolConfirmationResults,
       skipAiTurn:
-        (data.toolConfirmations?.length ?? 0) > 0 &&
-        toolConfirmationResults.length === 0,
+        ((data.toolConfirmations?.length ?? 0) > 0 &&
+          toolConfirmationResults.length === 0) ||
+        // If a confirmed execute-tool (queue WAIT) already created a remote task,
+        // skip the AI turn entirely. The revival stream triggered by handleTaskCompletion
+        // will fire the next AI turn. Without this, the SDK makes an initial API call
+        // before stopWhen can fire (stopWhen only prevents SUBSEQUENT steps), creating
+        // an AI message that then collides with the revival's AI message → branch violation.
+        confirmationSetWaitingForRemote,
       voiceMode: data.voiceMode
         ? {
             enabled: data.voiceMode.enabled ?? false,
@@ -1479,14 +1607,19 @@ export async function setupAiStream(params: {
       userMessageMetadata,
       fileUploadPromise,
       modelConfig,
-      tools,
+      // Revival streams (WAIT/wakeUp after async task completes) must not call tools.
+      // The AI's only job is to acknowledge the result in the context. Passing no tools
+      // prevents the AI from re-executing tool calls it sees in the message history,
+      // which would create duplicate tool messages and corrupt the thread branch.
+      tools: params.isRevival ? undefined : tools,
       toolsConfig,
-      activeToolNames,
+      activeToolNames: params.isRevival ? null : activeToolNames,
       provider,
       streamAbortController,
       effectiveCompactTrigger,
       streamContext,
       bridgeContext,
+      systemPromptParams,
     },
   };
 }

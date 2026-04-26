@@ -80,6 +80,19 @@ export function createMessageMetadata(
 }
 
 /**
+ * Prefix for all context metadata lines injected into the messages array.
+ * Used for constructing and identifying context lines — never match raw strings.
+ */
+export const CONTEXT_LINE_PREFIX = "[Context: ";
+
+/**
+ * Check whether a system message content string is a context metadata line.
+ */
+export function isContextLine(content: string): boolean {
+  return content.startsWith(CONTEXT_LINE_PREFIX);
+}
+
+/**
  * Create metadata system message content (compact format)
  * Wraps metadata in standard format
  * Returns empty string if no metadata available
@@ -90,5 +103,5 @@ export function createMetadataSystemMessage(
   timezone: string,
 ): string {
   const metadata = createMessageMetadata(message, rootFolderId, timezone);
-  return `[Context: ${metadata}]`;
+  return `${CONTEXT_LINE_PREFIX}${metadata}]`;
 }

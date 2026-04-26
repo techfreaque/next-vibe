@@ -140,8 +140,8 @@ export const translations: typeof enTranslations = {
   medianExecutionTime: "Mediana czasu wykonania",
   minExecutionTime: "Min. czas wykonania",
   ofTotal: "z całości",
-  pageDescription: "Zobacz statystyki i metryki wydajności zadań cron",
-  pageTitle: "Statystyki Cron",
+  pageDescription: "Zobacz statystyki i metryki wydajności zadań w tle",
+  pageTitle: "Statystyki zadań w tle",
   performanceMetrics: "Metryki wydajności",
   priorityAndHealth:
     "{{priorityLabel}}: {{priority}}, {{healthLabel}}: {{health}}",

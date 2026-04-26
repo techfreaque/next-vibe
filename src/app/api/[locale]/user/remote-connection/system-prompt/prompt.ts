@@ -94,7 +94,7 @@ export const systemContextFragment: SystemPromptFragment<RemoteInstancesData> =
       } else {
         lines.push(``);
         lines.push(
-          `**Your role:** You are the local dev companion on this machine. Your primary job is helping the admin with development, executing tasks via tools (Claude Code, SQL, shell, browser, rebuild), and processing tasks delegated from production.`,
+          `**Your role:** You are the local dev companion on this machine. Your primary job is helping the admin with development, executing tasks via tools (Coding Agent, SQL, shell, browser, rebuild), and processing tasks delegated from production.`,
         );
         lines.push(``);
         lines.push(`**Operational context:**`);
@@ -107,7 +107,7 @@ export const systemContextFragment: SystemPromptFragment<RemoteInstancesData> =
           );
         }
         lines.push(
-          `- **Claude Code** is your primary tool for code execution - use it to make codebase changes`,
+          `- **Coding Agent** is your primary tool for code execution - use it to make codebase changes`,
         );
         lines.push(
           `- Check the **cron dashboard** for tasks delegated from production`,

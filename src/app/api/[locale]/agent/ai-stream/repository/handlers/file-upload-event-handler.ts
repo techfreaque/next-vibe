@@ -28,10 +28,12 @@ export class FileUploadEventHandler {
         }>
       | undefined;
     userMessageId: string | null;
+    userId: string | undefined;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
   }): void {
-    const { fileUploadPromise, userMessageId, dbWriter, logger } = params;
+    const { fileUploadPromise, userMessageId, userId, dbWriter, logger } =
+      params;
 
     if (fileUploadPromise && userMessageId) {
       void fileUploadPromise
@@ -54,6 +56,15 @@ export class FileUploadEventHandler {
               messageId: result.userMessageId,
               attachmentCount: result.attachments.length,
             });
+
+            // Fire-and-forget: sync upload to cortex_nodes for vector search
+            if (userId) {
+              void dbWriter
+                .syncUploadEmbedding(userId, result.userMessageId)
+                .catch(() => {
+                  // Best-effort
+                });
+            }
           } else {
             logger.warn(
               "[File Processing] File upload failed - no event emitted",

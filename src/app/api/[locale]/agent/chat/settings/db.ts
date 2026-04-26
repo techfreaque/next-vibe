@@ -64,6 +64,13 @@ export const chatSettings = pgTable("chat_settings", {
   // Custom user message to kick off each autopilot session. null = skill default
   autopilotPrompt: jsonb("autopilot_prompt").$type<string | null>(),
 
+  // Mama pulse — Thea runs the production instance (admin-only, global shared task). null = disabled (false)
+  mamaEnabled: jsonb("mama_enabled").$type<boolean>(),
+  // Cron schedule for mama heartbeat. null = system default ("0 */4 * * *")
+  mamaSchedule: jsonb("mama_schedule").$type<string>(),
+  // Custom prompt for mama session. null = skill default
+  mamaPrompt: jsonb("mama_prompt").$type<string | null>(),
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

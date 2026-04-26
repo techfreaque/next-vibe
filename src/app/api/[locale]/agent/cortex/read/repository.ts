@@ -15,6 +15,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CortexReadT } from "./i18n";
 import { CortexNodeType } from "../enum";
@@ -24,12 +25,14 @@ import {
   isValidPath,
   isVirtualWritable,
   isWritablePath,
+  normalizeToCanonicalPath,
   normalizePath,
 } from "../repository";
 
 interface ReadParams {
   userId: string;
   user: JwtPrivatePayloadType;
+  locale: CountryLanguage;
   path: string;
   maxLines?: number;
   logger: EndpointLogger;
@@ -50,12 +53,13 @@ export class CortexReadRepository {
   static async readFile({
     userId,
     user,
+    locale,
     path: rawPath,
     maxLines,
     logger,
     t,
   }: ReadParams): Promise<ResponseType<ReadResult>> {
-    const path = normalizePath(rawPath);
+    const path = normalizeToCanonicalPath(normalizePath(rawPath), locale);
 
     if (!isValidPath(path)) {
       return fail({
@@ -68,21 +72,78 @@ export class CortexReadRepository {
     if (!user.isPublic) {
       const { isFilesystemMode } = await import("../fs-provider");
       if (isFilesystemMode(user)) {
-        const mountPrefix = getMountPrefix(path);
+        const mountPrefix = getMountPrefix(path, locale);
+        // Virtual mounts are not on disk — delegate to virtual resolver inline
+        if (mountPrefix && !isWritablePath(path, locale)) {
+          return CortexReadRepository.readVirtualMount(
+            userId,
+            path,
+            mountPrefix,
+            maxLines,
+            logger,
+            t,
+          );
+        }
+        // Native paths (memories, documents) — use filesystem
         if (mountPrefix) {
           const { ensureMountPopulated } =
             await import("../fs-provider/fs-populate");
           await ensureMountPopulated(mountPrefix, userId, logger);
         }
         const { fsReadFile } = await import("../fs-provider/fs-read");
-        return fsReadFile(path, maxLines, { t });
+        const fsResult = await fsReadFile(path, maxLines, { t });
+        if (fsResult.success) {
+          return fsResult;
+        }
+        // Non-NOT_FOUND error (e.g. FORBIDDEN, INTERNAL) — return immediately
+        if (fsResult.errorType !== ErrorResponseTypes.NOT_FOUND) {
+          return fsResult;
+        }
+        // NOT_FOUND on disk — check virtual templates (memories/documents only)
+        const { getAllTemplates } = await import("../seeds/templates");
+        if (path.startsWith("/memories/")) {
+          const templates = getAllTemplates(locale);
+          const template = templates.find(
+            (item) => item.seedOnlyNew && item.path === path,
+          );
+          if (template) {
+            const content = template.content;
+            return success({
+              responsePath: path,
+              content,
+              size: Buffer.byteLength(content, "utf8"),
+              truncated: false,
+              readonly: false,
+              nodeType: "file",
+              updatedAt: new Date().toISOString(),
+            });
+          }
+        } else if (path.startsWith("/documents/")) {
+          const templates = getAllTemplates(locale);
+          const template = templates.find(
+            (item) => item.updateIfUnchanged && item.path === path,
+          );
+          if (template) {
+            const content = template.content;
+            return success({
+              responsePath: path,
+              content,
+              size: Buffer.byteLength(content, "utf8"),
+              truncated: false,
+              readonly: false,
+              nodeType: "file",
+              updatedAt: new Date().toISOString(),
+            });
+          }
+        }
+        return fsResult; // genuine NOT_FOUND
       }
     }
 
-    const mountPrefix = getMountPrefix(path);
+    const mountPrefix = getMountPrefix(path, locale);
 
     // Virtual mount reads — delegate to mount resolvers
-    if (mountPrefix && !isWritablePath(path)) {
+    if (mountPrefix && !isWritablePath(path, locale)) {
       return CortexReadRepository.readVirtualMount(
         userId,
         path,
@@ -96,6 +157,43 @@ export class CortexReadRepository {
     // Document workspace read
     const node = await getNode(userId, path);
     if (!node) {
+      // Fallback: check virtual templates. Path is already canonical (/memories/..., /documents/...).
+      const { getAllTemplates } = await import("../seeds/templates");
+      if (path.startsWith("/memories/")) {
+        const templates = getAllTemplates(locale);
+        const template = templates.find(
+          (item) => item.seedOnlyNew && item.path === path,
+        );
+        if (template) {
+          const content = template.content;
+          return success({
+            responsePath: path,
+            content,
+            size: Buffer.byteLength(content, "utf8"),
+            truncated: false,
+            readonly: false,
+            nodeType: "file",
+            updatedAt: new Date().toISOString(),
+          });
+        }
+      } else if (path.startsWith("/documents/")) {
+        const templates = getAllTemplates(locale);
+        const template = templates.find(
+          (item) => item.updateIfUnchanged && item.path === path,
+        );
+        if (template) {
+          const content = template.content;
+          return success({
+            responsePath: path,
+            content,
+            size: Buffer.byteLength(content, "utf8"),
+            truncated: false,
+            readonly: false,
+            nodeType: "file",
+            updatedAt: new Date().toISOString(),
+          });
+        }
+      }
       return fail({
         message: t("get.errors.notFound.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
@@ -149,6 +247,32 @@ export class CortexReadRepository {
       const result = await resolveVirtualRead(userId, path, mountPrefix);
 
       if (!result) {
+        // Path may be a directory in the virtual mount — render a listing summary
+        const { resolveVirtualList } = await import("../mounts/resolver");
+        const entries = await resolveVirtualList(userId, path, mountPrefix);
+        // Treat as a dir if it has entries OR if it's a known dir path (mount root or subdir)
+        const isKnownDir =
+          path === mountPrefix || path.startsWith(`${mountPrefix}/`);
+        if (entries.length > 0 || isKnownDir) {
+          const lines = [`# ${path}`, ""];
+          for (const entry of entries) {
+            const icon = entry.nodeType === "dir" ? "📁" : "📄";
+            lines.push(`${icon} ${entry.name}`);
+          }
+          if (entries.length === 0) {
+            lines.push("*(empty)*");
+          }
+          const content = lines.join("\n");
+          return success({
+            responsePath: path,
+            content,
+            size: Buffer.byteLength(content, "utf8"),
+            truncated: false,
+            readonly: true,
+            nodeType: "dir",
+            updatedAt: new Date().toISOString(),
+          });
+        }
         return fail({
           message: t("get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,

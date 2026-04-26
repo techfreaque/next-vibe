@@ -48,7 +48,13 @@ export class VideoGenerationRepository {
     t: VideoGenerationT,
     streamContext: MediaGenStreamContext,
   ): Promise<ResponseType<VideoGenerationPostResponseOutput>> {
-    // model is resolved via serverDefault on the field definition (from ToolExecutionContext.videoGenModelId)
+    // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
+    if (!data.model) {
+      return fail({
+        message: t("post.errors.not_found.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
     const videoModel = getVideoGenModelById(data.model);
 
     if (!videoModel) {
@@ -216,7 +222,7 @@ export class VideoGenerationRepository {
     const deductResult = await deductMediaCredits(
       user,
       creditCost,
-      "video-generation",
+      t("post.title"),
       locale,
       logger,
       tCredits,

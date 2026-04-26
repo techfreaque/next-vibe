@@ -18,7 +18,7 @@ export const VIDEO_GEN_TOOL_NAME = "video_gen" as const;
 
 export const DEFAULT_VIDEO_GEN_MODEL_SELECTION: VideoGenModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
-  manualModelId: VideoGenModelId.WAN_2_7_T2V,
+  manualModelId: VideoGenModelId.VEO_3_1,
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,

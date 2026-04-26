@@ -23,6 +23,7 @@ interface FsWriteResult {
   size: number;
   created: boolean;
   updatedAt: string;
+  responseContent: string;
 }
 
 export async function fsWriteFile(
@@ -58,6 +59,7 @@ export async function fsWriteFile(
       size,
       created,
       updatedAt: new Date().toISOString(),
+      responseContent: content,
     });
   } catch (error) {
     if (error instanceof Error && hasErrCode(error, "EACCES")) {

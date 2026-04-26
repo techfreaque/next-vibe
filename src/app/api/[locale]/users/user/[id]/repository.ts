@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { count, eq, sum } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -18,6 +18,11 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { leads } from "@/app/api/[locale]/leads/db";
+import {
+  referralCodes,
+  referralEarnings,
+  userReferrals,
+} from "@/app/api/[locale]/referral/db";
 import { users } from "@/app/api/[locale]/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -63,11 +68,37 @@ export class UserByIdRepository {
 
       logger.debug("User found successfully", { userId: foundUser.id });
 
-      const userRolesResponse = await UserRolesRepository.findByUserId(
-        foundUser.id,
-        logger,
-        locale,
-      );
+      const [
+        userRolesResponse,
+        referralRecord,
+        referralCountResult,
+        earningsResult,
+      ] = await Promise.all([
+        UserRolesRepository.findByUserId(foundUser.id, logger, locale),
+        // Who referred this user
+        db
+          .select({
+            referrerUserId: userReferrals.referrerUserId,
+            code: referralCodes.code,
+          })
+          .from(userReferrals)
+          .leftJoin(
+            referralCodes,
+            eq(userReferrals.referralCodeId, referralCodes.id),
+          )
+          .where(eq(userReferrals.referredUserId, foundUser.id))
+          .limit(1),
+        // How many users this user referred
+        db
+          .select({ cnt: count() })
+          .from(userReferrals)
+          .where(eq(userReferrals.referrerUserId, foundUser.id)),
+        // Total earnings for this user
+        db
+          .select({ total: sum(referralEarnings.amountCents) })
+          .from(referralEarnings)
+          .where(eq(referralEarnings.earnerUserId, foundUser.id)),
+      ]);
 
       // Default to empty array if roles fetch fails
       const userRoles = userRolesResponse.success ? userRolesResponse.data : [];
@@ -78,6 +109,13 @@ export class UserByIdRepository {
           error: userRolesResponse.message,
         });
       }
+
+      const referralBy = referralRecord[0] ?? null;
+      const [firstReferralCount] = referralCountResult;
+      const totalReferrals = Number(firstReferralCount?.cnt ?? 0);
+      const [firstEarnings] = earningsResult;
+      const totalEarnedCents =
+        firstEarnings?.total !== null ? Number(firstEarnings?.total ?? 0) : 0;
 
       return success({
         userProfile: {
@@ -97,6 +135,12 @@ export class UserByIdRepository {
         timestamps: {
           createdAt: foundUser.createdAt,
           updatedAt: foundUser.updatedAt,
+        },
+        referralInfo: {
+          referredByUserId: referralBy?.referrerUserId ?? null,
+          referredByCode: referralBy?.code ?? null,
+          totalReferrals,
+          totalEarnedCents,
         },
         leadId: null,
         email: foundUser.email,

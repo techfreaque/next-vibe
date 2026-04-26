@@ -74,7 +74,7 @@ export const translations = {
     },
     id: {
       label: "skill ID",
-      description: "The unique identifier of the skill",
+      description: "The slug or friendly ID of the skill",
     },
     systemPrompt: {
       label: "System Prompt",
@@ -246,7 +246,7 @@ export const translations = {
     },
     id: {
       label: "skill ID",
-      description: "The unique identifier of the skill to update",
+      description: "The slug or friendly ID of the skill to update",
     },
     name: {
       label: "skill Name",
@@ -449,7 +449,7 @@ export const translations = {
     },
     id: {
       label: "skill ID",
-      description: "The unique identifier of the skill to delete",
+      description: "The slug or friendly ID of the skill to delete",
     },
     errors: {
       validation: {

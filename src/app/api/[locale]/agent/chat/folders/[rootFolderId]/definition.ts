@@ -85,12 +85,16 @@ const { GET } = createEndpoint({
             label: "config.folders.public" as const,
           },
           {
-            value: DefaultFolderId.CRON,
-            label: "config.folders.cron" as const,
+            value: DefaultFolderId.BACKGROUND,
+            label: "config.folders.background" as const,
           },
           {
             value: DefaultFolderId.INCOGNITO,
             label: "config.folders.incognito" as const,
+          },
+          {
+            value: DefaultFolderId.SUPPORT,
+            label: "config.folders.support" as const,
           },
         ],
         schema: z
@@ -98,8 +102,9 @@ const { GET } = createEndpoint({
             DefaultFolderId.PRIVATE,
             DefaultFolderId.SHARED,
             DefaultFolderId.PUBLIC,
-            DefaultFolderId.CRON,
+            DefaultFolderId.BACKGROUND,
             DefaultFolderId.INCOGNITO,
+            DefaultFolderId.SUPPORT,
           ])
           .describe(
             "Root folder to filter folders (incognito routed to route-client.ts via useClientRoute)",

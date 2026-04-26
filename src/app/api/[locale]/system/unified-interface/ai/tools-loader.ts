@@ -655,7 +655,10 @@ export async function loadTools(params: {
   streamContext: ToolExecutionContext;
 }): Promise<{
   tools: Record<string, CoreTool> | undefined;
-  toolsMeta: Map<string, { requiresConfirmation: boolean; credits: number }>;
+  toolsMeta: Map<
+    string,
+    { requiresConfirmation: boolean; credits: number; label: string }
+  >;
   systemPrompt: string;
 }> {
   // Empty array = explicitly no tools
@@ -690,7 +693,7 @@ export async function loadTools(params: {
     const toolsMap = new Map<string, CoreTool>();
     const toolsMeta = new Map<
       string,
-      { requiresConfirmation: boolean; credits: number }
+      { requiresConfirmation: boolean; credits: number; label: string }
     >();
 
     // ── Local tools ──────────────────────────────────────────────────────────
@@ -730,10 +733,14 @@ export async function loadTools(params: {
           requiresConfirmation,
         });
 
+        const { t: tEndpoint } = endpoint.scopedTranslation.scopedT(
+          params.locale,
+        );
         toolsMap.set(preferredToolName, createdTool);
         toolsMeta.set(preferredToolName, {
           requiresConfirmation,
           credits: endpoint.credits ?? 0,
+          label: tEndpoint(endpoint.title),
         });
       } catch (error) {
         const parsedError = parseError(error);
@@ -809,6 +816,7 @@ export async function loadTools(params: {
             toolsMeta.set(fullName, {
               requiresConfirmation,
               credits: cap.credits ?? 0,
+              label: cap.title ?? fullName,
             });
           } catch (error) {
             params.logger.error("[Tools Loader] Failed to create remote tool", {

@@ -13,7 +13,8 @@ export const translations = {
     fields: {
       path: {
         label: "Path",
-        description: "Folder path, e.g. /documents/projects/my-app",
+        description:
+          "Folder path. Use your locale's root (e.g. /dokumente/ for DE, /dokumenty/ for PL). Example: /documents/projects/my-app",
       },
       viewType: {
         label: "View",

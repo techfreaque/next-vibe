@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, asc, eq, inArray, or } from "drizzle-orm";
+import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -30,7 +30,13 @@ import { SkillsRepository } from "../skills/repository";
 import { chatSettings } from "../settings/db";
 import { scopedTranslation as settingsScopedTranslation } from "../settings/i18n";
 import { ChatSettingsRepository } from "../settings/repository";
-import { formatSkillId, isUuid } from "../slugify";
+import {
+  formatSkillId,
+  isSkillVariantId,
+  isUuid,
+  parseSkillId,
+  resolveIdAlias,
+} from "../slugify";
 import {
   chatFavorites,
   FAVORITE_CONFIG_COLUMNS,
@@ -75,17 +81,34 @@ export async function resolveFavoriteConfig(
   if (!favoriteId || !userId) {
     return null;
   }
+
+  let condition: ReturnType<typeof and>;
+  if (isUuid(favoriteId)) {
+    condition = and(
+      eq(chatFavorites.id, favoriteId),
+      eq(chatFavorites.userId, userId),
+    );
+  } else if (isSkillVariantId(favoriteId)) {
+    // Merged "skillSlug__variantId" format — look up by skill identity
+    const { skillId, variantId } = parseSkillId(favoriteId);
+    condition = and(
+      eq(chatFavorites.skillId, skillId),
+      variantId !== null
+        ? eq(chatFavorites.variantId, variantId)
+        : sql`${chatFavorites.variantId} IS NULL`,
+      eq(chatFavorites.userId, userId),
+    );
+  } else {
+    condition = and(
+      eq(chatFavorites.slug, favoriteId),
+      eq(chatFavorites.userId, userId),
+    );
+  }
+
   const [row] = await db
     .select(FAVORITE_CONFIG_COLUMNS)
     .from(chatFavorites)
-    .where(
-      and(
-        isUuid(favoriteId)
-          ? eq(chatFavorites.id, favoriteId)
-          : eq(chatFavorites.slug, favoriteId),
-        eq(chatFavorites.userId, userId),
-      ),
-    )
+    .where(condition)
     .limit(1);
   return row ?? null;
 }
@@ -169,6 +192,10 @@ export class ChatFavoritesRepository {
             }
           }
 
+          // Normalize skillId to canonical slug (legacy rows may store UUIDs)
+          const canonicalSkillId =
+            await SkillsRepository.resolveCanonicalSkillId(favorite.skillId);
+
           // Use client repository's compute method for DRY
           // Map ChatFavorite to StoredLocalFavorite structure
           // Use slug as the external ID (fall back to UUID for backcompat)
@@ -176,7 +203,7 @@ export class ChatFavoritesRepository {
             {
               id: favorite.slug || favorite.id,
               skillId: formatSkillId(
-                favorite.skillId,
+                canonicalSkillId,
                 favorite.variantId ?? null,
               ),
               customVariantName: favorite.customVariantName ?? null,
@@ -290,11 +317,14 @@ export class ChatFavoritesRepository {
         return formatEmptyFavoritesGuidance();
       }
 
-      // Resolve localized skill names
+      // Resolve localized skill names + build UUID→slug map for canonical IDs
       const { t: charT } = charactersScopedTranslation.scopedT(locale);
       const skillNameMap = new Map<string, string>();
+      const skillSlugMap = new Map<string, string>();
       for (const char of DEFAULT_SKILLS) {
         skillNameMap.set(char.id, charT(char.name));
+        // Default skill IDs are already friendly — identity mapping
+        skillSlugMap.set(char.id, char.id);
       }
 
       // Look up custom skill names for any non-default skillIds
@@ -328,8 +358,11 @@ export class ChatFavoritesRepository {
           .where(condition);
         for (const s of customSkillsList) {
           skillNameMap.set(s.id, s.name);
+          // Map UUID → slug for canonical ID resolution
           if (s.slug) {
             skillNameMap.set(s.slug, s.name);
+            skillSlugMap.set(s.id, s.slug);
+            skillSlugMap.set(s.slug, s.slug);
           }
         }
       }
@@ -338,9 +371,11 @@ export class ChatFavoritesRepository {
         const baseName = skillNameMap.get(row.skillId) ?? row.skillId;
         let variantLabel: string | null = null;
         if (row.variantId) {
-          const defaultSkill = DEFAULT_SKILLS.find((s) => s.id === row.skillId);
+          const defaultSkill = DEFAULT_SKILLS.find(
+            (s) => s.id === resolveIdAlias(row.skillId),
+          );
           const variant = defaultSkill?.variants?.find(
-            (v) => v.id === row.variantId,
+            (v) => v.id === resolveIdAlias(row.variantId ?? ""),
           );
           if (variant?.variantName) {
             variantLabel = charT(variant.variantName);
@@ -351,10 +386,12 @@ export class ChatFavoritesRepository {
           : baseName;
         // Use slug as external ID (fall back to UUID for backcompat)
         const externalId = row.slug || row.id;
+        // Resolve skillId to canonical slug (never expose UUIDs in system prompt)
+        const canonicalSkillId = skillSlugMap.get(row.skillId) ?? row.skillId;
         return {
           id: externalId,
           name: row.customVariantName ?? characterName,
-          skillId: row.skillId,
+          skillId: canonicalSkillId,
           characterName,
           modelId: null as string | null, // model resolved client-side; not stored server-side
           modelInfo: "",
@@ -408,11 +445,13 @@ export class ChatFavoritesRepository {
       return [];
     }
 
-    // Resolve localized skill names
+    // Resolve localized skill names + build UUID→slug map for canonical IDs
     const { t: charT } = charactersScopedTranslation.scopedT(locale);
     const skillNameMap = new Map<string, string>();
+    const skillSlugMap = new Map<string, string>();
     for (const char of DEFAULT_SKILLS) {
       skillNameMap.set(char.id, charT(char.name));
+      skillSlugMap.set(char.id, char.id);
     }
 
     // Look up custom skill names for any non-default skillIds
@@ -447,6 +486,8 @@ export class ChatFavoritesRepository {
         skillNameMap.set(s.id, s.name);
         if (s.slug) {
           skillNameMap.set(s.slug, s.name);
+          skillSlugMap.set(s.id, s.slug);
+          skillSlugMap.set(s.slug, s.slug);
         }
       }
     }
@@ -468,10 +509,12 @@ export class ChatFavoritesRepository {
         : baseName;
       // Use slug as external ID (fall back to UUID for backcompat)
       const externalId = row.slug || row.id;
+      // Resolve skillId to canonical slug (never expose UUIDs)
+      const canonicalSkillId = skillSlugMap.get(row.skillId) ?? row.skillId;
       return {
         id: externalId,
         name: row.customVariantName ?? characterName,
-        skillId: row.skillId,
+        skillId: canonicalSkillId,
         characterName,
         modelId: null,
         modelInfo: "",

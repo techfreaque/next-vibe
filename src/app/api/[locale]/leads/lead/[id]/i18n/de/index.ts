@@ -213,6 +213,20 @@ export const translations = {
           content: "Anzeigename",
         },
       },
+      referralHistory: {
+        title: "Empfehlungsverlauf",
+        description:
+          "Empfehlungscodes, die dieser Lead vor der Anmeldung angeklickt hat",
+        code: {
+          content: "Empfehlungscode",
+        },
+        ownerUserId: {
+          content: "Code-Besitzer",
+        },
+        clickedAt: {
+          content: "Geklickt am",
+        },
+      },
     },
     errors: {
       validation: {

@@ -8,34 +8,35 @@
     "alt-svc": "h3=\":443\"; ma=86400",
     "cache-control": "no-cache, private",
     "cf-cache-status": "DYNAMIC",
-    "cf-ray": "9e732f7b99e3bc01-FRA",
+    "cf-ray": "9f25da15daecd23b-FRA",
     "connection": "keep-alive",
     "content-encoding": "br",
     "content-type": "application/json",
-    "date": "Sat, 04 Apr 2026 20:50:40 GMT",
+    "date": "Sun, 26 Apr 2026 13:14:42 GMT",
     "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
-    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=U0MeLIC1%2FlfFfFwuguM1QWVZYcS%2BCg0a6mZGML9nz01NCW4YdQ5MFGk%2FNZou16I0DLOj2Uj8iQ5RBLC6NgOVCMSfBq52hvn0DtyJa5GotxXA9KddGnfoHkBovlU4ciE%3D\"}]}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=gYt%2Bd6RHYp3cKa4natPoAQd1P6I6lZ%2F4rkK9IWDdmlUL8vxMbXtev2lXvWkdVBMPuOy8mIZXEuNJsqd95F83TwPx5F68ZRuajF1dmKL7T3N6QXsfU79B%2BinL9X1e9Ks%3D\"}]}",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
-    "x-cloud-trace-context": "7e5c27589f237953e25f20ceaf8740e8",
-    "x-request-time": "12.209",
+    "x-cloud-trace-context": "cfc1089753105ec912bb12a967faed0e",
+    "x-request-time": "1.764",
     "x-served-by": "octane-api",
     "x-upstream-connect": "0.000",
     "x-upstream-time": "-"
   },
   "body": {
-    "status": "success",
-    "generationTime": 12,
-    "id": 3882146,
-    "output": [
-      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/aeed015c-5fcb-45df-bc76-34a1d6185ba5.mp3"
-    ],
-    "proxy_links": [
-      "https://cdn2.stablediffusionapi.com/generations/aeed015c-5fcb-45df-bc76-34a1d6185ba5.mp3"
-    ],
+    "status": "processing",
+    "tip": "Your audio is processing in background, you can get this image using fetch API",
+    "eta": 5,
+    "message": "Try to fetch request after seconds estimated",
+    "fetch_result": "https://modelslab.com/api/v7/voice/fetch/3973161",
+    "id": 3973161,
+    "output": [],
     "meta": {
       "prompt": "upbeat piano melody",
-      "model_id": "lyria-3"
-    }
+      "model_id": "sonauto_song"
+    },
+    "future_links": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/89c707f8-95e2-45bc-9078-d19b3b912b92.mp3"
+    ]
   }
 }

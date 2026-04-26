@@ -141,8 +141,8 @@ export const translations = {
           "Configure automated campaign starter settings and scheduling",
         form: {
           cronSettings: {
-            label: "Cron Task Settings",
-            description: "Configure the cron job execution settings",
+            label: "Background Task Settings",
+            description: "Configure the background task execution settings",
             schedule: {
               label: "Schedule",
               placeholder: "Enter cron expression (e.g., */3 * * * *)",
@@ -226,7 +226,8 @@ export const translations = {
         },
         settings: {
           title: "Campaign Starter Settings",
-          description: "Configure the campaign starter cron job settings",
+          description:
+            "Configure the campaign starter background task settings",
         },
       },
       emails: {
@@ -820,7 +821,7 @@ export const translations = {
     },
     campaign: {
       title: "Email Campaign System",
-      description: "Automated email campaigns powered by cron jobs",
+      description: "Automated email campaigns powered by background tasks",
       starter: {
         title: "Campaign Starter",
         description: "Processes NEW leads → CONTACTED",
@@ -836,7 +837,7 @@ export const translations = {
         description: "Maintains data quality",
         schedule: "Daily 2 AM",
       },
-      info: "Campaign management is handled automatically by the cron system. Visit the Cron Admin page for detailed monitoring.",
+      info: "Campaign management is handled automatically by background tasks. Visit the Background Admin page for detailed monitoring.",
     },
     constants: {
       unknown: "unknown",

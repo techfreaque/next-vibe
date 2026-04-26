@@ -12,7 +12,8 @@ export const translations: typeof enTranslations = {
         shared: "Geteilt",
         public: "Öffentlich",
         incognito: "Inkognito",
-        cron: "Cron",
+        cron: "Hintergrund",
+        support: "Support",
       },
     },
     folderList: {
@@ -107,8 +108,9 @@ export const translations: typeof enTranslations = {
       private: "Privat",
       shared: "Geteilt",
       public: "Öffentlich",
-      cron: "Cron",
+      background: "Hintergrund",
       incognito: "Inkognito",
+      support: "Support",
     },
   },
   errors: {
@@ -121,7 +123,7 @@ export const translations: typeof enTranslations = {
     rootFolderId: {
       label: "Stammordner",
       description:
-        "Der abzurufende Stammordner (privat, geteilt, öffentlich, cron, inkognito)",
+        "Der abzurufende Stammordner (privat, geteilt, öffentlich, hintergrund, inkognito)",
     },
     container: {
       title: "Ordnerdetails",

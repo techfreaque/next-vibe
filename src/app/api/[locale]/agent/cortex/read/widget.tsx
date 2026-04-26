@@ -1,6 +1,6 @@
 /**
  * Cortex Read Widget (Web)
- * File viewer with path header, metadata badges, monospace content block.
+ * File viewer with path header, metadata badges, markdown content block.
  */
 
 "use client";
@@ -10,20 +10,22 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { FileText } from "next-vibe-ui/ui/icons/FileText";
-import { Pre } from "next-vibe-ui/ui/pre";
+import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
 
 import {
   useWidgetDisabled,
+  useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { CortexNav } from "../_shared/cortex-nav";
 import { DomainEnrichment } from "../_shared/domain-enrichment";
 import { formatBytes } from "../_shared/format-bytes";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
 
@@ -38,6 +40,8 @@ export function CortexReadWidget({
   const children = field.children;
   const t = useWidgetTranslation<typeof definition.GET>();
   const isDisabled = useWidgetDisabled();
+  const navigation = useWidgetNavigation();
+  const isPushed = navigation.canGoBack;
 
   const handleCopy = (): void => {
     if (value?.content) {
@@ -47,9 +51,26 @@ export function CortexReadWidget({
 
   return (
     <Div className="flex flex-col gap-4">
-      {/* Form */}
-      {!isDisabled && (
-        <Div className="flex flex-col gap-3 p-4 border rounded-lg bg-card">
+      {/* Top nav — always shown, back + context actions when we have a path */}
+      <CortexNav
+        path={value?.responsePath}
+        actions={value ? ["list", "edit", "write", "move", "delete"] : ["list"]}
+        actionData={
+          value
+            ? {
+                list: { path: value.responsePath },
+                edit: { path: value.responsePath },
+                write: { path: value.responsePath, content: value.content },
+                move: { from: value.responsePath },
+                delete: { path: value.responsePath },
+              }
+            : {}
+        }
+      />
+
+      {/* Form — only show when not opened via navigation push */}
+      {!isDisabled && !isPushed && (
+        <Div className="flex flex-col gap-3 px-4">
           <TextFieldWidget fieldName="path" field={children.path} />
           <Div className="grid grid-cols-12 gap-4">
             <Div className="col-span-6">
@@ -75,16 +96,16 @@ export function CortexReadWidget({
 
       {/* Response */}
       {value && (
-        <Div className="flex flex-col gap-3">
+        <Div className="flex flex-col gap-3 px-4 pb-4">
           {/* Header */}
           <Div className="flex items-center justify-between">
-            <Div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-muted-foreground" />
-              <Span className="font-mono text-sm font-medium">
+            <Div className="flex items-center gap-2 min-w-0">
+              <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+              <Span className="font-mono text-sm font-medium truncate">
                 {value.responsePath}
               </Span>
             </Div>
-            <Div className="flex items-center gap-2">
+            <Div className="flex items-center gap-2 shrink-0 ml-2">
               {value.readonly && (
                 <Badge variant="secondary">
                   {t("get.response.readonly.text")}
@@ -96,18 +117,20 @@ export function CortexReadWidget({
                 </Badge>
               )}
               <Badge variant="outline">{formatBytes(value.size)}</Badge>
-              <Badge variant="outline">{value.nodeType}</Badge>
-              <Button variant="ghost" size="sm" onClick={handleCopy}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCopy}
+                className="h-7 w-7 p-0"
+              >
                 <Copy className="h-3.5 w-3.5" />
               </Button>
             </Div>
           </Div>
 
-          {/* Content */}
-          <Div className="relative rounded-lg border bg-muted/30 overflow-auto max-h-[600px]">
-            <Pre className="p-4 text-sm font-mono whitespace-pre-wrap break-words">
-              {value.content}
-            </Pre>
+          {/* Content — rendered as Markdown */}
+          <Div className="prose prose-sm dark:prose-invert max-w-none rounded-lg border bg-muted/20 p-4 overflow-auto max-h-[600px]">
+            <Markdown content={value.content} />
           </Div>
 
           {/* Footer */}

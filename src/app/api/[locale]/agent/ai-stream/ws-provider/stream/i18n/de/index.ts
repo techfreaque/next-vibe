@@ -29,6 +29,11 @@ export const translations: typeof enTranslations = {
           "UUID eines bestehenden Threads zum Fortsetzen. Weglassen, um einen neuen Thread zu starten.",
         placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
       },
+      rootFolderId: {
+        label: "Stammordner",
+        description:
+          "Ordner für den neuen Thread. Standard: 'private'. 'support' für Support-Sitzungen.",
+      },
       skill: {
         label: "Skill",
         description:

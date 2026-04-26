@@ -418,10 +418,12 @@ export class ToolConfirmationHandler {
           },
         };
       } else if (!isIncognito) {
-        // Same sequence (no newer messages from a different sequence): update in-place.
-        // Different sequence (messages exist after this one in a new sequence): insert deferred.
-        // Exclude error messages - they belong to prior sequences and should not
-        // be counted as evidence that a new sequence has started.
+        // Same user turn (no newer USER messages): update the original message in-place.
+        // Different user turn (user sent a new message after this tool was pending): insert deferred.
+        //
+        // Important: AI revival messages (from callbackMode=wait/wakeUp completing) are NOT
+        // counted as a "new user turn" — they are part of the same user turn even if they have
+        // a different sequenceId. Only explicit USER messages constitute a new turn.
         const newerSequenceMessage = toolMessage.sequenceId
           ? await db
               .select({ id: chatMessages.id })
@@ -430,12 +432,11 @@ export class ToolConfirmationHandler {
                 and(
                   eq(chatMessages.threadId, toolMessage.threadId),
                   gt(chatMessages.createdAt, toolMessage.createdAt),
-                  ne(chatMessages.sequenceId, toolMessage.sequenceId),
-                  ne(chatMessages.role, ChatMessageRole.ERROR),
+                  eq(chatMessages.role, ChatMessageRole.USER),
                 ),
               )
               .limit(1)
-          : []; // no sequenceId → treat as same sequence (update in-place)
+          : []; // no sequenceId → treat as same user turn (update in-place)
 
         logger.debug("[Tool Confirmation] newerSequenceMessage check", {
           sequenceId: toolMessage.sequenceId,

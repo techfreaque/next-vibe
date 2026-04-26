@@ -43,8 +43,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { CollapseStateStore } from "../hooks/use-collapse-state";
 import { scopedTranslation } from "../i18n";
-import type messagesDefinition from "../definition";
-import { useWidgetItem } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { AssistantMessageActions } from "./assistant-message-actions";
 import { CompactingMessage } from "./compacting-message";
 import { useMessageGroupName } from "./embedded-context";
@@ -201,12 +199,12 @@ const ToolMessage = memo(
 );
 
 /**
- * Assistant Content Message - subscribes to this message via useWidgetItem.
- * Accepts messageId to break the prop-drilling re-render cascade:
- * during streaming only this specific message re-renders, not all N messages.
+ * Assistant Content Message - renders a single assistant message.
+ * Custom memo comparator ensures re-renders only when this specific message changes,
+ * preventing cascading re-renders across all messages during streaming.
  */
 interface AssistantContentMessageProps {
-  messageId: string;
+  message: ChatMessage;
   hasContentAfter: boolean;
   collapseState: CollapseStateStore | null;
   locale: CountryLanguage;
@@ -363,78 +361,76 @@ function GeneratedImageWithPrompt({
   );
 }
 
-const AssistantContentMessage = memo(function AssistantContentMessage({
-  messageId,
-  hasContentAfter,
-  collapseState,
-  locale,
-}: AssistantContentMessageProps): JSX.Element | null {
-  // Subscribe to this specific message in widget context — re-renders only when THIS message changes.
-  // Breaks the prop-drilling cascade: deltas on other messages don't trigger a re-render here.
-  const message = useWidgetItem<typeof messagesDefinition.GET>()(
-    (d) => d?.messages ?? [],
-    (m) => m.id,
-    messageId,
-  );
+const AssistantContentMessage = memo(
+  function AssistantContentMessage({
+    message,
+    hasContentAfter,
+    collapseState,
+    locale,
+  }: AssistantContentMessageProps): JSX.Element | null {
+    const content = message.content ?? "";
+    const generatedMedia = message.metadata?.generatedMedia;
 
-  const content = message?.content ?? "";
-  const generatedMedia = message?.metadata?.generatedMedia;
+    if (!content.trim() && !generatedMedia) {
+      return null;
+    }
 
-  if (!content.trim() && !generatedMedia) {
-    return null;
-  }
-
-  return (
-    <Div className="mb-3 last:mb-0">
-      {content.trim() ? (
-        <Markdown
-          content={content}
-          messageId={messageId}
-          hasContentAfter={hasContentAfter}
-          collapseState={collapseState ?? undefined}
-          isMessageStreaming={Boolean(message?.metadata?.isStreaming)}
-        />
-      ) : null}
-      {/* Generated Media (image / audio / video) */}
-      {generatedMedia ? (
-        generatedMedia.type === "image" && generatedMedia.url ? (
-          <GeneratedImageWithPrompt
-            url={generatedMedia.url}
-            prompt={generatedMedia.prompt ?? ""}
-            locale={locale}
+    return (
+      <Div className="mb-3 last:mb-0">
+        {content.trim() ? (
+          <Markdown
+            content={content}
+            messageId={message.id}
+            hasContentAfter={hasContentAfter}
+            collapseState={collapseState ?? undefined}
+            isMessageStreaming={Boolean(message.metadata?.isStreaming)}
           />
-        ) : generatedMedia.type === "audio" && generatedMedia.url ? (
-          <Div className="mt-2 w-full">
-            <Audio src={generatedMedia.url} controls className="w-full" />
-            <MediaActions
+        ) : null}
+        {/* Generated Media (image / audio / video) */}
+        {generatedMedia ? (
+          generatedMedia.type === "image" && generatedMedia.url ? (
+            <GeneratedImageWithPrompt
               url={generatedMedia.url}
-              type="audio"
+              prompt={generatedMedia.prompt ?? ""}
               locale={locale}
             />
-          </Div>
-        ) : generatedMedia.type === "video" && generatedMedia.url ? (
-          <Div className="mt-2 max-w-lg">
-            <Video
-              src={generatedMedia.url}
-              controls
-              className="rounded-lg w-full h-auto"
-            />
-            <MediaActions
-              url={generatedMedia.url}
-              type="video"
-              locale={locale}
-            />
-          </Div>
-        ) : null
-      ) : null}
-      {/* File Attachments */}
-      {message?.metadata?.attachments &&
-        message.metadata.attachments.length > 0 && (
-          <FileAttachments attachments={message.metadata.attachments} />
-        )}
-    </Div>
-  );
-});
+          ) : generatedMedia.type === "audio" && generatedMedia.url ? (
+            <Div className="mt-2 w-full">
+              <Audio src={generatedMedia.url} controls className="w-full" />
+              <MediaActions
+                url={generatedMedia.url}
+                type="audio"
+                locale={locale}
+              />
+            </Div>
+          ) : generatedMedia.type === "video" && generatedMedia.url ? (
+            <Div className="mt-2 max-w-lg">
+              <Video
+                src={generatedMedia.url}
+                controls
+                className="rounded-lg w-full h-auto"
+              />
+              <MediaActions
+                url={generatedMedia.url}
+                type="video"
+                locale={locale}
+              />
+            </Div>
+          ) : null
+        ) : null}
+        {/* File Attachments */}
+        {message.metadata?.attachments &&
+          message.metadata.attachments.length > 0 && (
+            <FileAttachments attachments={message.metadata.attachments} />
+          )}
+      </Div>
+    );
+  },
+  (prev, next) =>
+    prev.message === next.message &&
+    prev.hasContentAfter === next.hasContentAfter &&
+    prev.collapseState === next.collapseState,
+);
 
 /**
  * Messages List with Tool Confirmation - handles all tool confirmation logic
@@ -744,6 +740,7 @@ const MessagesList = memo(function MessagesList({
               key={message.id}
               message={message}
               rootFolderId={rootFolderId}
+              messages={allMessages}
             />
           );
         }
@@ -773,7 +770,7 @@ const MessagesList = memo(function MessagesList({
           return (
             <AssistantContentMessage
               key={message.id}
-              messageId={message.id}
+              message={message}
               hasContentAfter={hasContentAfter}
               collapseState={collapseState}
               locale={locale}
@@ -813,6 +810,7 @@ interface MessageActionsWrapperProps {
   cachedInputTokens: number | null;
   cacheWriteTokens: number | null;
   timeToFirstToken: number | null;
+  streamingTime: number | null;
   /** Server-computed credit cost (preferred over client recalculation) */
   serverCreditCost: number | null;
   readOnly: boolean;
@@ -839,6 +837,7 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
   cachedInputTokens,
   cacheWriteTokens,
   timeToFirstToken,
+  streamingTime,
   serverCreditCost,
   readOnly,
   user,
@@ -935,6 +934,7 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
       cachedInputTokens={cachedInputTokens}
       cacheWriteTokens={cacheWriteTokens}
       timeToFirstToken={timeToFirstToken}
+      streamingTime={streamingTime}
       creditCost={creditCost}
       readOnly={readOnly}
       user={user}
@@ -1106,9 +1106,11 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
     let totalCachedInputTokens = 0;
     let totalCacheWriteTokens = 0;
     let totalCreditCost = 0;
+    let totalStreamingTime = 0;
     let timeToFirstToken: number | null = null;
     let hasAnyTokens = false;
     let hasAnyCreditCost = false;
+    let hasAnyStreamingTime = false;
 
     for (const msg of allMessages) {
       if (msg.metadata?.promptTokens) {
@@ -1138,6 +1140,11 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
       if (timeToFirstToken === null && msg.metadata?.timeToFirstToken) {
         timeToFirstToken = msg.metadata.timeToFirstToken;
       }
+      // streamingTime: sum across all steps for multi-step tool loops
+      if (msg.metadata?.streamingTime) {
+        totalStreamingTime += msg.metadata.streamingTime;
+        hasAnyStreamingTime = true;
+      }
     }
 
     return {
@@ -1150,6 +1157,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
       // Server-computed credit cost (preferred - accounts for cache pricing correctly)
       creditCost: hasAnyCreditCost ? totalCreditCost : null,
       timeToFirstToken,
+      streamingTime: hasAnyStreamingTime ? totalStreamingTime : null,
     };
   }, [allMessages]);
 
@@ -1200,6 +1208,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
             cachedInputTokens={groupTotals.cachedInputTokens}
             cacheWriteTokens={groupTotals.cacheWriteTokens}
             timeToFirstToken={groupTotals.timeToFirstToken}
+            streamingTime={groupTotals.streamingTime}
             serverCreditCost={groupTotals.creditCost}
             readOnly={readOnly}
             user={user}

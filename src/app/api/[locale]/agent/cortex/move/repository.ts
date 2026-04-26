@@ -17,6 +17,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CortexMoveT } from "./i18n";
 import { cortexNodes } from "../db";
+import { CortexCreditFeature, CortexNodeType } from "../enum";
 import {
   ensureParentDirs,
   getNode,
@@ -24,6 +25,7 @@ import {
   isValidPath,
   isVirtualWritable,
   isWritablePath,
+  normalizeToCanonicalPath,
   normalizePath,
   pathExists,
 } from "../repository";
@@ -54,8 +56,8 @@ export class CortexMoveRepository {
       nodesAffected: number;
     }>
   > {
-    const from = normalizePath(rawFrom);
-    const to = normalizePath(rawTo);
+    const from = normalizeToCanonicalPath(normalizePath(rawFrom), locale);
+    const to = normalizeToCanonicalPath(normalizePath(rawTo), locale);
 
     if (!isValidPath(from) || !isValidPath(to)) {
       return fail({
@@ -75,8 +77,8 @@ export class CortexMoveRepository {
     }
 
     // Virtual writable mount — both paths must share the same mount
-    const fromMount = getMountPrefix(from);
-    const toMount = getMountPrefix(to);
+    const fromMount = getMountPrefix(from, locale);
+    const toMount = getMountPrefix(to, locale);
     if (isVirtualWritable(from) || isVirtualWritable(to)) {
       if (fromMount !== toMount) {
         // Cross-mount moves are forbidden
@@ -122,7 +124,7 @@ export class CortexMoveRepository {
       }
     }
 
-    if (!isWritablePath(from) || !isWritablePath(to)) {
+    if (!isWritablePath(from, locale) || !isWritablePath(to, locale)) {
       return fail({
         message: t("post.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
@@ -190,6 +192,28 @@ export class CortexMoveRepository {
         if (movedNode?.content !== null && movedNode?.content !== undefined) {
           const { syncToDisk } = await import("../fs-provider/fs-sync");
           await syncToDisk(to, movedNode.content);
+        }
+      } catch {
+        // Best-effort
+      }
+
+      // Re-queue embedding for the moved node — path changed so embedding text changed
+      try {
+        const movedFile = await getNode(userId, to);
+        if (
+          movedFile?.id &&
+          movedFile.nodeType === CortexNodeType.FILE &&
+          movedFile.content !== null &&
+          movedFile.content !== undefined
+        ) {
+          const { queueEmbedding } = await import("../embeddings/auto-embed");
+          queueEmbedding(movedFile.id, to, movedFile.content, {
+            billCredits: false,
+            user,
+            locale,
+            logger,
+            feature: CortexCreditFeature.EMBEDDING,
+          });
         }
       } catch {
         // Best-effort

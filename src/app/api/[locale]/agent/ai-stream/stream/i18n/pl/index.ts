@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
         favoriteId: {
           label: "ID ulubionego",
           description:
-            "UUID zapisanego ulubionego. Ładuje skill, model i konfigurację narzędzi jako wartości domyślne. Jawne pola nadpisują wartości ulubionego.",
+            "Slug lub ID zapisanego ulubionego. Ładuje skill, model i konfigurację narzędzi jako wartości domyślne. Jawne pola nadpisują wartości ulubionego.",
           placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         model: {
@@ -113,10 +113,10 @@ export const translations: typeof enTranslations = {
         rootFolderId: {
           label: "Folder zapisu",
           description:
-            "Gdzie zapisać wątek. 'cron' (domyślny) = trwałe uruchomienia agenta. 'incognito' = bez zapisu, bez historii. 'private' = prywatny folder użytkownika. 'shared' = dostępny dla zespołu.",
-          placeholder: "cron",
+            "Gdzie zapisać wątek. W tle = wszystkie automatyczne uruchomienia (Dreamer, Autopilot, zaplanowane zadania). Prywatny = twój folder. Udostępniony = zespół. Incognito = bez zapisu.",
+          placeholder: "background",
           options: {
-            cron: "Cron (zadania agenta)",
+            background: "W tle",
             private: "Prywatny",
             shared: "Udostępniony",
             incognito: "Incognito (bez zapisu)",

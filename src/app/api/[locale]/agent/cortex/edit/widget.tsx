@@ -16,13 +16,14 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { DomainEnrichment } from "../_shared/domain-enrichment";
-import { formatBytes } from "../_shared/format-bytes";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
 import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
+import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+import { CortexNav } from "../_shared/cortex-nav";
+import { DomainEnrichment } from "../_shared/domain-enrichment";
+import { formatBytes } from "../_shared/format-bytes";
 
 import type definition from "./definition";
 
@@ -40,9 +41,28 @@ export function CortexEditWidget({
 
   return (
     <Div className="flex flex-col gap-4">
+      {/* Top nav */}
+      <CortexNav
+        path={value?.responsePath}
+        actions={
+          value ? ["list", "read", "write", "move", "delete"] : ["list", "read"]
+        }
+        actionData={
+          value
+            ? {
+                list: { path: value.responsePath },
+                read: { path: value.responsePath },
+                write: { path: value.responsePath },
+                move: { from: value.responsePath },
+                delete: { path: value.responsePath },
+              }
+            : {}
+        }
+      />
+
       {/* Form */}
       {!isDisabled && (
-        <Div className="flex flex-col gap-3 p-4 border rounded-lg bg-card">
+        <Div className="flex flex-col gap-3 p-4 border rounded-lg bg-card mx-4">
           <TextFieldWidget fieldName="path" field={children.path} />
           <Div className="grid grid-cols-12 gap-4">
             <Div className="col-span-6">
@@ -83,19 +103,19 @@ export function CortexEditWidget({
 
       {/* Response */}
       {value && (
-        <>
+        <Div className="flex flex-col gap-3 px-4 pb-4">
           <Card className="border-green-500/20 bg-green-500/5">
             <CardContent className="p-4">
               <Div className="flex items-center gap-3">
                 <Div className="rounded-full bg-green-500/10 p-2">
                   <Check className="h-4 w-4 text-green-500" />
                 </Div>
-                <Div className="flex-1">
-                  <Span className="font-mono text-sm font-medium block">
+                <Div className="flex-1 min-w-0">
+                  <Span className="font-mono text-sm font-medium block truncate">
                     {value.responsePath}
                   </Span>
                 </Div>
-                <Div className="flex items-center gap-2">
+                <Div className="flex items-center gap-2 shrink-0">
                   <Badge variant="default">
                     {value.replacements} {t("patch.response.replacements.text")}
                   </Badge>
@@ -105,7 +125,7 @@ export function CortexEditWidget({
             </CardContent>
           </Card>
           <DomainEnrichment responsePath={value.responsePath} />
-        </>
+        </Div>
       )}
     </Div>
   );

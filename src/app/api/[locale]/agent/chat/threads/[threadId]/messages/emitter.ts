@@ -32,7 +32,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import folderContentsDefinitions from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
 import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
-import { buildMessagesChannel } from "./channel";
+import { buildMessagesChannel, buildSupportFeedChannel } from "./channel";
 import type { MessagesWsEmit } from "./definition";
 
 export type WsEmitCallback = MessagesWsEmit & {
@@ -88,6 +88,7 @@ export function createMessagesEmitter(
   rootFolderId: DefaultFolderId | null,
   logger: EndpointLogger,
   user: JwtPayloadType,
+  supportSessionId?: string | null,
 ): MessagesWsEmit & {
   flush: () => void;
   setStreamPreview: (p: { preview: string | null; updatedAt: Date }) => void;
@@ -103,6 +104,12 @@ export function createMessagesEmitter(
       ]
     : [threadsChannel];
 
+  // When a support session is active, also broadcast key events to the support feed channel
+  // so local supporters subscribed to this session see live updates.
+  const supportChannel = supportSessionId
+    ? buildSupportFeedChannel(supportSessionId)
+    : null;
+
   const batcher = createBatchingEmitter(logger, user);
 
   // Set by clearStreamingState before stream-finished is emitted.
@@ -110,6 +117,11 @@ export function createMessagesEmitter(
 
   function doEmit(eventName: string, payload: WsWireMessage["data"]): void {
     batcher.emit(channel, eventName, payload);
+
+    // Fan-out to support session channel so local supporters see live updates
+    if (supportChannel) {
+      batcher.emit(supportChannel, eventName, payload);
+    }
 
     const typedPayload =
       payload !== null && typeof payload === "object" && !Array.isArray(payload)

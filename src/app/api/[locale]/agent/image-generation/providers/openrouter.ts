@@ -56,6 +56,8 @@ export async function generateWithOpenRouter(params: {
           "Content-Type": "application/json",
           // eslint-disable-next-line i18next/no-literal-string
           "HTTP-Referer": "https://unbottled.ai",
+          // eslint-disable-next-line i18next/no-literal-string
+          "X-Title": "Unbottled AI",
         },
         body: JSON.stringify({
           model: providerModel,

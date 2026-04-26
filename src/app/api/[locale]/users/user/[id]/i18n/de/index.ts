@@ -105,6 +105,22 @@ export const translations: typeof enTranslations = {
             content: "Aktualisiert am",
           },
         },
+        referralInfo: {
+          title: "Empfehlungsinfo",
+          description: "Empfehlungskette und Verdienste",
+          referredByUserId: {
+            content: "Empfohlen von (Benutzer-ID)",
+          },
+          referredByCode: {
+            content: "Verwendeter Empfehlungscode",
+          },
+          totalReferrals: {
+            content: "Geworbene Nutzer",
+          },
+          totalEarnedCents: {
+            content: "Gesamtverdienst (Cent)",
+          },
+        },
         leadId: {
           content: "Zugehörige Lead-ID",
         },

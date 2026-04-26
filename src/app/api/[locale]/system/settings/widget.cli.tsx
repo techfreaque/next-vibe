@@ -300,7 +300,7 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
           typeof RouteExecutionExecutor.executeGenericHandler
         >[0]["platform"],
         streamContext: {
-          rootFolderId: DefaultFolderId.CRON,
+          rootFolderId: DefaultFolderId.BACKGROUND,
           threadId: undefined,
           aiMessageId: undefined,
           skillId: undefined,
@@ -743,7 +743,7 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
           typeof RouteExecutionExecutor.executeGenericHandler
         >[0]["platform"],
         streamContext: {
-          rootFolderId: DefaultFolderId.CRON,
+          rootFolderId: DefaultFolderId.BACKGROUND,
           threadId: undefined,
           aiMessageId: undefined,
           skillId: undefined,
@@ -1089,7 +1089,7 @@ export function SystemSettingsPatchWidget(): JSX.Element {
             typeof RouteExecutionExecutor.executeGenericHandler
           >[0]["platform"],
           streamContext: {
-            rootFolderId: DefaultFolderId.CRON,
+            rootFolderId: DefaultFolderId.BACKGROUND,
             threadId: undefined,
             aiMessageId: undefined,
             skillId: undefined,

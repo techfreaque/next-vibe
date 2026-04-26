@@ -87,7 +87,7 @@ export const translations: typeof enTranslations = {
   cron: {
     frequency: {
       everyMinute: "jede Minute",
-      everyMinutes: "alle {interval} Minuten",
+      everyMinutes: "alle {{interval}} Minuten",
       everyHour: "jede Stunde",
       everyDays: "jeden Tag",
       hourly: "stündlich",
@@ -114,34 +114,36 @@ export const translations: typeof enTranslations = {
       everyThirtyMinutes: "alle 30 Minuten",
     },
     patterns: {
-      everyIntervalMinutes: "alle {interval} Minuten",
-      everyIntervalMinutesStarting: "alle {interval} Minuten ab Minute {start}",
-      atMinutes: "bei Minuten {minutes}",
-      fromMinuteToMinute: "von Minute {from} bis {to}",
-      atMinute: "bei Minute {minute}",
-      everyIntervalHours: "alle {interval} Stunden",
-      everyIntervalHoursStarting: "alle {interval} Stunden ab Stunde {start}",
-      atHours: "bei Stunden {hours}",
-      fromHourToHour: "von Stunde {from} bis {to}",
-      atHour: "bei Stunde {hour}",
+      everyIntervalMinutes: "alle {{interval}} Minuten",
+      everyIntervalMinutesStarting:
+        "alle {{interval}} Minuten ab Minute {{start}}",
+      atMinutes: "bei Minuten {{minutes}}",
+      fromMinuteToMinute: "von Minute {{from}} bis {{to}}",
+      atMinute: "bei Minute {{minute}}",
+      everyIntervalHours: "alle {{interval}} Stunden",
+      everyIntervalHoursStarting:
+        "alle {{interval}} Stunden ab Stunde {{start}}",
+      atHours: "bei Stunden {{hours}}",
+      fromHourToHour: "von Stunde {{from}} bis {{to}}",
+      atHour: "bei Stunde {{hour}}",
     },
     calendar: {
-      onDays: "an Tagen {days}",
-      onDay: "an Tag {day}",
-      inMonths: "in {months}",
-      inMonth: "in {month}",
-      onWeekdays: "an {weekdays}",
-      fromWeekdayToWeekday: "von {from} bis {to}",
-      onWeekday: "an {weekday}",
+      onDays: "an Tagen {{days}}",
+      onDay: "an Tag {{day}}",
+      inMonths: "in {{months}}",
+      inMonth: "in {{month}}",
+      onWeekdays: "an {{weekdays}}",
+      fromWeekdayToWeekday: "von {{from}} bis {{to}}",
+      onWeekday: "an {{weekday}}",
     },
-    timezone: "in {timezone}",
+    timezone: "in {{timezone}}",
     time: {
       midnight: "Mitternacht",
       noon: "Mittag",
-      hourAm: "{hour} Uhr",
-      hourPm: "{hour} Uhr",
-      hourMinuteAm: "{hour}:{minute} Uhr",
-      hourMinutePm: "{hour}:{minute} Uhr",
+      hourAm: "{{hour}} Uhr",
+      hourPm: "{{hour}} Uhr",
+      hourMinuteAm: "{{hour}}:{{minute}} Uhr",
+      hourMinutePm: "{{hour}}:{{minute}} Uhr",
     },
     weekdays: {
       sunday: "Sonntag",
@@ -175,7 +177,7 @@ export const translations: typeof enTranslations = {
     deleteCronTask: "Fehler beim Löschen der Cron-Aufgabe",
     fetchCronTaskHistory: "Fehler beim Abrufen der Cron-Aufgaben-Historie",
     fetchCronTaskStats: "Fehler beim Abrufen der Cron-Aufgaben-Statistiken",
-    fetchCronStatus: "Fehler beim Abrufen des Cron-System-Status",
+    fetchCronStatus: "Fehler beim Abrufen des Cron-Aufgaben-Status",
     cronTaskNotFound: "Cron-Aufgabe nicht gefunden",
 
     // Unified Runner errors
@@ -590,7 +592,7 @@ export const translations: typeof enTranslations = {
     post: {
       title: "Auf Aufgabe warten",
       description:
-        "Wartet auf eine ausstehende Hintergrundaufgabe. Gibt das Ergebnis sofort zurück, falls bereits abgeschlossen, oder pausiert den KI-Stream bis die Aufgabe fertig ist.",
+        "Wartet auf eine ausstehende Cron-Aufgabe. Gibt das Ergebnis sofort zurück, falls bereits abgeschlossen, oder pausiert den KI-Stream bis die Aufgabe fertig ist.",
       fields: {
         taskId: {
           title: "Aufgaben-ID",

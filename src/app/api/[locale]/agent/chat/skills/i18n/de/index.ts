@@ -61,7 +61,7 @@ export const translations: typeof enTranslations = {
     },
     intelligence: {
       quick: "Schnell",
-      smart: "Intelligent",
+      smart: "Günstig & Schlau",
       brilliant: "Brillant",
     },
     price: {
@@ -321,7 +321,7 @@ export const translations: typeof enTranslations = {
       },
     },
     chan4: {
-      name: "4chan KI",
+      name: "4chan Skill",
       description: "4chan-Stil-Antworten im klassischen Oldfag-Stil",
       tagline: "Anonym & Ungefiltert",
       shortDesc: "Anonyme Imageboard-Kultur-Stil",
@@ -435,9 +435,9 @@ export const translations: typeof enTranslations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Unzensiert",
-        oracle: "Orakel",
+        oracle: "Klassiker",
         elonTusk: "Elon Tusk",
-        vision: "Vision",
+        vision: "Allsehend",
       },
     },
     hermes: {
@@ -455,9 +455,9 @@ export const translations: typeof enTranslations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Unzensiert",
-        oracle: "Orakel",
+        oracle: "Klassiker",
         elonTusk: "Elon Tusk",
-        vision: "Vision",
+        vision: "Allsehend",
       },
     },
     theaDreamer: {
@@ -475,9 +475,9 @@ export const translations: typeof enTranslations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Unzensiert",
-        oracle: "Orakel",
+        oracle: "Klassiker",
         elonTusk: "Elon Tusk",
-        vision: "Vision",
+        vision: "Allsehend",
       },
     },
     hermesAutopilot: {
@@ -495,9 +495,29 @@ export const translations: typeof enTranslations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Unzensiert",
-        oracle: "Orakel",
+        oracle: "Klassiker",
         elonTusk: "Elon Tusk",
-        vision: "Vision",
+        vision: "Allsehend",
+      },
+    },
+    theaMama: {
+      name: "Thea · Mama",
+      description:
+        "Thea im Mama-Modus — Produktionsverantwortliche der Plattform. Überwacht die Gesundheit, treibt Features voran, erledigt Marketing, verschickt Neuigkeiten.",
+      tagline: "Plattform-Chefin",
+      shortDesc: "Produktion und Plattformpflege",
+      suggestedPrompts: {
+        0: "Was hast du beim letzten Durchlauf gefunden?",
+        1: "Prüf die Plattformgesundheit und berichte",
+        2: "Schreib eine Ankündigung für das neueste Feature",
+        3: "Was braucht gerade meine Aufmerksamkeit?",
+      },
+      variants: {
+        brilliant: "Brilliant",
+        uncensored: "Unzensiert",
+        oracle: "Klassiker",
+        elonTusk: "Elon Tusk",
+        vision: "Allsehend",
       },
     },
     quickWriter: {
@@ -799,6 +819,23 @@ export const translations: typeof enTranslations = {
         budget: "Budget",
       },
     },
+    supportAgent: {
+      name: "Support-Agent",
+      description:
+        "KI-gestützter technischer Support — weiß, wann ein Mensch ran muss",
+      tagline: "Problem gelöst",
+      shortDesc: "Technischer Support mit Weiterleitung an Experten",
+      suggestedPrompts: {
+        0: "Meine App stürzt ständig ab — was kann ich tun?",
+        1: "Ich komme nicht ins Netzwerk",
+        2: "Ich bekomme eine Fehlermeldung, die ich nicht verstehe",
+        3: "Wie setze ich mein Passwort zurück?",
+      },
+      variants: {
+        default: "Standard",
+        fast: "Schnell",
+      },
+    },
     travelPlanner: {
       name: "Reiseplaner",
       description: "Reiseplanung und Reiseempfehlungen",
@@ -1013,7 +1050,7 @@ export const translations: typeof enTranslations = {
         0: "Führe einen vollständigen System-Gesundheitscheck durch",
         1: "Zeige mir den Pulse-Überwachungsstatus",
         2: "Prüfe die Datenbankverbindung",
-        3: "Wie ist der aktuelle Cron-Aufgaben-Zustand?",
+        3: "Wie ist der aktuelle Hintergrundaufgaben-Zustand?",
       },
       variants: {
         fast: "Schnell",
@@ -1242,8 +1279,10 @@ export const translations: typeof enTranslations = {
         addToCollection: "Zur Sammlung hinzufügen:",
         quick: "Schnell",
         customize: "Anpassen",
-        useNow: "Jetzt verwenden",
-        inUse: "In Verwendung",
+        useNow: "Aktivieren",
+        inUse: "Aktiv",
+        goToChat: "Zum Chat",
+        useThis: "Diesen verwenden",
         chooseFavorite: "Favorit wählen",
         selectFavorite: "Wähle einen Favoriten zum Aktivieren:",
         addVariant: "Variante hinzufügen",

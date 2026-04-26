@@ -28,6 +28,7 @@ import {
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
@@ -80,6 +81,7 @@ export function ImageGenerationContainer({
   field,
 }: CustomWidgetProps): JSX.Element {
   const isSubmitting = useWidgetIsSubmitting();
+  const isDisabled = useWidgetDisabled();
   const form = useWidgetForm<typeof definition.POST>();
   const result = useWidgetValue<typeof definition.POST>();
   const children = field.children;
@@ -221,6 +223,7 @@ export function ImageGenerationContainer({
             className="w-full min-h-[80px] resize-none"
             placeholder={t("post.prompt.placeholder")}
             value={prompt}
+            disabled={isDisabled}
             onChange={(e) => form?.setValue("prompt", e.target.value)}
           />
         </Div>
@@ -239,6 +242,7 @@ export function ImageGenerationContainer({
                   variant={currentSize === preset.value ? "default" : "outline"}
                   size="sm"
                   className="flex-1 h-auto py-2 flex flex-col gap-1"
+                  disabled={isDisabled}
                   onClick={() => form?.setValue("size", preset.value)}
                 >
                   <Div
@@ -271,6 +275,7 @@ export function ImageGenerationContainer({
                     variant={currentQuality === q.value ? "default" : "outline"}
                     size="sm"
                     className="flex-1 h-8 text-xs"
+                    disabled={isDisabled}
                     onClick={() => form?.setValue("quality", q.value)}
                   >
                     {q.label}
@@ -295,6 +300,7 @@ export function ImageGenerationContainer({
                   variant={currentAspectRatio === ratio ? "default" : "outline"}
                   size="sm"
                   className="h-7 px-3 text-xs"
+                  disabled={isDisabled}
                   onClick={() => form?.setValue("aspectRatio", ratio)}
                 >
                   {ratio}
@@ -325,7 +331,7 @@ export function ImageGenerationContainer({
             allowedRoles={["image-gen"]}
             defaultModelSelection={defaultModelSelection}
             placeholder={t("post.model.label")}
-            onClick={() => setShowModelSelector(true)}
+            onClick={isDisabled ? undefined : () => setShowModelSelector(true)}
             locale={locale}
             user={user}
           />

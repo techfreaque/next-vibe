@@ -27,7 +27,7 @@ export enum ImageVisionModelId {
   GEMINI_2_5_PRO = "gemini-2.5-pro",
   GEMINI_2_5_FLASH = "gemini-2.5-flash",
   GEMINI_2_5_FLASH_LITE = "gemini-2.5-flash-lite",
-  KIMI_K2_5 = "kimi_k2_5",
+  KIMI_K2_6 = "kimi-k2.6",
   GROK_4_FAST = "grok-4-fast",
   GROK_4 = "grok-4",
   GROK_4_20 = "grok-4.20",

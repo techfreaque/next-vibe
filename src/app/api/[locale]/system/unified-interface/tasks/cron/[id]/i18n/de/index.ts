@@ -295,7 +295,7 @@ export const translations: typeof enTranslations = {
     high: "Hoch",
     medium: "Mittel",
     low: "Niedrig",
-    background: "Hintergrund",
+    background: "Cron",
   },
   status: {
     pending: "Ausstehend",

@@ -158,6 +158,10 @@ export class AbortErrorHandler {
     trailingSystemMessage?: string;
     messages?: ModelMessage[];
     tools?: Record<string, CoreTool>;
+    toolsConfig?: Map<
+      string,
+      { requiresConfirmation: boolean; credits: number; label: string }
+    >;
     user: JwtPayloadType;
     t: AiStreamT;
   }): Promise<{ wasHandled: boolean }> {
@@ -173,6 +177,7 @@ export class AbortErrorHandler {
       trailingSystemMessage,
       messages,
       tools,
+      toolsConfig,
       user,
       t,
     } = params;
@@ -289,6 +294,7 @@ export class AbortErrorHandler {
               cachedInputTokens: 0,
               cacheWriteTokens: 0,
               timeToFirstToken: null,
+              streamingTime: null,
               finishReason: "stop",
               creditCost: modelCreditCost,
             });
@@ -362,7 +368,9 @@ export class AbortErrorHandler {
                 await ctx.dbWriter.deductAndEmitCredits({
                   user,
                   amount: toolCall.creditsUsed,
-                  feature: toolCall.toolName,
+                  feature:
+                    toolsConfig?.get(toolCall.toolName)?.label ??
+                    toolCall.toolName,
                   type: "tool",
                   model,
                 });

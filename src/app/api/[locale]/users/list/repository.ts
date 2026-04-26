@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
+import { and, count, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -17,6 +17,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { referralCodes, userReferrals } from "@/app/api/[locale]/referral/db";
 import { users } from "@/app/api/[locale]/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -101,6 +102,9 @@ export class UserListRepository {
           emailVerified: boolean;
           createdAt: Date;
           updatedAt: Date;
+          referralCode: string | null;
+          referredByUserId: string | null;
+          totalReferrals: number;
         }>;
       };
       paginationInfo: {
@@ -191,6 +195,57 @@ export class UserListRepository {
 
       const totalPages = Math.ceil(total / limit);
 
+      // Fetch referral data for all users in bulk
+      const userIds = usersList.map((u) => u.id);
+      const [referralData, referralCountData] =
+        userIds.length > 0
+          ? await Promise.all([
+              // Who referred each user (userReferrals → referralCode)
+              db
+                .select({
+                  referredUserId: userReferrals.referredUserId,
+                  referrerUserId: userReferrals.referrerUserId,
+                  code: referralCodes.code,
+                })
+                .from(userReferrals)
+                .leftJoin(
+                  referralCodes,
+                  eq(userReferrals.referralCodeId, referralCodes.id),
+                )
+                .where(
+                  sql`${userReferrals.referredUserId} = ANY(ARRAY[${sql.join(
+                    userIds.map((id) => sql`${id}::uuid`),
+                    sql`, `,
+                  )}])`,
+                ),
+              // How many users each user referred
+              db
+                .select({
+                  referrerUserId: userReferrals.referrerUserId,
+                  cnt: count(),
+                })
+                .from(userReferrals)
+                .where(
+                  sql`${userReferrals.referrerUserId} = ANY(ARRAY[${sql.join(
+                    userIds.map((id) => sql`${id}::uuid`),
+                    sql`, `,
+                  )}])`,
+                )
+                .groupBy(userReferrals.referrerUserId),
+            ])
+          : [[], []];
+
+      // Build lookup maps
+      const referralByUser = new Map(
+        referralData.map((r) => [
+          r.referredUserId,
+          { referrerUserId: r.referrerUserId, code: r.code },
+        ]),
+      );
+      const referralCountByUser = new Map(
+        referralCountData.map((r) => [r.referrerUserId, Number(r.cnt)]),
+      );
+
       logger.debug("Users listed successfully", {
         total,
         page,
@@ -201,16 +256,22 @@ export class UserListRepository {
 
       return success({
         response: {
-          users: usersList.map((u) => ({
-            id: u.id,
-            email: u.email,
-            privateName: u.privateName,
-            publicName: u.publicName,
-            isActive: u.isActive,
-            emailVerified: u.emailVerified,
-            createdAt: u.createdAt,
-            updatedAt: u.updatedAt,
-          })),
+          users: usersList.map((u) => {
+            const ref = referralByUser.get(u.id);
+            return {
+              id: u.id,
+              email: u.email,
+              privateName: u.privateName,
+              publicName: u.publicName,
+              isActive: u.isActive,
+              emailVerified: u.emailVerified,
+              createdAt: u.createdAt,
+              updatedAt: u.updatedAt,
+              referralCode: ref?.code ?? null,
+              referredByUserId: ref?.referrerUserId ?? null,
+              totalReferrals: referralCountByUser.get(u.id) ?? 0,
+            };
+          }),
         },
         paginationInfo: {
           totalCount: total,

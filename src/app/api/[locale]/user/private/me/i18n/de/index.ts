@@ -444,7 +444,7 @@ export const translations: typeof enTranslations = {
     emailCard: {
       title: "Deine E-Mail-Liste",
       description:
-        "Besucher deiner Skill-Seite können sich eintragen. Die Liste gehört dir - kein Mittelsmann.",
+        "Besucher deiner Skill-Seite und deines Creator-Profils können sich eintragen. Die Liste gehört dir - kein Mittelsmann.",
     },
     previewCard: {
       title: "Dein öffentliches Profil",

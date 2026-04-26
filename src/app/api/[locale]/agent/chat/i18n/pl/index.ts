@@ -26,14 +26,16 @@ export const translations: typeof enTranslations = {
       shared: "Udostępniony",
       public: "Publiczny",
       incognito: "Incognito",
-      cron: "Cron",
+      background: "W tle",
+      support: "Wsparcie",
     },
     foldersShort: {
       private: "Prywatny",
       shared: "Udostępniony",
       public: "Publiczny",
       incognito: "Incognito",
-      cron: "Cron",
+      background: "W tle",
+      support: "Wsparcie",
     },
   },
   enums: {
@@ -469,6 +471,14 @@ export const translations: typeof enTranslations = {
         "Google Gemini 3 Flash - Szybki, wydajny multimodalny model AI zoptymalizowany dla szybkich odpowiedzi",
       deepseekV32:
         "DeepSeek V3.2 - Wysokowydajny model rozumowania z zaawansowanymi możliwościami kodowania",
+      deepseekV4Pro:
+        "DeepSeek V4 Pro - 1,6T parametrów MoE z kontekstem 1M. Do analizy całych baz kodu, złożonego rozumowania i wieloetapowych agentów.",
+      deepseekV4Flash:
+        "DeepSeek V4 Flash - 284B MoE za grosze. Kontekst 1M, szybka inferecja, solidne kodowanie. Wydajny wybór do zadań wymagających wysokiej przepustowości.",
+      gpt55:
+        "GPT-5.5 - Frontier model OpenAI dla złożonych profesjonalnych zadań. Silniejsze rozumowanie, wyższa niezawodność, lepsza wydajność tokenów. Kontekst 1M+ z obsługą tekstu i obrazów.",
+      gpt55Pro:
+        "GPT-5.5 Pro - Najwydajniejszy model OpenAI do głębokiego rozumowania w złożonych, wysokostawkowych zadaniach. Kontekst 1M+, długohoryzontowe rozwiązywanie problemów, agentyczne kodowanie, precyzyjne wykonanie wieloetapowe.",
       gpt54Pro:
         "GPT-5.4 Pro - Najbardziej zaawansowany model OpenAI z ulepszonym rozumowaniem, oknem kontekstu 1M+ i doskonałą wydajnością dla złożonych zadań",
       gpt54:
@@ -499,6 +509,8 @@ export const translations: typeof enTranslations = {
         "Claude Sonnet 4.6 - Najpotężniejszy model Sonnet od Anthropic z najwyższą wydajnością w kodowaniu, agentach i pracy profesjonalnej",
       claudeHaiku45:
         "Claude Haiku 4.5 - Szybki i wydajny model Claude zoptymalizowany pod kątem szybkości i opłacalności",
+      glm5_1:
+        "GLM-5.1 - model kodowania nowej generacji Z.AI stworzony do zadań długoterminowych. Pracuje autonomicznie ponad 8 godzin nad jednym zadaniem - planuje, wykonuje i doskonali się, aż dostarczy wyniki klasy inżynieryjnej.",
       glm5: "GLM-5 - flagowy model open-source Z.AI zaprojektowany do projektowania złożonych systemów i długoterminowych przepływów agentów, dorównujący wiodącym modelom zamkniętym",
       glm5Turbo:
         "GLM-5 Turbo - model nowej generacji Z.AI głęboko zoptymalizowany dla środowisk agentycznych z szybką inferencją, ulepszoną dekompozycją instrukcji i stabilnością długich zadań",
@@ -510,8 +522,8 @@ export const translations: typeof enTranslations = {
         "GLM-4 7B Flash - Ultraszybki model chińsko-angielski zoptymalizowany dla szybkich odpowiedzi",
       kimiK2:
         "Kimi K2 - Potężny chiński model AI z doskonałym zrozumieniem kontekstu",
-      kimiK2_5:
-        "Kimi K2.5 - Rozszerzony chiński model AI z ulepszonymi możliwościami rozumowania i kreatywnymi",
+      kimiK2_6:
+        "Kimi K2.6 - Model multimodalny nowej generacji Moonshot AI do długoterminowego kodowania, generowania UI/UX z promptów i obrazów oraz orkiestracji wielu agentów z architekturą roju agentów skalującą do setek równoległych podsystemów",
       claudeSonnet45:
         "Claude Sonnet 4.5 - Poprzednia generacja modelu Sonnet od Anthropic z silnymi możliwościami kodowania i analizy",
       claudeAgentSonnet:
@@ -602,6 +614,8 @@ export const translations: typeof enTranslations = {
         "GPT-5 Image Mini - Wydajny multimodalny model generowania obrazów OpenAI łączący możliwości językowe GPT-5 Mini z szybką i przystępną cenowo generacją obrazów",
       gpt5Image:
         "GPT-5 Image - Flagowy multimodalny model OpenAI łączący możliwości językowe GPT-5 z najnowocześniejszym generowaniem i edytowaniem obrazów",
+      gpt54Image2:
+        "GPT-5.4 Image 2 - Multimodalny model nowej generacji OpenAI łączący rozumowanie GPT-5.4 z generowaniem GPT Image 2. Płynnie przechodzi między kodowaniem, analizą i tworzeniem wizualnym w jednej rozmowie.",
       seedream45:
         "Seedream 4.5 - Najnowszy model generowania obrazów ByteDance z kompleksowymi ulepszeniami spójności edycji, retuszu portretów i kompozycji wielu obrazów",
       sdxl: "Stable Diffusion XL - Wysokiej jakości otwarty model generowania obrazów Stability AI",

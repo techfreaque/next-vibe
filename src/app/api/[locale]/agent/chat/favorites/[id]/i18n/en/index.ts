@@ -440,7 +440,7 @@ export const translations = {
     },
     id: {
       label: "Favorite ID",
-      description: "The unique identifier of the favorite to delete",
+      description: "The slug or friendly ID of the favorite to delete",
     },
     response: {
       success: {

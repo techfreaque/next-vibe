@@ -8,7 +8,7 @@ export const translations = {
       private: "Private",
       shared: "Shared",
       public: "Public",
-      cron: "Cron",
+      background: "Background",
       incognito: "Incognito",
     },
   },

@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "next-vibe-ui/ui/avatar";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { Camera } from "next-vibe-ui/ui/icons/Camera";
 import { Check } from "next-vibe-ui/ui/icons/Check";
@@ -39,17 +40,19 @@ import {
   ProfileSocialPills,
 } from "@/app/[locale]/creator/[userId]/_shared/profile-content";
 import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import skillsDef from "@/app/api/[locale]/agent/chat/skills/definition";
 import { SkillOwnershipType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
 import { CollapsibleSkillSection } from "@/app/api/[locale]/agent/chat/skills/widget";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import configDef from "@/app/api/[locale]/lead-magnet/config/definition";
 import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -182,6 +185,7 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
   const t = useWidgetTranslation<typeof meDefinition.POST>();
   const roleT = userRoleScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof meDefinition.POST>();
+  const onSubmit = useWidgetOnSubmit();
   const { user: profileRaw, refetch } = useUser(user, logger);
   const profile = profileRaw && !profileRaw.isPublic ? profileRaw : undefined;
 
@@ -207,9 +211,12 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
   const skillsFieldChildren = skillsDef.GET.fields.children;
 
   // Favorites for skill status indicators
-  const { favorites, activeFavoriteId } = useChatFavorites(logger, {
-    activeFavoriteId: null,
+  const { settings } = useChatSettings(user, logger);
+  const settingsActiveFavoriteId = settings?.activeFavoriteId ?? null;
+  const { favorites } = useChatFavorites(logger, {
+    activeFavoriteId: settingsActiveFavoriteId,
   });
+  const activeFavoriteId = settingsActiveFavoriteId;
 
   const favoritesBySkill = useMemo(() => {
     const map: Record<string, string[]> = {};
@@ -369,9 +376,9 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
   // Resolved slug for public profile links (null if no profile loaded yet)
   const profileSlug = profile?.creatorSlug ?? null;
   const profilePath = profileSlug
-    ? `/${locale}/creator/${profileSlug}`
+    ? `/creator/${profileSlug}`
     : user && !user.isPublic
-      ? `/${locale}/creator/${user.id}`
+      ? `/creator/${user.id}`
       : null;
   const profileHref = profilePath
     ? `${envClient.NEXT_PUBLIC_APP_URL}${profilePath}`
@@ -659,77 +666,79 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
         ...scopedPaletteStyle,
       }}
     >
-      <FormAlertWidget field={emptyField} />
+      <Form form={form} onSubmit={onSubmit}>
+        <FormAlertWidget field={emptyField} />
 
-      {/* ── HERO (identical structure to creator page) ── */}
-      <ProfileHero
-        profile={profileData}
-        avatarNode={avatarNode}
-        nameSubline={nameSubline}
-        topRightActions={topRightActions}
-        belowAvatarRow={belowAvatarRow}
-      />
+        {/* ── HERO (identical structure to creator page) ── */}
+        <ProfileHero
+          profile={profileData}
+          avatarNode={avatarNode}
+          nameSubline={nameSubline}
+          topRightActions={topRightActions}
+          belowAvatarRow={belowAvatarRow}
+        />
 
-      {/* ── SKILLS GRID ── */}
-      <Div
-        style={{
-          maxWidth: 720,
-          margin: "0 auto",
-          padding: "0 24px 48px",
-        }}
-      >
-        {/* Skills section header */}
-        {mySkills.length > 0 && (
-          <Div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 12,
-            }}
-          >
-            <H2
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "0.12em",
-                color: "rgba(255,255,255,0.3)",
-                margin: 0,
-              }}
-            >
-              {t("widget.skills.title")}
-            </H2>
-            <Span
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                color: "rgba(255,255,255,0.2)",
-                background: "rgba(255,255,255,0.06)",
-                borderRadius: 4,
-                padding: "1px 6px",
-              }}
-            >
-              {mySkills.length}
-            </Span>
-          </Div>
-        )}
-        <CollapsibleSkillSection
-          skills={mySkills}
-          idx={0}
-          navigate={navigate}
-          logger={logger}
-          user={user}
-          locale={locale}
-          isTouch={isTouch}
-          t={skillsT}
-          favoritesBySkill={favoritesBySkill}
-          favoritesByVariant={favoritesByVariant}
-          activeFavoriteId={activeFavoriteId}
+        {/* ── SKILLS GRID ── */}
+        <Div
+          style={{
+            maxWidth: 720,
+            margin: "0 auto",
+            padding: "0 24px 48px",
+          }}
         >
-          {skillsFieldChildren}
-        </CollapsibleSkillSection>
-      </Div>
+          {/* Skills section header */}
+          {mySkills.length > 0 && (
+            <Div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 12,
+              }}
+            >
+              <H2
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.12em",
+                  color: "rgba(255,255,255,0.3)",
+                  margin: 0,
+                }}
+              >
+                {t("widget.skills.title")}
+              </H2>
+              <Span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: "rgba(255,255,255,0.2)",
+                  background: "rgba(255,255,255,0.06)",
+                  borderRadius: 4,
+                  padding: "1px 6px",
+                }}
+              >
+                {mySkills.length}
+              </Span>
+            </Div>
+          )}
+          <CollapsibleSkillSection
+            skills={mySkills}
+            idx={0}
+            navigate={navigate}
+            logger={logger}
+            user={user}
+            locale={locale}
+            isTouch={isTouch}
+            t={skillsT}
+            favoritesBySkill={favoritesBySkill}
+            favoritesByVariant={favoritesByVariant}
+            activeFavoriteId={activeFavoriteId}
+          >
+            {skillsFieldChildren}
+          </CollapsibleSkillSection>
+        </Div>
+      </Form>
 
       {/* ── EMAIL LIST ── */}
       <Div

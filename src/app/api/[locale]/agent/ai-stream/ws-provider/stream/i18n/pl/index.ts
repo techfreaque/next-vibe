@@ -28,6 +28,11 @@ export const translations: typeof enTranslations = {
           "UUID istniejącego wątku do kontynuacji. Pomiń, aby rozpocząć nowy wątek.",
         placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
       },
+      rootFolderId: {
+        label: "Folder główny",
+        description:
+          "Folder dla nowego wątku. Domyślnie 'private'. 'support' dla sesji wsparcia.",
+      },
       skill: {
         label: "Umiejętność",
         description:

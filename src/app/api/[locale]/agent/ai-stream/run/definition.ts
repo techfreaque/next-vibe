@@ -18,7 +18,6 @@ import {
   getChatModelById,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { MAX_TOOL_CALLS } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
-import { DEFAULT_SKILL_IDS } from "@/app/api/[locale]/system/generated/skills-index";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -112,7 +111,7 @@ const { POST } = createEndpoint({
         placeholder: "run.post.fields.favoriteId.placeholder",
         columns: 6,
         schema: z
-          .union([z.literal(""), z.string().uuid()])
+          .string()
           .optional()
           .transform((v) => (v === "" ? undefined : v)),
       }),
@@ -135,9 +134,7 @@ const { POST } = createEndpoint({
         description: "run.post.fields.skill.description",
         placeholder: "run.post.fields.skill.placeholder",
         columns: 6,
-        schema: z
-          .union([z.enum(DEFAULT_SKILL_IDS), z.string().uuid()])
-          .optional(),
+        schema: z.string().optional(),
       }),
 
       // ── User prompt ─────────────────────────────────────────────────────
@@ -285,7 +282,7 @@ const { POST } = createEndpoint({
 
       // ── Thread persistence ───────────────────────────────────────────────
       // appendThreadId: continue an existing thread; omit to start a new one
-      // rootFolderId: incognito = no persistence, cron (default) = persisted
+      // rootFolderId: incognito = no persistence, background (default) = persisted
       appendThreadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -324,11 +321,11 @@ const { POST } = createEndpoint({
             label: "run.post.fields.rootFolderId.options.public" as const,
           },
           {
-            value: DefaultFolderId.CRON,
-            label: "run.post.fields.rootFolderId.options.cron" as const,
+            value: DefaultFolderId.BACKGROUND,
+            label: "run.post.fields.rootFolderId.options.background" as const,
           },
         ],
-        schema: z.enum(DefaultFolderId).default(DefaultFolderId.CRON),
+        schema: z.enum(DefaultFolderId).default(DefaultFolderId.BACKGROUND),
       }),
 
       subFolderId: requestField(scopedTranslation, {

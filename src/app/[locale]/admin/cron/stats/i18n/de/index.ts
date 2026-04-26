@@ -141,8 +141,8 @@ export const translations: typeof enTranslations = {
   minExecutionTime: "Min. Ausführungszeit",
   ofTotal: "von gesamt",
   pageDescription:
-    "Statistiken und Leistungsmetriken für Cron-Aufgaben anzeigen",
-  pageTitle: "Cron-Statistiken",
+    "Statistiken und Leistungsmetriken für Hintergrundaufgaben anzeigen",
+  pageTitle: "Hintergrundaufgaben-Statistiken",
   performanceMetrics: "Leistungsmetriken",
   priorityAndHealth:
     "{{priorityLabel}}: {{priority}}, {{healthLabel}}: {{health}}",

@@ -33,7 +33,12 @@ export const { POST } = createEndpoint({
   category: "endpointCategories.leadMagnet",
   subCategory: "endpointCategories.leadMagnetCapture",
   tags: ["submit.tag" as const],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+  ] as const,
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,

@@ -442,7 +442,7 @@ export const translations: typeof enTranslations = {
     },
     id: {
       label: "Favoriten-ID",
-      description: "Die eindeutige Kennung des zu löschenden Favoriten",
+      description: "Der Slug oder die lesbare ID des zu löschenden Favoriten",
     },
     response: {
       success: {

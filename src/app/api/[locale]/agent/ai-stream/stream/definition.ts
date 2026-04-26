@@ -173,8 +173,8 @@ const { POST } = createEndpoint({
             label: "chat.config.folders.incognito" as const,
           },
           {
-            value: DefaultFolderId.CRON,
-            label: "chat.config.folders.cron" as const,
+            value: DefaultFolderId.BACKGROUND,
+            label: "chat.config.folders.background" as const,
           },
         ],
         schema: z.enum(DefaultFolderId),

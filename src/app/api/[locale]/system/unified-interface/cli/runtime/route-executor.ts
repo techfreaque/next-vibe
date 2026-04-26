@@ -466,7 +466,7 @@ export class RouteDelegationHandler {
           platform: options.platform,
           preloadedHandler: routeHandler,
           streamContext: {
-            rootFolderId: DefaultFolderId.CRON,
+            rootFolderId: DefaultFolderId.BACKGROUND,
             threadId: undefined,
             aiMessageId: undefined,
             skillId: undefined,

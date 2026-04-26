@@ -97,8 +97,9 @@ A claim about functionality is worthless without verification. The user should n
 
 1. **Lint/types:** `mcp hermes-dev check` or `vibe check <path>` → must end at 0 errors project wide unless told otherwise by user
 2. **`vibe gen`** → must complete with 0 warnings for all endpoints and route count must increase. If this fails the tool is not registered and step 3 is meaningless.
-3. **CLI:** `vibe <alias> "<arg>"` → run it, screenshot the output mentally. Ask: would a first-time user be impressed? Every field renders, layout is intentional, colors/structure match the data. Not a raw dump. Not "good enough". A purpose-built experience for that specific tool. MCP path must be compact and parseable by AI.
-4. **Browser E2E:** use `browser_*` MCP tools (find them via `mcp hermes-dev tool-help query=browser`). Submit a real request. Take a screenshot. Ask: does this look like a finished product feature or a dev prototype? Animations, loading states, result layout - all intentional. If anything looks off, fix it before declaring done.
+3. **Tests:** `bun test --bail <path>` → run relevant test files, all must pass.
+4. **CLI:** `vibe <alias> "<arg>"` → run it, screenshot the output mentally. Ask: would a first-time user be impressed? Every field renders, layout is intentional, colors/structure match the data. Not a raw dump. Not "good enough". A purpose-built experience for that specific tool. MCP path must be compact and parseable by AI.
+5. **Browser E2E:** use `browser_*` MCP tools (find them via `mcp hermes-dev tool-help query=browser`). Submit a real request. Take a screenshot. Ask: does this look like a finished product feature or a dev prototype? Animations, loading states, result layout - all intentional. If anything looks off, fix it before declaring done.
 
 **"It works" is not done. Done means it works AND looks like it was crafted specifically for this use case.**
 

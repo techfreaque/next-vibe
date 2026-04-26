@@ -81,7 +81,7 @@ export const translations: typeof enTranslations = {
     toggleJson: "JSON-Editor umschalten",
     trigger: "Ausloeser",
     triggerManual: "Manuell",
-    triggerCron: "Cron",
+    triggerCron: "Hintergrund",
     customEndpoint: "Benutzerdefinierter Endpunkt",
     customEndpointDesc: "Beliebiger GET/POST Endpunkt",
     nodes: "Knoten",

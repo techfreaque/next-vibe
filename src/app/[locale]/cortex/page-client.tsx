@@ -26,23 +26,25 @@ export function CortexPageClient({
   const { t } = scopedTranslation.scopedT(locale);
 
   return (
-    <Div className="bg-background">
-      <Div className="container max-w-4xl mx-auto py-6 px-4">
+    <Div className="bg-background min-h-screen">
+      <Div className="container max-w-3xl mx-auto py-8 px-4">
         <Link
           href={`/${locale}/threads/private/new`}
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 gap-1"
         >
-          <ChevronLeft className="mr-1 h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" />
           {t("backToChat")}
         </Link>
 
-        <Div className="flex items-center gap-3 mb-2">
-          <Brain className="h-6 w-6 text-primary" />
+        <Div className="flex items-center gap-3 mb-1">
+          <Div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+            <Brain className="h-5 w-5 text-primary" />
+          </Div>
           <H1 className="text-2xl font-bold">{t("title")}</H1>
         </Div>
-        <P className="text-muted-foreground mb-6">{t("description")}</P>
+        <P className="text-muted-foreground text-sm mb-8">{t("description")}</P>
 
-        <Div className="rounded-xl border bg-card overflow-hidden">
+        <Div className="rounded-xl border bg-card overflow-hidden shadow-sm">
           <EndpointsPage
             endpoint={cortexListDefinitions}
             locale={locale}

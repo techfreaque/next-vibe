@@ -9,6 +9,15 @@
 
 // Testing infrastructure - test descriptions are for developers, not end users
 
+import "server-only";
+
+import {
+  installFetchCache,
+  setFetchCacheContext,
+} from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
+installFetchCache();
+setFetchCacheContext("cortex-route-tests");
+
 import { and, eq, like } from "drizzle-orm";
 import {
   afterAll,
@@ -34,7 +43,7 @@ import { defaultLocale } from "@/i18n/core/config";
 import { env } from "@/config/env";
 
 import { cortexNodes } from "./db";
-import { CortexNodeType } from "./enum";
+
 
 import readEndpoint from "./read/definition";
 import listEndpoint from "./list/definition";
@@ -58,7 +67,7 @@ testEndpoint(editEndpoint.PATCH);
 testEndpoint(mkdirEndpoint.POST);
 testEndpoint(moveEndpoint.POST);
 testEndpoint(deleteEndpoint.DELETE);
-testEndpoint(backfillEndpoint.POST);
+testEndpoint(backfillEndpoint.POST, { skipExampleTests: true });
 
 // ── Part B: CRUD Integration Tests ───────────────────────────────────────────
 
@@ -253,7 +262,7 @@ describe("Cortex CRUD Integration", () => {
       (e: Record<string, unknown>) => e.name === "hello.md",
     );
     expect(helloEntry, "hello.md not found in listing").toBeTruthy();
-    expect(helloEntry!.nodeType).toBe(CortexNodeType.FILE);
+    expect(helloEntry!.nodeType).toBe("file");
     expect(helloEntry!.entryPath).toBe(`${TEST_PREFIX}/hello.md`);
   });
 

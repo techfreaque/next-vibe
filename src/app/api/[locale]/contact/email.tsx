@@ -20,8 +20,8 @@ import { z } from "zod";
 
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { configScopedTranslation } from "@/config/i18n";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { EmailTemplate } from "../messenger/providers/email/smtp-client/components/template.email";
 import {
@@ -29,10 +29,7 @@ import {
   type TrackingContext,
 } from "../messenger/providers/email/smtp-client/components/tracking_context.email";
 import type definition from "./definition";
-import {
-  type ContactRequestOutput,
-  type ContactResponseOutput,
-} from "./definition";
+import { type ContactRequest, type ContactResponse } from "./definition";
 import { type ContactT, scopedTranslation } from "./i18n";
 import { contactClientRepository } from "./repository-client";
 
@@ -281,8 +278,8 @@ function ContactFormEmail({
 export const contactFormEmailTemplate: EmailTemplateDefinition<
   ContactFormProps,
   typeof scopedTranslation,
-  ContactRequestOutput,
-  ContactResponseOutput,
+  ContactRequest,
+  ContactResponse,
   never,
   typeof definition.POST.allowedRoles
 > = {
@@ -376,9 +373,10 @@ export const contactFormEmailTemplate: EmailTemplateDefinition<
     const { t: contactT } = scopedTranslation.scopedT(locale);
     const { t: globalT } = configScopedTranslation.scopedT(locale);
     try {
+      const resolvedEmail = requestData.email ?? "";
       const templateProps: ContactFormProps = {
         name: requestData.name,
-        email: requestData.email,
+        email: resolvedEmail,
         subject: requestData.subject,
         priority: requestData.priority,
         message: requestData.message,
@@ -391,7 +389,7 @@ export const contactFormEmailTemplate: EmailTemplateDefinition<
         subject: contactT("email.partner.subject", {
           subject: requestData.subject,
         }),
-        replyToEmail: requestData.email,
+        replyToEmail: resolvedEmail,
         replyToName: requestData.name,
         leadId: user.leadId,
         jsx: contactFormEmailTemplate.component({
@@ -428,8 +426,8 @@ type AdminContactProps = z.infer<typeof adminContactPropsSchema>;
 export const adminContactFormEmailTemplate: EmailTemplateDefinition<
   AdminContactProps,
   typeof scopedTranslation,
-  ContactRequestOutput,
-  ContactResponseOutput,
+  ContactRequest,
+  ContactResponse,
   never,
   typeof definition.POST.allowedRoles
 > = {
@@ -512,9 +510,10 @@ export const adminContactFormEmailTemplate: EmailTemplateDefinition<
   render: ({ requestData, locale, user }) => {
     const { t: contactT } = scopedTranslation.scopedT(locale);
     try {
+      const resolvedEmail = requestData.email ?? "";
       const templateProps: ContactFormProps = {
         name: requestData.name,
-        email: requestData.email,
+        email: resolvedEmail,
         subject: requestData.subject,
         priority: requestData.priority,
         message: requestData.message,
@@ -525,7 +524,7 @@ export const adminContactFormEmailTemplate: EmailTemplateDefinition<
       const { t: globalT } = configScopedTranslation.scopedT(locale);
 
       return success({
-        toEmail: requestData.email,
+        toEmail: resolvedEmail,
         toName: requestData.name,
         subject: contactT("email.partner.subject", {
           subject: requestData.subject,
@@ -537,7 +536,7 @@ export const adminContactFormEmailTemplate: EmailTemplateDefinition<
           props: templateProps,
           t: contactT,
           locale,
-          recipientEmail: requestData.email,
+          recipientEmail: resolvedEmail,
           tracking: createTrackingContext(locale, user?.leadId, user?.id),
         }),
       });

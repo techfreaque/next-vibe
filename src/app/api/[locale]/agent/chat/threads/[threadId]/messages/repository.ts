@@ -114,6 +114,24 @@ export class MessagesRepository {
       currentId = currentMessage?.parentId ?? null;
     }
 
+    // Include sibling tool messages: when the parent is a tool message, the AI called
+    // multiple tools in parallel. All sibling tool results share the same parent
+    // (the assistant message that spawned them). Including only the direct ancestor
+    // misses the other tool results, causing the AI to re-call missing tools on revival.
+    // Add all tool-role siblings so the AI sees the complete parallel batch.
+    const parentMsg = messageMap.get(parentMessageId);
+    if (parentMsg?.role === "tool" && parentMsg.parentId) {
+      for (const msg of allMessages) {
+        if (
+          msg.parentId === parentMsg.parentId &&
+          msg.role === "tool" &&
+          !ancestorIds.has(msg.id)
+        ) {
+          ancestorIds.add(msg.id);
+        }
+      }
+    }
+
     // Filter messages to only include ancestors and maintain chronological order
     const branchMessages = allMessages.filter((msg) => ancestorIds.has(msg.id));
 

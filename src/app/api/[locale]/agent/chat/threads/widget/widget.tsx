@@ -90,7 +90,8 @@ function getFolderName(folderId: DefaultFolderId, tChat: ChatT): string {
     [DefaultFolderId.INCOGNITO]: tChat("config.folders.incognito"),
     [DefaultFolderId.SHARED]: tChat("config.folders.shared"),
     [DefaultFolderId.PUBLIC]: tChat("config.folders.public"),
-    [DefaultFolderId.CRON]: tChat("config.folders.cron"),
+    [DefaultFolderId.BACKGROUND]: tChat("config.folders.background"),
+    [DefaultFolderId.SUPPORT]: tChat("config.folders.support"),
   };
   return folderNames[folderId];
 }

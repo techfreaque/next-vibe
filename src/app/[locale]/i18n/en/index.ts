@@ -372,6 +372,11 @@ export const translations = {
     browserInteraction: "Interaction",
     browserInspection: "Inspection",
     browserDevTools: "DevTools",
+    desktop: "Desktop",
+    desktopCapture: "Capture",
+    desktopInteraction: "Interaction",
+    desktopInspection: "Inspection",
+    desktopWindows: "Windows",
     chat: "Chat",
     chatFavorites: "Favorites",
     chatSettings: "Settings",
@@ -438,7 +443,7 @@ export const translations = {
     databaseMigrations: "Migrations",
     databaseTools: "Tools",
     tasks: "Tasks",
-    tasksCron: "Cron",
+    tasksCron: "Background",
     tasksPulse: "Pulse",
     tasksMonitoring: "Monitoring",
     tasksSync: "Sync",
@@ -466,6 +471,7 @@ export const translations = {
     remoteInstances: "Instances",
     remoteSelf: "Self",
     users: "Users",
+    support: "Support",
   },
   ui: {
     iconPicker: {

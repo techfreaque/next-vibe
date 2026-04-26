@@ -27,6 +27,7 @@ import {
   isValidPath,
   isVirtualWritable,
   isWritablePath,
+  normalizeToCanonicalPath,
   normalizePath,
   parseFrontmatter,
 } from "../repository";
@@ -58,9 +59,12 @@ export class CortexWriteRepository {
       size: number;
       created: boolean;
       updatedAt: string;
+      responseContent: string;
     }>
   > {
-    const path = normalizePath(rawPath);
+    const rawNormalized = normalizePath(rawPath);
+    // Normalize locale-aware path to canonical English path for DB storage
+    const path = normalizeToCanonicalPath(rawNormalized, locale);
 
     if (!isValidPath(path)) {
       return fail({
@@ -81,7 +85,7 @@ export class CortexWriteRepository {
 
     // Virtual writable mount — delegate to mount handler
     if (isVirtualWritable(path)) {
-      const mountPrefix = getMountPrefix(path);
+      const mountPrefix = getMountPrefix(path, locale);
       if (!mountPrefix) {
         return fail({
           message: t("post.errors.forbidden.title"),
@@ -107,6 +111,7 @@ export class CortexWriteRepository {
           size: Buffer.byteLength(content, "utf8"),
           created: result.created,
           updatedAt: new Date().toISOString(),
+          responseContent: content,
         });
       } catch (error) {
         logger.error("Cortex virtual write failed", parseError(error), {
@@ -119,7 +124,7 @@ export class CortexWriteRepository {
       }
     }
 
-    if (!isWritablePath(path)) {
+    if (!isWritablePath(path, locale)) {
       return fail({
         message: t("post.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
@@ -205,6 +210,7 @@ export class CortexWriteRepository {
         size,
         created: isNew,
         updatedAt: now.toISOString(),
+        responseContent: content,
       });
     } catch (error) {
       logger.error("Cortex write failed", parseError(error), { path });

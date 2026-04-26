@@ -206,5 +206,6 @@ export const translations: typeof enTranslations = {
     sortBusinessNameZA: "Nazwa firmy (Z-A)",
     linkedCount: "{{count}} powiązanych",
     hasLinkedUser: "Użytkownik",
+    referralCode: "Kod ref.",
   },
 };

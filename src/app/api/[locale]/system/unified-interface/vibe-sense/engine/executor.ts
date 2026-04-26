@@ -44,7 +44,7 @@ const VIBE_SENSE_SYSTEM_USER: JwtPayloadType = {
 const VIBE_SENSE_ABORT_CONTROLLER = new AbortController();
 
 const VIBE_SENSE_STREAM_CONTEXT: ToolExecutionContext = {
-  rootFolderId: DefaultFolderId.CRON,
+  rootFolderId: DefaultFolderId.BACKGROUND,
   threadId: undefined,
   aiMessageId: undefined,
   skillId: undefined,

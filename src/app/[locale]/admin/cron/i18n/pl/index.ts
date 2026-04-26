@@ -32,13 +32,13 @@ export const translations: typeof enTranslations = {
   },
   nav: {
     status: "Status",
-    status_description: "Monitoruj stan systemu cron i aktywne zadania",
+    status_description: "Monitoruj stan zadań w tle i aktywne zadania",
     stats: "Statystyki",
-    stats_description: "Zobacz statystyki i metryki wydajności zadań cron",
+    stats_description: "Zobacz statystyki i metryki wydajności zadań w tle",
     tasks: "Zadania",
-    tasks_description: "Zarządzaj i konfiguruj zadania cron",
+    tasks_description: "Zarządzaj i konfiguruj zadania w tle",
     history: "Historia",
-    history_description: "Zobacz historię wykonywania zadań cron",
+    history_description: "Zobacz historię wykonywania zadań w tle",
   },
   buttons: {
     previous: "Poprzedni",

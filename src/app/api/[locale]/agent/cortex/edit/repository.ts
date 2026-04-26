@@ -29,6 +29,7 @@ import {
   isValidPath,
   isVirtualWritable,
   isWritablePath,
+  normalizeToCanonicalPath,
   normalizePath,
   parseFrontmatter,
 } from "../repository";
@@ -69,7 +70,7 @@ export class CortexEditRepository {
       updatedAt: string;
     }>
   > {
-    const path = normalizePath(rawPath);
+    const path = normalizeToCanonicalPath(normalizePath(rawPath), locale);
 
     if (!isValidPath(path)) {
       return fail({
@@ -113,7 +114,7 @@ export class CortexEditRepository {
       });
     }
 
-    if (!isWritablePath(path)) {
+    if (!isWritablePath(path, locale)) {
       return fail({
         message: t("patch.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
@@ -254,7 +255,7 @@ export class CortexEditRepository {
       updatedAt: string;
     }>
   > {
-    const mountPrefix = getMountPrefix(path);
+    const mountPrefix = getMountPrefix(path, locale);
     if (!mountPrefix) {
       return fail({
         message: t("patch.errors.forbidden.title"),

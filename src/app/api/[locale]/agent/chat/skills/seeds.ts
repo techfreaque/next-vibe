@@ -18,6 +18,7 @@ import {
   SkillType,
   SkillTrustLevel,
 } from "./enum";
+import type { SkillVariantData } from "./db";
 import { customSkills, type NewCustomSkill } from "./db";
 import { generateSlug, ensureUniqueSlug } from "../slugify";
 
@@ -45,6 +46,20 @@ const TEST_SKILLS: Omit<NewCustomSkill, "userId">[] = [
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
     },
+    variants: [
+      {
+        id: "standard",
+        displayName: "Standard",
+        modelSelection: { selectionType: ModelSelectionType.FILTERS },
+        isDefault: true,
+      },
+      {
+        id: "verbose",
+        displayName: "Verbose",
+        modelSelection: { selectionType: ModelSelectionType.FILTERS },
+        isDefault: false,
+      },
+    ] satisfies SkillVariantData[],
     systemPrompt:
       "You are a test skill. If someone is chatting with you, something has gone wrong. Apologize and redirect them to a real skill.",
     longContent: `# Layout Preview Bot
@@ -115,6 +130,20 @@ const testSkill = { name: "Layout Preview Bot", status: "just vibing" };
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
     },
+    variants: [
+      {
+        id: "default",
+        displayName: "Default",
+        modelSelection: { selectionType: ModelSelectionType.FILTERS },
+        isDefault: true,
+      },
+      {
+        id: "turbo",
+        displayName: "Turbo",
+        modelSelection: { selectionType: ModelSelectionType.FILTERS },
+        isDefault: false,
+      },
+    ] satisfies SkillVariantData[],
     systemPrompt: "You are a highly rated test skill. Very impressive.",
     longContent: `# High-Vote Skill
 
@@ -140,6 +169,20 @@ This skill has 999 votes. Test that the verified badge renders correctly, vote c
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
     },
+    variants: [
+      {
+        id: "default",
+        displayName: "Default",
+        modelSelection: { selectionType: ModelSelectionType.FILTERS },
+        isDefault: true,
+      },
+      {
+        id: "stealth",
+        displayName: "Stealth",
+        modelSelection: { selectionType: ModelSelectionType.FILTERS },
+        isDefault: false,
+      },
+    ] satisfies SkillVariantData[],
     systemPrompt: "You are an unlisted test skill.",
     publishedAt: new Date("2026-03-01T14:00:00Z"),
     createdAt: new Date("2026-02-20T10:00:00Z"),
@@ -180,15 +223,28 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     for (const skillData of TEST_SKILLS) {
       try {
         const existing = await db
-          .select({ id: customSkills.id })
+          .select({ id: customSkills.id, variants: customSkills.variants })
           .from(customSkills)
           .where(eq(customSkills.name, skillData.name))
           .limit(1);
 
         if (existing.length > 0) {
-          logger.debug(
-            `Test skill "${skillData.name}" already exists, skipping`,
-          );
+          // Patch variants if the skill has them in seed data but not in DB
+          const existingSkill = existing[0];
+          if (
+            skillData.variants &&
+            (!existingSkill.variants || existingSkill.variants.length < 2)
+          ) {
+            await db
+              .update(customSkills)
+              .set({ variants: skillData.variants })
+              .where(eq(customSkills.id, existingSkill.id));
+            logger.info(`Updated variants for test skill: ${skillData.name}`);
+          } else {
+            logger.debug(
+              `Test skill "${skillData.name}" already exists, skipping`,
+            );
+          }
           continue;
         }
 

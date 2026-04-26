@@ -57,8 +57,6 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ] as const,
 
-  allowedLocalModeRoles: [] as const,
-
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.VERTICAL,

@@ -162,8 +162,8 @@ const imageVisionModelOptionsIndex: Record<
   [ImageVisionModelId.GEMINI_2_5_FLASH_LITE]: makeImageVisionOption(
     ImageVisionModelId.GEMINI_2_5_FLASH_LITE,
   ),
-  [ImageVisionModelId.KIMI_K2_5]: makeImageVisionOption(
-    ImageVisionModelId.KIMI_K2_5,
+  [ImageVisionModelId.KIMI_K2_6]: makeImageVisionOption(
+    ImageVisionModelId.KIMI_K2_6,
   ),
   [ImageVisionModelId.GROK_4_FAST]: makeImageVisionOption(
     ImageVisionModelId.GROK_4_FAST,

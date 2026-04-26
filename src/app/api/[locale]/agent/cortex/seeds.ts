@@ -1,245 +1,22 @@
 /**
  * Cortex Seeds
- * Runs after memories migration (priority 50). Ensures all cortex_nodes
- * have embeddings and materializes virtual mount data for semantic search.
+ * Runs after memories migration (priority 50).
  *
- * Also scaffolds default folder structure for every user:
- *   /documents/inbox, /projects, /knowledge, /journal, /templates
- *   /memories/identity, /expertise, /context (with atomic starter files)
+ * Templates (memory scaffolds, document templates) and default folder scaffolds
+ * are now fully virtual — resolved at request time from i18n translations per
+ * locale. Nothing is written to DB for templates or scaffolds.
  *
- * Short, specific filenames → AI knows what each file contains at a glance.
- * Atomic files (< 200 words each) → AI can read entire file in one call.
+ * This seed only materializes:
+ *   - Virtual mount data (skills, threads, tasks) into cortex_nodes
+ *   - Built-in skills with pre-computed embeddings
  */
 
-import { and, eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { CortexNodeType, CortexViewType } from "./enum";
-
 /** Run after memories migration seed */
 export const priority = 60;
-
-// ─── Default Folder Scaffold ──────────────────────────────────────────────────
-
-/**
- * Default /documents/ subdirectories.
- * purpose label appears inline in the AI workspace tree.
- */
-const DEFAULT_DOCUMENT_DIRS = [
-  {
-    path: "/documents/inbox",
-    purpose:
-      "Raw captures: drop here fast, process and file when context is clear",
-    icon: "inbox",
-    viewType: CortexViewType.LIST,
-  },
-  {
-    path: "/documents/projects",
-    purpose: "Active work: one subfolder per project",
-    icon: "folder-open",
-    viewType: CortexViewType.LIST,
-  },
-  {
-    path: "/documents/knowledge",
-    purpose: "Permanent reference: things worth keeping forever",
-    icon: "book-open",
-    viewType: CortexViewType.WIKI,
-  },
-  {
-    path: "/documents/journal",
-    purpose: "Dated entries: ideas, reflections, observations",
-    icon: "pen-line",
-    viewType: CortexViewType.LIST,
-  },
-  {
-    path: "/documents/templates",
-    purpose: "Reusable structures for recurring tasks",
-    icon: "layout-template",
-    viewType: CortexViewType.LIST,
-  },
-];
-
-/**
- * Default /memories/ subdirectories + atomic starter files.
- * One file per concept, < 200 words each.
- * Specific names → AI knows exactly what to write without reading the file.
- */
-const DEFAULT_MEMORY_GROUPS = [
-  {
-    dirPath: "/memories/identity",
-    purpose: "Who the user is: name, role, goals, communication style",
-    files: [
-      { name: "name.md", tags: ["identity"], priority: 100 },
-      { name: "role.md", tags: ["identity", "work"], priority: 100 },
-      { name: "goals.md", tags: ["identity", "goals"], priority: 90 },
-      { name: "communication.md", tags: ["identity", "style"], priority: 85 },
-    ],
-  },
-  {
-    dirPath: "/memories/expertise",
-    purpose: "What the user knows: skills, tools, background",
-    files: [
-      { name: "skills.md", tags: ["expertise"], priority: 80 },
-      { name: "tools.md", tags: ["expertise", "tech"], priority: 75 },
-      { name: "background.md", tags: ["expertise"], priority: 70 },
-    ],
-  },
-  {
-    dirPath: "/memories/context",
-    purpose: "Current situation: active projects, preferences, constraints",
-    files: [
-      { name: "projects.md", tags: ["context", "projects"], priority: 80 },
-      { name: "preferences.md", tags: ["context"], priority: 70 },
-      { name: "constraints.md", tags: ["context"], priority: 65 },
-    ],
-  },
-] as const;
-
-/** All default paths we'll ensure exist */
-function getAllDefaultPaths(): string[] {
-  const paths = ["/documents", "/memories"];
-  for (const dir of DEFAULT_DOCUMENT_DIRS) {
-    paths.push(dir.path);
-  }
-  for (const group of DEFAULT_MEMORY_GROUPS) {
-    paths.push(group.dirPath);
-    for (const file of group.files) {
-      paths.push(`${group.dirPath}/${file.name}`);
-    }
-  }
-  return paths;
-}
-
-/**
- * Scaffold default folder structure for a single user.
- * Only creates nodes that don't already exist — safe to re-run.
- */
-async function scaffoldUser(userId: string): Promise<{ created: number }> {
-  const { db } = await import("@/app/api/[locale]/system/db");
-  const { cortexNodes } = await import("./db");
-
-  const allDefaultPaths = getAllDefaultPaths();
-
-  const existing = await db
-    .select({ path: cortexNodes.path })
-    .from(cortexNodes)
-    .where(
-      and(
-        eq(cortexNodes.userId, userId),
-        inArray(cortexNodes.path, allDefaultPaths),
-      ),
-    );
-
-  const existingPaths = new Set(existing.map((r) => r.path));
-  const toInsert: (typeof cortexNodes.$inferInsert)[] = [];
-
-  // Root dirs
-  for (const rootPath of ["/documents", "/memories"] as const) {
-    if (!existingPaths.has(rootPath)) {
-      toInsert.push({
-        userId,
-        path: rootPath,
-        nodeType: CortexNodeType.DIR,
-        content: null,
-        size: 0,
-      });
-    }
-  }
-
-  // /documents/ subdirs
-  for (const dir of DEFAULT_DOCUMENT_DIRS) {
-    if (!existingPaths.has(dir.path)) {
-      toInsert.push({
-        userId,
-        path: dir.path,
-        nodeType: CortexNodeType.DIR,
-        content: null,
-        size: 0,
-        icon: dir.icon,
-        viewType: dir.viewType,
-        frontmatter: { purpose: dir.purpose },
-      });
-    }
-  }
-
-  // /memories/ subdirs + starter files
-  for (const group of DEFAULT_MEMORY_GROUPS) {
-    if (!existingPaths.has(group.dirPath)) {
-      toInsert.push({
-        userId,
-        path: group.dirPath,
-        nodeType: CortexNodeType.DIR,
-        content: null,
-        size: 0,
-        frontmatter: { purpose: group.purpose },
-      });
-    }
-
-    for (const file of group.files) {
-      const filePath = `${group.dirPath}/${file.name}`;
-      if (!existingPaths.has(filePath)) {
-        // Minimal frontmatter only — body empty, AI fills in on first exchange
-        const content = `---\npriority: ${file.priority}\ntags: [${file.tags.join(", ")}]\n---\n`;
-        toInsert.push({
-          userId,
-          path: filePath,
-          nodeType: CortexNodeType.FILE,
-          content,
-          size: Buffer.byteLength(content, "utf8"),
-          frontmatter: { priority: file.priority },
-          tags: [...file.tags],
-        });
-      }
-    }
-  }
-
-  if (toInsert.length === 0) {
-    return { created: 0 };
-  }
-
-  // Insert in batches
-  const BATCH_SIZE = 50;
-  for (let i = 0; i < toInsert.length; i += BATCH_SIZE) {
-    await db.insert(cortexNodes).values(toInsert.slice(i, i + BATCH_SIZE));
-  }
-
-  return { created: toInsert.length };
-}
-
-/**
- * Scaffold all users who are missing default folder structure.
- */
-async function scaffoldDefaultFolders(logger: EndpointLogger): Promise<void> {
-  const { db } = await import("@/app/api/[locale]/system/db");
-  const { users } = await import("@/app/api/[locale]/user/db");
-
-  const allUsers = await db.select({ id: users.id }).from(users);
-
-  if (allUsers.length === 0) {
-    logger.info("Cortex scaffold: no users found");
-    return;
-  }
-
-  let totalCreated = 0;
-  let errored = 0;
-
-  for (const user of allUsers) {
-    try {
-      const result = await scaffoldUser(user.id);
-      totalCreated += result.created;
-    } catch (err) {
-      errored++;
-      logger.warn(`Cortex scaffold: failed for user ${user.id}`, {
-        error: err instanceof Error ? err.message : String(err),
-      });
-    }
-  }
-
-  logger.info(
-    `Cortex scaffold: ${allUsers.length} users, ${totalCreated} nodes created, ${errored} errors`,
-  );
-}
 
 // ─── Main Seed ────────────────────────────────────────────────────────────────
 
@@ -247,21 +24,72 @@ async function scaffoldDefaultFolders(logger: EndpointLogger): Promise<void> {
  * Materialize virtual mount data into cortex_nodes and backfill embeddings.
  */
 async function runCortexSeed(logger: EndpointLogger): Promise<void> {
-  // Step 0: Scaffold default folder structure for all users
-  await scaffoldDefaultFolders(logger);
+  // Step 1: Ensure scaffold dirs (memories + documents) exist for all users
+  await ensureScaffoldDirs(logger);
 
-  // Step 1: Materialize virtual mounts (skills, threads, tasks) into cortex_nodes
+  // Step 2: Materialize virtual mounts (skills, threads, tasks) into cortex_nodes
   await materializeVirtualMounts(logger);
 
-  // Step 2: Materialize built-in skills for all users using cached embeddings
+  // Step 3: Materialize built-in skills for all users using cached embeddings
   await materializeBuiltInSkills(logger);
 
-  // Step 3: Backfill embeddings for all nodes with NULL embedding
-  const { backfillEmbeddings } = await import("./embeddings/backfill");
-  const result = await backfillEmbeddings();
+  // NOTE: No synchronous backfill here. Virtual mount nodes (threads, skills,
+  // tasks) that need embeddings use fire-and-forget queueEmbedding() which runs
+  // post-startup without blocking. Built-in skills ship with pre-computed
+  // embeddings (vibe gen). Manual recovery: POST /agent/cortex/embeddings/backfill
+}
+
+/**
+ * Ensure scaffold directories exist in cortex_nodes for all users.
+ * /memories/inbox, /memories/identity, /memories/expertise, /memories/context, /memories/life
+ * /documents/inbox, /documents/projects, /documents/knowledge, /documents/journal, /documents/templates
+ * Idempotent via onConflictDoNothing.
+ */
+async function ensureScaffoldDirs(logger: EndpointLogger): Promise<void> {
+  const { db } = await import("@/app/api/[locale]/system/db");
+  const { users } = await import("@/app/api/[locale]/user/db");
+  const { cortexNodes } = await import("./db");
+  const { CortexNodeType } = await import("./enum");
+
+  const SCAFFOLD_DIRS = [
+    "/memories",
+    "/memories/inbox",
+    "/memories/identity",
+    "/memories/expertise",
+    "/memories/context",
+    "/memories/life",
+    "/documents",
+    "/documents/inbox",
+    "/documents/projects",
+    "/documents/knowledge",
+    "/documents/journal",
+    "/documents/templates",
+  ];
+
+  const allUsers = await db.select({ id: users.id }).from(users);
+  let created = 0;
+
+  for (const user of allUsers) {
+    for (const dirPath of SCAFFOLD_DIRS) {
+      const result = await db
+        .insert(cortexNodes)
+        .values({
+          userId: user.id,
+          path: dirPath,
+          nodeType: CortexNodeType.DIR,
+          content: null,
+          size: 0,
+        })
+        .onConflictDoNothing()
+        .returning({ id: cortexNodes.id });
+      if (result.length > 0) {
+        created++;
+      }
+    }
+  }
 
   logger.info(
-    `Cortex seed: embeddings backfill complete — ${result.processed} embedded, ${result.failed} failed, ${result.skipped} skipped`,
+    `Cortex seed: ensured scaffold dirs (${created} created) for ${allUsers.length} users`,
   );
 }
 
@@ -270,8 +98,7 @@ async function runCortexSeed(logger: EndpointLogger): Promise<void> {
  * so they get embeddings and become searchable via vector search.
  */
 async function materializeVirtualMounts(logger: EndpointLogger): Promise<void> {
-  const { syncVirtualNodeToEmbedding } =
-    await import("./embeddings/sync-virtual");
+  const { upsertVirtualNode } = await import("./embeddings/sync-virtual");
   const { db } = await import("@/app/api/[locale]/system/db");
 
   // --- User-created Skills ---
@@ -300,11 +127,7 @@ async function materializeVirtualMounts(logger: EndpointLogger): Promise<void> {
       .filter(Boolean)
       .join("\n");
 
-    await syncVirtualNodeToEmbedding(
-      skill.userId,
-      `/skills/${skill.id}.md`,
-      content,
-    );
+    await upsertVirtualNode(skill.userId, `/skills/${skill.id}.md`, content);
     skillCount++;
   }
   logger.info(`Cortex seed: materialized ${skillCount} user-created skills`);
@@ -312,6 +135,12 @@ async function materializeVirtualMounts(logger: EndpointLogger): Promise<void> {
   // --- Tasks ---
   const { cronTasks } =
     await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
+  const {
+    eq: eqHidden,
+    and: andTask,
+    or: orTask,
+  } = await import("drizzle-orm");
+  // Exclude: hidden tasks, and run-once tasks that have been disabled (already ran)
   const allTasks = await db
     .select({
       id: cronTasks.id,
@@ -320,9 +149,19 @@ async function materializeVirtualMounts(logger: EndpointLogger): Promise<void> {
       description: cronTasks.description,
       schedule: cronTasks.schedule,
     })
-    .from(cronTasks);
+    .from(cronTasks)
+    .where(
+      andTask(
+        eqHidden(cronTasks.hidden, false),
+        orTask(
+          eqHidden(cronTasks.runOnce, false),
+          eqHidden(cronTasks.enabled, true),
+        ),
+      ),
+    );
 
   let taskCount = 0;
+  const activePaths = new Set<string>();
   for (const task of allTasks) {
     if (!task.userId) {
       continue;
@@ -336,14 +175,31 @@ async function materializeVirtualMounts(logger: EndpointLogger): Promise<void> {
       .filter(Boolean)
       .join("\n");
 
-    await syncVirtualNodeToEmbedding(
-      task.userId,
-      `/tasks/${task.id}.md`,
-      content,
-    );
+    await upsertVirtualNode(task.userId, `/tasks/${task.id}.md`, content);
+    activePaths.add(`/tasks/${task.id}.md`);
     taskCount++;
   }
   logger.info(`Cortex seed: materialized ${taskCount} tasks`);
+
+  // Clean up stale task cortex nodes (hidden/disabled run-once tasks)
+  const { like: likeTask } = await import("drizzle-orm");
+  const { cortexNodes: cortexNodesForClean } = await import("./db");
+  const staleTaskNodes = await db
+    .select({ id: cortexNodesForClean.id, path: cortexNodesForClean.path })
+    .from(cortexNodesForClean)
+    .where(likeTask(cortexNodesForClean.path, "/tasks/%"));
+
+  const toDelete = staleTaskNodes.filter((n) => !activePaths.has(n.path));
+  if (toDelete.length > 0) {
+    const { inArray: inArrayDel } = await import("drizzle-orm");
+    await db.delete(cortexNodesForClean).where(
+      inArrayDel(
+        cortexNodesForClean.id,
+        toDelete.map((n) => n.id),
+      ),
+    );
+    logger.info(`Cortex seed: deleted ${toDelete.length} stale task nodes`);
+  }
 
   // --- Threads ---
   // Only materialize threads with recent activity (last 100 threads per user)
@@ -408,7 +264,7 @@ async function materializeVirtualMounts(logger: EndpointLogger): Promise<void> {
       .replace(/[^a-z0-9-]/g, "-")
       .slice(0, 50);
 
-    await syncVirtualNodeToEmbedding(
+    await upsertVirtualNode(
       thread.userId,
       `/threads/${thread.rootFolderId}/${slug}-${thread.id}.md`,
       content,
@@ -424,47 +280,54 @@ async function materializeVirtualMounts(logger: EndpointLogger): Promise<void> {
  * No API calls — the file is the source of truth.
  */
 async function materializeBuiltInSkills(logger: EndpointLogger): Promise<void> {
-  const { syncVirtualNodeWithCachedEmbedding } =
+  const { syncVirtualNodeWithCachedEmbedding, upsertVirtualNode } =
     await import("./embeddings/sync-virtual");
   const { db } = await import("@/app/api/[locale]/system/db");
   const { users } = await import("@/app/api/[locale]/user/db");
 
-  const { DEFAULT_SKILLS } =
+  const { DEFAULT_SKILLS, DEFAULT_SKILL_EMBEDDINGS } =
     await import("@/app/api/[locale]/system/generated/skills-index");
 
-  // Only process skills that have inline embeddings
-  const skillsWithEmbeddings = DEFAULT_SKILLS.filter(
-    (s) => s.embedding && s.embeddingHash && s.embedding.length > 0,
+  // Build skillId → embedding map
+  const embedMap = new Map(
+    (DEFAULT_SKILL_EMBEDDINGS ?? [])
+      .filter(
+        (e): e is NonNullable<typeof e> =>
+          e !== null &&
+          e !== undefined &&
+          Boolean(e.embeddingHash) &&
+          e.embedding.length > 0,
+      )
+      .map((e) => [e.skillId, e]),
   );
 
-  if (skillsWithEmbeddings.length === 0) {
-    logger.info(
-      "Cortex seed: no built-in skills have embeddings — run vibe gen first",
-    );
-    return;
-  }
-
+  const embeddedCount = embedMap.size;
   const allUsers = await db.select({ id: users.id }).from(users);
 
   let totalCount = 0;
   for (const user of allUsers) {
-    for (const skill of skillsWithEmbeddings) {
+    for (const skill of DEFAULT_SKILLS) {
       const path = `/skills/default/${skill.id}.md`;
       const content = [`# ${skill.id}`, "", skill.systemPrompt].join("\n");
+      const emb = embedMap.get(skill.id);
 
-      await syncVirtualNodeWithCachedEmbedding(
-        user.id,
-        path,
-        content,
-        skill.embeddingHash!,
-        skill.embedding!,
-      );
+      if (emb) {
+        await syncVirtualNodeWithCachedEmbedding(
+          user.id,
+          path,
+          content,
+          emb.embeddingHash,
+          emb.embedding,
+        );
+      } else {
+        await upsertVirtualNode(user.id, path, content);
+      }
       totalCount++;
     }
   }
 
   logger.info(
-    `Cortex seed: materialized ${skillsWithEmbeddings.length} built-in skills × ${allUsers.length} users = ${totalCount} nodes`,
+    `Cortex seed: materialized ${DEFAULT_SKILLS.length} built-in skills (${embeddedCount} with embeddings) × ${allUsers.length} users = ${totalCount} nodes`,
   );
 }
 

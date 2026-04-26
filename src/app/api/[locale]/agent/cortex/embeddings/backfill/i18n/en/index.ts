@@ -12,12 +12,19 @@ export const translations = {
     widget: {
       hint: "Generate embeddings for all cortex nodes that are missing them. This may take a while.",
     },
-    fields: {},
+    fields: {
+      force: {
+        label: "Force Re-embed",
+        description:
+          "Clear all existing embeddings first and regenerate from scratch (content-only format). Use when embedding format has changed.",
+      },
+    },
     submitButton: {
       label: "Start Backfill",
       loadingText: "Processing...",
     },
     response: {
+      materialized: { text: "Materialized" },
       processed: { text: "Embedded" },
       failed: { text: "Failed" },
       skipped: { text: "Skipped" },

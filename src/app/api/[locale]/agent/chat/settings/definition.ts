@@ -144,6 +144,45 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.string().nullable(),
       }),
+
+      // Mama pulse settings (admin-only global heartbeat)
+      mamaEnabled: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean(),
+      }),
+      mamaSchedule: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string(),
+      }),
+      mamaPrompt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().nullable(),
+      }),
+
+      // Pulse folder UUIDs — null if the folder hasn't been created yet (task never enabled)
+      dreamerSubFolderId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().uuid().nullable(),
+      }),
+      dreamerThreadCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.number().int(),
+      }),
+      autopilotSubFolderId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().uuid().nullable(),
+      }),
+      autopilotThreadCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.number().int(),
+      }),
     },
   }),
 
@@ -209,6 +248,13 @@ const { GET } = createEndpoint({
         autopilotFavoriteId: null,
         autopilotSchedule: "0 8 * * 1-5",
         autopilotPrompt: null,
+        mamaEnabled: false,
+        mamaSchedule: "0 */4 * * *",
+        mamaPrompt: null,
+        dreamerSubFolderId: null,
+        dreamerThreadCount: 0,
+        autopilotSubFolderId: null,
+        autopilotThreadCount: 0,
       },
     },
   },
@@ -367,6 +413,33 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.autopilot.prompt.label" as const,
+        columns: 12,
+        schema: z.string().nullable().optional(),
+      }),
+
+      // Mama pulse settings (admin-only — global shared platform heartbeat)
+      mamaEnabled: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.mama.toggle.label" as const,
+        description: "post.mama.description" as const,
+        allowedRoles: [UserRole.ADMIN],
+        columns: 12,
+        schema: z.boolean().optional(),
+      }),
+      mamaSchedule: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.mama.schedule.label" as const,
+        allowedRoles: [UserRole.ADMIN],
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+      mamaPrompt: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.mama.prompt.label" as const,
+        allowedRoles: [UserRole.ADMIN],
         columns: 12,
         schema: z.string().nullable().optional(),
       }),

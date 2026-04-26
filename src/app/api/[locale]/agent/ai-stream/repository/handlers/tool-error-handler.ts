@@ -67,7 +67,7 @@ export class ToolErrorHandler {
     /** Confirmation config for tools (from visible tools + active tools). */
     toolsConfig: Map<
       string,
-      { requiresConfirmation: boolean; credits: number }
+      { requiresConfirmation: boolean; credits: number; label: string }
     >;
     model: ChatModelId;
     skill: string;
@@ -254,6 +254,7 @@ export class ToolErrorHandler {
         sequenceId,
         toolCall: toolCallWithResult,
         toolName: part.toolName,
+        toolLabel: toolsConfig.get(part.toolName)?.label,
         result: fallbackResult.data,
         error: undefined,
         skipSseEmit: false,
@@ -278,14 +279,16 @@ export class ToolErrorHandler {
         error: fallbackResult.error,
       });
 
+      // Pass the actual error message from the tool so the model gets actionable context,
+      // not a generic "please try again" that hides what went wrong.
+      const errorResponse = fail({
+        message: fallbackResult.error as typeof fallbackResult.error &
+          "createScopedTranslation-key",
+        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+      });
       const toolCallWithError: ToolCall = {
         ...toolCallData.toolCall,
-        error: fail({
-          message: t("errors.toolExecutionError", {
-            error: fallbackResult.error,
-          }),
-          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-        }),
+        error: errorResponse,
         isPartial: false,
       };
 

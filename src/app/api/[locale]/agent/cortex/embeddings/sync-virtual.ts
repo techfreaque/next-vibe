@@ -11,6 +11,7 @@ import { db } from "@/app/api/[locale]/system/db";
 
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
+import { parseFrontmatter } from "../repository";
 
 import { queueEmbedding } from "./auto-embed";
 import { computeEmbeddingHash } from "./service";
@@ -61,8 +62,40 @@ export async function syncVirtualNodeToEmbedding(
 }
 
 /**
+ * Upsert a cortex_nodes FILE row WITHOUT queueing an embedding.
+ * Used during bulk seed to avoid stampeding the embedding API with hundreds
+ * of simultaneous queueEmbedding() calls. The caller is responsible for
+ * scheduling a backfill after materialization is complete.
+ */
+export async function upsertVirtualNode(
+  userId: string,
+  path: string,
+  content: string,
+): Promise<void> {
+  const size = Buffer.byteLength(content, "utf8");
+  const now = new Date();
+  const { frontmatter } = parseFrontmatter(content);
+
+  await db
+    .insert(cortexNodes)
+    .values({
+      userId,
+      path,
+      nodeType: CortexNodeType.FILE,
+      content,
+      size,
+      frontmatter,
+    })
+    .onConflictDoUpdate({
+      target: [cortexNodes.userId, cortexNodes.path],
+      set: { content, size, frontmatter, updatedAt: now },
+    });
+}
+
+/**
  * Sync a virtual node with a pre-computed embedding (from skill.ts files).
  * Skips the API call entirely — writes the cached embedding directly.
+ * Skips the DB write entirely if hash already matches and embedding exists.
  * Uses ON CONFLICT to handle concurrent upserts safely.
  */
 export async function syncVirtualNodeWithCachedEmbedding(
@@ -72,10 +105,26 @@ export async function syncVirtualNodeWithCachedEmbedding(
   cachedHash: string,
   cachedEmbedding: number[],
 ): Promise<void> {
+  const { eq, and } = await import("drizzle-orm");
+
+  // Check if this node already has the correct embedding — skip if so
+  const [existing] = await db
+    .select({
+      contentHash: cortexNodes.contentHash,
+      embedding: cortexNodes.embedding,
+    })
+    .from(cortexNodes)
+    .where(and(eq(cortexNodes.userId, userId), eq(cortexNodes.path, path)))
+    .limit(1);
+
+  if (existing?.contentHash === cachedHash && existing.embedding !== null) {
+    return;
+  }
+
   const size = Buffer.byteLength(content, "utf8");
   const now = new Date();
 
-  // Upsert with embedding+hash — on conflict, always update to latest cached values
+  // Upsert with embedding+hash — on conflict, update to latest cached values
   await db
     .insert(cortexNodes)
     .values({

@@ -1,22 +1,22 @@
 /**
  * Memories Migration Seed
  * Migrates memories from the legacy `memories` table to `cortex_nodes`.
- * Each memory becomes a markdown file at /memories/{memoryNumber}.md with YAML frontmatter.
- * Idempotent: skips users who already have /memories/ entries in cortex_nodes.
+ * Each memory becomes a markdown file at /memories/inbox/{memoryNumber}.md with YAML frontmatter.
+ * Also creates scaffold dirs (inbox, identity, expertise, context, life) for each user.
+ * Idempotent: skips entries that already exist via onConflictDoNothing.
  */
-
-import { and, eq, like, count as drizzleCount } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
 import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
+import { queueEmbedding } from "@/app/api/[locale]/agent/cortex/embeddings/auto-embed";
 
 import { memories, type Memory } from "./db";
 
-/** Run after users + cortex schema exist */
-export const priority = 50;
+/** Run before cortex seeds (priority 60) so migrated memories exist when cortex scaffolds */
+export const priority = 70;
 
 /**
  * Render a memory as markdown with YAML frontmatter
@@ -49,7 +49,6 @@ function renderMemoryMarkdown(memory: Memory): string {
  * Runs on dev/prod — safe to re-run (idempotent).
  */
 async function migrateMemories(logger: EndpointLogger): Promise<void> {
-  // Get all distinct user IDs that have memories
   const allMemories = await db
     .select()
     .from(memories)
@@ -71,79 +70,75 @@ async function migrateMemories(logger: EndpointLogger): Promise<void> {
     }
   }
 
+  const SCAFFOLD_DIRS = [
+    "/memories",
+    "/memories/inbox",
+    "/memories/identity",
+    "/memories/expertise",
+    "/memories/context",
+    "/memories/life",
+  ];
+
   let totalMigrated = 0;
   let totalSkipped = 0;
 
   for (const [userId, userMemories] of byUser) {
-    // Check if this user already has /memories/ entries in cortex_nodes
-    const existingCount = await db
-      .select({ count: drizzleCount() })
-      .from(cortexNodes)
-      .where(
-        and(
-          eq(cortexNodes.userId, userId),
-          like(cortexNodes.path, "/memories/%"),
-          eq(cortexNodes.nodeType, CortexNodeType.FILE),
-        ),
-      );
-
-    if ((existingCount[0]?.count ?? 0) > 0) {
-      totalSkipped += userMemories.length;
-      continue;
+    // Ensure scaffold dirs exist
+    for (const dirPath of SCAFFOLD_DIRS) {
+      await db
+        .insert(cortexNodes)
+        .values({
+          userId,
+          path: dirPath,
+          nodeType: CortexNodeType.DIR,
+          content: null,
+          size: 0,
+        })
+        .onConflictDoNothing();
     }
 
-    // Create /memories/ directory node if it doesn't exist
-    const dirExists = await db
-      .select({ id: cortexNodes.id })
-      .from(cortexNodes)
-      .where(
-        and(eq(cortexNodes.userId, userId), eq(cortexNodes.path, "/memories")),
-      )
-      .limit(1);
-
-    if (dirExists.length === 0) {
-      await db.insert(cortexNodes).values({
-        userId,
-        path: "/memories",
-        nodeType: CortexNodeType.DIR,
-        content: null,
-        size: 0,
-      });
-    }
-
-    // Migrate each memory
+    // Migrate each memory into /memories/inbox/
     for (const mem of userMemories) {
-      const path = `/memories/${mem.memoryNumber}.md`;
+      const path = `/memories/inbox/${mem.memoryNumber}.md`;
       const content = renderMemoryMarkdown(mem);
-
       const size = Buffer.byteLength(content, "utf8");
       const meta = mem.metadata;
       const syncId =
         meta && typeof meta.syncId === "string" ? meta.syncId : undefined;
 
-      await db.insert(cortexNodes).values({
-        userId: mem.userId,
-        path,
-        nodeType: CortexNodeType.FILE,
-        content,
-        size,
-        frontmatter: {
-          priority: mem.priority,
-          isPublic: mem.isPublic,
-          isArchived: mem.isArchived,
-          isShared: mem.isShared,
-        },
-        tags: mem.tags,
-        syncId: syncId ?? undefined,
-        createdAt: mem.createdAt,
-        updatedAt: mem.updatedAt,
-      });
-      totalMigrated++;
+      const [row] = await db
+        .insert(cortexNodes)
+        .values({
+          userId: mem.userId,
+          path,
+          nodeType: CortexNodeType.FILE,
+          content,
+          size,
+          frontmatter: {
+            priority: mem.priority,
+            isPublic: mem.isPublic,
+            isArchived: mem.isArchived,
+            isShared: mem.isShared,
+          },
+          tags: mem.tags,
+          syncId: syncId ?? undefined,
+          createdAt: mem.createdAt,
+          updatedAt: mem.updatedAt,
+        })
+        .onConflictDoNothing()
+        .returning({ id: cortexNodes.id });
+
+      if (row) {
+        queueEmbedding(row.id, path, content);
+        totalMigrated++;
+      } else {
+        totalSkipped++;
+      }
     }
   }
 
   logger.info(
-    `Memories migration: ${totalMigrated} migrated, ${totalSkipped} skipped (already in cortex)`,
+    `Memories migration: ${totalMigrated} migrated to /memories/inbox/, ${totalSkipped} skipped (already in cortex)`,
   );
 }
 

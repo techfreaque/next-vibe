@@ -393,6 +393,24 @@ const { GET } = createEndpoint({
     },
   }),
 
+  events: {
+    // Partial task update — merge only changes into matching task by id.
+    // Fields listed here are the minimum required by the type system; extra
+    // fields present on the payload are passed through by applyPartialToCache.
+    "task-updated": {
+      fields: { tasks: ["id"] as const },
+      operation: "merge" as const,
+    },
+    "task-created": {
+      fields: { tasks: ["id"] as const },
+      operation: "merge" as const,
+    },
+    "task-removed": {
+      fields: { tasks: ["id"] as const },
+      operation: "remove" as const,
+    },
+  },
+
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "get.errors.validation.title",

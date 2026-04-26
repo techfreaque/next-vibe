@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: STEP_OK\n\n**Verification:**\n- `tools` array present with 25 items on current page\n- Total tools: 397 across 16 pages\n- Each tool has `name` field (e.g., \"ai-run\", \"brave-search\", \"coding-agent\")\n- Each tool has `description` field (e.g., \"Delegate a task to a specialist AI agent...\", \"Search the internet for current information...\")\n\nUser: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\n\nAssistant: STEP_OK\n\n**Verification:**\n- `name`: \"generate_image\" ✓\n- `description`: \"Generate an image from a text prompt using AI\" ✓\n- `parameters` schema: Present with properties `prompt`, `model`, `quality`, `size`, `aspectRatio` ✓\n\nUser: [T3a retry-branch] Say exactly: RETRY_RESPONSE STEP_OK",
+    "encoding_format": "float"
+  }
+}

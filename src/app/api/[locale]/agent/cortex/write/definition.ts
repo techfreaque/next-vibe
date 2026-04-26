@@ -114,6 +114,12 @@ const { POST } = createEndpoint({
         content: "post.response.updatedAt.content" as const,
         schema: z.string(),
       }),
+      responseContent: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.content.content" as const,
+        schema: z.string(),
+        fieldName: "content",
+      }),
     },
   }),
 
@@ -181,12 +187,16 @@ const { POST } = createEndpoint({
         size: 78,
         created: true,
         updatedAt: "2026-04-17T14:30:00Z",
+        responseContent:
+          "---\ndate: 2026-04-17\n---\n\n# Team Meeting\n\nDiscussed Cortex architecture.",
       },
       overwritten: {
         responsePath: "/documents/notes/meeting.md",
         size: 120,
         created: false,
         updatedAt: "2026-04-17T15:00:00Z",
+        responseContent:
+          "---\ndate: 2026-04-17\n---\n\n# Team Meeting\n\nDiscussed Cortex architecture.",
       },
     },
   },

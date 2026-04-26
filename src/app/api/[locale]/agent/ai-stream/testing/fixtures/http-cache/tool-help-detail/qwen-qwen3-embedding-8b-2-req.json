@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Tool: [result:tool-help] {\"hint\":\"397 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\\\"<name>\\\" for detail on one tool. To call any tool: execute-tool toolName=\\\"<name>\\\". Page 1/16 - pass page=2 to continue.\",\"tools\":[{\"name\":\"ai-run\",\"title\":\"Run AI Agent\",\"alias\n\nAssistant: STEP_OK\n\n**Verification:**\n- `tools` array present with 25 items on current page\n- Total tools: 397 across 16 pages\n- Each tool has `name` field (e.g., \"ai-run\", \"brave-search\", \"coding-agent\")\n- Each tool has `description` field (e.g., \"Delegate a task to a specialist AI agent...\", \"Search the internet for current information...\")\n\nSystem: [Context: ID:74ebb1b5 | Posted:Apr 26, 13:13]\n\nUser: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English — the user's language.\n\n/ (cortex)\n├── memories/ (6)\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · \n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nu\n│   \n\nSystem: [Context: ID:3834862e | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:13]\n\nAssistant: [tool:tool-help] {\"toolName\":\"generate_image\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"generate_image\",\"title\":\"Generate Image\",\"description\":\"Generate an image from a text prompt using AI\",\"category\":\"AI\",\"subCategory\":\"Generation\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"parameters\":{\"$schema\":\"http://j",
+    "encoding_format": "float"
+  }
+}

@@ -20,7 +20,7 @@ export const { GET, POST, DELETE, tools } = endpointsHandler({
       UserProfileRepository.updateProfile(data, user, locale, logger, t),
   },
   [Methods.DELETE]: {
-    handler: ({ data, logger, locale, t }) =>
-      UserProfileRepository.deleteAccount(data, locale, logger, t),
+    handler: ({ user, logger, locale, t }) =>
+      UserProfileRepository.deleteAccount(user, locale, logger, t),
   },
 });

@@ -4,6 +4,7 @@
 
 import "server-only";
 
+import type { SkillVariantData } from "@/app/api/[locale]/agent/chat/skills/db";
 import { and, eq, or, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
@@ -15,8 +16,11 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
-import { SkillOwnershipType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";
+import {
+  SkillOwnershipType,
+  SkillStatus,
+} from "@/app/api/[locale]/agent/chat/skills/enum";
 import { formatSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
 import { modelProviders } from "@/app/api/[locale]/agent/models/models";
@@ -54,20 +58,20 @@ async function resolveCreatorId(param: string): Promise<string | null> {
 
 export class CreatorProfileRepository {
   static async getCreatorProfile(
-    urlPathParams: { creatorId: string },
+    urlPathParams: { userId: string },
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: CreatorT,
     viewer: JwtPayloadType,
   ): Promise<ResponseType<CreatorGetResponseOutput>> {
     try {
-      const resolvedId = await resolveCreatorId(urlPathParams.creatorId);
+      const resolvedId = await resolveCreatorId(urlPathParams.userId);
 
       if (!resolvedId) {
         return fail({
           message: t("get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { creatorId: urlPathParams.creatorId },
+          messageParams: { userId: urlPathParams.userId },
         });
       }
 
@@ -89,6 +93,7 @@ export class CreatorProfileRepository {
               ownershipType: customSkills.ownershipType,
               voteCount: customSkills.voteCount,
               trustLevel: customSkills.trustLevel,
+              variants: customSkills.variants,
             })
             .from(customSkills)
             .where(
@@ -98,6 +103,7 @@ export class CreatorProfileRepository {
                   customSkills.ownershipType,
                   SkillOwnershipType.PUBLIC as typeof SkillOwnershipType.PUBLIC,
                 ),
+                eq(customSkills.status, SkillStatus.PUBLISHED),
               ),
             ),
           db
@@ -128,43 +134,73 @@ export class CreatorProfileRepository {
       const { t: configT } = configScopedTranslation.scopedT(locale);
       const appName = configT("appName");
 
-      // Enrich skills with model display info
-      const skills = skillRows.map((row) => {
-        const selection = row.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
-        const bestModel = getBestChatModel(selection, viewer);
-        const modelId = bestModel?.id ?? null;
-        const modelRow = bestModel
-          ? {
-              modelIcon: bestModel.icon,
-              modelInfo: getModelDisplayName(bestModel, false),
-              modelProvider:
-                modelProviders[bestModel.provider]?.name ?? bestModel.provider,
-            }
-          : {
-              modelIcon: "sparkles" as const,
-              modelInfo: "Unknown Model",
-              modelProvider: "Unknown",
+      // Enrich skills with model display info, expanding multi-variant skills
+      const skills = skillRows.flatMap((row) => {
+        const variants: SkillVariantData[] | null = row.variants;
+        const expandedVariants =
+          variants && variants.length > 1 ? variants : null;
+        const rows = expandedVariants
+          ? expandedVariants.map((variant) => ({
+              modelSelection: variant.modelSelection,
+              variantId: variant.id,
+              variantName: variant.displayName ?? variant.id,
+              isVariant: true,
+              isDefault: variant.isDefault ?? false,
+            }))
+          : [
+              {
+                modelSelection: row.modelSelection,
+                variantId: null,
+                variantName: null,
+                isVariant: false,
+                isDefault: false,
+              },
+            ];
+        return rows.map(
+          ({
+            modelSelection,
+            variantId,
+            variantName,
+            isVariant,
+            isDefault,
+          }) => {
+            const selection = modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
+            const bestModel = getBestChatModel(selection, viewer);
+            const modelId = bestModel?.id ?? null;
+            const modelRow = bestModel
+              ? {
+                  modelIcon: bestModel.icon,
+                  modelInfo: getModelDisplayName(bestModel, false),
+                  modelProvider:
+                    modelProviders[bestModel.provider]?.name ??
+                    bestModel.provider,
+                }
+              : {
+                  modelIcon: "sparkles" as const,
+                  modelInfo: "Unknown Model",
+                  modelProvider: "Unknown",
+                };
+            return {
+              id: row.id,
+              internalId: null,
+              skillId: formatSkillId(row.id, variantId),
+              category: row.category,
+              icon: row.icon ?? "sparkles",
+              modelId,
+              name: row.name,
+              description: row.description,
+              tagline: row.tagline,
+              ownershipType: row.ownershipType,
+              voteCount: row.voteCount,
+              trustLevel: row.trustLevel,
+              variantId,
+              variantName,
+              isVariant,
+              isDefault,
+              ...modelRow,
             };
-
-        return {
-          id: row.id,
-          internalId: null,
-          skillId: formatSkillId(row.id, null),
-          category: row.category,
-          icon: row.icon ?? "sparkles",
-          modelId,
-          name: row.name,
-          description: row.description,
-          tagline: row.tagline,
-          ownershipType: row.ownershipType,
-          voteCount: row.voteCount,
-          trustLevel: row.trustLevel,
-          variantId: null,
-          variantName: null,
-          isVariant: false,
-          isDefault: false,
-          ...modelRow,
-        };
+          },
+        );
       });
 
       const referralCode = referralResult[0]?.code ?? null;

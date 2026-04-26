@@ -22,7 +22,7 @@ const ROOT_FOLDERS: readonly DefaultFolderId[] = [
   DefaultFolderId.PRIVATE,
   DefaultFolderId.SHARED,
   DefaultFolderId.PUBLIC,
-  DefaultFolderId.CRON,
+  DefaultFolderId.BACKGROUND,
 ];
 
 function isRootFolder(value: string): value is DefaultFolderId {
@@ -279,7 +279,7 @@ export async function listThreadPath(
     for (const folder of subfolders) {
       entries.push({
         name: folder.name,
-        path: `/threads/${rootFolderId}/${folder.id}`,
+        path: `/threads/${rootFolderId}/${folderId}/${folder.id}`,
         nodeType: "dir",
         size: null,
         updatedAt: folder.updatedAt.toISOString(),

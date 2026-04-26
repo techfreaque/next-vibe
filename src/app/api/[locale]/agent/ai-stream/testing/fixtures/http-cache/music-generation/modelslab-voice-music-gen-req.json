@@ -6,9 +6,8 @@
   },
   "body": {
     "key": "t20x6N3haz5IAxDzfP0MBUSzQ5IpjZ5nMkd5AY9nKDuGR7svtN53lD31jsMa",
-    "model_id": "lyria-3",
+    "model_id": "sonauto_song",
     "prompt": "upbeat piano melody",
-    "duration": 30,
-    "output_format": "mp3"
+    "duration": 8
   }
 }

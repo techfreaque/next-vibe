@@ -38,7 +38,11 @@ import type {
   AiStreamPostResponseOutput,
 } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
-import { clearStreamingState, StreamRegistry } from "./core/stream-registry";
+import {
+  clearStreamingState,
+  setStreamingStateWaiting,
+  StreamRegistry,
+} from "./core/stream-registry";
 import {
   subscribeWakeUpSignal,
   type WakeUpPayload,
@@ -55,6 +59,7 @@ import { buildFavoriteConfig } from "../../chat/favorites/repository";
 import { parseSkillId } from "../../chat/slugify";
 import type { HeadlessAiStreamResult } from "./headless";
 import { setupAiStream } from "./stream-setup";
+import { buildSystemPrompt } from "./system-prompt/builder";
 
 /**
  * AI Stream Repository Implementation
@@ -178,6 +183,18 @@ export class AiStreamRepository {
   > {
     const { userId, leadId, ipAddress } =
       AiStreamRepository.extractUserIdentifiers(user, request, headless);
+
+    // ================================================================
+    // Remote host: if rootFolderId === REMOTE, delegate to the configured
+    // remote provider via the ws-provider/stream protocol. No local AI runs.
+    // ================================================================
+    if (!headless && !isRevival) {
+      const { isRemoteHostRequest, delegateToRemoteHost } =
+        await import("../../support/remote-host-repository");
+      if (isRemoteHostRequest(data)) {
+        return delegateToRemoteHost({ data, user, locale, logger, request });
+      }
+    }
 
     // ================================================================
     // Auto-queue: if the thread is already streaming, save the user
@@ -364,7 +381,7 @@ export class AiStreamRepository {
       userMessageCreatedAt,
       messages,
       systemPrompt,
-      trailingSystemMessage,
+      trailingSystemMessage: initialTrailingSystemMessage,
       toolConfirmationResults,
       voiceMode,
       voiceTranscription,
@@ -380,15 +397,40 @@ export class AiStreamRepository {
       streamContext,
       skipAiTurn,
       bridgeContext,
+      systemPromptParams,
     } = setupResult.data;
+    let trailingSystemMessage = initialTrailingSystemMessage;
 
-    // All confirmations were wakeUp-pending - no AI turn needed here.
-    // resume-stream will handle revival when each goroutine completes.
+    // All confirmations were wakeUp-pending OR a confirmed execute-tool (queue WAIT) already
+    // created a remote task - no AI turn needed here.
+    // wakeUp-pending: resume-stream will handle revival when each goroutine completes.
+    // queue WAIT: handleTaskCompletion fires the revival after the remote task finishes.
     if (skipAiTurn) {
+      const isWaitPending = streamContext.waitingForRemoteResult === true;
       logger.debug(
-        "[AiStream] All confirmations wakeUp-pending - skipping AI turn, revival handles it",
+        isWaitPending
+          ? "[AiStream] Confirmed execute-tool (queue WAIT) created remote task - skipping AI turn, waiting for revival"
+          : "[AiStream] All confirmations wakeUp-pending - skipping AI turn, revival handles it",
         { threadId: data.threadId },
       );
+      if (isWaitPending && threadResultThreadId) {
+        // Set thread → waiting so the UI shows the stop button and blocks new messages.
+        // clearStreamingState is called by handleTaskCompletion when the revival fires.
+        await setStreamingStateWaiting(threadResultThreadId);
+      }
+      if (headless) {
+        return {
+          success: true,
+          data: {
+            threadId: threadResultThreadId,
+            lastAiMessageId: aiMessageId,
+            lastAiMessageContent: null,
+            lastGeneratedMediaUrl: null,
+            totalCreditsDeducted: 0,
+            pinnedToolCount: 0,
+          },
+        } satisfies ResponseType<HeadlessAiStreamResult>;
+      }
       return {
         success: true,
         data: {
@@ -731,6 +773,33 @@ export class AiStreamRepository {
               return;
             }
 
+            // Refresh cortex context — messages[] has the full conversation
+            // that was just compacted, so embedding search reflects current topic.
+            try {
+              const { buildEmbeddingQuery } =
+                await import("../../cortex/system-prompt/server");
+              const refreshedPrompt = await buildSystemPrompt({
+                ...systemPromptParams,
+                lastUserMessage: buildEmbeddingQuery(messages),
+                voiceTranscription: null,
+              });
+              trailingSystemMessage = refreshedPrompt.trailingSystemMessage;
+              logger.debug(
+                "[Compacting] Refreshed cortex context for rebuilt history",
+              );
+            } catch (refreshError) {
+              // Non-fatal: use original trailing message if refresh fails
+              logger.warn(
+                "[Compacting] Cortex refresh failed, using original context",
+                {
+                  error:
+                    refreshError instanceof Error
+                      ? refreshError.message
+                      : String(refreshError),
+                },
+              );
+            }
+
             // Rebuild message history with compacted version
             const rebuiltHistory =
               await MessageContextBuilder.rebuildWithCompactedHistory({
@@ -926,6 +995,7 @@ export class AiStreamRepository {
               imageSize: data.imageSize ?? undefined,
               imageQuality: data.imageQuality ?? undefined,
               musicDuration: data.musicDuration ?? undefined,
+              systemPromptParams,
             });
           }
 

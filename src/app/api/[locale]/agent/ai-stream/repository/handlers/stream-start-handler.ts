@@ -184,6 +184,7 @@ export class StreamStartHandler {
     FileUploadEventHandler.attachFileUploadListener({
       fileUploadPromise,
       userMessageId,
+      userId: user.isPublic ? undefined : user.id,
       dbWriter: ctx.dbWriter,
       logger,
     });

@@ -132,7 +132,12 @@ function RootFolderBar({
   const rootFolders = useMemo(
     () =>
       Object.values(DEFAULT_FOLDER_CONFIGS)
-        .filter((f) => f.id !== DefaultFolderId.CRON || isAdmin)
+        .filter(
+          (f) =>
+            (f.id !== DefaultFolderId.BACKGROUND &&
+              f.id !== DefaultFolderId.SUPPORT) ||
+            isAdmin,
+        )
         .toSorted((a, b) => a.order - b.order),
     [isAdmin],
   );

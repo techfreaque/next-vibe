@@ -22,7 +22,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { ChatModelId } from "../../models";
+import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import type { AiStreamT } from "../../stream/i18n";
 import { walkToLeafMessage } from "./branch-utils";
 
@@ -132,7 +132,7 @@ export async function processNextQueuedMessage(
       parentMessageId: resolvedParentId,
       content: queuedMessage.content ?? "",
       role: ChatMessageRole.USER,
-      model: queuedSettings?.model ?? ChatModelId.KIMI_K2_5,
+      model: queuedSettings?.model ?? DEFAULT_CHAT_MODEL_ID,
       skill: queuedSettings?.skill ?? "default",
       favoriteConfig: queuedSettings?.favoriteConfig ?? null,
       toolConfirmations: null,

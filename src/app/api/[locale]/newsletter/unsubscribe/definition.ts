@@ -42,7 +42,6 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
   ],
-  allowedLocalModeRoles: [] as const,
   aliases: ["newsletter-unsubscribe", "unsubscribe"],
 
   cli: {

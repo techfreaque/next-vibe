@@ -8,11 +8,11 @@ export const translations: typeof enTranslations = {
   },
 
   get: {
-    title: "Cron-Task-Statistiken Abrufen",
+    title: "Hintergrundaufgaben-Statistiken Abrufen",
     description: "Umfassende Statistiken und Metriken für Cron-Tasks abrufen",
-    tag: "Cron-Statistiken",
+    tag: "Hintergrund-Statistiken",
     form: {
-      title: "Cron-Statistiken-Anfrage",
+      title: "Hintergrundaufgaben-Statistiken-Anfrage",
       description:
         "Parameter für das Abrufen von Cron-Task-Statistiken konfigurieren",
     },
@@ -159,7 +159,7 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Statistiken Abgerufen",
-      description: "Cron-Task-Statistiken erfolgreich abgerufen",
+      description: "Hintergrundaufgaben-Statistiken erfolgreich abgerufen",
     },
   },
   priority: {
@@ -170,7 +170,7 @@ export const translations: typeof enTranslations = {
     background: "Hintergrund",
   },
   widget: {
-    title: "Cron-Statistiken",
+    title: "Hintergrund-Statistiken",
     loading: "Statistiken werden geladen...",
     viewTasks: "Aufgaben",
     viewHistory: "Verlauf",

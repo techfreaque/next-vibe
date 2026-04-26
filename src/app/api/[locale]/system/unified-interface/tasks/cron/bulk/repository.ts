@@ -27,6 +27,8 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { createTaskEmitters } from "@/app/api/[locale]/system/unified-interface/tasks/cron/emitter";
+
 import type {
   CronBulkRequestOutput,
   CronBulkResponseOutput,
@@ -130,6 +132,17 @@ export class CronBulkRepository {
           await db.delete(cronTasks).where(inArray(cronTasks.id, allowedIds));
           succeeded = allowedIds.length;
           logger.info("Bulk deleted cron tasks", { count: succeeded });
+
+          // Emit task-removed per deleted task
+          const { emitTaskList, emitTaskQueue } = createTaskEmitters(
+            logger,
+            user,
+          );
+          for (const deletedId of allowedIds) {
+            const removedPayload = { tasks: [{ id: deletedId }] };
+            emitTaskList("task-removed", removedPayload);
+            emitTaskQueue("task-removed", removedPayload);
+          }
         } catch (error) {
           const parsedError = parseError(error);
           logger.error("Bulk delete failed", { error: parsedError.message });
@@ -180,6 +193,19 @@ export class CronBulkRepository {
             .where(whereClause);
           succeeded = allowedIds.length;
           logger.info(`Bulk ${action}d cron tasks`, { count: succeeded });
+
+          // Emit task-updated per toggled task
+          const { emitTaskList, emitTaskQueue } = createTaskEmitters(
+            logger,
+            user,
+          );
+          for (const toggledId of allowedIds) {
+            const updatedPayload = {
+              tasks: [{ id: toggledId, enabled }],
+            };
+            emitTaskList("task-updated", updatedPayload);
+            emitTaskQueue("task-updated", updatedPayload);
+          }
         } catch (error) {
           const parsedError = parseError(error);
           logger.error(`Bulk ${action} failed`, { error: parsedError.message });

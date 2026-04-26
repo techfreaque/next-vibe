@@ -127,7 +127,7 @@ export class CompactingHandler {
           ctx.locale,
         );
 
-    const { formatAbsoluteTimestamp } =
+    const { CONTEXT_LINE_PREFIX, formatAbsoluteTimestamp } =
       await import("../system-prompt/message-metadata");
     const shortId = compactingMessageId.slice(-8);
     const timestamp = formatAbsoluteTimestamp(
@@ -135,7 +135,7 @@ export class CompactingHandler {
       timezone,
     );
 
-    const compactingModeContext = `[Context: ID:${shortId} | Posted:${timestamp} | Mode:auto-compacting]`;
+    const compactingModeContext = `${CONTEXT_LINE_PREFIX}ID:${shortId} | Posted:${timestamp} | Mode:auto-compacting]`;
     const compactingInstructions = buildCompactingInstructions();
 
     const metadataParts: string[] = [`ID:${shortId}`];
@@ -145,7 +145,7 @@ export class CompactingHandler {
     }
     metadataParts.push(`Mode:compacting`);
     metadataParts.push(`Posted:${timestamp}`);
-    const finalContextMessage = `[Context: ${metadataParts.join(" | ")}]`;
+    const finalContextMessage = `${CONTEXT_LINE_PREFIX}${metadataParts.join(" | ")}]`;
 
     const compactingMessages: Parameters<typeof streamText>[0]["messages"] = [
       ...historyMessages,
@@ -204,6 +204,12 @@ export class CompactingHandler {
 
     let compactedSummary = "";
 
+    const compactingModelConfig = getChatModelById(model);
+    const compactingTemperatureParam =
+      compactingModelConfig?.features.supportsTemperature !== false
+        ? { temperature: 0.3 }
+        : {};
+
     try {
       const streamResult = await streamText({
         model: providerModel,
@@ -211,7 +217,7 @@ export class CompactingHandler {
         // task that should not be influenced by skill personas, tool definitions,
         // or other system-level instructions that would bloat the context.
         messages: compactingMessages,
-        temperature: 0.3,
+        ...compactingTemperatureParam,
         abortSignal,
       });
 

@@ -11,7 +11,7 @@ import { LeadSkillRepository } from "./repository";
 export const { PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.PATCH]: {
-    handler: ({ data, user, logger, t }) =>
-      LeadSkillRepository.setAttribute(data, user, logger, t),
+    handler: ({ data, user, logger }) =>
+      LeadSkillRepository.setAttribute(data, user, logger),
   },
 });

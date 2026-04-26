@@ -29,14 +29,15 @@ export const translations = {
   },
   nav: {
     status: "Status",
-    status_description: "Monitor cron system health and active tasks",
+    status_description:
+      "Monitor background task system health and active tasks",
     stats: "Statistics",
     stats_description:
-      "View cron task execution statistics and performance metrics",
+      "View background task execution statistics and performance metrics",
     tasks: "Tasks",
-    tasks_description: "Manage and configure cron tasks",
+    tasks_description: "Manage and configure background tasks",
     history: "History",
-    history_description: "View cron task execution history",
+    history_description: "View background task execution history",
   },
   buttons: {
     previous: "Previous",

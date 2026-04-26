@@ -74,7 +74,8 @@ export class StreamContext {
    *  All are called in cleanup(). */
   private cleanupCallbacks: Array<() => void> = [];
 
-  // Time-to-first-token tracking: set when first text delta arrives
+  // Timing: requestStartTime set just before AI model call; streamStartTime set on first token
+  requestStartTime: number | null = null;
   streamStartTime: number | null = null;
 
   // Parent chain

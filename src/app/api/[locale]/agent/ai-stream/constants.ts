@@ -17,12 +17,18 @@ import {
 } from "./vision-models";
 
 /**
+ * The default chat model used across skills, fallbacks, and test fixtures.
+ * Change this one constant to switch the platform default everywhere.
+ */
+export const DEFAULT_CHAT_MODEL_ID = ChatModelId.KIMI_K2;
+
+/**
  * Default chat model selection - MANUAL preferred model with 2-level sort fallback.
  * Use resolveModelSelectionForEnv(selection, env) before getBestModel() to env-filter.
  */
 export const DEFAULT_CHAT_MODEL_SELECTION: ChatModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
-  manualModelId: ChatModelId.KIMI_K2_5,
+  manualModelId: DEFAULT_CHAT_MODEL_ID,
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,

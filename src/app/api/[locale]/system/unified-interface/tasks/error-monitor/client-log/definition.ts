@@ -35,7 +35,12 @@ export const { POST } = createEndpoint({
   subCategory: "endpointCategories.tasksMonitoring",
   icon: "alert-triangle",
   tags: ["post.tags.monitoring" as const],
-  allowedRoles: [UserRole.PUBLIC],
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+  ],
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,

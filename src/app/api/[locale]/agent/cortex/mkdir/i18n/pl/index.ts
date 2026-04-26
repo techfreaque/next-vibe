@@ -13,7 +13,8 @@ export const translations = {
     fields: {
       path: {
         label: "Ścieżka",
-        description: "Ścieżka folderu, np. /documents/projekty/moja-apka",
+        description:
+          "Ścieżka folderu. Polskie korzenie: /dokumenty/. Przykład: /dokumenty/projekty/moja-apka",
       },
       viewType: {
         label: "Widok",

@@ -6,7 +6,7 @@ import "server-only";
  * Reconstructed from chatMessages where metadata.toolCall.toolName = "web-search"
  */
 
-import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, or, sql } from "drizzle-orm";
 
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
@@ -59,6 +59,17 @@ function toMonthFolder(date: Date): string {
 }
 
 /**
+ * Search tool names — covers all variants used across providers and API versions
+ */
+const SEARCH_TOOL_NAMES = [
+  "web-search",
+  "brave-search",
+  "kagi-search",
+  "agent_brave-search_GET",
+  "v1_core_agent_brave-search_GET",
+] as const;
+
+/**
  * Load all web search tool calls for a user
  */
 async function loadUserSearches(userId: string): Promise<SearchRow[]> {
@@ -76,7 +87,12 @@ async function loadUserSearches(userId: string): Promise<SearchRow[]> {
       and(
         eq(chatThreads.userId, userId),
         isNotNull(chatMessages.metadata),
-        sql`${chatMessages.metadata}->'toolCall'->>'toolName' = 'web-search'`,
+        or(
+          ...SEARCH_TOOL_NAMES.map(
+            (name) =>
+              sql`TRIM(${chatMessages.metadata}->'toolCall'->>'toolName') = ${name}`,
+          ),
+        ),
         sql`${chatMessages.metadata}->'toolCall'->'result' IS NOT NULL`,
       ),
     )
@@ -143,8 +159,9 @@ export async function readSearchPath(
     return null;
   }
 
-  // Extract message ID from filename (UUID at end)
-  const uuidMatch = filenameSegment.match(
+  // Extract message ID from filename (UUID before optional .md extension)
+  const filenameBase = filenameSegment.replace(/\.md$/i, "");
+  const uuidMatch = filenameBase.match(
     /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i,
   );
   if (!uuidMatch) {
@@ -267,6 +284,73 @@ export async function listSearchPath(
   }
 
   return [];
+}
+
+export interface VirtualSearchHit {
+  path: string;
+  excerpt: string;
+  updatedAt: Date;
+}
+
+/**
+ * Direct keyword search across web search results — one DB query, no file-by-file reads.
+ */
+export async function searchSearches(
+  userId: string,
+  query: string,
+  limit: number,
+): Promise<VirtualSearchHit[]> {
+  const pattern = `%${query}%`;
+  const rows = await db
+    .select({
+      messageId: chatMessages.id,
+      metadata: chatMessages.metadata,
+      createdAt: chatMessages.createdAt,
+      threadId: chatMessages.threadId,
+      threadTitle: chatThreads.title,
+    })
+    .from(chatMessages)
+    .innerJoin(chatThreads, eq(chatMessages.threadId, chatThreads.id))
+    .where(
+      and(
+        eq(chatThreads.userId, userId),
+        isNotNull(chatMessages.metadata),
+        or(
+          ...SEARCH_TOOL_NAMES.map(
+            (name) =>
+              sql`TRIM(${chatMessages.metadata}->'toolCall'->>'toolName') = ${name}`,
+          ),
+        ),
+        sql`${chatMessages.metadata}->'toolCall'->'result' IS NOT NULL`,
+        or(
+          sql`${chatMessages.metadata}->'toolCall'->'args'->>'query' ILIKE ${pattern}`,
+          sql`${chatMessages.metadata}->'toolCall'->'result'->>'output' ILIKE ${pattern}`,
+        ),
+      ),
+    )
+    .orderBy(desc(chatMessages.createdAt))
+    .limit(limit);
+
+  const hits: VirtualSearchHit[] = [];
+  for (const row of rows) {
+    const meta = row.metadata as {
+      toolCall?: {
+        toolName: string;
+        args?: { query?: string };
+        result?: SearchToolCallResult;
+      };
+    } | null;
+    if (!meta?.toolCall?.args?.query) {
+      continue;
+    }
+    const q = meta.toolCall.args.query;
+    const month = toMonthFolder(row.createdAt);
+    const slug = `${slugify(q)}-${row.messageId}`;
+    const path = `/searches/${month}/${slug}.md`;
+    const excerpt = (meta.toolCall.result?.output ?? q).slice(0, 150);
+    hits.push({ path, excerpt, updatedAt: row.createdAt });
+  }
+  return hits;
 }
 
 /**

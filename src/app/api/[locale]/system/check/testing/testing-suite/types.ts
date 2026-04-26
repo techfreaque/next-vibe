@@ -51,6 +51,12 @@ export interface TestEndpointOptions<
    * @default false
    */
   skipExampleTests?: boolean;
+
+  /**
+   * Timeout in ms for example payload tests (default: vitest default 5000ms)
+   * Use for slow endpoints like embedding backfill.
+   */
+  testTimeout?: number;
 }
 
 /**

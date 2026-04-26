@@ -10,13 +10,24 @@ import type { CountryLanguage } from "@/i18n/core/config";
 interface ContactFormSectionProps {
   locale: CountryLanguage;
   user: JWTPublicPayloadType;
+  userEmail?: string;
 }
 
 export function ContactFormSection({
   locale,
   user,
+  userEmail,
 }: ContactFormSectionProps): JSX.Element {
   return (
-    <EndpointsPage endpoint={contactDefinitions} locale={locale} user={user} />
+    <EndpointsPage
+      endpoint={contactDefinitions}
+      locale={locale}
+      user={user}
+      endpointOptions={
+        userEmail
+          ? { create: { autoPrefillData: { email: userEmail } } }
+          : undefined
+      }
+    />
   );
 }

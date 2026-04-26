@@ -38,11 +38,17 @@ export class DatabaseMigrationRepository {
         `🔄 ${formatActionCommand("Running migrations using:", "bunx drizzle-kit migrate")}`,
       );
 
-      const result = spawnSync("bunx", ["drizzle-kit", "migrate"], {
-        encoding: "utf8",
-        cwd: process.cwd(),
-        env: { ...process.env, DATABASE_URL: env.DATABASE_URL },
-      });
+      // Use the same bun binary that is running this process — works in Docker (/usr/local/bin/bun)
+      // and locally (~/.bun/bin/bun) without depending on PATH.
+      const result = spawnSync(
+        process.execPath,
+        ["x", "drizzle-kit", "migrate"],
+        {
+          encoding: "utf8",
+          cwd: process.cwd(),
+          env: { ...process.env, DATABASE_URL: env.DATABASE_URL },
+        },
+      );
 
       if (result.error) {
         return fail({
@@ -58,7 +64,7 @@ export class DatabaseMigrationRepository {
 
       if (result.status !== 0) {
         logger.error(
-          `Migration failed with exit code ${String(result.status)}`,
+          `Migration failed with exit code ${String(result.status)}: ${rawOutput}`,
         );
         return fail({
           message: t("post.errors.network.title"),

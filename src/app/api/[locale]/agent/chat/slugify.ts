@@ -59,6 +59,31 @@ export function isUuid(value: string): boolean {
 }
 
 // ============================================================
+// LEGACY SKILL ID ALIASES
+// Maps old stored IDs (camelCase, apostrophes) → canonical slugs.
+// The DB keeps whatever it stored — reads normalize transparently.
+// Add entries here whenever a skill/variant ID is renamed.
+// ============================================================
+
+export const SKILL_ID_ALIASES: Record<string, string> = {
+  // Skill IDs
+  freeSpeechActivist: "free-speech-activist",
+  "devil'sAdvocate": "devils-advocate",
+  socraticQuestioner: "socratic-questioner",
+  unbiasedHistorian: "unbiased-historian",
+  // Variant IDs
+  cheapSmart: "cheap-smart",
+};
+
+/**
+ * Resolve a stored skill or variant ID to its canonical slug form.
+ * Handles legacy camelCase / apostrophe IDs transparently.
+ */
+export function resolveIdAlias(id: string): string {
+  return SKILL_ID_ALIASES[id] ?? id;
+}
+
+// ============================================================
 // SKILL ID MERGED FORMAT: "skillSlug__variantId"
 // Double-underscore separator — URL-safe, can't appear in a slug
 // ============================================================
@@ -66,12 +91,23 @@ export function isUuid(value: string): boolean {
 export const SKILL_VARIANT_SEPARATOR = "__";
 
 /**
+ * Check if a string is a merged skill+variant ID ("skillSlug__variantId").
+ * Returns true if the double-underscore separator is present.
+ */
+export function isSkillVariantId(value: string): boolean {
+  return value.includes(SKILL_VARIANT_SEPARATOR);
+}
+
+/**
  * Split a merged skill ID ("skillSlug__variantId") into its parts.
+ * Resolves legacy aliases on both skillId and variantId.
  * If no separator is present, variantId is null (use default variant).
  *
  * Examples:
- *   "thea"             → { skillId: "thea", variantId: null }
- *   "thea__brilliant"  → { skillId: "thea", variantId: "brilliant" }
+ *   "thea"                    → { skillId: "thea", variantId: null }
+ *   "thea__brilliant"         → { skillId: "thea", variantId: "brilliant" }
+ *   "freeSpeechActivist"      → { skillId: "free-speech-activist", variantId: null }
+ *   "thea__cheapSmart"        → { skillId: "thea", variantId: "cheap-smart" }
  */
 export function parseSkillId(raw: string): {
   skillId: string;
@@ -79,11 +115,13 @@ export function parseSkillId(raw: string): {
 } {
   const idx = raw.indexOf(SKILL_VARIANT_SEPARATOR);
   if (idx === -1) {
-    return { skillId: raw, variantId: null };
+    return { skillId: resolveIdAlias(raw), variantId: null };
   }
+  const rawSkillId = raw.slice(0, idx);
+  const rawVariantId = raw.slice(idx + SKILL_VARIANT_SEPARATOR.length) || null;
   return {
-    skillId: raw.slice(0, idx),
-    variantId: raw.slice(idx + SKILL_VARIANT_SEPARATOR.length) || null,
+    skillId: resolveIdAlias(rawSkillId),
+    variantId: rawVariantId ? resolveIdAlias(rawVariantId) : null,
   };
 }
 

@@ -63,6 +63,10 @@ export async function resolveVirtualRead(
       const { readSkillPath } = await import("./skills");
       return readSkillPath(userId, path);
     }
+    case "/favorites": {
+      const { readFavoritePath } = await import("./favorites");
+      return readFavoritePath(userId, path);
+    }
     case "/tasks": {
       const { readTaskPath } = await import("./tasks");
       return readTaskPath(userId, path);
@@ -74,6 +78,10 @@ export async function resolveVirtualRead(
     case "/searches": {
       const { readSearchPath } = await import("./searches");
       return readSearchPath(userId, path);
+    }
+    case "/gens": {
+      const { readGenPath } = await import("./gens");
+      return readGenPath(userId, path);
     }
     default:
       return null;
@@ -97,6 +105,10 @@ export async function resolveVirtualList(
       const { listSkillPath } = await import("./skills");
       return listSkillPath(userId, path);
     }
+    case "/favorites": {
+      const { listFavoritePath } = await import("./favorites");
+      return listFavoritePath(userId, path);
+    }
     case "/tasks": {
       const { listTaskPath } = await import("./tasks");
       return listTaskPath(userId, path);
@@ -108,6 +120,10 @@ export async function resolveVirtualList(
     case "/searches": {
       const { listSearchPath } = await import("./searches");
       return listSearchPath(userId, path);
+    }
+    case "/gens": {
+      const { listGenPath } = await import("./gens");
+      return listGenPath(userId, path);
     }
     default:
       return [];
@@ -121,37 +137,43 @@ export async function getVirtualMountCounts(userId: string): Promise<{
   threads: { total: number; byRoot: Record<string, number> };
   memories: number;
   skills: number;
+  favorites: number;
   tasks: number;
   documents: number;
   uploads: number;
   searches: number;
+  gens: number;
 }> {
-  const [threadCounts, skillCount, taskCount] = await Promise.all([
-    import("./threads").then((m) => m.getThreadCounts(userId)),
-    import("./skills").then((m) => m.getSkillCount(userId)),
-    import("./tasks").then((m) => m.getTaskCount(userId)),
-  ]);
+  const [threadCounts, skillCount, favoriteCount, taskCount] =
+    await Promise.all([
+      import("./threads").then((m) => m.getThreadCounts(userId)),
+      import("./skills").then((m) => m.getSkillCount(userId)),
+      import("./favorites").then((m) => m.getFavoriteCount(userId)),
+      import("./tasks").then((m) => m.getTaskCount(userId)),
+    ]);
 
   // Count document + memory workspace files from cortex_nodes
   const { countDocuments } = await import("./documents");
   const { countMemories } = await import("./memories-count");
-  const [docCount, memoryCount, uploadCounts, searchCounts] = await Promise.all(
-    [
+  const [docCount, memoryCount, uploadCounts, searchCounts, genCounts] =
+    await Promise.all([
       countDocuments(userId),
       countMemories(userId),
       import("./uploads").then((m) => m.getUploadCounts(userId)),
       import("./searches").then((m) => m.getSearchCounts(userId)),
-    ],
-  );
+      import("./gens").then((m) => m.getGenCounts(userId)),
+    ]);
 
   return {
     threads: threadCounts,
     memories: memoryCount,
     skills: skillCount,
+    favorites: favoriteCount,
     tasks: taskCount,
     documents: docCount,
     uploads: uploadCounts.total,
     searches: searchCounts.total,
+    gens: genCounts.total,
   };
 }
 

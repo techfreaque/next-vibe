@@ -56,6 +56,7 @@ export enum ImageGenModelId {
   GEMINI_3_PRO_IMAGE_PREVIEW = "gemini-3-pro-image-preview",
   GPT_5_IMAGE_MINI = "gpt-5-image-mini",
   GPT_5_IMAGE = "gpt-5-image",
+  GPT_5_4_IMAGE_2 = "gpt-5.4-image-2",
   // END:llm-generated
 }
 
@@ -65,6 +66,7 @@ export const llmImageGenModelIds = [
   ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
   ImageGenModelId.GPT_5_IMAGE_MINI,
   ImageGenModelId.GPT_5_IMAGE,
+  ImageGenModelId.GPT_5_4_IMAGE_2,
 ] as const satisfies ImageGenModelId[];
 
 type DedicatedImageGenModelId = Exclude<
@@ -1180,6 +1182,20 @@ const llmImageGenModelOptions: ImageGenModelOption[] = (
           inputTokenCost: 10, // updated: 2026-03-31 from openrouter-api
           outputTokenCost: 10, // updated: 2026-03-31 from openrouter-api
           cacheReadTokenCost: 1.25, // updated: 2026-03-31 from openrouter-api
+        } satisfies ModelProviderConfigTokenBased,
+      ],
+    ),
+    chatModelToImageGenOption(
+      ImageGenModelId.GPT_5_4_IMAGE_2,
+      ChatModelId.GPT_5_4_IMAGE_2,
+      [
+        {
+          id: ImageGenModelId.GPT_5_4_IMAGE_2,
+          apiProvider: ApiProvider.OPENROUTER,
+          providerModel: "openai/gpt-5.4-image-2",
+          creditCost: calculateCreditCost,
+          inputTokenCost: 8, // released: 2026-04-21 from openrouter
+          outputTokenCost: 15, // released: 2026-04-21 from openrouter
         } satisfies ModelProviderConfigTokenBased,
       ],
     ),

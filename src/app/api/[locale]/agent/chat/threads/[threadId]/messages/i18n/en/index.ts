@@ -26,15 +26,10 @@ export const translations = {
   errorFeedback: {
     autoReported: "Error reported automatically",
     helpFix: "Help us fix this",
-    hideDetails: "Hide",
-    feedbackHelps: "Your feedback helps us fix this faster.",
-    reportCta: "Send feedback",
-    threadShared: "Thread ID will be included",
-    incognitoNote: "Incognito - no thread data available",
-    incognitoThread: "Incognito thread (no data stored)",
     autoContext: "[Auto-generated error report]",
     errorLabel: "Error",
-    userContextLabel: "Your context (optional)",
+    causeLabel: "Cause",
+    userContextLabel: "Add more context here (optional)",
     separator: "·",
   },
   compacting: {
@@ -339,8 +334,12 @@ export const translations = {
         cachedPercent: "{{percent}}% cached",
         cachedPercentTitle:
           "{{percent}}% of input tokens were served from cache, reducing cost",
+        cached: "cached",
+        pipeline: "Pipeline",
         timeToFirstToken: "{{seconds}}s to first token",
-        timeToFirstTokenTitle: "Time from request to first token",
+        timeToFirstTokenTitle: "Time to first token",
+        streamingTime: "{{seconds}}s streaming",
+        streamingTimeTitle: "Total streaming duration",
         cacheWriteTokens: "Cache write",
         cacheWrite: "{{tokens}} written to cache",
         cacheWriteTitle:

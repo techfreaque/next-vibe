@@ -28,6 +28,7 @@ import {
   getVideoGenModelById,
 } from "@/app/api/[locale]/agent/video-generation/models";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
@@ -108,6 +109,7 @@ export function VideoGenerationContainer({
   field,
 }: CustomWidgetProps): JSX.Element {
   const isSubmitting = useWidgetIsSubmitting();
+  const isDisabled = useWidgetDisabled();
   const form = useWidgetForm<typeof definition.POST>();
   const result = useWidgetValue<typeof definition.POST>();
   const children = field.children;
@@ -274,6 +276,7 @@ export function VideoGenerationContainer({
             className="w-full min-h-[80px] resize-none"
             placeholder={t("post.prompt.placeholder")}
             value={prompt}
+            disabled={isDisabled}
             onChange={(e) => form?.setValue("prompt", e.target.value)}
           />
           {/* Style chips */}
@@ -285,6 +288,7 @@ export function VideoGenerationContainer({
                 variant="outline"
                 size="sm"
                 className="h-6 px-2 text-[10px] rounded-full"
+                disabled={isDisabled}
                 onClick={() => appendStyle(style)}
               >
                 {style}
@@ -308,6 +312,7 @@ export function VideoGenerationContainer({
                 }
                 size="sm"
                 className="flex-1 h-auto py-2 flex flex-col gap-0.5"
+                disabled={isDisabled}
                 onClick={() => form?.setValue("duration", preset.seconds)}
               >
                 <Span className="text-xs font-medium">{preset.label}</Span>
@@ -333,6 +338,7 @@ export function VideoGenerationContainer({
                   variant={currentAspectRatio === ratio ? "default" : "outline"}
                   size="sm"
                   className="h-7 px-3 text-xs"
+                  disabled={isDisabled}
                   onClick={() => form?.setValue("aspectRatio", ratio)}
                 >
                   {ratio}
@@ -356,6 +362,7 @@ export function VideoGenerationContainer({
                   variant={currentResolution === res ? "default" : "outline"}
                   size="sm"
                   className="h-7 px-3 text-xs"
+                  disabled={isDisabled}
                   onClick={() => form?.setValue("resolution", res)}
                 >
                   {res}
@@ -386,7 +393,7 @@ export function VideoGenerationContainer({
             allowedRoles={["video-gen"]}
             defaultModelSelection={defaultModelSelection}
             placeholder={t("post.model.label")}
-            onClick={() => setShowModelSelector(true)}
+            onClick={isDisabled ? undefined : () => setShowModelSelector(true)}
             locale={locale}
             user={user}
           />

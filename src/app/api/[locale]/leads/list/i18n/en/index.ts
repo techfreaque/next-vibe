@@ -203,5 +203,6 @@ export const translations = {
     sortBusinessNameZA: "Business name (Z-A)",
     linkedCount: "{{count}} linked",
     hasLinkedUser: "User",
+    referralCode: "Ref Code",
   },
 };

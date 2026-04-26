@@ -94,9 +94,7 @@ const { POST } = createEndpoint({
         description: "post.model.description",
         columns: 6,
         options: ImageGenModelIdOptions,
-        schema: z
-          .enum(ImageGenModelId)
-          .default(ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW),
+        schema: z.enum(ImageGenModelId).optional(),
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
       }),
       size: requestField(scopedTranslation, {
@@ -219,7 +217,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         prompt: "A photorealistic sunset over a mountain lake",
-        model: ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
+        model: ImageGenModelId.GPT_5_IMAGE,
         size: ImageSize.SQUARE_1024,
         quality: ImageQuality.STANDARD,
       },

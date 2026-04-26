@@ -24,7 +24,10 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { defaultLocale } from "@/i18n/core/config";
 
-import type { UserRoleValue } from "../../../../user/user-roles/enum";
+import {
+  UserPermissionRole,
+  type UserRoleValue,
+} from "../../../../user/user-roles/enum";
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
@@ -85,19 +88,23 @@ export async function sendTestRequest<
     >["types"]["ResponseOutput"]
   >
 > {
-  // Create default user based on endpoint configuration if not provided
-  const testUser: JwtPayloadType =
-    user ??
-    (endpoint.requiresAuthentication()
-      ? {
-          isPublic: false,
-          id: "00000000-0000-0000-0000-000000000001",
-          leadId: "00000000-0000-0000-0000-000000000002",
-        }
-      : {
-          isPublic: true,
-          leadId: "00000000-0000-0000-0000-000000000002",
-        });
+  // Use provided user or resolve the real admin user from DB
+  let testUser: JwtPayloadType;
+  if (user) {
+    testUser = user;
+  } else if (endpoint.requiresAuthentication()) {
+    const { resolveTestAdminUser } = await import("./resolve-test-user");
+    testUser = await resolveTestAdminUser();
+  } else {
+    // Resolve the admin user to get a valid leadId, then create a public variant
+    const { resolveTestAdminUser } = await import("./resolve-test-user");
+    const admin = await resolveTestAdminUser();
+    testUser = {
+      isPublic: true,
+      leadId: admin.leadId,
+      roles: [UserPermissionRole.PUBLIC],
+    };
+  }
 
   try {
     // Create a test logger
@@ -105,7 +112,8 @@ export async function sendTestRequest<
 
     // Build the tool name from endpoint path and method
     // Format: "user_public_login_POST" (underscores match generated route-handlers.ts)
-    const toolName = `${endpoint.path.join("_")}_${endpoint.method}`;
+    // Strip brackets from path params: "[id]" → "id"
+    const toolName = `${endpoint.path.map((s) => s.replace(/^\[|\]$/g, "")).join("_")}_${endpoint.method}`;
 
     // Execute using the shared route execution executor
     // This is the same infrastructure used by CLI, MCP, and AI tools
@@ -120,7 +128,7 @@ export async function sendTestRequest<
       logger,
       platform: Platform.CLI, // Use CLI platform for testing
       streamContext: {
-        rootFolderId: DefaultFolderId.CRON,
+        rootFolderId: DefaultFolderId.BACKGROUND,
         threadId: undefined,
         aiMessageId: undefined,
         skillId: undefined,

@@ -12,12 +12,19 @@ export const translations = {
     widget: {
       hint: "Embeddings für alle Cortex-Knoten ohne Vektoren erzeugen. Kann etwas dauern.",
     },
-    fields: {},
+    fields: {
+      force: {
+        label: "Neu einbetten",
+        description:
+          "Bestehende Embeddings löschen und neu erzeugen (nur Inhalt, kein Pfad). Verwenden, wenn das Format geändert wurde.",
+      },
+    },
     submitButton: {
       label: "Starten",
       loadingText: "Läuft...",
     },
     response: {
+      materialized: { text: "Materialisiert" },
       processed: { text: "Eingebettet" },
       failed: { text: "Fehlgeschlagen" },
       skipped: { text: "Übersprungen" },

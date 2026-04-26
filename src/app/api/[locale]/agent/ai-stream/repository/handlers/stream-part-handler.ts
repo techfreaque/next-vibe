@@ -39,7 +39,7 @@ export class StreamPartHandler {
     locale: CountryLanguage;
     toolsConfig: Map<
       string,
-      { requiresConfirmation: boolean; credits: number }
+      { requiresConfirmation: boolean; credits: number; label: string }
     >;
     /** Set of tool names the model is allowed to execute. null = all allowed. */
     activeToolNames: Set<string> | null;
@@ -404,6 +404,7 @@ export class StreamPartHandler {
         dbWriter: ctx.dbWriter,
         logger,
         emittedToolResultIds,
+        toolsConfig,
         t,
       });
       if (result) {

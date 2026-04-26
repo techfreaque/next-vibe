@@ -117,7 +117,8 @@ function getFolderName(folderId: DefaultFolderId, tChat: ChatT): string {
     [DefaultFolderId.INCOGNITO]: tChat("config.folders.incognito"),
     [DefaultFolderId.SHARED]: tChat("config.folders.shared"),
     [DefaultFolderId.PUBLIC]: tChat("config.folders.public"),
-    [DefaultFolderId.CRON]: tChat("config.folders.cron"),
+    [DefaultFolderId.BACKGROUND]: tChat("config.folders.background"),
+    [DefaultFolderId.SUPPORT]: tChat("config.folders.support"),
   };
   return folderNames[folderId];
 }
@@ -1349,7 +1350,12 @@ export function FolderContentsWidget({
     activeRootFolderId === DefaultFolderId.PUBLIC && !widgetSubFolderId;
 
   const grouped = useMemo(() => {
-    const rawItems: FolderContentsItem[] = fieldItems ?? [];
+    // Filter out stub items that arrived via partial SSE merge (missing rootFolderId means
+    // the item was upserted from a streaming-state-changed event before the full thread data
+    // arrived - such items have no valid navigation target and must not render).
+    const rawItems: FolderContentsItem[] = (fieldItems ?? []).filter(
+      (item) => item.rootFolderId !== null && item.rootFolderId !== undefined,
+    );
 
     if (isPublicRootLevel) {
       const sorted = [...rawItems].toSorted(
@@ -1387,7 +1393,19 @@ export function FolderContentsWidget({
       }
     }
 
-    return { pinned, today, lastWeek, lastMonth, older };
+    const byUpdatedAtDesc = (
+      a: FolderContentsItem,
+      b: FolderContentsItem,
+    ): number =>
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+
+    return {
+      pinned: pinned.toSorted(byUpdatedAtDesc),
+      today: today.toSorted(byUpdatedAtDesc),
+      lastWeek: lastWeek.toSorted(byUpdatedAtDesc),
+      lastMonth: lastMonth.toSorted(byUpdatedAtDesc),
+      older: older.toSorted(byUpdatedAtDesc),
+    };
   }, [fieldItems, isPublicRootLevel]);
 
   if (!isDefaultFolderId(activeRootFolderId)) {

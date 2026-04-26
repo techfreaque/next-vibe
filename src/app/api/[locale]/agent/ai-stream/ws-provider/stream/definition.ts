@@ -13,6 +13,7 @@ import {
   ChatModelId,
   ChatModelIdOptions,
 } from "@/app/api/[locale]/agent/ai-stream/models";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -83,6 +84,15 @@ const { POST } = createEndpoint({
           .union([z.literal(""), z.string().uuid()])
           .optional()
           .transform((v) => (v === "" ? undefined : v)),
+      }),
+
+      rootFolderId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.rootFolderId.label",
+        description: "post.fields.rootFolderId.description",
+        columns: 6,
+        schema: z.nativeEnum(DefaultFolderId).optional(),
       }),
 
       skill: requestField(scopedTranslation, {

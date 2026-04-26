@@ -138,8 +138,8 @@ export const translations = {
   medianExecutionTime: "Median Execution Time",
   minExecutionTime: "Min Execution Time",
   ofTotal: "of total",
-  pageDescription: "View and analyze cron task statistics",
-  pageTitle: "Cron Statistics",
+  pageDescription: "View and analyze background task statistics",
+  pageTitle: "Background Statistics",
   performanceMetrics: "Performance Metrics",
   priorityAndHealth:
     "{{priorityLabel}}: {{priority}}, {{healthLabel}}: {{health}}",

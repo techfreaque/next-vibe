@@ -60,7 +60,7 @@ export const translations = {
     },
     intelligence: {
       quick: "Quick",
-      smart: "Smart",
+      smart: "Smart & Cheap",
       brilliant: "Brilliant",
     },
     price: {
@@ -320,7 +320,7 @@ export const translations = {
       },
     },
     chan4: {
-      name: "4chan AI",
+      name: "4chan Skill",
       description: "4chan style responses the classic oldfag style",
       tagline: "Anonymous & Unfiltered",
       shortDesc: "Anonymous imageboard culture style",
@@ -433,9 +433,9 @@ export const translations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Uncensored",
-        oracle: "Oracle",
+        oracle: "Classic",
         elonTusk: "Elon Tusk",
-        vision: "Vision",
+        vision: "All-Seeing",
       },
     },
     hermes: {
@@ -453,9 +453,9 @@ export const translations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Uncensored",
-        oracle: "Oracle",
+        oracle: "Classic",
         elonTusk: "Elon Tusk",
-        vision: "Vision",
+        vision: "All-Seeing",
       },
     },
     theaDreamer: {
@@ -473,9 +473,9 @@ export const translations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Uncensored",
-        oracle: "Oracle",
+        oracle: "Classic",
         elonTusk: "Elon Tusk",
-        vision: "Vision",
+        vision: "All-Seeing",
       },
     },
     hermesAutopilot: {
@@ -493,9 +493,29 @@ export const translations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Uncensored",
-        oracle: "Oracle",
+        oracle: "Classic",
         elonTusk: "Elon Tusk",
-        vision: "Vision",
+        vision: "All-Seeing",
+      },
+    },
+    theaMama: {
+      name: "Thea · Mama",
+      description:
+        "Thea in Mama mode — platform prodmaster. Monitors health, advances features, handles marketing, sends news.",
+      tagline: "Platform Overseer",
+      shortDesc: "Production platform management",
+      suggestedPrompts: {
+        0: "What did you find on your last run?",
+        1: "Check the platform health and report",
+        2: "Draft an announcement for the latest feature",
+        3: "What needs my attention right now?",
+      },
+      variants: {
+        brilliant: "Brilliant",
+        uncensored: "Uncensored",
+        oracle: "Classic",
+        elonTusk: "Elon Tusk",
+        vision: "All-Seeing",
       },
     },
     quickWriter: {
@@ -796,6 +816,23 @@ export const translations = {
         budget: "Budget",
       },
     },
+    supportAgent: {
+      name: "Support Agent",
+      description:
+        "AI-powered technical support that knows when to call a human",
+      tagline: "Fix It Fast",
+      shortDesc: "Technical support with human escalation",
+      suggestedPrompts: {
+        0: "My app keeps crashing — help me fix it",
+        1: "I can't connect to the network",
+        2: "I'm getting an error message I don't understand",
+        3: "Walk me through resetting my password",
+      },
+      variants: {
+        default: "Standard",
+        fast: "Fast",
+      },
+    },
     travelPlanner: {
       name: "Travel Planner",
       description: "Trip planning and travel recommendations",
@@ -1009,7 +1046,7 @@ export const translations = {
         0: "Run a full system health check",
         1: "Show me the pulse monitoring status",
         2: "Check database connectivity",
-        3: "What's the current cron task health?",
+        3: "What's the current background task health?",
       },
       variants: {
         fast: "Fast",
@@ -1237,8 +1274,10 @@ export const translations = {
         addToCollection: "Add to collection:",
         quick: "Quick",
         customize: "Customize",
-        useNow: "Use Now",
-        inUse: "In Use",
+        useNow: "Activate",
+        inUse: "Active",
+        goToChat: "Go to Chat",
+        useThis: "Use This",
         chooseFavorite: "Choose Favorite",
         selectFavorite: "Select a favorite to activate:",
         addVariant: "Add Variant",

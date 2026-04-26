@@ -85,7 +85,7 @@ export async function tanstackLoader({
 
   const { t } = scopedTranslation.scopedT(locale);
   const response = await CreatorProfileRepository.getCreatorProfile(
-    { creatorId: userId },
+    { userId },
     locale,
     logger,
     t,

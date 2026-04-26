@@ -30,6 +30,7 @@ import {
 import type { ProviderFactory } from "../core/provider-factory";
 import type { StreamContext } from "../core/stream-context";
 import type { StreamingTTSHandler } from "../streaming-tts";
+import type { SystemPromptParams } from "../system-prompt/builder";
 import { StreamCompletionHandler } from "./stream-completion-handler";
 import { StreamPartHandler } from "./stream-part-handler";
 
@@ -47,7 +48,7 @@ export class StreamExecutionHandler {
     tools: Record<string, CoreTool> | undefined;
     toolsConfig: Map<
       string,
-      { requiresConfirmation: boolean; credits: number }
+      { requiresConfirmation: boolean; credits: number; label: string }
     >;
     /** Set of tool names the model is allowed to execute. null = all allowed. */
     activeToolNames: Set<string> | null;
@@ -67,6 +68,8 @@ export class StreamExecutionHandler {
     imageSize?: string;
     imageQuality?: string;
     musicDuration?: string;
+    /** Params to rebuild the system prompt per-step for fresh cortex context */
+    systemPromptParams?: SystemPromptParams;
   }): Promise<void> {
     const {
       provider,
@@ -164,10 +167,20 @@ export class StreamExecutionHandler {
       };
     }
 
+    // Record the time the request is sent to the model - used for true TTFT calculation
+    ctx.requestStartTime = Date.now();
+
+    // Some models (e.g. gpt-5-image via OpenRouter) reject the temperature parameter.
+    // Only send it when the model explicitly supports it (supportsTemperature !== false).
+    const temperatureParam =
+      modelConfig.features.supportsTemperature !== false
+        ? { temperature: DEFAULT_TEMPERATURE }
+        : {};
+
     const streamResult = aiStreamText({
       model: provider.chat(modelConfig.providerModel) as LanguageModel,
       messages,
-      temperature: DEFAULT_TEMPERATURE,
+      ...temperatureParam,
       abortSignal: streamAbortController.signal,
       system: systemWithCacheControl,
       ...(Object.keys(providerOptions).length > 0 ? { providerOptions } : {}),
@@ -188,6 +201,83 @@ export class StreamExecutionHandler {
                   params.streamContext.waitingForRemoteResult === true
               )(),
             ],
+            // Refresh cortex context (trailing system message) before each tool loop step.
+            // The AI SDK captures messages once — prepareStep is the official hook to override
+            // the message list per-step. We rebuild the embedding query from accumulated
+            // conversation context and replace the trailing system message with fresh results.
+            prepareStep: params.systemPromptParams
+              ? async ({
+                  messages: stepMessages,
+                  stepNumber,
+                }: {
+                  messages: ModelMessage[];
+                  stepNumber: number;
+                }): Promise<{ messages?: ModelMessage[] }> => {
+                  // Step 0 = initial request, already has fresh context from stream-setup
+                  if (stepNumber === 0) {
+                    return {};
+                  }
+
+                  try {
+                    const [{ buildEmbeddingQuery }, { buildSystemPrompt }] =
+                      await Promise.all([
+                        import("../../../cortex/system-prompt/server"),
+                        import("../system-prompt/builder"),
+                      ]);
+
+                    // stepMessages = initialMessages + responseMessages
+                    // accumulated by the SDK across all steps. Pass directly
+                    // to buildEmbeddingQuery which handles all ModelMessage
+                    // content shapes (string, parts, tool calls, tool results).
+                    const embeddingQuery = buildEmbeddingQuery(stepMessages);
+
+                    const refreshed = await buildSystemPrompt({
+                      ...params.systemPromptParams!,
+                      lastUserMessage: embeddingQuery,
+                      voiceTranscription: null,
+                    });
+
+                    // Find the trailing system message and replace it.
+                    // It's the last system message before the context line.
+                    const { isContextLine } =
+                      await import("../system-prompt/message-metadata");
+                    const updatedMessages = [...stepMessages];
+                    for (let i = updatedMessages.length - 1; i >= 0; i--) {
+                      const msg = updatedMessages[i];
+                      if (
+                        msg?.role === "system" &&
+                        typeof msg.content === "string" &&
+                        !isContextLine(msg.content)
+                      ) {
+                        updatedMessages[i] = {
+                          role: "system" as const,
+                          content: refreshed.trailingSystemMessage,
+                        };
+                        break;
+                      }
+                    }
+
+                    logger.debug("[prepareStep] Refreshed cortex context", {
+                      stepNumber,
+                      embeddingQueryLength: embeddingQuery.length,
+                    });
+
+                    return { messages: updatedMessages };
+                  } catch (error) {
+                    logger.warn(
+                      "[prepareStep] Cortex refresh failed, using stale context",
+                      {
+                        stepNumber,
+                        error:
+                          error instanceof Error
+                            ? error.message
+                            : String(error),
+                      },
+                    );
+                    return {};
+                  }
+                }
+              : undefined,
             onStepFinish: (stepResult): void => {
               // Tool arguments are already sent via tool-call stream events.
               // Additionally: check real input token usage and abort if we are
@@ -261,6 +351,7 @@ export class StreamExecutionHandler {
               trailingSystemMessage,
               messages,
               tools,
+              toolsConfig,
               user,
               t,
             });
@@ -299,6 +390,7 @@ export class StreamExecutionHandler {
             trailingSystemMessage,
             messages,
             tools,
+            toolsConfig,
             user,
             t,
           });
@@ -419,6 +511,7 @@ export class StreamExecutionHandler {
       modelCost: actualCreditCost,
       model,
       threadId,
+      locale,
       logger,
     });
   }

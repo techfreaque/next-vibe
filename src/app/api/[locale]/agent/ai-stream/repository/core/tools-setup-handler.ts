@@ -54,7 +54,7 @@ export class ToolsSetupHandler {
     tools: Record<string, CoreTool> | undefined;
     toolsConfig: Map<
       string,
-      { requiresConfirmation: boolean; credits: number }
+      { requiresConfirmation: boolean; credits: number; label: string }
     >;
     /** Set of tool names (preferred) the model is allowed to execute. null = all allowed. */
     activeToolNames: Set<string> | null;
@@ -157,17 +157,22 @@ export class ToolsSetupHandler {
     // Client config overrides endpoint definition; confirmed tools are never re-confirmed
     const toolsConfig = new Map<
       string,
-      { requiresConfirmation: boolean; credits: number }
+      { requiresConfirmation: boolean; credits: number; label: string }
     >();
     for (const [toolName, meta] of toolsResult.toolsMeta) {
-      const credits = meta.credits;
+      const { credits, label } = meta;
       if (confirmedToolNames.has(toolName)) {
-        toolsConfig.set(toolName, { requiresConfirmation: false, credits });
+        toolsConfig.set(toolName, {
+          requiresConfirmation: false,
+          credits,
+          label,
+        });
       } else {
         const clientConfig = clientConfirmationConfig.get(toolName);
         toolsConfig.set(toolName, {
           requiresConfirmation: clientConfig ?? meta.requiresConfirmation,
           credits,
+          label,
         });
       }
     }
@@ -178,7 +183,11 @@ export class ToolsSetupHandler {
     // tools that aren't in the visible/loaded set.
     for (const [toolName, requiresConfirmation] of clientConfirmationConfig) {
       if (!toolsConfig.has(toolName) && !confirmedToolNames.has(toolName)) {
-        toolsConfig.set(toolName, { requiresConfirmation, credits: 0 });
+        toolsConfig.set(toolName, {
+          requiresConfirmation,
+          credits: 0,
+          label: toolName,
+        });
       }
     }
 

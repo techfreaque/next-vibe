@@ -334,6 +334,21 @@ const { GET } = createEndpoint({
     },
   }),
 
+  events: {
+    "task-updated": {
+      fields: { tasks: ["id"] as const },
+      operation: "merge" as const,
+    },
+    "task-created": {
+      fields: { tasks: ["id"] as const },
+      operation: "merge" as const,
+    },
+    "task-removed": {
+      fields: { tasks: ["id"] as const },
+      operation: "remove" as const,
+    },
+  },
+
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "get.errors.validation.title",

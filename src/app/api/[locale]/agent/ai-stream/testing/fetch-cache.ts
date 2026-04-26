@@ -89,6 +89,134 @@ export function setFetchCacheStrictMode(strict: boolean): void {
 }
 
 /**
+ * Patch SSE streaming response files where a dynamic value (e.g. taskId) is
+ * split across multiple `tool_calls[].function.arguments` chunks.
+ *
+ * Strategy: collect all argument chunks from SSE events in order, concatenate
+ * them, do the string replacement, then redistribute the new characters back
+ * into the same chunk boundaries (same number of chunks, each chunk gets the
+ * same character count as before, overflow/underflow is absorbed by the last
+ * chunk).
+ *
+ * Returns the patched file content string, or null if oldStr wasn't found
+ * in the concatenated arguments.
+ */
+function patchSseToolCallArguments(
+  fileContent: string,
+  oldStr: string,
+  newStr: string,
+): string | null {
+  const parsed = JSON.parse(fileContent) as ResFile & {
+    events: string[];
+  };
+  if (parsed.type !== "sse" || !Array.isArray(parsed.events)) {
+    return null;
+  }
+
+  // For each tool_call index, collect argument chunks with their event indices
+  interface ChunkInfo {
+    eventIdx: number;
+    toolIdx: number;
+    text: string;
+  }
+  const toolChunks = new Map<number, ChunkInfo[]>();
+
+  for (let i = 0; i < parsed.events.length; i++) {
+    const evt = parsed.events[i]!;
+    const dataPrefix = "data: ";
+    if (typeof evt !== "string" || !evt.startsWith(dataPrefix)) {
+      continue;
+    }
+    const jsonStr = evt.slice(dataPrefix.length);
+    if (jsonStr === "[DONE]") {
+      continue;
+    }
+
+    let data: {
+      choices?: Array<{
+        delta?: {
+          tool_calls?: Array<{
+            index: number;
+            function?: { arguments?: string };
+          }>;
+        };
+      }>;
+    };
+    try {
+      data = JSON.parse(jsonStr) as typeof data;
+    } catch {
+      continue;
+    }
+
+    const tcs = data.choices?.[0]?.delta?.tool_calls;
+    if (!tcs) {
+      continue;
+    }
+
+    for (const tc of tcs) {
+      const args = tc.function?.arguments;
+      if (args === undefined) {
+        continue;
+      }
+      const idx = tc.index;
+      if (!toolChunks.has(idx)) {
+        toolChunks.set(idx, []);
+      }
+      toolChunks.get(idx)!.push({ eventIdx: i, toolIdx: idx, text: args });
+    }
+  }
+
+  // For each tool_call index, check if concatenated args contain oldStr
+  let anyPatched = false;
+  for (const [toolIdx, chunks] of toolChunks) {
+    const fullArgs = chunks.map((c) => c.text).join("");
+    if (!fullArgs.includes(oldStr)) {
+      continue;
+    }
+
+    const patchedArgs = fullArgs.replaceAll(oldStr, newStr);
+    anyPatched = true;
+
+    // Redistribute patchedArgs back into same chunk boundaries
+    let offset = 0;
+    for (let ci = 0; ci < chunks.length; ci++) {
+      const chunk = chunks[ci]!;
+      const isLast = ci === chunks.length - 1;
+      const chunkLen = isLast ? patchedArgs.length - offset : chunk.text.length;
+      const newText = patchedArgs.slice(offset, offset + chunkLen);
+      offset += chunkLen;
+
+      // Update the event in-place
+      const evt = parsed.events[chunk.eventIdx]!;
+      const jsonStr = (evt as string).slice("data: ".length);
+      interface SseChunkData {
+        choices: Array<{
+          delta: {
+            tool_calls: Array<{
+              index: number;
+              function?: { arguments?: string };
+            }>;
+          };
+        }>;
+      }
+      const data = JSON.parse(jsonStr) as SseChunkData;
+      const tc = data.choices[0]!.delta.tool_calls.find(
+        (t) => t.index === toolIdx,
+      );
+      if (tc?.function) {
+        tc.function.arguments = newText;
+      }
+      parsed.events[chunk.eventIdx] = `data: ${JSON.stringify(data)}`;
+    }
+  }
+
+  if (!anyPatched) {
+    return null;
+  }
+  return JSON.stringify(parsed, null, 2);
+}
+
+/**
  * Patch all fixture files in a named context directory, replacing every
  * occurrence of `oldStr` with `newStr`. Use this to update dynamic values
  * (e.g. taskIds) in recorded fixtures before replaying them in a subsequent
@@ -97,6 +225,136 @@ export function setFetchCacheStrictMode(strict: boolean): void {
  * Call with the TARGET context name (not necessarily the current context).
  * Safe to call when the directory doesn't exist yet (no-op).
  */
+/**
+ * Normalize fixture files by replacing all occurrences of strings matching `pattern`
+ * with `placeholder`. Handles both plain JSON files and SSE response files.
+ *
+ * Use this at the start of a test that creates a live ID (e.g. taskId), to reset stale
+ * IDs left by a previous failed run that didn't reach its end-of-test normalization step.
+ *
+ * Example:
+ *   normalizeFetchCacheFixtures("callback-wait-step2", /local-bg-\d+-\w+/g, "T5B_TASK_ID_PLACEHOLDER")
+ */
+export function normalizeFetchCacheFixtures(
+  contextName: string,
+  pattern: RegExp,
+  placeholder: string,
+): void {
+  const dir = cacheDir(slugify(contextName));
+  if (!existsSync(dir)) {
+    return;
+  }
+  const files = readdirSync(dir).filter((f) => f.endsWith(".json"));
+  for (const file of files) {
+    const fp = join(dir, file);
+    if (!existsSync(fp)) {
+      continue;
+    }
+    const content = readFileSync(fp, "utf-8");
+
+    // Determine file type before deciding how to match
+    let parsedType: string | undefined;
+    try {
+      parsedType = (JSON.parse(content) as { type?: string }).type;
+    } catch {
+      parsedType = undefined;
+    }
+
+    if (parsedType !== "sse") {
+      // Plain files (req files, non-SSE responses): quick content check + direct replace
+      pattern.lastIndex = 0;
+      if (!pattern.test(content)) {
+        pattern.lastIndex = 0;
+        continue;
+      }
+      pattern.lastIndex = 0;
+      writeFileSync(fp, content.replace(pattern, placeholder), "utf-8");
+      continue;
+    }
+
+    // SSE res files: the value may be split across argument chunks so a plain
+    // regex on `content` won't find it. Reconstruct full tool argument strings
+    // from the parsed events, apply the pattern there, then use
+    // patchSseToolCallArguments for each discovered match.
+    const globalPattern = pattern.global
+      ? pattern
+      : new RegExp(pattern.source, `${pattern.flags}g`);
+
+    // Reconstruct concatenated tool args from SSE events
+    const sseMatches = new Set<string>();
+    try {
+      const parsed = JSON.parse(content) as { type: string; events?: string[] };
+      if (Array.isArray(parsed.events)) {
+        const toolArgs = new Map<number, string>();
+        for (const evt of parsed.events) {
+          if (typeof evt !== "string" || !evt.startsWith("data: ")) {
+            continue;
+          }
+          const raw = evt.slice(6);
+          if (raw === "[DONE]") {
+            continue;
+          }
+          try {
+            const d = JSON.parse(raw) as {
+              choices?: Array<{
+                delta?: {
+                  tool_calls?: Array<{
+                    index: number;
+                    function?: { arguments?: string };
+                  }>;
+                };
+              }>;
+            };
+            for (const tc of d.choices?.[0]?.delta?.tool_calls ?? []) {
+              const args = tc.function?.arguments;
+              if (args !== undefined) {
+                toolArgs.set(tc.index, (toolArgs.get(tc.index) ?? "") + args);
+              }
+            }
+          } catch {
+            // ignore
+          }
+        }
+        for (const full of toolArgs.values()) {
+          globalPattern.lastIndex = 0;
+          for (const m of full.matchAll(globalPattern)) {
+            sseMatches.add(m[0]);
+          }
+        }
+      }
+    } catch {
+      // ignore parse errors
+    }
+
+    // Also search plain content (catches non-fragmented occurrences)
+    globalPattern.lastIndex = 0;
+    for (const m of content.matchAll(globalPattern)) {
+      sseMatches.add(m[0]);
+    }
+
+    let current = content;
+    for (const match of sseMatches) {
+      if (match === placeholder) {
+        continue;
+      }
+      const result = patchSseToolCallArguments(current, match, placeholder);
+      if (result !== null) {
+        current = result;
+      } else {
+        // Not in tool args - try plain replace (e.g. in text content)
+        globalPattern.lastIndex = 0;
+        const replaced = current.replace(globalPattern, placeholder);
+        if (replaced !== current) {
+          current = replaced;
+        }
+      }
+    }
+    if (current !== content) {
+      writeFileSync(fp, current, "utf-8");
+    }
+  }
+}
+
 export function patchFetchCacheFixtures(
   contextName: string,
   oldStr: string,
@@ -109,9 +367,24 @@ export function patchFetchCacheFixtures(
   const files = readdirSync(dir).filter((f) => f.endsWith(".json"));
   for (const file of files) {
     const fp = join(dir, file);
+    if (!existsSync(fp)) {
+      continue; // may have been deleted by SSE cleanup in a previous iteration
+    }
     const content = readFileSync(fp, "utf-8");
     if (content.includes(oldStr)) {
+      // Contiguous match (req files, non-SSE responses)
       writeFileSync(fp, content.replaceAll(oldStr, newStr), "utf-8");
+    } else if (
+      file.endsWith("-res.json") &&
+      content.includes('"type": "sse"')
+    ) {
+      // SSE streaming responses: the value may be split across argument chunks.
+      // Reconstruct tool_calls arguments from SSE events, do the replacement,
+      // then re-split into the same chunk pattern.
+      const patched = patchSseToolCallArguments(content, oldStr, newStr);
+      if (patched !== null) {
+        writeFileSync(fp, patched, "utf-8");
+      }
     }
   }
 }
@@ -351,6 +624,11 @@ function sseEventsToTickingStream(
             const line = events[index++];
             // Each event is followed by \n (and events are separated by \n)
             controller.enqueue(encoder.encode(`${line}\n\n`));
+            // Close immediately after the last event so the AI SDK doesn't need
+            // to call pull() one more time (it may stop pulling after data: [DONE])
+            if (index >= events.length) {
+              controller.close();
+            }
           }
           resolve();
         }, 0);

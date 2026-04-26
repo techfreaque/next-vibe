@@ -280,11 +280,17 @@ export class ResumeStreamRepository {
             if (resolved) {
               resolvedSkill = skillId ?? resolved.skill;
               resolvedFavoriteConfig = resolved.favoriteConfig;
+              // resolveFavorite already cascades through skill variant to find the best model.
+              // Use it directly so the model is available even when favoriteConfig has no
+              // explicit modelSelection (favorite relies on skill variant defaults).
+              if (!resolvedModel) {
+                resolvedModel = resolved.model;
+              }
             }
           }
 
           // Resolve model from favorite + skill cascade (fresh from DB).
-          {
+          if (!resolvedModel) {
             const { resolveSkillVariant } =
               await import("@/app/api/[locale]/agent/chat/skills/resolver");
             const { resolveChatModelId } =
@@ -931,137 +937,139 @@ export class ResumeStreamRepository {
               resolvedToolMessageId,
             );
 
-            void runHeadlessAiStream({
-              favoriteId: favoriteId ?? undefined,
-              favoriteConfig: resolvedFavoriteConfig,
-              model: resolvedModel,
-              skill: resolvedSkill,
-              prompt: "",
-              wakeUpRevival: true,
-              explicitParentMessageId: waitRevivalParentId,
-              sequenceIdOverride: resolvedExisting?.sequenceId ?? undefined,
-              threadId: effectiveThreadId,
-              rootFolderId: threadRootFolderId,
-              subAgentDepth,
-              user,
-              locale,
-              logger,
-              t,
-              abortSignal,
-            })
-              .then(async (result) => {
-                logger.debug("[ResumeStream] WAIT revival complete", {
-                  threadId,
-                  success: result.success,
-                  lastAiMessageId: result.success
-                    ? result.data.lastAiMessageId
-                    : null,
-                });
-
-                // When revival failed (setup error etc), reset thread from streaming→idle
-                // so it doesn't stay stuck. runHeadlessAiStream handles the state internally
-                // on success; only failures need explicit reset here.
-                if (!result.success) {
-                  db.update(chatThreads)
-                    .set({ streamingState: "idle", updatedAt: new Date() })
-                    .where(
-                      and(
-                        eq(chatThreads.id, effectiveThreadId),
-                        sql`${chatThreads.streamingState} = 'streaming'`,
-                      ),
-                    )
-                    .catch(() => undefined);
-                  createMessagesEmitter(
-                    effectiveThreadId,
-                    threadRootFolderId,
-                    logger,
-                    user,
-                  )("streaming-state-changed", { streamingState: "idle" });
-                } else {
-                  createMessagesEmitter(
-                    threadId,
-                    threadRootFolderId,
-                    logger,
-                    user,
-                  )("stream-finished", { streamingState: "idle" });
-                  // Clean up any error messages that are children of the tool message.
-                  // These can appear if a previous revival attempt failed (e.g. due to a
-                  // stale module cache in the MCP process) and createAiStream inserted an
-                  // error bubble before this retry succeeded.
-                  db.delete(chatMessages)
-                    .where(
-                      and(
-                        eq(chatMessages.parentId, resolvedToolMessageId),
-                        eq(chatMessages.role, ChatMessageRole.ERROR),
-                      ),
-                    )
-                    .catch(() => undefined);
-
-                  // Cleanup cron tasks - only on success. On failure, leave the cron task
-                  // intact so the cron pulse can retry the revival with fresh code.
-                  // Only delete wakeUpTaskId if consumed (executionCount > 0).
-                  try {
-                    const cleanupOps = [];
-                    if (resumeTaskId) {
-                      cleanupOps.push(
-                        db
-                          .delete(cronTasks)
-                          .where(eq(cronTasks.id, resumeTaskId)),
-                      );
-                    }
-                    if (wakeUpTaskId) {
-                      cleanupOps.push(
-                        db
-                          .delete(cronTasks)
-                          .where(
-                            and(
-                              eq(cronTasks.id, wakeUpTaskId),
-                              gt(cronTasks.executionCount, 0),
-                            ),
-                          ),
-                      );
-                    }
-                    if (cleanupOps.length > 0) {
-                      await Promise.all(cleanupOps);
-                      logger.debug("[ResumeStream] Cleaned up cron tasks", {
-                        wakeUpTaskId,
-                        resumeTaskId,
-                      });
-                    }
-                  } catch (cleanupErr) {
-                    logger.warn("[ResumeStream] Cleanup failed (non-fatal)", {
-                      wakeUpTaskId,
-                      resumeTaskId,
-                      error: parseError(cleanupErr).message,
-                    });
-                  }
-                }
-                return;
-              })
-              .catch((err) => {
-                logger.error("[ResumeStream] WAIT headless revival failed", {
-                  threadId,
-                  error: parseError(err).message,
-                });
-                // Reset thread from streaming→idle so it doesn't get stuck.
-                db.update(chatThreads)
-                  .set({ streamingState: "idle", updatedAt: new Date() })
-                  .where(
-                    and(
-                      eq(chatThreads.id, effectiveThreadId),
-                      sql`${chatThreads.streamingState} = 'streaming'`,
-                    ),
-                  )
-                  .catch(() => undefined);
-                createMessagesEmitter(
-                  effectiveThreadId,
-                  threadRootFolderId,
-                  logger,
-                  user,
-                )("streaming-state-changed", { streamingState: "idle" });
+            let revivalResult;
+            try {
+              revivalResult = await runHeadlessAiStream({
+                favoriteId: favoriteId ?? undefined,
+                favoriteConfig: resolvedFavoriteConfig,
+                model: resolvedModel,
+                skill: resolvedSkill,
+                prompt: "",
+                wakeUpRevival: true,
+                explicitParentMessageId: waitRevivalParentId,
+                sequenceIdOverride: resolvedExisting?.sequenceId ?? undefined,
+                threadId: effectiveThreadId,
+                rootFolderId: threadRootFolderId,
+                subAgentDepth,
+                user,
+                locale,
+                logger,
+                t,
+                abortSignal,
+                headlessInstructions:
+                  "The async remote task has completed. All tool results from the previous step are now available in the context above. Your ONLY task is to acknowledge the completion to the user. Do NOT call any tools. Do NOT re-execute any previous tool calls. Simply confirm the result in one or two sentences and stop.",
               });
+            } catch (err) {
+              logger.error("[ResumeStream] WAIT headless revival threw", {
+                threadId,
+                error: parseError(err).message,
+              });
+              db.update(chatThreads)
+                .set({ streamingState: "idle", updatedAt: new Date() })
+                .where(
+                  and(
+                    eq(chatThreads.id, effectiveThreadId),
+                    sql`${chatThreads.streamingState} = 'streaming'`,
+                  ),
+                )
+                .catch(() => undefined);
+              createMessagesEmitter(
+                effectiveThreadId,
+                threadRootFolderId,
+                logger,
+                user,
+              )("streaming-state-changed", { streamingState: "idle" });
+              return success({ resumed: true, lastAiMessageId: null });
+            }
 
-            return success({ resumed: true, lastAiMessageId: null });
+            logger.debug("[ResumeStream] WAIT revival complete", {
+              threadId,
+              success: revivalResult.success,
+              lastAiMessageId: revivalResult.success
+                ? revivalResult.data.lastAiMessageId
+                : null,
+            });
+
+            // When revival failed (setup error etc), reset thread from streaming→idle
+            // so it doesn't stay stuck. runHeadlessAiStream handles the state internally
+            // on success; only failures need explicit reset here.
+            if (!revivalResult.success) {
+              db.update(chatThreads)
+                .set({ streamingState: "idle", updatedAt: new Date() })
+                .where(
+                  and(
+                    eq(chatThreads.id, effectiveThreadId),
+                    sql`${chatThreads.streamingState} = 'streaming'`,
+                  ),
+                )
+                .catch(() => undefined);
+              createMessagesEmitter(
+                effectiveThreadId,
+                threadRootFolderId,
+                logger,
+                user,
+              )("streaming-state-changed", { streamingState: "idle" });
+            } else {
+              createMessagesEmitter(
+                threadId,
+                threadRootFolderId,
+                logger,
+                user,
+              )("stream-finished", { streamingState: "idle" });
+              // Clean up any error messages that are children of the tool message.
+              db.delete(chatMessages)
+                .where(
+                  and(
+                    eq(chatMessages.parentId, resolvedToolMessageId),
+                    eq(chatMessages.role, ChatMessageRole.ERROR),
+                  ),
+                )
+                .catch(() => undefined);
+
+              // Cleanup cron tasks - only on success. On failure, leave the cron task
+              // intact so the cron pulse can retry the revival with fresh code.
+              // Only delete wakeUpTaskId if consumed (executionCount > 0).
+              try {
+                const cleanupOps = [];
+                if (resumeTaskId) {
+                  cleanupOps.push(
+                    db.delete(cronTasks).where(eq(cronTasks.id, resumeTaskId)),
+                  );
+                }
+                if (wakeUpTaskId) {
+                  cleanupOps.push(
+                    db
+                      .delete(cronTasks)
+                      .where(
+                        and(
+                          eq(cronTasks.id, wakeUpTaskId),
+                          gt(cronTasks.executionCount, 0),
+                        ),
+                      ),
+                  );
+                }
+                if (cleanupOps.length > 0) {
+                  await Promise.all(cleanupOps);
+                  logger.debug("[ResumeStream] Cleaned up cron tasks", {
+                    wakeUpTaskId,
+                    resumeTaskId,
+                  });
+                }
+              } catch (cleanupErr) {
+                logger.warn("[ResumeStream] Cleanup failed (non-fatal)", {
+                  wakeUpTaskId,
+                  resumeTaskId,
+                  error: parseError(cleanupErr).message,
+                });
+              }
+            }
+
+            return success({
+              resumed: true,
+              lastAiMessageId: revivalResult.success
+                ? revivalResult.data.lastAiMessageId
+                : null,
+            });
           }
         } else {
           logger.warn(

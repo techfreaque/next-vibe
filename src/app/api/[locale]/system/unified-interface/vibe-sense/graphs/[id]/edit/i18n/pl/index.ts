@@ -78,7 +78,7 @@ export const translations: typeof enTranslations = {
     toggleJson: "Przelacz edytor JSON",
     trigger: "Wyzwalacz",
     triggerManual: "Reczny",
-    triggerCron: "Cron",
+    triggerCron: "W tle",
     customEndpoint: "Niestandardowy endpoint",
     customEndpointDesc: "Dowolny endpoint GET/POST",
     nodes: "wezlow",

@@ -21,10 +21,11 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
 import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+import { CortexNav } from "../_shared/cortex-nav";
 
 import type definition from "./definition";
 
@@ -32,7 +33,6 @@ interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
 
-/** Mount-specific badges for the tree stats bar */
 const MOUNT_BADGES: {
   icon: React.ComponentType<{ className?: string }>;
   color: string;
@@ -79,16 +79,18 @@ export function CortexTreeWidget({
   const t = useWidgetTranslation<typeof definition.GET>();
   const isDisabled = useWidgetDisabled();
 
-  // Detect which mounts are present in the tree
   const presentMounts = value
     ? MOUNT_BADGES.filter((m) => value.tree.includes(m.pathPrefix))
     : [];
 
   return (
     <Div className="flex flex-col gap-4">
+      {/* Top nav */}
+      <CortexNav actions={["list", "search", "write"]} />
+
       {/* Form */}
       {!isDisabled && (
-        <Div className="flex flex-col gap-3 p-4 border rounded-lg bg-card">
+        <Div className="flex flex-col gap-3 p-4 border rounded-lg bg-card mx-4">
           <Div className="grid grid-cols-12 gap-4">
             <Div className="col-span-8">
               <TextFieldWidget fieldName="path" field={children.path} />
@@ -113,7 +115,7 @@ export function CortexTreeWidget({
 
       {/* Response */}
       {value && (
-        <Div className="flex flex-col gap-3">
+        <Div className="flex flex-col gap-3 px-4 pb-4">
           {/* Stats */}
           <Div className="flex items-center gap-2 flex-wrap">
             <Badge variant="outline" className="gap-1">

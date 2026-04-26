@@ -17,10 +17,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { CampaignType } from "../messenger/accounts/enum";
 import { scopedTranslation as sendScopedTranslation } from "../messenger/send/i18n";
 import { SmsServiceRepository } from "../messenger/sms-service/repository";
-import { CampaignType } from "../messenger/accounts/enum";
-import type { ContactRequestOutput } from "./definition";
+import type { ContactRequest } from "./definition";
 import type { scopedTranslation } from "./i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
@@ -30,7 +30,7 @@ type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
  */
 export interface ContactSmsService {
   sendAdminNotificationSms(
-    contactData: ContactRequestOutput,
+    contactData: ContactRequest,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -38,7 +38,7 @@ export interface ContactSmsService {
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>>;
 
   sendConfirmationSms(
-    contactData: ContactRequestOutput,
+    contactData: ContactRequest,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -54,7 +54,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
    * Send SMS notification to admin about new contact form submission
    */
   async sendAdminNotificationSms(
-    contactData: ContactRequestOutput,
+    contactData: ContactRequest,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -121,7 +121,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
    * Send confirmation SMS to contact form submitter
    */
   async sendConfirmationSms(
-    contactData: ContactRequestOutput,
+    contactData: ContactRequest,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -188,7 +188,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
    * Generate admin notification message for contact form submission
    */
   private generateAdminNotificationMessage(
-    contactData: ContactRequestOutput,
+    contactData: ContactRequest,
     t: ModuleT,
   ): string {
     const { name, email, subject } = contactData;
@@ -196,7 +196,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
     // Use i18n translations: sms.admin.notification
     return t("sms.admin.notification", {
       name,
-      email,
+      email: email ?? "",
       subject,
     });
   }
@@ -205,7 +205,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
    * Generate confirmation message for contact form submitter
    */
   private generateConfirmationMessage(
-    contactData: ContactRequestOutput,
+    contactData: ContactRequest,
     t: ModuleT,
   ): string {
     const { name } = contactData;
@@ -226,7 +226,7 @@ export const contactSmsService = new ContactSmsServiceImpl();
  * Helper functions for easy integration in routes
  */
 export const sendAdminNotificationSms = async (
-  contactData: ContactRequestOutput,
+  contactData: ContactRequest,
   user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
@@ -242,7 +242,7 @@ export const sendAdminNotificationSms = async (
 };
 
 export const sendConfirmationSms = async (
-  contactData: ContactRequestOutput,
+  contactData: ContactRequest,
   user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,

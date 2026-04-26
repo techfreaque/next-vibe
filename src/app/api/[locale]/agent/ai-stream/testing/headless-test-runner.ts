@@ -8,7 +8,6 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type {
   HeadlessAiStreamResult,
   HeadlessPreCall,
@@ -63,13 +62,8 @@ export interface TestStreamParams {
    */
   audioInput?: File | null;
   /**
-   * Override the default VIBE_TEST_AI_MODEL for this test.
-   * Use when testing a specific model (e.g. native multimodal LLM for image output).
-   */
-  model?: ChatModelId;
-  /**
    * Use a pre-created favorite to load model + skill.
-   * Takes precedence over model/skill fields when provided.
+   * Takes precedence over skill field when provided.
    */
   favoriteId?: string;
   /**
@@ -100,6 +94,14 @@ export interface TestStreamParams {
   providerOverride?: ApiProvider;
   /** Abort signal to cancel the stream. Defaults to a never-aborting signal. */
   abortSignal?: AbortSignal;
+  /**
+   * Override available tools with custom requiresConfirmation settings.
+   * Used in integration tests to configure confirmation gates for specific tools.
+   */
+  availableTools?: Array<{
+    toolId: string;
+    requiresConfirmation: boolean;
+  }> | null;
 }
 
 /** Slim message shape - only fields we assert on */
@@ -119,6 +121,10 @@ export interface SlimMessage {
     isDeferred?: boolean;
     toolCallId?: string;
     originalToolCallId?: string;
+    status?: "pending" | "completed" | "failed";
+    remoteTaskId?: string;
+    callbackMode?: string;
+    waitingForConfirmation?: boolean;
   } | null;
   generatedMedia: { type: string; url?: string | null }[] | null;
   /** True when this is a compacting summary message */
@@ -195,6 +201,13 @@ function slimMessages(
           isDeferred: r.metadata.toolCall.isDeferred === true,
           toolCallId: r.metadata.toolCall.toolCallId,
           originalToolCallId: r.metadata.toolCall.originalToolCallId,
+          status: r.metadata.toolCall.status,
+          remoteTaskId: r.metadata.toolCall.remoteTaskId,
+          callbackMode: r.metadata.toolCall.callbackMode,
+          waitingForConfirmation:
+            r.metadata.toolCall.waitingForConfirmation === true
+              ? true
+              : undefined,
         }
       : null,
     generatedMedia: r.metadata?.generatedMedia
@@ -302,7 +315,6 @@ export async function runTestStream(
     explicitParentMessageId,
     attachments,
     audioInput,
-    model,
     favoriteId,
     preCalls,
     wakeUpRevival,
@@ -311,6 +323,7 @@ export async function runTestStream(
     favoriteConfig: paramFavoriteConfig,
     operationOverride: callerOperationOverride,
     abortSignal = new AbortController().signal,
+    availableTools,
   } = params;
 
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -330,14 +343,11 @@ export async function runTestStream(
 
   const result = await runHeadlessAiStream({
     prompt,
-    // Never inject a fallback model - headless.ts resolves from skill variant or favorite.
-    // Explicit model param is only for tests that must target a specific model.
-    model,
     favoriteId,
     skill: skill ?? (favoriteId ? undefined : NO_SKILL_ID),
     threadId,
     operationOverride: resolvedOperationOverride,
-    rootFolderId: DefaultFolderId.CRON,
+    rootFolderId: DefaultFolderId.BACKGROUND,
     subAgentDepth: 0,
     user,
     locale: defaultLocale,
@@ -352,6 +362,7 @@ export async function runTestStream(
     providerOverride,
     favoriteConfig: paramFavoriteConfig ?? null,
     abortSignal,
+    availableTools: availableTools ?? null,
   });
 
   let messages: SlimMessage[] = [];

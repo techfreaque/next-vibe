@@ -7,10 +7,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
+  objectField,
   requestUrlPathParamsField,
   responseArrayField,
   responseField,
-  objectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -22,12 +22,12 @@ import {
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import {
   SkillCategoryDB,
   SkillOwnershipTypeDB,
   SkillTrustLevelDB,
 } from "@/app/api/[locale]/agent/chat/skills/enum";
+import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { UserRole } from "../../../user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
@@ -38,7 +38,7 @@ const CreatorProfileWidget = lazyWidget(() =>
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["user", "public", "creator", ":creatorId"],
+  path: ["user", "public", "creator", ":userId"],
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "user",
@@ -51,13 +51,14 @@ export const { GET } = createEndpoint({
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
+    UserRole.AI_TOOL_OFF,
   ] as const,
 
   fields: customWidgetObject({
     render: CreatorProfileWidget,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      creatorId: requestUrlPathParamsField(scopedTranslation, {
+      userId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.form.creatorId.label" as const,
@@ -340,7 +341,7 @@ export const { GET } = createEndpoint({
 
   examples: {
     urlPathParams: {
-      default: { creatorId: "thea-ai" },
+      default: { userId: "thea-ai" },
     },
     responses: {
       default: {

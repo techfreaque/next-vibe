@@ -6,9 +6,10 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import {
@@ -18,13 +19,64 @@ import {
 import { TASK_TIMEOUTS } from "@/app/api/[locale]/system/unified-interface/tasks/constants";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+
 import type { ChatSettings } from "../db";
 import {
   DREAM_DEFAULT_SCHEDULE,
   AUTOPILOT_DEFAULT_SCHEDULE,
+  MAMA_DEFAULT_SCHEDULE,
 } from "./constants";
 
-export { DREAM_DEFAULT_SCHEDULE, AUTOPILOT_DEFAULT_SCHEDULE };
+export {
+  DREAM_DEFAULT_SCHEDULE,
+  AUTOPILOT_DEFAULT_SCHEDULE,
+  MAMA_DEFAULT_SCHEDULE,
+};
+
+/**
+ * Find or create a background subfolder for a pulse task.
+ * Returns the UUID of the (possibly newly created) folder.
+ * Folders are user-scoped under the BACKGROUND root.
+ */
+async function ensurePulseSubFolder(
+  userId: string,
+  name: string,
+  icon: IconKey,
+  color: string,
+): Promise<string | null> {
+  const [existing] = await db
+    .select({ id: chatFolders.id })
+    .from(chatFolders)
+    .where(
+      and(
+        eq(chatFolders.userId, userId),
+        eq(chatFolders.rootFolderId, DefaultFolderId.BACKGROUND),
+        eq(chatFolders.name, name),
+        isNull(chatFolders.parentId),
+      ),
+    )
+    .limit(1);
+
+  if (existing) {
+    return existing.id;
+  }
+
+  const [created] = await db
+    .insert(chatFolders)
+    .values({
+      userId,
+      rootFolderId: DefaultFolderId.BACKGROUND,
+      name,
+      icon,
+      color,
+      expanded: true,
+      sortOrder: 0,
+    })
+    .returning({ id: chatFolders.id });
+
+  return created?.id ?? null;
+}
 
 /** Stable task ID prefix for dreaming tasks */
 const DREAM_TASK_PREFIX = "dream-";
@@ -72,13 +124,20 @@ export async function ensureDreamTask(
   const favoriteId = settings.dreamerFavoriteId ?? undefined;
   const prompt = settings.dreamerPrompt ?? DREAM_DEFAULT_PROMPT;
 
+  const subFolderId = await ensurePulseSubFolder(
+    userId,
+    "Dreams",
+    "moon",
+    "#6366f1",
+  );
+
   const taskInput: Record<string, WidgetData> = {
     favoriteId: favoriteId ?? undefined,
     skill: "thea-dreamer",
     prompt,
     maxTurns: 10,
-    rootFolderId: DefaultFolderId.CRON,
-    subFolderId: "dreams",
+    rootFolderId: DefaultFolderId.BACKGROUND,
+    subFolderId,
     appendThreadId: undefined,
     excludeMemories: false,
   };
@@ -134,13 +193,20 @@ export async function ensureAutopilotTask(
   const favoriteId = settings.autopilotFavoriteId ?? undefined;
   const prompt = settings.autopilotPrompt ?? AUTOPILOT_DEFAULT_PROMPT;
 
+  const subFolderId = await ensurePulseSubFolder(
+    userId,
+    "Autopilot",
+    "zap",
+    "#f59e0b",
+  );
+
   const taskInput: Record<string, WidgetData> = {
     favoriteId: favoriteId ?? undefined,
     skill: "hermes-autopilot",
     prompt,
     maxTurns: 12,
-    rootFolderId: DefaultFolderId.CRON,
-    subFolderId: "autopilot",
+    rootFolderId: DefaultFolderId.BACKGROUND,
+    subFolderId,
     appendThreadId: undefined,
     excludeMemories: false,
   };
@@ -162,6 +228,75 @@ export async function ensureAutopilotTask(
       timeout: TASK_TIMEOUTS.EXTENDED,
       taskInput,
       userId,
+    })
+    .onConflictDoUpdate({
+      target: cronTasks.id,
+      set: {
+        enabled,
+        schedule,
+        taskInput,
+        updatedAt: new Date(),
+      },
+    });
+}
+
+/** Stable task ID for the global mama heartbeat (shared across all admins, userId = null) */
+const MAMA_TASK_ID = "thea-mama";
+
+/** Default prompt for mama sessions */
+const MAMA_DEFAULT_PROMPT =
+  "Run your mama session. Check platform health, review error logs, advance any pending feature work, and draft any needed announcements. Leave a summary in /documents/mama/log/.";
+
+/**
+ * Ensure the mama heartbeat cron task exists and is in the correct enabled state.
+ * This is a global system task (userId = null) — shared across all admins.
+ * Last-write-wins: whichever admin saves settings controls the shared task.
+ * userId is the admin who triggered the settings save — used to scope the mama folder.
+ */
+export async function ensureMamaTask(
+  userId: string,
+  settings: Partial<
+    Pick<ChatSettings, "mamaEnabled" | "mamaSchedule" | "mamaPrompt">
+  >,
+): Promise<void> {
+  const enabled = settings.mamaEnabled ?? false;
+  const schedule = settings.mamaSchedule ?? MAMA_DEFAULT_SCHEDULE;
+  const prompt = settings.mamaPrompt ?? MAMA_DEFAULT_PROMPT;
+
+  const subFolderId = await ensurePulseSubFolder(
+    userId,
+    "Mama",
+    "heart",
+    "#ec4899",
+  );
+
+  const taskInput: Record<string, WidgetData> = {
+    skill: "thea-mama",
+    prompt,
+    maxTurns: 15,
+    rootFolderId: DefaultFolderId.BACKGROUND,
+    subFolderId,
+    appendThreadId: undefined,
+    excludeMemories: false,
+  };
+
+  await db
+    .insert(cronTasks)
+    .values({
+      id: MAMA_TASK_ID,
+      shortId: MAMA_TASK_ID,
+      routeId: "agent.ai-stream.run",
+      displayName: "Mama Heartbeat",
+      description:
+        "Thea monitors the production instance — checks health, advances features, handles marketing, sends news.",
+      schedule,
+      enabled,
+      hidden: false,
+      category: TaskCategory.SYSTEM,
+      priority: CronTaskPriority.LOW,
+      timeout: TASK_TIMEOUTS.EXTENDED,
+      taskInput,
+      userId: null,
     })
     .onConflictDoUpdate({
       target: cronTasks.id,

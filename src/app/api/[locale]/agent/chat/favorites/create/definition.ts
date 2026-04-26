@@ -95,13 +95,24 @@ const { POST } = createEndpoint({
         const { skillId: resolvedSkillId, variantId: resolvedVariantId } =
           parseSkillId(requestData.skillId ?? "");
 
-        const character = apiClient.getEndpointData(
+        let character = apiClient.getEndpointData(
           characterSingleDefinitions.default.GET,
           logger,
           { urlPathParams: { id: resolvedSkillId } },
         );
 
-        // Fall back to DEFAULT_SKILLS for built-in skills not yet in the single-fetch cache
+        // If not in cache, fetch from server
+        if (!character?.success) {
+          character = await apiClient.fetch(
+            characterSingleDefinitions.default.GET,
+            logger,
+            user,
+            undefined,
+            { id: resolvedSkillId },
+            locale,
+          );
+        }
+
         let characterName: string | null = null;
         let characterTagline: string | null = null;
         let characterDescription: string | null = null;
@@ -110,7 +121,6 @@ const { POST } = createEndpoint({
           characterName = character.data.name ?? null;
           characterTagline = character.data.tagline ?? null;
           characterDescription = character.data.description ?? null;
-          // Resolve modelSelection from the specific variant
           const variants = character.data.variants;
           const variant = resolvedVariantId
             ? variants?.find((v) => v.id === resolvedVariantId)
@@ -361,7 +371,6 @@ const { POST } = createEndpoint({
       }),
 
       backButton: backButton(scopedTranslation, {
-        label: "post.backButton.label" as const,
         icon: "arrow-left",
         variant: "outline",
         usage: { request: "data" },
@@ -455,11 +464,11 @@ const { POST } = createEndpoint({
     responses: {
       create: {
         success: "success.title",
-        id: "550e8400-e29b-41d4-a716-446655440000",
+        id: "thea",
       },
       createWithVoice: {
         success: "success.title",
-        id: "550e8400-e29b-41d4-a716-446655440001",
+        id: "thea-brilliant",
       },
     },
   },

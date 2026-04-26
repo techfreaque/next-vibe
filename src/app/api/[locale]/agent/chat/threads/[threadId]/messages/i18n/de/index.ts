@@ -28,15 +28,10 @@ export const translations: typeof enTranslations = {
   errorFeedback: {
     autoReported: "Fehler wurde automatisch gemeldet",
     helpFix: "Hilf uns, das zu beheben",
-    hideDetails: "Ausblenden",
-    feedbackHelps: "Dein Feedback hilft uns, das schneller zu fixen.",
-    reportCta: "Feedback senden",
-    threadShared: "Thread-ID wird mitgeschickt",
-    incognitoNote: "Inkognito - keine Thread-Daten verfügbar",
-    incognitoThread: "Inkognito-Thread (keine Daten gespeichert)",
     autoContext: "[Automatisch generierter Fehlerbericht]",
     errorLabel: "Fehler",
-    userContextLabel: "Dein Kontext (optional)",
+    causeLabel: "Ursache",
+    userContextLabel: "Mehr Kontext hinzufügen (optional)",
     separator: "·",
   },
   compacting: {
@@ -341,8 +336,12 @@ export const translations: typeof enTranslations = {
         cachedPercent: "{{percent}}% gecacht",
         cachedPercentTitle:
           "{{percent}}% der Eingabe-Tokens wurden aus dem Cache abgerufen, was Kosten reduziert",
+        cached: "gecacht",
+        pipeline: "Pipeline",
         timeToFirstToken: "{{seconds}}s bis erstes Token",
-        timeToFirstTokenTitle: "Zeit von Anfrage bis zum ersten Token",
+        timeToFirstTokenTitle: "Zeit bis erstes Token",
+        streamingTime: "{{seconds}}s Streaming",
+        streamingTimeTitle: "Gesamte Streaming-Dauer",
         cacheWriteTokens: "Cache-Schreiben",
         cacheWrite: "{{tokens}} in Cache geschrieben",
         cacheWriteTitle:

@@ -25,7 +25,7 @@ const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
   path: ["leads", "skill"],
-  allowedRoles: [UserRole.PUBLIC] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
 
   title: "patch.title" as const,
   description: "patch.description" as const,

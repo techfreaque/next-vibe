@@ -1090,6 +1090,34 @@ const { GET } = createEndpoint({
               },
             }),
           }),
+
+          // Referral codes used by this lead (pre-signup history)
+          referralHistory: responseArrayField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: objectField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              layoutType: LayoutType.GRID,
+              columns: 2,
+              usage: { response: true },
+              children: {
+                code: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.referralHistory.code.content",
+                  schema: z.string(),
+                }),
+                ownerUserId: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.referralHistory.ownerUserId.content",
+                  schema: z.uuid(),
+                }),
+                clickedAt: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.referralHistory.clickedAt.content",
+                  schema: dateSchema,
+                }),
+              },
+            }),
+          }),
         },
       }),
     },
@@ -1200,6 +1228,7 @@ const { GET } = createEndpoint({
           },
           linkedLeads: [],
           linkedUsers: [],
+          referralHistory: [],
         },
       },
     },

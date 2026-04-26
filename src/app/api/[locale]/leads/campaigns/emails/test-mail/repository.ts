@@ -73,6 +73,7 @@ export class TestEmailRepository {
       updatedAt: new Date(),
       linkedLeadsCount: 0,
       hasLinkedUser: false,
+      referralCode: null,
     };
   }
   /**

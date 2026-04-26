@@ -476,10 +476,21 @@ function EndpointsPageInternal<
     navigationStack,
   ]);
 
-  // Merge finalNavigation-aware mutation options and endpoint's built-in options
+  // Merge finalNavigation-aware mutation options and endpoint's built-in options.
+  // Auto-enable subscribeToEvents when the GET endpoint declares events.
   const finalEndpointOptions = useMemo((): UseEndpointOptionsBase<T> => {
+    const getEndpointDef = endpoint.GET;
+    const hasEvents =
+      getEndpointDef &&
+      "events" in getEndpointDef &&
+      getEndpointDef.events &&
+      Object.keys(getEndpointDef.events).length > 0;
+
     const baseOptions: UseEndpointOptionsBase<T> = {
       ...endpointOptions,
+      ...(hasEvents && !endpointOptions?.subscribeToEvents
+        ? { subscribeToEvents: true }
+        : {}),
     };
 
     if (
@@ -518,6 +529,7 @@ function EndpointsPageInternal<
 
     return result;
   }, [
+    endpoint.GET,
     endpointOptions,
     mutationOptionsWithNav,
     patchMutationOptionsWithNav,

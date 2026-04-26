@@ -48,7 +48,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { DEFAULT_CHAT_MODEL_SELECTION } from "../../../../constants";
+import {
+  DEFAULT_CHAT_MODEL_ID,
+  DEFAULT_CHAT_MODEL_SELECTION,
+} from "../../../../constants";
 import { ChatModelId } from "../../../../models";
 
 export type UseCase =
@@ -129,16 +132,13 @@ async function seedFavorites(
   // Create one favorite per companion variant
   const variants = companion.variants ?? [];
   for (const variant of variants) {
-    const resolvedModelSelection = variant.modelSelection
-      ? variant.modelSelection
-      : null;
     const companionDefaultVariant =
       companion.variants.find((v) => v.isDefault) ?? companion.variants[0];
     const id = await addFavorite({
       skillId: formatSkillId(companionId, variant.id),
       icon: companion.icon,
       voiceModelSelection: companionDefaultVariant?.voiceModelSelection,
-      modelSelection: resolvedModelSelection,
+      modelSelection: variant.modelSelection ?? null,
     });
     if (id) {
       if (variant.isDefault ?? false) {
@@ -147,7 +147,7 @@ async function seedFavorites(
       entries.push({
         id,
         skillId: formatSkillId(companionId, variant.id),
-        modelSelection: resolvedModelSelection,
+        modelSelection: variant.modelSelection ?? null,
       });
     }
   }
@@ -186,32 +186,22 @@ async function seedFavorites(
       const skillVariants = skill.variants ?? [];
       if (skillVariants.length > 0) {
         for (const variant of skillVariants) {
-          const resolvedModelSelection = variant.modelSelection
-            ? variant.modelSelection
-            : null;
           const id = await addFavorite({
             skillId: formatSkillId(skillId, variant.id),
-            modelSelection: resolvedModelSelection,
+            modelSelection: variant.modelSelection ?? null,
           });
           if (id) {
             entries.push({
               id,
               skillId: formatSkillId(skillId, variant.id),
-              modelSelection: resolvedModelSelection,
+              modelSelection: variant.modelSelection ?? null,
             });
           }
         }
       } else {
-        const id = await addFavorite({
-          skillId,
-          modelSelection: null,
-        });
+        const id = await addFavorite({ skillId, modelSelection: null });
         if (id) {
-          entries.push({
-            id,
-            skillId,
-            modelSelection: null,
-          });
+          entries.push({ id, skillId, modelSelection: null });
         }
       }
     }
@@ -344,7 +334,7 @@ export function UsecasesStep({
           const activeModelId: ChatModelId =
             (resolvedAnyId !== undefined
               ? Object.values(ChatModelId).find((id) => id === resolvedAnyId)
-              : undefined) ?? ChatModelId.KIMI_K2_5;
+              : undefined) ?? DEFAULT_CHAT_MODEL_ID;
           setActiveFavorite(firstCompanionId, companionId, activeModelId);
         }
       } catch (e) {

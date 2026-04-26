@@ -86,7 +86,7 @@ const { POST } = createEndpoint({
         columns: 12,
         options: [],
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
-        schema: z.enum(VideoGenModelId).default(VideoGenModelId.WAN_2_7_T2V),
+        schema: z.enum(VideoGenModelId).optional(),
       }),
       duration: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -207,7 +207,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         prompt: "A cinematic shot of a mountain lake at sunset",
-        model: VideoGenModelId.WAN_2_7_T2V,
+        model: VideoGenModelId.VEO_3_1,
         duration: 5,
       },
     },

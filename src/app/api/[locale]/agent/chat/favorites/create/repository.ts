@@ -88,23 +88,19 @@ function normalizeImageGenSelection(
  */
 export class FavoritesCreateRepository {
   /**
-   * Resolve the slug to use for a skill in a favorite slug.
+   * Resolve the slug base to use for a skill in a favorite slug.
    * For default skills, use their config ID (e.g. "thea", "hermes").
-   * For custom skills, use the skill name if available.
+   * For custom skills, the skillId is already the canonical slug — use it directly.
    */
-  static resolveSkillSlug(skillId: string, skillName: string | null): string {
+  static resolveSkillSlug(skillId: string): string {
     // Default skills already have short IDs (e.g. "thea", "hermes", "default")
     const defaultSkill = DEFAULT_SKILLS.find((s) => s.id === skillId);
     if (defaultSkill) {
       return defaultSkill.id;
     }
-    // For custom skills, use the skill name for a readable slug
-    if (skillName) {
-      return skillName
-        .toLowerCase()
-        .replace(/[^a-z0-9-]/g, "-")
-        .replace(/-{2,}/g, "-")
-        .replace(/^-+|-+$/g, "");
+    // Custom skill: skillId is already the canonical slug after resolveCanonicalSkillId
+    if (skillId && skillId !== "favorite") {
+      return skillId;
     }
     return "favorite";
   }
@@ -264,10 +260,8 @@ export class FavoritesCreateRepository {
       const nextPosition = (maxPositionResult?.maxPosition ?? -1) + 1;
 
       // Generate slug for this favorite
-      const skillSlug = FavoritesCreateRepository.resolveSkillSlug(
-        resolvedSkillId,
-        character?.name ?? null,
-      );
+      const skillSlug =
+        FavoritesCreateRepository.resolveSkillSlug(resolvedSkillId);
       const baseSlug = generateFavoriteSlug({
         customVariantName: data.customVariantName,
         skillSlug,
@@ -288,12 +282,16 @@ export class FavoritesCreateRepository {
         existingSlugs.map((r) => r.slug),
       );
 
+      // Normalize skillId to its canonical slug form (never store UUIDs)
+      const canonicalSkillId =
+        await SkillsRepository.resolveCanonicalSkillId(resolvedSkillId);
+
       const [favorite] = await db
         .insert(chatFavorites)
         .values({
           userId,
           slug,
-          skillId: resolvedSkillId,
+          skillId: canonicalSkillId,
           variantId: effectiveVariantId ?? null,
           customVariantName: data.customVariantName || null,
           customIcon: null,

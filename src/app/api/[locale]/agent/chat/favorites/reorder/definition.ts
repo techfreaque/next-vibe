@@ -115,8 +115,8 @@ const { POST } = createEndpoint({
     requests: {
       reorder: {
         positions: [
-          { id: "550e8400-e29b-41d4-a716-446655440000", position: 0 },
-          { id: "550e8400-e29b-41d4-a716-446655440001", position: 1 },
+          { id: "thea", position: 0 },
+          { id: "hermes-technical", position: 1 },
         ],
       },
     },

@@ -143,6 +143,8 @@ export const translations = {
       },
       lastRun: "Last run:",
       neverRun: "Never run",
+      folderLink: "Open Dreams folder",
+      runNow: "Run now",
     },
     autopilot: {
       title: "Autopilot",
@@ -171,6 +173,33 @@ export const translations = {
           "What should Hermes focus on this session? Leave blank for the default.",
         defaultPrompt:
           "Run your autopilot session. Pick up where active projects left off — advance next steps, handle queued work, keep things moving.",
+      },
+      lastRun: "Last run:",
+      neverRun: "Never run",
+      folderLink: "Open Autopilot folder",
+      runNow: "Run now",
+    },
+    mama: {
+      title: "Platform Heartbeat",
+      description:
+        "Thea monitors your production instance — checks health, advances features, handles marketing, sends news. One shared slot across all admins.",
+      toggle: {
+        label: "Enable Mama Mode",
+      },
+      schedule: {
+        label: "Schedule",
+        options: {
+          every4h: "Every 4 hours",
+          every6h: "Every 6 hours",
+          every12h: "Every 12 hours",
+          daily: "Daily at midnight",
+        },
+      },
+      prompt: {
+        label: "Session prompt",
+        placeholder: "What should Thea focus on? Leave blank for the default.",
+        defaultPrompt:
+          "Run your mama session. Check platform health, review error logs, advance any pending feature work, and draft any needed announcements. Leave a summary in /documents/mama/log/.",
       },
       lastRun: "Last run:",
       neverRun: "Never run",

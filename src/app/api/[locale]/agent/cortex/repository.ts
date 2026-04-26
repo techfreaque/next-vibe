@@ -8,9 +8,11 @@ import "server-only";
 import { and, eq, like, sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cortexNodes, type CortexNode } from "./db";
 import { CortexNodeType } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 /** Maximum path length */
 const MAX_PATH_LENGTH = 1024;
@@ -22,18 +24,20 @@ const MAX_DEPTH = 20;
 export const VIRTUAL_MOUNTS = [
   "/threads",
   "/skills",
+  "/favorites",
   "/tasks",
   "/uploads",
   "/searches",
+  "/gens",
 ] as const;
 
 /** Virtual mounts that support write-through (write/edit/delete/move) */
 export const WRITABLE_MOUNTS = ["/skills"] as const;
 
-/** The document workspace prefix — always writable, stored in cortex_nodes */
+/** The document workspace prefix — canonical English, stored in cortex_nodes */
 export const DOCUMENTS_PREFIX = "/documents";
 
-/** The memories prefix — writable, stored natively in cortex_nodes */
+/** The memories prefix — canonical English, stored in cortex_nodes */
 export const MEMORIES_PREFIX = "/memories";
 
 /** All native writable prefixes (stored in cortex_nodes, not virtual mounts) */
@@ -41,6 +45,102 @@ export const NATIVE_WRITABLE_PREFIXES = [
   DOCUMENTS_PREFIX,
   MEMORIES_PREFIX,
 ] as const;
+
+/**
+ * Get the locale-aware roots for memories and documents.
+ * These are the paths users and AI should use in their locale.
+ * Cached per-locale to avoid repeated i18n lookups.
+ */
+export function getLocaleRootsSync(locale: CountryLanguage): {
+  memories: string;
+  documents: string;
+} {
+  const { t } = scopedTranslation.scopedT(locale);
+  return {
+    memories: `/${t("scaffold.roots.memories" as never)}`,
+    documents: `/${t("scaffold.roots.documents" as never)}`,
+  };
+}
+
+/**
+ * Check if a path is under a native writable prefix, accepting both canonical
+ * (English) paths and locale-aware paths.
+ * Returns the canonical prefix if writable, null otherwise.
+ */
+export function getCanonicalWritablePrefix(
+  path: string,
+  locale?: CountryLanguage,
+): string | null {
+  // Check English canonical first
+  for (const prefix of NATIVE_WRITABLE_PREFIXES) {
+    if (path === prefix || path.startsWith(`${prefix}/`)) {
+      return prefix;
+    }
+  }
+  // Check locale-aware roots if locale provided
+  if (locale) {
+    const roots = getLocaleRootsSync(locale);
+    if (path === roots.memories || path.startsWith(`${roots.memories}/`)) {
+      return MEMORIES_PREFIX;
+    }
+    if (path === roots.documents || path.startsWith(`${roots.documents}/`)) {
+      return DOCUMENTS_PREFIX;
+    }
+  }
+  return null;
+}
+
+/**
+ * Normalize a locale-aware path to its canonical English equivalent.
+ * e.g. /erinnerungen/identität/name.md → /memories/identity/name.md
+ * Only remaps the ROOT segment; subdirectory names are preserved as-is.
+ * If the path is already canonical (or not locale-specific), returns as-is.
+ */
+export function normalizeToCanonicalPath(
+  path: string,
+  locale: CountryLanguage,
+): string {
+  const roots = getLocaleRootsSync(locale);
+  // Remap locale root → canonical root (only root segment)
+  if (path === roots.memories) {
+    return MEMORIES_PREFIX;
+  }
+  if (path.startsWith(`${roots.memories}/`)) {
+    return MEMORIES_PREFIX + path.slice(roots.memories.length);
+  }
+  if (path === roots.documents) {
+    return DOCUMENTS_PREFIX;
+  }
+  if (path.startsWith(`${roots.documents}/`)) {
+    return DOCUMENTS_PREFIX + path.slice(roots.documents.length);
+  }
+  return path;
+}
+
+/**
+ * Convert a canonical path back to locale-aware path for display.
+ * e.g. /memories/identity → /erinnerungen/identity (for DE locale)
+ * Note: only the ROOT segment is localized; file/subdir names stay as stored.
+ */
+export function canonicalToLocalePath(
+  path: string,
+  locale: CountryLanguage,
+): string {
+  const roots = getLocaleRootsSync(locale);
+  if (path === MEMORIES_PREFIX) {
+    return roots.memories;
+  }
+  if (path.startsWith(`${MEMORIES_PREFIX}/`)) {
+    return roots.memories + path.slice(MEMORIES_PREFIX.length);
+  }
+  if (path === DOCUMENTS_PREFIX) {
+    return roots.documents;
+  }
+  if (path.startsWith(`${DOCUMENTS_PREFIX}/`)) {
+    return roots.documents + path.slice(DOCUMENTS_PREFIX.length);
+  }
+  return path;
+}
 
 /**
  * Normalize a path: resolve "..", ensure leading "/", remove trailing "/", collapse "//"
@@ -113,12 +213,11 @@ export function isValidPath(path: string): boolean {
 }
 
 /**
- * Check if a path is writable (under /documents/ or /memories/)
+ * Check if a path is writable (under /documents/ or /memories/, canonical or locale-aware).
+ * Pass locale to also accept locale-aware paths (e.g. /erinnerungen/, /dokumente/).
  */
-export function isWritablePath(path: string): boolean {
-  return NATIVE_WRITABLE_PREFIXES.some(
-    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
-  );
+export function isWritablePath(path: string, locale: CountryLanguage): boolean {
+  return getCanonicalWritablePrefix(path, locale) !== null;
 }
 
 /**
@@ -131,11 +230,19 @@ export function isVirtualWritable(path: string): boolean {
 }
 
 /**
- * Check if a path is a virtual mount (resolved from existing tables)
+ * Check if a path is a virtual mount (resolved from existing tables).
+ * Locale-aware paths for memories/documents are NOT virtual mounts.
  */
-export function isVirtualMount(path: string): boolean {
+export function isVirtualMount(path: string, locale: CountryLanguage): boolean {
   if (path === "/") {
     return true;
+  }
+  // If it's a writable native path (incl. locale variants), not a virtual mount
+  if (locale && getCanonicalWritablePrefix(path, locale) !== null) {
+    return false;
+  }
+  if (getCanonicalWritablePrefix(path) !== null) {
+    return false;
   }
   return VIRTUAL_MOUNTS.some(
     (mount) => path === mount || path.startsWith(`${mount}/`),
@@ -143,17 +250,27 @@ export function isVirtualMount(path: string): boolean {
 }
 
 /**
- * Get the mount prefix for a path, or null if unrecognized
+ * Get the mount prefix for a path, or null if unrecognized.
+ * Pass locale to also recognize locale-aware paths (returns canonical prefix).
  */
 export function getMountPrefix(
   path: string,
+  locale: CountryLanguage,
 ):
   | (typeof VIRTUAL_MOUNTS)[number]
   | (typeof NATIVE_WRITABLE_PREFIXES)[number]
   | null {
+  // Check canonical native writable prefixes first
   for (const prefix of NATIVE_WRITABLE_PREFIXES) {
     if (path === prefix || path.startsWith(`${prefix}/`)) {
       return prefix;
+    }
+  }
+  // Check locale-aware roots → return canonical
+  if (locale) {
+    const canonicalPrefix = getCanonicalWritablePrefix(path, locale);
+    if (canonicalPrefix) {
+      return canonicalPrefix as (typeof NATIVE_WRITABLE_PREFIXES)[number];
     }
   }
   for (const mount of VIRTUAL_MOUNTS) {
@@ -301,6 +418,7 @@ export async function listChildren(
 
 /**
  * Ensure all parent directories exist for a path, creating them if needed.
+ * Accepts canonical English paths only (normalize before calling).
  * Returns the number of directories created.
  */
 export async function ensureParentDirs(
@@ -309,7 +427,7 @@ export async function ensureParentDirs(
 ): Promise<number> {
   const parent = parentPath(filePath);
 
-  // Find the root prefix for this path
+  // Find the root prefix for this path (canonical only)
   const rootPrefix = NATIVE_WRITABLE_PREFIXES.find(
     (prefix) => filePath === prefix || filePath.startsWith(`${prefix}/`),
   );

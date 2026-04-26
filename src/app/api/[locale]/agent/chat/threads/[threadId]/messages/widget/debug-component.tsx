@@ -18,8 +18,13 @@ import {
   chatShadows,
   chatTransitions,
 } from "@/app/[locale]/chat/lib/design-tokens";
-import type { DebugSystemPromptParts } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/hook";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+export interface DebugSystemPromptParts {
+  systemPrompt: string;
+  trailingSystemMessage: string;
+  contextLine: string;
+}
 
 import { scopedTranslation } from "../i18n";
 

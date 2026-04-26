@@ -12,7 +12,7 @@ import { ImageGenModelId } from "./models";
  */
 export const DEFAULT_IMAGE_GEN_MODEL_SELECTION: ImageGenModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
-  manualModelId: ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
+  manualModelId: ImageGenModelId.GPT_5_IMAGE,
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,

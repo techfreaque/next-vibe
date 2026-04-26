@@ -31,19 +31,18 @@ import {
 import { scopedTranslation } from "./i18n";
 
 /**
- * Contact form endpoint with scoped translations
- * Translation keys are type-safe and validated against the ContactTranslationKey type
+ * Contact form endpoint
  */
 const { POST } = createEndpoint({
   scopedTranslation,
-  method: Methods.POST as const,
-  path: ["contact"] as const,
+  method: Methods.POST,
+  path: ["contact"],
   title: "title",
   description: "description",
   category: "endpointCategories.messenger",
   subCategory: "endpointCategories.users",
   icon: "mail",
-  aliases: [CONTACT_FORM_ALIAS] as const,
+  aliases: [CONTACT_FORM_ALIAS],
   requiresConfirmation: true,
   tags: [
     "tags.contactForm",
@@ -59,7 +58,6 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
   ],
-  allowedLocalModeRoles: [] as const,
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
@@ -79,7 +77,7 @@ const { POST } = createEndpoint({
         columns: 12,
       }),
       email: requestField(scopedTranslation, {
-        schema: z.string().email(),
+        schema: z.string().email().optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "form.fields.email.label",
@@ -178,52 +176,50 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "errors.validation.title" as const,
-      description: "errors.validation.description" as const,
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "errors.network.title" as const,
-      description: "errors.network.description" as const,
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "errors.unauthorized.title" as const,
-      description: "errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "errors.forbidden.title" as const,
-      description: "errors.forbidden.description" as const,
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "errors.notFound.title" as const,
-      description: "errors.notFound.description" as const,
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "errors.serverError.title" as const,
-      description: "errors.serverError.description" as const,
+      title: "errors.serverError.title",
+      description: "errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "errors.unknown.title" as const,
-      description: "errors.unknown.description" as const,
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "errors.unsavedChanges.title" as const,
-      description: "errors.unsavedChanges.description" as const,
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "errors.conflict.title" as const,
-      description: "errors.conflict.description" as const,
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
   successTypes: {
-    title: "success.title" as const,
-    description: "success.description" as const,
+    title: "success.title",
+    description: "success.description",
   },
 });
 
-export type ContactRequestInput = typeof POST.types.RequestInput;
-export type ContactRequestOutput = typeof POST.types.RequestOutput;
-export type ContactResponseInput = typeof POST.types.ResponseInput;
-export type ContactResponseOutput = typeof POST.types.ResponseOutput;
+export type ContactRequest = typeof POST.types.RequestOutput;
+export type ContactResponse = typeof POST.types.ResponseOutput;
 
 const endpoints = { POST };
 export default endpoints;

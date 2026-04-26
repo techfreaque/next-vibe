@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "E-Mail-Kampagnen-Konfiguration abrufen",
-    description: "E-Mail-Kampagnen-Cron-Konfiguration laden",
+    description: "E-Mail-Kampagnen-Hintergrundaufgaben-Konfiguration laden",
     errors: {
       unauthorized: {
         title: "Nicht autorisiert",
@@ -158,10 +158,12 @@ export const translations: typeof enTranslations = {
   },
   put: {
     title: "E-Mail-Kampagnen-Konfiguration",
-    description: "E-Mail-Kampagnen-Cron-Konfiguration aktualisieren",
+    description:
+      "E-Mail-Kampagnen-Hintergrundaufgaben-Konfiguration aktualisieren",
     enabled: {
       label: "Aktiviert",
-      description: "E-Mail-Kampagnen-Cron-Task aktivieren oder deaktivieren",
+      description:
+        "E-Mail-Kampagnen-Hintergrundaufgabe aktivieren oder deaktivieren",
     },
     dryRun: {
       label: "Testmodus",
@@ -174,7 +176,7 @@ export const translations: typeof enTranslations = {
     maxEmailsPerRun: {
       label: "Max. E-Mails pro Durchlauf",
       description:
-        "Maximale Anzahl zu sendender E-Mails pro Cron-Durchlauf (1–1000)",
+        "Maximale Anzahl zu sendender E-Mails pro Hintergrundlauf (1–1000)",
     },
     schedule: {
       label: "Zeitplan",
@@ -214,7 +216,7 @@ export const translations: typeof enTranslations = {
     titleSaved: "Konfiguration gespeichert",
     saving: "Speichern...",
     save: "Einstellungen speichern",
-    guidanceTitle: "E-Mail-Kampagnen-Cron konfigurieren",
+    guidanceTitle: "E-Mail-Kampagnen-Hintergrundaufgabe konfigurieren",
     guidanceDescription:
       "E-Mail-Kampagnen-Cron-Task aktivieren/deaktivieren und Zeitplan, Batch-Größe konfigurieren.",
     runButton: "Jetzt ausführen",

@@ -378,6 +378,11 @@ export const translations: typeof enTranslations = {
     browserInteraction: "Interakcja",
     browserInspection: "Inspekcja",
     browserDevTools: "DevTools",
+    desktop: "Pulpit",
+    desktopCapture: "Przechwytywanie",
+    desktopInteraction: "Interakcja",
+    desktopInspection: "Inspekcja",
+    desktopWindows: "Okna",
     chat: "Czat",
     chatFavorites: "Ulubione",
     chatSettings: "Ustawienia",
@@ -444,7 +449,7 @@ export const translations: typeof enTranslations = {
     databaseMigrations: "Migracje",
     databaseTools: "Narzędzia",
     tasks: "Zadania",
-    tasksCron: "Cron",
+    tasksCron: "W tle",
     tasksPulse: "Pulse",
     tasksMonitoring: "Monitoring",
     tasksSync: "Synchronizacja",
@@ -472,6 +477,7 @@ export const translations: typeof enTranslations = {
     remoteInstances: "Instancje",
     remoteSelf: "Własna",
     users: "Użytkownicy",
+    support: "Wsparcie",
   },
   ui: {
     iconPicker: {

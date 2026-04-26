@@ -10,7 +10,8 @@ export const translations = {
         shared: "Shared",
         public: "Public",
         incognito: "Incognito",
-        cron: "Cron",
+        cron: "Background",
+        support: "Support",
       },
     },
     folderList: {
@@ -109,8 +110,9 @@ export const translations = {
       private: "Private",
       shared: "Shared",
       public: "Public",
-      cron: "Cron",
+      background: "Background",
       incognito: "Incognito",
+      support: "Support",
     },
   },
   get: {
@@ -119,7 +121,7 @@ export const translations = {
     rootFolderId: {
       label: "Root Folder",
       description:
-        "The root folder to retrieve (private, shared, public, cron, incognito)",
+        "The root folder to retrieve (private, shared, public, background, incognito)",
     },
     container: {
       title: "Folder Details",

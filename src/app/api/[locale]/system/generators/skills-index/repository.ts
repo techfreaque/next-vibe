@@ -89,7 +89,7 @@ export class SkillsIndexGeneratorRepository {
       }
 
       // ── 2. Parse each skill.ts and extract the export name + skill id ──
-      const skills = SkillsIndexGeneratorRepository.extractSkills(
+      const skills = await SkillsIndexGeneratorRepository.extractSkills(
         skillFiles,
         logger,
       );
@@ -139,21 +139,19 @@ export class SkillsIndexGeneratorRepository {
     }
   }
 
-  private static extractSkills(
+  private static async extractSkills(
     skillFiles: string[],
     logger: EndpointLogger,
-  ): SkillEntry[] {
+  ): Promise<SkillEntry[]> {
     const skills: SkillEntry[] = [];
 
     for (const skillFile of skillFiles) {
       try {
         const content = readFileSync(skillFile, "utf-8");
 
-        // Match: export const <exportName>: Skill = { id: "<skillId>",
+        // Find the export name from source text
         const exportMatch = /export const (\w+): Skill\s*=/.exec(content);
-        const idMatch = /\bid:\s*["']([^"']+)["']/.exec(content);
-
-        if (!exportMatch || !idMatch) {
+        if (!exportMatch) {
           logger.warn(
             `Could not parse skill file ${basename(skillFile)} - skipping`,
           );
@@ -161,7 +159,20 @@ export class SkillsIndexGeneratorRepository {
         }
 
         const exportName = exportMatch[1];
-        const skillId = idMatch[1];
+        // Import the skill module to get the real id value (handles constants)
+        const mod = (await import(skillFile)) as Record<
+          string,
+          { id?: string }
+        >;
+        const skillId = mod[exportName]?.id;
+
+        if (!skillId) {
+          logger.warn(
+            `Could not parse skill file ${basename(skillFile)} - skipping`,
+          );
+          continue;
+        }
+
         const isCompanion = (
           SkillsIndexGeneratorRepository.COMPANION_SKILL_IDS as readonly string[]
         ).includes(skillId);
@@ -221,11 +232,26 @@ export class SkillsIndexGeneratorRepository {
       )
       .join("\n");
 
+    // Import sibling skill.embedding.ts for each skill
+    const embeddingImports = skills
+      .map((s) => {
+        const embeddingPath = s.absPath.replace(
+          /skill\.ts$/,
+          "skill.embedding.ts",
+        );
+        return `import { embedding as ${s.exportName}Embedding } from "${getRelativeImportPath(embeddingPath, absOutputFile)}";`;
+      })
+      .join("\n");
+
     const companionList = companions
       .map((s) => `  ${s.exportName},`)
       .join("\n");
 
     const skillIdList = skills.map((s) => `  "${s.skillId}",`).join("\n");
+
+    const embeddingList = skills
+      .map((s) => `  ${s.exportName}Embedding,`)
+      .join("\n");
 
     return `${header}
 
@@ -233,8 +259,11 @@ export class SkillsIndexGeneratorRepository {
 /* eslint-disable simple-import-sort/imports */
 
 import type { Skill } from "@/app/api/[locale]/agent/chat/skills/config";
+import type { SkillEmbedding } from "@/app/api/[locale]/agent/chat/skills/embedding-type";
 
 ${imports}
+
+${embeddingImports}
 
 export const COMPANION_SKILLS: Skill[] = [
 ${companionList}
@@ -249,6 +278,10 @@ export type DefaultSkillId = (typeof DEFAULT_SKILL_IDS)[number];
 export const DEFAULT_SKILLS: Skill[] = [
   ...COMPANION_SKILLS,
 ${nonCompanions.map((s) => `  ${s.exportName},`).join("\n")}
+];
+
+export const DEFAULT_SKILL_EMBEDDINGS: (SkillEmbedding | undefined)[] = [
+${embeddingList}
 ];
 `;
   }

@@ -47,6 +47,30 @@ export type EmitThreadTitleFn = (threadId: string, title: string) => void;
 /** Throttle window in ms - coalesces content updates to same message */
 const THROTTLE_MS = 300;
 
+/** Map a MIME type to an uploads mount type folder */
+function getMimeTypeFolder(mimeType: string): string {
+  if (mimeType.startsWith("image/")) {
+    return "images";
+  }
+  if (mimeType.startsWith("audio/")) {
+    return "audio";
+  }
+  if (mimeType.startsWith("video/")) {
+    return "video";
+  }
+  if (
+    mimeType.startsWith("text/") ||
+    mimeType === "application/pdf" ||
+    mimeType.startsWith("application/vnd.") ||
+    mimeType === "application/json" ||
+    mimeType === "application/xml" ||
+    mimeType === "application/msword"
+  ) {
+    return "documents";
+  }
+  return "other";
+}
+
 interface PendingWrite {
   messageId: string;
   content: string;
@@ -227,11 +251,6 @@ export class MessageDbWriter {
         cachedInputTokens: cachedInputTokens ?? null,
         timeToFirstToken: timeToFirstToken ?? null,
       });
-
-      // Fire-and-forget: sync thread embedding for vector search
-      void this.syncThreadEmbedding().catch(() => {
-        // Intentional no-op: embedding sync is fire-and-forget
-      });
     }
   }
 
@@ -246,6 +265,7 @@ export class MessageDbWriter {
     cachedInputTokens: number;
     cacheWriteTokens: number;
     timeToFirstToken: number | null;
+    streamingTime: number | null;
     finishReason: string | null;
     creditCost: number;
   }): void {
@@ -261,6 +281,7 @@ export class MessageDbWriter {
             cacheWriteTokens:
               params.cacheWriteTokens > 0 ? params.cacheWriteTokens : undefined,
             timeToFirstToken: params.timeToFirstToken ?? undefined,
+            streamingTime: params.streamingTime ?? undefined,
             creditCost: params.creditCost,
             finishReason: params.finishReason ?? undefined,
           },
@@ -503,6 +524,7 @@ export class MessageDbWriter {
     sequenceId: string | null;
     toolCall: ToolCall; // updated with result/error
     toolName: string;
+    toolLabel?: string;
     result: WidgetData | undefined;
     error: ErrorResponseType | undefined;
     skipSseEmit?: boolean; // skip TOOL_RESULT SSE if already emitted in batch handler
@@ -517,6 +539,7 @@ export class MessageDbWriter {
       sequenceId,
       toolCall,
       toolName,
+      toolLabel,
       error,
       skipSseEmit,
       user,
@@ -596,7 +619,7 @@ export class MessageDbWriter {
       await this.deductAndEmitCredits({
         user,
         amount: toolCall.creditsUsed,
-        feature: toolName,
+        feature: toolLabel ?? toolName,
         type: "tool",
         model,
       });
@@ -1411,11 +1434,202 @@ export class MessageDbWriter {
   // ─── Embedding sync ──────────────────────────────────────────────────────
 
   /**
+   * Sync a tool result (web search, gen) to cortex_nodes for vector search.
+   * Called fire-and-forget from the tool result handler.
+   * Queries the message directly by ID — no list traversal.
+   */
+  async syncToolResultEmbedding(
+    userId: string,
+    toolMessageId: string,
+    toolName: string,
+  ): Promise<void> {
+    const SEARCH_TOOL_NAMES = new Set([
+      "web-search",
+      "brave-search",
+      "kagi-search",
+      "agent_brave-search_GET",
+      "v1_core_agent_brave-search_GET",
+    ]);
+    const GEN_TOOL_NAMES = new Set([
+      "generate_image",
+      "generate_music",
+      "generate_video",
+    ]);
+
+    const isSearch = SEARCH_TOOL_NAMES.has(toolName);
+    const isGen = GEN_TOOL_NAMES.has(toolName);
+
+    if (!isSearch && !isGen) {
+      return;
+    }
+
+    // Load the message row directly — no list traversal
+    const [row] = await db
+      .select({
+        id: chatMessages.id,
+        metadata: chatMessages.metadata,
+        createdAt: chatMessages.createdAt,
+        threadId: chatMessages.threadId,
+      })
+      .from(chatMessages)
+      .where(eq(chatMessages.id, toolMessageId))
+      .limit(1);
+
+    if (!row) {
+      return;
+    }
+
+    const { syncVirtualNodeToEmbedding } =
+      await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+
+    if (isSearch) {
+      const { readSearchPath } =
+        await import("@/app/api/[locale]/agent/cortex/mounts/searches");
+      const meta = row.metadata as {
+        toolCall?: { args?: { query?: string } };
+      } | null;
+      const query = meta?.toolCall?.args?.query;
+      if (!query) {
+        return;
+      }
+      const month = row.createdAt.toISOString().slice(0, 7);
+      const slug = `${query
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 60)}-${toolMessageId}`;
+      const path = `/searches/${month}/${slug}.md`;
+      const result = await readSearchPath(userId, path).catch(() => null);
+      if (result) {
+        await syncVirtualNodeToEmbedding(userId, path, result.content);
+      }
+      return;
+    }
+
+    if (isGen) {
+      const { readGenPath } =
+        await import("@/app/api/[locale]/agent/cortex/mounts/gens");
+      const GEN_TOOLS: Record<string, string> = {
+        generate_image: "images",
+        generate_music: "audio",
+        generate_video: "video",
+      };
+      const mediaType = GEN_TOOLS[toolName];
+      if (!mediaType) {
+        return;
+      }
+      const meta = row.metadata as {
+        toolCall?: { args?: { prompt?: string } };
+      } | null;
+      const prompt = meta?.toolCall?.args?.prompt;
+      if (!prompt) {
+        return;
+      }
+      const month = row.createdAt.toISOString().slice(0, 7);
+      const slug = `${prompt
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 60)}-${toolMessageId}`;
+      const path = `/gens/${mediaType}/${month}/${slug}.md`;
+      const result = await readGenPath(userId, path).catch(() => null);
+      if (result) {
+        await syncVirtualNodeToEmbedding(userId, path, result.content);
+      }
+    }
+  }
+
+  /**
+   * Sync a file upload to cortex_nodes for vector search.
+   * Called fire-and-forget from FileUploadEventHandler after upload completes.
+   * Queries the message directly by ID — no list traversal.
+   */
+  async syncUploadEmbedding(
+    userId: string,
+    userMessageId: string,
+  ): Promise<void> {
+    const { readUploadPath } =
+      await import("@/app/api/[locale]/agent/cortex/mounts/uploads");
+    const { syncVirtualNodeToEmbedding } =
+      await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+
+    // List uploads for the uploads/images,documents,audio,video,other under all threads
+    // We need to find attachment files for this specific userMessageId.
+    // Load user message row to get attachments
+    const [row] = await db
+      .select({
+        metadata: chatMessages.metadata,
+        createdAt: chatMessages.createdAt,
+        threadId: chatMessages.threadId,
+      })
+      .from(chatMessages)
+      .where(eq(chatMessages.id, userMessageId))
+      .limit(1);
+
+    if (!row) {
+      return;
+    }
+
+    const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
+    const [thread] = await db
+      .select({ title: chatThreads.title })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, row.threadId))
+      .limit(1);
+
+    const threadTitle = thread?.title ?? "Untitled";
+    const threadSlug = `${threadTitle
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 50)}-${row.threadId}`;
+
+    const meta = row.metadata as {
+      attachments?: Array<{
+        id?: string;
+        url?: string;
+        filename?: string;
+        name?: string;
+        mimeType?: string;
+        type?: string;
+        size?: number;
+      }>;
+    } | null;
+
+    if (!meta?.attachments) {
+      return;
+    }
+
+    for (const att of meta.attachments) {
+      const filename = att.filename ?? att.name ?? "";
+      if (!filename) {
+        continue;
+      }
+      const mimeType = att.mimeType ?? att.type ?? "application/octet-stream";
+      const typeFolder = getMimeTypeFolder(mimeType);
+      const safeFilename = filename
+        .toLowerCase()
+        .replace(/[^a-z0-9.]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 50);
+      const path = `/uploads/${typeFolder}/${threadSlug}/${safeFilename}.md`;
+      const result = await readUploadPath(userId, path).catch(() => null);
+      if (result) {
+        await syncVirtualNodeToEmbedding(userId, path, result.content).catch(
+          () => {
+            // Best-effort
+          },
+        );
+      }
+    }
+  }
+
+  /**
    * Sync the current thread to cortex_nodes for vector search.
    * Uses dynamic imports to avoid circular dependencies.
    * Fire-and-forget safe - errors are silently caught by the caller.
    */
-  private async syncThreadEmbedding(): Promise<void> {
+  async syncThreadEmbedding(): Promise<void> {
     if (!this.lastThreadId) {
       return;
     }
@@ -1584,6 +1798,7 @@ export class MessageDbWriter {
       cachedInputTokens?: number | null;
       cacheWriteTokens?: number | null;
       timeToFirstToken?: number | null;
+      streamingTime?: number | null;
       creditCost?: number | null;
     },
   ): Promise<void> {
@@ -1619,6 +1834,9 @@ export class MessageDbWriter {
         tokens.timeToFirstToken !== undefined
       ) {
         tokenMetadata.timeToFirstToken = tokens.timeToFirstToken;
+      }
+      if (tokens.streamingTime !== null && tokens.streamingTime !== undefined) {
+        tokenMetadata.streamingTime = tokens.streamingTime;
       }
       if (tokens.creditCost !== null && tokens.creditCost !== undefined) {
         tokenMetadata.creditCost = tokens.creditCost;

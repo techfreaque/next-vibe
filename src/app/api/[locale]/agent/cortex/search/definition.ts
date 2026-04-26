@@ -36,7 +36,7 @@ const { GET } = createEndpoint({
   path: ["agent", "cortex", "search"],
   aliases: [CORTEX_SEARCH_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-
+  cli: { firstCliArgKey: "query" },
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "search",
@@ -64,6 +64,14 @@ const { GET } = createEndpoint({
   subCategory: "endpointCategories.aiTools",
   tags: ["get.tags.cortex" as const],
   defaultExpanded: true,
+  options: {
+    queryOptions: {
+      enabled: false, // Don't auto-fetch, wait for user to press submit
+    },
+    formOptions: {
+      autoSubmit: false, // Don't auto-submit, wait for user to press submit
+    },
+  },
 
   fields: customWidgetObject({
     render: CortexSearchWidget,

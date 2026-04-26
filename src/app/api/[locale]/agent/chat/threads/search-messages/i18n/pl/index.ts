@@ -31,7 +31,7 @@ export const translations: typeof enTranslations = {
       rootFolderId: {
         label: "Folder główny",
         description:
-          "Ogranicz wyszukiwanie do określonego typu folderu (prywatny, udostępniony, publiczny, cron)",
+          "Ogranicz wyszukiwanie do określonego typu folderu (prywatny, udostępniony, publiczny, w tle)",
       },
       role: {
         label: "Rola wiadomości",

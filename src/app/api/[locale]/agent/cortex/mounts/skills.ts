@@ -5,7 +5,7 @@ import "server-only";
  * Renders custom skills as markdown files at /skills/<skillId>.md
  */
 
-import { and, count as drizzleCount, eq } from "drizzle-orm";
+import { and, count as drizzleCount, eq, inArray, or } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 
@@ -39,20 +39,36 @@ export async function readSkillPath(
   const { customSkills } =
     await import("@/app/api/[locale]/agent/chat/skills/db");
 
-  const rows = await db
-    .select()
-    .from(customSkills)
-    .where(eq(customSkills.id, skillId))
-    .limit(1);
+  const UUID_RE =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const whereClause = UUID_RE.test(skillId)
+    ? or(eq(customSkills.id, skillId), eq(customSkills.slug, skillId))
+    : eq(customSkills.slug, skillId);
+
+  const rows = await db.select().from(customSkills).where(whereClause).limit(1);
 
   const skill = rows[0];
   if (!skill) {
     return null;
   }
 
-  // Only allow reading own skills
+  // Allow reading own skills or skills referenced by user's favorites
   if (skill.userId !== userId) {
-    return null;
+    const { chatFavorites } =
+      await import("@/app/api/[locale]/agent/chat/favorites/db");
+    const [fav] = await db
+      .select({ id: chatFavorites.id })
+      .from(chatFavorites)
+      .where(
+        and(
+          eq(chatFavorites.userId, userId),
+          eq(chatFavorites.skillId, skill.id),
+        ),
+      )
+      .limit(1);
+    if (!fav) {
+      return null;
+    }
   }
 
   const frontmatterLines = [
@@ -85,7 +101,7 @@ export async function readSkillPath(
 }
 
 /**
- * List skills
+ * List skills — own skills + skills referenced by user's favorites (deduped)
  */
 export async function listSkillPath(
   userId: string,
@@ -95,35 +111,84 @@ export async function listSkillPath(
     return [];
   }
 
-  const { customSkills } =
-    await import("@/app/api/[locale]/agent/chat/skills/db");
+  const [{ customSkills }, { chatFavorites }] = await Promise.all([
+    import("@/app/api/[locale]/agent/chat/skills/db"),
+    import("@/app/api/[locale]/agent/chat/favorites/db"),
+  ]);
+
+  // Get skillIds referenced by user's favorites
+  const favRows = await db
+    .select({ skillId: chatFavorites.skillId })
+    .from(chatFavorites)
+    .where(eq(chatFavorites.userId, userId));
+
+  const UUID_RE_LIST =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const favSkillIds = [
+    ...new Set(
+      favRows.map((r) => r.skillId).filter((id) => UUID_RE_LIST.test(id)),
+    ),
+  ];
+
+  // Fetch own skills + favorited skills in one query
+  const whereClause =
+    favSkillIds.length > 0
+      ? or(
+          eq(customSkills.userId, userId),
+          inArray(customSkills.id, favSkillIds),
+        )
+      : eq(customSkills.userId, userId);
 
   const rows = await db
     .select()
     .from(customSkills)
-    .where(eq(customSkills.userId, userId))
+    .where(whereClause)
     .orderBy(customSkills.name);
 
-  return rows.map((s) => ({
-    name: `${s.id}.md`,
-    path: `/skills/${s.id}`,
-    nodeType: "file" as const,
-    size: s.systemPrompt ? Buffer.byteLength(s.systemPrompt, "utf8") : 0,
-    updatedAt: s.updatedAt.toISOString(),
-  }));
+  return rows.map((s) => {
+    const fileKey = s.slug || s.id;
+    return {
+      name: `${fileKey}.md`,
+      path: `/skills/${fileKey}`,
+      nodeType: "file" as const,
+      size: s.systemPrompt ? Buffer.byteLength(s.systemPrompt, "utf8") : 0,
+      updatedAt: s.updatedAt.toISOString(),
+    };
+  });
 }
 
 /**
- * Get skill count
+ * Get skill count — own + favorited (deduped)
  */
 export async function getSkillCount(userId: string): Promise<number> {
-  const { customSkills } =
-    await import("@/app/api/[locale]/agent/chat/skills/db");
+  const [{ customSkills }, { chatFavorites }] = await Promise.all([
+    import("@/app/api/[locale]/agent/chat/skills/db"),
+    import("@/app/api/[locale]/agent/chat/favorites/db"),
+  ]);
+
+  const favRows = await db
+    .select({ skillId: chatFavorites.skillId })
+    .from(chatFavorites)
+    .where(eq(chatFavorites.userId, userId));
+
+  const UUID_RE =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const favSkillIds = [
+    ...new Set(favRows.map((r) => r.skillId).filter((id) => UUID_RE.test(id))),
+  ];
+
+  const whereClause =
+    favSkillIds.length > 0
+      ? or(
+          eq(customSkills.userId, userId),
+          inArray(customSkills.id, favSkillIds),
+        )
+      : eq(customSkills.userId, userId);
 
   const rows = await db
     .select({ count: drizzleCount() })
     .from(customSkills)
-    .where(eq(customSkills.userId, userId));
+    .where(whereClause);
 
   return rows[0]?.count ?? 0;
 }
@@ -198,12 +263,15 @@ export async function writeSkillPath(
   const { customSkills } =
     await import("@/app/api/[locale]/agent/chat/skills/db");
 
-  // Check if skill exists and belongs to user
+  // Check if skill exists and belongs to user (by id or slug)
   const [existing] = await db
     .select({ id: customSkills.id })
     .from(customSkills)
     .where(
-      and(eq(customSkills.id, skillId), eq(customSkills.userId, ctx.user.id)),
+      and(
+        or(eq(customSkills.id, skillId), eq(customSkills.slug, skillId)),
+        eq(customSkills.userId, ctx.user.id),
+      ),
     )
     .limit(1);
 
@@ -223,7 +291,7 @@ export async function writeSkillPath(
         : {}),
       ...(parsed.tagline !== undefined ? { tagline: parsed.tagline } : {}),
     })
-    .where(eq(customSkills.id, skillId));
+    .where(eq(customSkills.id, existing.id));
 
   // Disk write-through
   try {
@@ -271,14 +339,14 @@ export async function deleteSkillPath(
   const [existing] = await db
     .select({ id: customSkills.id, userId: customSkills.userId })
     .from(customSkills)
-    .where(eq(customSkills.id, skillId))
+    .where(or(eq(customSkills.id, skillId), eq(customSkills.slug, skillId)))
     .limit(1);
 
   if (!existing || existing.userId !== ctx.userId) {
     return null;
   }
 
-  await db.delete(customSkills).where(eq(customSkills.id, skillId));
+  await db.delete(customSkills).where(eq(customSkills.id, existing.id));
 
   // Disk write-through — delete from disk
   try {
@@ -326,7 +394,7 @@ export async function moveSkillPath(
   const { customSkills } =
     await import("@/app/api/[locale]/agent/chat/skills/db");
 
-  // Verify source exists and belongs to user
+  // Verify source exists and belongs to user (by id or slug)
   const [existing] = await db
     .select({
       id: customSkills.id,
@@ -334,7 +402,7 @@ export async function moveSkillPath(
       slug: customSkills.slug,
     })
     .from(customSkills)
-    .where(eq(customSkills.id, sourceId))
+    .where(or(eq(customSkills.id, sourceId), eq(customSkills.slug, sourceId)))
     .limit(1);
 
   if (!existing || existing.userId !== ctx.userId) {

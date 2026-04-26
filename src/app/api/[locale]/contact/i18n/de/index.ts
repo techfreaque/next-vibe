@@ -1,9 +1,9 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Kontakt",
+  title: "Mit einem Menschen sprechen",
   description:
-    "Nachricht an das Team senden - für Fragen, Feedback, Support oder Partnerschaftsanfragen. Du erhältst eine Bestätigungs-E-Mail und wir antworten innerhalb von 24 Stunden.",
+    "Etwas funktioniert nicht, oder du möchtest einfach mit einer echten Person reden. Wir sind da. Schreib, was du brauchst – jemand aus unserem Team liest es und antwortet persönlich.",
   category: "System",
   summary: "Kontaktformular-Einreichungen mit Lead-Tracking verarbeiten",
   tags: {
@@ -14,9 +14,9 @@ export const translations: typeof enTranslations = {
   },
 
   form: {
-    label: "Kontaktformular",
+    label: "Kontakt aufnehmen",
     description:
-      "Füllen Sie das Formular aus, um mit unserem Team in Kontakt zu treten",
+      "Eine echte Person liest das hier und antwortet. Kein Bot, keine Warteschleife.",
     fields: {
       name: {
         label: "Ihr Name",
@@ -25,7 +25,8 @@ export const translations: typeof enTranslations = {
       },
       email: {
         label: "E-Mail-Adresse",
-        description: "Geben Sie Ihre E-Mail-Adresse ein",
+        description:
+          "Wohin wir antworten sollen. Wenn Sie angemeldet sind, können Sie das Feld leer lassen – wir nutzen Ihre Konto-E-Mail.",
         placeholder: "max.mustermann@beispiel.de",
       },
       company: {
@@ -131,6 +132,8 @@ export const translations: typeof enTranslations = {
         "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
       nameMinLength: "Der Name muss mindestens 2 Zeichen lang sein",
       emailInvalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      emailRequired:
+        "Bitte geben Sie eine E-Mail-Adresse an, damit wir antworten können",
       subjectRequired: "Betreff ist erforderlich",
       messageMinLength: "Die Nachricht muss mindestens 10 Zeichen lang sein",
       priorityInvalid: "Bitte wählen Sie eine gültige Prioritätsstufe",
@@ -262,8 +265,18 @@ export const translations: typeof enTranslations = {
   },
 
   success: {
-    title: "Erfolg",
-    description: "Ihr Kontaktformular wurde erfolgreich eingereicht",
+    title: "Nachricht gesendet",
+    description:
+      "Ihre Nachricht ist angekommen. Eine echte Person meldet sich.",
+  },
+
+  aiPrompt: {
+    confirmBeforeSend:
+      "Vor dem Absenden eines Kontaktformulars immer die Bestätigung des Nutzers einholen.",
+    humanHelp:
+      "Wenn der Nutzer frustriert, verärgert oder nicht weiterkommt – proaktiv anbieten, ihn über das Kontaktformular mit einem echten Supportmitarbeiter zu verbinden.",
+    emailFallback:
+      "Wenn der Nutzer angemeldet ist, ist seine E-Mail-Adresse bereits hinterlegt – er muss sie nicht erneut angeben.",
   },
 
   email: {

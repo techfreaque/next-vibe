@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Tool: [result:execute-tool] {\"result\":{\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/ea36c307-def6-46c6-87ed-19f59c712051/e13940b0-5866-4b22-a5c8-229c0aeddaaf.png\",\"creditCost\":2.8}}\n\nAssistant: STEP_OK\n\n**Verification:**\n- `imageUrl`: present and non-empty ✓\n- `creditCost`: 2.8 (positive) ✓\n\nSystem: [Context: ID:48598f88 | Posted:Apr 26, 13:19]\n\nUser: [T5c execute-tool-direct] Call the execute-tool endpoint with toolName='tool-help' and input={}. Check that the inner result contains a tools array with at least one entry. End your reply with STEP_OK if a tools list was returned, or FAILED: <reason> if the result was missing or malformed.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English — the user's language.\n\n/ (cortex)\n├── memories/ (6)\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · \n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nu\n│   \n\nSystem: [Context: ID:7ce5967d | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:19]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"agent_ai-stream_ws-provider_models_GET\",\"title\":\"List AI Models\",\"description\":\"Returns all available AI models with pricing and capability information\",\"category\":\"AI\",\"subCategory\":\"Inference\",\"platforms\":[\"cli\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"elect",
+    "encoding_format": "float"
+  }
+}

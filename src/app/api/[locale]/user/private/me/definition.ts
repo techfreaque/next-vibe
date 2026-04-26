@@ -465,6 +465,7 @@ const { POST } = createEndpoint({
   ] as const,
   fields: customWidgetObject({
     render: MeUpdateWidget,
+    noFormElement: true,
     usage: { request: "data", response: true } as const,
     children: {
       // === BASIC INFORMATION ===

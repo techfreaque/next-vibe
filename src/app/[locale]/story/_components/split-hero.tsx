@@ -157,83 +157,128 @@ export function SplitHero({
     onSideChange?.(next);
   }
 
+  const chips: {
+    key: string;
+    color: string;
+    bg: string;
+    border: string;
+    side: ActiveSide;
+  }[] = [
+    {
+      key: "home.splitHero.chipChat",
+      color: "text-violet-300",
+      bg: "bg-violet-500/10",
+      border: "border-violet-500/30",
+      side: "unbottled",
+    },
+    {
+      key: "home.splitHero.chipSelfHost",
+      color: "text-emerald-300",
+      bg: "bg-emerald-500/10",
+      border: "border-emerald-500/30",
+      side: "personal",
+    },
+    {
+      key: "home.splitHero.chipBuild",
+      color: "text-cyan-300",
+      bg: "bg-cyan-500/10",
+      border: "border-cyan-500/30",
+      side: "nextvibe",
+    },
+    {
+      key: "home.splitHero.chipEarn",
+      color: "text-rose-300",
+      bg: "bg-rose-500/10",
+      border: "border-rose-500/30",
+      side: "referral",
+    },
+  ];
+
   return (
     <Div className="relative flex flex-col">
-      {/* Intro section - underdog narrative */}
+      {/* Intro section */}
       <Div className="w-full bg-[#080010] px-6 py-14 md:py-20">
-        <Div className="max-w-3xl mx-auto">
+        <Div className="max-w-2xl mx-auto text-center">
+          {/* Badge */}
+          <MotionDiv
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="inline-flex items-center gap-2 px-3 py-1 mb-8 rounded-full border border-white/10 bg-white/5 text-white/40 text-xs font-medium tracking-wide"
+          >
+            {t("home.splitHero.badge")}
+          </MotionDiv>
+
+          {/* Header */}
           <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-center mb-6"
+            className="mb-4"
           >
-            <H1 className="text-2xl md:text-4xl font-black text-white tracking-tighter mb-3 leading-tight">
+            <H1 className="text-2xl md:text-4xl font-black text-white tracking-tighter leading-tight">
               {t("home.splitHero.header")}
             </H1>
+          </MotionDiv>
+
+          {/* Subheader — 3 punchy values */}
+          <MotionDiv
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mb-10"
+          >
             <P className="text-sm md:text-base text-white/50 font-medium">
               {t("home.splitHero.subheader")}
             </P>
           </MotionDiv>
 
+          {/* 4 chips — color-coded to panels below */}
           <MotionDiv
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-sm md:text-base text-white/40 leading-relaxed text-center mb-8"
+            className="mb-3"
           >
-            {t("home.splitHero.introBody")}
-          </MotionDiv>
-
-          <MotionDiv
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="space-y-2 mb-8"
-          >
-            <Div className="text-xs font-bold text-white/60 uppercase tracking-widest mb-3 text-center">
+            <Div className="text-xs font-bold text-white/30 uppercase tracking-widest mb-4">
               {t("home.splitHero.introGuide")}
             </Div>
-            <Div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <Div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-violet-500/5 border border-violet-500/10">
-                <MessageSquare className="w-4 h-4 text-violet-400 mt-0.5 flex-shrink-0" />
-                <Span className="text-sm text-white/50">
-                  {t("home.splitHero.introOption1")}
-                </Span>
-              </Div>
-              <Div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
-                <Server className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-                <Span className="text-sm text-white/50">
-                  {t("home.splitHero.introOption2")}
-                </Span>
-              </Div>
-              <Div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-cyan-500/5 border border-cyan-500/10">
-                <Code className="w-4 h-4 text-cyan-400 mt-0.5 flex-shrink-0" />
-                <Span className="text-sm text-white/50">
-                  {t("home.splitHero.introOption3")}
-                </Span>
-              </Div>
-              <Div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-rose-500/5 border border-rose-500/10">
-                <TrendingUp className="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0" />
-                <Span className="text-sm text-white/50">
-                  {t("home.splitHero.introOption4")}
-                </Span>
-              </Div>
+            <Div className="flex flex-wrap justify-center gap-2">
+              {chips.map((chip) => (
+                <Div
+                  key={chip.side}
+                  onClick={() => {
+                    handleClick(chip.side);
+                    setTimeout(() => {
+                      document
+                        .getElementById("universe-content")
+                        ?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                    }, 100);
+                  }}
+                  className={`cursor-pointer px-4 py-1.5 rounded-full border text-xs font-semibold transition-all duration-200 hover:opacity-80 ${chip.color} ${chip.bg} ${chip.border}`}
+                >
+                  {t(chip.key as Parameters<typeof t>[0])}
+                </Div>
+              ))}
             </Div>
           </MotionDiv>
 
+          {/* Footer — small team + bug report */}
           <MotionDiv
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-center"
+            transition={{ delay: 0.35 }}
+            className="mt-10"
           >
-            <Span className="text-sm text-white/30">
+            <Span className="text-xs text-white/25">
               {t("home.splitHero.introHelp")}{" "}
             </Span>
             <Link
               href={`/${locale}/help`}
-              className="text-sm text-white/50 underline underline-offset-2 hover:text-white/70 transition-colors"
+              className="text-xs text-white/40 underline underline-offset-2 hover:text-white/60 transition-colors"
             >
               {t("home.splitHero.introHelpCta")}
             </Link>
@@ -711,7 +756,7 @@ function ReferralContent({
           asChild
           onClick={(e) => e.stopPropagation()}
         >
-          <Link href={`/${locale}/story/referral`}>
+          <Link href={`/${locale}/user/referral`}>
             {t("home.splitHero.referral.cta")}
             <TrendingUp className="ml-2 h-4 w-4" />
           </Link>

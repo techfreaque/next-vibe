@@ -52,7 +52,13 @@ export class MusicGenerationRepository {
     t: MusicGenerationT,
     streamContext?: MediaGenStreamContext,
   ): Promise<ResponseType<MusicGenerationPostResponseOutput>> {
-    // model is resolved via serverDefault on the field definition (from ToolExecutionContext.musicGenModelId)
+    // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
+    if (!data.model) {
+      return fail({
+        message: t("post.errors.not_found.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
     const audioModel = getMusicGenModelById(data.model);
 
     if (!audioModel) {
@@ -188,7 +194,7 @@ export class MusicGenerationRepository {
     const deductResult = await deductMediaCredits(
       user,
       creditCost,
-      "music-generation",
+      t("post.title"),
       locale,
       logger,
       tCredits,

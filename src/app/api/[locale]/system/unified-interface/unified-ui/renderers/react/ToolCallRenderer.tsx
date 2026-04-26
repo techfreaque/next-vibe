@@ -164,6 +164,10 @@ export function ToolCallRenderer({
     null,
   );
 
+  // When outer tool is execute-tool, also load the inner tool definition for display title
+  const [innerToolDefinition, setInnerToolDefinition] =
+    useState<CreateApiEndpointAny | null>(null);
+
   // Create a form for managing the tool parameters when waiting for confirmation
   const confirmationForm = useForm<FieldValues>({
     defaultValues:
@@ -340,6 +344,67 @@ export function ToolCallRenderer({
     collapseState,
     messageId,
     toolIndex,
+  ]);
+
+  // When the outer tool is execute-tool, load the inner tool's definition for its display title
+  const innerToolArgs =
+    definition?.aliases?.includes("execute-tool") &&
+    toolCall.args &&
+    typeof toolCall.args === "object" &&
+    !Array.isArray(toolCall.args)
+      ? (toolCall.args as { [key: string]: WidgetData })
+      : null;
+  const innerToolNameRaw = innerToolArgs?.toolName;
+  const innerToolName =
+    typeof innerToolNameRaw === "string" ? innerToolNameRaw : undefined;
+
+  useEffect((): (() => void) => {
+    if (!innerToolName) {
+      setInnerToolDefinition(null);
+      return () => undefined;
+    }
+    let cancelled = false;
+    const load = async (): Promise<void> => {
+      const result = await tryLoadIdentifier(innerToolName);
+      if (!cancelled && result.success) {
+        setInnerToolDefinition(result.data);
+        // Apply inner tool's defaultExpanded, same logic as the outer definition loader
+        if (result.data.defaultExpanded !== undefined) {
+          const hasUserOverride =
+            collapseState &&
+            messageId !== undefined &&
+            collapseState.isCollapsed(
+              { messageId, sectionType: "tool", sectionIndex: toolIndex },
+              !result.data.defaultExpanded,
+            ) !== !result.data.defaultExpanded;
+          if (!hasUserOverride) {
+            const currentlyLoading =
+              Boolean(toolCall.isPartial) ||
+              (!toolCall.result &&
+                !toolCall.error &&
+                !toolCall.waitingForConfirmation &&
+                toolCall.status !== "completed" &&
+                toolCall.status !== "failed");
+            setIsOpen(result.data.defaultExpanded ? currentlyLoading : false);
+          }
+        }
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    innerToolName,
+    tryLoadIdentifier,
+    collapseState,
+    messageId,
+    toolIndex,
+    toolCall.isPartial,
+    toolCall.result,
+    toolCall.error,
+    toolCall.waitingForConfirmation,
+    toolCall.status,
   ]);
 
   const isPartial = Boolean(toolCall.isPartial);
@@ -526,11 +591,26 @@ export function ToolCallRenderer({
     | { message: string; messageParams?: Record<string, string | number> }
     | undefined;
 
-  // Resolve display title: use this definition's own title/dynamicTitle
+  // Resolve display title: use this definition's own title/dynamicTitle.
+  // When outer tool is execute-tool and the inner tool definition is loaded,
+  // show the inner tool's title directly (so "Generate Image" shows instead of "Execute: generate_image").
   const resolveDisplay = (): {
     displayName: string;
     icon: IconKey | undefined;
   } => {
+    // If we have the inner tool resolved, use its title as the display name
+    if (innerToolDefinition) {
+      const innerScopedT =
+        innerToolDefinition.scopedTranslation.scopedT(locale);
+      const innerTitle = innerToolDefinition.title
+        ? (innerScopedT?.t(innerToolDefinition.title) ?? toolCall.toolName)
+        : toolCall.toolName;
+      return {
+        displayName: innerTitle,
+        icon: innerToolDefinition.icon ?? definition?.icon,
+      };
+    }
+
     const scopedT = definition?.scopedTranslation.scopedT(locale);
     const staticTitle = definition?.title
       ? scopedT?.t(definition.title)

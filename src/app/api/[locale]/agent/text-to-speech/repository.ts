@@ -313,6 +313,13 @@ export class TextToSpeechRepository {
     logger: EndpointLogger,
     t: TextToSpeechT,
   ): Promise<ResponseType<TextToSpeechPostResponseOutput>> {
+    // voiceId is resolved via fieldDefaults in route.ts (from favorites/skill config)
+    if (!data.voiceId) {
+      return fail({
+        message: t("post.errors.not_found.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
     const modelOption = getBestTtsModel(
       { selectionType: ModelSelectionType.MANUAL, manualModelId: data.voiceId },
       user,

@@ -140,7 +140,9 @@ function groupBySkill(favorites: FavoriteCard[]): SkillGroup[] {
   const map = new Map<string, FavoriteCard[]>();
   for (const fav of favorites) {
     // Default (model-only) favorites are never grouped - each gets its own entry
-    const groupKey = fav.skillId === NO_SKILL_ID ? fav.id : fav.skillId;
+    // Use base skillId (strip variant suffix) so all variants of the same skill group together
+    const { skillId: baseSkillId } = parseSkillId(fav.skillId);
+    const groupKey = baseSkillId === NO_SKILL_ID ? fav.id : baseSkillId;
     const group = map.get(groupKey);
     if (group) {
       group.push(fav);
@@ -151,7 +153,7 @@ function groupBySkill(favorites: FavoriteCard[]): SkillGroup[] {
   return [...map.entries()]
     .map(([groupKey, items]) => ({
       id: `${GROUP_PREFIX}${groupKey}`,
-      skillId: items[0].skillId,
+      skillId: parseSkillId(items[0].skillId).skillId,
       // Always use base name (items[0].name is the skill name, not variant-suffixed)
       name: items[0].name,
       icon: items[0].icon,
@@ -821,12 +823,16 @@ export function FavoritesListContainer({
   );
 
   const favoriteSelectOverride = useFavoriteSelectOverride();
+  const hideChrome = favoriteSelectOverride?.hideChrome ?? false;
 
   const handleSelectFavorite = useCallback(
     async (item: FavoriteCard): Promise<void> => {
       if (favoriteSelectOverride) {
         favoriteSelectOverride.onSelectFavorite(item);
-        useTourState.getState().setModelSelectorOpen(false);
+        // Only close the model selector when not embedded in another panel
+        if (!hideChrome) {
+          useTourState.getState().setModelSelectorOpen(false);
+        }
         return;
       }
       await ChatSettingsRepositoryClient.selectFavorite({
@@ -839,7 +845,7 @@ export function FavoritesListContainer({
       });
       useTourState.getState().setModelSelectorOpen(false);
     },
-    [favoriteSelectOverride, logger, locale, user],
+    [favoriteSelectOverride, hideChrome, logger, locale, user],
   );
 
   const rawFavoritesList = useMemo(
@@ -1020,31 +1026,33 @@ export function FavoritesListContainer({
 
   return (
     <Div className="flex flex-col gap-0">
-      {/* Tab bar: My Favorites | Settings gear */}
-      <Div className="flex border-b border-border shrink-0">
-        <Div className="flex-1 flex items-center justify-center gap-1.5 h-10 text-sm font-medium border-b-2 border-primary text-primary">
-          <Star className="h-4 w-4" />
-          {tFav("get.tabs.myFavorites")}
+      {/* Tab bar: My Favorites | Settings gear — hidden when embedded */}
+      {!hideChrome && (
+        <Div className="flex border-b border-border shrink-0">
+          <Div className="flex-1 flex items-center justify-center gap-1.5 h-10 text-sm font-medium border-b-2 border-primary text-primary">
+            <Star className="h-4 w-4" />
+            {tFav("get.tabs.myFavorites")}
+          </Div>
+          <Button
+            type="button"
+            variant="ghost"
+            className="flex-1 rounded-none border-b-2 border-transparent h-10 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5"
+            onClick={() => void handleBrowseSkills()}
+            data-tour={TOUR_DATA_ATTRS.FAVORITES_BROWSE_SKILLS}
+          >
+            <Compass className="h-4 w-4" />
+            {tFav("get.tabs.browseSkills")}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="shrink-0 h-10 w-10 px-0 rounded-none border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
+            onClick={() => void handleOpenSettings()}
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
         </Div>
-        <Button
-          type="button"
-          variant="ghost"
-          className="flex-1 rounded-none border-b-2 border-transparent h-10 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5"
-          onClick={() => void handleBrowseSkills()}
-          data-tour={TOUR_DATA_ATTRS.FAVORITES_BROWSE_SKILLS}
-        >
-          <Compass className="h-4 w-4" />
-          {tFav("get.tabs.browseSkills")}
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          className="shrink-0 h-10 w-10 px-0 rounded-none border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
-          onClick={() => void handleOpenSettings()}
-        >
-          <Settings className="h-4 w-4" />
-        </Button>
-      </Div>
+      )}
 
       {/* Favorites List - grouped by character */}
       <Div className="px-4 pt-4 pb-4 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]">

@@ -136,10 +136,6 @@ export interface Skill {
   publishedAt?: Date | null;
   /** Short description of the last change (for published skills). */
   changeNote?: string | null;
-  /** Pre-computed embedding vector (written by `vibe gen`). */
-  embedding?: number[];
-  /** SHA-256 hash of embedded content — skip re-embedding when unchanged. */
-  embeddingHash?: string;
 }
 
 /**

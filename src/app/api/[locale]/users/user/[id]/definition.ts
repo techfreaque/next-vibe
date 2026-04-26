@@ -185,6 +185,42 @@ const { GET } = createEndpoint({
         },
       }),
 
+      // === REFERRAL INFO ===
+      referralInfo: objectField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "id.get.response.referralInfo.title" as const,
+        description: "id.get.response.referralInfo.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { response: true },
+        children: {
+          referredByUserId: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content:
+              "id.get.response.referralInfo.referredByUserId.content" as const,
+            schema: z.string().nullable(),
+          }),
+          referredByCode: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content:
+              "id.get.response.referralInfo.referredByCode.content" as const,
+            schema: z.string().nullable(),
+          }),
+          totalReferrals: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content:
+              "id.get.response.referralInfo.totalReferrals.content" as const,
+            schema: z.coerce.number(),
+          }),
+          totalEarnedCents: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content:
+              "id.get.response.referralInfo.totalEarnedCents.content" as const,
+            schema: z.coerce.number(),
+          }),
+        },
+      }),
+
       leadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "id.get.response.leadId.content" as const,
@@ -326,6 +362,12 @@ const { GET } = createEndpoint({
         timestamps: {
           createdAt: "2023-01-01T00:00:00.000Z",
           updatedAt: "2023-01-01T00:00:00.000Z",
+        },
+        referralInfo: {
+          referredByUserId: null,
+          referredByCode: null,
+          totalReferrals: 0,
+          totalEarnedCents: 0,
         },
         // Backward compatibility fields
         leadId: null,

@@ -47,6 +47,7 @@ import { getFullPath } from "../../shared/utils/path";
 import { isCronTaskDue } from "../cron-formatter";
 import { splitTaskArgs } from "../cron/arg-splitter";
 import { cronTasks as cronTasksTable, dbUserIdToOwner } from "../cron/db";
+import { createTaskEmitters } from "../cron/emitter";
 import { CronTasksRepository } from "../cron/repository";
 import { resolveTaskOwnerUser } from "../cron/resolve-task-user";
 import {
@@ -597,6 +598,25 @@ export class PulseHealthRepository {
           const { t: tTask } = scopedTranslation.scopedT(userLocale);
           const startedAt = new Date();
 
+          // Emit task-updated (RUNNING) to WS subscribers
+          {
+            const { emitTaskList, emitTaskQueue } = createTaskEmitters(
+              logger,
+              cronUser,
+            );
+            const runningPayload = {
+              tasks: [
+                {
+                  id: dbTask.id,
+                  lastExecutionStatus: CronTaskStatus.RUNNING,
+                  enabled: dbTask.runOnce ? false : dbTask.enabled,
+                },
+              ],
+            };
+            emitTaskList("task-updated", runningPayload);
+            emitTaskQueue("task-updated", runningPayload);
+          }
+
           // Resolve routeId → endpoint path → handler
           const path = getFullPath(dbTask.routeId);
           const handler = path
@@ -679,7 +699,7 @@ export class PulseHealthRepository {
                       platform: Platform.CRON,
                       cronTaskId: dbTask.id,
                       streamContext: {
-                        rootFolderId: DefaultFolderId.CRON,
+                        rootFolderId: DefaultFolderId.BACKGROUND,
                         threadId: undefined,
                         aiMessageId: undefined,
                         currentToolMessageId: undefined,
@@ -838,6 +858,27 @@ export class PulseHealthRepository {
                 })
                 .where(eq(cronTasksTable.id, dbTask.id));
 
+              // Emit task-updated (final status) to WS subscribers
+              {
+                const { emitTaskList, emitTaskQueue } = createTaskEmitters(
+                  logger,
+                  cronUser,
+                );
+                const completedPayload = {
+                  tasks: [
+                    {
+                      id: dbTask.id,
+                      lastExecutionStatus: finalStatus,
+                      lastExecutedAt: startedAt.toISOString(),
+                      lastExecutionDuration: finalDurationMs,
+                      consecutiveFailures: newConsecutiveFailures,
+                    },
+                  ],
+                };
+                emitTaskList("task-updated", completedPayload);
+                emitTaskQueue("task-updated", completedPayload);
+              }
+
               // If task has callback context (set by wait-for-task or execute-tool AI path),
               // emit TASK_COMPLETED WS event + backfill tool message + schedule resume-stream.
               // Read from typed wakeUp* columns - not from untyped taskInput JSON blob.
@@ -915,6 +956,25 @@ export class PulseHealthRepository {
                   updatedAt: new Date(),
                 })
                 .where(eq(cronTasksTable.id, dbTask.id));
+
+              // Emit task-updated (FAILED) to WS subscribers
+              {
+                const { emitTaskList, emitTaskQueue } = createTaskEmitters(
+                  logger,
+                  cronUser,
+                );
+                const failedPayload = {
+                  tasks: [
+                    {
+                      id: dbTask.id,
+                      lastExecutionStatus: CronTaskStatus.FAILED,
+                      consecutiveFailures: catchConsecutiveFailures,
+                    },
+                  ],
+                };
+                emitTaskList("task-updated", failedPayload);
+                emitTaskQueue("task-updated", failedPayload);
+              }
 
               // Fire-and-forget: push FAILED to remote so it doesn't stay stuck on RUNNING
               if (dbTask.targetInstance) {

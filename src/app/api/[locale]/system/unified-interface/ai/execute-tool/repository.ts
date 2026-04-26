@@ -89,6 +89,7 @@ export class RouteExecuteRepository {
       input: (input ?? {}) as Parameters<typeof buildRemoteUrl>[3]["input"],
     });
     try {
+      logger.debug("[RouteExecute] Direct HTTP call", { url, toolName });
       const resp = await fetch(url, {
         method: "POST",
         headers: {
@@ -99,9 +100,12 @@ export class RouteExecuteRepository {
         signal: AbortSignal.timeout(90_000),
       });
       if (!resp.ok) {
+        const errBody = await resp.text().catch(() => "");
         logger.warn("[RouteExecute] Direct HTTP call failed", {
           toolName,
           status: resp.status,
+          url,
+          errBody: errBody.slice(0, 200),
         });
         return null;
       }
@@ -373,7 +377,10 @@ export class RouteExecuteRepository {
               });
             if (directResult !== null) {
               // Result returned inline - loop continues normally (wait/endLoop).
-              return success({ result: directResult });
+              // directResult is already body.data from the remote execute-tool response
+              // (which has shape {result: <actual-tool-result>}) - return it flat so the
+              // AI sees the same {result: ...} shape as a local execute-tool call.
+              return success(directResult);
             }
             // Direct call failed - fall through to task-queue path below.
             logger.warn(
@@ -452,10 +459,28 @@ export class RouteExecuteRepository {
                 return;
               }
 
+              // Guard: if the remote returned {status:"pending"} or {status:"status.pending"}
+              // the task is still running on the remote — it will call back via /report when done.
+              // Do NOT fire handleTaskCompletion with a pending result; that would trigger a
+              // premature revival with no real output.
+              const directResultObj =
+                directResult !== null &&
+                typeof directResult === "object" &&
+                !Array.isArray(directResult)
+                  ? (directResult as Record<
+                      string,
+                      string | number | boolean | null
+                    >)
+                  : null;
+              const isPendingResult =
+                directResultObj?.status === "pending" ||
+                directResultObj?.status === "status.pending";
+
               if (
                 callbackMode === CallbackMode.WAKE_UP &&
                 effectiveToolMessageId &&
-                effectiveThreadId
+                effectiveThreadId &&
+                !isPendingResult
               ) {
                 await handleTaskCompletion({
                   toolMessageId: effectiveToolMessageId,
@@ -478,17 +503,12 @@ export class RouteExecuteRepository {
             })();
 
             return success({
-              ...(callbackMode === CallbackMode.DETACH
-                ? { taskId: directTaskId }
-                : {}),
+              taskId: directTaskId,
               status: CronTaskStatus.PENDING,
-              ...(callbackMode === CallbackMode.DETACH
-                ? {
-                    hint: "Task detached. Use wait-for-task with this taskId if you need to wait for the result/return.",
-                  }
-                : {
-                    hint: "Result/return will be injected when complete and wakes up the thread. Call wait-for-task only if you need the result before continuing.",
-                  }),
+              hint:
+                callbackMode === CallbackMode.DETACH
+                  ? "Task detached. Use wait-for-task with this taskId if you need to wait for the result/return."
+                  : "Result/return will be injected when complete and wakes up the thread. Call wait-for-task only if you need the result before continuing.",
             });
           }
         }
@@ -1242,7 +1262,7 @@ export class RouteExecuteRepository {
         logger,
         platform: Platform.MCP,
         streamContext: streamContext ?? {
-          rootFolderId: DefaultFolderId.CRON,
+          rootFolderId: DefaultFolderId.BACKGROUND,
           threadId: undefined,
           aiMessageId: undefined,
           currentToolMessageId: undefined,

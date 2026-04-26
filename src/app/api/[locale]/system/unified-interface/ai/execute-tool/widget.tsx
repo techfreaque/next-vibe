@@ -76,7 +76,16 @@ export function ExecuteToolWidget(): JSX.Element {
   const fieldValue = useWidgetValue<typeof definition.POST>();
 
   const rawToolName = form.watch("toolName");
-  const resultData = fieldValue?.result;
+
+  // In disabled mode, form is pre-filled with merged args+result data from the tool call.
+  // Use all form values as-is — the inner endpoint's widget knows what to render.
+  const allFormValues = form.watch();
+
+  // In disabled (tool call display) mode, always use allFormValues as the prefill data
+  // for the inner endpoint — it contains both request fields (from args) and response fields
+  // (from result, merged in by ToolCallRenderer). fieldValue.result is only set for wait/endLoop
+  // mode where execute-tool itself wraps the inner response in a {result} key.
+  const resultData = disabled ? allFormValues : fieldValue?.result;
 
   // Parse remote tool prefix: "hermes__ssh_exec_POST" → instanceId + toolName
   const remoteInfo = useMemo(() => {
@@ -402,6 +411,7 @@ export function ExecuteToolWidget(): JSX.Element {
           endpoint={{ [method]: resolvedEndpoint }}
           locale={locale}
           user={user}
+          disabled={disabled}
           endpointOptions={endpointOptions}
         />
       )}

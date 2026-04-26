@@ -106,7 +106,7 @@ function UnbottledCta({
                 className="bg-transparent border-white/20 text-white/80 hover:bg-white/8 hover:text-white hover:border-white/40 font-semibold px-8"
                 asChild
               >
-                <Link href={`/${locale}/user/(auth)/signup`}>
+                <Link href={`/${locale}/user/signup`}>
                   {t("home.ctaUnbottled.secondary")}
                   <Span className="ml-1.5 text-white/40 text-xs font-normal">
                     {t("home.ctaUnbottled.secondarySub")}

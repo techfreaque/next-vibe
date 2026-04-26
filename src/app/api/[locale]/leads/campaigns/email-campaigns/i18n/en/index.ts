@@ -102,7 +102,7 @@ export const translations = {
   },
   get: {
     title: "Get Email Campaigns Config",
-    description: "Retrieve email campaigns cron task configuration",
+    description: "Retrieve email campaigns background task configuration",
     errors: {
       unauthorized: {
         title: "Unauthorized",
@@ -150,10 +150,10 @@ export const translations = {
   },
   put: {
     title: "Email Campaigns Config",
-    description: "Update email campaigns cron task configuration",
+    description: "Update email campaigns background task configuration",
     enabled: {
       label: "Enabled",
-      description: "Enable or disable the email campaigns cron task",
+      description: "Enable or disable the email campaigns background task",
     },
     dryRun: {
       label: "Dry Run Mode",
@@ -165,7 +165,8 @@ export const translations = {
     },
     maxEmailsPerRun: {
       label: "Max Emails Per Run",
-      description: "Maximum number of emails to send per cron run (1–1000)",
+      description:
+        "Maximum number of emails to send per background run (1–1000)",
     },
     schedule: {
       label: "Schedule",
@@ -204,7 +205,7 @@ export const translations = {
     titleSaved: "Configuration Saved",
     saving: "Saving...",
     save: "Save Settings",
-    guidanceTitle: "Configure Email Campaigns Cron",
+    guidanceTitle: "Configure Email Campaigns Background Task",
     guidanceDescription:
       "Enable or disable the email campaigns cron task and configure its schedule, batch size, and execution settings.",
     runButton: "Run Now",

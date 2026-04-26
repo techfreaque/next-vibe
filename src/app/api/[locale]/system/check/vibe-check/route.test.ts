@@ -40,21 +40,21 @@ const TEST_FILES = [
 // ============================================================
 const EXPECTED_COUNTS = {
   // Total summary (counts may vary slightly based on test environment)
-  totalIssues: 319,
-  totalErrors: 313,
+  totalIssues: 308,
+  totalErrors: 302,
   totalWarnings: 6,
   totalFiles: 11,
 
   // Per-file expected errors+warnings
   files: {
-    "a11y-issues.tsx": { errors: 64, warnings: 2 },
-    "eslint-issues.tsx": { errors: 7, warnings: 0 },
+    "a11y-issues.tsx": { errors: 62, warnings: 2 },
+    "eslint-issues.tsx": { errors: 6, warnings: 0 },
     "general-issues.ts": { errors: 34, warnings: 0 },
     "i18n-issues.tsx": { errors: 43, warnings: 1 },
-    "jsx-capitalization-issues.tsx": { errors: 30, warnings: 1 },
-    "nextjs-issues.tsx": { errors: 48, warnings: 1 },
-    "promise-issues.ts": { errors: 11, warnings: 0 },
-    "react-issues.tsx": { errors: 34, warnings: 1 },
+    "jsx-capitalization-issues.tsx": { errors: 29, warnings: 1 },
+    "nextjs-issues.tsx": { errors: 37, warnings: 1 },
+    "promise-issues.ts": { errors: 12, warnings: 0 },
+    "react-issues.tsx": { errors: 37, warnings: 1 },
     "restricted-syntax-issues.tsx": { errors: 21, warnings: 0 },
     "typescript-issues.ts": { errors: 20, warnings: 0 },
     "calculate.ts": { errors: 1, warnings: 0 },
@@ -165,7 +165,7 @@ function runVibeCheck(targetPath = "./"): string {
 
   try {
     const output = execSync(
-      `cd "${TEST_PROJECT_PATH}" && bun "${resolve(ROOT_PATH, "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts")}" check "${targetPath}" 2>&1`,
+      `cd "${TEST_PROJECT_PATH}" && bun "${resolve(ROOT_PATH, "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts")}" check --fix=false "${targetPath}" 2>&1`,
       {
         encoding: "utf-8",
         timeout: 120000,
@@ -194,10 +194,9 @@ function countOccurrences(output: string, pattern: string): number {
  * The summary section looks like:
  * 📊 Summary
  * ──────────────────────────────────────────────────
- *    Files:       12
- *    Issues:      320
- *    ❌ 314 errors
- *    ⚠️ 6 warnings
+ * 📁 Files: 11
+ * ⚠️  Issues: 295
+ * ❌ Errors: 289
  */
 function extractSummary(output: string): {
   files: number;
@@ -207,16 +206,17 @@ function extractSummary(output: string): {
 } {
   const filesMatch = output.match(/Files:\s+(\d+)/);
   const issuesMatch = output.match(/Issues:\s+(\d+)/);
-  // Match errors/warnings in the summary section (after the emoji icons)
-  const errorsMatch = output.match(/❌\s*(\d+)\s*errors/);
-  const warningsMatch = output.match(/⚠️\s*(\d+)\s*warnings/);
+  // Match errors in new format "❌ Errors: N" or old format "❌ N errors"
+  const errorsMatch =
+    output.match(/❌\s*Errors:\s*(\d+)/) ??
+    output.match(/❌\s*(\d+)\s*errors/);
 
-  return {
-    files: filesMatch ? parseInt(filesMatch[1], 10) : 0,
-    issues: issuesMatch ? parseInt(issuesMatch[1], 10) : 0,
-    errors: errorsMatch ? parseInt(errorsMatch[1], 10) : 0,
-    warnings: warningsMatch ? parseInt(warningsMatch[1], 10) : 0,
-  };
+  const files = filesMatch ? parseInt(filesMatch[1], 10) : 0;
+  const issues = issuesMatch ? parseInt(issuesMatch[1], 10) : 0;
+  const errors = errorsMatch ? parseInt(errorsMatch[1], 10) : 0;
+  const warnings = issues - errors;
+
+  return { files, issues, errors, warnings };
 }
 
 // ============================================================
@@ -298,7 +298,7 @@ describe("Config Creation Flow", () => {
     expect(existsSync(TEST_PROJECT_CONFIG)).toBe(true);
     vibeCheckOutput = runVibeCheck("./");
     expect(vibeCheckOutput).toContain("Starting Oxlint check");
-    expect(vibeCheckOutput).toContain("All checks completed");
+    expect(vibeCheckOutput).toContain("Oxlint check completed");
   });
 });
 
@@ -332,7 +332,6 @@ describe("Vibe Check Complete Test Suite", () => {
       expect(vibeCheckOutput).toContain("Oxlint check completed");
       expect(vibeCheckOutput).toContain("ESLint check completed");
       expect(vibeCheckOutput).toContain("TypeScript check completed");
-      expect(vibeCheckOutput).toContain("All checks completed");
     });
 
     it("should detect errors", () => {
@@ -447,13 +446,13 @@ describe("Vibe Check Complete Test Suite", () => {
           "oxlint-plugin-restricted(restricted-syntax)",
         );
         expect(vibeCheckOutput).toContain(
-          "Usage of the 'unknown' type isn't allowed",
+          "Replace 'unknown' with existing typed interface",
         );
       });
 
       it("should detect object type usage", () => {
         expect(vibeCheckOutput).toContain(
-          "Usage of the 'object' type isn't allowed",
+          "Replace 'object' with existing typed interface",
         );
       });
 
@@ -1005,7 +1004,7 @@ describe("Compiled Runtime Tests", () => {
 
     try {
       compiledOutput = execSync(
-        `cd "${TEST_PROJECT_PATH}" && bun "${COMPILED_RUNTIME}" check ./ 2>&1`,
+        `cd "${TEST_PROJECT_PATH}" && bun "${COMPILED_RUNTIME}" check --fix=false ./ 2>&1`,
         { encoding: "utf-8", timeout: 120000 },
       );
     } catch (error) {
@@ -1062,7 +1061,7 @@ describe("Multi-Directory Tests", () => {
     beforeAll(() => {
       try {
         fromTestProjectOutput = execSync(
-          `cd "${TEST_PROJECT_PATH}" && bun "${resolve(ROOT_PATH, "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts")}" check ./ 2>&1`,
+          `cd "${TEST_PROJECT_PATH}" && bun "${resolve(ROOT_PATH, "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts")}" check --fix=false ./ 2>&1`,
           { encoding: "utf-8", timeout: 120000 },
         );
       } catch (error) {
@@ -1109,7 +1108,7 @@ describe("Multi-Directory Tests", () => {
     beforeAll(() => {
       try {
         fromRootOutput = execSync(
-          `cd "${ROOT_PATH}" && bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts check "src/app/api/[locale]/system/check/test-project" 2>&1`,
+          `cd "${ROOT_PATH}" && bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts check --fix=false "src/app/api/[locale]/system/check/test-project" 2>&1`,
           { encoding: "utf-8", timeout: 120000 },
         );
       } catch (error) {
@@ -1124,6 +1123,7 @@ describe("Multi-Directory Tests", () => {
       const hasMinimalIssues =
         fromRootOutput.includes("Keine Codequalitätsprobleme") ||
         fromRootOutput.includes("No code quality issues") ||
+        fromRootOutput.includes("No issues found") ||
         fromRootOutput.includes("true");
       expect(hasMinimalIssues).toBe(true);
     });

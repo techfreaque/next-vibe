@@ -22,13 +22,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { DefaultFolderId } from "../../config";
 import { ChatMessageRole, ChatMessageRoleDB } from "../../enum";
 import { scopedTranslation } from "./i18n";
-
-/**
- * Root folder IDs for filtering
- */
-const rootFolderIds = ["private", "shared", "public", "cron"] as const;
 
 /**
  * Global Message Search Endpoint (GET)
@@ -121,7 +117,7 @@ const { GET } = createEndpoint({
             fieldType: FieldDataType.TEXT,
             label: "search.get.rootFolderId.label" as const,
             description: "search.get.rootFolderId.description" as const,
-            schema: z.enum(rootFolderIds).optional(),
+            schema: z.enum(DefaultFolderId).optional(),
           }),
           role: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -245,7 +241,7 @@ const { GET } = createEndpoint({
       default: {
         query: "Tool execution failed",
         filters: {
-          rootFolderId: "private",
+          rootFolderId: DefaultFolderId.PRIVATE,
           role: ChatMessageRole.ASSISTANT,
         },
         pagination: {

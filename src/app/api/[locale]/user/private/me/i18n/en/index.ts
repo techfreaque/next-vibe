@@ -439,7 +439,7 @@ export const translations = {
     emailCard: {
       title: "Your email list",
       description:
-        "Visitors on your skill page can subscribe. You own the list - no platform in the middle.",
+        "Visitors on your skill page and creator profile can subscribe. You own the list - no platform in the middle.",
     },
     previewCard: {
       title: "Your Public Profile",

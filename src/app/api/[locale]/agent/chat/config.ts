@@ -5,6 +5,17 @@
 
 import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
 import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
+import {
+  CORTEX_DELETE_ALIAS,
+  CORTEX_EDIT_ALIAS,
+  CORTEX_LIST_ALIAS,
+  CORTEX_MKDIR_ALIAS,
+  CORTEX_MOVE_ALIAS,
+  CORTEX_READ_ALIAS,
+  CORTEX_SEARCH_ALIAS,
+  CORTEX_TREE_ALIAS,
+  CORTEX_WRITE_ALIAS,
+} from "@/app/api/[locale]/agent/cortex/constants";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -31,13 +42,15 @@ export enum DefaultFolderId {
   /** Incognito folder - localStorage only, never sent to server */
   INCOGNITO = "incognito",
 
-  /** Cron folder - threads created by scheduled AI agent tasks */
-  CRON = "cron",
+  /** Background folder - threads created by scheduled AI agent tasks */
+  BACKGROUND = "cron",
+
+  /** Support folder - admin-to-admin support threads via ws-provider */
+  SUPPORT = "support",
 }
 
 /**
  * Tool IDs denied per folder type. Stacked onto deniedToolIds in stream-setup.
- * Uses plain string aliases (not imports) to avoid circular deps - config.ts is foundational.
  * Admin-only tools (campaign-starter, leads-import, etc.) are already gated by allowedRoles
  * and don't need explicit denial here.
  */
@@ -46,14 +59,24 @@ export const FOLDER_DENIED_TOOL_IDS: Partial<
 > = {
   [DefaultFolderId.INCOGNITO]: [
     // Task infrastructure - results can't route back to localStorage-only threads
-    "coding-agent", // escalateToTask + spawns OS processes
-    "ssh-exec", // escalates long commands to cron tasks
-    "execute-tool", // creates remote cron tasks (PUBLIC-accessible)
-    "wait-for-task", // monitors tasks (useless without detach/wakeUp)
-    "complete-task", // forges task completion
-    "cron-create", // direct task creation
-    "execute-task", // runs stored tasks
-    "task-sync", // syncs remote instance tasks
+    "coding-agent",
+    "ssh-exec",
+    "execute-tool",
+    "wait-for-task",
+    "complete-task",
+    "cron-create",
+    "execute-task",
+    "task-sync",
+    // Cortex - requires authenticated user + server-side storage
+    CORTEX_LIST_ALIAS,
+    CORTEX_READ_ALIAS,
+    CORTEX_WRITE_ALIAS,
+    CORTEX_EDIT_ALIAS,
+    CORTEX_MKDIR_ALIAS,
+    CORTEX_MOVE_ALIAS,
+    CORTEX_DELETE_ALIAS,
+    CORTEX_TREE_ALIAS,
+    CORTEX_SEARCH_ALIAS,
   ],
   [DefaultFolderId.PUBLIC]: [
     "coding-agent",
@@ -64,6 +87,16 @@ export const FOLDER_DENIED_TOOL_IDS: Partial<
     "cron-create",
     "execute-task",
     "task-sync",
+    // Cortex - requires authenticated user + server-side storage
+    CORTEX_LIST_ALIAS,
+    CORTEX_READ_ALIAS,
+    CORTEX_WRITE_ALIAS,
+    CORTEX_EDIT_ALIAS,
+    CORTEX_MKDIR_ALIAS,
+    CORTEX_MOVE_ALIAS,
+    CORTEX_DELETE_ALIAS,
+    CORTEX_TREE_ALIAS,
+    CORTEX_SEARCH_ALIAS,
   ],
 };
 
@@ -374,19 +407,33 @@ export const DEFAULT_FOLDER_CONFIGS = {
     rolesModerate: [UserRole.PARTNER_ADMIN, UserRole.ADMIN], // Moderators and admins can moderate
     rolesAdmin: [UserRole.ADMIN], // Only admins can delete
   },
-  [DefaultFolderId.CRON]: {
-    id: DefaultFolderId.CRON,
-    translationKey: "common.cronChats",
+  [DefaultFolderId.BACKGROUND]: {
+    id: DefaultFolderId.BACKGROUND,
+    translationKey: "common.backgroundChats",
     icon: "clock",
-    descriptionKey: "folders.cronDescription",
+    descriptionKey: "folders.backgroundDescription",
     order: 4,
-    color: "green", // Green for automated/cron tasks
-    rolesView: [UserRole.ADMIN], // Only admins can view
-    rolesManage: [UserRole.ADMIN], // Only admins can manage
-    rolesCreateThread: [UserRole.ADMIN], // Only admins can create threads
-    rolesPost: [UserRole.ADMIN], // Only admins can post
+    color: "green", // Green for automated/background tasks
+    rolesView: [UserRole.CUSTOMER, UserRole.ADMIN], // Customers see their own threads, admins see all
+    rolesManage: [UserRole.ADMIN], // Only admins can manage the folder
+    rolesCreateThread: [UserRole.CUSTOMER, UserRole.ADMIN], // Cron system creates on behalf of user
+    rolesPost: [UserRole.CUSTOMER, UserRole.ADMIN], // Users can post in their own cron threads
     rolesModerate: [UserRole.ADMIN], // Only admins
     rolesAdmin: [UserRole.ADMIN], // Only admins
+  },
+  [DefaultFolderId.SUPPORT]: {
+    id: DefaultFolderId.SUPPORT,
+    translationKey: "common.supportChats",
+    icon: "help-circle",
+    descriptionKey: "folders.supportDescription",
+    order: 5,
+    color: "indigo",
+    rolesView: [UserRole.ADMIN], // Admin-only: local instance owners + remote support agents
+    rolesManage: [UserRole.ADMIN],
+    rolesCreateThread: [UserRole.ADMIN],
+    rolesPost: [UserRole.ADMIN],
+    rolesModerate: [UserRole.ADMIN],
+    rolesAdmin: [UserRole.ADMIN],
   },
 } as const satisfies Record<DefaultFolderId, DefaultFolderConfig>;
 

@@ -28,7 +28,7 @@ export const translations = {
       rootFolderId: {
         label: "Root Folder",
         description:
-          "Limit search to a specific root folder type (private, shared, public, cron)",
+          "Limit search to a specific root folder type (private, shared, public, background)",
       },
       role: {
         label: "Message Role",

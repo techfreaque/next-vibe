@@ -19,6 +19,7 @@ import { Home } from "next-vibe-ui/ui/icons/Home";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { Menu } from "next-vibe-ui/ui/icons/Menu";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { PanelLeft } from "next-vibe-ui/ui/icons/PanelLeft";
 import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Settings } from "next-vibe-ui/ui/icons/Settings";
@@ -127,6 +128,13 @@ export function AdminLayoutClient({
       href: `/${locale}/admin/remote` as const,
       icon: Link2,
       current: pathname.startsWith(`/${locale}/admin/remote`),
+      hidden: false,
+    },
+    {
+      name: t("navigation.support"),
+      href: `/${locale}/admin/support` as const,
+      icon: MessageSquare,
+      current: pathname.startsWith(`/${locale}/admin/support`),
       hidden: false,
     },
     {
