@@ -36,9 +36,13 @@ export class FilesListRepository {
     // Dynamic imports keep node:fs/promises, node:os, node:path and the ssh2
     // chain out of the static module graph so Turbopack's NFT tracer doesn't
     // scan next.config.ts as a side-effect of the ssh2 package.
-    const { readdir, stat } = await import("node:fs/promises");
-    const { homedir } = await import("node:os");
-    const { join, resolve } = await import("node:path");
+    const { readdir, stat } = await import(
+      /* turbopackIgnore: true */ "node:fs/promises"
+    );
+    const { homedir } = await import(/* turbopackIgnore: true */ "node:os");
+    const { join, resolve } = await import(
+      /* turbopackIgnore: true */ "node:path"
+    );
 
     const raw = data.path ?? "~";
     const dirPath =

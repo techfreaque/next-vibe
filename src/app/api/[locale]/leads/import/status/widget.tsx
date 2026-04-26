@@ -29,8 +29,9 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
 import type definition from "./definition";
 import type { ImportJobsStatusGetResponseOutput } from "./definition";
@@ -40,9 +41,7 @@ type Job = NonNullable<
 >["items"][number];
 
 interface CustomWidgetProps {
-  field: {
-    value: ImportJobsStatusGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 type TFunc = ReturnType<typeof useWidgetTranslation>;
@@ -265,7 +264,7 @@ export function ImportStatusContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.GET>();
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();

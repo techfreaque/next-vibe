@@ -16,24 +16,18 @@ import {
   useWidgetForm,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type endpoints from "./definition";
-import type { FilesWriteResponseOutput } from "./definition";
 
-interface WidgetProps {
-  field: {
-    value: FilesWriteResponseOutput | null | undefined;
-  } & (typeof endpoints.POST)["fields"];
-}
-
-export function FilesWriteContainer({ field }: WidgetProps): React.JSX.Element {
+export function FilesWriteContainer(): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.POST>();
   const form = useWidgetForm<typeof endpoints.POST>();
   const onSubmit = useWidgetOnSubmit();
   const { endpointMutations } = useWidgetContext();
 
-  const value = field.value;
+  const value = useWidgetValue<typeof endpoints.POST>();
   const isLoading = endpointMutations?.read?.isLoading ?? false;
   const content = form.watch("content") ?? "";
 

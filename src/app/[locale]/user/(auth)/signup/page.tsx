@@ -8,7 +8,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import { ReferralRepository } from "@/app/api/[locale]/referral/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { envClient } from "@/config/env-client";

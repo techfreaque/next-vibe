@@ -28,13 +28,13 @@ import {
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { cliRequestDataSchema } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { Platform } from "../unified-interface/shared/types/platform";
 import { TOOL_HELP_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-const HelpToolsWidget = lazyCliWidget(() =>
+const HelpToolsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.HelpToolsWidget })),
 );
 
@@ -61,8 +61,8 @@ const aiToolMetadataSchema = z.object({
   parameters: z.record(z.string(), z.unknown()).optional(),
   examples: z
     .object({
-      inputs: z.record(z.string(), cliRequestDataSchema).optional(),
-      responses: z.record(z.string(), cliRequestDataSchema).optional(),
+      inputs: z.record(z.string(), WidgetDataSchema).optional(),
+      responses: z.record(z.string(), WidgetDataSchema).optional(),
     })
     .optional(),
   /** Remote instance this tool belongs to (only present for remote tools) */

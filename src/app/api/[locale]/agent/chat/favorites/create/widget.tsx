@@ -84,12 +84,13 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
-import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/widget";
+import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { useChatSettings } from "../../settings/hooks";
@@ -98,15 +99,12 @@ import { DEFAULT_SKILLS } from "../../skills/config";
 import { ModelSelectionType } from "../../skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "../../skills/i18n";
 import type definition from "./definition";
-import type { FavoriteCreateResponseOutput } from "./definition";
 
 /**
  * Props for custom widget
  */
 interface CustomWidgetProps {
-  field: {
-    value: FavoriteCreateResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 /**
@@ -123,6 +121,7 @@ export function FavoriteCreateContainer({
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const navigate = useWidgetNavigation();
+  const createResult = useWidgetValue<typeof definition.POST>();
   const [isApplying, setIsApplying] = useState(false);
   const [activeSelector, setActiveSelector] = useState<
     | "chat"
@@ -691,7 +690,7 @@ export function FavoriteCreateContainer({
 
             <AlertWidget
               fieldName="success"
-              field={withValue(children.success, field.value?.success, null)}
+              field={withValue(children.success, createResult?.success, null)}
             />
 
             <Div className="flex flex-col gap-4">

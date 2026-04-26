@@ -9,6 +9,7 @@ import type { JSONValue } from "ai";
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { AbortReason, isStreamAbort } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
@@ -26,11 +27,11 @@ export class StreamErrorCatchHandler {
     maxDuration: number;
     model: ChatModelId;
     threadId: string;
-    userId: string | undefined;
+    user: JwtPayloadType;
     logger: EndpointLogger;
     t: AiStreamT;
   }): Promise<void> {
-    const { error, ctx, maxDuration, model, threadId, userId, logger, t } =
+    const { error, ctx, maxDuration, model, threadId, user, logger, t } =
       params;
 
     // Note: Abort errors are handled inline in stream-execution-handler.
@@ -46,7 +47,7 @@ export class StreamErrorCatchHandler {
           maxDuration,
           model,
           threadId,
-          userId,
+          user,
           lastParentId: ctx.lastParentId,
           lastSequenceId: ctx.lastSequenceId,
           dbWriter: ctx.dbWriter,
@@ -57,7 +58,7 @@ export class StreamErrorCatchHandler {
         await StreamErrorHandler.handleStreamError({
           error: error instanceof Error ? error : (error as JSONValue),
           threadId,
-          userId,
+          user,
           lastParentId: ctx.lastParentId,
           lastSequenceId: ctx.lastSequenceId,
           dbWriter: ctx.dbWriter,
@@ -77,7 +78,7 @@ export class StreamErrorCatchHandler {
         },
       );
     } finally {
-      await clearStreamingState(threadId, logger);
+      await clearStreamingState(threadId, logger, user);
       ctx.cleanup();
     }
   }

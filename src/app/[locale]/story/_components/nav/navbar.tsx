@@ -57,7 +57,7 @@ export function Navbar({
             <ThemeToggle locale={locale} />
           </Div>
 
-          <CountrySelector isNavBar locale={locale} user={user} />
+          <CountrySelector isNavBar user={user} />
 
           {/* Auth buttons display logic */}
           {!hideUserMenu && (

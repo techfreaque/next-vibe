@@ -180,6 +180,7 @@ export const translations: typeof enTranslations = {
     selectPlaceholder: "Wybierz...",
     boolTrue: "wł.",
     boolFalse: "wył.",
+    logPathDisabled: "logowanie do pliku wyłączone",
     restartWizard: "Kreator konfiguracji",
     generate: "Generuj",
     editConfirmHint: "[Enter] potwierdź  [Esc] anuluj",

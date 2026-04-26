@@ -10,6 +10,7 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { AiStreamT, AiStreamTranslationKey } from "../../stream/i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
@@ -20,7 +21,7 @@ export class StreamErrorHandler {
   static async handleStreamError(params: {
     error: Error | JSONValue;
     threadId: string;
-    userId: string | undefined;
+    user: JwtPayloadType;
     lastParentId: string | null;
     lastSequenceId: string | null;
     dbWriter: MessageDbWriter;
@@ -30,7 +31,7 @@ export class StreamErrorHandler {
     const {
       error,
       threadId,
-      userId,
+      user,
       lastParentId,
       lastSequenceId,
       dbWriter,
@@ -47,7 +48,8 @@ export class StreamErrorHandler {
       error: errorMessage,
       errorType: errorName,
       threadId,
-      userId: userId ?? null,
+      userId: user.isPublic ? null : user.id,
+      leadId: user.leadId,
       stack: errorStack,
     });
 
@@ -115,7 +117,7 @@ export class StreamErrorHandler {
       error: structuredError,
       parentId: lastParentId,
       sequenceId: lastSequenceId,
-      userId,
+      user,
     });
   }
 }

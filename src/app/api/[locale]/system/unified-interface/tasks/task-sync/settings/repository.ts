@@ -13,6 +13,7 @@ import { success } from "next-vibe/shared/types/response.schema";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { CRON_SCHEDULES, TASK_TIMEOUTS } from "../../constants";
 import { cronTasks } from "../../cron/db";
@@ -41,6 +42,7 @@ export class TaskSyncSettingsRepository {
 
   static async updateTaskSyncSettings(
     syncEnabled: boolean,
+    user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<TaskSyncSettingsPatchResponseOutput>> {
     if (syncEnabled) {
@@ -60,7 +62,7 @@ export class TaskSyncSettingsRepository {
           timeout: TASK_TIMEOUTS.MEDIUM,
           taskInput: {},
           runOnce: false,
-          userId: null,
+          userId: user.id,
         })
         .onConflictDoUpdate({
           target: [cronTasks.id],

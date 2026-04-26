@@ -62,9 +62,12 @@ import { ThreadPermissionsDialog } from "@/app/api/[locale]/agent/chat/threads/[
 import { ThreadShareDialog } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/widget";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetContext,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import {
   scopedTranslation as chatScopedTranslation,
   type ChatT,
@@ -74,8 +77,8 @@ import { DefaultFolderId } from "../../config";
 import type { ChatThread } from "../../db";
 import { useChatStore } from "../../hooks/store";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
-import type definition from "../definition";
 import type { ThreadListResponseOutput } from "../definition";
+import type definition from "../definition";
 import { scopedTranslation } from "../i18n";
 
 type ThreadFromResponse = ThreadListResponseOutput["threads"][number];
@@ -90,15 +93,6 @@ function getFolderName(folderId: DefaultFolderId, tChat: ChatT): string {
     [DefaultFolderId.CRON]: tChat("config.folders.cron"),
   };
   return folderNames[folderId];
-}
-
-/**
- * Props for custom widget - matches the customWidgetObject pattern
- */
-interface CustomWidgetProps {
-  field: {
-    value: ThreadListResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
 }
 
 /**
@@ -119,11 +113,7 @@ function ThreadRow({
   const { locale, logger, user } = useWidgetContext();
   const { t } = scopedTranslation.scopedT(locale);
   const { t: tChat } = chatScopedTranslation.scopedT(locale);
-  const navIsStreaming = useChatNavigationStore((s) => s.isStreaming);
-  // Optimistic: show streaming indicator immediately when the active thread starts
-  // streaming (before the WS STREAMING_STATE_CHANGED event arrives from the server)
-  const isThreadStreaming =
-    thread.streamingState !== "idle" || (isActive && navIsStreaming);
+  const isThreadStreaming = thread.streamingState !== "idle";
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(thread.title);
   const [isHovered, setIsHovered] = useState(false);
@@ -791,21 +781,20 @@ export function ThreadsList({
  * ThreadsListContainer - the widget rendered by EndpointsPage for threads/definition GET.
  * Only used as fallback; primary rendering is done via ThreadsList in folders/widget.tsx.
  */
-export function ThreadsListContainer({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
+export function ThreadsListContainer(): React.JSX.Element {
   const { logger, user, endpointMutations } = useWidgetContext();
 
   const isLoadingFresh = endpointMutations?.read?.isLoadingFresh ?? false;
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
 
-  const dataLoaded = field.value !== null && field.value !== undefined;
+  const fieldValue = useWidgetValue<typeof definition.GET>();
+  const dataLoaded = fieldValue !== null && fieldValue !== undefined;
 
   // Only show root threads here (folderId === null).
   // Folder threads are rendered inside FolderRow in folders/widget.tsx.
   const rootThreads = useMemo(
-    () => (field.value?.threads ?? []).filter((t) => t.folderId === null),
-    [field.value?.threads],
+    () => (fieldValue?.threads ?? []).filter((t) => t.folderId === null),
+    [fieldValue?.threads],
   );
 
   const foldersEndpoint = useEndpoint(

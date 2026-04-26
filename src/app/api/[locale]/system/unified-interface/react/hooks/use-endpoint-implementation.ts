@@ -5,8 +5,9 @@ import { useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointReadOptions } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type {
   DeleteRequest,
@@ -39,6 +40,7 @@ import type { ApiMutationOptions } from "./types";
 import { useEndpointCreate } from "./use-endpoint-create";
 import { useEndpointDelete } from "./use-endpoint-delete";
 import { useEndpointRead } from "./use-endpoint-read";
+import { useEndpointSubscription } from "./use-endpoint-subscription";
 
 /**
  * Hook that provides all CRUD operations for an endpoints object
@@ -199,6 +201,20 @@ export function useEndpoint<
   );
 
   const read = useEndpointRead(readEndpoint, logger, user, readOptions);
+
+  // Subscribe to definition-driven WS events for the GET endpoint.
+  // read?.cacheKey is the same key useEndpointRead built — guaranteed to match.
+  // read.form.getValues() provides the current request data (e.g. rootFolderId)
+  // to onEvent callbacks via requestDataRef — no re-subscription on form changes.
+  useEndpointSubscription(
+    readEndpoint,
+    options?.subscribeToEvents ?? false,
+    readUrlPathParams,
+    read?.form.getValues() as Record<string, WidgetData> | undefined,
+    logger,
+    read?.cacheKey,
+    user,
+  );
 
   // Use the appropriate operation based on endpoint type
   const autoPrefillData = useMemo(() => {

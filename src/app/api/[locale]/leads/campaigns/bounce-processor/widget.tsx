@@ -22,22 +22,19 @@ import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
 
-type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
-
 interface CustomWidgetProps {
-  field: {
-    value: GetResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 export function BounceProcessorConfigWidget({
@@ -49,7 +46,7 @@ export function BounceProcessorConfigWidget({
   const locale = useWidgetLocale();
   const form = useWidgetForm<typeof definition.POST>();
 
-  const savedData = field.value;
+  const savedData = useWidgetValue<typeof definition.GET>();
   const hasBeenSaved = savedData !== null && savedData !== undefined;
   const isPending = endpointMutations?.update?.isSubmitting;
 

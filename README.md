@@ -2,7 +2,7 @@
 
 **Define it once. It exists everywhere.**
 
-One endpoint definition. 13 platforms. Not generated code that drifts - one living contract that the web app, mobile app, CLI, AI agent, MCP server, cron system, and dataflow engine all read natively. Change the definition, every platform updates instantly. Delete the folder, the feature ceases to exist everywhere at once.
+One folder per feature. `definition.ts` defines the contract, `route.ts` wires it up, `widget.tsx` makes it yours. Two required, one you'll always want. 13 platforms. Not generated code that drifts - one living contract that the web UI, CLI, AI agent, MCP server, mobile app, cron system, and dataflow engine all read natively. Change the definition, every platform updates. Delete the folder, the feature ceases to exist everywhere at once.
 
 [![License: GPL-3.0](https://img.shields.io/badge/Framework-GPL--3.0-blue.svg)](LICENSE)
 [![License: MIT](https://img.shields.io/badge/App-MIT-green.svg)](LICENSE)
@@ -12,11 +12,15 @@ One endpoint definition. 13 platforms. Not generated code that drifts - one livi
 
 > **The spiritual successor to WordPress - for the AI era.** Fork it, own it, build your platform. No vendor lock-in. No black box. You own every line.
 
+> **Linux only (for now).** Mac and Windows aren't officially supported yet. Getting it running on either is probably a few Claude Code or Codex prompts away - we just don't have a Mac. PRs and issues welcome.
+
+> **Interactive CLI broken since v3.2.0.** `vibe -i` / `--interactive` is temporarily disabled. The trade-off was intentional: the entire codebase now runs on CLI and web through the same renderer layer. `next-vibe-ui` has a CLI equivalent of every component - same props, same types, shadcn-derived for web, Ink-based for terminal. Interactive mode returns once the unified renderer is fully stable.
+
+> **Migrating from Next.js to TanStack Start + Vite Nitro.** Dev already defaults to TanStack - fast cold start, lighter footprint, and still optimizing. Production runs Next.js - stable and proven. The tradeoff: occasional SSR hydration errors in dev that clear on refresh. Actively being resolved.
+
 ---
 
 ## Getting Started
-
-### Step 1 - Clone and Install
 
 ```bash
 git clone https://github.com/techfreaque/next-vibe
@@ -24,108 +28,78 @@ cd next-vibe
 bun install
 ```
 
-### Step 2 - Start the Server
-
 Three commands, three situations:
 
 ```bash
-vibe dev                  # local development
+vibe dev                  # local development (Docker DB, migrations, seeds, hot reload)
 vibe build && vibe start  # production, first time
-vibe rebuild              # production, after changes
+vibe rebuild              # production, zero-downtime update after changes
 ```
 
-**`vibe dev`** - for local development. Starts PostgreSQL in Docker, runs migrations, seeds data, hot reload. No `.env` editing needed.
+Open the app → **Login as Admin** (no password in dev) → the setup wizard walks you through AI provider config and admin credentials.
 
-**`vibe build && vibe start`** - for your first production deploy on a server. Build the app, then start the production server with cron tasks.
+**Claude Code** _(recommended - no API key)_: `claude login`, then pick any `(claude-code)` model in the model selector.
+**OpenRouter** _(100+ models, pay per use)_: paste your key from [openrouter.ai/keys](https://openrouter.ai/keys).
 
-**`vibe rebuild`** - for updating a running production server. Runs `vibe check`, rebuilds, and hot-restarts with zero downtime. This is what you run after asking the AI to build or change something.
+### Deploy
 
-### Step 3 - Login and Configure
-
-Open the app and click **"Login as Admin"** - no password required in dev mode. The setup wizard walks you through:
-
-- Choosing and configuring your AI provider (Claude Code, OpenRouter, etc.)
-- Setting your admin password
-
-**Option A: Claude Code** _(recommended - no API key needed)_
-
-If you have a Claude subscription and the [Claude Code CLI](https://claude.ai/code), sign in once:
+Works on any VPS. Scales to Kubernetes.
 
 ```bash
-claude login
+bash scripts/install-docker.sh     # Docker deployment
+# or: vibe build && vibe start     # bare metal
+# Point Caddy / nginx at port 3000
 ```
 
-Then select any `claude-code-*` model in the model picker.
+**Kubernetes:** `kubectl apply -k k8s/` - templates for web, workers, Redis, ingress, namespace.
 
-**Option B: OpenRouter** _(200+ models, pay per use)_
-
-Paste your key from [openrouter.ai/keys](https://openrouter.ai/keys) in the wizard. Claude, ChatGPT, Gemini, Llama, Mistral, DeepSeek, and everything else.
-
----
-
-### Choose Your Deployment
-
-#### Self-Hosted Platform - The WordPress Route
-
-Full production deployment on your own domain. Works on any VPS. Scales to Kubernetes when you need it.
-
-```bash
-# docker deployment script
-bash scripts/install-docker.sh
-# Or run on the machine itself
-vibe build && vibe start
-# Point Caddy / nginx at port 3000 - done
-```
-
-**Kubernetes:** edit `k8s/secret.yaml`, then `kubectl apply -k k8s/`. Templates for web, task workers, Redis, ingress, and namespace included.
-
-**Connect your local machine** so Thea can route tasks to your dev tools: go to **Admin → Remote Connections** in the dashboard and add your local instance URL. Memories and tasks sync every 60 seconds. No port forwarding, no VPN - your local instance initiates the connection on the pulse.
+**Connect your dev machine:** Admin → Remote Connections → add your local URL. Thea discovers your tools, syncs memories and tasks every 60s. Your machine initiates the connection - no port forwarding needed.
 
 ---
 
 ## The Core Idea
 
-You build a contact form. Then support wants a CLI command. Then the AI agent needs to file tickets. Then mobile needs the same form. Then someone wants an MCP tool. Five implementations. Five places where bugs hide.
+You build a contact form. Support wants a CLI command. The AI needs to file tickets. Mobile needs the same form. Someone asks for an MCP tool. Five implementations. Five places where bugs hide.
 
-**NextVibe's answer:** describe your feature once - its inputs, outputs, validation, permissions, UI hints, error types, translations, and examples - and every platform renders it natively.
+NextVibe: describe the feature once - inputs, outputs, validation, permissions, UI hints, error types, translations, examples - and every platform renders it natively.
 
-| #   | Platform             | Status        | What it does                                                                                                      |
-| --- | -------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------- |
-| 1   | **Web API**          | ✅ Production | RESTful endpoint, full type safety                                                                                |
-| 2   | **React UI**         | ✅ Production | Data-driven forms and display widgets from the definition                                                         |
-| 3   | **CLI**              | ✅ Production | Every endpoint is a command with auto-generated flags                                                             |
-| 4   | **CLI Package**      | ✅ Production | Ship your CLI as an installable npm package                                                                       |
-| 5   | **AI Tools**         | ✅ Production | OpenAI/Anthropic function-calling schema - auto-generated                                                         |
-| 6   | **MCP Server**       | ✅ Production | Model Context Protocol - plug into any AI workflow                                                                |
-| 7   | **Remote Skills**    | 🚧 Beta       | AI-readable skill files for agent capability discovery                                                            |
-| 8   | **Cron / Pulse**     | ✅ Production | Scheduled execution with per-instance task routing                                                                |
-| 9   | **WebSocket Events** | ✅ Production | Real-time pub/sub - in-process or Redis for scale                                                                 |
-| 10  | **React Native**     | 🚧 Beta       | Same contract on iOS/Android - NativeWind 5 + Expo Router                                                         |
-| 11  | **Electron**         | 🚧 Beta       | Desktop app - macOS, Linux, Windows from the same build                                                           |
-| 12  | **Vibe Frame**       | 🚧 Beta       | Embed any endpoint as an iframe widget on any website. Federated widgets (any remote NextVibe instance) included. |
-| 13  | **tRPC**             | ⏸ Inactive    | Type-safe client-server calls - available but unused, replaced by a custom RPC layer                              |
+| #   | Platform             | Status        | What it does                                                        |
+| --- | -------------------- | ------------- | ------------------------------------------------------------------- |
+| 1   | **Web API**          | ✅ Production | RESTful endpoint, full type safety                                  |
+| 2   | **React UI**         | ✅ Production | Data-driven forms and widgets from the definition                   |
+| 3   | **CLI**              | ✅ Production | Every endpoint is a command with auto-generated flags               |
+| 4   | **CLI Package**      | ✅ Production | Ship your CLI as an installable npm package                         |
+| 5   | **AI Tools**         | ✅ Production | Function-calling schema for any provider - auto-generated           |
+| 6   | **MCP Server**       | ✅ Production | Model Context Protocol - plug into any AI workflow                  |
+| 7   | **Remote Skills**    | 🚧 Beta       | AI-readable skill files for cross-agent capability discovery        |
+| 8   | **Cron / Pulse**     | ✅ Production | Scheduled execution with per-instance task routing                  |
+| 9   | **WebSocket Events** | ✅ Production | Real-time pub/sub - in-process or Redis for scale                   |
+| 10  | **React Native**     | 🚧 Beta       | Same contract on iOS/Android - NativeWind 5 + Expo Router           |
+| 11  | **Electron**         | 🚧 Beta       | Desktop app from the same build                                     |
+| 12  | **Vibe Frame**       | 🚧 Beta       | Embed any endpoint as a widget on any website. Federation built in. |
+| 13  | **tRPC**             | ⏸ Inactive    | Available but replaced by a custom RPC layer                        |
 
-There is no "API for humans" and "API for AI." There's just the tool.
+There is no "API for humans" and "API for AI." There's one contract. Everything reads it.
 
 ---
 
-## One Folder Per Feature
+## One Folder = One Feature
 
 ```
 contact/
-  definition.ts    - What it does (contract)
-  route.ts         - Makes it available on all 13 platforms
-  repository.ts    - Where the logic lives (convention - can be inline in route.ts)
-  i18n/            - What it says (translations)
-  widget.tsx       - How it looks (custom React UI override)
-  widget.cli.tsx   - How it looks in the terminal (Ink override)
-  email.tsx        - What it sends (transactional email)
-  db.ts            - What it stores (Drizzle schema)
+  definition.ts    - The contract (fields, validation, permissions, examples)
+  route.ts         - Wires it to all 13 platforms
+  repository.ts    - Business logic (or inline in route.ts)
+  i18n/            - Translations (en, de, pl - compile-time checked)
+  widget.tsx       - Custom web/native UI
+  widget.cli.tsx   - Custom terminal UI (Ink)
+  email.tsx        - Transactional email template
+  db.ts            - Drizzle schema
 ```
 
-Only `definition.ts` and `route.ts` are required. Everything else is added when you need it. Add a field to `definition.ts` - the web form, CLI flags, AI tool schema, and mobile screen all update. Delete the folder - the feature is gone from every platform. No orphaned code, no dead routes, no cleanup.
+`definition.ts` and `route.ts` are required. `widget.tsx` is optional but you'll want it for any non-trivial endpoint — it's how users actually experience the feature. Everything else is added when needed. Add a field to the definition — web form, CLI flags, AI tool schema, and mobile screen all update. Delete the folder — gone from every platform. No orphans. No cleanup.
 
-→ Full pattern docs: [Definition](docs/patterns/definition.md) · [Route](docs/patterns/route.md) · [Repository](docs/patterns/repository.md) · [Widget](docs/patterns/widget.md) · [All patterns](docs/README.md)
+> [Definition](docs/patterns/definition.md) · [Route](docs/patterns/route.md) · [Repository](docs/patterns/repository.md) · [Widget](docs/patterns/widget.md) · [All patterns](docs/README.md)
 
 ---
 
@@ -175,7 +149,7 @@ const { POST } = createEndpoint({
 });
 ```
 
-From this one file: web renders a form · CLI gets `vibe contact --name="Jane" --message="..."` · AI gets a function-calling schema · MCP server exposes a tool · validation and permissions identical on every platform.
+From this one file: web renders a form · CLI gets `vibe contact --name="Jane" --message="..."` · AI gets a function-calling schema · MCP server exposes a tool · validation and permissions identical everywhere.
 
 ### route.ts
 
@@ -190,7 +164,7 @@ export const { POST, tools } = endpointsHandler({
 });
 ```
 
-### Platform access control - one array controls everything
+### Access control - one array
 
 ```typescript
 allowedRoles: [
@@ -207,15 +181,17 @@ allowedRoles: [
 
 ## AI Is Not a Feature. It's a Team Member.
 
-Most platforms treat AI as a chatbot widget bolted on. NextVibe is built around a different idea: the AI agent is a full participant, operating through the same contracts as every human.
+The agent operates through the same contracts as every human user. When Thea calls your contact endpoint, she hits the same `definition.ts` and `route.ts` as the browser. Same validation. Same permissions. No special API.
 
-When Thea calls your contact endpoint, she uses the same definition a user sees in their browser. Same validation. Same permissions. No special API.
+### Skills (skill.ts)
 
-### Skills & Skills
+A skill is a saved AI configuration: persona, model selection, tool whitelist. Users or the AI create them, favorite them, and on the next turn the model already knows what sub-agents are available.
 
-Every AI skill in NextVibe is two things at once: a **persona** for the user (name, avatar, personality, memory context) and a **skill set** for the AI (which endpoints it can call, which models it uses, what it's optimized for). The `.md` skill file is what other platforms - Claude Code, Cursor - read to discover the skill's capabilities. A stats analyst skill can call `ema_GET`, `rsi_GET`, `bollinger-bands_GET` directly as AI tools.
+This is how delegation works. A cheap orchestrator handles the conversation. When it needs serious writing, it calls `master-writer` - pinned to Claude Opus. Research? `researcher` - Grok with search tools. The expensive model only runs when that specific capability is needed. Any skill can call any other. Users shape the team; the AI routes automatically.
 
-### Central Thea + Local Hermes
+The generated `.md` skill file is machine-readable - Claude Code, Cursor, or any MCP client can discover and call skills directly. Skills are context-efficient by design: `skill-create` pins only `help-tool` and `execute-tool`. One call to `help-tool` returns the full schema for any tool on demand.
+
+### Thea + Hermes
 
 ```
               +------------------+
@@ -231,66 +207,66 @@ Every AI skill in NextVibe is two things at once: a **persona** for the user (na
     +--------------+       +--------------+
 ```
 
-**Thea** runs 24/7 on production. She talks to users, manages tasks, coordinates work, and runs the platform. Not an assistant - the AI team lead.
+**Thea** runs 24/7 on production. Talks to users, manages tasks, coordinates work. Not an assistant - the AI team lead.
 
-**Hermes** is the local worker. Connect via `vibe remote-connect`. The pulse syncs memories, capabilities, and tasks every 60 seconds. Thea discovers local tools via `help(instanceId="hermes")`, executes them remotely, and routes Claude Code tasks to the right machine. No Jira. No standup.
+**Hermes** is the local worker. `vibe remote-connect` links your machine. The pulse syncs memories, capabilities, and tasks every 60 seconds. Thea discovers local tools via `help(instanceId="hermes")`, executes remotely, routes coding tasks to the right machine.
 
-**What Thea can do:** 42+ AI models · skill.ts files · Persistent memories · Tool calling (any endpoint) · Task scheduling · MCP · Voice (TTS + STT)
-
----
-
-## Vibe Sense - Your Platform Watching Itself
-
-Vibe Sense is a dataflow engine built entirely on the same endpoint pattern. Every node **is** an endpoint.
-
-```
-DataSource endpoints → Indicator endpoints → Transformer endpoints → Evaluator endpoints → Action endpoints
-```
-
-An EMA node is just `vibe analytics/indicators/ema --period=14 --source=leads-created`. A threshold evaluator is `vibe analytics/evaluators/threshold --value=... --threshold=100`. Chain them into a graph. The graph engine calls them via `getRouteHandler()`. Same contracts. Same type safety. Same validation.
-
-**Ships with graph seeds:** lead funnel monitoring, credit economy health, user growth tracking. Ready on first boot.
-
-Use cases: business metric monitoring · trading strategy execution · IoT anomaly detection · email deliverability health · any process that can be described as data → conditions → actions.
-Chara
-The graph builder canvas is live in the admin panel. Backtest: replay any strategy over history - evaluator calls are intercepted so nothing fires. Multi-resolution: mix 5-minute and daily timeframes in the same graph.
-
-→ [Vibe Sense docs](docs/vibe-sense/)
+**Capabilities:** 100+ AI models · skill delegation · persistent memories · tool calling (any endpoint) · task scheduling · MCP · any-to-any modality (text · image · audio · video · music)
 
 ---
 
-## Type Safety That Actually Means Something
+## Vibe Sense
 
-- **Translations are type-checked.** `t("contact.form.fields.name.label")` compiles. `t("typo.here")` is a compiler error. Across three languages.
-- **Error types are exhaustive.** Every endpoint declares which errors it can return. Miss one, the compiler complains.
-- **Schemas flow end-to-end.** One Zod schema validates the API, types the React hooks, generates CLI flags, and constrains the AI tool schema. Zero drift.
-- **`vibe check` is one command.** Oxlint + ESLint + TypeScript together, in parallel. AI agents can't skip half the checks.
+A dataflow engine built on the same endpoint pattern. Every node **is** an endpoint.
 
-**245 endpoints. 750,000+ lines. Zero `any`. Zero `unknown` casts. Zero runtime type errors.**
+```
+DataSource → Indicator → Transformer → Evaluator → Action
+```
 
-`@next-vibe/checker` is available as a standalone npm package - bring the same zero-escape-hatch quality enforcement to any TypeScript project.
+An EMA node is `vibe analytics/indicators/ema --period=14 --source=leads-created`. A threshold evaluator is `vibe analytics/evaluators/threshold --value=... --threshold=100`. Chain them into a graph. Same contracts. Same type safety.
+
+Graph builder canvas is live in admin. Backtest replays any strategy over history - evaluator calls are intercepted so nothing fires. Mix timeframes freely.
+
+**Ships with seeds:** lead funnel monitoring, credit economy health, user growth tracking.
+
+**Use cases:** business metrics · trading strategies · IoT anomaly detection · email deliverability · any pipeline that's data → conditions → actions.
+
+> [Vibe Sense docs](docs/vibe-sense/)
+
+---
+
+## Type Safety
+
+- **Translations are compile-time checked.** `t("contact.form.fields.name.label")` compiles. `t("typo.here")` is a compiler error. Three languages.
+- **Error types are exhaustive.** Every endpoint declares its possible errors. Miss one, compiler fails.
+- **Schemas flow end-to-end.** One Zod schema validates the API, types the hooks, generates CLI flags, constrains the AI tool schema. Zero drift.
+- **`vibe check` runs everything.** Oxlint + ESLint + TypeScript in parallel. One command. No shortcuts.
+
+**430+ endpoints. 2,100,000+ lines. Zero `any`. Zero `unknown` casts. Zero runtime type errors.**
+
+`@next-vibe/checker` ships as a standalone npm package for any TypeScript project.
 
 ---
 
 ## Unbottled.ai - The Flagship
 
-NextVibe is the engine. **[Unbottled.ai](https://unbottled.ai)** is the product - like WordPress.org vs WordPress.com. Fork and deploy your own, or use ours.
+NextVibe is the engine. **[Unbottled.ai](https://unbottled.ai)** is the product. Like WordPress.org vs WordPress.com - fork and deploy your own, or use ours.
 
-Free speech AI - 42+ models, user-controlled content filtering. Users choose their own censorship level.
+Free speech AI. 100+ models. Users choose their own content filtering level.
 
-- **AI Chat** - Multi-model, branching message trees, skills, memories, curated favorites
+- **AI Chat** - Multi-model, branching message trees, skills, memories, favorites
 - **Payments** - Stripe + NowPayments (crypto), credits, referral program
-- **Communication** - React Email, full SMTP/IMAP client, automated campaigns
+- **Communication** - React Email, SMTP/IMAP client, automated campaigns
 - **Lead System** - Journey workflows, CSV import, engagement analytics
 - **Admin** - Auto-generated panels, database studio, health monitoring, cron dashboard
 
 | Metric                           | Value          |
 | -------------------------------- | -------------- |
-| TypeScript files                 | 4,400+         |
-| Lines of code                    | 750,000+       |
-| Endpoint definitions             | 245            |
+| TypeScript files                 | 7,000+         |
+| Lines of code                    | 2,100,000+     |
+| Endpoint definitions             | 430+           |
 | Platforms per endpoint           | Up to 13       |
-| Database tables                  | 25+            |
+| Database tables                  | 28+            |
 | Languages (compile-time checked) | 3 (en, de, pl) |
 | Runtime type errors              | 0              |
 
@@ -298,35 +274,35 @@ Free speech AI - 42+ models, user-controlled content filtering. Users choose the
 
 ## Tech Stack
 
-| Layer      | Technology                                                        |
-| ---------- | ----------------------------------------------------------------- |
-| Runtime    | Bun                                                               |
-| Language   | TypeScript 7 / TSGO (strict mode)                                 |
-| Web        | Next.js 16 (App Router), React 19, Tailwind CSS 4, shadcn-like UI |
-| Mobile     | React Native, NativeWind 5, Expo Router                           |
-| Desktop    | Electron 40                                                       |
-| Database   | PostgreSQL + Drizzle ORM                                          |
-| Validation | Zod - one schema, all platforms                                   |
-| AI         | Claude Code, OpenRouter (200+ models)                             |
-| MCP        | Model Context Protocol server                                     |
-| Quality    | Vibe checker (Oxlint + ESLint + TypeScript)                       |
-| Email      | React Email + SMTP/IMAP                                           |
-| Payments   | Stripe, NowPayments                                               |
+| Layer      | Technology                                                                                            |
+| ---------- | ----------------------------------------------------------------------------------------------------- |
+| Runtime    | Bun                                                                                                   |
+| Language   | TypeScript 7 / TSGO (strict mode)                                                                     |
+| Web        | TanStack Start + Vite Nitro (dev) · Next.js 16 (prod) · React 19 · Tailwind CSS 4 · shadcn-derived UI |
+| Mobile     | React Native, NativeWind 5, Expo Router                                                               |
+| Desktop    | Electron 40                                                                                           |
+| Database   | PostgreSQL + Drizzle ORM                                                                              |
+| Validation | Zod - one schema, all platforms                                                                       |
+| AI         | Claude Code, OpenRouter (100+ models)                                                                 |
+| MCP        | Model Context Protocol server                                                                         |
+| Quality    | Vibe checker (Oxlint + ESLint + TypeScript)                                                           |
+| Email      | React Email + SMTP/IMAP                                                                               |
+| Payments   | Stripe, NowPayments                                                                                   |
 
 ---
 
-## Vibe CLI
+## CLI
 
 ```bash
 # Dev & production
-vibe dev                    # start dev server + Docker DB (add -r to reset)
+vibe dev                    # dev server + Docker DB (add -r to reset)
 vibe build                  # build for production
-vibe start                  # start production server + cron tasks
+vibe start                  # start production + cron tasks
 vibe rebuild                # check + rebuild + hot-restart (zero downtime)
 
-# Code quality
+# Quality
 vibe check                  # lint + typecheck in one command
-vibe check src/path file.ts # check a specific area, one or more files
+vibe check src/path file.ts # check specific files
 
 # Database
 vibe migrate                # run pending migrations
@@ -335,13 +311,13 @@ vibe seed / vibe reset      # seed / drop + migrate + seed
 vibe studio                 # Drizzle Studio (browser DB GUI)
 vibe sql "SELECT ..."       # raw SQL
 
-# Any endpoint as a command
+# Any endpoint = a command
 vibe web-search "quantum computing"
 vibe analytics/indicators/ema --period=14 --source=leads-created
 
 # MCP + remote
 vibe mcp                    # start MCP server
-vibe remote-connect --instance-id=hermes --remote-url=https://... --email=... --password=...
+vibe remote-connect --help
 vibe help                   # list everything
 ```
 
@@ -349,11 +325,11 @@ vibe help                   # list everything
 
 ## Docs
 
-- **[Full Documentation Index](docs/README.md)**
-- **[Definition](docs/patterns/definition.md)** · **[Repository](docs/patterns/repository.md)** · **[Route](docs/patterns/route.md)** · **[Database](docs/patterns/database.md)**
-- **[i18n](docs/patterns/i18n.md)** · **[Enum](docs/patterns/enum.md)** · **[Seeds](docs/patterns/seeds.md)** · **[Logger](docs/patterns/logger.md)**
-- **[Widget (Web)](docs/patterns/widget.md)** · **[Widget (CLI/MCP)](docs/patterns/widget.cli.md)** · **[Hooks](docs/patterns/hooks.md)**
-- **[Email](docs/patterns/email.md)** · **[Tasks](docs/patterns/tasks.md)** · **[React Native](docs/patterns/repository.native.md)** · **[Client Repository](docs/patterns/repository.client.md)**
+- **[Full Index](docs/README.md)**
+- [Definition](docs/patterns/definition.md) · [Repository](docs/patterns/repository.md) · [Route](docs/patterns/route.md) · [Database](docs/patterns/database.md)
+- [i18n](docs/patterns/i18n.md) · [Enum](docs/patterns/enum.md) · [Seeds](docs/patterns/seeds.md) · [Logger](docs/patterns/logger.md)
+- [Widget (Web)](docs/patterns/widget.md) · [Widget (CLI/MCP)](docs/patterns/widget.cli.md) · [Hooks](docs/patterns/hooks.md)
+- [Email](docs/patterns/email.md) · [Tasks](docs/patterns/tasks.md) · [React Native](docs/patterns/repository.native.md) · [Client Repository](docs/patterns/repository.client.md)
 
 ---
 
@@ -361,47 +337,45 @@ vibe help                   # list everything
 
 ### New Platforms
 
-The endpoint definition is the single source of truth. Every new platform is a new renderer + one new permission marker. Labels, types, validation, permissions, UI hints, and examples are already there - most new platforms need almost nothing added.
+Every new platform is a renderer + one permission marker. The definition already has everything it needs.
 
-| #   | Platform                        | Marker                | What it unlocks                                                                                                                                                                                                                                       |
-| --- | ------------------------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Trading Endpoints**           | -                     | Exchange connectivity (order placement, portfolio queries, position management) as first-class endpoints. Feeds Vibe Sense natively - price series, P&L, position data become data sources. Full strategy builder in the graph editor.                |
-| 2   | **Browser Extension**           | `EXTENSION_VISIBLE`   | Every endpoint becomes a browser action or context menu item. The definition drives a popup UI. Right-click an email → "Add to leads" → endpoint fires. VibeFrame's cross-origin bridge adapts directly to the extension sandbox.                     |
-| 3   | **Voice / Telephony**           | `VOICE_VISIBLE`       | Endpoints callable via phone or voice assistant. Field labels become IVR prompts, Zod validates speech-to-text output, response fields become TTS. TTS + STT already in the platform.                                                                 |
-| 4   | **Actionable Email**            | `EMAIL_ACTIONABLE`    | Endpoints callable directly from an email - approve, confirm, trigger a workflow - via signed one-time tokens. React Email already in the stack. No browser required.                                                                                 |
-| 5   | **Spreadsheet / Grid**          | `SPREADSHEET_VISIBLE` | Collection endpoints as live editable spreadsheets. Columns from response fields, row actions from endpoints, validation from Zod. Embeddable via VibeFrame.                                                                                          |
-| 6   | **Webhook Receiver**            | `WEBHOOK_SOURCE`      | Endpoints as inbound webhook targets. The definition declares the expected payload as a Zod schema, validates and normalizes it, and feeds Vibe Sense as a time series.                                                                               |
-| 7   | **GraphQL**                     | `GRAPHQL_VISIBLE`     | Endpoints exposed as GraphQL queries and mutations. No `.graphql` file to maintain - generated live from the registry. Subscriptions map to existing WebSocket events.                                                                                |
-| 8   | **OpenAPI / Swagger**           | `OPENAPI_VISIBLE`     | Fully compliant OpenAPI 3.1 spec generated live from the registry. Always current because it IS the definition.                                                                                                                                       |
-| 9   | **Automation Platforms**        | `AUTOMATION_VISIBLE`  | Endpoints published as triggers and actions in Zapier, Make, and n8n. Your platform appears as a native app generated from your definitions.                                                                                                          |
-| 10  | **Slash Commands**              | `SLASH_COMMAND`       | Endpoints callable as slash commands inside Notion, Linear, or Slack. The CLI flag parser already handles this syntax.                                                                                                                                |
-| 11  | **QR Code / NFC**               | `QR_VISIBLE`          | Endpoints reachable via QR code or NFC tap with pre-filled parameters and signed tokens. Scan at a venue → check-in fires.                                                                                                                            |
-| 12  | **PDF / Document Generation**   | `DOCUMENT_OUTPUT`     | Response fields renderable as PDF documents. Invoice, contract, report - the response schema defines the document structure. No separate template system.                                                                                             |
-| 13  | **IoT / MQTT**                  | `IOT_VISIBLE`         | Endpoints exposed as MQTT topics. A sensor publishes, the endpoint validates, the result feeds Vibe Sense. Threshold evaluator detects anomaly, fires an action. The full monitoring chain applies to physical hardware.                              |
-| 14  | **AR / Spatial**                | `SPATIAL_VISIBLE`     | Response fields rendered as spatial UI in AR/VR - Apple Vision Pro, Meta Quest, WebXR. Vibe Sense graphs as floating time series in physical space.                                                                                                   |
-| 15  | **Print / Label**               | `PRINT_VISIBLE`       | Endpoints that produce structured output renderable as print layouts, shipping labels, or receipts. ZPL for thermal printers, PDF for standard.                                                                                                       |
-| 16  | **Watch / Wearable**            | `WEARABLE_VISIBLE`    | Simplified endpoint surfaces for Apple Watch or Wear OS. Single-action endpoints become watch complications. Vibe Sense evaluator signals become glanceable health indicators on the wrist.                                                           |
-| 17  | **Game Engine / SDK**           | `GAMEDEV_VISIBLE`     | Endpoints as Unity/Unreal/Godot SDK calls. Leaderboards, player state, matchmaking, analytics - each a typed endpoint. Same definition drives the web admin panel and the game client.                                                                |
-| 18  | **Blockchain / Smart Contract** | `ONCHAIN_VISIBLE`     | Endpoint schemas mapped to smart contract ABI. Zod validates on-chain data the same way it validates API payloads. Vibe Sense tracks on-chain events as time series.                                                                                  |
-| 19  | **A2A (Agent-to-Agent)**        | `A2A_VISIBLE`         | Endpoints discoverable and callable by external AI agents via the Agent-to-Agent protocol (Google/Linux Foundation). The definition already contains everything an Agent Card needs. Agents negotiate tasks without human intermediation.             |
-| 20  | **Remote Tool Rendering**       | -                     | VibeFrame renders a remote endpoint's field-driven UI locally without a local server - the definition travels with the widget. Any NextVibe instance can expose its endpoints as embeddable, fully-interactive widgets on any other site or instance. |
-
----
+| #   | Platform                  | What it unlocks                                                                                                         |
+| --- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Trading Endpoints**     | Exchange connectivity as first-class endpoints. Feeds Vibe Sense natively - price, P&L, positions as data sources.      |
+| 2   | **Browser Extension**     | Endpoints as browser actions. Right-click → "Add to leads" → fires. Definition drives the popup UI.                     |
+| 3   | **Voice / Telephony**     | Endpoints callable via phone. Field labels become IVR prompts, Zod validates STT output. TTS + STT already in platform. |
+| 4   | **Actionable Email**      | Endpoints callable from email via signed tokens. Approve, confirm, trigger - no browser required.                       |
+| 5   | **Spreadsheet / Grid**    | Collection endpoints as live editable grids. Columns from response fields, validation from Zod.                         |
+| 6   | **Webhook Receiver**      | Inbound webhooks. Definition declares payload schema, validates, feeds Vibe Sense.                                      |
+| 7   | **GraphQL**               | Generated live from the registry. No `.graphql` files. Subscriptions map to WebSocket events.                           |
+| 8   | **OpenAPI / Swagger**     | OpenAPI 3.1 spec generated live. Always current because it IS the definition.                                           |
+| 9   | **Automation Platforms**  | Endpoints as Zapier/Make/n8n triggers and actions. Your platform appears as a native app.                               |
+| 10  | **Slash Commands**        | Endpoints as slash commands in Notion, Linear, Slack.                                                                   |
+| 11  | **QR / NFC**              | Endpoints reachable via scan or tap with pre-filled params and signed tokens.                                           |
+| 12  | **PDF / Documents**       | Response fields renderable as invoices, contracts, reports. Schema defines structure.                                   |
+| 13  | **IoT / MQTT**            | Endpoints as MQTT topics. Sensor → validate → Vibe Sense → anomaly → action.                                            |
+| 14  | **AR / Spatial**          | Response fields as spatial UI. Vision Pro, Quest, WebXR.                                                                |
+| 15  | **Print / Label**         | Structured output as shipping labels, receipts. ZPL for thermal, PDF for standard.                                      |
+| 16  | **Wearable**              | Single-action endpoints as watch complications. Vibe Sense signals as glanceable indicators.                            |
+| 17  | **Game Engine**           | Unity/Unreal/Godot SDK calls. Leaderboards, matchmaking, analytics - typed endpoints.                                   |
+| 18  | **Blockchain**            | Schemas mapped to smart contract ABI. Zod validates on-chain data.                                                      |
+| 19  | **A2A (Agent-to-Agent)**  | Google/LF Agent-to-Agent protocol. The definition already contains everything an Agent Card needs.                      |
+| 20  | **Remote Tool Rendering** | VibeFrame renders remote endpoints without a local server. The definition travels with the widget.                      |
 
 ### Framework & Ecosystem
 
-| #   | Feature                               | What it does                                                                                                                                                                                                                                                                                                                    |
-| --- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Module Store**                      | A registry of NextVibe-compatible GitHub repos - plug-and-play features, integrations, and AI skill packs. Clone a module directly into your instance with one command. Each module is a folder of endpoints. Browse, install, update, remove - like a package manager, but the packages are live features in your codebase.    |
-| 2   | **Import-Aware Setup Wizard**         | On first install, the setup wizard scans which imports are actually used and removes modules you didn't select. Choose "e-commerce" and payments, lead journeys, and email campaigns stay. Skip "admin" and that entire tree is cleanly excised. No dead code. No unused routes.                                                |
-| 3   | **Module Dependency Graph**           | Static analysis of endpoint imports - knows exactly which files depend on which features. When you remove a module, it tells you every file that needs updating. Safe removals. Safe upgrades.                                                                                                                                  |
-| 4   | **Vibe Sense Graph Builder - Polish** | The canvas and node palette are live. Remaining work: inline param editing for all node types, live chart preview while editing, backtest UI with result overlay, mobile-responsive layout.                                                                                                                                     |
-| 5   | **Multi-Tenant Support**              | Multiple tenants from one instance. Isolated data, custom branding, per-tenant feature flags, and optionally per-tenant Vibe Sense graphs.                                                                                                                                                                                      |
-| 6   | **Plugin API**                        | A stable public API surface for extending NextVibe without forking. Plugins register endpoints, DB tables, seeds, i18n keys, and admin nav items through a declared interface. Enable/disable without touching framework code.                                                                                                  |
-| 7   | **Visual Admin Builder**              | Drag-and-drop admin panel construction. Drag endpoint widgets onto a canvas, arrange layouts, save as a named admin page. Output is stored config, not generated code.                                                                                                                                                          |
-| 8   | **Vibe UI - Native Parity**           | React Native component parity with the web library. Same types, same props, same behavior - but production-ready on iOS and Android. This is the difference between "runs on native" and "looks native."                                                                                                                        |
-| 9   | **Federation - VibeFrame Layer**      | Remote connect already handles instance-to-instance task routing, memory sync, and capability discovery. The remaining piece: VibeFrame rendering remote endpoints from a connected instance without a local server - UI widgets, Vibe Sense graphs, and tools from instance B render natively inside instance A's admin panel. |
-| 10  | **Marketplace & Revenue Share**       | Module authors publish to the store, set a price, earn when other instances install. NextVibe handles the licensing check on install. Revenue split between author and the project. The ecosystem funds itself.                                                                                                                 |
+| #   | Feature                         | What it does                                                                                           |
+| --- | ------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| 1   | **Module Store**                | Registry of plug-and-play feature repos. Clone into your instance with one command.                    |
+| 2   | **Import-Aware Setup Wizard**   | First install scans imports, removes unselected modules. No dead code.                                 |
+| 3   | **Module Dependency Graph**     | Static analysis knows which files depend on which features. Safe removals, safe upgrades.              |
+| 4   | **Vibe Sense Polish**           | Inline param editing, live chart preview, backtest UI, mobile-responsive canvas.                       |
+| 5   | **Multi-Tenant**                | Isolated data, custom branding, per-tenant feature flags and Vibe Sense graphs.                        |
+| 6   | **Plugin API**                  | Extend without forking. Plugins register endpoints, tables, seeds, i18n, nav items.                    |
+| 7   | **Visual Admin Builder**        | Drag endpoint widgets onto a canvas. Output is config, not generated code.                             |
+| 8   | **Native Parity**               | Production-ready React Native components. Same types, same props - looks native, not "runs on native." |
+| 9   | **Federation**                  | VibeFrame renders remote endpoints from connected instances inside your admin panel.                   |
+| 10  | **Marketplace & Revenue Share** | Module authors publish, set prices, earn on installs. The ecosystem funds itself.                      |
 
 ---
 
@@ -409,9 +383,9 @@ The endpoint definition is the single source of truth. Every new platform is a n
 
 **GPL-3.0 + MIT** - Framework core is GPL-3.0 (share improvements back). Everything else is MIT.
 
-See [LICENSE](LICENSE) · [CONTRIBUTING.md](CONTRIBUTING.md)
+[LICENSE](LICENSE) · [CONTRIBUTING.md](CONTRIBUTING.md)
 
-`vibe check` must pass with zero errors and zero: `any`, `unknown`, `object`, `@ts-expect-error`, `as`, `eslint-disable`. Then PR.
+`vibe check` must pass with zero errors. Zero `any`, `unknown`, `object`, `@ts-expect-error`, `as`, `eslint-disable`. Then PR.
 
 ---
 

@@ -14,8 +14,8 @@ import {
   useCustomState,
 } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { useLogger } from "@/hooks/use-logger";
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
@@ -49,11 +49,7 @@ export function useNewsletterStatus(
     enabled?: boolean;
   },
 ): EndpointReturn<typeof statusEndpoints> {
-  const { locale } = useTranslation();
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
 
   return useEndpoint(
     statusEndpoints,
@@ -76,11 +72,7 @@ export function useNewsletterStatus(
 export function useNewsletterSubscription(
   user: JwtPayloadType,
 ): EndpointReturn<typeof subscribeEndpoints> {
-  const { locale } = useTranslation();
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
 
   return useEndpoint(
     subscribeEndpoints,
@@ -106,11 +98,7 @@ export function useNewsletterSubscription(
 export function useNewsletterUnsubscription(
   user: JwtPayloadType,
 ): EndpointReturn<typeof unsubscribeEndpoints> {
-  const { locale } = useTranslation();
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
 
   return useEndpoint(
     unsubscribeEndpoints,
@@ -162,11 +150,8 @@ export function useNewsletterManager(
   user: JwtPayloadType,
   userEmail: string | undefined,
 ): NewsletterManagerResult {
+  const logger = useLogger();
   const { locale } = useTranslation();
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
   const { t } = useMemo(() => scopedTranslation.scopedT(locale), [locale]);
 
   // Use typed custom state for newsletter-related state

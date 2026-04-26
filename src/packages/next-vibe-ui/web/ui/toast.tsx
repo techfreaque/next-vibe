@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import { useTouchDevice } from "../hooks/use-touch-device";
 
 import type { StyleType } from "../utils/style-type";
 

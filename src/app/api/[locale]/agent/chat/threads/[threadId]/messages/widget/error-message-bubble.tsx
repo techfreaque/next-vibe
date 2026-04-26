@@ -15,7 +15,7 @@ import {
   useWidgetLogger,
   useWidgetNavigation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { useTranslation } from "@/i18n/core/client";
 
 import { scopedTranslation } from "../i18n";

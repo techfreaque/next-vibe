@@ -5,15 +5,13 @@
 
 "use client";
 
-import { Environment, parseError } from "next-vibe/shared/utils";
+import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useEffect, useState } from "react";
 
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useLogger } from "@/hooks/use-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { envClient } from "@/config/env-client";
-import { useTranslation } from "@/i18n/core/client";
 
 import type { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
 import type { LeadListGetRequestTypeOutput } from "../list/definition";
@@ -26,9 +24,7 @@ import definitions, { type BatchOperationScope } from "./definition";
 export function useBatchUpdateEndpoint(user: JwtPayloadType): EndpointReturn<{
   PATCH: typeof definitions.PATCH;
 }> {
-  const { locale } = useTranslation();
-  const isDevelopment = envClient.NODE_ENV === Environment.DEVELOPMENT;
-  const logger = createEndpointLogger(isDevelopment, Date.now(), locale);
+  const logger = useLogger();
 
   return useEndpoint(
     { PATCH: definitions.PATCH },
@@ -58,9 +54,7 @@ export function useBatchUpdateEndpoint(user: JwtPayloadType): EndpointReturn<{
 export function useBatchDeleteEndpoint(user: JwtPayloadType): EndpointReturn<{
   DELETE: typeof definitions.DELETE;
 }> {
-  const { locale } = useTranslation();
-  const isDevelopment = envClient.NODE_ENV === Environment.DEVELOPMENT;
-  const logger = createEndpointLogger(isDevelopment, Date.now(), locale);
+  const logger = useLogger();
 
   return useEndpoint(
     {
@@ -166,9 +160,7 @@ export function useBatchOperations(
   onOperationComplete?: () => void,
 ): BatchOperationsReturn {
   // Initialize client logger
-  const { locale } = useTranslation();
-  const isDevelopment = envClient.NODE_ENV === Environment.DEVELOPMENT;
-  const logger = createEndpointLogger(isDevelopment, Date.now(), locale);
+  const logger = useLogger();
 
   // Dialog state
   const [batchDialogOpen, setBatchDialogOpen] = useState(false);

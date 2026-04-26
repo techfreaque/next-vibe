@@ -9,7 +9,7 @@ import type z from "zod";
 
 import type { InferResponseOutput } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 import { withValueNonStrict } from "../../widgets/_shared/field-helpers";
 import type {

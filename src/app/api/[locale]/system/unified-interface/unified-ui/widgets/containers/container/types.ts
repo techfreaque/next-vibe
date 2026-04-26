@@ -12,7 +12,7 @@ import type {
   LayoutType,
   WidgetType,
 } from "../../../../shared/types/enums";
-import type { WidgetData } from "../../../../shared/widgets/widget-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   ArrayChildConstraint,
   BaseArrayWidgetConfig,

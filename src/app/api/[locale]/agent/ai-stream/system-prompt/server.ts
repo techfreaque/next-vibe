@@ -43,6 +43,7 @@ export async function loadPromptContextData(
     callMode = false,
     extraInstructions,
     isExposedFolder,
+    subAgentDepth,
     mediaCapabilities,
   } = params;
 
@@ -134,5 +135,6 @@ export async function loadPromptContextData(
     isAdmin,
     isFreshUser,
     mediaCapabilities: mediaCapabilities ?? null,
+    subAgentDepth,
   };
 }

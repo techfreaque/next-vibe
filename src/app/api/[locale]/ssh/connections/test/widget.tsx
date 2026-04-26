@@ -4,22 +4,16 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetTranslation,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import type { ConnectionTestResponseOutput } from "./definition";
 import type endpoints from "./definition";
 
-interface WidgetProps {
-  field: {
-    value: ConnectionTestResponseOutput | null | undefined;
-  } & (typeof endpoints.POST)["fields"];
-}
-
-export function ConnectionTestContainer({
-  field,
-}: WidgetProps): React.JSX.Element {
+export function ConnectionTestContainer(): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.POST>();
-  const value = field.value;
+  const value = useWidgetValue<typeof endpoints.POST>();
 
   return (
     <Div className="flex flex-col gap-2 min-h-[80px] px-4 py-3">

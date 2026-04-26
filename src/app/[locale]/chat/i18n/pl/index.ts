@@ -1269,7 +1269,9 @@ export const translations: typeof enTranslations = {
       claudeOpus45:
         "Claude Opus 4.5 - Najpotężniejszy model Claude z wyjątkowym rozumowaniem i zdolnościami kreatywnymi",
       claudeOpus46:
-        "Claude Opus 4.6 - Najnowszy i najpotężniejszy model Claude z wyjątkowym rozumowaniem i zdolnościami kreatywnymi",
+        "Claude Opus 4.6 - Potężny model Claude z wyjątkowym rozumowaniem i zdolnościami kreatywnymi",
+      claudeOpus47:
+        "Claude Opus 4.7 - Najnowszy i najpotężniejszy model Claude z wyjątkowym rozumowaniem i zdolnościami kreatywnymi",
       claudeSonnet46:
         "Claude Sonnet 4.6 - Najbardziej zaawansowany model Sonnet firmy Anthropic z najwyższą wydajnością w kodowaniu, agentach i pracy zawodowej",
       gemini3Pro:

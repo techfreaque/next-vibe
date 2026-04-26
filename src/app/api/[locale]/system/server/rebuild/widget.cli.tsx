@@ -8,10 +8,10 @@ import type { JSX } from "react";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
-  useInkWidgetPlatform,
-  useInkWidgetResponseOnly,
-  useInkWidgetTranslation,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+  useWidgetPlatform,
+  useWidgetResponseOnly,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { RebuildResponseOutput } from "./definition";
 import type endpoints from "./definition";
@@ -36,9 +36,9 @@ function formatDuration(ms: number): string {
 }
 
 export function RebuildWidget({ field }: CliWidgetProps): JSX.Element {
-  const platform = useInkWidgetPlatform();
-  const responseOnly = useInkWidgetResponseOnly();
-  const t = useInkWidgetTranslation<typeof endpoints.POST>();
+  const platform = useWidgetPlatform();
+  const responseOnly = useWidgetResponseOnly();
+  const t = useWidgetTranslation<typeof endpoints.POST>();
   const isMcp = platform === Platform.MCP;
   const value = field.value;
 

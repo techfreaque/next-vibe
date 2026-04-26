@@ -142,6 +142,8 @@ export const { GET } = createEndpoint({
 
 export type RemoteConnectionsListResponseOutput =
   typeof GET.types.ResponseOutput;
+export type RemoteConnection =
+  RemoteConnectionsListResponseOutput["connections"][number];
 
 const endpoints = { GET };
 export default endpoints;

@@ -25,7 +25,6 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { scopedTranslation as appLocaleScopedTranslation } from "@/app/[locale]/i18n";
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
@@ -38,6 +37,7 @@ import type {
   CreateApiEndpointAny,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import {
   getPreferredToolName,
   pathSegmentsToToolName,
@@ -98,8 +98,8 @@ interface EndpointMeta {
   requiresConfirmation?: boolean;
   /** Example inputs/responses from the definition */
   examples?: {
-    inputs?: Record<string, CliRequestData>;
-    responses?: Record<string, CliRequestData>;
+    inputs?: Record<string, Record<string, WidgetData>>;
+    responses?: Record<string, Record<string, WidgetData>>;
   };
 }
 
@@ -398,9 +398,9 @@ export class EndpointsMetaGeneratorRepository {
       // Merge example requests + urlPathParams into flat inputs map
       const examplesRaw = definition.examples as
         | {
-            requests?: Record<string, CliRequestData>;
-            urlPathParams?: Record<string, CliRequestData>;
-            responses?: Record<string, CliRequestData>;
+            requests?: Record<string, Record<string, WidgetData>>;
+            urlPathParams?: Record<string, Record<string, WidgetData>>;
+            responses?: Record<string, Record<string, WidgetData>>;
           }
         | undefined;
       let examples: EndpointMeta["examples"];
@@ -409,7 +409,7 @@ export class EndpointsMetaGeneratorRepository {
           ...Object.keys(examplesRaw.requests ?? {}),
           ...Object.keys(examplesRaw.urlPathParams ?? {}),
         ]);
-        const inputs: Record<string, CliRequestData> = {};
+        const inputs: Record<string, Record<string, WidgetData>> = {};
         for (const key of allKeys) {
           inputs[key] = {
             ...(examplesRaw.requests?.[key] ?? {}),
@@ -533,7 +533,7 @@ export class EndpointsMetaGeneratorRepository {
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
 
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 export interface EndpointMeta {
   toolName: string;
@@ -550,8 +550,8 @@ export interface EndpointMeta {
   credits?: number;
   requiresConfirmation?: boolean;
   examples?: {
-    inputs?: Record<string, CliRequestData>;
-    responses?: Record<string, CliRequestData>;
+    inputs?: Record<string, Record<string, WidgetData>>;
+    responses?: Record<string, Record<string, WidgetData>>;
   };
 }
 

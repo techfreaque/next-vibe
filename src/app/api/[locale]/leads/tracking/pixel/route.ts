@@ -6,7 +6,7 @@
 import type { NextRequest } from "next-vibe-ui/lib/request";
 import { Environment } from "next-vibe/shared/utils/env-util";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { env } from "@/config/env";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 

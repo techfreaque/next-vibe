@@ -12,9 +12,9 @@ import terminalLink from "terminal-link";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
-  useInkWidgetLocale,
-  useInkWidgetPlatform,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+  useWidgetLocale,
+  useWidgetPlatform,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { CliIcon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/cli-icons";
 
 export interface CodeQualityItem {
@@ -65,8 +65,8 @@ export function CodeQualityIssueListCli({
   items: CodeQualityItem[] | null | undefined;
   editorUriScheme?: string;
 }): JSX.Element {
-  const locale = useInkWidgetLocale();
-  const platform = useInkWidgetPlatform();
+  const locale = useWidgetLocale();
+  const platform = useWidgetPlatform();
   const { t } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const scheme = editorUriScheme || "vscode://file/";
 
@@ -177,7 +177,7 @@ export function CodeQualityFilesListCli({
 }: {
   files: FileStats[] | null | undefined;
 }): JSX.Element {
-  const locale = useInkWidgetLocale();
+  const locale = useWidgetLocale();
   const { t } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   const fileLines = useMemo(() => {
@@ -244,8 +244,8 @@ export function CodeQualitySummaryCli({
   displayedIssues?: number;
   displayedFiles?: number;
 }): JSX.Element {
-  const locale = useInkWidgetLocale();
-  const platform = useInkWidgetPlatform();
+  const locale = useWidgetLocale();
+  const platform = useWidgetPlatform();
   const { t: globalT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   // No summary needed when there are no issues

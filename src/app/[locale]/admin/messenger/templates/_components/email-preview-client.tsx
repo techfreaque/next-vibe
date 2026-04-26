@@ -25,7 +25,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useEmailPreviewRender } from "@/app/api/[locale]/messenger/preview/render/hooks/hooks";
 import type { TranslatedPreviewFieldConfig } from "@/app/api/[locale]/messenger/registry/template";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useLogger } from "@/hooks/use-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { scopedTranslation } from "@/app/[locale]/admin/messenger/templates/i18n";
 import { useTranslation } from "@/i18n/core/client";
@@ -55,10 +55,7 @@ export function EmailPreviewClient({
   const { locale: currentLocale } = useTranslation();
   const { t } = scopedTranslation.scopedT(currentLocale);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
 
   const initialLanguageCountry = useMemo(
     () => getLanguageAndCountryFromLocale(locale),

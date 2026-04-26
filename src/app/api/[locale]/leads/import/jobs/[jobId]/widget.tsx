@@ -24,8 +24,9 @@ import {
   useWidgetContext,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
 import type definition from "./definition";
 import type retryDefinition from "./retry/definition";
@@ -35,19 +36,15 @@ import type stopDefinition from "./stop/definition";
 // ImportJobStatusContainer (for GET)
 // ============================================================
 
-type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
-
 interface ImportJobStatusWidgetProps {
-  field: {
-    value: GetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 export function ImportJobStatusContainer({
   field,
 }: ImportJobStatusWidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.GET>();
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -353,19 +350,15 @@ export function ImportJobStatusContainer({
 // ImportJobRetryContainer (for POST retry)
 // ============================================================
 
-type RetryResponseOutput = typeof retryDefinition.POST.types.ResponseOutput;
-
 interface ImportJobRetryWidgetProps {
-  field: {
-    value: RetryResponseOutput | null | undefined;
-  } & (typeof retryDefinition.POST)["fields"];
+  field: (typeof retryDefinition.POST)["fields"];
 }
 
 export function ImportJobRetryContainer({
   field,
 }: ImportJobRetryWidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof retryDefinition.POST>();
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -485,19 +478,15 @@ export function ImportJobRetryContainer({
 // ImportJobStopContainer (for POST stop)
 // ============================================================
 
-type StopResponseOutput = typeof stopDefinition.POST.types.ResponseOutput;
-
 interface ImportJobStopWidgetProps {
-  field: {
-    value: StopResponseOutput | null | undefined;
-  } & (typeof stopDefinition.POST)["fields"];
+  field: (typeof stopDefinition.POST)["fields"];
 }
 
 export function ImportJobStopContainer({
   field,
 }: ImportJobStopWidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof stopDefinition.POST>();
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();

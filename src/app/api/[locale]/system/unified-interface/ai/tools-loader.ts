@@ -26,12 +26,11 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CliRequestData } from "../cli/runtime/cli-request-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
 import { endpointToToolName, getPreferredToolName } from "../shared/utils/path";
-import type { JsonValue } from "../tasks/unified-runner/types";
 import { CallbackMode } from "./execute-tool/constants";
 
 /**
@@ -167,7 +166,7 @@ function createToolFromEndpoint(
       // For execute-tool itself, callbackMode must stay in restParams so the route
       // handler receives it (execute-tool handles all callbackModes natively).
       const { callbackMode: callbackModeParam, ...strippedParams } = (params ??
-        {}) as Record<string, JsonValue>;
+        {}) as Record<string, WidgetData>;
       const baseParams =
         toolName === "execute-tool" && callbackModeParam !== undefined
           ? { ...strippedParams, callbackMode: callbackModeParam }
@@ -181,7 +180,7 @@ function createToolFromEndpoint(
         permissionRoles,
         Platform.AI,
       );
-      const serverDefaultPatch: Record<string, JsonValue> = {};
+      const serverDefaultPatch: Record<string, WidgetData> = {};
       if (Object.keys(serverDefaults).length > 0) {
         const ctx = {
           user: context.user,
@@ -192,12 +191,12 @@ function createToolFromEndpoint(
         for (const [key, resolver] of Object.entries(serverDefaults)) {
           const resolved = resolver(ctx);
           if (resolved !== undefined) {
-            serverDefaultPatch[key] = resolved as JsonValue;
+            serverDefaultPatch[key] = resolved;
           }
         }
       }
 
-      const restParams = {
+      const restParams: Record<string, WidgetData> = {
         ...baseParams,
         ...serverDefaultPatch,
       };
@@ -212,8 +211,8 @@ function createToolFromEndpoint(
       context.logger.debug("[ToolsLoader] CoreTool execute called", {
         toolName,
         callbackMode,
-        threadId: context.streamContext?.threadId,
-        aiMessageId: context.streamContext?.aiMessageId,
+        threadId: context.streamContext.threadId,
+        aiMessageId: context.streamContext.aiMessageId,
         streamContextRef: !!context.streamContext,
       });
 
@@ -240,7 +239,7 @@ function createToolFromEndpoint(
       // Race tool execution against the abort signal so cancellation
       // kills even long-running tool calls immediately.
       const abortSignal = context.streamContext.abortSignal;
-      const executeToolInline = async (): Promise<JsonValue> => {
+      const executeToolInline = async (): Promise<WidgetData> => {
         // Detach and wakeUp need task creation + backfill + resume-stream scheduling.
         // Route through RouteExecuteRepository which handles both modes.
         // execute-tool always routes through RouteExecuteRepository directly
@@ -274,7 +273,7 @@ function createToolFromEndpoint(
           // For execute-tool: effective callbackMode is in restParams.callbackMode.
           const earlyCallbackMode =
             toolName === "execute-tool"
-              ? (restParams as Record<string, JsonValue>).callbackMode
+              ? restParams.callbackMode
               : callbackMode;
           const didEagerlySetWaiting =
             (earlyCallbackMode === CallbackMode.WAIT ||
@@ -362,7 +361,7 @@ function createToolFromEndpoint(
               toolName,
               callerToolCallId: options?.toolCallId,
               currentToolMessageId: perCallStreamContext?.currentToolMessageId,
-              aiMessageId: context.streamContext?.aiMessageId,
+              aiMessageId: context.streamContext.aiMessageId,
             },
           );
 
@@ -396,7 +395,7 @@ function createToolFromEndpoint(
             throw new Error(errorMsg);
           }
 
-          return result.data as JsonValue;
+          return result.data as WidgetData;
         }
 
         // Default path: execute inline (wait, endLoop, approve handled by stream layer)
@@ -424,15 +423,16 @@ function createToolFromEndpoint(
 
         const { RouteExecutionExecutor } =
           await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
-        const result = await RouteExecutionExecutor.executeGenericHandler({
-          toolName,
-          data: restParams as CliRequestData,
-          user: context.user,
-          locale: context.locale,
-          logger: context.logger,
-          platform: Platform.AI,
-          streamContext: context.streamContext,
-        });
+        const result =
+          await RouteExecutionExecutor.executeGenericHandler<WidgetData>({
+            toolName,
+            data: restParams as Record<string, WidgetData>,
+            user: context.user,
+            locale: context.locale,
+            logger: context.logger,
+            platform: Platform.AI,
+            streamContext: context.streamContext,
+          });
 
         if (!result.success) {
           // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
@@ -442,7 +442,7 @@ function createToolFromEndpoint(
 
         // Return the data to AI SDK
         // Must be JSON-serializable for streaming
-        return result.data as JsonValue;
+        return result.data;
       };
 
       // If no abort signal, just run inline
@@ -551,7 +551,7 @@ function createRemoteTool(params: {
     {
       validate: (value) => ({
         success: true,
-        value: value as Record<string, JsonValue>,
+        value: value as Record<string, WidgetData>,
       }),
     },
   );
@@ -562,7 +562,7 @@ function createRemoteTool(params: {
     execute: async (input, options) => {
       const abortSignal = streamContext.abortSignal;
 
-      const executeRemoteInline = async (): Promise<JsonValue> => {
+      const executeRemoteInline = async (): Promise<WidgetData> => {
         // Delegate to execute-tool which routes to the remote
         const { RouteExecuteRepository } =
           await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/repository");
@@ -572,7 +572,7 @@ function createRemoteTool(params: {
 
         // Extract callbackMode from input if AI passed it; default to wait
         const { callbackMode: inputCallbackMode, ...restInput } = (input ??
-          {}) as Record<string, JsonValue>;
+          {}) as Record<string, WidgetData>;
         const { CallbackMode: CM } =
           await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");
         const callbackMode =
@@ -609,7 +609,7 @@ function createRemoteTool(params: {
           streamContext.waitingForRemoteResult = true;
         }
 
-        return result.data as JsonValue;
+        return result.data as WidgetData;
       };
 
       // If no abort signal, just run inline

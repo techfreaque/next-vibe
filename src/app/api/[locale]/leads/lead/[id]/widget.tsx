@@ -22,8 +22,8 @@ import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
 import { ExternalLink as ExternalLinkIcon } from "next-vibe-ui/ui/icons/ExternalLink";
-import { Hash } from "next-vibe-ui/ui/icons/Hash";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
+import { Hash } from "next-vibe-ui/ui/icons/Hash";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
@@ -68,6 +68,7 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { configScopedTranslation } from "@/config/i18n";
 import { useTranslation } from "@/i18n/core/client";
@@ -96,10 +97,7 @@ import {
 } from "../../i18n";
 import leadsListDefinitions from "../../list/definition";
 import leadsSearchDefinitions from "../../search/definition";
-import type {
-  LeadGetResponseOutput,
-  LeadPatchResponseOutput,
-} from "./definition";
+import type { LeadGetResponseOutput } from "./definition";
 import definition from "./definition";
 
 // ─── Enum type helpers ────────────────────────────────────────────────────────
@@ -139,18 +137,6 @@ function asLanguage(v: string): LanguageValue | undefined {
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-
-interface GetWidgetProps {
-  field: {
-    value: LeadGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
-
-interface PatchWidgetProps {
-  field: {
-    value: LeadPatchResponseOutput | null | undefined;
-  } & (typeof definition.PATCH)["fields"];
-}
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -1275,9 +1261,7 @@ function LinkedIdentitiesTab({
 
 // ─── LeadDetailContainer (GET widget) ────────────────────────────────────────
 
-export function LeadDetailContainer({
-  field,
-}: GetWidgetProps): React.JSX.Element {
+export function LeadDetailContainer(): React.JSX.Element {
   const locale = useWidgetLocale();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -1285,7 +1269,8 @@ export function LeadDetailContainer({
   const endpointMutations = useWidgetEndpointMutations();
   const [activeTab, setActiveTab] = useState("overview");
 
-  const data = field.value?.lead;
+  const fieldValue = useWidgetValue<typeof definition.GET>();
+  const data = fieldValue?.lead;
   const leadId = data?.basicInfo?.id;
 
   const handleBack = useCallback((): void => {
@@ -1372,7 +1357,7 @@ export function LeadDetailContainer({
     navigation.push(leadsSearchDefinitions.GET);
   }, [navigation]);
 
-  if (!field.value) {
+  if (!fieldValue) {
     return (
       <Div className="flex flex-col items-center justify-center py-16 text-center gap-4">
         <Div className="rounded-full bg-muted p-4">
@@ -1520,7 +1505,7 @@ function FormField({
 
 // ─── LeadEditContainer (PATCH widget) ────────────────────────────────────────
 
-export function LeadEditContainer(props: PatchWidgetProps): React.JSX.Element {
+export function LeadEditContainer(): React.JSX.Element {
   const locale = useWidgetLocale();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.PATCH>();
@@ -1530,6 +1515,7 @@ export function LeadEditContainer(props: PatchWidgetProps): React.JSX.Element {
   const form = useWidgetForm<typeof definition.PATCH>();
   const onSubmit = useWidgetOnSubmit();
   const isSubmitting = useWidgetIsSubmitting();
+  const patchValue = useWidgetValue<typeof definition.PATCH>();
   const [activeTab, setActiveTab] = useState("basic");
   const [submittedSuccessfully, setSubmittedSuccessfully] = useState(false);
 
@@ -1538,8 +1524,8 @@ export function LeadEditContainer(props: PatchWidgetProps): React.JSX.Element {
   // Prefill flat form fields from GET response data.
   // When navigated with prefillFromGet: true, the GET response is passed as field.value
   // (typed as LeadPatchResponseOutput but at runtime contains { lead: { basicInfo: {...} } }).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- field.value contains GET response data at runtime when prefillFromGet: true
-  const fieldLead = (props.field.value as Record<string, any>)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- patchValue contains GET response data at runtime when prefillFromGet: true
+  const fieldLead = (patchValue as Record<string, any>)
     ?.lead as LeadGetResponseOutput["lead"];
   const prefillAppliedRef = useRef<string | undefined>(undefined);
   const nestedLeadId = fieldLead?.basicInfo?.id;

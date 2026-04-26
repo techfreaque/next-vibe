@@ -30,12 +30,13 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ChatModelId, ChatModelIdOptions } from "../models";
 import { scopedTranslation } from "../stream/i18n";
+import { RESUME_STREAM_ALIAS } from "./constants";
 
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["agent", "ai-stream", "resume-stream"],
-  aliases: ["resume-stream"],
+  aliases: [RESUME_STREAM_ALIAS],
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.CUSTOMER,

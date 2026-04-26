@@ -22,9 +22,12 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import type { RemoteConnectionsListResponseOutput } from "../list/definition";
 import { scopedTranslation } from "./i18n";
-import { RemoteConnectWidget } from "./widget";
+const RemoteConnectWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.RemoteConnectWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

@@ -56,9 +56,10 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 
 import type {
   CronTaskPriorityDB,
@@ -83,9 +84,7 @@ import type { CronTasksTranslationKey } from "./i18n";
 type Task = CronTaskListResponseOutput["tasks"][number];
 
 interface WidgetProps {
-  field: {
-    value: CronTaskListResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
+  field: (typeof endpoints.GET)["fields"];
 }
 
 // ---------------------------------------------------------------------------
@@ -285,7 +284,7 @@ function TaskRow({
             {task.routeId}
           </Span>
           {/* System vs user owner chip */}
-          {task.userId === null ? (
+          {task.owner.type === "system" ? (
             <Span className="px-1.5 py-0.5 rounded text-xs font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300">
               {t("widget.task.owner.system")}
             </Span>
@@ -626,7 +625,7 @@ function BulkToolbar({
 
 export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof endpoints.GET>();
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof endpoints.GET>();

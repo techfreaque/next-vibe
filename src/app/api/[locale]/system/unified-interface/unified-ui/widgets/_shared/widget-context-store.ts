@@ -46,30 +46,8 @@ export function createWidgetContextStore<
   return create<WidgetContextStore<TEndpoint, TContext>>((set) => ({
     context: initialContext,
     setContext: (newContext): void =>
-      set((state) => {
-        // If no existing context, just set it (first initialization)
-        if (!state.context) {
-          return { context: newContext };
-        }
-
-        // Only update if context actually changed
-        // Shallow equality check on object properties
-        if (state.context === newContext) {
-          return state;
-        }
-
-        // Check if any property is different using keyof to get proper types
-        const keys = Object.keys(newContext) as Array<keyof TContext>;
-        let hasChanges = false;
-        for (const key of keys) {
-          if (newContext[key] !== state.context[key]) {
-            hasChanges = true;
-            break;
-          }
-        }
-
-        // Return new context only if there were changes
-        return hasChanges ? { context: newContext } : state;
-      }),
+      set((state) =>
+        state.context === newContext ? state : { context: newContext },
+      ),
   }));
 }

@@ -186,6 +186,13 @@ export function loadEnvironment(): EnvironmentResult {
   const args = process.argv.slice(2);
   const isProduction = process.env["NODE_ENV"] === "production";
   const hasLocalFlag = args.includes("--preview") || args.includes("--local");
+
+  // Detect -v/--verbose early so NEXT_PUBLIC_VIBE_DEBUG is set before the env
+  // singleton freezes it. This makes debug mode work on the client bundle too.
+  const hasVerboseFlag = args.includes("--verbose") || args.includes("-v");
+  if (hasVerboseFlag || process.env["NEXT_PUBLIC_VIBE_DEBUG"] === "true") {
+    (process.env as Record<string, string>)["NEXT_PUBLIC_VIBE_DEBUG"] = "true";
+  }
   const isPreviewMode =
     hasLocalFlag ||
     (!isProduction &&
@@ -197,6 +204,11 @@ export function loadEnvironment(): EnvironmentResult {
   // Expose preview mode flag so tasks can distinguish vibe start from vibe dev.
   // Explicitly set to "false" when not in preview mode to clear any stale shell env.
   process.env["IS_PREVIEW_MODE"] = isPreviewMode ? "true" : "false";
+
+  // Stamp the vibe runtime PID so all code (MCP tool calls, browser sessions,
+  // etc.) can use a stable process identifier that survives hot-reload re-imports.
+  // eslint-disable-next-line i18next/no-literal-string
+  process.env["VIBE_PID"] = String(process.pid);
 
   // vibe start/build/rebuild always run in production mode - force NODE_ENV so
   // dev-only task runners (e.g. devWatcher) stay disabled.
@@ -271,6 +283,14 @@ export function loadEnvironment(): EnvironmentResult {
         // If URL parsing fails, leave NEXT_PUBLIC_APP_URL unchanged
       }
     }
+  }
+
+  // Smart default for VIBE_LOG_PATH: enable file logging for dev/start commands,
+  // disable for plain production (deployed server with no local file system access).
+  // User .env value always wins — only set if not already configured.
+  if (!callerEnv["VIBE_LOG_PATH"] && !process.env["VIBE_LOG_PATH"]) {
+    (process.env as Record<string, string>)["VIBE_LOG_PATH"] =
+      isDevCommand || isPreviewMode ? ".tmp" : "false";
   }
 
   // Derive NEXT_PUBLIC_AGENT_* availability flags from raw process.env so the

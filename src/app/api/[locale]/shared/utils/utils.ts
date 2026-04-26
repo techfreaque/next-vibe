@@ -1,6 +1,8 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+
 /**
  * Combines class names using clsx and tailwind-merge
  */
@@ -21,21 +23,9 @@ export function formatNumber(num: number): string {
 }
 
 /**
- * Debounce argument value types
- */
-type DebounceArgValue = string | number | boolean | DebounceArgObject | null;
-
-/**
- * Debounce argument object type for nested values
- */
-interface DebounceArgObject {
-  [key: string]: DebounceArgValue;
-}
-
-/**
  * Creates a debounced function that delays invoking func until after wait milliseconds
  */
-export function debounce<T extends (...args: DebounceArgValue[]) => void>(
+export function debounce<T extends (...args: WidgetData[]) => void>(
   func: T,
   wait: number,
 ): (...args: Parameters<T>) => void {

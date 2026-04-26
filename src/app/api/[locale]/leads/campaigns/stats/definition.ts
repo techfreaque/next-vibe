@@ -26,12 +26,15 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import {
   EmailJourneyVariantFilter,
   EmailJourneyVariantFilterOptions,
 } from "../../enum";
 import { scopedTranslation } from "./i18n";
-import { CampaignStatsWidget } from "./widget";
+const CampaignStatsWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.CampaignStatsWidget })),
+);
 
 const { GET } = createEndpoint({
   scopedTranslation,

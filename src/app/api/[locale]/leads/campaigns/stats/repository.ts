@@ -20,14 +20,14 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { isValidEnumValue } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { getCronFrequencyMinutes } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import {
   cronTaskExecutions,
   cronTasks,
 } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import { getCronFrequencyMinutes } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import { CronTasksRepository } from "@/app/api/[locale]/system/unified-interface/tasks/cron/repository";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { CountryLanguageValues } from "@/i18n/core/config";
@@ -50,7 +50,7 @@ function truncate(str: string, maxLen: number): string {
 }
 
 function summariseResult(
-  result: Record<string, JsonValue> | null,
+  result: Record<string, WidgetData> | null,
 ): string | null {
   if (!result) {
     return null;
@@ -381,9 +381,7 @@ export class CampaignStatsRepository {
             status: e.status,
             completedAt: e.completedAt?.toISOString() ?? null,
             durationMs: e.durationMs,
-            resultSnippet: e.result
-              ? summariseResult(e.result as Record<string, JsonValue>)
-              : null,
+            resultSnippet: e.result ? summariseResult(e.result) : null,
             errorSnippet: e.error?.message
               ? truncate(String(e.error.message), 60)
               : null,
@@ -399,9 +397,7 @@ export class CampaignStatsRepository {
             ...base,
             recentExecutions,
             lastResultSummary: lastSuccess
-              ? summariseResult(
-                  lastSuccess.result as Record<string, JsonValue> | null,
-                )
+              ? summariseResult(lastSuccess.result)
               : null,
           };
         }),

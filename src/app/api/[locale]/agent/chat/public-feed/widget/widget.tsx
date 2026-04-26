@@ -24,28 +24,17 @@ import React from "react";
 import {
   useWidgetContext,
   useWidgetForm,
+  useWidgetSelector,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import { DefaultFolderId } from "../../config";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
 import type definition from "../definition";
-import type {
-  PublicFeedGetResponseOutput,
-  PublicFeedItem,
-} from "../definition";
+import type { PublicFeedItem } from "../definition";
 import { FeedSortMode } from "../definition";
 import { scopedTranslation } from "../i18n";
 
 type SortMode = (typeof FeedSortMode)[keyof typeof FeedSortMode];
-
-/**
- * Props for custom widget - matches the customWidgetObject pattern
- */
-interface CustomWidgetProps {
-  field: {
-    value: PublicFeedGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
 
 function formatTimestamp(date: Date, locale: string): string {
   const now = new Date();
@@ -293,10 +282,10 @@ function PublicFeedView({
 /**
  * Container widget - receives field data from EndpointsPage
  */
-export function PublicFeedContainer({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
-  const items = field.value?.items ?? [];
+export function PublicFeedContainer(): React.JSX.Element {
+  const items = useWidgetSelector<typeof definition.GET>()(
+    (d) => d?.items ?? [],
+  );
   const form = useWidgetForm<typeof definition.GET>();
   const sortMode = form.watch("sortMode");
   const searchQuery = form.watch("search") ?? "";

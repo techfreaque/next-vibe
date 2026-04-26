@@ -19,9 +19,10 @@ export const { GET, PATCH, tools } = endpointsHandler({
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, user, logger }) =>
       TaskSyncSettingsRepository.updateTaskSyncSettings(
         data.syncEnabled,
+        user,
         logger,
       ),
   },

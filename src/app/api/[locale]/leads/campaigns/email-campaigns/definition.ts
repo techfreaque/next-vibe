@@ -26,8 +26,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { EmailCampaignsConfigWidget } from "./widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
+const EmailCampaignsConfigWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.EmailCampaignsConfigWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

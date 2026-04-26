@@ -22,9 +22,7 @@ import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/task
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
-import { buildMessagesChannel } from "../../../agent/chat/threads/[threadId]/messages/channel";
-import { createStreamEvent } from "../../../agent/chat/threads/[threadId]/messages/events";
+import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
 import {
   clearStreamingState,
   setStreamingStateAborting,
@@ -155,23 +153,25 @@ export class cancelRepository {
                 })
                 .where(eq(chatMessages.id, waitingTask.wakeUpToolMessageId));
 
-              publishWsEvent(
-                {
-                  channel: buildMessagesChannel(threadId),
-                  event: "tool-result",
-                  data: createStreamEvent.toolResult({
-                    messageId: waitingTask.wakeUpToolMessageId,
-                    toolName: toolCall.toolName,
-                    result: undefined,
-                    toolCall: {
-                      ...toolCall,
-                      status: "failed" as const,
-                      result: undefined,
-                    },
-                  }).data,
-                },
+              createMessagesEmitter(
+                threadId,
+                null,
                 logger,
-              );
+                user,
+              )("tool-result", {
+                messages: [
+                  {
+                    id: waitingTask.wakeUpToolMessageId,
+                    metadata: {
+                      toolCall: {
+                        ...toolCall,
+                        status: "failed" as const,
+                        result: undefined,
+                      },
+                    },
+                  },
+                ],
+              });
 
               logger.info(
                 "[Cancel] Wrote cancelled result to waiting tool message",
@@ -209,19 +209,13 @@ export class cancelRepository {
         }
         // Emit STREAM_FINISHED so the frontend stops showing the streaming
         // state - without this the client stays stuck in aborting/isStreaming.
-        await clearStreamingState(threadId, logger);
-        publishWsEvent(
-          {
-            channel: buildMessagesChannel(threadId),
-            event: "stream-finished",
-            data: createStreamEvent.streamFinished({
-              threadId,
-              reason: "cancelled",
-              finalState: "idle",
-            }).data,
-          },
+        await clearStreamingState(threadId, logger, user);
+        createMessagesEmitter(
+          threadId,
+          null,
           logger,
-        );
+          user,
+        )("stream-finished", { streamingState: "idle" });
         logger.info(
           "[Cancel] No active stream found - cleared DB flag, cancelled tasks, emitted STREAM_FINISHED",
           { threadId },

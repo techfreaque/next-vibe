@@ -15,16 +15,10 @@ import {
   useWidgetForm,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type definition from "./definition";
-import type { ReleaseResponseType } from "./definition";
-
-interface CustomWidgetProps {
-  field: {
-    value: ReleaseResponseType | null | undefined;
-  };
-}
 
 function formatDuration(ms: number): string {
   if (ms < 1000) {
@@ -38,11 +32,11 @@ function formatDuration(ms: number): string {
   return `${m}m ${s}s`;
 }
 
-export function ReleaseResultWidget({ field }: CustomWidgetProps): JSX.Element {
+export function ReleaseResultWidget(): JSX.Element {
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
   const t = useWidgetTranslation<typeof definition.POST>();
-  const value = field.value;
+  const value = useWidgetValue<typeof definition.POST>();
 
   if (!value) {
     return (

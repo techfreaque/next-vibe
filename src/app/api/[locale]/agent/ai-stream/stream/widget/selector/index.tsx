@@ -163,10 +163,12 @@ export function Selector({
       </PopoverTrigger>
 
       <PopoverContent
-        className="p-0 w-[480px] max-w-[calc(100vw-10px)] mx-[5px] max-h-[85dvh] overflow-y-auto"
+        className="p-0 w-[480px] max-w-[calc(100vw-10px)] max-h-[85dvh] overflow-y-auto"
         align="start"
         side="top"
         sideOffset={8}
+        avoidCollisions={true}
+        collisionPadding={8}
       >
         {/* Only render content when popover is open - so we don't fetch data until needed */}
         {popoverOpen && <SelectorContent locale={locale} />}

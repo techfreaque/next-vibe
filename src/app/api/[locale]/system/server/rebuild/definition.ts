@@ -23,11 +23,11 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { ServerFramework, ServerFrameworkOptions } from "../enum";
 
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { REBUILD_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-const RebuildWidget = lazyCliWidget(() =>
+const RebuildWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.RebuildWidget })),
 );
 
@@ -47,12 +47,7 @@ const { POST } = createEndpoint({
     UserRole.WEB_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
-  aliases: [
-    REBUILD_ALIAS,
-    "rebuild-restart",
-    "rebuild-server",
-    "rebuild-and-restart",
-  ],
+  aliases: [REBUILD_ALIAS, "re"],
 
   fields: customWidgetObject({
     render: RebuildWidget,

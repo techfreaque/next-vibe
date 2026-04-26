@@ -375,13 +375,18 @@ export type MusicGenModelSelection = z.infer<
 export function filterMusicGenModels(
   selection: MusicGenModelSelection | null | undefined,
   user: JwtPayloadType,
+  providerOverride?: ApiProvider,
 ): MusicGenModelOption[] {
-  return filterRoleModels(musicGenModelOptionsPool, selection, user);
+  const pool = providerOverride
+    ? musicGenModelOptionsPool.filter((m) => m.apiProvider === providerOverride)
+    : musicGenModelOptionsPool;
+  return filterRoleModels(pool, selection, user);
 }
 
 export function getBestMusicGenModel(
   selection: MusicGenModelSelection,
   user: JwtPayloadType,
+  providerOverride?: ApiProvider,
 ): MusicGenModelOption | null {
-  return filterMusicGenModels(selection, user)[0] ?? null;
+  return filterMusicGenModels(selection, user, providerOverride)[0] ?? null;
 }

@@ -4,7 +4,8 @@
 
 import "server-only";
 
-import type { ModelMessage, ToolCallPart, ToolResultPart } from "ai";
+import type { JSONValue, ModelMessage, ToolCallPart, ToolResultPart } from "ai";
+import type { ToolResultOutput } from "@ai-sdk/provider-utils";
 
 import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
@@ -21,7 +22,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
 
 import type { DefaultFolderId } from "../../../chat/config";
-import type { ChatMessage, ToolCallResult } from "../../../chat/db";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+
+import type { ChatMessage } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import type { ChatModelOption } from "../../models";
 import { createMetadataSystemMessage } from "../system-prompt/message-metadata";
@@ -265,7 +268,7 @@ export class MessageConverter {
           // Tools awaiting confirmation have no result/error yet - emit the
           // waiting_for_confirmation status as a placeholder result so the AI SDK
           // never sees a tool-call without a matching tool-result.
-          const output = toolCall.error
+          const output: ToolResultOutput | null = toolCall.error
             ? {
                 type: "error-text" as const,
                 value: MessageConverter.translateErrorRecursive(
@@ -509,7 +512,7 @@ export class MessageConverter {
           type: "tool-call";
           toolCallId: string;
           toolName: string;
-          input: ToolCallResult;
+          input: WidgetData;
         }> = [];
 
         // Build separate tool result messages (one per tool call with result)
@@ -575,7 +578,7 @@ export class MessageConverter {
           // Tools awaiting confirmation have no result/error yet - emit the
           // waiting_for_confirmation status as a placeholder result so the AI SDK
           // never sees a tool-call without a matching tool-result.
-          const output = toolCall.error
+          const output: ToolResultOutput | null = toolCall.error
             ? {
                 type: "error-text" as const,
                 value: MessageConverter.translateErrorRecursive(
@@ -783,13 +786,13 @@ export class MessageConverter {
    * - Model does not support it → pass only text description (gap-fill ensures text is populated)
    */
   private static buildToolResultOutput(
-    result: ToolCallResult | undefined,
+    result: WidgetData | undefined,
     toolName?: string,
     modelConfig?: ChatModelOption,
   ):
     | {
         type: "json";
-        value: ToolCallResult | null;
+        value: JSONValue;
       }
     | {
         type: "content";
@@ -869,7 +872,7 @@ export class MessageConverter {
 
       // If neither format has a media URL, fall through to generic JSON passthrough.
       if (!fileUrl && !mediaResult.text) {
-        return { type: "json", value: result ?? null };
+        return { type: "json", value: (result ?? null) as JSONValue };
       }
 
       // Determine which modality this tool produces
@@ -892,7 +895,7 @@ export class MessageConverter {
             text: mediaResult.text ?? null,
             mediaType: mediaResult.mediaType ?? null,
             creditCost: mediaResult.creditCost ?? null,
-          } satisfies ToolCallResult,
+          } satisfies JSONValue,
         };
       }
 
@@ -918,11 +921,11 @@ export class MessageConverter {
           text: mediaResult.text ?? null,
           mediaType: mediaResult.mediaType ?? null,
           creditCost: mediaResult.creditCost ?? null,
-        } satisfies ToolCallResult,
+        } satisfies JSONValue,
       };
     }
 
-    return { type: "json", value: result ?? null };
+    return { type: "json", value: (result ?? null) as JSONValue };
   }
 
   /**

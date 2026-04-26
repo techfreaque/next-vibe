@@ -82,8 +82,6 @@ export function useInputHandlers({
 
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
   const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
-  const startStream = useChatNavigationStore((s) => s.startStream);
-  const stopStream = useChatNavigationStore((s) => s.stopStream);
   const navActiveThreadId = useChatNavigationStore((s) => s.activeThreadId);
   const navRootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
   const navSubFolderId = useChatNavigationStore((s) => s.currentSubFolderId);
@@ -98,10 +96,6 @@ export function useInputHandlers({
 
     if (isValidInput(input) && !isLoading) {
       logger.debug("Chat", "submitMessage calling sendMessage");
-
-      // Optimistically set isStreaming=true NOW (synchronous, same event tick)
-      // so the stop button appears before the first WS chunk arrives.
-      startStream(navActiveThreadId ?? "new", logger);
 
       // Snapshot navigation state before sending - needed to revert on failure
       // These closure values are captured at render time (pre-navigation state).
@@ -141,9 +135,7 @@ export function useInputHandlers({
         },
       );
 
-      // If the stream failed, revert isStreaming and navigation
       if (!result.success) {
-        stopStream(navActiveThreadId ?? "new", logger);
         if (result.createdThreadId) {
           setNavigation(preNavSnapshot);
           logger.warn(
@@ -172,8 +164,6 @@ export function useInputHandlers({
     draftKey,
     setNavigation,
     setLeafMessageId,
-    startStream,
-    stopStream,
     navActiveThreadId,
     navRootFolderId,
     navSubFolderId,
@@ -198,9 +188,6 @@ export function useInputHandlers({
         logger.debug("Chat", "submitWithContent calling sendMessage");
         // Also update the input state for UI consistency
         setInput(content);
-
-        // Optimistically set isStreaming=true NOW (synchronous, same event tick)
-        startStream(navActiveThreadId ?? "new", logger);
 
         const preNavSnapshot = {
           activeThreadId: navActiveThreadId,
@@ -232,7 +219,6 @@ export function useInputHandlers({
         );
 
         if (!result.success) {
-          stopStream(navActiveThreadId ?? "new", logger);
           if (result.createdThreadId) {
             setNavigation(preNavSnapshot);
           }
@@ -257,8 +243,6 @@ export function useInputHandlers({
       draftKey,
       setNavigation,
       setLeafMessageId,
-      startStream,
-      stopStream,
       navActiveThreadId,
       navRootFolderId,
       navSubFolderId,
@@ -286,9 +270,6 @@ export function useInputHandlers({
       }
 
       logger.debug("Chat", "submitWithAudio calling sendMessage with audio");
-
-      // Optimistically set isStreaming=true NOW (synchronous, same event tick)
-      startStream(navActiveThreadId ?? "new", logger);
 
       const preNavSnapshot = {
         activeThreadId: navActiveThreadId,
@@ -325,7 +306,6 @@ export function useInputHandlers({
       );
 
       if (!result.success) {
-        stopStream(navActiveThreadId ?? "new", logger);
         if (result.createdThreadId) {
           setNavigation(preNavSnapshot);
         }
@@ -343,8 +323,6 @@ export function useInputHandlers({
       draftKey,
       setNavigation,
       setLeafMessageId,
-      startStream,
-      stopStream,
       navActiveThreadId,
       navRootFolderId,
       navSubFolderId,

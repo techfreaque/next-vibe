@@ -66,11 +66,11 @@ export const translations = {
     navigation: {
       subscription: "Subscription & Credits",
       referral: "Referral Program",
-      settings: "Profile Settings",
+      settings: "My Profile",
       leadMagnet: "Lead Magnet",
       help: "Feedback & Support",
       about: "About",
-      websiteBlog: "Website & Blog",
+      websiteBlog: "Stories",
       admin: "Admin Dashboard",
     },
     confirmations: {

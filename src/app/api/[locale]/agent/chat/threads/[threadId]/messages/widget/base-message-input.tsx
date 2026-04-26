@@ -27,7 +27,7 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 
 import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
 import { CallModeIndicator } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/call-mode-indicator";
@@ -39,7 +39,6 @@ import { ToolsButton } from "@/app/api/[locale]/agent/ai-stream/stream/widget/to
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
-import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -95,14 +94,7 @@ export function BaseMessageInput({
   logger,
   user,
 }: BaseMessageInputProps): JSX.Element {
-  const { initialCredits, initialSettingsData } = useChatBootContext();
-  const creditsHook = useCredits(user, logger, initialCredits);
-  const noopDeduct = useCallback(
-    // No-op fallback when credits hook is unavailable
-    () => undefined as void,
-    [],
-  );
-  const deductCredits = creditsHook?.deductCredits ?? noopDeduct;
+  const { initialSettingsData } = useChatBootContext();
 
   // Get settings directly (no context dependency for model/character)
   const { settings, setTTSAutoplay } = useChatSettings(
@@ -130,7 +122,6 @@ export function BaseMessageInput({
     currentValue: content,
     onValueChange: onContentChange,
     onSubmitAudio,
-    deductCredits,
     logger,
     locale,
   });

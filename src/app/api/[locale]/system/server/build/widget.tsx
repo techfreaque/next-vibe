@@ -14,14 +14,13 @@ import type { JSX } from "react";
 import {
   useWidgetForm,
   useWidgetOnSubmit,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type definition from "./definition";
 
 interface CustomWidgetProps {
-  field: {
-    value: typeof definition.POST.types.ResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 function formatDuration(ms: number): string {
@@ -35,7 +34,7 @@ function formatDuration(ms: number): string {
 export function BuildResultWidget({ field }: CustomWidgetProps): JSX.Element {
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
-  const value = field.value;
+  const value = useWidgetValue<typeof definition.POST>();
 
   if (!value) {
     return (

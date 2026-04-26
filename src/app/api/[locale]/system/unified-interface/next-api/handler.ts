@@ -40,7 +40,7 @@ import {
   type ApiHandlerOptions,
   createGenericHandler,
 } from "../shared/endpoints/route/handler";
-import { createEndpointLogger } from "../shared/logger/endpoint";
+import { createEndpointLogger } from "../shared/logger/server-logger";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Methods } from "../shared/types/enums";
 import { Platform } from "../shared/types/platform";
@@ -171,6 +171,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           skillId: undefined,
           modelId: undefined,
           headless: undefined,
+          subAgentDepth: 0,
           currentToolMessageId: undefined,
           callerToolCallId: undefined,
           pendingToolMessages: undefined,
@@ -187,6 +188,8 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           videoGenModelSelection: undefined,
           variantId: undefined,
           isRevival: undefined,
+
+          providerOverride: undefined,
         },
       });
 

@@ -306,12 +306,30 @@ export class UserProfileRepository {
       // Update user in database
       await db.update(users).set(updateData).where(eq(users.id, userId));
 
-      // Cascade email change to linked lead record
+      // Cascade email change to linked lead record.
+      // Use onConflictDoNothing to handle the edge case where another lead row
+      // already has the same email (leads_email_unique constraint). The users table
+      // update already succeeded, so a conflict here is non-fatal - the lead email
+      // stays as-is rather than crashing the whole request.
       if (updateData.email && currentUser.leadId) {
         await db
           .update(leads)
           .set({ email: updateData.email, updatedAt: new Date() })
-          .where(eq(leads.id, currentUser.leadId));
+          .where(eq(leads.id, currentUser.leadId))
+          .catch((leadUpdateErr) => {
+            const msg = parseError(leadUpdateErr).message;
+            if (msg.includes("leads_email_unique")) {
+              logger.warn(
+                "Lead email update skipped - email already claimed by another lead",
+                { leadId: currentUser.leadId, email: updateData.email },
+              );
+            } else {
+              logger.error("Failed to cascade email to lead", {
+                leadId: currentUser.leadId,
+                error: msg,
+              });
+            }
+          });
       }
 
       logger.debug("Successfully updated user profile", { userId });

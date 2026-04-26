@@ -31,6 +31,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { formatValidationErrorCompact } from "@/app/api/[locale]/system/unified-interface/shared/utils/format-validation-error";
 import { getPreferredName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
@@ -45,11 +46,11 @@ import {
   TaskOutputMode,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { handleTaskCompletion } from "@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler";
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { buildRemoteUrl } from "@/app/api/[locale]/system/unified-interface/remote/remote-call";
+import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
 
 import type { AiT } from "../i18n";
 import { CallbackMode } from "./constants";
@@ -73,12 +74,14 @@ export class RouteExecuteRepository {
   private static async executeRemoteDirect(params: {
     remoteUrl: string;
     token: string;
+    leadId: string;
     toolName: string;
-    input: Record<string, JsonValue> | null;
+    input: Record<string, WidgetData> | null;
     locale: CountryLanguage;
     logger: EndpointLogger;
-  }): Promise<Record<string, JsonValue> | null> {
-    const { remoteUrl, token, toolName, input, locale, logger } = params;
+  }): Promise<Record<string, WidgetData> | null> {
+    const { remoteUrl, token, leadId, toolName, input, locale, logger } =
+      params;
     // Build URL from the execute-tool definition so the path is always in sync.
     const executeDefinition = (await import("./definition")).default;
     const url = buildRemoteUrl(remoteUrl, locale, executeDefinition.POST, {
@@ -90,7 +93,7 @@ export class RouteExecuteRepository {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}${BEARER_LEAD_ID_SEPARATOR}${leadId}`,
         },
         body: JSON.stringify({ toolName, input: input ?? {} }),
         signal: AbortSignal.timeout(90_000),
@@ -103,7 +106,7 @@ export class RouteExecuteRepository {
         return null;
       }
       const body = (await resp.json()) as {
-        data?: Record<string, JsonValue>;
+        data?: Record<string, WidgetData>;
         success?: boolean;
       };
       return body.data ?? null;
@@ -160,7 +163,7 @@ export class RouteExecuteRepository {
       // create new remote WAIT tasks - this causes an infinite loop where each revival calls
       // execute-tool, creates a task, waits, resume-streams again, etc.
       // Only auto-upgrade in revival streams (isRevival=true), NOT all headless streams.
-      if (instanceId && streamContext?.isRevival) {
+      if (instanceId && streamContext.isRevival) {
         const callbackMode = data.callbackMode ?? CallbackMode.WAIT;
         if (callbackMode === CallbackMode.WAIT) {
           logger.debug(
@@ -177,14 +180,14 @@ export class RouteExecuteRepository {
 
       if (
         instanceId &&
-        FOLDER_ALLOWS_REMOTE_TOOLS[streamContext?.rootFolderId] === false
+        FOLDER_ALLOWS_REMOTE_TOOLS[streamContext.rootFolderId] === false
       ) {
         logger.warn(
           "[RouteExecute] Remote tool blocked for restricted folder",
           {
             toolName,
             instanceId,
-            rootFolderId: streamContext?.rootFolderId,
+            rootFolderId: streamContext.rootFolderId,
           },
         );
         return fail({
@@ -195,14 +198,14 @@ export class RouteExecuteRepository {
 
       const effectiveCallbackMode = data.callbackMode ?? CallbackMode.WAIT;
       const folderBlockedModes =
-        FOLDER_BLOCKED_CALLBACK_MODES[streamContext?.rootFolderId] ?? [];
+        FOLDER_BLOCKED_CALLBACK_MODES[streamContext.rootFolderId] ?? [];
       if (folderBlockedModes.includes(effectiveCallbackMode)) {
         logger.warn(
           "[RouteExecute] Blocked callbackMode for restricted folder",
           {
             toolName,
             callbackMode: effectiveCallbackMode,
-            rootFolderId: streamContext?.rootFolderId,
+            rootFolderId: streamContext.rootFolderId,
           },
         );
         return fail({
@@ -227,7 +230,7 @@ export class RouteExecuteRepository {
         // Deduplication: if a remote task for this toolMessageId already exists
         // (created by the first stream before the user confirmed), skip creation.
         // The caller (tool-confirmation-handler) will poll for its completion.
-        if (streamContext?.callerToolCallId) {
+        if (streamContext.callerToolCallId) {
           const { sql: sqlFn } = await import("drizzle-orm");
           const [existing] = await db
             .select({
@@ -236,7 +239,7 @@ export class RouteExecuteRepository {
             })
             .from(cronTasks)
             .where(
-              sqlFn`${cronTasks.taskInput}->>'toolMessageId' = ${streamContext?.callerToolCallId}`,
+              sqlFn`${cronTasks.taskInput}->>'toolMessageId' = ${streamContext.callerToolCallId}`,
             )
             .limit(1);
 
@@ -308,9 +311,9 @@ export class RouteExecuteRepository {
 
         // Get threadId and tool message ID from streamContext (set by the calling AI stream).
         // tools-loader injects currentToolMessageId from pendingToolMessages before execute() runs.
-        const effectiveThreadId = streamContext?.threadId;
+        const effectiveThreadId = streamContext.threadId;
         const effectiveToolMessageId =
-          streamContext?.currentToolMessageId ?? streamContext?.aiMessageId;
+          streamContext.currentToolMessageId ?? streamContext.aiMessageId;
 
         // ── Direct HTTP transport ──────────────────────────────────────────────
         // If the remote instance is directly accessible (no NAT, no queue wait),
@@ -336,8 +339,9 @@ export class RouteExecuteRepository {
               await RouteExecuteRepository.executeRemoteDirect({
                 remoteUrl: connInfo.remoteUrl,
                 token: connInfo.token,
+                leadId: connInfo.leadId,
                 toolName,
-                input: strippedInput as Record<string, JsonValue> | null,
+                input: strippedInput,
                 locale,
                 logger,
               });
@@ -385,10 +389,11 @@ export class RouteExecuteRepository {
                 wakeUpCallbackMode: callbackMode,
                 wakeUpThreadId: effectiveThreadId,
                 wakeUpToolMessageId: effectiveToolMessageId ?? null,
-                wakeUpLeafMessageId: streamContext?.leafMessageId ?? null,
-                wakeUpModelId: streamContext?.modelId ?? null,
-                wakeUpSkillId: streamContext?.skillId ?? null,
-                wakeUpFavoriteId: streamContext?.favoriteId ?? null,
+                wakeUpLeafMessageId: streamContext.leafMessageId ?? null,
+                wakeUpModelId: streamContext.modelId ?? null,
+                wakeUpSkillId: streamContext.skillId ?? null,
+                wakeUpFavoriteId: streamContext.favoriteId ?? null,
+                wakeUpSubAgentDepth: streamContext.subAgentDepth ?? 0,
                 outputMode: TaskOutputMode.STORE_ONLY,
                 notificationTargets: [],
                 tags: ["remote-direct", instanceId, "wakeUp"],
@@ -398,6 +403,7 @@ export class RouteExecuteRepository {
             }
 
             const capturedToken = connInfo.token;
+            const capturedLeadId = connInfo.leadId;
             const capturedRemoteUrl = connInfo.remoteUrl;
 
             void (async (): Promise<void> => {
@@ -405,8 +411,9 @@ export class RouteExecuteRepository {
                 await RouteExecuteRepository.executeRemoteDirect({
                   remoteUrl: capturedRemoteUrl,
                   token: capturedToken,
+                  leadId: capturedLeadId,
                   toolName,
-                  input: strippedInput as Record<string, JsonValue> | null,
+                  input: strippedInput,
                   locale,
                   logger,
                 });
@@ -431,14 +438,15 @@ export class RouteExecuteRepository {
                   status: CronTaskStatus.COMPLETED,
                   output: directResult,
                   taskId: directTaskId,
-                  modelId: streamContext?.modelId ?? null,
-                  skillId: streamContext?.skillId ?? null,
-                  favoriteId: streamContext?.favoriteId ?? null,
-                  leafMessageId: streamContext?.leafMessageId ?? null,
-                  userId: user.id,
+                  modelId: streamContext.modelId ?? null,
+                  skillId: streamContext.skillId ?? null,
+                  favoriteId: streamContext.favoriteId ?? null,
+                  leafMessageId: streamContext.leafMessageId ?? null,
+                  subAgentDepth: streamContext.subAgentDepth,
+                  ownerUser: user,
                   logger,
-                  directResumeUser: user,
                   directResumeLocale: locale,
+                  abortSignal: streamContext.abortSignal,
                 });
               }
             })();
@@ -450,10 +458,10 @@ export class RouteExecuteRepository {
               status: CronTaskStatus.PENDING,
               ...(callbackMode === CallbackMode.DETACH
                 ? {
-                    hint: "Task detached. Use wait-for-task with this taskId if you need the result.",
+                    hint: "Task detached. Use wait-for-task with this taskId if you need to wait for the result/return.",
                   }
                 : {
-                    hint: "Result will be injected when complete. Call wait-for-task only if you need the result before continuing.",
+                    hint: "Result/return will be injected when complete and wakes up the thread. Call wait-for-task only if you need the result before continuing.",
                   }),
             });
           }
@@ -488,10 +496,11 @@ export class RouteExecuteRepository {
           wakeUpCallbackMode: callbackMode,
           wakeUpThreadId: effectiveThreadId ?? null,
           wakeUpToolMessageId: effectiveToolMessageId ?? null,
-          wakeUpModelId: streamContext?.modelId ?? null,
-          wakeUpSkillId: streamContext?.skillId ?? null,
-          wakeUpFavoriteId: streamContext?.favoriteId ?? null,
-          wakeUpLeafMessageId: streamContext?.leafMessageId ?? null,
+          wakeUpModelId: streamContext.modelId ?? null,
+          wakeUpSkillId: streamContext.skillId ?? null,
+          wakeUpFavoriteId: streamContext.favoriteId ?? null,
+          wakeUpLeafMessageId: streamContext.leafMessageId ?? null,
+          wakeUpSubAgentDepth: streamContext.subAgentDepth ?? 0,
           outputMode: TaskOutputMode.STORE_ONLY,
           notificationTargets: [],
           tags: ["remote", instanceId],
@@ -509,6 +518,7 @@ export class RouteExecuteRepository {
           connInfo.token
         ) {
           const capturedToken = connInfo.token;
+          const capturedLeadId2 = connInfo.leadId;
           const capturedLocalUrl = connInfo.localUrl;
           const capturedTaskId = taskId;
           void (async (): Promise<void> => {
@@ -542,7 +552,7 @@ export class RouteExecuteRepository {
                       ...(effectiveToolMessageId
                         ? { toolMessageId: effectiveToolMessageId }
                         : {}),
-                      ...(streamContext?.leafMessageId
+                      ...(streamContext.leafMessageId
                         ? { leafMessageId: streamContext.leafMessageId }
                         : {}),
                     },
@@ -563,7 +573,7 @@ export class RouteExecuteRepository {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
-                  Authorization: `Bearer ${capturedToken}`,
+                  Authorization: `Bearer ${capturedToken}${BEARER_LEAD_ID_SEPARATOR}${capturedLeadId2}`,
                 },
                 body: JSON.stringify(pushBody),
                 signal: AbortSignal.timeout(10_000),
@@ -633,11 +643,11 @@ export class RouteExecuteRepository {
           status: CronTaskStatus.PENDING,
           ...(callbackMode === CallbackMode.DETACH
             ? {
-                hint: "Task detached. Use wait-for-task with this taskId if you need the result.",
+                hint: "Task detached. Use wait-for-task with this taskId if you need the result/return.",
               }
             : callbackMode === CallbackMode.WAKE_UP
               ? {
-                  hint: "Result will be injected when complete. Call wait-for-task only if you need the result before continuing.",
+                  hint: "Result/return will be injected when complete and wakes up the thread. Call wait-for-task only if you need the result before continuing.",
                 }
               : {}),
         });
@@ -656,10 +666,7 @@ export class RouteExecuteRepository {
           { toolName },
         );
         return success({
-          result: { status: "waiting_for_confirmation", toolName } as Record<
-            string,
-            JsonValue
-          >,
+          result: { status: "waiting_for_confirmation", toolName },
         });
       }
 
@@ -679,7 +686,7 @@ export class RouteExecuteRepository {
         const effectiveThreadId = streamContext.threadId;
         // tools-loader injects currentToolMessageId from pendingToolMessages before execute() is called
         const effectiveToolMessageId =
-          streamContext?.currentToolMessageId ?? streamContext?.aiMessageId;
+          streamContext.currentToolMessageId ?? streamContext.aiMessageId;
 
         await db.insert(cronTasks).values({
           id: taskId,
@@ -696,6 +703,7 @@ export class RouteExecuteRepository {
           wakeUpCallbackMode: CallbackMode.DETACH,
           wakeUpThreadId: effectiveThreadId ?? null,
           wakeUpToolMessageId: effectiveToolMessageId ?? null,
+          wakeUpSubAgentDepth: streamContext.subAgentDepth ?? 0,
           outputMode: TaskOutputMode.STORE_ONLY,
           notificationTargets: [],
           tags: ["detach", "local"],
@@ -707,7 +715,7 @@ export class RouteExecuteRepository {
         void (async (): Promise<void> => {
           try {
             const result = await RouteExecutionExecutor.executeGenericHandler<
-              Record<string, JsonValue>
+              Record<string, WidgetData>
             >({
               toolName,
               data: input ?? {},
@@ -781,7 +789,7 @@ export class RouteExecuteRepository {
                 enabled: false,
                 taskInput: {
                   ...(input ?? {}),
-                  __result: (finalResult ?? null) as JsonValue,
+                  __result: finalResult ?? null,
                 },
                 updatedAt: completedAt,
               })
@@ -801,6 +809,7 @@ export class RouteExecuteRepository {
                   wakeUpSkillId: cronTasks.wakeUpSkillId,
                   wakeUpFavoriteId: cronTasks.wakeUpFavoriteId,
                   wakeUpLeafMessageId: cronTasks.wakeUpLeafMessageId,
+                  wakeUpSubAgentDepth: cronTasks.wakeUpSubAgentDepth,
                 })
                 .from(cronTasks)
                 .where(eq(cronTasks.id, taskId))
@@ -836,10 +845,13 @@ export class RouteExecuteRepository {
                 skillId: latestTask?.wakeUpSkillId ?? null,
                 favoriteId: latestTask?.wakeUpFavoriteId ?? null,
                 leafMessageId: latestTask?.wakeUpLeafMessageId ?? null,
-                userId: user.id,
+                subAgentDepth:
+                  latestTask?.wakeUpSubAgentDepth ??
+                  streamContext.subAgentDepth,
+                ownerUser: user,
                 logger,
-                directResumeUser: user,
                 directResumeLocale: locale,
+                abortSignal: streamContext.abortSignal,
               });
             }
           } catch (err) {
@@ -866,7 +878,7 @@ export class RouteExecuteRepository {
       if (callbackMode === CallbackMode.WAKE_UP) {
         const taskId = `local-wu-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-        const effectiveThreadId = streamContext?.threadId;
+        const effectiveThreadId = streamContext.threadId;
         // Resolve tool message ID for this specific parallel tool call.
         // Priority: (1) DB lookup by toolCallId (authoritative, avoids race with stream-part-handler)
         //           (2) pendingToolMessages map (set by tools-loader before execute() if no race)
@@ -874,24 +886,24 @@ export class RouteExecuteRepository {
         //           (4) aiMessageId (placeholder assistant - last resort, almost always wrong for wakeUp)
         // The DB lookup is safe because tool-call-handler writes the tool message row before
         // returning, and execute() is called asynchronously after that write.
-        const pendingEntry = streamContext?.callerToolCallId
-          ? streamContext?.pendingToolMessages?.get(
-              streamContext?.callerToolCallId,
+        const pendingEntry = streamContext.callerToolCallId
+          ? streamContext.pendingToolMessages?.get(
+              streamContext.callerToolCallId,
             )
           : undefined;
 
         let resolvedToolMessageId: string | undefined =
-          pendingEntry?.messageId ?? streamContext?.currentToolMessageId;
+          pendingEntry?.messageId ?? streamContext.currentToolMessageId;
         let resolvedLeafMessageId: string | null =
           pendingEntry?.toolCallData?.parentId ??
-          streamContext?.leafMessageId ??
+          streamContext.leafMessageId ??
           null;
 
         // DB fallback: if in-memory lookup missed (race between execute() and stream-part-handler),
         // query the tool message row directly using toolCallId stored in metadata JSONB + threadId.
         if (
           !resolvedToolMessageId &&
-          streamContext?.callerToolCallId &&
+          streamContext.callerToolCallId &&
           effectiveThreadId
         ) {
           const { chatMessages } =
@@ -902,7 +914,7 @@ export class RouteExecuteRepository {
             .where(
               and(
                 eq(chatMessages.threadId, effectiveThreadId),
-                drizzleSql`(${chatMessages.metadata}->'toolCall'->>'toolCallId') = ${streamContext?.callerToolCallId}`,
+                drizzleSql`(${chatMessages.metadata}->'toolCall'->>'toolCallId') = ${streamContext.callerToolCallId}`,
               ),
             )
             .limit(1);
@@ -913,7 +925,7 @@ export class RouteExecuteRepository {
         }
 
         const effectiveToolMessageId =
-          resolvedToolMessageId ?? streamContext?.aiMessageId;
+          resolvedToolMessageId ?? streamContext.aiMessageId;
         const effectiveLeafMessageId = resolvedLeafMessageId;
 
         logger.debug("[RouteExecute] Creating local wakeUp task (RUNNING)", {
@@ -940,10 +952,11 @@ export class RouteExecuteRepository {
           wakeUpCallbackMode: CallbackMode.WAKE_UP,
           wakeUpThreadId: effectiveThreadId ?? null,
           wakeUpToolMessageId: effectiveToolMessageId ?? null,
-          wakeUpModelId: streamContext?.modelId ?? null,
-          wakeUpSkillId: streamContext?.skillId ?? null,
-          wakeUpFavoriteId: streamContext?.favoriteId ?? null,
+          wakeUpModelId: streamContext.modelId ?? null,
+          wakeUpSkillId: streamContext.skillId ?? null,
+          wakeUpFavoriteId: streamContext.favoriteId ?? null,
           wakeUpLeafMessageId: effectiveLeafMessageId,
+          wakeUpSubAgentDepth: streamContext.subAgentDepth ?? 0,
           outputMode: TaskOutputMode.STORE_ONLY,
           notificationTargets: [],
           tags: ["wakeup", "local"],
@@ -970,7 +983,7 @@ export class RouteExecuteRepository {
           type EscalateResult = ReturnType<
             NonNullable<typeof streamContext.escalateToTask>
           >;
-          const wrappedEscalateToTask = streamContext?.escalateToTask
+          const wrappedEscalateToTask = streamContext.escalateToTask
             ? async (opts?: EscalateOpts): EscalateResult => {
                 selfEscalated = true;
                 return streamContext!.escalateToTask!(opts);
@@ -993,10 +1006,10 @@ export class RouteExecuteRepository {
           };
           // Closure variable: holds the tool result so the finally block can store it
           // in taskInput.__result for wait-for-task to read inline.
-          let wakeUpFinalResult: Record<string, JsonValue> | null = null;
+          let wakeUpFinalResult: Record<string, WidgetData> | null = null;
           try {
             const result = await RouteExecutionExecutor.executeGenericHandler<
-              Record<string, JsonValue>
+              Record<string, WidgetData>
             >({
               toolName,
               data: input ?? {},
@@ -1057,7 +1070,7 @@ export class RouteExecuteRepository {
                     lastExecutionStatus: CronTaskStatus.COMPLETED,
                     lastExecutedAt: new Date(),
                     taskInput: {
-                      __result: (wakeUpFinalResult ?? null) as JsonValue,
+                      __result: wakeUpFinalResult ?? null,
                     },
                     updatedAt: new Date(),
                   })
@@ -1081,7 +1094,7 @@ export class RouteExecuteRepository {
                       lastExecutionStatus: CronTaskStatus.COMPLETED,
                       lastExecutedAt: new Date(),
                       taskInput: {
-                        __result: (wakeUpFinalResult ?? null) as JsonValue,
+                        __result: wakeUpFinalResult ?? null,
                       },
                       updatedAt: new Date(),
                     })
@@ -1097,6 +1110,7 @@ export class RouteExecuteRepository {
                       wakeUpSkillId: cronTasks.wakeUpSkillId,
                       wakeUpFavoriteId: cronTasks.wakeUpFavoriteId,
                       wakeUpLeafMessageId: cronTasks.wakeUpLeafMessageId,
+                      wakeUpSubAgentDepth: cronTasks.wakeUpSubAgentDepth,
                       userId: cronTasks.userId,
                     })
                     .from(cronTasks)
@@ -1117,24 +1131,27 @@ export class RouteExecuteRepository {
                     taskId,
                     modelId:
                       latestTask?.wakeUpModelId ??
-                      streamContext?.modelId ??
+                      streamContext.modelId ??
                       null,
                     skillId:
                       latestTask?.wakeUpSkillId ??
-                      streamContext?.skillId ??
+                      streamContext.skillId ??
                       null,
                     favoriteId:
                       latestTask?.wakeUpFavoriteId ??
-                      streamContext?.favoriteId ??
+                      streamContext.favoriteId ??
                       null,
                     leafMessageId:
                       latestTask?.wakeUpLeafMessageId ??
-                      streamContext?.leafMessageId ??
+                      streamContext.leafMessageId ??
                       null,
-                    userId: latestTask?.userId ?? user.id,
+                    subAgentDepth:
+                      latestTask?.wakeUpSubAgentDepth ??
+                      streamContext.subAgentDepth,
+                    ownerUser: user,
                     logger,
-                    directResumeUser: user,
                     directResumeLocale: locale,
+                    abortSignal: streamContext.abortSignal,
                   });
                 }
               } catch (completionErr) {
@@ -1158,7 +1175,7 @@ export class RouteExecuteRepository {
                     lastExecutionStatus: CronTaskStatus.COMPLETED,
                     lastExecutedAt: new Date(),
                     taskInput: {
-                      __result: (wakeUpFinalResult ?? null) as JsonValue,
+                      __result: wakeUpFinalResult ?? null,
                     },
                     updatedAt: new Date(),
                   })
@@ -1183,7 +1200,7 @@ export class RouteExecuteRepository {
         return success({
           taskId,
           status: CronTaskStatus.PENDING,
-          hint: "Result will be injected when complete. Call wait-for-task only if you need the result before continuing.",
+          hint: "Result/return will be injected when complete and wakes up the thread. Call wait-for-task only if you need the result before continuing.",
         });
       }
 
@@ -1213,6 +1230,7 @@ export class RouteExecuteRepository {
           modelId: undefined,
           favoriteId: undefined,
           headless: undefined,
+          subAgentDepth: 0,
           waitingForRemoteResult: undefined,
           abortSignal: undefined,
           callerToolCallId: undefined,

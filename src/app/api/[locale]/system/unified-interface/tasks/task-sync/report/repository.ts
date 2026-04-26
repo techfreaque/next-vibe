@@ -18,11 +18,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { NewCronTask } from "../../cron/db";
-import { cronTaskExecutions, cronTasks } from "../../cron/db";
+import { cronTaskExecutions, cronTasks, dbUserIdToOwner } from "../../cron/db";
+import { resolveTaskOwnerUser } from "../../cron/resolve-task-user";
 import { CronTaskStatus } from "../../enum";
 import { scopedTranslation } from "../../i18n";
 import { handleTaskCompletion } from "../../task-completion-handler";
-import type { JsonValue } from "../../unified-runner/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { ReportRequestOutput, ReportResponseOutput } from "./definition";
 
 export class TaskReportRepository {
@@ -30,6 +31,7 @@ export class TaskReportRepository {
     data: ReportRequestOutput,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    abortSignal: AbortSignal,
   ): Promise<ResponseType<ReportResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
 
@@ -79,7 +81,7 @@ export class TaskReportRepository {
                 ? CronTaskStatus.TIMEOUT
                 : CronTaskStatus.FAILED;
 
-        const updates: Partial<NewCronTask<Record<string, JsonValue>>> & {
+        const updates: Partial<NewCronTask<Record<string, WidgetData>>> & {
           updatedAt: Date;
         } = {
           lastExecutedAt: now,
@@ -164,21 +166,47 @@ export class TaskReportRepository {
                     ? CallbackMode.APPROVE
                     : null;
 
-        if ((toolMessageId ?? threadId) && task.userId) {
-          await handleTaskCompletion({
-            toolMessageId: toolMessageId ?? "",
-            threadId,
-            callbackMode,
-            status: finalStatus,
-            output: data.output ?? null,
-            taskId: task.id,
-            modelId: task.wakeUpModelId ?? null,
-            skillId: task.wakeUpSkillId ?? null,
-            favoriteId: task.wakeUpFavoriteId ?? null,
-            leafMessageId: task.wakeUpLeafMessageId ?? null,
-            userId: task.userId,
+        const owner = dbUserIdToOwner(task.userId);
+
+        if (toolMessageId ?? threadId) {
+          const ownerContext = await resolveTaskOwnerUser(
+            owner,
+            locale,
             logger,
-          });
+          );
+          if (ownerContext) {
+            const { RemoteConnectionRepository } =
+              await import("@/app/api/[locale]/user/remote-connection/repository");
+            // getLocalInstanceId respects user-configured instance identity (DB);
+            // falls back to deriveDefaultSelfInstanceId() (env-based) when no
+            // record exists — on Thea (prod) this resolves to "thea".
+            const selfInstanceId =
+              owner.type === "user"
+                ? await RemoteConnectionRepository.getLocalInstanceId(
+                    owner.userId,
+                  )
+                : RemoteConnectionRepository.deriveDefaultSelfInstanceId();
+
+            await handleTaskCompletion({
+              toolMessageId: toolMessageId ?? "",
+              threadId,
+              callbackMode,
+              status: finalStatus,
+              output: data.output ?? null,
+              taskId: task.id,
+              modelId: task.wakeUpModelId ?? null,
+              skillId: task.wakeUpSkillId ?? null,
+              favoriteId: task.wakeUpFavoriteId ?? null,
+              leafMessageId: task.wakeUpLeafMessageId ?? null,
+              subAgentDepth: task.wakeUpSubAgentDepth ?? 0,
+              ownerUser: ownerContext.user,
+              logger,
+              // Pin resume-stream to THIS instance so Hermes (remote) doesn't
+              // steal the revival cron task that must run on Thea (prod).
+              selfInstanceId,
+              abortSignal,
+            });
+          }
         }
       }
 

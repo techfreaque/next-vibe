@@ -38,10 +38,14 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { DefaultFolderId } from "../../chat/config";
+import { SKILL_CREATOR_ID } from "../../chat/skills/constants";
 import { scopedTranslation } from "../stream/i18n";
 import { AI_RUN_ALIAS } from "./constants";
-import { AiRunWidget } from "./widget";
+const AiRunWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.AiRunWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -86,7 +90,13 @@ const { POST } = createEndpoint({
   },
   tags: ["tags.ai", "tags.chat"],
 
-  // No events - run emits to the messages channel directly.
+  events: {
+    // Emitted once a new thread is created — lets callers update thread lists without polling
+    "thread-created": {
+      operation: "append" as const,
+      fields: ["threadId", "threadTitle", "threadCreatedAt"] as const,
+    },
+  },
 
   fields: customWidgetObject({
     render: AiRunWidget,
@@ -487,7 +497,7 @@ const { POST } = createEndpoint({
     requests: {
       // Create a skill: always use skill-creator
       skillCreator: {
-        skill: "skill-creator",
+        skill: SKILL_CREATOR_ID,
         prompt:
           "Create a Python code reviewer skill. Personality: direct, zero-fluff. Focuses on correctness and idiomatic Python. Target: professional developers. Model: BRILLIANT.",
       },

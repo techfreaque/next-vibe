@@ -20,7 +20,7 @@ import definitions from "./definition";
 export function useLeadsImportEndpoint(
   user: JwtPayloadType,
   logger: EndpointLogger,
-  params?: { enabled?: boolean },
+  params?: { enabled?: boolean; onSuccess?: () => void },
 ): EndpointReturn<typeof definitions> & {
   selectedFile: File | null;
   setSelectedFile: React.Dispatch<React.SetStateAction<File | null>>;
@@ -34,6 +34,8 @@ export function useLeadsImportEndpoint(
 } {
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const [dragOver, setDragOver] = React.useState(false);
+
+  const onSuccess = params?.onSuccess;
 
   const form = useEndpoint(
     definitions,
@@ -50,6 +52,13 @@ export function useLeadsImportEndpoint(
           persistForm: false,
           persistenceKey: "leads-import-form",
         },
+        mutationOptions: onSuccess
+          ? {
+              onSuccess: async (): Promise<void> => {
+                onSuccess();
+              },
+            }
+          : undefined,
       },
     },
     logger,

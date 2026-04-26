@@ -124,6 +124,7 @@ const { POST } = createEndpoint({
 
             const newSkill: SkillListItem = {
               id: data.responseData.id,
+              internalId: null,
               icon: data.requestData.icon,
               category: data.requestData.category,
               modelId: bestModel.id,

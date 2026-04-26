@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -28,7 +29,9 @@ import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speec
 import { ensureUniqueSlug, generateFavoriteSlug } from "../../slugify";
 import { DEFAULT_SKILLS } from "../../skills/config";
 import { SkillsRepository } from "../../skills/repository";
+import favoritesDefinitions from "../definition";
 import { chatFavorites } from "../db";
+import { ChatFavoritesRepositoryClient } from "../repository-client";
 import type {
   FavoriteCreateRequestOutput,
   FavoriteCreateResponseOutput,
@@ -317,6 +320,43 @@ export class FavoritesCreateRepository {
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
+
+      // Emit WS event — push full computed FavoriteCard so all tabs update immediately
+      const emitFavorites = createEndpointEmitter(
+        favoritesDefinitions.GET,
+        logger,
+        user,
+      );
+      const variantForDisplay = data.variantId
+        ? character?.variants?.find((v) => v.id === data.variantId)
+        : (character?.variants?.find((v) => v.isDefault) ??
+          character?.variants?.[0] ??
+          null);
+      const newFavoriteCard =
+        ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
+          {
+            id: favorite.slug || favorite.id,
+            skillId: favorite.skillId,
+            variantId: favorite.variantId ?? null,
+            customVariantName: favorite.customVariantName ?? null,
+            customIcon: null,
+            voiceModelSelection: voiceToStore,
+            modelSelection: modelSelectionToStore ?? null,
+            position: nextPosition,
+          },
+          variantForDisplay?.modelSelection ??
+            character?.variants?.[0]?.modelSelection ??
+            null,
+          character?.icon ?? null,
+          character?.name ?? null,
+          character?.tagline ?? null,
+          character?.description ?? null,
+          null,
+          character?.voiceModelSelection ?? null,
+          locale,
+          user,
+        );
+      emitFavorites("favorite-created", { favorites: [newFavoriteCard] });
 
       return success({
         success: t("post.success.title"),

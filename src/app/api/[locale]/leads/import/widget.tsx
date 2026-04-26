@@ -20,8 +20,8 @@ import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Square } from "next-vibe-ui/ui/icons/Square";
 import { Upload } from "next-vibe-ui/ui/icons/Upload";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
-import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Li } from "next-vibe-ui/ui/li";
+import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { Code } from "next-vibe-ui/ui/typography";
 import { Ul } from "next-vibe-ui/ui/ul";
@@ -31,23 +31,20 @@ import {
   useWidgetContext,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
-import { FileFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/file-field/react";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
+import { FileFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/file-field/widget";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
 
-type PostResponseOutput = typeof definition.POST.types.ResponseOutput;
-
 interface CustomWidgetProps {
-  field: {
-    value: PostResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 /** CSV column list shown to users in the guidance section */
@@ -135,7 +132,7 @@ export function LeadsImportContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.POST>();
   const t = useWidgetTranslation<typeof definition.POST>();
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();

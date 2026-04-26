@@ -16,8 +16,10 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import favoritesDefinitions from "../definition";
 import { chatFavorites } from "../db";
 import type {
   FavoritesReorderRequestOutput,
@@ -68,6 +70,20 @@ export class FavoritesReorderRepository {
       });
 
       logger.info("Favorites reordered successfully", { userId });
+
+      // Emit WS event — triggers invalidation so all tabs refetch with new order
+      const emitFavorites = createEndpointEmitter(
+        favoritesDefinitions.GET,
+        logger,
+        user,
+      );
+      emitFavorites("favorites-reordered", {
+        favorites: requestData.positions.map((p) => ({
+          id: p.id,
+          position: p.position,
+        })),
+      });
+
       return success({ success: true });
     } catch (error) {
       logger.error("Failed to reorder favorites", parseError(error));

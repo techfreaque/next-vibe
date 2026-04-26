@@ -15,25 +15,17 @@ import React, { useCallback } from "react";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type endpoints from "./definition";
-import type { ConnectionsListResponseOutput } from "./definition";
 
-interface WidgetProps {
-  field: {
-    value: ConnectionsListResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
-}
-
-export function ConnectionsListContainer({
-  field,
-}: WidgetProps): React.JSX.Element {
+export function ConnectionsListContainer(): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const navigation = useWidgetNavigation();
 
-  const value = field.value;
-  const connections = value?.connections ?? [];
+  const connectionsData = useWidgetValue<typeof endpoints.GET>();
+  const connections = connectionsData?.connections ?? [];
 
   const handleCreate = useCallback((): void => {
     void (async (): Promise<void> => {

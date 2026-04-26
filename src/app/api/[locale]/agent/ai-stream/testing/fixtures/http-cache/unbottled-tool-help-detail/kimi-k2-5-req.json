@@ -1,0 +1,16 @@
+{
+  "url": "http://localhost:3001/api/en-GLOBAL/agent/ai-stream/ws-provider/stream",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "[redacted]",
+    "Cookie": "lead_id_3000=53706876-6f2e-4dfc-859c-53da467ebb8e"
+  },
+  "body": {
+    "content": "[T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.",
+    "model": "kimi_k2_5",
+    "skill": "quality-tester",
+    "timezone": "UTC",
+    "instanceId": "2aa8b619-700a-4d11-819a-aa7398bb8c18"
+  }
+}

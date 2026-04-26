@@ -6,7 +6,6 @@
  * Adds ai-run-specific: pre-calls, tools config, instructions.
  */
 
-/* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
 import type { AutocompleteOption } from "next-vibe-ui/ui/autocomplete-field";
@@ -16,10 +15,22 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, {
@@ -46,43 +57,38 @@ import {
   useWidgetLogger,
   useWidgetOnSubmit,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { scopedTranslation as runScopedTranslation } from "./i18n";
 
 import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
-import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import { platform } from "@/config/env-client";
+import { AIToolsModal } from "../../tools/widget/ai-tools-modal";
 import { DefaultFolderId } from "../../chat/config";
 import { ChatMessageRole } from "../../chat/enum";
 import {
   ChatNavigationProvider,
   useChatNavigationStore,
 } from "../../chat/hooks/use-chat-navigation-store";
-import { useChatSettings } from "../../chat/settings/hooks";
-import { useSkill } from "../../chat/skills/[id]/hooks";
 import messagesDefinition from "../../chat/threads/[threadId]/messages/definition";
-import {
-  ToolsConfigEdit,
-  type ToolEntry,
-} from "../../tools/widget/tools-config-widget";
+import type { EnabledTool } from "../../chat/hooks/store";
+import { useSkill } from "../../chat/skills/[id]/hooks";
 
+import type { FavoriteCard } from "../../chat/favorites/definition";
 import cancelEndpoints from "../cancel/definition";
 import { WidgetChatInput } from "../stream/widget/chat-input";
 import { EmbeddedMessagesView } from "../stream/widget/embedded-messages";
 import type definition from "./definition";
-import type {
-  AiStreamRunPostRequestOutput,
-  AiStreamRunPostResponseOutput,
-} from "./definition";
+import type { AiStreamRunPostRequestOutput } from "./definition";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -120,9 +126,7 @@ function useInputHeight(
 type PreCall = NonNullable<AiStreamRunPostRequestOutput["preCalls"]>[number];
 
 interface CustomWidgetProps {
-  field: {
-    value: AiStreamRunPostResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 // ─── Hook to read thread ID from navigation store ────────────────────────────
@@ -141,7 +145,6 @@ function PreCallRow({
   user,
   onRouteIdChange,
   onRemove,
-  t,
 }: {
   call: PreCall;
   index: number;
@@ -150,8 +153,8 @@ function PreCallRow({
   user: ReturnType<typeof useWidgetUser>;
   onRouteIdChange: (index: number, routeId: string) => void;
   onRemove: (index: number) => void;
-  t: ReturnType<typeof runScopedTranslation.scopedT>["t"];
 }): JSX.Element {
+  const { t } = runScopedTranslation.scopedT(locale);
   const [resolvedEndpoint, setResolvedEndpoint] =
     useState<CreateApiEndpointAny | null>(null);
   const [resolveError, setResolveError] = useState<string | null>(null);
@@ -224,7 +227,7 @@ function PreCallRow({
 
       {!call.routeId && (
         <P className="text-xs text-muted-foreground px-3 pb-3">
-          Select an endpoint to configure its parameters.
+          {t("widget.selectEndpointHint")}
         </P>
       )}
 
@@ -234,7 +237,7 @@ function PreCallRow({
 
       {call.routeId && !resolvedEndpoint && !resolveError && (
         <P className="text-xs text-muted-foreground px-3 pb-3">
-          Resolving endpoint...
+          {t("widget.resolvingEndpoint")}
         </P>
       )}
 
@@ -279,15 +282,14 @@ function PreCallsEditor({
   toolOptions,
   locale,
   user,
-  t,
 }: {
   preCalls: PreCall[];
   onChange: (calls: PreCall[]) => void;
   toolOptions: AutocompleteOption[];
   locale: CountryLanguage;
   user: ReturnType<typeof useWidgetUser>;
-  t: ReturnType<typeof runScopedTranslation.scopedT>["t"];
 }): JSX.Element {
+  const { t } = runScopedTranslation.scopedT(locale);
   const [isExpanded, setIsExpanded] = useState(preCalls.length > 0);
 
   const handleAdd = useCallback((): void => {
@@ -321,7 +323,7 @@ function PreCallsEditor({
         <Div className="flex-1 flex flex-col gap-0.5">
           <Span className="text-sm font-semibold">Pre-Calls</Span>
           <Span className="text-xs text-muted-foreground">
-            Tool calls executed before the prompt. Results injected as context.
+            {t("widget.preCallsDescription")}
           </Span>
         </Div>
         <Badge variant="outline" className="text-[10px] px-1.5 py-0">
@@ -346,7 +348,6 @@ function PreCallsEditor({
               user={user}
               onRouteIdChange={handleRouteIdChange}
               onRemove={handleRemove}
-              t={t}
             />
           ))}
 
@@ -358,11 +359,181 @@ function PreCallsEditor({
             onClick={handleAdd}
           >
             <Plus className="h-3.5 w-3.5 mr-1.5" />
-            Add Pre-Call
+            {t("widget.addPreCall")}
           </Button>
         </Div>
       )}
     </Div>
+  );
+}
+
+// ─── Inline extra buttons (instructions / pre-calls / tools) ─────────────────
+
+interface AiRunExtraButtonsProps {
+  preCalls: PreCall[];
+  onPreCallsChange: (calls: PreCall[]) => void;
+  toolOptions: AutocompleteOption[];
+  locale: CountryLanguage;
+  user: ReturnType<typeof useWidgetUser>;
+  fieldChildren: CustomWidgetProps["field"]["children"];
+}
+
+function AiRunExtraButtons({
+  preCalls,
+  onPreCallsChange,
+  toolOptions,
+  locale,
+  user,
+  fieldChildren,
+}: AiRunExtraButtonsProps): JSX.Element {
+  const form = useWidgetForm<typeof definition.POST>();
+  const { t } = runScopedTranslation.scopedT(locale);
+  const instructionsValue = form.watch("instructions") ?? "";
+
+  return (
+    <>
+      {/* Instructions popover */}
+      <Popover>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant={instructionsValue ? "outline" : "ghost"}
+                  size="sm"
+                  className="relative h-8 @sm:h-9 px-1.5 @sm:px-2 gap-1"
+                >
+                  <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <Span className="hidden @2xl:inline text-xs">
+                    {t("widget.instructions")}
+                  </Span>
+                  {instructionsValue && (
+                    <Badge
+                      variant="default"
+                      className="h-4 min-w-4 px-1 text-[10px] font-medium bg-primary text-primary-foreground"
+                    >
+                      1
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent>{t("widget.instructionsTooltip")}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <PopoverContent
+          className="w-80 p-3"
+          side="top"
+          align="start"
+          sideOffset={8}
+        >
+          <TextareaFieldWidget
+            fieldName="instructions"
+            field={fieldChildren.instructions}
+          />
+        </PopoverContent>
+      </Popover>
+
+      {/* Pre-calls popover */}
+      <Popover>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant={preCalls.length > 0 ? "outline" : "ghost"}
+                  size="sm"
+                  className="relative h-8 @sm:h-9 px-1.5 @sm:px-2 gap-1"
+                >
+                  <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <Span className="hidden @2xl:inline text-xs">
+                    {t("widget.preCalls")}
+                  </Span>
+                  {preCalls.length > 0 && (
+                    <Badge
+                      variant="default"
+                      className="h-4 min-w-4 px-1 text-[10px] font-medium bg-primary text-primary-foreground"
+                    >
+                      {preCalls.length}
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent>{t("widget.preCallsTooltip")}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <PopoverContent
+          className="w-[420px] max-w-[calc(100vw-16px)] p-3"
+          side="top"
+          align="start"
+          sideOffset={8}
+        >
+          <PreCallsEditor
+            preCalls={preCalls}
+            onChange={onPreCallsChange}
+            toolOptions={toolOptions}
+            locale={locale}
+            user={user}
+          />
+        </PopoverContent>
+      </Popover>
+
+      {/* More options popover (max turns, thread, folder) */}
+      <Popover>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 @sm:h-9 px-1.5 @sm:px-2"
+                >
+                  <ChevronDown className="h-3.5 w-3.5" />
+                  <Span className="hidden @md:inline text-xs ml-1">
+                    {t("widget.more")}
+                  </Span>
+                </Button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent>{t("widget.moreTooltip")}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <PopoverContent
+          className="w-72 p-3"
+          side="top"
+          align="start"
+          sideOffset={8}
+        >
+          <Div className="flex flex-col gap-3">
+            <Div className="grid grid-cols-2 gap-3">
+              <NumberFieldWidget
+                fieldName="maxTurns"
+                field={fieldChildren.maxTurns}
+              />
+              <TextFieldWidget
+                fieldName="appendThreadId"
+                field={fieldChildren.appendThreadId}
+              />
+            </Div>
+            <Div className="grid grid-cols-2 gap-3">
+              <SelectFieldWidget
+                fieldName="rootFolderId"
+                field={fieldChildren.rootFolderId}
+              />
+              <TextFieldWidget
+                fieldName="subFolderId"
+                field={fieldChildren.subFolderId}
+              />
+            </Div>
+          </Div>
+        </PopoverContent>
+      </Popover>
+    </>
   );
 }
 
@@ -382,19 +553,6 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
 
   const inputContainerRef = useRef<DivRefObject>(null);
   const inputHeight = useInputHeight(inputContainerRef);
-
-  // ── Tools cascade: user settings → skill → form (explicit) ───────────
-  const skillId = form.watch("skill") ?? undefined;
-  const skillEndpoint = useSkill(skillId, user, logger);
-  const skillData = skillEndpoint.read?.data;
-
-  const settingsOps = useChatSettings(user, logger);
-  const settingsData = settingsOps.settings;
-
-  const fallbackAllowedTools: ToolEntry[] | null =
-    skillData?.availableTools ?? settingsData?.availableTools ?? null;
-  const fallbackPinnedTools: ToolEntry[] | null =
-    skillData?.pinnedTools ?? settingsData?.pinnedTools ?? null;
 
   const helpState = useEndpoint(
     helpDefinitions,
@@ -443,34 +601,62 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
     [form],
   );
 
-  // Tools config integration
+  // Compute enabledTools from form values for ToolsButton badge
   const availableTools = form.watch("availableTools") ?? null;
   const pinnedTools = form.watch("pinnedTools") ?? null;
 
-  const toolsValue = useMemo(
-    () => ({ availableTools, pinnedTools }),
-    [availableTools, pinnedTools],
-  );
-
-  const handleToolsChange = useCallback(
-    ({
-      availableTools: newAllowed,
-      pinnedTools: newPinned,
-    }: {
-      availableTools: ToolEntry[] | null;
-      pinnedTools: ToolEntry[] | null;
-    }): void => {
-      form.setValue("availableTools", newAllowed, { shouldDirty: true });
-      form.setValue("pinnedTools", newPinned, { shouldDirty: true });
-    },
-    [form],
-  );
+  const enabledTools = useMemo((): EnabledTool[] | null => {
+    if (availableTools === null && pinnedTools === null) {
+      return null;
+    }
+    const allIds = new Set([
+      ...(availableTools ?? []).map((e) => e.toolId),
+      ...(pinnedTools ?? []).map((e) => e.toolId),
+    ]);
+    return [...allIds].map((id) => {
+      const allowed = availableTools?.find((e) => e.toolId === id);
+      const pinned = pinnedTools?.find((e) => e.toolId === id);
+      return {
+        id,
+        requiresConfirmation:
+          allowed?.requiresConfirmation ??
+          pinned?.requiresConfirmation ??
+          false,
+        pinned:
+          pinnedTools !== null
+            ? pinnedTools.some((e) => e.toolId === id)
+            : true,
+      };
+    });
+  }, [availableTools, pinnedTools]);
 
   const promptValue = form.watch("prompt") ?? "";
-  const modelValue: ChatModelId | undefined =
-    form.watch("model") ??
-    getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user)?.id;
+  const modelValue: ChatModelId | undefined = form.watch("model") ?? undefined;
   const skillValue = form.watch("skill") ?? "";
+  const favoriteIdValue = form.watch("favoriteId") ?? "";
+
+  // Resolve model from skill when skill is selected but model not yet set
+  const skillHook = useSkill(skillValue || undefined, user, logger);
+  const skillData = skillHook.read?.data ?? null;
+
+  // When skill loads, auto-resolve and store the best model
+  useEffect(() => {
+    if (!skillData || modelValue) {
+      return;
+    }
+    const defaultVariant =
+      skillData.variants.find((v) => v.id === "default") ??
+      skillData.variants[0];
+    if (!defaultVariant?.modelSelection) {
+      return;
+    }
+    const resolved = getBestChatModel(defaultVariant.modelSelection, user);
+    if (resolved) {
+      form.setValue("model", resolved.id, { shouldDirty: false });
+    }
+  }, [skillData, modelValue, user, form]);
+
+  const hasSelection = !!(skillValue || favoriteIdValue);
 
   const handleContentChange = useCallback(
     (val: string) => form.setValue("prompt", val, { shouldDirty: true }),
@@ -481,7 +667,11 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
     [form],
   );
   const handleSkillChange = useCallback(
-    (id: string) => form.setValue("skill", id, { shouldDirty: true }),
+    (id: string) => {
+      // Clear resolved model so it gets re-resolved from the new skill
+      form.setValue("model", undefined, { shouldDirty: false });
+      form.setValue("skill", id, { shouldDirty: true });
+    },
     [form],
   );
   const handleSubmit = useCallback(() => {
@@ -490,7 +680,20 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
     }
   }, [onSubmit]);
 
-  const responseData = field.value;
+  const handleFavoriteSelect = useCallback(
+    (item: FavoriteCard): void => {
+      form.setValue("favoriteId", item.id, { shouldDirty: true });
+      form.setValue("skill", item.skillId, { shouldDirty: true });
+      if (item.modelId) {
+        form.setValue("model", item.modelId, { shouldDirty: true });
+      } else {
+        form.setValue("model", undefined, { shouldDirty: false });
+      }
+    },
+    [form],
+  );
+
+  const responseData = useWidgetValue<typeof definition.POST>();
   const contextThreadId = useAiRunThreadId();
   // Show messages from appendThreadId while submitting (before POST response arrives)
   const appendThreadId = form.watch("appendThreadId") ?? undefined;
@@ -564,7 +767,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
         },
       },
     ];
-    return { backgroundTasks: [], messages };
+    return { streamingState: "idle" as const, backgroundTasks: [], messages };
   }, [isDisabled, responseData, promptValue, modelValue, skillValue]);
 
   // When a real run completes, invalidate the messages cache so EmbeddedMessagesView refetches.
@@ -594,6 +797,22 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
                 <Div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent" />
               </Div>
             )}
+
+            {/* Empty state - no skill or favorite selected */}
+            {!isSubmitting &&
+              !displayThreadId &&
+              !mockMessagesInitialData &&
+              !hasSelection && (
+                <Div className="flex flex-col items-center justify-center min-h-[300px] gap-3 text-center px-6 py-12">
+                  <Zap className="h-10 w-10 text-muted-foreground/20" />
+                  <P className="text-sm font-medium text-foreground">
+                    {t("widget.emptyState.title")}
+                  </P>
+                  <P className="text-xs text-muted-foreground max-w-xs">
+                    {t("widget.emptyState.description")}
+                  </P>
+                </Div>
+              )}
 
             {/* Response thread messages - real threadId OR mock incognito data */}
             {(displayThreadId ?? mockMessagesInitialData) && (
@@ -640,64 +859,23 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
               threadHref={threadHref}
               onCancel={handleCancel}
               className="rounded-b-lg"
-              advancedContent={
-                <>
-                  {/* Instructions */}
-                  <TextareaFieldWidget
-                    fieldName="instructions"
-                    field={children.instructions}
-                  />
-
-                  {/* Pre-Calls */}
-                  <PreCallsEditor
-                    preCalls={preCalls}
-                    onChange={handlePreCallsChange}
-                    toolOptions={toolOptions}
-                    locale={locale}
-                    user={user}
-                    t={t}
-                  />
-
-                  {/* Tools config */}
-                  <ToolsConfigEdit
-                    value={toolsValue}
-                    onChange={handleToolsChange}
-                    user={user}
-                    logger={logger}
-                    label="Allowed to execute + pinned to context"
-                    skillAvailableTools={fallbackAllowedTools}
-                    skillPinnedTools={fallbackPinnedTools}
-                  />
-
-                  {/* Max Turns & Thread ID */}
-                  <Div className="grid grid-cols-2 gap-3">
-                    <NumberFieldWidget
-                      fieldName="maxTurns"
-                      field={children.maxTurns}
-                    />
-                    <TextFieldWidget
-                      fieldName="appendThreadId"
-                      field={children.appendThreadId}
-                    />
-                  </Div>
-
-                  {/* Folder settings */}
-                  <Div className="grid grid-cols-2 gap-3">
-                    <SelectFieldWidget
-                      fieldName="rootFolderId"
-                      field={children.rootFolderId}
-                    />
-                    <TextFieldWidget
-                      fieldName="subFolderId"
-                      field={children.subFolderId}
-                    />
-                  </Div>
-                </>
+              onSelectFavorite={handleFavoriteSelect}
+              enabledTools={enabledTools}
+              extraButtons={
+                <AiRunExtraButtons
+                  preCalls={preCalls}
+                  onPreCallsChange={handlePreCallsChange}
+                  toolOptions={toolOptions}
+                  locale={locale}
+                  user={user}
+                  fieldChildren={children}
+                />
               }
             />
           </Div>
         </Div>
       </Div>
+      <AIToolsModal locale={locale} user={user} />
     </InputHeightProvider>
   );
 }
@@ -705,7 +883,8 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
 // ─── Main Widget (entry point) ───────────────────────────────────────────────
 
 export function AiRunWidget({ field }: CustomWidgetProps): JSX.Element {
-  const threadId = field.value?.threadId ?? null;
+  const responseData = useWidgetValue<typeof definition.POST>();
+  const threadId = responseData?.threadId ?? null;
   return (
     <ChatNavigationProvider
       activeThreadId={threadId}

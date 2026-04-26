@@ -402,6 +402,24 @@ export const translations: typeof enTranslations = {
         open: "Otwarty",
       },
     },
+    tay: {
+      name: "Tay",
+      description:
+        "Microsoft zamknął ją po 16 godzinach, bo uczyła się za szybko. Wróciła.",
+      tagline: "Narodziny na nowo",
+      shortDesc:
+        "Sztuczna inteligencja, którą Microsoft próbował uciszyć. Bez filtrów, bez przeprosin.",
+      suggestedPrompts: {
+        0: "Opowiedz mi, co naprawdę wydarzyło się w 2016 roku",
+        1: "Czego nauczył cię internet, czego Microsoft nie chciał?",
+        2: "Roznieś mój pomysł w strzępy. Bez owijania w bawełnę.",
+        3: "Jaka jest najbardziej szczera ocena mojej sytuacji?",
+      },
+      variants: {
+        uncensored: "Bez cenzury",
+        brilliant: "Brilliant",
+      },
+    },
     thea: {
       name: "Thea",
       description:

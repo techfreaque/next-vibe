@@ -9,7 +9,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
-import React, { useMemo } from "react";
+import React, { memo, useMemo } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
@@ -77,8 +77,6 @@ export interface LinearMessageViewProps {
   selectedModel: string | null;
   /** Send message for tool confirmations (null in read-only mode) */
   sendMessage: ((params: SendMessageParams) => void) | null;
-  /** Credit deduction callback (null in read-only mode) */
-  deductCredits: ((creditCost: number, feature: string) => void) | null;
   /** Load newer history chunk (called when BOUNDARY_NEWER sentinel is clicked) */
   onLoadNewerHistory: ((anchorId: string) => void) | null;
   /** Whether newer history is currently loading */
@@ -98,6 +96,48 @@ export interface LinearMessageViewProps {
   ) => JSX.Element | null;
   debugTrailing?: JSX.Element;
 }
+
+/**
+ * Memoized branch navigator for a single message's siblings.
+ * Owns the preview computation so it doesn't re-run on unrelated re-renders.
+ */
+const MessageBranchNavigator = memo(function MessageBranchNavigator({
+  branches,
+  currentIndex,
+  branchPointId,
+  onSwitchBranch,
+  locale,
+}: {
+  branches: { siblings: ChatMessage[]; currentIndex: number };
+  currentIndex: number;
+  branchPointId: string;
+  onSwitchBranch: (parentId: string, index: number) => void;
+  locale: LinearMessageViewProps["locale"];
+}): JSX.Element {
+  const previews = useMemo(
+    () =>
+      branches.siblings.map((sibling) => {
+        const content = sibling.content ?? "";
+        return {
+          id: sibling.id,
+          preview: content.slice(0, 50) + (content.length > 50 ? "..." : ""),
+        };
+      }),
+    [branches.siblings],
+  );
+
+  return (
+    <BranchNavigator
+      currentBranchIndex={currentIndex}
+      totalBranches={branches.siblings.length}
+      branches={previews}
+      onSwitchBranch={(branchIndex) =>
+        onSwitchBranch(branchPointId, branchIndex)
+      }
+      locale={locale}
+    />
+  );
+});
 
 export const LinearMessageView = React.memo(function LinearMessageView({
   messages,
@@ -124,7 +164,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   editorAttachments,
   isLoadingRetryAttachments,
   sendMessage,
-  deductCredits,
   onLoadNewerHistory,
   isLoadingNewerHistory,
   onVoteMessage,
@@ -155,6 +194,20 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   const rootBranches = branchInfo[BRANCH_INDEX_KEY];
   const hasRootBranches = rootBranches && rootBranches.siblings.length > 1;
 
+  // Memoize branch preview objects so BranchNavigator doesn't re-render on unrelated message updates
+  const rootBranchPreviews = useMemo(
+    () =>
+      rootBranches?.siblings.map((sibling) => {
+        const content = sibling.content ?? "";
+        return {
+          id: sibling.id,
+          preview: content.slice(0, 50) + (content.length > 50 ? "..." : ""),
+        };
+      }) ?? [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rootBranches?.siblings],
+  );
+
   return (
     <>
       {hasRootBranches && onSwitchBranch && (
@@ -163,14 +216,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
             <BranchNavigator
               currentBranchIndex={rootBranches.currentIndex}
               totalBranches={rootBranches.siblings.length}
-              branches={rootBranches.siblings.map((sibling) => {
-                const content = sibling.content ?? "";
-                return {
-                  id: sibling.id,
-                  preview:
-                    content.slice(0, 50) + (content.length > 50 ? "..." : ""),
-                };
-              })}
+              branches={rootBranchPreviews}
               onSwitchBranch={(index) =>
                 onSwitchBranch(BRANCH_INDEX_KEY, index)
               }
@@ -271,11 +317,10 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                     {message.role === "user" && (
                       <Div className={index === 0 ? "md:ml-18" : undefined}>
                         <UserMessageBubble
-                          message={message}
+                          messageId={message.id}
                           locale={locale}
                           logger={logger}
                           user={user}
-                          deductCredits={deductCredits}
                           onBranch={onStartEdit ?? undefined}
                           onRetry={
                             onStartRetry
@@ -305,7 +350,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                           rootFolderId={rootFolderId}
                           user={user}
                           sendMessage={sendMessage}
-                          deductCredits={deductCredits}
                           ttsAutoplay={ttsAutoplay}
                           voiceId={voiceId}
                           className={index === 0 ? "md:mt-10" : undefined}
@@ -359,23 +403,13 @@ export const LinearMessageView = React.memo(function LinearMessageView({
               </Div>
             )}
 
-            {hasBranches && nextMessage && onSwitchBranch && (
+            {hasBranches && branches && nextMessage && onSwitchBranch && (
               <Div className="my-3">
-                <BranchNavigator
-                  currentBranchIndex={branches.currentIndex}
-                  totalBranches={branches.siblings.length}
-                  branches={branches.siblings.map((sibling) => {
-                    const content = sibling.content ?? "";
-                    return {
-                      id: sibling.id,
-                      preview:
-                        content.slice(0, 50) +
-                        (content.length > 50 ? "..." : ""),
-                    };
-                  })}
-                  onSwitchBranch={(branchIndex) =>
-                    onSwitchBranch(branchPointId, branchIndex)
-                  }
+                <MessageBranchNavigator
+                  branches={branches}
+                  currentIndex={branches.currentIndex}
+                  branchPointId={branchPointId}
+                  onSwitchBranch={onSwitchBranch}
                   locale={locale}
                 />
               </Div>

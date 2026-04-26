@@ -133,7 +133,7 @@ Always recommend consulting a licensed financial advisor for personalized advice
       variantName: "skills.financialAdvisor.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_OPUS_4_6,
+        manualModelId: ChatModelId.CLAUDE_OPUS_4_7,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,

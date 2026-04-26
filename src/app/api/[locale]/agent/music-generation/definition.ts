@@ -97,11 +97,15 @@ const { POST } = createEndpoint({
         schema: z.enum(MusicGenModelId).default(MusicGenModelId.LYRIA_3),
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
         serverDefault: (ctx) => {
-          const sel = ctx.streamContext?.musicGenModelSelection;
+          const sel = ctx.streamContext.musicGenModelSelection;
           if (!sel || !ctx.user) {
             return undefined;
           }
-          return getBestMusicGenModel(sel, ctx.user)?.id;
+          return getBestMusicGenModel(
+            sel,
+            ctx.user,
+            ctx.streamContext.providerOverride,
+          )?.id;
         },
       }),
       duration: requestField(scopedTranslation, {

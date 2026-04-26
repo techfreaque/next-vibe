@@ -24,7 +24,9 @@ import {
   TaskCategoryDB,
   TaskOutputModeDB,
 } from "../enum";
-import type { JsonValue, NotificationTarget } from "../unified-runner/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { NotificationTarget } from "../unified-runner/types";
 
 /**
  * Cron Tasks Table
@@ -68,7 +70,7 @@ export const cronTasks = pgTable("cron_tasks", {
    * Can be overridden per DB instance. splitTaskArgs() splits by schema at execution time.
    */
   taskInput: jsonb("task_input")
-    .$type<Record<string, JsonValue>>()
+    .$type<Record<string, WidgetData>>()
     .notNull()
     .default({}),
   /**
@@ -124,17 +126,56 @@ export const cronTasks = pgTable("cron_tasks", {
   wakeUpModelId: text("wake_up_model_id"),
   wakeUpSkillId: text("wake_up_skill_id"),
   wakeUpFavoriteId: text("wake_up_favorite_id"),
+  wakeUpSubAgentDepth: integer("wake_up_sub_agent_depth"),
 
   // Metadata
   tags: jsonb("tags").$type<string[]>().notNull().default([]),
 
   // Ownership - null means system task (admin-seeded), otherwise user who created it
+  // Use SYSTEM_TASK_OWNER in application code instead of null for clarity.
   userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+/**
+ * Typed task owner - discriminated union so callers must handle both cases explicitly.
+ * DB stores null for system tasks; use dbUserIdToOwner() / toDbUserId() at the boundary.
+ */
+export type TaskOwner = { type: "user"; userId: string } | { type: "system" };
+
+/**
+ * Convert a non-nullable userId string to a user TaskOwner.
+ * Use this when you already know userId is a real user ID.
+ */
+export function userOwner(userId: string): TaskOwner & { type: "user" } {
+  return { type: "user", userId };
+}
+
+/** The system owner singleton - for seed files and system tasks only. */
+export const SYSTEM_OWNER: TaskOwner & { type: "system" } = {
+  type: "system",
+};
+
+/**
+ * Convert a nullable DB userId to a TaskOwner.
+ * ONLY use this at the DB read boundary (reading raw DB rows).
+ * Do NOT use this to silently coerce unknown values - the null case
+ * must be intentional (seeded system tasks only).
+ */
+export function dbUserIdToOwner(userId: string | null | undefined): TaskOwner {
+  if (userId) {
+    return { type: "user", userId };
+  }
+  return SYSTEM_OWNER;
+}
+
+/** Convert a TaskOwner back to a nullable DB userId. */
+export function toDbUserId(owner: TaskOwner): string | null {
+  return owner.type === "user" ? owner.userId : null;
+}
 
 /**
  * Cron Task Executions Table
@@ -158,7 +199,7 @@ export const cronTaskExecutions = pgTable("cron_task_executions", {
 
   // Configuration and results
   config: jsonb("config").notNull(),
-  result: jsonb("result").$type<Record<string, JsonValue>>(),
+  result: jsonb("result").$type<Record<string, WidgetData>>(),
   error: jsonb("error").$type<ErrorResponseType>(),
 
   // Execution context
@@ -183,18 +224,13 @@ export const cronTaskExecutions = pgTable("cron_task_executions", {
 /**
  * Zod schemas for validation
  */
-const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
-  z.union([
-    z.string(),
-    z.number(),
-    z.boolean(),
-    z.null(),
-    z.array(jsonValueSchema),
-    z.record(z.string(), jsonValueSchema),
-  ]),
-);
+export const taskInputSchema = z.record(z.string(), WidgetDataSchema);
 
-export const taskInputSchema = z.record(z.string(), jsonValueSchema);
+/** Zod schema for the TaskOwner discriminated union — use in response schemas. */
+export const taskOwnerSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("user"), userId: z.string() }),
+  z.object({ type: z.literal("system") }),
+]);
 const notificationTargetsSchema = z.array(
   z.object({ type: z.enum(["email", "sms", "webhook"]), target: z.string() }),
 );

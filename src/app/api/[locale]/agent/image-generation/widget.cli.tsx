@@ -9,7 +9,7 @@ import type { JSX } from "react";
 import { useMemo } from "react";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { useInkWidgetPlatform } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import { useWidgetPlatform } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { ImageGenerationPostResponseOutput } from "./definition";
 
@@ -40,7 +40,7 @@ function renderMcp(value: ImageGenerationPostResponseOutput): string {
 }
 
 export function ImageGenerationWidget({ field }: CliWidgetProps): JSX.Element {
-  const platform = useInkWidgetPlatform();
+  const platform = useWidgetPlatform();
   const isMcp = platform === Platform.MCP;
 
   const output = useMemo(() => {

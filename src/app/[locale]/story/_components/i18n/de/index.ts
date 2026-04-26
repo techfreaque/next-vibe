@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   nav: {
     help: "Hilfe",
     logout: "Abmelden",
-    settings: "Profileinstellungen",
+    settings: "Mein Profil",
     leadMagnet: "Lead Magnet",
     enableLightMode: "Hellen Modus aktivieren",
     enableDarkMode: "Dunklen Modus aktivieren",
@@ -54,7 +54,7 @@ export const translations: typeof enTranslations = {
     signIn: "Anmelden",
     goToApp: "App öffnen",
     backToChat: "Zurück zum Chat",
-    unbottledHome: "Website & Blog",
+    unbottledHome: "Geschichten",
     subscription: "Abonnement",
     referral: "Empfehlungsprogramm",
     services: {
@@ -254,7 +254,7 @@ export const translations: typeof enTranslations = {
       header: "Vier Produkte. Eine Plattform.",
 
       subheader:
-        "Uncensored AI · Self-hosted Agent · Open-Source-Framework · Passives Einkommen",
+        "Unzensierte KI · Selbstgehosteter Agent · Open-Source-Framework · Passives Einkommen",
       unbottled: {
         badge: "Unzensiert · Open · Mainstream",
         titleLine1: "Unzensierte KI.",
@@ -294,10 +294,10 @@ export const translations: typeof enTranslations = {
       },
       referral: {
         badge: "Skill-Ökonomie",
-        titleLine1: "Publish. Refer.",
+        titleLine1: "Veröffentlichen. Empfehlen.",
         titleLine2: "Verdienen.",
         subtitle:
-          "Skills bauen. 15% verdienen, wenn sich jemand darüber anmeldet. Jeden weiterempfehlen - 10% jeder Zahlung, für immer. Ihr Netzwerk zahlt dir auch.",
+          "Empfehlungslink: 10% jeder Zahlung, dauerhaft. Das Skill als Einstiegsseite: +5% — auch wenn andere es teilen.",
         cta: "Jetzt verdienen",
         ctaExplore: "Mehr erfahren",
       },

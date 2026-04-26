@@ -11,21 +11,19 @@ import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-u
 import {
   useWidgetContext,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { PaginationWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/pagination/react";
+import { PaginationWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/pagination/widget";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
-import NavigateButtonWidget from "../../system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import NavigateButtonWidget from "../../system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 import type definition from "./definition";
-import type { CreditsHistoryGetResponseOutput } from "./definition";
 
 /**
  * Props for custom widget
  */
 interface CustomWidgetProps {
-  field: {
-    value: CreditsHistoryGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 /**
@@ -37,10 +35,11 @@ export function CreditHistoryContainer({
   const context = useWidgetContext();
   const { locale } = context;
   const tField = useWidgetTranslation<typeof definition.GET>();
+  const value = useWidgetValue<typeof definition.GET>();
   const children = field.children;
 
-  const transactions = field.value?.transactions ?? [];
-  const paginationInfo = field.value?.paginationInfo;
+  const transactions = value?.transactions ?? [];
+  const paginationInfo = value?.paginationInfo;
 
   return (
     <Div className="flex flex-col gap-0">
@@ -101,11 +100,7 @@ export function CreditHistoryContainer({
       {/* Pagination */}
       {paginationInfo && (
         <PaginationWidget
-          field={withValue(
-            children.paginationInfo,
-            paginationInfo,
-            field.value,
-          )}
+          field={withValue(children.paginationInfo, paginationInfo, value)}
           fieldName={"paginationInfo"}
         />
       )}

@@ -7,25 +7,20 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetTranslation,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type endpoints from "./definition";
-import type { SessionOpenResponseOutput } from "./definition";
 
-interface WidgetProps {
-  field: {
-    value: SessionOpenResponseOutput | null | undefined;
-  } & (typeof endpoints.POST)["fields"];
-}
-
-export function SessionOpenContainer({
-  field,
-}: WidgetProps): React.JSX.Element {
+export function SessionOpenContainer(): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.POST>();
+  const data = useWidgetValue<typeof endpoints.POST>();
   return (
     <Div className="px-4 py-3">
       <Span className="text-sm text-muted-foreground">
-        {field.value?.sessionId ?? t("session.open.post.disconnected")}
+        {data?.sessionId ?? t("session.open.post.disconnected")}
       </Span>
     </Div>
   );

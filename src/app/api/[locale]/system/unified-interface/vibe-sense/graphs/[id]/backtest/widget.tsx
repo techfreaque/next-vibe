@@ -18,19 +18,16 @@ import React, { useState } from "react";
 import {
   useWidgetForm,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
 
-type BacktestResponseOutput = typeof definition.POST.types.ResponseOutput;
-
 interface CustomWidgetProps {
-  field: {
-    value: BacktestResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -59,7 +56,7 @@ export function BacktestWidget({
   const t = useWidgetTranslation<typeof definition.POST>();
   const form = useWidgetForm<typeof definition.POST>();
   const children = field.children;
-  const response = field.value;
+  const response = useWidgetValue<typeof definition.POST>();
 
   const defaultFrom = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const defaultTo = new Date();

@@ -17,25 +17,23 @@ import { useState, type JSX } from "react";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
-import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
 import type definition from "./definition";
-import type { SkillModerationGetResponseOutput } from "./definition";
 
 interface CustomWidgetProps {
-  field: {
-    value: SkillModerationGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 export function SkillModerationContainer({
   field,
 }: CustomWidgetProps): JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
   const { push: navigate } = useWidgetNavigation();
   const [actioned, setActioned] = useState<Set<string>>(new Set());

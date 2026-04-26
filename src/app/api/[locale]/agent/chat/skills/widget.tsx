@@ -39,13 +39,14 @@ import {
   useWidgetForm,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/react";
-import IconWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/icon/react";
-import { SeparatorWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/separator/react";
-import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/widget";
+import IconWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/icon/widget";
+import { SeparatorWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/separator/widget";
+import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 
 import { cn } from "../../../shared/utils";
 import { Icon } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -56,7 +57,7 @@ import { useChatFavorites } from "../favorites/hooks/hooks";
 import skillDetailDefinitions from "./[id]/definition";
 import { COMPANION_SKILLS } from "./config";
 import type definition from "./definition";
-import type { SkillListItem, SkillListResponseOutput } from "./definition";
+import type { SkillListItem } from "./definition";
 import { SkillOwnershipType, SkillSourceFilter, SkillTrustLevel } from "./enum";
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 
@@ -64,9 +65,7 @@ import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favor
  * Props for custom widget
  */
 interface CustomWidgetProps {
-  field: {
-    value: SkillListResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 /**
@@ -81,6 +80,7 @@ export function SkillsListContainer({
   const { logger, locale, user } = context;
   const t = useWidgetTranslation<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
+  const skillsData = useWidgetValue<typeof definition.GET>();
   const isTouch = useTouchDevice();
   const [isFullPage, setIsFullPage] = useState(false);
   useEffect(() => {
@@ -136,7 +136,7 @@ export function SkillsListContainer({
   // into a single ranked list (VERIFIED first, then by voteCount desc).
   // When no query: return sections as-is (server already applied source filter).
   const filteredSections = useMemo(() => {
-    const sections = field.value?.sections;
+    const sections = skillsData?.sections;
     if (!sections) {
       return null;
     }
@@ -164,7 +164,7 @@ export function SkillsListContainer({
         skills: ranked,
       },
     ];
-  }, [field.value?.sections, searchQuery, t]);
+  }, [skillsData?.sections, searchQuery, t]);
 
   // Get companion skill name for onboarding banner
   const companionSkill = companionSkillId
@@ -263,7 +263,7 @@ export function SkillsListContainer({
   }
 
   // Loading state - show spinner that fills the scrollable area
-  if (!field.value) {
+  if (!skillsData) {
     return (
       <Div
         className={`flex flex-col gap-0${isFullPage ? "" : " h-[min(800px,calc(100dvh-100px))]"}`}
@@ -484,7 +484,7 @@ export function SkillsListContainer({
                 {t("get.search.noResults")}
               </Div>
             ) : null}
-            {(filteredSections ?? field.value?.sections ?? []).map(
+            {(filteredSections ?? skillsData?.sections ?? []).map(
               (section, idx) => (
                 <Div key={idx} className="flex flex-col gap-4">
                   {/* Section Header */}
@@ -588,6 +588,45 @@ type SkillGroup =
   | { type: "single"; item: SkillListItem }
   | { type: "variants"; id: string; items: SkillListItem[] };
 
+function getSkillReferenceIds(skill: SkillListItem): string[] {
+  if (!skill.internalId || skill.internalId === skill.id) {
+    return [skill.id];
+  }
+  return [skill.id, skill.internalId];
+}
+
+function getFavoriteIdsForSkill(
+  favoritesBySkill: Record<string, string[]>,
+  skill: SkillListItem,
+): string[] {
+  const favoriteIds: string[] = [];
+  for (const skillReferenceId of getSkillReferenceIds(skill)) {
+    const ids = favoritesBySkill[skillReferenceId];
+    if (ids) {
+      favoriteIds.push(...ids);
+    }
+  }
+  return favoriteIds;
+}
+
+function getFavoriteIdsForVariant(
+  favoritesByVariant: Record<string, string[]>,
+  skill: SkillListItem,
+): string[] {
+  if (!skill.variantId) {
+    return [];
+  }
+
+  const favoriteIds: string[] = [];
+  for (const skillReferenceId of getSkillReferenceIds(skill)) {
+    const ids = favoritesByVariant[`${skillReferenceId}:${skill.variantId}`];
+    if (ids) {
+      favoriteIds.push(...ids);
+    }
+  }
+  return favoriteIds;
+}
+
 function groupSkillItems(skills: SkillListItem[]): SkillGroup[] {
   const groups: SkillGroup[] = [];
   const seen = new Set<string>();
@@ -659,7 +698,7 @@ function CollapsibleSkillSection({
               locale={locale}
               isTouch={isTouch}
               t={t}
-              favoriteIds={favoritesBySkill[group.item.id] || []}
+              favoriteIds={getFavoriteIdsForSkill(favoritesBySkill, group.item)}
               activeFavoriteId={activeFavoriteId}
             >
               {children}
@@ -749,7 +788,7 @@ function VariantGroupCard({
     return <></>;
   }
   const skillId = first.id;
-  const allFavoriteIds = favoritesBySkill[skillId] || [];
+  const allFavoriteIds = getFavoriteIdsForSkill(favoritesBySkill, first);
   const isInCollection = allFavoriteIds.length > 0;
   const isActive =
     activeFavoriteId !== null && allFavoriteIds.includes(activeFavoriteId);
@@ -822,11 +861,8 @@ function VariantGroupCard({
 
       {/* Variant rows - one per variant */}
       {items.map((variant, vIdx) => {
-        const variantKey = variant.variantId
-          ? `${skillId}:${variant.variantId}`
-          : null;
-        const variantFavoriteIds = variantKey
-          ? (favoritesByVariant[variantKey] ?? [])
+        const variantFavoriteIds = variant.variantId
+          ? getFavoriteIdsForVariant(favoritesByVariant, variant)
           : allFavoriteIds;
         return (
           <VariantRow

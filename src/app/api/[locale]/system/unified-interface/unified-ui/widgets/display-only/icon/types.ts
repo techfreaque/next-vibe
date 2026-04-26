@@ -12,7 +12,7 @@ import type {
   IconSchemaType,
 } from "@/app/api/[locale]/shared/types/common.schema";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
 import type {

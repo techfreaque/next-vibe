@@ -47,7 +47,11 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
-import type { EventSchemas } from "../../../websocket/types";
+import type {
+  ComputeEventPayloads,
+  EndpointEventsMap,
+} from "../../../websocket/structured-events";
+
 import type { EndpointLogger } from "../../logger/endpoint";
 
 // Extract schema type directly from field, bypassing complex field structure
@@ -168,7 +172,6 @@ export interface ApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
-  out TEvents extends EventSchemas | never,
 > {
   // Core endpoint metadata - all required for type safety
   readonly method: TMethod;
@@ -323,8 +326,7 @@ export interface ApiEndpoint<
    * }
    * ```
    */
-  readonly events?: TEvents;
-
+  readonly events?: EndpointEventsMap<InferResponseOutput<TFields>>;
   // Unified fields for schema generation
   readonly fields: TFields;
 
@@ -505,25 +507,40 @@ export interface CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
-  out TEvents extends EventSchemas | never,
+  // oxlint-disable-next-line no-explicit-any
+  TEvents extends EndpointEventsMap<any> | never,
   RequestInput = InferRequestInput<TFields>,
   RequestOutput = InferRequestOutput<TFields>,
   ResponseInput = InferResponseInput<TFields>,
   ResponseOutput = InferResponseOutput<TFields>,
   UrlVariablesInput = InferUrlVariablesInput<TFields>,
   UrlVariablesOutput = InferUrlVariablesOutput<TFields>,
-> extends ApiEndpoint<
-  TMethod,
-  TUserRoleValue,
-  TScopedTranslationKey,
-  TFields,
-  TEvents
-> {
+> extends ApiEndpoint<TMethod, TUserRoleValue, TScopedTranslationKey, TFields> {
   readonly requestSchema: InferRequestDataSchema<TFields>;
   readonly requestUrlPathParamsSchema: InferUrlParamsSchema<TFields>;
   readonly responseSchema: InferResponseDataSchema<TFields>;
 
   readonly requiresAuthentication: () => boolean;
+
+  /**
+   * Named events this endpoint can emit.
+   *
+   * Each key is an event name. The value declares:
+   * - `fields`: which ResponseOutput keys this event carries (typed Pick)
+   * - `onEvent`: optional handler for cross-endpoint side effects (runs after auto-merge)
+   *
+   * Server emits via `props.emitEvent("event-name", partial)` — type-checked against fields.
+   * Client subscribes via `useEndpoint({ subscribeToEvents: true })` — framework merges automatically.
+   *
+   * Usage:
+   * ```ts
+   * events: {
+   *   "message-upserted": { fields: ["messages"] as const },
+   *   "stream-finished":  { fields: [] as const, onEvent: ({ queryClient }) => { ... } },
+   * } satisfies EndpointEventsMap<typeof GET.types.ResponseOutput>
+   * ```
+   */
+  readonly events?: TEvents;
 
   // oxlint-disable-next-line no-explicit-any
   readonly options?: TMethod extends any
@@ -559,6 +576,7 @@ export interface CreateApiEndpoint<
     UserRoleValue: TUserRoleValue;
     ScopedTranslationKey: TScopedTranslationKey;
     Events: TEvents;
+    EventPayloads: ComputeEventPayloads<InferResponseOutput<TFields>, TEvents>;
   };
 }
 /**
@@ -574,14 +592,20 @@ export type CreateEndpointReturnInMethod<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
-  TEvents extends EventSchemas | never,
+  TEvents extends EndpointEventsMap<InferResponseOutput<TFields>> | never,
 > = {
   readonly [KMethod in TMethod]: CreateApiEndpoint<
     KMethod,
     TUserRoleValue,
     TScopedTranslationKey,
     TFields,
-    TEvents
+    TEvents,
+    InferRequestInput<TFields>,
+    InferRequestOutput<TFields>,
+    InferResponseInput<TFields>,
+    InferResponseOutput<TFields>,
+    InferUrlVariablesInput<TFields>,
+    InferUrlVariablesOutput<TFields>
   >;
 };
 
@@ -596,8 +620,8 @@ export type CreateEndpointReturnInMethod<
 export function createEndpoint<
   const TMethod extends Methods,
   const TUserRoleValue extends readonly UserRoleValue[],
-  const TEvents extends EventSchemas | never,
   TScopedTranslationKey extends string,
+  const TEvents extends EndpointEventsMap<InferResponseOutput<TFields>> | never,
   const TFields extends UnifiedField<
     TScopedTranslationKey,
     z.ZodTypeAny,
@@ -614,9 +638,10 @@ export function createEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TFields,
-    TEvents
-  >,
+    TFields
+  > & {
+    events?: TEvents;
+  },
 ): CreateEndpointReturnInMethod<
   TMethod,
   TUserRoleValue,
@@ -624,25 +649,26 @@ export function createEndpoint<
   TFields,
   TEvents
 > {
-  // Generate schemas from unified fields
-  // const fieldBuilder = createFieldBuilder<TScopedTranslationKey>();
-  // const fields = typeof config.fields === "function" ? config.fields(fieldBuilder) : config.fields;
   const requestSchema = generateRequestDataSchema(config.fields);
   const responseSchema = generateResponseSchema(config.fields);
   const requestUrlSchema = generateRequestUrlSchema(config.fields);
 
   function requiresAuthentication(): boolean {
-    // Endpoint requires authentication if PUBLIC role is NOT in the allowed roles
     return !config.allowedRoles.includes(UserRole.PUBLIC);
   }
 
-  // Create endpoint with proper type inference - preserve actual schema types for input/output differentiation
   const endpointDefinition: CreateApiEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
     TFields,
-    TEvents
+    TEvents,
+    InferRequestInput<TFields>,
+    InferRequestOutput<TFields>,
+    InferResponseInput<TFields>,
+    InferResponseOutput<TFields>,
+    InferUrlVariablesInput<TFields>,
+    InferUrlVariablesOutput<TFields>
   > = {
     method: config.method,
     path: config.path,
@@ -667,8 +693,8 @@ export function createEndpoint<
     credits: config.credits,
     dynamicCredits: config.dynamicCredits,
     defaultExpanded: config.defaultExpanded,
-    icon: config.icon,
     events: config.events,
+    icon: config.icon,
     options: config.options,
     requestSchema,
     responseSchema,
@@ -698,10 +724,13 @@ export function createEndpoint<
       UserRoleValue: undefined! as TUserRoleValue,
       ScopedTranslationKey: undefined! as TScopedTranslationKey,
       Events: undefined! as TEvents,
+      EventPayloads: undefined! as ComputeEventPayloads<
+        InferResponseOutput<TFields>,
+        TEvents
+      >,
     },
   };
 
-  // Return the method-keyed object with proper type inference
   return {
     [config.method]: endpointDefinition,
   } as CreateEndpointReturnInMethod<

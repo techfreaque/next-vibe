@@ -7,18 +7,16 @@
 
 import "server-only";
 
-import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  type ResponseType as BaseResponseType,
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import {
-  createEndpointLogger,
-  type EndpointLogger,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
 import type { DirtyFlags, LiveIndex } from "../shared/live-index";
@@ -43,167 +41,163 @@ export class GenerateAllRepository {
     let functionalGeneratorsCompleted = false;
 
     try {
-      // Run all generators in parallel
-      const generatorPromises = [];
+      // Definition-scanning generators (endpoints-meta, endpoint, route-handlers,
+      // client-routes-index) must run SEQUENTIALLY to avoid Bun TDZ race conditions.
+      // When multiple generators scan definition files in parallel, they can all try
+      // to initialize the same ESM module simultaneously, causing "Cannot access
+      // 'default' before initialization" errors. Running them sequentially ensures
+      // each module is fully initialized in Bun's cache before the next scan starts.
+      const defScanResults: (string | null)[] = [];
 
       // 1. Endpoints Meta Generator - Generate per-locale metadata for tools modal
       if (!data.skipEndpoints) {
-        generatorPromises.push(
-          (async (): Promise<string | null> => {
-            try {
-              const { EndpointsMetaGeneratorRepository } =
-                await import("../endpoints-meta/repository");
+        try {
+          const { EndpointsMetaGeneratorRepository } =
+            await import("../endpoints-meta/repository");
 
-              const { scopedTranslation: endpointsMetaI18n } =
-                await import("../endpoints-meta/i18n");
-              const { t: subT } = endpointsMetaI18n.scopedT(locale);
-              const result =
-                await EndpointsMetaGeneratorRepository.generateEndpointsMeta(
-                  {
-                    outputDir:
-                      "src/app/api/[locale]/system/generated/endpoints-meta",
-                    dryRun: false,
-                  },
-                  logger,
-                  subT,
-                );
+          const { scopedTranslation: endpointsMetaI18n } =
+            await import("../endpoints-meta/i18n");
+          const { t: subT } = endpointsMetaI18n.scopedT(locale);
+          const result =
+            await EndpointsMetaGeneratorRepository.generateEndpointsMeta(
+              {
+                outputDir:
+                  "src/app/api/[locale]/system/generated/endpoints-meta",
+                dryRun: false,
+              },
+              logger,
+              subT,
+            );
 
-              if (result.success) {
-                generatorsRun++;
-                return "endpoints-meta";
-              }
-              outputLines.push(
-                `❌ Endpoints meta generation failed: ${result.message || "Unknown error"}`,
-              );
-              return null;
-            } catch (error) {
-              outputLines.push(
-                `❌ Endpoints meta generator failed: ${parseError(error).message}`,
-              );
-              return null;
-            }
-          })(),
-        );
+          if (result.success) {
+            generatorsRun++;
+            defScanResults.push("endpoints-meta");
+          } else {
+            outputLines.push(
+              `❌ Endpoints meta generation failed: ${result.message || "Unknown error"}`,
+            );
+            defScanResults.push(null);
+          }
+        } catch (error) {
+          outputLines.push(
+            `❌ Endpoints meta generator failed: ${parseError(error).message}`,
+          );
+          defScanResults.push(null);
+        }
       }
 
       // 1b. Endpoint Generator - Generate endpoint.ts with dynamic imports
       if (!data.skipEndpoints) {
-        generatorPromises.push(
-          (async (): Promise<string | null> => {
-            try {
-              const { EndpointGeneratorRepository } =
-                await import("../endpoint/repository");
+        try {
+          const { EndpointGeneratorRepository } =
+            await import("../endpoint/repository");
 
-              const { scopedTranslation: endpointI18n } =
-                await import("../endpoint/i18n");
-              const { t: subT } = endpointI18n.scopedT(locale);
-              const result = await EndpointGeneratorRepository.generateEndpoint(
-                {
-                  outputFile:
-                    "src/app/api/[locale]/system/generated/endpoint.ts",
-                  dryRun: false,
-                },
-                logger,
-                subT,
-              );
+          const { scopedTranslation: endpointI18n } =
+            await import("../endpoint/i18n");
+          const { t: subT } = endpointI18n.scopedT(locale);
+          const result = await EndpointGeneratorRepository.generateEndpoint(
+            {
+              outputFile: "src/app/api/[locale]/system/generated/endpoint.ts",
+              dryRun: false,
+            },
+            logger,
+            subT,
+          );
 
-              if (result.success) {
-                generatorsRun++;
-                return "endpoint";
-              }
-              outputLines.push(
-                `❌ Endpoint generation failed: ${result.message || "Unknown error"}`,
-              );
-              return null;
-            } catch (error) {
-              outputLines.push(
-                `❌ Endpoint generator failed: ${parseError(error).message}`,
-              );
-              return null;
-            }
-          })(),
-        );
+          if (result.success) {
+            generatorsRun++;
+            defScanResults.push("endpoint");
+          } else {
+            outputLines.push(
+              `❌ Endpoint generation failed: ${result.message || "Unknown error"}`,
+            );
+            defScanResults.push(null);
+          }
+        } catch (error) {
+          outputLines.push(
+            `❌ Endpoint generator failed: ${parseError(error).message}`,
+          );
+          defScanResults.push(null);
+        }
       }
 
       // 1b. Route Handlers Generator - Generate route-handlers.ts with dynamic imports
       if (!data.skipEndpoints) {
-        generatorPromises.push(
-          (async (): Promise<string | null> => {
-            try {
-              const { RouteHandlersGeneratorRepository } =
-                await import("../route-handlers/repository");
+        try {
+          const { RouteHandlersGeneratorRepository } =
+            await import("../route-handlers/repository");
 
-              const { scopedTranslation: routeHandlersI18n } =
-                await import("../route-handlers/i18n");
-              const { t: subT } = routeHandlersI18n.scopedT(locale);
-              const result =
-                await RouteHandlersGeneratorRepository.generateRouteHandlers(
-                  {
-                    outputFile:
-                      "src/app/api/[locale]/system/generated/route-handlers.ts",
-                    dryRun: false,
-                  },
-                  logger,
-                  subT,
-                );
+          const { scopedTranslation: routeHandlersI18n } =
+            await import("../route-handlers/i18n");
+          const { t: subT } = routeHandlersI18n.scopedT(locale);
+          const result =
+            await RouteHandlersGeneratorRepository.generateRouteHandlers(
+              {
+                outputFile:
+                  "src/app/api/[locale]/system/generated/route-handlers.ts",
+                dryRun: false,
+              },
+              logger,
+              subT,
+            );
 
-              if (result.success) {
-                generatorsRun++;
-                return "route-handlers";
-              }
-              outputLines.push(
-                `❌ Route handlers generation failed: ${result.message || "Unknown error"}`,
-              );
-              return null;
-            } catch (error) {
-              outputLines.push(
-                `❌ Route handlers generator failed: ${parseError(error).message}`,
-              );
-              return null;
-            }
-          })(),
-        );
+          if (result.success) {
+            generatorsRun++;
+            defScanResults.push("route-handlers");
+          } else {
+            outputLines.push(
+              `❌ Route handlers generation failed: ${result.message || "Unknown error"}`,
+            );
+            defScanResults.push(null);
+          }
+        } catch (error) {
+          outputLines.push(
+            `❌ Route handlers generator failed: ${parseError(error).message}`,
+          );
+          defScanResults.push(null);
+        }
       }
 
       // 1c. Client Route Handlers Generator - Generate route-handlers-client.ts with dynamic imports
       if (!data.skipEndpoints) {
-        generatorPromises.push(
-          (async (): Promise<string | null> => {
-            try {
-              const { ClientRoutesIndexGeneratorRepository } =
-                await import("../client-routes-index/repository");
+        try {
+          const { ClientRoutesIndexGeneratorRepository } =
+            await import("../client-routes-index/repository");
 
-              const { scopedTranslation: clientRoutesI18n } =
-                await import("../client-routes-index/i18n");
-              const { t: subT } = clientRoutesI18n.scopedT(locale);
-              const result =
-                await ClientRoutesIndexGeneratorRepository.generateClientRoutesIndex(
-                  {
-                    outputFile:
-                      "src/app/api/[locale]/system/generated/route-handlers-client.ts",
-                    dryRun: false,
-                  },
-                  logger,
-                  subT,
-                );
+          const { scopedTranslation: clientRoutesI18n } =
+            await import("../client-routes-index/i18n");
+          const { t: subT } = clientRoutesI18n.scopedT(locale);
+          const result =
+            await ClientRoutesIndexGeneratorRepository.generateClientRoutesIndex(
+              {
+                outputFile:
+                  "src/app/api/[locale]/system/generated/route-handlers-client.ts",
+                dryRun: false,
+              },
+              logger,
+              subT,
+            );
 
-              if (result.success) {
-                generatorsRun++;
-                return "client-route-handlers";
-              }
-              outputLines.push(
-                `❌ Client route handlers generation failed: ${result.message || "Unknown error"}`,
-              );
-              return null;
-            } catch (error) {
-              outputLines.push(
-                `❌ Client route handlers generator failed: ${parseError(error).message}`,
-              );
-              return null;
-            }
-          })(),
-        );
+          if (result.success) {
+            generatorsRun++;
+            defScanResults.push("client-route-handlers");
+          } else {
+            outputLines.push(
+              `❌ Client route handlers generation failed: ${result.message || "Unknown error"}`,
+            );
+            defScanResults.push(null);
+          }
+        } catch (error) {
+          outputLines.push(
+            `❌ Client route handlers generator failed: ${parseError(error).message}`,
+          );
+          defScanResults.push(null);
+        }
       }
+
+      // Remaining generators run in parallel (they don't scan definition files,
+      // or if they do, all definitions are now cached from the sequential phase above).
+      const generatorPromises = [];
 
       // 2. Seeds Generator - Generate seed index
       if (!data.skipSeeds) {
@@ -626,9 +620,11 @@ export class GenerateAllRepository {
         })(),
       );
 
-      // Wait for all generators to complete
+      // Wait for parallel generators to complete
       const results = await Promise.allSettled(generatorPromises);
-      const completedGenerators: string[] = [];
+      const completedGenerators: string[] = defScanResults.filter(
+        (r): r is string => r !== null,
+      );
 
       for (const result of results) {
         if (result.status === "fulfilled" && result.value !== null) {

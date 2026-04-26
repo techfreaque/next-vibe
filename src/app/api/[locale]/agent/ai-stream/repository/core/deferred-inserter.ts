@@ -11,11 +11,11 @@ import "server-only";
 
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { buildMessagesChannel } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/channel";
-import { createStreamEvent } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/events";
+import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
+
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { walkToLeafMessage } from "./branch-utils";
 import type { WakeUpPayload } from "./wake-up-channel";
@@ -24,6 +24,7 @@ export async function insertDeferredWakeUpMessage(
   threadId: string,
   payload: WakeUpPayload,
   logger: EndpointLogger,
+  user: JwtPayloadType,
   sharedSequenceId?: string,
 ): Promise<{ deferredId: string; deferredSequenceId: string }> {
   const {
@@ -76,39 +77,27 @@ export async function insertDeferredWakeUpMessage(
     metadata: { toolCall: deferredToolCall },
   });
 
-  publishWsEvent(
-    {
-      channel: buildMessagesChannel(threadId),
-      event: "message-created",
-      data: createStreamEvent.messageCreated({
-        messageId: deferredId,
+  const wsEmit = createMessagesEmitter(threadId, null, logger, user);
+  wsEmit("message-created", {
+    messages: [
+      {
+        id: deferredId,
         threadId,
         role: ChatMessageRole.TOOL,
+        isAI: true,
         parentId: chainParentId,
         content: null,
         model: resolvedModel,
         skill: resolvedSkill,
         sequenceId: deferredSequenceId,
-        toolCall: deferredToolCall,
-      }).data,
-    },
-    logger,
-  );
-
-  publishWsEvent(
-    {
-      channel: buildMessagesChannel(threadId),
-      event: "tool-result",
-      data: createStreamEvent.toolResult({
-        messageId: deferredId,
-        toolName: deferredToolCall.toolName,
-        result: deferredToolCall.result,
-        error: deferredToolCall.error,
-        toolCall: deferredToolCall,
-      }).data,
-    },
-    logger,
-  );
+        metadata: { toolCall: deferredToolCall },
+      },
+    ],
+    streamingState: "streaming",
+  });
+  wsEmit("tool-result", {
+    messages: [{ id: deferredId, metadata: { toolCall: deferredToolCall } }],
+  });
 
   logger.debug("[WakeUp] Deferred message inserted by live stream", {
     threadId,

@@ -11,24 +11,24 @@ import { ExternalLink as ExternalLinkIcon } from "next-vibe-ui/ui/icons/External
 import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
-import { useWidgetDisabled } from "../../../system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetDisabled,
+  useWidgetValue,
+} from "../../../system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type definition from "./definition";
-import type { BraveSearchGetResponseOutput } from "./definition";
 
 /**
  * Props for custom widget
  */
 interface CustomWidgetProps {
-  field: {
-    value: BraveSearchGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 /**
@@ -37,7 +37,7 @@ interface CustomWidgetProps {
 export function BraveSearchResultsContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
-  const value = field.value;
+  const value = useWidgetValue<typeof definition.GET>();
   const children = field.children;
   const isDisabled = useWidgetDisabled();
 

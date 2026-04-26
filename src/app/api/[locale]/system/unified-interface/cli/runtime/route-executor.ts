@@ -36,14 +36,13 @@ import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { Platform } from "../../shared/types/platform";
-import type { WidgetData } from "../../shared/widgets/widget-data";
 import type { CliResultFormatter as CliResultFormatterType } from "../../unified-ui/renderers/cli/response/result-formatter";
 import { createCliBypassUser } from "../auth/cli-bypass-user";
 import type { getCliUser } from "../auth/cli-user";
 import { scopedTranslation as cliScopedTranslation } from "../i18n";
 import { CliTarget, type CliTargetValue } from "../types/cli-target";
-import type { CliRequestData } from "./cli-request-data";
-import { CliInputParser, type CliObject, type CliUrlParams } from "./parsing";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { CliInputParser, type CliUrlParams } from "./parsing";
 
 // Lazy-loaded: only needed for MCP + non-bypass paths, not for normal `vibe c`
 let _getCliUser: typeof getCliUser | null = null;
@@ -87,7 +86,7 @@ export type CliCompatiblePlatform =
  * Extends BaseExecutionContext with CLI-specific fields
  */
 export interface RouteExecutionContext extends Omit<
-  BaseExecutionContext<CliRequestData>,
+  BaseExecutionContext<Record<string, WidgetData>>,
   "user"
 > {
   /** URL path parameters */
@@ -96,7 +95,7 @@ export interface RouteExecutionContext extends Omit<
   /** CLI-specific arguments */
   cliArgs?: {
     positionalArgs: string[];
-    namedArgs: CliObject;
+    namedArgs: Record<string, WidgetData>;
     /** Raw tokens after the command, for endpoint-aware re-parsing */
     rawTokens?: string[];
   };
@@ -169,13 +168,13 @@ export interface RouteExecutionResult {
  * CLI execution options interface
  */
 export interface CliExecutionOptions {
-  data: CliRequestData | undefined;
+  data: Record<string, WidgetData> | undefined;
   urlPathParams:
     | Record<string, string | number | boolean | null | undefined>
     | undefined;
   cliArgs: {
     positionalArgs: string[];
-    namedArgs: CliObject;
+    namedArgs: Record<string, WidgetData>;
     rawTokens?: string[];
   };
   locale: CountryLanguage;
@@ -326,49 +325,12 @@ export class RouteDelegationHandler {
         );
 
         // Render interactive Ink UI - waits until user exits
+        // EndpointsPage handles submission internally via useEndpoint
         await renderInkEndpointPage({
           endpoint: { [endpoint.method]: endpoint },
           locale: options.locale,
           user: cliUser,
           debug: options.verbose || false,
-          onSubmit: async (data: WidgetData) => {
-            const result =
-              await RouteExecutionExecutor.executeGenericHandler<WidgetData>({
-                toolName: resolvedCommand,
-                data: data as CliRequestData,
-                urlPathParams: inputData.urlPathParams || {},
-                user: cliUser,
-                locale: options.locale,
-                logger,
-                platform: options.platform,
-                preloadedHandler: routeHandler,
-                streamContext: {
-                  rootFolderId: DefaultFolderId.CRON,
-                  threadId: undefined,
-                  aiMessageId: undefined,
-                  skillId: undefined,
-                  modelId: undefined,
-                  headless: undefined,
-                  currentToolMessageId: undefined,
-                  callerToolCallId: undefined,
-                  pendingToolMessages: undefined,
-                  pendingTimeoutMs: undefined,
-                  leafMessageId: undefined,
-                  waitingForRemoteResult: undefined,
-                  favoriteId: undefined,
-                  abortSignal: new AbortController().signal,
-                  callerCallbackMode: undefined,
-                  onEscalatedTaskCancel: undefined,
-                  escalateToTask: undefined,
-                  imageGenModelSelection: undefined,
-                  musicGenModelSelection: undefined,
-                  videoGenModelSelection: undefined,
-                  variantId: undefined,
-                  isRevival: undefined,
-                },
-              });
-            return result;
-          },
           initialData: inputData.data,
         });
 
@@ -510,6 +472,7 @@ export class RouteDelegationHandler {
             skillId: undefined,
             modelId: undefined,
             headless: undefined,
+            subAgentDepth: 0,
             currentToolMessageId: undefined,
             callerToolCallId: undefined,
             pendingToolMessages: undefined,
@@ -526,6 +489,7 @@ export class RouteDelegationHandler {
             videoGenModelSelection: undefined,
             variantId: undefined,
             isRevival: undefined,
+            providerOverride: undefined,
           },
         });
 

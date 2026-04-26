@@ -127,6 +127,8 @@ export const translations = {
             "Interactive session launched in terminal.",
           copyOutput: "Copy",
           copied: "Copied!",
+          interactive: "Interactive",
+          emptyPromptHint: "Enter a prompt below to run the coding agent",
         },
       },
     },

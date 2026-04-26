@@ -16,13 +16,14 @@ import { useCallback, useState } from "react";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
-  useInkWidgetContext,
-  useInkWidgetForm,
-  useInkWidgetPlatform,
-  useInkWidgetResponseOnly,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+  useWidgetContext,
+  useWidgetForm,
+  useWidgetPlatform,
+  useWidgetResponseOnly,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { ConfigCreateResponseOutput } from "./definition";
+import type defintion from "./definition";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -248,15 +249,14 @@ function ConfigCreateWizard({ onSubmit }: WizardProps): JSX.Element {
 // ── Main widget ────────────────────────────────────────────────────────────
 
 export function ConfigCreateCliWidget({ field }: CliWidgetProps): JSX.Element {
-  const platform = useInkWidgetPlatform();
+  const platform = useWidgetPlatform();
   const isMcp = platform === Platform.MCP;
-  const responseOnly = useInkWidgetResponseOnly();
-  const form = useInkWidgetForm();
-  const ctx = useInkWidgetContext();
+  const responseOnly = useWidgetResponseOnly();
+  const form = useWidgetForm<typeof defintion.POST>();
+  const ctx = useWidgetContext();
 
   const value = field.value;
-  const interactive =
-    (form?.getValue<boolean>("interactive") ?? true) !== false;
+  const interactive = (form?.getValues("interactive") ?? true) !== false;
 
   // Once a result comes back, show it
   if (value) {
@@ -280,7 +280,9 @@ export function ConfigCreateCliWidget({ field }: CliWidgetProps): JSX.Element {
         if (!form) {
           return;
         }
-        for (const [key, val] of Object.entries(answers)) {
+        for (const [key, val] of Object.entries(answers) as Array<
+          [Parameters<typeof form.setValue>[0], boolean]
+        >) {
           form.setValue(key, val);
         }
         // Mark as non-interactive so repository skips any prompt logic

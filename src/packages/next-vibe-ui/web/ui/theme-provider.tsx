@@ -9,7 +9,7 @@ import type { StyleType } from "../utils/style-type";
 export const THEME_COOKIE_NAME = "theme";
 
 /** Mirrors the resolved theme to a non-expiring cookie so SSR can read it.
- *  Also cleans up legacy "system" values in localStorage and cookies. */
+ *  Cookie is the single source of truth; localStorage is kept in sync. */
 function ThemeCookieSync(): null {
   const { resolvedTheme, setTheme } = useTheme();
   useEffect(() => {
@@ -22,9 +22,9 @@ function ThemeCookieSync(): null {
     if (!resolvedTheme) {
       return;
     }
-    // SameSite=Lax; no Secure required (works on http localhost too).
-    // Max-Age=2147483647 ≈ 68 years - effectively non-expiring.
+    // Keep cookie and localStorage in sync — cookie wins on SSR, localStorage is just next-themes' internal state
     document.cookie = `${THEME_COOKIE_NAME}=${resolvedTheme};path=/;max-age=2147483647;SameSite=Lax`;
+    localStorage.setItem("theme", resolvedTheme);
   }, [resolvedTheme, setTheme]);
   return null;
 }

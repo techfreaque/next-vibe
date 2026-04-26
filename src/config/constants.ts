@@ -89,3 +89,12 @@ export const RESET_TOKEN_EXPIRY = 4; // hours
  */
 export const CSRF_TOKEN_COOKIE_NAME = `csrf_token${PORT_SUFFIX}`;
 export const CSRF_TOKEN_HEADER_NAME = "x-csrf-token";
+
+/**
+ * Separator used in the Bearer token to embed leadId alongside the JWT.
+ * Format: "Authorization: Bearer <jwtToken>####<leadId>"
+ * For public (unauthenticated) callers: "Bearer ####<leadId>"
+ * This lets cross-origin clients pass both values in a single header
+ * without relying on cookies.
+ */
+export const BEARER_LEAD_ID_SEPARATOR = "####";

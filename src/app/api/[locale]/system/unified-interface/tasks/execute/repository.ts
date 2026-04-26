@@ -16,15 +16,19 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { LeadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import { splitTaskArgs } from "@/app/api/[locale]/system/unified-interface/tasks/cron/arg-splitter";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import {
+  cronTasks,
+  dbUserIdToOwner,
+} from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTasksRepository } from "@/app/api/[locale]/system/unified-interface/tasks/cron/repository";
+import { resolveTaskOwnerUser } from "@/app/api/[locale]/system/unified-interface/tasks/cron/resolve-task-user";
 import {
   CronTaskStatus,
   type CronTaskStatusValue,
@@ -32,16 +36,8 @@ import {
 import { scopedTranslation as tasksScopedTranslation } from "@/app/api/[locale]/system/unified-interface/tasks/i18n";
 import { handleTaskCompletion } from "@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler";
 import { TaskSyncRepository } from "@/app/api/[locale]/system/unified-interface/tasks/task-sync/repository";
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import type {
-  JwtPayloadType,
-  JwtPrivatePayloadType,
-} from "@/app/api/[locale]/user/auth/types";
-import { users as usersTable } from "@/app/api/[locale]/user/db";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { UserRolesRepository } from "@/app/api/[locale]/user/user-roles/repository";
-import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
@@ -63,6 +59,7 @@ export class TaskExecuteRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: TaskExecuteT,
+    abortSignal: AbortSignal,
   ): Promise<ResponseType<TaskExecuteResponseOutput>> {
     const isAdmin =
       !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
@@ -87,7 +84,11 @@ export class TaskExecuteRepository {
     // 2. Permission check
     if (!isAdmin) {
       // Customers can only run their own tasks
-      if (!currentUserId || task.userId !== currentUserId) {
+      const taskOwner = dbUserIdToOwner(task.userId);
+      if (
+        taskOwner.type === "system" ||
+        (taskOwner.type === "user" && taskOwner.userId !== currentUserId)
+      ) {
         return fail({
           message: t("errors.forbidden"),
           errorType: ErrorResponseTypes.FORBIDDEN,
@@ -143,9 +144,9 @@ export class TaskExecuteRepository {
       });
     }
 
-    // 5. Resolve execution user context
-    const taskUserContext = await TaskExecuteRepository.resolveTaskUser(
-      task.userId,
+    // 5. Resolve execution user context — always the task owner, never the caller
+    const taskUserContext = await resolveTaskOwnerUser(
+      dbUserIdToOwner(task.userId),
       locale,
       logger,
     );
@@ -231,7 +232,7 @@ export class TaskExecuteRepository {
     let finalMessage: string | null = null;
     let finalDurationMs = 0;
     let taskSucceeded = false;
-    let finalResult: JsonValue | null = null;
+    let finalResult: WidgetData | null = null;
     let firstExecutionId: string | null = null;
     let didLogHistory = false;
 
@@ -258,6 +259,7 @@ export class TaskExecuteRepository {
             locale: execLocale,
             logger,
             platform: Platform.CRON,
+            cronTaskId: task.id,
             streamContext: {
               rootFolderId: DefaultFolderId.CRON,
               threadId: undefined,
@@ -271,6 +273,7 @@ export class TaskExecuteRepository {
               skillId: undefined,
               modelId: undefined,
               headless: undefined,
+              subAgentDepth: 0,
               waitingForRemoteResult: undefined,
               abortSignal: taskAbortController.signal,
               callerCallbackMode: undefined,
@@ -281,6 +284,8 @@ export class TaskExecuteRepository {
               videoGenModelSelection: undefined,
               variantId: undefined,
               isRevival: undefined,
+
+              providerOverride: undefined,
             },
           }),
           new Promise<never>((...[, reject]) => {
@@ -355,7 +360,7 @@ export class TaskExecuteRepository {
         taskSucceeded = true;
         finalStatus = CronTaskStatus.COMPLETED;
         finalMessage = null;
-        finalResult = (typedResult.data as JsonValue) ?? null;
+        finalResult = typedResult.data ?? null;
         break;
       }
 
@@ -392,13 +397,12 @@ export class TaskExecuteRepository {
       (task.wakeUpCallbackMode as CallbackModeValue | null) ?? null;
     const taskThreadId = task.wakeUpThreadId ?? null;
     const taskToolMessageId = task.wakeUpToolMessageId ?? null;
-    const completionUserId = taskUserContext?.user.id ?? currentUserId ?? null;
 
     // Skip handleTaskCompletion for remote tasks (targetInstance set) - the
     // originator receives the result via /report and runs handleTaskCompletion
     // there. Running it here would create resume-stream on the wrong instance
     // and try to backfill a toolMessageId that doesn't exist locally.
-    if (taskToolMessageId && completionUserId && !task.targetInstance) {
+    if (taskToolMessageId && taskUserContext && !task.targetInstance) {
       await handleTaskCompletion({
         toolMessageId: taskToolMessageId,
         threadId: taskThreadId,
@@ -410,10 +414,11 @@ export class TaskExecuteRepository {
         skillId: task.wakeUpSkillId ?? null,
         favoriteId: task.wakeUpFavoriteId ?? null,
         leafMessageId: task.wakeUpLeafMessageId ?? null,
-        userId: completionUserId,
+        subAgentDepth: task.wakeUpSubAgentDepth ?? 0,
+        ownerUser: taskUserContext.user,
         logger,
-        directResumeUser: taskUserContext?.user ?? user,
-        directResumeLocale: locale,
+        directResumeLocale: taskUserContext.locale,
+        abortSignal,
       }).catch((completionErr: Error) => {
         logger.error("handleTaskCompletion failed", {
           taskId: task.id,
@@ -430,7 +435,7 @@ export class TaskExecuteRepository {
         summary: finalMessage ?? "",
         durationMs: finalDurationMs,
         executionId: firstExecutionId ?? undefined,
-        output: finalResult as Record<string, JsonValue> | undefined,
+        output: finalResult ?? undefined,
         startedAt: startedAt.toISOString(),
         serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         executedByInstance: instanceId,
@@ -462,70 +467,5 @@ export class TaskExecuteRepository {
       duration: finalDurationMs,
       status: finalStatus,
     });
-  }
-
-  /**
-   * Resolve the user context for task execution.
-   * For system tasks (userId=null), uses the admin account.
-   * For user tasks, resolves the actual user's roles/locale.
-   */
-  private static async resolveTaskUser(
-    taskUserId: string | null,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<{ user: JwtPrivatePayloadType; locale: CountryLanguage } | null> {
-    if (!taskUserId) {
-      // System task - use admin account
-      const adminEmail = env.VIBE_ADMIN_USER_EMAIL;
-      if (!adminEmail) {
-        return null;
-      }
-      const authResult = await AuthRepository.authenticateUserByEmail(
-        adminEmail,
-        locale,
-        logger,
-      );
-      if (!authResult.success || !authResult.data) {
-        return null;
-      }
-      return { user: authResult.data, locale };
-    }
-
-    // User task - resolve their locale and roles
-    let userLocale: CountryLanguage = locale;
-    const ownerRow = await db
-      .select({ locale: usersTable.locale })
-      .from(usersTable)
-      .where(eq(usersTable.id, taskUserId))
-      .limit(1);
-    if (ownerRow[0]?.locale) {
-      userLocale = ownerRow[0].locale;
-    }
-
-    const rolesResult = await UserRolesRepository.getUserRoles(
-      taskUserId,
-      logger,
-      userLocale,
-    );
-    if (!rolesResult.success) {
-      return null;
-    }
-
-    const { leadId } = await LeadAuthRepository.getAuthenticatedUserLeadId(
-      taskUserId,
-      undefined,
-      userLocale,
-      logger,
-    );
-
-    return {
-      user: {
-        id: taskUserId,
-        leadId,
-        isPublic: false as const,
-        roles: rolesResult.data,
-      },
-      locale: userLocale,
-    };
   }
 }

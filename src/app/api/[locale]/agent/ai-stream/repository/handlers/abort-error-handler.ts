@@ -401,7 +401,7 @@ export class AbortErrorHandler {
             content: t("info.streamInterrupted"),
             parentId: ctx.lastParentId,
             sequenceId: ctx.sequenceId,
-            userId,
+            user,
           });
 
           logger.debug("[AI Stream] Emitted interruption error message", {
@@ -431,34 +431,16 @@ export class AbortErrorHandler {
       // Emit WS event so live clients update the stop button.
       // REMOTE_TOOL_WAIT: escalateToTask already fires this early - emitting again is harmless (idempotent on client).
       // STREAM_TIMEOUT: no prior emission, so this is the first signal.
-      void (async (): Promise<void> => {
-        try {
-          const { publishWsEvent } =
-            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-          const { buildMessagesChannel } =
-            await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/channel");
-          const { createStreamEvent } =
-            await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/events");
-          publishWsEvent(
-            {
-              channel: buildMessagesChannel(threadId),
-              event: "streaming-state-changed",
-              data: createStreamEvent.streamingStateChanged({
-                threadId,
-                state: "waiting",
-              }).data,
-            },
-            logger,
-          );
-        } catch (err) {
-          logger.warn("[AI Stream] Failed to emit waiting state WS event", {
-            threadId,
-            error: err instanceof Error ? err.message : String(err),
-          });
-        }
-      })();
+      try {
+        ctx.wsEmit("streaming-state-changed", { streamingState: "waiting" });
+      } catch (err) {
+        logger.warn("[AI Stream] Failed to emit waiting state WS event", {
+          threadId,
+          error: err instanceof Error ? err.message : String(err),
+        });
+      }
     } else {
-      await clearStreamingState(threadId, logger);
+      await clearStreamingState(threadId, logger, user);
     }
 
     ctx.cleanup();

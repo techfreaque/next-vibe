@@ -404,7 +404,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       },
       {
         method: endpoint.method,
-        requestData: data as z.input<typeof endpoint.requestSchema>,
+        requestData: data as z.input<typeof roleFilteredRequestSchema>,
         urlParameters: urlPathParams as z.input<
           typeof endpoint.requestUrlPathParamsSchema
         >,
@@ -448,9 +448,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       const { CreditRepository } =
         await import("@/app/api/[locale]/credits/repository");
       const hasSufficient = await CreditRepository.hasSufficientCredits(
-        user.id
-          ? { userId: user.id, leadId: user.leadId }
-          : { leadId: user.leadId },
+        user,
         endpoint.credits,
         logger,
         tCredits,

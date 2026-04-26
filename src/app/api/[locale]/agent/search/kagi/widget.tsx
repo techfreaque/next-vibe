@@ -14,24 +14,22 @@ import { Span } from "next-vibe-ui/ui/span";
 import {
   useWidgetDisabled,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import { withValue } from "../../../system/unified-interface/unified-ui/widgets/_shared/field-helpers";
-import { MarkdownWidget } from "../../../system/unified-interface/unified-ui/widgets/display-only/markdown/react";
+import { MarkdownWidget } from "../../../system/unified-interface/unified-ui/widgets/display-only/markdown/widget";
 import type definition from "./definition";
-import type { KagiSearchGetResponseOutput } from "./definition";
 
 /**
  * Props for custom widget
  */
 interface CustomWidgetProps {
-  field: {
-    value: KagiSearchGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 /**
@@ -40,7 +38,7 @@ interface CustomWidgetProps {
 export function KagiSearchResultsContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
-  const value = field.value;
+  const value = useWidgetValue<typeof definition.GET>();
   const children = field.children;
   const t = useWidgetTranslation<typeof definition.GET>();
   const disabled = useWidgetDisabled();
@@ -97,7 +95,7 @@ export function KagiSearchResultsContainer({
                 <Div className="p-4">
                   <MarkdownWidget
                     fieldName="output"
-                    field={withValue(children.output, output ?? null, null)}
+                    field={withValue(children.output, output ?? null, value)}
                   />
                 </Div>
               </CardContent>

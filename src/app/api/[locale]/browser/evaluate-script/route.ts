@@ -13,11 +13,9 @@ export const { POST, tools } = endpointsHandler({
   endpoint: evaluateScriptEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, user, request }) =>
+    handler: ({ data, t, logger }) =>
       BrowserSharedRepository.executeEvaluateScript(
         {
-          sessionId:
-            request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.EVALUATE_SCRIPT,
           args: BrowserSharedRepository.filterUndefinedArgs({
             function: data.function,

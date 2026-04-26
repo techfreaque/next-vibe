@@ -187,6 +187,9 @@ const imageVisionModelOptionsIndex: Record<
   [ImageVisionModelId.CLAUDE_OPUS_4_6]: makeImageVisionOption(
     ImageVisionModelId.CLAUDE_OPUS_4_6,
   ),
+  [ImageVisionModelId.CLAUDE_OPUS_4_7]: makeImageVisionOption(
+    ImageVisionModelId.CLAUDE_OPUS_4_7,
+  ),
   [ImageVisionModelId.GLM_4_5V]: makeImageVisionOption(
     ImageVisionModelId.GLM_4_5V,
   ),

@@ -12,7 +12,7 @@ import {
 } from "next-vibe-ui/ui/alert-dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import aiStreamDefinition from "@/app/api/[locale]/agent/ai-stream/stream/definition";
@@ -22,10 +22,10 @@ import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-
 import publicFeedDefinition from "@/app/api/[locale]/agent/chat/public-feed/definition";
 import { useDeleteDialogStore } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-delete-dialog-store";
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { platform } from "@/config/env-client";
+import { useLogger } from "@/hooks/use-logger";
 import { useTranslation } from "@/i18n/core/client";
 
 import { SidebarWrapper } from "./sidebar/sidebar-wrapper";
@@ -58,10 +58,7 @@ export function ChatInterface({
   const { locale, currentCountry } = useTranslation();
   const { t } = scopedTranslation.scopedT(locale);
   // Create logger once - memoize to prevent recreating on every render
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
 
   // Use server-provided user prop to determine authentication status immediately
   // This prevents hydration mismatch - no client-side delay

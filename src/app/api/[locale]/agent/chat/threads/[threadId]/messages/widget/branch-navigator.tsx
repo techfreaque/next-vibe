@@ -7,6 +7,7 @@ import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { Span } from "next-vibe-ui/ui/span";
+import { memo } from "react";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -22,7 +23,7 @@ interface BranchNavigatorProps {
   className?: string;
 }
 
-export function BranchNavigator({
+export const BranchNavigator = memo(function BranchNavigator({
   currentBranchIndex,
   totalBranches,
   branches,
@@ -91,4 +92,4 @@ export function BranchNavigator({
       )}
     </Div>
   );
-}
+});

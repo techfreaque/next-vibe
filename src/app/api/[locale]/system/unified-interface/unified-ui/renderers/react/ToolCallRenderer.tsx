@@ -39,10 +39,8 @@ import type { FieldValues } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
 import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
-import type {
-  ToolCall,
-  ToolCallResult,
-} from "@/app/api/[locale]/agent/chat/db";
+import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
@@ -400,7 +398,7 @@ export function ToolCallRenderer({
       return err.message;
     }
     // Fallback: toolCall.result is an ErrorResponseType (tool returned fail() without throwing).
-    // Display the raw message string - it may be a translation key but ToolCallResult
+    // Display the raw message string - it may be a translation key but WidgetData
     if (
       resultIsError &&
       typeof toolCall.result === "object" &&
@@ -442,13 +440,32 @@ export function ToolCallRenderer({
 
   const handleCopyJson = (e: DivMouseEvent): void => {
     e.stopPropagation();
+
+    // Build request: merge args with top-level metadata fields not already present in args
+    const argsObj =
+      toolCall.args &&
+      typeof toolCall.args === "object" &&
+      !Array.isArray(toolCall.args)
+        ? (toolCall.args as Record<string, ToolCall["args"]>)
+        : undefined;
+    const metaOverrides: Record<string, string> = {};
+    if (toolCall.callbackMode && (!argsObj || !("callbackMode" in argsObj))) {
+      metaOverrides["callbackMode"] = toolCall.callbackMode;
+    }
+    if (toolCall.remoteTaskId && (!argsObj || !("remoteTaskId" in argsObj))) {
+      metaOverrides["remoteTaskId"] = toolCall.remoteTaskId;
+    }
+
     const payload: {
+      toolName: string;
       request?: ToolCall["args"];
       response?: ToolCall["result"];
       error?: ToolCall["error"];
-    } = {};
-    if (toolCall.args) {
-      payload.request = toolCall.args;
+    } = { toolName: toolCall.toolName };
+    if (toolCall.args || Object.keys(metaOverrides).length > 0) {
+      payload.request = argsObj
+        ? { ...argsObj, ...metaOverrides }
+        : metaOverrides;
     }
     if (toolCall.result) {
       if (typeof toolCall.result === "string") {
@@ -791,6 +808,7 @@ export function ToolCallRenderer({
                           data={toolCall.args}
                           logger={logger}
                           disabled={true}
+                          response={undefined}
                         />
                       </NavigationStackProvider>
                     </Div>
@@ -846,22 +864,22 @@ export function ToolCallRenderer({
                     ? toolCall.args
                     : {};
                 // Parse string results (backwards compat: old DB rows may have stringified results)
-                let resultObj: { [key: string]: ToolCallResult } = {};
+                let resultObj: { [key: string]: WidgetData } = {};
                 if (toolCall.result) {
                   if (
                     typeof toolCall.result === "object" &&
-                    !Array.isArray(toolCall.result)
+                    !Array.isArray(toolCall.result) &&
+                    !(toolCall.result instanceof Date)
                   ) {
                     resultObj = toolCall.result;
                   } else if (typeof toolCall.result === "string") {
                     try {
-                      const parsed = JSON.parse(
-                        toolCall.result,
-                      ) as ToolCallResult;
+                      const parsed = JSON.parse(toolCall.result) as WidgetData;
                       if (
                         parsed &&
                         typeof parsed === "object" &&
-                        !Array.isArray(parsed)
+                        !Array.isArray(parsed) &&
+                        !(parsed instanceof Date)
                       ) {
                         resultObj = parsed;
                       }
@@ -1088,6 +1106,11 @@ export function ToolCallRenderer({
                                       ? "destructive"
                                       : "outline",
                                 }
+                              : undefined
+                          }
+                          response={
+                            resultObj && Object.keys(resultObj).length > 0
+                              ? { success: true as const, data: resultObj }
                               : undefined
                           }
                         />

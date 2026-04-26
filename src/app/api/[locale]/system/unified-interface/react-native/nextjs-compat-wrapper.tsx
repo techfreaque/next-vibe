@@ -34,7 +34,7 @@ import type { JSX, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 

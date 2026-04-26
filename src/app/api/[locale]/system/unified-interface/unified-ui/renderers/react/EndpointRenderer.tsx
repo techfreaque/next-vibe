@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import type { JSX } from "react";
-import { Suspense, useMemo } from "react";
+import { Suspense, useCallback, useMemo } from "react";
 import type {
   DefaultValues,
   Path,
@@ -38,7 +38,7 @@ import type { EndpointLogger } from "../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
 import { WidgetType } from "../../../shared/types/enums";
 import { Platform } from "../../../shared/types/platform";
-import type { WidgetData } from "../../../shared/widgets/widget-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import {
   extractAllFields,
   scanForInlineButtons,
@@ -123,7 +123,7 @@ export interface EndpointRendererProps<TEndpoint extends CreateApiEndpointAny> {
   /** Disable all form inputs */
   disabled?: boolean;
   /** Full ResponseType<T> from endpoint (includes success/error state) */
-  response?: ResponseType<WidgetData>;
+  response: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined;
   /** Endpoint mutations for widgets to trigger directly */
   endpointMutations?: ReactWidgetContext<TEndpoint>["endpointMutations"];
   /** Logger instance for widgets to use directly */
@@ -133,6 +133,10 @@ export interface EndpointRendererProps<TEndpoint extends CreateApiEndpointAny> {
   /** When true, renders FormProvider without a <form> element.
    *  Use this to embed endpoint fields inside an existing form (avoids nested <form>). */
   _noFormElement?: boolean;
+  /** Platform identifier - defaults to NEXT_PAGE */
+  platform?: Platform;
+  /** When true, only renders response fields (used by CLI result formatter) */
+  responseOnly?: boolean;
 }
 
 /**
@@ -157,6 +161,8 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   logger,
   user,
   _noFormElement: noFormElementProp = false,
+  platform: platformProp,
+  responseOnly = false,
 }: EndpointRendererProps<TEndpoint>): JSX.Element {
   // Initialize navigation stack for cross-definition navigation
   const navigation = useNavigationStack();
@@ -198,10 +204,14 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   const form = externalForm ?? internalForm;
 
   // Wrap onSubmit for widgets - widgets trigger submission without data parameter
-  const handleWidgetSubmit = onSubmit
-    ? (): void => {
-        void form.handleSubmit(onSubmit)();
-      }
+  const handleWidgetSubmit = useCallback((): void => {
+    if (onSubmit) {
+      void form.handleSubmit(onSubmit)();
+    }
+  }, [form, onSubmit]);
+
+  const handleWidgetSubmitOrUndefined = onSubmit
+    ? handleWidgetSubmit
     : undefined;
 
   // Scan endpoint fields for inline buttons/alerts (memoized)
@@ -212,30 +222,48 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   );
 
   // Create render context with scoped translation from endpoint definition
-  const context: ReactWidgetContext<TEndpoint> = {
-    locale,
-    isInteractive: true,
-    logger,
-    user,
-    platform: Platform.NEXT_PAGE,
-    endpointFields: endpoint.fields,
-    disabled,
-    response,
-    endpointMutations,
-    t: endpoint.scopedTranslation.scopedT(locale).t,
-    navigation,
-    endpoint,
-    form,
-    onSubmit: handleWidgetSubmit,
-    onCancel,
-    isSubmitting,
-    submitButton,
-    cancelButton,
-    buttonState: {
-      hasRenderedSubmitButton: false,
-      hasRenderedBackButton: false,
-    },
-  };
+  // Memoized so Zustand selectors only fire when actual values change
+  const context = useMemo<ReactWidgetContext<TEndpoint>>(
+    () => ({
+      locale,
+      isInteractive: platformProp !== Platform.MCP,
+      logger,
+      user,
+      platform: platformProp ?? Platform.NEXT_PAGE,
+      responseOnly,
+      endpointFields: endpoint.fields,
+      disabled,
+      response,
+      endpointMutations,
+      t: endpoint.scopedTranslation.scopedT(locale).t,
+      navigation,
+      endpoint,
+      form,
+      onSubmit: handleWidgetSubmitOrUndefined,
+      onCancel,
+      isSubmitting,
+      submitButton,
+      cancelButton,
+    }),
+    [
+      locale,
+      logger,
+      user,
+      disabled,
+      response,
+      endpointMutations,
+      endpoint,
+      form,
+      handleWidgetSubmitOrUndefined,
+      onCancel,
+      isSubmitting,
+      submitButton,
+      cancelButton,
+      navigation,
+      platformProp,
+      responseOnly,
+    ],
+  );
 
   // ContentResponse: render mixed content blocks (text + images) directly
   // This applies to any endpoint that returns a ContentResponse (e.g. browser take-screenshot)
@@ -262,13 +290,6 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
    * This ensures the root container's configuration (like submitButton) is not lost.
    */
   if (isRootContainer) {
-    // Wrap onSubmit for form handling - this will be passed to Form component
-    const handleFormSubmit = onSubmit
-      ? (): void => {
-          void form.handleSubmit(onSubmit)();
-        }
-      : undefined;
-
     // CUSTOM_WIDGET with render: render directly without WidgetRenderer.
     // This avoids loading all widget dependencies when a custom component
     // handles its own rendering (e.g. chat messages widget).
@@ -306,7 +327,7 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
         <WidgetContextProvider context={context}>
           <Form
             form={form}
-            onSubmit={handleFormSubmit}
+            onSubmit={handleWidgetSubmitOrUndefined}
             className={className}
             noFormElement={_noFormElement}
           >
@@ -406,7 +427,7 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
       <WidgetContextProvider context={context}>
         <Form
           form={form}
-          onSubmit={handleWidgetSubmit}
+          onSubmit={handleWidgetSubmitOrUndefined}
           className={className}
           noFormElement={_noFormElement}
         >

@@ -12,11 +12,12 @@ import type { ResponseType } from "@/app/api/[locale]/shared/types/response.sche
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { InkEndpointRenderer } from "../cli/CliEndpointRenderer";
+import { EndpointRenderer } from "../react/EndpointRenderer";
+import { NavigationStackProvider } from "../../../react/hooks/use-navigation-stack";
 import { renderToString as fastRenderToString } from "../cli/response/fast-ink-renderer/renderer";
 
 /**
@@ -71,16 +72,20 @@ export class McpResultFormatter {
 
       // Create component
       const createStart = performance.now();
-      const component = createElement(InkEndpointRenderer, {
-        endpoint,
-        locale,
-        data,
-        logger,
-        user,
-        response: { success: true, data },
-        responseOnly: true,
-        platform: Platform.MCP,
-      });
+      const component = createElement(
+        NavigationStackProvider,
+        null,
+        createElement(EndpointRenderer, {
+          endpoint,
+          locale,
+          data,
+          logger,
+          user,
+          response: { success: true, data },
+          responseOnly: true,
+          platform: Platform.MCP,
+        }),
+      );
       const componentTime = performance.now() - createStart;
 
       // Use fast renderer for performance

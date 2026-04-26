@@ -43,28 +43,26 @@ import type {
   TtsModelId,
   VoiceModelSelection,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
+  useWidgetEndpointMutations,
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetSelector } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { platform } from "@/config/env-client";
 import { parseError } from "next-vibe/shared/utils";
 import type { MessageMetadata } from "../../../../db";
 import { NEW_MESSAGE_ID, ViewMode } from "../../../../enum";
-import folderContentsDefinition from "../../../../folder-contents/[rootFolderId]/definition";
 import messagesDefinition from "../definition";
 import { loadMessageAttachments } from "../hooks/load-message-attachments";
 import { patchMessage, upsertMessage } from "../hooks/update-messages";
 import { useBranchManagement } from "../hooks/use-branch-management";
 import { useCollapseState } from "../hooks/use-collapse-state";
 import { useMessageEditorStore } from "../hooks/use-message-editor-store";
-import { useMessagesSubscription } from "../hooks/use-messages-subscription";
 import { useMessageOperations } from "../hooks/use-operations";
 import { scopedTranslation } from "../i18n";
 import pathDefinitions from "../path/definition";
@@ -150,7 +148,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
 
   // Boot context for stable server-origin values
   const {
-    initialCredits,
     initialThreadId: bootInitialThreadId,
     initialSettingsData,
     initialSkillData,
@@ -165,46 +162,27 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     (s) => s.currentSubFolderId,
   );
 
-  // Read messages reactively from the React Query / apiClient cache via useEndpoint.
-  // staleTime: Infinity - data is managed via updateEndpointData/upsertMessage; never auto-refetch.
-  const messagesEndpointOptions = useMemo(
-    () => ({
-      read: {
-        urlPathParams: { threadId: activeThreadId ?? "" },
-        initialState: { rootFolderId: currentRootFolderId },
-        queryOptions: {
-          enabled: !!activeThreadId && activeThreadId !== NEW_MESSAGE_ID,
-          staleTime: Infinity,
-        },
-      },
-      create: {
-        urlPathParams: { threadId: activeThreadId ?? "" },
-      },
-    }),
-    [activeThreadId, currentRootFolderId],
-  );
-  const messagesEndpoint = useEndpoint(
-    messagesDefinition,
-    messagesEndpointOptions,
-    logger,
-    user,
-  );
+  // Read messages from widget context — data flows from EndpointsPage which owns the
+  // useEndpoint instance with initialData. No separate useEndpoint needed here.
+  const endpointMutations = useWidgetEndpointMutations();
+  const isLoading = endpointMutations?.read?.isLoading ?? false;
 
-  const isLoading = messagesEndpoint.read?.isLoading ?? false;
+  const messagesData = useWidgetSelector<typeof messagesDefinition.GET>()(
+    (d) => d,
+  );
 
   const activeThreadMessages: ChatMessage[] = useMemo(() => {
     if (!activeThreadId || activeThreadId === NEW_MESSAGE_ID) {
       return [];
     }
-    const data = messagesEndpoint.read?.data;
-    return (data?.messages ?? []).map((msg) => ({
+    return (messagesData?.messages ?? []).map((msg) => ({
       ...msg,
       createdAt:
         msg.createdAt instanceof Date ? msg.createdAt : new Date(msg.createdAt),
       updatedAt:
         msg.updatedAt instanceof Date ? msg.updatedAt : new Date(msg.updatedAt),
     }));
-  }, [messagesEndpoint.read?.data, activeThreadId]);
+  }, [messagesData, activeThreadId]);
 
   // Settings - pass SSR initialData so no client fetch on hydration
   const { settings } = useChatSettings(user, logger, initialSettingsData);
@@ -230,13 +208,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       );
     }
   }, [initialSkillData, selectedSkill, logger]);
-
-  // Credits
-  const creditsHook = useCredits(user, logger, initialCredits);
-  const noopDeduct = useCallback((): void => {
-    // No-op when credits hook is not available
-  }, []);
-  const deductCredits = creditsHook?.deductCredits ?? noopDeduct;
 
   // AI Stream
   const aiStream = useAIStream();
@@ -305,8 +276,16 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       !activeThreadId ||
       activeThreadId === NEW_MESSAGE_ID ||
       activeThreadId === bootInitialThreadId ||
-      messagesEndpoint.read?.data !== undefined
+      messagesData !== undefined
     ) {
+      return;
+    }
+
+    // Also skip if path cache is already pre-seeded (new thread just created client-side).
+    const cachedPath = apiClient.getEndpointData(pathDefinitions.GET, logger, {
+      urlPathParams: { threadId: activeThreadId },
+    });
+    if (cachedPath !== undefined) {
       return;
     }
 
@@ -393,7 +372,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     logger,
     user,
     setLeafMessageId,
-    messagesEndpoint.read?.data,
+    messagesData,
   ]);
 
   // Abort in-flight history requests when thread changes
@@ -645,19 +624,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     ],
   );
 
-  /**
-   * Invalidate thread - refetch messages from server.
-   * Called by useMessagesSubscription when a remote stream completes.
-   */
-  const invalidateThread = useCallback(
-    (tid: string): void => {
-      if (tid === activeThreadId && activeThreadId !== NEW_MESSAGE_ID) {
-        void messagesEndpoint.read?.refetch();
-      }
-    },
-    [activeThreadId, messagesEndpoint.read],
-  );
-
   // Branch management - derives branchIndices from leafMessageId + loaded messages
   const { branchIndices, handleSwitchBranch } = useBranchManagement({
     activeThreadMessages,
@@ -666,59 +632,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     threadId: activeThreadId || "",
     logger,
   });
-
-  // Streaming state from navigation store
-  const startStream = useChatNavigationStore((s) => s.startStream);
-  const stopStream = useChatNavigationStore((s) => s.stopStream);
-  const setWaiting = useChatNavigationStore((s) => s.setWaiting);
-
-  // Read initial streamingState from the folder-contents cache for page load recovery.
-  // If the thread is in "waiting" state (task in flight, stream dead), restore stop button.
-  const initialStreamingState = useMemo(() => {
-    if (!activeThreadId) {
-      return undefined;
-    }
-    const cached = apiClient.getEndpointData(
-      folderContentsDefinition.GET,
-      logger,
-      {
-        urlPathParams: { rootFolderId: currentRootFolderId },
-        requestData: { subFolderId: currentSubFolderId ?? null },
-      },
-    );
-    if (!cached?.success) {
-      return undefined;
-    }
-    const item = cached.data.items.find(
-      (i) => i.type === "thread" && i.id === activeThreadId,
-    );
-    return item?.streamingState ?? undefined;
-  }, [activeThreadId, currentRootFolderId, currentSubFolderId, logger]);
-
-  // Always-on WS subscription for all stream events on this thread
-  useMessagesSubscription(
-    activeThreadId !== NEW_MESSAGE_ID ? activeThreadId : null,
-    currentRootFolderId,
-    currentSubFolderId,
-    logger,
-    {
-      onCreditsDeducted: (data) => {
-        deductCredits(data.amount, data.feature);
-      },
-      invalidateThread,
-      onStreamStarted: activeThreadId
-        ? (): void => startStream(activeThreadId, logger)
-        : undefined,
-      onStreamFinished: activeThreadId
-        ? (): void => stopStream(activeThreadId, logger)
-        : undefined,
-      onStreamingStateWaiting: activeThreadId
-        ? (): void => setWaiting(activeThreadId, logger)
-        : undefined,
-      initialStreamingState,
-      ttsAutoplay: effectiveSettings.ttsAutoplay,
-    },
-  );
 
   // Editor state from Zustand store (decoupled from context)
   const editingMessageId = useMessageEditorStore((s) => s.editingMessageId);
@@ -1154,7 +1067,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                     onVoteMessage={voteMessage}
                     user={user}
                     ttsAutoplay={effectiveSettings.ttsAutoplay}
-                    deductCredits={deductCredits}
                     voiceId={resolveVoiceId(
                       effectiveSettings.voiceModelSelection,
                     )}
@@ -1271,7 +1183,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                           selectedSkill={selectedSkill}
                           selectedModel={selectedModel ?? null}
                           sendMessage={sendMessage}
-                          deductCredits={deductCredits}
                           onLoadNewerHistory={loadNewerHistory}
                           isLoadingNewerHistory={isLoadingNewerHistory}
                           onVoteMessage={voteMessage}
@@ -1309,7 +1220,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                           selectedSkill={selectedSkill}
                           selectedModel={selectedModel ?? null}
                           sendMessage={sendMessage}
-                          deductCredits={deductCredits}
                           onLoadNewerHistory={loadNewerHistory}
                           isLoadingNewerHistory={isLoadingNewerHistory}
                           onVoteMessage={voteMessage}

@@ -377,7 +377,7 @@ export function AdminLayoutClient({
 
             <Div className="flex items-center gap-2 shrink-0">
               <ThemeToggle locale={locale} />
-              <CountrySelector isNavBar locale={locale} user={user} />
+              <CountrySelector isNavBar user={user} />
               <Link
                 href={`/${locale}/threads`}
                 className="hidden sm:inline-flex text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent"

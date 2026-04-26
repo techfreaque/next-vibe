@@ -4,14 +4,13 @@ import { useSearchParams } from "next-vibe-ui/hooks/use-navigation";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
-import { useMemo } from "react";
 
 import { scopedTranslation } from "@/app/[locale]/track/i18n";
 import { LeadSource } from "@/app/api/[locale]/leads/enum";
 import trackingEndpoints from "@/app/api/[locale]/leads/tracking/engagement/definition";
 import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-query";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { useLogger } from "@/hooks/use-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
@@ -32,10 +31,7 @@ export default function TrackPage({
   const ref = searchParams.get("ref") ?? undefined;
   const campaignId = searchParams.get("campaignId") ?? undefined;
 
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
 
   // Single API call - handles both tracking (with id) and ref-only cases server-side
   useApiQuery({

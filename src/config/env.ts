@@ -12,7 +12,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
 import { DEFAULT_PROJECT_URL } from "./constants";
-import { createSchema } from "./env-client";
 
 export const {
   env,
@@ -20,10 +19,7 @@ export const {
   examples: envExamples,
 } = defineEnv({
   NODE_ENV: {
-    schema: createSchema(
-      z.enum(Environment),
-      z.enum(Environment).default(Environment.DEVELOPMENT),
-    ),
+    schema: z.enum(Environment).default(Environment.DEVELOPMENT),
     example: "development",
     comment:
       "vibe dev always uses dev DB on port 5432. vibe build/start in development: auto-manages preview DB on port 5433. vibe build/start in production: no DB setup, expects externally managed database.",
@@ -38,17 +34,11 @@ export const {
     commented: true,
   },
   NEXT_PUBLIC_APP_URL: {
-    schema: createSchema(
-      z
-        .string()
-        .url()
-        .transform((s) => s.replace(/\/$/, "")),
-      z
-        .string()
-        .url()
-        .default("http://localhost:3000")
-        .transform((s) => s.replace(/\/$/, "")),
-    ),
+    schema: z
+      .string()
+      .url()
+      .default("http://localhost:3000")
+      .transform((s) => s.replace(/\/$/, "")),
     example: "http://localhost:3000",
     fieldType: "url",
   },
@@ -56,6 +46,13 @@ export const {
     schema: z.string().url().default(DEFAULT_PROJECT_URL),
     example: DEFAULT_PROJECT_URL,
     fieldType: "url",
+  },
+  VIBE_PID: {
+    schema: z.string().default(String(process.pid)),
+    example: false,
+    comment:
+      "Vibe runtime process ID. Set automatically at startup — no need to configure manually.",
+    commented: true,
   },
   IS_PREVIEW_MODE: {
     schema: z
@@ -79,21 +76,15 @@ export const {
     fieldType: "boolean",
   },
   NEXT_PUBLIC_TEST_SERVER_URL: {
-    schema: createSchema(
-      z.string().url(),
-      z.string().url().default("http://localhost:4000"),
-    ),
+    schema: z.string().url().default("http://localhost:4000"),
     example: "http://localhost:4000",
     fieldType: "url",
   },
   DATABASE_URL: {
-    schema: createSchema(
-      z.string().url(),
-      z
-        .string()
-        .url()
-        .default("postgres://postgres:postgres@localhost:5432/postgres"),
-    ),
+    schema: z
+      .string()
+      .url()
+      .default("postgres://postgres:postgres@localhost:5432/postgres"),
     example: "postgres://postgres:postgres@localhost:5432/postgres",
     comment: "Database connection URL",
     sensitive: true,
@@ -113,20 +104,7 @@ export const {
     fieldType: "number",
   },
   JWT_SECRET_KEY: {
-    schema: createSchema(
-      z
-        .string()
-        .min(32, "JWT_SECRET_KEY must be at least 32 characters")
-        .refine(
-          (v) =>
-            process.env["NODE_ENV"] !== "production" ||
-            (v.length >= 64 &&
-              !v.startsWith("REPLACE_WITH_") &&
-              !v.includes("your-secret")),
-          "JWT_SECRET_KEY must be at least 64 random characters in production - run: openssl rand -hex 32",
-        ),
-      z.string().min(32),
-    ),
+    schema: z.string().min(32),
     example: "REPLACE_WITH_openssl_rand_hex_32_output",
     comment:
       "JWT signing secret - MUST be at least 64 random characters in production. Generate with: openssl rand -hex 32",
@@ -137,18 +115,7 @@ export const {
     autoGenerate: "hex64" as const,
   },
   CRON_SECRET: {
-    schema: createSchema(
-      z
-        .string()
-        .min(32, "CRON_SECRET must be at least 32 characters")
-        .refine(
-          (v) =>
-            process.env["NODE_ENV"] !== "production" ||
-            (!v.startsWith("REPLACE_WITH_") && !v.includes("your-cron")),
-          "CRON_SECRET must not be a placeholder in production - run: openssl rand -hex 32",
-        ),
-      z.string().min(32),
-    ),
+    schema: z.string().min(32),
     example: "REPLACE_WITH_openssl_rand_hex_32_output",
     comment: "Cron job secret - generate with: openssl rand -hex 32",
     sensitive: true,
@@ -210,6 +177,33 @@ export const {
     comment: "CLI locale setting",
     fieldType: "select",
     options: ["en-US", "en-GLOBAL", "de-DE", "de-GLOBAL", "pl-PL", "pl-GLOBAL"],
+  },
+  NEXT_PUBLIC_VIBE_DEBUG: {
+    schema: z
+      .string()
+      .optional()
+      .default("false")
+      .transform((v) => v === "true"),
+    example: "false",
+    comment:
+      "Enable verbose debug logging across the full stack, including the browser client. Two ways to activate: (1) pass -v or --verbose to any vibe command - detected at startup and baked into the build automatically; (2) set NEXT_PUBLIC_VIBE_DEBUG=true in .env for a persistent always-on debug build.",
+    commented: true,
+    fieldType: "boolean",
+  },
+  VIBE_LOG_PATH: {
+    schema: z
+      .string()
+      .optional()
+      .default(".tmp")
+      .refine((v) => v === "false" || v.length > 0, {
+        message:
+          "VIBE_LOG_PATH must be a directory path or 'false' to disable file logging",
+      }),
+    example: ".tmp",
+    comment:
+      "Directory for server log files (vibe-start.log, vibe-dev.log, vibe-mcp.log). Defaults to .tmp. Set to an absolute or relative path to change location. Set to 'false' to disable file logging entirely. Auto-set by vibe dev/start if not configured.",
+    commented: true,
+    fieldType: "log-path",
   },
   VIBE_DISABLE_PROXY: {
     schema: z

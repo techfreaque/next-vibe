@@ -13,22 +13,22 @@ import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import {
+  useWidgetTranslation,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
-import type { SubscriptionCancelDeleteResponseOutput } from "./definition";
 
 /**
  * Props for custom widget
  */
 interface CustomWidgetProps {
-  field: {
-    value: SubscriptionCancelDeleteResponseOutput | null | undefined;
-  } & (typeof definition.DELETE)["fields"];
+  field: (typeof definition.DELETE)["fields"];
 }
 
 /**
@@ -39,6 +39,7 @@ export function SubscriptionCancelContainer({
 }: CustomWidgetProps): JSX.Element {
   const t = useWidgetTranslation<typeof definition.DELETE>();
   const children = field.children;
+  const value = useWidgetValue<typeof definition.DELETE>();
 
   return (
     <Div className="flex flex-col gap-4 p-4">
@@ -68,7 +69,7 @@ export function SubscriptionCancelContainer({
       />
 
       {/* Success Response */}
-      {field.value?.success && (
+      {value?.success && (
         <Card className="mt-4 border-success/30 bg-success/10">
           <CardContent className="pt-6">
             <Div className="flex items-center gap-3">
@@ -78,7 +79,7 @@ export function SubscriptionCancelContainer({
                   {t("delete.success.title")}
                 </P>
                 <P className="text-sm text-success-foreground/80">
-                  {field.value.message}
+                  {value?.message}
                 </P>
               </Div>
             </Div>

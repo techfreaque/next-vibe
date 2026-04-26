@@ -9,25 +9,24 @@ import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useMemo } from "react";
 
-import { useWidgetLocale } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import {
+  useWidgetLocale,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";
 
-type PostResponseOutput = typeof definition.POST.types.ResponseOutput;
-
 interface CustomWidgetProps {
-  field: {
-    value: PostResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 export function ImportJobRetryContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.POST>();
   const locale = useWidgetLocale();
   const t = useMemo(() => scopedTranslation.scopedT(locale).t, [locale]);
 

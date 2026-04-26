@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, eq, ne, or, sql } from "drizzle-orm";
+import { and, count, eq, inArray, ne, or, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -34,6 +34,7 @@ import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { getModelDisplayName } from "../../models/all-models";
 import { modelProviders } from "../../models/models";
@@ -42,6 +43,7 @@ import { leadMagnetConfigs } from "@/app/api/[locale]/lead-magnet/db";
 import { referralCodes } from "@/app/api/[locale]/referral/db";
 import { users } from "@/app/api/[locale]/user/db";
 import { getBestChatModel } from "../../ai-stream/models";
+import { chatFavorites } from "../favorites/db";
 import { ensureUniqueSlug, generateSlug, isUuid } from "../slugify";
 import type {
   SkillDeleteResponseOutput,
@@ -49,6 +51,7 @@ import type {
   SkillUpdateRequestOutput,
   SkillUpdateResponseOutput,
 } from "./[id]/definition";
+import skillIdDefinitions from "./[id]/definition";
 import {
   type Skill,
   type SkillVariant,
@@ -67,6 +70,7 @@ import type {
   SkillListResponseOutput,
   SkillListSections,
 } from "./definition";
+import skillsDefinitions from "./definition";
 import {
   type SkillCategoryValue,
   type SkillOwnershipTypeValue,
@@ -84,6 +88,16 @@ import { scopedTranslation } from "./i18n";
  * All methods return ResponseType for consistent error handling
  */
 export class SkillsRepository {
+  private static getSkillReferenceIds(
+    skillId: string,
+    skillSlug: string | null,
+  ): string[] {
+    if (!skillSlug || skillSlug === skillId) {
+      return [skillId];
+    }
+    return [skillSlug, skillId];
+  }
+
   /**
    * Resolve a skill identifier (UUID or slug) to a DB where condition.
    * Returns null if the identifier doesn't match any known format.
@@ -289,6 +303,7 @@ export class SkillsRepository {
               customSkillsCards.push(
                 SkillsRepository.mapSkillToListItem(
                   externalId,
+                  char.slug ? char.id : null,
                   {
                     icon: char.icon,
                     name: char.name,
@@ -456,6 +471,7 @@ export class SkillsRepository {
             communitySkillsCards.push(
               SkillsRepository.mapSkillToListItem(
                 externalId,
+                char.slug ? char.id : null,
                 {
                   icon: char.icon,
                   name: char.name,
@@ -538,6 +554,7 @@ export class SkillsRepository {
         currentPage: null,
         totalPages: null,
         hint: null,
+        wsEvent: null,
       };
     }
 
@@ -562,6 +579,7 @@ export class SkillsRepository {
       currentPage: safePage,
       totalPages,
       hint,
+      wsEvent: null,
     };
   }
 
@@ -639,6 +657,7 @@ export class SkillsRepository {
           defaultSkill.variants.find((v) => v.isDefault) ??
           defaultSkill.variants[0];
         return success<SkillGetResponseOutput>({
+          internalId: null,
           icon: defaultSkill.icon,
           name: t(defaultSkill.name),
           tagline: t(defaultSkill.tagline),
@@ -698,6 +717,7 @@ export class SkillsRepository {
       // Check for NO_SKILL
       if (skillId === NO_SKILL_ID) {
         return success({
+          internalId: null,
           icon: null,
           name: null,
           tagline: null,
@@ -834,6 +854,7 @@ export class SkillsRepository {
       // Return only response fields (exclude database fields like userId, createdAt, updatedAt)
       // Flattened response
       return success<SkillGetResponseOutput>({
+        internalId: customSkill.slug ? customSkill.id : null,
         icon: customSkill.icon,
         name: customSkill.name,
         tagline: customSkill.tagline,
@@ -998,6 +1019,42 @@ export class SkillsRepository {
         })
         .returning();
 
+      // Emit WS event so all open tabs see the new skill immediately
+      const emitSkills = createEndpointEmitter(
+        skillsDefinitions.GET,
+        logger,
+        user,
+      );
+      if (skill) {
+        const listItem = SkillsRepository.mapSkillToListItem(
+          skill.slug ?? skill.id,
+          skill.slug ? skill.id : null,
+          {
+            icon: skill.icon,
+            name: skill.name,
+            tagline: skill.tagline,
+            description: skill.description,
+            category: skill.category,
+            modelSelection:
+              skill.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
+            ownershipType: skill.ownershipType,
+            voteCount: skill.voteCount,
+            trustLevel: skill.trustLevel,
+          },
+          t,
+          user,
+        );
+        emitSkills("skill-created", {
+          wsEvent: {
+            type: "created",
+            item: listItem,
+            category: skill.category,
+          },
+        });
+      } else {
+        emitSkills("skill-created", { wsEvent: null });
+      }
+
       return success({
         success: t("post.success.title"),
         id: skill.slug,
@@ -1054,7 +1111,7 @@ export class SkillsRepository {
           data.name,
         );
 
-        await db
+        const [derivedSkill] = await db
           .insert(customSkills)
           .values({
             userId,
@@ -1103,6 +1160,42 @@ export class SkillsRepository {
             compactTrigger: data.compactTrigger ?? null,
           })
           .returning();
+
+        // Emit WS event so all open tabs see the new skill immediately
+        const emitSkillsCreate = createEndpointEmitter(
+          skillsDefinitions.GET,
+          logger,
+          user,
+        );
+        if (derivedSkill) {
+          const derivedListItem = SkillsRepository.mapSkillToListItem(
+            derivedSkill.slug ?? derivedSkill.id,
+            derivedSkill.slug ? derivedSkill.id : null,
+            {
+              icon: derivedSkill.icon,
+              name: derivedSkill.name,
+              tagline: derivedSkill.tagline,
+              description: derivedSkill.description,
+              category: derivedSkill.category,
+              modelSelection:
+                derivedSkill.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
+              ownershipType: derivedSkill.ownershipType,
+              voteCount: derivedSkill.voteCount,
+              trustLevel: derivedSkill.trustLevel,
+            },
+            t,
+            user,
+          );
+          emitSkillsCreate("skill-created", {
+            wsEvent: {
+              type: "created",
+              item: derivedListItem,
+              category: derivedSkill.category,
+            },
+          });
+        } else {
+          emitSkillsCreate("skill-created", { wsEvent: null });
+        }
 
         // Flattened response
         return success({
@@ -1207,6 +1300,67 @@ export class SkillsRepository {
         });
       }
 
+      // Emit WS events so all open tabs see the updated skill immediately
+      const emitSkills = createEndpointEmitter(
+        skillsDefinitions.GET,
+        logger,
+        user,
+      );
+      emitSkills("skill-updated", {
+        wsEvent: {
+          type: "updated",
+          id: existingSkill.slug ?? existingSkill.id,
+          name: updated.name,
+          icon: updated.icon,
+          tagline: updated.tagline,
+          ownershipType: updated.ownershipType,
+          voteCount: updated.voteCount,
+          trustLevel: updated.trustLevel,
+        },
+      });
+      const emitSkillId = createEndpointEmitter(
+        skillIdDefinitions.GET,
+        logger,
+        user,
+        { id: existingSkill.slug ?? existingSkill.id },
+      );
+      emitSkillId("skill-updated", {
+        name: updated.name ?? null,
+        icon: updated.icon ?? null,
+        tagline: updated.tagline ?? null,
+        description: updated.description ?? null,
+        category: updated.category,
+        isPublic: updated.ownershipType === SkillOwnershipType.PUBLIC,
+        skillOwnership: updated.ownershipType,
+        systemPrompt: updated.systemPrompt ?? null,
+        compactTrigger: updated.compactTrigger ?? null,
+        variants: updated.variants ?? [],
+        availableTools:
+          updated.availableTools?.map((tool) => ({
+            toolId: tool.toolId,
+            requiresConfirmation: tool.requiresConfirmation ?? false,
+          })) ?? null,
+        pinnedTools:
+          updated.pinnedTools?.map((tool) => ({
+            toolId: tool.toolId,
+            requiresConfirmation: tool.requiresConfirmation ?? false,
+          })) ?? null,
+        voiceModelSelection: updated.voiceModelSelection ?? null,
+        sttModelSelection: updated.sttModelSelection ?? null,
+        imageVisionModelSelection: updated.imageVisionModelSelection ?? null,
+        videoVisionModelSelection: updated.videoVisionModelSelection ?? null,
+        audioVisionModelSelection: updated.audioVisionModelSelection ?? null,
+        imageGenModelSelection: updated.imageGenModelSelection ?? null,
+        musicGenModelSelection: updated.musicGenModelSelection ?? null,
+        videoGenModelSelection: updated.videoGenModelId
+          ? {
+              selectionType: ModelSelectionType.MANUAL,
+              manualModelId: updated.videoGenModelId,
+            }
+          : null,
+        defaultChatMode: updated.defaultChatMode ?? null,
+      });
+
       // Return the full updated skill to match GET response structure
       // Transform ownershipType: PATCH response only accepts "user" | "public", not "system"
       // Custom skills should never be "system", but TypeScript doesn't know this
@@ -1246,11 +1400,47 @@ export class SkillsRepository {
 
       logger.debug("Deleting custom skill", { userId, skillId });
 
-      const deleteCondition = SkillsRepository.resolveSkillIdCondition(skillId);
-      const result = await db
-        .delete(customSkills)
-        .where(and(deleteCondition, eq(customSkills.userId, userId)))
-        .returning();
+      const idCondition = SkillsRepository.resolveSkillIdCondition(skillId);
+      const [existingSkill] = await db
+        .select()
+        .from(customSkills)
+        .where(and(idCondition, eq(customSkills.userId, userId)))
+        .limit(1);
+
+      if (!existingSkill) {
+        return fail({
+          message: t("id.delete.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      const skillReferenceIds = SkillsRepository.getSkillReferenceIds(
+        existingSkill.id,
+        existingSkill.slug,
+      );
+
+      const result = await db.transaction(async (tx) => {
+        await tx
+          .delete(chatFavorites)
+          .where(
+            and(
+              eq(chatFavorites.userId, userId),
+              skillReferenceIds.length === 1
+                ? eq(chatFavorites.skillId, skillReferenceIds[0])
+                : inArray(chatFavorites.skillId, skillReferenceIds),
+            ),
+          );
+
+        return tx
+          .delete(customSkills)
+          .where(
+            and(
+              eq(customSkills.id, existingSkill.id),
+              eq(customSkills.userId, userId),
+            ),
+          )
+          .returning();
+      });
 
       if (result.length === 0) {
         return fail({
@@ -1260,6 +1450,17 @@ export class SkillsRepository {
       }
 
       const deleted = result[0];
+
+      // Emit WS event so all open tabs remove the deleted skill immediately
+      const emitSkills = createEndpointEmitter(
+        skillsDefinitions.GET,
+        logger,
+        user,
+      );
+      emitSkills("skill-deleted", {
+        wsEvent: { type: "deleted", id: deleted.slug ?? deleted.id },
+      });
+
       return success({
         name: deleted.name,
         tagline: deleted.tagline,
@@ -1285,6 +1486,7 @@ export class SkillsRepository {
    */
   private static mapSkillToListItem(
     id: string,
+    internalId: string | null,
     char: {
       icon: IconKey | null;
       name: string | null;
@@ -1327,6 +1529,7 @@ export class SkillsRepository {
     // name/tagline/description are pre-resolved strings (from t() for defaults, raw strings for custom chars)
     return {
       id,
+      internalId,
       category: char.category,
       icon: char.icon ?? "sparkles",
       modelId,
@@ -1367,6 +1570,7 @@ export class SkillsRepository {
     return char.variants.map((variant) =>
       SkillsRepository.mapSkillToListItem(
         id,
+        null,
         {
           ...char,
           modelSelection: variant.modelSelection,

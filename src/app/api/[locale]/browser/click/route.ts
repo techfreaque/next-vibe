@@ -13,11 +13,9 @@ export const { POST, tools } = endpointsHandler({
   endpoint: clickEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, user, request }) =>
+    handler: ({ data, t, logger }) =>
       BrowserSharedRepository.executeClick<ClickResponseOutput>(
         {
-          sessionId:
-            request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.CLICK,
           args: BrowserSharedRepository.filterUndefinedArgs({
             uid: data.uid,

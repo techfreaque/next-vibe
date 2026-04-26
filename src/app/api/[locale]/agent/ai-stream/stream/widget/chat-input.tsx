@@ -11,8 +11,6 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Square } from "next-vibe-ui/ui/icons/Square";
@@ -28,7 +26,7 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { AGENT_MESSAGE_LENGTH } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
@@ -42,6 +40,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 import { useChatSettings } from "../../../chat/settings/hooks";
+import { FavoriteSelectProvider } from "../../../chat/favorites/favorite-select-context";
+import type { FavoriteCard } from "../../../chat/favorites/definition";
 import { Selector } from "./selector";
 import { ToolsButton } from "./tools-button";
 
@@ -60,7 +60,11 @@ export interface WidgetChatInputProps {
   onSubmit: () => void;
   isSubmitting: boolean;
   enabledTools?: EnabledTool[] | null;
-  advancedContent?: ReactNode;
+  /**
+   * Extra buttons rendered inline in the left controls group (after tools button).
+   * Use for popover triggers (instructions, pre-calls, etc.) — keeps the toolbar flat.
+   */
+  extraButtons?: ReactNode;
   className?: string;
   /** Read-only mode (e.g. inside completed tool call results) */
   disabled?: boolean;
@@ -88,6 +92,12 @@ export interface WidgetChatInputProps {
    * Useful for "sent" state in single-turn widgets.
    */
   hideInputWhenSubmitting?: boolean;
+  /**
+   * When provided, favorite selection writes to the caller's local state instead of
+   * global chat settings. Wraps children in FavoriteSelectProvider.
+   * When absent, behavior is unchanged (global settings write).
+   */
+  onSelectFavorite?: (item: FavoriteCard) => void;
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
@@ -105,7 +115,7 @@ export function WidgetChatInput({
   onSubmit,
   isSubmitting,
   enabledTools,
-  advancedContent,
+  extraButtons,
   className,
   disabled = false,
   threadHref,
@@ -114,8 +124,8 @@ export function WidgetChatInput({
   micSlot,
   hideTools = false,
   hideInputWhenSubmitting = false,
+  onSelectFavorite,
 }: WidgetChatInputProps): JSX.Element {
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { t } = aiStreamScopedTranslation.scopedT(locale);
   const isInactive = disabled || isSubmitting;
@@ -126,6 +136,11 @@ export function WidgetChatInput({
   const settingsCharRef = useRef(settings?.selectedSkill);
 
   useEffect(() => {
+    // When an onSelectFavorite override is active (e.g. ai-run), the form is driven
+    // by that callback — skip the global settings sync to avoid fighting it.
+    if (onSelectFavorite) {
+      return;
+    }
     if (
       settings?.selectedModel &&
       settings.selectedModel !== settingsModelRef.current
@@ -141,6 +156,7 @@ export function WidgetChatInput({
       onSkillChange(settings.selectedSkill);
     }
   }, [
+    onSelectFavorite,
     settings?.selectedModel,
     settings?.selectedSkill,
     onModelChange,
@@ -164,13 +180,13 @@ export function WidgetChatInput({
   const modelSupportsTools = currentModel?.supportsTools ?? false;
   const canSubmit = content.trim().length > 0 && !isInactive;
 
-  return (
+  const content_ = (
     <Div
       className={cn(
         "@container",
         "p-2 @sm:p-3 @md:p-4 backdrop-blur",
         "border border-border rounded-t-lg",
-        "bg-primary/70",
+        "bg-primary/10",
         className,
       )}
     >
@@ -245,23 +261,7 @@ export function WidgetChatInput({
             />
           )}
 
-          {/* Advanced toggle */}
-          {advancedContent && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2 text-xs text-muted-foreground"
-              onClick={() => setShowAdvanced((v) => !v)}
-            >
-              {showAdvanced ? (
-                <ChevronDown className="h-3.5 w-3.5" />
-              ) : (
-                <ChevronRight className="h-3.5 w-3.5" />
-              )}
-              <Span className="hidden @md:inline ml-1">Advanced</Span>
-            </Button>
-          )}
+          {extraButtons}
         </Div>
 
         {/* Right: mic slot + Go-to-thread (disabled) / Send / Stop */}
@@ -329,13 +329,20 @@ export function WidgetChatInput({
             </TooltipProvider>
           ))}
       </Div>
-
-      {/* Advanced section */}
-      {showAdvanced && advancedContent && (
-        <Div className="border-t mt-3 pt-3 flex flex-col gap-3">
-          {advancedContent}
-        </Div>
-      )}
     </Div>
   );
+
+  if (onSelectFavorite) {
+    return (
+      <FavoriteSelectProvider
+        onSelectFavorite={onSelectFavorite}
+        activeSkillId={skillId}
+        activeModelId={modelId ?? null}
+      >
+        {content_}
+      </FavoriteSelectProvider>
+    );
+  }
+
+  return content_;
 }

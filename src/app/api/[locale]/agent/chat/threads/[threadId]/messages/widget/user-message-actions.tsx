@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
@@ -8,6 +7,7 @@ import { Square } from "next-vibe-ui/ui/icons/Square";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
 import { X } from "next-vibe-ui/ui/icons/X";
+import { cn } from "next-vibe/shared/utils";
 import type React from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -17,7 +17,7 @@ import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
@@ -30,7 +30,6 @@ interface UserMessageActionsProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
   user: JwtPayloadType;
-  deductCredits: ((creditCost: number, feature: string) => void) | null;
   onBranch?: (messageId: string) => void;
   onRetry?: (message: ChatMessage) => Promise<void>;
   rootFolderId?: DefaultFolderId;
@@ -42,7 +41,6 @@ export function UserMessageActions({
   locale,
   logger,
   user,
-  deductCredits,
   onBranch,
   onRetry,
   rootFolderId,
@@ -72,11 +70,6 @@ export function UserMessageActions({
     user,
     logger,
     messageId: message.id,
-    deductCredits:
-      deductCredits ??
-      ((): void => {
-        /* no-op */
-      }),
   });
 
   const handleDelete = (): void => {

@@ -6,21 +6,18 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H3, H4 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { useWidgetLocale } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetLocale,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import type { ModelPricesGetResponseOutput } from "./definition";
+import type definition from "./definition";
 import { scopedTranslation } from "./i18n";
 
-interface CustomWidgetProps {
-  field: {
-    value: ModelPricesGetResponseOutput | null | undefined;
-  };
-}
-
-export function ModelPricesWidget({ field }: CustomWidgetProps): JSX.Element {
+export function ModelPricesWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
-  const value = field.value;
+  const value = useWidgetValue<typeof definition.GET>();
 
   if (!value) {
     return <Div />;

@@ -7,19 +7,12 @@
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 
+import { useWidgetValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+
 import type definition from "./definition";
-import type { TestResponseOutput } from "./definition";
 
-interface CustomWidgetProps {
-  field: {
-    value: TestResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
-}
-
-export function TestResultWidget({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
-  const value = field.value;
+export function TestResultWidget(): React.JSX.Element {
+  const value = useWidgetValue<typeof definition.POST>();
   if (!value) {
     return <Div />;
   }

@@ -30,18 +30,15 @@ import {
   useWidgetForm,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
 
 import type definition from "./definition";
 
-type PostResponseOutput = typeof definition.POST.types.ResponseOutput;
-
 interface HaltAllWidgetProps {
-  field: {
-    value: PostResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 export function HaltAllWidget({
@@ -53,7 +50,7 @@ export function HaltAllWidget({
   const form = useWidgetForm<typeof definition.POST>();
   const onSubmit = useWidgetOnSubmit();
   const isSubmitting = endpointMutations?.create?.isSubmitting;
-  const response = field.value;
+  const response = useWidgetValue<typeof definition.POST>();
 
   return (
     <Div className="flex flex-col gap-3 p-4 border-destructive/30">

@@ -3,8 +3,10 @@
 /**
  * WebSocket Client Hook
  *
- * Low-level hook for connecting to the WebSocket server.
- * Handles connection, reconnection, and message dispatching.
+ * One WebSocket per browser tab. All channel subscriptions are virtual:
+ * the client sends {type:"subscribe", channel} / {type:"unsubscribe", channel}
+ * messages to the server, which filters broadcasts accordingly.
+ *
  * Auth is handled via httpOnly cookies (sent automatically on same-origin).
  *
  * Most consumers should use `useWidgetEvents` instead, which adds
@@ -13,10 +15,15 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { EventHandler, WsWireMessage } from "./types";
+import type {
+  EventHandler,
+  WsClientMessage,
+  WsWireFrame,
+  WsWireMessage,
+} from "./types";
 
 // ============================================================================
-// CONNECTION MANAGER (singleton per channel)
+// CONNECTION MANAGER (single shared connection, virtual channel routing)
 // ============================================================================
 
 /**
@@ -25,74 +32,90 @@ import type { EventHandler, WsWireMessage } from "./types";
  */
 type WireHandler = EventHandler<WsWireMessage["data"]>;
 
-interface ConnectionState {
-  ws: WebSocket | null;
+/**
+ * Per-channel subscription state.
+ * The physical WS connection is shared; this tracks virtual subscriptions.
+ */
+interface ChannelState {
   /** Event-specific handlers: event name → Set of handlers receiving msg.data */
   listeners: Map<string, Set<WireHandler>>;
   /** Wildcard handlers: receive the full WsWireMessage for lastEvent tracking */
   wildcardListeners: Set<EventHandler<WsWireMessage>>;
-  reconnectTimer: ReturnType<typeof setTimeout> | null;
-  reconnectAttempts: number;
-  /** Set to true by disconnectChannel to prevent handleClose from reconnecting */
-  destroyed: boolean;
 }
 
-const connections = new Map<string, ConnectionState>();
+// Shared connection state
+let sharedWs: WebSocket | null = null;
+let reconnectAttempts = 0;
 
-function getOrCreateConnection(channel: string): ConnectionState {
-  let state = connections.get(channel);
-  if (state) {
-    return state;
+// Connection state listeners — notified immediately on open/close
+const connectionListeners = new Set<(connected: boolean) => void>();
+
+function notifyConnectionState(connected: boolean): void {
+  for (const listener of connectionListeners) {
+    listener(connected);
   }
-
-  state = {
-    ws: null,
-    listeners: new Map(),
-    wildcardListeners: new Set(),
-    reconnectTimer: null,
-    reconnectAttempts: 0,
-    destroyed: false,
-  };
-  connections.set(channel, state);
-
-  connect(channel, state);
-  return state;
 }
 
-function connect(channel: string, state: ConnectionState): void {
-  if (state.ws?.readyState === WebSocket.OPEN) {
+// Virtual channel subscriptions: channel → ChannelState
+const channels = new Map<string, ChannelState>();
+
+function sendToServer(msg: WsClientMessage): void {
+  if (sharedWs?.readyState === WebSocket.OPEN) {
+    sharedWs.send(JSON.stringify(msg));
+  }
+}
+
+function connect(): void {
+  if (
+    sharedWs?.readyState === WebSocket.OPEN ||
+    sharedWs?.readyState === WebSocket.CONNECTING
+  ) {
     return;
   }
 
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  const params = new URLSearchParams({ channel });
-  // WS handler is on the same host/port as Next.js at path /ws
-  // (Bun proxy intercepts the upgrade before forwarding to Next.js)
-  const url = `${protocol}//${window.location.host}/ws?${params.toString()}`;
+  const url = `${protocol}//${window.location.host}/ws`;
 
   const ws = new WebSocket(url);
+  sharedWs = ws;
 
   const handleOpen = (): void => {
-    state.reconnectAttempts = 0;
+    reconnectAttempts = 0;
+    notifyConnectionState(true);
+    // Re-subscribe to all active channels after reconnect
+    for (const channel of channels.keys()) {
+      sendToServer({ type: "subscribe", channel });
+    }
   };
+
+  function dispatch(msg: WsWireMessage): void {
+    const channelState = channels.get(msg.channel);
+    if (!channelState) {
+      return;
+    }
+
+    const handlers = channelState.listeners.get(msg.event);
+    if (handlers) {
+      for (const handler of handlers) {
+        handler(msg.data);
+      }
+    }
+
+    // Notify wildcard listeners (for lastEvent tracking)
+    for (const handler of channelState.wildcardListeners) {
+      handler(msg);
+    }
+  }
 
   const handleMessage = (event: MessageEvent): void => {
     try {
-      const msg = JSON.parse(event.data as string) as WsWireMessage;
-      if (msg.channel !== channel) {
-        return;
-      }
-
-      const handlers = state.listeners.get(msg.event);
-      if (handlers) {
-        for (const handler of handlers) {
-          handler(msg.data);
+      const frame = JSON.parse(event.data as string) as WsWireFrame;
+      if ("type" in frame && frame.type === "batch") {
+        for (const msg of frame.events) {
+          dispatch(msg);
         }
-      }
-
-      // Notify wildcard listeners (for lastEvent tracking)
-      for (const handler of state.wildcardListeners) {
-        handler(msg);
+      } else {
+        dispatch(frame as WsWireMessage);
       }
     } catch {
       // Invalid JSON - ignore
@@ -100,15 +123,16 @@ function connect(channel: string, state: ConnectionState): void {
   };
 
   const handleClose = (): void => {
-    state.ws = null;
-    if (state.destroyed) {
+    sharedWs = null;
+    notifyConnectionState(false);
+    if (channels.size === 0) {
       return;
     }
     // Exponential backoff: 1s, 2s, 4s, 8s, max 30s
-    const delay = Math.min(1000 * Math.pow(2, state.reconnectAttempts), 30000);
-    state.reconnectAttempts++;
-    state.reconnectTimer = setTimeout(() => {
-      connect(channel, state);
+    const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+    reconnectAttempts++;
+    setTimeout(() => {
+      connect();
     }, delay);
   };
 
@@ -116,14 +140,51 @@ function connect(channel: string, state: ConnectionState): void {
   ws.addEventListener("message", handleMessage);
   ws.addEventListener("close", handleClose);
   // onerror is followed by onclose, which triggers reconnect
+}
 
-  state.ws = ws;
+function ensureConnected(): void {
+  if (
+    !sharedWs ||
+    sharedWs.readyState === WebSocket.CLOSED ||
+    sharedWs.readyState === WebSocket.CLOSING
+  ) {
+    connect();
+  }
+}
+
+function getOrCreateChannel(channel: string): ChannelState {
+  let state = channels.get(channel);
+  if (state) {
+    return state;
+  }
+
+  state = {
+    listeners: new Map(),
+    wildcardListeners: new Set(),
+  };
+  channels.set(channel, state);
+
+  ensureConnected();
+  sendToServer({ type: "subscribe", channel });
+  return state;
+}
+
+function removeChannelIfEmpty(channel: string): void {
+  const state = channels.get(channel);
+  if (!state) {
+    return;
+  }
+  if (state.listeners.size === 0 && state.wildcardListeners.size === 0) {
+    channels.delete(channel);
+    sendToServer({ type: "unsubscribe", channel });
+  }
 }
 
 function addListener(
-  state: ConnectionState,
+  state: ChannelState,
   event: string,
   handler: WireHandler,
+  channel: string,
 ): () => void {
   let handlers = state.listeners.get(event);
   if (!handlers) {
@@ -137,17 +198,20 @@ function addListener(
     if (handlers.size === 0) {
       state.listeners.delete(event);
     }
+    removeChannelIfEmpty(channel);
   };
 }
 
 function addWildcardListener(
-  state: ConnectionState,
+  state: ChannelState,
   handler: EventHandler<WsWireMessage>,
+  channel: string,
 ): () => void {
   state.wildcardListeners.add(handler);
 
   return (): void => {
     state.wildcardListeners.delete(handler);
+    removeChannelIfEmpty(channel);
   };
 }
 
@@ -164,10 +228,10 @@ export function subscribeToChannel<T extends WsWireMessage["data"]>(
   event: string,
   handler: EventHandler<T>,
 ): () => void {
-  const state = getOrCreateConnection(channel);
+  const state = getOrCreateChannel(channel);
   // Caller's generic T narrows the wire data - safe since the WS protocol
   // guarantees the event name correlates with the correct payload shape.
-  return addListener(state, event, handler as WireHandler);
+  return addListener(state, event, handler as WireHandler, channel);
 }
 
 /**
@@ -177,30 +241,23 @@ export function subscribeToChannel<T extends WsWireMessage["data"]>(
  * Safe to call multiple times - returns existing connection if already open.
  */
 export function preWarmChannel(channel: string): void {
-  getOrCreateConnection(channel);
+  getOrCreateChannel(channel);
 }
 
 /**
- * Disconnect and remove a channel connection entirely.
+ * Unsubscribe from a channel and remove all its local listeners.
+ * The shared WS connection is kept open for other channels.
  * Safe to call even if the channel doesn't exist.
  */
 export function disconnectChannel(channel: string): void {
-  const state = connections.get(channel);
+  const state = channels.get(channel);
   if (!state) {
     return;
   }
-  state.destroyed = true;
-  if (state.reconnectTimer) {
-    clearTimeout(state.reconnectTimer);
-    state.reconnectTimer = null;
-  }
-  if (state.ws) {
-    state.ws.close();
-    state.ws = null;
-  }
   state.listeners.clear();
   state.wildcardListeners.clear();
-  connections.delete(channel);
+  channels.delete(channel);
+  sendToServer({ type: "unsubscribe", channel });
 }
 
 // ============================================================================
@@ -223,43 +280,52 @@ export interface UseWebSocketReturn {
  * @param channel - Channel to subscribe to (e.g. "agent/chat/threads/{threadId}/messages")
  */
 export function useWebSocket(channel: string | null): UseWebSocketReturn {
-  const [connected, setConnected] = useState(false);
+  const [connected, setConnected] = useState(
+    () => sharedWs?.readyState === WebSocket.OPEN,
+  );
   const [lastEvent, setLastEvent] = useState<WsWireMessage | null>(null);
-  const stateRef = useRef<ConnectionState | null>(null);
+  const channelRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!channel) {
       return;
     }
 
-    const state = getOrCreateConnection(channel);
-    stateRef.current = state;
+    channelRef.current = channel;
+    const state = getOrCreateChannel(channel);
 
-    // Track connection state
-    const checkConnection = setInterval(() => {
-      setConnected(state.ws?.readyState === WebSocket.OPEN);
-    }, 500);
+    // Sync initial state (connection may already be open before mount)
+    setConnected(sharedWs?.readyState === WebSocket.OPEN);
+
+    // Track connection state via event-driven listeners (no polling)
+    connectionListeners.add(setConnected);
 
     // Track last event via wildcard listener - receives full WsWireMessage
-    const unsub = addWildcardListener(state, (msg: WsWireMessage) => {
-      setLastEvent(msg);
-    });
+    const unsub = addWildcardListener(
+      state,
+      (msg: WsWireMessage) => {
+        setLastEvent(msg);
+      },
+      channel,
+    );
 
     return (): void => {
-      clearInterval(checkConnection);
+      connectionListeners.delete(setConnected);
       unsub();
     };
   }, [channel]);
 
   const on = useCallback(
     (event: string, handler: WireHandler): (() => void) => {
-      if (!stateRef.current) {
+      const ch = channelRef.current;
+      if (!ch) {
         // oxlint-disable-next-line no-empty-function
         return (): void => {
           /* noop */
         };
       }
-      return addListener(stateRef.current, event, handler);
+      const state = getOrCreateChannel(ch);
+      return addListener(state, event, handler, ch);
     },
     [],
   );

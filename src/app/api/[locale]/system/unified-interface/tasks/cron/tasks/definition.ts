@@ -26,7 +26,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import {
   CronTaskEnabledFilter,
   CronTaskEnabledFilterDB,
@@ -45,59 +45,13 @@ import {
   TaskOutputModeDB,
   TaskOutputModeOptions,
 } from "../../enum";
-import { taskInputSchema } from "../db";
+import { taskInputSchema, taskOwnerSchema } from "../db";
 import { CRON_CREATE_ALIAS, CRON_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-const CronTasksContainer = lazyCliWidget(() =>
+const CronTasksContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CronTasksContainer })),
 );
-
-/** Reusable task response shape - keep in sync with CronTaskResponse in repository.ts */
-export const cronTaskResponseSchema = z.object({
-  id: z.string(),
-  shortId: z.string(),
-  routeId: z.string(),
-  displayName: z.string(),
-  description: z.string().nullable(),
-  version: z.string(),
-  category: z.enum(TaskCategoryDB),
-  schedule: z.string(),
-  timezone: z.string().nullable(),
-  enabled: z.boolean(),
-  hidden: z.boolean(),
-  priority: z.enum(CronTaskPriorityDB),
-  timeout: z.number().nullable(),
-  retries: z.number().nullable(),
-  retryDelay: z.number().nullable(),
-  taskInput: taskInputSchema.optional().default({}),
-  runOnce: z.boolean(),
-  outputMode: z.enum(TaskOutputModeDB),
-  notificationTargets: z
-    .array(
-      z.object({
-        type: z.enum(["email", "sms", "webhook"]),
-        target: z.string(),
-      }),
-    )
-    .optional()
-    .default([]),
-  lastExecutedAt: z.string().nullable(),
-  lastExecutionStatus: z.enum(CronTaskStatusDB).nullable(),
-  lastExecutionError: z.string().nullable(),
-  lastExecutionDuration: z.number().nullable(),
-  nextExecutionAt: z.string().nullable(),
-  executionCount: z.number(),
-  successCount: z.number(),
-  errorCount: z.number(),
-  averageExecutionTime: z.number().nullable(),
-  consecutiveFailures: z.number(),
-  targetInstance: z.string().nullable(),
-  tags: z.array(z.string()).optional().default([]),
-  userId: z.string().nullable(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
 
 /**
  * GET /cron/tasks - List cron tasks
@@ -309,10 +263,10 @@ const { GET } = createEndpoint({
               content: "get.response.task.outputMode",
               schema: z.enum(TaskOutputModeDB),
             }),
-            userId: responseField(scopedTranslation, {
+            owner: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.userId",
-              schema: z.string().nullable(),
+              content: "get.response.task.owner",
+              schema: taskOwnerSchema,
             }),
             lastExecutedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -363,6 +317,39 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               content: "get.response.task.averageExecutionTime",
               schema: z.number().nullable(),
+            }),
+            taskInput: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.taskInput",
+              schema: taskInputSchema.optional().default({}),
+            }),
+            runOnce: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.runOnce",
+              schema: z.boolean(),
+            }),
+            notificationTargets: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.notificationTargets",
+              schema: z
+                .array(
+                  z.object({
+                    type: z.enum(["email", "sms", "webhook"]),
+                    target: z.string(),
+                  }),
+                )
+                .optional()
+                .default([]),
+            }),
+            targetInstance: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.targetInstance",
+              schema: z.string().nullable(),
+            }),
+            tags: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.tags",
+              schema: z.array(z.string()).optional().default([]),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -648,10 +635,192 @@ const { POST } = createEndpoint({
       }),
 
       // Response - return the created task
-      task: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "post.response.task.title",
-        schema: cronTaskResponseSchema,
+      task: objectField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.response.task.title",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          id: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.id",
+            schema: z.string(),
+          }),
+          shortId: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.shortId",
+            schema: z.string(),
+          }),
+          routeId: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.routeId",
+            schema: z.string(),
+          }),
+          displayName: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.displayName",
+            schema: z.string(),
+          }),
+          description: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.taskDescription",
+            schema: z.string().nullable(),
+          }),
+          version: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.version",
+            schema: z.string(),
+          }),
+          category: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.category",
+            schema: z.enum(TaskCategoryDB),
+          }),
+          schedule: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.schedule",
+            schema: z.string(),
+          }),
+          timezone: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.timezone",
+            schema: z.string().nullable(),
+          }),
+          enabled: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.enabled",
+            schema: z.boolean(),
+          }),
+          hidden: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.hidden",
+            schema: z.boolean(),
+          }),
+          priority: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.priority",
+            schema: z.enum(CronTaskPriorityDB),
+          }),
+          timeout: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.timeout",
+            schema: z.number().nullable(),
+          }),
+          retries: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.retries",
+            schema: z.number().nullable(),
+          }),
+          retryDelay: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.retryDelay",
+            schema: z.number().nullable(),
+          }),
+          taskInput: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.taskInput",
+            schema: taskInputSchema.optional().default({}),
+          }),
+          runOnce: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.runOnce",
+            schema: z.boolean(),
+          }),
+          outputMode: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.outputMode",
+            schema: z.enum(TaskOutputModeDB),
+          }),
+          notificationTargets: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.notificationTargets",
+            schema: z
+              .array(
+                z.object({
+                  type: z.enum(["email", "sms", "webhook"]),
+                  target: z.string(),
+                }),
+              )
+              .optional()
+              .default([]),
+          }),
+          lastExecutedAt: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.lastExecutedAt",
+            schema: z.string().nullable(),
+          }),
+          lastExecutionStatus: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.lastExecutionStatus",
+            schema: z.enum(CronTaskStatusDB).nullable(),
+          }),
+          lastExecutionError: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.lastExecutionError",
+            schema: z.string().nullable(),
+          }),
+          lastExecutionDuration: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.lastExecutionDuration",
+            schema: z.number().nullable(),
+          }),
+          nextExecutionAt: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.nextExecutionAt",
+            schema: z.string().nullable(),
+          }),
+          executionCount: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.executionCount",
+            schema: z.number(),
+          }),
+          successCount: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.successCount",
+            schema: z.number(),
+          }),
+          errorCount: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.errorCount",
+            schema: z.number(),
+          }),
+          averageExecutionTime: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.averageExecutionTime",
+            schema: z.number().nullable(),
+          }),
+          consecutiveFailures: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.consecutiveFailures",
+            schema: z.number(),
+          }),
+          targetInstance: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.targetInstance",
+            schema: z.string().nullable(),
+          }),
+          tags: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.tags",
+            schema: z.array(z.string()).optional().default([]),
+          }),
+          owner: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.owner",
+            schema: taskOwnerSchema,
+          }),
+          createdAt: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.createdAt",
+            schema: z.string(),
+          }),
+          updatedAt: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "post.response.task.updatedAt",
+            schema: z.string(),
+          }),
+        },
       }),
     },
   }),
@@ -772,7 +941,7 @@ const { POST } = createEndpoint({
           consecutiveFailures: 0,
           targetInstance: null,
           tags: [],
-          userId: null,
+          owner: { type: "system" },
           createdAt: "2024-01-15T10:00:00.000Z",
           updatedAt: "2024-01-15T10:00:00.000Z",
         },
@@ -796,8 +965,8 @@ export type CronTaskCreateRequestOutput = typeof POST.types.RequestOutput;
 export type CronTaskCreateResponseInput = typeof POST.types.ResponseInput;
 export type CronTaskCreateResponseOutput = typeof POST.types.ResponseOutput;
 
-// Individual task type - derived from canonical schema (includes all fields)
-export type CronTaskResponseType = z.infer<typeof cronTaskResponseSchema>;
+// Individual task type - derived from the GET list response items
+export type CronTaskResponseType = CronTaskListResponseOutput["tasks"][number];
 
 export type CronTaskItem = Pick<
   CronTaskResponseType,

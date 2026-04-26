@@ -31,7 +31,7 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useLogger } from "@/hooks/use-logger";
 import { CRON_SCHEDULES } from "@/app/api/[locale]/system/unified-interface/tasks/constants";
 import { formatCronScheduleShort } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -70,7 +70,7 @@ export function ScheduleAutocomplete({
   const [isCustomValue, setIsCustomValue] = useState(false);
 
   const timezone = getDefaultTimezone(locale);
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = useLogger();
 
   // Generate unique ID for aria-controls
   const popoverId = React.useId();

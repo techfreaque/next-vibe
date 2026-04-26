@@ -15,13 +15,13 @@
  */
 
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 import { getFullPath } from "./path";
 
 export interface SplitArgsResult {
-  urlPathParams: CliRequestData;
-  data: CliRequestData;
+  urlPathParams: Record<string, WidgetData>;
+  data: Record<string, WidgetData>;
 }
 
 /**
@@ -33,7 +33,7 @@ export interface SplitArgsResult {
  */
 export async function splitArgs(
   toolName: string,
-  mergedArgs: CliRequestData,
+  mergedArgs: Record<string, WidgetData>,
 ): Promise<SplitArgsResult> {
   const path = getFullPath(toolName);
   if (path === null) {
@@ -47,15 +47,15 @@ export async function splitArgs(
 
   const urlParseResult =
     definition.requestUrlPathParamsSchema.safeParse(mergedArgs);
-  const urlPathParams: CliRequestData = urlParseResult.success
-    ? (urlParseResult.data as CliRequestData)
+  const urlPathParams: Record<string, WidgetData> = urlParseResult.success
+    ? (urlParseResult.data as Record<string, WidgetData>)
     : {};
 
   const urlKeySet = new Set(Object.keys(urlPathParams));
-  const data: CliRequestData = {};
+  const data: Record<string, WidgetData> = {};
   for (const [key, value] of Object.entries(mergedArgs)) {
     if (!urlKeySet.has(key)) {
-      data[key] = value as CliRequestData[string];
+      data[key] = value;
     }
   }
 

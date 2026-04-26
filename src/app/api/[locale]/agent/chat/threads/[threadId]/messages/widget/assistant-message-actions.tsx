@@ -14,21 +14,22 @@ import { cn } from "next-vibe/shared/utils";
 import React from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import {
   prepareTextForTTS,
   stripThinkTags,
 } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
+import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { useMessageItem } from "../hooks/use-message-item";
 import { scopedTranslation } from "../i18n";
+import type messagesDefinition from "../definition";
+import { useWidgetItem } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
 import { MessageActionButton } from "./message-action-button";
@@ -58,8 +59,6 @@ interface AssistantMessageActionsProps {
   ttsAutoplay: boolean;
   /** TTS voice preference */
   voiceId: TtsModelId | undefined;
-  /** Credit deduction callback (null in read-only mode) */
-  deductCredits: ((creditCost: number, feature: string) => void) | null;
   /** Vote callback - null when voting is not available */
   onVote: ((messageId: string, vote: 1 | -1 | 0) => Promise<void>) | null;
   userVote: "up" | "down" | null;
@@ -98,7 +97,6 @@ export function AssistantMessageActions({
   user,
   ttsAutoplay,
   voiceId,
-  deductCredits,
   onVote,
   userVote,
   voteScore,
@@ -122,8 +120,12 @@ export function AssistantMessageActions({
     })();
   };
 
-  // Check if this message is currently streaming via per-item cache (O(1) per delta)
-  const liveMessage = useMessageItem(messageId);
+  // Check if this message is currently streaming
+  const liveMessage = useWidgetItem<typeof messagesDefinition.GET>()(
+    (d) => d?.messages ?? [],
+    (m) => m.id,
+    messageId,
+  );
   const isMessageStreaming = liveMessage?.metadata?.isStreaming ?? false;
 
   // Prepare content for TTS (strip think tags, markdown, convert line breaks)
@@ -146,11 +148,6 @@ export function AssistantMessageActions({
     user,
     logger,
     messageId,
-    deductCredits:
-      deductCredits ??
-      ((): void => {
-        /* no-op in read-only mode */
-      }),
   });
 
   // Calculate TTS credit cost based on text length

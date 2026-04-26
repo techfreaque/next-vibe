@@ -23,24 +23,16 @@ import React, { useCallback } from "react";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type endpoints from "./definition";
-import type { LinuxUsersListResponseOutput } from "./definition";
 
-interface WidgetProps {
-  field: {
-    value: LinuxUsersListResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
-}
-
-export function LinuxUsersListContainer({
-  field,
-}: WidgetProps): React.JSX.Element {
+export function LinuxUsersListContainer(): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const navigation = useWidgetNavigation();
-  const value = field.value;
-  const isLoading = value === null || value === undefined;
+  const value = useWidgetValue<typeof endpoints.GET>();
+  const isLoading = value === undefined;
   const users = value?.users ?? [];
 
   const handleCreate = useCallback((): void => {

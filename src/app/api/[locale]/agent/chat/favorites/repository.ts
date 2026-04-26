@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { asc, eq, inArray } from "drizzle-orm";
+import { asc, eq, inArray, or } from "drizzle-orm";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -252,12 +252,33 @@ export class ChatFavoritesRepository {
       if (customSkillIds.length > 0) {
         const { customSkills: customSkillsTable } =
           await import("../skills/db");
+        // Postgres UUID column rejects non-UUID strings — separate UUIDs from slugs
+        const UUID_RE =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const uuidIds = customSkillIds.filter((id) => UUID_RE.test(id));
+        const slugIds = customSkillIds.filter((id) => !UUID_RE.test(id));
+        const condition =
+          uuidIds.length > 0 && slugIds.length > 0
+            ? or(
+                inArray(customSkillsTable.id, uuidIds),
+                inArray(customSkillsTable.slug, slugIds),
+              )
+            : uuidIds.length > 0
+              ? inArray(customSkillsTable.id, uuidIds)
+              : inArray(customSkillsTable.slug, slugIds);
         const customSkillsList = await db
-          .select({ id: customSkillsTable.id, name: customSkillsTable.name })
+          .select({
+            id: customSkillsTable.id,
+            slug: customSkillsTable.slug,
+            name: customSkillsTable.name,
+          })
           .from(customSkillsTable)
-          .where(inArray(customSkillsTable.id, customSkillIds));
+          .where(condition);
         for (const s of customSkillsList) {
           skillNameMap.set(s.id, s.name);
+          if (s.slug) {
+            skillNameMap.set(s.slug, s.name);
+          }
         }
       }
 
@@ -348,12 +369,33 @@ export class ChatFavoritesRepository {
       .filter((id) => id !== NO_SKILL_ID && !skillNameMap.has(id));
     if (customSkillIds.length > 0) {
       const { customSkills: customSkillsTable } = await import("../skills/db");
+      // Postgres UUID column rejects non-UUID strings — separate UUIDs from slugs
+      const UUID_RE =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const uuidIds = customSkillIds.filter((id) => UUID_RE.test(id));
+      const slugIds = customSkillIds.filter((id) => !UUID_RE.test(id));
+      const condition =
+        uuidIds.length > 0 && slugIds.length > 0
+          ? or(
+              inArray(customSkillsTable.id, uuidIds),
+              inArray(customSkillsTable.slug, slugIds),
+            )
+          : uuidIds.length > 0
+            ? inArray(customSkillsTable.id, uuidIds)
+            : inArray(customSkillsTable.slug, slugIds);
       const customSkillsList = await db
-        .select({ id: customSkillsTable.id, name: customSkillsTable.name })
+        .select({
+          id: customSkillsTable.id,
+          slug: customSkillsTable.slug,
+          name: customSkillsTable.name,
+        })
         .from(customSkillsTable)
-        .where(inArray(customSkillsTable.id, customSkillIds));
+        .where(condition);
       for (const s of customSkillsList) {
         skillNameMap.set(s.id, s.name);
+        if (s.slug) {
+          skillNameMap.set(s.slug, s.name);
+        }
       }
     }
 

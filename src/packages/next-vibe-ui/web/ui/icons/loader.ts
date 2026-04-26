@@ -529,6 +529,8 @@ export async function loadIconModule(name: string): Promise<IconModule> {
       return import("./Tv") as Promise<IconModule>;
     case "Twitter":
       return import("./Twitter") as Promise<IconModule>;
+    case "TayLogo":
+      return import("./TayLogo") as Promise<IconModule>;
     case "Type":
       return import("./Type") as Promise<IconModule>;
     case "UncensoredAILogo":

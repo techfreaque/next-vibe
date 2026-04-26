@@ -13,11 +13,9 @@ export const { POST, tools } = endpointsHandler({
   endpoint: hoverEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, user, request }) =>
+    handler: ({ data, t, logger }) =>
       BrowserSharedRepository.executeMCPTool(
         {
-          sessionId:
-            request?.headers.get("authorization") ?? user.id ?? user.leadId,
           toolName: BrowserTool.HOVER,
           args: BrowserSharedRepository.filterUndefinedArgs({
             uid: data.uid,

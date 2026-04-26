@@ -116,6 +116,8 @@ export interface ApiQueryReturn<TResponse> {
    * @deprecated Use response property instead
    */
   setErrorType: (error: ErrorResponseType | null) => void;
+  /** The React Query cache key string used for this query. */
+  cacheKey: string;
 }
 
 /**
@@ -202,6 +204,8 @@ export interface ApiQueryFormReturn<
   TResponse,
   TUrlVariables,
 > extends ApiFormReturn<TRequest, TResponse, TUrlVariables> {
+  /** The React Query cache key string used for this query. */
+  cacheKey: string;
   // Query-specific properties - backward compatibility
   /** @deprecated Use response.success and response.data instead */
   data: TResponse | undefined;

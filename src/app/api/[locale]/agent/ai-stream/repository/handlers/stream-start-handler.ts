@@ -13,6 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";
 import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
+import type { EmitThreadTitleFn } from "../core/message-db-writer";
 import type { StreamContext } from "../core/stream-context";
 import { StreamContextInitializer } from "../core/stream-context-initializer";
 import {
@@ -66,7 +67,8 @@ export class StreamStartHandler {
     locale: CountryLanguage;
     user: JwtPayloadType;
     logger: EndpointLogger;
-    wsEmit?: WsEmitCallback | null;
+    wsEmit: WsEmitCallback;
+    emitTitle: EmitThreadTitleFn;
     /** Force a specific sequenceId - used by wakeUp revival to share sequence with deferred tool pair */
     sequenceIdOverride?: string;
   }): {
@@ -89,6 +91,7 @@ export class StreamStartHandler {
       user,
       logger,
       wsEmit,
+      emitTitle,
       sequenceIdOverride,
     } = params;
 
@@ -102,6 +105,7 @@ export class StreamStartHandler {
       logger,
       locale,
       wsEmit,
+      emitTitle,
       sequenceIdOverride,
     });
 

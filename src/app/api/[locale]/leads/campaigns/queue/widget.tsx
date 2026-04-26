@@ -17,17 +17,10 @@ import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type definition from "./definition";
-
-type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
-
-interface CustomWidgetProps {
-  field: {
-    value: GetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
 
 // ── Date formatter ────────────────────────────────────────────────────────────
 
@@ -97,7 +90,7 @@ function Badge({
 
 // ── Lead card (responsive mobile view) ────────────────────────────────────────
 
-type QueueItem = GetResponseOutput["items"][number];
+type QueueItem = (typeof definition.GET.types.ResponseOutput)["items"][number];
 type QueueTranslation = ReturnType<
   typeof useWidgetTranslation<typeof definition.GET>
 >;
@@ -179,12 +172,10 @@ function LeadCard({
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export function CampaignQueueWidget({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
+export function CampaignQueueWidget(): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
   const t = useWidgetTranslation<typeof definition.GET>();
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.GET>();
 
   const items = data?.items ?? [];
 

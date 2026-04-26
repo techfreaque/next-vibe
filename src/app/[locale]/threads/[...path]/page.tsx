@@ -55,7 +55,7 @@ import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/defini
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { scopedTranslation as userScopedTranslation } from "@/app/api/[locale]/user/i18n";

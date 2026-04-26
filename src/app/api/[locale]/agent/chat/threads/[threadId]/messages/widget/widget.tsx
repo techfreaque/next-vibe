@@ -16,27 +16,16 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { useMessagesSubscription } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-messages-subscription";
 import {
-  useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetSelector,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import type definitions from "../definition";
-import type { MessageListResponseOutput } from "../definition";
+import type definition from "../definition";
 import { LinearMessageView } from "./linear-view/view";
 import { ChatMessages } from "./messages";
-
-/**
- * Props for custom widget - matches the customWidgetObject pattern
- */
-interface MessagesWidgetProps {
-  field: {
-    value: MessageListResponseOutput | null | undefined;
-  } & (typeof definitions.GET)["fields"];
-}
 
 /**
  * Messages Widget Container
@@ -47,20 +36,20 @@ interface MessagesWidgetProps {
  *
  * When rendered standalone (ai-stream/run embeds): renders a read-only LinearMessageView.
  */
-export const MessagesWidget = React.memo(function MessagesWidget({
-  field,
-}: MessagesWidgetProps): React.JSX.Element {
-  const bootContext = useContext(ChatBootContext);
-  const isEmbedded = useChatNavigationStore((s) => s.isEmbedded);
+export const MessagesWidget = React.memo(
+  function MessagesWidget(): React.JSX.Element {
+    const bootContext = useContext(ChatBootContext);
+    const isEmbedded = useChatNavigationStore((s) => s.isEmbedded);
 
-  // Interactive mode: inside a ChatBootProvider and not an embedded read-only view
-  if (bootContext && !isEmbedded) {
-    return <InteractiveMessages />;
-  }
+    // Interactive mode: inside a ChatBootProvider and not an embedded read-only view
+    if (bootContext && !isEmbedded) {
+      return <InteractiveMessages />;
+    }
 
-  // Read-only mode: standalone embed or no ChatBootProvider
-  return <ReadOnlyMessages field={field} />;
-});
+    // Read-only mode: standalone embed or no ChatBootProvider
+    return <ReadOnlyMessages />;
+  },
+);
 
 /**
  * Interactive messages - renders the full ChatMessages component.
@@ -74,39 +63,29 @@ function InteractiveMessages(): React.JSX.Element {
  * Read-only messages - renders LinearMessageView with all callbacks null.
  * Used by ai-stream/run embeds where no ChatBootProvider exists.
  */
-function ReadOnlyMessages({
-  field,
-}: {
-  field: { value: MessageListResponseOutput | null | undefined };
-}): React.JSX.Element {
+function ReadOnlyMessages(): React.JSX.Element {
   const locale = useWidgetLocale();
-  const form = useWidgetForm<typeof definitions.GET>();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
-  const threadId = form.watch("threadId");
-  const rootFolderId = form.watch("rootFolderId");
 
-  useMessagesSubscription(threadId ?? null, rootFolderId, null, logger);
+  // Subscribe only to the messages array — re-renders when messages change,
+  // NOT when streamingState or backgroundTasks change.
+  const rawMessages = useWidgetSelector<typeof definition.GET>()(
+    (d) => d?.messages || [],
+  );
 
   const messages: ChatMessage[] = useMemo(() => {
-    const raw = field.value?.messages;
-    if (!raw || raw.length === 0) {
+    if (rawMessages.length === 0) {
       return [];
     }
-
-    return raw.map((msg) => {
+    return rawMessages.map((msg) => {
       const createdAt =
         msg.createdAt instanceof Date ? msg.createdAt : new Date(msg.createdAt);
       const updatedAt =
         msg.updatedAt instanceof Date ? msg.updatedAt : new Date(msg.updatedAt);
-      return {
-        ...msg,
-        authorName: null,
-        createdAt,
-        updatedAt,
-      } as ChatMessage;
+      return { ...msg, authorName: null, createdAt, updatedAt };
     });
-  }, [field.value?.messages]);
+  }, [rawMessages]);
 
   const emptyBranchIndices = useMemo(() => ({}), []);
   const { path, branchInfo } = useMemo(
@@ -150,7 +129,6 @@ function ReadOnlyMessages({
         selectedSkill={null}
         selectedModel={null}
         sendMessage={null}
-        deductCredits={null}
         onLoadNewerHistory={null}
         isLoadingNewerHistory={false}
         onVoteMessage={null}

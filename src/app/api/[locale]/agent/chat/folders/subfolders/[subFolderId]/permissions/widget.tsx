@@ -17,31 +17,29 @@ import {
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/react";
+import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/widget";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
 import type definition from "./definition";
-import type { FolderPermissionsGetResponseOutput } from "./definition";
 import type { FolderPermissionsTranslationKey } from "./i18n";
+
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
 /**
  * Props for custom widget
  */
 interface CustomWidgetProps {
-  field: {
-    value: FolderPermissionsGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
-
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
 /**
  * Permission section configuration
  */
 interface PermissionSection {
-  key: keyof FolderPermissionsGetResponseOutput;
+  key: keyof (typeof definition.GET)["types"]["ResponseOutput"];
   icon: IconKey;
   labelKey: FolderPermissionsTranslationKey;
   descriptionKey: FolderPermissionsTranslationKey;
@@ -58,8 +56,9 @@ export function FolderPermissionsContainer({
   const navigation = useWidgetNavigation();
   const logger = useWidgetLogger();
   const form = useWidgetForm<typeof definition.GET>();
+  const fieldValue = useWidgetValue<typeof definition.GET>();
 
-  if (!field.value) {
+  if (!fieldValue) {
     return (
       <Div className="flex items-center justify-center p-8 text-muted-foreground">
         <Span>{t("get.noData")}</Span>
@@ -160,7 +159,7 @@ export function FolderPermissionsContainer({
       <Div className="px-6 pb-6">
         <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {permissionSections.map((section) => {
-            const rolesArray = field.value?.[section.key];
+            const rolesArray = fieldValue?.[section.key];
             const hasRoles = rolesArray && rolesArray.length > 0;
 
             return (

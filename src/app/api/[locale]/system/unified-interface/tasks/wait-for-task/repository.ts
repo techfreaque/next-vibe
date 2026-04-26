@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import { and, desc, eq, sql } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -24,11 +24,11 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { CallbackMode } from "../../ai/execute-tool/constants";
 import { cronTaskExecutions, cronTasks } from "../cron/db";
 import { CronTaskStatus } from "../enum";
 import type { TasksT } from "../i18n";
-import type { JsonValue } from "../unified-runner/types";
 import type {
   WaitForTaskRequestOutput,
   WaitForTaskResponseOutput,
@@ -69,88 +69,23 @@ export class WaitForTaskRepository {
         }
       }
 
-      // Thread-based fallback: if the exact taskId isn't found, look for the most
-      // recent completed detach task for this thread. This handles fixture replay
-      // where the LLM response hardcodes a stale taskId from a previous run —
-      // the real task was created with a different ID in the current run.
-      if (!task && streamContext?.threadId) {
-        const [recent] = await db
-          .select()
-          .from(cronTasks)
-          .where(
-            and(
-              eq(cronTasks.wakeUpThreadId, streamContext.threadId),
-              sql`${cronTasks.tags} @> '["detach","local"]'::jsonb`,
-            ),
-          )
-          .orderBy(desc(cronTasks.updatedAt))
-          .limit(1);
-        if (recent) {
-          logger.info(
-            "[WaitForTask] Exact taskId not found - falling back to most recent detach task for thread",
-            { requestedTaskId: taskId, foundTaskId: recent.id },
-          );
-          task = recent;
-          // Rebind taskId so all subsequent operations (UPDATE, DELETE, cleanup)
-          // target the real task row, not the stale ID the LLM hardcoded.
-          taskId = recent.id;
-        }
-      }
-
       if (!task) {
-        // Task not found - completed and cleaned up before wait-for-task was called.
-        // Try to recover the result from cron_task_executions (set by hermes cron runner).
-        logger.info(
-          "[WaitForTask] Task not found - already completed and cleaned up",
+        logger.error(
+          "[WaitForTask] Task not found - taskId does not exist in DB",
           { taskId },
         );
-        let notFoundResult: JsonValue | undefined;
-        try {
-          const [latestExec] = await db
-            .select({ result: cronTaskExecutions.result })
-            .from(cronTaskExecutions)
-            .where(eq(cronTaskExecutions.taskId, taskId))
-            .orderBy(desc(cronTaskExecutions.completedAt))
-            .limit(1);
-          if (latestExec?.result !== null && latestExec?.result !== undefined) {
-            notFoundResult = latestExec.result as JsonValue;
-          }
-        } catch (_execErr) {
-          // Non-fatal: execution row may also be gone
-        }
-        try {
-          await db
-            .delete(cronTasks)
-            .where(
-              sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = 'resume-stream'`,
-            );
-        } catch (cleanupErr) {
-          logger.warn("[WaitForTask] Revival cleanup failed (non-fatal)", {
-            taskId,
-            error:
-              cleanupErr instanceof Error
-                ? cleanupErr.message
-                : String(cleanupErr),
-          });
-        }
-        return success({
-          status: CronTaskStatus.COMPLETED,
-          result:
-            notFoundResult !== undefined
-              ? (notFoundResult as Record<string, JsonValue>)
-              : { message: "Task already completed." },
-          waiting: false,
+        return fail({
+          message: t("waitForTask.post.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       // Helper: extract original tool info from task row for widget rendering
       const originalToolName = task.routeId ?? undefined;
-      const rawTaskInput = task.taskInput as Record<string, JsonValue> | null;
+      const rawTaskInput = task.taskInput as Record<string, WidgetData> | null;
       // Strip internal __result sentinel if present
-      const { __result: taskInputResult, ...cleanTaskInput } = (rawTaskInput ??
-        {}) as Record<string, JsonValue> & {
-        __result?: JsonValue;
-      };
+      const { __result: taskInputResult, ...cleanTaskInput } =
+        rawTaskInput ?? {};
       const originalArgs =
         Object.keys(cleanTaskInput).length > 0 ? cleanTaskInput : undefined;
 
@@ -170,7 +105,7 @@ export class WaitForTaskRepository {
 
         // Resolve result: prefer __result from taskInput (set by execute-tool goroutine),
         // fall back to cron_task_executions.result (set by hermes cron runner).
-        let storedResult: JsonValue | undefined = taskInputResult;
+        let storedResult: WidgetData | undefined = taskInputResult;
         if (storedResult === undefined) {
           const [latestExecution] = await db
             .select({ result: cronTaskExecutions.result })
@@ -182,7 +117,7 @@ export class WaitForTaskRepository {
             latestExecution?.result !== null &&
             latestExecution?.result !== undefined
           ) {
-            storedResult = latestExecution.result as JsonValue;
+            storedResult = latestExecution.result;
           }
         }
 
@@ -221,12 +156,9 @@ export class WaitForTaskRepository {
           });
         }
 
-        return success({
+        return success<WaitForTaskResponseOutput>({
           status: task.lastExecutionStatus,
-          result:
-            storedResult !== undefined
-              ? (storedResult as Record<string, JsonValue>)
-              : undefined,
+          result: storedResult !== undefined ? storedResult : undefined,
           waiting: false,
           originalToolName,
           originalArgs,
@@ -236,15 +168,15 @@ export class WaitForTaskRepository {
       // Task is pending/running - register the calling thread as a waiter.
       // When the task completes, handleTaskCompletion will backfill the tool
       // message and schedule resume-stream to revive the AI.
-      const effectiveThreadId = streamContext?.threadId;
+      const effectiveThreadId = streamContext.threadId;
       const effectiveToolMessageId =
-        streamContext?.currentToolMessageId ?? streamContext?.aiMessageId;
+        streamContext.currentToolMessageId ?? streamContext.aiMessageId;
 
       if (effectiveThreadId && effectiveToolMessageId) {
-        const streamModelId = streamContext?.modelId;
-        const streamSkillId = streamContext?.skillId;
-        const streamFavoriteId = streamContext?.favoriteId;
-        const streamLeafMessageId = streamContext?.leafMessageId;
+        const streamModelId = streamContext.modelId;
+        const streamSkillId = streamContext.skillId;
+        const streamFavoriteId = streamContext.favoriteId;
+        const streamLeafMessageId = streamContext.leafMessageId;
 
         // Write revival context to typed wakeUp* columns - not into taskInput JSON blob.
         // Use WAIT (not WAKE_UP) so handleTaskCompletion backfills the tool message
@@ -259,6 +191,7 @@ export class WaitForTaskRepository {
             wakeUpSkillId: streamSkillId ?? null,
             wakeUpFavoriteId: streamFavoriteId ?? null,
             wakeUpLeafMessageId: streamLeafMessageId ?? null,
+            wakeUpSubAgentDepth: streamContext.subAgentDepth ?? 0,
             // Use the calling user's ID so resume-stream runs as the stream owner
             userId: !user.isPublic ? user.id : (task.userId ?? null),
             updatedAt: new Date(),

@@ -25,10 +25,13 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { DefaultFolderId } from "../../../../config";
 import { ChatMessageRole, ChatMessageRoleOptions } from "../../../../enum";
 import { scopedTranslation } from "./i18n";
-import { DeleteMessageWidget } from "./widget";
+const DeleteMessageWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.DeleteMessageWidget })),
+);
 
 /**
  * Get Message by ID Endpoint (GET)
@@ -410,6 +413,7 @@ const { DELETE } = createEndpoint({
             return {
               success: true,
               data: {
+                streamingState: oldData.data.streamingState,
                 backgroundTasks: oldData.data.backgroundTasks,
                 messages: oldData.data.messages.filter(
                   (msg) => msg.id !== data.pathParams.messageId,

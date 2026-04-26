@@ -274,7 +274,7 @@ export class RemoteConnectionRepository {
     userId: string;
     remoteUrl: string;
     token: string;
-    leadId?: string;
+    leadId: string;
     instanceId?: string;
     remoteInstanceId?: string;
     isDefault?: boolean;
@@ -328,7 +328,7 @@ export class RemoteConnectionRepository {
         userId,
         remoteUrl,
         token: encryptedToken,
-        leadId: leadId ?? null,
+        leadId,
         instanceId,
         remoteInstanceId: remoteInstanceId ?? null,
         isActive: true,
@@ -340,7 +340,7 @@ export class RemoteConnectionRepository {
         set: {
           remoteUrl,
           token: encryptedToken,
-          leadId: leadId ?? null,
+          leadId,
           remoteInstanceId: remoteInstanceId ?? null,
           isActive: true,
           isDefault,
@@ -457,7 +457,7 @@ export class RemoteConnectionRepository {
         userId: r.userId,
         remoteUrl: r.remoteUrl,
         token: RemoteConnectionRepository.decryptToken(r.token),
-        leadId: r.leadId ?? "",
+        leadId: r.leadId,
         instanceId: r.instanceId,
         memoriesHash: r.memoriesHash ?? null,
         remoteMemoriesHash: r.remoteMemoriesHash ?? null,
@@ -496,7 +496,7 @@ export class RemoteConnectionRepository {
       .map((r) => ({
         remoteUrl: r.remoteUrl,
         token: RemoteConnectionRepository.decryptToken(r.token),
-        leadId: r.leadId ?? "",
+        leadId: r.leadId,
         instanceId: r.instanceId,
         remoteInstanceId: r.remoteInstanceId ?? null,
       }));
@@ -538,7 +538,7 @@ export class RemoteConnectionRepository {
     return {
       remoteUrl: row.remoteUrl,
       token: RemoteConnectionRepository.decryptToken(row.token),
-      leadId: row.leadId ?? "",
+      leadId: row.leadId,
       instanceId: row.instanceId,
     };
   }
@@ -613,7 +613,7 @@ export class RemoteConnectionRepository {
     /** Local instance URL - set on cloud-side records to push tasks/memories directly. */
     localUrl: string | null;
     token: string | null;
-    leadId: string | null;
+    leadId: string;
   } | null> {
     const [row] = await db
       .select({
@@ -661,7 +661,7 @@ export class RemoteConnectionRepository {
     capabilities: RemoteToolCapability[] | null;
     remoteUrl: string;
     token: string | null;
-    leadId: string | null;
+    leadId: string;
   } | null> {
     const [row] = await db
       .select({

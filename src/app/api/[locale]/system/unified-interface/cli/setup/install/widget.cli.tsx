@@ -3,7 +3,7 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { useInkWidgetPlatform } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import { useWidgetPlatform } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { InstallResponseOutput } from "./definition";
 
@@ -15,7 +15,7 @@ interface CliWidgetProps {
 }
 
 export function SetupInstallWidget({ field }: CliWidgetProps): JSX.Element {
-  const platform = useInkWidgetPlatform();
+  const platform = useWidgetPlatform();
   const isMcp = platform === Platform.MCP;
   const value = field.value;
 

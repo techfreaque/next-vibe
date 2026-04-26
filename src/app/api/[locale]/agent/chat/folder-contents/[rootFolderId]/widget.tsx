@@ -81,11 +81,12 @@ import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unifi
 import {
   useWidgetContext,
   useWidgetForm,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import {
   scopedTranslation as chatScopedTranslation,
   type ChatT,
@@ -101,10 +102,7 @@ import renameDefinitions from "../../folders/subfolders/[subFolderId]/rename/def
 import { useChatBootContext } from "../../hooks/context";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
 import { scopedTranslation as threadsScopedTranslation } from "../../threads/i18n";
-import type {
-  FolderContentsItem,
-  FolderContentsResponseOutput,
-} from "./definition";
+import type { FolderContentsItem } from "./definition";
 import definitions from "./definition";
 
 type FolderFromList = FolderListResponseOutput["folders"][number];
@@ -202,9 +200,7 @@ function ThreadRow({
   const isActive = activeThreadId === item.id;
   const isIncognito = item.rootFolderId === DefaultFolderId.INCOGNITO;
 
-  const navIsStreaming = useChatNavigationStore((s) => s.isStreaming);
-  const isThreadStreaming =
-    item.streamingState !== "idle" || (isActive && navIsStreaming);
+  const isThreadStreaming = item.streamingState !== "idle";
 
   const handleThreadClick = (e: DivMouseEvent): void => {
     if (isEditing) {
@@ -420,11 +416,6 @@ function ThreadRow({
         ) : (
           <Div className="flex-1 min-w-0">
             <Div className="text-sm font-medium truncate">{item.title}</Div>
-            {item.preview && (
-              <Div className="text-xs text-muted-foreground truncate">
-                {item.preview}
-              </Div>
-            )}
           </Div>
         )}
 
@@ -1099,6 +1090,7 @@ function FolderRow({
                   staleTime: 30_000,
                 },
               },
+              subscribeToEvents: true,
             }}
           />
         </Div>
@@ -1301,19 +1293,19 @@ function ItemSection({
 // ---------------------------------------------------------------------------
 
 interface CustomWidgetProps {
-  field: {
-    value: FolderContentsResponseOutput | null | undefined;
-  } & (typeof definitions.GET)["fields"];
+  field: (typeof definitions.GET)["fields"];
 }
 
 export function FolderContentsWidget({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  // field.value is undefined while loading, and { items: [] } when loaded with no results.
+  const folderContentsData = useWidgetValue<typeof definitions.GET>();
+  // folderContentsData is undefined while loading, and { items: [] } when loaded with no results.
   // Never show an empty state while loading.
-  const fieldItems = field.value?.items;
-  const isLoaded = field.value !== undefined && field.value !== null;
+  const fieldItems = folderContentsData?.items;
+  const isLoaded =
+    folderContentsData !== undefined && folderContentsData !== null;
   const activeRootFolderId = useChatNavigationStore(
     (s) => s.currentRootFolderId,
   );

@@ -36,7 +36,7 @@ import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { Methods } from "../../shared/types/enums";
 import { getRemoteSession } from "../auth/remote-session-cache";
 import { scopedTranslation as cliScopedTranslation } from "../i18n";
-import type { CliRequestData } from "./cli-request-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 interface DecodedJwtPayload {
   id?: string;
@@ -147,12 +147,16 @@ async function handleLoginResponse(
   );
 
   if (!token) {
-    logger.warn("[REMOTE] Login succeeded but no token in Set-Cookie");
+    logger.error("[REMOTE] Login succeeded but no token in Set-Cookie");
+    return;
+  }
+  if (!leadIdFromCookie) {
+    logger.error("[REMOTE] Login succeeded but no leadId in Set-Cookie");
     return;
   }
 
   const payload = decodeJwtPayload(token);
-  const leadId = leadIdFromCookie ?? payload?.leadId ?? "";
+  const leadId = leadIdFromCookie ?? payload?.leadId;
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + AUTH_TOKEN_COOKIE_MAX_AGE_DAYS);
@@ -164,7 +168,7 @@ async function handleLoginResponse(
     userId,
     remoteUrl: host,
     token,
-    leadId: leadId || undefined,
+    leadId,
     logger,
   });
 
@@ -200,7 +204,7 @@ export class RemoteExecutor {
    */
   static async execute(params: {
     endpoint: CreateApiEndpointAny;
-    data: CliRequestData;
+    data: Record<string, WidgetData>;
     locale: CountryLanguage;
     logger: EndpointLogger;
     remoteUrl: string;
@@ -214,14 +218,14 @@ export class RemoteExecutor {
 
     // Resolve session from DB
     let resolvedToken: string | null = null;
-    let resolvedLeadId: string | undefined;
+    let resolvedLeadId: string | null = null;
     let resolvedRemoteUrl = remoteUrl;
 
     if (userId) {
       const dbSession = await getRemoteSession(userId);
       if (dbSession) {
         resolvedToken = dbSession.token;
-        resolvedLeadId = dbSession.leadId || undefined;
+        resolvedLeadId = dbSession.leadId;
         resolvedRemoteUrl = dbSession.remoteUrl;
         logger.debug("[REMOTE] Using DB session", { userId });
       }
@@ -236,7 +240,7 @@ export class RemoteExecutor {
     }
 
     // Login: bootstrap leadId if we don't have one yet
-    let leadId = resolvedLeadId ?? null;
+    let leadId: string | null = resolvedLeadId;
     if (isLoginEndpoint && !leadId) {
       logger.info("[REMOTE] No leadId found, bootstrapping from remote...");
       leadId = await bootstrapLeadId(resolvedRemoteUrl, logger);
@@ -248,7 +252,22 @@ export class RemoteExecutor {
       }
     }
 
-    const effectiveLeadId = resolvedLeadId ?? leadId ?? undefined;
+    // At this point leadId is always set: login bootstrapped it above (with
+    // early return on failure); non-login has it from the DB session.
+    if (!leadId) {
+      return fail({
+        message: t("vibe.errors.remoteNoLeadId"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+    if (!resolvedToken && !isLoginEndpoint) {
+      // Should be caught above, but guard here so token is provably non-null.
+      return fail({
+        message: t("vibe.errors.remoteNotLoggedIn"),
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
+      });
+    }
+    const effectiveLeadId = leadId;
     const token = resolvedToken ?? "";
 
     // Non-login/logout: delegate to shared executeRemote()

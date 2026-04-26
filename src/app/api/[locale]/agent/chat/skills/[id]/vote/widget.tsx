@@ -11,23 +11,23 @@ import { ThumbsUp } from "next-vibe-ui/ui/icons/ThumbsUp";
 import { Span } from "next-vibe-ui/ui/span";
 import { type JSX } from "react";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import {
+  useWidgetTranslation,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import { SkillTrustLevel } from "../../enum";
 import type definition from "./definition";
-import type { SkillVotePostResponseOutput } from "./definition";
 
 interface CustomWidgetProps {
-  field: {
-    value: SkillVotePostResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 export function SkillVoteContainer({ field }: CustomWidgetProps): JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.POST>();
   const t = useWidgetTranslation<typeof definition.POST>();
 
   return (

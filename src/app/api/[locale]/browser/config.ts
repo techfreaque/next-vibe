@@ -5,6 +5,8 @@
 
 import "server-only";
 
+import { browserEnv } from "./env";
+
 export interface ChromeMCPConfig {
   /** Command to run the MCP server */
   command: string;
@@ -31,16 +33,9 @@ export const CHROME_REMOTE_DEBUG_PORT = 9222;
  * Claude Code) to share one Chrome without profile-lock conflicts.
  */
 export const chromeMCPConfig: ChromeMCPConfig = {
-  command: "bunx",
-  args: [
-    "chrome-devtools-mcp@latest",
-    `--browserUrl=http://127.0.0.1:${CHROME_REMOTE_DEBUG_PORT}`,
-    "--experimentalPageIdRouting",
-  ],
-  env: {
-    XDG_RUNTIME_DIR: "/run/user/1000",
-    WAYLAND_DISPLAY: "wayland-0",
-  },
+  command: "node_modules/.bin/chrome-devtools-mcp",
+  args: [`--browserUrl=http://127.0.0.1:${CHROME_REMOTE_DEBUG_PORT}`],
+  env: {},
   timeout: 120000,
   debug: false,
 };
@@ -50,43 +45,38 @@ export const chromeMCPConfig: ChromeMCPConfig = {
  * Allows overriding default config via environment variables
  */
 export function getChromeMCPConfig(): ChromeMCPConfig {
-  const config = { ...chromeMCPConfig };
+  const config = { ...chromeMCPConfig, env: { ...chromeMCPConfig.env } };
+  const isLinux = process.platform === "linux";
 
-  // Override executable path if specified
-  if (process.env.CHROME_EXECUTABLE_PATH) {
-    const executableArgIndex = config.args.findIndex((arg) =>
-      arg.startsWith("--executablePath"),
-    );
-    if (executableArgIndex !== -1) {
-      config.args[executableArgIndex] =
-        `--executablePath=${process.env.CHROME_EXECUTABLE_PATH}`;
+  // Propagate Linux display env to the MCP subprocess
+  if (isLinux) {
+    const xdgRuntimeDir =
+      process.env["XDG_RUNTIME_DIR"] ??
+      `/run/user/${process.getuid?.() ?? 1000}`;
+    config.env = { ...config.env, XDG_RUNTIME_DIR: xdgRuntimeDir };
+
+    const waylandDisplay = process.env["WAYLAND_DISPLAY"];
+    if (waylandDisplay) {
+      config.env = { ...config.env, WAYLAND_DISPLAY: waylandDisplay };
+    }
+
+    const display = process.env["DISPLAY"];
+    if (display) {
+      config.env = { ...config.env, DISPLAY: display };
+    }
+
+    const dbusAddr = process.env["DBUS_SESSION_BUS_ADDRESS"];
+    if (dbusAddr) {
+      config.env = { ...config.env, DBUS_SESSION_BUS_ADDRESS: dbusAddr };
     }
   }
 
-  // Override Wayland display if specified
-  if (process.env.WAYLAND_DISPLAY) {
-    config.env = {
-      ...config.env,
-      WAYLAND_DISPLAY: process.env.WAYLAND_DISPLAY,
-    };
-  }
-
-  // Override XDG runtime dir if specified
-  if (process.env.XDG_RUNTIME_DIR) {
-    config.env = {
-      ...config.env,
-      XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR,
-    };
-  }
-
-  // Enable debug mode if specified
-  if (process.env.CHROME_MCP_DEBUG === "true") {
+  if (browserEnv.CHROME_MCP_DEBUG) {
     config.debug = true;
   }
 
-  // Override timeout if specified
-  if (process.env.CHROME_MCP_TIMEOUT) {
-    config.timeout = parseInt(process.env.CHROME_MCP_TIMEOUT, 10);
+  if (browserEnv.CHROME_MCP_TIMEOUT !== undefined) {
+    config.timeout = browserEnv.CHROME_MCP_TIMEOUT;
   }
 
   return config;

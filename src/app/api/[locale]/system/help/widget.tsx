@@ -64,26 +64,15 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import remoteConnectionListDefinition from "@/app/api/[locale]/user/remote-connection/list/definition";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { Platform } from "../unified-interface/shared/types/platform";
 import type definition from "./definition";
-import type {
-  HelpGetResponseOutput,
-  HelpToolMetadataSerialized,
-} from "./definition";
+import type { HelpToolMetadataSerialized } from "./definition";
 import { scopedTranslation } from "./i18n";
-
-/**
- * Props for custom widget - follows the CustomWidgetProps pattern
- */
-interface CustomWidgetProps {
-  field: {
-    value: HelpGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
 
 // ─── Label helpers ──────────────────────────────────────────────────────────
 
@@ -137,7 +126,7 @@ async function navigateToLocalTool(
 
 // ─── Main widget component ──────────────────────────────────────────────────
 
-export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
+export function HelpToolsWidget(): JSX.Element {
   const { push: navigate } = useWidgetNavigation();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
@@ -212,7 +201,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     endpoint: string;
   } | null>(null);
 
-  const response = field.value;
+  const response = useWidgetValue<typeof definition.GET>();
   const availableTools: HelpToolMetadataSerialized[] = useMemo(
     () => response?.tools ?? [],
     [response],

@@ -38,18 +38,23 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { configScopedTranslation } from "@/config/i18n";
 import { FEATURED_MODELS } from "../../../agent/ai-stream/models";
 import { contactClientRepository } from "../../../contact/repository-client";
-import { getPricingParams } from "../../../products/repository-client";
 import { EmailTemplate } from "../../../messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,
   type TrackingContext,
 } from "../../../messenger/providers/email/smtp-client/components/tracking_context.email";
+import { getPricingParams } from "../../../products/repository-client";
 import userCreateDefinition, {
   type UserCreateRequestOutput,
   type UserCreateResponseOutput,
 } from "../../../users/create/definition";
+import type { JwtPrivatePayloadType } from "../../auth/types";
 import { UserDetailLevel } from "../../enum";
 import { UserRepository } from "../../repository";
+import {
+  UserPermissionRole,
+  filterUserPermissionRoles,
+} from "../../user-roles/enum";
 import signupDefinition, {
   type SignupPostRequestOutput,
   type SignupPostResponseOutput,
@@ -942,13 +947,24 @@ async function renderAdminNotificationByEmail(
     });
   }
   const user = userResponse.data;
+  const jwtUser: JwtPrivatePayloadType = {
+    isPublic: false,
+    id: user.id,
+    leadId: user.leadId,
+    roles: filterUserPermissionRoles(user.userRoles.map((r) => r.role)),
+  };
 
   // Fetch credit balances (non-blocking - omit from email if unavailable)
   const [userBalanceResult, leadBalanceResult] = await Promise.all([
-    CreditRepository.getBalance({ userId: user.id }, logger, creditsT, locale),
+    CreditRepository.getBalance(
+      jwtUser,
+      logger,
+      creditsT,
+      locale,
+    ),
     user.leadId
       ? CreditRepository.getBalance(
-          { leadId: user.leadId },
+          { isPublic: true, leadId: user.leadId, roles: [UserPermissionRole.PUBLIC] },
           logger,
           creditsT,
           locale,

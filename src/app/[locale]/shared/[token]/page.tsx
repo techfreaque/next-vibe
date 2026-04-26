@@ -14,7 +14,7 @@ import type { JSX } from "react";
 import { scopedTranslation } from "@/app/[locale]/shared/i18n";
 import { scopedTranslation as shareLinksScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/i18n";
 import { ShareLinksRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";

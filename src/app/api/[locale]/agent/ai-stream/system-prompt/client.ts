@@ -41,6 +41,7 @@ export function usePromptContextData(
     callMode = false,
     extraInstructions = "",
     headless = false,
+    subAgentDepth,
   } = params;
 
   const isExposedFolder = !enabledPrivate || user.isPublic;
@@ -102,6 +103,7 @@ export function usePromptContextData(
       isAdmin,
       isFreshUser,
       mediaCapabilities: null,
+      subAgentDepth,
     };
   }, [
     userData,
@@ -121,5 +123,6 @@ export function usePromptContextData(
     isExposedFolder,
     isPublicUser,
     isAdmin,
+    subAgentDepth,
   ]);
 }

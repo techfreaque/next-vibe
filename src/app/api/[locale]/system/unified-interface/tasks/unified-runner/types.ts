@@ -8,6 +8,8 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import type { z } from "zod";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+
 import type {
   GenericHandlerBase,
   GenericHandlerReturnType,
@@ -35,15 +37,6 @@ export type CronTaskInput<T extends CreateApiEndpointAny> = [
       ? undefined
       : T["types"]["RequestOutput"]
     : T["types"]["RequestOutput"] & T["types"]["UrlVariablesOutput"];
-
-/** JSON-serializable value */
-export type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonValue[]
-  | { [key: string]: JsonValue };
 
 /**
  * Task Result
@@ -224,7 +217,7 @@ export interface CronTaskAny {
    * Flat merged default args (body data + urlPathParams combined).
    * splitTaskArgs() splits these by schema at execution time.
    */
-  taskInput?: Record<string, JsonValue>;
+  taskInput?: Record<string, WidgetData>;
   /** When true, task disables itself after first execution (success or failure) */
   runOnce?: boolean;
   /** Minimum interval (ms) between successful history records. null/undefined = log every run. Always logs errors. */
@@ -318,7 +311,7 @@ export function createCronTask<const T extends CreateApiEndpointAny>(
     definition,
     route: route as GenericHandlerBase,
     ...config,
-    taskInput: config.taskInput as Record<string, JsonValue> | undefined,
+    taskInput: config.taskInput,
   };
 }
 

@@ -20,7 +20,7 @@ import type {
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
 import type { FieldUsage } from "../../../shared/types/enums";
 import { WidgetType } from "../../../shared/types/enums";
-import type { WidgetData } from "../../../shared/widgets/widget-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { hasChildren } from "./type-guards";
 import type {
   AnyChildrenConstrain,

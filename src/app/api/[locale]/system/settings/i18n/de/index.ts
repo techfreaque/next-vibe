@@ -181,6 +181,7 @@ export const translations: typeof enTranslations = {
     selectPlaceholder: "Auswählen...",
     boolTrue: "an",
     boolFalse: "aus",
+    logPathDisabled: "Datei-Logging deaktiviert",
     restartWizard: "Einrichtungsassistent",
     generate: "Generieren",
     editConfirmHint: "[Enter] bestätigen  [Esc] abbrechen",

@@ -24,37 +24,31 @@ import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
 
-type PatchResponseOutput = typeof definition.PATCH.types.ResponseOutput;
-type DeleteResponseOutput = typeof definition.DELETE.types.ResponseOutput;
-
 interface PatchWidgetProps {
-  field: {
-    value: PatchResponseOutput | null | undefined;
-  } & (typeof definition.PATCH)["fields"];
+  field: (typeof definition.PATCH)["fields"];
 }
 
 interface DeleteWidgetProps {
-  field: {
-    value: DeleteResponseOutput | null | undefined;
-  } & (typeof definition.DELETE)["fields"];
+  field: (typeof definition.DELETE)["fields"];
 }
 
 export function LeadsBatchUpdateContainer({
   field,
 }: PatchWidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.PATCH>();
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const { push: navigate } = useWidgetNavigation();
@@ -388,7 +382,7 @@ export function LeadsBatchDeleteContainer({
   field,
 }: DeleteWidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.DELETE>();
   const locale = useWidgetLocale();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.DELETE>();

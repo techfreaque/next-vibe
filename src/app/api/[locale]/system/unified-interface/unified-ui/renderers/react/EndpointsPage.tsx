@@ -22,11 +22,13 @@ import {
   NavigationStackProvider,
   useNavigationStack,
 } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { NavigationStackEntry } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { useLogger } from "@/hooks/use-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { EndpointRenderer, type SubmitButtonConfig } from "./EndpointRenderer";
@@ -90,6 +92,25 @@ interface EndpointsPagePropsBase<
   forceMethod?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   /** Optional finalNavigation overrides (e.g., to override pop behavior in modals) */
   navigationOverride?: Partial<ReturnType<typeof useNavigationStack>>;
+  /**
+   * When true, renders the endpoint fields in read-only display mode.
+   * No form submission, no network calls.
+   */
+  disabled?: boolean;
+  /**
+   * When true, renders only response fields (for CLI/MCP result-formatter mode).
+   * Passed through to EndpointRenderer.
+   */
+  responseOnly?: boolean;
+  /**
+   * Platform override. When provided, passed to EndpointRenderer.
+   */
+  platform?: Platform;
+  /**
+   * Logger override. When provided, used instead of useLogger() context.
+   * Required for CLI/MCP contexts that don't have LoggerProvider.
+   */
+  logger?: EndpointLogger;
 }
 
 /**
@@ -160,6 +181,9 @@ function EndpointsPageInternal<
   _disableNavigationStack = false,
   forceMethod,
   navigationOverride,
+  disabled,
+  responseOnly,
+  platform,
 }: EndpointsPagePropsInternal<T>): React.JSX.Element {
   // Check finalNavigation stack to render stacked endpoints (only for base layer)
   const navigation = useNavigationStack();
@@ -224,11 +248,9 @@ function EndpointsPageInternal<
     endpoint.DELETE;
 
   // Read configuration from endpoint definition with fallbacks
-  const finalDebug = debug ?? activeEndpoint?.debug ?? false;
-  const logger = useMemo(
-    () => createEndpointLogger(finalDebug, Date.now(), locale),
-    [finalDebug, locale],
-  );
+  // useLoggerOptional returns null when LoggerProvider is absent (CLI/MCP context)
+  // In that case loggerProp must be supplied
+  const logger = useLogger();
 
   // Build mutation options with onSuccess callback for finalNavigation
   const mutationOptionsWithNav = useMemo(() => {
@@ -612,10 +634,12 @@ function EndpointsPageInternal<
   const topIsModal = topEntry?.renderInModal ?? false;
 
   // Base layer is visible only when:
+  // - Disabled (read-only display mode), OR
   // - Stack is disabled, OR
   // - Stack is empty, OR
   // - Stack has ONLY a modal (base is the background for that modal)
   const isBaseVisible =
+    disabled ||
     _disableNavigationStack ||
     finalNavigation.stack.length === 0 ||
     (finalNavigation.stack.length === 1 && topIsModal);
@@ -632,7 +656,23 @@ function EndpointsPageInternal<
 
         {activeEndpoint && (
           <>
-            {isGetEndpoint && endpointState.read && (
+            {disabled && (
+              <EndpointRenderer
+                endpoint={activeEndpoint}
+                locale={locale}
+                isSubmitting={false}
+                data={responseData}
+                className={className}
+                response={response}
+                endpointMutations={endpointMutations}
+                logger={logger}
+                user={user}
+                disabled={true}
+                responseOnly={responseOnly}
+                platform={platform}
+              />
+            )}
+            {!disabled && isGetEndpoint && endpointState.read && (
               <EndpointRenderer
                 endpoint={activeEndpoint}
                 form={endpointState.create?.form ?? endpointState.read.form}
@@ -654,9 +694,12 @@ function EndpointsPageInternal<
                 endpointMutations={endpointMutations}
                 logger={logger}
                 user={user}
+                responseOnly={responseOnly}
+                platform={platform}
               />
             )}
-            {isMutationEndpoint &&
+            {!disabled &&
+              isMutationEndpoint &&
               (endpointState.create || endpointState.update) && (
                 <EndpointRenderer
                   endpoint={activeEndpoint}
@@ -680,9 +723,11 @@ function EndpointsPageInternal<
                   endpointMutations={endpointMutations}
                   logger={logger}
                   user={user}
+                  responseOnly={responseOnly}
+                  platform={platform}
                 />
               )}
-            {isDeleteEndpoint && endpointState.delete && (
+            {!disabled && isDeleteEndpoint && endpointState.delete && (
               <EndpointRenderer
                 endpoint={activeEndpoint}
                 form={endpointState.delete.form}
@@ -697,6 +742,8 @@ function EndpointsPageInternal<
                 endpointMutations={endpointMutations}
                 logger={logger}
                 user={user}
+                responseOnly={responseOnly}
+                platform={platform}
               />
             )}
           </>
@@ -704,8 +751,9 @@ function EndpointsPageInternal<
       </Div>
 
       {/* Stacked endpoint layers - each mounted to preserve state */}
-      {/* Only render finalNavigation stack for base layer (not for stacked instances) */}
-      {!_disableNavigationStack &&
+      {/* Only render finalNavigation stack for base layer (not for stacked instances, not for disabled) */}
+      {!disabled &&
+        !_disableNavigationStack &&
         finalNavigation.stack.map((entry, index) => (
           <StackEntryLayer
             key={`nav-${entry.timestamp}-${index}`}

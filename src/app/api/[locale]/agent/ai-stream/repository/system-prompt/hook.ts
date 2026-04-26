@@ -62,6 +62,7 @@ export function useDebugSystemPrompt(params: {
     rootFolderId,
     subFolderId,
     callMode,
+    subAgentDepth: 0,
   });
 
   return useMemo(() => {

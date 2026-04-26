@@ -11,22 +11,15 @@ import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Wallet } from "next-vibe-ui/ui/icons/Wallet";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetTranslation,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 
 import { REFERRAL_CONFIG } from "../config";
 import type definition from "./definition";
-import type { StatsGetResponseOutput } from "./definition";
-
-/**
- * Props for custom widget
- */
-interface CustomWidgetProps {
-  field: {
-    value: StatsGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
 
 /** Format credit cents as dollars: 100 credits = $1. Drops .00 for whole dollar amounts. */
 function formatDollars(credits: number): string {
@@ -87,10 +80,8 @@ function StatCard({
 /**
  * Custom container widget for referral stats
  */
-export function ReferralStatsContainer({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
-  const stats = field.value;
+export function ReferralStatsContainer(): React.JSX.Element {
+  const stats = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
 
   if (!stats) {

@@ -233,6 +233,7 @@ export class MCPRegistry {
         skillId: undefined,
         modelId: undefined,
         headless: undefined,
+        subAgentDepth: 0,
         currentToolMessageId: undefined,
         callerToolCallId: undefined,
         pendingToolMessages: undefined,
@@ -249,6 +250,8 @@ export class MCPRegistry {
         videoGenModelSelection: undefined,
         variantId: undefined,
         isRevival: undefined,
+
+        providerOverride: undefined,
       },
     };
 

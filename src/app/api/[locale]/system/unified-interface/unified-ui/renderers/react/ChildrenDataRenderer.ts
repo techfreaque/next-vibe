@@ -16,7 +16,7 @@ import type z from "zod";
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 

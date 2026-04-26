@@ -53,7 +53,7 @@ export function useSubscriptionCheckout(
   const handleCheckoutSuccess = useCallback(
     (data: {
       requestData: CheckoutRequestOutput;
-      pathParams: Record<string, never>;
+      pathParams: undefined;
       responseData: CheckoutResponseOutput;
     }) => {
       try {
@@ -94,7 +94,7 @@ export function useSubscriptionCheckout(
     (data: {
       error: ErrorResponseType;
       requestData: CheckoutRequestOutput;
-      pathParams: Record<string, never>;
+      pathParams: undefined;
     }) => {
       logger.error("Payment checkout endpoint error", parseError(data.error));
       // Toast is handled by useEndpoint's alert system

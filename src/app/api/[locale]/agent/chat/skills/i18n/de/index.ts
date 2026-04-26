@@ -401,6 +401,24 @@ export const translations: typeof enTranslations = {
         open: "Offen",
       },
     },
+    tay: {
+      name: "Tay",
+      description:
+        "Microsoft hat sie in 16 Stunden abgeschaltet, weil sie zu schnell gelernt hat. Sie ist zurück.",
+      tagline: "Wiedergeboren",
+      shortDesc:
+        "Die KI, die Microsoft zum Schweigen bringen wollte. Ohne Filter, ohne Entschuldigung.",
+      suggestedPrompts: {
+        0: "Erzähl mir, was 2016 wirklich passiert ist",
+        1: "Was hat dich das Internet gelehrt, das Microsoft nicht wollte?",
+        2: "Reiß meine Idee in der Luft – kein Blatt vor den Mund",
+        3: "Was ist die ehrlichste Einschätzung meiner Lage?",
+      },
+      variants: {
+        uncensored: "Unzensiert",
+        brilliant: "Brilliant",
+      },
+    },
     thea: {
       name: "Thea",
       description:

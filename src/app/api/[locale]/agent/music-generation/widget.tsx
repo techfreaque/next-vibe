@@ -28,22 +28,20 @@ import {
   useWidgetIsSubmitting,
   useWidgetLocale,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
-import type { MusicGenerationPostResponseOutput } from "./definition";
 import { MusicDuration } from "./enum";
 import { scopedTranslation } from "./i18n";
 import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "./constants";
 import { getMusicGenModelById, MusicGenModelId } from "./models";
 
 interface CustomWidgetProps {
-  field: {
-    value: MusicGenerationPostResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 const DURATION_PRESETS = [
@@ -68,7 +66,7 @@ export function MusicGenerationContainer({
 }: CustomWidgetProps): JSX.Element {
   const isSubmitting = useWidgetIsSubmitting();
   const form = useWidgetForm<typeof definition.POST>();
-  const result = field.value;
+  const result = useWidgetValue<typeof definition.POST>();
   const children = field.children;
   const prompt = form?.watch("prompt") ?? "";
   const user = useWidgetUser();

@@ -1,125 +1,58 @@
 "use client";
 
 /**
- * updateMessages - single source of truth for message cache writes.
+ * Message cache helpers — minimal imperative writes for cases the framework
+ * event system cannot handle: optimistic inserts, delete, vote, history pagination,
+ * and HTTP-error messages.
  *
- * Two-layer cache architecture for O(1) per-delta re-renders:
- *
- * Layer 1: apiClient cache keyed by { threadId, rootFolderId }
- *   - { messages: ChatMessage[] } - the full list, used for path building / branch loading
- *   - All list-level operations (branch navigation, send, retry) read/write here
- *
- * Layer 2: per-message queryClient cache keyed by ['message-item', messageId]
- *   - Single ChatMessage - seeded automatically by updateMessages on every write
- *   - Used by per-message components (streaming indicator, TTS, actions) via useMessageItem()
- *   - O(1) per delta: only the changed message's observer re-renders, not all N messages
- *
- * Usage:
- *   updateMessages(threadId, rootFolderId, logger, (msgs) =>
- *     msgs.map((m) => m.id === id ? { ...m, content: m.content + delta } : m)
- *   );
+ * All streaming state (content-delta, message-created, stream-finished, …) is
+ * handled declaratively by the event declarations in definition.ts — no manual
+ * writes needed for those.
  */
 
 import { success } from "next-vibe/shared/types/response.schema";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { saveMessage } from "@/app/api/[locale]/agent/chat/incognito/storage";
-import {
-  apiClient,
-  queryClient,
-} from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import { ChatMessageRole } from "../../../../enum";
 import messagesDefinition from "../definition";
 
-// ─── Per-item cache key ───────────────────────────────────────────────────────
+// ─── Core write ───────────────────────────────────────────────────────────────
 
-/**
- * React Query cache key for a single message.
- * Kept stable and opaque - use seedMessageItemCache / useMessageItem to interact.
- */
-export function messageItemQueryKey(messageId: string): [string, string] {
-  return ["message-item", messageId];
-}
-
-/**
- * Seed the per-item cache for a single message.
- * Called automatically by updateMessages - not needed externally.
- *
- * Uses replaceEqualDeep (React Query default) so unchanged fields preserve
- * their object references - components using useMessageItem() only re-render
- * when their specific message's data actually changes.
- */
-export function seedMessageItemCache(message: ChatMessage): void {
-  queryClient.setQueryData(messageItemQueryKey(message.id), message);
-}
-
-/**
- * Update the messages cache for a thread, with automatic incognito localStorage sync.
- *
- * @param threadId - The thread whose messages to update
- * @param rootFolderId - Needed for cache key + incognito detection
- * @param logger - Endpoint logger for apiClient calls
- * @param updater - Pure function from old messages array to new messages array
- */
-export function updateMessages(
+function writeMessages(
   threadId: string,
   rootFolderId: DefaultFolderId,
   logger: EndpointLogger,
   updater: (messages: ChatMessage[]) => ChatMessage[],
 ): void {
-  // Collect updated messages from inside the updater closure for incognito sync.
-  // Stored in an array so TypeScript doesn't narrow it to 'never' after the closure.
-  const result: ChatMessage[][] = [];
-
   apiClient.updateEndpointData(
     messagesDefinition.GET,
     logger,
     (old) => {
       const existing = old?.success ? old.data.messages : [];
       const updated = updater(existing);
-      result.push(updated);
       return success({
+        streamingState: old?.success ? old.data.streamingState : "idle",
         backgroundTasks: old?.success ? old.data.backgroundTasks : [],
         messages: updated,
       });
     },
     { urlPathParams: { threadId }, requestData: { rootFolderId } },
   );
-
-  if (result.length > 0) {
-    // Seed per-item cache for every message in the updated list.
-    // React Query's replaceEqualDeep means unchanged messages keep their
-    // existing references - only the actually-changed message triggers re-renders.
-    for (const msg of result[0]!) {
-      seedMessageItemCache(msg);
-    }
-
-    // Incognito: persist changed messages to localStorage.
-    // Skip optimistic placeholders - they are ephemeral UI state and must not
-    // pollute localStorage (they would show as orphaned branches after reload).
-    if (rootFolderId === DefaultFolderId.INCOGNITO) {
-      for (const msg of result[0]!) {
-        if (!msg.metadata?.isOptimistic) {
-          void saveMessage(msg);
-        }
-      }
-    }
-  }
 }
 
-/**
- * Add or replace a single message in the cache.
- * Convenience wrapper around updateMessages for upsert operations.
- */
+// ─── Public helpers ───────────────────────────────────────────────────────────
+
 export function upsertMessage(
   threadId: string,
   rootFolderId: DefaultFolderId,
   logger: EndpointLogger,
   message: ChatMessage,
 ): void {
-  updateMessages(threadId, rootFolderId, logger, (msgs) => {
+  writeMessages(threadId, rootFolderId, logger, (msgs) => {
     const idx = msgs.findIndex((m) => m.id === message.id);
     if (idx === -1) {
       return [...msgs, message];
@@ -130,10 +63,6 @@ export function upsertMessage(
   });
 }
 
-/**
- * Patch a single message's fields in the cache.
- * Convenience wrapper for partial updates.
- */
 export function patchMessage(
   threadId: string,
   rootFolderId: DefaultFolderId,
@@ -141,23 +70,20 @@ export function patchMessage(
   messageId: string,
   patch: Partial<ChatMessage>,
 ): void {
-  updateMessages(threadId, rootFolderId, logger, (msgs) =>
+  writeMessages(threadId, rootFolderId, logger, (msgs) =>
     msgs.map((m) =>
       m.id === messageId ? { ...m, ...patch, updatedAt: new Date() } : m,
     ),
   );
 }
 
-/**
- * Remove a message from the cache, re-parenting its children to its parent.
- */
 export function removeMessage(
   threadId: string,
   rootFolderId: DefaultFolderId,
   logger: EndpointLogger,
   messageId: string,
 ): void {
-  updateMessages(threadId, rootFolderId, logger, (msgs) => {
+  writeMessages(threadId, rootFolderId, logger, (msgs) => {
     const target = msgs.find((m) => m.id === messageId);
     const targetParentId = target?.parentId ?? null;
     return msgs
@@ -165,5 +91,99 @@ export function removeMessage(
       .map((m) =>
         m.parentId === messageId ? { ...m, parentId: targetParentId } : m,
       );
+  });
+}
+
+/** Remove optimistic placeholders with matching parentId across all folder caches. */
+export function removeOptimisticByParentId(
+  threadId: string,
+  parentId: string,
+  logger: EndpointLogger,
+): void {
+  for (const folderId of Object.values(DefaultFolderId)) {
+    writeMessages(threadId, folderId, logger, (msgs) =>
+      msgs.filter(
+        (m) => !(m.metadata?.isOptimistic && m.parentId === parentId),
+      ),
+    );
+  }
+}
+
+/** Read-only cache access — for incognito persistence and error handling. */
+export function getCachedMessages(
+  threadId: string,
+  rootFolderId: DefaultFolderId,
+  logger: EndpointLogger,
+): ChatMessage[] {
+  const data = apiClient.getEndpointData(messagesDefinition.GET, logger, {
+    urlPathParams: { threadId },
+    requestData: { rootFolderId },
+  });
+  return data?.success ? data.data.messages : [];
+}
+
+/**
+ * Insert an error message at the current branch leaf.
+ * De-dupes: if the leaf is already an ERROR message, patches it in place.
+ * Reverts optimistic user message and removes optimistic assistant placeholders.
+ */
+export function addErrorMessageToChat(
+  threadId: string,
+  rootFolderId: DefaultFolderId,
+  content: string,
+  errorType: string,
+  errorCode: string | null = null,
+  sequenceId: string | null = null,
+  logger: EndpointLogger,
+): void {
+  const msgs = getCachedMessages(threadId, rootFolderId, logger);
+  const sorted = [...msgs].toSorted(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+  const leafMsg = sorted[0];
+
+  if (leafMsg?.role === ChatMessageRole.ERROR) {
+    patchMessage(threadId, rootFolderId, logger, leafMsg.id, {
+      content,
+      errorType,
+      errorMessage: content,
+      errorCode,
+    });
+    return;
+  }
+
+  for (const m of msgs) {
+    if (m.metadata?.isOptimistic) {
+      removeMessage(threadId, rootFolderId, logger, m.id);
+    }
+  }
+
+  let errorParentId: string | null = leafMsg?.id ?? null;
+  if (leafMsg?.role === ChatMessageRole.USER) {
+    errorParentId = leafMsg.parentId;
+    removeMessage(threadId, rootFolderId, logger, leafMsg.id);
+  }
+
+  upsertMessage(threadId, rootFolderId, logger, {
+    id: crypto.randomUUID(),
+    threadId,
+    role: ChatMessageRole.ERROR,
+    content,
+    parentId: errorParentId,
+    sequenceId,
+    authorId: "system",
+    authorName: null,
+    isAI: false,
+    model: null,
+    skill: null,
+    errorType,
+    errorMessage: content,
+    errorCode,
+    metadata: {},
+    upvotes: 0,
+    downvotes: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    searchVector: null,
   });
 }

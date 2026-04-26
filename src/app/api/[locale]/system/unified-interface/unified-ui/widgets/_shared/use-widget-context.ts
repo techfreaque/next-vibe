@@ -34,7 +34,7 @@ export const WidgetContextStoreContext = createContext<WidgetContextStoreType<
  * Hook to get the widget context store
  * Returns the store as CreateApiEndpointAny since React Context cannot be properly generic
  */
-function useWidgetContextStore<
+export function useWidgetContextStore<
   TEndpoint extends CreateApiEndpointAny,
 >(): WidgetContextStoreType<TEndpoint, ReactWidgetContext<TEndpoint>> {
   const store = useContext(WidgetContextStoreContext);
@@ -256,7 +256,7 @@ export function useWidgetIsInteractive(): boolean {
 
 /**
  * Hook to get form from context (React Hook Form only)
- * Use this in React widgets. CLI widgets should use useInkWidgetForm from use-ink-widget-context.
+ * Use this in React widgets. CLI widgets should use useWidgetForm from use-ink-widget-context.
  */
 export function useWidgetForm<
   TEndpoint extends CreateApiEndpointAny,
@@ -344,21 +344,6 @@ export function useWidgetCancelButton<
 }
 
 /**
- * Hook to get buttonState from context
- */
-export function useWidgetButtonState(): BaseWidgetContext<CreateApiEndpointAny>["buttonState"] {
-  const store = useWidgetContextStore();
-  return store(
-    (
-      state: WidgetContextStore<
-        CreateApiEndpointAny,
-        ReactWidgetContext<CreateApiEndpointAny>
-      >,
-    ) => state.context.buttonState,
-  );
-}
-
-/**
  * Hook to get responseOnly flag from context
  */
 export function useWidgetResponseOnly(): boolean | undefined {
@@ -371,4 +356,29 @@ export function useWidgetResponseOnly(): boolean | undefined {
       >,
     ) => state.context.responseOnly,
   );
+}
+
+export {
+  useWidgetItem,
+  useWidgetSelector,
+  useWidgetValue,
+} from "./use-widget-value";
+
+// ---------------------------------------------------------------------------
+// CLI surface helpers — safe to call from cli/ui components
+// ---------------------------------------------------------------------------
+
+import { isAgentPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+
+export type CliSurface = "cli" | "mcp";
+
+/** Returns "mcp" for AI agent surfaces, "cli" for all other terminal contexts. */
+export function useCliPlatform(): CliSurface {
+  const platform = useWidgetPlatform();
+  return isAgentPlatform(platform) ? "mcp" : "cli";
+}
+
+/** Returns true when rendering for an AI/MCP consumer (no ANSI, no decoration). */
+export function useIsMcp(): boolean {
+  return useCliPlatform() === "mcp";
 }

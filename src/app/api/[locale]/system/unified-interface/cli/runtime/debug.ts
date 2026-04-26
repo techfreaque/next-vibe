@@ -3,7 +3,7 @@
  */
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { mcpSilentMode } from "@/config/debug";
 import type { CountryLanguage } from "@/i18n/core/config";
 

@@ -21,13 +21,13 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ContentLevel, IntelligenceLevel } from "../../chat/skills/enum";
 import { scopedTranslation } from "./i18n";
 
-const ModelsListContainer = lazyCliWidget(() =>
+const ModelsListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ModelsListContainer })),
 );
 

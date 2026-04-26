@@ -23,8 +23,6 @@ interface UseVoiceRecordingOptions {
   onSubmitText?: (text: string) => void | Promise<void>;
   /** Callback to submit with audio file */
   onSubmitAudio?: (file: File) => void | Promise<void>;
-  /** Callback for deducting credits */
-  deductCredits: (amount: number, feature: string) => void;
   /** User */
   user: JwtPayloadType;
   /** Logger instance */
@@ -74,7 +72,6 @@ export function useVoiceRecording({
   onValueChange,
   onSubmitText,
   onSubmitAudio,
-  deductCredits,
   user,
   logger,
   locale,
@@ -133,7 +130,6 @@ export function useVoiceRecording({
     locale,
     user,
     logger,
-    deductCredits,
   });
 
   // Start recording

@@ -12,17 +12,15 @@ import { useInView } from "react-intersection-observer";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type {
-  ChatMessage,
-  ToolCallResult,
-} from "@/app/api/[locale]/agent/chat/db";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
-import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { useLogger } from "@/hooks/use-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
@@ -117,8 +115,8 @@ function mkToolMsg(
   seq: string,
   toolCallId: string,
   toolName: string,
-  args: ToolCallResult,
-  result: ToolCallResult,
+  args: WidgetData,
+  result: WidgetData,
   executionTime: number,
 ): ChatMessage {
   return baseMockMsg({
@@ -434,10 +432,7 @@ function PersonalDemoVisual({
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
   const [activeId, setActiveId] = useState<PersonalDemoId>("heartbeat");
 
   const handleSelect = useCallback((id: PersonalDemoId) => {
@@ -501,7 +496,7 @@ function PersonalDemoVisual({
       </Div>
       <MockChatProvider>
         <Div className="rounded-lg border bg-card/50 overflow-hidden p-4 space-y-1 max-h-[32rem] overflow-y-auto">
-          <UserMessageBubble
+          <StaticUserMessageBubble
             message={userMsg}
             locale={locale}
             logger={logger}
@@ -512,7 +507,6 @@ function PersonalDemoVisual({
               id: "00000000-0000-0000-0000-000000000000",
               roles: [UserPermissionRole.ADMIN],
             }}
-            deductCredits={null}
           />
           <AnimatePresence mode="wait">
             <MotionDiv
@@ -539,7 +533,6 @@ function PersonalDemoVisual({
                   roles: [UserPermissionRole.ADMIN],
                 }}
                 sendMessage={null}
-                deductCredits={null}
                 ttsAutoplay={false}
                 voiceId={undefined}
                 onVote={null}

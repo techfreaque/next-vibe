@@ -2,9 +2,10 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
+import { memo } from "react";
 import type { JSX } from "react";
 
-export function LoadingIndicator({
+export const LoadingIndicator = memo(function LoadingIndicator({
   isStreaming,
 }: {
   isStreaming: boolean;
@@ -29,4 +30,4 @@ export function LoadingIndicator({
       </Div>
     </Div>
   ) : null;
-}
+});

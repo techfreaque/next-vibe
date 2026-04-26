@@ -12,10 +12,9 @@ import { Span } from "next-vibe-ui/ui/span";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { cn } from "next-vibe/shared/utils";
 import type { FC } from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type {
   JwtPayloadType,
   JWTPublicPayloadType,
@@ -23,13 +22,13 @@ import type {
 import meEndpoints from "@/app/api/[locale]/user/private/me/definition";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { configScopedTranslation } from "@/config/i18n";
+import { useLogger } from "@/hooks/use-logger";
 import { useTranslation } from "@/i18n/core/client";
-import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
+import type { Countries, Languages } from "@/i18n/core/config";
 import { getUniqueLanguages } from "@/i18n/core/language-utils";
 
 interface CountrySelectorProps {
   isNavBar?: boolean;
-  locale: CountryLanguage;
   user: JwtPayloadType;
 }
 
@@ -38,11 +37,7 @@ const isValidTab = (value: string): value is "country" | "language" => {
   return value === "country" || value === "language";
 };
 
-const CountrySelector: FC<CountrySelectorProps> = ({
-  isNavBar,
-  locale,
-  user,
-}) => {
+const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
   const {
     countries,
     currentCountry,
@@ -58,10 +53,7 @@ const CountrySelector: FC<CountrySelectorProps> = ({
   const [tabHover, setTabHover] = useState<"country" | "language" | null>(null);
 
   // Logger for locale sync mutation
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
 
   // Mutation to sync locale to DB (users and leads)
   const localeSyncMutation = useApiMutation(

@@ -54,6 +54,8 @@ import { generateWithReplicate } from "./providers/replicate";
 interface MediaGenStreamContext {
   threadId?: string | undefined;
   aiMessageId?: string | undefined;
+  abortSignal: AbortSignal;
+  subAgentDepth: number;
 }
 
 /**
@@ -97,7 +99,7 @@ export class ImageGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: ImageGenerationT,
-    streamContext?: MediaGenStreamContext,
+    streamContext: MediaGenStreamContext,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
     // model is resolved via serverDefault on the field definition (from ToolExecutionContext.imageGenModelId)
     const modelConfig = getImageGenModelById(data.model);
@@ -287,7 +289,7 @@ export class ImageGenerationRepository {
     let { imageUrl } = generationResult.data;
 
     // Upload to our storage so the URL is persistent and access-controlled
-    if (streamContext?.threadId) {
+    if (streamContext.threadId) {
       try {
         const storage = getStorageAdapter();
         const imgRes = await fetch(imageUrl);
@@ -359,7 +361,7 @@ export class ImageGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: ImageGenerationT,
-    streamContext?: MediaGenStreamContext,
+    streamContext: MediaGenStreamContext,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
     logger.debug("[ImageGen] Using headless AI runner for token-based model", {
       model: data.model,
@@ -385,6 +387,7 @@ export class ImageGenerationRepository {
       // in StreamRegistry, aborting the outer stream. FilePartHandler uploads to
       // an ephemeral thread; we re-upload to the real thread below.
       rootFolderId: DefaultFolderId.INCOGNITO,
+      subAgentDepth: streamContext.subAgentDepth,
       headlessInstructions:
         "You are an image generator. Output exactly one image based on the user's prompt. Do not output any text - only the image.",
       maxTurns: 1,
@@ -392,6 +395,7 @@ export class ImageGenerationRepository {
       locale,
       logger,
       t: aiStreamT,
+      abortSignal: streamContext.abortSignal,
     });
 
     if (!result.success) {
@@ -413,7 +417,7 @@ export class ImageGenerationRepository {
 
     // Re-upload from ephemeral storage to the real thread's storage so the
     // file-serving route can find it (it checks thread ownership in DB).
-    if (streamContext?.threadId) {
+    if (streamContext.threadId) {
       try {
         const storage = getStorageAdapter();
         // The ephemeral URL points to our file-serving API which requires DB thread lookup.

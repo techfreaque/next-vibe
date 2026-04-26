@@ -11,13 +11,13 @@
 import {
   closestCenter,
   DndContext,
-  type DragEndEvent,
-  type DraggableAttributes,
-  type DraggableSyntheticListeners,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
+  type DragEndEvent,
+  type DraggableAttributes,
+  type DraggableSyntheticListeners,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -55,28 +55,27 @@ import {
 import {
   useWidgetContext,
   useWidgetNavigation,
+  useWidgetSelector,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import IconWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/icon/react";
-import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import IconWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/icon/widget";
+import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/widget";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getTtsModelById } from "../../text-to-speech/models";
 import { cn } from "../../../shared/utils";
-import BadgeWidget from "../../../system/unified-interface/unified-ui/widgets/display-only/badge/react";
+import BadgeWidget from "../../../system/unified-interface/unified-ui/widgets/display-only/badge/widget";
 import {
   Icon,
   type IconKey,
 } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { getTtsModelById } from "../../text-to-speech/models";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
 import { NO_SKILL_ID } from "../skills/constants";
 import { SkillCategory } from "../skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "../skills/i18n";
-import definition, {
-  type FavoriteCard,
-  type FavoritesListResponseOutput,
-} from "./definition";
+import definition, { type FavoriteCard } from "./definition";
+import { useFavoriteSelectOverride } from "./favorite-select-context";
 import { scopedTranslation } from "./i18n";
 import reorderDefinition from "./reorder/definition";
 
@@ -84,9 +83,7 @@ import reorderDefinition from "./reorder/definition";
  * Props for custom widget
  */
 interface CustomWidgetProps {
-  field: {
-    value: FavoritesListResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 const FAVORITES_FIELD = "favorites";
@@ -793,6 +790,9 @@ export function FavoritesListContainer({
   const { push: navigate } = useWidgetNavigation();
   const context = useWidgetContext();
   const { logger, locale, user } = context;
+  const favoritesData = useWidgetSelector<typeof definition.GET>()(
+    (d) => d?.favorites,
+  );
   const isTouch = useTouchDevice();
 
   // Local override keeps the reordered list until the API call completes,
@@ -808,8 +808,15 @@ export function FavoritesListContainer({
     }),
   );
 
+  const favoriteSelectOverride = useFavoriteSelectOverride();
+
   const handleSelectFavorite = useCallback(
     async (item: FavoriteCard): Promise<void> => {
+      if (favoriteSelectOverride) {
+        favoriteSelectOverride.onSelectFavorite(item);
+        useTourState.getState().setModelSelectorOpen(false);
+        return;
+      }
       await ChatSettingsRepositoryClient.selectFavorite({
         favoriteId: item.id,
         modelId: item.modelId,
@@ -821,13 +828,31 @@ export function FavoritesListContainer({
       });
       useTourState.getState().setModelSelectorOpen(false);
     },
-    [logger, locale, user],
+    [favoriteSelectOverride, logger, locale, user],
   );
 
-  const favoritesList = useMemo(
-    () => dragOverride ?? field.value?.favorites ?? [],
-    [dragOverride, field.value?.favorites],
+  const rawFavoritesList = useMemo(
+    () => dragOverride ?? favoritesData ?? [],
+    [dragOverride, favoritesData],
   );
+
+  // When a FavoriteSelectContext is present, recompute activeBadge locally
+  // so the highlighted item reflects the current local form state, not global settings.
+  const favoritesList = useMemo((): FavoriteCard[] => {
+    if (!favoriteSelectOverride) {
+      return rawFavoritesList;
+    }
+    const { activeSkillId, activeModelId } = favoriteSelectOverride;
+    return rawFavoritesList.map((fav) => {
+      const isActive =
+        fav.skillId === activeSkillId &&
+        (activeModelId === null || fav.modelId === activeModelId);
+      return {
+        ...fav,
+        activeBadge: isActive ? "active" : null,
+      };
+    });
+  }, [rawFavoritesList, favoriteSelectOverride]);
   const groups = useMemo(() => groupBySkill(favoritesList), [favoritesList]);
 
   const { t: tFav } = scopedTranslation.scopedT(locale);
@@ -995,7 +1020,7 @@ export function FavoritesListContainer({
 
       {/* Favorites List - grouped by character */}
       <Div className="px-4 pt-4 pb-4 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]">
-        {!field.value ? (
+        {favoritesData === undefined ? (
           <Div className="h-[300px] flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </Div>

@@ -9,16 +9,13 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useCallback, useRef } from "react";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetTranslation,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type endpoints from "./definition";
 import type { CapturesListResponseOutput } from "./definition";
-
-interface WidgetProps {
-  field: {
-    value: CapturesListResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
-}
 
 type CaptureItem = CapturesListResponseOutput["items"][number];
 
@@ -57,9 +54,9 @@ function downloadCsv(items: CaptureItem[]): void {
   URL.revokeObjectURL(url);
 }
 
-export function LeadMagnetCapturesWidget({ field }: WidgetProps): JSX.Element {
+export function LeadMagnetCapturesWidget(): JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
-  const data = field.value;
+  const data = useWidgetValue<typeof endpoints.GET>();
   const items = data?.items ?? [];
   const itemsRef = useRef(items);
   itemsRef.current = items;

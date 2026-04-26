@@ -6,17 +6,16 @@
 import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   type UserPermissionRoleValue,
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import type { VideoGenModelSelection } from "../video-generation/models";
-
-import type { ToolCallResult } from "./db";
 
 /**
  * Default folder IDs
@@ -167,8 +166,19 @@ export interface ToolExecutionContext {
   musicGenModelSelection: MusicGenModelSelection | undefined;
   /** Cascaded video gen model selection - resolved to actual model at tool execution time */
   videoGenModelSelection: VideoGenModelSelection | undefined;
+  /**
+   * When set, all media gen tools (image/music/video) must use this provider.
+   * Mirrors the chat model providerOverride so the full stream uses one provider.
+   */
+  providerOverride: ApiProvider | undefined;
   /** Whether this is a headless/cron invocation */
   headless: boolean | undefined;
+  /**
+   * Sub-agent nesting depth. 0 = top-level (user-facing or cron).
+   * Incremented each time ai-run spawns a child stream.
+   * Revival / wakeUp streams inherit the parent's depth (they continue, not nest).
+   */
+  subAgentDepth: number;
   /** Whether this is a revival stream (resume-stream after wakeUp task completed). */
   isRevival: boolean | undefined;
   /**
@@ -214,7 +224,7 @@ export interface ToolExecutionContext {
    * Only available in streaming contexts - undefined for cron/headless invocations.
    *
    * Usage:
-   *   if (context.streamContext?.escalateToTask) {
+   *   if (context.streamContext.escalateToTask) {
    *     const { taskId, onComplete } = await context.streamContext.escalateToTask({
    *       callbackMode: context.streamContext.callerCallbackMode,
    *       displayName: "My long task",
@@ -233,7 +243,7 @@ export interface ToolExecutionContext {
         taskId: string;
         onComplete: (result: {
           success: boolean;
-          data?: Record<string, JsonValue>;
+          data?: Record<string, WidgetData>;
           message?: string;
         }) => Promise<void>;
       }>)
@@ -271,7 +281,7 @@ export interface ToolExecutionContext {
    * Called by long-running tools (e.g. ai-run) to stream intermediate state before completion.
    * Only available in streaming contexts - undefined for cron/headless invocations.
    */
-  emitPartialToolResult?: (partialResult: ToolCallResult) => Promise<void>;
+  emitPartialToolResult?: (partialResult: WidgetData) => Promise<void>;
 }
 
 /**

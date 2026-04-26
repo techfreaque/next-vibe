@@ -11,7 +11,7 @@ import { Navbar } from "@/app/[locale]/story/_components/nav/navbar";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";

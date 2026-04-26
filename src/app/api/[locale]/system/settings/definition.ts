@@ -26,13 +26,13 @@ import {
   type EnvKeyName,
 } from "@/app/api/[locale]/system/generated/env-keys";
 
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
 
-const SystemSettingsWidget = lazyCliWidget(() =>
+const SystemSettingsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SystemSettingsWidget })),
 );
-const SystemSettingsPatchWidget = lazyCliWidget(() =>
+const SystemSettingsPatchWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SystemSettingsPatchWidget })),
 );
 
@@ -60,6 +60,7 @@ const FIELD_TYPE_MAP: Record<EnvFieldType, FieldDataType> = {
   select: FieldDataType.SELECT,
   url: FieldDataType.URL,
   email: FieldDataType.EMAIL,
+  "log-path": FieldDataType.TEXT,
 };
 
 function buildEnvKeySchema(meta: EnvKeyMeta): z.ZodOptional<z.ZodTypeAny> {

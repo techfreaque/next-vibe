@@ -11,21 +11,21 @@ import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import {
+  useWidgetTranslation,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
-import type { SubscriptionUpdatePutResponseOutput } from "./definition";
 
 /**
  * Props for custom widget
  */
 interface CustomWidgetProps {
-  field: {
-    value: SubscriptionUpdatePutResponseOutput | null | undefined;
-  } & (typeof definition.PUT)["fields"];
+  field: (typeof definition.PUT)["fields"];
 }
 
 /**
@@ -36,6 +36,7 @@ export function SubscriptionUpdateContainer({
 }: CustomWidgetProps): JSX.Element {
   const t = useWidgetTranslation<typeof definition.PUT>();
   const children = field.children;
+  const value = useWidgetValue<typeof definition.PUT>();
 
   return (
     <Div className="flex flex-col gap-4 p-4">
@@ -59,7 +60,7 @@ export function SubscriptionUpdateContainer({
       />
 
       {/* Success Response */}
-      {field.value && (
+      {value && (
         <Card className="mt-4 border-success/30 bg-success/10">
           <CardContent className="pt-6">
             <Div className="flex items-center gap-3">

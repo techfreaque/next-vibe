@@ -1,18 +1,28 @@
-# AI Stream - callbackMode Spec
+# AI Stream — Tool Execution Lifecycle
 
-## Core Principle
+## Overview
 
-The AI sees identical behavior regardless of local/remote/transport. Every mode produces the same return shape and the same revival flow. The transport (inline, HTTP, task-queue) is invisible to the AI. The only difference is timing.
+When an AI calls a tool, five callback modes cover every meaningful execution pattern. The mode controls timing and revival — not UI presentation. Transport (local inline, remote HTTP, task queue) is invisible to the user and invisible to the AI.
 
 ---
 
-## Remote Execution - Two Tiers
+## Core Principle
 
-**Tier 1 - Direct HTTP** (preferred): If the remote instance has `isDirectlyAccessible=true` (set at connect time by pinging `localUrl`), the executing side calls the tool's HTTP route directly via `executeRemote()`.
+**Transport is invisible. UI is uniform.**
 
-**Tier 2 - Task-queue** (fallback): If `isDirectlyAccessible=false` (NAT, unreachable), create a `cron_task` with `targetInstance`. The remote picks it up on its next cron pulse (~1 min). Result arrives via `/report`.
+- The AI always sees the same return shape regardless of whether the tool ran inline, over HTTP, or via a background task queue.
+- The UI always shows the same state for the same mode regardless of transport. A `wait` tool shows as "executing" whether it ran in 2ms locally or is waiting for a 60s remote task.
+- The only observable difference is timing.
 
-**No polling anywhere.** `/report` → `handleTaskCompletion` is the universal result delivery mechanism for the queue path.
+---
+
+## Remote Execution — Two Tiers
+
+**Tier 1 — Direct HTTP** (`isDirectlyAccessible=true`): Blocking or fire-and-forget HTTP call to the remote instance. Result arrives in the same stream turn (wait/endLoop) or immediately as a taskId (detach/wakeUp).
+
+**Tier 2 — Task queue** (`isDirectlyAccessible=false`): Task row created with `targetInstance`. Remote picks it up on its next pulse (~1 min). Result arrives via `/report` → `handleTaskCompletion`. Stream aborts into `waiting` state; revival delivers the result.
+
+The task queue path always produces the same end state as if the tool had run locally — the stream revival reconstructs the turn as if nothing was deferred.
 
 ---
 
@@ -20,13 +30,13 @@ The AI sees identical behavior regardless of local/remote/transport. Every mode 
 
 Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
-**`waiting`** means: stream is dead but a task is still in flight. The stop button stays visible. No reasoning or content arrives until revival.
+**`waiting`** — stream is dead but a task is still in flight. Stop button stays visible. No content arrives until revival.
 
-- Set when: `waitingForRemoteResult=true` + stream aborts (`REMOTE_TOOL_WAIT` reason)
-- Cleared when: revival fires (`claimRevival` atomically transitions `idle|waiting` → `streaming`)
-- Also cleared when: cancel is called, or task completes with no revival (endLoop remote)
-- `STREAMING_STATE_CHANGED` WS event fires immediately when state → `waiting` so live clients update the stop button without a page refresh
-- Persisted in DB: page refresh recovery - if thread is `waiting` on load, stop button shown immediately
+- Set when: task-queue path activates (`waitingForRemoteResult=true` + stream aborts with `REMOTE_TOOL_WAIT`)
+- Cleared when: revival fires (atomically claims `idle|waiting → streaming`)
+- Also cleared when: cancel called, or task completes with no revival (endLoop remote, detach)
+- `STREAMING_STATE_CHANGED` WS event fires immediately so live clients update without refresh
+- Persisted across page loads: if thread is `waiting` on load, stop button shows immediately
 
 ---
 
@@ -34,245 +44,222 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 ### `wait` (default)
 
-AI sees: tool result returned inline, loop continues - **local only**. For remote/escalated, AI sees no result in this turn; stream aborts and revival delivers result in a new turn.
+**User sees**: tool executing. Stream pauses, then continues with the result. Seamless.
 
-| Transport                | Behavior                                                                                                                                       |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Local**                | Inline execution. Result returned to AI immediately. Loop continues.                                                                           |
-| **Remote direct**        | Blocking HTTP call via `executeRemote()`. Awaits response. Connection is alive and waiting - no timer. Result returned inline. Loop continues. |
-| **Remote queue**         | `waitingForRemoteResult=true`. Stream aborts (`REMOTE_TOOL_WAIT`). Thread → `waiting`. `/report` → `handleTaskCompletion(WAIT)` → revival.     |
-| **Escalated (>timeout)** | Same as remote queue path: `waitingForRemoteResult=true`, stream aborts, thread → `waiting`. Revival delivers result.                          |
+**AI sees**: result returned inline, loop continues — always. For the task-queue path, the stream revives and the AI picks up from where it left off; the deferred mechanics are invisible to the AI.
 
-**Tool message lifecycle - `wait` (remote/escalated):**
+| Transport                | Stream behavior                                                                        |
+| ------------------------ | -------------------------------------------------------------------------------------- |
+| **Local**                | Inline execution. Result returned immediately. Loop continues.                         |
+| **Remote direct**        | Blocking HTTP. Result returned in same turn. Loop continues.                           |
+| **Remote queue**         | Stream aborts → `waiting`. Task executes remotely. On completion: see lifecycle below. |
+| **Escalated (>timeout)** | Same as remote queue path.                                                             |
 
-- At tool-call time: original tool message created with `status: "pending"`, content = tool input args
-- While waiting: original message stays `pending`
-- On `handleTaskCompletion(WAIT)` → resume-stream checks sequenceId:
-  - **sameSequence** (thread has not moved since tool call): original tool message **backfilled in place** - `status: "completed"`, result set. No deferred message created. `TOOL_RESULT` WS event emitted.
-  - **diffSequence** (user sent new messages while waiting): a deferred TOOL message is inserted after the new leaf. `MESSAGE_CREATED` + `TOOL_RESULT` WS events emitted.
-- Revival fires headless stream from the backfilled original (sameSequence) or deferred message (diffSequence) as parent
-- AI sees result, loop continues (no loop stop for `wait`)
+**Tool message lifecycle — task-queue path:**
+
+- At call time: tool message created, `status: "pending"` (UI shows executing)
+- While waiting: message stays `pending`, thread stays `waiting`
+- On `handleTaskCompletion` → result inserted into the **message queue**:
+  - **No user message in queue** (same sequence): dequeue result → backfill original tool message in place — `status: "completed"`, result set. No deferred message created. `TOOL_RESULT` WS event emitted. Revival fires from original as parent.
+  - **User messages in queue** (different sequence): dequeue result → insert deferred TOOL message after the current leaf. `MESSAGE_CREATED` + `TOOL_RESULT` WS events. Revival fires from deferred as parent, with queued user messages prepended to the revival context.
+- AI sees result and continues. Loop does not stop.
 
 ---
 
 ### `detach`
 
-AI sees: `{ taskId, status: "pending", hint: "use wait-for-task(taskId) if you need the result" }` - always.
+**User sees**: tool dispatched, stream continues immediately. Result bubble updates in background when done.
 
-| Transport         | Behavior                                                                          |
-| ----------------- | --------------------------------------------------------------------------------- |
-| **Local**         | Inline execution (fire-and-forget). AI gets taskId immediately, stream continues. |
-| **Remote direct** | HTTP call (non-blocking), AI gets taskId immediately.                             |
-| **Remote queue**  | Task created, AI gets taskId immediately.                                         |
+**AI sees**: `{ taskId, status: "pending", hint: "use wait-for-task(taskId) if you need the result" }` — always.
 
-**Tool message:** created with `status: "pending"`. On task completion: backfilled with result, `TASK_COMPLETED` WS event. No revival. No AI continuation.
+| Transport         | Stream behavior                                                       |
+| ----------------- | --------------------------------------------------------------------- |
+| **Local**         | Fire-and-forget inline. AI gets taskId immediately, stream continues. |
+| **Remote direct** | Non-blocking HTTP. AI gets taskId immediately.                        |
+| **Remote queue**  | Task created. AI gets taskId immediately.                             |
 
-Result stored in task history only. AI can later call `wait-for-task(taskId)` to upgrade to wakeUp semantics.
+**Tool message**: created `pending`. On completion: backfilled with result, `TASK_COMPLETED` WS event. No revival. AI can upgrade by calling `wait-for-task(taskId)`.
 
 ---
 
 ### `wakeUp`
 
-AI sees: `{ taskId, status: "pending", hint: "result will be injected when ready - do NOT call wait-for-task" }` - always.
+**User sees**: tool dispatched, stream continues immediately. When result arrives, a new AI turn starts automatically.
 
-| Transport         | Behavior                                                                                                            |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------- |
-| **Local**         | Inline execution (fire-and-forget). `handleTaskCompletion(WAKE_UP)` fires immediately → schedules resume-stream.    |
-| **Remote direct** | HTTP call (non-blocking). Remote calls `/report` when done → `handleTaskCompletion(WAKE_UP)` → resume-stream.       |
-| **Remote queue**  | Task created. Remote picks up on cron, executes, calls `/report` → `handleTaskCompletion(WAKE_UP)` → resume-stream. |
+**AI sees**: `{ taskId, status: "pending", hint: "result will be injected when ready — do NOT call wait-for-task" }` — always.
 
-**Tool message lifecycle - `wakeUp`:**
+| Transport         | Stream behavior                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Local**         | Fire-and-forget. `handleTaskCompletion(WAKE_UP)` → result inserted into message queue → queue executor runs. |
+| **Remote direct** | Non-blocking HTTP. Remote calls `/report` when done → same completion path.                                  |
+| **Remote queue**  | Task created. Remote picks up on pulse → `/report` → same completion path.                                   |
 
-- At tool-call time: original tool message created with `status: "pending"`, content = `{taskId, status:"pending"}`
+**Tool message lifecycle:**
+
+- At call time: tool message created `pending`, content = `{taskId, status:"pending"}`
 - Original tool message is **never modified** after creation
-- On `handleTaskCompletion(WAKE_UP)`: a **new separate deferred TOOL message** is inserted at `leafMessageId` with the actual result
-- `MESSAGE_CREATED` + `TOOL_RESULT` WS events emitted for the deferred message
-- `TASK_COMPLETED` WS event emitted (carries `deferredMessage` for optimistic UI)
-- Revival fires headless stream from the deferred message as parent
+- On `handleTaskCompletion` → result inserted into the **message queue**:
+  - Queue executor checks thread state:
+    - **Stream still running**: result injected into current turn as next step. Deferred message inserted, AI loop picks it up immediately.
+    - **Stream dead** (thread `idle` or `waiting`): deferred TOOL message inserted at current leaf with actual result. `MESSAGE_CREATED` + `TOOL_RESULT` + `TASK_COMPLETED` WS events. Revival fires from deferred as parent. Any additional queued user messages included in revival context.
+- Revival fires a fresh full-tool-access turn.
 
-**AI context (message-converter):** for wakeUp, the original tool call's args are replaced with a short hint in AI context (e.g. `{hint:"args omitted, see deferred result below"}`). Full args preserved in DB and shown in UI. The deferred result message is included in AI context as the authoritative result.
-
-**When resume-stream fires:**
-
-- Loop still live → pub/sub signal intercepts → `stopWhen` yields → result injected
-- Loop dead → headless revival from stored `leafMessageId`
+**AI context**: original tool call args replaced with `{hint:"args omitted, see deferred result below"}` in AI context. Full args preserved in DB and shown in UI. Deferred result is the authoritative context entry.
 
 ---
 
 ### `endLoop`
 
-AI sees: tool result returned, then loop stops - always.
+**User sees**: tool executing, then stream ends. Background task visible until complete.
 
-| Transport         | Behavior                                                                                                                                                                                 |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Local**         | Inline execution. Result to AI. Loop stops after step. AI writes final response. Thread → `idle` when stream ends.                                                                       |
-| **Remote direct** | Blocking HTTP call. Result to AI. Loop stops. Thread → `idle`.                                                                                                                           |
-| **Remote queue**  | `waitingForRemoteResult=true`. Stream aborts (`REMOTE_TOOL_WAIT`). Thread → `waiting`. On completion: result backfilled, `TASK_COMPLETED` WS event. No AI continuation. Thread → `idle`. |
+**AI sees**: result returned, then loop stops — always.
 
-**Thread stays `waiting` (stop button visible) until task completes** - even though no AI continuation fires. This tells the user the background task is still running.
+| Transport         | Stream behavior                                                                                                                                                 |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Local**         | Inline execution. Result to AI. Loop stops. Thread → `idle`.                                                                                                    |
+| **Remote direct** | Blocking HTTP. Result to AI. Loop stops. Thread → `idle`.                                                                                                       |
+| **Remote queue**  | Stream aborts → `waiting`. Task executes. On completion: original tool message **backfilled in place**. `TASK_COMPLETED` WS event. No revival. Thread → `idle`. |
 
-**Tool message lifecycle - `endLoop` (remote queue):**
-
-- Original tool message backfilled with result on `handleTaskCompletion`
-- Additionally: a deferred TOOL message is inserted (same as wakeUp) for UI visibility
-- `TASK_COMPLETED` WS event with `deferredMessage`
-- No resume-stream scheduled. No AI continuation.
-
-No resume-stream for endLoop.
+Thread stays `waiting` (stop button visible) until the remote task completes — even though no AI continuation fires.
 
 ---
 
 ### `approve`
 
-AI sees: tool blocked pending human confirmation; other parallel tools proceed - always.
+**User sees**: confirmation dialog for this tool. Other tools in the same batch proceed normally.
 
-| Transport            | Behavior                                                                                                        |
-| -------------------- | --------------------------------------------------------------------------------------------------------------- |
-| **All**              | `TOOL_WAITING` emitted. UI shows Confirm/Cancel. Other parallel tools execute normally. Loop stops after batch. |
-| **Confirm + wait**   | Tool executes inline (blocking), AI turn resumes via resume-stream with result.                                 |
-| **Confirm + wakeUp** | Tool executes fire-and-forget. `approve-tool` endpoint returns immediately. Revival fires when done.            |
-| **Cancel**           | Tool marked cancelled, AI turn resumes.                                                                         |
+**AI sees**: tool blocked; other parallel tools execute normally. Loop stops after batch.
 
-AI cannot opt out if `requiresConfirmation=true` in tool settings.
+| Outcome              | Behavior                                                       |
+| -------------------- | -------------------------------------------------------------- |
+| **Confirm + wait**   | Tool executes. Result delivery follows `wait` lifecycle below. |
+| **Confirm + wakeUp** | Tool executes fire-and-forget. Revival fires when done.        |
+| **Cancel**           | Tool marked cancelled. AI turn resumes.                        |
+
+**Confirm + wait result lifecycle** (same as `wait` task-queue path):
+
+- **No user message in queue** (same sequence): result backfilled into original tool message in-place. `TOOL_RESULT` WS event. Revival from original.
+- **User message(s) in queue** (different sequence — user sent a follow-up before confirming): deferred TOOL message inserted after current leaf. `MESSAGE_CREATED` + `TOOL_RESULT` WS events. Revival from deferred, with queued user messages prepended to context.
+
+If `requiresConfirmation=true` on the endpoint definition, the AI cannot bypass this mode.
 
 ---
 
-## Tool Call Errors - Loop Always Continues
+## Message Queue
 
-Failed tool calls never stop the loop. `tool-result-handler.ts` marks the tool as failed and returns the error as a tool result. The AI receives:
+**Planned** (not yet in code):
+
+Every thread has a per-thread message queue. All async results and user messages during an active or waiting stream go through the queue. The queue is the single delivery mechanism — nothing bypasses it.
+
+**Enqueue sources:**
+
+- User sends a message while thread is `streaming` or `waiting` → message appended to queue
+- `handleTaskCompletion` for wakeUp/wait → result appended to queue
+- Cross-agent messages from remote agents → appended to queue (future)
+
+**Queue executor — runs after every enqueue:**
+
+1. If thread is `streaming`: hand the item to the live stream as the next step. Stream picks it up at the end of the current tool batch.
+2. If thread is `idle` or `waiting`: drain the full queue in one shot — fire a revival run with all queued items as context (tool results first, then user messages in order).
+3. If thread is `aborting`: wait, retry after abort settles.
+
+**Why a queue, not a block:**
+
+Users should not be frozen out of their thread while an agent works. Cross-agent communication depends on this: a remote agent returning results, a user adding context mid-run, a cron-triggered injection — all arrive asynchronously and must land in order. The queue is the foundation for agent-to-agent messaging where multiple senders need ordered delivery into a single thread.
+
+**Ordering guarantee**: items are drained oldest-first. A revival that includes both a tool result and queued user messages always presents the tool result first, then user messages, then fires the AI response.
+
+---
+
+## Tool Call Errors — Loop Always Continues
+
+Failed tool calls never stop the loop. The AI receives:
 
 ```json
 { "success": false, "message": "...", "errorType": "..." }
 ```
 
-The AI decides what to do (retry, skip, explain). Consistent with `ResponseType<T>` - no throw, always a result.
+The AI decides what to do (retry, skip, explain). Errors are data, not exceptions.
 
 ---
 
 ## `wait-for-task` Tool
 
-Works for **both** `detach` and `wakeUp` tasks:
+Works for both `detach` and `wakeUp` tasks:
 
-- Task **already complete**: returns result inline. Stream continues. Cleans up task + any pending revival.
-- Task **pending**: writes `callbackMode=WAKE_UP + threadId + toolMessageId` onto task row (upgrades detach to wakeUp semantics), sets `pendingTimeoutMs=90000` → stream pauses.
-- On timeout (`STREAM_TIMEOUT`): stream dies cleanly. Thread → `waiting`. When task completes, `handleTaskCompletion(WAKE_UP)` fires revival.
-- AI always sees: `{ taskId, status, result?, waiting }` - same shape for all cases.
+- Task **already complete**: result returned inline. Stream continues. Task cleaned up.
+- Task **pending**: upgrades to wakeUp semantics (`callbackMode=WAKE_UP` written on task row), sets `pendingTimeoutMs=90000` → stream pauses.
+- On timeout: stream dies cleanly. Thread → `waiting`. When task completes, `handleTaskCompletion(WAKE_UP)` → queue → revival.
+
+AI always sees: `{ taskId, status, result?, waiting }`.
 
 ---
 
 ## Stream Timeout
 
-Any time the stream is waiting for a remote result (queue path, `wait-for-task`, or escalated tool):
+When waiting for a remote result (task-queue path, `wait-for-task`, escalated tool):
 
-- Set `pendingTimeoutMs` on `ToolExecutionContext`
-- `finish-step-handler.ts` reads this and schedules `setTimeout` → `streamAbortController.abort(new StreamAbortError(AbortReason.STREAM_TIMEOUT))`
-- If result arrives before timeout: cancel the timer
-- Clean abort: no error shown to user; revival handles continuation
+- `pendingTimeoutMs` set on `ToolExecutionContext`
+- Timeout fires → stream aborts cleanly (`STREAM_TIMEOUT`)
+- Thread → `waiting`. Revival delivers result when task completes via queue.
 - `pendingTimeoutMs = 0` → no timer (wait forever)
 
-**Default timeout: 90s** - covers a full cron pulse cycle.
+**Default: 90s.** Covers a full task-queue pulse cycle.
 
-**Per-tool override:** set `streamTimeoutMs` on the endpoint definition in `createEndpoint()`. This is passed down by `tools-loader.ts` before calling execute. Tools that need no timeout (shell, claude-code interactive) set `streamTimeoutMs: 0`.
+**Per-tool override**: `streamTimeoutMs: 0` in endpoint definition for interactive tools (shells, long-running agents).
 
-**Direct HTTP `wait` mode does not use this timer** - the HTTP connection itself is the timeout.
+**Direct HTTP `wait` mode**: no timer — the HTTP connection is the timeout.
 
 ---
 
-## Tool Self-Escalation (`context.escalateToTask()`)
+## Tool Self-Escalation
 
-For tools that may run longer than the configured timeout (shell, claude-code, etc.):
+For tools that may run longer than the configured timeout:
 
-**Fast path (default):** Tool returns within timeout → result returned normally (local transport). Zero overhead.
+**Fast path**: returns within timeout → result returned normally. Zero overhead.
 
-**Escalation:** Tool calls `context.escalateToTask(callbackMode)` before the long-running operation:
+**Escalation**: tool calls `context.escalateToTask(callbackMode)` before the long-running work:
 
-1. Creates cron task row with the given callbackMode, stores `leafMessageId`
-2. Sets `waitingForRemoteResult = true` - **never** `shouldStopLoop` (that's for endLoop only)
-3. Sets `pendingTimeoutMs` from the tool's `streamTimeoutMs` definition (or default); `0` = no timer
-4. `STREAMING_STATE_CHANGED` → `waiting` emitted immediately
-5. Stream aborts at timeout (`REMOTE_TOOL_WAIT`) or immediately if `streamTimeoutMs=0`... wait, stream must stay alive until step batch ends
-6. After parallel batch completes: stream sees `waitingForRemoteResult=true` → aborts (`REMOTE_TOOL_WAIT`)
-7. Tool goroutine continues running detached from HTTP scope
-8. Tool goroutine completes → `handleTaskCompletion(callbackMode)` → revival (for WAIT or WAKE_UP)
+1. Creates task row with `callbackMode`, stores `leafMessageId`
+2. Sets `waitingForRemoteResult=true`, `pendingTimeoutMs` from endpoint definition
+3. `STREAMING_STATE_CHANGED → waiting` emitted immediately
+4. After parallel batch: stream sees `waitingForRemoteResult=true` → aborts (`REMOTE_TOOL_WAIT`)
+5. Tool goroutine continues detached from HTTP scope
+6. Completes → `handleTaskCompletion(callbackMode)` → queue → revival
 
-**The callbackMode passed to `escalateToTask` controls revival:**
-
-- `WAIT`: original tool message backfilled, AI resumes with full context
-- `WAKE_UP`: deferred message inserted, AI sees only result (args suppressed)
-- `END_LOOP`: backfill + deferred message, no AI continuation
-
-**The caller's callbackMode (passed by AI when invoking the tool) is used** - tools do not pick their own default unilaterally. `escalateToTask` receives the `callbackMode` from the tool's execution context.
+The callbackMode passed to `escalateToTask` is the one the AI requested. Tools do not pick their own.
 
 ---
 
 ## Branch Tracking for Revival
 
-Every wakeUp task stores `leafMessageId` (= `ctx.currentParentId` at tool-call time - the branch tip at the moment the tool was called).
+Every wakeUp/wait task stores `leafMessageId` (branch tip at call time):
 
-- `execute-tool/repository.ts` and `wait-for-task/repository.ts`: store `leafMessageId` in the dedicated `wakeUpLeafMessageId` column on the task row (NOT in the `taskInput` JSON blob)
-- `handleTaskCompletion` accepts `leafMessageId?: string | null` as a **first-class typed param** - callers pass it explicitly, never via `taskInput` spread
-- `resumeStreamRequestSchema.parse` receives only the known routing fields (`threadId`, `callbackMode`, `modelId`, `skillId`, `favoriteId`, `leafMessageId`) - never arbitrary tool input fields
-- `resume-stream/repository.ts` uses stored `leafMessageId` as the parent for the deferred message
-- Falls back to latest-message query only if `leafMessageId` not set (backwards compat)
-
-This ensures revival appends to the correct branch even if the user switched branches while the tool was running.
+- Stored in a dedicated column on the task row
+- `handleTaskCompletion` accepts it as a typed first-class parameter
+- Revival appends to the correct branch even if the user switched branches while the task ran
 
 ---
 
 ## Parallel Mixed-Mode Rules
 
-All parallel tools execute concurrently. Rules for how results land:
-
-| Combination                  | Rule                                                                                                    |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `wait + wait`                | Both results returned, loop continues.                                                                  |
-| `wakeUp + wakeUp`            | Both fire independently. Each schedules its own revival. Each revival is a fresh full-tool-access turn. |
-| `detach + detach`            | Both fire. Neither schedules revival. AI gets two taskIds.                                              |
-| `endLoop + anything`         | All parallel tools complete. Non-endLoop results returned to AI. Then loop stops.                       |
-| `approve + anything`         | approve blocks only itself. Other tools execute normally. Loop stops after batch.                       |
-| `wakeUp + endLoop`           | Both fire. endLoop stops loop. wakeUp revival fires later - fresh turn with full tool access.           |
-| `wakeUp + approve`           | approve blocks itself, wakeUp fires. Loop stops after batch. wakeUp revival fires when result arrives.  |
-| `detach + wakeUp`            | Both fire. Only wakeUp schedules revival.                                                               |
-| `wait + wakeUp`              | wait returns result to AI (local) or aborts with waiting (remote). wakeUp fires independently.          |
-| `wait + endLoop`             | endLoop stops loop after step. wait result returned before stop (local) or thread → waiting (remote).   |
-| `detach + endLoop`           | endLoop stops loop. detach fires, no revival.                                                           |
-| `approve + wakeUp + endLoop` | approve blocks. wakeUp fires, schedules revival. endLoop stops loop after batch.                        |
+| Combination                  | Rule                                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `wait + wait`                | Both results returned, loop continues.                                                                 |
+| `wakeUp + wakeUp`            | Both fire independently. Each goes through queue. Each revival is a fresh full-tool-access turn.       |
+| `detach + detach`            | Both fire. No revival. AI gets two taskIds.                                                            |
+| `endLoop + anything`         | All parallel tools complete. Non-endLoop results to AI. Then loop stops.                               |
+| `approve + anything`         | approve blocks only itself. Other tools execute normally. Loop stops after batch.                      |
+| `wakeUp + endLoop`           | Both fire. endLoop stops loop. wakeUp result goes to queue → revival fires later.                      |
+| `wakeUp + approve`           | approve blocks itself, wakeUp fires. Loop stops. wakeUp revival fires via queue when done.             |
+| `detach + wakeUp`            | Both fire. Only wakeUp goes to queue and schedules revival.                                            |
+| `wait + wakeUp`              | wait returns inline (local/direct) or aborts to waiting (queue). wakeUp fires independently via queue. |
+| `wait + endLoop`             | endLoop stops loop. wait result returned before stop (local/direct) or thread → waiting (queue).       |
+| `detach + endLoop`           | endLoop stops loop. detach fires, no revival.                                                          |
+| `approve + wakeUp + endLoop` | approve blocks. wakeUp fires via queue. endLoop stops loop after batch.                                |
 
 ---
 
-## Push-First Sync Architecture
+## Push-First Sync
 
-When `isDirectlyAccessible=true`, cloud pushes changes to local immediately instead of waiting for local's cron pull:
-
-- **Tasks**: after creating a task with `targetInstance`, immediately POST to local's task-sync endpoint via `executeRemote()`. On failure: fall back (task is already in DB, local pulls on next cron).
-- **Memories**: on `create`/`update`/`delete`, push delta to local's task-sync endpoint fire-and-forget.
-- **Capabilities**: on version bump, push updated capabilities to local immediately.
-
-Connecting side (local) always has `pullFromRemote()` as fallback - push is opportunistic.
-
----
-
-## toolMessageId - No Polling
-
-Each `execute()` wrapper in `tools-loader.ts` injects `currentToolMessageId` from `ctx.pendingToolMessages.get(toolCallId)?.messageId` before calling execute. No shared map, no polling. By the time `execute()` is called, the `tool-call` event has already been processed and `pendingToolMessages` is populated.
-
----
-
-## Related Files
-
-| File                                               | Role                                                                                       |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `ai/execute-tool/constants.ts`                     | `CallbackMode` enum + `TaskRoutingContext` type                                            |
-| `ai/execute-tool/repository.ts`                    | Local/remote execution paths per mode, transport routing; reads `streamTimeoutMs` from def |
-| `tasks/task-completion-handler.ts`                 | Backfill + deferred insert + WS events + resume-stream scheduling, reads `leafMessageId`   |
-| `tasks/execute/repository.ts`                      | Cron task execution + `handleTaskCompletion` call                                          |
-| `tasks/pulse/repository.ts`                        | Pulse loop (remote task pickup + `/report` push)                                           |
-| `tasks/wait-for-task/repository.ts`                | Blocks stream on pending task, upgrades detach→wakeUp                                      |
-| `resume-stream/repository.ts`                      | Headless AI turn (append mode), uses `leafMessageId` for branch                            |
-| `repository/handlers/finish-step-handler.ts`       | Reads `waitingForRemoteResult`/`shouldStopLoop`, starts timeout timer (skips if `0`)       |
-| `repository/handlers/tool-call-handler.ts`         | Sets `shouldStopLoop` (endLoop only), `requiresConfirmation`, emits `TOOL_WAITING`         |
-| `repository/handlers/tool-result-handler.ts`       | Detects waiting state via callbackMode; stores `pending` status for remote/escalated tools |
-| `repository/handlers/message-converter.ts`         | Deferred message handling in AI context, suppresses wakeUp args                            |
-| `repository/handlers/tool-confirmation-handler.ts` | Confirm/cancel flow, wakeUp fire-and-forget on confirm                                     |
-| `user/remote-connection/db.ts`                     | `isDirectlyAccessible` field on `remote_connections`                                       |
-| `tasks/task-sync/repository.ts`                    | Pull-from-remote, push-first on `isDirectlyAccessible=true`                                |
+When the remote node is directly reachable (`isDirectlyAccessible=true`), task creation and completion notifications are pushed immediately rather than waiting for the next cron pull. Pull is always the fallback — push is opportunistic.

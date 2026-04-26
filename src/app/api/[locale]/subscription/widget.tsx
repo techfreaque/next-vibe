@@ -28,21 +28,12 @@ import {
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { useTranslation } from "@/i18n/core/client";
 
 import type definition from "./definition";
-import type { SubscriptionGetResponseOutput } from "./definition";
 import { SubscriptionStatus } from "./enum";
-
-/**
- * Props for custom widget
- */
-interface CustomWidgetProps {
-  field: {
-    value: SubscriptionGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
 
 /**
  * Format date for display
@@ -54,11 +45,9 @@ function formatDate(date: string, locale: string): string {
 /**
  * Subscription Overview Container Widget
  */
-export function SubscriptionOverviewContainer({
-  field,
-}: CustomWidgetProps): JSX.Element {
+export function SubscriptionOverviewContainer(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
-  const subscription = field.value;
+  const subscription = useWidgetValue<typeof definition.GET>();
   const { locale } = useTranslation();
   const user = useWidgetUser();
   const logger = useWidgetLogger();

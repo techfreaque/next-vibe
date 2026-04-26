@@ -4,7 +4,7 @@
  */
 
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
-import type { JsonValue } from "./error-types";
+import type { WidgetData } from "../types/json";
 
 /**
  * Convert camelCase to kebab-case for CLI flags
@@ -18,10 +18,10 @@ function camelToKebab(str: string): string {
  * Objects are expanded as dot-notation: --key.subkey="value"
  * Primitives: --key="value"
  */
-function serializeFlag(key: string, value: JsonValue): string {
+function serializeFlag(key: string, value: WidgetData): string {
   const kebabKey = camelToKebab(key);
   if (value !== null && typeof value === "object" && !Array.isArray(value)) {
-    const entries = Object.entries(value as Record<string, JsonValue>);
+    const entries = Object.entries(value);
     if (entries.length === 0) {
       return `--${kebabKey}.KEY="value"`;
     }
@@ -64,7 +64,7 @@ export interface ValidationErrorData {
   /** Endpoint alias for example commands (null if no endpoint) */
   alias: string | null;
   /** Raw example values from endpoint definition */
-  exampleValues: Record<string, JsonValue>;
+  exampleValues: Record<string, WidgetData>;
   /** Already-provided input values (for --interactive pre-fill) */
   inputData: Record<string, string>;
 }
@@ -107,7 +107,7 @@ export function parseValidationError(
     typeof endpoint.examples.requests === "object"
       ? ((Object.values(
           endpoint.examples.requests as Record<string, Record<string, string>>,
-        )[0] ?? {}) as Record<string, JsonValue>)
+        )[0] ?? {}) as Record<string, WidgetData>)
       : {};
 
   return {
@@ -143,7 +143,7 @@ export function buildExampleCommand(
       ? endpoint.aliases[0]
       : endpoint.path.join("-");
 
-  const flags = Object.entries(example as Record<string, JsonValue>)
+  const flags = Object.entries(example as Record<string, WidgetData>)
     .map(([k, v]) => serializeFlag(k, v))
     .join(" ");
 

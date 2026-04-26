@@ -1,0 +1,1 @@
+ALTER TABLE "cron_tasks" ADD COLUMN "wake_up_sub_agent_depth" integer;

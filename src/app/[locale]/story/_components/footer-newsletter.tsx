@@ -140,7 +140,7 @@ export function NewsletterSignupFooter({
           {t("common.selector.country")} / {t("common.selector.language")}
         </H3>
         <Div className="inline-block">
-          <CountrySelector locale={locale} user={user} />
+          <CountrySelector user={user} />
         </Div>
       </Div>
     </Div>

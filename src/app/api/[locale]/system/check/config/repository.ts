@@ -25,13 +25,13 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { parseError } from "../../../shared/utils/parse-error";
 import { parseJsonWithComments } from "../../../shared/utils/parse-json";
 import { scopedTranslation } from "./i18n";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   CheckConfig,
   CreateDefaultCheckConfigResult,
   CreateDefaultMcpConfigResult,
   EnsureConfigResult,
   GenerateVSCodeSettingsResult,
-  JsonObject,
   OxlintJsPlugin,
 } from "./types";
 
@@ -269,7 +269,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   // --------------------------------------------------------
 
   private static applyOxcSettings(
-    settings: JsonObject,
+    settings: Record<string, WidgetData>,
     oxc: NonNullable<
       NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]
     >["oxc"],
@@ -301,7 +301,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   }
 
   private static applyEditorSettings(
-    settings: JsonObject,
+    settings: Record<string, WidgetData>,
     editor: NonNullable<
       NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]
     >["editor"],
@@ -321,7 +321,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   }
 
   private static applyTypescriptSettings(
-    settings: JsonObject,
+    settings: Record<string, WidgetData>,
     ts: NonNullable<
       NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]
     >["typescript"],
@@ -345,8 +345,8 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   }
 
   private static applyFileSettings(
-    settings: JsonObject,
-    existing: JsonObject,
+    settings: Record<string, WidgetData>,
+    existing: Record<string, WidgetData>,
     files: NonNullable<
       NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]
     >["files"],
@@ -366,8 +366,8 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   }
 
   private static applySearchSettings(
-    settings: JsonObject,
-    existing: JsonObject,
+    settings: Record<string, WidgetData>,
+    existing: Record<string, WidgetData>,
     search: NonNullable<
       NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]
     >["search"],
@@ -382,8 +382,8 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   }
 
   private static applyLanguageFormatterSettings(
-    settings: JsonObject,
-    existing: JsonObject,
+    settings: Record<string, WidgetData>,
+    existing: Record<string, WidgetData>,
     vscodeSettings: NonNullable<
       CheckConfig["vscode"] & { enabled: true }
     >["settings"],
@@ -400,7 +400,9 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       "javascriptreact",
     ]) {
       const langKey = `[${lang}]`;
-      const existingLang = existing[langKey] as JsonObject | undefined;
+      const existingLang = existing[langKey] as
+        | Record<string, WidgetData>
+        | undefined;
       settings[langKey] = {
         ...existingLang,
         "editor.defaultFormatter": formatter,
@@ -607,7 +609,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         settingsPath,
         locale,
       );
-      const newSettings: JsonObject = { ...existingSettings };
+      const newSettings: Record<string, WidgetData> = { ...existingSettings };
 
       // Apply all settings using static helpers
       ConfigRepositoryImpl.applyOxcSettings(
@@ -916,7 +918,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   private static async loadExistingSettings(
     settingsPath: string,
     locale: CountryLanguage,
-  ): Promise<JsonObject> {
+  ): Promise<Record<string, WidgetData>> {
     if (!existsSync(settingsPath)) {
       return {};
     }
@@ -924,7 +926,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       const content = await fs.readFile(settingsPath, "utf8");
       const parseResult = parseJsonWithComments(content, locale);
       if (parseResult.success && typeof parseResult.data === "object") {
-        return parseResult.data as JsonObject;
+        return parseResult.data as Record<string, WidgetData>;
       }
     } catch {
       // Return empty object if parsing fails

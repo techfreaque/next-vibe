@@ -26,8 +26,9 @@ import {
   useWidgetContext,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
 import type statsEndpoints from "./definition";
 import type { CronStatsGetResponseOutput } from "./definition";
@@ -37,9 +38,7 @@ import type { CronStatsGetResponseOutput } from "./definition";
 type StatsData = CronStatsGetResponseOutput;
 
 interface WidgetProps {
-  field: {
-    value: CronStatsGetResponseOutput | null | undefined;
-  } & (typeof statsEndpoints.GET)["fields"];
+  field: (typeof statsEndpoints.GET)["fields"];
 }
 
 // ─── Format Helpers ───────────────────────────────────────────────────────────
@@ -584,7 +583,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof statsEndpoints.GET>();
 
-  const data = field.value;
+  const data = useWidgetValue<typeof statsEndpoints.GET>();
   const isLoading = endpointMutations?.read?.isLoading;
 
   // ─── Callbacks ────────────────────────────────────────────────────────────

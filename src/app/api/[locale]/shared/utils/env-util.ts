@@ -36,8 +36,10 @@ export function validateEnv<TSchema extends z.ZodType>(
     const result = envSchema.safeParse(normalizedEnv);
     if (!result.success) {
       printEnvErrors(result.error, hints, logger);
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Clean exit on env misconfiguration, no stack trace needed
-      process.exit(1);
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      throw new Error(
+        "Environment variable validation failed. Check logs above.",
+      );
     }
     return result.data as z.infer<TSchema>;
   }
@@ -66,8 +68,10 @@ export function validateEnv<TSchema extends z.ZodType>(
       "──────────────────────────────────────────────────────────",
     ].join("\n");
     logger.error(message);
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Clean exit on env misconfiguration, no stack trace needed
-    process.exit(1);
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+    throw new Error(
+      "Environment variable validation failed. Check logs above.",
+    );
   }
   return validationResult.data as z.infer<TSchema>;
 }

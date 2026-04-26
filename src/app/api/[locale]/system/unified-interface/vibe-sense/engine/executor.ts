@@ -10,11 +10,13 @@ import "server-only";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
-import type { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { defaultLocale } from "@/i18n/core/config";
+
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 import { GraphResolution } from "../enum";
 import type { GraphNodeConfig } from "../graph/schema";
@@ -48,6 +50,7 @@ const VIBE_SENSE_STREAM_CONTEXT: ToolExecutionContext = {
   skillId: undefined,
   modelId: undefined,
   headless: undefined,
+  subAgentDepth: 0,
   currentToolMessageId: undefined,
   callerToolCallId: undefined,
   pendingToolMessages: undefined,
@@ -64,6 +67,8 @@ const VIBE_SENSE_STREAM_CONTEXT: ToolExecutionContext = {
   videoGenModelSelection: undefined,
   variantId: undefined,
   isRevival: undefined,
+
+  providerOverride: undefined,
 };
 
 // ─── Execution Context ────────────────────────────────────────────────────────
@@ -338,29 +343,21 @@ type MappedValue = MappedScalar | DataPoint[] | Record<string, MappedScalar>;
 
 // ─── Endpoint Dispatch ────────────────────────────────────────────────────────
 
-type SerializableValue =
-  | string
-  | number
-  | boolean
-  | null
-  | SerializableValue[]
-  | { [k: string]: SerializableValue };
-
 async function callEndpoint(
   endpointId: string,
   input: Record<string, MappedValue>,
   nodeId: string,
   logger: ReturnType<typeof createEndpointLogger>,
-): Promise<Record<string, SerializableValue> | null> {
+): Promise<Record<string, WidgetData> | null> {
   const toolName = endpointId;
 
-  const data: Record<string, SerializableValue> = {};
+  const data: Record<string, WidgetData> = {};
   for (const [k, v] of Object.entries(input)) {
     data[k] = coerce(v);
   }
 
   const result = await RouteExecutionExecutor.executeGenericHandler<
-    Record<string, SerializableValue>
+    Record<string, WidgetData>
   >({
     toolName,
     data,
@@ -384,13 +381,13 @@ async function callEndpoint(
   return null;
 }
 
-function coerce(val: MappedValue): SerializableValue {
+function coerce(val: MappedValue): WidgetData {
   if (val instanceof Date) {
     return val.toISOString();
   }
   if (Array.isArray(val)) {
     return val.map(
-      (dp): SerializableValue => ({
+      (dp): WidgetData => ({
         timestamp:
           dp.timestamp instanceof Date
             ? dp.timestamp.toISOString()
@@ -401,11 +398,11 @@ function coerce(val: MappedValue): SerializableValue {
     );
   }
   if (val !== null && typeof val === "object") {
-    const out: Record<string, SerializableValue> = {};
+    const out: Record<string, WidgetData> = {};
     for (const [k, v] of Object.entries(val)) {
       out[k] = v instanceof Date ? v.toISOString() : v;
     }
     return out;
   }
-  return val as SerializableValue;
+  return val as WidgetData;
 }

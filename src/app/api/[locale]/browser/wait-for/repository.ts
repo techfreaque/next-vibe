@@ -23,13 +23,11 @@ import type { WaitForRequestOutput, WaitForResponseOutput } from "./definition";
 export class WaitForRepository {
   static async waitFor(
     data: WaitForRequestOutput,
-    sessionId: string,
     t: BrowserT,
     logger: EndpointLogger,
   ): Promise<ResponseType<WaitForResponseOutput> | ContentResponse> {
     const result = await BrowserSharedRepository.executeWaitFor(
       {
-        sessionId,
         toolName: BrowserTool.WAIT_FOR,
         args: BrowserSharedRepository.filterUndefinedArgs({
           text: data.text,

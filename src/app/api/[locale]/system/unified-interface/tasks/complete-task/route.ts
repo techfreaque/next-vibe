@@ -11,7 +11,14 @@ import { CompleteTaskRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, t, user, locale }) =>
-      CompleteTaskRepository.completeTask(data, logger, t, user, locale),
+    handler: ({ data, logger, t, user, locale, streamContext }) =>
+      CompleteTaskRepository.completeTask(
+        data,
+        logger,
+        t,
+        user,
+        locale,
+        streamContext.abortSignal,
+      ),
   },
 });

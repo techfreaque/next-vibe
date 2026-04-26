@@ -5,6 +5,8 @@
  * tanstack/lib first so this file is used instead of next/server in Vite/TanStack.
  */
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+
 // ── Cookie helpers ────────────────────────────────────────────────────────────
 
 interface RequestCookie {
@@ -71,13 +73,6 @@ export class NextRequest extends Request {
 
 // ── NextResponse ──────────────────────────────────────────────────────────────
 
-type JsonPrimitive = string | number | boolean | null;
-interface JsonObject {
-  [key: string]: JsonValue;
-}
-type JsonArray = JsonValue[];
-type JsonValue = JsonPrimitive | JsonObject | JsonArray;
-
 export class NextResponse extends Response {
   readonly cookies: ResponseCookies;
 
@@ -131,7 +126,7 @@ export class NextResponse extends Response {
     };
   }
 
-  static override json(body: JsonValue, init?: ResponseInit): NextResponse {
+  static override json(body: WidgetData, init?: ResponseInit): NextResponse {
     return new NextResponse(JSON.stringify(body), {
       ...init,
       headers: {

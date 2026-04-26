@@ -12,12 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: getNetworkRequestEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, user, request }) =>
-      GetNetworkRequestRepository.getNetworkRequest(
-        data,
-        request?.headers.get("authorization") ?? user.id ?? user.leadId,
-        t,
-        logger,
-      ),
+    handler: ({ data, t, logger }) =>
+      GetNetworkRequestRepository.getNetworkRequest(data, t, logger),
   },
 });

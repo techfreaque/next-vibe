@@ -55,6 +55,7 @@ export enum ChatModelId {
   CLAUDE_SONNET_4_6 = "claude-sonnet-4.6",
   CLAUDE_OPUS_4_5 = "claude-opus-4.5",
   CLAUDE_OPUS_4_6 = "claude-opus-4.6",
+  CLAUDE_OPUS_4_7 = "claude-opus-4.7",
   GLM_4_5V = "glm-4.5v",
   KIMI_K2 = "kimi-k2",
   KIMI_K2_THINKING = "kimi-k2-thinking",
@@ -432,15 +433,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         cacheWriteTokenCost: 6.25, // updated: 2026-03-31 from openrouter-api
       },
       {
-        id: ChatModelId.CLAUDE_CODE_OPUS,
-        apiProvider: ApiProvider.CLAUDE_CODE,
-        providerModel: "claude-opus-4-6",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 5,
-        outputTokenCost: 25,
-        adminOnly: true,
-      },
-      {
         id: ChatModelId.CLAUDE_OPUS_4_6,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-opus-4.6",
@@ -449,6 +441,60 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 32.5, // updated: 2026-04-07 from unbottled.ai
         cacheReadTokenCost: 0.65, // updated: 2026-04-07 from unbottled.ai
         cacheWriteTokenCost: 8.125, // updated: 2026-04-07 from unbottled.ai
+      },
+    ],
+
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CREATIVE,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      toolCalling: true,
+    },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
+  },
+  [ChatModelId.CLAUDE_OPUS_4_7]: {
+    name: "Claude Opus 4.7",
+    by: "anthropic",
+    description: "chat.models.descriptions.claudeOpus47",
+    parameterCount: undefined,
+    contextWindow: 1000000,
+    icon: "si-anthropic",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.CLAUDE_OPUS_4_7,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "anthropic/claude-opus-4.7",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 5,
+        outputTokenCost: 25,
+      },
+      {
+        id: ChatModelId.CLAUDE_CODE_OPUS,
+        apiProvider: ApiProvider.CLAUDE_CODE,
+        providerModel: "claude-opus-4-7",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 5,
+        outputTokenCost: 25,
+        adminOnly: true,
+      },
+      {
+        id: ChatModelId.CLAUDE_OPUS_4_7,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "claude-opus-4.7",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 6.5,
+        outputTokenCost: 32.5,
       },
     ],
 
@@ -2498,9 +2544,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
   [ChatModelId.CLAUDE_CODE_OPUS]: {
     enabled: false, // auto-disabled: price not verified + modality not verified
     enabledWithoutPrice: true,
-    name: "Claude Opus 4.6",
+    name: "Claude Opus 4.7",
     by: "anthropic",
-    description: "chat.models.descriptions.claudeOpus46",
+    description: "chat.models.descriptions.claudeOpus47",
     parameterCount: undefined,
     contextWindow: 1000000,
     icon: "si-anthropic",
@@ -2510,7 +2556,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       {
         id: ChatModelId.CLAUDE_CODE_OPUS,
         apiProvider: ApiProvider.CLAUDE_CODE,
-        providerModel: "claude-opus-4-6",
+        providerModel: "claude-opus-4-7",
         creditCost: calculateCreditCost,
         inputTokenCost: 5,
         outputTokenCost: 25,
@@ -2676,7 +2722,7 @@ export const chatModelDefinitionsByString: Record<string, ModelDefinition> =
 export const FEATURED_MODELS = {
   // Representative picks per category - used in marketing content and emails
   mainstream: [
-    chatModelDefinitions[ChatModelId.CLAUDE_OPUS_4_6].name,
+    chatModelDefinitions[ChatModelId.CLAUDE_OPUS_4_7].name,
     chatModelDefinitions[ChatModelId.GPT_5_4_PRO].name,
     chatModelDefinitions[ChatModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS].name,
     chatModelDefinitions[ChatModelId.GROK_4_20].name,
@@ -2882,14 +2928,19 @@ export type ChatModelSelection = z.infer<typeof chatModelSelectionSchema>;
 export function filterChatModels(
   selection: ChatModelSelection,
   user: JwtPayloadType,
+  providerOverride?: ApiProvider,
 ): ChatModelOption[] {
-  return filterRoleModels(chatModelOptionsPool, selection, user);
+  const pool = providerOverride
+    ? chatModelOptionsPool.filter((m) => m.apiProvider === providerOverride)
+    : chatModelOptionsPool;
+  return filterRoleModels(pool, selection, user);
 }
 
 /** Get best chat model from a selection. */
 export function getBestChatModel(
   selection: ChatModelSelection,
   user: JwtPayloadType,
+  providerOverride?: ApiProvider,
 ): ChatModelOption | null {
-  return filterChatModels(selection, user)[0] ?? null;
+  return filterChatModels(selection, user, providerOverride)[0] ?? null;
 }

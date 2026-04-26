@@ -15,7 +15,7 @@ export const { POST, tools } = endpointsHandler({
     email: undefined,
     handler: ({ user, data, logger }) =>
       MemoriesRepository.addMemory({
-        userId: user.id,
+        user,
         content: data.content,
         tags: data.tags,
         priority: data.priority,

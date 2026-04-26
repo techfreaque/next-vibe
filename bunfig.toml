@@ -1,0 +1,4 @@
+[test]
+# Load env + set NEXT_PUBLIC_AGENT_* flags before any test module is imported.
+# This ensures agentEnvAvailability.unbottled is true when UNBOTTLED_CLOUD_CREDENTIALS is set.
+preload = ["./src/app/api/[locale]/agent/ai-stream/testing/setup-tests.ts"]

@@ -8,7 +8,10 @@
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { useCallback, useMemo, useRef, useState } from "react";
 
-import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
+import {
+  type ChatT,
+  scopedTranslation as chatScopedTranslation,
+} from "@/app/api/[locale]/agent/chat/i18n";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -22,7 +25,6 @@ interface UseEdenAISpeechOptions {
   locale: CountryLanguage;
   user: JwtPayloadType;
   logger: EndpointLogger;
-  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 interface UseEdenAISpeechReturn {
@@ -45,13 +47,81 @@ interface UseEdenAISpeechReturn {
   clearError: () => void;
 }
 
+/**
+ * Detect device platform from userAgent for device-specific microphone hints
+ */
+function getDevicePlatform():
+  | "ios"
+  | "android"
+  | "mac"
+  | "windows"
+  | "generic" {
+  if (typeof navigator === "undefined") {
+    return "generic";
+  }
+  const ua = navigator.userAgent;
+  // iOS check must come before Mac check (iPad reports as Macintosh with touch)
+  if (
+    /iPhone|iPad|iPod/.test(ua) ||
+    (/Macintosh/.test(ua) && "ontouchend" in document)
+  ) {
+    return "ios";
+  }
+  if (/Android/.test(ua)) {
+    return "android";
+  }
+  if (/Macintosh|Mac OS X/.test(ua)) {
+    return "mac";
+  }
+  if (/Windows/.test(ua)) {
+    return "windows";
+  }
+  return "generic";
+}
+
+/**
+ * Map getUserMedia errors to device-specific, actionable i18n messages
+ */
+function getMicrophoneErrorMessage(
+  err: DOMException | Error,
+  t: ChatT,
+): string {
+  const name = err.name;
+
+  switch (name) {
+    case "NotAllowedError":
+    case "PermissionDeniedError": {
+      const platform = getDevicePlatform();
+      const permissionKeys = {
+        ios: "hooks.stt.permission-denied-ios",
+        android: "hooks.stt.permission-denied-android",
+        mac: "hooks.stt.permission-denied-mac",
+        windows: "hooks.stt.permission-denied-windows",
+        generic: "hooks.stt.permission-denied",
+      } as const;
+      return t(permissionKeys[platform]);
+    }
+    case "NotFoundError":
+    case "DevicesNotFoundError":
+      return t("hooks.stt.no-microphone");
+    case "NotReadableError":
+    case "TrackStartError":
+    case "AbortError":
+      return t("hooks.stt.microphone-in-use");
+    case "TypeError":
+    case "NotSupportedError":
+      return t("hooks.stt.not-supported");
+    default:
+      return t("hooks.stt.failed-to-start");
+  }
+}
+
 export function useEdenAISpeech({
   onTranscript,
   onError,
   locale,
   user,
   logger,
-  deductCredits,
 }: UseEdenAISpeechOptions): UseEdenAISpeechReturn {
   const { t } = useMemo(() => chatScopedTranslation.scopedT(locale), [locale]);
   const [isRecording, setIsRecording] = useState(false);
@@ -167,12 +237,6 @@ export function useEdenAISpeech({
               textLength: transcribedText.length,
             });
 
-            // Optimistically update credit balance in UI using actual cost from server
-            const creditCost = responseData.creditCost ?? 0;
-            if (creditCost > 0) {
-              deductCredits(creditCost, "stt");
-            }
-
             setTranscript(transcribedText);
             onTranscript?.(transcribedText);
             setIsProcessing(false);
@@ -212,7 +276,7 @@ export function useEdenAISpeech({
       setIsProcessing(false);
       cleanup();
     }
-  }, [logger, t, onTranscript, onError, cleanup, deductCredits]);
+  }, [logger, t, onTranscript, onError, cleanup]);
 
   const startRecording = useCallback(async (): Promise<void> => {
     try {
@@ -247,7 +311,9 @@ export function useEdenAISpeech({
       logger.debug("STT: Recording started");
     } catch (err) {
       const errorMsg =
-        err instanceof Error ? err.message : t("hooks.stt.permission-denied");
+        err instanceof DOMException || err instanceof Error
+          ? getMicrophoneErrorMessage(err, t)
+          : t("hooks.stt.failed-to-start");
       logger.error("STT: Failed to start recording", parseError(err));
       setError(errorMsg);
       onError?.(errorMsg);

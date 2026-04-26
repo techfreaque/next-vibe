@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useLogger } from "@/hooks/use-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 type ErrorWithDigest = Error & { digest?: string };
@@ -27,7 +27,7 @@ export default function useErrorHandler(
   const { onError } = options;
 
   useEffect(() => {
-    const logger = createEndpointLogger(false, Date.now(), locale);
+    const logger = useLogger();
     logger.error("errors.application.generic", error);
     // Call custom error handler if provided
     if (onError) {

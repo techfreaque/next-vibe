@@ -59,6 +59,7 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type {
@@ -87,12 +88,6 @@ import versionsDefinitions from "../versions/definition";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
-
-interface WidgetProps {
-  field: {
-    value: GetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -521,11 +516,15 @@ function renderSeriesData(
     });
   }
 
-  // Fit content on first load (all panes)
+  // Fit content on first load — only on pane 0; time-scale sync propagates to others.
+  // Calling fitContent() on every pane independently causes conflicting range events
+  // because each pane fires subscribeVisibleLogicalRangeChange and overwrites others.
   if (!didFitContentRef.current) {
     didFitContentRef.current = true;
-    for (const [, pane] of panesRef.current) {
-      pane.chart.timeScale().fitContent();
+    const pane0 =
+      panesRef.current.get(0) ?? panesRef.current.values().next().value;
+    if (pane0) {
+      pane0.chart.timeScale().fitContent();
     }
   }
 }
@@ -760,9 +759,9 @@ function useMultiPaneRenderer(
             param.point.x < 0 ||
             param.point.y < 0
           ) {
-            onCrosshairMoveRef.current(null);
-            // Clear crosshair on all panes when mouse leaves
+            // Only emit null and clear when this is the primary (non-synced) event
             if (!syncingRef.current) {
+              onCrosshairMoveRef.current(null);
               syncingRef.current = true;
               for (const [, otherPane] of panesRef.current) {
                 otherPane.chart.clearCrosshairPosition();
@@ -771,15 +770,36 @@ function useMultiPaneRenderer(
             }
             return;
           }
-          // Collect values from ALL panes, not just the hovered one
+          // Only the primary (non-synced) pane drives the tooltip.
+          // Synced panes just show the vertical line, they don't re-emit tooltip data.
+          if (syncingRef.current) {
+            return;
+          }
+          // Collect values from THIS pane via param.seriesData (reliable),
+          // then from OTHER panes by looking up the nearest data index at param.logical.
           const crosshairPoints: CrosshairPoint[] = [];
-          for (const [, paneState] of panesRef.current) {
+          const logical = param.logical;
+          for (const [otherPaneNum, paneState] of panesRef.current) {
             for (const [nodeId, lwcS] of paneState.seriesMap) {
-              const d = param.seriesData?.get(lwcS);
-              const val =
-                d !== undefined && "value" in d && typeof d.value === "number"
-                  ? d.value
-                  : undefined;
+              let val: number | undefined;
+              if (otherPaneNum === paneNum) {
+                // Same pane: use seriesData from the event (exact match)
+                const d = param.seriesData?.get(lwcS);
+                val =
+                  d !== undefined && "value" in d && typeof d.value === "number"
+                    ? d.value
+                    : undefined;
+              } else if (logical !== null && logical !== undefined) {
+                // Other pane: look up by logical index (shared time axis)
+                const d = lwcS.dataByIndex(logical, -1);
+                val =
+                  d !== null &&
+                  d !== undefined &&
+                  "value" in d &&
+                  typeof d.value === "number"
+                    ? d.value
+                    : undefined;
+              }
               if (val !== undefined) {
                 const cfg = displayConfigsRef.current.get(nodeId);
                 crosshairPoints.push({
@@ -805,7 +825,7 @@ function useMultiPaneRenderer(
 
           // Sync crosshair vertical line to other panes via setCrosshairPosition.
           // Using NaN for price shows only the time line (no horizontal price line).
-          if (!syncingRef.current && param.time !== undefined) {
+          if (param.time !== undefined) {
             syncingRef.current = true;
             for (const [otherPaneNum, otherPane] of panesRef.current) {
               if (otherPaneNum !== paneNum) {
@@ -1004,6 +1024,12 @@ function useMultiPaneRenderer(
         lwcSeries.applyOptions({ visible: !hiddenSeries.has(nodeId) });
       }
     }
+    // Re-sync scale widths after visibility change: a hidden left-scale series
+    // would otherwise leave a phantom gap in adjacent panes.
+    const rafId = requestAnimationFrame(() => {
+      syncScaleWidths(panesRef, setScaleWidths);
+    });
+    return (): void => cancelAnimationFrame(rafId);
   }, [hiddenSeries]);
 
   return { paneContainerRef, panesRef, paneNumbers, scaleWidths };
@@ -1756,7 +1782,7 @@ function ResolutionPicker({
 
 // ─── Main Widget ──────────────────────────────────────────────────────────────
 
-export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
+export function GraphChartView(): React.JSX.Element {
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const outerMutations = useWidgetEndpointMutations();
@@ -1806,7 +1832,8 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
     return (): void => obs.disconnect();
   }, []);
 
-  const graph = field.value?.graph;
+  const responseData = useWidgetValue<typeof definition.GET>();
+  const graph = responseData?.graph;
 
   // Effective node config: optimistic override when a pane move is in flight
   const effectiveNodeConfig = optimisticConfig?.nodes ?? graph?.config?.nodes;
@@ -1989,13 +2016,13 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
   );
 
   useEffect(() => {
-    if (!field.value) {
+    if (!responseData) {
       return;
     }
-    setAccSeries((prev) => mergeSeries(prev, field.value?.series ?? []));
-    setAccSignals((prev) => mergeSignals(prev, field.value?.signals ?? []));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only run when field.value reference changes
-  }, [field.value]);
+    setAccSeries((prev) => mergeSeries(prev, responseData.series ?? []));
+    setAccSignals((prev) => mergeSignals(prev, responseData.signals ?? []));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only run when responseData reference changes
+  }, [responseData]);
 
   const handleResolutionChange = useCallback(
     (res: Resolution): void => {
@@ -2282,7 +2309,7 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
     return (): void => cancelAnimationFrame(rafId);
   }, [collapsedPanes, paneNumbers, panesRef]);
 
-  const isInitialLoading = !field.value && accSeries.length === 0;
+  const isInitialLoading = !responseData && accSeries.length === 0;
   const isNotFound = !isInitialLoading && !graph && accSeries.length === 0;
   const hasData = accSeries.some((s) => s.points.length > 0);
 

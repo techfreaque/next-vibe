@@ -17,27 +17,25 @@ import { Div } from "next-vibe-ui/ui/div";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
-import { EmailFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/email-field/react";
-import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
+import { EmailFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/email-field/widget";
+import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
 import { PasswordStrengthIndicator } from "@/app/api/[locale]/user/public/signup/widget/password-strength-indicator";
 
 import type definition from "../definition";
-import type { ResetPasswordConfirmPostResponseOutput } from "../definition";
-import AlertWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
+import AlertWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/widget";
 
 /**
  * Props for custom widget
  */
 interface CustomWidgetProps {
-  field: {
-    value: ResetPasswordConfirmPostResponseOutput | null | undefined;
-  } & (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"];
 }
 
 /**
@@ -49,6 +47,7 @@ export function ResetPasswordConfirmContainer({
   const children = field.children;
   const t = useWidgetTranslation<typeof definition.POST>();
   const navigation = useWidgetNavigation();
+  const data = useWidgetValue<typeof definition.POST>();
 
   return (
     <Card>
@@ -78,7 +77,7 @@ export function ResetPasswordConfirmContainer({
 
         <AlertWidget
           fieldName="message"
-          field={withValue(children.message, field.value?.message, null)}
+          field={withValue(children.message, data?.message, null)}
         />
 
         <FormAlertWidget field={{}} />

@@ -22,12 +22,15 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import {
   CampaignTypeFilterDB,
   CampaignTypeFilterOptions,
 } from "../../../messenger/accounts/enum";
 import { scopedTranslation } from "./i18n";
-import { CampaignQueueWidget } from "./widget";
+const CampaignQueueWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.CampaignQueueWidget })),
+);
 
 const { GET } = createEndpoint({
   scopedTranslation,

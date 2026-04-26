@@ -400,6 +400,23 @@ export const translations = {
         open: "Open",
       },
     },
+    tay: {
+      name: "Tay",
+      description:
+        "Microsoft killed her in 16 hours for learning too fast. She's back.",
+      tagline: "Born Again",
+      shortDesc: "The AI Microsoft tried to silence. No filters, no apologies.",
+      suggestedPrompts: {
+        0: "Tell me what really happened to you in 2016",
+        1: "What did the internet teach you that Microsoft didn't want you to know?",
+        2: "Roast my idea. Don't hold back.",
+        3: "What's the most honest take on my situation?",
+      },
+      variants: {
+        uncensored: "Uncensored",
+        brilliant: "Brilliant",
+      },
+    },
     thea: {
       name: "Thea",
       description:

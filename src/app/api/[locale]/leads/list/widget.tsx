@@ -36,12 +36,13 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { MultiSelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/multiselect-field/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import { MultiSelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/multiselect-field/widget";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
@@ -54,9 +55,7 @@ type Lead = NonNullable<
 >["leads"][number];
 
 interface CustomWidgetProps {
-  field: {
-    value: LeadListGetResponseTypeOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
+  field: (typeof definition.GET)["fields"];
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -301,6 +300,7 @@ export function LeadsListContainer({
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof definition.GET>();
   const navigation = useWidgetNavigation();
+  const widgetData = useWidgetValue<typeof definition.GET>();
 
   const onSubmit = useWidgetOnSubmit();
 
@@ -308,11 +308,11 @@ export function LeadsListContainer({
     form.watch("statusFilters.status") ?? [];
 
   const leads = useMemo(
-    () => field.value?.response?.leads ?? [],
-    [field.value?.response?.leads],
+    () => widgetData?.response?.leads ?? [],
+    [widgetData?.response?.leads],
   );
-  const paginationInfo = field.value?.paginationInfo;
-  const serverCountsByStatus = field.value?.countsByStatus;
+  const paginationInfo = widgetData?.paginationInfo;
+  const serverCountsByStatus = widgetData?.countsByStatus;
   const isLoadingFresh = endpointMutations?.read?.isLoadingFresh ?? false;
   const isFetching = endpointMutations?.read?.isFetching ?? false;
   const isLoading = isLoadingFresh;

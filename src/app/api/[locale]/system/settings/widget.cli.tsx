@@ -14,12 +14,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
-  useInkWidgetLocale,
-  useInkWidgetLogger,
-  useInkWidgetPlatform,
-  useInkWidgetTranslation,
-  useInkWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetPlatform,
+  useWidgetTranslation,
+  useWidgetUser,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type endpoints from "./definition";
 import type { SystemSettingsGetResponseOutput } from "./definition";
@@ -238,11 +238,11 @@ interface EditorProps {
 function CliEditor({ value, onDone }: EditorProps): JSX.Element {
   const { exit } = useApp();
   const { isRawModeSupported } = useStdin();
-  const user = useInkWidgetUser();
-  const locale = useInkWidgetLocale();
-  const logger = useInkWidgetLogger();
-  const platform = useInkWidgetPlatform();
-  const t = useInkWidgetTranslation<typeof endpoints.GET>() as (
+  const user = useWidgetUser();
+  const locale = useWidgetLocale();
+  const logger = useWidgetLogger();
+  const platform = useWidgetPlatform();
+  const t = useWidgetTranslation<typeof endpoints.GET>() as (
     k: string,
   ) => string;
 
@@ -306,10 +306,13 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
           skillId: undefined,
           modelId: undefined,
           headless: undefined,
+          subAgentDepth: 0,
           imageGenModelSelection: undefined,
           musicGenModelSelection: undefined,
           videoGenModelSelection: undefined,
           isRevival: undefined,
+
+          providerOverride: undefined,
           currentToolMessageId: undefined,
           callerToolCallId: undefined,
           pendingToolMessages: undefined,
@@ -682,11 +685,11 @@ interface WizardProps {
 function CliWizard({ value, onDone }: WizardProps): JSX.Element {
   const { exit } = useApp();
   const { isRawModeSupported } = useStdin();
-  const user = useInkWidgetUser();
-  const locale = useInkWidgetLocale();
-  const logger = useInkWidgetLogger();
-  const platform = useInkWidgetPlatform();
-  const t = useInkWidgetTranslation<typeof endpoints.GET>() as (
+  const user = useWidgetUser();
+  const locale = useWidgetLocale();
+  const logger = useWidgetLogger();
+  const platform = useWidgetPlatform();
+  const t = useWidgetTranslation<typeof endpoints.GET>() as (
     k: string,
   ) => string;
 
@@ -751,10 +754,13 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
           skillId: undefined,
           modelId: undefined,
           headless: undefined,
+          subAgentDepth: 0,
           imageGenModelSelection: undefined,
           musicGenModelSelection: undefined,
           videoGenModelSelection: undefined,
           isRevival: undefined,
+
+          providerOverride: undefined,
           currentToolMessageId: undefined,
           callerToolCallId: undefined,
           pendingToolMessages: undefined,
@@ -1025,8 +1031,8 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
 // ── Widget Component ─────────────────────────────────────────────────────
 
 export function SystemSettingsWidget({ field }: CliWidgetProps): JSX.Element {
-  const platform = useInkWidgetPlatform();
-  const t = useInkWidgetTranslation<typeof endpoints.GET>();
+  const platform = useWidgetPlatform();
+  const t = useWidgetTranslation<typeof endpoints.GET>();
   const isMcp = platform === Platform.MCP;
 
   const value = field.value;
@@ -1056,12 +1062,12 @@ SystemSettingsWidget.cliWidget = true as const;
 
 export function SystemSettingsPatchWidget(): JSX.Element {
   const { exit } = useApp();
-  const platform = useInkWidgetPlatform();
-  const user = useInkWidgetUser();
-  const locale = useInkWidgetLocale();
-  const logger = useInkWidgetLogger();
+  const platform = useWidgetPlatform();
+  const user = useWidgetUser();
+  const locale = useWidgetLocale();
+  const logger = useWidgetLogger();
   const { isRawModeSupported } = useStdin();
-  const t = useInkWidgetTranslation<typeof endpoints.GET>() as (
+  const t = useWidgetTranslation<typeof endpoints.GET>() as (
     k: string,
   ) => string;
 
@@ -1099,10 +1105,13 @@ export function SystemSettingsPatchWidget(): JSX.Element {
             skillId: undefined,
             modelId: undefined,
             headless: undefined,
+            subAgentDepth: 0,
             imageGenModelSelection: undefined,
             musicGenModelSelection: undefined,
             videoGenModelSelection: undefined,
             isRevival: undefined,
+
+            providerOverride: undefined,
             currentToolMessageId: undefined,
             callerToolCallId: undefined,
             pendingToolMessages: undefined,

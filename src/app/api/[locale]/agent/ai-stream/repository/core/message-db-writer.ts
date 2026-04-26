@@ -2,7 +2,7 @@
  * MessageDbWriter - Centralized handler for all ASSISTANT message events + DB writes.
  *
  * Each public method emits the WS event(s) AND persists to DB in one call.
- * Callers never touch wsEmit or createStreamEvent directly for message writes.
+ * Callers never touch wsEmit directly for message writes.
  *
  * DB throttle strategy: debounce content updates within THROTTLE_MS window so
  * rapid deltas don't hammer the DB. flush() / flushAll() cancel the timer and
@@ -29,17 +29,20 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+
 import {
   chatMessages,
   type MessageMetadata,
   type ToolCall,
-  type ToolCallResult,
 } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
-import { createStreamEvent } from "../../../chat/threads/[threadId]/messages/events";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
 import { serializeError } from "../error-utils";
+
+/** Callback for emitting thread-title-updated to sidebar channels. */
+export type EmitThreadTitleFn = (threadId: string, title: string) => void;
 
 /** Throttle window in ms - coalesces content updates to same message */
 const THROTTLE_MS = 300;
@@ -57,7 +60,6 @@ export class MessageDbWriter {
   private readonly pending = new Map<string, PendingWrite>();
   private readonly creditsT: ModuleT;
   private readonly locale: CountryLanguage;
-  private readonly wsEmit: WsEmitCallback | null;
 
   /** Tracks the last assistant message ID written - used by headless callers */
   lastAssistantMessageId: string | null = null;
@@ -68,18 +70,21 @@ export class MessageDbWriter {
   /** Running total of credits deducted during this stream - used by headless callers to report cost */
   totalCreditsDeducted = 0;
 
+  private readonly emitTitle: EmitThreadTitleFn;
+
   constructor(
     isIncognito: boolean,
     logger: EndpointLogger,
     creditsT: ModuleT,
     locale: CountryLanguage,
-    wsEmit: WsEmitCallback | null = null,
+    readonly wsEmit: WsEmitCallback,
+    emitTitle: EmitThreadTitleFn,
   ) {
     this.isIncognito = isIncognito;
     this.logger = logger;
     this.creditsT = creditsT;
     this.locale = locale;
-    this.wsEmit = wsEmit;
+    this.emitTitle = emitTitle;
   }
 
   // ─── High-level methods (SSE + DB in one call) ────────────────────────────
@@ -104,17 +109,23 @@ export class MessageDbWriter {
     this.lastAssistantMessageId = messageId;
 
     // Emit MESSAGE_CREATED (always - even incognito needs this for the UI)
-    const messageEvent = createStreamEvent.messageCreated({
-      messageId,
-      threadId,
-      role: ChatMessageRole.ASSISTANT,
-      content: "",
-      parentId,
-      model,
-      skill: skill,
-      sequenceId,
+    this.wsEmit("message-created", {
+      streamingState: "streaming",
+      messages: [
+        {
+          id: messageId,
+          threadId,
+          role: ChatMessageRole.ASSISTANT,
+          isAI: true,
+          content: "",
+          parentId,
+          sequenceId: sequenceId ?? null,
+          model: model ?? null,
+          skill: skill ?? null,
+          metadata: {},
+        },
+      ],
     });
-    this.enqueue(messageEvent);
 
     // Emit initial CONTENT_DELTA
     if (content) {
@@ -186,13 +197,19 @@ export class MessageDbWriter {
     } = params;
 
     // SSE: CONTENT_DONE
-    const doneEvent = createStreamEvent.contentDone({
-      messageId,
-      content,
-      totalTokens,
-      finishReason,
+    this.wsEmit("content-done", {
+      messages: [
+        {
+          id: messageId,
+          content,
+          metadata: {
+            totalTokens: totalTokens ?? undefined,
+            finishReason: finishReason ?? undefined,
+            isStreaming: false,
+          },
+        },
+      ],
     });
-    this.enqueue(doneEvent);
 
     // Always track final content in memory (incognito mode needs this since DB is skipped)
     this.lastAssistantContent = content;
@@ -224,8 +241,24 @@ export class MessageDbWriter {
     finishReason: string | null;
     creditCost: number;
   }): void {
-    const tokensEvent = createStreamEvent.tokensUpdated(params);
-    this.enqueue(tokensEvent);
+    this.wsEmit("tokens-updated", {
+      messages: [
+        {
+          id: params.messageId,
+          metadata: {
+            promptTokens: params.promptTokens,
+            completionTokens: params.completionTokens,
+            totalTokens: params.totalTokens,
+            cachedInputTokens: params.cachedInputTokens,
+            cacheWriteTokens:
+              params.cacheWriteTokens > 0 ? params.cacheWriteTokens : undefined,
+            timeToFirstToken: params.timeToFirstToken ?? undefined,
+            creditCost: params.creditCost,
+            finishReason: params.finishReason ?? undefined,
+          },
+        },
+      ],
+    });
   }
 
   /**
@@ -280,13 +313,6 @@ export class MessageDbWriter {
 
     if (deductResult.success) {
       this.totalCreditsDeducted += params.amount;
-      const creditEvent = createStreamEvent.creditsDeducted({
-        amount: params.amount,
-        feature: params.feature,
-        type: params.type,
-        partial: deductResult.data.partialDeduction,
-      });
-      this.enqueue(creditEvent);
     } else {
       this.logger.error("[MessageDbWriter] Failed to deduct credits", {
         amount: params.amount,
@@ -327,17 +353,23 @@ export class MessageDbWriter {
     this.lastAssistantMessageId = messageId;
 
     // SSE: MESSAGE_CREATED with empty content
-    const messageEvent = createStreamEvent.messageCreated({
-      messageId,
-      threadId,
-      role: ChatMessageRole.ASSISTANT,
-      content: "",
-      parentId,
-      model,
-      skill: skill,
-      sequenceId,
+    this.wsEmit("message-created", {
+      streamingState: "streaming",
+      messages: [
+        {
+          id: messageId,
+          threadId,
+          role: ChatMessageRole.ASSISTANT,
+          isAI: true,
+          content: "",
+          parentId,
+          sequenceId: sequenceId ?? null,
+          model: model ?? null,
+          skill: skill ?? null,
+          metadata: {},
+        },
+      ],
     });
-    this.enqueue(messageEvent);
 
     // DB: insert immediately (even for incognito the SSE is needed - only skip DB)
     if (!this.isIncognito) {
@@ -398,26 +430,23 @@ export class MessageDbWriter {
     } = params;
 
     // SSE: MESSAGE_CREATED for tool message
-    const toolMessageEvent = createStreamEvent.messageCreated({
-      messageId: toolMessageId,
-      threadId,
-      role: ChatMessageRole.TOOL,
-      content: null,
-      parentId,
-      sequenceId,
-      toolCall,
-      model,
-      skill: skill,
+    this.wsEmit("message-created", {
+      streamingState: "streaming",
+      messages: [
+        {
+          id: toolMessageId,
+          threadId,
+          role: ChatMessageRole.TOOL,
+          isAI: true,
+          content: null,
+          parentId,
+          sequenceId: sequenceId ?? null,
+          model: model ?? null,
+          skill: skill ?? null,
+          metadata: { toolCall },
+        },
+      ],
     });
-    this.enqueue(toolMessageEvent);
-
-    // SSE: TOOL_CALL for real-time UX
-    const toolCallEvent = createStreamEvent.toolCall({
-      messageId: toolMessageId,
-      toolName: toolCall.toolName,
-      args: toolCall.args,
-    });
-    this.enqueue(toolCallEvent);
 
     // DB: create tool message immediately
     if (!this.isIncognito) {
@@ -444,18 +473,11 @@ export class MessageDbWriter {
 
   /**
    * Emit TOOL_WAITING SSE (tool requires user confirmation before execution).
+   * No-op: tool-waiting is not a declared event on the messages channel.
+   * The UI derives waiting state from the tool message's metadata.toolCall field.
    */
-  emitToolWaiting(params: {
-    toolMessageId: string;
-    toolName: string;
-    toolCallId: string;
-  }): void {
-    const waitingEvent = createStreamEvent.toolWaiting({
-      messageId: params.toolMessageId,
-      toolName: params.toolName,
-      toolCallId: params.toolCallId,
-    });
-    this.enqueue(waitingEvent);
+  emitToolWaiting(): void {
+    // intentional no-op
   }
 
   /**
@@ -472,7 +494,7 @@ export class MessageDbWriter {
     sequenceId: string | null;
     toolCall: ToolCall; // updated with result/error
     toolName: string;
-    result: ToolCallResult | undefined;
+    result: WidgetData | undefined;
     error: ErrorResponseType | undefined;
     skipSseEmit?: boolean; // skip TOOL_RESULT SSE if already emitted in batch handler
     user: JwtPayloadType;
@@ -486,25 +508,29 @@ export class MessageDbWriter {
       sequenceId,
       toolCall,
       toolName,
-      result,
       error,
       skipSseEmit,
       user,
     } = params;
 
     // SSE: MESSAGE_CREATED with updated toolCall (result/error)
-    const toolMessageEvent = createStreamEvent.messageCreated({
-      messageId: toolMessageId,
-      threadId,
-      role: ChatMessageRole.TOOL,
-      content: null,
-      parentId,
-      model,
-      skill: skill,
-      sequenceId,
-      toolCall,
+    this.wsEmit("message-created", {
+      streamingState: "streaming",
+      messages: [
+        {
+          id: toolMessageId,
+          threadId,
+          role: ChatMessageRole.TOOL,
+          isAI: true,
+          content: null,
+          parentId,
+          sequenceId: sequenceId ?? null,
+          model: model ?? null,
+          skill: skill ?? null,
+          metadata: { toolCall },
+        },
+      ],
     });
-    this.enqueue(toolMessageEvent);
 
     // DB: update tool message with result/error.
     // Skip for wakeUp: handleTaskCompletion already backfilled the real result inline
@@ -551,14 +577,9 @@ export class MessageDbWriter {
 
     // SSE: TOOL_RESULT (skip if already emitted in batch confirmation handler)
     if (!skipSseEmit) {
-      const toolResultEvent = createStreamEvent.toolResult({
-        messageId: toolMessageId,
-        toolName,
-        result,
-        error,
-        toolCall,
+      this.wsEmit("tool-result", {
+        messages: [{ id: toolMessageId, metadata: { toolCall } }],
       });
-      this.enqueue(toolResultEvent);
     }
 
     // SSE + DB: CREDITS_DEDUCTED if tool consumed credits and succeeded
@@ -577,19 +598,34 @@ export class MessageDbWriter {
    * Emit a generic SSE error event.
    */
   emitError(errorResponse: ErrorResponseType): void {
-    const errorEvent = createStreamEvent.error(errorResponse);
-    this.enqueue(errorEvent);
+    this.wsEmit("error", {
+      messages: [
+        {
+          id: crypto.randomUUID(),
+          role: ChatMessageRole.ERROR,
+          content: errorResponse.message ?? null,
+          parentId: null,
+          sequenceId: null,
+          model: null,
+          skill: null,
+          metadata: null,
+          errorMessage: errorResponse.message ?? null,
+          errorCode:
+            errorResponse.errorType?.errorCode !== null &&
+            errorResponse.errorType?.errorCode !== undefined
+              ? String(errorResponse.errorType.errorCode)
+              : null,
+        },
+      ],
+    });
   }
 
   /**
    * Emit THREAD_TITLE_UPDATED SSE so the sidebar immediately shows the new title.
    */
   emitThreadTitleUpdated(params: { threadId: string; title: string }): void {
-    const event = createStreamEvent.threadTitleUpdated({
-      threadId: params.threadId,
-      title: params.title,
-    });
-    this.enqueue(event);
+    // Title lives on the thread, not on messages — route directly to sidebar channels.
+    this.emitTitle?.(params.threadId, params.title);
   }
 
   /**
@@ -606,13 +642,15 @@ export class MessageDbWriter {
     threadId?: string;
     isNewThread?: boolean;
   }): void {
-    const voiceEvent = createStreamEvent.voiceTranscribed({
-      messageId: params.messageId,
-      text: params.text,
-      confidence: params.confidence,
-      durationSeconds: params.durationSeconds,
+    this.wsEmit("voice-transcribed", {
+      messages: [
+        {
+          id: params.messageId,
+          content: params.text,
+          metadata: { isTranscribing: false },
+        },
+      ],
     });
-    this.enqueue(voiceEvent);
 
     // Update sidebar title when STT sets the content for a new thread
     if (params.isNewThread && params.threadId && params.text) {
@@ -620,16 +658,6 @@ export class MessageDbWriter {
         threadId: params.threadId,
         title: params.text.slice(0, 50),
       });
-    }
-
-    // Emit CREDITS_DEDUCTED for STT cost immediately (no DB deduction here - done upstream)
-    if (params.creditCost && params.creditCost > 0) {
-      const creditEvent = createStreamEvent.creditsDeducted({
-        amount: params.creditCost,
-        feature: "stt",
-        type: "tool",
-      });
-      this.enqueue(creditEvent);
     }
   }
 
@@ -645,14 +673,11 @@ export class MessageDbWriter {
   ): Set<string> {
     const emitted = new Set<string>();
     for (const result of toolResults) {
-      const event = createStreamEvent.toolResult({
-        messageId: result.messageId,
-        toolName: result.toolCall.toolName,
-        result: result.toolCall.result,
-        error: result.toolCall.error,
-        toolCall: result.toolCall,
+      this.wsEmit("tool-result", {
+        messages: [
+          { id: result.messageId, metadata: { toolCall: result.toolCall } },
+        ],
       });
-      this.enqueue(event);
       emitted.add(result.messageId);
     }
     return emitted;
@@ -671,8 +696,17 @@ export class MessageDbWriter {
       size: number;
     }>;
   }): void {
-    const event = createStreamEvent.filesUploaded(params);
-    this.enqueue(event);
+    this.wsEmit("files-uploaded", {
+      messages: [
+        {
+          id: params.messageId,
+          metadata: {
+            isUploadingAttachments: false,
+            attachments: params.attachments,
+          },
+        },
+      ],
+    });
   }
 
   /**
@@ -692,17 +726,23 @@ export class MessageDbWriter {
   }): void {
     const { messageId, threadId, content, parentId, model, skill, metadata } =
       params;
-    const event = createStreamEvent.messageCreated({
-      messageId,
-      threadId,
-      role: ChatMessageRole.USER,
-      content,
-      parentId,
-      model,
-      skill,
-      metadata,
+    this.wsEmit("message-created", {
+      streamingState: "streaming",
+      messages: [
+        {
+          id: messageId,
+          threadId,
+          role: ChatMessageRole.USER,
+          isAI: false,
+          content,
+          parentId,
+          sequenceId: null,
+          model: model ?? null,
+          skill: skill ?? null,
+          metadata: metadata ?? {},
+        },
+      ],
     });
-    this.enqueue(event);
   }
 
   /**
@@ -733,22 +773,27 @@ export class MessageDbWriter {
     } = params;
 
     // SSE
-    const event = createStreamEvent.messageCreated({
-      messageId,
-      threadId,
-      role: ChatMessageRole.ASSISTANT,
-      content: "",
-      parentId,
-      sequenceId,
-      model,
-      skill,
-      metadata: {
-        isCompacting: true,
-        compactedMessageCount: messagesToCompact.length,
-        ...(containsMediaReferences && { containsMediaReferences: true }),
-      },
+    this.wsEmit("message-created", {
+      streamingState: "streaming",
+      messages: [
+        {
+          id: messageId,
+          threadId,
+          role: ChatMessageRole.ASSISTANT,
+          isAI: true,
+          content: "",
+          parentId,
+          sequenceId: sequenceId ?? null,
+          model: model ?? null,
+          skill: skill ?? null,
+          metadata: {
+            isCompacting: true,
+            compactedMessageCount: messagesToCompact.length,
+            ...(containsMediaReferences && { containsMediaReferences: true }),
+          },
+        },
+      ],
     });
-    this.enqueue(event);
 
     // DB
     if (!this.isIncognito) {
@@ -807,8 +852,11 @@ export class MessageDbWriter {
    * Emit COMPACTING_DELTA SSE event.
    */
   emitCompactingDelta(messageId: string, delta: string): void {
-    const event = createStreamEvent.compactingDelta({ messageId, delta });
-    this.enqueue(event);
+    this.wsEmit("compacting-delta", {
+      messages: [
+        { id: messageId, content: delta, metadata: { isStreaming: true } },
+      ],
+    });
   }
 
   /**
@@ -870,18 +918,22 @@ export class MessageDbWriter {
     }
 
     // SSE: TOKENS_UPDATED
-    const tokensEvent = createStreamEvent.tokensUpdated({
-      messageId,
-      promptTokens: inputTokens,
-      completionTokens: outputTokens,
-      totalTokens,
-      cachedInputTokens: 0,
-      cacheWriteTokens: 0,
-      timeToFirstToken: null,
-      finishReason: "stop",
-      creditCost,
+    this.wsEmit("tokens-updated", {
+      messages: [
+        {
+          id: messageId,
+          metadata: {
+            promptTokens: inputTokens,
+            completionTokens: outputTokens,
+            totalTokens,
+            cachedInputTokens: 0,
+            timeToFirstToken: undefined,
+            creditCost,
+            finishReason: "stop",
+          },
+        },
+      ],
     });
-    this.enqueue(tokensEvent);
 
     // DB + SSE: CREDITS_DEDUCTED
     await this.deductAndEmitCredits({
@@ -893,15 +945,19 @@ export class MessageDbWriter {
     });
 
     // SSE: COMPACTING_DONE
-    const doneEvent = createStreamEvent.compactingDone({
-      messageId,
-      content,
-      metadata: {
-        isCompacting: true,
-        compactedMessageCount: messagesToCompact.length,
-      },
+    this.wsEmit("compacting-done", {
+      messages: [
+        {
+          id: messageId,
+          content,
+          metadata: {
+            isCompacting: true,
+            compactedMessageCount: messagesToCompact.length,
+            isStreaming: false,
+          },
+        },
+      ],
     });
-    this.enqueue(doneEvent);
   }
 
   /**
@@ -922,27 +978,33 @@ export class MessageDbWriter {
     error: ErrorResponseType;
     parentId: string | null;
     sequenceId: string | null;
-    userId: string | undefined;
+    user: JwtPayloadType;
     content?: TranslatedKeyType;
   }): Promise<void> {
-    const { threadId, errorType, error, parentId, sequenceId, userId } = params;
+    const { threadId, errorType, error, parentId, sequenceId, user } = params;
     const errorMessageId = crypto.randomUUID();
     const serializedError = params.content ?? serializeError(error);
 
     // SSE: MESSAGE_CREATED for the error message
     // The client's MESSAGE_CREATED handler adds this to the chat store with the
     // correct parentId/sequenceId - no additional ERROR event needed.
-    const errorMessageEvent = createStreamEvent.messageCreated({
-      messageId: errorMessageId,
-      threadId,
-      role: ChatMessageRole.ERROR,
-      content: serializedError,
-      parentId,
-      sequenceId,
-      model: null,
-      skill: null,
+    this.wsEmit("message-created", {
+      streamingState: "streaming",
+      messages: [
+        {
+          id: errorMessageId,
+          threadId,
+          role: ChatMessageRole.ERROR,
+          isAI: false,
+          content: serializedError,
+          parentId,
+          sequenceId: sequenceId ?? null,
+          model: null,
+          skill: null,
+          metadata: {},
+        },
+      ],
     });
-    this.enqueue(errorMessageEvent);
 
     // DB: save error message
     if (!this.isIncognito) {
@@ -952,7 +1014,7 @@ export class MessageDbWriter {
         content: serializedError,
         errorType,
         parentId,
-        userId,
+        user,
         sequenceId,
         logger: this.logger,
       });
@@ -994,18 +1056,23 @@ export class MessageDbWriter {
       generatedMedia,
       creditCost: generatedMedia?.creditCost,
     };
-    const messageEvent = createStreamEvent.messageCreated({
-      messageId,
-      threadId,
-      role: ChatMessageRole.ASSISTANT,
-      content: "",
-      parentId,
-      model,
-      skill,
-      sequenceId,
-      metadata,
+    this.wsEmit("message-created", {
+      streamingState: "streaming",
+      messages: [
+        {
+          id: messageId,
+          threadId,
+          role: ChatMessageRole.ASSISTANT,
+          isAI: true,
+          content: "",
+          parentId,
+          sequenceId: sequenceId ?? null,
+          model: model ?? null,
+          skill: skill ?? null,
+          metadata,
+        },
+      ],
     });
-    this.enqueue(messageEvent);
 
     // DB: insert with metadata
     if (!this.isIncognito) {
@@ -1054,22 +1121,24 @@ export class MessageDbWriter {
     }
 
     // SSE: GENERATED_MEDIA_ADDED - tells the frontend to attach media to existing message
-    const event = createStreamEvent.generatedMediaAdded({
-      messageId,
-      generatedMedia: {
-        type: generatedMedia.type,
-        url: generatedMedia.url,
-        prompt: generatedMedia.prompt ?? "",
-        modelId: generatedMedia.modelId ?? "",
-        mimeType: generatedMedia.mimeType ?? "",
-        creditCost: generatedMedia.creditCost ?? 0,
-        status: (generatedMedia.status ?? "complete") as
-          | "complete"
-          | "pending"
-          | "failed",
-      },
+    this.wsEmit("generated-media-added", {
+      messages: [
+        {
+          id: messageId,
+          metadata: {
+            generatedMedia: {
+              type: generatedMedia.type,
+              url: generatedMedia.url,
+              prompt: generatedMedia.prompt ?? "",
+              modelId: generatedMedia.modelId ?? "",
+              mimeType: generatedMedia.mimeType ?? "",
+              creditCost: generatedMedia.creditCost ?? 0,
+              status: generatedMedia.status ?? "complete",
+            },
+          },
+        },
+      ],
     });
-    this.enqueue(event);
 
     // DB: merge generatedMedia into existing message metadata
     if (!this.isIncognito) {
@@ -1100,18 +1169,15 @@ export class MessageDbWriter {
   async emitToolResultUpdated(params: {
     messageId: string;
     toolCallId: string;
-    result: ToolCallResult;
+    result: WidgetData;
     toolCall: ToolCall; // full updated toolCall with result
   }): Promise<void> {
-    const { messageId, toolCallId, result, toolCall } = params;
+    const { messageId, toolCall } = params;
 
     // SSE: TOOL_RESULT_UPDATED so frontend can update the pending bubble
-    const event = createStreamEvent.toolResultUpdated({
-      messageId,
-      toolCallId,
-      result,
+    this.wsEmit("tool-result-updated", {
+      messages: [{ id: messageId, metadata: { toolCall } }],
     });
-    this.enqueue(event);
 
     // DB: backfill the result into the tool message
     if (!this.isIncognito) {
@@ -1145,13 +1211,9 @@ export class MessageDbWriter {
     const { toolMessageId, toolCall } = params;
 
     // WS: TOOL_RESULT event - handler patches toolCall metadata on the message
-    const event = createStreamEvent.toolResult({
-      messageId: toolMessageId,
-      toolName: toolCall.toolName,
-      result: toolCall.result,
-      toolCall,
+    this.wsEmit("tool-result", {
+      messages: [{ id: toolMessageId, metadata: { toolCall } }],
     });
-    this.enqueue(event);
 
     // DB: persist partial result so page refresh shows latest state
     if (!this.isIncognito) {
@@ -1236,8 +1298,9 @@ export class MessageDbWriter {
     threadId: string;
     state: "idle" | "streaming" | "aborting" | "waiting";
   }): void {
-    const event = createStreamEvent.streamingStateChanged(params);
-    this.enqueue(event);
+    this.wsEmit("streaming-state-changed", {
+      streamingState: params.state,
+    });
   }
 
   /**
@@ -1249,8 +1312,20 @@ export class MessageDbWriter {
     bridgeType: "stt" | "vision" | "translation" | "tts";
     modality: Modality;
   }): void {
-    const event = createStreamEvent.gapFillStarted(params);
-    this.enqueue(event);
+    this.wsEmit("gap-fill-started", {
+      messages: [
+        {
+          id: params.messageId,
+          metadata: {
+            isStreaming: true,
+            gapFillStatus: {
+              bridgeType: params.bridgeType,
+              modality: params.modality,
+            },
+          },
+        },
+      ],
+    });
   }
 
   /**
@@ -1263,8 +1338,14 @@ export class MessageDbWriter {
     modality: Modality;
     variant: MessageVariant;
   }): Promise<void> {
-    const event = createStreamEvent.gapFillCompleted(params);
-    this.enqueue(event);
+    this.wsEmit("gap-fill-completed", {
+      messages: [
+        {
+          id: params.messageId,
+          metadata: { variants: [params.variant] },
+        },
+      ],
+    });
 
     // Persist variant to DB (non-incognito only)
     if (!this.isIncognito) {
@@ -1303,8 +1384,19 @@ export class MessageDbWriter {
     totalTokens: number | null;
     finishReason: string | null;
   }): void {
-    const doneEvent = createStreamEvent.contentDone(params);
-    this.enqueue(doneEvent);
+    this.wsEmit("content-done", {
+      messages: [
+        {
+          id: params.messageId,
+          content: params.content,
+          metadata: {
+            totalTokens: params.totalTokens ?? undefined,
+            finishReason: params.finishReason ?? undefined,
+            isStreaming: false,
+          },
+        },
+      ],
+    });
   }
 
   // ─── Low-level helpers (used internally and by flush paths) ───────────────
@@ -1315,8 +1407,9 @@ export class MessageDbWriter {
       messageId,
       deltaLength: delta.length,
     });
-    const deltaEvent = createStreamEvent.contentDelta({ messageId, delta });
-    this.enqueue(deltaEvent);
+    this.wsEmit("content-delta", {
+      messages: [{ id: messageId, content: delta }],
+    });
   }
 
   /** Schedule a throttled DB write. */
@@ -1553,18 +1646,6 @@ export class MessageDbWriter {
           error: err instanceof Error ? err.message : String(err),
         },
       );
-    }
-  }
-
-  // ─── Private helpers ──────────────────────────────────────────────────────
-
-  private enqueue(
-    event: ReturnType<
-      (typeof createStreamEvent)[keyof typeof createStreamEvent]
-    >,
-  ): void {
-    if (this.wsEmit) {
-      this.wsEmit(event);
     }
   }
 }

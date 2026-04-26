@@ -17,7 +17,15 @@ import definitions from "./definition";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: async ({ data, t, locale, logger, user, request }) =>
+    handler: async ({
+      data,
+      t,
+      locale,
+      logger,
+      user,
+      request,
+      streamContext,
+    }) =>
       AiStreamRepository.createAiStream({
         data,
         t,
@@ -25,6 +33,7 @@ export const { POST, tools } = endpointsHandler({
         logger,
         user,
         request,
+        subAgentDepth: streamContext.subAgentDepth,
       }),
   },
 });

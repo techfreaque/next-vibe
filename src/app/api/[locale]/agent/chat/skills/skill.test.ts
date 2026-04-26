@@ -34,8 +34,8 @@ import {
   runTestStream,
   toolResultRecord,
 } from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
-import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { scopedTranslation as favoritesScopedTranslation } from "@/app/api/[locale]/agent/chat/favorites/i18n";
 import { ChatFavoritesRepository } from "@/app/api/[locale]/agent/chat/favorites/repository";
 import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";
@@ -46,7 +46,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
 import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
@@ -190,8 +190,8 @@ function effectiveToolName(m: ThreadMessage): string {
  * execute-tool nests the actual response as {result: <actual>}.
  */
 function unwrapExecuteToolResult(
-  raw: ToolCallResult | undefined,
-): Record<string, ToolCallResult> | null {
+  raw: WidgetData | undefined,
+): Record<string, WidgetData> | null {
   const outer = toolResultRecord(raw);
   if (!outer) {
     return null;
@@ -203,7 +203,7 @@ function unwrapExecuteToolResult(
     typeof inner === "object" &&
     !Array.isArray(inner)
   ) {
-    return inner as Record<string, ToolCallResult>;
+    return inner as Record<string, WidgetData>;
   }
   return outer;
 }

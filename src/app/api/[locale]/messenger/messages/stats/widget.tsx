@@ -29,6 +29,7 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type {
@@ -50,7 +51,6 @@ import {
 } from "../enum";
 import { scopedTranslation as messagesScopedTranslation } from "../i18n";
 import type definition from "./definition";
-import type { EmailStatsGetResponseTypeOutput } from "./definition";
 import type {
   ChartTypeValue,
   DateRangePresetValue,
@@ -64,12 +64,6 @@ import {
   TimePeriod,
   TimePeriodOptions,
 } from "./enum";
-
-interface CustomWidgetProps {
-  field: {
-    value: EmailStatsGetResponseTypeOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
 
 function StatCard({
   label,
@@ -129,10 +123,8 @@ function RateBar({
   );
 }
 
-export function EmailStatsContainer({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
-  const data = field.value;
+export function EmailStatsContainer(): React.JSX.Element {
+  const data = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
   const messagesT = messagesScopedTranslation.scopedT(locale).t;

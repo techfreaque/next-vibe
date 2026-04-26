@@ -23,6 +23,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { taskOwnerSchema } from "../db";
 
 import {
   CronTaskHiddenFilter,
@@ -36,11 +37,11 @@ import {
   TaskOutputModeDB,
 } from "../../enum";
 
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { CRON_QUEUE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-const CronQueueContainer = lazyCliWidget(() =>
+const CronQueueContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CronQueueContainer })),
 );
 
@@ -219,10 +220,10 @@ const { GET } = createEndpoint({
               content: "get.response.task.outputMode",
               schema: z.enum(TaskOutputModeDB),
             }),
-            userId: responseField(scopedTranslation, {
+            owner: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.userId",
-              schema: z.string().nullable(),
+              content: "get.response.task.owner",
+              schema: taskOwnerSchema,
             }),
             lastExecutedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -273,6 +274,44 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               content: "get.response.task.averageExecutionTime",
               schema: z.number().nullable(),
+            }),
+            shortId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.shortId",
+              schema: z.string(),
+            }),
+            taskInput: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.taskInput",
+              schema: z.record(z.string(), z.unknown()).optional().default({}),
+            }),
+            runOnce: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.runOnce",
+              schema: z.boolean(),
+            }),
+            notificationTargets: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.notificationTargets",
+              schema: z
+                .array(
+                  z.object({
+                    type: z.enum(["email", "sms", "webhook"]),
+                    target: z.string(),
+                  }),
+                )
+                .optional()
+                .default([]),
+            }),
+            targetInstance: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.targetInstance",
+              schema: z.string().nullable(),
+            }),
+            tags: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.tags",
+              schema: z.array(z.string()).optional().default([]),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

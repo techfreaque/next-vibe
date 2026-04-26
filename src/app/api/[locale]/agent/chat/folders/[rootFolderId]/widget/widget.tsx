@@ -41,7 +41,10 @@ import {
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import folderContentsDefinition from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetContext,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
@@ -50,7 +53,6 @@ import { useChatNavigationStore } from "../../../hooks/use-chat-navigation-store
 import { ThreadsList } from "../../../threads/widget/widget";
 import createFolderDefinition from "../create/definition";
 import type definition from "../definition";
-import type { FolderListResponseOutput } from "../definition";
 import { scopedTranslation } from "../i18n";
 import { FolderAccessModal } from "./folder-access-modal";
 
@@ -213,15 +215,8 @@ function RootFolderBar({
 // FoldersListContainer - shell widget
 // ---------------------------------------------------------------------------
 
-interface CustomWidgetProps {
-  field: {
-    value: FolderListResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
-
-export function FoldersListContainer({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
+export function FoldersListContainer(): React.JSX.Element {
+  const field = useWidgetValue<typeof definition.GET>();
   const { user, locale } = useWidgetContext();
   const { initialFolderContentsData, initialRootFolderId } =
     useChatBootContext();
@@ -261,7 +256,7 @@ export function FoldersListContainer({
   const [newFolderDialogOpen, setNewFolderDialogOpen] = useState(false);
   const searchInputRef = useRef<InputRefObject>(null);
 
-  const rootFolderPermissions = field.value?.rootFolderPermissions;
+  const rootFolderPermissions = field?.rootFolderPermissions;
 
   const isAuthenticated = useMemo(
     () => user !== undefined && !user.isPublic,
@@ -323,10 +318,10 @@ export function FoldersListContainer({
   const isOnNewThreadPage =
     activeThreadId === NEW_MESSAGE_ID && activeFolderId === null;
 
-  const canCreateThread = field.value
+  const canCreateThread = field
     ? (rootFolderPermissions?.canCreateThread ?? false)
     : true;
-  const canCreateFolder = field.value
+  const canCreateFolder = field
     ? (rootFolderPermissions?.canCreateFolder ?? false)
     : true;
 
@@ -418,6 +413,7 @@ export function FoldersListContainer({
                     staleTime: 30 * 1000,
                   },
                 },
+                subscribeToEvents: true,
               }}
             />
           </Div>

@@ -7,8 +7,8 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
@@ -20,12 +20,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { PulseExecutionStatusDB, PulseHealthStatusDB } from "../../enum";
 import { PULSE_HISTORY_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 
-const PulseHistoryContainer = lazyCliWidget(() =>
+const PulseHistoryContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.PulseHistoryContainer })),
 );
 

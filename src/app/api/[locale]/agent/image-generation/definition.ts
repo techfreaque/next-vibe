@@ -100,11 +100,15 @@ const { POST } = createEndpoint({
           .default(ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW),
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
         serverDefault: (ctx) => {
-          const sel = ctx.streamContext?.imageGenModelSelection;
+          const sel = ctx.streamContext.imageGenModelSelection;
           if (!sel || !ctx.user) {
             return undefined;
           }
-          return getBestImageGenModel(sel, ctx.user)?.id;
+          return getBestImageGenModel(
+            sel,
+            ctx.user,
+            ctx.streamContext.providerOverride,
+          )?.id;
         },
       }),
       size: requestField(scopedTranslation, {

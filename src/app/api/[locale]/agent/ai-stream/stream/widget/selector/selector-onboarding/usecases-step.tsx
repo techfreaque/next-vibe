@@ -93,7 +93,7 @@ const USE_CASE_SKILL_IDS: Record<UseCase, string[]> = {
   creative: ["storyteller", "creative"],
   learning: ["tutor", "teacher"],
   health: ["health-wellness", "career-coach"],
-  controversial: ["uncensored", "philosopher"],
+  controversial: ["uncensored", "philosopher", "4chan", "neet"],
   roleplay: ["roleplay-skill", "character-creator"],
 };
 

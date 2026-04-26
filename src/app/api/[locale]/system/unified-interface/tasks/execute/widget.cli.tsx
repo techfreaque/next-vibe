@@ -12,9 +12,9 @@ import { useMemo } from "react";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
-  useInkWidgetLocale,
-  useInkWidgetPlatform,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+  useWidgetLocale,
+  useWidgetPlatform,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import { CronTaskStatus } from "../enum";
 import type { TaskExecuteResponseOutput } from "./definition";
@@ -146,9 +146,9 @@ function renderMcp(value: TaskExecuteResponseOutput): string {
 // ---------------------------------------------------------------------------
 
 export function TaskExecuteContainer({ field }: CliWidgetProps): JSX.Element {
-  const platform = useInkWidgetPlatform();
+  const platform = useWidgetPlatform();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const locale = useInkWidgetLocale();
+  const locale = useWidgetLocale();
   const isMcp = platform === Platform.MCP;
 
   const output = useMemo(() => {

@@ -39,7 +39,7 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CronTaskExecution } from "../cron/db";
+import { dbUserIdToOwner, type CronTaskExecution } from "../cron/db";
 import { CronTasksRepository } from "../cron/repository";
 import { CronTaskStatus } from "../enum";
 import { scopedTranslation as tasksScopedTranslation } from "../i18n";
@@ -47,9 +47,9 @@ import type {
   UnifiedRunnerRequestOutput,
   UnifiedRunnerResponseOutput,
 } from "./definition";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   CronTaskAny,
-  JsonValue,
   ResolveRouteIdResult,
   Task,
   TaskRunner,
@@ -239,7 +239,7 @@ export class UnifiedTaskRunnerRepository {
 
     // taskInput: DB value overrides file-task default.
     // splitTaskArgs() splits the flat merged input by URL-param schema at execution time.
-    const resolvedInput: Record<string, JsonValue> =
+    const resolvedInput: Record<string, WidgetData> =
       dbTask?.taskInput ?? task.taskInput ?? {};
 
     const executionId = crypto.randomUUID();
@@ -277,11 +277,12 @@ export class UnifiedTaskRunnerRepository {
     let taskUser: JwtPrivatePayloadType =
       UnifiedTaskRunnerRepository.systemCronUser;
 
-    if (dbTask?.userId) {
+    const dbTaskOwner = dbUserIdToOwner(dbTask?.userId);
+    if (dbTaskOwner.type === "user") {
       const ownerRow = await db
         .select({ locale: usersTable.locale })
         .from(usersTable)
-        .where(eq(usersTable.id, dbTask.userId))
+        .where(eq(usersTable.id, dbTaskOwner.userId))
         .limit(1);
 
       if (ownerRow[0]) {
@@ -297,7 +298,7 @@ export class UnifiedTaskRunnerRepository {
           .from(userRolesTable)
           .where(
             and(
-              eq(userRolesTable.userId, dbTask.userId),
+              eq(userRolesTable.userId, dbTaskOwner.userId),
               inArray(userRolesTable.role, [...UserRoleDB]),
             ),
           );
@@ -307,10 +308,10 @@ export class UnifiedTaskRunnerRepository {
         ) as (typeof UserRoleDB)[number][];
 
         taskUser = {
-          id: dbTask.userId,
+          id: dbTaskOwner.userId,
           // leadId is not stored on users table (users can have multiple leads).
           // Use task id as a stable, unique scope for cron-executed AI operations.
-          leadId: dbTask.userId,
+          leadId: dbTaskOwner.userId,
           isPublic: false,
           roles: roles.length > 0 ? roles : [UserPermissionRole.CUSTOMER],
         };
@@ -348,6 +349,7 @@ export class UnifiedTaskRunnerRepository {
           modelId: undefined,
           favoriteId: undefined,
           headless: undefined,
+          subAgentDepth: 0,
           waitingForRemoteResult: undefined,
           abortSignal: taskAbortController.signal,
           callerCallbackMode: undefined,
@@ -358,6 +360,8 @@ export class UnifiedTaskRunnerRepository {
           videoGenModelSelection: undefined,
           variantId: undefined,
           isRevival: undefined,
+
+          providerOverride: undefined,
         },
       });
 

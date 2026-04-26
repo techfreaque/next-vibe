@@ -16,7 +16,7 @@ import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interfac
 import type { NewCronTask } from "./cron/db";
 import { cronTasks } from "./cron/db";
 import { CronTaskPriority } from "./enum";
-import type { JsonValue } from "./unified-runner/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 /**
  * Upsert all cron tasks from the task registry into the DB.
@@ -40,7 +40,7 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
     `Upserting ${cronTaskDefs.length} cron task definitions into DB`,
   );
 
-  const taskRows: NewCronTask<Record<string, JsonValue>>[] = cronTaskDefs.map(
+  const taskRows: NewCronTask<Record<string, WidgetData>>[] = cronTaskDefs.map(
     (task) => ({
       // id: stable identity - multiple tasks can share the same routeId (endpoint)
       id: task.id,

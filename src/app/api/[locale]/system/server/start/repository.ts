@@ -31,6 +31,11 @@ import {
   formatTask,
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+import {
+  truncateClientLogs,
+  truncateStartLog,
+  writeStartLogOfflineHint,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
 import type { WebSocketServerHandle } from "@/app/api/[locale]/system/unified-interface/websocket/server";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
@@ -68,6 +73,8 @@ export class ServerStartRepository {
   private static runningProcesses: Map<string, ChildProcess> = new Map();
   /** Set to true when we intentionally stop Next.js (shutdown / SIGUSR1) - suppresses auto-restart */
   private static nextServerShuttingDown = false;
+  /** Set to true during SIGUSR1-triggered restart to suppress the exit→restart handler */
+  private static nextServerRestarting = false;
   private static nextRestartCount = 0;
 
   /** Extract port number from a URL string, returns undefined if not parseable */
@@ -363,17 +370,28 @@ export class ServerStartRepository {
       runNext,
     );
 
+    // Write offline hint on behalf of the previous instance BEFORE truncating —
+    // prevents the old process's own shutdown handler from appending the hint
+    // after the new session has already cleared the log.
+    writeStartLogOfflineHint();
+    // Truncate log files at session start (VIBE_LOG_PATH controls whether file logging is active)
+    void truncateStartLog();
+    void truncateClientLogs();
+
     // Kill any previous vibe start instance, then write our PID (including resolved port)
     killPreviousInstance(VIBE_START_PID_FILE, logger);
     writePidFile(VIBE_START_PID_FILE, logger, [], port);
 
     // Register early SIGINT/SIGTERM so Ctrl+C during setup exits immediately
-    const earlyExitHandler = (): void => {
+    const earlyExitHandler = (writeHint: boolean): void => {
       cleanupPidFile(VIBE_START_PID_FILE);
+      if (writeHint) {
+        writeStartLogOfflineHint();
+      }
       process.exit(0);
     };
-    process.on("SIGINT", earlyExitHandler);
-    process.on("SIGTERM", earlyExitHandler);
+    process.on("SIGINT", () => earlyExitHandler(true));
+    process.on("SIGTERM", () => earlyExitHandler(false));
 
     // Setup database if enabled
     if (runDb) {
@@ -461,23 +479,31 @@ export class ServerStartRepository {
     process.off("SIGINT", earlyExitHandler);
     process.off("SIGTERM", earlyExitHandler);
 
-    const handleShutdown = (): void => {
+    const handleShutdown = (writeHint: boolean): void => {
       // Signal auto-restart loop not to re-spawn after we kill Next.js
       ServerStartRepository.nextServerShuttingDown = true;
       cleanupPidFile(VIBE_START_PID_FILE);
       ServerStartRepository.stopAllProcesses();
+      // Only write the offline hint on user-initiated shutdown (SIGINT/Ctrl+C).
+      // On SIGTERM the new vibe start process already wrote it before truncating.
+      if (writeHint) {
+        writeStartLogOfflineHint();
+      }
       process.exit(0);
     };
 
-    process.on("SIGINT", handleShutdown);
-    process.on("SIGTERM", handleShutdown);
+    process.on("SIGINT", () => handleShutdown(true));
+    process.on("SIGTERM", () => handleShutdown(false));
 
     // SIGUSR1: hot-restart Next.js (triggered by `vibe rebuild`)
     process.on("SIGUSR1", () => {
       logger.info("🔄 Received SIGUSR1 - restarting server...");
 
-      // Suppress auto-restart while we intentionally kill the old process
-      ServerStartRepository.nextServerShuttingDown = true;
+      // Suppress auto-restart while we intentionally kill the old process.
+      // nextServerRestarting stays true until the new process is spawned so the
+      // exit handler (which fires asynchronously after the kill) doesn't queue
+      // a second restart that would race with ours and hit EADDRINUSE.
+      ServerStartRepository.nextServerRestarting = true;
 
       if (ServerStartRepository.wsServerHandle) {
         ServerStartRepository.wsServerHandle.stop();
@@ -491,20 +517,22 @@ export class ServerStartRepository {
         ServerStartRepository.nextServerProcess = null;
       }
 
-      // Re-enable auto-restart for the new process before spawning
-      ServerStartRepository.nextServerShuttingDown = false;
       ServerStartRepository.nextRestartCount = 0;
 
       ServerStartRepository.startNextServer(port, logger, t, data.profile)
         .then((result) => {
+          // New process is up - allow auto-restart to work again if it crashes
+          ServerStartRepository.nextServerRestarting = false;
           if (result.success) {
             logger.info("Server restarted via SIGUSR1");
           } else {
+            ServerStartRepository.nextServerRestarting = false;
             logger.error("Server restart failed", { message: result.message });
           }
           return result;
         })
         .catch((error) => {
+          ServerStartRepository.nextServerRestarting = false;
           logger.error("Server restart error after SIGUSR1", {
             error: parseError(error).message,
           });
@@ -543,7 +571,7 @@ export class ServerStartRepository {
       process.stdin.setEncoding("utf8");
       process.stdin.on("data", (key: string) => {
         if (key === "\u0003") {
-          handleShutdown();
+          handleShutdown(true);
           return;
         }
         if (key === "p" || key === "P") {
@@ -878,8 +906,11 @@ export class ServerStartRepository {
           ServerStartRepository.nextServerProcess = null;
           removePidFromFile(VIBE_START_PID_FILE, proc.pid ?? 0);
 
-          // Intentional shutdown (our SIGTERM or process exit) - do not restart
-          if (ServerStartRepository.nextServerShuttingDown) {
+          // Intentional shutdown or SIGUSR1-triggered restart - do not queue a second restart
+          if (
+            ServerStartRepository.nextServerShuttingDown ||
+            ServerStartRepository.nextServerRestarting
+          ) {
             return;
           }
 

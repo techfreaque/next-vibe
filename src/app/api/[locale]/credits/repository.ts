@@ -71,8 +71,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import {
-  chatModelOptionsIndex,
   type ChatModelId,
+  chatModelOptionsIndex,
 } from "../agent/ai-stream/models";
 import type {
   AudioVisionModelId,
@@ -83,6 +83,7 @@ import { ProductIds, productsRepository } from "../products/repository-client";
 import { payoutRequests } from "../referral/db";
 import { PayoutStatus } from "../referral/enum";
 import { withTransaction } from "../system/db/utils/repository-helpers";
+import { createEndpointEmitter } from "../system/unified-interface/websocket/endpoint-emitter";
 import { FREE_CREDIT_POOL } from "./constants";
 import {
   creditPacks,
@@ -92,6 +93,7 @@ import {
 } from "./db";
 import { getPoolBalance } from "./db-functions";
 import type { CreditsGetResponseOutput } from "./definition";
+import creditsDefinitions from "./definition";
 import {
   CreditPackType,
   type CreditPackTypeValue,
@@ -108,7 +110,7 @@ import { PublicCapRepository } from "./public-cap/repository";
 
 export interface CreditIdentifier {
   userId?: string;
-  leadId?: string;
+  leadId: string;
 }
 
 export interface CreditPool {
@@ -1322,7 +1324,7 @@ export class CreditRepository {
    * Get balance for identifier
    */
   static async getBalance(
-    identifier: CreditIdentifier,
+    user: JwtPayloadType,
     logger: EndpointLogger,
     t: CreditsT,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
@@ -1332,16 +1334,16 @@ export class CreditRepository {
       // Side effects first: ensure wallets exist + monthly reset
       let poolResult: ResponseType<CreditPool>;
 
-      if (identifier.userId) {
+      if (!user.isPublic) {
         poolResult = await CreditRepository.getUserPool(
-          identifier.userId,
+          user.id,
           logger,
           t,
           locale,
         );
-      } else if (identifier.leadId) {
+      } else if (user.leadId) {
         poolResult = await CreditRepository.getLeadPool(
-          identifier.leadId,
+          user.leadId,
           logger,
           t,
           locale,
@@ -1367,8 +1369,8 @@ export class CreditRepository {
       // Atomic balance calc: expiry + aggregation in one PG call
       const result = await getPoolBalance.call(
         {
-          p_user_id: identifier.userId ?? null,
-          p_lead_id: identifier.leadId ?? null,
+          p_user_id: user.isPublic ? null : user.id,
+          p_lead_id: user.leadId ?? null,
         },
         logger,
       );
@@ -1383,7 +1385,7 @@ export class CreditRepository {
       });
     } catch (error) {
       logger.error("Failed to get balance", parseError(error), {
-        ...identifier,
+        ...user,
       });
       return fail({
         message: t("errors.getBalanceFailed"),
@@ -3128,6 +3130,7 @@ export class CreditRepository {
         messageId: creditMessageId,
       });
 
+      CreditRepository.emitBalanceUpdate(user, logger, t, locale);
       return success({ messageId: creditMessageId });
     } catch (error) {
       logger.error(`Error deducting credits for ${feature}`, {
@@ -3205,6 +3208,7 @@ export class CreditRepository {
         partialDeduction,
       });
 
+      CreditRepository.emitBalanceUpdate(user, logger, t, locale);
       return success({ messageId: creditMessageId, partialDeduction });
     } catch (error) {
       logger.error("Failed to deduct TTS credits", parseError(error), {
@@ -3281,6 +3285,7 @@ export class CreditRepository {
         partialDeduction,
       });
 
+      CreditRepository.emitBalanceUpdate(user, logger, t, locale);
       return success({ messageId: creditMessageId, partialDeduction });
     } catch (error) {
       logger.error("Failed to deduct STT credits", parseError(error), {
@@ -3382,6 +3387,7 @@ export class CreditRepository {
         partialDeduction,
       });
 
+      CreditRepository.emitBalanceUpdate(user, logger, t, locale);
       return success({ messageId: creditMessageId, partialDeduction });
     } catch (error) {
       logger.error(`Error deducting credits for model`, {
@@ -3705,19 +3711,15 @@ export class CreditRepository {
    * Moved from BaseCreditHandler to enforce repository-first architecture
    */
   static async hasSufficientCredits(
-    identifier: CreditIdentifier,
+    user: JwtPayloadType,
     required: number,
     logger: EndpointLogger,
     t: CreditsT,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
   ): Promise<boolean> {
-    if (!identifier.leadId && !identifier.userId) {
-      logger.error("Credit check requires leadId or userId");
-      return false;
-    }
     const balanceResult = await CreditRepository.getBalance(
-      identifier,
+      user,
       logger,
       t,
       locale,
@@ -4130,6 +4132,39 @@ export class CreditRepository {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
+  }
+
+  /**
+   * Fire-and-forget: fetch updated balance and broadcast it on the credits WS channel.
+   * Called after every credit deduction so the client balance updates in real time.
+   */
+  private static emitBalanceUpdate(
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+    t: CreditsT,
+    locale: CountryLanguage,
+  ): void {
+    void CreditRepository.getBalance(user, logger, t, locale).then((result) => {
+      if (!result.success) {
+        return undefined;
+      }
+      const { total, expiring, permanent, earned, free, expiresAt } =
+        result.data;
+      const emitCredits = createEndpointEmitter(
+        creditsDefinitions.GET,
+        logger,
+        user,
+      );
+      emitCredits("credits-balance-updated", {
+        total,
+        expiring,
+        permanent,
+        earned,
+        free,
+        expiresAt,
+      });
+      return undefined;
+    });
   }
 }
 

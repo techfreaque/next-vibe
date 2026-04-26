@@ -25,12 +25,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { iconSchema } from "../../../shared/types/common.schema";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { allModelDefinitions } from "../../models/all-models";
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import { iconSchema } from "../../../shared/types/common.schema";
+import { allModelDefinitions } from "../../models/all-models";
 
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import createFavoriteDefinitions from "../favorites/create/definition";
 import { NO_SKILL_ID, SKILLS_LIST_ALIAS } from "./constants";
 import {
@@ -47,9 +47,34 @@ import {
 
 import { scopedTranslation } from "./i18n";
 
-const SkillsListContainer = lazyCliWidget(() =>
+const SkillsListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillsListContainer })),
 );
+
+/**
+ * Standalone skill item zod schema — shared between the sections[].skills
+ * response field and the wsEvent discriminated union (to avoid circular type inference).
+ */
+const skillItemSchema = z.object({
+  id: z.string(),
+  internalId: z.string().nullable(),
+  category: z.enum(SkillCategoryDB),
+  variantId: z.string().nullable(),
+  variantName: z.string().nullable(),
+  isVariant: z.boolean(),
+  isDefault: z.boolean(),
+  modelId: z.enum(ChatModelId).nullable(),
+  icon: iconSchema,
+  name: z.string(),
+  tagline: z.string(),
+  description: z.string(),
+  modelIcon: iconSchema,
+  modelInfo: z.string(),
+  modelProvider: z.string(),
+  ownershipType: z.enum(SkillOwnershipTypeDB),
+  trustLevel: z.enum(SkillTrustLevelDB).nullable(),
+  voteCount: z.number().int().nonnegative().nullable(),
+});
 
 /**
  * Get Skills List Endpoint (GET)
@@ -273,6 +298,33 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.string().nullable(),
       }),
+      wsEvent: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z
+          .discriminatedUnion("type", [
+            z.object({
+              type: z.literal("created"),
+              item: skillItemSchema,
+              category: z.enum(SkillCategoryDB),
+            }),
+            z.object({
+              type: z.literal("updated"),
+              id: z.string(),
+              name: z.string().optional(),
+              icon: iconSchema.optional(),
+              tagline: z.string().optional(),
+              ownershipType: z.enum(SkillOwnershipTypeDB).optional(),
+              voteCount: z.number().int().nonnegative().nullable().optional(),
+              trustLevel: z.enum(SkillTrustLevelDB).nullable().optional(),
+            }),
+            z.object({
+              type: z.literal("deleted"),
+              id: z.string(),
+            }),
+          ])
+          .nullable(),
+      }),
 
       // Sections array
       sections: responseArrayField(scopedTranslation, {
@@ -316,6 +368,11 @@ const { GET } = createEndpoint({
                     type: WidgetType.TEXT,
                     hidden: true,
                     schema: z.string(),
+                  }),
+                  internalId: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    hidden: true,
+                    schema: z.string().nullable(),
                   }),
                   category: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
@@ -503,6 +560,128 @@ const { GET } = createEndpoint({
     description: "get.success.description" as const,
   },
 
+  // === WS EVENTS ===
+  // Emitted by SkillsRepository after every mutation — keeps all open tabs in sync.
+  // hint carries a JSON payload with the data needed to update the nested
+  // sections[].skills[] cache directly without a round-trip to the server.
+  events: {
+    "skill-created": {
+      fields: ["wsEvent"] as const,
+      operation: "merge" as const,
+      onEvent: async ({ partial, logger }) => {
+        if (partial.wsEvent?.type !== "created") {
+          return;
+        }
+        const { item: newSkill, category } = partial.wsEvent;
+        const [{ apiClient }, def] = await Promise.all([
+          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("./definition"),
+        ]);
+        apiClient.updateEndpointData(def.default.GET, logger, (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          const found = old.data.sections.some(
+            (s) => s.skills[0]?.category === category,
+          );
+          return {
+            ...old,
+            data: {
+              ...old.data,
+              wsEvent: null,
+              sections: found
+                ? old.data.sections.map((section) =>
+                    section.skills[0]?.category === category
+                      ? {
+                          ...section,
+                          sectionCount: section.sectionCount + 1,
+                          skills: [newSkill, ...section.skills],
+                        }
+                      : section,
+                  )
+                : [
+                    ...old.data.sections,
+                    {
+                      sectionIcon: newSkill.icon,
+                      sectionTitle: newSkill.category,
+                      sectionCount: 1,
+                      skills: [newSkill],
+                    },
+                  ],
+            },
+          };
+        });
+      },
+    },
+    "skill-updated": {
+      fields: ["wsEvent"] as const,
+      operation: "merge" as const,
+      onEvent: async ({ partial, logger }) => {
+        if (partial.wsEvent?.type !== "updated") {
+          return;
+        }
+        const update = partial.wsEvent;
+        const [{ apiClient }, def] = await Promise.all([
+          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("./definition"),
+        ]);
+        apiClient.updateEndpointData(def.default.GET, logger, (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return {
+            ...old,
+            data: {
+              ...old.data,
+              wsEvent: null,
+              sections: old.data.sections.map((section) => ({
+                ...section,
+                skills: section.skills.map((skill) =>
+                  skill.id === update.id ? { ...skill, ...update } : skill,
+                ),
+              })),
+            },
+          };
+        });
+      },
+    },
+    "skill-deleted": {
+      fields: ["wsEvent"] as const,
+      operation: "merge" as const,
+      onEvent: async ({ partial, logger }) => {
+        if (partial.wsEvent?.type !== "deleted") {
+          return;
+        }
+        const { id } = partial.wsEvent;
+        const [{ apiClient }, def] = await Promise.all([
+          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("./definition"),
+        ]);
+        apiClient.updateEndpointData(def.default.GET, logger, (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return {
+            ...old,
+            data: {
+              ...old.data,
+              wsEvent: null,
+              sections: old.data.sections
+                .map((section) => ({
+                  ...section,
+                  sectionCount: section.skills.some((s) => s.id === id)
+                    ? section.sectionCount - 1
+                    : section.sectionCount,
+                  skills: section.skills.filter((s) => s.id !== id),
+                }))
+                .filter((section) => section.skills.length > 0),
+            },
+          };
+        });
+      },
+    },
+  },
+
   examples: {
     requests: {
       listAll: {},
@@ -516,6 +695,7 @@ const { GET } = createEndpoint({
         currentPage: null,
         totalPages: null,
         hint: null,
+        wsEvent: null,
         sections: [
           {
             sectionIcon: "robot-face",
@@ -524,6 +704,7 @@ const { GET } = createEndpoint({
             skills: [
               {
                 id: "default",
+                internalId: null,
                 icon: "robot-face",
                 modelId: ChatModelId.CLAUDE_SONNET_4_5,
                 category: SkillCategory.ASSISTANT,
@@ -549,7 +730,8 @@ const { GET } = createEndpoint({
             sectionCount: 1,
             skills: [
               {
-                id: "550e8400-e29b-41d4-a716-446655440000",
+                id: "hermes-code-reviewer",
+                internalId: "550e8400-e29b-41d4-a716-446655440000",
                 icon: "direct-hit",
                 modelId: ChatModelId.GPT_5,
                 category: SkillCategory.CODING,

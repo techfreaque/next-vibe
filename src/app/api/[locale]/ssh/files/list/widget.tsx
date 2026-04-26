@@ -22,16 +22,10 @@ import {
   useWidgetForm,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type endpoints from "./definition";
-import type { FilesListResponseOutput } from "./definition";
-
-interface WidgetProps {
-  field: {
-    value: FilesListResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
-}
 
 function formatSize(size: number | null): string {
   if (size === null) {
@@ -53,13 +47,13 @@ function formatDate(s: string | null): string {
   return s.slice(0, 10);
 }
 
-export function FilesListContainer({ field }: WidgetProps): React.JSX.Element {
+export function FilesListContainer(): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const form = useWidgetForm<typeof endpoints.GET>();
   const onSubmit = useWidgetOnSubmit();
   const { endpointMutations } = useWidgetContext();
 
-  const value = field.value;
+  const value = useWidgetValue<typeof endpoints.GET>();
   const isLoading = endpointMutations?.read?.isLoading ?? false;
   const currentPath = value?.currentPath ?? "~";
 

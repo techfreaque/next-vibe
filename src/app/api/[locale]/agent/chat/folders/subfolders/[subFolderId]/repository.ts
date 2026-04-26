@@ -12,6 +12,7 @@ import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
 import { canManageFolder } from "@/app/api/[locale]/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -19,6 +20,7 @@ import type {
   FolderDeleteResponseOutput,
   FolderGetResponseOutput,
 } from "./definition";
+import folderContentsDefinitions from "../../../folder-contents/[rootFolderId]/definition";
 import { scopedTranslation } from "./i18n";
 import type {
   FolderUpdateRequestOutput,
@@ -153,6 +155,26 @@ export class FolderRepository {
 
       logger.info("Folder updated", { folderId: data.id });
 
+      // Emit WS event so all open tabs update the folder in the sidebar immediately
+      const emitFolderContents = createEndpointEmitter(
+        folderContentsDefinitions.GET,
+        logger,
+        user,
+        { rootFolderId: updated.rootFolderId },
+      );
+      emitFolderContents("folder-updated", {
+        items: [
+          {
+            id: updated.id,
+            name: updated.name,
+            icon: updated.icon,
+            color: updated.color,
+            sortOrder: updated.sortOrder,
+            updatedAt: updated.updatedAt,
+          },
+        ],
+      });
+
       return success({
         folderId: updated.id,
         updatedAt: updated.updatedAt,
@@ -205,6 +227,15 @@ export class FolderRepository {
       await db.delete(chatFolders).where(eq(chatFolders.id, data.id));
 
       logger.info("Folder deleted", { folderId: data.id });
+
+      // Emit WS event so all open tabs remove the folder from the sidebar immediately
+      const emitFolderContents = createEndpointEmitter(
+        folderContentsDefinitions.GET,
+        logger,
+        user,
+        { rootFolderId: folder.rootFolderId },
+      );
+      emitFolderContents("folder-deleted", { items: [{ id: folder.id }] });
 
       return success({
         id: folder.id,

@@ -1299,7 +1299,9 @@ export const translations = {
       claudeOpus45:
         "Claude Opus 4.5 - Most powerful Claude model with exceptional reasoning and creative capabilities",
       claudeOpus46:
-        "Claude Opus 4.6 - Latest and most powerful Claude model with exceptional reasoning and creative capabilities",
+        "Claude Opus 4.6 - Powerful Claude model with exceptional reasoning and creative capabilities",
+      claudeOpus47:
+        "Claude Opus 4.7 - Latest and most powerful Claude model with exceptional reasoning and creative capabilities",
       claudeSonnet46:
         "Claude Sonnet 4.6 - Anthropic's most capable Sonnet-class model with frontier performance across coding, agents, and professional work",
       gemini3Pro:

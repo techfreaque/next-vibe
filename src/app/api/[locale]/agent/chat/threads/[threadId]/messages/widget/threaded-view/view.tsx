@@ -21,15 +21,16 @@ import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useSkill } from "../../../../../skills/[id]/hooks";
 import { loadMessageAttachments } from "../../hooks/load-message-attachments";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
-import { useMessageItem } from "../../hooks/use-message-item";
 import { scopedTranslation } from "../../i18n";
+import type messagesDefinition from "../../definition";
+import { useWidgetItem } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { useMessageGroupName } from "../embedded-context";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
@@ -76,7 +77,6 @@ interface ThreadedMessageProps {
   onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
   user: JwtPayloadType;
   ttsAutoplay: boolean;
-  deductCredits: (amount: number, feature: string) => void;
   voiceId: TtsModelId | undefined;
 }
 
@@ -99,7 +99,6 @@ export function ThreadedMessage({
   onVoteMessage,
   user,
   ttsAutoplay,
-  deductCredits,
   voiceId,
 }: ThreadedMessageProps): JSX.Element {
   // Navigation state from Zustand store
@@ -280,7 +279,11 @@ export function ThreadedMessage({
   const { group: messageGroupClass } = useMessageGroupName();
 
   // Check if this message is currently streaming
-  const liveMessage = useMessageItem(message.id);
+  const liveMessage = useWidgetItem<typeof messagesDefinition.GET>()(
+    (d) => d?.messages ?? [],
+    (m) => m.id,
+    message.id,
+  );
   const isMessageStreaming = liveMessage?.metadata?.isStreaming ?? false;
 
   // TTS support for assistant messages
@@ -321,7 +324,6 @@ export function ThreadedMessage({
     locale,
     user,
     logger,
-    deductCredits,
     voiceId,
   });
 
@@ -574,7 +576,6 @@ export function ThreadedMessage({
                       onVoteMessage={onVoteMessage}
                       user={user}
                       ttsAutoplay={ttsAutoplay}
-                      deductCredits={deductCredits}
                       voiceId={voiceId}
                     />
                   </ErrorBoundary>

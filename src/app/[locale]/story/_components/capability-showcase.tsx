@@ -16,15 +16,13 @@ import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type {
-  ChatMessage,
-  ToolCallResult,
-} from "@/app/api/[locale]/agent/chat/db";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
-import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
+import { useLogger } from "@/hooks/use-logger";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -163,8 +161,8 @@ function mkToolMsg(
   seq: string,
   toolCallId: string,
   toolName: string,
-  args: ToolCallResult,
-  result: ToolCallResult,
+  args: WidgetData,
+  result: WidgetData,
   executionTime: number,
 ): ChatMessage {
   return baseMockMsg({
@@ -598,10 +596,7 @@ const MEMORY_DEMOS: MemoryDemoId[] = ["context", "project"];
 
 function MemoryVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
   const [activeId, setActiveId] = useState<MemoryDemoId>("context");
 
   const handleSelect = useCallback((id: MemoryDemoId) => {
@@ -663,7 +658,7 @@ function MemoryVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
       </Div>
       <MockChatProvider>
         <Div className="rounded-lg border bg-card/50 overflow-hidden p-4 space-y-1 max-h-[32rem] overflow-y-auto">
-          <UserMessageBubble
+          <StaticUserMessageBubble
             message={userMsg}
             locale={locale}
             logger={logger}
@@ -674,7 +669,6 @@ function MemoryVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
               id: "00000000-0000-0000-0000-000000000000",
               roles: [UserPermissionRole.ADMIN],
             }}
-            deductCredits={null}
           />
           <AnimatePresence mode="wait">
             <MotionDiv
@@ -701,7 +695,6 @@ function MemoryVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
                   roles: [UserPermissionRole.ADMIN],
                 }}
                 sendMessage={null}
-                deductCredits={null}
                 ttsAutoplay={false}
                 voiceId={undefined}
                 onVote={null}
@@ -782,10 +775,7 @@ function ModelsVisual({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
   const [activeId, setActiveId] = useState<CensorDemoId>("mainstream");
 
   const handleSelect = useCallback((id: CensorDemoId) => {
@@ -903,7 +893,7 @@ function ModelsVisual({
       <Div>
         <MockChatProvider>
           <Div className="rounded-lg border bg-card/50 overflow-hidden p-4 space-y-1 max-h-[32rem] overflow-y-auto">
-            <UserMessageBubble
+            <StaticUserMessageBubble
               message={userMsg}
               locale={locale}
               logger={logger}
@@ -914,7 +904,6 @@ function ModelsVisual({
                 id: "00000000-0000-0000-0000-000000000000",
                 roles: [UserPermissionRole.ADMIN],
               }}
-              deductCredits={null}
             />
             <AnimatePresence mode="wait">
               <MotionDiv
@@ -941,7 +930,6 @@ function ModelsVisual({
                     roles: [UserPermissionRole.ADMIN],
                   }}
                   sendMessage={null}
-                  deductCredits={null}
                   ttsAutoplay={false}
                   voiceId={undefined}
                   onVote={null}
@@ -966,10 +954,7 @@ const SEARCH_DEMOS: SearchDemoId[] = ["news", "deepRead", "compare"];
 
 function SearchVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useLogger();
   const [activeId, setActiveId] = useState<SearchDemoId>("news");
 
   const handleSelect = useCallback((id: SearchDemoId) => {
@@ -1033,7 +1018,7 @@ function SearchVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
       </Div>
       <MockChatProvider>
         <Div className="rounded-lg border bg-card/50 overflow-hidden p-4 space-y-1 max-h-[32rem] overflow-y-auto">
-          <UserMessageBubble
+          <StaticUserMessageBubble
             message={userMsg}
             locale={locale}
             logger={logger}
@@ -1044,7 +1029,6 @@ function SearchVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
               id: "00000000-0000-0000-0000-000000000000",
               roles: [UserPermissionRole.ADMIN],
             }}
-            deductCredits={null}
           />
           <AnimatePresence mode="wait">
             <MotionDiv
@@ -1071,7 +1055,6 @@ function SearchVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
                   roles: [UserPermissionRole.ADMIN],
                 }}
                 sendMessage={null}
-                deductCredits={null}
                 ttsAutoplay={false}
                 voiceId={undefined}
                 onVote={null}

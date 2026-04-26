@@ -14,8 +14,10 @@ import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config"
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { parseError } from "../../../../shared/utils";
-import { type ToolCall, type ToolCallResult } from "../../../chat/db";
+
+import { type ToolCall } from "../../../chat/db";
 import type { AiStreamT } from "../../stream/i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
@@ -66,7 +68,7 @@ function sortObjectKeys(obj: JSONValue): JSONValue {
 /**
  * Type guard for tool result values
  */
-function isValidToolResult(value: JSONValue): value is ToolCallResult {
+function isValidToolResult(value: JSONValue): value is JSONValue & WidgetData {
   if (value === null) {
     return true;
   }
@@ -211,7 +213,7 @@ export class ToolResultHandler {
         ? sortObjectKeys(JSON.parse(JSON.stringify(output)) as JSONValue)
         : undefined;
 
-    const validatedOutput: ToolCallResult | undefined =
+    const validatedOutput: WidgetData | undefined =
       cleanedOutput !== undefined && isValidToolResult(cleanedOutput)
         ? cleanedOutput
         : undefined;
@@ -236,7 +238,7 @@ export class ToolResultHandler {
     let isWaitingForRemote =
       !effectiveIsError &&
       !isDetach &&
-      streamContext?.waitingForRemoteResult === true;
+      streamContext.waitingForRemoteResult === true;
     if (
       !isWaitingForRemote &&
       !effectiveIsError &&

@@ -10,27 +10,27 @@ import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { Span } from "next-vibe-ui/ui/span";
 import { type JSX } from "react";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import {
+  useWidgetTranslation,
+  useWidgetValue,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import { SkillStatus } from "../../enum";
 import type definition from "./definition";
-import type { SkillPublishPatchResponseOutput } from "./definition";
 
 interface CustomWidgetProps {
-  field: {
-    value: SkillPublishPatchResponseOutput | null | undefined;
-  } & (typeof definition.PATCH)["fields"];
+  field: (typeof definition.PATCH)["fields"];
 }
 
 export function SkillPublishContainer({
   field,
 }: CustomWidgetProps): JSX.Element {
   const children = field.children;
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.PATCH>();
   const t = useWidgetTranslation<typeof definition.PATCH>();
 
   return (

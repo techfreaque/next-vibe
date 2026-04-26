@@ -8,7 +8,7 @@ import { Film } from "next-vibe-ui/ui/icons/Film";
 import { Image as ImageIcon } from "next-vibe-ui/ui/icons/Image";
 import { Music } from "next-vibe-ui/ui/icons/Music";
 import { Span } from "next-vibe-ui/ui/span";
-import { useState } from "react";
+import { memo, useState } from "react";
 import type { JSX } from "react";
 
 import {
@@ -23,18 +23,20 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
+import type messagesDefinition from "../definition";
+import { useWidgetItem } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { useMessageGroupName } from "./embedded-context";
 import { FileAttachments } from "./file-attachments";
 import { MessageAuthorInfo } from "./message-author";
 import { TranscribingIndicator } from "./transcribing-indicator";
 import { UserMessageActions } from "./user-message-actions";
 
-interface UserMessageBubbleProps {
-  message: ChatMessage;
+// ─── Shared props (both variants) ────────────────────────────────────────────
+
+interface UserMessageBubbleSharedProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
   user: JwtPayloadType;
-  deductCredits: ((creditCost: number, feature: string) => void) | null;
   onBranch?: (messageId: string) => void;
   onRetry?: (message: ChatMessage) => Promise<void>;
   showAuthor?: boolean;
@@ -42,21 +44,23 @@ interface UserMessageBubbleProps {
   currentUserId?: string;
 }
 
-export function UserMessageBubble({
+// ─── Internal render ─────────────────────────────────────────────────────────
+
+function UserMessageBubbleInner({
   message,
   locale,
   logger,
   user,
-  deductCredits,
   onBranch,
   onRetry,
   showAuthor,
   rootFolderId,
   currentUserId,
-}: UserMessageBubbleProps): JSX.Element {
+}: UserMessageBubbleSharedProps & { message: ChatMessage }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { group } = useMessageGroupName();
   const [showVariant, setShowVariant] = useState(false);
+
   const character =
     message.role === "user" || message.role === "assistant"
       ? message.skill
@@ -65,7 +69,6 @@ export function UserMessageBubble({
   return (
     <Div className="flex justify-end">
       <Div className={cn("md:max-w-[75%]", group)}>
-        {/* Author info (for multi-user mode) */}
         {showAuthor && (
           <Div className="mb-2 flex justify-end">
             <MessageAuthorInfo
@@ -92,7 +95,6 @@ export function UserMessageBubble({
             chatTransitions.default,
           )}
         >
-          {/* Voice transcribing state */}
           {message.metadata?.isTranscribing ? (
             <TranscribingIndicator locale={locale} />
           ) : (
@@ -101,7 +103,6 @@ export function UserMessageBubble({
             </Div>
           )}
 
-          {/* File Attachments */}
           {message.metadata?.attachments &&
             message.metadata.attachments.length > 0 && (
               <Div
@@ -118,7 +119,6 @@ export function UserMessageBubble({
               </Div>
             )}
 
-          {/* Gap-fill live status chip */}
           {message.metadata?.gapFillStatus && (
             <GapFillStatus
               bridgeType={message.metadata.gapFillStatus.bridgeType}
@@ -127,7 +127,6 @@ export function UserMessageBubble({
             />
           )}
 
-          {/* Gap-fill variant display */}
           {!message.metadata?.gapFillStatus &&
             message.metadata?.variants &&
             message.metadata.variants.length > 0 && (
@@ -140,14 +139,12 @@ export function UserMessageBubble({
             )}
         </Div>
 
-        {/* Actions - Fixed height container to maintain consistent spacing */}
         <Div className="h-10 sm:h-8 flex items-center justify-end">
           <UserMessageActions
             message={message}
             locale={locale}
             logger={logger}
             user={user}
-            deductCredits={deductCredits}
             onBranch={onBranch}
             onRetry={onRetry}
             rootFolderId={rootFolderId}
@@ -157,6 +154,40 @@ export function UserMessageBubble({
     </Div>
   );
 }
+
+// ─── Live variant (reads from widget context by messageId) ───────────────────
+
+interface UserMessageBubbleProps extends UserMessageBubbleSharedProps {
+  messageId: string;
+}
+
+export const UserMessageBubble = memo(function UserMessageBubble({
+  messageId,
+  ...rest
+}: UserMessageBubbleProps): JSX.Element | null {
+  const message = useWidgetItem<typeof messagesDefinition.GET>()(
+    (d) => d?.messages ?? [],
+    (m) => m.id,
+    messageId,
+  );
+  if (!message) {
+    return null;
+  }
+  return <UserMessageBubbleInner message={message} {...rest} />;
+});
+
+// ─── Static variant (message passed directly, e.g. read-only demos) ──────────
+
+interface StaticUserMessageBubbleProps extends UserMessageBubbleSharedProps {
+  message: ChatMessage;
+}
+
+export const StaticUserMessageBubble = memo(function StaticUserMessageBubble({
+  message,
+  ...rest
+}: StaticUserMessageBubbleProps): JSX.Element {
+  return <UserMessageBubbleInner message={message} {...rest} />;
+});
 
 // ── Gap-fill helpers ─────────────────────────────────────────────────────────
 

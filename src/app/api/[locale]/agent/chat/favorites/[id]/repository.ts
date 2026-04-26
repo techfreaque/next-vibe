@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -25,11 +26,13 @@ import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-sp
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+import favoritesDefinitions from "../definition";
 import { ensureUniqueSlug, generateFavoriteSlug, isUuid } from "../../slugify";
 import { scopedTranslation as charactersScopedTranslation } from "../../skills/i18n";
 import { FavoritesCreateRepository } from "../create/repository";
 import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
+import { ChatFavoritesRepositoryClient } from "../repository-client";
 import type {
   FavoriteDeleteResponseOutput,
   FavoriteDeleteUrlVariablesOutput,
@@ -450,6 +453,43 @@ export class SingleFavoriteRepository {
         });
       }
 
+      // Emit WS event — push full computed FavoriteCard so all tabs update immediately
+      const emitFavorites = createEndpointEmitter(
+        favoritesDefinitions.GET,
+        logger,
+        user,
+      );
+      const variantForDisplay = updated.variantId
+        ? updatedSkill?.variants?.find((v) => v.id === updated.variantId)
+        : (updatedSkill?.variants?.find((v) => v.isDefault) ??
+          updatedSkill?.variants?.[0] ??
+          null);
+      const updatedFavoriteCard =
+        ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
+          {
+            id: updated.slug || updated.id,
+            skillId: updated.skillId,
+            variantId: updated.variantId ?? null,
+            customVariantName: updated.customVariantName ?? null,
+            customIcon: updated.customIcon,
+            voiceModelSelection: updated.voiceModelSelection ?? null,
+            modelSelection: updated.modelSelection,
+            position: updated.position,
+          },
+          variantForDisplay?.modelSelection ??
+            updatedSkill?.variants?.[0]?.modelSelection ??
+            null,
+          updatedSkill?.icon ?? null,
+          updatedSkill?.name ?? null,
+          updatedSkill?.tagline ?? null,
+          updatedSkill?.description ?? null,
+          null,
+          updatedSkill?.voiceModelSelection ?? null,
+          locale,
+          user,
+        );
+      emitFavorites("favorite-updated", { favorites: [updatedFavoriteCard] });
+
       // Flattened response
       return success({
         success: t("patch.response.success.content"),
@@ -505,6 +545,17 @@ export class SingleFavoriteRepository {
       }
 
       const deleted = result[0];
+
+      // Emit WS event — remove from favorites list in all open tabs immediately
+      const emitFavorites = createEndpointEmitter(
+        favoritesDefinitions.GET,
+        logger,
+        user,
+      );
+      emitFavorites("favorite-deleted", {
+        favorites: [{ id: deleted.slug || deleted.id }],
+      });
+
       return success({
         skillId: deleted.skillId,
         modelSelection: deleted.modelSelection,

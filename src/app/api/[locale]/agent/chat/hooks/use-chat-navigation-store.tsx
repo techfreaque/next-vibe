@@ -16,14 +16,10 @@
 
 "use client";
 
-import { success } from "next-vibe/shared/types/response.schema";
 import type { JSX, ReactNode } from "react";
 import { createContext, useContext, useRef } from "react";
 import type { StoreApi } from "zustand";
 import { createStore, useStore } from "zustand";
-
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { DefaultFolderId } from "../config";
 
@@ -41,9 +37,6 @@ export interface ChatNavigationState {
   leafMessageId: string | null;
   /** Whether this store is for an embedded/nested context (e.g. AI run) */
   isEmbedded: boolean;
-  /** Whether the active thread is currently streaming */
-  isStreaming: boolean;
-
   // --- Actions ---
   /** Set active thread ID */
   setActiveThreadId: (threadId: string | null) => void;
@@ -66,86 +59,9 @@ export interface ChatNavigationState {
     currentSubFolderId: string | null,
     leafMessageId: string | null,
   ) => void;
-  /** Mark active thread as streaming; also updates threads endpoint cache */
-  startStream: (threadId: string, logger: EndpointLogger) => void;
-  /** Mark active thread as aborting; also updates threads endpoint cache */
-  setAborting: (threadId: string, logger: EndpointLogger) => void;
-  /** Mark active thread as not streaming; also updates threads endpoint cache */
-  stopStream: (threadId: string, logger: EndpointLogger) => void;
-  /** Mark active thread as waiting (stream dead, task in flight); updates threads endpoint cache */
-  setWaiting: (threadId: string, logger: EndpointLogger) => void;
 }
 
 type ChatNavigationStore = StoreApi<ChatNavigationState>;
-
-/**
- * Patches both the threads cache and folder-contents cache for a given thread's
- * streamingState. Must patch both because the sidebar uses folder-contents while
- * some views use threads.
- * Uses dynamic imports to avoid circular dependency through definition → models → skills/enum → icons.
- */
-function patchThreadStreamingState(
-  threadId: string,
-  state: "idle" | "streaming" | "aborting" | "waiting",
-  currentRootFolderId: DefaultFolderId,
-  currentSubFolderId: string | null,
-  logger: EndpointLogger,
-): void {
-  void Promise.all([
-    import("../threads/definition"),
-    import("../folder-contents/[rootFolderId]/definition"),
-  ]).then(([threadsDefModule, folderContentsDefModule]) => {
-    const threadsDefinition = threadsDefModule.default;
-    const folderContentsDefinition = folderContentsDefModule.default;
-
-    // Patch threads endpoint cache (used by some views)
-    apiClient.updateEndpointData(
-      threadsDefinition.GET,
-      logger,
-      (old) => {
-        if (!old?.success) {
-          return old;
-        }
-        return success({
-          ...old.data,
-          threads: old.data.threads.map((t) =>
-            t.id === threadId ? { ...t, streamingState: state } : t,
-          ),
-        });
-      },
-      {
-        requestData: {
-          rootFolderId: currentRootFolderId,
-          subFolderId: currentSubFolderId,
-        },
-      },
-    );
-
-    // Patch folder-contents endpoint cache (used by sidebar)
-    apiClient.updateEndpointData(
-      folderContentsDefinition.GET,
-      logger,
-      (old) => {
-        if (!old?.success) {
-          return old;
-        }
-        return success({
-          ...old.data,
-          items: old.data.items.map((item) =>
-            item.type === "thread" && item.id === threadId
-              ? { ...item, streamingState: state }
-              : item,
-          ),
-        });
-      },
-      {
-        urlPathParams: { rootFolderId: currentRootFolderId },
-        requestData: { subFolderId: currentSubFolderId },
-      },
-    );
-    return undefined;
-  });
-}
 
 /**
  * Factory: creates a new store instance.
@@ -163,7 +79,6 @@ function createChatNavigationStore(opts?: {
     currentSubFolderId: opts?.currentSubFolderId ?? null,
     leafMessageId: opts?.leafMessageId ?? null,
     isEmbedded: opts?.isEmbedded ?? false,
-    isStreaming: false,
 
     setActiveThreadId: (threadId): void => set({ activeThreadId: threadId }),
     setCurrentRootFolderId: (rootFolderId): void =>
@@ -210,50 +125,6 @@ function createChatNavigationStore(opts?: {
         currentSubFolderId,
         leafMessageId,
       }),
-    startStream: (threadId, logger): void => {
-      set({ isStreaming: true });
-      const { currentRootFolderId, currentSubFolderId } = get();
-      patchThreadStreamingState(
-        threadId,
-        "streaming",
-        currentRootFolderId,
-        currentSubFolderId,
-        logger,
-      );
-    },
-    setAborting: (threadId, logger): void => {
-      set({ isStreaming: false });
-      const { currentRootFolderId, currentSubFolderId } = get();
-      patchThreadStreamingState(
-        threadId,
-        "aborting",
-        currentRootFolderId,
-        currentSubFolderId,
-        logger,
-      );
-    },
-    stopStream: (threadId, logger): void => {
-      set({ isStreaming: false });
-      const { currentRootFolderId, currentSubFolderId } = get();
-      patchThreadStreamingState(
-        threadId,
-        "idle",
-        currentRootFolderId,
-        currentSubFolderId,
-        logger,
-      );
-    },
-    setWaiting: (threadId, logger): void => {
-      set({ isStreaming: false });
-      const { currentRootFolderId, currentSubFolderId } = get();
-      patchThreadStreamingState(
-        threadId,
-        "waiting",
-        currentRootFolderId,
-        currentSubFolderId,
-        logger,
-      );
-    },
   }));
 }
 

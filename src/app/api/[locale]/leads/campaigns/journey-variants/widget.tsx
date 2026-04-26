@@ -23,24 +23,19 @@ import React, { useCallback, useState } from "react";
 import {
   useWidgetContext,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type definition from "./definition";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
-type VariantItem = GetResponseOutput["items"][number];
+type VariantItem =
+  (typeof definition.GET.types.ResponseOutput)["items"][number];
 
 interface VariantEdit {
   active?: boolean;
   weight?: number;
-}
-
-interface CustomWidgetProps {
-  field: {
-    value: GetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
 }
 
 // ── Colors for weight distribution bar ───────────────────────────────────────
@@ -58,12 +53,10 @@ const VARIANT_COLORS = [
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export function JourneyVariantsWidget({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
+export function JourneyVariantsWidget(): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
   const t = useWidgetTranslation<typeof definition.GET>();
-  const data = field.value;
+  const data = useWidgetValue<typeof definition.GET>();
   const items = data?.items ?? [];
 
   const [edits, setEdits] = useState<Map<string, VariantEdit>>(new Map());

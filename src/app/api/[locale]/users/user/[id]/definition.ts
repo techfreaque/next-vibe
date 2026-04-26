@@ -7,8 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   objectField,
   requestResponseField,
   requestUrlPathParamsField,

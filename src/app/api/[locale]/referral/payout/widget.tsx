@@ -23,11 +23,11 @@ import { Span } from "next-vibe-ui/ui/span";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import { REFERRAL_CONFIG, computeLevelPercentages } from "../config";
 import type definition from "./definition";
-import type { PayoutGetResponseOutput } from "./definition";
 
 function fmtPct(v: number): string {
   const pct = v * 100;
@@ -57,16 +57,8 @@ const STATUS_COLORS: Record<string, string> = {
   FAILED: "bg-destructive/10 text-destructive",
 };
 
-interface CustomWidgetProps {
-  field: {
-    value: PayoutGetResponseOutput | null | undefined;
-  } & (typeof definition.GET)["fields"];
-}
-
-export function ReferralPayoutContainer({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
-  const data = field.value;
+export function ReferralPayoutContainer(): React.JSX.Element {
+  const data = useWidgetValue<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
 

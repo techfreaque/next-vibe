@@ -17,7 +17,7 @@ import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 import { LeadAuthRepository } from "../../../leads/auth/repository";
 import { leads } from "../../../leads/db";
 import { db } from "../../db";
-import { createEndpointLogger } from "../../unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "../../unified-interface/shared/logger/server-logger";
 import { frameExchangeTokens } from "../../unified-interface/vibe-frame/db";
 import { shouldSkipPath } from "../utils";
 
