@@ -1,5 +1,5 @@
 /**
- * CLI cookie implementation — file-backed, one file per key.
+ * CLI cookie implementation - file-backed, one file per key.
  * Stored at ./.tmp/cookies/<key>.json relative to cwd.
  * Used for auth tokens and remote connection credentials.
  */

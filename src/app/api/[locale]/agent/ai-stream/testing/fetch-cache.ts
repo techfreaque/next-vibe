@@ -789,7 +789,7 @@ export function installFetchCache(): void {
       });
       const cached = JSON.parse(readFileSync(rp, "utf-8")) as ResFile;
       // SSE responses use sseEventsToTickingStream (pull-based, one event per
-      // macrotask tick) — see replayFromCache. Non-SSE responses still need one
+      // macrotask tick) - see replayFromCache. Non-SSE responses still need one
       // yield so the caller's await-fetch itself is truly async.
       await new Promise<void>((resolve) => {
         setTimeout(resolve, 0);

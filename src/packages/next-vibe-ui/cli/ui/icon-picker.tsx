@@ -1,4 +1,4 @@
-// CLI: icon picker has no terminal equivalent — return null
+// CLI: icon picker has no terminal equivalent - return null
 
 import type { IconPickerProps } from "../../web/ui/icon-picker";
 

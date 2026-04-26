@@ -1,5 +1,5 @@
 /**
- * Memory Detail Widget — domain enrichment for /memories/ paths
+ * Memory Detail Widget - domain enrichment for /memories/ paths
  *
  * Renders a compact memory card below the Cortex operation summary
  * showing the memory's metadata (path, tags, priority) in a

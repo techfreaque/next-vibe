@@ -1492,7 +1492,7 @@ export function SkillViewContainer({
     </>
   );
 
-  // Variants to render — always show at least the single variant
+  // Variants to render - always show at least the single variant
   const variantsToRender = variants ?? [];
 
   const creator = skillData?.creatorProfile ?? null;
@@ -1801,7 +1801,7 @@ export function SkillViewContainer({
             gap: 12,
           }}
         >
-          {/* Description — open prose, no collapse */}
+          {/* Description - open prose, no collapse */}
           {skillData?.description && (
             <Span
               style={{
@@ -1816,7 +1816,7 @@ export function SkillViewContainer({
             </Span>
           )}
 
-          {/* Variants — top-level, VariantCard has own border */}
+          {/* Variants - top-level, VariantCard has own border */}
           {!isLoading && variantsToRender.length > 0 && (
             <Div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {/* Owner header row: edit button */}
@@ -1871,7 +1871,7 @@ export function SkillViewContainer({
                   defaultExpanded={false}
                 />
               ))}
-              {/* Owner: Add Variant — styled like a variant card */}
+              {/* Owner: Add Variant - styled like a variant card */}
               {isOwner && skillId && (
                 <Div
                   className="rounded-lg border border-dashed border-muted-foreground/30 overflow-hidden transition-colors hover:border-primary/40 hover:bg-muted/20 cursor-pointer"
@@ -1901,7 +1901,7 @@ export function SkillViewContainer({
             </Div>
           )}
 
-          {/* Creator card — avatar + name + bio + social links */}
+          {/* Creator card - avatar + name + bio + social links */}
           {creator && (
             <Div style={cardStyle}>
               {/* Creator identity row */}
@@ -2044,7 +2044,7 @@ export function SkillViewContainer({
             </Div>
           )}
 
-          {/* System prompt — collapsible, only if present */}
+          {/* System prompt - collapsible, only if present */}
           {skillData?.systemPrompt && (
             <Div style={cardStyle}>
               <Collapsible>
@@ -2085,7 +2085,7 @@ export function SkillViewContainer({
             </Div>
           )}
 
-          {/* Lead capture — inline, always visible when active */}
+          {/* Lead capture - inline, always visible when active */}
           {creator?.leadMagnetActive && skillId && (
             <Div style={{ ...cardStyle, padding: "16px 20px" }}>
               <LeadCaptureForm
@@ -2314,7 +2314,7 @@ export function SkillViewContainer({
                 />
               ))}
 
-              {/* Owner: Add Variant — styled like a variant card */}
+              {/* Owner: Add Variant - styled like a variant card */}
               {isOwner && skillId && (
                 <Div
                   className="rounded-lg border border-dashed border-muted-foreground/30 overflow-hidden transition-colors hover:border-primary/40 hover:bg-muted/20 cursor-pointer"
@@ -2364,7 +2364,7 @@ export function SkillViewContainer({
 }
 
 /**
- * Expandable variant card — shows variant name + chat model summary in collapsed state.
+ * Expandable variant card - shows variant name + chat model summary in collapsed state.
  * On expand: per-variant model groups (brain, eyes, ears & voice, media) + action buttons.
  */
 function VariantCard({
@@ -2532,7 +2532,7 @@ function VariantCard({
         isDefault && "border-primary/30",
       )}
     >
-      {/* Header — always visible, click to expand */}
+      {/* Header - always visible, click to expand */}
       <Div
         className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-muted/30 transition-colors"
         onClick={() => setExpanded((p) => !p)}
@@ -2566,7 +2566,7 @@ function VariantCard({
           </Div>
         )}
 
-        {/* Primary action — always visible in header */}
+        {/* Primary action - always visible in header */}
         <Div
           className="flex items-center gap-1 shrink-0"
           onClick={(e) => e.stopPropagation()}
@@ -2849,7 +2849,7 @@ function CreatorRow({
 type CaptureState = "idle" | "submitting" | "done" | "error";
 
 /**
- * Email capture form — shown when creator has active lead magnet config.
+ * Email capture form - shown when creator has active lead magnet config.
  * Works in both landing page and panel mode.
  */
 function LeadCaptureForm({
@@ -3002,7 +3002,7 @@ function LeadCaptureForm({
 // ── LANDING PAGE COMPONENTS ──────────────────────────────────────────────────
 
 /**
- * Bottom CTA for landing page — signup/login for guests
+ * Bottom CTA for landing page - signup/login for guests
  */
 function LandingBottomCTA({
   skillName,
@@ -3092,7 +3092,7 @@ function LandingBottomCTA({
 }
 
 /**
- * Shows other public skills by the same creator — fetched client-side.
+ * Shows other public skills by the same creator - fetched client-side.
  */
 function CreatorOtherSkills({
   creatorUserId,
@@ -3159,7 +3159,7 @@ function CreatorOtherSkills({
           setSkills(filtered.slice(0, 6));
         }
       } catch {
-        // Silent fail — optional section
+        // Silent fail - optional section
       }
       setLoaded(true);
     })();
@@ -4760,7 +4760,7 @@ export function VariantList({
               isDefault && "border-primary/30",
             )}
           >
-            {/* Header row — always visible */}
+            {/* Header row - always visible */}
             <Div className="flex items-center gap-2 px-3 py-2.5">
               {/* Expand toggle */}
               <Div
@@ -4778,7 +4778,7 @@ export function VariantList({
                 </Span>
               </Div>
 
-              {/* Badges + actions — always in header */}
+              {/* Badges + actions - always in header */}
               <Div className="flex items-center gap-1.5 shrink-0">
                 {isDefault ? (
                   <Span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">

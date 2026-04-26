@@ -102,7 +102,7 @@ const { GET } = createEndpoint({
             await import("@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store");
           useChatInputStore.getState().reset();
         } else {
-          // Real assistant message arrived — remove optimistic placeholder(s)
+          // Real assistant message arrived - remove optimistic placeholder(s)
           // with matching parentId across all folder caches.
           const newParentId = arrived.parentId;
           if (newParentId) {
@@ -248,7 +248,7 @@ const { GET } = createEndpoint({
     },
 
     // ── audio-chunk ──────────────────────────────────────────────────────────
-    // Enqueues TTS audio for sequential playback — payload typed via response fields.
+    // Enqueues TTS audio for sequential playback - payload typed via response fields.
     "audio-chunk": {
       fields: {
         audioData: true as const,
@@ -312,7 +312,7 @@ const { GET } = createEndpoint({
         useChatStore
           .getState()
           .clearThreadPendingCreate(ctx.urlPathParams.threadId);
-        // Clear aborting state — the framework already merged
+        // Clear aborting state - the framework already merged
         // streamingState: "idle" into the cache; clear the cancel spinner.
         const { useAIStreamStore } =
           await import("../../../../ai-stream/stream/hooks/store");
@@ -556,7 +556,7 @@ const { GET } = createEndpoint({
         }),
       }),
 
-      // TTS streaming — audio-chunk event payload (not persisted, event-only transport)
+      // TTS streaming - audio-chunk event payload (not persisted, event-only transport)
       audioData: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string().nullable().optional(),
@@ -847,7 +847,7 @@ export type MessageListUrlParamsTypeOutput =
   typeof GET.types.UrlVariablesOutput;
 export type MessageListResponseOutput = typeof GET.types.ResponseOutput;
 
-/** Typed emit callback for the messages WS channel — payload types from GET.types.EventPayloads. */
+/** Typed emit callback for the messages WS channel - payload types from GET.types.EventPayloads. */
 export type MessagesWsEmit = EmitEventNamed<typeof GET.types.EventPayloads>;
 
 export type MessageCreateRequestOutput = typeof POST.types.RequestOutput;

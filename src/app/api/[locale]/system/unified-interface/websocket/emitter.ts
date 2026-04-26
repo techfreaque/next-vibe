@@ -69,7 +69,7 @@ export function publishWsEvent<T>(
 
 /**
  * Publish a WS event to multiple channels simultaneously.
- * Calls publishWsEvent once per channel — fire-and-forget.
+ * Calls publishWsEvent once per channel - fire-and-forget.
  * Only the connection matching the user's identity receives events on each channel.
  */
 export function publishWsEventToChannels<T>(
@@ -103,7 +103,7 @@ export function publishWsEventBatch(
     return;
   }
   if (events.length === 1) {
-    // Single event — use the simpler path
+    // Single event - use the simpler path
     publishWsEvent(
       {
         channel: events[0]!.channel,

@@ -101,7 +101,7 @@ export const translations: typeof enTranslations = {
         "Deine Registrierung bringt dem Ersteller dieses Skills +5% auf deine Abonnements.",
       selectorTitle: "Creator unterstützen",
       selectorDescription:
-        "Du hast Skills von unabhängigen Creators in deine Favoriten aufgenommen. Wähle einen zum Unterstützen — er erhält +5% aus deinen Abonnements. Du kannst das jederzeit ändern.",
+        "Du hast Skills von unabhängigen Creators in deine Favoriten aufgenommen. Wähle einen zum Unterstützen - er erhält +5% aus deinen Abonnements. Du kannst das jederzeit ändern.",
       selectorNone: "Keinen (überspringen)",
     },
     localFavorites: {

@@ -108,7 +108,7 @@ async function resolveUser(
   return { isPublic: false, id: user.id, leadId: link.leadId, roles };
 }
 
-/** Check if hermes is reachable — used to conditionally skip live sync tests */
+/** Check if hermes is reachable - used to conditionally skip live sync tests */
 async function isHermesReachable(): Promise<boolean> {
   try {
     const resp = await fetch(`${PROD_URL}/api/en-US/user/public/login`, {
@@ -228,7 +228,7 @@ describe("Sync hash engine (unit)", () => {
     expect(hash).toBeTruthy();
     expect(
       elapsed,
-      `Hash of 10k entries took ${elapsed}ms — must be < 500ms`,
+      `Hash of 10k entries took ${elapsed}ms - must be < 500ms`,
     ).toBeLessThan(500);
   });
 
@@ -279,7 +279,7 @@ describe("Sync hash short-circuit (unit)", () => {
       // When hashes match, no data should be transferred
       expect(
         Object.keys(syncPayloads).length,
-        "When hashes match, syncPayloads must be empty — no payload transferred",
+        "When hashes match, syncPayloads must be empty - no payload transferred",
       ).toBe(0);
     },
     SYNC_TIMEOUT,
@@ -347,7 +347,7 @@ describe("Sync hash short-circuit (unit)", () => {
   );
 });
 
-// ── 3. Documents sync — local in-process (no hermes required) ─────────────────
+// ── 3. Documents sync - local in-process (no hermes required) ─────────────────
 
 describe("Sync: documents provider serialize/deserialize (in-process)", () => {
   let adminUser: JwtPrivatePayloadType;
@@ -506,7 +506,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
   );
 
   it(
-    "SU4: hash of fakeProdUserId is empty (no nodes) — proves per-user isolation",
+    "SU4: hash of fakeProdUserId is empty (no nodes) - proves per-user isolation",
     async () => {
       if (!adminUser) {
         return;
@@ -594,13 +594,13 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
   );
 
   it(
-    "SU7: tombstone payload — upsertFromJson with isDeleted:true removes the node",
+    "SU7: tombstone payload - upsertFromJson with isDeleted:true removes the node",
     async () => {
       if (!adminUser) {
         return;
       }
 
-      // Use admin user — tombstone test uses a unique syncId to avoid collision with other tests
+      // Use admin user - tombstone test uses a unique syncId to avoid collision with other tests
       const tombSyncId = randomUUID();
       const tombPath = `/documents/sync-unit-test/su7-tombstone-${Date.now().toString(36)}.md`;
 
@@ -671,7 +671,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
   );
 
   it(
-    "SU8: last-writer-wins — older remote payload does NOT overwrite newer local",
+    "SU8: last-writer-wins - older remote payload does NOT overwrite newer local",
     async () => {
       if (!adminUser) {
         return;
@@ -742,7 +742,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
   );
 });
 
-// ── 4. Skills sync — local in-process ────────────────────────────────────────
+// ── 4. Skills sync - local in-process ────────────────────────────────────────
 
 describe("Sync: skills provider serialize/deserialize (in-process)", () => {
   let adminUser: JwtPrivatePayloadType;
@@ -828,7 +828,7 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
   );
 
   it(
-    "SK5: per-provider isolation — documents change does NOT affect skills hash",
+    "SK5: per-provider isolation - documents change does NOT affect skills hash",
     async () => {
       if (!adminUser) {
         return;
@@ -897,7 +897,7 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
     if (!hermesReachable) {
       // eslint-disable-next-line no-console
       console.warn(
-        `[sync-test] ${HERMES_SKIP_REASON} — skipping live sync tests`,
+        `[sync-test] ${HERMES_SKIP_REASON} - skipping live sync tests`,
       );
       return;
     }
@@ -957,9 +957,16 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   it(
     "SL1: write document on dev, trigger pull, verify on hermes DB",
     async () => {
-      if (!hermesReachable || !devUser || !prodUserId || !process.env.SYNC_CROSS_INSTANCE_TEST) {
+      if (
+        !hermesReachable ||
+        !devUser ||
+        !prodUserId ||
+        !process.env.SYNC_CROSS_INSTANCE_TEST
+      ) {
         // eslint-disable-next-line no-console
-        console.info("[SL1] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)");
+        console.info(
+          "[SL1] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)",
+        );
         return;
       }
 
@@ -1028,11 +1035,18 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   );
 
   it(
-    "SL2: hash short-circuit — no data sent when nothing changed",
+    "SL2: hash short-circuit - no data sent when nothing changed",
     async () => {
-      if (!hermesReachable || !devUser || !prodUserId || !process.env.SYNC_CROSS_INSTANCE_TEST) {
+      if (
+        !hermesReachable ||
+        !devUser ||
+        !prodUserId ||
+        !process.env.SYNC_CROSS_INSTANCE_TEST
+      ) {
         // eslint-disable-next-line no-console
-        console.info("[SL2] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)");
+        console.info(
+          "[SL2] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)",
+        );
         return;
       }
 
@@ -1060,9 +1074,16 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   it(
     "SL3: update content on dev, resync, hermes gets the new version",
     async () => {
-      if (!hermesReachable || !devUser || !prodUserId || !process.env.SYNC_CROSS_INSTANCE_TEST) {
+      if (
+        !hermesReachable ||
+        !devUser ||
+        !prodUserId ||
+        !process.env.SYNC_CROSS_INSTANCE_TEST
+      ) {
         // eslint-disable-next-line no-console
-        console.info("[SL3] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)");
+        console.info(
+          "[SL3] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)",
+        );
         return;
       }
 
@@ -1111,9 +1132,16 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   it(
     "SL4: delete on dev, resync, hermes removes the node (tombstone)",
     async () => {
-      if (!hermesReachable || !devUser || !prodUserId || !process.env.SYNC_CROSS_INSTANCE_TEST) {
+      if (
+        !hermesReachable ||
+        !devUser ||
+        !prodUserId ||
+        !process.env.SYNC_CROSS_INSTANCE_TEST
+      ) {
         // eslint-disable-next-line no-console
-        console.info("[SL4] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)");
+        console.info(
+          "[SL4] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)",
+        );
         return;
       }
 
@@ -1198,7 +1226,7 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
       await connectToHermes(devUser);
       connectedToHermes = true;
     } catch {
-      // Already connected or other error — skip live BN tests
+      // Already connected or other error - skip live BN tests
     }
   }, SYNC_TIMEOUT);
 
@@ -1235,9 +1263,17 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
     async () => {
       // BN tests require two separate instances with different user DBs.
       // Skip unless SYNC_CROSS_INSTANCE_TEST=1 is set (requires hermes on a different DB).
-      if (!hermesReachable || !devUser || !prodUserId || !connectedToHermes || !process.env.SYNC_CROSS_INSTANCE_TEST) {
+      if (
+        !hermesReachable ||
+        !devUser ||
+        !prodUserId ||
+        !connectedToHermes ||
+        !process.env.SYNC_CROSS_INSTANCE_TEST
+      ) {
         // eslint-disable-next-line no-console
-        console.info("[BN1] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)");
+        console.info(
+          "[BN1] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)",
+        );
         return;
       }
 
@@ -1304,13 +1340,21 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
   it(
     "BN2: consecutive pull with same content → no duplicate, content stable",
     async () => {
-      if (!hermesReachable || !devUser || !prodUserId || !connectedToHermes || !process.env.SYNC_CROSS_INSTANCE_TEST) {
+      if (
+        !hermesReachable ||
+        !devUser ||
+        !prodUserId ||
+        !connectedToHermes ||
+        !process.env.SYNC_CROSS_INSTANCE_TEST
+      ) {
         // eslint-disable-next-line no-console
-        console.info("[BN2] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)");
+        console.info(
+          "[BN2] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)",
+        );
         return;
       }
 
-      // Second pull — same content, hermes hash unchanged
+      // Second pull - same content, hermes hash unchanged
       await triggerPull();
       // eslint-disable-next-line no-promise-executor-return
       await new Promise<void>((resolve) => {
@@ -1355,7 +1399,7 @@ describe("Sync: scalability and efficiency", () => {
         return;
       }
 
-      // Insert 20 test nodes (small batch — enough to measure the pattern)
+      // Insert 20 test nodes (small batch - enough to measure the pattern)
       const batchNodes = [...Array(20).keys()].map((i) => ({
         userId: adminUser.id,
         path: `/documents/sync-scale-test/node-${i}.md`,
@@ -1388,7 +1432,7 @@ describe("Sync: scalability and efficiency", () => {
       );
       expect(
         elapsed,
-        `SC1: getHashEntries took ${elapsed}ms — must be < 2000ms`,
+        `SC1: getHashEntries took ${elapsed}ms - must be < 2000ms`,
       ).toBeLessThan(2000);
     },
     SYNC_TIMEOUT,
@@ -1412,7 +1456,7 @@ describe("Sync: scalability and efficiency", () => {
       // In practice: < 500ms for realistic data sizes.
       expect(
         elapsed,
-        `SC2: computeSyncHashes took ${elapsed}ms — targeting < 3000ms`,
+        `SC2: computeSyncHashes took ${elapsed}ms - targeting < 3000ms`,
       ).toBeLessThan(3000);
     },
     SYNC_TIMEOUT,

@@ -2,7 +2,7 @@ import type { JSX } from "react";
 
 import { type IconComponent } from "../../lib/helper";
 
-/** Tribe (tribe.so / Bettermode) — stylised "T" mark */
+/** Tribe (tribe.so / Bettermode) - stylised "T" mark */
 export const SiTribe: IconComponent = ({
   className,
 }: {

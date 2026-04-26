@@ -1,5 +1,5 @@
 /**
- * Favorites Test Suite — Endpoint Validation + CRUD Integration
+ * Favorites Test Suite - Endpoint Validation + CRUD Integration
  *
  * Part A: Auto-generated tests for all favorite endpoints (schema, auth, examples).
  * Part B: Sequential CRUD integration tests using the admin user.
@@ -10,13 +10,7 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
 import { and, eq, like } from "drizzle-orm";
-import {
-  afterAll,
-  beforeAll,
-  describe,
-  expect,
-  it,
-} from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 
@@ -96,7 +90,7 @@ async function resolveUser(
   };
 }
 
-/** Assert a string is a slug (lowercase, dashes, digits — never a UUID). */
+/** Assert a string is a slug (lowercase, dashes, digits - never a UUID). */
 function expectSlug(value: string, label: string): void {
   expect(isUuid(value), `${label} should not be a UUID: ${value}`).toBe(false);
   expect(
@@ -112,7 +106,10 @@ function expectSlugSkillId(value: string, label: string): void {
   expectSlug(parts[0], `${label} (base)`);
   if (parts[1]) {
     // Variant part can be any string but should not be a UUID
-    expect(isUuid(parts[1]), `${label} variant should not be a UUID: ${parts[1]}`).toBe(false);
+    expect(
+      isUuid(parts[1]),
+      `${label} variant should not be a UUID: ${parts[1]}`,
+    ).toBe(false);
   }
 }
 
@@ -151,7 +148,7 @@ describe("Favorites CRUD Integration", () => {
     if (!adminUser) {
       return;
     }
-    // Final cleanup — delete by slug
+    // Final cleanup - delete by slug
     for (const slug of createdSlugs) {
       await db
         .delete(chatFavorites)
@@ -175,11 +172,7 @@ describe("Favorites CRUD Integration", () => {
 
   // Sequential suite: each test builds on the previous
   let suiteFailed = false;
-  function fit(
-    name: string,
-    fn: () => Promise<void>,
-    timeout?: number,
-  ): void {
+  function fit(name: string, fn: () => Promise<void>, timeout?: number): void {
     it(
       name,
       async () => {
@@ -244,7 +237,7 @@ describe("Favorites CRUD Integration", () => {
     expect(response.data.modelSelection).toBeTruthy();
   });
 
-  // ── F3: List favorites — created favorite appears ───────────────────────
+  // ── F3: List favorites - created favorite appears ───────────────────────
   fit("F3: list favorites includes created favorite with slug IDs", async () => {
     const response = await sendTestRequest({
       endpoint: favoritesListEndpoint.GET,
@@ -320,7 +313,7 @@ describe("Favorites CRUD Integration", () => {
     expect(response.data.success).toBe(true);
   });
 
-  // ── F6: List after reorder — verify order ──────────────────────────────
+  // ── F6: List after reorder - verify order ──────────────────────────────
   fit("F6: list after reorder reflects new positions", async () => {
     const response = await sendTestRequest({
       endpoint: favoritesListEndpoint.GET,
@@ -369,7 +362,7 @@ describe("Favorites CRUD Integration", () => {
     expect(response.success, `Update failed: ${response.message}`).toBe(true);
   });
 
-  // ── F8: GET after update — verify changes ──────────────────────────────
+  // ── F8: GET after update - verify changes ──────────────────────────────
   // PATCH may regenerate the slug when customVariantName changes,
   // so we re-discover the slug from the list endpoint.
   fit("F8: get after update reflects changes", async () => {
@@ -379,13 +372,17 @@ describe("Favorites CRUD Integration", () => {
       data: {},
       user: adminUser,
     });
-    expect(listResponse.success, `F8 list failed: ${listResponse.message}`).toBe(true);
+    expect(
+      listResponse.success,
+      `F8 list failed: ${listResponse.message}`,
+    ).toBe(true);
     if (!listResponse.success) {
       return;
     }
 
     const updatedFav = listResponse.data.favorites.find(
-      (f: Record<string, unknown>) => f.customVariantName === "Test Fav Route 1 Updated",
+      (f: Record<string, unknown>) =>
+        f.customVariantName === "Test Fav Route 1 Updated",
     );
     expect(updatedFav, "Updated favorite not found in list").toBeTruthy();
     if (!updatedFav) {
@@ -444,7 +441,7 @@ describe("Favorites CRUD Integration", () => {
     expect(response.success, `Delete 2 failed: ${response.message}`).toBe(true);
   });
 
-  // ── F12: List after deletion — both gone ───────────────────────────────
+  // ── F12: List after deletion - both gone ───────────────────────────────
   fit("F12: list after deletion shows no test favorites", async () => {
     const response = await sendTestRequest({
       endpoint: favoritesListEndpoint.GET,

@@ -36,7 +36,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { CreatorGetResponseOutput } from "./definition";
 import type { CreatorT } from "./i18n";
 
-/** Resolve creatorId param — accepts UUID or creatorSlug */
+/** Resolve creatorId param - accepts UUID or creatorSlug */
 async function resolveCreatorId(param: string): Promise<string | null> {
   const uuidPattern =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

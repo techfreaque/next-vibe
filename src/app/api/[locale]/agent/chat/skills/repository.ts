@@ -119,7 +119,7 @@ export class SkillsRepository {
 
   /**
    * Resolve a skill identifier (UUID or slug) to its canonical slug form.
-   * Default skill IDs are already friendly strings — returned as-is.
+   * Default skill IDs are already friendly strings - returned as-is.
    * Custom skill UUIDs are looked up and resolved to the slug.
    * If the skill has no slug or isn't found, returns the original identifier.
    */

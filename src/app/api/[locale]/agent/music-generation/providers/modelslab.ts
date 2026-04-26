@@ -146,7 +146,7 @@ export async function generateMusicWithModelsLab(params: {
         });
       }
 
-      // Timed out polling — if we have a future_links URL from the initial response, use it.
+      // Timed out polling - if we have a future_links URL from the initial response, use it.
       // ModelsLab provides this pre-known URL where the file will be written once ready.
       if (futureUrl) {
         logger.error(

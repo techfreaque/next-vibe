@@ -80,7 +80,7 @@ export class CortexEditRepository {
     }
 
     // Filesystem backend for preview-mode admin
-    // Skip for virtual writable mounts — they go through mount handlers → DB → disk write-through
+    // Skip for virtual writable mounts - they go through mount handlers → DB → disk write-through
     if (!user.isPublic && !isVirtualWritable(path)) {
       const { isFilesystemMode } = await import("../fs-provider");
       if (isFilesystemMode(user)) {
@@ -97,7 +97,7 @@ export class CortexEditRepository {
       }
     }
 
-    // Virtual writable mount — read via mount, apply edit, write back via mount
+    // Virtual writable mount - read via mount, apply edit, write back via mount
     if (isVirtualWritable(path)) {
       return CortexEditRepository.editVirtualMount({
         userId,

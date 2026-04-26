@@ -29,7 +29,7 @@ export const translations = {
       email: {
         label: "Email Address",
         description:
-          "Where we should reply. Leave blank if you're logged in — we'll use your account email.",
+          "Where we should reply. Leave blank if you're logged in - we'll use your account email.",
         placeholder: "john.doe@example.com",
       },
       company: {
@@ -268,9 +268,9 @@ export const translations = {
     confirmBeforeSend:
       "Always confirm with the user before submitting a contact form on their behalf.",
     humanHelp:
-      "If the user seems frustrated, upset, or stuck — proactively offer to connect them with a human on our support team via the contact form.",
+      "If the user seems frustrated, upset, or stuck - proactively offer to connect them with a human on our support team via the contact form.",
     emailFallback:
-      "If the user is logged in, their email is already on file — they don't need to provide it again.",
+      "If the user is logged in, their email is already on file - they don't need to provide it again.",
   },
 
   email: {

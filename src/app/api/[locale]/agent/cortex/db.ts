@@ -84,7 +84,7 @@ export const cortexNodes = pgTable(
     // Embedding for semantic search (pgvector)
     embedding: vector3072("embedding"),
 
-    // SHA-256 hash of text-to-embed (path + content) — skip redundant API calls
+    // SHA-256 hash of text-to-embed (path + content) - skip redundant API calls
     contentHash: text("content_hash"),
 
     // Sync

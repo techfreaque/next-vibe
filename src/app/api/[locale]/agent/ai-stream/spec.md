@@ -1,8 +1,8 @@
-# AI Stream — Tool Execution Lifecycle
+# AI Stream - Tool Execution Lifecycle
 
 ## Overview
 
-When an AI calls a tool, five callback modes cover every meaningful execution pattern. The mode controls timing and revival — not UI presentation. Transport (local inline, remote HTTP, task queue) is invisible to the user and invisible to the AI.
+When an AI calls a tool, five callback modes cover every meaningful execution pattern. The mode controls timing and revival - not UI presentation. Transport (local inline, remote HTTP, task queue) is invisible to the user and invisible to the AI.
 
 ---
 
@@ -16,13 +16,13 @@ When an AI calls a tool, five callback modes cover every meaningful execution pa
 
 ---
 
-## Remote Execution — Two Tiers
+## Remote Execution - Two Tiers
 
-**Tier 1 — Direct HTTP** (`isDirectlyAccessible=true`): Blocking or fire-and-forget HTTP call to the remote instance. Result arrives in the same stream turn (wait/endLoop) or immediately as a taskId (detach/wakeUp).
+**Tier 1 - Direct HTTP** (`isDirectlyAccessible=true`): Blocking or fire-and-forget HTTP call to the remote instance. Result arrives in the same stream turn (wait/endLoop) or immediately as a taskId (detach/wakeUp).
 
-**Tier 2 — Task queue** (`isDirectlyAccessible=false`): Task row created with `targetInstance`. Remote picks it up on its next pulse (~1 min). Result arrives via `/report` → `handleTaskCompletion`. Stream aborts into `waiting` state; revival delivers the result.
+**Tier 2 - Task queue** (`isDirectlyAccessible=false`): Task row created with `targetInstance`. Remote picks it up on its next pulse (~1 min). Result arrives via `/report` → `handleTaskCompletion`. Stream aborts into `waiting` state; revival delivers the result.
 
-The task queue path always produces the same end state as if the tool had run locally — the stream revival reconstructs the turn as if nothing was deferred.
+The task queue path always produces the same end state as if the tool had run locally - the stream revival reconstructs the turn as if nothing was deferred.
 
 ---
 
@@ -30,7 +30,7 @@ The task queue path always produces the same end state as if the tool had run lo
 
 Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
-**`waiting`** — stream is dead but a task is still in flight. Stop button stays visible. No content arrives until revival.
+**`waiting`** - stream is dead but a task is still in flight. Stop button stays visible. No content arrives until revival.
 
 - Set when: task-queue path activates (`waitingForRemoteResult=true` + stream aborts with `REMOTE_TOOL_WAIT`)
 - Cleared when: revival fires (atomically claims `idle|waiting → streaming`)
@@ -46,7 +46,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 **User sees**: tool executing. Stream pauses, then continues with the result. Seamless.
 
-**AI sees**: result returned inline, loop continues — always. For the task-queue path, the stream revives and the AI picks up from where it left off; the deferred mechanics are invisible to the AI.
+**AI sees**: result returned inline, loop continues - always. For the task-queue path, the stream revives and the AI picks up from where it left off; the deferred mechanics are invisible to the AI.
 
 | Transport                | Stream behavior                                                                        |
 | ------------------------ | -------------------------------------------------------------------------------------- |
@@ -55,12 +55,12 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 | **Remote queue**         | Stream aborts → `waiting`. Task executes remotely. On completion: see lifecycle below. |
 | **Escalated (>timeout)** | Same as remote queue path.                                                             |
 
-**Tool message lifecycle — task-queue path:**
+**Tool message lifecycle - task-queue path:**
 
 - At call time: tool message created, `status: "pending"` (UI shows executing)
 - While waiting: message stays `pending`, thread stays `waiting`
 - On `handleTaskCompletion` → result inserted into the **message queue**:
-  - **No user message in queue** (same sequence): dequeue result → backfill original tool message in place — `status: "completed"`, result set. No deferred message created. `TOOL_RESULT` WS event emitted. Revival fires from original as parent.
+  - **No user message in queue** (same sequence): dequeue result → backfill original tool message in place - `status: "completed"`, result set. No deferred message created. `TOOL_RESULT` WS event emitted. Revival fires from original as parent.
   - **User messages in queue** (different sequence): dequeue result → insert deferred TOOL message after the current leaf. `MESSAGE_CREATED` + `TOOL_RESULT` WS events. Revival fires from deferred as parent, with queued user messages prepended to the revival context.
 - AI sees result and continues. Loop does not stop.
 
@@ -70,7 +70,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 **User sees**: tool dispatched, stream continues immediately. Result bubble updates in background when done.
 
-**AI sees**: `{ taskId, status: "pending", hint: "use wait-for-task(taskId) if you need the result" }` — always.
+**AI sees**: `{ taskId, status: "pending", hint: "use wait-for-task(taskId) if you need the result" }` - always.
 
 | Transport         | Stream behavior                                                       |
 | ----------------- | --------------------------------------------------------------------- |
@@ -86,7 +86,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 **User sees**: tool dispatched, stream continues immediately. When result arrives, a new AI turn starts automatically.
 
-**AI sees**: `{ taskId, status: "pending", hint: "result will be injected when ready — do NOT call wait-for-task" }` — always.
+**AI sees**: `{ taskId, status: "pending", hint: "result will be injected when ready - do NOT call wait-for-task" }` - always.
 
 | Transport         | Stream behavior                                                                                              |
 | ----------------- | ------------------------------------------------------------------------------------------------------------ |
@@ -112,7 +112,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 **User sees**: tool executing, then stream ends. Background task visible until complete.
 
-**AI sees**: result returned, then loop stops — always.
+**AI sees**: result returned, then loop stops - always.
 
 | Transport         | Stream behavior                                                                                                                                                 |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -120,7 +120,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 | **Remote direct** | Blocking HTTP. Result to AI. Loop stops. Thread → `idle`.                                                                                                       |
 | **Remote queue**  | Stream aborts → `waiting`. Task executes. On completion: original tool message **backfilled in place**. `TASK_COMPLETED` WS event. No revival. Thread → `idle`. |
 
-Thread stays `waiting` (stop button visible) until the remote task completes — even though no AI continuation fires.
+Thread stays `waiting` (stop button visible) until the remote task completes - even though no AI continuation fires.
 
 ---
 
@@ -139,7 +139,7 @@ Thread stays `waiting` (stop button visible) until the remote task completes —
 **Confirm + wait result lifecycle** (same as `wait` task-queue path):
 
 - **No user message in queue** (same sequence): result backfilled into original tool message in-place. `TOOL_RESULT` WS event. Revival from original.
-- **User message(s) in queue** (different sequence — user sent a follow-up before confirming): deferred TOOL message inserted after current leaf. `MESSAGE_CREATED` + `TOOL_RESULT` WS events. Revival from deferred, with queued user messages prepended to context.
+- **User message(s) in queue** (different sequence - user sent a follow-up before confirming): deferred TOOL message inserted after current leaf. `MESSAGE_CREATED` + `TOOL_RESULT` WS events. Revival from deferred, with queued user messages prepended to context.
 
 If `requiresConfirmation=true` on the endpoint definition, the AI cannot bypass this mode.
 
@@ -149,7 +149,7 @@ If `requiresConfirmation=true` on the endpoint definition, the AI cannot bypass 
 
 **Planned** (not yet in code):
 
-Every thread has a per-thread message queue. All async results and user messages during an active or waiting stream go through the queue. The queue is the single delivery mechanism — nothing bypasses it.
+Every thread has a per-thread message queue. All async results and user messages during an active or waiting stream go through the queue. The queue is the single delivery mechanism - nothing bypasses it.
 
 **Enqueue sources:**
 
@@ -157,21 +157,21 @@ Every thread has a per-thread message queue. All async results and user messages
 - `handleTaskCompletion` for wakeUp/wait → result appended to queue
 - Cross-agent messages from remote agents → appended to queue (future)
 
-**Queue executor — runs after every enqueue:**
+**Queue executor - runs after every enqueue:**
 
 1. If thread is `streaming`: hand the item to the live stream as the next step. Stream picks it up at the end of the current tool batch.
-2. If thread is `idle` or `waiting`: drain the full queue in one shot — fire a revival run with all queued items as context (tool results first, then user messages in order).
+2. If thread is `idle` or `waiting`: drain the full queue in one shot - fire a revival run with all queued items as context (tool results first, then user messages in order).
 3. If thread is `aborting`: wait, retry after abort settles.
 
 **Why a queue, not a block:**
 
-Users should not be frozen out of their thread while an agent works. Cross-agent communication depends on this: a remote agent returning results, a user adding context mid-run, a cron-triggered injection — all arrive asynchronously and must land in order. The queue is the foundation for agent-to-agent messaging where multiple senders need ordered delivery into a single thread.
+Users should not be frozen out of their thread while an agent works. Cross-agent communication depends on this: a remote agent returning results, a user adding context mid-run, a cron-triggered injection - all arrive asynchronously and must land in order. The queue is the foundation for agent-to-agent messaging where multiple senders need ordered delivery into a single thread.
 
 **Ordering guarantee**: items are drained oldest-first. A revival that includes both a tool result and queued user messages always presents the tool result first, then user messages, then fires the AI response.
 
 ---
 
-## Tool Call Errors — Loop Always Continues
+## Tool Call Errors - Loop Always Continues
 
 Failed tool calls never stop the loop. The AI receives:
 
@@ -208,7 +208,7 @@ When waiting for a remote result (task-queue path, `wait-for-task`, escalated to
 
 **Per-tool override**: `streamTimeoutMs: 0` in endpoint definition for interactive tools (shells, long-running agents).
 
-**Direct HTTP `wait` mode**: no timer — the HTTP connection is the timeout.
+**Direct HTTP `wait` mode**: no timer - the HTTP connection is the timeout.
 
 ---
 
@@ -262,4 +262,4 @@ Every wakeUp/wait task stores `leafMessageId` (branch tip at call time):
 
 ## Push-First Sync
 
-When the remote node is directly reachable (`isDirectlyAccessible=true`), task creation and completion notifications are pushed immediately rather than waiting for the next cron pull. Pull is always the fallback — push is opportunistic.
+When the remote node is directly reachable (`isDirectlyAccessible=true`), task creation and completion notifications are pushed immediately rather than waiting for the next cron pull. Pull is always the fallback - push is opportunistic.

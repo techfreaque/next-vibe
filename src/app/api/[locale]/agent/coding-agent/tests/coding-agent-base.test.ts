@@ -256,7 +256,7 @@ function assertSnapshotsEquivalent(
       `${step}: callbackMode must match across modes`,
     ).toBe(interactive.reqCallbackMode);
   }
-  // interactiveMode differs by design — don't compare it
+  // interactiveMode differs by design - don't compare it
   expect(
     batch.resKeys,
     `${step}: response keys must match across modes`,
@@ -348,7 +348,7 @@ async function patchWakeUpFixture(
 
   // Read fixture files to find the previously-recorded wakeUp task ID.
   // The task ID lives in the LLM request file (call 2) as part of the conversation
-  // history — specifically as the execute-tool result the AI received. We want the
+  // history - specifically as the execute-tool result the AI received. We want the
   // LAST remote-hermes-* ID in that file, which is the wakeUp task's taskId
   // (earlier IDs belong to prior CA steps like DETACH).
   const { existsSync, readdirSync, readFileSync } = await import("node:fs");
@@ -662,7 +662,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           const res = toolResultRecord(toolMsg?.toolCall?.result);
           expect(res, "CA1: result must be an object").not.toBeNull();
 
-          // WAIT: result must have exactly {output, durationMs} — no extra keys
+          // WAIT: result must have exactly {output, durationMs} - no extra keys
           const resKeys = Object.keys(res ?? {}).toSorted();
           expect(
             resKeys,
@@ -738,7 +738,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           const res = toolResultRecord(toolMsg?.toolCall?.result);
           expect(res, "CA2: result must be an object").not.toBeNull();
 
-          // END_LOOP: result must have exactly {output, durationMs} — no extra keys
+          // END_LOOP: result must have exactly {output, durationMs} - no extra keys
           const resKeys = Object.keys(res ?? {}).toSorted();
           expect(
             resKeys,
@@ -810,7 +810,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           const res = toolResultRecord(toolMsg?.toolCall?.result);
           expect(res, "CA3: result must be an object").not.toBeNull();
 
-          // DETACH: result must have exactly {hint, status, taskId} — no output
+          // DETACH: result must have exactly {hint, status, taskId} - no output
           const resKeys = Object.keys(res ?? {}).toSorted();
           expect(
             resKeys,
@@ -901,7 +901,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
 
           const finalMsgs = await fetchThreadMessages(threadId);
 
-          // execute-tool(wakeUp) message must exist — it dispatched the task
+          // execute-tool(wakeUp) message must exist - it dispatched the task
           const dispatchMsg = findCodingAgentMsg(finalMsgs);
           expect(
             dispatchMsg,
@@ -952,7 +952,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             "CA4: durationMs must be positive",
           ).toBe(true);
 
-          // No deferred child on the dispatch message — result came via wait-for-task
+          // No deferred child on the dispatch message - result came via wait-for-task
           const deferred = finalMsgs.find(
             (m) =>
               m.role === "tool" &&

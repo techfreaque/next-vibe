@@ -684,7 +684,7 @@ function timeAgo(date: Date | string): string {
 /* eslint-enable i18next/no-literal-string */
 
 // ---------------------------------------------------------------------------
-// ThreadRowShared — 2-line variant for the SHARED root folder
+// ThreadRowShared - 2-line variant for the SHARED root folder
 // ---------------------------------------------------------------------------
 
 function ThreadRowShared({
@@ -1045,7 +1045,7 @@ function ThreadRowShared({
           )}
         </Div>
 
-        {/* Line 2: share status — always visible */}
+        {/* Line 2: share status - always visible */}
         {!isEditing && shareStatusLine}
       </Div>
 

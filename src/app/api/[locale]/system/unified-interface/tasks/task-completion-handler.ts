@@ -95,14 +95,14 @@ export async function handleTaskCompletion(params: {
   favoriteId?: string | null;
   /** Branch leaf message ID at tool-call time - typed column wakeUpLeafMessageId */
   leafMessageId?: string | null;
-  /** The resolved task owner — must come from resolveTaskOwnerUser(), never fabricated */
+  /** The resolved task owner - must come from resolveTaskOwnerUser(), never fabricated */
   ownerUser: JwtPrivatePayloadType;
   logger: EndpointLogger;
   /**
    * When provided, fire resume-stream directly instead of waiting for the cron pulse.
    * Always provided for local wakeUp/wait flows. Falls back to the cron task as a
    * safety net (no-op if already claimed by direct fire).
-   * The ownerUser is always used as the identity — this is only the locale signal.
+   * The ownerUser is always used as the identity - this is only the locale signal.
    */
   directResumeLocale?: CountryLanguage;
   /**
@@ -111,9 +111,9 @@ export async function handleTaskCompletion(params: {
    * the thread (Thea), not on Hermes which also polls the cron table.
    */
   selfInstanceId?: string | null;
-  /** Abort signal from the originating route/task handler — propagated to revival headless stream */
+  /** Abort signal from the originating route/task handler - propagated to revival headless stream */
   abortSignal: AbortSignal;
-  /** Sub-agent nesting depth from the original stream — preserved across task completion/revival */
+  /** Sub-agent nesting depth from the original stream - preserved across task completion/revival */
   subAgentDepth: number;
 }): Promise<void> {
   const {
@@ -382,7 +382,7 @@ export async function handleTaskCompletion(params: {
       // runs with the correct leadId for credit validation - not the complete-task caller's identity.
       if (directResumeLocale) {
         const { t } = aiStreamScopedTranslation.scopedT(directResumeLocale);
-        // Always use ownerUser for the revival stream — correct credit validation.
+        // Always use ownerUser for the revival stream - correct credit validation.
         // Await so callers that await handleTaskCompletion (e.g. pulse) get a fully
         // resolved revival. The cron task above is a safety net if this throws.
         const { ResumeStreamRepository } =

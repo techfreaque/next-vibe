@@ -335,7 +335,7 @@ export class RemoteCapabilitiesGeneratorRepository {
       return null;
     }
 
-    // Access .default with retry — Bun plugin race can throw TDZ here too
+    // Access .default with retry - Bun plugin race can throw TDZ here too
     let defaultExport: Record<string, CreateApiEndpointAny> | undefined;
     try {
       defaultExport = mod.default;

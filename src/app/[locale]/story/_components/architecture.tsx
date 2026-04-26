@@ -215,7 +215,7 @@ apiClient.updateEndpointData(
     : old,
 );`;
 
-const STEP_DIALOG = `// auto-renders form from definition — works anywhere
+const STEP_DIALOG = `// auto-renders form from definition - works anywhere
 <EndpointsPage
   endpoint={greetDefinitions}
   locale={locale}
@@ -298,7 +298,7 @@ function CliPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
         </P>
       </Div>
 
-      {/* Terminal output — mirrors `vibe greet -h` */}
+      {/* Terminal output - mirrors `vibe greet -h` */}
       <Div className="rounded-lg bg-[#011627] border border-slate-700/60 font-mono text-[12px] leading-relaxed overflow-hidden">
         {/* Prompt line */}
         <Div className="px-4 pt-3 pb-2 border-b border-slate-700/40">
@@ -537,7 +537,7 @@ function CronPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
   );
 }
 
-const WEBSOCKET_SNIPPET = `// in handler — push to all connected clients
+const WEBSOCKET_SNIPPET = `// in handler - push to all connected clients
 broadcastLocal("greetings", "new:greeting", {
   name: data.name,
   message: \`Hello, \${data.name}!\`,
@@ -564,10 +564,10 @@ function WebSocketPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
   );
 }
 
-const ELECTRON_SNIPPET = `# dev — compile, spawn server, open window
+const ELECTRON_SNIPPET = `# dev - compile, spawn server, open window
 $ vibe electron --vibeStart=true
 
-# ship — .AppImage  ·  .exe  ·  .dmg
+# ship - .AppImage  ·  .exe  ·  .dmg
 $ vibe electron:build --platform=all`;
 
 function ElectronPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
@@ -732,7 +732,7 @@ const PLATFORM_PANELS: Record<EndpointPlatformKey, PanelComponent> = {
 
 type TFn = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
-// ── Example 1: Hello World — definition.ts ────────────────────────────────────
+// ── Example 1: Hello World - definition.ts ────────────────────────────────────
 function buildHelloDefinition(t: TFn): string {
   const title = t("home.architecture.snippet.greetTitle");
   const description = t("home.architecture.snippet.greetDescription");
@@ -780,7 +780,7 @@ function buildHelloDefinition(t: TFn): string {
 });`;
 }
 
-// ── Example 1: Hello World — route.ts ─────────────────────────────────────────
+// ── Example 1: Hello World - route.ts ─────────────────────────────────────────
 const HELLO_ROUTE = `export const { POST, tools } = endpointsHandler({
   endpoint: greetEndpoint,
   [Methods.POST]: {
@@ -790,7 +790,7 @@ const HELLO_ROUTE = `export const { POST, tools } = endpointsHandler({
   },
 });`;
 
-// ── Example 2: Custom Widget — definition.ts ──────────────────────────────────
+// ── Example 2: Custom Widget - definition.ts ──────────────────────────────────
 function buildWidgetDefinition(t: TFn): string {
   const title = t("home.architecture.snippet.greetTitle");
   const description = t("home.architecture.snippet.greetDescription");
@@ -830,7 +830,7 @@ function buildWidgetDefinition(t: TFn): string {
 });`;
 }
 
-// ── Example 2: Custom Widget — route.ts ───────────────────────────────────────
+// ── Example 2: Custom Widget - route.ts ───────────────────────────────────────
 const WIDGET_ROUTE = `export const { POST, tools } = endpointsHandler({
   endpoint: greetEndpoint,
   [Methods.POST]: {
@@ -840,7 +840,7 @@ const WIDGET_ROUTE = `export const { POST, tools } = endpointsHandler({
   },
 });`;
 
-// ── Example 2: Custom Widget — widget.tsx ─────────────────────────────────────
+// ── Example 2: Custom Widget - widget.tsx ─────────────────────────────────────
 const WIDGET_WIDGET = `"use client";
 
 interface GreetWidgetProps {

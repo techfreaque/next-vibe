@@ -162,7 +162,7 @@ export class CompleteTaskRepository {
     const owner = dbUserIdToOwner(task.userId);
 
     if (toolMessageId) {
-      // Always resolve the actual task owner — never use the API caller's identity.
+      // Always resolve the actual task owner - never use the API caller's identity.
       const ownerContext = await resolveTaskOwnerUser(owner, locale, logger);
       if (ownerContext) {
         await handleTaskCompletion({

@@ -397,7 +397,7 @@ export class ChatSettingsRepository {
           dreamerSchedule: savedRow.dreamerSchedule ?? undefined,
           dreamerPrompt: savedRow.dreamerPrompt ?? null,
         }).catch(() => {
-          // Best-effort — don't fail settings save if task sync fails
+          // Best-effort - don't fail settings save if task sync fails
         });
       }
       if (
@@ -413,7 +413,7 @@ export class ChatSettingsRepository {
           autopilotSchedule: savedRow.autopilotSchedule ?? undefined,
           autopilotPrompt: savedRow.autopilotPrompt ?? null,
         }).catch(() => {
-          // Best-effort — don't fail settings save if task sync fails
+          // Best-effort - don't fail settings save if task sync fails
         });
       }
       if (
@@ -427,7 +427,7 @@ export class ChatSettingsRepository {
           mamaSchedule: savedRow.mamaSchedule ?? undefined,
           mamaPrompt: savedRow.mamaPrompt ?? null,
         }).catch(() => {
-          // Best-effort — don't fail settings save if task sync fails
+          // Best-effort - don't fail settings save if task sync fails
         });
       }
 

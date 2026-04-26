@@ -51,7 +51,7 @@ export function TabsTrigger({
     return <Text dimColor>[{children}]</Text>;
   }
 
-  // In CLI, all tabs show as inactive style — no active state tracking
+  // In CLI, all tabs show as inactive style - no active state tracking
   return (
     <Text color="cyan" dimColor>
       [{children}]

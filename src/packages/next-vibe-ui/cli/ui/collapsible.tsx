@@ -13,7 +13,7 @@ export type {
   CollapsibleContentProps,
 } from "../../web/ui/collapsible";
 
-// CLI: always expanded — no interactivity in terminal
+// CLI: always expanded - no interactivity in terminal
 
 export function Collapsible({ children }: CollapsibleProps): JSX.Element {
   return <Box flexDirection="column">{children}</Box>;

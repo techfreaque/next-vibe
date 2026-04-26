@@ -254,12 +254,12 @@ export const translations: typeof enTranslations = {
       badge: "Mały zespół · Open source · Rozwijamy otwarcie",
       header: "AI, które nie mówi ci, co masz myśleć.",
       subheader:
-        "Żadnych odmów. Nikt nie czyta twoich rozmów. Twoja AI — nie nasza.",
+        "Żadnych odmów. Nikt nie czyta twoich rozmów. Twoja AI - nie nasza.",
       chipChat: "Czat",
       chipSelfHost: "Własny serwer",
       chipBuild: "Buduj",
       chipEarn: "Zarabiaj",
-      introGuide: "Cztery drogi — wybierz swoją:",
+      introGuide: "Cztery drogi - wybierz swoją:",
       introOption1: "",
       introOption2: "",
       introOption3: "",
@@ -270,11 +270,11 @@ export const translations: typeof enTranslations = {
       card: {
         chat: {
           label: "Po prostu pogadaj",
-          desc: "Pytaj o wszystko — łącznie z tym, czego ChatGPT odmawia. Bez rejestracji.",
+          desc: "Pytaj o wszystko - łącznie z tym, czego ChatGPT odmawia. Bez rejestracji.",
         },
         personal: {
           label: "Twoja własna AI",
-          desc: "Działa na twoim sprzęcie. Mówisz jej czego potrzebujesz — dostosowuje się do twojego życia.",
+          desc: "Działa na twoim sprzęcie. Mówisz jej czego potrzebujesz - dostosowuje się do twojego życia.",
         },
         nextvibe: {
           label: "Własny biznes AI",
@@ -290,7 +290,7 @@ export const translations: typeof enTranslations = {
         titleLine1: "AI bez cenzury.",
         titleLine2: "Zapytaj o wszystko.",
         subtitle:
-          "{{modelCount}} modeli. Trzy poziomy — Ty wybierasz. Zmieniaj w każdej rozmowie. Prawdziwa odpowiedź, nie zatwierdzona wersja.",
+          "{{modelCount}} modeli. Trzy poziomy - Ty wybierasz. Zmieniaj w każdej rozmowie. Prawdziwa odpowiedź, nie zatwierdzona wersja.",
         pill1: "{{modelCount}} modeli - Ty wybierasz filtr",
         pill2: "Generuj obrazy, wideo i muzykę",
         pill3: "{{skillCount}}+ skillów z pamięcią i wyszukiwarką",
@@ -327,7 +327,7 @@ export const translations: typeof enTranslations = {
         titleLine1: "Publikuj. Polecaj.",
         titleLine2: "Zarabiaj.",
         subtitle:
-          "Link polecający: 10% z każdej płatności, na zawsze. Twój skill jako strona wejścia: +5% — nawet gdy inni go udostępniają.",
+          "Link polecający: 10% z każdej płatności, na zawsze. Twój skill jako strona wejścia: +5% - nawet gdy inni go udostępniają.",
         cta: "Zacznij zarabiać",
         ctaExplore: "Dowiedz się więcej",
       },
@@ -814,7 +814,7 @@ export const translations: typeof enTranslations = {
           bodyPrefix: "Każdy endpoint jest dostępny dla agentów AI przez",
           bodyMiddle1: ". Użyj",
           bodyMiddle2:
-            "dla długich zadań — agent zawiesza się i wznawia po zakończeniu. Przekaż",
+            "dla długich zadań - agent zawiesza się i wznawia po zakończeniu. Przekaż",
           bodySuffix: "aby uruchomić na zdalnym serwerze.",
         },
         mcpServer: {
@@ -858,24 +858,24 @@ export const translations: typeof enTranslations = {
           headline: "Strony admina piszą się same.",
           bodyPrefix: "Ustaw",
           bodyMiddle:
-            "a endpoint jest zablokowany wszędzie — API, CLI, MCP, UI. Jedno wywołanie guard plus",
+            "a endpoint jest zablokowany wszędzie - API, CLI, MCP, UI. Jedno wywołanie guard plus",
           bodySuffix:
             "renderuje pełny interfejs admina. Każdy ekran admina w platformie jest zbudowany dokładnie w ten sposób.",
         },
         vibeFrame: {
           headline: "Dowolny endpoint. Dowolna strona. Jeden tag script.",
-          body: "Wrzuć Vibe Frame na dowolną istniejącą stronę — WordPress, Webflow, czysty HTML. Zadeklaruj który endpoint renderować i gdzie go zamontować. Pełny formularz, walidacja i przepływ wysyłania pojawia się inline przez mostek postMessage. Żadnych iframes, żadnych problemów z CORS.",
+          body: "Wrzuć Vibe Frame na dowolną istniejącą stronę - WordPress, Webflow, czysty HTML. Zadeklaruj który endpoint renderować i gdzie go zamontować. Pełny formularz, walidacja i przepływ wysyłania pojawia się inline przez mostek postMessage. Żadnych iframes, żadnych problemów z CORS.",
         },
         remoteSkill: {
           headline: "Twoje API samo się dokumentuje jako skill AI.",
           bodyPrefix:
-            "Każdy publiczny endpoint jest uwzględniony w wygenerowanym manifeście skilla, który zewnętrzni agenci AI pobierają i poznają. Dwa pliki: jeden dla anonimowych, jeden dla zalogowanych. Każdy endpoint jest domyślnie uwzględniony — dodaj",
+            "Każdy publiczny endpoint jest uwzględniony w wygenerowanym manifeście skilla, który zewnętrzni agenci AI pobierają i poznają. Dwa pliki: jeden dla anonimowych, jeden dla zalogowanych. Każdy endpoint jest domyślnie uwzględniony - dodaj",
           bodySuffix:
             "aby go wykluczyć. Koniec z ręcznym utrzymywaniem dokumentacji API.",
         },
         vibeBoard: {
           headline: "Każdy endpoint staje się kafelkiem dashboardu na żywo.",
-          body: "Vibe Board to kolejna powierzchnia — analityczny dashboard drag-and-drop, gdzie dowolny endpoint można przypiąć jako kafelek. Warstwa danych, Vibe Sense, jest już dostępna. Zdefiniuj teraz pipeline grafu a wyrenderuje się automatycznie gdy Vibe Board wyjdzie. Ta sama definicja, zero dodatkowego kodu.",
+          body: "Vibe Board to kolejna powierzchnia - analityczny dashboard drag-and-drop, gdzie dowolny endpoint można przypiąć jako kafelek. Warstwa danych, Vibe Sense, jest już dostępna. Zdefiniuj teraz pipeline grafu a wyrenderuje się automatycznie gdy Vibe Board wyjdzie. Ta sama definicja, zero dodatkowego kodu.",
         },
       },
       surfaceDemo: {
@@ -1143,7 +1143,7 @@ export const translations: typeof enTranslations = {
     ctaNextvibe: {
       title: "Jedna definicja. Każda platforma.",
       subtitle:
-        "Web UI, CLI, narzędzie AI, serwer MCP, ekran mobilny, cron job — automatycznie. Sforkuj. Posiadaj.",
+        "Web UI, CLI, narzędzie AI, serwer MCP, ekran mobilny, cron job - automatycznie. Sforkuj. Posiadaj.",
       primary: "Czytaj dokumentację",
       secondary: "Star na GitHub",
     },

@@ -81,7 +81,7 @@ export class CortexListRepository {
             await import("../fs-provider/fs-populate");
           await ensureMountPopulated(mountPrefix, userId, logger);
         } else {
-          // Root listing — create native dirs on disk
+          // Root listing - create native dirs on disk
           const { ensureDataRoot } = await import("../fs-provider/fs-populate");
           await ensureDataRoot();
         }

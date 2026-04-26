@@ -118,7 +118,7 @@ export const translations: typeof enTranslations = {
     dreaming: {
       title: "Śnienie",
       description:
-        "AI porządkuje twoją głowę podczas snu — scala wspomnienia, sprząta dokumenty, wyciąga to, co ważne.",
+        "AI porządkuje twoją głowę podczas snu - scala wspomnienia, sprząta dokumenty, wyciąga to, co ważne.",
       toggle: {
         label: "Włącz śnienie",
       },
@@ -141,7 +141,7 @@ export const translations: typeof enTranslations = {
         placeholder:
           "Na czym ma się skupić Thea w tej sesji? Pozostaw puste, aby użyć domyślnego.",
         defaultPrompt:
-          "Uruchom sesję śnienia. Zreorganizuj i scal korteks — wspomnienia, dokumenty, wątki. Zostaw wszystko czystsze i lepiej uporządkowane.",
+          "Uruchom sesję śnienia. Zreorganizuj i scal korteks - wspomnienia, dokumenty, wątki. Zostaw wszystko czystsze i lepiej uporządkowane.",
       },
       lastRun: "Ostatnie uruchomienie:",
       neverRun: "Nigdy nie uruchomiono",
@@ -151,7 +151,7 @@ export const translations: typeof enTranslations = {
     autopilot: {
       title: "Autopilot",
       description:
-        "AI pracuje nad twoją kolejką, gdy cię nie ma — kolejne kroki, projekty w toku, zaległe zadania.",
+        "AI pracuje nad twoją kolejką, gdy cię nie ma - kolejne kroki, projekty w toku, zaległe zadania.",
       toggle: {
         label: "Włącz autopilota",
       },
@@ -174,7 +174,7 @@ export const translations: typeof enTranslations = {
         placeholder:
           "Na czym ma się skupić Hermes w tej sesji? Pozostaw puste, aby użyć domyślnego.",
         defaultPrompt:
-          "Uruchom sesję autopilota. Kontynuuj aktywne projekty — realizuj kolejne kroki, obsługuj zaległą pracę, nie zatrzymuj się.",
+          "Uruchom sesję autopilota. Kontynuuj aktywne projekty - realizuj kolejne kroki, obsługuj zaległą pracę, nie zatrzymuj się.",
       },
       lastRun: "Ostatnie uruchomienie:",
       neverRun: "Nigdy nie uruchomiono",
@@ -184,7 +184,7 @@ export const translations: typeof enTranslations = {
     mama: {
       title: "Tętno platformy",
       description:
-        "Thea monitoruje twoją instancję produkcyjną — sprawdza stan, posuwa funkcje do przodu, zajmuje się marketingiem, wysyła nowości. Jeden wspólny slot dla wszystkich adminów.",
+        "Thea monitoruje twoją instancję produkcyjną - sprawdza stan, posuwa funkcje do przodu, zajmuje się marketingiem, wysyła nowości. Jeden wspólny slot dla wszystkich adminów.",
       toggle: {
         label: "Włącz tryb Mama",
       },

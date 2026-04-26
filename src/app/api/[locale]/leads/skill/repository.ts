@@ -27,7 +27,7 @@ export class LeadSkillRepository {
     try {
       const leadId = user.leadId;
       if (!leadId) {
-        logger.debug("No leadId in JWT — skipping skill attribution");
+        logger.debug("No leadId in JWT - skipping skill attribution");
         return success({ success: false });
       }
 

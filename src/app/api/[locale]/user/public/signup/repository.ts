@@ -308,7 +308,7 @@ export class SignupRepository {
           await LeadsRepository.updateLeadSkillId(
             leadIdResult.leadId,
             data.supportedSkillId,
-            true, // overwrite — user explicitly chose this creator
+            true, // overwrite - user explicitly chose this creator
             logger,
           );
         } catch (skillErr) {

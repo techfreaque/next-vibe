@@ -98,7 +98,7 @@ export const translations = {
   sessionJoined: {
     title: "Callback dołączenia",
     description:
-      "Wewnętrzny callback — powiadamia inicjującą instancję o dołączeniu.",
+      "Wewnętrzny callback - powiadamia inicjującą instancję o dołączeniu.",
     tags: { support: "Wsparcie", callback: "Callback" },
     fields: {
       sessionId: {

@@ -22,7 +22,7 @@ function ThemeCookieSync(): null {
     if (!resolvedTheme) {
       return;
     }
-    // Keep cookie and localStorage in sync — cookie wins on SSR, localStorage is just next-themes' internal state
+    // Keep cookie and localStorage in sync - cookie wins on SSR, localStorage is just next-themes' internal state
     document.cookie = `${THEME_COOKIE_NAME}=${resolvedTheme};path=/;max-age=2147483647;SameSite=Lax`;
     localStorage.setItem("theme", resolvedTheme);
   }, [resolvedTheme, setTheme]);

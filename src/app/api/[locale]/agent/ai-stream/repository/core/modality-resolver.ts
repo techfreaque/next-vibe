@@ -138,7 +138,7 @@ export type VariantResolution =
  */
 /**
  * Resolve chat model ID from already-loaded favorite config and skill variant.
- * No DB access — callers must resolve favorite/skill data before calling.
+ * No DB access - callers must resolve favorite/skill data before calling.
  * Cascade: favorite.modelSelection → skillVariant.modelSelection → null.
  */
 export function resolveChatModelId(

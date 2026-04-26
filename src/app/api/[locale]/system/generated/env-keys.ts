@@ -83,7 +83,7 @@ export const ENV_KEYS = [
     key: "VIBE_PID",
     module: "env",
     comment:
-      "Vibe runtime process ID. Set automatically at startup — no need to configure manually.",
+      "Vibe runtime process ID. Set automatically at startup - no need to configure manually.",
     example: "",
     sensitive: false,
     fieldType: "text",
@@ -1209,4 +1209,3 @@ export const ENV_KEYS = [
 ] as const satisfies readonly EnvKeyMeta[];
 
 export type EnvKeyName = (typeof ENV_KEYS)[number]["key"];
-

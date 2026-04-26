@@ -8,7 +8,7 @@
  * To add a new mount widget:
  *   1. Add an entry here with extractLabel + loadWidget + translationKey + icon + color
  *   2. Add the translation key to cortex/i18n/{en,de,pl}/index.ts under `mounts`
- *   3. Done — DomainEnrichment + list/tree widgets pick it up automatically
+ *   3. Done - DomainEnrichment + list/tree widgets pick it up automatically
  */
 
 import type React from "react";

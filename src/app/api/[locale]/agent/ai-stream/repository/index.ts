@@ -198,10 +198,10 @@ export class AiStreamRepository {
 
     // ================================================================
     // Auto-queue: if the thread is already streaming, save the user
-    // message with isQueued metadata and return immediately — no AI
+    // message with isQueued metadata and return immediately - no AI
     // stream, no credits, no tools. The queue processor will pick
     // this up after the current stream ends.
-    // The client sends a normal "send" operation — queue detection is
+    // The client sends a normal "send" operation - queue detection is
     // entirely server-side via StreamRegistry.
     // ================================================================
     if (
@@ -253,7 +253,7 @@ export class AiStreamRepository {
         user,
       );
       wsEmit("message-created", {
-        streamingState: "streaming", // Keep streaming state — the AI is still streaming
+        streamingState: "streaming", // Keep streaming state - the AI is still streaming
         messages: [
           {
             id: data.userMessageId,
@@ -773,7 +773,7 @@ export class AiStreamRepository {
               return;
             }
 
-            // Refresh cortex context — messages[] has the full conversation
+            // Refresh cortex context - messages[] has the full conversation
             // that was just compacted, so embedding search reflects current topic.
             try {
               const { buildEmbeddingQuery } =

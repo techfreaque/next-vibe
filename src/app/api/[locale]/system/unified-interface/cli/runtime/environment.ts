@@ -287,7 +287,7 @@ export function loadEnvironment(): EnvironmentResult {
 
   // Smart default for VIBE_LOG_PATH: enable file logging for dev/start commands,
   // disable for plain production (deployed server with no local file system access).
-  // User .env value always wins — only set if not already configured.
+  // User .env value always wins - only set if not already configured.
   if (!callerEnv["VIBE_LOG_PATH"] && !process.env["VIBE_LOG_PATH"]) {
     (process.env as Record<string, string>)["VIBE_LOG_PATH"] =
       isDevCommand || isPreviewMode ? ".tmp" : "false";

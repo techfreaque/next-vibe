@@ -461,7 +461,7 @@ export const translations = {
     theaDreamer: {
       name: "Thea · Dreamer",
       description:
-        "Thea's dreaming mode — tends your cortex while you sleep, weaving order from the day's threads.",
+        "Thea's dreaming mode - tends your cortex while you sleep, weaving order from the day's threads.",
       tagline: "Nightly Consolidation",
       shortDesc: "Background cortex maintenance",
       suggestedPrompts: {
@@ -481,7 +481,7 @@ export const translations = {
     hermesAutopilot: {
       name: "Hermes · Autopilot",
       description:
-        "Hermes in execution mode — advances your active projects and queued work while you're away.",
+        "Hermes in execution mode - advances your active projects and queued work while you're away.",
       tagline: "Always Moving Forward",
       shortDesc: "Background project execution",
       suggestedPrompts: {
@@ -501,7 +501,7 @@ export const translations = {
     theaMama: {
       name: "Thea · Mama",
       description:
-        "Thea in Mama mode — platform prodmaster. Monitors health, advances features, handles marketing, sends news.",
+        "Thea in Mama mode - platform prodmaster. Monitors health, advances features, handles marketing, sends news.",
       tagline: "Platform Overseer",
       shortDesc: "Production platform management",
       suggestedPrompts: {
@@ -823,7 +823,7 @@ export const translations = {
       tagline: "Fix It Fast",
       shortDesc: "Technical support with human escalation",
       suggestedPrompts: {
-        0: "My app keeps crashing — help me fix it",
+        0: "My app keeps crashing - help me fix it",
         1: "I can't connect to the network",
         2: "I'm getting an error message I don't understand",
         3: "Walk me through resetting my password",

@@ -463,7 +463,7 @@ export const translations: typeof enTranslations = {
     theaDreamer: {
       name: "Thea · Träumerin",
       description:
-        "Theas Traumzustand — pflegt deinen Cortex im Schlaf und bringt Ordnung in den Tag.",
+        "Theas Traumzustand - pflegt deinen Cortex im Schlaf und bringt Ordnung in den Tag.",
       tagline: "Nächtliche Ordnung",
       shortDesc: "Hintergrund-Cortex-Pflege",
       suggestedPrompts: {
@@ -483,7 +483,7 @@ export const translations: typeof enTranslations = {
     hermesAutopilot: {
       name: "Hermes · Autopilot",
       description:
-        "Hermes im Ausführungsmodus — treibt deine aktiven Projekte voran, während du weg bist.",
+        "Hermes im Ausführungsmodus - treibt deine aktiven Projekte voran, während du weg bist.",
       tagline: "Immer vorwärts",
       shortDesc: "Hintergrund-Projektausführung",
       suggestedPrompts: {
@@ -503,7 +503,7 @@ export const translations: typeof enTranslations = {
     theaMama: {
       name: "Thea · Mama",
       description:
-        "Thea im Mama-Modus — Produktionsverantwortliche der Plattform. Überwacht die Gesundheit, treibt Features voran, erledigt Marketing, verschickt Neuigkeiten.",
+        "Thea im Mama-Modus - Produktionsverantwortliche der Plattform. Überwacht die Gesundheit, treibt Features voran, erledigt Marketing, verschickt Neuigkeiten.",
       tagline: "Plattform-Chefin",
       shortDesc: "Produktion und Plattformpflege",
       suggestedPrompts: {
@@ -822,11 +822,11 @@ export const translations: typeof enTranslations = {
     supportAgent: {
       name: "Support-Agent",
       description:
-        "KI-gestützter technischer Support — weiß, wann ein Mensch ran muss",
+        "KI-gestützter technischer Support - weiß, wann ein Mensch ran muss",
       tagline: "Problem gelöst",
       shortDesc: "Technischer Support mit Weiterleitung an Experten",
       suggestedPrompts: {
-        0: "Meine App stürzt ständig ab — was kann ich tun?",
+        0: "Meine App stürzt ständig ab - was kann ich tun?",
         1: "Ich komme nicht ins Netzwerk",
         2: "Ich bekomme eine Fehlermeldung, die ich nicht verstehe",
         3: "Wie setze ich mein Passwort zurück?",

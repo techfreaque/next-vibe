@@ -1,5 +1,5 @@
 /**
- * Search Detail Widget — domain enrichment for /searches/ paths
+ * Search Detail Widget - domain enrichment for /searches/ paths
  *
  * Renders a compact search card below the Cortex operation summary
  * showing the search query in a domain-aware format.

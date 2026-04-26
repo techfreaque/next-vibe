@@ -15,8 +15,8 @@
  *     where partial is the typed event payload from types.EventPayloads
  *
  * Subscribes to TWO channels:
- *  - path-based channel (e.g. "agent/chat/threads/abc/messages") — for direct emits
- *  - user channel (e.g. "user/xyz") — for batched events routed by the server
+ *  - path-based channel (e.g. "agent/chat/threads/abc/messages") - for direct emits
+ *  - user channel (e.g. "user/xyz") - for batched events routed by the server
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -65,7 +65,7 @@ export function useEndpointSubscription(
   const urlPathParamsRef = useRef(urlPathParams);
   urlPathParamsRef.current = urlPathParams;
 
-  // Stable user id key — avoid re-subscribing when the user object is recreated.
+  // Stable user id key - avoid re-subscribing when the user object is recreated.
   const userId = user ? (user.isPublic ? user.leadId : user.id) : undefined;
 
   useEffect(() => {
@@ -189,7 +189,7 @@ export function useEndpointSubscription(
         unsub();
       }
     };
-    // urlPathParamsKey is a stable JSON string — re-subscribe only when values actually change.
+    // urlPathParamsKey is a stable JSON string - re-subscribe only when values actually change.
     // userId is derived from user so we don't need user in the dep array too.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, endpoint, urlPathParamsKey, logger, cacheKey, userId]);

@@ -109,7 +109,7 @@ export function SkillsListContainer({
   const activeFavoriteId = settingsActiveFavoriteId;
 
   // Group favorites by base skill ID (for skill-level indicators)
-  // fav.skillId is merged format "slug" or "slug__variantId" — extract base slug
+  // fav.skillId is merged format "slug" or "slug__variantId" - extract base slug
   const favoritesBySkill = useMemo(() => {
     const map: Record<string, string[]> = {};
     if (favorites) {
@@ -1453,7 +1453,7 @@ export function EditFavBeforeAddButton({
 
       const fullChar = skillResponse.data;
 
-      // Resolve model selections — prefer the specific variant if one is selected
+      // Resolve model selections - prefer the specific variant if one is selected
       const { variantId } = parseSkillId(char.skillId);
       const matchedVariant = variantId
         ? fullChar.variants.find((v) => v.id === variantId)

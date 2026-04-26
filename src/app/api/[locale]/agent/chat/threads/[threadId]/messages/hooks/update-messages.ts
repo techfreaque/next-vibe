@@ -1,12 +1,12 @@
 "use client";
 
 /**
- * Message cache helpers — minimal imperative writes for cases the framework
+ * Message cache helpers - minimal imperative writes for cases the framework
  * event system cannot handle: optimistic inserts, delete, vote, history pagination,
  * and HTTP-error messages.
  *
  * All streaming state (content-delta, message-created, stream-finished, …) is
- * handled declaratively by the event declarations in definition.ts — no manual
+ * handled declaratively by the event declarations in definition.ts - no manual
  * writes needed for those.
  */
 
@@ -109,7 +109,7 @@ export function removeOptimisticByParentId(
   }
 }
 
-/** Read-only cache access — for incognito persistence and error handling. */
+/** Read-only cache access - for incognito persistence and error handling. */
 export function getCachedMessages(
   threadId: string,
   rootFolderId: DefaultFolderId,

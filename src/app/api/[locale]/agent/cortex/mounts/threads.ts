@@ -52,7 +52,7 @@ export async function readThreadPath(
   userId: string,
   path: string,
 ): Promise<VirtualReadResult | null> {
-  // Extract the thread ID from the path — it's always the last segment ending in .md
+  // Extract the thread ID from the path - it's always the last segment ending in .md
   const segments = path.split("/").filter(Boolean);
   // threads / rootFolder / [folder /] threadId.md
   if (segments.length < 3) {

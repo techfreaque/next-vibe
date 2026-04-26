@@ -330,7 +330,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
 
   const currentModel = getChatModelById(selectedModel);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
-  // Allow typing during streaming — queued messages can be sent while AI is active
+  // Allow typing during streaming - queued messages can be sent while AI is active
   const isInputDisabled = !canPost;
 
   // Model-type-aware UI

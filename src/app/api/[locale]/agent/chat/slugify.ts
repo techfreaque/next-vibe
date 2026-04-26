@@ -61,7 +61,7 @@ export function isUuid(value: string): boolean {
 // ============================================================
 // LEGACY SKILL ID ALIASES
 // Maps old stored IDs (camelCase, apostrophes) → canonical slugs.
-// The DB keeps whatever it stored — reads normalize transparently.
+// The DB keeps whatever it stored - reads normalize transparently.
 // Add entries here whenever a skill/variant ID is renamed.
 // ============================================================
 
@@ -85,7 +85,7 @@ export function resolveIdAlias(id: string): string {
 
 // ============================================================
 // SKILL ID MERGED FORMAT: "skillSlug__variantId"
-// Double-underscore separator — URL-safe, can't appear in a slug
+// Double-underscore separator - URL-safe, can't appear in a slug
 // ============================================================
 
 export const SKILL_VARIANT_SEPARATOR = "__";

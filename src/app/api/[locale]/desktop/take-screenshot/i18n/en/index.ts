@@ -27,7 +27,7 @@ export const translations = {
       maxWidth: {
         label: "Max Width",
         description:
-          "Downscale to this width if the capture is wider. Useful for AI — 4-monitor captures are massive.",
+          "Downscale to this width if the capture is wider. Useful for AI - 4-monitor captures are massive.",
         placeholder: "1920",
       },
     },

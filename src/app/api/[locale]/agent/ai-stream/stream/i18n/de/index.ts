@@ -324,7 +324,7 @@ export const translations: typeof enTranslations = {
     favoriteConfig: {
       label: "Favoriten-Konfiguration",
       description:
-        "Vollständige Konfiguration des aktiven Favoriten — Modellauswahl, Tool-Konfiguration, Kontexteinstellungen. null = kein Favorit aktiv, Skill-/Systemstandards werden verwendet.",
+        "Vollständige Konfiguration des aktiven Favoriten - Modellauswahl, Tool-Konfiguration, Kontexteinstellungen. null = kein Favorit aktiv, Skill-/Systemstandards werden verwendet.",
     },
     resumeToken: {
       label: "Wiederaufnahme-Token",

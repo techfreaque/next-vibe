@@ -1,7 +1,7 @@
 export const translations = {
   post: {
     title: "Zapisz plik",
-    description: "Zapisz plik. Podaj ścieżkę i treść — gotowe.",
+    description: "Zapisz plik. Podaj ścieżkę i treść - gotowe.",
     dynamicTitle: "Zapisano: {{path}}",
     status: {
       loading: "Zapisywanie...",

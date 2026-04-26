@@ -44,7 +44,7 @@ export function ToolsButton({
   const logger = useWidgetLogger();
   const openToolsModal = useToolsModalStore((state) => state.open);
 
-  // Fetch tool count from help endpoint — cached with long staleTime
+  // Fetch tool count from help endpoint - cached with long staleTime
   const helpEndpoint = useEndpoint(
     helpDefinitions,
     useMemo(

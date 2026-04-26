@@ -68,7 +68,7 @@ function ReadOnlyMessages(): React.JSX.Element {
   const logger = useWidgetLogger();
   const user = useWidgetUser();
 
-  // Subscribe only to the messages array — re-renders when messages change,
+  // Subscribe only to the messages array - re-renders when messages change,
   // NOT when streamingState or backgroundTasks change.
   const rawMessages = useWidgetSelector<typeof definition.GET>()(
     (d) => d?.messages || [],

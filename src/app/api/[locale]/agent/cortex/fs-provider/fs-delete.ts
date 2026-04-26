@@ -1,5 +1,5 @@
 /**
- * Filesystem Delete — removes files or directories from disk
+ * Filesystem Delete - removes files or directories from disk
  */
 
 import "server-only";

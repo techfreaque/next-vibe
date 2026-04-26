@@ -22,8 +22,8 @@ export const webFragment: SystemPromptFragment<WebData> = {
     lines.push(`## Web
 
 You can search the web and read URLs:
-- \`${WEB_SEARCH_ALIAS}\` — search query → results (auto-selects user's preferred engine)
-- \`${FETCH_URL_SHORT_ALIAS}\` — any URL → markdown content`);
+- \`${WEB_SEARCH_ALIAS}\` - search query → results (auto-selects user's preferred engine)
+- \`${FETCH_URL_SHORT_ALIAS}\` - any URL → markdown content`);
 
     if (data.hasBrowser) {
       lines.push(`

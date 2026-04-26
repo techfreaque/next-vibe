@@ -456,7 +456,7 @@ export class MessageConverter {
         // break the group - they are just DB artifacts from sequential tool calls.
         // Non-revival: non-empty ASSISTANT between a fully-superseded group and a deferred
         // result is also skipped (handles "dispatched" intermediate response).
-        // Revival: non-empty ASSISTANT is a hard boundary — the AI needs to see the full
+        // Revival: non-empty ASSISTANT is a hard boundary - the AI needs to see the full
         // prior-turn context (e.g. STEP_OK) before the deferred result.
         const toolMessages: ChatMessage[] = [msg];
         let j = i + 1;

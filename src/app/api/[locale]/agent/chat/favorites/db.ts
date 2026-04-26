@@ -163,7 +163,7 @@ export type ChatFavorite = typeof chatFavorites.$inferSelect;
 export type NewChatFavorite = typeof chatFavorites.$inferInsert;
 
 /**
- * Config subset of ChatFavorite — everything the server needs for cascade resolution.
+ * Config subset of ChatFavorite - everything the server needs for cascade resolution.
  */
 export type FavoriteConfig = Pick<
   ChatFavorite,

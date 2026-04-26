@@ -16,7 +16,7 @@ export enum FormFieldCategory {
   OTHER = "other",
 }
 
-// CLI: show current value as plain text — no dropdown in terminal
+// CLI: show current value as plain text - no dropdown in terminal
 export function AutocompleteField({
   value,
   options,

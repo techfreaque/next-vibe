@@ -43,7 +43,7 @@ export interface EmbedOptions {
 /**
  * Queue an embedding update for a cortex node.
  * Non-blocking: runs in background via setTimeout.
- * Safe to call on every write/edit — skips if content hash unchanged.
+ * Safe to call on every write/edit - skips if content hash unchanged.
  */
 export function queueEmbedding(
   nodeId: string,
@@ -51,7 +51,7 @@ export function queueEmbedding(
   content: string,
   options?: EmbedOptions,
 ): void {
-  // Fire and forget — don't block the response
+  // Fire and forget - don't block the response
   setTimeout(() => {
     void embedNode(nodeId, path, content, options);
   }, 0);
@@ -68,13 +68,13 @@ async function embedNode(
   options?: EmbedOptions,
 ): Promise<void> {
   try {
-    // Embed path + content combined — path tokens (e.g. "projects/auth/decision-log")
+    // Embed path + content combined - path tokens (e.g. "projects/auth/decision-log")
     // are high-signal for retrieval, especially for sparse or newly-created files.
     // Re-embedding on rename/move is now meaningful since path changes the text.
     const textToEmbed = `${path}\n\n${content}`;
     const newHash = computeEmbeddingHash(path, content);
 
-    // Check if content hash matches — skip redundant API call
+    // Check if content hash matches - skip redundant API call
     const [existing] = await db
       .select({
         contentHash: cortexNodes.contentHash,
@@ -85,13 +85,13 @@ async function embedNode(
       .limit(1);
 
     if (existing?.contentHash === newHash && existing.hasEmbedding !== null) {
-      return; // Content unchanged — skip
+      return; // Content unchanged - skip
     }
 
     const embedding = await generateEmbedding(textToEmbed);
 
     if (!embedding) {
-      return; // API key missing or call failed — skip silently
+      return; // API key missing or call failed - skip silently
     }
 
     await db
@@ -109,7 +109,7 @@ async function embedNode(
       await deductEmbeddingCredits(options);
     }
   } catch (error) {
-    // Best-effort — don't crash the server on embedding failures
+    // Best-effort - don't crash the server on embedding failures
     // eslint-disable-next-line no-console
     console.error(
       `[cortex-embed] Failed to embed node ${nodeId}:`,
@@ -120,7 +120,7 @@ async function embedNode(
 
 /**
  * Deduct credits for an embedding API call.
- * Fire-and-forget — failures are logged but don't block.
+ * Fire-and-forget - failures are logged but don't block.
  */
 async function deductEmbeddingCredits(options: EmbedOptions): Promise<void> {
   try {
@@ -143,7 +143,7 @@ async function deductEmbeddingCredits(options: EmbedOptions): Promise<void> {
       options.locale!,
     );
   } catch (error) {
-    // Best-effort credit deduction — don't fail the embedding
+    // Best-effort credit deduction - don't fail the embedding
     // eslint-disable-next-line no-console
     console.error(
       "[cortex-embed] Credit deduction failed:",

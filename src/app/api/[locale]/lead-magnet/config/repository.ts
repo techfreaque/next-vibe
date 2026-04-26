@@ -21,7 +21,7 @@ type LeadMagnetProviderKey = (typeof LeadMagnetProviderDB)[number];
 
 /**
  * Credential keys that are sensitive and must never be returned to the client.
- * Matched by exact key name — all use FieldDataType.PASSWORD in their definitions.
+ * Matched by exact key name - all use FieldDataType.PASSWORD in their definitions.
  */
 const SENSITIVE_CREDENTIAL_KEYS = new Set([
   "klaviyoApiKey",

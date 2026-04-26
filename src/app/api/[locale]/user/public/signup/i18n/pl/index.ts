@@ -99,7 +99,7 @@ export const translations: typeof enTranslations = {
         "Twoja rejestracja daje twórcy tego skilla +5% z Twoich subskrypcji.",
       selectorTitle: "Wesprzyj twórcę",
       selectorDescription:
-        "Masz w ulubionych skille od niezależnych twórców. Wybierz jednego do wsparcia — dostanie +5% z Twoich subskrypcji. Możesz to zmienić w każdej chwili.",
+        "Masz w ulubionych skille od niezależnych twórców. Wybierz jednego do wsparcia - dostanie +5% z Twoich subskrypcji. Możesz to zmienić w każdej chwili.",
       selectorNone: "Żaden (pomiń)",
     },
     localFavorites: {

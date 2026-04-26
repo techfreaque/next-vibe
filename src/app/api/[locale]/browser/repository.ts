@@ -2,7 +2,7 @@
  * Browser API Repository
  *
  * One shared chrome-devtools-mcp process per Bun server instance.
- * Session ID = String(process.pid) — stable for the server lifetime, unique per instance.
+ * Session ID = String(process.pid) - stable for the server lifetime, unique per instance.
  * Each session owns one Chrome tab via chrome-devtools-mcp's new_page tool.
  * select_page + tool call are serialized atomically via a mutex so concurrent
  * requests within a server don't stomp each other's selected page.
@@ -84,7 +84,7 @@ interface MCPProcess {
 interface SessionState {
   /** Stable Chrome-level target ID (hex string from /json endpoint). Survives chrome-devtools-mcp restarts. */
   cdpTargetId: string;
-  /** Current MCP integer page ID — reassigned each time chrome-devtools-mcp restarts. */
+  /** Current MCP integer page ID - reassigned each time chrome-devtools-mcp restarts. */
   mcpPageId: number;
 }
 
@@ -285,7 +285,7 @@ async function ensureChrome(logger: EndpointLogger): Promise<void> {
   // Use headless mode when explicitly requested, or when on Linux without any
   // display (neither X11 nor Wayland). With a display available, prefer X11
   // over Wayland because Chrome on Wayland needs a visible window to have a
-  // compositor surface — without one, Puppeteer screenshots return black.
+  // compositor surface - without one, Puppeteer screenshots return black.
   const x11Display = process.env["DISPLAY"];
   const noDisplay = isLinux && !x11Display && !waylandDisplay;
   const useHeadless = browserEnv.CHROME_HEADLESS || noDisplay;
@@ -373,7 +373,7 @@ async function listCDPTargets(): Promise<CDPTarget[]> {
 }
 
 // ---------------------------------------------------------------------------
-// chrome-devtools-mcp page list (MCP integer IDs — reset on each restart)
+// chrome-devtools-mcp page list (MCP integer IDs - reset on each restart)
 // ---------------------------------------------------------------------------
 
 function parsePageList(
@@ -438,7 +438,7 @@ function saveSessions(sessions: Map<string, SessionState>): void {
     }
     writeFileSync(SESSIONS_FILE, JSON.stringify(obj, null, 2), "utf-8");
   } catch {
-    // Non-fatal — session will be re-created on next call.
+    // Non-fatal - session will be re-created on next call.
   }
 }
 
@@ -464,7 +464,7 @@ async function findMCPPageForTarget(
     return null;
   }
 
-  // Match by URL — works as long as each tab has a unique URL.
+  // Match by URL - works as long as each tab has a unique URL.
   // For about:blank tabs, match by open count order as fallback.
   const match = mcpPages.find((p) => p.url === target.url);
   return match?.id ?? null;
@@ -570,7 +570,7 @@ async function ensureSession(
       saveSessions(sessions);
       state = undefined;
     } else if (!knownTargetId.startsWith("unknown-")) {
-      // Target is alive — re-resolve MCP integer ID in case chrome-devtools-mcp restarted.
+      // Target is alive - re-resolve MCP integer ID in case chrome-devtools-mcp restarted.
       const mcpId = await findMCPPageForTarget(mcp, knownTargetId, cdpTargets);
       if (mcpId !== null) {
         state.mcpPageId = mcpId;
@@ -711,7 +711,7 @@ export class BrowserRepository {
         const toolSuccess = !resp.error && !mcpResult?.isError;
 
         // Tab-management tools (new_page, select_page, close_page) explicitly
-        // change which page is selected — the session tab should NOT follow.
+        // change which page is selected - the session tab should NOT follow.
         // Only follow an unexpected page switch caused by navigation tools
         // (e.g. clicking a link that opens in a new tab).
         const isTabManagementTool =

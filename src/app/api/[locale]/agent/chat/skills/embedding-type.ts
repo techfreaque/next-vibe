@@ -6,7 +6,7 @@
  */
 
 export interface SkillEmbedding {
-  /** Skill ID — must match the skill's id field */
+  /** Skill ID - must match the skill's id field */
   skillId: string;
   /** SHA-256 of (cortex path + systemPrompt). Written by `vibe gen`. */
   embeddingHash: string;

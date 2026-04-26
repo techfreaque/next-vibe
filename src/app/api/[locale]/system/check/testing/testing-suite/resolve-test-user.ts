@@ -1,6 +1,6 @@
 /**
  * Resolves the real admin user from the database for test infrastructure.
- * Cached after first call — all testEndpoint() suites share the same resolved user.
+ * Cached after first call - all testEndpoint() suites share the same resolved user.
  */
 
 import { eq } from "drizzle-orm";
@@ -33,7 +33,7 @@ export async function resolveTestAdminUser(): Promise<JwtPrivatePayloadType> {
   if (!result.success || !result.data) {
     // oxlint-disable-next-line restricted-syntax
     throw new Error(
-      `Test admin user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+      `Test admin user ${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe seed`,
     );
   }
 
@@ -49,7 +49,7 @@ export async function resolveTestAdminUser(): Promise<JwtPrivatePayloadType> {
   if (!link) {
     // oxlint-disable-next-line restricted-syntax
     throw new Error(
-      `Test admin user ${env.VIBE_ADMIN_USER_EMAIL} has no lead link — run: vibe seed`,
+      `Test admin user ${env.VIBE_ADMIN_USER_EMAIL} has no lead link - run: vibe seed`,
     );
   }
 

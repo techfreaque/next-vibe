@@ -115,7 +115,7 @@ export class SingleFavoriteRepository {
         eq(chatFavorites.userId, userId),
       );
     }
-    // Merged "skillSlug__variantId" format — look up by the skill identity
+    // Merged "skillSlug__variantId" format - look up by the skill identity
     if (isSkillVariantId(favoriteId)) {
       const { skillId, variantId } = parseSkillId(favoriteId);
       return and(
@@ -126,7 +126,7 @@ export class SingleFavoriteRepository {
         eq(chatFavorites.userId, userId),
       );
     }
-    // Plain slug — favorite's own slug
+    // Plain slug - favorite's own slug
     return and(
       eq(chatFavorites.slug, favoriteId),
       eq(chatFavorites.userId, userId),
@@ -382,7 +382,7 @@ export class SingleFavoriteRepository {
         parsedVariantId !== null
           ? parsedVariantId
           : data.skillId !== undefined
-            ? existing.variantId // skillId was provided but no variant part — keep existing variantId
+            ? existing.variantId // skillId was provided but no variant part - keep existing variantId
             : existing.variantId;
       const newCustomVariantName =
         data.customVariantName !== undefined
@@ -486,7 +486,7 @@ export class SingleFavoriteRepository {
         });
       }
 
-      // Emit WS event — push full computed FavoriteCard so all tabs update immediately
+      // Emit WS event - push full computed FavoriteCard so all tabs update immediately
       const emitFavorites = createEndpointEmitter(
         favoritesDefinitions.GET,
         logger,
@@ -581,7 +581,7 @@ export class SingleFavoriteRepository {
 
       const deleted = result[0];
 
-      // Emit WS event — remove from favorites list in all open tabs immediately
+      // Emit WS event - remove from favorites list in all open tabs immediately
       const emitFavorites = createEndpointEmitter(
         favoritesDefinitions.GET,
         logger,

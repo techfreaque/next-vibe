@@ -1,6 +1,6 @@
 /**
  * List Windows CLI Widget
- * CLI: grouped by desktop, aligned columns — window ID, PID, size, title
+ * CLI: grouped by desktop, aligned columns - window ID, PID, size, title
  * MCP: compact one-line-per-window, AI-parseable
  */
 

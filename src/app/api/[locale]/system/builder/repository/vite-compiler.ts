@@ -164,7 +164,7 @@ function serverOnlyTracePlugin(
 
 // Walk the importer graph recursively and invalidate every module that
 // transitively depends on the changed file. Only invalidating the leaf module
-// leaves importers with stale cached references — they never know to re-fetch.
+// leaves importers with stale cached references - they never know to re-fetch.
 function invalidateWithImporters(
   graph: EnvironmentModuleGraph,
   startId: string,
@@ -1613,7 +1613,7 @@ export class ViteCompiler {
             },
             // disableGlobbing tells chokidar to treat [locale] as a literal path,
             // not a glob pattern. This allows native inotify (Linux) / FSEvents (macOS)
-            // instead of polling — faster detection, less CPU, no false mtime positives.
+            // instead of polling - faster detection, less CPU, no false mtime positives.
             // ignored must be a function (not glob strings) for this to work correctly.
             disableGlobbing: true,
           },

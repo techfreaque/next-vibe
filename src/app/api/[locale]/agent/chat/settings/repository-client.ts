@@ -333,7 +333,7 @@ export class ChatSettingsRepositoryClient {
         updates.mamaPrompt !== undefined
           ? updates.mamaPrompt
           : current.mamaPrompt,
-      // Server-computed fields — preserved from current, never written to localStorage
+      // Server-computed fields - preserved from current, never written to localStorage
       dreamerSubFolderId: current.dreamerSubFolderId,
       dreamerThreadCount: current.dreamerThreadCount,
       autopilotSubFolderId: current.autopilotSubFolderId,

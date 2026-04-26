@@ -148,7 +148,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     (s) => s.currentSubFolderId,
   );
 
-  // Read messages from widget context — data flows from EndpointsPage which owns the
+  // Read messages from widget context - data flows from EndpointsPage which owns the
   // useEndpoint instance with initialData. No separate useEndpoint needed here.
   const endpointMutations = useWidgetEndpointMutations();
   const isLoading = endpointMutations?.read?.isLoading ?? false;

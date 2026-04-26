@@ -365,7 +365,7 @@ export {
 } from "./use-widget-value";
 
 // ---------------------------------------------------------------------------
-// CLI surface helpers — safe to call from cli/ui components
+// CLI surface helpers - safe to call from cli/ui components
 // ---------------------------------------------------------------------------
 
 import { isAgentPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";

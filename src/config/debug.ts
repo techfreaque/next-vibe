@@ -5,7 +5,7 @@ export let enableDebugLogger = process.env["NEXT_PUBLIC_VIBE_DEBUG"] === "true";
 export let debugMiddleware = process.env["NEXT_PUBLIC_VIBE_DEBUG"] === "true";
 // set by the mcp server to disable all console output
 export let mcpSilentMode = false;
-// write server logs to file — read process.env at call time so loadEnvironment() can set VIBE_LOG_PATH first
+// write server logs to file - read process.env at call time so loadEnvironment() can set VIBE_LOG_PATH first
 export function isFileLoggingEnabled(): boolean {
   const p = process.env["VIBE_LOG_PATH"];
   return Boolean(p) && p !== "false";

@@ -13,11 +13,11 @@ export const { POST, tools } = endpointsHandler({
       const { materializeAllVirtualMounts, backfillEmbeddings } =
         await import("../backfill");
 
-      // Step 1: Materialize virtual mounts synchronously — fast, just DB upserts
+      // Step 1: Materialize virtual mounts synchronously - fast, just DB upserts
       const materialized = await materializeAllVirtualMounts();
       logger.info("Cortex virtual mounts materialized", { materialized });
 
-      // Step 2: Run embedding backfill in background — rate-limited, takes minutes
+      // Step 2: Run embedding backfill in background - rate-limited, takes minutes
       void backfillEmbeddings(data.force ?? false).then((result) => {
         logger.info("Cortex embedding backfill completed", result);
         return result;

@@ -29,7 +29,7 @@ export const translations: typeof enTranslations = {
       maxWidth: {
         label: "Maks. szerokość",
         description:
-          "Skaluj do tej szerokości jeśli obraz jest szerszy. Przydatne dla AI — zrzuty z 4 monitorów są ogromne.",
+          "Skaluj do tej szerokości jeśli obraz jest szerszy. Przydatne dla AI - zrzuty z 4 monitorów są ogromne.",
         placeholder: "1920",
       },
     },

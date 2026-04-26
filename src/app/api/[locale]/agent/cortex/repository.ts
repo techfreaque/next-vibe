@@ -20,7 +20,7 @@ const MAX_PATH_LENGTH = 1024;
 /** Maximum nesting depth */
 const MAX_DEPTH = 20;
 
-/** Reserved mount prefixes — these paths resolve to existing tables, not cortex_nodes */
+/** Reserved mount prefixes - these paths resolve to existing tables, not cortex_nodes */
 export const VIRTUAL_MOUNTS = [
   "/threads",
   "/skills",
@@ -34,10 +34,10 @@ export const VIRTUAL_MOUNTS = [
 /** Virtual mounts that support write-through (write/edit/delete/move) */
 export const WRITABLE_MOUNTS = ["/skills"] as const;
 
-/** The document workspace prefix — canonical English, stored in cortex_nodes */
+/** The document workspace prefix - canonical English, stored in cortex_nodes */
 export const DOCUMENTS_PREFIX = "/documents";
 
-/** The memories prefix — canonical English, stored in cortex_nodes */
+/** The memories prefix - canonical English, stored in cortex_nodes */
 export const MEMORIES_PREFIX = "/memories";
 
 /** All native writable prefixes (stored in cortex_nodes, not virtual mounts) */
@@ -198,7 +198,7 @@ export function isValidPath(path: string): boolean {
     if (seg.trim().length === 0) {
       return false;
     }
-    // No control characters — intentional use of control char regex
+    // No control characters - intentional use of control char regex
     // eslint-disable-next-line no-control-regex
     if (/[\x00-\x1f\x7f]/.test(seg)) {
       return false;

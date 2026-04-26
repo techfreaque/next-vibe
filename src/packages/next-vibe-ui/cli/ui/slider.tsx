@@ -15,7 +15,7 @@ export type {
   SliderThumbProps,
 } from "../../web/ui/slider";
 
-// CLI: show value range as "min..max" — no drag UI in terminal
+// CLI: show value range as "min..max" - no drag UI in terminal
 export function Slider({ value, min, max }: SliderRootProps): JSX.Element {
   const vals = value ?? [];
   const displayMin = vals[0] ?? min ?? 0;
@@ -31,7 +31,7 @@ export function Slider({ value, min, max }: SliderRootProps): JSX.Element {
 }
 Slider.displayName = "Slider";
 
-// Sub-components are no-ops in CLI — Slider renders the full representation
+// Sub-components are no-ops in CLI - Slider renders the full representation
 export function SliderTrack({ children }: SliderTrackProps): JSX.Element {
   return <>{children}</>;
 }

@@ -21,7 +21,7 @@ function renderChildren(children: React.ReactNode): string {
 /**
  * Link component for CLI/MCP contexts.
  *
- * - MCP: plain text `{children}: {href}` — no decoration, AI-parseable
+ * - MCP: plain text `{children}: {href}` - no decoration, AI-parseable
  * - CLI TTY: terminal hyperlink via terminal-link (OSC 8 sequence) with cyan underline
  * - CLI non-TTY: `{children} ({href})` in cyan
  */
@@ -61,7 +61,7 @@ Link.displayName = "Link";
 
 /**
  * ExternalLink component for CLI/MCP contexts.
- * Identical behaviour to Link — external URLs use a plain string href.
+ * Identical behaviour to Link - external URLs use a plain string href.
  */
 export function ExternalLink({
   children,

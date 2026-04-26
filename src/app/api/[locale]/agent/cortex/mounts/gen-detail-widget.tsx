@@ -1,5 +1,5 @@
 /**
- * Gen Detail Widget — domain enrichment for /gens/ paths
+ * Gen Detail Widget - domain enrichment for /gens/ paths
  *
  * Renders a compact card for AI-generated media files.
  * No single-item endpoint exists; shows path identity only.

@@ -125,7 +125,7 @@ export const translations = {
   sessionJoined: {
     title: "Session Joined Callback",
     description:
-      "Internal callback — notifies initiating instance that a supporter joined.",
+      "Internal callback - notifies initiating instance that a supporter joined.",
     tags: {
       support: "Support",
       callback: "Callback",

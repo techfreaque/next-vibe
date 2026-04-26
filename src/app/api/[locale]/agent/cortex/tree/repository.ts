@@ -146,7 +146,7 @@ export class CortexTreeRepository {
           }
         }
         lines.push(
-          `├── threads/ (${counts.threads.total} threads${threadParts.length > 0 ? ` — ${threadParts.join(", ")}` : ""})`,
+          `├── threads/ (${counts.threads.total} threads${threadParts.length > 0 ? ` - ${threadParts.join(", ")}` : ""})`,
         );
         totalDirs++;
 
@@ -160,7 +160,7 @@ export class CortexTreeRepository {
         lines.push(`└── tasks/ (${counts.tasks})`);
         totalDirs += 3;
       } else {
-        // Check if path is a virtual mount (skills, threads, tasks — NOT memories/documents which are native DB)
+        // Check if path is a virtual mount (skills, threads, tasks - NOT memories/documents which are native DB)
         const virtualMountPrefixes = [
           "/skills",
           "/favorites",

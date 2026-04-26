@@ -1,5 +1,5 @@
 /**
- * CLI NumberInput — text input that parses integers/floats
+ * CLI NumberInput - text input that parses integers/floats
  * Also supports +/- keys to increment/decrement
  */
 import TextInput from "ink-text-input";

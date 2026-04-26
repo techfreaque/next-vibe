@@ -256,12 +256,12 @@ export const translations = {
       clickToExplore: "Click to explore",
       badge: "Small team · Open source · Built in public",
       header: "AI that doesn't tell you what to think.",
-      subheader: "No refusals. No one reads your chats. Your AI — not ours.",
+      subheader: "No refusals. No one reads your chats. Your AI - not ours.",
       chipChat: "Chat",
       chipSelfHost: "Self-host",
       chipBuild: "Build",
       chipEarn: "Earn",
-      introGuide: "Four ways in — pick yours:",
+      introGuide: "Four ways in - pick yours:",
       introOption1: "",
       introOption2: "",
       introOption3: "",
@@ -272,11 +272,11 @@ export const translations = {
       card: {
         chat: {
           label: "Just chat",
-          desc: "Ask anything — including what ChatGPT refuses. No account needed to try.",
+          desc: "Ask anything - including what ChatGPT refuses. No account needed to try.",
         },
         personal: {
           label: "Your own AI",
-          desc: "Runs on your machine. Tell it what you need — it builds around your life, grows with you.",
+          desc: "Runs on your machine. Tell it what you need - it builds around your life, grows with you.",
         },
         nextvibe: {
           label: "Start a business",
@@ -329,7 +329,7 @@ export const translations = {
         titleLine1: "Publish. Refer.",
         titleLine2: "Earn.",
         subtitle:
-          "Referral link: 10% of every payment, forever. Your skill as their entry point: +5% — even when others share it.",
+          "Referral link: 10% of every payment, forever. Your skill as their entry point: +5% - even when others share it.",
         cta: "Start Earning",
         ctaExplore: "Learn More",
       },
@@ -721,7 +721,7 @@ export const translations = {
           bodyPrefix: "Every endpoint is available to AI agents via",
           bodyMiddle1: ". Use",
           bodyMiddle2:
-            "mode for long tasks — the agent suspends and resumes when done. Pass",
+            "mode for long tasks - the agent suspends and resumes when done. Pass",
           bodySuffix: "to run on a remote server.",
         },
         mcpServer: {
@@ -762,23 +762,23 @@ export const translations = {
           headline: "Admin pages write themselves.",
           bodyPrefix: "Set",
           bodyMiddle:
-            "and the endpoint is locked everywhere — API, CLI, MCP, UI. One guard call plus",
+            "and the endpoint is locked everywhere - API, CLI, MCP, UI. One guard call plus",
           bodySuffix:
             "renders the full admin interface. Every admin screen in the platform is built exactly this way.",
         },
         vibeFrame: {
           headline: "Any endpoint. Any website. One script tag.",
-          body: "Drop Vibe Frame onto any existing site — WordPress, Webflow, plain HTML. Declare which endpoint to render and where to mount it. The full form, validation, and submission flow appears inline via a postMessage bridge. No iframes, no CORS issues.",
+          body: "Drop Vibe Frame onto any existing site - WordPress, Webflow, plain HTML. Declare which endpoint to render and where to mount it. The full form, validation, and submission flow appears inline via a postMessage bridge. No iframes, no CORS issues.",
         },
         remoteSkill: {
           headline: "Your API self-documents as an AI skill.",
           bodyPrefix:
-            "Every public endpoint is included in a generated skill manifest that external AI agents fetch and learn from. Two files: one for anonymous users, one for authenticated. Every endpoint opts in by default — add",
+            "Every public endpoint is included in a generated skill manifest that external AI agents fetch and learn from. Two files: one for anonymous users, one for authenticated. Every endpoint opts in by default - add",
           bodySuffix: "to exclude it. No manual API docs to maintain.",
         },
         vibeBoard: {
           headline: "Every endpoint becomes a live dashboard tile.",
-          body: "Vibe Board is the next surface — a drag-and-drop analytics dashboard where any endpoint pins as a tile. The data layer, Vibe Sense, is live today. Define a graph pipeline now and it renders automatically when Vibe Board ships. Same definition, zero extra code.",
+          body: "Vibe Board is the next surface - a drag-and-drop analytics dashboard where any endpoint pins as a tile. The data layer, Vibe Sense, is live today. Define a graph pipeline now and it renders automatically when Vibe Board ships. Same definition, zero extra code.",
         },
       },
     },
@@ -1024,7 +1024,7 @@ export const translations = {
     ctaNextvibe: {
       title: "One definition. Every platform.",
       subtitle:
-        "Web UI, CLI, AI tool, MCP server, mobile screen, cron job — automatically. Fork it. Own it.",
+        "Web UI, CLI, AI tool, MCP server, mobile screen, cron job - automatically. Fork it. Own it.",
       primary: "Read the docs",
       secondary: "Star on GitHub",
     },

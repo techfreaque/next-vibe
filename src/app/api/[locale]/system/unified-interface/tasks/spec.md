@@ -54,7 +54,7 @@ If `routeId` resolves to `unknown`: execution fails with `INVALID_ROUTE_ID` erro
 
 ### System task routes (`task.ts` files)
 
-Each `task.ts` file exports a `CronTask` with a `name` (e.g. `"lead-email-campaigns"`). That name becomes the `routeId` in DB. The executor currently resolves `routeId` only through the endpoint alias map — direct `run()` dispatch by task name is planned but not yet implemented.
+Each `task.ts` file exports a `CronTask` with a `name` (e.g. `"lead-email-campaigns"`). That name becomes the `routeId` in DB. The executor currently resolves `routeId` only through the endpoint alias map - direct `run()` dispatch by task name is planned but not yet implemented.
 
 ### `cron-steps` route (planned)
 

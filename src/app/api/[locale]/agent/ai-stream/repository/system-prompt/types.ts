@@ -41,7 +41,7 @@ export interface SystemPromptServerParams {
   callMode?: boolean;
   /** Extra per-request instructions to append */
   extraInstructions?: string;
-  /** Last user message content — used for vector search context injection */
+  /** Last user message content - used for vector search context injection */
   lastUserMessage?: string;
   /** Resolved memory token limit from cascade: favorite → skill → settings → null (use default) */
   memoryLimit?: number | null;
@@ -88,7 +88,7 @@ export interface SystemPromptClientParams {
   headless?: boolean;
   /** Sub-agent nesting depth (0 = top-level, 1+ = sub-agent) */
   subAgentDepth: number;
-  /** Last user message content — used for vector search context injection (debug panel) */
+  /** Last user message content - used for vector search context injection (debug panel) */
   lastUserMessage?: string;
 }
 

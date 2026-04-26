@@ -161,7 +161,7 @@ export class TaskExecuteRepository {
       emitTaskQueue("task-updated", runningPayload);
     }
 
-    // 5. Resolve execution user context — always the task owner, never the caller
+    // 5. Resolve execution user context - always the task owner, never the caller
     const taskUserContext = await resolveTaskOwnerUser(
       dbUserIdToOwner(task.userId),
       locale,

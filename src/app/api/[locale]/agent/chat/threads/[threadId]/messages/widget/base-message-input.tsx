@@ -153,10 +153,13 @@ export function BaseMessageInput({
           stream={voice.stream}
           hasExistingInput={voice.hasExistingInput}
           existingInputText={content}
+          error={voice.error}
+          hasSavedAudio={voice.hasSavedAudio}
           onCancel={voice.cancelRecording}
           onTogglePause={voice.togglePause}
           onTranscribeToInput={voice.transcribeToInput}
           onSendVoice={() => void voice.submitAudioDirectly()}
+          onRetry={() => void voice.retryTranscription()}
           locale={locale}
         />
 

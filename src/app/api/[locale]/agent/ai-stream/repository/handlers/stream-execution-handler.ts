@@ -202,7 +202,7 @@ export class StreamExecutionHandler {
               )(),
             ],
             // Refresh cortex context (trailing system message) before each tool loop step.
-            // The AI SDK captures messages once — prepareStep is the official hook to override
+            // The AI SDK captures messages once - prepareStep is the official hook to override
             // the message list per-step. We rebuild the embedding query from accumulated
             // conversation context and replace the trailing system message with fresh results.
             prepareStep: params.systemPromptParams

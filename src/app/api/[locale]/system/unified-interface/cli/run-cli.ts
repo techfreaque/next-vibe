@@ -8,7 +8,7 @@
 import { Command } from "commander";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-// environment must be imported BEFORE @/config/constants — it sets NODE_ENV=production
+// environment must be imported BEFORE @/config/constants - it sets NODE_ENV=production
 // at module load time for preview mode (vibe start/build/rebuild), and constants.ts
 // reads NODE_ENV to compute cookie name suffixes.
 import { type EnvironmentResult, loadEnvironment } from "./runtime/environment";

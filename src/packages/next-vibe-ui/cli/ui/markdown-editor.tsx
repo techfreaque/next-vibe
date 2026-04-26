@@ -13,7 +13,7 @@ export type {
 } from "../../web/ui/markdown-editor";
 
 // MarkdownEditor in CLI: show the current markdown value as plain text.
-// No WYSIWYG editing — the terminal can't render a rich text editor.
+// No WYSIWYG editing - the terminal can't render a rich text editor.
 // In MCP: return null (editors are interactive UI, not useful for AI).
 export function MarkdownEditor({
   value,

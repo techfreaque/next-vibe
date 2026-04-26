@@ -355,7 +355,7 @@ export interface VirtualSearchHit {
 }
 
 /**
- * Direct keyword search across uploads — one DB query, no file-by-file reads.
+ * Direct keyword search across uploads - one DB query, no file-by-file reads.
  * Matches against filename and user message context.
  */
 export async function searchUploads(

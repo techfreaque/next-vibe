@@ -1,5 +1,5 @@
 /**
- * Skill Detail Widget — domain enrichment for /skills/ paths
+ * Skill Detail Widget - domain enrichment for /skills/ paths
  *
  * Renders the actual skill view widget using EndpointsPage,
  * so the full skill detail appears below the Cortex file content.

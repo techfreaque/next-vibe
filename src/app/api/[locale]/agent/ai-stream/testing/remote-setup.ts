@@ -111,7 +111,7 @@ export async function resolveProdUserId(): Promise<string> {
 
 /**
  * Ensure the prod (hermes) admin user has at least `minCredits` permanent credits.
- * Used by direct-mode tests that send tool calls to hermes (3001) directly — hermes
+ * Used by direct-mode tests that send tool calls to hermes (3001) directly - hermes
  * checks credits in its own DB, so we must top up there, not in the local DB.
  *
  * Credits live in credit_packs (not just credit_wallets.balance), so we insert a
@@ -1059,7 +1059,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
 
   // Interactive terminal pending: coding-agent spawned a real terminal, but in tests
   // there is no real terminal. Re-run the same handler with interactiveMode=false to
-  // get the real batch output — so the result is identical to batch mode.
+  // get the real batch output - so the result is identical to batch mode.
   const isTerminalPending =
     taskOutput &&
     typeof taskOutput === "object" &&

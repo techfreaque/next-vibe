@@ -25,7 +25,7 @@ export type {
   CommandShortcutProps,
 } from "../../web/ui/command";
 
-// CLI: passthrough wrappers — command UI has no terminal equivalent
+// CLI: passthrough wrappers - command UI has no terminal equivalent
 // but child content (items, groups) should still render
 
 export function Command({ children }: CommandProps): JSX.Element {
@@ -70,7 +70,7 @@ export function CommandGroup({
 }
 CommandGroup.displayName = "CommandGroup";
 
-// CommandSeparator has no visual equivalent in terminal — omit all props
+// CommandSeparator has no visual equivalent in terminal - omit all props
 export function CommandSeparator(): null {
   return null;
 }

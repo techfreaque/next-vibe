@@ -592,7 +592,7 @@ export class ChatFavoritesRepositoryClient {
   /**
    * Store the last UUID skillId (+ display name) a public user favorited.
    * Used on the signup page to pre-select the creator to support.
-   * "Last wins" — each new UUID-skill add overwrites.
+   * "Last wins" - each new UUID-skill add overwrites.
    */
   static setLastAttributedSkillId(skillId: string, name?: string | null): void {
     if (typeof window === "undefined") {

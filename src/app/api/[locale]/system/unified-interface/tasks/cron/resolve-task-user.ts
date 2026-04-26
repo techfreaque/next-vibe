@@ -35,7 +35,7 @@ export interface TaskUserContext {
  * Resolve the execution user context for a task based on its owner.
  *
  * Returns null if the user cannot be resolved (admin email missing,
- * user not found, or role fetch failed) — callers must treat this as
+ * user not found, or role fetch failed) - callers must treat this as
  * a hard failure and abort task execution.
  */
 export async function resolveTaskOwnerUser(
@@ -52,7 +52,7 @@ export async function resolveTaskOwnerUser(
     const adminEmail = env.VIBE_ADMIN_USER_EMAIL;
     if (!adminEmail) {
       logger.error(
-        "[resolveTaskOwnerUser] VIBE_ADMIN_USER_EMAIL not set — cannot resolve system task user",
+        "[resolveTaskOwnerUser] VIBE_ADMIN_USER_EMAIL not set - cannot resolve system task user",
       );
       return null;
     }
@@ -70,7 +70,7 @@ export async function resolveTaskOwnerUser(
     return { user: authResult.data, locale: systemLocale };
   }
 
-  // User task — resolve real locale, roles, and leadId from DB
+  // User task - resolve real locale, roles, and leadId from DB
   let userLocale: CountryLanguage = systemLocale;
   const ownerRow = await db
     .select({ locale: usersTable.locale })

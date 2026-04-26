@@ -51,7 +51,7 @@ export const translations = {
       },
       conflict: {
         title: "Nicht leer",
-        description: "Ordner ist nicht leer — Mit Inhalt aktivieren",
+        description: "Ordner ist nicht leer - Mit Inhalt aktivieren",
       },
     },
     success: {

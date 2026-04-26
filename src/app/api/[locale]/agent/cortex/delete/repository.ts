@@ -60,7 +60,7 @@ export class CortexDeleteRepository {
     }
 
     // Filesystem backend for preview-mode admin
-    // Skip for virtual writable mounts — they go through mount handlers → DB → disk write-through
+    // Skip for virtual writable mounts - they go through mount handlers → DB → disk write-through
     if (!user.isPublic && !isVirtualWritable(path)) {
       const { isFilesystemMode } = await import("../fs-provider");
       if (isFilesystemMode(user)) {
@@ -69,7 +69,7 @@ export class CortexDeleteRepository {
       }
     }
 
-    // Virtual writable mount — delegate to mount handler
+    // Virtual writable mount - delegate to mount handler
     if (isVirtualWritable(path)) {
       const mountPrefix = getMountPrefix(path, locale);
       if (!mountPrefix) {

@@ -656,7 +656,7 @@ export class MessageDbWriter {
    * Emit THREAD_TITLE_UPDATED SSE so the sidebar immediately shows the new title.
    */
   emitThreadTitleUpdated(params: { threadId: string; title: string }): void {
-    // Title lives on the thread, not on messages — route directly to sidebar channels.
+    // Title lives on the thread, not on messages - route directly to sidebar channels.
     this.emitTitle?.(params.threadId, params.title);
   }
 
@@ -1436,7 +1436,7 @@ export class MessageDbWriter {
   /**
    * Sync a tool result (web search, gen) to cortex_nodes for vector search.
    * Called fire-and-forget from the tool result handler.
-   * Queries the message directly by ID — no list traversal.
+   * Queries the message directly by ID - no list traversal.
    */
   async syncToolResultEmbedding(
     userId: string,
@@ -1463,7 +1463,7 @@ export class MessageDbWriter {
       return;
     }
 
-    // Load the message row directly — no list traversal
+    // Load the message row directly - no list traversal
     const [row] = await db
       .select({
         id: chatMessages.id,
@@ -1542,7 +1542,7 @@ export class MessageDbWriter {
   /**
    * Sync a file upload to cortex_nodes for vector search.
    * Called fire-and-forget from FileUploadEventHandler after upload completes.
-   * Queries the message directly by ID — no list traversal.
+   * Queries the message directly by ID - no list traversal.
    */
   async syncUploadEmbedding(
     userId: string,

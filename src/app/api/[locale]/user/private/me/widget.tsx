@@ -204,7 +204,7 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
     );
   }, [profile]);
 
-  // Skills list context — reuse the real components from skills/widget.tsx
+  // Skills list context - reuse the real components from skills/widget.tsx
   const { push: navigate } = useWidgetNavigation();
   const isTouch = useTouchDevice();
   const skillsT = skillsScopedTranslation.scopedT(locale).t;

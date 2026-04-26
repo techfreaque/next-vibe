@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   title: "Korteks",
   backToChat: "Wróć do czatu",
   description:
-    "Trwała pamięć twojej AI. Pliki, dokumenty, wątki, umiejętności — przeglądaj, edytuj, usuwaj.",
+    "Trwała pamięć twojej AI. Pliki, dokumenty, wątki, umiejętności - przeglądaj, edytuj, usuwaj.",
   openFullPage: "Otwórz pełną stronę",
   modal: {
     title: "Korteks",

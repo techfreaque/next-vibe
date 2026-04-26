@@ -203,9 +203,9 @@ export function useEndpoint<
   const read = useEndpointRead(readEndpoint, logger, user, readOptions);
 
   // Subscribe to definition-driven WS events for the GET endpoint.
-  // read?.cacheKey is the same key useEndpointRead built — guaranteed to match.
+  // read?.cacheKey is the same key useEndpointRead built - guaranteed to match.
   // read.form.getValues() provides the current request data (e.g. rootFolderId)
-  // to onEvent callbacks via requestDataRef — no re-subscription on form changes.
+  // to onEvent callbacks via requestDataRef - no re-subscription on form changes.
   useEndpointSubscription(
     readEndpoint,
     options?.subscribeToEvents ?? false,

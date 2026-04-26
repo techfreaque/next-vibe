@@ -1,5 +1,5 @@
 /**
- * CLI DatePicker — text input accepting YYYY-MM-DD format
+ * CLI DatePicker - text input accepting YYYY-MM-DD format
  */
 import TextInput from "ink-text-input";
 import { Box, Text } from "ink";

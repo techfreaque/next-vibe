@@ -1,5 +1,5 @@
 /**
- * Filesystem Populate — lazy export of DB data to disk on first access
+ * Filesystem Populate - lazy export of DB data to disk on first access
  *
  * Only /memories and /documents are filesystem-backed (NATIVE_WRITABLE_PREFIXES).
  * All other mounts (threads, skills, tasks, uploads, searches, gens) are virtual-only
@@ -18,8 +18,8 @@ import { DATA_ROOT } from ".";
 
 /**
  * Ensure a native mount directory exists and has been populated from DB.
- * Only works for /memories and /documents — virtual mounts are skipped.
- * Idempotent — checks for `.populated` marker file.
+ * Only works for /memories and /documents - virtual mounts are skipped.
+ * Idempotent - checks for `.populated` marker file.
  */
 export async function ensureMountPopulated(
   mountPrefix: string,
@@ -45,7 +45,7 @@ export async function ensureMountPopulated(
     await stat(markerPath);
     return; // Already populated
   } catch {
-    // Not yet populated — continue
+    // Not yet populated - continue
   }
 
   // Create the mount directory
@@ -88,7 +88,7 @@ export async function ensureMountPopulated(
       `Cortex fs-populate: failed for ${mountPrefix}`,
       parseError(error),
     );
-    // Don't fail — the directory exists, just wasn't fully populated
+    // Don't fail - the directory exists, just wasn't fully populated
   }
 
   // Write marker

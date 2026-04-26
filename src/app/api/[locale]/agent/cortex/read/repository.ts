@@ -73,7 +73,7 @@ export class CortexReadRepository {
       const { isFilesystemMode } = await import("../fs-provider");
       if (isFilesystemMode(user)) {
         const mountPrefix = getMountPrefix(path, locale);
-        // Virtual mounts are not on disk — delegate to virtual resolver inline
+        // Virtual mounts are not on disk - delegate to virtual resolver inline
         if (mountPrefix && !isWritablePath(path, locale)) {
           return CortexReadRepository.readVirtualMount(
             userId,
@@ -84,7 +84,7 @@ export class CortexReadRepository {
             t,
           );
         }
-        // Native paths (memories, documents) — use filesystem
+        // Native paths (memories, documents) - use filesystem
         if (mountPrefix) {
           const { ensureMountPopulated } =
             await import("../fs-provider/fs-populate");
@@ -95,11 +95,11 @@ export class CortexReadRepository {
         if (fsResult.success) {
           return fsResult;
         }
-        // Non-NOT_FOUND error (e.g. FORBIDDEN, INTERNAL) — return immediately
+        // Non-NOT_FOUND error (e.g. FORBIDDEN, INTERNAL) - return immediately
         if (fsResult.errorType !== ErrorResponseTypes.NOT_FOUND) {
           return fsResult;
         }
-        // NOT_FOUND on disk — check virtual templates (memories/documents only)
+        // NOT_FOUND on disk - check virtual templates (memories/documents only)
         const { getAllTemplates } = await import("../seeds/templates");
         if (path.startsWith("/memories/")) {
           const templates = getAllTemplates(locale);
@@ -142,7 +142,7 @@ export class CortexReadRepository {
 
     const mountPrefix = getMountPrefix(path, locale);
 
-    // Virtual mount reads — delegate to mount resolvers
+    // Virtual mount reads - delegate to mount resolvers
     if (mountPrefix && !isWritablePath(path, locale)) {
       return CortexReadRepository.readVirtualMount(
         userId,
@@ -247,7 +247,7 @@ export class CortexReadRepository {
       const result = await resolveVirtualRead(userId, path, mountPrefix);
 
       if (!result) {
-        // Path may be a directory in the virtual mount — render a listing summary
+        // Path may be a directory in the virtual mount - render a listing summary
         const { resolveVirtualList } = await import("../mounts/resolver");
         const entries = await resolveVirtualList(userId, path, mountPrefix);
         // Treat as a dir if it has entries OR if it's a known dir path (mount root or subdir)

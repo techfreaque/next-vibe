@@ -1026,7 +1026,7 @@ export function FavoritesListContainer({
 
   return (
     <Div className="flex flex-col gap-0">
-      {/* Tab bar: My Favorites | Settings gear — hidden when embedded */}
+      {/* Tab bar: My Favorites | Settings gear - hidden when embedded */}
       {!hideChrome && (
         <Div className="flex border-b border-border shrink-0">
           <Div className="flex-1 flex items-center justify-center gap-1.5 h-10 text-sm font-medium border-b-2 border-primary text-primary">

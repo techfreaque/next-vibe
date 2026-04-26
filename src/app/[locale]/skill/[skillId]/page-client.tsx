@@ -56,11 +56,11 @@ export interface SkillLandingPageProps {
   appName: string;
   resolvedModels: ResolvedSkillModels;
   leadMagnetConfig: LeadMagnetConfigData | null;
-  /** Full skill GET response pre-fetched server-side — seeds React Query cache */
+  /** Full skill GET response pre-fetched server-side - seeds React Query cache */
   skillData: SkillGetResponseOutput | null;
 }
 
-// ─── page (minimal shell — widget handles nav, hero, CTA, footer) ───────────
+// ─── page (minimal shell - widget handles nav, hero, CTA, footer) ───────────
 
 export function SkillLandingPage({
   locale,

@@ -22,7 +22,7 @@ export const translations = {
     heroSub: "Cyklicznie. Wiecznie.",
     chainTitle: "10 subskrybentów. Co zarabiasz miesięcznie.",
     chainSubtitle:
-      "Każdy poziom to połowa wyższego. Zbudowany raz przy rejestracji — płaci wiecznie.",
+      "Każdy poziom to połowa wyższego. Zbudowany raz przy rejestracji - płaci wiecznie.",
     youLabel: "Ty",
     whoLabels: [
       "Ty - ktokolwiek polecił ich bezpośrednio",
@@ -62,7 +62,7 @@ export const translations = {
   story: {
     title: "Jak łańcuch się mnoży",
     subtitle:
-      "Te same 10 subskrybentów. Każdy aktywowany poziom dodaje się do sumy — wiecznie.",
+      "Te same 10 subskrybentów. Każdy aktywowany poziom dodaje się do sumy - wiecznie.",
     totalLabel: "Łącznie / mies.",
     addedLabel: "+{{amount}} z tego poziomu",
     levelLabel: "Poziom {{n}} aktywny",
@@ -169,11 +169,11 @@ export const translations = {
   },
   audienceCallout: {
     title: "Dwa sposoby zarabiania",
-    newTitle: "Link polecający — {{directPct}} na użytkownika",
+    newTitle: "Link polecający - {{directPct}} na użytkownika",
     newBody:
       "Udostępnij kod. Każdy, kto się przez niego zarejestruje i płaci, daje Ci {{directPct}} każdej płatności, co miesiąc, wiecznie. Wrzucasz raz. Zarabiasz zawsze.",
     newCta: "Zdobądź swój link polecający",
-    proTitle: "Link do skilla — {{skillPct}} na użytkownika",
+    proTitle: "Link do skilla - {{skillPct}} na użytkownika",
     proBody:
       "Zbuduj skill. Udostępnij link. Każdy, kto przez niego wejdzie, płaci Ci {{directPct}} bezpośrednio + {{skillBonusPct}} bonus za skill = {{skillPct}} od użytkownika, cyklicznie. Co więcej: {{skillBonusPct}} należy do Ciebie jako autora skilla, nawet gdy ktoś inny go udostępnia. Platforma śledzi autorstwo skilla - pasywna atrybucja bez dodatkowego wysiłku.",
     proCta: "Zbuduj skill",

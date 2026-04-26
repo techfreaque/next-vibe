@@ -394,7 +394,7 @@ const { GET } = createEndpoint({
   }),
 
   events: {
-    // Partial task update — merge only changes into matching task by id.
+    // Partial task update - merge only changes into matching task by id.
     // Fields listed here are the minimum required by the type system; extra
     // fields present on the payload are passed through by applyPartialToCache.
     "task-updated": {

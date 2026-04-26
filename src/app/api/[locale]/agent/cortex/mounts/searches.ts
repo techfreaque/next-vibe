@@ -59,7 +59,7 @@ function toMonthFolder(date: Date): string {
 }
 
 /**
- * Search tool names — covers all variants used across providers and API versions
+ * Search tool names - covers all variants used across providers and API versions
  */
 const SEARCH_TOOL_NAMES = [
   "web-search",
@@ -209,7 +209,7 @@ export async function readSearchPath(
       const snippet = truncateContent(result.snippet, 200);
       const meta = [result.source, result.age].filter(Boolean).join(" · ");
       contentLines.push(
-        `${i + 1}. **[${result.title}](${result.url})**${meta ? ` — ${meta}` : ""}`,
+        `${i + 1}. **[${result.title}](${result.url})**${meta ? ` - ${meta}` : ""}`,
         `   ${snippet}`,
         "",
       );
@@ -293,7 +293,7 @@ export interface VirtualSearchHit {
 }
 
 /**
- * Direct keyword search across web search results — one DB query, no file-by-file reads.
+ * Direct keyword search across web search results - one DB query, no file-by-file reads.
  */
 export async function searchSearches(
   userId: string,

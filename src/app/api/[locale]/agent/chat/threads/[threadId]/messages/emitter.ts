@@ -14,7 +14,7 @@
  * folder-contents caches auto-update. These low-frequency events are sent directly
  * (not through the batching emitter) so they flush immediately.
  *
- * thread-title-updated is sidebar-only — use emitThreadTitleUpdated() directly,
+ * thread-title-updated is sidebar-only - use emitThreadTitleUpdated() directly,
  * NOT through MessagesWsEmit (title lives on the thread, not on messages).
  */
 
@@ -42,7 +42,7 @@ export type WsEmitCallback = MessagesWsEmit & {
 
 /**
  * Emit thread-title-updated directly to sidebar channels.
- * Title lives on the thread, not on messages — do NOT use MessagesWsEmit for this.
+ * Title lives on the thread, not on messages - do NOT use MessagesWsEmit for this.
  */
 export function emitThreadTitleUpdated(
   threadId: string,
@@ -135,7 +135,7 @@ export function createMessagesEmitter(
       const finalStreamingState =
         typedPayload?.streamingState === "waiting" ? "waiting" : "idle";
 
-      // Build thread update — include preview + updatedAt if available so sidebar
+      // Build thread update - include preview + updatedAt if available so sidebar
       // shows the final AI response without a separate round-trip.
       const threadUpdate: {
         id: string;

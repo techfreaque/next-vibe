@@ -1,5 +1,5 @@
 /**
- * CLI Select — interactive keyboard navigation
+ * CLI Select - interactive keyboard navigation
  * Items are collected via SelectItem children, Select manages state
  */
 import { Box, Text, useInput } from "ink";
@@ -73,7 +73,7 @@ const ARROW = "\u25B6";
 const SPACE = "\u0020";
 const CHECK = "\u2713";
 const BLANK = "\u0020";
-// Terminal-only hint strings — not user-facing i18n content
+// Terminal-only hint strings - not user-facing i18n content
 const HINT_NAV = "\u2191\u2193 navigate, Enter select, Esc cancel";
 const SEPARATOR_LINE =
   "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500";

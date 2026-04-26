@@ -182,7 +182,7 @@ export function RecordingInputArea({
           </Div>
         </Div>
       ) : error ? (
-        // Error state — show message and retry/cancel buttons
+        // Error state - show message and retry/cancel buttons
         <Div className="flex flex-col items-center gap-3 py-2">
           <Span className="text-sm text-destructive text-center">{error}</Span>
           <Div className="flex items-center gap-2">

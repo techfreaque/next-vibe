@@ -24,7 +24,7 @@ next-vibe-ui/ui/X
   → web/ui/X.tsx      (tsconfig default, Next.js prod)
 ```
 
-Almost everything just works — React, React Query, React Hook Form, Zustand, all pure JS. The only seams are a handful of browser-specific APIs abstracted into targeted utils.
+Almost everything just works - React, React Query, React Hook Form, Zustand, all pure JS. The only seams are a handful of browser-specific APIs abstracted into targeted utils.
 
 ---
 
@@ -42,7 +42,7 @@ Key-value persistence.
 
 ### `next-vibe-ui/lib/fetch`
 
-API call interceptor — the core seam between web and CLI.
+API call interceptor - the core seam between web and CLI.
 
 - Web: normal `fetch("/api/...")`
 - CLI local: calls repository function directly, user from CLI session
@@ -69,11 +69,11 @@ Fire-and-forget notifications.
 
 `useEndpoint()` reads a mode flag injected by the CLI runner:
 
-**Local mode (default):** No HTTP server needed. The query function calls the route handler's repository directly — same args, same `ResponseType<T>`. The CLI user object is passed directly into the repository call.
+**Local mode (default):** No HTTP server needed. The query function calls the route handler's repository directly - same args, same `ResponseType<T>`. The CLI user object is passed directly into the repository call.
 
 **Remote mode (`--remote`):** Normal HTTP fetch. Auth via stored leadId + session token injected as cookies, matching the user's saved remote connection.
 
-React Query handles both identically — it awaits whatever the query function returns.
+React Query handles both identically - it awaits whatever the query function returns.
 
 ---
 
@@ -87,38 +87,38 @@ Bun plugin (`cli-widget-plugin.ts`) intercepts `next-vibe-ui/*` → checks `cli/
 
 No-op CLI components log once in dev: `[CLI] <ComponentName> not rendered`. Surfaces gaps without crashing. Muting is opt-in per component once confirmed intentional.
 
-### Tier 1 — Core layout
+### Tier 1 - Core layout
 
 `Div`, `Section`, `Main`, `Nav`, `Container`, `Span`, `Strong`, `P`, `H1-H4`, `Hr`, `Separator`, `Br`, `Badge`, `Button`, `Link`
 
-### Tier 2 — Data display
+### Tier 2 - Data display
 
 `Card`, `Alert`, `Progress`, `Tabs`, `Accordion`, `Collapsible`, `Pagination`, `Breadcrumb`, `ol`, `ul`, `li`, `Table`, `tbody`, `tr`, `td`, `DataTable`
 
-### Tier 3 — Forms
+### Tier 3 - Forms
 
 `Input`, `Textarea`, `Label`, `Checkbox`, `Select`, `Switch`, `Form`, `FormAlert`, `FormSection`, `EndpointFormField`
 
-### Tier 4 — No-ops
+### Tier 4 - No-ops
 
 Components with no meaningful CLI equivalent render their children or nothing:
 `Dialog`, `Sheet`, `Drawer`, `Popover`, `HoverCard`, `Tooltip`, `AlertDialog`, `ContextMenu`, `DropdownMenu`, `Menubar`, `NavigationMenu`, `Carousel`, `Resizable`, `ScrollArea`, `Motion`, `Skeleton`, `ThemeProvider`, `Sonner`, `Toaster`, `Toast`, `Sidebar`, `PageLayout`, `Iframe`, `Audio`, `Video`, `Chart`, `AudioWaveform`
 
-### Tier 5 — Icons
+### Tier 5 - Icons
 
-`cli/ui/icons/` — unicode/emoji symbol map. Common mappings: `✓ ✗ ★ ⚠ ℹ →`
+`cli/ui/icons/` - unicode/emoji symbol map. Common mappings: `✓ ✗ ★ ⚠ ℹ →`
 
 ---
 
 ## Tailwind → Ink Translation
 
-`cli/utils/tailwind-to-ink.ts` — `parseClassesToInkProps(className)` maps Tailwind class strings to Ink `<Box>` and `<Text>` props. This is the foundation all CLI components build on.
+`cli/utils/tailwind-to-ink.ts` - `parseClassesToInkProps(className)` maps Tailwind class strings to Ink `<Box>` and `<Text>` props. This is the foundation all CLI components build on.
 
 ---
 
 ## MCP Mode
 
-MCP consumers are AI agents — output must be clean parseable plain text, no ANSI codes, no decoration.
+MCP consumers are AI agents - output must be clean parseable plain text, no ANSI codes, no decoration.
 
 Every CLI component checks `useIsMcp()` from `cli/hooks/use-cli-platform.ts` and strips decoration internally. App code never checks platform directly.
 

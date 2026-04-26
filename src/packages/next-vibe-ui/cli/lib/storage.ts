@@ -1,5 +1,5 @@
 /**
- * CLI storage implementation — file-backed, one file per key.
+ * CLI storage implementation - file-backed, one file per key.
  * Stored at ./.tmp/storage/<key>.json relative to cwd.
  */
 

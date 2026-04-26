@@ -67,7 +67,7 @@ export class CortexMoveRepository {
     }
 
     // Filesystem backend for preview-mode admin
-    // Skip for virtual writable mounts — they go through mount handlers → DB → disk write-through
+    // Skip for virtual writable mounts - they go through mount handlers → DB → disk write-through
     if (!user.isPublic && !isVirtualWritable(from) && !isVirtualWritable(to)) {
       const { isFilesystemMode } = await import("../fs-provider");
       if (isFilesystemMode(user)) {
@@ -76,7 +76,7 @@ export class CortexMoveRepository {
       }
     }
 
-    // Virtual writable mount — both paths must share the same mount
+    // Virtual writable mount - both paths must share the same mount
     const fromMount = getMountPrefix(from, locale);
     const toMount = getMountPrefix(to, locale);
     if (isVirtualWritable(from) || isVirtualWritable(to)) {
@@ -185,7 +185,7 @@ export class CortexMoveRepository {
       try {
         const { deleteFromDisk } = await import("../fs-provider/fs-sync");
         await deleteFromDisk(from);
-        // For the new path, we'd need to read the content back — the DB already has it.
+        // For the new path, we'd need to read the content back - the DB already has it.
         // The next fs-populate cycle or explicit read will sync it. For single file moves,
         // read the node at the new path and sync.
         const movedNode = await getNode(userId, to);
@@ -197,7 +197,7 @@ export class CortexMoveRepository {
         // Best-effort
       }
 
-      // Re-queue embedding for the moved node — path changed so embedding text changed
+      // Re-queue embedding for the moved node - path changed so embedding text changed
       try {
         const movedFile = await getNode(userId, to);
         if (

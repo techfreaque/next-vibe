@@ -215,7 +215,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      // === SUPPORTED SKILL (hidden — set from localStorage last-attributed UUID skill) ===
+      // === SUPPORTED SKILL (hidden - set from localStorage last-attributed UUID skill) ===
       supportedSkillId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -224,7 +224,7 @@ const { POST } = createEndpoint({
         schema: z.string().uuid().optional(),
       }),
 
-      // === LOCAL FAVORITES (hidden — migrated from localStorage on signup) ===
+      // === LOCAL FAVORITES (hidden - migrated from localStorage on signup) ===
       localFavorites: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,

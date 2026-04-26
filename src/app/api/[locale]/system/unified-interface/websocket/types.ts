@@ -97,7 +97,7 @@ export type WsClientMessage = WsSubscribeMessage | WsUnsubscribeMessage;
 /**
  * Extract the identity key for matching WS connections.
  * userId takes priority; leadId is the fallback for anonymous users.
- * Single source of truth for the matching logic — never inline this elsewhere.
+ * Single source of truth for the matching logic - never inline this elsewhere.
  */
 export function wsIdentityKey(user: JwtPayloadType): string {
   return user.isPublic ? user.leadId : user.id;

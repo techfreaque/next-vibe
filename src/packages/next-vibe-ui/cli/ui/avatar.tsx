@@ -22,13 +22,13 @@ function getInitials(text: string): string {
     .slice(0, 2);
 }
 
-// Avatar renders as [initials] in CLI — children handled by AvatarFallback
+// Avatar renders as [initials] in CLI - children handled by AvatarFallback
 export function Avatar({ children }: AvatarRootProps): JSX.Element {
   return <>{children}</>;
 }
 Avatar.displayName = "Avatar";
 
-// AvatarImage is a no-op in CLI — terminal cannot display images
+// AvatarImage is a no-op in CLI - terminal cannot display images
 export function AvatarImage(): null {
   return null;
 }

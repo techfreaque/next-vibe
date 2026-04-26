@@ -38,7 +38,7 @@ export class DatabaseMigrationRepository {
         `🔄 ${formatActionCommand("Running migrations using:", "bunx drizzle-kit migrate")}`,
       );
 
-      // Use the same bun binary that is running this process — works in Docker (/usr/local/bin/bun)
+      // Use the same bun binary that is running this process - works in Docker (/usr/local/bin/bun)
       // and locally (~/.bun/bin/bun) without depending on PATH.
       const result = spawnSync(
         process.execPath,

@@ -51,7 +51,7 @@ export function CortexReadWidget({
 
   return (
     <Div className="flex flex-col gap-4">
-      {/* Top nav — always shown, back + context actions when we have a path */}
+      {/* Top nav - always shown, back + context actions when we have a path */}
       <CortexNav
         path={value?.responsePath}
         actions={value ? ["list", "edit", "write", "move", "delete"] : ["list"]}
@@ -68,7 +68,7 @@ export function CortexReadWidget({
         }
       />
 
-      {/* Form — only show when not opened via navigation push */}
+      {/* Form - only show when not opened via navigation push */}
       {!isDisabled && !isPushed && (
         <Div className="flex flex-col gap-3 px-4">
           <TextFieldWidget fieldName="path" field={children.path} />
@@ -128,7 +128,7 @@ export function CortexReadWidget({
             </Div>
           </Div>
 
-          {/* Content — rendered as Markdown */}
+          {/* Content - rendered as Markdown */}
           <Div className="prose prose-sm dark:prose-invert max-w-none rounded-lg border bg-muted/20 p-4 overflow-auto max-h-[600px]">
             <Markdown content={value.content} />
           </Div>

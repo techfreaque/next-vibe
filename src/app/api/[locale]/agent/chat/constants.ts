@@ -41,7 +41,7 @@ export const STORAGE_KEYS = {
   ONBOARDING_COMPLETED: "chat-onboarding-completed",
   SELECTOR_ONBOARDING_COMPLETED: "chat-selector-onboarding-v2",
   COMPANION_CHOICE: "chat-companion-choice",
-  /** Last UUID skillId that a public user favorited — used for signup attribution */
+  /** Last UUID skillId that a public user favorited - used for signup attribution */
   LAST_ATTRIBUTED_SKILL: "chat-last-attributed-skill",
 } as const;
 
@@ -71,7 +71,7 @@ export const DEFAULT_TOOL_IDS_PUBLIC = [
 
 /**
  * Default AI tools for customer (authenticated non-admin) users.
- * Only essential cortex tools are pinned — rest discoverable via tool-help.
+ * Only essential cortex tools are pinned - rest discoverable via tool-help.
  */
 export const DEFAULT_TOOL_IDS_CUSTOMER = [
   TOOL_HELP_ALIAS,
@@ -91,7 +91,7 @@ export const DEFAULT_TOOL_IDS_CUSTOMER = [
 
 /**
  * Default AI tools for admin users.
- * Only essential cortex tools are pinned — rest discoverable via tool-help.
+ * Only essential cortex tools are pinned - rest discoverable via tool-help.
  */
 export const DEFAULT_TOOL_IDS_ADMIN = [
   TOOL_HELP_ALIAS,

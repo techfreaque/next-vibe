@@ -161,7 +161,7 @@ async function loadFavoriteOnce(
     });
   }
 
-  // 3. No favorite available — downstream cascade resolves skill → system defaults
+  // 3. No favorite available - downstream cascade resolves skill → system defaults
   return null;
 }
 
@@ -216,7 +216,7 @@ async function buildInitialEmbeddingQuery(
 
   // Server threads: walk up parent chain via PK lookups
   if (!parentMessageId) {
-    return ""; // New conversation — no prior context
+    return ""; // New conversation - no prior context
   }
 
   const results: Array<{
@@ -339,10 +339,10 @@ export interface StreamSetupResult {
   skipAiTurn?: boolean;
   /** Resolved bridge models for STT, TTS, vision, and translation */
   bridgeContext: BridgeContext;
-  /** Params used to build the system prompt — stored for compacting refresh */
+  /** Params used to build the system prompt - stored for compacting refresh */
   systemPromptParams: SystemPromptParams;
   // resolvedFavoriteConfig lives inside streamContext.resolvedFavoriteConfig
-  // — no top-level duplicate needed.
+  // - no top-level duplicate needed.
 }
 
 export async function setupAiStream(params: {
@@ -757,7 +757,7 @@ export async function setupAiStream(params: {
   });
 
   // Resolve tool config cascade: favorite → skill → null (all allowed)
-  // Uses resolvedFavoriteConfig loaded once above — no additional DB queries for favorites.
+  // Uses resolvedFavoriteConfig loaded once above - no additional DB queries for favorites.
   const resolvedToolConfig = await (async (): Promise<{
     availableTools: Array<{
       toolId: string;
@@ -912,7 +912,7 @@ export async function setupAiStream(params: {
   }
 
   // Resolve bridge models via cascade: skill variant → favorite → system default
-  // Uses resolvedFavoriteConfig loaded once above — no additional DB queries for favorites.
+  // Uses resolvedFavoriteConfig loaded once above - no additional DB queries for favorites.
   const bridgeContext = await (async (): Promise<BridgeContext> => {
     let skillConfig: BridgeContext["skill"] = null;
     // FavoriteConfig is structurally compatible with BridgeFavorite
@@ -1147,7 +1147,7 @@ export async function setupAiStream(params: {
     headless: params.headless,
     subAgentDepth: params.subAgentDepth,
     isRevival: params.isRevival,
-    // favoriteId: from headless override OR favorite config — lets resume-stream reload full context
+    // favoriteId: from headless override OR favorite config - lets resume-stream reload full context
     favoriteId:
       params.favoriteIdOverride ?? resolvedFavoriteConfig?.id ?? undefined,
     currentToolMessageId: undefined,

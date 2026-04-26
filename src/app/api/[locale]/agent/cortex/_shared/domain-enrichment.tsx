@@ -1,5 +1,5 @@
 /**
- * Domain Enrichment — renders a domain-specific widget for known Cortex mounts
+ * Domain Enrichment - renders a domain-specific widget for known Cortex mounts
  *
  * When a Cortex operation targets a path under a known mount (e.g., /memories/,
  * /skills/), this component renders a domain-aware detail card below the

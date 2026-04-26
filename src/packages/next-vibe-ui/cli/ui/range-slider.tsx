@@ -11,7 +11,7 @@ export type {
   RangeSliderOption,
 } from "../../web/ui/range-slider";
 
-// CLI: show selected range as "minLabel..maxLabel" — no drag UI in terminal
+// CLI: show selected range as "minLabel..maxLabel" - no drag UI in terminal
 export function RangeSlider({
   options,
   minIndex,

@@ -186,7 +186,7 @@ export function getAllTemplates(locale: CountryLanguage): CortexSeedItem[] {
 /**
  * Returns the default /documents/ subdirectory definitions for the given locale.
  * Paths are canonical (/documents/inbox); purpose/icon are localized.
- * These are virtual — shown in listings until the user creates real dirs.
+ * These are virtual - shown in listings until the user creates real dirs.
  */
 export function getDefaultDocumentDirs(
   locale: CountryLanguage,
@@ -244,7 +244,7 @@ export function getDefaultMemoryDirs(
 
 /**
  * Returns the locale-specific roots for memories and documents.
- * Used for display names — the actual DB paths are always canonical English.
+ * Used for display names - the actual DB paths are always canonical English.
  */
 export function getLocaleRoots(locale: CountryLanguage): {
   memories: string;

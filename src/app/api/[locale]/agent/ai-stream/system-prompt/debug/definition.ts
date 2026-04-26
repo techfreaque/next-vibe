@@ -1,6 +1,6 @@
 /**
  * System Prompt Debug Endpoint
- * Admin/dev-only — renders the full system prompt for a given user context.
+ * Admin/dev-only - renders the full system prompt for a given user context.
  */
 
 import { z } from "zod";
@@ -100,7 +100,7 @@ const { GET } = createEndpoint({
           .string()
           .optional()
           .describe(
-            "User message to drive cortex embedding search — what the user would ask",
+            "User message to drive cortex embedding search - what the user would ask",
           ),
       }),
       threadId: requestField(scopedTranslation, {

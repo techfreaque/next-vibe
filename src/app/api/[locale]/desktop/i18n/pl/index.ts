@@ -68,6 +68,6 @@ export const translations: typeof enTranslations = {
     focusWindowRequiresIdentifier:
       "Wymagane jest co najmniej jedno z: windowId, pid lub title",
     missingDep:
-      "Brakuje pakietu systemowego: {{dep}}. Powinno pojawić się okno autoryzacji — zatwierdź, aby zainstalować automatycznie.",
+      "Brakuje pakietu systemowego: {{dep}}. Powinno pojawić się okno autoryzacji - zatwierdź, aby zainstalować automatycznie.",
   },
 };

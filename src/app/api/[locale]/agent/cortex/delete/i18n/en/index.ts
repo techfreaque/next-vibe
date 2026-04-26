@@ -42,7 +42,7 @@ export const translations = {
       },
       conflict: {
         title: "Not Empty",
-        description: "Folder has stuff in it — use Include Contents",
+        description: "Folder has stuff in it - use Include Contents",
       },
     },
     success: {

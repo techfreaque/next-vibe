@@ -19,7 +19,7 @@ import { agentEnvAvailability } from "../env-availability";
 import { SearchProvider, type SearchProviderValue } from "./enum";
 
 /**
- * Normalized search result — common shape across all providers
+ * Normalized search result - common shape across all providers
  */
 export interface WebSearchResult {
   title: string;
@@ -49,7 +49,7 @@ export interface WebSearchOptions {
 }
 
 /**
- * Provider adapter contract — each provider implements this
+ * Provider adapter contract - each provider implements this
  */
 export interface SearchProviderConfig {
   id: SearchProviderValue;
@@ -129,7 +129,7 @@ const kagiProvider: SearchProviderConfig = {
 };
 
 /**
- * Provider registry — typesafe lookup by enum value
+ * Provider registry - typesafe lookup by enum value
  * To add a new provider: add enum value, create adapter, add to registry.
  */
 export const SEARCH_PROVIDER_REGISTRY: Record<

@@ -102,7 +102,7 @@ export interface ToolCall {
    * the original stream ended (wakeUp/endLoop). UI shows a distinct badge.
    */
   isDeferred?: boolean;
-  /** True when this is a partial/intermediate result — tool is still executing */
+  /** True when this is a partial/intermediate result - tool is still executing */
   isPartial?: boolean;
 }
 

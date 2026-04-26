@@ -36,8 +36,8 @@ export class WebAuthHandler extends BaseAuthHandler {
    * Checks: Authorization header → HTTP-only cookies.
    *
    * Bearer format supports an embedded leadId suffix for cross-origin callers:
-   *   "Bearer <jwtToken>####<leadId>"  — authenticated user
-   *   "Bearer ####<leadId>"            — public user (no JWT, leadId only)
+   *   "Bearer <jwtToken>####<leadId>"  - authenticated user
+   *   "Bearer ####<leadId>"            - public user (no JWT, leadId only)
    * The suffix is stripped here; leadId extraction happens in authenticate().
    */
   async getStoredAuthToken(

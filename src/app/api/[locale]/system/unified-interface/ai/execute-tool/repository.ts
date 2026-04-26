@@ -307,7 +307,7 @@ export class RouteExecuteRepository {
               execFav?.videoGenModelSelection;
             if (sel) {
               // For MANUAL selection, use manualModelId directly (skip provider availability
-              // check — provider availability is local, but execution is on the remote).
+              // check - provider availability is local, but execution is on the remote).
               const parsed = videoGenModelSelectionSchema.safeParse(sel);
               if (
                 parsed.success &&
@@ -545,7 +545,7 @@ export class RouteExecuteRepository {
               }
 
               // Guard: if the remote returned {status:"pending"} or {status:"status.pending"}
-              // the task is still running on the remote — it will call back via /report when done.
+              // the task is still running on the remote - it will call back via /report when done.
               // Do NOT fire handleTaskCompletion with a pending result; that would trigger a
               // premature revival with no real output.
               const directResultObj =

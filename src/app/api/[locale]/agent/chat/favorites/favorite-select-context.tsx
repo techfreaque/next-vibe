@@ -6,9 +6,9 @@ import type { FavoriteCard } from "./definition";
 
 interface FavoriteSelectContextValue {
   onSelectFavorite: (item: FavoriteCard) => void;
-  /** Current skillId in the local form — used to compute active state client-side */
+  /** Current skillId in the local form - used to compute active state client-side */
   activeSkillId: string | null;
-  /** Current modelId in the local form — used to compute active state client-side */
+  /** Current modelId in the local form - used to compute active state client-side */
   activeModelId: string | null;
   /** When true, hides the tab bar and settings gear (for embedding in other panels) */
   hideChrome: boolean;

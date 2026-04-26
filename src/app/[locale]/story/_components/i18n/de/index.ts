@@ -254,12 +254,12 @@ export const translations: typeof enTranslations = {
       badge: "Kleines Team · Open Source · Offen entwickelt",
       header: "KI, die dir nicht vorschreibt, was du denken sollst.",
       subheader:
-        "Keine Verweigerungen. Niemand liest deine Chats. Deine KI — nicht unsere.",
+        "Keine Verweigerungen. Niemand liest deine Chats. Deine KI - nicht unsere.",
       chipChat: "Chatten",
       chipSelfHost: "Selbst hosten",
       chipBuild: "Aufbauen",
       chipEarn: "Verdienen",
-      introGuide: "Vier Wege — such dir deinen aus:",
+      introGuide: "Vier Wege - such dir deinen aus:",
       introOption1: "",
       introOption2: "",
       introOption3: "",
@@ -270,15 +270,15 @@ export const translations: typeof enTranslations = {
       card: {
         chat: {
           label: "Einfach chatten",
-          desc: "Frag alles — auch was ChatGPT ablehnt. Kein Account nötig.",
+          desc: "Frag alles - auch was ChatGPT ablehnt. Kein Account nötig.",
         },
         personal: {
           label: "Deine eigene KI",
-          desc: "Läuft auf deinem Rechner. Sag ihr, was du brauchst — sie passt sich deinem Leben an.",
+          desc: "Läuft auf deinem Rechner. Sag ihr, was du brauchst - sie passt sich deinem Leben an.",
         },
         nextvibe: {
           label: "Eigene Plattform aufbauen",
-          desc: "Wie WordPress, aber für KI. Sofort startklar — bau es zu deiner Nische aus.",
+          desc: "Wie WordPress, aber für KI. Sofort startklar - bau es zu deiner Nische aus.",
         },
         referral: {
           label: "Verdiene Geld",
@@ -327,7 +327,7 @@ export const translations: typeof enTranslations = {
         titleLine1: "Veröffentlichen. Empfehlen.",
         titleLine2: "Verdienen.",
         subtitle:
-          "Empfehlungslink: 10% jeder Zahlung, dauerhaft. Dein Skill als Einstiegspunkt: +5% — auch wenn andere ihn teilen.",
+          "Empfehlungslink: 10% jeder Zahlung, dauerhaft. Dein Skill als Einstiegspunkt: +5% - auch wenn andere ihn teilen.",
         cta: "Jetzt verdienen",
         ctaExplore: "Mehr erfahren",
       },
@@ -815,7 +815,7 @@ export const translations: typeof enTranslations = {
           bodyPrefix: "Jeder Endpoint ist KI-Agenten via",
           bodyMiddle1: "zugänglich. Nutze",
           bodyMiddle2:
-            "für lange Tasks — der Agent pausiert und setzt fort wenn fertig. Übergib",
+            "für lange Tasks - der Agent pausiert und setzt fort wenn fertig. Übergib",
           bodySuffix: "um auf einem Remote-Server auszuführen.",
         },
         mcpServer: {
@@ -857,24 +857,24 @@ export const translations: typeof enTranslations = {
           headline: "Admin-Seiten schreiben sich selbst.",
           bodyPrefix: "Setze",
           bodyMiddle:
-            "und der Endpoint ist überall gesperrt — API, CLI, MCP, UI. Ein Guard-Aufruf plus",
+            "und der Endpoint ist überall gesperrt - API, CLI, MCP, UI. Ein Guard-Aufruf plus",
           bodySuffix:
             "rendert das vollständige Admin-Interface. Jeder Admin-Screen in der Plattform ist exakt so gebaut.",
         },
         vibeFrame: {
           headline: "Jeder Endpoint. Jede Website. Ein Script-Tag.",
-          body: "Vibe Frame auf jede bestehende Site droppen — WordPress, Webflow, reines HTML. Endpoint und Mount-Punkt deklarieren. Das vollständige Formular, Validierung und Submission-Flow erscheinen inline über eine postMessage-Bridge. Keine Iframes, keine CORS-Probleme.",
+          body: "Vibe Frame auf jede bestehende Site droppen - WordPress, Webflow, reines HTML. Endpoint und Mount-Punkt deklarieren. Das vollständige Formular, Validierung und Submission-Flow erscheinen inline über eine postMessage-Bridge. Keine Iframes, keine CORS-Probleme.",
         },
         remoteSkill: {
           headline: "Deine API dokumentiert sich selbst als KI-Skill.",
           bodyPrefix:
-            "Jeder öffentliche Endpoint ist in einem generierten Skill-Manifest enthalten, das externe KI-Agenten abrufen und erlernen. Zwei Dateien: eine für anonyme, eine für authentifizierte Nutzer. Jeder Endpoint ist standardmäßig dabei — füge",
+            "Jeder öffentliche Endpoint ist in einem generierten Skill-Manifest enthalten, das externe KI-Agenten abrufen und erlernen. Zwei Dateien: eine für anonyme, eine für authentifizierte Nutzer. Jeder Endpoint ist standardmäßig dabei - füge",
           bodySuffix:
             "hinzu um ihn auszuschließen. Keine manuelle API-Dokumentation mehr pflegen.",
         },
         vibeBoard: {
           headline: "Jeder Endpoint wird zum Live-Dashboard-Kachel.",
-          body: "Vibe Board ist die nächste Oberfläche — ein Drag-and-Drop-Analytics-Dashboard, auf dem jeder Endpoint als Kachel angepinnt werden kann. Die Datenschicht, Vibe Sense, ist heute live. Definiere jetzt eine Graph-Pipeline und sie rendert automatisch wenn Vibe Board erscheint. Dieselbe Definition, null zusätzlicher Code.",
+          body: "Vibe Board ist die nächste Oberfläche - ein Drag-and-Drop-Analytics-Dashboard, auf dem jeder Endpoint als Kachel angepinnt werden kann. Die Datenschicht, Vibe Sense, ist heute live. Definiere jetzt eine Graph-Pipeline und sie rendert automatisch wenn Vibe Board erscheint. Dieselbe Definition, null zusätzlicher Code.",
         },
       },
       surfaceDemo: {
@@ -1145,7 +1145,7 @@ export const translations: typeof enTranslations = {
     ctaNextvibe: {
       title: "Eine Definition. Jede Plattform.",
       subtitle:
-        "Web-UI, CLI, KI-Tool, MCP-Server, mobiler Bildschirm, Cron-Job — automatisch. Fork it. Own it.",
+        "Web-UI, CLI, KI-Tool, MCP-Server, mobiler Bildschirm, Cron-Job - automatisch. Fork it. Own it.",
       primary: "Dokumentation lesen",
       secondary: "Auf GitHub starten",
     },

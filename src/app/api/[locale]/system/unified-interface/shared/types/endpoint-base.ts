@@ -34,7 +34,7 @@ export type CreateApiEndpointAny = CreateApiEndpoint<
     AnyChildrenConstrain<string, FieldUsageConfig>
   >,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  EndpointEventsMap<any>, // TEvents — accepts both never and any events map; with out (covariant) TEvents, any EndpointEventsMap<X> and never are both subtypes
+  EndpointEventsMap<any>, // TEvents - accepts both never and any events map; with out (covariant) TEvents, any EndpointEventsMap<X> and never are both subtypes
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any, // RequestInput
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

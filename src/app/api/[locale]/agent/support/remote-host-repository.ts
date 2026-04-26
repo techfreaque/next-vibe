@@ -3,7 +3,7 @@ import "server-only";
 /**
  * Remote host delegation for SUPPORT folder streams.
  * Per spec: local admin → POST to ws-provider/stream on remote instance.
- * Status: TODO — see spec.md for implementation plan.
+ * Status: TODO - see spec.md for implementation plan.
  */
 
 import {
@@ -40,7 +40,7 @@ export async function delegateToRemoteHost(_params: {
   request: NextRequest | undefined;
 }): Promise<ResponseType<AiStreamPostResponseOutput>> {
   _params.logger.warn(
-    "Remote host delegation not yet implemented — SUPPORT folder streams are pending",
+    "Remote host delegation not yet implemented - SUPPORT folder streams are pending",
   );
   return fail({
     message:

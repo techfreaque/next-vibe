@@ -9,7 +9,7 @@
  *   import resolution issues when content is served at the web/ui path.
  *
  * Rule 2: Any *.tsx/*.ts file → if a *.cli.tsx/*.cli.ts sibling exists, use it.
- *   .tsx: handled in onLoad (must return content — Bun requires it).
+ *   .tsx: handled in onLoad (must return content - Bun requires it).
  *   .ts:  handled in onResolve (path redirect) to avoid double-registering
  *         modules in Bun's ESM registry, which would break lazy require() calls.
  */
@@ -43,7 +43,7 @@ plugin({
   target: "bun", // eslint-disable-line i18next/no-literal-string
   setup(build) {
     // Rule 1 + Rule 2 (.tsx): intercept all *.tsx loads
-    // onLoad for .tsx must always return content — Bun requires it.
+    // onLoad for .tsx must always return content - Bun requires it.
     // This is safe for .tsx because those files are not in the lazy require() chain.
     build.onLoad({ filter: /\.tsx$/ }, ({ path }) => {
       // Rule 1: web/ui/*.tsx → serve cli/ui/*.tsx contents

@@ -90,7 +90,7 @@ export class FavoritesCreateRepository {
   /**
    * Resolve the slug base to use for a skill in a favorite slug.
    * For default skills, use their config ID (e.g. "thea", "hermes").
-   * For custom skills, the skillId is already the canonical slug — use it directly.
+   * For custom skills, the skillId is already the canonical slug - use it directly.
    */
   static resolveSkillSlug(skillId: string): string {
     // Default skills already have short IDs (e.g. "thea", "hermes", "default")
@@ -320,7 +320,7 @@ export class FavoritesCreateRepository {
         });
       }
 
-      // Emit WS event — push full computed FavoriteCard so all tabs update immediately
+      // Emit WS event - push full computed FavoriteCard so all tabs update immediately
       const emitFavorites = createEndpointEmitter(
         favoritesDefinitions.GET,
         logger,

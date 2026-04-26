@@ -146,7 +146,7 @@ describe("Support System Integration", () => {
     );
   }
 
-  // ── S1: Escalate — create support session ─────────────────────────────────
+  // ── S1: Escalate - create support session ─────────────────────────────────
   fit("S1: escalate creates a pending support session", async () => {
     const response = await sendTestRequest({
       endpoint: escalateEndpoint.POST,

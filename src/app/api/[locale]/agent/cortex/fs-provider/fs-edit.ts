@@ -1,5 +1,5 @@
 /**
- * Filesystem Edit — find/replace or line-range edit on disk files
+ * Filesystem Edit - find/replace or line-range edit on disk files
  */
 
 import "server-only";

@@ -1,7 +1,7 @@
 /**
  * Cortex /memories AI Integration Tests
  *
- * Comprehensive tests for the /memories mount — the AI's private, persistent
+ * Comprehensive tests for the /memories mount - the AI's private, persistent
  * knowledge store. Covers all subdirectory conventions, pinning, frontmatter
  * fields, write/read/edit/move/delete on memory files, and the life-area
  * template structure introduced in the dreamer redesign.
@@ -280,7 +280,7 @@ describe("Cortex Mount: /memories basic CRUD", () => {
 
   beforeAll(async () => {
     const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
-    expect(resolved, "admin user not found — run: vibe dev").toBeTruthy();
+    expect(resolved, "admin user not found - run: vibe dev").toBeTruthy();
     if (!resolved) {
       return;
     }
@@ -535,7 +535,7 @@ Confirm the file was created and report the path.${VERDICT_INSTRUCTION}`,
       user: testUser,
       favoriteId: mainFavoriteId,
       threadId,
-      prompt: `Use cortex-move to move /memories/mem-test/project-notes.md to /memories/mem-test/archived/project-notes.md. Confirm the move succeeded — source should be gone, destination should exist.${VERDICT_INSTRUCTION}`,
+      prompt: `Use cortex-move to move /memories/mem-test/project-notes.md to /memories/mem-test/archived/project-notes.md. Confirm the move succeeded - source should be gone, destination should exist.${VERDICT_INSTRUCTION}`,
     });
 
     expect(result.success, "MM5: stream failed").toBe(true);
@@ -971,8 +971,8 @@ describe("Cortex Mount: /memories/life/ area coverage", () => {
     }
 
     const entries = Array.isArray(listResult.entries) ? listResult.entries : [];
-    // Life files are seeded — if at least 1 exists the test is meaningful
-    // They may not exist if seed hasn't run — allow graceful empty
+    // Life files are seeded - if at least 1 exists the test is meaningful
+    // They may not exist if seed hasn't run - allow graceful empty
     expect(
       entries.length,
       "ML1: /memories/life/ must have entries if seeded",
@@ -1002,7 +1002,7 @@ describe("Cortex Mount: /memories/life/ area coverage", () => {
       return;
     }
 
-    // The file may not exist (not seeded) — that is fine, AI should handle gracefully
+    // The file may not exist (not seeded) - that is fine, AI should handle gracefully
     // (we call resolveToolResult to validate the structure but don't assert its value)
     resolveToolResult(readMsg);
     // Success or not, AI must give a verdict
@@ -1394,7 +1394,7 @@ describe("Cortex Mount: /memories write vs virtual-mount isolation", () => {
         testUser.id,
         "/memories/write-test/ok.md",
       );
-      // May or may not exist — /threads write should fail
+      // May or may not exist - /threads write should fail
 
       // Clean up if it was created
       if (dbMemNode) {

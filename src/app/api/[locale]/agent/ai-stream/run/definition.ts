@@ -90,7 +90,7 @@ const { POST } = createEndpoint({
   tags: ["tags.ai", "tags.chat"],
 
   events: {
-    // Emitted once a new thread is created — lets callers update thread lists without polling
+    // Emitted once a new thread is created - lets callers update thread lists without polling
     "thread-created": {
       operation: "append" as const,
       fields: ["threadId", "threadTitle", "threadCreatedAt"] as const,

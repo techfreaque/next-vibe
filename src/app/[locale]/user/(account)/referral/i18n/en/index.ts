@@ -22,7 +22,7 @@ export const translations = {
     heroSub: "Recurring. Forever.",
     chainTitle: "10 subscribers. What you earn per month.",
     chainSubtitle:
-      "Each level is half the one above. Built once at signup — pays forever.",
+      "Each level is half the one above. Built once at signup - pays forever.",
     youLabel: "You",
     whoLabels: [
       "You - whoever referred them directly",
@@ -63,7 +63,7 @@ export const translations = {
   story: {
     title: "How the chain compounds",
     subtitle:
-      "Same 10 subscribers. Each level that activates adds to your total — forever.",
+      "Same 10 subscribers. Each level that activates adds to your total - forever.",
     totalLabel: "Total / mo",
     addedLabel: "+{{amount}} from this level",
     levelLabel: "Level {{n}} active",
@@ -167,11 +167,11 @@ export const translations = {
   },
   audienceCallout: {
     title: "Two ways to earn",
-    newTitle: "Referral link — {{directPct}} per user",
+    newTitle: "Referral link - {{directPct}} per user",
     newBody:
       "Share your code. Anyone who signs up and pays gives you {{directPct}} of every payment, every month, forever. Post it once. Earn forever.",
     newCta: "Get your referral link",
-    proTitle: "Skill link — {{skillPct}} per user",
+    proTitle: "Skill link - {{skillPct}} per user",
     proBody:
       "Build a skill. Share its link. Everyone who signs up through it pays you {{directPct}} direct + {{skillBonusPct}} skill bonus = {{skillPct}} per user, recurring. Even better: you earn the {{skillBonusPct}} as the skill author even when someone else shares your skill. The platform tracks skill authorship - passive attribution with no extra work.",
     proCta: "Build a skill",

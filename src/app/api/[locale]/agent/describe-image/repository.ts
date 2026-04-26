@@ -53,7 +53,7 @@ export class DescribeImageRepository {
     const tCredits = creditsScopedTranslation.scopedT(locale).t;
     const userId = !user.isPublic && "id" in user ? user.id : undefined;
 
-    // Resolve favorite on demand from favoriteId — picks up latest DB state
+    // Resolve favorite on demand from favoriteId - picks up latest DB state
     const resolvedFavoriteConfig = await resolveFavoriteConfig(
       favoriteId,
       userId,

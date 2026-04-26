@@ -2,7 +2,7 @@
  * Definition-Driven Event Types
  *
  * Events declare which fields from ResponseOutput they carry.
- * The payload IS exactly those fields — no partial, no wrapping.
+ * The payload IS exactly those fields - no partial, no wrapping.
  * Types are computed once in createEndpoint and stored in types.EventPayloads.
  */
 
@@ -11,7 +11,7 @@ import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/sha
 import type { EndpointLogger } from "../shared/logger/endpoint";
 
 // ============================================================================
-// DEEP PARTIAL — used only internally by cache-merger
+// DEEP PARTIAL - used only internally by cache-merger
 // ============================================================================
 
 export type DeepPartial<T> = T extends
@@ -26,7 +26,7 @@ export type DeepPartial<T> = T extends
     : { [K in keyof T]?: DeepPartial<T[K]> };
 
 // ============================================================================
-// EVENT PAYLOAD — derived from declared fields, computed once on definition
+// EVENT PAYLOAD - derived from declared fields, computed once on definition
 // ============================================================================
 
 type ArrayItem<T> =
@@ -79,7 +79,7 @@ export type EventPayload<
     : never;
 
 /**
- * Compute EventPayload for every event in the map — stored once on types.EventPayloads.
+ * Compute EventPayload for every event in the map - stored once on types.EventPayloads.
  */
 export type ComputeEventPayloads<
   TResponseOutput,
@@ -106,7 +106,7 @@ export type EventOperation = "merge" | "append" | "remove";
 
 /**
  * Context passed to onEvent callbacks. The `partial` field is typed as the
- * event's declared payload — computed from fields via ComputeEventPayloads
+ * event's declared payload - computed from fields via ComputeEventPayloads
  * and indexed per event name.
  *
  * For the single-event declaration interfaces below, `partial` is typed as
@@ -194,11 +194,11 @@ export interface EndpointEventsMap<
 }
 
 // ============================================================================
-// TYPED EMIT — uses EventPayloads stored on types
+// TYPED EMIT - uses EventPayloads stored on types
 // ============================================================================
 
 /**
- * Typed emit function. TEventPayloads is types.EventPayloads — computed once on definition.
+ * Typed emit function. TEventPayloads is types.EventPayloads - computed once on definition.
  * Each event name maps to its exact payload shape, no recomputation.
  */
 export interface EmitEventNamed<

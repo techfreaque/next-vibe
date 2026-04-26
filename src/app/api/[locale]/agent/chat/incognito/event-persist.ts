@@ -3,11 +3,11 @@
  *
  * Two levels of helpers:
  *
- * 1. Factory helpers (onEventXxx) — for simple events where the entire
+ * 1. Factory helpers (onEventXxx) - for simple events where the entire
  *    onEvent is incognito persistence. Assign directly:
  *      onEvent: onEventPersistMessage()
  *
- * 2. Imperative helpers (persistXxxIfIncognito) — for mixed events that
+ * 2. Imperative helpers (persistXxxIfIncognito) - for mixed events that
  *    also have other logic. Call inside an existing onEvent handler:
  *      onEvent: async (ctx) => {
  *        // ... other logic

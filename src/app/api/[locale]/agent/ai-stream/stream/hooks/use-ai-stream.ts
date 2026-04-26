@@ -68,7 +68,7 @@ export function useAIStream(): UseAIStreamReturn {
    * 3. On HTTP error, adds error message to chat and cleans up
    *
    * WS subscription is handled by useMessagesSubscription (always-on).
-   * Streaming state is tracked by the framework via WS events — not here.
+   * Streaming state is tracked by the framework via WS events - not here.
    */
   const startStream = useCallback(
     async (data: AiStreamPostRequestOutput): Promise<boolean> => {

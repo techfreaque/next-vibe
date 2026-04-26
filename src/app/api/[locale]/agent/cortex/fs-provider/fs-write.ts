@@ -1,5 +1,5 @@
 /**
- * Filesystem Write — creates or overwrites a file on disk
+ * Filesystem Write - creates or overwrites a file on disk
  */
 
 import "server-only";
@@ -41,7 +41,7 @@ export async function fsWriteFile(
       await stat(diskPath);
       created = false;
     } catch {
-      // File doesn't exist — will be created
+      // File doesn't exist - will be created
     }
 
     // Ensure parent directories exist

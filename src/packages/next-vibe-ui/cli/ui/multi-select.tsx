@@ -1,5 +1,5 @@
 /**
- * CLI MultiSelect — keyboard navigation with space-to-toggle
+ * CLI MultiSelect - keyboard navigation with space-to-toggle
  * Arrow keys to navigate, Space to toggle selection, Enter to confirm
  */
 import { Box, Text, useInput } from "ink";
@@ -21,7 +21,7 @@ const CHECKED = "\u2713";
 const UNCHECKED = "\u25A1";
 const ARROW = "\u25B6";
 const SPACE = "\u0020";
-// Terminal-only hint string — not user-facing i18n content
+// Terminal-only hint string - not user-facing i18n content
 const HINT_NAV =
   "\u2191\u2193 navigate, Space toggle, Enter confirm, Esc close";
 const OPEN_HINT = " \u21B5 to open";

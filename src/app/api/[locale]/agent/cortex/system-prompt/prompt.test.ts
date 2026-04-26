@@ -38,9 +38,7 @@ function makeMemory(
   };
 }
 
-function makeMountContent(
-  partial?: Partial<MountContent>,
-): MountContent {
+function makeMountContent(partial?: Partial<MountContent>): MountContent {
   return {
     pinned: [],
     relevant: [],
@@ -119,7 +117,7 @@ describe("memory sort order", () => {
       memories: makeMountContent({ totalCount: 2, relevant }),
     });
     const memoriesSection = result.slice(result.indexOf("/memories"));
-    // relevant is rendered in provided order — caller sorts by score desc
+    // relevant is rendered in provided order - caller sorts by score desc
     const highPos = memoriesSection.indexOf("high.md");
     const lowPos = memoriesSection.indexOf("low.md");
     // The relevant array is rendered in insertion order;
@@ -142,9 +140,7 @@ describe("pinned memory marker", () => {
   });
 
   it("recent memory does not get 📌 marker", () => {
-    const recent = [
-      makeMemory({ path: "/memories/identity/normal.md" }),
-    ];
+    const recent = [makeMemory({ path: "/memories/identity/normal.md" })];
     const result = buildFragment({
       memories: makeMountContent({ totalCount: 1, recent }),
     });
@@ -160,7 +156,7 @@ describe("pinned memory marker", () => {
         pinned: true,
       }),
     ];
-    // Use tiny budget — pinned should still show full content
+    // Use tiny budget - pinned should still show full content
     const data = makeData({
       memories: makeMountContent({ totalCount: 1, pinned }),
     });
@@ -207,7 +203,7 @@ describe("equal trim for unpinned memories", () => {
 describe("threads section", () => {
   it("is empty when totalThreads is 0", () => {
     const result = buildFragment({ totalThreads: 0 });
-    // The footer always mentions /threads/ — check for the section header format
+    // The footer always mentions /threads/ - check for the section header format
     expect(result).not.toMatch(/\/threads\/\s*\(\d+/);
   });
 
@@ -276,9 +272,7 @@ describe("tasks section", () => {
   });
 
   it("renders task items with name and schedule", () => {
-    const items = [
-      { name: "dreamer", schedule: "0 3 * * *", enabled: true },
-    ];
+    const items = [{ name: "dreamer", schedule: "0 3 * * *", enabled: true }];
     const result = buildFragment({
       taskCount: 1,
       tasks: { items, totalCount: 1 },
@@ -288,9 +282,7 @@ describe("tasks section", () => {
   });
 
   it("shows hidden count when taskCount exceeds items length", () => {
-    const items = [
-      { name: "dreamer", schedule: "0 3 * * *", enabled: true },
-    ];
+    const items = [{ name: "dreamer", schedule: "0 3 * * *", enabled: true }];
     const result = buildFragment({
       taskCount: 5,
       tasks: { items, totalCount: 5 },

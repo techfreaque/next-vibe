@@ -279,7 +279,7 @@ export async function executeUnbottledStream(
   }
 
   return new Promise<void>((resolve) => {
-    // Server-provided IDs are used verbatim — no local remapping.
+    // Server-provided IDs are used verbatim - no local remapping.
     // The remote generates all message and tool call IDs; clients store them as-is.
     // Sync is trivial: identical IDs mean identical state across platforms.
     const seenMessageIds = new Set<string>();
@@ -452,13 +452,13 @@ export async function executeUnbottledStream(
           seenMessageIds.add(remoteId);
           if (role === ChatMessageRole.ASSISTANT) {
             if (!firstAssistantCreated) {
-              // First assistant message — use server-provided ID directly.
+              // First assistant message - use server-provided ID directly.
               firstAssistantCreated = true;
               currentAssistantId = remoteId;
               currentAssistantContent = "";
               await createAssistantMessage(remoteId, userMessageId);
             } else {
-              // Subsequent assistant in a tool loop — server ID, parent = last tool message
+              // Subsequent assistant in a tool loop - server ID, parent = last tool message
               currentAssistantId = remoteId;
               currentAssistantContent = "";
               await createAssistantMessage(
@@ -467,7 +467,7 @@ export async function executeUnbottledStream(
               );
             }
           } else if (role === ChatMessageRole.TOOL && toolCall) {
-            // Tool message from cloud — use server-provided ID directly.
+            // Tool message from cloud - use server-provided ID directly.
             lastToolMessageId = remoteId;
 
             if (!isIncognito) {
@@ -559,7 +559,7 @@ export async function executeUnbottledStream(
         }
 
         case "tool-call": {
-          // Remote shape: {} (empty — informational only, no message data available)
+          // Remote shape: {} (empty - informational only, no message data available)
           // Tool call handling is done in MESSAGE_CREATED for TOOL role.
           break;
         }

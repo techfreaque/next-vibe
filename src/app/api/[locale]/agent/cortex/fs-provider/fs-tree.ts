@@ -1,5 +1,5 @@
 /**
- * Filesystem Tree — builds ASCII tree combining disk files + virtual mounts + templates
+ * Filesystem Tree - builds ASCII tree combining disk files + virtual mounts + templates
  */
 
 import "server-only";
@@ -124,7 +124,7 @@ function renderLines(
 }
 
 /**
- * Build tree for a memories or documents path — merges disk + template overlay
+ * Build tree for a memories or documents path - merges disk + template overlay
  */
 async function buildNativeDirTree(
   cortexPath: string,

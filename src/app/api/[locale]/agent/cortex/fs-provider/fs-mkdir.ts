@@ -1,5 +1,5 @@
 /**
- * Filesystem Mkdir — creates directories on disk
+ * Filesystem Mkdir - creates directories on disk
  */
 
 import "server-only";
@@ -40,13 +40,13 @@ export async function fsMkdir(
           created: false,
         });
       }
-      // Path exists but is a file — conflict
+      // Path exists but is a file - conflict
       return fail({
         message: t("post.errors.conflict.title"),
         errorType: ErrorResponseTypes.CONFLICT,
       });
     } catch {
-      // Doesn't exist — create it
+      // Doesn't exist - create it
     }
 
     await mkdir(diskPath, { recursive: createParents });

@@ -1,5 +1,5 @@
 /**
- * Filesystem List — lists directory contents from disk
+ * Filesystem List - lists directory contents from disk
  */
 
 import "server-only";
@@ -47,7 +47,7 @@ export async function fsListDirectory(
 ): Promise<ResponseType<FsListResult>> {
   const cortexPath = normalizePath(rawPath);
 
-  // Virtual mount paths — delegate to virtual resolver (not on disk)
+  // Virtual mount paths - delegate to virtual resolver (not on disk)
   if (cortexPath !== "/") {
     const mountPrefix = VIRTUAL_MOUNTS.find(
       (m) => cortexPath === m || cortexPath.startsWith(`${m}/`),
@@ -99,7 +99,7 @@ export async function fsListDirectory(
         size = isDir ? null : st.size;
         updatedAt = st.mtime.toISOString();
       } catch {
-        // stat failed — use defaults
+        // stat failed - use defaults
       }
 
       entries.push({

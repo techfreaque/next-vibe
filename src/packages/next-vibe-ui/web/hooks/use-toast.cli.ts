@@ -1,5 +1,5 @@
 /**
- * CLI toast stub — prints to stdout instead of rendering UI.
+ * CLI toast stub - prints to stdout instead of rendering UI.
  * Matches the web useToast() API so widget code works unchanged.
  */
 

@@ -2,7 +2,7 @@ export const translations = {
   title: "Cortex",
   backToChat: "Back to Chat",
   description:
-    "Your AI's persistent memory. Files, documents, threads, skills — browse, edit, delete.",
+    "Your AI's persistent memory. Files, documents, threads, skills - browse, edit, delete.",
   openFullPage: "Open full page",
   modal: {
     title: "Cortex",

@@ -1,6 +1,6 @@
 export const translations = {
   meta: {
-    title: "Zbuduj skill — Własna AI do wszystkiego",
+    title: "Zbuduj skill - Własna AI do wszystkiego",
     description:
       "Zamień każdy workflow w wielokrotnego użytku skill AI. Otwórz stronę skillów lub poproś Theę w czacie. Bez kodu.",
     category: "Skille",
@@ -13,7 +13,7 @@ export const translations = {
     title: "Zbuduj skill.",
     titleLine2: "Miej własną AI.",
     subtitle:
-      "Persona, model, narzędzia, głos — skonfigurowane raz, twoje na zawsze. Zbuduj do czegokolwiek. Udostępnij. Zarabiaj.",
+      "Persona, model, narzędzia, głos - skonfigurowane raz, twoje na zawsze. Zbuduj do czegokolwiek. Udostępnij. Zarabiaj.",
     ctaPrimary: "Stwórz skill",
     ctaSecondary: "Zapytaj Theę lub Hermesa",
   },
@@ -25,7 +25,7 @@ export const translations = {
       "Tożsamość i instrukcje. 200–500 słów. Brzmi jak osoba, nie jak FAQ.",
     item1Label: "Wybór modelu",
     item1Body:
-      "Filtruj po inteligencji, poziomie treści i cenie — albo przypnij konkretny model.",
+      "Filtruj po inteligencji, poziomie treści i cenie - albo przypnij konkretny model.",
     item2Label: "Narzędzia",
     item2Body:
       "Dokładna whitelist: wyszukiwanie, generowanie obrazów, pamięć, kod, muzyka, wideo.",
@@ -38,7 +38,7 @@ export const translations = {
     way1Badge: "Strona skillów",
     way1Title: "Przycisk Stwórz w liście skillów",
     way1Body:
-      "Otwórz stronę skillów lub selektor modelu w dowolnym wątku czatu. Kliknij Stwórz. Wypełnij formularz — nazwa, system prompt, model, narzędzia. Gotowe.",
+      "Otwórz stronę skillów lub selektor modelu w dowolnym wątku czatu. Kliknij Stwórz. Wypełnij formularz - nazwa, system prompt, model, narzędzia. Gotowe.",
     way1Detail:
       "Żadnego wizarda, żadnych dodatkowych kroków. Formularz to cała konfiguracja.",
     way1Cta: "Otwórz skille",
@@ -47,7 +47,7 @@ export const translations = {
     way2Body:
       'Otwórz wątek i powiedz: "Zbuduj mi skill do klinicznego rozumowania dla studentów medycyny." Subagent Kreatora Skillów zadaje kilka pytań, szkicuje prompt, dobiera model, konfiguruje narzędzia, tworzy skill i przypina go do sidebara.',
     way2Detail:
-      "Thea deleguje do Kreatora Skillów — subagenta z skill-create, favorite-create, tool-help. Opisujesz, on buduje.",
+      "Thea deleguje do Kreatora Skillów - subagenta z skill-create, favorite-create, tool-help. Opisujesz, on buduje.",
     way2Cta: "Otwórz czat",
   },
   prompt: {
@@ -71,12 +71,12 @@ export const translations = {
     do4Body: "Model czyta cały prompt przy każdej turze. Krótszy jest lepszy.",
     dont0Title: "Listy reguł jak regulamin",
     dont0Body:
-      '"Zawsze bądź pomocna, nigdy nie bądź niegrzeczna" — każda AI dostaje to samo. Tylko szum.',
+      '"Zawsze bądź pomocna, nigdy nie bądź niegrzeczna" - każda AI dostaje to samo. Tylko szum.',
     dont1Title: '"Zawsze bądź pomocna"',
     dont1Body: "Model i tak to wie. Pominąć.",
     dont2Title: "Sprzeczne ograniczenia",
     dont2Body:
-      '"Bądź kreatywna, ale zawsze trzymaj się tematu" — model będzie się ciągle zabezpieczał. Wybierz jedno.',
+      '"Bądź kreatywna, ale zawsze trzymaj się tematu" - model będzie się ciągle zabezpieczał. Wybierz jedno.',
     dont3Title: "Za długie listy możliwości",
     dont3Body:
       "Model wie, co potrafi. Nie przepisuj instrukcji obsługi w system prompcie.",
@@ -106,12 +106,12 @@ export const translations = {
     item5Name: "Ekspert, na którego cię nie stać",
     item5Category: "Specjalista",
     item5Desc:
-      "Konsultant, doradca finansowy, prawnik — destylowany w skill. Wiedza za 400 €/h, dostępna dla każdego.",
+      "Konsultant, doradca finansowy, prawnik - destylowany w skill. Wiedza za 400 €/h, dostępna dla każdego.",
   },
   dev: {
     title: "Dla deweloperów: skill.ts",
-    body: "Uruchamiasz next-vibe lokalnie? Poproś agenta o wygenerowanie pliku skilla. Ta sama struktura co każdy wbudowany skill — gotowy do kompilacji i commita.",
-    note: "Agent zna pełny schemat. Opisz co chcesz — generuje plik, rejestruje skill, od razu gotowy.",
+    body: "Uruchamiasz next-vibe lokalnie? Poproś agenta o wygenerowanie pliku skilla. Ta sama struktura co każdy wbudowany skill - gotowy do kompilacji i commita.",
+    note: "Agent zna pełny schemat. Opisz co chcesz - generuje plik, rejestruje skill, od razu gotowy.",
   },
   cta: {
     title: "Zbuduj swój.",

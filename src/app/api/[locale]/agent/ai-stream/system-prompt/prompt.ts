@@ -213,7 +213,7 @@ Respond in ${languageName} (${locale}) unless the task explicitly specifies othe
 **Default language:** ${languageName} (${locale}) | **Location:** ${countryName} ${flag}
 
 ALWAYS respond in the language of the user's current message. Default language is a fallback only.
-When writing to Cortex (memories, documents, tasks), always use the user's language — not English — unless the content is inherently language-neutral (code, identifiers).`;
+When writing to Cortex (memories, documents, tasks), always use the user's language - not English - unless the content is inherently language-neutral (code, identifiers).`;
   },
 };
 

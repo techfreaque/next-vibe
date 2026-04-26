@@ -90,7 +90,7 @@ export class JoinRepository {
         })
         .where(eq(supportSessions.id, sessionId));
 
-      // Post system message and emit WS — either locally or cross-instance
+      // Post system message and emit WS - either locally or cross-instance
       const threadId = session.threadId;
       if (threadId) {
         if (conn) {

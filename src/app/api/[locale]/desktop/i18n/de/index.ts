@@ -68,6 +68,6 @@ export const translations: typeof enTranslations = {
     focusWindowRequiresIdentifier:
       "Mindestens eines von windowId, pid oder title wird benötigt",
     missingDep:
-      "Systempaket fehlt: {{dep}}. Ein Authentifizierungsdialog sollte erschienen sein — bestätigen, um automatisch zu installieren.",
+      "Systempaket fehlt: {{dep}}. Ein Authentifizierungsdialog sollte erschienen sein - bestätigen, um automatisch zu installieren.",
   },
 };

@@ -116,7 +116,7 @@ export const translations = {
 
   sessionJoined: {
     title: "Sitzung-Beigetreten-Callback",
-    description: "Interner Callback — benachrichtigt die initierende Instanz.",
+    description: "Interner Callback - benachrichtigt die initierende Instanz.",
     tags: { support: "Support", callback: "Callback" },
     fields: {
       sessionId: {

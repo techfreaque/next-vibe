@@ -137,7 +137,7 @@ const { GET } = createEndpoint({
   },
 
   // === WS EVENTS ===
-  // Emitted by CreditRepository after every deduction — carries actual server balance.
+  // Emitted by CreditRepository after every deduction - carries actual server balance.
   // Framework merges partial into GET response cache. No client-side math needed.
   events: {
     "credits-balance-updated": {

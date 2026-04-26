@@ -94,7 +94,7 @@ export async function upsertVirtualNode(
 
 /**
  * Sync a virtual node with a pre-computed embedding (from skill.ts files).
- * Skips the API call entirely — writes the cached embedding directly.
+ * Skips the API call entirely - writes the cached embedding directly.
  * Skips the DB write entirely if hash already matches and embedding exists.
  * Uses ON CONFLICT to handle concurrent upserts safely.
  */
@@ -107,7 +107,7 @@ export async function syncVirtualNodeWithCachedEmbedding(
 ): Promise<void> {
   const { eq, and } = await import("drizzle-orm");
 
-  // Check if this node already has the correct embedding — skip if so
+  // Check if this node already has the correct embedding - skip if so
   const [existing] = await db
     .select({
       contentHash: cortexNodes.contentHash,
@@ -124,7 +124,7 @@ export async function syncVirtualNodeWithCachedEmbedding(
   const size = Buffer.byteLength(content, "utf8");
   const now = new Date();
 
-  // Upsert with embedding+hash — on conflict, update to latest cached values
+  // Upsert with embedding+hash - on conflict, update to latest cached values
   await db
     .insert(cortexNodes)
     .values({

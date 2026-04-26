@@ -122,7 +122,7 @@ export const documentsSyncProvider: SyncProvider = {
           continue;
         }
 
-        // Match by syncId OR path (path wins if syncId not found — handles local docs without syncId)
+        // Match by syncId OR path (path wins if syncId not found - handles local docs without syncId)
         const [existing] = await db
           .select({ id: cortexNodes.id, updatedAt: cortexNodes.updatedAt })
           .from(cortexNodes)

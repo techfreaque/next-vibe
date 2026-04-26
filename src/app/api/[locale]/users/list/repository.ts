@@ -91,7 +91,7 @@ export class UserListRepository {
   }
 
   /**
-   * Subscription presence filter — uses EXISTS on subscriptions table
+   * Subscription presence filter - uses EXISTS on subscriptions table
    */
   private static convertSubscriptionFilter(
     filter: string | undefined,
@@ -141,7 +141,7 @@ export class UserListRepository {
   }
 
   /**
-   * Credit activity filter — purchased packs or spent credits
+   * Credit activity filter - purchased packs or spent credits
    */
   private static convertCreditActivityFilter(
     filter: string | undefined,
@@ -204,7 +204,7 @@ export class UserListRepository {
   }
 
   /**
-   * Threads filter — has/no chat threads
+   * Threads filter - has/no chat threads
    */
   private static convertThreadsFilter(filter: string | undefined): SQL | null {
     if (!filter || filter === ThreadsFilter.ANY) {
@@ -232,7 +232,7 @@ export class UserListRepository {
   }
 
   /**
-   * Referral activity filter — code, clicks, signups, paying subscribers
+   * Referral activity filter - code, clicks, signups, paying subscribers
    */
   private static convertReferralActivityFilter(
     filter: string | undefined,

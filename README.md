@@ -97,7 +97,7 @@ contact/
   db.ts            - Drizzle schema
 ```
 
-`definition.ts` and `route.ts` are required. `widget.tsx` is optional but you'll want it for any non-trivial endpoint — it's how users actually experience the feature. Everything else is added when needed. Add a field to the definition — web form, CLI flags, AI tool schema, and mobile screen all update. Delete the folder — gone from every platform. No orphans. No cleanup.
+`definition.ts` and `route.ts` are required. `widget.tsx` is optional but you'll want it for any non-trivial endpoint - it's how users actually experience the feature. Everything else is added when needed. Add a field to the definition - web form, CLI flags, AI tool schema, and mobile screen all update. Delete the folder - gone from every platform. No orphans. No cleanup.
 
 > [Definition](docs/patterns/definition.md) · [Route](docs/patterns/route.md) · [Repository](docs/patterns/repository.md) · [Widget](docs/patterns/widget.md) · [All patterns](docs/README.md)
 

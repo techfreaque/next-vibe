@@ -319,7 +319,7 @@ export const translations: typeof enTranslations = {
     favoriteConfig: {
       label: "Konfiguracja ulubionego",
       description:
-        "Pełna konfiguracja aktywnego ulubionego — wybór modeli, konfiguracja narzędzi, ustawienia kontekstu. null = brak aktywnego ulubionego, używane domyślne ustawienia skilla/systemu.",
+        "Pełna konfiguracja aktywnego ulubionego - wybór modeli, konfiguracja narzędzi, ustawienia kontekstu. null = brak aktywnego ulubionego, używane domyślne ustawienia skilla/systemu.",
     },
     resumeToken: {
       label: "Token wznowienia",

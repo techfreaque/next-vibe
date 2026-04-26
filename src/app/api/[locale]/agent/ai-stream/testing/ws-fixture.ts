@@ -18,7 +18,7 @@
  *   test (same context name as setFetchCacheContext).
  *
  * Strict mode: setWsFixtureStrictMode(true) throws when a WS connection is
- * opened without a matching fixture — proving fully offline test execution.
+ * opened without a matching fixture - proving fully offline test execution.
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -371,7 +371,7 @@ export function installWsFixture(): void {
 
   // Replace globalThis.WebSocket with our interceptor class.
   // Routes to MockWebSocket (cache hit) or RecordingWebSocket (cache miss).
-  // No `implements WebSocket` — DOM interface has internal slots that can't be
+  // No `implements WebSocket` - DOM interface has internal slots that can't be
   // structurally satisfied. We match the runtime shape the unbottled handler uses:
   // addEventListener, removeEventListener, send, close, readyState, url.
   class WsInterceptor {

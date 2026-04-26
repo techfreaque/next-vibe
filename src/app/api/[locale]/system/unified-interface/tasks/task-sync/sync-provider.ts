@@ -38,7 +38,7 @@ export interface SyncProvider {
   /** Unique key: "memories", "documents", "skills", "threads", ... */
   readonly key: string;
 
-  /** Return {syncId, updatedAt} pairs — framework computes SHA256 hash from these */
+  /** Return {syncId, updatedAt} pairs - framework computes SHA256 hash from these */
   getHashEntries(userId: string): Promise<SyncHashEntry[]>;
 
   /** Serialize all syncable items as JSON string. Only called when hash differs. */

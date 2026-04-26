@@ -34,7 +34,7 @@ const EMPTY_RECT = (): Record<string, number> => ({
 });
 
 // Build a minimal synthetic event so web-style onChange handlers work in CLI.
-// Cast via unknown — the CLI never inspects the event shape, only reads .target.value.
+// Cast via unknown - the CLI never inspects the event shape, only reads .target.value.
 function makeChangeEvent(
   name: string | undefined,
   text: string,

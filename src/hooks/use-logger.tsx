@@ -14,7 +14,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 const LoggerContext = createContext<EndpointLogger | null>(null);
 
-/** Stable per-tab ID stored in sessionStorage — new tab = new ID, refresh = same ID */
+/** Stable per-tab ID stored in sessionStorage - new tab = new ID, refresh = same ID */
 function getOrCreateTabId(): string {
   try {
     const existing = sessionStorage.getItem("vibe-tab-id");
@@ -25,7 +25,7 @@ function getOrCreateTabId(): string {
     sessionStorage.setItem("vibe-tab-id", id);
     return id;
   } catch {
-    // SSR or storage unavailable — use a one-off ID (won't persist but won't crash)
+    // SSR or storage unavailable - use a one-off ID (won't persist but won't crash)
     return crypto.randomUUID();
   }
 }

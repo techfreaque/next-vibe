@@ -179,7 +179,7 @@ export class TaskReportRepository {
               await import("@/app/api/[locale]/user/remote-connection/repository");
             // getLocalInstanceId respects user-configured instance identity (DB);
             // falls back to deriveDefaultSelfInstanceId() (env-based) when no
-            // record exists — on Thea (prod) this resolves to "thea".
+            // record exists - on Thea (prod) this resolves to "thea".
             const selfInstanceId =
               owner.type === "user"
                 ? await RemoteConnectionRepository.getLocalInstanceId(

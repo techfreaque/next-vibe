@@ -100,7 +100,7 @@ export interface VirtualSearchHit {
 }
 
 /**
- * Direct keyword search across cron tasks — one DB query.
+ * Direct keyword search across cron tasks - one DB query.
  */
 export async function searchTasks(
   userId: string,

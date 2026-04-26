@@ -79,7 +79,7 @@ interface Palette {
 const PALETTES: Palette[] = [
   {
     name: "Sapphire",
-    description: "Current default — deep blue, blue-tinted surfaces",
+    description: "Current default - deep blue, blue-tinted surfaces",
     preview: "hsl(224, 71%, 40%)",
     colors: {
       light: {
@@ -140,7 +140,7 @@ const PALETTES: Palette[] = [
   },
   {
     name: "Electric Blue",
-    description: "Crisp blue — classic SaaS, high trust",
+    description: "Crisp blue - classic SaaS, high trust",
     preview: "hsl(221, 83%, 53%)",
     colors: {
       light: {
@@ -201,7 +201,7 @@ const PALETTES: Palette[] = [
   },
   {
     name: "Emerald",
-    description: "Fresh green — nature, growth, fintech",
+    description: "Fresh green - nature, growth, fintech",
     preview: "hsl(160, 84%, 39%)",
     colors: {
       light: {
@@ -262,7 +262,7 @@ const PALETTES: Palette[] = [
   },
   {
     name: "Rose",
-    description: "Warm pink — creative, bold, social",
+    description: "Warm pink - creative, bold, social",
     preview: "hsl(340, 82%, 52%)",
     colors: {
       light: {
@@ -323,7 +323,7 @@ const PALETTES: Palette[] = [
   },
   {
     name: "Amber",
-    description: "Warm gold — premium, luxury, warm",
+    description: "Warm gold - premium, luxury, warm",
     preview: "hsl(37, 91%, 55%)",
     colors: {
       light: {
@@ -384,7 +384,7 @@ const PALETTES: Palette[] = [
   },
   {
     name: "Teal",
-    description: "Ocean teal — fresh, not another blue SaaS",
+    description: "Ocean teal - fresh, not another blue SaaS",
     preview: "hsl(173, 80%, 40%)",
     colors: {
       light: {
@@ -506,7 +506,7 @@ const PALETTES: Palette[] = [
   },
   {
     name: "Slate",
-    description: "Neutral gray — minimal, zen, content-first",
+    description: "Neutral gray - minimal, zen, content-first",
     preview: "hsl(215, 16%, 47%)",
     colors: {
       light: {
@@ -567,7 +567,7 @@ const PALETTES: Palette[] = [
   },
   {
     name: "Crimson",
-    description: "Bold red — edgy, media, entertainment",
+    description: "Bold red - edgy, media, entertainment",
     preview: "hsl(0, 72%, 51%)",
     colors: {
       light: {
@@ -628,7 +628,7 @@ const PALETTES: Palette[] = [
   },
   {
     name: "Indigo",
-    description: "Refined indigo — current hue boosted, crisper edges",
+    description: "Refined indigo - current hue boosted, crisper edges",
     preview: "hsl(239, 84%, 67%)",
     colors: {
       light: {
@@ -841,7 +841,7 @@ export function PaletteSwitcher(): JSX.Element {
       </Div>
       <P className="text-xs text-muted-foreground">
         {PALETTES[activeIndex]?.description}
-        {activeIndex === 0 ? " — reset to default with first button" : ""}
+        {activeIndex === 0 ? " - reset to default with first button" : ""}
       </P>
     </Div>
   );

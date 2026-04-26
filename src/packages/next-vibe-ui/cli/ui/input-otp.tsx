@@ -1,4 +1,4 @@
-// CLI: OTP input has no terminal equivalent — return null
+// CLI: OTP input has no terminal equivalent - return null
 
 import type {
   InputOTPProps,

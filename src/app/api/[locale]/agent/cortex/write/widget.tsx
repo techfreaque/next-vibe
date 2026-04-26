@@ -114,7 +114,7 @@ export function CortexWriteWidget({
               </Div>
             </CardContent>
           </Card>
-          {/* Content — rendered as Markdown */}
+          {/* Content - rendered as Markdown */}
           {value.responseContent && (
             <Div className="prose prose-sm dark:prose-invert max-w-none rounded-lg border bg-muted/20 p-4 overflow-auto max-h-[600px]">
               <Markdown content={value.responseContent} />

@@ -539,8 +539,8 @@ export interface CreateApiEndpoint<
    * - `fields`: which ResponseOutput keys this event carries (typed Pick)
    * - `onEvent`: optional handler for cross-endpoint side effects (runs after auto-merge)
    *
-   * Server emits via `props.emitEvent("event-name", partial)` — type-checked against fields.
-   * Client subscribes via `useEndpoint({ subscribeToEvents: true })` — framework merges automatically.
+   * Server emits via `props.emitEvent("event-name", partial)` - type-checked against fields.
+   * Client subscribes via `useEndpoint({ subscribeToEvents: true })` - framework merges automatically.
    *
    * Usage:
    * ```ts

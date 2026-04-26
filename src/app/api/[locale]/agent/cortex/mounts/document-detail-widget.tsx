@@ -1,5 +1,5 @@
 /**
- * Document Detail Widget — domain enrichment for /documents/ paths
+ * Document Detail Widget - domain enrichment for /documents/ paths
  *
  * Renders a compact document card below the Cortex operation summary
  * showing the document's path in a domain-aware format.

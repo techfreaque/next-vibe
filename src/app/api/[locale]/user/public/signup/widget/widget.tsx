@@ -274,7 +274,7 @@ export function SignupFormContainer({
           />
         )}
 
-        {/* Creator support selector — only shown when user has UUID skills in localStorage */}
+        {/* Creator support selector - only shown when user has UUID skills in localStorage */}
         {hasUuidSkills && (
           <FormField
             control={form.control}

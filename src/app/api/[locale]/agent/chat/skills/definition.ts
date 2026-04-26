@@ -55,7 +55,7 @@ const SkillsListContainer = lazyWidget(() =>
 );
 
 /**
- * Standalone skill item zod schema — shared between the sections[].skills
+ * Standalone skill item zod schema - shared between the sections[].skills
  * response field and the wsEvent discriminated union (to avoid circular type inference).
  */
 const skillItemSchema = z.object({
@@ -565,7 +565,7 @@ const { GET } = createEndpoint({
   },
 
   // === WS EVENTS ===
-  // Emitted by SkillsRepository after every mutation — keeps all open tabs in sync.
+  // Emitted by SkillsRepository after every mutation - keeps all open tabs in sync.
   // hint carries a JSON payload with the data needed to update the nested
   // sections[].skills[] cache directly without a round-trip to the server.
   events: {

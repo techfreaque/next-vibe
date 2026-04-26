@@ -1,7 +1,7 @@
 /**
  * useWidgetValue / useWidgetSelector
  * Granular Zustand selectors for widget endpoint response data.
- * Fully type-safe — ResponseOutput is inferred from the endpoint type, no casts needed.
+ * Fully type-safe - ResponseOutput is inferred from the endpoint type, no casts needed.
  */
 
 "use client";
@@ -48,7 +48,7 @@ export function useWidgetValue<TEndpoint extends CreateApiEndpointAny>():
 /**
  * Subscribe to a specific slice of the response data.
  * Re-renders ONLY when the selected slice changes.
- * TSelected is inferred from the selector's return type — no second type param needed.
+ * TSelected is inferred from the selector's return type - no second type param needed.
  *
  *   const total = useWidgetSelector<typeof definition.GET>()(d => d?.total ?? 0);
  *   //    ^? number  (inferred from selector)
@@ -57,7 +57,7 @@ export function useWidgetValue<TEndpoint extends CreateApiEndpointAny>():
  *   //    ^? Message[]  (inferred from selector)
  *
  * The two-call syntax `useWidgetSelector<TEndpoint>()(selector)` is required because
- * TypeScript does not support partial type argument inference — you cannot specify
+ * TypeScript does not support partial type argument inference - you cannot specify
  * TEndpoint and have TSelected inferred from the selector in a single call.
  * The extra `()` costs nothing at runtime.
  */
@@ -83,7 +83,7 @@ export function useWidgetSelector<TEndpoint extends CreateApiEndpointAny>(): <
 
 /**
  * Subscribe to a single item inside a nested array in the response data.
- * Re-renders ONLY when that specific item changes — not when other items change.
+ * Re-renders ONLY when that specific item changes - not when other items change.
  *
  * Use this to avoid prop-drilling re-render cascades in list renderers.
  *
@@ -95,7 +95,7 @@ export function useWidgetSelector<TEndpoint extends CreateApiEndpointAny>(): <
  *   //  ^? ChatMessage | undefined  (inferred from array element type)
  *
  * The three-call syntax `useWidgetItem<TEndpoint>()(arraySelector, keyFn, id)` mirrors
- * useWidgetSelector — TEndpoint must be explicit, TItem is inferred from the array selector.
+ * useWidgetSelector - TEndpoint must be explicit, TItem is inferred from the array selector.
  */
 export function useWidgetItem<TEndpoint extends CreateApiEndpointAny>(): <
   TItem,

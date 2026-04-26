@@ -1,5 +1,5 @@
 /**
- * CortexNav — shared top navigation bar for all Cortex widgets.
+ * CortexNav - shared top navigation bar for all Cortex widgets.
  *
  * Shows:
  * - Back button when opened via navigation.push

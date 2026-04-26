@@ -47,7 +47,7 @@ interface ChannelState {
 let sharedWs: WebSocket | null = null;
 let reconnectAttempts = 0;
 
-// Connection state listeners — notified immediately on open/close
+// Connection state listeners - notified immediately on open/close
 const connectionListeners = new Set<(connected: boolean) => void>();
 
 function notifyConnectionState(connected: boolean): void {

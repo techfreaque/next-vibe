@@ -166,7 +166,7 @@ export const remoteConnections = pgTable(
     // Build version string from remote (git SHA / package version)
     capabilitiesVersion: text("capabilities_version"),
 
-    // Unified sync hashes — JSONB { memories: "sha256...", documents: "sha256...", skills: "sha256..." }
+    // Unified sync hashes - JSONB { memories: "sha256...", documents: "sha256...", skills: "sha256..." }
     syncHashes: jsonb("sync_hashes").$type<Record<string, string>>(),
 
     // Last sync hashes received from the remote side

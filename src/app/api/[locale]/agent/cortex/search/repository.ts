@@ -159,9 +159,9 @@ export class CortexSearchRepository {
 
         if (isDbVirtualPath || shouldSearchVirtual(path)) {
           // Virtual-only paths (threads, skills, tasks, uploads, searches, gens)
-          // fall through to DB search below — no disk files here
+          // fall through to DB search below - no disk files here
         } else {
-          // Unknown path — try virtual search anyway
+          // Unknown path - try virtual search anyway
           const virtualResults = await runVirtualSearch(
             userId,
             query,
@@ -328,7 +328,7 @@ async function runVectorSearch(
   const queryEmbedding = await generateEmbedding(query);
 
   if (!queryEmbedding) {
-    logger.info("Vector search skipped — embedding generation failed");
+    logger.info("Vector search skipped - embedding generation failed");
     return [];
   }
 
@@ -430,7 +430,7 @@ async function runVirtualSearch(
 }
 
 /**
- * Search template files (memories + documents) — not in cortexNodes.
+ * Search template files (memories + documents) - not in cortexNodes.
  */
 async function runTemplateSearch(
   query: string,

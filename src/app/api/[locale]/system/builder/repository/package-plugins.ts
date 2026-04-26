@@ -18,7 +18,7 @@ import type { BunPlugin } from "bun";
 
 import type { PackageManifest } from "../../packages/types";
 
-// Absolute path to next-vibe-ui/cli — resolved relative to this file
+// Absolute path to next-vibe-ui/cli - resolved relative to this file
 const CLI_UI_DIR = resolve(
   dirname(fileURLToPath(import.meta.url)),
   "../../../../../packages/next-vibe-ui/cli",

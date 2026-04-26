@@ -221,7 +221,7 @@ export function SplitHero({
             </H1>
           </MotionDiv>
 
-          {/* Subheader — 3 punchy values */}
+          {/* Subheader - 3 punchy values */}
           <MotionDiv
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -233,7 +233,7 @@ export function SplitHero({
             </P>
           </MotionDiv>
 
-          {/* 4 chips — color-coded to panels below */}
+          {/* 4 chips - color-coded to panels below */}
           <MotionDiv
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -266,7 +266,7 @@ export function SplitHero({
             </Div>
           </MotionDiv>
 
-          {/* Footer — small team + bug report */}
+          {/* Footer - small team + bug report */}
           <MotionDiv
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -340,7 +340,7 @@ export function SplitHero({
         </Panel>
       </Div>
 
-      {/* Desktop: pure 2×2 grid — no extra children that would skew row heights */}
+      {/* Desktop: pure 2×2 grid - no extra children that would skew row heights */}
       <Div className="relative hidden md:grid md:grid-cols-2">
         {/* Center badge */}
         <Div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex z-30">

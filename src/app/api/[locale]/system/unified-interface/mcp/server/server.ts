@@ -166,7 +166,7 @@ export class MCPServer {
         error: error.message,
         stack: error.stack,
       });
-      // Do NOT exit — log and continue so one bad route import
+      // Do NOT exit - log and continue so one bad route import
       // doesn't kill the whole MCP session.
     });
 
@@ -174,7 +174,7 @@ export class MCPServer {
       logger.error("[MCP Server] Unhandled rejection (non-fatal)", {
         reason: String(reason),
       });
-      // Do NOT exit — one bad dynamic import (e.g. server-only in a route)
+      // Do NOT exit - one bad dynamic import (e.g. server-only in a route)
       // must not kill the whole MCP session.
     });
   }

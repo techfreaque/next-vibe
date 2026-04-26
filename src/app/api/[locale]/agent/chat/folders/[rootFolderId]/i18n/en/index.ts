@@ -81,7 +81,7 @@ export const translations = {
       },
     },
     sharedThread: {
-      noLinks: "Not shared yet — tap to share",
+      noLinks: "Not shared yet - tap to share",
       linkCount: "{{count}} active link(s)",
       shareAction: "Share",
       moveToShared: "Move to Shared",

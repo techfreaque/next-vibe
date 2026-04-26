@@ -74,7 +74,7 @@ export class FavoritesReorderRepository {
 
       logger.info("Favorites reordered successfully", { userId });
 
-      // Emit WS event — triggers invalidation so all tabs refetch with new order
+      // Emit WS event - triggers invalidation so all tabs refetch with new order
       const emitFavorites = createEndpointEmitter(
         favoritesDefinitions.GET,
         logger,

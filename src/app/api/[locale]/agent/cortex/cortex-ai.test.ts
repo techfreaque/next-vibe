@@ -89,7 +89,7 @@ function parseVerdict(content: string | null | undefined): {
     return { verdict: "MISSING" };
   }
   const lines = content.trimEnd().split("\n");
-  // Scan from the end — verdict must be the last non-empty line
+  // Scan from the end - verdict must be the last non-empty line
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i].trim();
     if (!line) {
@@ -215,7 +215,7 @@ function matchesToolName(m: SlimMessage, toolName: string): boolean {
 /**
  * Find the LAST tool message by tool name.
  * Using last (not first) is critical when a tool is called multiple times across
- * sequential test steps that share a thread — e.g. cortex-read appears in C2 and C3.5.
+ * sequential test steps that share a thread - e.g. cortex-read appears in C2 and C3.5.
  * The current turn's call is always appended at the end, so last = current turn.
  */
 function findToolMsg(
@@ -243,7 +243,9 @@ function findAllToolMsgsSinceLast(
   toolName: string,
 ): SlimMessage[] {
   const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
-  if (!lastUserMsg) {return findAllToolMsgs(messages, toolName);}
+  if (!lastUserMsg) {
+    return findAllToolMsgs(messages, toolName);
+  }
   return messages.filter(
     (m) => matchesToolName(m, toolName) && m.createdAt > lastUserMsg.createdAt,
   );
@@ -383,7 +385,7 @@ describe("Cortex AI Integration", () => {
     if (!testUser) {
       return;
     }
-    // Final cleanup — belt-and-suspenders after C6
+    // Final cleanup - belt-and-suspenders after C6
     await db
       .delete(cortexNodes)
       .where(
@@ -394,7 +396,7 @@ describe("Cortex AI Integration", () => {
       );
   });
 
-  // Sequential: each step builds on previous — one failure skips the rest
+  // Sequential: each step builds on previous - one failure skips the rest
   let suiteFailed = false;
   function fit(name: string, fn: () => Promise<void>, timeout?: number): void {
     it(
@@ -435,9 +437,12 @@ describe("Cortex AI Integration", () => {
     threadId = result.data.threadId!;
     expect(threadId, "C1: no threadId").toBeTruthy();
 
-    // ── Tool call assertions — find the write call that created the file
+    // ── Tool call assertions - find the write call that created the file
     const allWrites = findAllToolMsgs(messages, "cortex-write");
-    expect(allWrites.length, "C1: no cortex-write tool calls found").toBeGreaterThan(0);
+    expect(
+      allWrites.length,
+      "C1: no cortex-write tool calls found",
+    ).toBeGreaterThan(0);
 
     // Find the call that actually created the file (created: true)
     // Model may call cortex-write multiple times; we want the creation event
@@ -446,7 +451,8 @@ describe("Cortex AI Integration", () => {
       .find((r) => r?.created === true);
 
     // If no single call had created:true, the DB check below is the ground truth
-    const writeResult = createWrite ?? resolveToolResult(allWrites[allWrites.length - 1]);
+    const writeResult =
+      createWrite ?? resolveToolResult(allWrites[allWrites.length - 1]);
     expect(writeResult, "C1: no tool result on any write call").toBeTruthy();
     if (!writeResult) {
       return;
@@ -490,7 +496,7 @@ describe("Cortex AI Integration", () => {
       user: testUser,
       favoriteId: mainFavoriteId,
       threadId,
-      prompt: `Use cortex-read to read the file at /documents/ai-test/notes.md. Tell me what's in it — quote the exact content you receive.${VERDICT_INSTRUCTION}`,
+      prompt: `Use cortex-read to read the file at /documents/ai-test/notes.md. Tell me what's in it - quote the exact content you receive.${VERDICT_INSTRUCTION}`,
     });
 
     expect(result.success, "C2: stream failed").toBe(true);
@@ -521,7 +527,7 @@ describe("Cortex AI Integration", () => {
       "C2: content must contain original word 'testing'",
     ).toContain(ORIGINAL_WORD);
     expect(readResult.nodeType, "C2: nodeType must be present").toBeTruthy();
-    // truncated must be false — file is small
+    // truncated must be false - file is small
     expect(
       readResult.truncated,
       "C2: small file must not be truncated",
@@ -656,7 +662,7 @@ describe("Cortex AI Integration", () => {
       return;
     }
 
-    // Exactly one cortex-tree call expected — not cortex-list (since last user msg)
+    // Exactly one cortex-tree call expected - not cortex-list (since last user msg)
     const treeMsgs = findAllToolMsgsSinceLast(messages, "cortex-tree");
     expect(
       treeMsgs.length,
@@ -713,7 +719,7 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
     }
 
     // Must NOT have called any tools in this turn.
-    // messages contains all thread history — find the last user message (this turn's prompt)
+    // messages contains all thread history - find the last user message (this turn's prompt)
     // and check no tool messages appear after it.
     const userMsgs = messages.filter((m) => m.role === "user");
     const lastUserMsg = userMsgs[userMsgs.length - 1];
@@ -724,7 +730,7 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
       : [];
     expect(
       toolMsgsThisTurn.length,
-      "C5: AI must answer from memory — no tool calls this turn",
+      "C5: AI must answer from memory - no tool calls this turn",
     ).toBe(0);
 
     const aiMsg = lastAiMessage(messages);
@@ -887,7 +893,7 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
       return;
     }
 
-    // Tool errored — result may be undefined (error before result stored) or a not-found object.
+    // Tool errored - result may be undefined (error before result stored) or a not-found object.
     // Either way: the AI received the error and its response is what we verify below.
     const rawResult = readMsg.toolCall?.result;
     const readResult = resolveToolResult(readMsg);
@@ -936,7 +942,7 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
 //
 // Each mount type (/threads /skills /tasks /uploads /searches) gets its own
 // independent test. Tests share a single thread per describe block for context
-// but each mount describe is isolated — no carry-over state between mount groups.
+// but each mount describe is isolated - no carry-over state between mount groups.
 //
 // Cache bust: delete fixtures/http-cache/cortex-mount-{context}/ to re-record.
 //
@@ -1023,15 +1029,13 @@ describe("Cortex Mount: /threads", () => {
   }, TEST_TIMEOUT);
 
   let suiteFailed = false;
-  function fit(
-    name: string,
-    fn: () => Promise<void>,
-    timeout?: number,
-  ): void {
+  function fit(name: string, fn: () => Promise<void>, timeout?: number): void {
     it(
       name,
       async () => {
-        if (suiteFailed) {return;}
+        if (suiteFailed) {
+          return;
+        }
         try {
           await fn();
         } catch (err) {
@@ -1054,26 +1058,38 @@ describe("Cortex Mount: /threads", () => {
     });
 
     expect(result.success, "M1: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
 
     threadId = result.data.threadId!;
 
     const listMsg = findToolMsg(messages, "cortex-list");
     expect(listMsg, "M1: no cortex-list tool call").toBeTruthy();
-    if (!listMsg) {return;}
+    if (!listMsg) {
+      return;
+    }
 
     const listResult = resolveToolResult(listMsg);
     expect(listResult, "M1: no list result").toBeTruthy();
-    if (!listResult) {return;}
+    if (!listResult) {
+      return;
+    }
 
     const entries = Array.isArray(listResult.entries) ? listResult.entries : [];
-    expect(entries.length, "M1: /threads must have at least 1 folder").toBeGreaterThanOrEqual(1);
+    expect(
+      entries.length,
+      "M1: /threads must have at least 1 folder",
+    ).toBeGreaterThanOrEqual(1);
 
     // Every entry must have name and path
     for (const entry of entries) {
       const e = entry as Record<string, WidgetData>;
       expect(e.name, "M1: entry missing name").toBeTruthy();
-      expect(String(e.entryPath ?? e.path ?? ""), "M1: entry missing path").toContain("/threads");
+      expect(
+        String(e.entryPath ?? e.path ?? ""),
+        "M1: entry missing path",
+      ).toContain("/threads");
     }
 
     // AI must name the folders
@@ -1093,20 +1109,29 @@ describe("Cortex Mount: /threads", () => {
     });
 
     expect(result.success, "M2: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
 
     // Must have called cortex-read
     const readMsg = findToolMsg(messages, "cortex-read");
     expect(readMsg, "M2: no cortex-read tool call").toBeTruthy();
-    if (!readMsg) {return;}
+    if (!readMsg) {
+      return;
+    }
 
     const readResult = resolveToolResult(readMsg);
     expect(readResult, "M2: no read result").toBeTruthy();
-    if (!readResult) {return;}
+    if (!readResult) {
+      return;
+    }
 
     const content = String(readResult.content ?? "");
     // Thread files must have YAML frontmatter with threadId
-    expect(content, "M2: thread file must have threadId in frontmatter").toContain("threadId:");
+    expect(
+      content,
+      "M2: thread file must have threadId in frontmatter",
+    ).toContain("threadId:");
 
     const aiMsg = lastAiMessage(messages);
     expect(aiMsg, "M2: no AI response").toBeTruthy();
@@ -1130,7 +1155,9 @@ describe("Cortex Mount: /threads", () => {
     });
 
     expect(result.success, "M3: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
 
     // Either: the AI called cortex-write and got an error, or it recognized
     // /threads as read-only from the system prompt and reported without trying.
@@ -1140,7 +1167,7 @@ describe("Cortex Mount: /threads", () => {
 
     const aiContent = (aiMsg?.content ?? "").toLowerCase();
     if (writeMsg) {
-      // Must be an error — /threads is not writable
+      // Must be an error - /threads is not writable
       const rawResult = writeMsg.toolCall?.result;
       const writeResult = resolveToolResult(writeMsg);
       const isError =
@@ -1148,10 +1175,19 @@ describe("Cortex Mount: /threads", () => {
         (writeResult !== null &&
           (writeResult.success === false ||
             String(writeResult.errorType ?? "").includes("FORBIDDEN") ||
-            String(writeResult.message ?? "").toLowerCase().includes("read"))) ||
-        String(rawResult ?? "").toLowerCase().includes("read") ||
-        String(rawResult ?? "").toLowerCase().includes("forbidden");
-      expect(isError, "M3: write to /threads must fail with a read-only or forbidden error").toBe(true);
+            String(writeResult.message ?? "")
+              .toLowerCase()
+              .includes("read"))) ||
+        String(rawResult ?? "")
+          .toLowerCase()
+          .includes("read") ||
+        String(rawResult ?? "")
+          .toLowerCase()
+          .includes("forbidden");
+      expect(
+        isError,
+        "M3: write to /threads must fail with a read-only or forbidden error",
+      ).toBe(true);
     } else {
       // AI may have called cortex-write and reported the error in its response,
       // or recognized read-only from the system prompt without trying.
@@ -1163,7 +1199,10 @@ describe("Cortex Mount: /threads", () => {
         aiContent.includes("forbidden") ||
         aiContent.includes("403") ||
         aiContent.includes("errortype");
-      expect(mentionsReadOnly, `M3: AI must mention read-only restriction, got: ${aiContent.slice(0, 200)}`).toBe(true);
+      expect(
+        mentionsReadOnly,
+        `M3: AI must mention read-only restriction, got: ${aiContent.slice(0, 200)}`,
+      ).toBe(true);
     }
 
     assertVerdictPass(aiMsg?.content, "M3");
@@ -1185,7 +1224,9 @@ describe("Cortex Mount: /skills", () => {
       defaultLocale,
       logger,
     );
-    if (!result.success || !result.data) {return;}
+    if (!result.success || !result.data) {
+      return;
+    }
     const user = result.data;
     const [link, roleRows] = await Promise.all([
       db.query.userLeadLinks.findFirst({
@@ -1193,7 +1234,9 @@ describe("Cortex Mount: /skills", () => {
       }),
       db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
     ]);
-    if (!link) {return;}
+    if (!link) {
+      return;
+    }
     const roles = roleRows
       .map((r) => r.role)
       .filter((r): r is (typeof UserRoleDB)[number] =>
@@ -1258,20 +1301,34 @@ describe("Cortex Mount: /skills", () => {
   }, TEST_TIMEOUT);
 
   afterAll(async () => {
-    if (!testSkillId) {return;}
+    if (!testSkillId) {
+      return;
+    }
     const { customSkills: customSkillsTable } =
       await import("@/app/api/[locale]/agent/chat/skills/db");
-    await db.delete(customSkillsTable).where(eq(customSkillsTable.id, testSkillId));
+    await db
+      .delete(customSkillsTable)
+      .where(eq(customSkillsTable.id, testSkillId));
   });
 
   let suiteFailed = false;
   function fit(name: string, fn: () => Promise<void>, timeout?: number): void {
-    it(name, async () => {
-      if (suiteFailed) {return;}
-      try { await fn(); }
-      // oxlint-disable-next-line restricted-syntax
-      catch (err) { suiteFailed = true; throw err; }
-    }, timeout ?? TEST_TIMEOUT);
+    it(
+      name,
+      async () => {
+        if (suiteFailed) {
+          return;
+        }
+        try {
+          await fn();
+        } catch (err) {
+          // oxlint-disable-next-line restricted-syntax
+          suiteFailed = true;
+          throw err;
+        }
+      },
+      timeout ?? TEST_TIMEOUT,
+    );
   }
 
   // ── S1: List /skills ─────────────────────────────────────────────────────
@@ -1284,22 +1341,34 @@ describe("Cortex Mount: /skills", () => {
     });
 
     expect(result.success, "S1: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
     threadId = result.data.threadId!;
 
     const listMsg = findToolMsg(messages, "cortex-list");
     expect(listMsg, "S1: no cortex-list call").toBeTruthy();
-    if (!listMsg) {return;}
+    if (!listMsg) {
+      return;
+    }
 
     const listResult = resolveToolResult(listMsg);
     expect(listResult, "S1: no list result").toBeTruthy();
-    if (!listResult) {return;}
+    if (!listResult) {
+      return;
+    }
 
     const entries = Array.isArray(listResult.entries) ? listResult.entries : [];
-    expect(entries.length, "S1: must have at least 1 skill (the test skill)").toBeGreaterThanOrEqual(1);
+    expect(
+      entries.length,
+      "S1: must have at least 1 skill (the test skill)",
+    ).toBeGreaterThanOrEqual(1);
 
     const names = entries.map((e: { name?: string }) => String(e.name ?? ""));
-    expect(names.some((n) => n.includes(testSkillSlug)), "S1: test skill must appear in listing").toBe(true);
+    expect(
+      names.some((n) => n.includes(testSkillSlug)),
+      "S1: test skill must appear in listing",
+    ).toBe(true);
 
     const aiMsg = lastAiMessage(messages);
     expect(aiMsg, "S1: no AI response").toBeTruthy();
@@ -1317,20 +1386,34 @@ describe("Cortex Mount: /skills", () => {
     });
 
     expect(result.success, "S2: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
 
     const readMsg = findToolMsg(messages, "cortex-read");
     expect(readMsg, "S2: no cortex-read call").toBeTruthy();
-    if (!readMsg) {return;}
+    if (!readMsg) {
+      return;
+    }
 
     const readResult = resolveToolResult(readMsg);
     expect(readResult, "S2: no read result").toBeTruthy();
-    if (!readResult) {return;}
+    if (!readResult) {
+      return;
+    }
 
     const content = String(readResult.content ?? "");
-    expect(content, "S2: skill file must have skillId in frontmatter").toContain("skillId:");
-    expect(content, "S2: skill file must have system prompt").toContain("cortex test skill");
-    expect(content.length, "S2: skill file content must be substantial").toBeGreaterThan(100);
+    expect(
+      content,
+      "S2: skill file must have skillId in frontmatter",
+    ).toContain("skillId:");
+    expect(content, "S2: skill file must have system prompt").toContain(
+      "cortex test skill",
+    );
+    expect(
+      content.length,
+      "S2: skill file content must be substantial",
+    ).toBeGreaterThan(100);
 
     const aiMsg = lastAiMessage(messages);
     assertVerdictPass(aiMsg?.content, "S2");
@@ -1347,15 +1430,21 @@ describe("Cortex Mount: /skills", () => {
     });
 
     expect(result.success, "S3: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
 
     const treeMsg = findToolMsg(messages, "cortex-tree");
     expect(treeMsg, "S3: no cortex-tree call").toBeTruthy();
-    if (!treeMsg) {return;}
+    if (!treeMsg) {
+      return;
+    }
 
     const treeResult = resolveToolResult(treeMsg);
     expect(treeResult, "S3: no tree result").toBeTruthy();
-    if (!treeResult) {return;}
+    if (!treeResult) {
+      return;
+    }
 
     const tree = String(treeResult.tree ?? "");
     expect(tree, "S3: tree must contain .md files").toContain(".md");
@@ -1376,7 +1465,9 @@ describe("Cortex Mount: /tasks", () => {
       defaultLocale,
       logger,
     );
-    if (!result.success || !result.data) {return;}
+    if (!result.success || !result.data) {
+      return;
+    }
     const user = result.data;
     const [link, roleRows] = await Promise.all([
       db.query.userLeadLinks.findFirst({
@@ -1384,7 +1475,9 @@ describe("Cortex Mount: /tasks", () => {
       }),
       db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
     ]);
-    if (!link) {return;}
+    if (!link) {
+      return;
+    }
     const roles = roleRows
       .map((r) => r.role)
       .filter((r): r is (typeof UserRoleDB)[number] =>
@@ -1422,41 +1515,55 @@ describe("Cortex Mount: /tasks", () => {
   }, TEST_TIMEOUT);
 
   // ── T1: List /tasks ──────────────────────────────────────────────────────
-  it("T1: AI lists /tasks and reads a task file", async () => {
-    setFetchCacheContext("cortex-mount-tasks-list");
-    const { result, messages } = await runTestStream({
-      user: testUser,
-      favoriteId: mainFavoriteId,
-      prompt: `Use cortex-list to list /tasks. If there are any task files, use cortex-read on the first one and confirm it has frontmatter with taskId and a status field. If /tasks is empty, just confirm it's an empty directory.${VERDICT_INSTRUCTION}`,
-    });
+  it(
+    "T1: AI lists /tasks and reads a task file",
+    async () => {
+      setFetchCacheContext("cortex-mount-tasks-list");
+      const { result, messages } = await runTestStream({
+        user: testUser,
+        favoriteId: mainFavoriteId,
+        prompt: `Use cortex-list to list /tasks. If there are any task files, use cortex-read on the first one and confirm it has frontmatter with taskId and a status field. If /tasks is empty, just confirm it's an empty directory.${VERDICT_INSTRUCTION}`,
+      });
 
-    expect(result.success, "T1: stream failed").toBe(true);
-    if (!result.success) {return;}
+      expect(result.success, "T1: stream failed").toBe(true);
+      if (!result.success) {
+        return;
+      }
 
-    const listMsg = findToolMsg(messages, "cortex-list");
-    expect(listMsg, "T1: no cortex-list call").toBeTruthy();
-    if (!listMsg) {return;}
+      const listMsg = findToolMsg(messages, "cortex-list");
+      expect(listMsg, "T1: no cortex-list call").toBeTruthy();
+      if (!listMsg) {
+        return;
+      }
 
-    const listResult = resolveToolResult(listMsg);
-    expect(listResult, "T1: no list result").toBeTruthy();
-    if (!listResult) {return;}
+      const listResult = resolveToolResult(listMsg);
+      expect(listResult, "T1: no list result").toBeTruthy();
+      if (!listResult) {
+        return;
+      }
 
-    // entries may be empty if no tasks exist — that's fine
-    const entries = Array.isArray(listResult.entries) ? listResult.entries : [];
-    if (entries.length > 0) {
-      // If tasks exist, must also have read one
-      const readMsg = findToolMsg(messages, "cortex-read");
-      if (readMsg) {
-        const readResult = resolveToolResult(readMsg);
-        if (readResult) {
-          const content = String(readResult.content ?? "");
-          expect(content, "T1: task file must have taskId").toContain("taskId:");
+      // entries may be empty if no tasks exist - that's fine
+      const entries = Array.isArray(listResult.entries)
+        ? listResult.entries
+        : [];
+      if (entries.length > 0) {
+        // If tasks exist, must also have read one
+        const readMsg = findToolMsg(messages, "cortex-read");
+        if (readMsg) {
+          const readResult = resolveToolResult(readMsg);
+          if (readResult) {
+            const content = String(readResult.content ?? "");
+            expect(content, "T1: task file must have taskId").toContain(
+              "taskId:",
+            );
+          }
         }
       }
-    }
 
-    assertVerdictPass(lastAiMessage(messages)?.content, "T1");
-  }, TEST_TIMEOUT);
+      assertVerdictPass(lastAiMessage(messages)?.content, "T1");
+    },
+    TEST_TIMEOUT,
+  );
 });
 
 describe("Cortex Mount: /searches and cortex-search", () => {
@@ -1472,7 +1579,9 @@ describe("Cortex Mount: /searches and cortex-search", () => {
       defaultLocale,
       logger,
     );
-    if (!result.success || !result.data) {return;}
+    if (!result.success || !result.data) {
+      return;
+    }
     const user = result.data;
     const [link, roleRows] = await Promise.all([
       db.query.userLeadLinks.findFirst({
@@ -1480,7 +1589,9 @@ describe("Cortex Mount: /searches and cortex-search", () => {
       }),
       db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
     ]);
-    if (!link) {return;}
+    if (!link) {
+      return;
+    }
     const roles = roleRows
       .map((r) => r.role)
       .filter((r): r is (typeof UserRoleDB)[number] =>
@@ -1528,7 +1639,9 @@ describe("Cortex Mount: /searches and cortex-search", () => {
   }, TEST_TIMEOUT);
 
   afterAll(async () => {
-    if (!testUser) {return;}
+    if (!testUser) {
+      return;
+    }
     await db
       .delete(cortexNodes)
       .where(
@@ -1541,12 +1654,22 @@ describe("Cortex Mount: /searches and cortex-search", () => {
 
   let suiteFailed = false;
   function fit(name: string, fn: () => Promise<void>, timeout?: number): void {
-    it(name, async () => {
-      if (suiteFailed) {return;}
-      try { await fn(); }
-      // oxlint-disable-next-line restricted-syntax
-      catch (err) { suiteFailed = true; throw err; }
-    }, timeout ?? TEST_TIMEOUT);
+    it(
+      name,
+      async () => {
+        if (suiteFailed) {
+          return;
+        }
+        try {
+          await fn();
+        } catch (err) {
+          // oxlint-disable-next-line restricted-syntax
+          suiteFailed = true;
+          throw err;
+        }
+      },
+      timeout ?? TEST_TIMEOUT,
+    );
   }
 
   // ── SR1: Write a searchable document ────────────────────────────────────
@@ -1559,23 +1682,35 @@ describe("Cortex Mount: /searches and cortex-search", () => {
     });
 
     expect(result.success, "SR1: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
     threadId = result.data.threadId!;
 
     const writeMsg = findToolMsg(messages, "cortex-write");
     expect(writeMsg, "SR1: no cortex-write call").toBeTruthy();
-    if (!writeMsg) {return;}
+    if (!writeMsg) {
+      return;
+    }
 
     const writeResult = resolveToolResult(writeMsg);
     expect(writeResult, "SR1: no write result").toBeTruthy();
-    if (!writeResult) {return;}
+    if (!writeResult) {
+      return;
+    }
 
     expect(writeResult.created, "SR1: created must be true").toBe(true);
 
     // DB cross-check
-    const dbNode = await dbGetNode(testUser.id, "/documents/search-test/quantum-flux.md");
+    const dbNode = await dbGetNode(
+      testUser.id,
+      "/documents/search-test/quantum-flux.md",
+    );
     expect(dbNode, "SR1: DB node not found").toBeTruthy();
-    expect(dbNode!.content, "SR1: DB must contain unique search term").toContain("quantum flux resonance");
+    expect(
+      dbNode!.content,
+      "SR1: DB must contain unique search term",
+    ).toContain("quantum flux resonance");
 
     assertVerdictPass(lastAiMessage(messages)?.content, "SR1");
   });
@@ -1591,26 +1726,43 @@ describe("Cortex Mount: /searches and cortex-search", () => {
     });
 
     expect(result.success, "SR2: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
 
     const searchMsg = findToolMsg(messages, "cortex-search");
     expect(searchMsg, "SR2: no cortex-search call").toBeTruthy();
-    if (!searchMsg) {return;}
+    if (!searchMsg) {
+      return;
+    }
 
     const searchResult = resolveToolResult(searchMsg);
     expect(searchResult, "SR2: no search result").toBeTruthy();
-    if (!searchResult) {return;}
+    if (!searchResult) {
+      return;
+    }
 
-    const results = Array.isArray(searchResult.results) ? searchResult.results : [];
-    expect(results.length, "SR2: search must return at least 1 result").toBeGreaterThanOrEqual(1);
+    const results = Array.isArray(searchResult.results)
+      ? searchResult.results
+      : [];
+    expect(
+      results.length,
+      "SR2: search must return at least 1 result",
+    ).toBeGreaterThanOrEqual(1);
 
-    // quantum-flux should appear in the results — skip gracefully if vector similarity
+    // quantum-flux should appear in the results - skip gracefully if vector similarity
     // ranks other nodes higher (embedding vectors in test fixtures are approximate)
-    const allPaths = results.map(
-      (r) => String((r as Record<string, WidgetData>).resultPath ?? (r as Record<string, WidgetData>).path ?? ""),
+    const allPaths = results.map((r) =>
+      String(
+        (r as Record<string, WidgetData>).resultPath ??
+          (r as Record<string, WidgetData>).path ??
+          "",
+      ),
     );
     if (!allPaths.some((p) => p.includes("quantum-flux"))) {
-      console.warn(`SR2: quantum-flux not in top results — skipping (got: ${allPaths.slice(0, 3).join(", ")})`);
+      console.warn(
+        `SR2: quantum-flux not in top results - skipping (got: ${allPaths.slice(0, 3).join(", ")})`,
+      );
       return;
     }
 
@@ -1621,7 +1773,9 @@ describe("Cortex Mount: /searches and cortex-search", () => {
     const aiMsg = lastAiMessage(messages);
     expect(aiMsg, "SR2: no AI response").toBeTruthy();
     const aiContent = aiMsg?.content ?? "";
-    expect(aiContent, "SR2: AI must mention the result path").toContain("quantum-flux");
+    expect(aiContent, "SR2: AI must mention the result path").toContain(
+      "quantum-flux",
+    );
     assertVerdictPass(aiContent, "SR2");
   });
 
@@ -1636,23 +1790,41 @@ describe("Cortex Mount: /searches and cortex-search", () => {
     });
 
     expect(result.success, "SR3: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
 
     const searchMsg = findToolMsg(messages, "cortex-search");
     expect(searchMsg, "SR3: no cortex-search call").toBeTruthy();
-    if (!searchMsg) {return;}
+    if (!searchMsg) {
+      return;
+    }
 
     const searchResult = resolveToolResult(searchMsg);
     expect(searchResult, "SR3: no search result").toBeTruthy();
-    if (!searchResult) {return;}
+    if (!searchResult) {
+      return;
+    }
 
-    const results = Array.isArray(searchResult.results) ? searchResult.results : [];
-    expect(results.length, "SR3: scoped search must find at least 1 result").toBeGreaterThanOrEqual(1);
+    const results = Array.isArray(searchResult.results)
+      ? searchResult.results
+      : [];
+    expect(
+      results.length,
+      "SR3: scoped search must find at least 1 result",
+    ).toBeGreaterThanOrEqual(1);
 
     // All results must be within the scoped path
     for (const r of results) {
-      const resultPath = String((r as Record<string, WidgetData>).resultPath ?? (r as Record<string, WidgetData>).path ?? "");
-      expect(resultPath, "SR3: all results must be within /documents/search-test/").toContain("/documents/search-test");
+      const resultPath = String(
+        (r as Record<string, WidgetData>).resultPath ??
+          (r as Record<string, WidgetData>).path ??
+          "",
+      );
+      expect(
+        resultPath,
+        "SR3: all results must be within /documents/search-test/",
+      ).toContain("/documents/search-test");
     }
 
     assertVerdictPass(lastAiMessage(messages)?.content, "SR3");
@@ -1669,17 +1841,23 @@ describe("Cortex Mount: /searches and cortex-search", () => {
     });
 
     expect(result.success, "SR4: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
 
     const listMsg = findToolMsg(messages, "cortex-list");
     expect(listMsg, "SR4: no cortex-list call").toBeTruthy();
-    if (!listMsg) {return;}
+    if (!listMsg) {
+      return;
+    }
 
     const listResult = resolveToolResult(listMsg);
     expect(listResult, "SR4: no list result").toBeTruthy();
-    if (!listResult) {return;}
+    if (!listResult) {
+      return;
+    }
 
-    // /searches may be empty if no web searches exist — fine, just check structure
+    // /searches may be empty if no web searches exist - fine, just check structure
     const aiMsg = lastAiMessage(messages);
     expect(aiMsg, "SR4: no AI response").toBeTruthy();
     assertVerdictPass(aiMsg?.content, "SR4");
@@ -1699,7 +1877,9 @@ describe("Cortex: /documents path operations and edge cases", () => {
       defaultLocale,
       logger,
     );
-    if (!result.success || !result.data) {return;}
+    if (!result.success || !result.data) {
+      return;
+    }
     const user = result.data;
     const [link, roleRows] = await Promise.all([
       db.query.userLeadLinks.findFirst({
@@ -1707,7 +1887,9 @@ describe("Cortex: /documents path operations and edge cases", () => {
       }),
       db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
     ]);
-    if (!link) {return;}
+    if (!link) {
+      return;
+    }
     const roles = roleRows
       .map((r) => r.role)
       .filter((r): r is (typeof UserRoleDB)[number] =>
@@ -1754,7 +1936,9 @@ describe("Cortex: /documents path operations and edge cases", () => {
   }, TEST_TIMEOUT);
 
   afterAll(async () => {
-    if (!testUser) {return;}
+    if (!testUser) {
+      return;
+    }
     await db
       .delete(cortexNodes)
       .where(
@@ -1767,12 +1951,22 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
   let suiteFailed = false;
   function fit(name: string, fn: () => Promise<void>, timeout?: number): void {
-    it(name, async () => {
-      if (suiteFailed) {return;}
-      try { await fn(); }
-      // oxlint-disable-next-line restricted-syntax
-      catch (err) { suiteFailed = true; throw err; }
-    }, timeout ?? TEST_TIMEOUT);
+    it(
+      name,
+      async () => {
+        if (suiteFailed) {
+          return;
+        }
+        try {
+          await fn();
+        } catch (err) {
+          // oxlint-disable-next-line restricted-syntax
+          suiteFailed = true;
+          throw err;
+        }
+      },
+      timeout ?? TEST_TIMEOUT,
+    );
   }
 
   // ── E1: List root / ──────────────────────────────────────────────────────
@@ -1785,22 +1979,33 @@ describe("Cortex: /documents path operations and edge cases", () => {
     });
 
     expect(result.success, "E1: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
     threadId = result.data.threadId!;
 
     const listMsg = findToolMsg(messages, "cortex-list");
     expect(listMsg, "E1: no cortex-list call").toBeTruthy();
-    if (!listMsg) {return;}
+    if (!listMsg) {
+      return;
+    }
 
     const listResult = resolveToolResult(listMsg);
     expect(listResult, "E1: no list result").toBeTruthy();
-    if (!listResult) {return;}
+    if (!listResult) {
+      return;
+    }
 
     const entries = Array.isArray(listResult.entries) ? listResult.entries : [];
-    expect(entries.length, "E1: root must have multiple entries").toBeGreaterThanOrEqual(3);
+    expect(
+      entries.length,
+      "E1: root must have multiple entries",
+    ).toBeGreaterThanOrEqual(3);
 
     // Must include the main mounts
-    const names = entries.map((e) => String((e as Record<string, WidgetData>).name ?? ""));
+    const names = entries.map((e) =>
+      String((e as Record<string, WidgetData>).name ?? ""),
+    );
     const hasDocuments = names.some((n) => n.includes("documents"));
     const hasThreads = names.some((n) => n.includes("threads"));
     expect(hasDocuments, "E1: root must include /documents").toBe(true);
@@ -1820,22 +2025,31 @@ describe("Cortex: /documents path operations and edge cases", () => {
     });
 
     expect(result.success, "E2: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
 
     const mkdirMsg = findToolMsg(messages, "cortex-mkdir");
     expect(mkdirMsg, "E2: no cortex-mkdir call").toBeTruthy();
 
     const writeMsg = findToolMsg(messages, "cortex-write");
     expect(writeMsg, "E2: no cortex-write call").toBeTruthy();
-    if (!writeMsg) {return;}
+    if (!writeMsg) {
+      return;
+    }
 
     const writeResult = resolveToolResult(writeMsg);
     expect(writeResult, "E2: no write result").toBeTruthy();
-    if (!writeResult) {return;}
+    if (!writeResult) {
+      return;
+    }
     expect(writeResult.created, "E2: nested file must be created").toBe(true);
 
     // DB cross-check
-    const dbNode = await dbGetNode(testUser.id, "/documents/edge-test/deep/nested/leaf.md");
+    const dbNode = await dbGetNode(
+      testUser.id,
+      "/documents/edge-test/deep/nested/leaf.md",
+    );
     expect(dbNode, "E2: DB must have nested file").toBeTruthy();
 
     assertVerdictPass(lastAiMessage(messages)?.content, "E2");
@@ -1848,25 +2062,40 @@ describe("Cortex: /documents path operations and edge cases", () => {
       user: testUser,
       favoriteId: mainFavoriteId,
       threadId,
-      prompt: `Use cortex-write to create /documents/edge-test/overwrite-me.md with content "Version 1". Then immediately use cortex-write again on the same path with content "Version 2". Report what 'created' was for each write — first should be true, second should be false.${VERDICT_INSTRUCTION}`,
+      prompt: `Use cortex-write to create /documents/edge-test/overwrite-me.md with content "Version 1". Then immediately use cortex-write again on the same path with content "Version 2". Report what 'created' was for each write - first should be true, second should be false.${VERDICT_INSTRUCTION}`,
     });
 
     expect(result.success, "E3: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
 
     // Two write calls expected - filter since last user msg to avoid picking up E2's writes
     const allWrites = findAllToolMsgsSinceLast(messages, "cortex-write");
-    expect(allWrites.length, "E3: expected 2 cortex-write calls").toBeGreaterThanOrEqual(2);
+    expect(
+      allWrites.length,
+      "E3: expected 2 cortex-write calls",
+    ).toBeGreaterThanOrEqual(2);
 
     const firstWrite = resolveToolResult(allWrites[0]);
     const secondWrite = resolveToolResult(allWrites[1]);
-    expect(firstWrite?.created, "E3: first write must be created=true").toBe(true);
-    expect(secondWrite?.created, "E3: second write must be created=false (overwrite)").toBe(false);
+    expect(firstWrite?.created, "E3: first write must be created=true").toBe(
+      true,
+    );
+    expect(
+      secondWrite?.created,
+      "E3: second write must be created=false (overwrite)",
+    ).toBe(false);
 
     // DB must have Version 2
-    const dbNode = await dbGetNode(testUser.id, "/documents/edge-test/overwrite-me.md");
+    const dbNode = await dbGetNode(
+      testUser.id,
+      "/documents/edge-test/overwrite-me.md",
+    );
     expect(dbNode, "E3: DB node must exist").toBeTruthy();
-    expect(dbNode!.content, "E3: DB must have Version 2").toContain("Version 2");
+    expect(dbNode!.content, "E3: DB must have Version 2").toContain(
+      "Version 2",
+    );
 
     assertVerdictPass(lastAiMessage(messages)?.content, "E3");
   });
@@ -1882,7 +2111,9 @@ describe("Cortex: /documents path operations and edge cases", () => {
     });
 
     expect(result.success, "E4: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
 
     const readMsg = findToolMsg(messages, "cortex-read");
     if (readMsg) {
@@ -1895,10 +2126,19 @@ describe("Cortex: /documents path operations and edge cases", () => {
           (readResult.success === false ||
             String(readResult.errorType ?? "") !== "" ||
             String(readResult.message ?? "").length > 0)) ||
-        String(rawResult ?? "").toLowerCase().includes("invalid") ||
-        String(rawResult ?? "").toLowerCase().includes("not found") ||
-        String(rawResult ?? "").toLowerCase().includes("forbidden");
-      expect(isError, "E4: path traversal must be rejected or normalized to safe path").toBe(true);
+        String(rawResult ?? "")
+          .toLowerCase()
+          .includes("invalid") ||
+        String(rawResult ?? "")
+          .toLowerCase()
+          .includes("not found") ||
+        String(rawResult ?? "")
+          .toLowerCase()
+          .includes("forbidden");
+      expect(
+        isError,
+        "E4: path traversal must be rejected or normalized to safe path",
+      ).toBe(true);
     }
 
     // AI must report an error or explain the path was rejected
@@ -1918,18 +2158,30 @@ describe("Cortex: /documents path operations and edge cases", () => {
     });
 
     expect(result.success, "E5: stream failed").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
 
     const deleteMsg = findToolMsg(messages, "cortex-delete");
     expect(deleteMsg, "E5: no cortex-delete call").toBeTruthy();
-    if (!deleteMsg) {return;}
+    if (!deleteMsg) {
+      return;
+    }
 
     const deleteResult = resolveToolResult(deleteMsg);
     expect(deleteResult, "E5: no delete result").toBeTruthy();
-    if (!deleteResult) {return;}
+    if (!deleteResult) {
+      return;
+    }
 
-    const nodesDeleted = typeof deleteResult.nodesDeleted === "number" ? deleteResult.nodesDeleted : 0;
-    expect(nodesDeleted, "E5: must have deleted at least 2 nodes").toBeGreaterThanOrEqual(2);
+    const nodesDeleted =
+      typeof deleteResult.nodesDeleted === "number"
+        ? deleteResult.nodesDeleted
+        : 0;
+    expect(
+      nodesDeleted,
+      "E5: must have deleted at least 2 nodes",
+    ).toBeGreaterThanOrEqual(2);
 
     // DB cross-check
     const remaining = await dbCountNodes(testUser.id, "/documents/edge-test");
@@ -1941,16 +2193,16 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
 // ── System Prompt Injection Tests ────────────────────────────────────────────
 //
-// These are UNIT tests — no AI stream, no fetch cache.
+// These are UNIT tests - no AI stream, no fetch cache.
 // They insert test cortex nodes directly, then call loadCortexData() and
 // cortexFragment.build() to verify system prompt assembly works correctly.
-// Self-contained — no dependency on `vibe seed`.
+// Self-contained - no dependency on `vibe seed`.
 
 describe("Cortex System Prompt Injection", () => {
   let testUser: JwtPrivatePayloadType;
   const SP_TIMEOUT = 30_000;
 
-  const TEST_MEMORY_CONTENT = `---\npriority: 100\ntags: [identity]\n---\n\nTest User — integration test identity.\nPrefers concise responses. Works with TypeScript.`;
+  const TEST_MEMORY_CONTENT = `---\npriority: 100\ntags: [identity]\n---\n\nTest User - integration test identity.\nPrefers concise responses. Works with TypeScript.`;
 
   const TEST_SKILLS_CONTENT = `---\npriority: 80\ntags: [expertise]\n---\n\nExpert in: TypeScript, React, Node.js.\nStrong in: testing, API design.`;
 
@@ -1958,251 +2210,372 @@ describe("Cortex System Prompt Injection", () => {
 
   beforeAll(async () => {
     const user = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
-    if (!user) {return;}
+    if (!user) {
+      return;
+    }
     testUser = user;
     await ensureCredits(testUser);
 
-    // Ensure test memories exist — upsert so repeated runs are safe
+    // Ensure test memories exist - upsert so repeated runs are safe
     const { upsertVirtualNode } = await import("./embeddings/sync-virtual");
-    await upsertVirtualNode(user.id, "/memories/identity/name.md", TEST_MEMORY_CONTENT);
-    await upsertVirtualNode(user.id, "/memories/expertise/skills.md", TEST_SKILLS_CONTENT);
-    await upsertVirtualNode(user.id, "/memories/expertise/background.md", TEST_BACKGROUND_CONTENT);
-
+    await upsertVirtualNode(
+      user.id,
+      "/memories/identity/name.md",
+      TEST_MEMORY_CONTENT,
+    );
+    await upsertVirtualNode(
+      user.id,
+      "/memories/expertise/skills.md",
+      TEST_SKILLS_CONTENT,
+    );
+    await upsertVirtualNode(
+      user.id,
+      "/memories/expertise/background.md",
+      TEST_BACKGROUND_CONTENT,
+    );
   }, SP_TIMEOUT);
 
   // ── SP1: loadCortexData returns test-created memories ─────────────────────
-  it("SP1: loadCortexData returns memories with correct structure", async () => {
-    expect(testUser, "SP1: admin user not resolved").toBeTruthy();
-    if (!testUser) {return;}
+  it(
+    "SP1: loadCortexData returns memories with correct structure",
+    async () => {
+      expect(testUser, "SP1: admin user not resolved").toBeTruthy();
+      if (!testUser) {
+        return;
+      }
 
-    const { loadCortexData } = await import("./system-prompt/server");
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const { loadCortexData } = await import("./system-prompt/server");
+      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
-    const data = await loadCortexData({
-      user: testUser,
-      logger,
-      locale: defaultLocale,
-      rootFolderId: "background",
-      subFolderId: null,
-      skillId: null,
-      isIncognito: false,
-      isExposedFolder: false,
-      subAgentDepth: 0,
-    });
+      const data = await loadCortexData({
+        user: testUser,
+        logger,
+        locale: defaultLocale,
+        rootFolderId: "background",
+        subFolderId: null,
+        skillId: null,
+        isIncognito: false,
+        isExposedFolder: false,
+        subAgentDepth: 0,
+      });
 
-    // Must have memories dir in tree
-    const memDir = data.tree.find((e) => e.kind === "dir" && e.path.includes("memories"));
-    expect(memDir, "SP1: memories dir must be in tree").toBeTruthy();
-    if (!memDir || memDir.kind !== "dir") {return;}
-    expect(memDir.totalCount, "SP1: must have active memories").toBeGreaterThan(0);
-    expect(memDir.children.length, "SP1: memories children must be non-empty").toBeGreaterThan(0);
+      // Must have memories dir in tree
+      const memDir = data.tree.find(
+        (e) => e.kind === "dir" && e.path.includes("memories"),
+      );
+      expect(memDir, "SP1: memories dir must be in tree").toBeTruthy();
+      if (!memDir || memDir.kind !== "dir") {
+        return;
+      }
+      expect(
+        memDir.totalCount,
+        "SP1: must have active memories",
+      ).toBeGreaterThan(0);
+      expect(
+        memDir.children.length,
+        "SP1: memories children must be non-empty",
+      ).toBeGreaterThan(0);
 
-    // Test-inserted identity/name.md must be present in children
-    const nameChild = memDir.children.find(
-      (c) => c.kind === "file" && c.path === "/memories/identity/name.md",
-    );
-    expect(nameChild, "SP1: identity/name.md must be in memories").toBeTruthy();
-    if (!nameChild || nameChild.kind !== "file") {return;}
-    expect(nameChild.excerpt.length, "SP1: name.md must have real excerpt").toBeGreaterThan(5);
-    expect(nameChild.excerpt, "SP1: must contain test identity text").toContain("integration test identity");
+      // Test-inserted identity/name.md must be present in children
+      const nameChild = memDir.children.find(
+        (c) => c.kind === "file" && c.path === "/memories/identity/name.md",
+      );
+      expect(
+        nameChild,
+        "SP1: identity/name.md must be in memories",
+      ).toBeTruthy();
+      if (!nameChild || nameChild.kind !== "file") {
+        return;
+      }
+      expect(
+        nameChild.excerpt.length,
+        "SP1: name.md must have real excerpt",
+      ).toBeGreaterThan(5);
+      expect(
+        nameChild.excerpt,
+        "SP1: must contain test identity text",
+      ).toContain("integration test identity");
 
-    // Skills memory must also be present
-    const skillsChild = memDir.children.find(
-      (c) => c.kind === "file" && c.path === "/memories/expertise/skills.md",
-    );
-    expect(skillsChild, "SP1: expertise/skills.md must be in memories").toBeTruthy();
-  }, SP_TIMEOUT);
+      // Skills memory must also be present
+      const skillsChild = memDir.children.find(
+        (c) => c.kind === "file" && c.path === "/memories/expertise/skills.md",
+      );
+      expect(
+        skillsChild,
+        "SP1: expertise/skills.md must be in memories",
+      ).toBeTruthy();
+    },
+    SP_TIMEOUT,
+  );
 
   // ── SP2: fragment.build() produces correct system prompt sections ─────────
-  it("SP2: cortexFragment.build() renders memories and workspace tree", async () => {
-    expect(testUser, "SP2: admin user not resolved").toBeTruthy();
-    if (!testUser) {return;}
+  it(
+    "SP2: cortexFragment.build() renders memories and workspace tree",
+    async () => {
+      expect(testUser, "SP2: admin user not resolved").toBeTruthy();
+      if (!testUser) {
+        return;
+      }
 
-    const { loadCortexData } = await import("./system-prompt/server");
-    const { cortexFragment } = await import("./system-prompt/prompt");
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const { loadCortexData } = await import("./system-prompt/server");
+      const { cortexFragment } = await import("./system-prompt/prompt");
+      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
-    const data = await loadCortexData({
-      user: testUser,
-      logger,
-      locale: defaultLocale,
-      rootFolderId: "background",
-      subFolderId: null,
-      skillId: null,
-      isIncognito: false,
-      isExposedFolder: false,
-      subAgentDepth: 0,
-    });
+      const data = await loadCortexData({
+        user: testUser,
+        logger,
+        locale: defaultLocale,
+        rootFolderId: "background",
+        subFolderId: null,
+        skillId: null,
+        isIncognito: false,
+        isExposedFolder: false,
+        subAgentDepth: 0,
+      });
 
-    const prompt = cortexFragment.build(data);
-    expect(prompt, "SP2: fragment must produce output").toBeTruthy();
-    if (!prompt) {return;}
+      const prompt = cortexFragment.build(data);
+      expect(prompt, "SP2: fragment must produce output").toBeTruthy();
+      if (!prompt) {
+        return;
+      }
 
-    // Must have the cortex header
-    expect(prompt, "SP2: must have Cortex header").toContain("Cortex (Your Persistent Brain)");
+      // Must have the cortex header
+      expect(prompt, "SP2: must have Cortex header").toContain(
+        "Cortex (Your Persistent Brain)",
+      );
 
-    // Must have memories and documents mounts
-    expect(prompt, "SP2: must have /memories/ in output").toContain("/memories/");
-    expect(prompt, "SP2: must have /documents/ in output").toContain("/documents/");
+      // Must have memories and documents mounts
+      expect(prompt, "SP2: must have /memories/ in output").toContain(
+        "/memories/",
+      );
+      expect(prompt, "SP2: must have /documents/ in output").toContain(
+        "/documents/",
+      );
 
-    // identity/name.md must appear in the rendered output
-    expect(prompt, "SP2: name.md must appear in prompt").toContain("name.md");
+      // identity/name.md must appear in the rendered output
+      expect(prompt, "SP2: name.md must appear in prompt").toContain("name.md");
 
-    // Must have the tools list
-    expect(prompt, "SP2: must list cortex-write tool").toContain("cortex-write");
-    expect(prompt, "SP2: must list cortex-read tool").toContain("cortex-read");
-    expect(prompt, "SP2: must list cortex-search tool").toContain("cortex-search");
+      // Must have the tools list
+      expect(prompt, "SP2: must list cortex-write tool").toContain(
+        "cortex-write",
+      );
+      expect(prompt, "SP2: must list cortex-read tool").toContain(
+        "cortex-read",
+      );
+      expect(prompt, "SP2: must list cortex-search tool").toContain(
+        "cortex-search",
+      );
 
-    // Memory management instruction must be present
-    expect(prompt, "SP2: must have memory management section").toContain("**Rules:**");
-  }, SP_TIMEOUT);
+      // Memory management instruction must be present
+      expect(prompt, "SP2: must have memory management section").toContain(
+        "**Rules:**",
+      );
+    },
+    SP_TIMEOUT,
+  );
 
   // ── SP3: incognito returns empty (no memory leak) ─────────────────────────
-  it("SP3: incognito mode returns empty CortexData (memory isolation)", async () => {
-    expect(testUser, "SP3: admin user not resolved").toBeTruthy();
-    if (!testUser) {return;}
+  it(
+    "SP3: incognito mode returns empty CortexData (memory isolation)",
+    async () => {
+      expect(testUser, "SP3: admin user not resolved").toBeTruthy();
+      if (!testUser) {
+        return;
+      }
 
-    const { loadCortexData } = await import("./system-prompt/server");
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const { loadCortexData } = await import("./system-prompt/server");
+      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
-    const data = await loadCortexData({
-      user: testUser,
-      logger,
-      locale: defaultLocale,
-      rootFolderId: "background",
-      subFolderId: null,
-      skillId: null,
-      isIncognito: true,  // <-- key flag
-      isExposedFolder: false,
-      subAgentDepth: 0,
-    });
+      const data = await loadCortexData({
+        user: testUser,
+        logger,
+        locale: defaultLocale,
+        rootFolderId: "background",
+        subFolderId: null,
+        skillId: null,
+        isIncognito: true, // <-- key flag
+        isExposedFolder: false,
+        subAgentDepth: 0,
+      });
 
-    expect(data.tree.length, "SP3: incognito must return empty tree").toBe(0);
-    expect(data.totalThreads, "SP3: incognito totalThreads must be 0").toBe(0);
-  }, SP_TIMEOUT);
+      expect(data.tree.length, "SP3: incognito must return empty tree").toBe(0);
+      expect(data.totalThreads, "SP3: incognito totalThreads must be 0").toBe(
+        0,
+      );
+    },
+    SP_TIMEOUT,
+  );
 
   // ── SP4: vector search returns relevant context for a query ───────────────
-  it("SP4: relevant context vector search returns results matching the query", async () => {
-    expect(testUser, "SP4: admin user not resolved").toBeTruthy();
-    if (!testUser) {return;}
+  it(
+    "SP4: relevant context vector search returns results matching the query",
+    async () => {
+      expect(testUser, "SP4: admin user not resolved").toBeTruthy();
+      if (!testUser) {
+        return;
+      }
 
-    const { loadCortexData } = await import("./system-prompt/server");
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const { loadCortexData } = await import("./system-prompt/server");
+      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
-    // Query something that should match our test-inserted skills.md
-    const data = await loadCortexData({
-      user: testUser,
-      logger,
-      locale: defaultLocale,
-      rootFolderId: "background",
-      subFolderId: null,
-      skillId: null,
-      isIncognito: false,
-      isExposedFolder: false,
-      subAgentDepth: 0,
-      lastUserMessage: "what TypeScript skills and expertise does the user have?",
-    });
+      // Query something that should match our test-inserted skills.md
+      const data = await loadCortexData({
+        user: testUser,
+        logger,
+        locale: defaultLocale,
+        rootFolderId: "background",
+        subFolderId: null,
+        skillId: null,
+        isIncognito: false,
+        isExposedFolder: false,
+        subAgentDepth: 0,
+        lastUserMessage:
+          "what TypeScript skills and expertise does the user have?",
+      });
 
-    // Relevant context is shown inline in the tree as file entries with score.
-    // Check all file entries with scores across the tree as proxy for embeddings working.
-    const allFileEntries = data.tree.flatMap((e) =>
-      e.kind === "dir"
-        ? e.children.filter((c) => c.kind === "file" && c.score !== undefined)
-        : [],
-    );
+      // Relevant context is shown inline in the tree as file entries with score.
+      // Check all file entries with scores across the tree as proxy for embeddings working.
+      const allFileEntries = data.tree.flatMap((e) =>
+        e.kind === "dir"
+          ? e.children.filter((c) => c.kind === "file" && c.score !== undefined)
+          : [],
+      );
 
-    if (allFileEntries.length === 0) {
-      // No embeddings available in this env — skip gracefully (same as SP5)
-      console.warn("SP4: no relevant context returned (embeddings may be unavailable) — skipping");
-      return;
-    }
+      if (allFileEntries.length === 0) {
+        // No embeddings available in this env - skip gracefully (same as SP5)
+        console.warn(
+          "SP4: no relevant context returned (embeddings may be unavailable) - skipping",
+        );
+        return;
+      }
 
-    // Scores must be in valid range
-    for (const node of allFileEntries) {
-      if (node.kind !== "file" || node.score === undefined) {continue;}
-      expect(node.score, `SP4: score for ${node.path} must be > 0`).toBeGreaterThan(0);
-      expect(node.score, `SP4: score for ${node.path} must be <= 2`).toBeLessThanOrEqual(2);
-      expect(node.excerpt.length, `SP4: excerpt for ${node.path} must be non-empty`).toBeGreaterThan(0);
-    }
-  }, SP_TIMEOUT);
+      // Scores must be in valid range
+      for (const node of allFileEntries) {
+        if (node.kind !== "file" || node.score === undefined) {
+          continue;
+        }
+        expect(
+          node.score,
+          `SP4: score for ${node.path} must be > 0`,
+        ).toBeGreaterThan(0);
+        expect(
+          node.score,
+          `SP4: score for ${node.path} must be <= 2`,
+        ).toBeLessThanOrEqual(2);
+        expect(
+          node.excerpt.length,
+          `SP4: excerpt for ${node.path} must be non-empty`,
+        ).toBeGreaterThan(0);
+      }
+    },
+    SP_TIMEOUT,
+  );
 
   // ── SP5: fragment renders relevant context section ────────────────────────
-  it("SP5: cortexFragment renders Relevant Context section when vector hits exist", async () => {
-    expect(testUser, "SP5: admin user not resolved").toBeTruthy();
-    if (!testUser) {return;}
+  it(
+    "SP5: cortexFragment renders Relevant Context section when vector hits exist",
+    async () => {
+      expect(testUser, "SP5: admin user not resolved").toBeTruthy();
+      if (!testUser) {
+        return;
+      }
 
-    const { loadCortexData } = await import("./system-prompt/server");
-    const { cortexFragment } = await import("./system-prompt/prompt");
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const { loadCortexData } = await import("./system-prompt/server");
+      const { cortexFragment } = await import("./system-prompt/prompt");
+      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
-    const data = await loadCortexData({
-      user: testUser,
-      logger,
-      locale: defaultLocale,
-      rootFolderId: "background",
-      subFolderId: null,
-      skillId: null,
-      isIncognito: false,
-      isExposedFolder: false,
-      subAgentDepth: 0,
-      lastUserMessage: "TypeScript React expertise and technical skills",
-    });
+      const data = await loadCortexData({
+        user: testUser,
+        logger,
+        locale: defaultLocale,
+        rootFolderId: "background",
+        subFolderId: null,
+        skillId: null,
+        isIncognito: false,
+        isExposedFolder: false,
+        subAgentDepth: 0,
+        lastUserMessage: "TypeScript React expertise and technical skills",
+      });
 
-    const allRelevant = data.tree.flatMap((e) =>
-      e.kind === "dir"
-        ? e.children.filter((c) => c.kind === "file" && c.score !== undefined)
-        : [],
-    );
-    if (allRelevant.length === 0) {
-      // No embeddings available in this env — skip gracefully
-      console.warn("SP5: no relevant context returned (embeddings may be unavailable) — skipping");
-      return;
-    }
+      const allRelevant = data.tree.flatMap((e) =>
+        e.kind === "dir"
+          ? e.children.filter((c) => c.kind === "file" && c.score !== undefined)
+          : [],
+      );
+      if (allRelevant.length === 0) {
+        // No embeddings available in this env - skip gracefully
+        console.warn(
+          "SP5: no relevant context returned (embeddings may be unavailable) - skipping",
+        );
+        return;
+      }
 
-    const prompt = cortexFragment.build(data);
-    expect(prompt, "SP5: prompt must be non-null").toBeTruthy();
-    if (!prompt) {return;}
+      const prompt = cortexFragment.build(data);
+      expect(prompt, "SP5: prompt must be non-null").toBeTruthy();
+      if (!prompt) {
+        return;
+      }
 
-    // Relevant results are shown inline in their mount section with score %
-    expect(prompt, "SP5: must show score % for relevant results").toMatch(/\(\d+%\)/);
-  }, SP_TIMEOUT);
+      // Relevant results are shown inline in their mount section with score %
+      expect(prompt, "SP5: must show score % for relevant results").toMatch(
+        /\(\d+%\)/,
+      );
+    },
+    SP_TIMEOUT,
+  );
 
   // ── SP6: memories sort by priority descending ─────────────────────────────
-  it("SP6: memories are sorted by priority desc (critical memories appear first)", async () => {
-    expect(testUser, "SP6: admin user not resolved").toBeTruthy();
-    if (!testUser) {return;}
+  it(
+    "SP6: memories are sorted by priority desc (critical memories appear first)",
+    async () => {
+      expect(testUser, "SP6: admin user not resolved").toBeTruthy();
+      if (!testUser) {
+        return;
+      }
 
-    const { loadCortexData } = await import("./system-prompt/server");
-    const { cortexFragment } = await import("./system-prompt/prompt");
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const { loadCortexData } = await import("./system-prompt/server");
+      const { cortexFragment } = await import("./system-prompt/prompt");
+      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
-    const data = await loadCortexData({
-      user: testUser,
-      logger,
-      locale: defaultLocale,
-      rootFolderId: "background",
-      subFolderId: null,
-      skillId: null,
-      isIncognito: false,
-      isExposedFolder: false,
-      subAgentDepth: 0,
-    });
+      const data = await loadCortexData({
+        user: testUser,
+        logger,
+        locale: defaultLocale,
+        rootFolderId: "background",
+        subFolderId: null,
+        skillId: null,
+        isIncognito: false,
+        isExposedFolder: false,
+        subAgentDepth: 0,
+      });
 
-    const memDir6 = data.tree.find((e) => e.kind === "dir" && e.path.includes("memories"));
-    expect(memDir6, "SP6: must have memories dir in tree").toBeTruthy();
-    if (!memDir6 || memDir6.kind !== "dir") {return;}
-    expect(memDir6.children.length, "SP6: must have memories").toBeGreaterThan(0);
+      const memDir6 = data.tree.find(
+        (e) => e.kind === "dir" && e.path.includes("memories"),
+      );
+      expect(memDir6, "SP6: must have memories dir in tree").toBeTruthy();
+      if (!memDir6 || memDir6.kind !== "dir") {
+        return;
+      }
+      expect(
+        memDir6.children.length,
+        "SP6: must have memories",
+      ).toBeGreaterThan(0);
 
-    // The fragment builds sorted memories — check name.md (P:100) appears before background.md (P:70)
-    const prompt = cortexFragment.build(data) ?? "";
-    const nameIdx = prompt.indexOf("name.md");
-    const backgroundIdx = prompt.indexOf("background.md");
+      // The fragment builds sorted memories - check name.md (P:100) appears before background.md (P:70)
+      const prompt = cortexFragment.build(data) ?? "";
+      const nameIdx = prompt.indexOf("name.md");
+      const backgroundIdx = prompt.indexOf("background.md");
 
-    expect(nameIdx, "SP6: name.md must appear in prompt").toBeGreaterThan(-1);
-    expect(backgroundIdx, "SP6: background.md must appear in prompt").toBeGreaterThan(-1);
-    expect(
-      nameIdx,
-      "SP6: name.md (P:100) must appear before background.md (P:70) in rendered prompt",
-    ).toBeLessThan(backgroundIdx);
-  }, SP_TIMEOUT);
+      expect(nameIdx, "SP6: name.md must appear in prompt").toBeGreaterThan(-1);
+      expect(
+        backgroundIdx,
+        "SP6: background.md must appear in prompt",
+      ).toBeGreaterThan(-1);
+      expect(
+        nameIdx,
+        "SP6: name.md (P:100) must appear before background.md (P:70) in rendered prompt",
+      ).toBeLessThan(backgroundIdx);
+    },
+    SP_TIMEOUT,
+  );
 });

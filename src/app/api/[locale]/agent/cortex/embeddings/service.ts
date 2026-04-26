@@ -55,12 +55,12 @@ export async function generateEmbedding(
   const maxCharsPerChunk = 32000;
 
   try {
-    // Short text — single call
+    // Short text - single call
     if (trimmed.length <= maxCharsPerChunk) {
       return callEmbeddingApi(apiKey, trimmed);
     }
 
-    // Long text — chunk and average
+    // Long text - chunk and average
     const chunks: string[] = [];
     for (let i = 0; i < trimmed.length; i += maxCharsPerChunk) {
       chunks.push(trimmed.slice(i, i + maxCharsPerChunk));

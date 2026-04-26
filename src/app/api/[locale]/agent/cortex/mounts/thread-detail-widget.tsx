@@ -1,5 +1,5 @@
 /**
- * Thread Detail Widget — domain enrichment for /threads/ paths
+ * Thread Detail Widget - domain enrichment for /threads/ paths
  *
  * Renders the actual messages widget for the thread using EndpointsPage,
  * so the full thread view (read-only) appears below the Cortex file content.

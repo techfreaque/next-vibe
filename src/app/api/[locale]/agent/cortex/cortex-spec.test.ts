@@ -250,34 +250,42 @@ describe("Cortex Spec E2E", () => {
     }
 
     // Clean up spec test data
-    await db.delete(cortexNodes).where(
-      and(
-        eq(cortexNodes.userId, testUser.id),
-        like(cortexNodes.path, "/documents/spec-test%"),
-      ),
-    );
-    await db.delete(cortexNodes).where(
-      and(
-        eq(cortexNodes.userId, testUser.id),
-        like(cortexNodes.path, "/memories/spec-test%"),
-      ),
-    );
+    await db
+      .delete(cortexNodes)
+      .where(
+        and(
+          eq(cortexNodes.userId, testUser.id),
+          like(cortexNodes.path, "/documents/spec-test%"),
+        ),
+      );
+    await db
+      .delete(cortexNodes)
+      .where(
+        and(
+          eq(cortexNodes.userId, testUser.id),
+          like(cortexNodes.path, "/memories/spec-test%"),
+        ),
+      );
   }, TEST_TIMEOUT);
 
   afterAll(async () => {
     if (!testUser) return;
-    await db.delete(cortexNodes).where(
-      and(
-        eq(cortexNodes.userId, testUser.id),
-        like(cortexNodes.path, "/documents/spec-test%"),
-      ),
-    );
-    await db.delete(cortexNodes).where(
-      and(
-        eq(cortexNodes.userId, testUser.id),
-        like(cortexNodes.path, "/memories/spec-test%"),
-      ),
-    );
+    await db
+      .delete(cortexNodes)
+      .where(
+        and(
+          eq(cortexNodes.userId, testUser.id),
+          like(cortexNodes.path, "/documents/spec-test%"),
+        ),
+      );
+    await db
+      .delete(cortexNodes)
+      .where(
+        and(
+          eq(cortexNodes.userId, testUser.id),
+          like(cortexNodes.path, "/memories/spec-test%"),
+        ),
+      );
   });
 
   let suiteFailed = false;
@@ -381,16 +389,13 @@ ${VERDICT_INSTRUCTION}`,
 
     expect(result.success, "SP2: stream failed").toBe(true);
 
-    // DB cross-check — verify pinned is in frontmatter
+    // DB cross-check - verify pinned is in frontmatter
     const dbNode = await dbGetNode(
       testUser.id,
       "/memories/spec-test/critical-note.md",
     );
     expect(dbNode, "SP2: pinned note not in DB").toBeTruthy();
-    expect(
-      dbNode!.frontmatter,
-      "SP2: no frontmatter",
-    ).toBeTruthy();
+    expect(dbNode!.frontmatter, "SP2: no frontmatter").toBeTruthy();
 
     // The content should have pinned: true somewhere (frontmatter in content field)
     const content = dbNode!.content ?? "";
@@ -406,7 +411,7 @@ ${VERDICT_INSTRUCTION}`,
   });
 
   // ── SP3: Move re-embedding ────────────────────────────────────────────────
-  fit("SP3: AI moves a file — source path gone, destination exists", async () => {
+  fit("SP3: AI moves a file - source path gone, destination exists", async () => {
     setFetchCacheContext("cortex-spec-move");
     // First, ensure the source exists (SP1 created it at spec-test/life-career.md)
     const sourcePath = "/memories/spec-test/life-career.md";
@@ -484,8 +489,8 @@ ${VERDICT_INSTRUCTION}`,
       favoriteId: mainFavoriteId,
       threadId,
       prompt: `Do these two writes in sequence:
-1. cortex-write /documents/spec-test/project-brief.md — content: "# Spec Test Project\n\nTesting the budget system."
-2. cortex-write /memories/spec-test/context-note.md — content: "---\npriority: 30\ntags: [context]\n---\n\nThis note tests memory budget handling."
+1. cortex-write /documents/spec-test/project-brief.md - content: "# Spec Test Project\n\nTesting the budget system."
+2. cortex-write /memories/spec-test/context-note.md - content: "---\npriority: 30\ntags: [context]\n---\n\nThis note tests memory budget handling."
 
 After both writes succeed, list /documents/spec-test/ and /memories/spec-test/ to confirm both files exist.
 
@@ -533,7 +538,7 @@ ${VERDICT_INSTRUCTION}`,
 
     expect(result.success, "SP6: stream failed").toBe(true);
 
-    // AI should be able to answer about its own context — no tool calls needed
+    // AI should be able to answer about its own context - no tool calls needed
     const aiMsg = lastAiMessage(messages);
     expect(aiMsg, "SP6: no AI response").toBeTruthy();
     expect(

@@ -46,7 +46,7 @@ function renderMemoryMarkdown(memory: Memory): string {
 
 /**
  * Migrate all memories from the legacy table to cortex_nodes.
- * Runs on dev/prod — safe to re-run (idempotent).
+ * Runs on dev/prod - safe to re-run (idempotent).
  */
 async function migrateMemories(logger: EndpointLogger): Promise<void> {
   const allMemories = await db
@@ -151,5 +151,5 @@ export async function prod(logger: EndpointLogger): Promise<void> {
 }
 
 export async function test(): Promise<void> {
-  // No-op in test — test data should use cortex_nodes directly
+  // No-op in test - test data should use cortex_nodes directly
 }

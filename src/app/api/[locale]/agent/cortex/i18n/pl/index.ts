@@ -33,22 +33,22 @@ export const translations = {
       inbox: {
         path: "skrzynka",
         purpose:
-          "Szybkie wpisy — zapisuj od razu, porządkuj gdy kontekst jest jasny",
+          "Szybkie wpisy - zapisuj od razu, porządkuj gdy kontekst jest jasny",
         icon: "inbox",
       },
       projects: {
         path: "projekty",
-        purpose: "Aktywna praca — jeden podfolder na projekt",
+        purpose: "Aktywna praca - jeden podfolder na projekt",
         icon: "folder-open",
       },
       knowledge: {
         path: "wiedza",
-        purpose: "Stałe referencje — rzeczy warte zachowania na zawsze",
+        purpose: "Stałe referencje - rzeczy warte zachowania na zawsze",
         icon: "book-open",
       },
       journal: {
         path: "dziennik",
-        purpose: "Datowane wpisy — pomysły, refleksje, obserwacje",
+        purpose: "Datowane wpisy - pomysły, refleksje, obserwacje",
         icon: "pen-line",
       },
       templates: {
@@ -72,7 +72,7 @@ export const translations = {
         },
         goals: {
           path: "cele.md",
-          content: `---\npriority: 90\ntags: [tożsamość, cele]\n---\n\n<!-- Twoje główne cele — co chcesz zbudować, osiągnąć lub poprawić. Krótko- i długoterminowo. -->\n`,
+          content: `---\npriority: 90\ntags: [tożsamość, cele]\n---\n\n<!-- Twoje główne cele - co chcesz zbudować, osiągnąć lub poprawić. Krótko- i długoterminowo. -->\n`,
         },
         communication: {
           path: "komunikacja.md",
@@ -130,14 +130,14 @@ export const translations = {
         },
         purpose: {
           path: "sens.md",
-          content: `---\npriority: 95\ntags: [życie, sens, wartości, cele]\n---\n\n## Gwiazda przewodnia\n\n<!-- Jedno lub dwa zdania: o czym fundamentalnie jest twoje życie? Co jesteś tu, żeby zrobić lub zbudować? -->\n\n## Podstawowe wartości\n\n<!-- 3-5 wartości, które kierują twoimi decyzjami. Nie aspiracje — rzeczy, którymi naprawdę żyjesz. -->\n\n## Jak wygląda sukces\n\n<!-- Za 5 lat: jak konkretnie wygląda dla ciebie dobrze przeżyte życie? -->\n`,
+          content: `---\npriority: 95\ntags: [życie, sens, wartości, cele]\n---\n\n## Gwiazda przewodnia\n\n<!-- Jedno lub dwa zdania: o czym fundamentalnie jest twoje życie? Co jesteś tu, żeby zrobić lub zbudować? -->\n\n## Podstawowe wartości\n\n<!-- 3-5 wartości, które kierują twoimi decyzjami. Nie aspiracje - rzeczy, którymi naprawdę żyjesz. -->\n\n## Jak wygląda sukces\n\n<!-- Za 5 lat: jak konkretnie wygląda dla ciebie dobrze przeżyte życie? -->\n`,
         },
       },
     },
     documents: {
       meetingNotes: {
         path: "notatki-ze-spotkania.md",
-        content: `---\ntype: szablon\ntags: [spotkania, szablon]\n---\n\n# Notatki ze spotkania — [Data]\n\n**Uczestnicy:**\n**Cel:**\n\n## Kontekst\n\nKrótkie tło — dlaczego to spotkanie się odbyło.\n\n## Agenda\n\n1.\n2.\n3.\n\n## Kluczowe decyzje\n\n-\n\n## Zadania\n\n- [ ] @osoba — zadanie — termin [data]\n\n## Notatki\n\n---\n*Przeniesiono z: /dokumenty/skrzynka*\n`,
+        content: `---\ntype: szablon\ntags: [spotkania, szablon]\n---\n\n# Notatki ze spotkania - [Data]\n\n**Uczestnicy:**\n**Cel:**\n\n## Kontekst\n\nKrótkie tło - dlaczego to spotkanie się odbyło.\n\n## Agenda\n\n1.\n2.\n3.\n\n## Kluczowe decyzje\n\n-\n\n## Zadania\n\n- [ ] @osoba - zadanie - termin [data]\n\n## Notatki\n\n---\n*Przeniesiono z: /dokumenty/skrzynka*\n`,
       },
       projectBrief: {
         path: "opis-projektu.md",
@@ -149,11 +149,11 @@ export const translations = {
       },
       decisionLog: {
         path: "dziennik-decyzji.md",
-        content: `---\ntype: szablon\ntags: [decyzje, architektura, szablon]\n---\n\n# Decyzja: [Tytuł]\n\n**Data:**\n**Status:** zaproponowana | zaakceptowana | zastąpiona | przestarzała\n**Decydenci:**\n\n## Kontekst\n\nJaka sytuacja wymusiła tę decyzję? Jakie ograniczenia istnieją?\n\n## Rozważane opcje\n\n### Opcja A — [Nazwa]\n\n**Zalety:**\n**Wady:**\n\n### Opcja B — [Nazwa]\n\n**Zalety:**\n**Wady:**\n\n## Decyzja\n\nWybraliśmy **Opcję [X]**, ponieważ:\n\n## Konsekwencje\n\n**Dobre:**\n**Złe:**\n**Neutralne:**\n\n---\n*Podlinkuj ten plik z odpowiedniego opisu projektu lub komentarza w kodzie.*\n`,
+        content: `---\ntype: szablon\ntags: [decyzje, architektura, szablon]\n---\n\n# Decyzja: [Tytuł]\n\n**Data:**\n**Status:** zaproponowana | zaakceptowana | zastąpiona | przestarzała\n**Decydenci:**\n\n## Kontekst\n\nJaka sytuacja wymusiła tę decyzję? Jakie ograniczenia istnieją?\n\n## Rozważane opcje\n\n### Opcja A - [Nazwa]\n\n**Zalety:**\n**Wady:**\n\n### Opcja B - [Nazwa]\n\n**Zalety:**\n**Wady:**\n\n## Decyzja\n\nWybraliśmy **Opcję [X]**, ponieważ:\n\n## Konsekwencje\n\n**Dobre:**\n**Złe:**\n**Neutralne:**\n\n---\n*Podlinkuj ten plik z odpowiedniego opisu projektu lub komentarza w kodzie.*\n`,
       },
       knowledgeArticle: {
         path: "artykuł-wiedzy.md",
-        content: `---\ntype: szablon\ntags: [wiedza, referencja, szablon]\n---\n\n# [Temat]\n\n**Ostatnio zweryfikowano:**\n**Źródło:**\n\n## Podsumowanie\n\nJeden akapit. Czym to jest, dlaczego ma znaczenie, kiedy ma zastosowanie?\n\n## Jak to działa\n\nGłówna mechanika. Bez wypełniacza — tylko to, co potrzebujesz, żeby to zrozumieć lub zastosować.\n\n## Kiedy używać\n\n-\n-\n\n## Kiedy NIE używać\n\n-\n\n## Przykłady\n\n\`\`\`\nwklej przykład tutaj\n\`\`\`\n\n## Referencje\n\n-\n`,
+        content: `---\ntype: szablon\ntags: [wiedza, referencja, szablon]\n---\n\n# [Temat]\n\n**Ostatnio zweryfikowano:**\n**Źródło:**\n\n## Podsumowanie\n\nJeden akapit. Czym to jest, dlaczego ma znaczenie, kiedy ma zastosowanie?\n\n## Jak to działa\n\nGłówna mechanika. Bez wypełniacza - tylko to, co potrzebujesz, żeby to zrozumieć lub zastosować.\n\n## Kiedy używać\n\n-\n-\n\n## Kiedy NIE używać\n\n-\n\n## Przykłady\n\n\`\`\`\nwklej przykład tutaj\n\`\`\`\n\n## Referencje\n\n-\n`,
       },
     },
   },
@@ -193,7 +193,7 @@ export const translations = {
   },
   button: {
     label: "Korteks",
-    title: "Korteks — pamięć AI",
+    title: "Korteks - pamięć AI",
     unavailableTitle: "Korteks niedostępny",
     unavailableDescription:
       "Korteks działa tylko w prywatnych i udostępnionych wątkach. Utwórz prywatny wątek, żeby używać pamięci AI.",

@@ -1,5 +1,5 @@
 /**
- * Filesystem Sync — disk write-through for preview mode
+ * Filesystem Sync - disk write-through for preview mode
  *
  * After any DB mutation (memories, documents, skills), call these helpers
  * to keep the `data/` directory in sync. No-op in production mode.
@@ -15,7 +15,7 @@ import { normalizePath } from "../repository";
 
 /**
  * Returns true when disk sync is active (preview mode).
- * Lightweight check — no user context needed.
+ * Lightweight check - no user context needed.
  */
 export function isDiskSyncActive(): boolean {
   return process.env["IS_PREVIEW_MODE"] !== "false";
@@ -65,6 +65,6 @@ export async function deleteFromDisk(cortexPath: string): Promise<void> {
   try {
     await unlink(diskPath);
   } catch {
-    // File doesn't exist — nothing to delete
+    // File doesn't exist - nothing to delete
   }
 }

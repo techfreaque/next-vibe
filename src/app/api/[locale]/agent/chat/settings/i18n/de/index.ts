@@ -119,7 +119,7 @@ export const translations: typeof enTranslations = {
     dreaming: {
       title: "Träumen",
       description:
-        "Die KI sortiert deinen Kopf im Schlaf — konsolidiert Erinnerungen, räumt Dokumente auf, hebt hervor, was zählt.",
+        "Die KI sortiert deinen Kopf im Schlaf - konsolidiert Erinnerungen, räumt Dokumente auf, hebt hervor, was zählt.",
       toggle: {
         label: "Träumen aktivieren",
       },
@@ -142,7 +142,7 @@ export const translations: typeof enTranslations = {
         placeholder:
           "Worauf soll sich Thea in dieser Session konzentrieren? Leer lassen für den Standard.",
         defaultPrompt:
-          "Starte deine Träum-Session. Reorganisiere und konsolidiere den Cortex — Erinnerungen, Dokumente, Threads. Hinterlasse alles sauberer und geordneter.",
+          "Starte deine Träum-Session. Reorganisiere und konsolidiere den Cortex - Erinnerungen, Dokumente, Threads. Hinterlasse alles sauberer und geordneter.",
       },
       lastRun: "Letzter Lauf:",
       neverRun: "Noch nie ausgeführt",
@@ -152,7 +152,7 @@ export const translations: typeof enTranslations = {
     autopilot: {
       title: "Autopilot",
       description:
-        "Die KI arbeitet deine Warteschlange ab, während du weg bist — nächste Schritte, laufende Projekte, Aufgaben im Rückstand.",
+        "Die KI arbeitet deine Warteschlange ab, während du weg bist - nächste Schritte, laufende Projekte, Aufgaben im Rückstand.",
       toggle: {
         label: "Autopilot aktivieren",
       },
@@ -175,7 +175,7 @@ export const translations: typeof enTranslations = {
         placeholder:
           "Worauf soll sich Hermes in dieser Session konzentrieren? Leer lassen für den Standard.",
         defaultPrompt:
-          "Starte deine Autopilot-Session. Mach weiter, wo aktive Projekte stehen — nächste Schritte vorantreiben, Warteschlange abarbeiten, Dinge in Bewegung halten.",
+          "Starte deine Autopilot-Session. Mach weiter, wo aktive Projekte stehen - nächste Schritte vorantreiben, Warteschlange abarbeiten, Dinge in Bewegung halten.",
       },
       lastRun: "Letzter Lauf:",
       neverRun: "Noch nie ausgeführt",
@@ -185,7 +185,7 @@ export const translations: typeof enTranslations = {
     mama: {
       title: "Plattform-Herzschlag",
       description:
-        "Thea überwacht deine Produktionsinstanz — prüft die Gesundheit, treibt Features voran, kümmert sich um Marketing, sendet Neuigkeiten. Ein gemeinsamer Slot für alle Admins.",
+        "Thea überwacht deine Produktionsinstanz - prüft die Gesundheit, treibt Features voran, kümmert sich um Marketing, sendet Neuigkeiten. Ein gemeinsamer Slot für alle Admins.",
       toggle: {
         label: "Mama-Modus aktivieren",
       },

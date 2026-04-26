@@ -116,7 +116,7 @@ export const translations = {
     dreaming: {
       title: "Dreaming",
       description:
-        "AI sorts your brain while you sleep — consolidates memories, cleans up documents, surfaces what matters.",
+        "AI sorts your brain while you sleep - consolidates memories, cleans up documents, surfaces what matters.",
       toggle: {
         label: "Enable Dreaming",
       },
@@ -139,7 +139,7 @@ export const translations = {
         placeholder:
           "What should Thea focus on this session? Leave blank for the default.",
         defaultPrompt:
-          "Run your dreaming session. Reorganize and consolidate the cortex — memories, documents, threads. Leave everything cleaner and more organized.",
+          "Run your dreaming session. Reorganize and consolidate the cortex - memories, documents, threads. Leave everything cleaner and more organized.",
       },
       lastRun: "Last run:",
       neverRun: "Never run",
@@ -149,7 +149,7 @@ export const translations = {
     autopilot: {
       title: "Autopilot",
       description:
-        "AI works your queue while you're away — picks up next steps, advances projects, handles what's waiting.",
+        "AI works your queue while you're away - picks up next steps, advances projects, handles what's waiting.",
       toggle: {
         label: "Enable Autopilot",
       },
@@ -172,7 +172,7 @@ export const translations = {
         placeholder:
           "What should Hermes focus on this session? Leave blank for the default.",
         defaultPrompt:
-          "Run your autopilot session. Pick up where active projects left off — advance next steps, handle queued work, keep things moving.",
+          "Run your autopilot session. Pick up where active projects left off - advance next steps, handle queued work, keep things moving.",
       },
       lastRun: "Last run:",
       neverRun: "Never run",
@@ -182,7 +182,7 @@ export const translations = {
     mama: {
       title: "Platform Heartbeat",
       description:
-        "Thea monitors your production instance — checks health, advances features, handles marketing, sends news. One shared slot across all admins.",
+        "Thea monitors your production instance - checks health, advances features, handles marketing, sends news. One shared slot across all admins.",
       toggle: {
         label: "Enable Mama Mode",
       },

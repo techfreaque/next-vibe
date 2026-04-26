@@ -5,7 +5,7 @@
  * The framework's cache (streamingState on messagesDefinition.GET) is
  * the single source of truth for whether a thread is streaming.
  *
- * This store only tracks **aborting** — the optimistic window between
+ * This store only tracks **aborting** - the optimistic window between
  * "user clicked cancel" and "server confirmed via stream-finished WS event".
  * No framework equivalent exists for this transient client-side state.
  */
@@ -13,7 +13,7 @@
 import { create } from "zustand";
 
 /**
- * AI Stream Lifecycle State — aborting only
+ * AI Stream Lifecycle State - aborting only
  */
 interface AIStreamState {
   /** Thread IDs where cancel request was sent but stream-finished hasn't arrived */

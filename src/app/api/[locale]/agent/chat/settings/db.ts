@@ -46,7 +46,7 @@ export const chatSettings = pgTable("chat_settings", {
   // Coding agent provider preference (admin-only). null = "claude-code" (default)
   codingAgent: jsonb("coding_agent").$type<"claude-code" | "open-code">(),
 
-  // Dreaming pulse — AI reorganizes cortex on a schedule. null = disabled (false)
+  // Dreaming pulse - AI reorganizes cortex on a schedule. null = disabled (false)
   dreamerEnabled: jsonb("dreamer_enabled").$type<boolean>(),
   // Favorite slot to power the dreaming session. null = system default (Thea)
   dreamerFavoriteId: jsonb("dreamer_favorite_id").$type<string | null>(),
@@ -55,7 +55,7 @@ export const chatSettings = pgTable("chat_settings", {
   // Custom user message to kick off each dreaming session. null = skill default
   dreamerPrompt: jsonb("dreamer_prompt").$type<string | null>(),
 
-  // Autopilot pulse — AI works your queue while you're away. null = disabled (false)
+  // Autopilot pulse - AI works your queue while you're away. null = disabled (false)
   autopilotEnabled: jsonb("autopilot_enabled").$type<boolean>(),
   // Favorite slot to power the autopilot session. null = system default (Thea)
   autopilotFavoriteId: jsonb("autopilot_favorite_id").$type<string | null>(),
@@ -64,7 +64,7 @@ export const chatSettings = pgTable("chat_settings", {
   // Custom user message to kick off each autopilot session. null = skill default
   autopilotPrompt: jsonb("autopilot_prompt").$type<string | null>(),
 
-  // Mama pulse — Thea runs the production instance (admin-only, global shared task). null = disabled (false)
+  // Mama pulse - Thea runs the production instance (admin-only, global shared task). null = disabled (false)
   mamaEnabled: jsonb("mama_enabled").$type<boolean>(),
   // Cron schedule for mama heartbeat. null = system default ("0 */4 * * *")
   mamaSchedule: jsonb("mama_schedule").$type<string>(),

@@ -81,7 +81,7 @@ export function createMessageMetadata(
 
 /**
  * Prefix for all context metadata lines injected into the messages array.
- * Used for constructing and identifying context lines — never match raw strings.
+ * Used for constructing and identifying context lines - never match raw strings.
  */
 export const CONTEXT_LINE_PREFIX = "[Context: ";
 

@@ -162,7 +162,7 @@ const { GET } = createEndpoint({
         schema: z.string().nullable(),
       }),
 
-      // Pulse folder UUIDs — null if the folder hasn't been created yet (task never enabled)
+      // Pulse folder UUIDs - null if the folder hasn't been created yet (task never enabled)
       dreamerSubFolderId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
@@ -417,7 +417,7 @@ const { POST } = createEndpoint({
         schema: z.string().nullable().optional(),
       }),
 
-      // Mama pulse settings (admin-only — global shared platform heartbeat)
+      // Mama pulse settings (admin-only - global shared platform heartbeat)
       mamaEnabled: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,

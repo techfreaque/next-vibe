@@ -32,22 +32,22 @@ export const translations = {
       inbox: {
         path: "inbox",
         purpose:
-          "Raw captures — drop here fast, process and file when context is clear",
+          "Raw captures - drop here fast, process and file when context is clear",
         icon: "inbox",
       },
       projects: {
         path: "projects",
-        purpose: "Active work — one subfolder per project",
+        purpose: "Active work - one subfolder per project",
         icon: "folder-open",
       },
       knowledge: {
         path: "knowledge",
-        purpose: "Permanent reference — things worth keeping forever",
+        purpose: "Permanent reference - things worth keeping forever",
         icon: "book-open",
       },
       journal: {
         path: "journal",
-        purpose: "Dated entries — ideas, reflections, observations",
+        purpose: "Dated entries - ideas, reflections, observations",
         icon: "pen-line",
       },
       templates: {
@@ -70,7 +70,7 @@ export const translations = {
         },
         goals: {
           path: "goals.md",
-          content: `---\npriority: 90\ntags: [identity, goals]\n---\n\n<!-- Your primary goals — what you're trying to build, achieve, or improve. Short-term and long-term. -->\n`,
+          content: `---\npriority: 90\ntags: [identity, goals]\n---\n\n<!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n`,
         },
         communication: {
           path: "communication.md",
@@ -128,14 +128,14 @@ export const translations = {
         },
         purpose: {
           path: "purpose.md",
-          content: `---\npriority: 95\ntags: [life, purpose, values, goals]\n---\n\n## North Star\n\n<!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? -->\n\n## Core Values\n\n<!-- 3-5 values that guide your decisions. Not aspirations — things you actually live by. -->\n\n## What Success Looks Like\n\n<!-- In 5 years, what does a life well-lived look like for you specifically? -->\n`,
+          content: `---\npriority: 95\ntags: [life, purpose, values, goals]\n---\n\n## North Star\n\n<!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? -->\n\n## Core Values\n\n<!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. -->\n\n## What Success Looks Like\n\n<!-- In 5 years, what does a life well-lived look like for you specifically? -->\n`,
         },
       },
     },
     documents: {
       meetingNotes: {
         path: "meeting-notes.md",
-        content: `---\ntype: template\ntags: [meetings, template]\n---\n\n# Meeting Notes — [Date]\n\n**Attendees:**\n**Purpose:**\n\n## Context\n\nBrief background on why this meeting happened.\n\n## Agenda\n\n1.\n2.\n3.\n\n## Key Decisions\n\n-\n\n## Action Items\n\n- [ ] @person — task — due [date]\n\n## Notes\n\n---\n*Filed from: /documents/inbox*\n`,
+        content: `---\ntype: template\ntags: [meetings, template]\n---\n\n# Meeting Notes - [Date]\n\n**Attendees:**\n**Purpose:**\n\n## Context\n\nBrief background on why this meeting happened.\n\n## Agenda\n\n1.\n2.\n3.\n\n## Key Decisions\n\n-\n\n## Action Items\n\n- [ ] @person - task - due [date]\n\n## Notes\n\n---\n*Filed from: /documents/inbox*\n`,
       },
       projectBrief: {
         path: "project-brief.md",
@@ -147,11 +147,11 @@ export const translations = {
       },
       decisionLog: {
         path: "decision-log.md",
-        content: `---\ntype: template\ntags: [decisions, architecture, template]\n---\n\n# Decision: [Title]\n\n**Date:**\n**Status:** proposed | accepted | superseded | deprecated\n**Deciders:**\n\n## Context\n\nWhat situation forced this decision? What constraints exist?\n\n## Options Considered\n\n### Option A — [Name]\n\n**Pros:**\n**Cons:**\n\n### Option B — [Name]\n\n**Pros:**\n**Cons:**\n\n## Decision\n\nWe chose **Option [X]** because:\n\n## Consequences\n\n**Good:**\n**Bad:**\n**Neutral:**\n\n---\n*Link to this file from the relevant project brief or code comment.*\n`,
+        content: `---\ntype: template\ntags: [decisions, architecture, template]\n---\n\n# Decision: [Title]\n\n**Date:**\n**Status:** proposed | accepted | superseded | deprecated\n**Deciders:**\n\n## Context\n\nWhat situation forced this decision? What constraints exist?\n\n## Options Considered\n\n### Option A - [Name]\n\n**Pros:**\n**Cons:**\n\n### Option B - [Name]\n\n**Pros:**\n**Cons:**\n\n## Decision\n\nWe chose **Option [X]** because:\n\n## Consequences\n\n**Good:**\n**Bad:**\n**Neutral:**\n\n---\n*Link to this file from the relevant project brief or code comment.*\n`,
       },
       knowledgeArticle: {
         path: "knowledge-article.md",
-        content: `---\ntype: template\ntags: [knowledge, reference, template]\n---\n\n# [Topic]\n\n**Last verified:**\n**Source:**\n\n## Summary\n\nOne paragraph. What is this, why does it matter, when does it apply?\n\n## How It Works\n\nCore mechanics. No padding — just what you need to understand or apply it.\n\n## When to Use\n\n-\n-\n\n## When NOT to Use\n\n-\n\n## Examples\n\n\`\`\`\npaste example here\n\`\`\`\n\n## References\n\n-\n`,
+        content: `---\ntype: template\ntags: [knowledge, reference, template]\n---\n\n# [Topic]\n\n**Last verified:**\n**Source:**\n\n## Summary\n\nOne paragraph. What is this, why does it matter, when does it apply?\n\n## How It Works\n\nCore mechanics. No padding - just what you need to understand or apply it.\n\n## When to Use\n\n-\n-\n\n## When NOT to Use\n\n-\n\n## Examples\n\n\`\`\`\npaste example here\n\`\`\`\n\n## References\n\n-\n`,
       },
     },
   },
@@ -191,7 +191,7 @@ export const translations = {
   },
   button: {
     label: "Cortex",
-    title: "Cortex — AI memory",
+    title: "Cortex - AI memory",
     unavailableTitle: "Cortex unavailable",
     unavailableDescription:
       "Cortex is only available in private and shared threads. Start a private thread to use your AI memory.",

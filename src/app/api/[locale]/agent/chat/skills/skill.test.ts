@@ -388,7 +388,9 @@ When BOTH are done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on 
         ).toBeTruthy();
 
         // ── Fetch sub-agent thread and assert tool call sequence ──
-        if (!subThreadId) { return; }
+        if (!subThreadId) {
+          return;
+        }
         const subMessages = await fetchThreadMessages(subThreadId);
         // eslint-disable-next-line no-console
         console.log(
@@ -423,7 +425,7 @@ When BOTH are done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on 
           `Expected exactly 1 favorite-create call in sub-agent (no retries), got ${String(favoriteCreateCalls.length)}`,
         ).toBe(1);
       } else {
-        // Path B: direct tool calls — AI called skill-create + favorite-create directly
+        // Path B: direct tool calls - AI called skill-create + favorite-create directly
         skillCreateCalls = toolMessages.filter(
           (m) => effectiveToolName(m) === "skill-create",
         );
@@ -447,16 +449,15 @@ When BOTH are done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on 
       ).toBeNull();
 
       const skillId = skillCreateResult?.["id"];
-      const favId = favoriteCreateCalls.length > 0
-        ? unwrapExecuteToolResult(
-            favoriteCreateCalls[0]?.toolCall?.result,
-          )?.["id"]
-        : undefined;
+      const favId =
+        favoriteCreateCalls.length > 0
+          ? unwrapExecuteToolResult(favoriteCreateCalls[0]?.toolCall?.result)?.[
+              "id"
+            ]
+          : undefined;
 
       expect(skillId, "skill-create result missing id field").toBeTruthy();
-      expect(typeof skillId, "skill-create id must be a string").toBe(
-        "string",
-      );
+      expect(typeof skillId, "skill-create id must be a string").toBe("string");
 
       if (typeof skillId === "string") {
         createdSkillId = skillId;

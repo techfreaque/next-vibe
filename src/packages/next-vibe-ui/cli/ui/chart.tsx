@@ -23,7 +23,7 @@ export type {
 } from "../../web/ui/chart";
 
 export function useChart(): ChartContextProps {
-  // CLI stub — chart context is never used in terminal rendering
+  // CLI stub - chart context is never used in terminal rendering
   return { config: {} };
 }
 

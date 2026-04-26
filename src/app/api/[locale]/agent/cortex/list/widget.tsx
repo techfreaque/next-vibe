@@ -1,6 +1,6 @@
 /**
  * Cortex List Widget (Web)
- * Interactive file explorer — click folders to navigate, click files to open via read endpoint.
+ * Interactive file explorer - click folders to navigate, click files to open via read endpoint.
  */
 
 "use client";

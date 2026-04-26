@@ -740,7 +740,7 @@ function PulseFavSlot({
 }
 
 // ---------------------------------------------------------------------------
-// PulseSection component — shared between Dreaming and Autopilot
+// PulseSection component - shared between Dreaming and Autopilot
 // ---------------------------------------------------------------------------
 
 interface PulseSectionProps {
@@ -1275,7 +1275,7 @@ export function ChatSettingsWidget({
         </SettingsSection>
       )}
 
-      {/* Dreaming — customers only */}
+      {/* Dreaming - customers only */}
       {!user.isPublic && (
         <PulseSectionDreaming
           enabled={settings.dreamerEnabled ?? false}
@@ -1297,7 +1297,7 @@ export function ChatSettingsWidget({
         />
       )}
 
-      {/* Autopilot — customers only */}
+      {/* Autopilot - customers only */}
       {!user.isPublic && (
         <PulseSectionAutopilot
           enabled={settings.autopilotEnabled ?? false}
@@ -1319,7 +1319,7 @@ export function ChatSettingsWidget({
         />
       )}
 
-      {/* AI Heartbeat (Mama) — admin only */}
+      {/* AI Heartbeat (Mama) - admin only */}
       {isAdmin && (
         <PulseSectionMama
           enabled={settings.mamaEnabled ?? false}

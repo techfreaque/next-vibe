@@ -1,5 +1,5 @@
 /**
- * Filesystem Search — greps files on disk for content matches
+ * Filesystem Search - greps files on disk for content matches
  */
 
 import "server-only";

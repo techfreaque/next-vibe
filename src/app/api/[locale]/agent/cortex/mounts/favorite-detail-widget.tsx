@@ -1,5 +1,5 @@
 /**
- * Favorite Detail Widget — domain enrichment for /favorites/ paths
+ * Favorite Detail Widget - domain enrichment for /favorites/ paths
  *
  * Renders the actual favorite view using EndpointsPage.
  */

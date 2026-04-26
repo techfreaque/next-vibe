@@ -3,7 +3,7 @@
  *
  * The generated values follow the same HSL patterns observed across the 11
  * hand-tuned palettes in design-test/palette-switcher.tsx.  Semantic colors
- * (destructive, success, warning, info) are constants — only hue-derived
+ * (destructive, success, warning, info) are constants - only hue-derived
  * tokens change.
  */
 
@@ -94,12 +94,12 @@ export interface GeneratedPalette {
 export function generatePalette(hex: string): GeneratedPalette {
   const { h, s } = hexToHsl(hex);
 
-  // Derived saturation levels — reduced for surfaces, full for primary
+  // Derived saturation levels - reduced for surfaces, full for primary
   const surfaceSat = clamp(Math.round(s * 0.35), 10, 40);
   const midSat = clamp(Math.round(s * 0.55), 15, 50);
 
   const light: PaletteMode = {
-    // Surfaces — very light tint of the hue
+    // Surfaces - very light tint of the hue
     background: hsl(h, surfaceSat, 97),
     foreground: hsl(h, clamp(Math.round(s * 0.4), 14, 47), 11),
     card: hsl(0, 0, 100),
@@ -107,23 +107,23 @@ export function generatePalette(hex: string): GeneratedPalette {
     popover: hsl(0, 0, 100),
     "popover-foreground": hsl(h, clamp(Math.round(s * 0.4), 14, 47), 11),
 
-    // Primary — the accent color itself
+    // Primary - the accent color itself
     primary: hsl(h, s, clamp(Math.round(s > 50 ? 45 : 40), 35, 55)),
     "primary-foreground": "0 0% 100%",
 
-    // Secondary — very light, subtle hue
+    // Secondary - very light, subtle hue
     secondary: hsl(h, midSat, 94),
     "secondary-foreground": hsl(h, clamp(Math.round(s * 0.3), 10, 25), 18),
 
-    // Muted — even subtler
+    // Muted - even subtler
     muted: hsl(h, clamp(Math.round(s * 0.25), 10, 25), 95),
     "muted-foreground": hsl(h, clamp(Math.round(s * 0.15), 8, 16), 47),
 
-    // Accent — light wash
+    // Accent - light wash
     accent: hsl(h, clamp(Math.round(s * 0.7), 30, 80), 95),
     "accent-foreground": hsl(h, clamp(Math.round(s * 0.3), 10, 25), 17),
 
-    // Semantic — constants across all palettes
+    // Semantic - constants across all palettes
     destructive: "0 72% 51%",
     "destructive-foreground": "0 0% 100%",
     success: "142 71% 45%",
@@ -139,7 +139,7 @@ export function generatePalette(hex: string): GeneratedPalette {
     ring: hsl(h, s, clamp(Math.round(s > 50 ? 45 : 40), 35, 55)),
   };
 
-  // Dark mode — saturated primary, very dark surfaces tinted with hue
+  // Dark mode - saturated primary, very dark surfaces tinted with hue
   const darkPrimarySat = clamp(Math.round(s * 1.1), 60, 96);
   const darkPrimaryL = clamp(Math.round(s > 50 ? 55 : 50), 48, 60);
 
@@ -213,7 +213,7 @@ const CSS_VAR_KEYS: readonly (keyof PaletteMode)[] = [
 /**
  * Build a React `style` object that sets CSS variables for all 25 palette
  * tokens.  Spread this onto a container `<div>` to scope the palette via
- * CSS inheritance — child elements using `hsl(var(--primary))` etc. will
+ * CSS inheritance - child elements using `hsl(var(--primary))` etc. will
  * resolve to the generated values without touching the global theme.
  */
 export function buildScopedPaletteStyle(

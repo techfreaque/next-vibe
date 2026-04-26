@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       },
     },
     sharedThread: {
-      noLinks: "Noch nicht geteilt — tippen zum Teilen",
+      noLinks: "Noch nicht geteilt - tippen zum Teilen",
       linkCount: "{{count}} aktive(r) Link(s)",
       shareAction: "Teilen",
       moveToShared: "In Geteilt verschieben",

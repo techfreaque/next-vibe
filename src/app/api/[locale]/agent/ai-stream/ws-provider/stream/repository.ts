@@ -46,7 +46,7 @@ import type {
  * Keyed by callId. When the remote AI loop calls a delegated tool, it registers
  * a resolver here and awaits it. When the local node broadcasts TOOL_EXECUTE_RESULT
  * on the messages channel, our WS subscription resolves the matching promise.
- * Scoped to this Next.js process — no Bun proxy involvement.
+ * Scoped to this Next.js process - no Bun proxy involvement.
  */
 const pendingToolWaiters = new Map<
   string,
@@ -60,7 +60,7 @@ const pendingToolWaiters = new Map<
 /**
  * Open a WebSocket subscription to the messages channel on the local Bun proxy.
  * Returns a Promise that resolves with a cleanup function once the connection is
- * established and subscribed — guaranteeing no TOOL_EXECUTE_RESULT events are missed.
+ * established and subscribed - guaranteeing no TOOL_EXECUTE_RESULT events are missed.
  * Rejects after 5 s if the local proxy isn't reachable.
  */
 async function openToolResultSubscription(
@@ -112,7 +112,7 @@ async function openToolResultSubscription(
         channel,
       });
 
-      // Resolve with cleanup function — AI stream may now start.
+      // Resolve with cleanup function - AI stream may now start.
       resolve((): void => {
         closed = true;
         try {
@@ -149,7 +149,7 @@ async function openToolResultSubscription(
           });
         }
       } catch {
-        // Malformed message — ignore
+        // Malformed message - ignore
       }
     });
 
@@ -212,7 +212,7 @@ function buildDelegatedTools(
           callId,
         });
 
-        // 1. Register pending resolver before emitting — avoid race condition.
+        // 1. Register pending resolver before emitting - avoid race condition.
         //    A single `resolved` flag ensures the promise settles exactly once.
         let resolveToolResult!: (result: WidgetData) => void;
         const resultPromise = new Promise<WidgetData>((resolve) => {
@@ -239,7 +239,7 @@ function buildDelegatedTools(
         });
 
         // 2. Emit TOOL_EXECUTE_REQUEST on the messages channel via /ws/broadcast
-        //    This uses the same mechanism as publishWsEvent — standard framework call.
+        //    This uses the same mechanism as publishWsEvent - standard framework call.
         try {
           await fetch(broadcastUrl, {
             method: "POST",
@@ -300,7 +300,7 @@ export class WsProviderStreamRepository {
       // 1. Resolve threadId - use existing or generate new
       const threadId = data.threadId ?? crypto.randomUUID();
 
-      // 2. The messages channel — local subscribes to receive TOOL_EXECUTE_REQUEST
+      // 2. The messages channel - local subscribes to receive TOOL_EXECUTE_REQUEST
       //    events; remote emits them here; local sends TOOL_EXECUTE_RESULT back.
       const channel = `agent/chat/threads/${threadId}/messages`;
 
@@ -315,7 +315,7 @@ export class WsProviderStreamRepository {
             };
 
       // 4. Build delegated tools from client-provided specs.
-      //    All tools execute on local — remote emits the request and awaits the result.
+      //    All tools execute on local - remote emits the request and awaits the result.
       const toolsOverride =
         data.tools && data.tools.length > 0
           ? buildDelegatedTools(
@@ -330,7 +330,7 @@ export class WsProviderStreamRepository {
           : undefined;
 
       // 5. Build AiStream-compatible data object
-      //    userMessageId is generated here (provider-side) — it becomes the
+      //    userMessageId is generated here (provider-side) - it becomes the
       //    server-assigned ID that flows to the client via MESSAGE_CREATED.
       const aiStreamData: AiStreamPostRequestOutput = {
         operation: "send",

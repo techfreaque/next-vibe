@@ -3,7 +3,7 @@
  *
  * WidgetData accepts any JS value that can flow through an endpoint:
  * primitives, Date, undefined, nested objects and arrays.
- * No functions — those are stripped at serialization boundaries.
+ * No functions - those are stripped at serialization boundaries.
  * Field schemas in the endpoint definition handle specific coercions (e.g. string → Date).
  *
  * Type is declared before the schema to satisfy TypeScript's forward-reference

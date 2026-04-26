@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Empfehlungs-Konversionsrate",
     description:
-      "Anmeldungen pro Lead-Klick — wie viele Empfehlungsklicks zu registrierten Nutzern werden",
+      "Anmeldungen pro Lead-Klick - wie viele Empfehlungsklicks zu registrierten Nutzern werden",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
       range: { label: "Bereich", description: "Abzufragender Zeitraum" },

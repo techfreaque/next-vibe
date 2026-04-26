@@ -62,7 +62,7 @@ export const IMAGE_GEN = {
     sortDirection2: ModelSortDirection.ASC,
   } satisfies ImageGenModelSelection,
 
-  /** GPT-5 Image Mini — fast, cheap mainstream image model for most skills. */
+  /** GPT-5 Image Mini - fast, cheap mainstream image model for most skills. */
   mainstreamCheap: {
     selectionType: ModelSelectionType.MANUAL,
     manualModelId: ImageGenModelId.GPT_5_IMAGE_MINI,
@@ -70,7 +70,7 @@ export const IMAGE_GEN = {
     sortDirection: ModelSortDirection.ASC,
   } satisfies ImageGenModelSelection,
 
-  /** GPT-5.4 Image 2 — best non-legacy mainstream image model, falls back by intelligence then price. */
+  /** GPT-5.4 Image 2 - best non-legacy mainstream image model, falls back by intelligence then price. */
   mainstreamSmart: {
     selectionType: ModelSelectionType.MANUAL,
     manualModelId: ImageGenModelId.GPT_5_4_IMAGE_2,
@@ -80,7 +80,7 @@ export const IMAGE_GEN = {
     sortDirection2: ModelSortDirection.ASC,
   } satisfies ImageGenModelSelection,
 
-  /** Unrestricted — no content filter. Use only for explicitly uncensored skills. */
+  /** Unrestricted - no content filter. Use only for explicitly uncensored skills. */
   uncensoredCheap: {
     selectionType: ModelSelectionType.FILTERS,
     sortBy: ModelSortField.PRICE,
@@ -120,7 +120,7 @@ export const MUSIC_GEN = {
     sortDirection2: ModelSortDirection.ASC,
   } satisfies MusicGenModelSelection,
 
-  /** Sonauto Song (ModelsLab) — cheapest available mainstream music model. */
+  /** Sonauto Song (ModelsLab) - cheapest available mainstream music model. */
   mainstreamCheap: {
     selectionType: ModelSelectionType.MANUAL,
     manualModelId: MusicGenModelId.SONAUTO_SONG,
@@ -128,7 +128,7 @@ export const MUSIC_GEN = {
     sortDirection: ModelSortDirection.ASC,
   } satisfies MusicGenModelSelection,
 
-  /** Sonauto Song (ModelsLab) — best mainstream music model with intelligence/price fallback. */
+  /** Sonauto Song (ModelsLab) - best mainstream music model with intelligence/price fallback. */
   mainstreamSmart: {
     selectionType: ModelSelectionType.MANUAL,
     manualModelId: MusicGenModelId.SONAUTO_SONG,
@@ -151,7 +151,7 @@ export const MUSIC_GEN = {
 // Cheap/smart distinction is the main differentiator.
 
 export const VIDEO_GEN = {
-  /** VEO_3_1_FAST — cheapest high-quality video model. Falls back by price if unavailable. */
+  /** VEO_3_1_FAST - cheapest high-quality video model. Falls back by price if unavailable. */
   cheap: {
     selectionType: ModelSelectionType.MANUAL,
     manualModelId: VideoGenModelId.VEO_3_1_FAST,
@@ -159,7 +159,7 @@ export const VIDEO_GEN = {
     sortDirection: ModelSortDirection.ASC,
   } satisfies VideoGenModelSelection,
 
-  /** Veo 3.1 — best-quality video model with intelligence/price fallback. */
+  /** Veo 3.1 - best-quality video model with intelligence/price fallback. */
   smart: {
     selectionType: ModelSelectionType.MANUAL,
     manualModelId: VideoGenModelId.VEO_3_1,
@@ -171,20 +171,20 @@ export const VIDEO_GEN = {
 } as const;
 
 // ─── Voice (TTS) ─────────────────────────────────────────────────────────────
-// Voice presets are pinned to specific voices — persona consistency matters
+// Voice presets are pinned to specific voices - persona consistency matters
 // more than dynamic price selection. Voices differ in character, not just quality.
 //
 // Available voices (from ttsModelDefinitions voiceMeta):
-//   OPENAI_ALLOY    — neutral, conversational
-//   OPENAI_NOVA     — female, warm
-//   OPENAI_ONYX     — male, deep
-//   OPENAI_ECHO     — male
-//   OPENAI_SHIMMER  — female
-//   OPENAI_FABLE    — male, expressive
-//   ELEVENLABS_RACHEL — female, calm
-//   ELEVENLABS_JOSH   — male, deep
-//   ELEVENLABS_BELLA  — female, friendly
-//   ELEVENLABS_ADAM   — male, authoritative
+//   OPENAI_ALLOY    - neutral, conversational
+//   OPENAI_NOVA     - female, warm
+//   OPENAI_ONYX     - male, deep
+//   OPENAI_ECHO     - male
+//   OPENAI_SHIMMER  - female
+//   OPENAI_FABLE    - male, expressive
+//   ELEVENLABS_RACHEL - female, calm
+//   ELEVENLABS_JOSH   - male, deep
+//   ELEVENLABS_BELLA  - female, friendly
+//   ELEVENLABS_ADAM   - male, authoritative
 
 export const VOICE = {
   /** Neutral, conversational. Safe default for general-purpose skills. */
@@ -242,7 +242,7 @@ export const STT = {
     sortDirection: ModelSortDirection.ASC,
   } satisfies SttModelSelection,
 
-  /** OpenAI Whisper — pinned for skills needing consistent STT behavior. */
+  /** OpenAI Whisper - pinned for skills needing consistent STT behavior. */
   whisper: {
     selectionType: ModelSelectionType.MANUAL,
     manualModelId: SttModelId.OPENAI_WHISPER,
@@ -261,7 +261,7 @@ export const AUDIO_VISION = {
     sortDirection: ModelSortDirection.ASC,
   } satisfies AudioVisionModelSelection,
 
-  /** Gemini 2.5 Flash — pinned for quality-sensitive audio analysis. */
+  /** Gemini 2.5 Flash - pinned for quality-sensitive audio analysis. */
   geminiFlash: {
     selectionType: ModelSelectionType.MANUAL,
     manualModelId: AudioVisionModelId.GEMINI_2_5_FLASH,

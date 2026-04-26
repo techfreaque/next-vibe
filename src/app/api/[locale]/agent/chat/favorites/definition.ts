@@ -309,7 +309,7 @@ const { GET } = createEndpoint({
   },
 
   // === WS EVENTS ===
-  // Emitted by favorites mutation repositories — keeps sidebar in sync across all tabs.
+  // Emitted by favorites mutation repositories - keeps sidebar in sync across all tabs.
   // Framework merges/removes from React Query cache automatically. No client code needed.
   events: {
     "favorite-created": {

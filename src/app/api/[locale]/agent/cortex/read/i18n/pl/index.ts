@@ -2,7 +2,7 @@ export const translations = {
   get: {
     title: "Czytaj plik",
     description:
-      "Otwórz dowolny plik — notatki, wątki, wspomnienia, skille czy zadania.",
+      "Otwórz dowolny plik - notatki, wątki, wspomnienia, skille czy zadania.",
     dynamicTitle: "{{path}}",
     status: {
       loading: "Odczytywanie...",

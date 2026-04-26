@@ -1,5 +1,5 @@
 /**
- * Task Detail Widget — domain enrichment for /tasks/ paths
+ * Task Detail Widget - domain enrichment for /tasks/ paths
  *
  * Renders the actual cron task view using EndpointsPage.
  */

@@ -86,7 +86,7 @@ function greet(user: User): string {
 ## Blockquote
 
 > The only way to do great work is to love what you do.
-> — Steve Jobs
+> - Steve Jobs
 
 ## Table
 

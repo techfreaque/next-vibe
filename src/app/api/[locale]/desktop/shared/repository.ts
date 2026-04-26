@@ -144,7 +144,7 @@ async function ensureBinary(
 
   const pkg = PKG[binary]?.[pm] ?? binary;
   logger.info(
-    `[Desktop] ${binary} missing — showing auth dialog to install ${pkg}`,
+    `[Desktop] ${binary} missing - showing auth dialog to install ${pkg}`,
   );
 
   try {
@@ -177,7 +177,7 @@ async function ensureYdotool(logger: EndpointLogger): Promise<boolean> {
   }
 
   logger.info(
-    "[Desktop] ydotoold not running — starting via systemd user service",
+    "[Desktop] ydotoold not running - starting via systemd user service",
   );
   try {
     await execFile(
@@ -233,7 +233,7 @@ async function ensurePyAtspi(logger: EndpointLogger): Promise<boolean> {
 
   const pkg = PKG[key]?.[pm] ?? "python3-pyatspi";
   logger.info(
-    `[Desktop] pyatspi missing — showing auth dialog to install ${pkg}`,
+    `[Desktop] pyatspi missing - showing auth dialog to install ${pkg}`,
   );
 
   try {
@@ -325,7 +325,7 @@ function makeExecutionId(): string {
 }
 
 // ---------------------------------------------------------------------------
-// Monitor listing — kscreen-doctor (KDE) with xrandr fallback
+// Monitor listing - kscreen-doctor (KDE) with xrandr fallback
 // ---------------------------------------------------------------------------
 
 export interface MonitorInfo {
@@ -479,7 +479,7 @@ async function getAtSpiBusAddress(): Promise<string | undefined> {
 }
 
 // ---------------------------------------------------------------------------
-// Image helpers — dimensions + downscaling via ImageMagick
+// Image helpers - dimensions + downscaling via ImageMagick
 // ---------------------------------------------------------------------------
 
 async function getImageDimensions(
@@ -538,7 +538,7 @@ async function downscaleImage(
 }
 
 // ---------------------------------------------------------------------------
-// Screenshot — spectacle (KDE/Wayland native), fallback grim
+// Screenshot - spectacle (KDE/Wayland native), fallback grim
 // ---------------------------------------------------------------------------
 
 export interface ScreenshotResult {
@@ -686,7 +686,7 @@ export class DesktopScreenshotRepository {
           /* non-fatal */
         }
         if (isCommandError(cropResult)) {
-          // Crop failed — return full screenshot instead
+          // Crop failed - return full screenshot instead
           logger.warn(
             "[Desktop] ImageMagick crop failed, returning full desktop screenshot",
           );
@@ -800,7 +800,7 @@ export class DesktopScreenshotRepository {
 }
 
 // ---------------------------------------------------------------------------
-// Accessibility tree — python3-pyatspi (works on Wayland via AT-SPI2)
+// Accessibility tree - python3-pyatspi (works on Wayland via AT-SPI2)
 // ---------------------------------------------------------------------------
 
 export interface AccessibilityTreeResult {
@@ -995,7 +995,7 @@ export class DesktopAccessibilityRepository {
     }
 
     const tree = timedOut
-      ? `${stdout.trim()}\n\n[WARNING: Query timed out — output may be incomplete]`
+      ? `${stdout.trim()}\n\n[WARNING: Query timed out - output may be incomplete]`
       : stdout.trim();
 
     return success({
@@ -1130,7 +1130,7 @@ function resolveKeyArgs(keyExpr: string): string[] {
 }
 
 // ---------------------------------------------------------------------------
-// Mouse / keyboard — ydotool (Wayland, /dev/uinput)
+// Mouse / keyboard - ydotool (Wayland, /dev/uinput)
 // ---------------------------------------------------------------------------
 
 export interface SimpleResult {
@@ -1394,7 +1394,7 @@ export class DesktopInputRepository {
 }
 
 // ---------------------------------------------------------------------------
-// Window management — qdbus6 (KDE Plasma DBus, Wayland native)
+// Window management - qdbus6 (KDE Plasma DBus, Wayland native)
 // ---------------------------------------------------------------------------
 
 export interface FocusedWindowResult {

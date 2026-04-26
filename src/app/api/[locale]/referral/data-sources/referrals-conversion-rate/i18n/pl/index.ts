@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Współczynnik konwersji poleceń",
     description:
-      "Rejestracje na kliknięcie leada — ilu użytkowników z kliknięć w linki polecające faktycznie się rejestrowało",
+      "Rejestracje na kliknięcie leada - ilu użytkowników z kliknięć w linki polecające faktycznie się rejestrowało",
     fields: {
       resolution: {
         label: "Rozdzielczość",

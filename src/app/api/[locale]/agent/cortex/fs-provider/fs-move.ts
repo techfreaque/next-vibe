@@ -1,5 +1,5 @@
 /**
- * Filesystem Move — renames/moves files or directories on disk
+ * Filesystem Move - renames/moves files or directories on disk
  */
 
 import "server-only";

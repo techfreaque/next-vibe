@@ -798,7 +798,7 @@ interface MessageActionsWrapperProps {
   primaryId: string;
   primaryThreadId: string;
   allMessages: ChatMessage[];
-  /** True when any message in the group is still streaming — suppresses content processing */
+  /** True when any message in the group is still streaming - suppresses content processing */
   isGroupStreaming: boolean;
   locale: CountryLanguage;
   onAnswerAsModel: ((messageId: string) => void) | null;
@@ -847,7 +847,7 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
   userVote,
   voteScore,
 }: MessageActionsWrapperProps): JSX.Element {
-  // Process content for actions — skip while streaming: the actions bar is hidden
+  // Process content for actions - skip while streaming: the actions bar is hidden
   // during streaming and these async calls (TTS/copy processing) are expensive.
   // They run once when streaming completes (isGroupStreaming flips to false).
   const [allContent, setAllContent] = useState<string>("");

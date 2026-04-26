@@ -1,4 +1,4 @@
-// CLI: calendar has no terminal equivalent — return null
+// CLI: calendar has no terminal equivalent - return null
 
 import type { CalendarProps } from "../../web/ui/calendar";
 

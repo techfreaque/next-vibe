@@ -608,7 +608,7 @@ function createRemoteTool(params: {
 
         // Signal the stream layer to pause when callbackMode=wait AND the result
         // is actually pending (task-queue path). For direct HTTP the result is
-        // already inline — do NOT set waitingForRemoteResult or the tool-result
+        // already inline - do NOT set waitingForRemoteResult or the tool-result
         // handler will skip storing the result (treating it as still queued).
         const resultData = result.data as Record<string, WidgetData> | null;
         const isActuallyPending =

@@ -52,7 +52,7 @@ export interface MessageOperationDeps {
     selectedSkill: string;
     ttsAutoplay: boolean;
   };
-  /** Active favorite config — sent to server for model/tool/context resolution */
+  /** Active favorite config - sent to server for model/tool/context resolution */
   favoriteConfig: FavoriteConfig | null;
   /** Called immediately after the optimistic user message is added - switches the visible branch */
   setLeafMessageId?: (messageId: string) => void;
@@ -264,7 +264,7 @@ export async function createAndSendUserMessage(
     // POST is fire-and-forget - WS events handled by useMessagesSubscription
     // If the thread is already streaming, the server auto-queues the message.
     // favoriteConfig carries the full cascade config (models, tools, context).
-    // Server uses it directly — no re-query needed.
+    // Server uses it directly - no re-query needed.
     const streamStarted = await startStream({
       operation,
       rootFolderId: currentRootFolderId,

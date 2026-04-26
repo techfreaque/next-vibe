@@ -1,8 +1,8 @@
-# Support System — Spec
+# Support System - Spec
 
 ## What This Is
 
-Admin-to-admin support across vibe instances. A local vibe admin creates a support thread — it runs through the existing ws-provider protocol, so the thread lives on the remote (unbottled.ai). Both the local admin and the remote admin see it in their SUPPORT folder. They collaborate in the same thread.
+Admin-to-admin support across vibe instances. A local vibe admin creates a support thread - it runs through the existing ws-provider protocol, so the thread lives on the remote (unbottled.ai). Both the local admin and the remote admin see it in their SUPPORT folder. They collaborate in the same thread.
 
 No separate relay. No custom transport. The ws-provider protocol already handles thread creation and message delivery across instances.
 
@@ -17,7 +17,7 @@ Local vibe (in local mode) → POST to ws-provider/stream on unbottled.ai → th
 
 No new transport. No custom cross-instance HTTP. The ws-provider already does this.
 
-The local user's `remoteConnections` record points to unbottled.ai — same record used for all other remote features.
+The local user's `remoteConnections` record points to unbottled.ai - same record used for all other remote features.
 
 ---
 
@@ -28,7 +28,7 @@ The local user's `remoteConnections` record points to unbottled.ai — same reco
 - All support endpoints: `allowedRoles: [UserRole.ADMIN]`
 - SUPPORT folder: `rolesView: [UserRole.ADMIN]`
 - No customer access. No AI tool. No `escalate-to-human`.
-- `allowRemoteControl` user setting: not needed — remove it.
+- `allowRemoteControl` user setting: not needed - remove it.
 
 Local mode user = admin of their instance → same access.
 Prod cloud user = no access to support system whatsoever.
@@ -40,16 +40,16 @@ Prod cloud user = no access to support system whatsoever.
 `DefaultFolderId.SUPPORT` replaces `REMOTE`.
 
 - `rolesView: [UserRole.ADMIN]`
-- Threads in this folder are ws-provider threads — live on the remote instance
+- Threads in this folder are ws-provider threads - live on the remote instance
 - Local admin sees their own support threads (their local view via WS)
 - Remote admin sees all support threads from all connected instances
-- Normal thread mechanics: messages, files, WS events — all via existing ws-provider
+- Normal thread mechanics: messages, files, WS events - all via existing ws-provider
 
 ---
 
 ## DB: supportSessions
 
-Minimal. Tracks session lifecycle — who opened it, who joined, status.
+Minimal. Tracks session lifecycle - who opened it, who joined, status.
 
 ```
 supportSessions {
@@ -63,7 +63,7 @@ supportSessions {
 }
 ```
 
-The session row lives on the remote (unbottled.ai) — created when the ws-provider stream starts with `rootFolderId: SUPPORT`.
+The session row lives on the remote (unbottled.ai) - created when the ws-provider stream starts with `rootFolderId: SUPPORT`.
 
 ---
 
@@ -71,20 +71,20 @@ The session row lives on the remote (unbottled.ai) — created when the ws-provi
 
 All `allowedRoles: [UserRole.ADMIN]`.
 
-### `sessions` — support queue
+### `sessions` - support queue
 
 - Lists pending + active support sessions
 - Remote admin: sees all sessions from all connected instances
 - Local admin: sees their own sessions (by initiatorInstanceUrl)
 - Widget: table with Join/Close, status, origin instance, time-ago
 
-### `join` — remote admin claims a session
+### `join` - remote admin claims a session
 
 - Updates: status=active, supporterId=me
 - Posts system message into thread via normal message flow
-- Returns `{ threadId }` — admin navigates to thread, posts via ws-provider
+- Returns `{ threadId }` - admin navigates to thread, posts via ws-provider
 
-### `close` — ends the session
+### `close` - ends the session
 
 - Updates status=closed
 - Posts system message "Support session ended"

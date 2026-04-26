@@ -11,7 +11,7 @@ export type {
   RadioGroupItemProps,
 } from "../../web/ui/radio-group";
 
-// Radio button marker — non-translatable terminal symbol
+// Radio button marker - non-translatable terminal symbol
 const RADIO_MARKER = "(\u00a0)";
 
 // CLI: show selected value as plain text

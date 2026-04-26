@@ -50,7 +50,7 @@ export function GetAccessibilityTreeCliWidget({
     }
 
     if (isMcp) {
-      // AI gets full tree — prepend stats
+      // AI gets full tree - prepend stats
       const stats: string[] = [];
       if (v.nodeCount !== null && v.nodeCount !== undefined) {
         stats.push(`nodes: ${v.nodeCount}`);
@@ -78,7 +78,7 @@ export function GetAccessibilityTreeCliWidget({
     }
     if (v.truncated) {
       header.push(
-        chalk.yellow("  ⚠ Query timed out — output may be incomplete"),
+        chalk.yellow("  ⚠ Query timed out - output may be incomplete"),
       );
     }
 

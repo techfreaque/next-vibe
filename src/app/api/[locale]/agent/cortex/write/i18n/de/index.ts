@@ -2,7 +2,7 @@ export const translations = {
   post: {
     title: "Datei speichern",
     description:
-      "Datei anlegen oder überschreiben. Pfad und Inhalt angeben — fertig.",
+      "Datei anlegen oder überschreiben. Pfad und Inhalt angeben - fertig.",
     dynamicTitle: "Gespeichert: {{path}}",
     status: {
       loading: "Schreiben...",

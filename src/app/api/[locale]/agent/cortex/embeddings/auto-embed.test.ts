@@ -8,7 +8,7 @@
  * - Path change alone produces different hash (move invalidation)
  * - queueEmbedding fires non-blocking (setTimeout 0)
  *
- * Note: embedNode itself is async and calls DB + API — those paths are covered
+ * Note: embedNode itself is async and calls DB + API - those paths are covered
  * by integration tests (cortex-ai.test.ts). Here we test the hash math and
  * the public surface (computeEmbeddingHash) which is the skip gate.
  */
@@ -20,7 +20,7 @@ import { computeEmbeddingHash } from "./service";
 // ── Hash determinism ──────────────────────────────────────────────────────────
 
 describe("computeEmbeddingHash", () => {
-  it("is deterministic — same input produces same hash", () => {
+  it("is deterministic - same input produces same hash", () => {
     const h1 = computeEmbeddingHash("/memories/identity/name.md", "Max");
     const h2 = computeEmbeddingHash("/memories/identity/name.md", "Max");
     expect(h1).toBe(h2);
@@ -55,7 +55,7 @@ describe("computeEmbeddingHash", () => {
   });
 
   it("embeds path + newline + content combined", () => {
-    // The embedded text is `${path}\n\n${content}` — verify by checking
+    // The embedded text is `${path}\n\n${content}` - verify by checking
     // that path-only and content-only both affect the result
     const pathHash = computeEmbeddingHash("/path.md", "");
     const contentHash = computeEmbeddingHash("", "content");

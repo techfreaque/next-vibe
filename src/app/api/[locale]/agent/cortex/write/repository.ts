@@ -74,7 +74,7 @@ export class CortexWriteRepository {
     }
 
     // Filesystem backend for preview-mode admin
-    // Skip for virtual writable mounts — they go through mount handlers → DB → disk write-through
+    // Skip for virtual writable mounts - they go through mount handlers → DB → disk write-through
     if (!user.isPublic && !isVirtualWritable(path)) {
       const { isFilesystemMode } = await import("../fs-provider");
       if (isFilesystemMode(user)) {
@@ -83,7 +83,7 @@ export class CortexWriteRepository {
       }
     }
 
-    // Virtual writable mount — delegate to mount handler
+    // Virtual writable mount - delegate to mount handler
     if (isVirtualWritable(path)) {
       const mountPrefix = getMountPrefix(path, locale);
       if (!mountPrefix) {
@@ -151,7 +151,7 @@ export class CortexWriteRepository {
       const size = Buffer.byteLength(content, "utf8");
       const now = new Date();
 
-      // Upsert file — ON CONFLICT handles concurrent writes safely
+      // Upsert file - ON CONFLICT handles concurrent writes safely
       const [row] = await db
         .insert(cortexNodes)
         .values({

@@ -67,6 +67,6 @@ export const translations = {
     focusWindowRequiresIdentifier:
       "At least one of windowId, pid, or title is required",
     missingDep:
-      "Required system package missing: {{dep}}. A system auth dialog should have appeared — approve it to install automatically.",
+      "Required system package missing: {{dep}}. A system auth dialog should have appeared - approve it to install automatically.",
   },
 };

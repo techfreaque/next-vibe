@@ -98,7 +98,7 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         schema: z.record(z.string(), z.string()),
       }),
-      // Per-provider payloads: { memories: "[...]", documents: "[...]" } — only keys that differ
+      // Per-provider payloads: { memories: "[...]", documents: "[...]" } - only keys that differ
       syncPayloads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.record(z.string(), z.string()),

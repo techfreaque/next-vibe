@@ -485,7 +485,7 @@ const { GET } = createEndpoint({
         pick: ["streamingState", "preview", "updatedAt"],
       }),
     },
-    // Thread CRUD — emitted by threads/[threadId]/repository.ts
+    // Thread CRUD - emitted by threads/[threadId]/repository.ts
     "thread-updated": {
       fields: {
         items: [
@@ -513,7 +513,7 @@ const { GET } = createEndpoint({
         arrayField: "items",
       }),
     },
-    // Folder CRUD — emitted by folders/subfolders/[subFolderId]/repository.ts
+    // Folder CRUD - emitted by folders/subfolders/[subFolderId]/repository.ts
     "folder-created": {
       fields: {
         items: [

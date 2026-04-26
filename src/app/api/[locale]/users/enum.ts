@@ -172,7 +172,7 @@ export const PaymentMethodFilterDB = [
 ] as const;
 
 /**
- * Subscription Presence Filter — does the user have / had a subscription?
+ * Subscription Presence Filter - does the user have / had a subscription?
  */
 export const {
   enum: SubscriptionPresenceFilter,
@@ -192,7 +192,7 @@ export const SubscriptionPresenceFilterDB = [
 ] as const;
 
 /**
- * Credit Activity Filter — purchased packs / spent credits
+ * Credit Activity Filter - purchased packs / spent credits
  */
 export const {
   enum: CreditActivityFilter,
@@ -212,7 +212,7 @@ export const CreditActivityFilterDB = [
 ] as const;
 
 /**
- * Threads Filter — has any threads
+ * Threads Filter - has any threads
  */
 export const {
   enum: ThreadsFilter,
@@ -230,7 +230,7 @@ export const ThreadsFilterDB = [
 ] as const;
 
 /**
- * Referral Activity Filter — referral link, clicks, signups, paying subscribers
+ * Referral Activity Filter - referral link, clicks, signups, paying subscribers
  */
 export const {
   enum: ReferralActivityFilter,

@@ -1,5 +1,5 @@
 /**
- * CLI Tooltip — shows tooltip content inline as dimmed text
+ * CLI Tooltip - shows tooltip content inline as dimmed text
  * In terminal there are no hover states, so we display the content inline.
  */
 import { Box, Text } from "ink";
@@ -28,7 +28,7 @@ interface TooltipCtx {
 }
 
 const TooltipContext = React.createContext<TooltipCtx>({ showContent: true });
-// Unicode info symbol — terminal display only, not translatable
+// Unicode info symbol - terminal display only, not translatable
 const INFO_GLYPH = "\u2139\uFE0F ";
 
 export function TooltipProvider({

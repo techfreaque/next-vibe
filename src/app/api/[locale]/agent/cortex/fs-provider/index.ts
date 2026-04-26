@@ -1,5 +1,5 @@
 /**
- * Cortex Filesystem Provider — Guard & Path Mapping
+ * Cortex Filesystem Provider - Guard & Path Mapping
  *
  * In preview mode for admin users, Cortex operations read/write the `data/`
  * directory on disk instead of PostgreSQL.

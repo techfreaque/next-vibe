@@ -15,7 +15,7 @@ export type {
   AccordionContentProps,
 } from "../../web/ui/accordion";
 
-// CLI: always expanded — no interactivity in terminal
+// CLI: always expanded - no interactivity in terminal
 
 export function Accordion({ children }: AccordionProps): JSX.Element {
   return <Box flexDirection="column">{children}</Box>;

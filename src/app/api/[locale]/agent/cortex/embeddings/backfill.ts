@@ -63,7 +63,7 @@ async function getAllUserIds(): Promise<string[]> {
 /**
  * Materialize all virtual mount content for a user into cortexNodes rows.
  * This is a prerequisite for embedding: nodes must exist before they can be embedded.
- * Uses upsertVirtualNode (no embedding API call) — embedding backfill picks them up next.
+ * Uses upsertVirtualNode (no embedding API call) - embedding backfill picks them up next.
  * Returns count of nodes upserted.
  */
 async function materializeVirtualMounts(userId: string): Promise<number> {
@@ -93,7 +93,7 @@ async function materializeVirtualMounts(userId: string): Promise<number> {
   // --- Threads (already synced by syncThreadEmbedding, but backfill any gaps) ---
   // Threads use cortexNodes path /threads/<rootFolderId>/<slug>-<threadId>.md
   // They're synced on stream end, so most should already exist. Skip here to avoid
-  // a huge query — the embedding backfill will pick up any that slipped through.
+  // a huge query - the embedding backfill will pick up any that slipped through.
 
   // --- Skills ---
   const skillRoot = await listSkillPath(userId, "/skills").catch(() => []);
@@ -149,7 +149,7 @@ async function materializeVirtualMounts(userId: string): Promise<number> {
 
 /**
  * Materialize virtual mounts for all users.
- * Step 1 of backfill — populates cortexNodes rows without embeddings.
+ * Step 1 of backfill - populates cortexNodes rows without embeddings.
  * Fast: only DB reads + upserts, no embedding API calls.
  */
 export async function materializeAllVirtualMounts(): Promise<number> {
@@ -240,7 +240,7 @@ export async function backfillEmbeddings(force = false): Promise<{
     }
 
     for (const node of batch) {
-      // Embed content only — path is for filtering/display, not semantic match
+      // Embed content only - path is for filtering/display, not semantic match
       const textToEmbed = node.content ?? "";
 
       if (textToEmbed.trim().length === 0) {

@@ -103,7 +103,7 @@ const remoteSyncResponseSchema = z.object({
 
 /**
  * Serialized cron task for sync payloads.
- * Inferred from the Zod schema for type safety — no manual duplication.
+ * Inferred from the Zod schema for type safety - no manual duplication.
  */
 type SyncedCronTask = z.infer<typeof syncedCronTaskSchema>;
 
@@ -175,7 +175,7 @@ export class TaskSyncRepository {
 
   /**
    * Parse a sync field that may arrive as a JSON string OR as a pre-parsed array.
-   * Uses Zod schema for runtime validation — zero type assertions.
+   * Uses Zod schema for runtime validation - zero type assertions.
    */
   private static parseSyncField<T>(
     value: string | WidgetData,

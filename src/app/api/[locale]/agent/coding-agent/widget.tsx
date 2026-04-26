@@ -329,10 +329,13 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
     isProcessing,
     stream,
     hasExistingInput,
+    error: voiceError,
+    hasSavedAudio,
     startRecording,
     transcribeToInput,
     cancelRecording,
     togglePause,
+    retryTranscription,
   } = useVoiceRecording({
     currentValue: promptValue,
     onValueChange: handleContentChange,
@@ -559,10 +562,13 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
               isProcessing={isProcessing}
               stream={stream}
               hasExistingInput={hasExistingInput}
+              error={voiceError}
+              hasSavedAudio={hasSavedAudio}
               onCancel={cancelRecording}
               onTogglePause={togglePause}
               onTranscribeToInput={transcribeToInput}
               onSendVoice={() => undefined}
+              onRetry={() => void retryTranscription()}
               locale={locale}
             />
           )}

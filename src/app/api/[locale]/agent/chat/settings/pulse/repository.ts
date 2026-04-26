@@ -96,11 +96,11 @@ function autopilotTaskId(userId: string): string {
 
 /** Default user message to kick off a dreaming session */
 const DREAM_DEFAULT_PROMPT =
-  "Run your dreaming session. Reorganize and consolidate the cortex — memories, documents, threads. Leave everything cleaner and more organized.";
+  "Run your dreaming session. Reorganize and consolidate the cortex - memories, documents, threads. Leave everything cleaner and more organized.";
 
 /** Default user message to kick off an autopilot session */
 const AUTOPILOT_DEFAULT_PROMPT =
-  "Run your autopilot session. Pick up where active projects left off — advance next steps, handle queued work, keep things moving.";
+  "Run your autopilot session. Pick up where active projects left off - advance next steps, handle queued work, keep things moving.";
 
 /**
  * Ensure the dreaming cron task exists and is in the correct enabled state.
@@ -150,7 +150,7 @@ export async function ensureDreamTask(
       routeId: "agent.ai-stream.run",
       displayName: "Dreaming",
       description:
-        "AI reorganizes your cortex while you sleep — consolidates memories, cleans up documents, surfaces what matters.",
+        "AI reorganizes your cortex while you sleep - consolidates memories, cleans up documents, surfaces what matters.",
       schedule,
       enabled,
       hidden: false,
@@ -219,7 +219,7 @@ export async function ensureAutopilotTask(
       routeId: "agent.ai-stream.run",
       displayName: "Autopilot",
       description:
-        "AI works your queue while you're away — advances projects, handles next steps, picks up where you left off.",
+        "AI works your queue while you're away - advances projects, handles next steps, picks up where you left off.",
       schedule,
       enabled,
       hidden: false,
@@ -249,9 +249,9 @@ const MAMA_DEFAULT_PROMPT =
 
 /**
  * Ensure the mama heartbeat cron task exists and is in the correct enabled state.
- * This is a global system task (userId = null) — shared across all admins.
+ * This is a global system task (userId = null) - shared across all admins.
  * Last-write-wins: whichever admin saves settings controls the shared task.
- * userId is the admin who triggered the settings save — used to scope the mama folder.
+ * userId is the admin who triggered the settings save - used to scope the mama folder.
  */
 export async function ensureMamaTask(
   userId: string,
@@ -288,7 +288,7 @@ export async function ensureMamaTask(
       routeId: "agent.ai-stream.run",
       displayName: "Mama Heartbeat",
       description:
-        "Thea monitors the production instance — checks health, advances features, handles marketing, sends news.",
+        "Thea monitors the production instance - checks health, advances features, handles marketing, sends news.",
       schedule,
       enabled,
       hidden: false,
@@ -310,7 +310,7 @@ export async function ensureMamaTask(
 }
 
 /**
- * Disable a pulse task by ID. Used when user toggles off — keeps task row for re-enable later.
+ * Disable a pulse task by ID. Used when user toggles off - keeps task row for re-enable later.
  */
 export async function disablePulseTask(
   taskId: string,

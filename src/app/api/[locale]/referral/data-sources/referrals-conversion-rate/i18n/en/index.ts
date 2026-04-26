@@ -3,7 +3,7 @@ export const translations = {
   post: {
     title: "Referral Conversion Rate",
     description:
-      "Signups per lead click — how many referral clicks turn into registered users",
+      "Signups per lead click - how many referral clicks turn into registered users",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to query" },

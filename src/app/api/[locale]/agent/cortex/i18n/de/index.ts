@@ -33,23 +33,23 @@ export const translations = {
       inbox: {
         path: "posteingang",
         purpose:
-          "Schnellerfassung — hier ablegen, später sortieren wenn der Kontext klar ist",
+          "Schnellerfassung - hier ablegen, später sortieren wenn der Kontext klar ist",
         icon: "inbox",
       },
       projects: {
         path: "projekte",
-        purpose: "Aktive Arbeit — ein Unterordner pro Projekt",
+        purpose: "Aktive Arbeit - ein Unterordner pro Projekt",
         icon: "folder-open",
       },
       knowledge: {
         path: "wissen",
         purpose:
-          "Permanente Referenz — Dinge, die es wert sind, für immer aufgehoben zu werden",
+          "Permanente Referenz - Dinge, die es wert sind, für immer aufgehoben zu werden",
         icon: "book-open",
       },
       journal: {
         path: "tagebuch",
-        purpose: "Datierte Einträge — Ideen, Reflexionen, Beobachtungen",
+        purpose: "Datierte Einträge - Ideen, Reflexionen, Beobachtungen",
         icon: "pen-line",
       },
       templates: {
@@ -72,7 +72,7 @@ export const translations = {
         },
         goals: {
           path: "ziele.md",
-          content: `---\npriority: 90\ntags: [identität, ziele]\n---\n\n<!-- Deine wichtigsten Ziele — was du aufbauen, erreichen oder verbessern willst. Kurz- und langfristig. -->\n`,
+          content: `---\npriority: 90\ntags: [identität, ziele]\n---\n\n<!-- Deine wichtigsten Ziele - was du aufbauen, erreichen oder verbessern willst. Kurz- und langfristig. -->\n`,
         },
         communication: {
           path: "kommunikation.md",
@@ -130,14 +130,14 @@ export const translations = {
         },
         purpose: {
           path: "sinn.md",
-          content: `---\npriority: 95\ntags: [leben, sinn, werte, ziele]\n---\n\n## Leitstern\n\n<!-- Ein oder zwei Sätze: worum geht es in deinem Leben im Kern? Was bist du hier, um zu tun oder aufzubauen? -->\n\n## Kernwerte\n\n<!-- 3-5 Werte, die deine Entscheidungen leiten. Keine Wünsche — Dinge, nach denen du wirklich lebst. -->\n\n## Wie Erfolg aussieht\n\n<!-- In 5 Jahren: wie sieht ein gut gelebtes Leben konkret für dich aus? -->\n`,
+          content: `---\npriority: 95\ntags: [leben, sinn, werte, ziele]\n---\n\n## Leitstern\n\n<!-- Ein oder zwei Sätze: worum geht es in deinem Leben im Kern? Was bist du hier, um zu tun oder aufzubauen? -->\n\n## Kernwerte\n\n<!-- 3-5 Werte, die deine Entscheidungen leiten. Keine Wünsche - Dinge, nach denen du wirklich lebst. -->\n\n## Wie Erfolg aussieht\n\n<!-- In 5 Jahren: wie sieht ein gut gelebtes Leben konkret für dich aus? -->\n`,
         },
       },
     },
     documents: {
       meetingNotes: {
         path: "besprechungsnotizen.md",
-        content: `---\ntype: vorlage\ntags: [besprechungen, vorlage]\n---\n\n# Besprechungsnotizen — [Datum]\n\n**Teilnehmer:**\n**Zweck:**\n\n## Kontext\n\nKurzer Hintergrund, warum dieses Treffen stattfand.\n\n## Agenda\n\n1.\n2.\n3.\n\n## Wichtige Entscheidungen\n\n-\n\n## Aufgaben\n\n- [ ] @person — Aufgabe — fällig [Datum]\n\n## Notizen\n\n---\n*Abgelegt aus: /dokumente/posteingang*\n`,
+        content: `---\ntype: vorlage\ntags: [besprechungen, vorlage]\n---\n\n# Besprechungsnotizen - [Datum]\n\n**Teilnehmer:**\n**Zweck:**\n\n## Kontext\n\nKurzer Hintergrund, warum dieses Treffen stattfand.\n\n## Agenda\n\n1.\n2.\n3.\n\n## Wichtige Entscheidungen\n\n-\n\n## Aufgaben\n\n- [ ] @person - Aufgabe - fällig [Datum]\n\n## Notizen\n\n---\n*Abgelegt aus: /dokumente/posteingang*\n`,
       },
       projectBrief: {
         path: "projektbeschreibung.md",
@@ -149,11 +149,11 @@ export const translations = {
       },
       decisionLog: {
         path: "entscheidungsprotokoll.md",
-        content: `---\ntype: vorlage\ntags: [entscheidungen, architektur, vorlage]\n---\n\n# Entscheidung: [Titel]\n\n**Datum:**\n**Status:** vorgeschlagen | akzeptiert | abgelöst | veraltet\n**Entscheider:**\n\n## Kontext\n\nWelche Situation hat diese Entscheidung erzwungen? Welche Einschränkungen gibt es?\n\n## Betrachtete Optionen\n\n### Option A — [Name]\n\n**Vorteile:**\n**Nachteile:**\n\n### Option B — [Name]\n\n**Vorteile:**\n**Nachteile:**\n\n## Entscheidung\n\nWir wählten **Option [X]**, weil:\n\n## Konsequenzen\n\n**Positiv:**\n**Negativ:**\n**Neutral:**\n\n---\n*Diese Datei aus dem relevanten Projektbrief oder Codekommentar verlinken.*\n`,
+        content: `---\ntype: vorlage\ntags: [entscheidungen, architektur, vorlage]\n---\n\n# Entscheidung: [Titel]\n\n**Datum:**\n**Status:** vorgeschlagen | akzeptiert | abgelöst | veraltet\n**Entscheider:**\n\n## Kontext\n\nWelche Situation hat diese Entscheidung erzwungen? Welche Einschränkungen gibt es?\n\n## Betrachtete Optionen\n\n### Option A - [Name]\n\n**Vorteile:**\n**Nachteile:**\n\n### Option B - [Name]\n\n**Vorteile:**\n**Nachteile:**\n\n## Entscheidung\n\nWir wählten **Option [X]**, weil:\n\n## Konsequenzen\n\n**Positiv:**\n**Negativ:**\n**Neutral:**\n\n---\n*Diese Datei aus dem relevanten Projektbrief oder Codekommentar verlinken.*\n`,
       },
       knowledgeArticle: {
         path: "wissensartikel.md",
-        content: `---\ntype: vorlage\ntags: [wissen, referenz, vorlage]\n---\n\n# [Thema]\n\n**Zuletzt überprüft:**\n**Quelle:**\n\n## Zusammenfassung\n\nEin Absatz. Was ist das, warum ist es wichtig, wann gilt es?\n\n## Wie es funktioniert\n\nKernmechanik. Kein Füllstoff — nur was du brauchst, um es zu verstehen oder anzuwenden.\n\n## Wann verwenden\n\n-\n-\n\n## Wann NICHT verwenden\n\n-\n\n## Beispiele\n\n\`\`\`\nBeispiel hier einfügen\n\`\`\`\n\n## Referenzen\n\n-\n`,
+        content: `---\ntype: vorlage\ntags: [wissen, referenz, vorlage]\n---\n\n# [Thema]\n\n**Zuletzt überprüft:**\n**Quelle:**\n\n## Zusammenfassung\n\nEin Absatz. Was ist das, warum ist es wichtig, wann gilt es?\n\n## Wie es funktioniert\n\nKernmechanik. Kein Füllstoff - nur was du brauchst, um es zu verstehen oder anzuwenden.\n\n## Wann verwenden\n\n-\n-\n\n## Wann NICHT verwenden\n\n-\n\n## Beispiele\n\n\`\`\`\nBeispiel hier einfügen\n\`\`\`\n\n## Referenzen\n\n-\n`,
       },
     },
   },
@@ -193,7 +193,7 @@ export const translations = {
   },
   button: {
     label: "Kortex",
-    title: "Kortex — KI-Gedächtnis",
+    title: "Kortex - KI-Gedächtnis",
     unavailableTitle: "Kortex nicht verfügbar",
     unavailableDescription:
       "Kortex steht nur in privaten und geteilten Unterhaltungen zur Verfügung. Starte einen privaten Thread, um dein KI-Gedächtnis zu nutzen.",

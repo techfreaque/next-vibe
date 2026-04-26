@@ -1,7 +1,7 @@
 /**
  * Client Error Log API Definition
  * POST endpoint for client-side components to report errors/warnings for DB persistence.
- * Public — client-side code can call this even when unauthenticated.
+ * Public - client-side code can call this even when unauthenticated.
  */
 
 import { z } from "zod";

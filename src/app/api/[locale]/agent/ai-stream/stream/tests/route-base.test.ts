@@ -381,7 +381,7 @@ function assertRemoteToolCall(
 /**
  * Full lifecycle assertion for a remote tool message.
  * Verifies routing, result presence, status completion, and parent chain.
- * `expectedStatus` defaults to "completed" — pass "pending" for async phase1.
+ * `expectedStatus` defaults to "completed" - pass "pending" for async phase1.
  */
 function assertToolMessageComplete(
   msg: SlimMessage,
@@ -2541,7 +2541,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             const toolMsg = findToolMsg(added, "generate_image", cfg);
             expect(toolMsg).toBeDefined();
             if (toolMsg) {
-              // wakeUp phase1: tool dispatched async — status is "pending" in remote, undefined in local
+              // wakeUp phase1: tool dispatched async - status is "pending" in remote, undefined in local
               assertToolMessageComplete(
                 toolMsg,
                 "generate_image",
@@ -2866,7 +2866,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             );
 
             // Branch from the main chain tip. T6c chains linearly from T6b's
-            // conclusion; T6d chains from T6c's, T6e from T6d's — proper linked list.
+            // conclusion; T6d chains from T6c's, T6e from T6d's - proper linked list.
             t6cBranchParent = lastMainAiMsgId;
 
             const { result, messages } = await runStream({
@@ -3325,7 +3325,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             // Insert a fresh tool message with a UNIQUE toolCallId.
             // T6c and T6d share fixture toolCallId (:9). T6c's goroutine already inserted a
-            // deferred for :9 — that deferred is now an ancestor in the chain. Using the
+            // deferred for :9 - that deferred is now an ancestor in the chain. Using the
             // original :9 toolCallId would hit the idempotency check and skip insertion.
             // A fresh UUID toolCallId bypasses idempotency so we can test the double-call path.
             const { chatMessages: cm } =
@@ -3448,7 +3448,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // ── Exactly 1 revival AI message (direct child of deferred tool) ──
             // The revival may create >1 AI message via context compaction (first = error/summary,
             // second = final reply). We only check that exactly 1 AI message is DIRECTLY parented
-            // to the deferred (the first revival AI) — not that the entire chain is length 1.
+            // to the deferred (the first revival AI) - not that the entire chain is length 1.
             const deferredId = deferredMessages[0]?.id;
             let t6dRevivalAiId: string | undefined;
             if (deferredId) {
@@ -3486,7 +3486,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             await assertThreadIdle(threadId);
             await assertNoPendingTasks(threadId);
 
-            // Advance main chain tip to T6d's conclusion — T6e chains from here.
+            // Advance main chain tip to T6d's conclusion - T6e chains from here.
             // NOTE: T6e's cleanup deletes stale deferreds by originalToolCallId, which may
             // delete T6d's deferred too (shared fixture toolCallId). If that happens,
             // idemLeafMsgId becomes a dead-end leaf with no children. Track it defensively.
@@ -3507,7 +3507,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // ── T6e: wakeUp dead-stream - thread already idle when revival fires ─────────
       // Branch on main thread. Tests the dead-stream path: the original stream has
       // already ended (idle) when ResumeStreamRepository.resume is called.
-      // No live publishWakeUpSignal path — goes directly to claimRevival + deferred insert.
+      // No live publishWakeUpSignal path - goes directly to claimRevival + deferred insert.
       // Asserts:
       //   - deferred message inserted correctly (not via live signal)
       //   - revival AI responds naturally (WAKEUP_OK, imageUrl visible)
@@ -3600,7 +3600,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             // Insert a fresh tool message with a UNIQUE toolCallId.
             // T6c/T6d/T6e share fixture toolCallId (:9). T6c's goroutine-inserted deferred
-            // for :9 is an ancestor in the chain — using the original :9 would hit the
+            // for :9 is an ancestor in the chain - using the original :9 would hit the
             // idempotency check in resume and skip insertion. Fresh UUID bypasses it.
             {
               const { chatMessages: cm } =
@@ -3823,7 +3823,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               `T6e-phase2: ${String(loopRiskTasks.length)} enabled non-terminal tasks remain (WAKEUP LOOP RISK): ${loopRiskTasks.map((task) => `${task.id}:${String(task.last_execution_status)}`).join(", ")}`,
             ).toBe(0);
 
-            // Advance main chain tip to T6e's conclusion — T7a chains from here.
+            // Advance main chain tip to T6e's conclusion - T7a chains from here.
             // T6e is a straight chain (deadLeafMsgId → deferred → revivalAi), no dead-ends.
             if (revivalAi) {
               lastMainAiMsgId = revivalAi.id;
@@ -4123,7 +4123,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             ).toBeGreaterThan(0);
 
             lastMainAiMsgId = effectiveLastAiMsgId;
-            // T6c/d/e now chain linearly from T6b — no t6WakeUpBranchParentId needed.
+            // T6c/d/e now chain linearly from T6b - no t6WakeUpBranchParentId needed.
             // Only T2's branch point remains as a known multi-child node.
             assertNoOrphans(
               messages,

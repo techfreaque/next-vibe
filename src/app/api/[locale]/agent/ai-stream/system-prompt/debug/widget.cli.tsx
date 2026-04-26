@@ -42,7 +42,7 @@ export function SystemPromptDebugWidget({
         diagLines.push(
           isMcp
             ? "cortex-embedding: FAILED (no API key or call error)"
-            : chalk.red.bold("⚠ Cortex embedding FAILED — no API key or error"),
+            : chalk.red.bold("⚠ Cortex embedding FAILED - no API key or error"),
         );
       } else if (d.topScores.length === 0) {
         diagLines.push(
@@ -65,7 +65,7 @@ export function SystemPromptDebugWidget({
         } else {
           diagLines.push(
             chalk.cyan(
-              `Cortex Embeddings — top ${d.topScores.length} (${passing} pass >${0.2})`,
+              `Cortex Embeddings - top ${d.topScores.length} (${passing} pass >${0.2})`,
             ),
           );
           for (const s of d.topScores) {

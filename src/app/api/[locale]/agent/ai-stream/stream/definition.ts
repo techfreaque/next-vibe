@@ -57,7 +57,7 @@ const toolConfigItemSchema = z.object({
 });
 
 /**
- * Zod schema for FavoriteConfig — proper field-driven validation.
+ * Zod schema for FavoriteConfig - proper field-driven validation.
  * skillId accepts merged "skillSlug__variantId" format or plain "skillSlug".
  */
 const favoriteConfigSchema = z.object({
@@ -260,7 +260,7 @@ const { POST } = createEndpoint({
         schema: z.string(),
       }),
 
-      // Active favorite's full config — model selections, tools, context settings.
+      // Active favorite's full config - model selections, tools, context settings.
       // null = no favorite active (use skill/system defaults).
       // Logged-in users send their active favorite's config.
       // Public users send their client-side favorite's config.

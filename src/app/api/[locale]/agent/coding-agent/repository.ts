@@ -328,7 +328,7 @@ export async function runCodingAgent(
       });
     }
 
-    // WAIT / END_LOOP: pause the stream — complete-task will revive it.
+    // WAIT / END_LOOP: pause the stream - complete-task will revive it.
     // Mirror the remote queue WAIT path: set waitingForRemoteResult, omit taskId.
     if (
       (callbackMode === CallbackMode.WAIT ||
@@ -336,7 +336,7 @@ export async function runCodingAgent(
       streamContext
     ) {
       streamContext.waitingForRemoteResult = true;
-      // No timeout — interactive sessions can take arbitrarily long.
+      // No timeout - interactive sessions can take arbitrarily long.
       streamContext.pendingTimeoutMs = 0;
       return success({
         output: `Interactive ${provider.bin} session launched. Waiting for completion.`,
@@ -353,7 +353,7 @@ export async function runCodingAgent(
     });
   }
 
-  // Path 2: goroutine / cron context — reuse the parent task ID directly.
+  // Path 2: goroutine / cron context - reuse the parent task ID directly.
   // The parent cron task (cronTaskId) already has all wakeUp revival columns and
   // exists on both Thea and Hermes. When Claude calls complete-task with cronTaskId,
   // Hermes pushes the result to Thea using that same ID, Thea's /report finds the
@@ -400,7 +400,7 @@ export async function runCodingAgent(
 
   // Path 3: CLI/cron - no revival.
   // If the provider supports task context injection (e.g. claude-code), reaching here
-  // means we have no taskId to inject — the spawned process can't call complete-task.
+  // means we have no taskId to inject - the spawned process can't call complete-task.
   // Return an error so the caller knows the session can't be tracked.
   if (provider.injectTaskContext) {
     logger.error(
@@ -413,7 +413,7 @@ export async function runCodingAgent(
     });
   }
 
-  // Provider doesn't support task context (e.g. TUI tools) — spawn without revival.
+  // Provider doesn't support task context (e.g. TUI tools) - spawn without revival.
   logger.info("Interactive (CLI/cron): spawning detached, no revival");
   const terminal = detectTerminal(logger);
   if (terminal) {

@@ -464,7 +464,7 @@ export const translations: typeof enTranslations = {
     theaDreamer: {
       name: "Thea · Marzycielka",
       description:
-        "Thea w trybie snu — porządkuje twój cortex w nocy, tkając ład z wątków dnia.",
+        "Thea w trybie snu - porządkuje twój cortex w nocy, tkając ład z wątków dnia.",
       tagline: "Nocna Konsolidacja",
       shortDesc: "Konserwacja cortex w tle",
       suggestedPrompts: {
@@ -484,7 +484,7 @@ export const translations: typeof enTranslations = {
     hermesAutopilot: {
       name: "Hermes · Autopilot",
       description:
-        "Hermes w trybie wykonawczym — przesuwa twoje aktywne projekty do przodu, gdy cię nie ma.",
+        "Hermes w trybie wykonawczym - przesuwa twoje aktywne projekty do przodu, gdy cię nie ma.",
       tagline: "Zawsze do przodu",
       shortDesc: "Wykonywanie projektów w tle",
       suggestedPrompts: {
@@ -504,7 +504,7 @@ export const translations: typeof enTranslations = {
     theaMama: {
       name: "Thea · Mama",
       description:
-        "Thea w trybie Mama — szefowa produkcji platformy. Monitoruje zdrowie systemu, posuwa funkcje do przodu, zajmuje się marketingiem, wysyła nowości.",
+        "Thea w trybie Mama - szefowa produkcji platformy. Monitoruje zdrowie systemu, posuwa funkcje do przodu, zajmuje się marketingiem, wysyła nowości.",
       tagline: "Opiekunka platformy",
       shortDesc: "Zarządzanie produkcją platformy",
       suggestedPrompts: {
@@ -825,11 +825,11 @@ export const translations: typeof enTranslations = {
     supportAgent: {
       name: "Agent Wsparcia",
       description:
-        "Wsparcie techniczne napędzane AI — wie, kiedy przekazać sprawę człowiekowi",
+        "Wsparcie techniczne napędzane AI - wie, kiedy przekazać sprawę człowiekowi",
       tagline: "Problem rozwiązany",
       shortDesc: "Wsparcie techniczne z eskalacją do człowieka",
       suggestedPrompts: {
-        0: "Moja aplikacja ciągle się zawiesza — pomóż mi to naprawić",
+        0: "Moja aplikacja ciągle się zawiesza - pomóż mi to naprawić",
         1: "Nie mogę połączyć się z siecią",
         2: "Dostaję komunikat o błędzie, którego nie rozumiem",
         3: "Przeprowadź mnie przez resetowanie hasła",

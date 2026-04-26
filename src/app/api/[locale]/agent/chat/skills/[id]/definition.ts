@@ -1143,7 +1143,7 @@ const { GET } = createEndpoint({
   },
 
   // === WS EVENTS ===
-  // Emitted by SkillsRepository after skill mutations — keeps skill detail view in sync.
+  // Emitted by SkillsRepository after skill mutations - keeps skill detail view in sync.
   // Uses fields + merge so the framework applies the payload directly into the cache.
   events: {
     "skill-updated": {

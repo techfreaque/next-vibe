@@ -93,10 +93,10 @@ export async function loadCortexData(
     );
 
     // Pre-warm skills/db so it's in the module cache before getVirtualMountCounts
-    // calls getSkillCount — otherwise we hit a TDZ circular-dep crash.
+    // calls getSkillCount - otherwise we hit a TDZ circular-dep crash.
     await import("@/app/api/[locale]/agent/chat/skills/db").catch(() => null);
 
-    // 2. Parallel loads — all mounts independent
+    // 2. Parallel loads - all mounts independent
     const [
       counts,
       memCtx,
@@ -251,7 +251,7 @@ export function buildEmbeddingQuery(
 
 // ─── Shared Vector Search ─────────────────────────────────────────────────────
 
-/** Path-type weighting — memories and skills are higher signal */
+/** Path-type weighting - memories and skills are higher signal */
 const PATH_TYPE_WEIGHTS: Record<string, number> = {
   memories: 1.2,
   skills: 1.1,
@@ -375,7 +375,7 @@ async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
       .toSorted((a, b) => b.score - a.score)
       .slice(0, limit);
   } catch (error) {
-    logger.warn("Vector search failed — skipping", {
+    logger.warn("Vector search failed - skipping", {
       error: error instanceof Error ? error.message : String(error),
     });
     return [];
@@ -455,7 +455,7 @@ async function loadMemoryContext(
     }
   }
 
-  // Overlay virtual template files — only if they have meaningful content (not pure placeholders)
+  // Overlay virtual template files - only if they have meaningful content (not pure placeholders)
   try {
     const { getMemoryTemplates } = await import("../seeds/templates");
     const templates = getMemoryTemplates(
@@ -487,7 +487,7 @@ async function loadMemoryContext(
       existingPaths.add(tpl.path);
     }
   } catch {
-    // Templates optional — don't fail memory load
+    // Templates optional - don't fail memory load
   }
 
   const recent = active.toSorted(
@@ -586,7 +586,7 @@ async function buildTrimmedDocTree(
     const docTemplates = getDocumentTemplates(localeParam);
     const templateDirPath = `${documentsPath}/templates`;
 
-    // NOTE: Do NOT inject empty default subdirs — they're clutter until the user has files there.
+    // NOTE: Do NOT inject empty default subdirs - they're clutter until the user has files there.
 
     // Inject template files into the templates subdir
     const templateDirEntry = result.find((d) => d.path === templateDirPath);
@@ -612,7 +612,7 @@ async function buildTrimmedDocTree(
       }
     }
   } catch {
-    // Templates optional — don't fail doc tree
+    // Templates optional - don't fail doc tree
   }
 
   return result;
@@ -665,7 +665,7 @@ async function loadFavedSkills(userId: string): Promise<SkillRecord[]> {
     const { chatFavorites } = await import("../../chat/favorites/db");
     const { eq } = await import("drizzle-orm");
 
-    // Step 1: get skillIds from favorites — filter to UUID-format only (custom skills)
+    // Step 1: get skillIds from favorites - filter to UUID-format only (custom skills)
     const favRows = await db
       .select({ skillId: chatFavorites.skillId })
       .from(chatFavorites)
@@ -757,8 +757,8 @@ async function loadFavoritesForCortex(
   logger: EndpointLogger,
 ): Promise<{ items: FavoriteSummaryItem[]; activeId: string | null }> {
   try {
-    // Dynamic imports only — skip DEFAULT_SKILLS/skills/config/skills/i18n (pull in UI widget chain → TDZ)
-    // Default skill IDs are friendly slugs (e.g. "thea", "vibe-coder") — non-UUID, treated as canonical.
+    // Dynamic imports only - skip DEFAULT_SKILLS/skills/config/skills/i18n (pull in UI widget chain → TDZ)
+    // Default skill IDs are friendly slugs (e.g. "thea", "vibe-coder") - non-UUID, treated as canonical.
     const [
       { chatFavorites },
       { chatSettings },
@@ -920,7 +920,7 @@ function buildMemoriesDir(
     usedChars += excerpt.length + 30;
   }
 
-  // Show all files that fit within budget — no arbitrary hard cap
+  // Show all files that fit within budget - no arbitrary hard cap
   const shownPaths = orderedForContent
     .filter((x) => contentMap.has(x.path))
     .map((x) => x.path);
@@ -970,11 +970,11 @@ function buildDocumentsDir(
     usedChars += excerpt.length + 30;
   }
 
-  // Dir tree — each top-level subdir with its files, content for relevant. Skip empty dirs.
+  // Dir tree - each top-level subdir with its files, content for relevant. Skip empty dirs.
   const children: CortexEntry[] = [];
   for (const dir of docTree) {
     if (dir.fileCount === 0 && dir.shownFiles.length === 0) {
-      continue; // Don't show empty subdirs — clutter
+      continue; // Don't show empty subdirs - clutter
     }
     const dirName = dir.path.split("/").pop() ?? dir.path;
     const subChildren: CortexFileEntry[] = dir.shownFiles.map((filePath) => {
@@ -1133,7 +1133,7 @@ function buildSkillsDir(
     shownIds.add(s.id);
   }
 
-  // Relevant from vector search (user skills in cortexNodes — skip default/ system skills)
+  // Relevant from vector search (user skills in cortexNodes - skip default/ system skills)
   for (const n of relevant) {
     if (n.path.startsWith("/skills/default/")) {
       continue;
@@ -1283,7 +1283,7 @@ function baseName(path: string): string {
 /** Extract a short excerpt from a skill system prompt, stripping "You are X," opener */
 function skillExcerpt(systemPrompt: string): string {
   const cleaned = cleanExcerpt(systemPrompt)
-    // Strip "You are X, ..." opener — the name already shown in displayName
+    // Strip "You are X, ..." opener - the name already shown in displayName
     .replace(/^you are [^,.]+[,.]?\s*/i, "")
     .trim();
   return cleaned.slice(0, 100);

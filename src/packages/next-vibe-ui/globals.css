@@ -125,6 +125,7 @@
     100% {
       height: 12px;
     }
+
     50% {
       height: 24px;
     }
@@ -368,7 +369,7 @@
     --input: #a8bad4;
     --ring: #1e40af;
 
-    /* Modern HSL values — Sapphire with blue-tinted surfaces */
+    /* Modern HSL values - Sapphire with blue-tinted surfaces */
     --background: 217 64% 89%;
     --foreground: 224 40% 15%;
     --card: 222 70% 94%;
@@ -438,7 +439,7 @@
     --input: #253352;
     --ring: #3b82f6;
 
-    /* Modern HSL values — Sapphire dark with deep blue surfaces */
+    /* Modern HSL values - Sapphire dark with deep blue surfaces */
     --background: 225 40% 8%;
     --foreground: 210 40% 98%;
     --card: 225 35% 10%;

@@ -89,7 +89,7 @@ export async function resolveFavoriteConfig(
       eq(chatFavorites.userId, userId),
     );
   } else if (isSkillVariantId(favoriteId)) {
-    // Merged "skillSlug__variantId" format — look up by skill identity
+    // Merged "skillSlug__variantId" format - look up by skill identity
     const { skillId, variantId } = parseSkillId(favoriteId);
     condition = and(
       eq(chatFavorites.skillId, skillId),
@@ -323,7 +323,7 @@ export class ChatFavoritesRepository {
       const skillSlugMap = new Map<string, string>();
       for (const char of DEFAULT_SKILLS) {
         skillNameMap.set(char.id, charT(char.name));
-        // Default skill IDs are already friendly — identity mapping
+        // Default skill IDs are already friendly - identity mapping
         skillSlugMap.set(char.id, char.id);
       }
 
@@ -334,7 +334,7 @@ export class ChatFavoritesRepository {
       if (customSkillIds.length > 0) {
         const { customSkills: customSkillsTable } =
           await import("../skills/db");
-        // Postgres UUID column rejects non-UUID strings — separate UUIDs from slugs
+        // Postgres UUID column rejects non-UUID strings - separate UUIDs from slugs
         const UUID_RE =
           /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         const uuidIds = customSkillIds.filter((id) => UUID_RE.test(id));
@@ -467,7 +467,7 @@ export class ChatFavoritesRepository {
       .filter((id) => id !== NO_SKILL_ID && !skillNameMap.has(id));
     if (customSkillIds.length > 0) {
       const { customSkills: customSkillsTable } = await import("../skills/db");
-      // Postgres UUID column rejects non-UUID strings — separate UUIDs from slugs
+      // Postgres UUID column rejects non-UUID strings - separate UUIDs from slugs
       const UUID_RE =
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       const uuidIds = customSkillIds.filter((id) => UUID_RE.test(id));

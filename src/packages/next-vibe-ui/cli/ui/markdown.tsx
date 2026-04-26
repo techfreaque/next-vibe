@@ -1,4 +1,4 @@
-// CLI/MCP: render markdown content as plain text — no syntax highlighting,
+// CLI/MCP: render markdown content as plain text - no syntax highlighting,
 // no copy buttons, no modals. Strip formatting and pass content through.
 
 import { Text } from "ink";

@@ -1,5 +1,5 @@
 /**
- * Cortex Test Suite — Endpoint Validation + CRUD Integration
+ * Cortex Test Suite - Endpoint Validation + CRUD Integration
  *
  * Part A: Auto-generated tests for all 10 cortex endpoints (schema, auth, examples).
  * Part B: Sequential CRUD integration tests using the admin user.
@@ -43,7 +43,6 @@ import { defaultLocale } from "@/i18n/core/config";
 import { env } from "@/config/env";
 
 import { cortexNodes } from "./db";
-
 
 import readEndpoint from "./read/definition";
 import listEndpoint from "./list/definition";
@@ -173,11 +172,7 @@ describe("Cortex CRUD Integration", () => {
 
   // Sequential suite: each test builds on the previous
   let suiteFailed = false;
-  function fit(
-    name: string,
-    fn: () => Promise<void>,
-    timeout?: number,
-  ): void {
+  function fit(name: string, fn: () => Promise<void>, timeout?: number): void {
     it(
       name,
       async () => {
@@ -478,9 +473,10 @@ describe("Cortex CRUD Integration", () => {
       user: adminUser,
     });
 
-    expect(response.success, `Delete recursive failed: ${response.message}`).toBe(
-      true,
-    );
+    expect(
+      response.success,
+      `Delete recursive failed: ${response.message}`,
+    ).toBe(true);
     if (!response.success) {
       return;
     }
@@ -502,7 +498,7 @@ describe("Cortex CRUD Integration", () => {
   });
 
   // ── B17: Overwrite (upsert) ───────────────────────────────────────────────
-  fit("B17: write same path twice — first creates, second overwrites", async () => {
+  fit("B17: write same path twice - first creates, second overwrites", async () => {
     // First write
     const first = await sendTestRequest({
       endpoint: writeEndpoint.POST,
@@ -568,8 +564,10 @@ describe("Cortex CRUD Integration", () => {
     });
     expect(traversal.success).toBe(false);
     expect(
-      traversal.errorType?.errorCode === ErrorResponseTypes.VALIDATION_ERROR.errorCode ||
-        traversal.errorType?.errorCode === ErrorResponseTypes.FORBIDDEN.errorCode,
+      traversal.errorType?.errorCode ===
+        ErrorResponseTypes.VALIDATION_ERROR.errorCode ||
+        traversal.errorType?.errorCode ===
+          ErrorResponseTypes.FORBIDDEN.errorCode,
     ).toBe(true);
 
     // Empty path

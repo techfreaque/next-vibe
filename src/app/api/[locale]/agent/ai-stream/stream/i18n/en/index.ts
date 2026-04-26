@@ -352,7 +352,7 @@ export const translations = {
     favoriteConfig: {
       label: "Favorite Config",
       description:
-        "Active favorite's full configuration — model selections, tool config, context settings. null = no favorite active, use skill/system defaults.",
+        "Active favorite's full configuration - model selections, tool config, context settings. null = no favorite active, use skill/system defaults.",
     },
     enabledToolIds: {
       label: "Enabled Tool IDs",

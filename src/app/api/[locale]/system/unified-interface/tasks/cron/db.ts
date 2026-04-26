@@ -226,7 +226,7 @@ export const cronTaskExecutions = pgTable("cron_task_executions", {
  */
 export const taskInputSchema = z.record(z.string(), WidgetDataSchema);
 
-/** Zod schema for the TaskOwner discriminated union — use in response schemas. */
+/** Zod schema for the TaskOwner discriminated union - use in response schemas. */
 export const taskOwnerSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("user"), userId: z.string() }),
   z.object({ type: z.literal("system") }),

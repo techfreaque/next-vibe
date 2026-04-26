@@ -45,7 +45,7 @@ import {
  *   {{AGENT_NAME}}      → "Claude Code" or "Coding Agent"
  *   {{AGENT_DOCS_FILE}} → "CLAUDE.md" or "AGENTS.md"
  *
- * Do NOT edit CLAUDE.md or AGENTS.md manually — edit this systemPrompt instead.
+ * Do NOT edit CLAUDE.md or AGENTS.md manually - edit this systemPrompt instead.
  */
 export const PROJECT_INSTRUCTIONS = `# Project Overview
 

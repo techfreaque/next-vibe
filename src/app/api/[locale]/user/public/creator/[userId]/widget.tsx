@@ -179,7 +179,7 @@ export function CreatorProfileWidget(): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { push: navigate } = useWidgetNavigation();
 
-  // Skills context — reuse real components from skills/widget.tsx
+  // Skills context - reuse real components from skills/widget.tsx
   const isTouch = useTouchDevice();
   const skillsT = skillsScopedTranslation.scopedT(locale).t;
   const skillsFieldChildren = skillsDef.GET.fields.children;
@@ -336,7 +336,7 @@ export function CreatorProfileWidget(): JSX.Element {
           padding: "0 24px 80px",
         }}
       >
-        {/* Skills — rendered via CollapsibleSkillSection */}
+        {/* Skills - rendered via CollapsibleSkillSection */}
         {skills.length > 0 && (
           <Div style={{ marginBottom: 36 }}>
             <CollapsibleSkillSection

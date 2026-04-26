@@ -1,5 +1,5 @@
 /**
- * Upload Detail Widget — domain enrichment for /uploads/ paths
+ * Upload Detail Widget - domain enrichment for /uploads/ paths
  *
  * Renders a compact upload card below the Cortex operation summary
  * showing the file's identity in a domain-aware format.

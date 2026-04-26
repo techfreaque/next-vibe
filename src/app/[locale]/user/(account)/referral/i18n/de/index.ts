@@ -22,7 +22,7 @@ export const translations = {
     heroSub: "Wiederkehrend. Für immer.",
     chainTitle: "10 Abonnenten. Was du pro Monat verdienst.",
     chainSubtitle:
-      "Jede Ebene ist die Hälfte der darüberliegenden. Einmalig aufgebaut — zahlt für immer.",
+      "Jede Ebene ist die Hälfte der darüberliegenden. Einmalig aufgebaut - zahlt für immer.",
     youLabel: "Du",
     whoLabels: [
       "Du - wer auch immer sie direkt empfohlen hat",
@@ -62,7 +62,7 @@ export const translations = {
   story: {
     title: "Wie die Kette wächst",
     subtitle:
-      "Dieselben 10 Abonnenten. Jede Ebene, die aktiviert wird, addiert sich — für immer.",
+      "Dieselben 10 Abonnenten. Jede Ebene, die aktiviert wird, addiert sich - für immer.",
     totalLabel: "Gesamt / Monat",
     addedLabel: "+{{amount}} von dieser Ebene",
     levelLabel: "Ebene {{n}} aktiv",
@@ -167,11 +167,11 @@ export const translations = {
   },
   audienceCallout: {
     title: "Zwei Wege zu verdienen",
-    newTitle: "Empfehlungslink — {{directPct}} pro Nutzer",
+    newTitle: "Empfehlungslink - {{directPct}} pro Nutzer",
     newBody:
       "Code teilen. Jeder, der sich anmeldet und zahlt, bringt dir {{directPct}} jeder Zahlung, jeden Monat, für immer. Einmal gepostet. Für immer verdient.",
     newCta: "Deinen Empfehlungslink holen",
-    proTitle: "Skill-Link — {{skillPct}} pro Nutzer",
+    proTitle: "Skill-Link - {{skillPct}} pro Nutzer",
     proBody:
       "Skill bauen. Link teilen. Jeder, der sich darüber anmeldet, zahlt dir {{directPct}} direkt + {{skillBonusPct}} Skill-Bonus = {{skillPct}} pro Nutzer, wiederkehrend. Noch besser: Die {{skillBonusPct}} gehören dir als Skill-Autor, auch wenn jemand anderes deinen Skill teilt. Die Plattform trackt Skill-Autorenschaft - passive Attribution ohne extra Aufwand.",
     proCta: "Skill bauen",

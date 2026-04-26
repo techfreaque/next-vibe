@@ -1,7 +1,7 @@
 /**
  * Cortex search / relevant context unit tests
  *
- * Tests the mergeResults score logic directly — no DB needed.
+ * Tests the mergeResults score logic directly - no DB needed.
  * The merge function is the core of hybrid search correctness.
  *
  * Covers:
@@ -256,9 +256,7 @@ describe("thread path identification", () => {
       },
     ];
 
-    const threadChunks = allNodes.filter((n) =>
-      n.path.startsWith("/threads/"),
-    );
+    const threadChunks = allNodes.filter((n) => n.path.startsWith("/threads/"));
     const relevantContext = allNodes.filter(
       (n) => !n.path.startsWith("/threads/"),
     );

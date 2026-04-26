@@ -23,7 +23,7 @@ export interface VirtualListEntry {
   updatedAt: string;
 }
 
-/** Context passed to mount write handlers — carries user identity + locale for native repos */
+/** Context passed to mount write handlers - carries user identity + locale for native repos */
 export interface MountWriteContext {
   userId: string;
   user: JwtPrivatePayloadType;
@@ -178,7 +178,7 @@ export async function getVirtualMountCounts(userId: string): Promise<{
 }
 
 /**
- * Resolve a virtual path write — delegates to mount-specific handler
+ * Resolve a virtual path write - delegates to mount-specific handler
  */
 export async function resolveVirtualWrite(
   ctx: MountWriteContext,
@@ -197,7 +197,7 @@ export async function resolveVirtualWrite(
 }
 
 /**
- * Resolve a virtual path delete — delegates to mount-specific handler
+ * Resolve a virtual path delete - delegates to mount-specific handler
  */
 export async function resolveVirtualDelete(
   ctx: MountWriteContext,
@@ -215,7 +215,7 @@ export async function resolveVirtualDelete(
 }
 
 /**
- * Resolve a virtual path move — delegates to mount-specific handler
+ * Resolve a virtual path move - delegates to mount-specific handler
  */
 export async function resolveVirtualMove(
   ctx: MountWriteContext,

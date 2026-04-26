@@ -51,7 +51,7 @@ function formatCredits(amount: number): string {
 }
 
 /**
- * Credits total badge — subscribes only to `total`
+ * Credits total badge - subscribes only to `total`
  */
 function CreditsBadge(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -68,7 +68,7 @@ function CreditsBadge(): JSX.Element {
 }
 
 /**
- * Expiring credits cell — re-renders only when `expiring` changes
+ * Expiring credits cell - re-renders only when `expiring` changes
  */
 function ExpiringCell(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -99,7 +99,7 @@ function ExpiringCell(): JSX.Element {
 }
 
 /**
- * Permanent credits cell — re-renders only when `permanent` changes
+ * Permanent credits cell - re-renders only when `permanent` changes
  */
 function PermanentCell(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -123,7 +123,7 @@ function PermanentCell(): JSX.Element {
 }
 
 /**
- * Free credits cell — re-renders only when `free` changes
+ * Free credits cell - re-renders only when `free` changes
  */
 function FreeCell(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -150,7 +150,7 @@ function FreeCell(): JSX.Element {
 }
 
 /**
- * Earned credits cell — re-renders only when `earned` changes
+ * Earned credits cell - re-renders only when `earned` changes
  */
 function EarnedCell(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -178,7 +178,7 @@ function EarnedCell(): JSX.Element {
 
 /**
  * Credits Balance Container Widget
- * The container itself subscribes to nothing — only sub-components re-render on data changes
+ * The container itself subscribes to nothing - only sub-components re-render on data changes
  */
 export function CreditsBalanceContainer(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();

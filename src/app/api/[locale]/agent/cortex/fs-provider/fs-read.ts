@@ -1,5 +1,5 @@
 /**
- * Filesystem Read — reads a file from disk
+ * Filesystem Read - reads a file from disk
  */
 
 import "server-only";

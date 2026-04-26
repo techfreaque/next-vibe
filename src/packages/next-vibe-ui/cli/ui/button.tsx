@@ -6,7 +6,7 @@ import type { ButtonProps } from "../../web/ui/button";
 
 import { cva } from "class-variance-authority";
 
-// Stub variants for CLI — CSS classes are unused in terminal rendering
+// Stub variants for CLI - CSS classes are unused in terminal rendering
 export const buttonVariants = cva("");
 export const buttonTextVariants = cva("");
 export type { ButtonVariant, ButtonSize } from "../../web/ui/button";

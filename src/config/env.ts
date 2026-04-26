@@ -51,7 +51,7 @@ export const {
     schema: z.string().default(String(process.pid)),
     example: false,
     comment:
-      "Vibe runtime process ID. Set automatically at startup — no need to configure manually.",
+      "Vibe runtime process ID. Set automatically at startup - no need to configure manually.",
     commented: true,
   },
   IS_PREVIEW_MODE: {

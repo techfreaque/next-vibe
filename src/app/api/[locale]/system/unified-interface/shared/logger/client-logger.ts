@@ -36,7 +36,7 @@ function reportToServer(
     : undefined;
   const fullMeta = tabMeta ? [...metaPayload, tabMeta] : metaPayload;
 
-  // Use the typed executeMutation transport — handles CSRF, auth, and response parsing.
+  // Use the typed executeMutation transport - handles CSRF, auth, and response parsing.
   // Import lazily so this file stays tree-shakeable in non-browser bundles.
   void (async (): Promise<void> => {
     try {
@@ -45,7 +45,7 @@ function reportToServer(
         import("@/app/api/[locale]/system/unified-interface/tasks/error-monitor/client-log/definition"),
       ]);
 
-      // Minimal public-user stub — server re-auths from the JWT cookie.
+      // Minimal public-user stub - server re-auths from the JWT cookie.
       // The user param here only drives client-side routing decisions.
       const publicUser = {
         isPublic: true as const,
@@ -73,7 +73,7 @@ function reportToServer(
         user: publicUser,
       });
     } catch {
-      // silently swallow — client logger must never cascade
+      // silently swallow - client logger must never cascade
     }
   })();
 }

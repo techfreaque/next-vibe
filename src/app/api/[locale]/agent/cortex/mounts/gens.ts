@@ -367,7 +367,7 @@ export interface VirtualSearchHit {
 }
 
 /**
- * Direct keyword search across AI-generated media — one DB query, no file-by-file reads.
+ * Direct keyword search across AI-generated media - one DB query, no file-by-file reads.
  * Matches against prompt text.
  */
 export async function searchGens(

@@ -3,7 +3,7 @@
  *
  * Parses a Tailwind className string and returns Ink-compatible props
  * for <Text> and <Box> components. This is the foundation of the CLI
- * rendering surface — all next-vibe-ui/cli components use this to
+ * rendering surface - all next-vibe-ui/cli components use this to
  * translate web className strings into terminal output.
  *
  * Design notes:
@@ -75,7 +75,7 @@ export interface InkBoxProps {
 export interface InkProps {
   text: InkTextProps;
   box: InkBoxProps;
-  /** true if a `hidden` class was found — component should return null */
+  /** true if a `hidden` class was found - component should return null */
   hidden: boolean;
 }
 
@@ -227,7 +227,7 @@ export function parseClassesToInkProps(className?: string): InkProps {
     // ── Text color ─────────────────────────────────────────────────────────
     if (bare.startsWith("text-")) {
       const token = bare.slice(5);
-      // Size classes — not colors
+      // Size classes - not colors
       if (
         ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl"].includes(
           token,
@@ -248,7 +248,7 @@ export function parseClassesToInkProps(className?: string): InkProps {
         }
         continue;
       }
-      // Alignment — ignore in CLI
+      // Alignment - ignore in CLI
       if (["left", "center", "right", "justify"].includes(token)) {
         continue;
       }
@@ -580,7 +580,7 @@ export function parseClassesToInkProps(className?: string): InkProps {
     }
 
     // Everything else (bg-*, border-*, rounded-*, shadow-*, ring-*, cursor-*,
-    // transition-*, animate-*, z-*, absolute, relative, fixed, etc.) — ignored
+    // transition-*, animate-*, z-*, absolute, relative, fixed, etc.) - ignored
   }
 
   return { text, box, hidden };

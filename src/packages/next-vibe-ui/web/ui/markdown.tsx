@@ -619,10 +619,10 @@ export const CodeBlock = memo(function CodeBlock({
   );
 });
 
-// Clean code snippet — use on landing pages, docs, anywhere outside chat markdown.
+// Clean code snippet - use on landing pages, docs, anywhere outside chat markdown.
 // variant="bare"  → syntax-highlighted code only, no wrapper chrome
 // variant="card"  → subtle dark card with optional copy button, no fake window
-// variant="file"  → filename tab + copy button, clean border — for multi-file viewers
+// variant="file"  → filename tab + copy button, clean border - for multi-file viewers
 export const CodeSnippet = memo(function CodeSnippet({
   code,
   language,
@@ -668,7 +668,7 @@ export const CodeSnippet = memo(function CodeSnippet({
         border: "unset",
         borderRadius: "",
         // wrapLines adds span wrappers per line which breaks Enter-key formatting
-        // — we never enable it for CodeSnippet
+        // - we never enable it for CodeSnippet
       }}
       wrapLongLines={false}
     >

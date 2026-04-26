@@ -101,7 +101,7 @@ export async function readSkillPath(
 }
 
 /**
- * List skills — own skills + skills referenced by user's favorites (deduped)
+ * List skills - own skills + skills referenced by user's favorites (deduped)
  */
 export async function listSkillPath(
   userId: string,
@@ -158,7 +158,7 @@ export async function listSkillPath(
 }
 
 /**
- * Get skill count — own + favorited (deduped)
+ * Get skill count - own + favorited (deduped)
  */
 export async function getSkillCount(userId: string): Promise<number> {
   const [{ customSkills }, { chatFavorites }] = await Promise.all([
@@ -348,7 +348,7 @@ export async function deleteSkillPath(
 
   await db.delete(customSkills).where(eq(customSkills.id, existing.id));
 
-  // Disk write-through — delete from disk
+  // Disk write-through - delete from disk
   try {
     const { deleteFromDisk } = await import("../fs-provider/fs-sync");
     await deleteFromDisk(`/skills/${skillId}.md`);

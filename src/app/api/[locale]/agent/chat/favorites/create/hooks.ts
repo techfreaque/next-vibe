@@ -189,7 +189,7 @@ export function useAddToFavorites({
       // Capture for closure
       const charData = fullChar;
 
-      // Create the favorite — pass skillId as-is (merged format handled server-side)
+      // Create the favorite - pass skillId as-is (merged format handled server-side)
       const createFavoriteDefinition = await import("./definition");
       const createResponse = await apiClient.mutate(
         createFavoriteDefinition.default.POST,

@@ -62,7 +62,7 @@ export interface WidgetChatInputProps {
   enabledTools?: EnabledTool[] | null;
   /**
    * Extra buttons rendered inline in the left controls group (after tools button).
-   * Use for popover triggers (instructions, pre-calls, etc.) — keeps the toolbar flat.
+   * Use for popover triggers (instructions, pre-calls, etc.) - keeps the toolbar flat.
    */
   extraButtons?: ReactNode;
   className?: string;
@@ -137,7 +137,7 @@ export function WidgetChatInput({
 
   useEffect(() => {
     // When an onSelectFavorite override is active (e.g. ai-run), the form is driven
-    // by that callback — skip the global settings sync to avoid fighting it.
+    // by that callback - skip the global settings sync to avoid fighting it.
     if (onSelectFavorite) {
       return;
     }

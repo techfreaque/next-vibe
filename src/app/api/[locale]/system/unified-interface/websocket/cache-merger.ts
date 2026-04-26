@@ -43,10 +43,10 @@ function mergeArray(
     return existing;
   }
 
-  // Check if items have id — use first partial item as probe
+  // Check if items have id - use first partial item as probe
   const firstPartial = partial[0];
   if (!firstPartial || !hasId(firstPartial)) {
-    // No id field — replace wholesale
+    // No id field - replace wholesale
     return partial;
   }
 
@@ -80,7 +80,7 @@ function mergeArray(
         }
       }
     } else {
-      // New item — append
+      // New item - append
       result.push(patchItem);
       changed = true;
     }
@@ -102,7 +102,7 @@ export function applyPartialToCache(
     return existing;
   }
 
-  // Primitives — replace if changed
+  // Primitives - replace if changed
   if (typeof partial !== "object") {
     return partial === existing ? existing : partial;
   }
@@ -116,7 +116,7 @@ export function applyPartialToCache(
     return merged === existing ? existing : merged;
   }
 
-  // Object merge — existing must also be an object (non-array)
+  // Object merge - existing must also be an object (non-array)
   if (
     typeof existing !== "object" ||
     existing === null ||

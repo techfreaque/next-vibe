@@ -264,7 +264,7 @@ export function useEdenAISpeech({
         type: mediaRecorderRef.current?.mimeType || "audio/webm",
       });
 
-      // Bail out if blob is too small (silent/empty recording) — show error so user knows
+      // Bail out if blob is too small (silent/empty recording) - show error so user knows
       if (audioBlob.size < 1000) {
         logger.debug("STT: Audio too short/silent", {
           blobSize: audioBlob.size,

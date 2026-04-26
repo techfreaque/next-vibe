@@ -17,7 +17,7 @@ export interface CortexFileEntry {
   kind: "file";
   /** Canonical path e.g. /memories/identity/name.md */
   path: string;
-  /** Display name — basename without extension */
+  /** Display name - basename without extension */
   displayName: string;
   /** Content to show inline below the filename (empty = filename only) */
   excerpt: string;
@@ -111,11 +111,11 @@ export const cortexFragment: SystemPromptFragment<CortexData> = {
       searchCount === 0;
 
     const langNote = languageName
-      ? `**Language:** Write all content in ${languageName} — the user's language.\n`
+      ? `**Language:** Write all content in ${languageName} - the user's language.\n`
       : "";
 
     const emptyNotice = isEmptyWorkspace
-      ? `\n> Empty workspace — learn the user's name, role, goals. Write to ${memoriesPath}/identity/ right now.\n`
+      ? `\n> Empty workspace - learn the user's name, role, goals. Write to ${memoriesPath}/identity/ right now.\n`
       : "";
 
     const treeStr = renderCortexTree(data);
@@ -125,10 +125,10 @@ Shared memory between you and the user. Persists across conversations. You read 
 ${langNote}${emptyNotice}
 ${treeStr}
 
-**Tools:** \`${CORTEX_WRITE_ALIAS}\` · \`${CORTEX_READ_ALIAS}\` · \`${CORTEX_SEARCH_ALIAS}\` · \`${CORTEX_LIST_ALIAS}\` (+ edit/move/delete/mkdir/tree — \`tool-help query="cortex"\`)
-**Rules:** One idea per file. <200 words. Names: \`specific-kebab-case.md\`. Write proactively. Consolidate duplicates. Archive (\`archived: true\` frontmatter) over deleting. Pin critical files (\`pinned: true\`) — always shown, never trimmed.
+**Tools:** \`${CORTEX_WRITE_ALIAS}\` · \`${CORTEX_READ_ALIAS}\` · \`${CORTEX_SEARCH_ALIAS}\` · \`${CORTEX_LIST_ALIAS}\` (+ edit/move/delete/mkdir/tree - \`tool-help query="cortex"\`)
+**Rules:** One idea per file. <200 words. Names: \`specific-kebab-case.md\`. Write proactively. Consolidate duplicates. Archive (\`archived: true\` frontmatter) over deleting. Pin critical files (\`pinned: true\`) - always shown, never trimmed.
 **Writable:** ${memoriesPath}/ (knowledge) · ${documentsPath}/ (working files) · /skills/ (custom skills)
-**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ — use \`${CORTEX_READ_ALIAS}\` or \`${CORTEX_LIST_ALIAS}\` only`;
+**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ - use \`${CORTEX_READ_ALIAS}\` or \`${CORTEX_LIST_ALIAS}\` only`;
   },
 };
 
@@ -171,14 +171,14 @@ export function renderCortexTree(data: CortexData): string {
   const extraLeafs: string[] = [];
   if (uploadCount > 0) {
     extraLeafs.push(
-      `/uploads/ (${uploadCount} — images, documents, audio, video)`,
+      `/uploads/ (${uploadCount} - images, documents, audio, video)`,
     );
   }
   if (searchCount > 0) {
-    extraLeafs.push(`/searches/ (${searchCount} — by month)`);
+    extraLeafs.push(`/searches/ (${searchCount} - by month)`);
   }
   if (genCount > 0) {
-    extraLeafs.push(`/gens/ (${genCount} — images, audio, video)`);
+    extraLeafs.push(`/gens/ (${genCount} - images, audio, video)`);
   }
 
   const lines: string[] = ["/ (cortex)"];

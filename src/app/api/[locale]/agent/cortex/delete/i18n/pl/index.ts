@@ -48,7 +48,7 @@ export const translations = {
       },
       conflict: {
         title: "Niepusty",
-        description: "Folder nie jest pusty — włącz Z zawartością",
+        description: "Folder nie jest pusty - włącz Z zawartością",
       },
     },
     success: {

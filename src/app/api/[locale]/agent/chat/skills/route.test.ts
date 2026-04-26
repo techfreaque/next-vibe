@@ -1,5 +1,5 @@
 /**
- * Skills Test Suite — Endpoint Validation + CRUD Integration
+ * Skills Test Suite - Endpoint Validation + CRUD Integration
  *
  * Part A: Auto-generated tests for all skill endpoints (schema, auth, examples).
  * Part B: Sequential CRUD integration tests using the admin user.
@@ -10,13 +10,7 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
 import { and, eq, like } from "drizzle-orm";
-import {
-  afterAll,
-  beforeAll,
-  describe,
-  expect,
-  it,
-} from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 
@@ -34,7 +28,13 @@ import { env } from "@/config/env";
 
 import { customSkills } from "./db";
 import { isUuid } from "../slugify";
-import { SkillCategory, ModelSelectionType, IntelligenceLevel, SkillStatus, SkillSourceFilter } from "./enum";
+import {
+  SkillCategory,
+  ModelSelectionType,
+  IntelligenceLevel,
+  SkillStatus,
+  SkillSourceFilter,
+} from "./enum";
 import { ChatModelId } from "../../ai-stream/models";
 
 // ── Definition imports ───────────────────────────────────────────────────────
@@ -105,7 +105,7 @@ async function resolveUser(
   };
 }
 
-/** Assert a string is a slug (lowercase, dashes, digits — never a UUID). */
+/** Assert a string is a slug (lowercase, dashes, digits - never a UUID). */
 function expectSlug(value: string, label: string): void {
   expect(isUuid(value), `${label} should not be a UUID: ${value}`).toBe(false);
   expect(
@@ -158,11 +158,7 @@ describe("Skills CRUD Integration", () => {
 
   // Sequential suite: each test builds on the previous
   let suiteFailed = false;
-  function fit(
-    name: string,
-    fn: () => Promise<void>,
-    timeout?: number,
-  ): void {
+  function fit(name: string, fn: () => Promise<void>, timeout?: number): void {
     it(
       name,
       async () => {
@@ -188,9 +184,11 @@ describe("Skills CRUD Integration", () => {
       data: {
         name: TEST_SKILL_NAME,
         tagline: "Integration test skill for route suite",
-        description: "This skill is created by the automated test suite to verify the full CRUD flow",
+        description:
+          "This skill is created by the automated test suite to verify the full CRUD flow",
         icon: "test-tube",
-        systemPrompt: "You are a test assistant. Always respond with 'test-ok'.",
+        systemPrompt:
+          "You are a test assistant. Always respond with 'test-ok'.",
         category: SkillCategory.CODING,
         isPublic: false,
         modelSelection: {
@@ -238,7 +236,7 @@ describe("Skills CRUD Integration", () => {
     }
   });
 
-  // ── S3: List skills — created skill appears ─────────────────────────────
+  // ── S3: List skills - created skill appears ─────────────────────────────
   fit("S3: list skills includes created skill with slug IDs", async () => {
     const response = await sendTestRequest({
       endpoint: skillsListEndpoint.GET,
@@ -306,7 +304,9 @@ describe("Skills CRUD Integration", () => {
 
     expect(response.data.name).toBe(`${TEST_SKILL_NAME} Updated`);
     expect(response.data.tagline).toBe("Updated tagline for test");
-    expect(response.data.systemPrompt).toBe("You are an updated test assistant.");
+    expect(response.data.systemPrompt).toBe(
+      "You are an updated test assistant.",
+    );
   });
 
   // ── S6: Publish skill ──────────────────────────────────────────────────
@@ -330,7 +330,7 @@ describe("Skills CRUD Integration", () => {
     expect(response.data.publishedAt).toBeTruthy();
   });
 
-  // ── S7: List all skills — published skill visible ─────────────────────
+  // ── S7: List all skills - published skill visible ─────────────────────
   // Note: COMMUNITY filter excludes the current user's own skills,
   // so we use ALL to verify the published skill is accessible.
   fit("S7: published skill appears in all-skills listing", async () => {
@@ -341,14 +341,20 @@ describe("Skills CRUD Integration", () => {
       user: adminUser,
     });
 
-    expect(response.success, `All-skills list failed: ${response.message}`).toBe(true);
+    expect(
+      response.success,
+      `All-skills list failed: ${response.message}`,
+    ).toBe(true);
     if (!response.success) {
       return;
     }
 
     const allSkills = response.data.sections.flatMap((s) => s.skills);
     const found = allSkills.find((s) => s.name === updatedName);
-    expect(found, "Published skill not found in all-skills listing").toBeTruthy();
+    expect(
+      found,
+      "Published skill not found in all-skills listing",
+    ).toBeTruthy();
     if (found) {
       expectSlug(found.skillId, "community listed skill.skillId");
     }
@@ -379,7 +385,9 @@ describe("Skills CRUD Integration", () => {
       user: adminUser,
     });
 
-    expect(response.success, `Vote toggle failed: ${response.message}`).toBe(true);
+    expect(response.success, `Vote toggle failed: ${response.message}`).toBe(
+      true,
+    );
     if (!response.success) {
       return;
     }
@@ -413,7 +421,10 @@ describe("Skills CRUD Integration", () => {
       user: adminUser,
     });
 
-    expect(response.success, `Moderation list failed: ${response.message}`).toBe(true);
+    expect(
+      response.success,
+      `Moderation list failed: ${response.message}`,
+    ).toBe(true);
     if (!response.success) {
       return;
     }
@@ -423,7 +434,10 @@ describe("Skills CRUD Integration", () => {
     const reported = response.data.skills.find(
       (s: Record<string, unknown>) => s.name === updatedName,
     );
-    expect(reported, "Reported skill not found in moderation list").toBeTruthy();
+    expect(
+      reported,
+      "Reported skill not found in moderation list",
+    ).toBeTruthy();
     if (reported) {
       // Moderation uses internal UUIDs for id and ownerAuthorId
       expect(reported.reportCount).toBeGreaterThanOrEqual(1);
@@ -445,7 +459,10 @@ describe("Skills CRUD Integration", () => {
         .limit(1);
       skillDbId = row?.id ?? null;
     }
-    expect(skillDbId, "Could not resolve skill DB id for moderation").toBeTruthy();
+    expect(
+      skillDbId,
+      "Could not resolve skill DB id for moderation",
+    ).toBeTruthy();
     if (!skillDbId) {
       return;
     }
@@ -456,7 +473,10 @@ describe("Skills CRUD Integration", () => {
       user: adminUser,
     });
 
-    expect(response.success, `Moderation clear failed: ${response.message}`).toBe(true);
+    expect(
+      response.success,
+      `Moderation clear failed: ${response.message}`,
+    ).toBe(true);
     if (!response.success) {
       return;
     }
@@ -476,7 +496,9 @@ describe("Skills CRUD Integration", () => {
       user: adminUser,
     });
 
-    expect(response.success, `Unpublish failed: ${response.message}`).toBe(true);
+    expect(response.success, `Unpublish failed: ${response.message}`).toBe(
+      true,
+    );
     if (!response.success) {
       return;
     }
@@ -506,7 +528,9 @@ describe("Skills CRUD Integration", () => {
       user: adminUser,
     });
 
-    expect(response.success, `GET by UUID failed: ${response.message}`).toBe(true);
+    expect(response.success, `GET by UUID failed: ${response.message}`).toBe(
+      true,
+    );
     if (!response.success) {
       return;
     }
@@ -514,7 +538,10 @@ describe("Skills CRUD Integration", () => {
     // Even when queried by UUID, the response should not leak UUIDs
     expect(response.data.name).toBe(`${TEST_SKILL_NAME} Updated`);
     if (response.data.creatorProfile) {
-      expectSlug(response.data.creatorProfile.userId, "creatorProfile.userId via UUID lookup");
+      expectSlug(
+        response.data.creatorProfile.userId,
+        "creatorProfile.userId via UUID lookup",
+      );
     }
   });
 

@@ -109,7 +109,7 @@ async function setupUnbottled(_testUser: JwtPrivatePayloadType): Promise<void> {
   // Note: strict mode is NOT enabled here so that first-run fixture recording
   // can make live calls to localhost:3001. On replay runs, all calls hit
   // cached fixtures naturally. Compliance is proven by addLocalhostPort(3001)
-  // which routes all external AI calls through hermes — no real provider is
+  // which routes all external AI calls through hermes - no real provider is
   // reachable unless via localhost:3001 which is always intercepted.
 }
 

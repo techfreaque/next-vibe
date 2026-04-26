@@ -3,7 +3,7 @@
  * Runs after memories migration (priority 50).
  *
  * Templates (memory scaffolds, document templates) and default folder scaffolds
- * are now fully virtual — resolved at request time from i18n translations per
+ * are now fully virtual - resolved at request time from i18n translations per
  * locale. Nothing is written to DB for templates or scaffolds.
  *
  * This seed only materializes:
@@ -208,7 +208,7 @@ async function materializeVirtualMounts(logger: EndpointLogger): Promise<void> {
   const { chatMessages } = await import("@/app/api/[locale]/agent/chat/db");
   const { desc, sql } = await import("drizzle-orm");
 
-  // Per-user limit via window function — each user gets their most recent 100 threads
+  // Per-user limit via window function - each user gets their most recent 100 threads
   const recentThreads = await db
     .select({
       id: chatThreads.id,
@@ -277,7 +277,7 @@ async function materializeVirtualMounts(logger: EndpointLogger): Promise<void> {
 /**
  * Materialize built-in skills into cortex_nodes for all users.
  * Reads pre-computed embeddings directly from skill.ts files (written by `vibe gen`).
- * No API calls — the file is the source of truth.
+ * No API calls - the file is the source of truth.
  */
 async function materializeBuiltInSkills(logger: EndpointLogger): Promise<void> {
   const { syncVirtualNodeWithCachedEmbedding, upsertVirtualNode } =

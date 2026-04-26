@@ -30,7 +30,7 @@ export const translations: typeof enTranslations = {
       maxWidth: {
         label: "Maximale Breite",
         description:
-          "Bild auf diese Breite skalieren, wenn es breiter ist. Nützlich für KI — 4-Monitor-Aufnahmen sind riesig.",
+          "Bild auf diese Breite skalieren, wenn es breiter ist. Nützlich für KI - 4-Monitor-Aufnahmen sind riesig.",
         placeholder: "1920",
       },
     },

@@ -422,7 +422,7 @@ export class ToolConfirmationHandler {
         // Different user turn (user sent a new message after this tool was pending): insert deferred.
         //
         // Important: AI revival messages (from callbackMode=wait/wakeUp completing) are NOT
-        // counted as a "new user turn" — they are part of the same user turn even if they have
+        // counted as a "new user turn" - they are part of the same user turn even if they have
         // a different sequenceId. Only explicit USER messages constitute a new turn.
         const newerSequenceMessage = toolMessage.sequenceId
           ? await db

@@ -10,7 +10,7 @@
 
 import type { LoggerMetadata } from "./endpoint";
 
-// File names — fixed
+// File names - fixed
 const DEBUG_FILE = "vibe-mcp.log";
 const DEV_LOG_FILE = "vibe-dev.log";
 const START_LOG_FILE = "vibe-start.log";
@@ -251,7 +251,7 @@ export async function clientFileLog(
 }
 
 /**
- * Delete all vibe-client-*.log files — called on server start to clean up stale tab logs.
+ * Delete all vibe-client-*.log files - called on server start to clean up stale tab logs.
  */
 export async function truncateClientLogs(): Promise<void> {
   try {
@@ -268,7 +268,7 @@ export async function truncateClientLogs(): Promise<void> {
     try {
       files = readdirSync(debugDir);
     } catch {
-      return; // dir doesn't exist yet — nothing to clean
+      return; // dir doesn't exist yet - nothing to clean
     }
     for (const file of files) {
       if (file.startsWith("vibe-client-") && file.endsWith(".log")) {
