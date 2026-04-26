@@ -150,6 +150,8 @@ export class MessageDbWriter {
           model: model ?? null,
           skill: skill ?? null,
           metadata: {},
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
     });
@@ -397,6 +399,8 @@ export class MessageDbWriter {
           model: model ?? null,
           skill: skill ?? null,
           metadata: {},
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
     });
@@ -474,6 +478,8 @@ export class MessageDbWriter {
           model: model ?? null,
           skill: skill ?? null,
           metadata: { toolCall },
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
     });
@@ -560,6 +566,8 @@ export class MessageDbWriter {
           model: model ?? null,
           skill: skill ?? null,
           metadata: { toolCall },
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
     });
@@ -647,6 +655,8 @@ export class MessageDbWriter {
             errorResponse.errorType?.errorCode !== undefined
               ? String(errorResponse.errorType.errorCode)
               : null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
     });
@@ -772,6 +782,8 @@ export class MessageDbWriter {
           model: model ?? null,
           skill: skill ?? null,
           metadata: metadata ?? {},
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
     });
@@ -823,6 +835,8 @@ export class MessageDbWriter {
             compactedMessageCount: messagesToCompact.length,
             ...(containsMediaReferences && { containsMediaReferences: true }),
           },
+          createdAt,
+          updatedAt: createdAt,
         },
       ],
     });
@@ -1034,6 +1048,8 @@ export class MessageDbWriter {
           model: null,
           skill: null,
           metadata: {},
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
     });
@@ -1102,6 +1118,8 @@ export class MessageDbWriter {
           model: model ?? null,
           skill: skill ?? null,
           metadata,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
     });

@@ -37,13 +37,13 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import {
   type ToolCall,
   chatMessages,
   chatThreads,
 } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -677,6 +677,8 @@ export class ResumeStreamRepository {
                   skill: resolvedSkill,
                   sequenceId: deferredSequenceId,
                   metadata: { toolCall: deferredToolCall },
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
                   isAI: true,
                 },
               ],

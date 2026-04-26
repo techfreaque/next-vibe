@@ -363,6 +363,8 @@ export class StreamingTTSHandler {
                 metadata: null,
                 errorMessage: message,
                 errorCode: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR.errorKey,
+                createdAt: new Date(),
+                updatedAt: new Date(),
               },
             ],
           });

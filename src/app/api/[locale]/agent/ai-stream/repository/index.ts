@@ -22,6 +22,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
+import { buildFavoriteConfig } from "../../chat/favorites/repository";
+import { parseSkillId } from "../../chat/slugify";
 import {
   createMessagesEmitter,
   emitThreadTitleUpdated,
@@ -55,8 +57,6 @@ import { MessageContextBuilder } from "./handlers/message-context-builder";
 import { StreamErrorCatchHandler } from "./handlers/stream-error-catch-handler";
 import { StreamExecutionHandler } from "./handlers/stream-execution-handler";
 import { StreamStartHandler } from "./handlers/stream-start-handler";
-import { buildFavoriteConfig } from "../../chat/favorites/repository";
-import { parseSkillId } from "../../chat/slugify";
 import type { HeadlessAiStreamResult } from "./headless";
 import { setupAiStream } from "./stream-setup";
 import { buildSystemPrompt } from "./system-prompt/builder";
@@ -266,6 +266,8 @@ export class AiStreamRepository {
             model: null,
             skill: null,
             metadata: { isQueued: true },
+            createdAt: new Date(),
+            updatedAt: new Date(),
           },
         ],
       });
@@ -355,6 +357,8 @@ export class AiStreamRepository {
                 model: null,
                 skill: null,
                 metadata: {},
+                createdAt: new Date(),
+                updatedAt: new Date(),
                 isAI: true,
               },
             ],
@@ -1322,6 +1326,8 @@ export class AiStreamRepository {
                 skill: null,
                 metadata: null,
                 isAI: true,
+                createdAt: new Date(),
+                updatedAt: new Date(),
               },
             ],
             streamingState: "idle",

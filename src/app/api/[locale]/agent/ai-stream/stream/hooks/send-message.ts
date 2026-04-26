@@ -140,7 +140,9 @@ export async function sendMessage(
           childrenByParent.set(
             key,
             arr.toSorted(
-              (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+              (a, b) =>
+                new Date(a.createdAt).getTime() -
+                new Date(b.createdAt).getTime(),
             ),
           );
         }
@@ -150,7 +152,9 @@ export async function sendMessage(
         const startId = startMsg
           ? startMsg.id
           : (threadMessages.toSorted(
-              (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime(),
             )[0]?.id ?? null);
 
         if (startId) {

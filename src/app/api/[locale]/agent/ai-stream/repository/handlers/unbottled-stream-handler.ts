@@ -17,11 +17,11 @@
 
 import "server-only";
 
-import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
@@ -31,9 +31,9 @@ import {
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
+import type { ToolCall } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
-import type { ToolCall } from "../../../chat/db";
 import type { UnbottledCloudSession } from "../../../env";
 import type { ChatModelId, ChatModelOption } from "../../models";
 import type { AiStreamT } from "../../stream/i18n";
@@ -416,6 +416,8 @@ export async function executeUnbottledStream(
               model,
               skill,
               metadata: null,
+              createdAt: new Date(),
+              updatedAt: new Date(),
             },
           ],
           streamingState: "streaming",
@@ -497,6 +499,8 @@ export async function executeUnbottledStream(
                     model,
                     skill,
                     metadata: { toolCall },
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
                   },
                 ],
               });
@@ -949,6 +953,8 @@ async function executeSelfRelay(params: UnbottledStreamParams): Promise<void> {
           model,
           skill,
           metadata: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
       streamingState: "streaming",

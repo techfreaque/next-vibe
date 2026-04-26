@@ -91,6 +91,8 @@ export async function insertDeferredWakeUpMessage(
         skill: resolvedSkill,
         sequenceId: deferredSequenceId,
         metadata: { toolCall: deferredToolCall },
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ],
     streamingState: "streaming",
