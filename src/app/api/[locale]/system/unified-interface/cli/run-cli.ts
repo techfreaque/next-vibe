@@ -19,6 +19,7 @@ import { enableMcpSilentMode } from "@/config/debug";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   DefinitionLoader,
@@ -36,7 +37,6 @@ import {
   ErrorHandler,
   setupGlobalErrorHandlers,
 } from "./runtime/execution-errors";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { CliInputParser } from "./runtime/parsing";
 import {
   type CliCompatiblePlatform,
@@ -120,7 +120,7 @@ interface CliOptions {
   remote?: boolean;
 }
 
-const CLI_VERSION = "3.2.0" as const;
+const CLI_VERSION = "3.3.0" as const;
 const DEFAULT_OUTPUT = "pretty" as const;
 
 export interface RunCliOptions {

@@ -1,6 +1,6 @@
 {
   "name": "next-vibe",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "Full-stack TypeScript framework with unified CLI, React, and API interfaces",
   "keywords": [
     "api",
