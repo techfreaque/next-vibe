@@ -231,7 +231,6 @@ export class MCPRegistry {
         threadId: undefined,
         aiMessageId: undefined,
         skillId: undefined,
-        modelId: undefined,
         headless: undefined,
         subAgentDepth: 0,
         currentToolMessageId: undefined,
@@ -245,10 +244,6 @@ export class MCPRegistry {
         callerCallbackMode: undefined,
         onEscalatedTaskCancel: undefined,
         escalateToTask: undefined,
-        imageGenModelSelection: undefined,
-        musicGenModelSelection: undefined,
-        videoGenModelSelection: undefined,
-        variantId: undefined,
         isRevival: undefined,
 
         providerOverride: undefined,

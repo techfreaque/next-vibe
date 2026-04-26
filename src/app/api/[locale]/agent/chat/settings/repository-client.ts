@@ -12,23 +12,22 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { getBestChatModel, type ChatModelId } from "../../ai-stream/models";
-import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
-import type {
-  TtsModelId,
-  VoiceModelSelection,
-} from "../../text-to-speech/models";
 import { ViewMode } from "../enum";
 import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,
 } from "./definition";
+import {
+  AUTOPILOT_DEFAULT_SCHEDULE,
+  DREAM_DEFAULT_SCHEDULE,
+} from "./pulse/constants";
 
 /**
  * Storage key for chat settings
  */
-const STORAGE_KEY = "chat-settings-v4";
+const STORAGE_KEY = "chat-settings-v5";
 
 /**
  * Chat Settings Repository Client
@@ -86,20 +85,17 @@ export class ChatSettingsRepositoryClient {
       selectedSkill: "thea",
       activeFavoriteId: null,
       ttsAutoplay: false,
-      voiceModelSelection: null,
-      sttModelSelection: undefined,
-      imageVisionModelSelection: undefined,
-      videoVisionModelSelection: undefined,
-      audioVisionModelSelection: undefined,
-      imageGenModelSelection: undefined,
-      musicGenModelSelection: undefined,
-      defaultChatMode: undefined,
       viewMode: ViewMode.LINEAR,
-      availableTools: null,
-      pinnedTools: null,
-      compactTrigger: COMPACT_TRIGGER,
-      memoryLimit: null,
+      searchProvider: null,
       codingAgent: null,
+      dreamerEnabled: false,
+      dreamerFavoriteId: null,
+      dreamerSchedule: DREAM_DEFAULT_SCHEDULE,
+      dreamerPrompt: null,
+      autopilotEnabled: false,
+      autopilotFavoriteId: null,
+      autopilotSchedule: AUTOPILOT_DEFAULT_SCHEDULE,
+      autopilotPrompt: null,
     };
   }
 
@@ -119,7 +115,7 @@ export class ChatSettingsRepositoryClient {
     }
 
     try {
-      const overrides = JSON.parse(stored);
+      const overrides = JSON.parse(stored) as ChatSettingsGetResponseOutput;
       const defaults = this.getDefaults(user);
 
       // Merge overrides with defaults
@@ -132,38 +128,37 @@ export class ChatSettingsRepositoryClient {
             ? overrides.activeFavoriteId
             : defaults.activeFavoriteId,
         ttsAutoplay: overrides.ttsAutoplay ?? defaults.ttsAutoplay,
-        voiceModelSelection:
-          overrides.voiceModelSelection ?? defaults.voiceModelSelection,
-        sttModelSelection:
-          overrides.sttModelSelection ?? defaults.sttModelSelection,
-        imageVisionModelSelection:
-          overrides.imageVisionModelSelection ??
-          defaults.imageVisionModelSelection,
-        videoVisionModelSelection:
-          overrides.videoVisionModelSelection ??
-          defaults.videoVisionModelSelection,
-        audioVisionModelSelection:
-          overrides.audioVisionModelSelection ??
-          defaults.audioVisionModelSelection,
-        defaultChatMode: overrides.defaultChatMode ?? defaults.defaultChatMode,
         viewMode: overrides.viewMode ?? defaults.viewMode,
-        availableTools:
-          "availableTools" in overrides
-            ? overrides.availableTools
-            : defaults.availableTools,
-        pinnedTools:
-          "pinnedTools" in overrides
-            ? overrides.pinnedTools
-            : defaults.pinnedTools,
-        compactTrigger: overrides.compactTrigger ?? defaults.compactTrigger,
-        memoryLimit:
-          "memoryLimit" in overrides
-            ? overrides.memoryLimit
-            : defaults.memoryLimit,
+        searchProvider:
+          "searchProvider" in overrides
+            ? overrides.searchProvider
+            : defaults.searchProvider,
         codingAgent:
           "codingAgent" in overrides
             ? overrides.codingAgent
             : defaults.codingAgent,
+        dreamerEnabled: overrides.dreamerEnabled ?? defaults.dreamerEnabled,
+        dreamerFavoriteId:
+          "dreamerFavoriteId" in overrides
+            ? overrides.dreamerFavoriteId
+            : defaults.dreamerFavoriteId,
+        dreamerSchedule: overrides.dreamerSchedule ?? defaults.dreamerSchedule,
+        dreamerPrompt:
+          "dreamerPrompt" in overrides
+            ? overrides.dreamerPrompt
+            : defaults.dreamerPrompt,
+        autopilotEnabled:
+          overrides.autopilotEnabled ?? defaults.autopilotEnabled,
+        autopilotFavoriteId:
+          "autopilotFavoriteId" in overrides
+            ? overrides.autopilotFavoriteId
+            : defaults.autopilotFavoriteId,
+        autopilotSchedule:
+          overrides.autopilotSchedule ?? defaults.autopilotSchedule,
+        autopilotPrompt:
+          "autopilotPrompt" in overrides
+            ? overrides.autopilotPrompt
+            : defaults.autopilotPrompt,
       };
     } catch {
       return this.getDefaults(user);
@@ -197,62 +192,38 @@ export class ChatSettingsRepositoryClient {
     if (settings.ttsAutoplay !== defaults.ttsAutoplay) {
       overrides.ttsAutoplay = settings.ttsAutoplay;
     }
-    if (
-      JSON.stringify(settings.voiceModelSelection) !==
-      JSON.stringify(defaults.voiceModelSelection)
-    ) {
-      overrides.voiceModelSelection = settings.voiceModelSelection;
-    }
-    if (
-      JSON.stringify(settings.sttModelSelection) !==
-      JSON.stringify(defaults.sttModelSelection)
-    ) {
-      overrides.sttModelSelection = settings.sttModelSelection;
-    }
-    if (
-      JSON.stringify(settings.imageVisionModelSelection) !==
-      JSON.stringify(defaults.imageVisionModelSelection)
-    ) {
-      overrides.imageVisionModelSelection = settings.imageVisionModelSelection;
-    }
-    if (
-      JSON.stringify(settings.videoVisionModelSelection) !==
-      JSON.stringify(defaults.videoVisionModelSelection)
-    ) {
-      overrides.videoVisionModelSelection = settings.videoVisionModelSelection;
-    }
-    if (
-      JSON.stringify(settings.audioVisionModelSelection) !==
-      JSON.stringify(defaults.audioVisionModelSelection)
-    ) {
-      overrides.audioVisionModelSelection = settings.audioVisionModelSelection;
-    }
-    if (settings.defaultChatMode !== defaults.defaultChatMode) {
-      overrides.defaultChatMode = settings.defaultChatMode;
-    }
     if (settings.viewMode !== defaults.viewMode) {
       overrides.viewMode = settings.viewMode;
     }
-    if (
-      JSON.stringify(settings.availableTools) !==
-      JSON.stringify(defaults.availableTools)
-    ) {
-      overrides.availableTools = settings.availableTools;
-    }
-    if (
-      JSON.stringify(settings.pinnedTools) !==
-      JSON.stringify(defaults.pinnedTools)
-    ) {
-      overrides.pinnedTools = settings.pinnedTools;
-    }
-    if (settings.compactTrigger !== defaults.compactTrigger) {
-      overrides.compactTrigger = settings.compactTrigger;
-    }
-    if (settings.memoryLimit !== defaults.memoryLimit) {
-      overrides.memoryLimit = settings.memoryLimit;
+    if (settings.searchProvider !== defaults.searchProvider) {
+      overrides.searchProvider = settings.searchProvider;
     }
     if (settings.codingAgent !== defaults.codingAgent) {
       overrides.codingAgent = settings.codingAgent;
+    }
+    if (settings.dreamerEnabled !== defaults.dreamerEnabled) {
+      overrides.dreamerEnabled = settings.dreamerEnabled;
+    }
+    if (settings.dreamerFavoriteId !== defaults.dreamerFavoriteId) {
+      overrides.dreamerFavoriteId = settings.dreamerFavoriteId;
+    }
+    if (settings.dreamerSchedule !== defaults.dreamerSchedule) {
+      overrides.dreamerSchedule = settings.dreamerSchedule;
+    }
+    if (settings.dreamerPrompt !== defaults.dreamerPrompt) {
+      overrides.dreamerPrompt = settings.dreamerPrompt;
+    }
+    if (settings.autopilotEnabled !== defaults.autopilotEnabled) {
+      overrides.autopilotEnabled = settings.autopilotEnabled;
+    }
+    if (settings.autopilotFavoriteId !== defaults.autopilotFavoriteId) {
+      overrides.autopilotFavoriteId = settings.autopilotFavoriteId;
+    }
+    if (settings.autopilotSchedule !== defaults.autopilotSchedule) {
+      overrides.autopilotSchedule = settings.autopilotSchedule;
+    }
+    if (settings.autopilotPrompt !== defaults.autopilotPrompt) {
+      overrides.autopilotPrompt = settings.autopilotPrompt;
     }
 
     if (Object.keys(overrides).length === 0) {
@@ -281,37 +252,47 @@ export class ChatSettingsRepositoryClient {
         updates.ttsAutoplay !== undefined
           ? updates.ttsAutoplay
           : current.ttsAutoplay,
-      voiceModelSelection:
-        updates.voiceModelSelection ?? current.voiceModelSelection,
-      sttModelSelection: updates.sttModelSelection ?? current.sttModelSelection,
-      imageVisionModelSelection:
-        updates.imageVisionModelSelection ?? current.imageVisionModelSelection,
-      videoVisionModelSelection:
-        updates.videoVisionModelSelection ?? current.videoVisionModelSelection,
-      audioVisionModelSelection:
-        updates.audioVisionModelSelection ?? current.audioVisionModelSelection,
-      defaultChatMode: updates.defaultChatMode ?? current.defaultChatMode,
       viewMode: updates.viewMode ?? current.viewMode,
-      availableTools:
-        updates.availableTools !== undefined
-          ? updates.availableTools
-          : current.availableTools,
-      pinnedTools:
-        updates.pinnedTools !== undefined
-          ? updates.pinnedTools
-          : current.pinnedTools,
-      compactTrigger:
-        updates.compactTrigger !== undefined
-          ? updates.compactTrigger
-          : current.compactTrigger,
-      memoryLimit:
-        updates.memoryLimit !== undefined
-          ? updates.memoryLimit
-          : current.memoryLimit,
+      searchProvider:
+        updates.searchProvider !== undefined
+          ? updates.searchProvider
+          : current.searchProvider,
       codingAgent:
         updates.codingAgent !== undefined
           ? updates.codingAgent
           : current.codingAgent,
+      dreamerEnabled:
+        updates.dreamerEnabled !== undefined
+          ? updates.dreamerEnabled
+          : current.dreamerEnabled,
+      dreamerFavoriteId:
+        updates.dreamerFavoriteId !== undefined
+          ? updates.dreamerFavoriteId
+          : current.dreamerFavoriteId,
+      dreamerSchedule:
+        updates.dreamerSchedule !== undefined
+          ? updates.dreamerSchedule
+          : current.dreamerSchedule,
+      dreamerPrompt:
+        updates.dreamerPrompt !== undefined
+          ? updates.dreamerPrompt
+          : current.dreamerPrompt,
+      autopilotEnabled:
+        updates.autopilotEnabled !== undefined
+          ? updates.autopilotEnabled
+          : current.autopilotEnabled,
+      autopilotFavoriteId:
+        updates.autopilotFavoriteId !== undefined
+          ? updates.autopilotFavoriteId
+          : current.autopilotFavoriteId,
+      autopilotSchedule:
+        updates.autopilotSchedule !== undefined
+          ? updates.autopilotSchedule
+          : current.autopilotSchedule,
+      autopilotPrompt:
+        updates.autopilotPrompt !== undefined
+          ? updates.autopilotPrompt
+          : current.autopilotPrompt,
     };
 
     this.saveLocalSettings(updated, user);
@@ -336,26 +317,16 @@ export class ChatSettingsRepositoryClient {
     favoriteId: string;
     modelId: ChatModelId | null;
     skillId: string | null;
-    voiceId: TtsModelId | null;
     logger: EndpointLogger;
     locale: CountryLanguage;
     user: JwtPayloadType;
   }): Promise<void> {
-    const { favoriteId, modelId, skillId, voiceId, logger, locale, user } =
-      params;
+    const { favoriteId, modelId, skillId, logger, locale, user } = params;
 
     const { apiClient } =
       await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
     const settingsDefinition = await import("./definition");
     const favoritesDefinition = await import("../favorites/definition");
-
-    // Build voiceModelSelection from the favorite's resolved voiceId
-    const voiceModelSelection: VoiceModelSelection | null = voiceId
-      ? {
-          selectionType: "enums.selectionType.manual" as const,
-          manualModelId: voiceId,
-        }
-      : null;
 
     // Optimistic update 1: Update settings
     apiClient.updateEndpointData(
@@ -373,7 +344,6 @@ export class ChatSettingsRepositoryClient {
             activeFavoriteId: favoriteId,
             ...(modelId && { selectedModel: modelId }),
             ...(skillId && { selectedSkill: skillId }),
-            ...(voiceModelSelection && { voiceModelSelection }),
           },
         };
       },
@@ -408,7 +378,6 @@ export class ChatSettingsRepositoryClient {
           activeFavoriteId: favoriteId,
           ...(modelId && { selectedModel: modelId }),
           ...(skillId && { selectedSkill: skillId }),
-          ...(voiceModelSelection && { voiceModelSelection }),
         },
         undefined,
         locale,

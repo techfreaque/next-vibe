@@ -14,10 +14,6 @@ import {
 import { skillVariantSchema } from "@/app/api/[locale]/agent/chat/skills/db";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
-import {
-  CHAT_MODE_IDS,
-  ChatModeOptions,
-} from "@/app/api/[locale]/agent/models/enum";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
@@ -69,6 +65,7 @@ import type {
 import type { SkillListResponseOutput } from "../definition";
 import { CategoryOptions, SkillCategory } from "../enum";
 import type { SkillsTranslationKey } from "../i18n";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { scopedTranslation } from "./i18n";
 
 const SkillEditContainer = lazyWidget(() =>
@@ -129,20 +126,11 @@ const { DELETE } = createEndpoint({
               sections: oldData.data.sections.map((section) => ({
                 ...section,
                 skills: section.skills.filter((char) => {
-                  const isMatch =
-                    char.id === data.pathParams.id ||
-                    char.internalId === data.pathParams.id;
+                  const baseId = parseSkillId(char.skillId).skillId;
+                  const isMatch = baseId === data.pathParams.id;
 
-                  if (isMatch) {
-                    if (!removedSkillIds.includes(char.id)) {
-                      removedSkillIds.push(char.id);
-                    }
-                    if (
-                      char.internalId &&
-                      !removedSkillIds.includes(char.internalId)
-                    ) {
-                      removedSkillIds.push(char.internalId);
-                    }
+                  if (isMatch && !removedSkillIds.includes(char.skillId)) {
+                    removedSkillIds.push(char.skillId);
                   }
 
                   return !isMatch;
@@ -418,22 +406,15 @@ const { PATCH } = createEndpoint({
                 sections: oldData.data.sections.map((section) => ({
                   ...section,
                   skills: section.skills.map((char) => {
-                    const isMatch =
-                      char.id === data.pathParams.id ||
-                      char.internalId === data.pathParams.id;
+                    const baseId = parseSkillId(char.skillId).skillId;
+                    const isMatch = baseId === data.pathParams.id;
 
                     if (!isMatch) {
                       return char;
                     }
 
-                    if (!updatedSkillIds.includes(char.id)) {
-                      updatedSkillIds.push(char.id);
-                    }
-                    if (
-                      char.internalId &&
-                      !updatedSkillIds.includes(char.internalId)
-                    ) {
-                      updatedSkillIds.push(char.internalId);
+                    if (!updatedSkillIds.includes(char.skillId)) {
+                      updatedSkillIds.push(char.skillId);
                     }
 
                     // Update the skill with new data from the request
@@ -720,19 +701,6 @@ const { PATCH } = createEndpoint({
           optionalColor: "transparent",
         },
       }),
-      defaultChatMode: requestField(scopedTranslation, {
-        schema: z.enum(CHAT_MODE_IDS).nullable().optional(),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        options: ChatModeOptions,
-        label: "patch.defaultChatMode.label" as const,
-        description: "patch.defaultChatMode.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-      }),
       systemPrompt: requestField(scopedTranslation, {
         schema: z.string().nullable(),
         type: WidgetType.FORM_FIELD,
@@ -885,7 +853,6 @@ const { PATCH } = createEndpoint({
         imageGenModelSelection: undefined,
         musicGenModelSelection: undefined,
         videoGenModelSelection: undefined,
-        defaultChatMode: undefined,
         modelSelection: {
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: ChatModelId.GPT_5,
@@ -1034,11 +1001,6 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         hidden: true,
         schema: videoGenModelSelectionSchema.nullable(),
-      }),
-      defaultChatMode: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.enum(CHAT_MODE_IDS).nullable().optional(),
       }),
       systemPrompt: responseField(scopedTranslation, {
         type: WidgetType.MARKDOWN,
@@ -1206,7 +1168,6 @@ const { GET } = createEndpoint({
         "imageGenModelSelection",
         "musicGenModelSelection",
         "videoGenModelSelection",
-        "defaultChatMode",
       ] as const,
       operation: "merge" as const,
     },

@@ -135,7 +135,7 @@ export class SkillVoteRepository {
       emitSkills("skill-updated", {
         wsEvent: {
           type: "updated",
-          id: skill.slug ?? skill.id,
+          skillId: skill.slug ?? skill.id,
           voteCount: newVoteCount,
           trustLevel: newTrustLevel,
         },

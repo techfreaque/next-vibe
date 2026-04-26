@@ -13,7 +13,7 @@ export const translations = {
     fields: {
       skillId: {
         label: "Skill",
-        description: "Der Skill, für den du dich anmeldest",
+        description: "Das Skill, für das du dich anmeldest",
       },
       firstName: {
         label: "Vorname",
@@ -34,7 +34,7 @@ export const translations = {
     success: {
       title: "Du bist dabei!",
       description:
-        "Schau in dein Postfach - und melde dich an, um den Skill zu nutzen",
+        "Schau in dein Postfach - und melde dich an, um das Skill zu nutzen",
     },
     errors: {
       validation: {

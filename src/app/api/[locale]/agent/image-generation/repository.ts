@@ -35,6 +35,7 @@ import { chatModelOptionsIndex } from "../ai-stream/models";
 import { runHeadlessAiStream } from "../ai-stream/repository/headless";
 import { scopedTranslation as aiStreamScopedTranslation } from "../ai-stream/stream/i18n";
 import { DefaultFolderId } from "../chat/config";
+import { buildFavoriteConfig } from "../chat/favorites/repository";
 import { NO_SKILL_ID } from "../chat/skills/constants";
 import {
   checkMediaBalance,
@@ -378,8 +379,12 @@ export class ImageGenerationRepository {
       model: chatModel?.id,
       skill: NO_SKILL_ID,
       prompt: `Generate an image: ${data.prompt}${sizeHint}${qualityHint}`,
-      pinnedTools: [],
-      availableTools: [],
+      favoriteConfig: buildFavoriteConfig({
+        id: "image-gen-headless",
+        skillId: NO_SKILL_ID,
+        availableTools: [],
+        pinnedTools: [],
+      }),
       // Always "none" - the outer AI stream persists the tool result.
       // Using "append" with the same threadId would re-register in StreamRegistry,
       // aborting the outer stream (superseded).

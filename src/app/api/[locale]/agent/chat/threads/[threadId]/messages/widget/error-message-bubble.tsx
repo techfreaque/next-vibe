@@ -1,13 +1,17 @@
 "use client";
 
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CheckCircle2, MessageSquareText } from "lucide-react";
 import { Div } from "next-vibe-ui/ui/div";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Span } from "next-vibe-ui/ui/span";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
+import { useState } from "react";
 
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  type DefaultFolderId,
+  isIncognitoFolder,
+} from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
@@ -39,6 +43,9 @@ export function ErrorMessageBubble({
   const logger = useWidgetLogger();
   const isTouch = useTouchDevice();
   const { group, groupHover } = useMessageGroupName();
+  const [showFeedback, setShowFeedback] = useState(false);
+
+  const isIncognito = isIncognitoFolder(rootFolderId);
 
   const handleDelete = (): void => {
     void (async (): Promise<void> => {
@@ -47,6 +54,29 @@ export function ErrorMessageBubble({
       navigate(messageIdDefs.default.DELETE, {
         urlPathParams: { threadId: message.threadId, messageId: message.id },
         data: { rootFolderId },
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  };
+
+  const handleReport = (): void => {
+    void (async (): Promise<void> => {
+      const contactDefs = await import("@/app/api/[locale]/contact/definition");
+      const { ContactSubject, ContactPriority } =
+        await import("@/app/api/[locale]/contact/enum");
+
+      const errorSummary = displayContent.slice(0, 200);
+      const threadInfo = isIncognito
+        ? ts("errorFeedback.incognitoThread")
+        : `Thread: ${message.threadId}`;
+
+      navigate(contactDefs.default.POST, {
+        data: {
+          subject: ContactSubject.BUG_REPORT,
+          priority: ContactPriority.HIGH,
+          message: `${ts("errorFeedback.autoContext")}\n\n${errorTypeDisplay ? `${ts("errorCode")}: ${errorTypeDisplay}` : ""}${errorData?.errorType?.errorCode ? ` (${errorData.errorType.errorCode})` : ""}\n${ts("errorFeedback.errorLabel")}: ${errorSummary}\n${threadInfo}\n\n---\n${ts("errorFeedback.userContextLabel")}:\n`,
+        },
         renderInModal: true,
         popNavigationOnSuccess: 1,
       });
@@ -109,6 +139,62 @@ export function ErrorMessageBubble({
                 </Span>
               )}
             </Div>
+          </Div>
+
+          {/* Error feedback section */}
+          <Div className="mt-3 pt-2 border-t border-destructive/10">
+            <Div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <CheckCircle2 className="h-3 w-3 text-muted-foreground/60 flex-shrink-0" />
+              <Span>{ts("errorFeedback.autoReported")}</Span>
+              <Span className="text-muted-foreground/40">
+                {ts("errorFeedback.separator")}
+              </Span>
+              <Span
+                className="text-muted-foreground/70 hover:text-foreground cursor-pointer transition-colors underline underline-offset-2"
+                onClick={() => setShowFeedback(!showFeedback)}
+              >
+                {showFeedback
+                  ? ts("errorFeedback.hideDetails")
+                  : ts("errorFeedback.helpFix")}
+              </Span>
+            </Div>
+
+            {showFeedback && (
+              <Div className="mt-2 flex flex-col gap-2">
+                <Span className="text-xs text-muted-foreground/60">
+                  {ts("errorFeedback.feedbackHelps")}
+                </Span>
+                <Div className="flex items-center gap-2 flex-wrap">
+                  <Span
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-primary/80 hover:text-primary cursor-pointer transition-colors"
+                    onClick={handleReport}
+                  >
+                    <MessageSquareText className="h-3.5 w-3.5" />
+                    {ts("errorFeedback.reportCta")}
+                  </Span>
+                  {!isIncognito && (
+                    <>
+                      <Span className="text-muted-foreground/30">
+                        {ts("errorFeedback.separator")}
+                      </Span>
+                      <Span className="text-xs text-muted-foreground/50">
+                        {ts("errorFeedback.threadShared")}
+                      </Span>
+                    </>
+                  )}
+                  {isIncognito && (
+                    <>
+                      <Span className="text-muted-foreground/30">
+                        {ts("errorFeedback.separator")}
+                      </Span>
+                      <Span className="text-xs text-muted-foreground/40 italic">
+                        {ts("errorFeedback.incognitoNote")}
+                      </Span>
+                    </>
+                  )}
+                </Div>
+              </Div>
+            )}
           </Div>
         </Div>
 

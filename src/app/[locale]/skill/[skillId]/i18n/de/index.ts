@@ -98,7 +98,7 @@ export const translations = {
   cta: {
     guestTitle: "Bereit, {{name}} zu nutzen?",
     guestSubtitle:
-      "Erstelle ein kostenloses Konto, um diesen Skill hinzuzufügen und {{modelCount}}+ KI-Modelle zu nutzen.",
+      "Erstelle ein kostenloses Konto, um dieses Skill hinzuzufügen und {{modelCount}}+ KI-Modelle zu nutzen.",
     signUp: "Kostenloses Konto erstellen",
     logIn: "Anmelden",
   },

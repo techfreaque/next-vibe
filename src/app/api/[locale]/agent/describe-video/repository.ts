@@ -24,7 +24,11 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
 import { ProviderFactory } from "@/app/api/[locale]/agent/ai-stream/repository/core/provider-factory";
 import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
-import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
+import {
+  chatFavorites,
+  FAVORITE_CONFIG_COLUMNS,
+} from "@/app/api/[locale]/agent/chat/favorites/db";
+import { resolveFavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/repository";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -44,12 +48,22 @@ export class DescribeVideoRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: DescribeVideoT,
+    favoriteId: string | undefined,
   ): Promise<ResponseType<DescribeVideoPostResponseOutput>> {
     const tCredits = creditsScopedTranslation.scopedT(locale).t;
     const userId = !user.isPublic && "id" in user ? user.id : undefined;
 
-    const bridgeContext =
-      await DescribeVideoRepository.buildBridgeContext(userId);
+    // Resolve favorite on demand from favoriteId — picks up latest DB state
+    const resolvedFavoriteConfig = await resolveFavoriteConfig(
+      favoriteId,
+      userId,
+    );
+    const bridgeContext = resolvedFavoriteConfig
+      ? ({
+          skill: null,
+          favorite: resolvedFavoriteConfig,
+        } satisfies BridgeContext)
+      : await DescribeVideoRepository.buildBridgeContext(userId);
 
     const visionModel = ModalityResolver.resolveVideoVisionModel(
       bridgeContext,
@@ -159,46 +173,30 @@ export class DescribeVideoRepository {
     userId: string | undefined,
   ): Promise<BridgeContext> {
     if (!userId) {
-      return { skill: null, favorite: null, userSettings: null };
+      return { skill: null, favorite: null };
     }
 
     const [userSettingsRow] = await db
       .select({
         activeFavoriteId: chatSettings.activeFavoriteId,
-        voiceModelSelection: chatSettings.voiceModelSelection,
-        sttModelSelection: chatSettings.sttModelSelection,
-        imageVisionModelSelection: chatSettings.imageVisionModelSelection,
-        videoVisionModelSelection: chatSettings.videoVisionModelSelection,
-        audioVisionModelSelection: chatSettings.audioVisionModelSelection,
-        defaultChatMode: chatSettings.defaultChatMode,
-        imageGenModelSelection: chatSettings.imageGenModelSelection,
-        musicGenModelSelection: chatSettings.musicGenModelSelection,
-        videoGenModelSelection: chatSettings.videoGenModelSelection,
       })
       .from(chatSettings)
       .where(eq(chatSettings.userId, userId))
       .limit(1);
 
-    if (!userSettingsRow) {
-      return { skill: null, favorite: null, userSettings: null };
+    if (!userSettingsRow?.activeFavoriteId) {
+      return { skill: null, favorite: null };
     }
 
-    let favoriteConfig: BridgeContext["favorite"] = null;
-    if (userSettingsRow.activeFavoriteId) {
-      const [favRow] = await db
-        .select()
-        .from(chatFavorites)
-        .where(eq(chatFavorites.id, userSettingsRow.activeFavoriteId))
-        .limit(1);
-      if (favRow) {
-        favoriteConfig = favRow;
-      }
-    }
+    const [favRow] = await db
+      .select(FAVORITE_CONFIG_COLUMNS)
+      .from(chatFavorites)
+      .where(eq(chatFavorites.id, userSettingsRow.activeFavoriteId))
+      .limit(1);
 
     return {
       skill: null,
-      favorite: favoriteConfig,
-      userSettings: userSettingsRow,
+      favorite: favRow ?? null,
     };
   }
 }

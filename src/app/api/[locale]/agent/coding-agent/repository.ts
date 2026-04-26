@@ -260,7 +260,7 @@ export async function runCodingAgent(
   logger: EndpointLogger,
   t: CodingAgentT,
   cronTaskId: string | undefined,
-  streamContext: ToolExecutionContext | undefined,
+  streamContext: ToolExecutionContext,
 ): Promise<ResponseType<CodingAgentResponse>> {
   const timeoutMs = 30 * 60 * 1000;
   const start = Date.now();

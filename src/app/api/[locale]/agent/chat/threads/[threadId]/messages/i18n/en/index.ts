@@ -23,6 +23,20 @@ export const translations = {
     hideAnalysis: "Hide analysis",
   },
   errorCode: "Error Code",
+  errorFeedback: {
+    autoReported: "Error reported automatically",
+    helpFix: "Help us fix this",
+    hideDetails: "Hide",
+    feedbackHelps: "Your feedback helps us fix this faster.",
+    reportCta: "Send feedback",
+    threadShared: "Thread ID will be included",
+    incognitoNote: "Incognito - no thread data available",
+    incognitoThread: "Incognito thread (no data stored)",
+    autoContext: "[Auto-generated error report]",
+    errorLabel: "Error",
+    userContextLabel: "Your context (optional)",
+    separator: "·",
+  },
   compacting: {
     title: "History Compacted",
     loading: "Compacting history...",
@@ -502,6 +516,10 @@ export const translations = {
     },
     batchToolConfirmation: {
       title: "Confirm batch tool calls",
+    },
+    queue: {
+      badge: "Queued",
+      cancelTooltip: "Remove from queue and restore to input",
     },
   },
   flatView: {

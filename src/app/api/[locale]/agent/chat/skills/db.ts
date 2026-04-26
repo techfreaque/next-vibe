@@ -17,10 +17,6 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import {
-  CHAT_MODE_IDS,
-  type ChatMode,
-} from "@/app/api/[locale]/agent/models/enum";
 import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
@@ -103,9 +99,6 @@ export const customSkills = pgTable(
     audioVisionModelSelection: jsonb(
       "audio_vision_model_selection",
     ).$type<AudioVisionModelSelection>(),
-
-    // Default chat mode for this skill (null = cascade to user settings → "text")
-    defaultChatMode: text("default_chat_mode").$type<ChatMode>(),
 
     // Image/music/video gen model selections (null = cascade to user settings → system default)
     imageGenModelSelection: jsonb(
@@ -313,7 +306,6 @@ export const skillVariantSchema = z.object({
   imageVisionModelSelection: imageVisionModelSelectionSchema.optional(),
   videoVisionModelSelection: videoVisionModelSelectionSchema.optional(),
   audioVisionModelSelection: audioVisionModelSelectionSchema.optional(),
-  defaultChatMode: z.enum(CHAT_MODE_IDS).optional(),
   isDefault: z.boolean().optional(),
 });
 

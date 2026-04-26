@@ -50,7 +50,7 @@ export class StreamContextInitializer {
 
     // Calculate initial parent for AI message
     // IMPORTANT: Always prefer userMessageId when available (works for both incognito and server-persisted threads)
-    const initialAiParentId = userMessageId ?? effectiveParentMessageId ?? null;
+    const initialAiParentId = userMessageId || effectiveParentMessageId || null;
 
     // Initialize stream context OUTSIDE try block so it's accessible in catch blocks
     const lastConfirmedTool =

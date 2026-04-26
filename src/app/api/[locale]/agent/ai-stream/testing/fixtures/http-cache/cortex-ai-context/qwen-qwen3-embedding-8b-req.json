@@ -1,0 +1,13 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Without using any tools, answer from memory: What file did you just create and read? What was its main topic? What edit did you make to it?",
+    "encoding_format": "float"
+  }
+}

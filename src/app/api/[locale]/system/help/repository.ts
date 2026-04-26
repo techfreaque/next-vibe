@@ -837,19 +837,40 @@ export class HelpRepository {
         const { db } = await import("@/app/api/[locale]/system/db");
         const { chatSettings } =
           await import("@/app/api/[locale]/agent/chat/settings/db");
+        const { chatFavorites } =
+          await import("@/app/api/[locale]/agent/chat/favorites/db");
         const { eq } = await import("drizzle-orm");
-        const rows = await db
-          .select({
-            availableTools: chatSettings.availableTools,
-            pinnedTools: chatSettings.pinnedTools,
-          })
+
+        // Tool configs now live on the active favorite, not on settings
+        let dbPinned: Array<{ toolId: string }> | null = null;
+        let dbAllowed: Array<{ toolId: string }> | null = null;
+
+        const [settingsRow] = await db
+          .select({ activeFavoriteId: chatSettings.activeFavoriteId })
           .from(chatSettings)
           .where(eq(chatSettings.userId, user.id))
           .limit(1);
 
-        const row = rows[0]; // undefined = no settings row = all defaults
-        const dbPinned = row?.pinnedTools ?? null;
-        const dbAllowed = row?.availableTools ?? null;
+        if (settingsRow?.activeFavoriteId) {
+          const { isUuid } =
+            await import("@/app/api/[locale]/agent/chat/slugify");
+          const [fav] = await db
+            .select({
+              availableTools: chatFavorites.availableTools,
+              pinnedTools: chatFavorites.pinnedTools,
+            })
+            .from(chatFavorites)
+            .where(
+              isUuid(settingsRow.activeFavoriteId)
+                ? eq(chatFavorites.id, settingsRow.activeFavoriteId)
+                : eq(chatFavorites.slug, settingsRow.activeFavoriteId),
+            )
+            .limit(1);
+          if (fav) {
+            dbPinned = fav.pinnedTools;
+            dbAllowed = fav.availableTools;
+          }
+        }
 
         // Always build both ID sets for accurate counts on all filter tabs
         const pinnedIds: Set<string> =
@@ -893,7 +914,7 @@ export class HelpRepository {
           );
         }
       } catch {
-        // Settings fetch failed - fall through with unfiltered list
+        // Favorite fetch failed - fall through with unfiltered list
       }
     }
 

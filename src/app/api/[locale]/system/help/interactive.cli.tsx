@@ -753,12 +753,8 @@ function InteractiveHelp({
             threadId: undefined,
             aiMessageId: undefined,
             skillId: undefined,
-            modelId: undefined,
             headless: undefined,
             subAgentDepth: 0,
-            imageGenModelSelection: undefined,
-            musicGenModelSelection: undefined,
-            videoGenModelSelection: undefined,
             isRevival: undefined,
 
             providerOverride: undefined,
@@ -773,7 +769,6 @@ function InteractiveHelp({
             callerCallbackMode: undefined,
             onEscalatedTaskCancel: undefined,
             escalateToTask: undefined,
-            variantId: undefined,
           },
         }),
       )

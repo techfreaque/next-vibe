@@ -73,60 +73,38 @@ export const translations: typeof enTranslations = {
     ttsAutoplay: {
       label: "Automatyczne odtwarzanie TTS",
     },
-    ttsVoice: {
-      label: "Głos TTS",
-    },
-    voiceModelSelection: {
-      label: "Model głosu",
-      placeholder: "Domyślny systemu",
-    },
-    sttModel: {
-      label: "Model mowy na tekst",
-      placeholder: "Domyślny systemu",
-    },
-    imageVisionModel: {
-      label: "Model wizji obrazu",
-      placeholder: "Domyślny systemu",
-    },
-    videoVisionModel: {
-      label: "Model wizji wideo",
-      placeholder: "Domyślny systemu",
-    },
-    audioVisionModel: {
-      label: "Model wizji audio",
-      placeholder: "Domyślny systemu",
-    },
-    imageGenModel: {
-      label: "Model generowania obrazów",
-      placeholder: "Domyślny systemu",
-    },
-    musicGenModel: {
-      label: "Model generowania muzyki",
-      placeholder: "Domyślny systemu",
-    },
-    videoGenModel: {
-      label: "Model generowania wideo",
-      placeholder: "Domyślny systemu",
-    },
-    defaultChatMode: {
-      label: "Domyślny tryb czatu",
-    },
     viewMode: {
       label: "Tryb widoku",
     },
-    availableTools: {
-      label: "Dozwolone narzędzia",
-    },
-    pinnedTools: {
-      label: "Przypięte narzędzia",
-    },
-    compactTrigger: {
-      label: "Wyzwalacz kompresji (tokeny)",
-    },
-    memoryLimit: {
-      label: "Limit pamięci (tokeny)",
+    contextMemory: {
+      title: "Budżet pamięci kontekstu",
       description:
-        "Maksymalna łączna liczba tokenów treści pamięci wstrzykiwanych na turę. Pozostaw puste, aby użyć domyślnego systemu (1000 tokenów).",
+        "Jak daleko wstecz AI pamięta rozmowę, zanim zacznie streszczać starsze wiadomości.",
+      costNote: "Mniej = taniej",
+      costExplain:
+        "(do pewnego stopnia) – zamieniasz trochę pamięci na niższy koszt wiadomości.",
+      tooltipTitle: "Ile historii rozmowy zachowuje AI",
+      tooltipBody:
+        "Gdy rozmowa przekroczy ten limit, starsze wiadomości są automatycznie streszczane. AI pozostaje spójne, ale zużywa mniej tokenów – obniżając koszty.",
+      tooltipModelCap: "Aktualny model obsługuje do {cap} tokenów.",
+      default: "domyślny",
+      tokens: "tokeny",
+      modelMax: "maks. modelu",
+      resetToDefault: "Przywróć domyślne ({value})",
+      cheaper: "taniej",
+      moreMemory: "więcej pamięci",
+      barCheap: "Niższy koszt · krótsza pamięć",
+      barBalanced: "Zrównoważony koszt i pamięć",
+      barRich: "Bogatsza pamięć · wyższy koszt",
+      barMax: "Maksymalna pamięć · najwyższy koszt",
+      tools: "Narzędzia",
+      toolsInherited: "odziedziczone",
+    },
+    searchProvider: {
+      label: "Dostawca wyszukiwania",
+      description:
+        "Preferowana wyszukiwarka. Auto wybiera najtańszego dostępnego dostawcę.",
+      auto: "Automatycznie",
     },
     codingAgent: {
       label: "Agent kodowania",
@@ -136,6 +114,68 @@ export const translations: typeof enTranslations = {
         claudeCode: "Claude Code (domyślny)",
         openCode: "OpenCode",
       },
+    },
+    dreaming: {
+      title: "Śnienie",
+      description:
+        "AI porządkuje twoją głowę podczas snu — scala wspomnienia, sprząta dokumenty, wyciąga to, co ważne.",
+      toggle: {
+        label: "Włącz śnienie",
+      },
+      schedule: {
+        label: "Harmonogram",
+        options: {
+          nightlyAt2: "2:00 każdej nocy",
+          weekdaysAt2: "2:00 w dni robocze",
+          weekdaysAt8: "8:00 w dni robocze",
+          every6h: "Co 6 godzin",
+          every12h: "Co 12 godzin",
+        },
+      },
+      favoriteId: {
+        label: "Slot ulubiony",
+        defaultOption: "Domyślny (Thea)",
+      },
+      prompt: {
+        label: "Komunikat sesji",
+        placeholder:
+          "Na czym ma się skupić Thea w tej sesji? Pozostaw puste, aby użyć domyślnego.",
+        defaultPrompt:
+          "Uruchom sesję śnienia. Zreorganizuj i scal korteks — wspomnienia, dokumenty, wątki. Zostaw wszystko czystsze i lepiej uporządkowane.",
+      },
+      lastRun: "Ostatnie uruchomienie:",
+      neverRun: "Nigdy nie uruchomiono",
+    },
+    autopilot: {
+      title: "Autopilot",
+      description:
+        "AI pracuje nad twoją kolejką, gdy cię nie ma — kolejne kroki, projekty w toku, zaległe zadania.",
+      toggle: {
+        label: "Włącz autopilota",
+      },
+      schedule: {
+        label: "Harmonogram",
+        options: {
+          nightlyAt2: "2:00 każdej nocy",
+          weekdaysAt2: "2:00 w dni robocze",
+          weekdaysAt8: "8:00 w dni robocze",
+          every6h: "Co 6 godzin",
+          every12h: "Co 12 godzin",
+        },
+      },
+      favoriteId: {
+        label: "Slot ulubiony",
+        defaultOption: "Domyślny (Thea)",
+      },
+      prompt: {
+        label: "Komunikat sesji",
+        placeholder:
+          "Na czym ma się skupić Hermes w tej sesji? Pozostaw puste, aby użyć domyślnego.",
+        defaultPrompt:
+          "Uruchom sesję autopilota. Kontynuuj aktywne projekty — realizuj kolejne kroki, obsługuj zaległą pracę, nie zatrzymuj się.",
+      },
+      lastRun: "Ostatnie uruchomienie:",
+      neverRun: "Nigdy nie uruchomiono",
     },
     errors: {
       validation: {

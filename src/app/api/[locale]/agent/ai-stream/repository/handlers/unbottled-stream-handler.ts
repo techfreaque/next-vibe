@@ -882,6 +882,7 @@ async function executeSelfRelay(params: UnbottledStreamParams): Promise<void> {
       model: underlyingModel,
       skill: skill || NO_SKILL_ID,
       prompt: content,
+      favoriteConfig: null,
       rootFolderId: DefaultFolderId.INCOGNITO,
       subAgentDepth: params.streamContext.subAgentDepth,
       user,

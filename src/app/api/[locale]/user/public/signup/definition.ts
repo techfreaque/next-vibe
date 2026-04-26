@@ -18,6 +18,8 @@ import {
   responseField,
   widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
+import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 
 import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../user-roles/enum";
@@ -211,6 +213,36 @@ const { POST } = createEndpoint({
           labelKey: "fields.referralCode.label",
         },
         schema: z.string().optional(),
+      }),
+
+      // === SUPPORTED SKILL (hidden — set from localStorage last-attributed UUID skill) ===
+      supportedSkillId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "fields.supportedSkillId.label",
+        hidden: true,
+        schema: z.string().uuid().optional(),
+      }),
+
+      // === LOCAL FAVORITES (hidden — migrated from localStorage on signup) ===
+      localFavorites: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "fields.localFavorites.label",
+        hidden: true,
+        schema: z
+          .array(
+            z.object({
+              /** Merged skill+variant ID: "skillSlug" or "skillSlug__variantId" */
+              skillId: z.string(),
+              customVariantName: z.string().nullable().optional(),
+              modelSelection: chatModelSelectionSchema.nullable().optional(),
+              voiceModelSelection: voiceModelSelectionSchema
+                .nullable()
+                .optional(),
+            }),
+          )
+          .optional(),
       }),
 
       // === FORM ALERT (shows validation and API errors) ===

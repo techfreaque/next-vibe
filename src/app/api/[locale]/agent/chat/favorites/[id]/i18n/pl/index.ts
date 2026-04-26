@@ -192,9 +192,8 @@ export const translations: typeof enTranslations = {
     },
     skillId: {
       label: "Postać",
-    },
-    variantId: {
-      label: "Wariant",
+      description:
+        'ID umiejętności. „skillSlug" dla domyślnego wariantu, „skillSlug__variantId" dla konkretnego wariantu.',
     },
     customVariantName: {
       label: "Nazwa wariantu",
@@ -244,10 +243,6 @@ export const translations: typeof enTranslations = {
       label: "Model generowania wideo",
       description: "Model do generowania wideo",
       placeholder: "Dziedzicz z postaci",
-    },
-    defaultChatMode: {
-      label: "Domyślny tryb czatu",
-      description: "Domyślny tryb przy otwieraniu tego czatu",
     },
     mode: {
       label: "Tryb wyboru",

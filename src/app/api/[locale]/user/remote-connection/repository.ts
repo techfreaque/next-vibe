@@ -79,7 +79,9 @@ export class RemoteConnectionRepository {
     if (parts.length !== 3) {
       return stored; // malformed
     }
-    const [ivHex, tagHex, ctHex] = parts as [string, string, string];
+    const ivHex = parts[0];
+    const tagHex = parts[1];
+    const ctHex = parts[2];
     const iv = Buffer.from(ivHex, "hex");
     const tag = Buffer.from(tagHex, "hex");
     const ciphertext = Buffer.from(ctHex, "hex");
@@ -384,50 +386,6 @@ export class RemoteConnectionRepository {
   }
 
   /**
-   * Compute SHA256 hash of all shared memories and store on active connections.
-   */
-  static async computeAndStoreMemoriesHash(userId: string): Promise<string> {
-    const { memories } =
-      await import("@/app/api/[locale]/agent/chat/memories/db");
-    const rows = await db
-      .select({ id: memories.id, updatedAt: memories.updatedAt })
-      .from(memories)
-      .where(
-        and(
-          eq(memories.userId, userId),
-          eq(memories.isShared, true),
-          eq(memories.isArchived, false),
-        ),
-      );
-
-    const tombstones = await db
-      .select({ id: memories.id, updatedAt: memories.updatedAt })
-      .from(memories)
-      .where(
-        sql`${memories.userId} = ${userId} AND ${memories.isShared} = false AND ${memories.metadata}->>'syncId' IS NOT NULL`,
-      );
-
-    const allRows = [...rows, ...tombstones];
-    const sorted = allRows
-      .map((r) => `${r.id}:${r.updatedAt.toISOString()}`)
-      .toSorted();
-
-    const hash = createHash("sha256").update(sorted.join(",")).digest("hex");
-
-    await db
-      .update(remoteConnections)
-      .set({ memoriesHash: hash, updatedAt: new Date() })
-      .where(
-        and(
-          eq(remoteConnections.userId, userId),
-          eq(remoteConnections.isActive, true),
-        ),
-      );
-
-    return hash;
-  }
-
-  /**
    * Get all active connections across all users - for system-level task sync.
    */
   static async getAllActiveConnectionsForSync(): Promise<
@@ -437,8 +395,7 @@ export class RemoteConnectionRepository {
       token: string;
       leadId: string;
       instanceId: string;
-      memoriesHash: string | null;
-      remoteMemoriesHash: string | null;
+      syncHashes: Record<string, string> | null;
       capabilitiesVersion: string | null;
       taskCursor: string | null;
       remoteInstanceId: string | null;
@@ -459,8 +416,7 @@ export class RemoteConnectionRepository {
         token: RemoteConnectionRepository.decryptToken(r.token),
         leadId: r.leadId,
         instanceId: r.instanceId,
-        memoriesHash: r.memoriesHash ?? null,
-        remoteMemoriesHash: r.remoteMemoriesHash ?? null,
+        syncHashes: r.syncHashes ?? null,
         capabilitiesVersion: r.capabilitiesVersion ?? null,
         taskCursor: r.taskCursor ?? null,
         remoteInstanceId: r.remoteInstanceId ?? null,
@@ -552,7 +508,8 @@ export class RemoteConnectionRepository {
     opts?: {
       capabilities?: RemoteToolCapability[];
       capabilitiesVersion?: string;
-      remoteMemoriesHash?: string;
+      /** Unified: merge into remoteSyncHashes JSONB */
+      remoteSyncHashes?: Record<string, string>;
       taskCursor?: string;
       isActive?: boolean;
     },
@@ -568,8 +525,11 @@ export class RemoteConnectionRepository {
         ...(opts?.capabilitiesVersion !== undefined
           ? { capabilitiesVersion: opts.capabilitiesVersion }
           : {}),
-        ...(opts?.remoteMemoriesHash !== undefined
-          ? { remoteMemoriesHash: opts.remoteMemoriesHash }
+        // Merge incoming sync hashes into existing JSONB (don't overwrite keys not in this update)
+        ...(opts?.remoteSyncHashes !== undefined
+          ? {
+              remoteSyncHashes: sql`COALESCE(${remoteConnections.remoteSyncHashes}, '{}'::jsonb) || ${JSON.stringify(opts.remoteSyncHashes)}::jsonb`,
+            }
           : {}),
         ...(opts?.taskCursor !== undefined
           ? { taskCursor: opts.taskCursor }

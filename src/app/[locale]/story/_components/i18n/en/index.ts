@@ -254,9 +254,22 @@ export const translations = {
     splitHero: {
       or: "OR",
       clickToExplore: "Click to explore",
-      header: "Four products. One platform.",
+      header: "We're not a billion-dollar lab.",
       subheader:
-        "Uncensored AI · Self-hosted agent · Open-source framework · Recurring income",
+        "We're builders who think AI shouldn't have a political opinion.",
+      introBody:
+        "That means rough edges sometimes. Models go down. Features ship half-baked. We fix things fast and we don't pretend to be perfect. What we are: the only platform where you pick the filter level - not some safety committee.",
+      introGuide: "Pick what fits you:",
+      introOption1:
+        "Just want to chat with uncensored AI? Start here - most people do.",
+      introOption2:
+        "Want to run it on your own hardware? Self-host the whole thing.",
+      introOption3:
+        "You're a developer? The framework is open source. Fork it.",
+      introOption4:
+        "Want to earn? Refer users or publish AI skills for recurring income.",
+      introHelp: "Lost or confused?",
+      introHelpCta: "Talk to us",
       unbottled: {
         badge: "Uncensored · Open · Mainstream",
         titleLine1: "Uncensored AI.",

@@ -152,6 +152,7 @@ export function BaseMessageInput({
           isProcessing={voice.isProcessing}
           stream={voice.stream}
           hasExistingInput={voice.hasExistingInput}
+          existingInputText={content}
           onCancel={voice.cancelRecording}
           onTogglePause={voice.togglePause}
           onTranscribeToInput={voice.transcribeToInput}

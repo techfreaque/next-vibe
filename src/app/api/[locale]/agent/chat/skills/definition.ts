@@ -56,10 +56,9 @@ const SkillsListContainer = lazyWidget(() =>
  * response field and the wsEvent discriminated union (to avoid circular type inference).
  */
 const skillItemSchema = z.object({
-  id: z.string(),
-  internalId: z.string().nullable(),
+  /** Skill ID in merged format: "skillSlug" or "skillSlug__variantId" for a specific variant */
+  skillId: z.string(),
   category: z.enum(SkillCategoryDB),
-  variantId: z.string().nullable(),
   variantName: z.string().nullable(),
   isVariant: z.boolean(),
   isDefault: z.boolean(),
@@ -310,7 +309,7 @@ const { GET } = createEndpoint({
             }),
             z.object({
               type: z.literal("updated"),
-              id: z.string(),
+              skillId: z.string(),
               name: z.string().optional(),
               icon: iconSchema.optional(),
               tagline: z.string().optional(),
@@ -320,7 +319,7 @@ const { GET } = createEndpoint({
             }),
             z.object({
               type: z.literal("deleted"),
-              id: z.string(),
+              skillId: z.string(),
             }),
           ])
           .nullable(),
@@ -364,26 +363,15 @@ const { GET } = createEndpoint({
                 noCard: true,
                 usage: { response: true },
                 children: {
-                  id: responseField(scopedTranslation, {
+                  skillId: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     hidden: true,
                     schema: z.string(),
-                  }),
-                  internalId: responseField(scopedTranslation, {
-                    type: WidgetType.TEXT,
-                    hidden: true,
-                    schema: z.string().nullable(),
                   }),
                   category: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     hidden: true,
                     schema: z.enum(SkillCategoryDB),
-                  }),
-                  /** Present only for variant sub-rows (isVariant=true) */
-                  variantId: responseField(scopedTranslation, {
-                    type: WidgetType.TEXT,
-                    hidden: true,
-                    schema: z.string().nullable(),
                   }),
                   variantName: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
@@ -637,7 +625,9 @@ const { GET } = createEndpoint({
               sections: old.data.sections.map((section) => ({
                 ...section,
                 skills: section.skills.map((skill) =>
-                  skill.id === update.id ? { ...skill, ...update } : skill,
+                  skill.skillId === update.skillId
+                    ? { ...skill, ...update }
+                    : skill,
                 ),
               })),
             },
@@ -652,7 +642,7 @@ const { GET } = createEndpoint({
         if (partial.wsEvent?.type !== "deleted") {
           return;
         }
-        const { id } = partial.wsEvent;
+        const { skillId } = partial.wsEvent;
         const [{ apiClient }, def] = await Promise.all([
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
           import("./definition"),
@@ -669,10 +659,12 @@ const { GET } = createEndpoint({
               sections: old.data.sections
                 .map((section) => ({
                   ...section,
-                  sectionCount: section.skills.some((s) => s.id === id)
+                  sectionCount: section.skills.some(
+                    (s) => s.skillId === skillId,
+                  )
                     ? section.sectionCount - 1
                     : section.sectionCount,
-                  skills: section.skills.filter((s) => s.id !== id),
+                  skills: section.skills.filter((s) => s.skillId !== skillId),
                 }))
                 .filter((section) => section.skills.length > 0),
             },
@@ -703,8 +695,7 @@ const { GET } = createEndpoint({
             sectionCount: 1,
             skills: [
               {
-                id: "default",
-                internalId: null,
+                skillId: "default",
                 icon: "robot-face",
                 modelId: ChatModelId.CLAUDE_SONNET_4_5,
                 category: SkillCategory.ASSISTANT,
@@ -717,7 +708,6 @@ const { GET } = createEndpoint({
                 ownershipType: SkillOwnershipTypeDB[0],
                 trustLevel: null,
                 voteCount: null,
-                variantId: null,
                 variantName: null,
                 isVariant: false,
                 isDefault: false,
@@ -730,8 +720,7 @@ const { GET } = createEndpoint({
             sectionCount: 1,
             skills: [
               {
-                id: "hermes-code-reviewer",
-                internalId: "550e8400-e29b-41d4-a716-446655440000",
+                skillId: "hermes-code-reviewer",
                 icon: "direct-hit",
                 modelId: ChatModelId.GPT_5,
                 category: SkillCategory.CODING,
@@ -744,7 +733,6 @@ const { GET } = createEndpoint({
                 ownershipType: SkillOwnershipTypeDB[2],
                 trustLevel: SkillTrustLevelDB[1],
                 voteCount: 42,
-                variantId: null,
                 variantName: null,
                 isVariant: false,
                 isDefault: false,

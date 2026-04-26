@@ -53,8 +53,6 @@ import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-
 
 import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
-import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
-import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
   useWidgetEndpointMutations,
@@ -135,58 +133,13 @@ export function HelpToolsWidget(): JSX.Element {
   const onSubmit = useWidgetOnSubmit();
   const endpointMutations = useWidgetEndpointMutations();
 
-  // Use settings directly (no ChatProvider dependency)
-  const settingsOps = useChatSettings(user, logger);
-  const effectiveSettings = useMemo(
-    () =>
-      settingsOps.settings ?? ChatSettingsRepositoryClient.getDefaults(user),
-    [settingsOps.settings, user],
-  );
-  const enabledTools = useMemo((): EnabledTool[] | null => {
-    const { availableTools, pinnedTools } = effectiveSettings;
-    if (availableTools === null && pinnedTools === null) {
-      return null;
-    }
-    const allIds = new Set([
-      ...(availableTools ?? []).map((t) => t.toolId),
-      ...(pinnedTools ?? []).map((t) => t.toolId),
-    ]);
-    return [...allIds].map((id) => {
-      const allowed = availableTools?.find((t) => t.toolId === id);
-      const pinned = pinnedTools?.find((t) => t.toolId === id);
-      return {
-        id,
-        requiresConfirmation:
-          allowed?.requiresConfirmation ??
-          pinned?.requiresConfirmation ??
-          false,
-        pinned:
-          pinnedTools !== null
-            ? pinnedTools.some((t) => t.toolId === id)
-            : true,
-      };
-    });
-  }, [effectiveSettings]);
-  const setEnabledTools = useCallback(
-    (tools: EnabledTool[] | null): void => {
-      if (tools === null) {
-        settingsOps.setTools(null, null);
-        return;
-      }
-      const availableTools = tools.map(({ id, requiresConfirmation }) => ({
-        toolId: id,
-        requiresConfirmation,
-      }));
-      const pinnedTools = tools
-        .filter((t) => t.pinned)
-        .map(({ id, requiresConfirmation }) => ({
-          toolId: id,
-          requiresConfirmation,
-        }));
-      settingsOps.setTools(availableTools, pinnedTools);
-    },
-    [settingsOps],
-  );
+  // Tool configuration now lives on favorites/skills, not global settings.
+  // Help widget shows all tools as available (null = all allowed).
+  const enabledTools: EnabledTool[] | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const setEnabledTools = useCallback((_tools: EnabledTool[] | null): void => {
+    // No-op: tool config is now per-favorite, not global settings
+  }, []);
   const { t } = scopedTranslation.scopedT(locale);
 
   const searchQuery = form.watch("query") ?? "";
@@ -313,23 +266,13 @@ export function HelpToolsWidget(): JSX.Element {
   }, [visibleTools]);
 
   const stats = useMemo(() => {
-    if (enabledTools === null) {
-      // Default: no explicit settings - use server-computed counts (accurate over full tool set)
-      return {
-        pinned: serverPinnedCount ?? 0,
-        enabled: serverAllowedCount ?? totalCount,
-        total: totalCount,
-      };
-    }
-    // Explicit settings: compute live from local state so toggles update instantly
-    const pinned = enabledTools.filter((et) => et.pinned).length;
-    const allowed = enabledTools.length;
+    // Tool config lives on favorites now - use server-computed counts
     return {
-      pinned,
-      enabled: allowed > 0 ? allowed : totalCount,
+      pinned: serverPinnedCount ?? 0,
+      enabled: serverAllowedCount ?? totalCount,
       total: totalCount,
     };
-  }, [enabledTools, serverPinnedCount, serverAllowedCount, totalCount]);
+  }, [serverPinnedCount, serverAllowedCount, totalCount]);
 
   const allVisibleEnabled = useMemo(
     () =>

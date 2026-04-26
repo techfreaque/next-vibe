@@ -45,7 +45,7 @@ export const translations = {
     way2Badge: "Chat",
     way2Title: "Thea oder Hermes fragen",
     way2Body:
-      'Thread öffnen: "Bau mir einen klinischen Reasoning-Skill für Medizinstudenten." Der Skill-Creator-Subagent stellt ein paar Fragen, schreibt den Prompt, wählt das Modell, konfiguriert Tools, erstellt den Skill, pinnt ihn in die Sidebar.',
+      'Thread öffnen: "Bau mir einen klinischen Reasoning-Skill für Medizinstudenten." Der Skill-Creator-Subagent stellt ein paar Fragen, schreibt den Prompt, wählt das Modell, konfiguriert Tools, erstellt das Skill, pinnt es in die Sidebar.',
     way2Detail:
       "Thea delegiert an den Skill Creator — Subagent mit skill-create, favorite-create, tool-help. Beschreiben, er baut.",
     way2Cta: "Chat öffnen",
@@ -106,11 +106,11 @@ export const translations = {
     item5Name: "Der Experte, den man sich nicht leisten kann",
     item5Category: "Spezialist",
     item5Desc:
-      "Berater, Anwalt, Finanzberater — destilliert in einen Skill. 400 €/Std.-Wissen, kostenlos.",
+      "Berater, Anwalt, Finanzberater — destilliert in ein Skill. 400 €/Std.-Wissen, kostenlos.",
   },
   dev: {
     title: "Für Entwickler: skill.ts",
-    body: "Next-vibe lokal? Den Agenten bitten, eine Skill-Datei zu generieren. Gleiche Struktur wie jeder eingebaute Skill — compile-ready, commit-ready.",
+    body: "Next-vibe lokal? Den Agenten bitten, eine Skill-Datei zu generieren. Gleiche Struktur wie jedes eingebaute Skill — compile-ready, commit-ready.",
     note: "Der Agent kennt das vollständige Schema. Beschreiben, was gebraucht wird — er generiert, registriert, sofort live.",
   },
   cta: {

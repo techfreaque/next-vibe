@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq, or } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -19,6 +19,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import { isUuid } from "../../slugify";
 import favoritesDefinitions from "../definition";
 import { chatFavorites } from "../db";
 import type {
@@ -62,7 +63,9 @@ export class FavoritesReorderRepository {
             .set({ position, updatedAt: new Date() })
             .where(
               and(
-                or(eq(chatFavorites.id, id), eq(chatFavorites.slug, id)),
+                isUuid(id)
+                  ? eq(chatFavorites.id, id)
+                  : eq(chatFavorites.slug, id),
                 eq(chatFavorites.userId, userId),
               ),
             );

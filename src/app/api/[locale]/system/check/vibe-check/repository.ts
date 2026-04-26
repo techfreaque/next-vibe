@@ -407,6 +407,22 @@ export class VibeCheckRepository {
 
       const checkResults = await Promise.allSettled(promises);
 
+      // If aborted (Ctrl+C), return empty success — caller suppresses output
+      if (signal.aborted) {
+        return success({
+          editorUriSchema: undefined,
+          items: [],
+          files: [],
+          totalIssues: 0,
+          totalFiles: 0,
+          totalErrors: 0,
+          displayedIssues: 0,
+          displayedFiles: 0,
+          currentPage: 1,
+          totalPages: 1,
+        });
+      }
+
       logger.debug("All checks completed");
 
       if (firstCheckStart > 0 && lastCheckEnd > 0) {

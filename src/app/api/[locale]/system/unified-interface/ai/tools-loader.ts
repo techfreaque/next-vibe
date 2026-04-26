@@ -189,7 +189,7 @@ function createToolFromEndpoint(
           streamContext: context.streamContext,
         };
         for (const [key, resolver] of Object.entries(serverDefaults)) {
-          const resolved = resolver(ctx);
+          const resolved = await resolver(ctx);
           if (resolved !== undefined) {
             serverDefaultPatch[key] = resolved;
           }

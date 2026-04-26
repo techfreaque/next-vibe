@@ -166,11 +166,12 @@ export const remoteConnections = pgTable(
     // Build version string from remote (git SHA / package version)
     capabilitiesVersion: text("capabilities_version"),
 
-    // SHA256 of sorted "id:updatedAt" pairs for shared memories
-    memoriesHash: text("memories_hash"),
+    // Unified sync hashes — JSONB { memories: "sha256...", documents: "sha256...", skills: "sha256..." }
+    syncHashes: jsonb("sync_hashes").$type<Record<string, string>>(),
 
-    // Last memoriesHash received from the remote side
-    remoteMemoriesHash: text("remote_memories_hash"),
+    // Last sync hashes received from the remote side
+    remoteSyncHashes:
+      jsonb("remote_sync_hashes").$type<Record<string, string>>(),
 
     // ISO timestamp - return REMOTE_TOOL_CALL tasks after this cursor
     taskCursor: text("task_cursor"),

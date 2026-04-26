@@ -50,9 +50,9 @@ export const translations = {
   structure: {
     title: "The full commission structure",
     p1: "Direct referral: 10% of every payment from people you refer directly. This is yours always, for life, regardless of anything else.",
-    p2: "Skill bonus: if someone signs up through a skill you published, you earn an additional 5% on their payments - 15% total from that user. Skills are shareable AI presets anyone can create and publish.",
+    p2: "Skill bonus: if someone signs up through a skill you published, you earn an additional 5% on their payments - 15% total from that user. Skills are shareable AI presets anyone can create and publish. Critical detail for affiliate pros: you earn the 5% as the skill author even when someone else shares your skill link. A user discovers your skill in the directory and shares it - you still get credited. Skill authorship is tracked by the platform, not by who distributed the link. This creates passive attribution you don't have to actively manage.",
     p3: "Multi-level chain: an additional 10% pool is distributed across up to 5 levels of your referral chain, with geometric decay - each level earns half of the one above it. Your direct referrals' referrals earn you ~5%, their referrals ~2.5%, and so on. Maximum total payout across all earners: ~20% of any single payment.",
-    p4: "Honest disclosure: the chain bonuses get small fast. The 10% direct + 5% skill is where the real income is. Don't build a strategy around multi-level depth - build it around quality direct referrals.",
+    p4: "Honest disclosure: the chain bonuses get small fast. The 10% direct + 5% skill is where the real income is. Don't build a strategy around multi-level depth - build it around quality direct referrals and publishable skills.",
   },
   audience: {
     title: "Who converts for this platform",

@@ -40,12 +40,12 @@ import { useForm } from "react-hook-form";
 
 import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { endpoints as cronIdEndpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
 import {
@@ -552,13 +552,30 @@ export function ToolCallRenderer({
         })
       : undefined;
 
+    type DynamicIconFn = (data: {
+      request?: ToolCall["args"];
+      response?: ToolCall["result"];
+    }) => IconKey | undefined;
+    const dynamicIconFn = definition?.dynamicIcon as DynamicIconFn | undefined;
+    const resolvedIcon =
+      dynamicIconFn?.({
+        request:
+          toolCall.args && typeof toolCall.args === "object"
+            ? toolCall.args
+            : undefined,
+        response:
+          toolCall.result && typeof toolCall.result === "object"
+            ? toolCall.result
+            : undefined,
+      }) ?? definition?.icon;
+
     return {
       displayName: dynamicResult
         ? (scopedT?.t(dynamicResult.message, dynamicResult.messageParams) ??
           staticTitle ??
           toolCall.toolName)
         : (staticTitle ?? toolCall.toolName),
-      icon: definition?.icon,
+      icon: resolvedIcon,
     };
   };
 

@@ -173,10 +173,34 @@ export class WaitForTaskRepository {
         streamContext.currentToolMessageId ?? streamContext.aiMessageId;
 
       if (effectiveThreadId && effectiveToolMessageId) {
-        const streamModelId = streamContext.modelId;
         const streamSkillId = streamContext.skillId;
         const streamFavoriteId = streamContext.favoriteId;
         const streamLeafMessageId = streamContext.leafMessageId;
+
+        // Resolve the active chat model from the favorite/skill cascade.
+        const waitUserId = !user.isPublic ? user.id : undefined;
+        const { resolveFavoriteConfig } =
+          await import("@/app/api/[locale]/agent/chat/favorites/repository");
+        const { resolveSkillVariant } =
+          await import("@/app/api/[locale]/agent/chat/skills/resolver");
+        const { resolveChatModelId } =
+          await import("@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver");
+        const waitFav = await resolveFavoriteConfig(
+          streamFavoriteId,
+          waitUserId,
+        );
+        const { parseSkillId } =
+          await import("@/app/api/[locale]/agent/chat/slugify");
+        const waitSkill = await resolveSkillVariant(
+          streamSkillId,
+          waitFav ? parseSkillId(waitFav.skillId).variantId : null,
+        );
+        const waitModelId = resolveChatModelId(
+          waitFav?.modelSelection ?? undefined,
+          waitSkill?.modelSelection ?? undefined,
+          user,
+          streamContext.providerOverride,
+        );
 
         // Write revival context to typed wakeUp* columns - not into taskInput JSON blob.
         // Use WAIT (not WAKE_UP) so handleTaskCompletion backfills the tool message
@@ -187,7 +211,7 @@ export class WaitForTaskRepository {
             wakeUpCallbackMode: CallbackMode.WAIT,
             wakeUpThreadId: effectiveThreadId,
             wakeUpToolMessageId: effectiveToolMessageId,
-            wakeUpModelId: streamModelId ?? null,
+            wakeUpModelId: waitModelId,
             wakeUpSkillId: streamSkillId ?? null,
             wakeUpFavoriteId: streamFavoriteId ?? null,
             wakeUpLeafMessageId: streamLeafMessageId ?? null,

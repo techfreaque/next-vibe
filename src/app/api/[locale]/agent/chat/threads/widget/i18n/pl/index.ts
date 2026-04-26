@@ -62,6 +62,7 @@ export const translations: typeof enTranslations = {
       },
     },
     credits: {
+      label: "Kredyty",
       credit: "{{count}} kredyt",
       credits: "{{count}} kredytów",
     },

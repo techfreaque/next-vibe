@@ -316,28 +316,10 @@ export const translations: typeof enTranslations = {
       label: "Czas trwania muzyki",
       description: "Czas trwania generowanego klipu audio",
     },
-    availableTools: {
-      label: "Może wykonywać",
+    favoriteConfig: {
+      label: "Konfiguracja ulubionego",
       description:
-        "Warstwa uprawnień wykonania - które narzędzia AI może faktycznie uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione.",
-      toolId: {
-        label: "ID narzędzia",
-        description: "Alias lub pełna nazwa narzędzia, które AI może wykonać",
-      },
-    },
-    pinnedTools: {
-      label: "W kontekście (AI to widzi)",
-      description:
-        "Narzędzia w oknie kontekstu modelu - co AI zna. null = domyślny zestaw użytkownika. availableTools kontroluje rzeczywiste wykonanie.",
-      toolId: {
-        label: "ID narzędzia",
-        description: "Alias lub pełna nazwa narzędzia w kontekście",
-      },
-      requiresConfirmation: {
-        label: "Wymaga potwierdzenia",
-        description:
-          "Czy to narzędzie wymaga potwierdzenia użytkownika przed wykonaniem",
-      },
+        "Pełna konfiguracja aktywnego ulubionego — wybór modeli, konfiguracja narzędzi, ustawienia kontekstu. null = brak aktywnego ulubionego, używane domyślne ustawienia skilla/systemu.",
     },
     resumeToken: {
       label: "Token wznowienia",

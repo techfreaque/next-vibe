@@ -274,9 +274,25 @@ When done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on failure.`
       });
 
       // eslint-disable-next-line no-console
-      console.log("[SC1 DEBUG] result:", JSON.stringify({ success: result.success, ...(result.success ? { threadId: result.data.threadId } : { message: (result as { message?: string }).message }) }));
+      console.log(
+        "[SC1 DEBUG] result:",
+        JSON.stringify({
+          success: result.success,
+          ...(result.success
+            ? { threadId: result.data.threadId }
+            : { message: (result as { message?: string }).message }),
+        }),
+      );
       // eslint-disable-next-line no-console
-      console.log("[SC1 DEBUG] Thea messages:", messages.map(m => ({ role: m.role, toolName: m.toolCall?.toolName, hasResult: !!m.toolCall?.result, content: (m.content ?? "").slice(0, 50) })));
+      console.log(
+        "[SC1 DEBUG] Thea messages:",
+        messages.map((m) => ({
+          role: m.role,
+          toolName: m.toolCall?.toolName,
+          hasResult: !!m.toolCall?.result,
+          content: (m.content ?? "").slice(0, 50),
+        })),
+      );
 
       expect(result.success, `Stream failed: ${JSON.stringify(result)}`).toBe(
         true,
@@ -298,7 +314,10 @@ When done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on failure.`
       // ── Extract sub-agent thread ID from ai-run result ──
       const aiRunResult = toolResultRecord(aiRunCalls[0]?.toolCall?.result);
       // eslint-disable-next-line no-console
-      console.log("[SC1 DEBUG] ai-run result:", JSON.stringify(aiRunResult).slice(0, 200));
+      console.log(
+        "[SC1 DEBUG] ai-run result:",
+        JSON.stringify(aiRunResult).slice(0, 200),
+      );
       const subThreadId =
         typeof aiRunResult?.["threadId"] === "string"
           ? aiRunResult["threadId"]
@@ -325,7 +344,19 @@ When done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on failure.`
       if (subThreadId) {
         const subMessages = await fetchThreadMessages(subThreadId);
         // eslint-disable-next-line no-console
-        console.log("[SC1 DEBUG] subAgent messages:", subMessages.map(m => ({ role: m.role, toolName: m.toolCall?.toolName, hasResult: !!m.toolCall?.result, resultPreview: JSON.stringify(m.toolCall?.result ?? null).slice(0, 100), content: (m.content ?? "").slice(0, 50) })));
+        console.log(
+          "[SC1 DEBUG] subAgent messages:",
+          subMessages.map((m) => ({
+            role: m.role,
+            toolName: m.toolCall?.toolName,
+            hasResult: !!m.toolCall?.result,
+            resultPreview: JSON.stringify(m.toolCall?.result ?? null).slice(
+              0,
+              100,
+            ),
+            content: (m.content ?? "").slice(0, 50),
+          })),
+        );
         const subToolMessages = subMessages.filter((m) => m.role === "tool");
         const subToolNames = subToolMessages.map(effectiveToolName);
 

@@ -27,7 +27,13 @@ import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-gene
 import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import favoritesDefinitions from "../definition";
-import { ensureUniqueSlug, generateFavoriteSlug, isUuid } from "../../slugify";
+import {
+  ensureUniqueSlug,
+  formatSkillId,
+  generateFavoriteSlug,
+  isUuid,
+  parseSkillId,
+} from "../../slugify";
 import { scopedTranslation as charactersScopedTranslation } from "../../skills/i18n";
 import { FavoritesCreateRepository } from "../create/repository";
 import { SkillsRepository } from "../../skills/repository";
@@ -195,8 +201,7 @@ export class SingleFavoriteRepository {
 
       // Flattened response
       return success<FavoriteGetResponseOutput>({
-        skillId: favorite.skillId,
-        variantId: favorite.variantId ?? null,
+        skillId: formatSkillId(favorite.skillId, favorite.variantId ?? null),
         customVariantName: favorite.customVariantName ?? null,
         icon: displayIcon,
         name: character?.name ?? charactersT("skills.default.name"),
@@ -220,7 +225,6 @@ export class SingleFavoriteRepository {
           character?.musicGenModelSelection ??
           undefined,
         videoGenModelSelection: favorite.videoGenModelSelection ?? undefined,
-        defaultChatMode: favorite.defaultChatMode ?? undefined,
         modelSelection,
         characterModelSelection,
         compactTrigger: favorite.compactTrigger ?? null,
@@ -337,20 +341,22 @@ export class SingleFavoriteRepository {
           ? data.musicGenModelSelection
           : null;
       const videoGenModelSelectionToStore = data.videoGenModelSelection ?? null;
-      const defaultChatModeToStore =
-        character && data.defaultChatMode === character.defaultChatMode
-          ? null
-          : (data.defaultChatMode ?? null);
-
       // Store modelSelection directly (null = use character defaults)
       const modelSelectionToStore = data.modelSelection;
 
       // Regenerate slug if skill, variant, or customVariantName changed
-      const newSkillId = data.skillId ?? existing.skillId;
+      // Parse merged "skillSlug__variantId" format if provided
+      const { skillId: parsedSkillId, variantId: parsedVariantId } =
+        data.skillId
+          ? parseSkillId(data.skillId)
+          : { skillId: undefined, variantId: null };
+      const newSkillId = parsedSkillId ?? existing.skillId;
       const newVariantId =
-        data.variantId !== undefined
-          ? data.variantId || null
-          : existing.variantId;
+        parsedVariantId !== null
+          ? parsedVariantId
+          : data.skillId !== undefined
+            ? existing.variantId // skillId was provided but no variant part — keep existing variantId
+            : existing.variantId;
       const newCustomVariantName =
         data.customVariantName !== undefined
           ? data.customVariantName || null
@@ -392,9 +398,8 @@ export class SingleFavoriteRepository {
         .update(chatFavorites)
         .set({
           ...(slugUpdate !== undefined ? { slug: slugUpdate } : {}),
-          skillId: data.skillId,
-          variantId:
-            data.variantId !== undefined ? data.variantId || null : undefined,
+          skillId: parsedSkillId,
+          variantId: data.skillId !== undefined ? newVariantId : undefined,
           customVariantName:
             data.customVariantName !== undefined
               ? data.customVariantName || null
@@ -408,7 +413,6 @@ export class SingleFavoriteRepository {
           imageGenModelSelection: imageGenModelSelectionToStore,
           musicGenModelSelection: musicGenModelSelectionToStore,
           videoGenModelSelection: videoGenModelSelectionToStore,
-          defaultChatMode: defaultChatModeToStore,
           modelSelection: modelSelectionToStore,
           compactTrigger: data.compactTrigger ?? null,
           availableTools: data.availableTools ?? null,
@@ -468,8 +472,7 @@ export class SingleFavoriteRepository {
         ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
           {
             id: updated.slug || updated.id,
-            skillId: updated.skillId,
-            variantId: updated.variantId ?? null,
+            skillId: formatSkillId(updated.skillId, updated.variantId ?? null),
             customVariantName: updated.customVariantName ?? null,
             customIcon: updated.customIcon,
             voiceModelSelection: updated.voiceModelSelection ?? null,

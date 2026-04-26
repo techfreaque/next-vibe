@@ -26,8 +26,8 @@ export const translations: typeof enTranslations = {
       info: {
         title: "Informacje kontaktowe",
         supportEmail: "E-mail wsparcia",
-        website: "Strona internetowa",
-        websiteUrl: "Odwiedź naszą stronę",
+        discord: "Discord",
+        discordUrl: "Dołącz do naszego Discorda",
       },
       faq: {
         title: "Najczęściej zadawane pytania",

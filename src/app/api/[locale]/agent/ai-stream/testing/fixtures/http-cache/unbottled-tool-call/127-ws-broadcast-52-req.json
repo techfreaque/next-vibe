@@ -1,0 +1,61 @@
+{
+  "url": "http://127.0.0.1:3001/ws/broadcast",
+  "method": "POST",
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": {
+    "type": "batch",
+    "events": [
+      {
+        "channel": "agent/chat/threads/90a65083-3943-466d-9b04-8f0ffa460cfe/messages",
+        "event": "content-delta",
+        "data": {
+          "messages": [
+            {
+              "id": "9892ea6b-89e4-4f91-9d55-b9007d67ec5e",
+              "content": "</think>"
+            }
+          ]
+        }
+      },
+      {
+        "channel": "agent/chat/threads/90a65083-3943-466d-9b04-8f0ffa460cfe/messages",
+        "event": "message-created",
+        "data": {
+          "streamingState": "streaming",
+          "messages": [
+            {
+              "id": "a784143d-8b09-4574-a5b4-5cfa0c4b68f5",
+              "threadId": "90a65083-3943-466d-9b04-8f0ffa460cfe",
+              "role": "tool",
+              "isAI": true,
+              "content": null,
+              "parentId": "9892ea6b-89e4-4f91-9d55-b9007d67ec5e",
+              "sequenceId": "ffc6c482-e824-465b-870b-fcd041e2d2c6",
+              "model": "kimi_k2_5",
+              "skill": "quality-tester",
+              "metadata": {
+                "toolCall": {
+                  "toolCallId": "functions.tool-help:0",
+                  "toolName": "tool-help",
+                  "args": {},
+                  "creditsUsed": 0,
+                  "requiresConfirmation": false,
+                  "isConfirmed": false,
+                  "waitingForConfirmation": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "user": {
+      "isPublic": false,
+      "id": "27111963-4352-474a-82f3-5f6619fa1719",
+      "leadId": "75aad929-34f0-4e9a-bb4c-9f25471b4aa3",
+      "roles": ["enums.userRole.admin"]
+    }
+  }
+}

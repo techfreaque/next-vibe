@@ -251,9 +251,22 @@ export const translations: typeof enTranslations = {
     splitHero: {
       or: "LUB",
       clickToExplore: "Kliknij, aby odkryć",
-      header: "Cztery produkty. Jedna platforma.",
+      header: "Nie jesteśmy laboratorium za miliardy.",
       subheader:
-        "AI bez cenzury · Własny agent · Framework open source · Stały dochód",
+        "Jesteśmy twórcami, którzy uważają, że AI nie powinno mieć opinii politycznych.",
+      introBody:
+        "To oznacza szorstkie krawędzie. Modele padają. Funkcje wychodzą surowe. Naprawiamy szybko i nie udajemy, że jesteśmy idealni. Czym jesteśmy: jedyną platformą, na której to Ty wybierasz poziom filtra - nie komisja ds. bezpieczeństwa.",
+      introGuide: "Wybierz co do Ciebie pasuje:",
+      introOption1:
+        "Chcesz po prostu rozmawiać z AI bez cenzury? Zacznij tutaj - większość tak robi.",
+      introOption2:
+        "Chcesz uruchomić to na własnym sprzęcie? Hostuj całość samodzielnie.",
+      introOption3:
+        "Jesteś programistą? Framework jest open source. Sforkuj go.",
+      introOption4:
+        "Chcesz zarabiać? Polecaj użytkowników lub publikuj skille AI za stały dochód.",
+      introHelp: "Nie wiesz co wybrać?",
+      introHelpCta: "Napisz do nas",
       unbottled: {
         badge: "Bez cenzury · Otwarty · Mainstream",
         titleLine1: "AI bez cenzury.",

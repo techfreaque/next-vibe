@@ -18,14 +18,13 @@ import { EXECUTE_TOOL_ALIAS } from "../../system/unified-interface/ai/execute-to
 import { WAIT_FOR_TASK_ALIAS } from "../../system/unified-interface/tasks/wait-for-task/constants";
 import { AI_RUN_ALIAS } from "../ai-stream/run/constants";
 import { CODING_AGENT_ALIAS } from "../coding-agent/constants";
-import { FETCH_URL_ALIAS } from "../fetch-url-content/constants";
-import { BRAVE_SEARCH_ALIAS } from "../search/brave/constants";
-import { KAGI_ALIAS } from "../search/kagi/constants";
 import {
-  MEMORY_DELETE_ALIAS,
-  MEMORY_UPDATE_ALIAS,
-} from "./memories/[id]/constants";
-import { MEMORY_ADD_ALIAS } from "./memories/create/constants";
+  CORTEX_EDIT_ALIAS,
+  CORTEX_LIST_ALIAS,
+  CORTEX_READ_ALIAS,
+  CORTEX_SEARCH_ALIAS,
+  CORTEX_WRITE_ALIAS,
+} from "../cortex/constants";
 
 /**
  * Storage keys for localStorage persistence
@@ -38,6 +37,8 @@ export const STORAGE_KEYS = {
   ONBOARDING_COMPLETED: "chat-onboarding-completed",
   SELECTOR_ONBOARDING_COMPLETED: "chat-selector-onboarding-v2",
   COMPANION_CHOICE: "chat-companion-choice",
+  /** Last UUID skillId that a public user favorited — used for signup attribution */
+  LAST_ATTRIBUTED_SKILL: "chat-last-attributed-skill",
 } as const;
 
 /**
@@ -61,52 +62,41 @@ export const DEFAULT_TOOL_IDS_PUBLIC = [
   TOOL_HELP_ALIAS,
   EXECUTE_TOOL_ALIAS,
   WAIT_FOR_TASK_ALIAS,
-  BRAVE_SEARCH_ALIAS,
-  KAGI_ALIAS,
-  FETCH_URL_ALIAS,
   AI_RUN_ALIAS,
 ] as const;
 
 /**
  * Default AI tools for customer (authenticated non-admin) users.
- * Adds memory tools, execute-tool, and wait-for-task on top of public defaults.
+ * Only essential cortex tools are pinned — rest discoverable via tool-help.
  */
 export const DEFAULT_TOOL_IDS_CUSTOMER = [
   TOOL_HELP_ALIAS,
   EXECUTE_TOOL_ALIAS,
   WAIT_FOR_TASK_ALIAS,
-  BRAVE_SEARCH_ALIAS,
-  KAGI_ALIAS,
-  FETCH_URL_ALIAS,
-  MEMORY_ADD_ALIAS,
-  MEMORY_UPDATE_ALIAS,
-  MEMORY_DELETE_ALIAS,
+  CORTEX_READ_ALIAS,
+  CORTEX_WRITE_ALIAS,
+  CORTEX_EDIT_ALIAS,
+  CORTEX_LIST_ALIAS,
+  CORTEX_SEARCH_ALIAS,
   AI_RUN_ALIAS,
 ] as const;
 
 /**
  * Default AI tools for admin users.
- * Adds coding-agent and other admin-only tools on top of customer defaults.
+ * Only essential cortex tools are pinned — rest discoverable via tool-help.
  */
 export const DEFAULT_TOOL_IDS_ADMIN = [
   TOOL_HELP_ALIAS,
   EXECUTE_TOOL_ALIAS,
   WAIT_FOR_TASK_ALIAS,
-  BRAVE_SEARCH_ALIAS,
-  KAGI_ALIAS,
-  FETCH_URL_ALIAS,
-  MEMORY_ADD_ALIAS,
-  MEMORY_UPDATE_ALIAS,
-  MEMORY_DELETE_ALIAS,
+  CORTEX_READ_ALIAS,
+  CORTEX_WRITE_ALIAS,
+  CORTEX_EDIT_ALIAS,
+  CORTEX_LIST_ALIAS,
+  CORTEX_SEARCH_ALIAS,
   CODING_AGENT_ALIAS,
   AI_RUN_ALIAS,
 ] as const;
-
-/**
- * @deprecated Use DEFAULT_TOOL_IDS_ADMIN / DEFAULT_TOOL_IDS_CUSTOMER / DEFAULT_TOOL_IDS_PUBLIC
- * or call getDefaultToolIds() with the user's role instead.
- */
-export const DEFAULT_TOOL_IDS = DEFAULT_TOOL_IDS_ADMIN;
 
 /**
  * Default remote tools made available (enabled) when a remote instance is connected.
@@ -161,7 +151,7 @@ export function getDefaultToolIdsForUser(
  * Role-based defaults:
  * - ADMIN (or local mode): admin tool set + dev tools (claude-code, sql, rebuild, etc.)
  * - CUSTOMER (authenticated, non-admin): customer tool set (no claude-code)
- * - PUBLIC (unauthenticated): public tool set (search, fetch, ai-run, help only)
+ * - PUBLIC (unauthenticated): public tool set (ai-run, help only; search/fetch via prompt fragment)
  *
  * Pass `isAdmin=true` / `isCustomer=true` flags derived from the JWT payload roles.
  * When neither flag is provided, defaults to admin in local mode.

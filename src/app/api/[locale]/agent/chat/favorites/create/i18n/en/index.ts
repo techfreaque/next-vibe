@@ -28,12 +28,8 @@ export const translations = {
     },
     skillId: {
       label: "Skill",
-      description: "Select the character for this favorite",
-    },
-    variantId: {
-      label: "Variant",
       description:
-        "Select a skill variant by ID. Variants are named model configurations for the same skill personality (e.g. 'brilliant' for deep reasoning, 'budget' for cheap/fast). null = use default variant. Fetch skill first to see available variants.",
+        'Skill ID in merged format: "skillSlug" for the default variant, "skillSlug__variantId" for a specific variant (e.g. "thea__brilliant"). Run skills to see available IDs.',
     },
     customVariantName: {
       label: "Variant Name",
@@ -95,10 +91,6 @@ export const translations = {
       description:
         "Video generator override. null = skill's videoGenModelSelection wins (media gen: skill takes priority).",
       placeholder: "Inherit from skill",
-    },
-    defaultChatMode: {
-      label: "Default Chat Mode",
-      description: "Default mode when opening this chat",
     },
     mode: {
       label: "Selection Mode",

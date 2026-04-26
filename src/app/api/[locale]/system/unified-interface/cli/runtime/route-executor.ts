@@ -22,6 +22,7 @@ import {
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TParams } from "@/i18n/core/static-types";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { TOOL_HELP_ALIAS } from "../../../help/constants";
 import {
@@ -41,7 +42,6 @@ import { createCliBypassUser } from "../auth/cli-bypass-user";
 import type { getCliUser } from "../auth/cli-user";
 import { scopedTranslation as cliScopedTranslation } from "../i18n";
 import { CliTarget, type CliTargetValue } from "../types/cli-target";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { CliInputParser, type CliUrlParams } from "./parsing";
 
 // Lazy-loaded: only needed for MCP + non-bypass paths, not for normal `vibe c`
@@ -131,7 +131,7 @@ export interface RouteExecutionResult {
   errorParams?: TParams;
 
   /** Original input data provided by the user (for --interactive hint pre-fill) */
-  inputData?: Record<string, string>;
+  inputData?: Record<string, WidgetData>;
 
   /** CLI-specific metadata */
   metadata?: {
@@ -470,7 +470,6 @@ export class RouteDelegationHandler {
             threadId: undefined,
             aiMessageId: undefined,
             skillId: undefined,
-            modelId: undefined,
             headless: undefined,
             subAgentDepth: 0,
             currentToolMessageId: undefined,
@@ -484,10 +483,7 @@ export class RouteDelegationHandler {
             callerCallbackMode: undefined,
             onEscalatedTaskCancel: undefined,
             escalateToTask: undefined,
-            imageGenModelSelection: undefined,
-            musicGenModelSelection: undefined,
-            videoGenModelSelection: undefined,
-            variantId: undefined,
+
             isRevival: undefined,
             providerOverride: undefined,
           },
@@ -499,9 +495,7 @@ export class RouteDelegationHandler {
         data: result.success ? result.data : undefined,
         error: result.success ? undefined : result.message,
         errorParams: result.success ? undefined : result.messageParams,
-        inputData: result.success
-          ? undefined
-          : (inputData.data as Record<string, string> | undefined),
+        inputData: result.success ? undefined : inputData.data,
         metadata: {
           executionTime: Date.now() - startTime,
           endpointPath: resolvedCommand,

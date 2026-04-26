@@ -32,6 +32,7 @@ import { Compass } from "next-vibe-ui/ui/icons/Compass";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { Star } from "next-vibe-ui/ui/icons/Star";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
@@ -61,6 +62,7 @@ import IconWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/w
 import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/widget";
 import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 
 import { cn } from "../../../shared/utils";
 import BadgeWidget from "../../../system/unified-interface/unified-ui/widgets/display-only/badge/widget";
@@ -115,11 +117,12 @@ function getVariantLabel(
   if (item.customVariantName) {
     return item.customVariantName;
   }
-  if (!item.variantId) {
+  const { skillId: baseSkillId, variantId } = parseSkillId(item.skillId);
+  if (!variantId) {
     return null;
   }
-  const skill = DEFAULT_SKILLS.find((s) => s.id === item.skillId);
-  const variant = skill?.variants?.find((v) => v.id === item.variantId);
+  const skill = DEFAULT_SKILLS.find((s) => s.id === baseSkillId);
+  const variant = skill?.variants?.find((v) => v.id === variantId);
   if (!variant) {
     return null;
   }
@@ -175,11 +178,12 @@ function flattenGroups(groups: SkillGroup[]): FavoriteCard[] {
     }));
 }
 
-type FavoriteSectionType = "companion" | "skills" | "model";
+type FavoriteSectionType = "companion" | "skills" | "model" | "background";
 
 /**
  * Classify a group into its section based on skill category.
  * - companion: COMPANION category skills
+ * - background: BACKGROUND category skills (dreamer, autopilot)
  * - model: no-skill (model-only) favorites
  * - skills: everything else (specialists, tool bundles, etc.)
  */
@@ -191,10 +195,18 @@ function getSectionType(group: SkillGroup): FavoriteSectionType {
   if (skill?.category === SkillCategory.COMPANION) {
     return "companion";
   }
+  if (skill?.category === SkillCategory.BACKGROUND) {
+    return "background";
+  }
   return "skills";
 }
 
-const SECTION_ORDER: FavoriteSectionType[] = ["companion", "skills", "model"];
+const SECTION_ORDER: FavoriteSectionType[] = [
+  "companion",
+  "skills",
+  "model",
+  "background",
+];
 
 // ============================================================================
 // Full card - used for single-item groups (no own useSortable - parent handles it)
@@ -821,7 +833,6 @@ export function FavoritesListContainer({
         favoriteId: item.id,
         modelId: item.modelId,
         skillId: item.skillId,
-        voiceId: item.voiceId,
         logger,
         locale,
         user,
@@ -876,6 +887,7 @@ export function FavoritesListContainer({
         companion: "get.sections.companion" as const,
         skills: "get.sections.skills" as const,
         model: "get.sections.model" as const,
+        background: "get.sections.background" as const,
       }[type];
       return {
         type,
@@ -998,9 +1010,17 @@ export function FavoritesListContainer({
     navigate(skillsDef.default.GET, {});
   }, [navigate]);
 
+  const handleOpenSettings = useCallback(async (): Promise<void> => {
+    const settingsDef = await import("../settings/definition");
+    navigate(settingsDef.default.POST, {
+      prefillFromGet: true,
+      getEndpoint: settingsDef.default.GET,
+    });
+  }, [navigate]);
+
   return (
     <Div className="flex flex-col gap-0">
-      {/* Tab bar: My Favorites | Browse Skills */}
+      {/* Tab bar: My Favorites | Settings gear */}
       <Div className="flex border-b border-border shrink-0">
         <Div className="flex-1 flex items-center justify-center gap-1.5 h-10 text-sm font-medium border-b-2 border-primary text-primary">
           <Star className="h-4 w-4" />
@@ -1015,6 +1035,14 @@ export function FavoritesListContainer({
         >
           <Compass className="h-4 w-4" />
           {tFav("get.tabs.browseSkills")}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          className="shrink-0 h-10 w-10 px-0 rounded-none border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
+          onClick={() => void handleOpenSettings()}
+        >
+          <Settings className="h-4 w-4" />
         </Button>
       </Div>
 

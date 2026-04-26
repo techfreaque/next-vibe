@@ -10,12 +10,14 @@ import type { NextRequest } from "next-vibe-ui/lib/request";
 import {
   ErrorResponseTypes,
   fail,
+  success,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../chat/db";
@@ -29,13 +31,14 @@ import { MessagesRepository } from "../../chat/threads/[threadId]/messages/repos
 import type { ImageGenModelSelection } from "../../image-generation/models";
 import { ApiProvider } from "../../models/models";
 import type { MusicGenModelSelection } from "../../music-generation/models";
+import { DEFAULT_TTS_VOICE_ID } from "../../text-to-speech/constants";
 import type { VideoGenModelSelection } from "../../video-generation/models";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
 } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
-import { clearStreamingState } from "./core/stream-registry";
+import { clearStreamingState, StreamRegistry } from "./core/stream-registry";
 import {
   subscribeWakeUpSignal,
   type WakeUpPayload,
@@ -48,6 +51,8 @@ import { MessageContextBuilder } from "./handlers/message-context-builder";
 import { StreamErrorCatchHandler } from "./handlers/stream-error-catch-handler";
 import { StreamExecutionHandler } from "./handlers/stream-execution-handler";
 import { StreamStartHandler } from "./handlers/stream-start-handler";
+import { buildFavoriteConfig } from "../../chat/favorites/repository";
+import { parseSkillId } from "../../chat/slugify";
 import type { HeadlessAiStreamResult } from "./headless";
 import { setupAiStream } from "./stream-setup";
 
@@ -174,6 +179,92 @@ export class AiStreamRepository {
     const { userId, leadId, ipAddress } =
       AiStreamRepository.extractUserIdentifiers(user, request, headless);
 
+    // ================================================================
+    // Auto-queue: if the thread is already streaming, save the user
+    // message with isQueued metadata and return immediately — no AI
+    // stream, no credits, no tools. The queue processor will pick
+    // this up after the current stream ends.
+    // The client sends a normal "send" operation — queue detection is
+    // entirely server-side via StreamRegistry.
+    // ================================================================
+    if (
+      data.operation === "send" &&
+      data.threadId &&
+      data.userMessageId &&
+      StreamRegistry.isActive(data.threadId)
+    ) {
+      const authorName = userId
+        ? await UserRepository.getUserPublicName(userId, logger)
+        : null;
+
+      await MessagesRepository.createUserMessage({
+        messageId: data.userMessageId,
+        threadId: data.threadId,
+        role: ChatMessageRole.USER,
+        content: data.content,
+        parentId: data.parentMessageId || null,
+        userId,
+        authorName,
+        logger,
+        extraMetadata: {
+          isQueued: true,
+          queuedSettings: {
+            model: data.model,
+            skill: data.skill,
+            rootFolderId: data.rootFolderId,
+            subFolderId: data.subFolderId ?? null,
+            voiceMode: data.voiceMode ?? {
+              enabled: false,
+              voice: DEFAULT_TTS_VOICE_ID,
+            },
+            favoriteConfig: data.favoriteConfig
+              ? buildFavoriteConfig({
+                  ...data.favoriteConfig,
+                  ...parseSkillId(data.favoriteConfig.skillId),
+                })
+              : null,
+            timezone: data.timezone,
+          },
+        },
+      });
+
+      // Emit message-created so the frontend can confirm persistence
+      const wsEmit = createMessagesEmitter(
+        data.threadId,
+        data.rootFolderId,
+        logger,
+        user,
+      );
+      wsEmit("message-created", {
+        streamingState: "streaming", // Keep streaming state — the AI is still streaming
+        messages: [
+          {
+            id: data.userMessageId,
+            threadId: data.threadId,
+            role: ChatMessageRole.USER,
+            isAI: false,
+            content: data.content,
+            parentId: data.parentMessageId || null,
+            sequenceId: null,
+            model: null,
+            skill: null,
+            metadata: { isQueued: true },
+          },
+        ],
+      });
+
+      logger.info("[AI Stream] Queued message created", {
+        messageId: data.userMessageId,
+        threadId: data.threadId,
+      });
+
+      return success({
+        success: true,
+        messageId: data.userMessageId,
+        responseThreadId: data.threadId,
+      }) satisfies ResponseType<AiStreamPostResponseOutput>;
+    }
+
     const setupResult = await setupAiStream({
       data,
       locale,
@@ -221,7 +312,7 @@ export class AiStreamRepository {
               threadId,
               content: errorContent,
               errorType,
-              parentId: data.parentMessageId ?? null,
+              parentId: data.parentMessageId || null,
               user,
               sequenceId: null,
               logger,
@@ -242,7 +333,7 @@ export class AiStreamRepository {
                 threadId,
                 role: ChatMessageRole.ERROR,
                 content: errorContent,
-                parentId: data.parentMessageId ?? null,
+                parentId: data.parentMessageId || null,
                 sequenceId: null,
                 model: null,
                 skill: null,
@@ -359,6 +450,7 @@ export class AiStreamRepository {
       const { runHeadlessAiStream } = await import("./headless");
       await runHeadlessAiStream({
         favoriteId: lastPayload.favoriteId,
+        favoriteConfig: null,
         model: lastPayload.resolvedModel,
         skill: lastPayload.resolvedSkill,
         prompt: "",
@@ -544,7 +636,7 @@ export class AiStreamRepository {
             //        so use the same parentId as the failed one.
             const compactingParentId = compactingCheck.failedCompactingMessage
               ? (compactingCheck.failedCompactingMessage.parentId ?? null)
-              : (effectiveParentMessageId ?? null);
+              : effectiveParentMessageId || null;
 
             // Pre-gap-fill the branch messages so the compacting LLM gets text variants
             // for any images/audio that the compacting model can't handle natively.
@@ -782,7 +874,7 @@ export class AiStreamRepository {
                 threadId: threadResultThreadId,
                 aiMessageId,
                 userMessageId: userMessageId ?? "",
-                parentMessageId: effectiveParentMessageId ?? null,
+                parentMessageId: effectiveParentMessageId || null,
                 model: data.model,
                 skill: data.skill,
                 sequenceId: sequenceIdOverride ?? crypto.randomUUID(),
@@ -891,12 +983,21 @@ export class AiStreamRepository {
         try {
           await runStream();
         } finally {
-          await clearStreamingState(
+          const clearResult = await clearStreamingState(
             threadResultThreadId,
             logger,
             user,
             capturedLastAiMessageContent,
           );
+          // Emit stream-finished so clients subscribed to the sub-thread channel
+          // (e.g. EmbeddedMessagesView after page refresh) get the "done" signal.
+          wsEmit.setStreamPreview({
+            preview: clearResult.preview,
+            updatedAt: clearResult.updatedAt,
+          });
+          wsEmit("stream-finished", {
+            streamingState: clearResult.state,
+          });
           // wakeUp revival: insert deferred (single stream = no race) then revive.
           // Skip if stream was aborted (user cancel or timeout) - don't revive cancelled streams.
           // Also filter out payloads intercepted by wait-for-task (delivered inline).
@@ -1029,6 +1130,28 @@ export class AiStreamRepository {
                   },
                 );
               }
+
+              // Queue processing: if stream completed naturally (not aborted)
+              // and no wakeUp revival, check for queued messages.
+              if (!wasAborted) {
+                const { processNextQueuedMessage } =
+                  await import("./core/queue-processor");
+                await processNextQueuedMessage(
+                  threadResultThreadId,
+                  logger,
+                  user,
+                  locale,
+                  aiStreamT,
+                  data.rootFolderId,
+                  subAgentDepth,
+                ).catch((err: Error) => {
+                  logger.error("[Queue] Failed to process queued message", {
+                    error: err.message,
+                    threadId: threadResultThreadId,
+                  });
+                });
+              }
+
               return Promise.resolve();
             })
             .catch((err) => {
@@ -1095,7 +1218,7 @@ export class AiStreamRepository {
           const errorParentId =
             capturedLastAiMessageId !== aiMessageId
               ? capturedLastAiMessageId
-              : (data.parentMessageId ?? null);
+              : data.parentMessageId || null;
           // Persist to DB for non-incognito threads (incognito has no DB row - WS event persists client-side).
           if (!isIncognito && userId) {
             await MessagesRepository.createErrorMessage({

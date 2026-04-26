@@ -349,28 +349,10 @@ export const translations = {
       label: "Music Duration",
       description: "Duration of the generated audio clip",
     },
-    availableTools: {
-      label: "Allowed to Execute",
+    favoriteConfig: {
+      label: "Favorite Config",
       description:
-        "Execution permission gate - which tools the AI is actually allowed to run. null = all tools permitted. Array = restrict to listed tools only.",
-      toolId: {
-        label: "Tool ID",
-        description: "Alias or full tool name the AI is permitted to execute",
-      },
-    },
-    pinnedTools: {
-      label: "In Context (model sees these)",
-      description:
-        "Tools loaded into the model's context window - what the AI knows about. null = user's default set. availableTools controls what can actually execute.",
-      toolId: {
-        label: "Tool ID",
-        description: "Alias or full tool name to load into the model's context",
-      },
-      requiresConfirmation: {
-        label: "Requires Confirmation",
-        description:
-          "Whether this tool requires user confirmation before execution",
-      },
+        "Active favorite's full configuration — model selections, tool config, context settings. null = no favorite active, use skill/system defaults.",
     },
     enabledToolIds: {
       label: "Enabled Tool IDs",

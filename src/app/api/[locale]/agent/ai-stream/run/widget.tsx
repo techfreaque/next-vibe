@@ -72,6 +72,7 @@ import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import { platform } from "@/config/env-client";
+import { CortexModal } from "../../../agent/cortex/widget/cortex-modal";
 import { AIToolsModal } from "../../tools/widget/ai-tools-modal";
 import { DefaultFolderId } from "../../chat/config";
 import { ChatMessageRole } from "../../chat/enum";
@@ -876,6 +877,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
         </Div>
       </Div>
       <AIToolsModal locale={locale} user={user} />
+      <CortexModal locale={locale} user={user} />
     </InputHeightProvider>
   );
 }

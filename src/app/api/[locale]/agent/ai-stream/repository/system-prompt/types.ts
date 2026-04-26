@@ -41,6 +41,8 @@ export interface SystemPromptServerParams {
   callMode?: boolean;
   /** Extra per-request instructions to append */
   extraInstructions?: string;
+  /** Last user message content — used for vector search context injection */
+  lastUserMessage?: string;
   /** Resolved memory token limit from cascade: favorite → skill → settings → null (use default) */
   memoryLimit?: number | null;
   /** Resolved media generation capabilities for the current request */

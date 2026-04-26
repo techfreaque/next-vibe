@@ -31,12 +31,13 @@ export const translations = {
       roleplay: "Roleplay",
       education: "Education",
       controversial: "Controversial",
+      background: "Background",
       custom: "Custom",
     },
     source: {
       all: "All",
       builtIn: "Built-in",
-      my: "My Skills",
+      my: "Mine",
       community: "Community",
     },
     ownershipType: {
@@ -432,6 +433,9 @@ export const translations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Uncensored",
+        oracle: "Oracle",
+        elonTusk: "Elon Tusk",
+        vision: "Vision",
       },
     },
     hermes: {
@@ -449,6 +453,49 @@ export const translations = {
       variants: {
         brilliant: "Brilliant",
         uncensored: "Uncensored",
+        oracle: "Oracle",
+        elonTusk: "Elon Tusk",
+        vision: "Vision",
+      },
+    },
+    theaDreamer: {
+      name: "Thea · Dreamer",
+      description:
+        "Thea's dreaming mode — tends your cortex while you sleep, weaving order from the day's threads.",
+      tagline: "Nightly Consolidation",
+      shortDesc: "Background cortex maintenance",
+      suggestedPrompts: {
+        0: "What did you organize last night?",
+        1: "Show me what memories you consolidated",
+        2: "What patterns did you find in my recent work?",
+        3: "What should I focus on today based on last night?",
+      },
+      variants: {
+        brilliant: "Brilliant",
+        uncensored: "Uncensored",
+        oracle: "Oracle",
+        elonTusk: "Elon Tusk",
+        vision: "Vision",
+      },
+    },
+    hermesAutopilot: {
+      name: "Hermes · Autopilot",
+      description:
+        "Hermes in execution mode — advances your active projects and queued work while you're away.",
+      tagline: "Always Moving Forward",
+      shortDesc: "Background project execution",
+      suggestedPrompts: {
+        0: "What did you advance while I was away?",
+        1: "What tasks are still in progress?",
+        2: "Where did you leave things off?",
+        3: "What needs my decision before you can continue?",
+      },
+      variants: {
+        brilliant: "Brilliant",
+        uncensored: "Uncensored",
+        oracle: "Oracle",
+        elonTusk: "Elon Tusk",
+        vision: "Vision",
       },
     },
     quickWriter: {
@@ -899,11 +946,11 @@ export const translations = {
       },
     },
     researchAgent: {
-      name: "Research Agent",
+      name: "Web Agent",
       description:
-        "Web research specialist with search, fetch, and memory tools for gathering and synthesizing information",
-      tagline: "Find & Synthesize",
-      shortDesc: "Web research and information gathering",
+        "Searches the web, reads pages, cross-references sources. Remembers findings across sessions. Discovers browser tools when available.",
+      tagline: "Search · Read · Verify",
+      shortDesc: "Web search, URL reading, and fact-checking",
       suggestedPrompts: {
         0: "Research the latest developments in AI regulation",
         1: "Find and summarize key facts about a topic",
@@ -911,8 +958,11 @@ export const translations = {
         3: "Compile a research brief with citations",
       },
       variants: {
-        gemini: "Gemini",
-        fast: "Fast",
+        kimi: "Bargain Bin Brain",
+        gemini: "Google's Gifted Child",
+        flash: "Caffeinated Intern",
+        grok: "Unhinged Librarian",
+        claude: "Overthinking Machine",
       },
     },
     statsAnalyst: {
@@ -1048,7 +1098,10 @@ export const translations = {
       },
       variants: {
         kimi: "Kimi",
-        budget: "Budget",
+        claudeCodeOpus: "Claude Code Opus",
+        claudeCodeSonnet: "Claude Code Sonnet",
+        claudeSonnet: "Claude Sonnet",
+        claudeOpus: "Claude Opus",
       },
     },
     skillCreator: {
@@ -1068,6 +1121,25 @@ export const translations = {
         fast: "Fast",
         cheapAndSmart: "Cheap & Smart",
         brilliant: "Brilliant",
+      },
+    },
+    heilpraktikerPruefung: {
+      name: "HP Exam Trainer",
+      description:
+        "Realistic oral Heilpraktiker exam simulation with adaptive difficulty",
+      tagline: "Mündliche Prüfung",
+      shortDesc: "Heilpraktiker exam preparation",
+      suggestedPrompts: {
+        0: "Starten wir die Prüfung",
+        1: "Prüfe mich in Innerer Medizin",
+        2: "Stelle mir einen klinischen Fall vor",
+        3: "Fragen zur Gesetzeskunde bitte",
+      },
+      variants: {
+        smart: "Balanced",
+        precise: "Precise",
+        thorough: "Thorough",
+        quick: "Quick",
       },
     },
     qualityTester: {
@@ -1169,6 +1241,7 @@ export const translations = {
         inUse: "In Use",
         chooseFavorite: "Choose Favorite",
         selectFavorite: "Select a favorite to activate:",
+        addVariant: "Add Variant",
       },
     },
     section: {
@@ -1372,10 +1445,6 @@ export const translations = {
       description:
         "Video generation model. Takes priority over user settings when set (media gen: skill intent wins). Set when this skill IS a video creator. null = use user's global video gen preference.",
       placeholder: "System default",
-    },
-    defaultChatMode: {
-      label: "Default Chat Mode",
-      description: "Default mode when opening this chat",
     },
     systemPrompt: {
       label: "System Prompt",

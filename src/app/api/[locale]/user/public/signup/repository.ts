@@ -254,6 +254,71 @@ export class SignupRepository {
         );
       }
 
+      // Migrate local favorites from localStorage to DB (fire-and-forget, best-effort)
+      if (data.localFavorites && data.localFavorites.length > 0) {
+        try {
+          const { FavoritesCreateRepository } =
+            await import("@/app/api/[locale]/agent/chat/favorites/create/repository");
+          const { scopedTranslation: favoritesCreateScopedTranslation } =
+            await import("@/app/api/[locale]/agent/chat/favorites/create/i18n");
+          const { t: favT } = favoritesCreateScopedTranslation.scopedT(locale);
+          const userJwt: JwtPayloadType = {
+            id: userData.id,
+            isPublic: false as const,
+            roles,
+            leadId: leadIdResult.leadId,
+          };
+          await Promise.allSettled(
+            data.localFavorites.map((fav) =>
+              FavoritesCreateRepository.createFavorite(
+                {
+                  skillId: fav.skillId,
+                  customVariantName: fav.customVariantName ?? null,
+                  modelSelection: fav.modelSelection ?? null,
+                  voiceModelSelection: fav.voiceModelSelection ?? null,
+                },
+                userJwt,
+                logger,
+                favT,
+                locale,
+              ),
+            ),
+          );
+          logger.debug("Local favorites migrated", {
+            userId: userData.id,
+            count: data.localFavorites.length,
+          });
+        } catch (favErr) {
+          // Never block signup due to favorites migration failure
+          logger.warn("Failed to migrate local favorites during signup", {
+            userId: userData.id,
+            error: String(favErr),
+          });
+        }
+      }
+
+      // Apply chosen skill attribution with overwrite (last wins before signup)
+      if (
+        data.supportedSkillId &&
+        /^[0-9a-f-]{36}$/i.test(data.supportedSkillId)
+      ) {
+        try {
+          const { LeadsRepository } =
+            await import("@/app/api/[locale]/leads/repository");
+          await LeadsRepository.updateLeadSkillId(
+            leadIdResult.leadId,
+            data.supportedSkillId,
+            true, // overwrite — user explicitly chose this creator
+            logger,
+          );
+        } catch (skillErr) {
+          logger.warn("Failed to apply supportedSkillId during signup", {
+            userId: userData.id,
+            error: String(skillErr),
+          });
+        }
+      }
+
       // Create JWT payload with roles
       const tokenPayload: JwtPrivatePayloadType = {
         id: userData.id,
@@ -274,7 +339,7 @@ export class SignupRepository {
         });
         // Continue without auto-login - user can manually log in
       } else {
-        // Create session in database (7 days default)
+        // Create session in database - default (no rememberMe) uses 7-day session
         const sessionDurationSeconds = 7 * 24 * 60 * 60;
         const expiresAt = new Date(Date.now() + sessionDurationSeconds * 1000);
         const sessionData = {

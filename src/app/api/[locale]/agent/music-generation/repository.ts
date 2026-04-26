@@ -159,7 +159,8 @@ export class MusicGenerationRepository {
     let { audioUrl } = generationResult.data;
 
     // Upload to our storage so the URL is persistent and access-controlled
-    if (streamContext.threadId) {
+    const scThreadId = streamContext?.threadId;
+    if (scThreadId) {
       try {
         const storage = getStorageAdapter();
         const arrayBuf = await fetch(audioUrl).then((r) => r.arrayBuffer());
@@ -167,7 +168,7 @@ export class MusicGenerationRepository {
         const uploadResult = await storage.uploadFile(audioBuffer, {
           filename: `generated-audio-${Date.now()}.mp3`,
           mimeType: "audio/mpeg",
-          threadId: streamContext.threadId,
+          threadId: scThreadId,
           userId: user.id,
         });
         audioUrl = uploadResult.url;

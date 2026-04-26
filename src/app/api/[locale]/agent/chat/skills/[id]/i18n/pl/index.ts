@@ -28,6 +28,7 @@ export const translations: typeof enTranslations = {
     backButton: {
       label: "Powrót do postaci",
     },
+    openFullPage: "Otwórz pełną stronę",
     editButton: {
       label: "Edytuj postać",
     },
@@ -41,6 +42,8 @@ export const translations: typeof enTranslations = {
       label: "Dodaj do ulubionych",
     },
     inCollection: "W kolekcji",
+    useNow: "Użyj teraz",
+    goToChat: "Przejdź do czatu",
     addAnother: "Dodaj kolejną",
     addAnotherTooltip: "Dodaj kolejną instancję tej postaci do swojej kolekcji",
     variants: {
@@ -61,6 +64,7 @@ export const translations: typeof enTranslations = {
       c: "C: Card Hero",
       d: "D: Two-Row",
     },
+    addVariant: "Dodaj wariant",
     yourskill: "Twoja postać",
     signupPrompt: {
       title: "Dostosuj tę postać",
@@ -93,6 +97,9 @@ export const translations: typeof enTranslations = {
     },
     systemPrompt: {
       label: "Prompt systemowy",
+      copy: "Kopiuj",
+      copied: "Skopiowano!",
+      view: "Zobacz pełny prompt",
     },
     response: {
       skill: {
@@ -341,10 +348,6 @@ export const translations: typeof enTranslations = {
       description: "Model do generowania wideo",
       placeholder: "Domyślny systemu",
     },
-    defaultChatMode: {
-      label: "Domyślny tryb czatu",
-      description: "Domyślny tryb przy otwieraniu tego czatu",
-    },
     modelSelection: {
       label: "Wybór modelu",
       description: "Jak model AI jest wybierany dla tej postaciy",
@@ -353,6 +356,13 @@ export const translations: typeof enTranslations = {
       label: "Warianty",
       description:
         "Nazwane warianty z własnymi ustawieniami modelu. Każdy wariant wymaga: id, modelSelection (wymagane), isDefault (dokładnie jeden true).",
+      addButton: "Dodaj wariant",
+      setDefault: "Ustaw jako domyślny",
+      remove: "Usuń",
+      defaultBadge: "Domyślny",
+      namePlaceholder: "Nazwa wariantu (opcjonalna)",
+      skillDefaults: "Domyślne ustawienia skillu",
+      skillDefaultsHint: "Fallback gdy wariant nie konfiguruje modalności",
     },
     preferredModel: {
       label: "Preferowany model",

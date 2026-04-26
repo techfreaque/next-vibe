@@ -22,7 +22,6 @@ const isSubmitKeyPress = (e: TextareaKeyboardEvent): boolean =>
 interface UseInputHandlersProps {
   input: string;
   attachments: File[];
-  isLoading: boolean;
   sendMessage: (
     params: {
       content: string;
@@ -69,7 +68,6 @@ interface UseInputHandlersReturn {
 export function useInputHandlers({
   input,
   attachments,
-  isLoading,
   sendMessage,
   setInput,
   locale,
@@ -90,11 +88,10 @@ export function useInputHandlers({
     logger.debug("Chat", "submitMessage called", {
       hasInput: Boolean(input),
       isValidInput: isValidInput(input),
-      isLoading,
       attachmentsCount: attachments?.length || 0,
     });
 
-    if (isValidInput(input) && !isLoading) {
+    if (isValidInput(input)) {
       logger.debug("Chat", "submitMessage calling sendMessage");
 
       // Snapshot navigation state before sending - needed to revert on failure
@@ -157,7 +154,6 @@ export function useInputHandlers({
   }, [
     input,
     attachments,
-    isLoading,
     sendMessage,
     logger,
     locale,
@@ -180,11 +176,10 @@ export function useInputHandlers({
     async (content: string) => {
       logger.debug("Chat", "submitWithContent called", {
         contentLength: content.length,
-        isLoading,
         attachmentsCount: attachments?.length || 0,
       });
 
-      if (isValidInput(content) && !isLoading) {
+      if (isValidInput(content)) {
         logger.debug("Chat", "submitWithContent calling sendMessage");
         // Also update the input state for UI consistency
         setInput(content);
@@ -230,11 +225,10 @@ export function useInputHandlers({
           setInput("");
         }
       } else {
-        logger.debug("Chat", "submitWithContent blocked", { isLoading });
+        logger.debug("Chat", "submitWithContent blocked");
       }
     },
     [
-      isLoading,
       attachments,
       sendMessage,
       setInput,
@@ -261,13 +255,7 @@ export function useInputHandlers({
       logger.debug("Chat", "submitWithAudio called", {
         fileSize: audioFile.size,
         fileType: audioFile.type,
-        isLoading,
       });
-
-      if (isLoading) {
-        logger.debug("Chat", "submitWithAudio blocked - isLoading");
-        return;
-      }
 
       logger.debug("Chat", "submitWithAudio calling sendMessage with audio");
 
@@ -315,7 +303,6 @@ export function useInputHandlers({
       }
     },
     [
-      isLoading,
       attachments,
       sendMessage,
       logger,

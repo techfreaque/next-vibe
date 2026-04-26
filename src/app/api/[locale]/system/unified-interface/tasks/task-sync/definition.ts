@@ -19,6 +19,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
@@ -46,63 +47,66 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      // ── Request: hashes local sends so remote can diff ──────────────────
+      // ── Request ────────────────────────────────────────────────────────
       instanceId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
-        // The local instance's instanceId - used to look up the connection record on cloud
         schema: z.string().optional(),
       }),
-      memoriesHash: requestField(scopedTranslation, {
+      // Unified per-provider hashes: { memories: "sha256...", documents: "sha256...", ... }
+      syncHashes: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.TEXTAREA,
         columns: 12,
-        // SHA256 of sorted "syncId:updatedAt" pairs for local shared memories
-        schema: z.string().optional(),
+        schema: z
+          .union([z.string(), z.record(z.string(), z.string())])
+          .optional(),
       }),
       capabilitiesVersion: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
-        // Build version string (git SHA or package version) - changes only on deploy
         schema: z.string().optional(),
       }),
       capabilitiesJson: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
-        // Full capability snapshot - only sent when capabilitiesVersion changed
-        schema: z.union([z.string(), z.array(z.any())]).optional(),
+        schema: z
+          .union([z.string(), z.array(z.record(z.string(), WidgetDataSchema))])
+          .optional(),
       }),
       taskCursor: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
-        // ISO timestamp - return REMOTE_TOOL_CALL tasks created after this
         schema: z.string().datetime().optional(),
       }),
       outboundTasks: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
-        // Tasks this local instance wants the remote to execute (JSON string or array).
-        // The request parser auto-deserialises JSON-looking strings, so accept both.
-        // Used for dev→cloud execution: dev creates a task targeting cloud's instanceId,
-        // then sends it here so cloud's pulse can pick it up.
-        schema: z.union([z.string(), z.array(z.any())]).optional(),
+        schema: z
+          .union([z.string(), z.array(z.record(z.string(), WidgetDataSchema))])
+          .optional(),
       }),
 
-      // ── Response: remote returns only what local is missing ─────────────
-      remoteMemoriesHash: responseField(scopedTranslation, {
+      // ── Response ───────────────────────────────────────────────────────
+      // Unified per-provider hashes from remote
+      remoteSyncHashes: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        // Remote's current hash - local stores for next diff
-        schema: z.string(),
+        schema: z.record(z.string(), z.string()),
       }),
-      memories: responseField(scopedTranslation, {
+      // Per-provider payloads: { memories: "[...]", documents: "[...]" } — only keys that differ
+      syncPayloads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        // Full memory records as JSON string - null if hashes matched
-        schema: z.string().nullable(),
+        schema: z.record(z.string(), z.string()),
+      }),
+      // Per-provider counts: { memories: 5, documents: 0 }
+      syncCounts: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.record(z.string(), z.number()),
       }),
       remoteCapabilitiesVersion: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -110,21 +114,14 @@ const { POST } = createEndpoint({
       }),
       capabilities: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        // Full capability snapshot as JSON string - null if versions matched
         schema: z.string().nullable(),
       }),
       tasks: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        // REMOTE_TOOL_CALL tasks newer than taskCursor, as JSON string
         schema: z.string(),
-      }),
-      memoriesSynced: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        schema: z.number(),
       }),
       serverTime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        // Remote server's DB time at sync - use as cursor to avoid JS/container timezone skew
         schema: z.string(),
       }),
     },
@@ -178,19 +175,27 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         instanceId: "hermes",
-        memoriesHash: "sha256:abc123",
+        syncHashes: {
+          memories: "abc123",
+          documents: "def456",
+          skills: "789abc",
+        },
         capabilitiesVersion: "519b91e8edbf",
         taskCursor: "2026-01-01T00:00:00.000Z",
       },
     },
     responses: {
       default: {
-        remoteMemoriesHash: "sha256:xyz789",
-        memories: null,
+        remoteSyncHashes: {
+          memories: "xyz789",
+          documents: "abc123",
+          skills: "def456",
+        },
+        syncPayloads: {},
+        syncCounts: {},
         remoteCapabilitiesVersion: "519b91e8edbf",
         capabilities: null,
         tasks: "[]",
-        memoriesSynced: 0,
         serverTime: "2026-01-01T00:00:00.000Z",
       },
     },

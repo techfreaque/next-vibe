@@ -14,7 +14,7 @@ import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/sha
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
-import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
+import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { useLogger } from "@/hooks/use-logger";
@@ -337,7 +337,7 @@ export function VibeFrameDemo({
       </Div>
       <MockChatProvider>
         <Div className="rounded-lg border border-gray-700 bg-gray-900/50 overflow-hidden p-4 space-y-1">
-          <UserMessageBubble
+          <StaticUserMessageBubble
             message={userMsg}
             locale={locale}
             logger={logger}

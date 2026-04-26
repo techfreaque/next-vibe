@@ -43,8 +43,10 @@ import {
   generateRoleFilteredRequestSchema,
 } from "../../field/utils";
 import type { EndpointLogger } from "../../logger/endpoint";
+import type { WidgetData } from "../../types/json";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { Platform } from "../../types/platform";
+import type { ServerDefaultContext } from "../../types/server-default";
 import { permissionsRegistry } from "../permissions/registry";
 import {
   validateHandlerRequestData,
@@ -236,6 +238,18 @@ export interface MethodHandlerConfig<
     TUrlVariablesOutput,
     TScopedTranslationKey
   >[];
+  /**
+   * Server-side field defaults for fields hidden from this platform.
+   * Runs after validation, before the handler. Values from here take precedence
+   * over any `serverDefault` declared on the definition field.
+   * Keyed by request field name. Only fires if the field is absent in the validated data.
+   */
+  fieldDefaults?: Partial<
+    Record<
+      keyof TRequestOutput & string,
+      (ctx: ServerDefaultContext) => Promise<WidgetData | undefined>
+    >
+  >;
 }
 
 export interface ApiHandlerOptions<
@@ -274,6 +288,18 @@ export interface ApiHandlerOptions<
       TScopedTranslationKey
     >[];
   };
+  /**
+   * Server-side field defaults for fields hidden from this platform.
+   * Runs after validation, before the handler. Values from here take precedence
+   * over any `serverDefault` declared on the definition field.
+   * Keyed by request field name. Only fires if the field is absent in the validated data.
+   */
+  fieldDefaults?: Partial<
+    Record<
+      keyof TRequestOutput & string,
+      (ctx: ServerDefaultContext) => Promise<WidgetData | undefined>
+    >
+  >;
 }
 
 export type GenericHandlerReturnType<
@@ -328,7 +354,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
   T["types"]["UrlVariablesOutput"],
   T["allowedRoles"]
 > {
-  const { endpoint, handler, email, sms } = options;
+  const { endpoint, handler, email, sms, fieldDefaults } = options;
 
   return async ({
     data,
@@ -419,23 +445,28 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       return validationResult;
     }
 
-    // 3b. Apply field-level serverDefault callbacks for hidden fields.
-    // Fields stripped by hiddenForPlatforms/visibleFor can declare a serverDefault
-    // that resolves a trusted value using request context.
-    const serverDefaults = collectServerDefaults(
+    // 3b. Apply field-level server defaults for hidden fields.
+    // Route-provided fieldDefaults take precedence over definition-level serverDefault.
+    const definitionDefaults = collectServerDefaults(
       endpoint.fields,
       permissionRoles,
       platform,
     );
-    if (Object.keys(serverDefaults).length > 0) {
+    const mergedDefaults = { ...definitionDefaults, ...fieldDefaults };
+    if (Object.keys(mergedDefaults).length > 0) {
       const reqData = validationResult.data.requestData as Record<
         string,
         string | number | boolean | null | undefined
       >;
-      const defaultCtx = { user, locale, platform, streamContext };
-      for (const [key, resolver] of Object.entries(serverDefaults)) {
-        if (reqData[key] === undefined) {
-          const resolved = resolver(defaultCtx);
+      const defaultCtx: ServerDefaultContext = {
+        user,
+        locale,
+        platform,
+        streamContext,
+      };
+      for (const [key, resolver] of Object.entries(mergedDefaults)) {
+        if (reqData[key] === undefined && resolver) {
+          const resolved = await resolver(defaultCtx);
           if (resolved !== undefined) {
             reqData[key] = resolved as string | number | boolean | null;
           }

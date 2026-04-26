@@ -28,6 +28,7 @@ export const translations: typeof enTranslations = {
     backButton: {
       label: "Zurück zu Charakteren",
     },
+    openFullPage: "Vollseite öffnen",
     editButton: {
       label: "Charakter bearbeiten",
     },
@@ -41,6 +42,8 @@ export const translations: typeof enTranslations = {
       label: "Zu Favoriten hinzufügen",
     },
     inCollection: "In Sammlung",
+    useNow: "Jetzt verwenden",
+    goToChat: "Zum Chat",
     addAnother: "Weitere hinzufügen",
     addAnotherTooltip:
       "Eine weitere Instanz dieses Charakters zu deiner Sammlung hinzufügen",
@@ -62,6 +65,7 @@ export const translations: typeof enTranslations = {
       c: "C: Card Hero",
       d: "D: Two-Row",
     },
+    addVariant: "Variante hinzufügen",
     yourskill: "Dein Charakter",
     signupPrompt: {
       title: "Diesen Charakter anpassen",
@@ -94,6 +98,9 @@ export const translations: typeof enTranslations = {
     },
     systemPrompt: {
       label: "System-Prompt",
+      copy: "Kopieren",
+      copied: "Kopiert!",
+      view: "Vollständigen Prompt anzeigen",
     },
     response: {
       skill: {
@@ -169,9 +176,9 @@ export const translations: typeof enTranslations = {
     },
     share: {
       button: "Teilen & Verdienen",
-      title: "Teile diesen Skill & verdiene",
+      title: "Teile dieses Skill & verdiene",
       description:
-        "Teile diesen Skill mit deinem Empfehlungslink. Verdiene 10% wiederkehrende Provision von jedem neuen Nutzer.",
+        "Teile dieses Skill mit deinem Empfehlungslink. Verdiene 10% wiederkehrende Provision von jedem neuen Nutzer.",
       selectCode: "Empfehlungscode waehlen:",
       noCodesYet: "Noch keine Empfehlungscodes",
       createCode: "Code erstellen",
@@ -213,7 +220,7 @@ export const translations: typeof enTranslations = {
       copyright: "\u00a9",
       allSkills: "Alle Skills",
       featuredSkill: "Vorgestellter Skill",
-      aboutSkill: "Ueber diesen Skill",
+      aboutSkill: "Über dieses Skill",
       modelsVariants: "Modelle & Varianten",
     },
   },
@@ -346,10 +353,6 @@ export const translations: typeof enTranslations = {
       description: "Modell zur Videoerstellung",
       placeholder: "Systemstandard",
     },
-    defaultChatMode: {
-      label: "Standard-Chat-Modus",
-      description: "Standardmodus beim Öffnen dieses Chats",
-    },
     modelSelection: {
       label: "Modellauswahl",
       description: "Wie das KI-Modell für diesen Charakter ausgewählt wird",
@@ -358,6 +361,14 @@ export const translations: typeof enTranslations = {
       label: "Varianten",
       description:
         "Benannte Varianten mit eigener Modellauswahl. Jede Variante braucht: id, modelSelection (Pflicht), isDefault (genau eine true).",
+      addButton: "Variante hinzufügen",
+      setDefault: "Als Standard setzen",
+      remove: "Entfernen",
+      defaultBadge: "Standard",
+      namePlaceholder: "Variantenname (optional)",
+      skillDefaults: "Skill-Standardwerte",
+      skillDefaultsHint:
+        "Fallback, wenn eine Variante keine Modalität konfiguriert",
     },
     preferredModel: {
       label: "Bevorzugtes Modell",

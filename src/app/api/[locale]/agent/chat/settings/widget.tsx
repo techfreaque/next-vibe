@@ -1,26 +1,37 @@
 /**
- * CompactTrigger Widget
- * Standalone reusable component for editing/viewing the auto-compact token threshold.
- * Used in: character edit, favorite edit, settings edit.
+ * Chat Settings Widget
+ * Custom widget for the settings POST endpoint, plus standalone reusable components.
  *
- * "Context Memory Budget" - how many tokens of conversation history the AI
- * keeps before summarising older messages to save cost.
+ * - ChatSettingsWidget: Full settings panel rendered via customWidgetObject
+ * - CompactTriggerEdit: Reusable context memory budget slider
+ * - SettingsModelSelectorsSection: Model selector grid for all 9 model slots
  */
 
-/* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
 import { Badge } from "next-vibe-ui/ui/badge";
+import { Textarea } from "next-vibe-ui/ui/textarea";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { Bot } from "next-vibe-ui/ui/icons/Bot";
 import { Brain } from "next-vibe-ui/ui/icons/Brain";
 import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
-import { Eye } from "next-vibe-ui/ui/icons/Eye";
-import { Film } from "next-vibe-ui/ui/icons/Film";
+import { Globe } from "next-vibe-ui/ui/icons/Globe";
 import { Info } from "next-vibe-ui/ui/icons/Info";
-import { Mic } from "next-vibe-ui/ui/icons/Mic";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Monitor } from "next-vibe-ui/ui/icons/Monitor";
+import { Moon } from "next-vibe-ui/ui/icons/Moon";
 import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
+import { Switch } from "next-vibe-ui/ui/switch";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe-ui/ui/select";
 import {
   Slider,
   SliderRange,
@@ -36,72 +47,36 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import {
-  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
-  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
-  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
-} from "@/app/api/[locale]/agent/ai-stream/constants";
-import {
   getChatModelById,
-  type ChatManualModelSelection,
   type ChatModelId,
   type ChatModelSelection,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { COMPACT_TRIGGER } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
-import {
-  audioVisionModelSelectionSchema,
-  getBestAudioVisionModel,
-  getBestImageVisionModel,
-  getBestVideoVisionModel,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import {
-  getBestImageGenModel,
-  imageGenModelSelectionSchema,
-} from "@/app/api/[locale]/agent/image-generation/models";
-import type { Modality, ModelRole } from "@/app/api/[locale]/agent/models/enum";
-import type { AnyRoleModelSelection } from "@/app/api/[locale]/agent/models/selection";
-import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
-import {
-  getBestMusicGenModel,
-  musicGenModelSelectionSchema,
-} from "@/app/api/[locale]/agent/music-generation/models";
-import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import {
-  getBestSttModel,
-  sttModelSelectionSchema,
-} from "@/app/api/[locale]/agent/speech-to-text/models";
-import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import {
-  getBestTtsModel,
-  voiceModelSelectionSchema,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
-import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
-import {
-  getBestVideoGenModel,
-  videoGenModelSelectionSchema,
-} from "@/app/api/[locale]/agent/video-generation/models";
-
-import {
-  ModelSelector,
-  ModelSelectorTrigger,
-} from "@/app/api/[locale]/agent/models/widget/model-selector";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation as skillIdTranslation } from "@/app/api/[locale]/agent/chat/skills/[id]/i18n";
-import { ModelGroup } from "@/app/api/[locale]/agent/chat/skills/[id]/widget";
-import type {
-  ChatSettingsGetResponseOutput,
-  ChatSettingsUpdateRequestOutput,
-} from "./definition";
+import { SearchProviderOptions } from "@/app/api/[locale]/agent/search/enum";
+import { scopedTranslation as searchScopedTranslation } from "@/app/api/[locale]/agent/search/i18n";
+import {
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetUser,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
+import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
+import type { ChatSettingsUpdateRequestOutput } from "./definition";
+import type definition from "./definition";
+import { useChatSettings } from "./hooks";
 import { scopedTranslation } from "./i18n";
+import {
+  AUTOPILOT_DEFAULT_SCHEDULE,
+  DREAM_DEFAULT_SCHEDULE,
+} from "./pulse/constants";
 
 const MIN_VALUE = 1_000;
 const MAX_ABSOLUTE = 200_000;
@@ -171,17 +146,22 @@ function CardHeader({
   modelCap,
   isDefault,
   label,
+  locale,
 }: {
   modelCap: number;
   isDefault: boolean;
   label?: ReactNode;
+  locale: CountryLanguage;
 }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   return (
     <Div className="flex items-start justify-between gap-2">
       <Div className="flex items-center gap-2">
         <Brain className="h-4 w-4 text-primary flex-shrink-0" />
         <Div className="flex flex-col">
-          <Span className="text-sm font-semibold">Context Memory Budget</Span>
+          <Span className="text-sm font-semibold">
+            {t("post.contextMemory.title")}
+          </Span>
           {label !== undefined && label !== null && label !== "" && (
             <Span className="text-xs text-muted-foreground">{label}</Span>
           )}
@@ -201,19 +181,16 @@ function CardHeader({
             <TooltipContent className="max-w-[280px] text-sm" side="top">
               <Div className="flex flex-col gap-1.5">
                 <Span className="font-medium">
-                  How much conversation history the AI keeps
+                  {t("post.contextMemory.tooltipTitle")}
                 </Span>
                 <Span className="text-muted-foreground">
-                  When the conversation grows past this limit, older messages
-                  are automatically summarised. The AI stays coherent but uses
-                  fewer tokens - reducing cost.
+                  {t("post.contextMemory.tooltipBody")}
                 </Span>
                 <Span className="text-muted-foreground">
-                  {"Current model supports up to "}
-                  <Span className="font-medium text-foreground">
-                    {formatTokens(modelCap)}
-                  </Span>
-                  {" tokens."}
+                  {t("post.contextMemory.tooltipModelCap").replace(
+                    "{cap}",
+                    formatTokens(modelCap),
+                  )}
                 </Span>
               </Div>
             </TooltipContent>
@@ -226,7 +203,7 @@ function CardHeader({
           variant="secondary"
           className="text-xs shrink-0 bg-muted text-muted-foreground"
         >
-          default
+          {t("post.contextMemory.default")}
         </Badge>
       )}
     </Div>
@@ -257,6 +234,8 @@ export interface CompactTriggerEditProps {
   className?: string;
   /** User payload for admin-only model filtering */
   user: JwtPayloadType;
+  /** Locale for translations */
+  locale: CountryLanguage;
 }
 
 // ---------------------------------------------------------------------------
@@ -271,7 +250,9 @@ export function CompactTriggerEdit({
   label,
   className,
   user,
+  locale,
 }: CompactTriggerEditProps): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   const modelCap = useMemo(
     () =>
       Math.min(
@@ -302,20 +283,21 @@ export function CompactTriggerEdit({
 
   return (
     <CardWrapper className={className}>
-      <CardHeader modelCap={modelCap} isDefault={isDefault} label={label} />
+      <CardHeader
+        modelCap={modelCap}
+        isDefault={isDefault}
+        label={label}
+        locale={locale}
+      />
 
-      {/* Description for noobs */}
+      {/* Description */}
       <Div className="text-xs text-muted-foreground leading-relaxed">
-        {
-          "How far back the AI remembers your conversation before it starts summarising. "
-        }
+        {`${t("post.contextMemory.description")} `}
         <Span className="inline-flex items-center gap-0.5 font-medium text-foreground/80">
           <DollarSign className="h-3 w-3" />
-          {"Lower = cheaper"}
+          {t("post.contextMemory.costNote")}
         </Span>
-        {
-          " (to a point) - you trade a little memory for lower per-message cost."
-        }
+        {` ${t("post.contextMemory.costExplain")}`}
       </Div>
 
       {/* Slider */}
@@ -345,17 +327,21 @@ export function CompactTriggerEdit({
             >
               {formatTokens(cappedValue)}
             </Span>
-            <Span className="text-[10px]">tokens</Span>
+            <Span className="text-[10px]">
+              {t("post.contextMemory.tokens")}
+            </Span>
           </Div>
           <Div className="flex flex-col items-end gap-0.5">
             <Span>{formatTokens(modelCap)}</Span>
-            <Span className="text-[10px]">model max</Span>
+            <Span className="text-[10px]">
+              {t("post.contextMemory.modelMax")}
+            </Span>
           </Div>
         </Div>
       </Div>
 
       {/* Cost / memory trade-off visual indicator */}
-      <CostMemoryBar value={cappedValue} modelCap={modelCap} />
+      <CostMemoryBar value={cappedValue} modelCap={modelCap} locale={locale} />
 
       {/* Reset button */}
       {!isDefault && (
@@ -367,7 +353,10 @@ export function CompactTriggerEdit({
           className="self-start gap-1.5 h-7 text-xs text-muted-foreground hover:text-foreground px-2"
         >
           <RotateCcw className="h-3 w-3" />
-          {`Reset to default (${formatTokens(COMPACT_TRIGGER)})`}
+          {t("post.contextMemory.resetToDefault").replace(
+            "{value}",
+            formatTokens(COMPACT_TRIGGER),
+          )}
         </Button>
       )}
     </CardWrapper>
@@ -389,10 +378,13 @@ const BAR_COLORS = {
 function CostMemoryBar({
   value,
   modelCap,
+  locale,
 }: {
   value: number;
   modelCap: number;
+  locale: CountryLanguage;
 }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   const pct = Math.round(((value - MIN_VALUE) / (modelCap - MIN_VALUE)) * 100);
 
   // Color logic: green (low cost) → yellow → orange → red (high cost)
@@ -407,21 +399,21 @@ function CostMemoryBar({
 
   const barLabel =
     pct < 30
-      ? "Lower cost · shorter memory"
+      ? t("post.contextMemory.barCheap")
       : pct < 60
-        ? "Balanced cost & memory"
+        ? t("post.contextMemory.barBalanced")
         : pct < 85
-          ? "Richer memory · higher cost"
-          : "Maximum memory · highest cost";
+          ? t("post.contextMemory.barRich")
+          : t("post.contextMemory.barMax");
 
   return (
     <Div className="flex flex-col gap-1">
       <Div className="flex justify-between text-[10px] text-muted-foreground">
-        <Span>{"💸 cheaper"}</Span>
+        <Span>{`💸 ${t("post.contextMemory.cheaper")}`}</Span>
         <Span className="text-center font-medium text-foreground/70">
           {barLabel}
         </Span>
-        <Span>{"🧠 more memory"}</Span>
+        <Span>{`🧠 ${t("post.contextMemory.moreMemory")}`}</Span>
       </Div>
       <Div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
         {/* Inner bar: use style-only (StyleType constraint - no mixing style+className on Div) */}
@@ -440,463 +432,490 @@ function CostMemoryBar({
 }
 
 // ---------------------------------------------------------------------------
-// SettingsModelSelectorsSection
+// Settings Section Card
 // ---------------------------------------------------------------------------
 
-export type ActiveSelector =
-  | "chat"
-  | "voice"
-  | "imageGen"
-  | "musicGen"
-  | "videoGen"
-  | "stt"
-  | "imageVision"
-  | "videoVision"
-  | "audioVision"
-  | null;
-
-export interface SettingsModelSelectorsSectionProps {
-  locale: CountryLanguage;
-  user: JwtPayloadType;
-  settings: ChatSettingsGetResponseOutput | null;
-  updateSettings: (
-    updates: Partial<ChatSettingsUpdateRequestOutput>,
-  ) => Promise<void>;
+function SettingsSection({
+  icon,
+  title,
+  description,
+  children,
+  className,
+}: {
+  icon: ReactNode;
+  title: string;
+  description?: string;
+  children: ReactNode;
+  className?: string;
+}): JSX.Element {
+  return (
+    <Div className={cn("rounded-xl border bg-card overflow-hidden", className)}>
+      <Div className="flex items-center gap-3 px-4 pt-4 pb-2">
+        <Div className="flex items-center justify-center rounded-lg bg-primary/10 w-8 h-8 shrink-0">
+          {icon}
+        </Div>
+        <Div className="flex flex-col min-w-0">
+          <Span className="text-sm font-semibold">{title}</Span>
+          {description && (
+            <Span className="text-xs text-muted-foreground">{description}</Span>
+          )}
+        </Div>
+      </Div>
+      <Div className="px-4 pb-4 pt-2">{children}</Div>
+    </Div>
+  );
 }
 
-interface SelectorConfig {
-  key: keyof Pick<
-    ChatSettingsUpdateRequestOutput,
-    | "voiceModelSelection"
-    | "imageGenModelSelection"
-    | "musicGenModelSelection"
-    | "videoGenModelSelection"
-    | "sttModelSelection"
-    | "imageVisionModelSelection"
-    | "videoVisionModelSelection"
-    | "audioVisionModelSelection"
-  >;
-  selectorKey: Exclude<ActiveSelector, "chat" | null>;
-  labelKey: Parameters<ReturnType<typeof scopedTranslation.scopedT>["t"]>[0];
-  placeholderKey: Parameters<
-    ReturnType<typeof scopedTranslation.scopedT>["t"]
-  >[0];
-  allowedRoles: ModelRole[];
-  /** Which model group this selector belongs to */
-  group: "eyes" | "ears" | "media";
-  /** Which slot label key (inside get.models.slots.*) */
-  slotKey:
-    | "imageVision"
-    | "videoVision"
-    | "stt"
-    | "tts"
-    | "audioVision"
-    | "imageGen"
-    | "musicGen"
-    | "videoGen";
-  /** When set, only models with all these input modalities are shown (e.g. vision bridge: ["image"]) */
-  requiredInputs?: Modality[];
-  /** Platform-level default selection to display when no value is set */
-  defaultModelSelection?: AnyRoleModelSelection;
+// ---------------------------------------------------------------------------
+// Settings Row - inline label + control
+// ---------------------------------------------------------------------------
+
+function SettingsRow({
+  label,
+  description,
+  children,
+  className,
+}: {
+  label: string;
+  description?: string;
+  children: ReactNode;
+  className?: string;
+}): JSX.Element {
+  return (
+    <Div
+      className={cn(
+        "flex items-center justify-between gap-4 py-2.5",
+        className,
+      )}
+    >
+      <Div className="flex flex-col min-w-0 flex-1">
+        <Span className="text-sm font-medium">{label}</Span>
+        {description && (
+          <Span className="text-xs text-muted-foreground leading-relaxed">
+            {description}
+          </Span>
+        )}
+      </Div>
+      <Div className="shrink-0">{children}</Div>
+    </Div>
+  );
 }
 
-function makeDefaultSelection(
-  roles: ModelRole[],
-  user: JwtPayloadType,
-): AnyRoleModelSelection | undefined {
-  const role = roles[0];
-  const manual = {
-    selectionType: ModelSelectionType.MANUAL,
-  };
-  if (role === "tts") {
-    const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user);
-    if (!m) {
-      return undefined;
-    }
-    const r = voiceModelSelectionSchema.safeParse({
-      ...manual,
-      manualModelId: m.id,
-    });
-    return r.success ? r.data : undefined;
-  }
-  if (role === "stt") {
-    const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user);
-    if (!m) {
-      return undefined;
-    }
-    const r = sttModelSelectionSchema.safeParse({
-      ...manual,
-      manualModelId: m.id,
-    });
-    return r.success ? r.data : undefined;
-  }
-  if (role === "image-gen") {
-    const m = getBestImageGenModel(DEFAULT_IMAGE_GEN_MODEL_SELECTION, user);
-    if (!m) {
-      return undefined;
-    }
-    const r = imageGenModelSelectionSchema.safeParse({
-      ...manual,
-      manualModelId: m.id,
-    });
-    return r.success ? r.data : undefined;
-  }
-  if (role === "audio-gen") {
-    const m = getBestMusicGenModel(DEFAULT_MUSIC_GEN_MODEL_SELECTION, user);
-    if (!m) {
-      return undefined;
-    }
-    const r = musicGenModelSelectionSchema.safeParse({
-      ...manual,
-      manualModelId: m.id,
-    });
-    return r.success ? r.data : undefined;
-  }
-  if (role === "video-gen") {
-    const m = getBestVideoGenModel(DEFAULT_VIDEO_GEN_MODEL_SELECTION, user);
-    if (!m) {
-      return undefined;
-    }
-    const r = videoGenModelSelectionSchema.safeParse({
-      ...manual,
-      manualModelId: m.id,
-    });
-    return r.success ? r.data : undefined;
-  }
-  if (role === "image-vision") {
-    const m = getBestImageVisionModel(
-      DEFAULT_IMAGE_VISION_MODEL_SELECTION,
-      user,
-    );
-    if (!m) {
-      return undefined;
-    }
-    const r = imageVisionModelSelectionSchema.safeParse({
-      ...manual,
-      manualModelId: m.id,
-    });
-    return r.success ? r.data : undefined;
-  }
-  if (role === "video-vision") {
-    const m = getBestVideoVisionModel(
-      DEFAULT_VIDEO_VISION_MODEL_SELECTION,
-      user,
-    );
-    if (!m) {
-      return undefined;
-    }
-    const r = videoVisionModelSelectionSchema.safeParse({
-      ...manual,
-      manualModelId: m.id,
-    });
-    return r.success ? r.data : undefined;
-  }
-  if (role === "audio-vision") {
-    const m = getBestAudioVisionModel(
-      DEFAULT_AUDIO_VISION_MODEL_SELECTION,
-      user,
-    );
-    if (!m) {
-      return undefined;
-    }
-    const r = audioVisionModelSelectionSchema.safeParse({
-      ...manual,
-      manualModelId: m.id,
-    });
-    return r.success ? r.data : undefined;
-  }
-  return undefined;
+// ---------------------------------------------------------------------------
+// ChatSettingsWidget - Main custom widget for the settings POST endpoint
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Schedule options for pulse tasks
+// ---------------------------------------------------------------------------
+
+interface ScheduleOption {
+  value: string;
+  labelKey:
+    | "nightlyAt2"
+    | "weekdaysAt2"
+    | "weekdaysAt8"
+    | "every6h"
+    | "every12h";
 }
 
-// Static config (no defaults - computed inside component with env awareness)
-const SELECTOR_CONFIGS: Omit<SelectorConfig, "defaultModelSelection">[] = [
-  {
-    key: "imageVisionModelSelection",
-    selectorKey: "imageVision",
-    labelKey: "post.imageVisionModel.label",
-    placeholderKey: "post.imageVisionModel.placeholder",
-    allowedRoles: ["image-vision"],
-    group: "eyes",
-    slotKey: "imageVision",
-  },
-  {
-    key: "videoVisionModelSelection",
-    selectorKey: "videoVision",
-    labelKey: "post.videoVisionModel.label",
-    placeholderKey: "post.videoVisionModel.placeholder",
-    allowedRoles: ["video-vision"],
-    group: "eyes",
-    slotKey: "videoVision",
-  },
-  {
-    key: "sttModelSelection",
-    selectorKey: "stt",
-    labelKey: "post.sttModel.label",
-    placeholderKey: "post.sttModel.placeholder",
-    allowedRoles: ["stt"],
-    group: "ears",
-    slotKey: "stt",
-  },
-  {
-    key: "voiceModelSelection",
-    selectorKey: "voice",
-    labelKey: "post.voiceModelSelection.label",
-    placeholderKey: "post.voiceModelSelection.placeholder",
-    allowedRoles: ["tts"],
-    group: "ears",
-    slotKey: "tts",
-  },
-  {
-    key: "audioVisionModelSelection",
-    selectorKey: "audioVision",
-    labelKey: "post.audioVisionModel.label",
-    placeholderKey: "post.audioVisionModel.placeholder",
-    allowedRoles: ["audio-vision"],
-    group: "ears",
-    slotKey: "audioVision",
-  },
-  {
-    key: "imageGenModelSelection",
-    selectorKey: "imageGen",
-    labelKey: "post.imageGenModel.label",
-    placeholderKey: "post.imageGenModel.placeholder",
-    allowedRoles: ["image-gen"],
-    group: "media",
-    slotKey: "imageGen",
-  },
-  {
-    key: "musicGenModelSelection",
-    selectorKey: "musicGen",
-    labelKey: "post.musicGenModel.label",
-    placeholderKey: "post.musicGenModel.placeholder",
-    allowedRoles: ["audio-gen"],
-    group: "media",
-    slotKey: "musicGen",
-  },
-  {
-    key: "videoGenModelSelection",
-    selectorKey: "videoGen",
-    labelKey: "post.videoGenModel.label",
-    placeholderKey: "post.videoGenModel.placeholder",
-    allowedRoles: ["video-gen"],
-    group: "media",
-    slotKey: "videoGen",
-  },
+const DREAM_SCHEDULE_OPTIONS: ScheduleOption[] = [
+  { value: "0 2 * * *", labelKey: "nightlyAt2" },
+  { value: "0 2 * * 1-5", labelKey: "weekdaysAt2" },
+  { value: "0 */6 * * *", labelKey: "every6h" },
+  { value: "0 */12 * * *", labelKey: "every12h" },
 ];
 
-function getModelSelectionFromSettings(
-  settings: ChatSettingsGetResponseOutput | null,
-  key: SelectorConfig["key"],
-): AnyRoleModelSelection | null {
-  const raw = settings?.[key];
-  if (raw === null || raw === undefined) {
-    return null;
-  }
-  // All role-specific selection fields share the same discriminant structure
-  // (selectionType: "manual" | "filters"). We verify the required discriminant
-  // field exists before returning.
-  if (
-    typeof raw === "object" &&
-    "selectionType" in raw &&
-    typeof raw.selectionType === "string"
-  ) {
-    return raw as AnyRoleModelSelection;
-  }
-  return null;
-}
+const AUTOPILOT_SCHEDULE_OPTIONS: ScheduleOption[] = [
+  { value: "0 8 * * 1-5", labelKey: "weekdaysAt8" },
+  { value: "0 2 * * 1-5", labelKey: "weekdaysAt2" },
+  { value: "0 2 * * *", labelKey: "nightlyAt2" },
+  { value: "0 */6 * * *", labelKey: "every6h" },
+  { value: "0 */12 * * *", labelKey: "every12h" },
+];
 
-function getChatModelSelection(
-  settings: ChatSettingsGetResponseOutput | null,
-): ChatModelSelection | null {
-  const modelId = settings?.selectedModel;
-  if (modelId === null || modelId === undefined) {
-    return null;
-  }
-  const manualSelection: ChatManualModelSelection = {
-    selectionType: ModelSelectionType.MANUAL,
-    manualModelId: modelId,
-  };
-  return manualSelection;
-}
-
-export function SettingsModelSelectorsSection({
-  locale,
-  user,
-  settings,
-  updateSettings,
-}: SettingsModelSelectorsSectionProps): JSX.Element {
+/** Translate schedule option labels - avoids dynamic template string in t() */
+function getScheduleLabel(
+  opt: ScheduleOption,
+  mode: "dreaming" | "autopilot",
+  locale: CountryLanguage,
+): string {
   const { t } = scopedTranslation.scopedT(locale);
-  const { t: tId } = skillIdTranslation.scopedT(locale);
-  const [activeSelector, setActiveSelector] = useState<ActiveSelector>(null);
+  if (mode === "dreaming") {
+    const map = {
+      nightlyAt2: t("post.dreaming.schedule.options.nightlyAt2"),
+      weekdaysAt2: t("post.dreaming.schedule.options.weekdaysAt2"),
+      weekdaysAt8: t("post.dreaming.schedule.options.weekdaysAt8"),
+      every6h: t("post.dreaming.schedule.options.every6h"),
+      every12h: t("post.dreaming.schedule.options.every12h"),
+    } as const;
+    return map[opt.labelKey];
+  }
+  const map = {
+    nightlyAt2: t("post.autopilot.schedule.options.nightlyAt2"),
+    weekdaysAt2: t("post.autopilot.schedule.options.weekdaysAt2"),
+    weekdaysAt8: t("post.autopilot.schedule.options.weekdaysAt8"),
+    every6h: t("post.autopilot.schedule.options.every6h"),
+    every12h: t("post.autopilot.schedule.options.every12h"),
+  } as const;
+  return map[opt.labelKey];
+}
 
-  // Env-aware defaults - recompute when env changes
-  const selectorDefaults = useMemo(
-    () =>
-      Object.fromEntries(
-        SELECTOR_CONFIGS.map((c) => [
-          c.key,
-          makeDefaultSelection(c.allowedRoles, user),
-        ]),
-      ),
-    [user],
+/** Sentinel value for the "Default" favorite option (no custom favorite) */
+const FAVORITE_DEFAULT_VALUE = "__default__";
+
+// ---------------------------------------------------------------------------
+// PulseSection component — shared between Dreaming and Autopilot
+// ---------------------------------------------------------------------------
+
+interface PulseSectionProps {
+  mode: "dreaming" | "autopilot";
+  enabled: boolean;
+  favoriteId: string | null;
+  schedule: string;
+  prompt: string | null;
+  favorites: FavoriteCard[];
+  scheduleOptions: ScheduleOption[];
+  defaultSchedule: string;
+  onToggle: (enabled: boolean) => void;
+  onScheduleChange: (schedule: string) => void;
+  onFavoriteChange: (favoriteId: string | null) => void;
+  onPromptChange: (prompt: string | null) => void;
+  locale: CountryLanguage;
+}
+
+function PulseSectionDreaming({
+  enabled,
+  favoriteId,
+  schedule,
+  prompt,
+  favorites,
+  scheduleOptions,
+  onToggle,
+  onScheduleChange,
+  onFavoriteChange,
+  onPromptChange,
+  locale,
+}: Omit<PulseSectionProps, "mode">): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  return (
+    <SettingsSection
+      icon={<Moon className="h-4 w-4 text-primary" />}
+      title={t("post.dreaming.title")}
+      description={t("post.dreaming.description")}
+    >
+      <SettingsRow label={t("post.dreaming.toggle.label")}>
+        <Switch checked={enabled} onCheckedChange={onToggle} />
+      </SettingsRow>
+      <SettingsRow label={t("post.dreaming.schedule.label")}>
+        <Select
+          value={schedule}
+          onValueChange={onScheduleChange}
+          disabled={!enabled}
+        >
+          <SelectTrigger className="w-[180px] h-8 text-sm">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {scheduleOptions.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {getScheduleLabel(opt, "dreaming", locale)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </SettingsRow>
+      <SettingsRow label={t("post.dreaming.favoriteId.label")}>
+        <Select
+          value={favoriteId ?? FAVORITE_DEFAULT_VALUE}
+          onValueChange={(value) =>
+            onFavoriteChange(value === FAVORITE_DEFAULT_VALUE ? null : value)
+          }
+          disabled={!enabled}
+        >
+          <SelectTrigger className="w-[180px] h-8 text-sm">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={FAVORITE_DEFAULT_VALUE}>
+              {t("post.dreaming.favoriteId.defaultOption")}
+            </SelectItem>
+            {favorites.map((fav) => (
+              <SelectItem key={fav.id} value={fav.id}>
+                {fav.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </SettingsRow>
+      <SettingsRow label={t("post.dreaming.prompt.label")}>
+        <Textarea
+          value={prompt ?? ""}
+          onChange={(e) =>
+            onPromptChange(e.target.value.trim() === "" ? null : e.target.value)
+          }
+          placeholder={t("post.dreaming.prompt.placeholder")}
+          disabled={!enabled}
+          className="text-sm min-h-[80px] resize-none"
+        />
+      </SettingsRow>
+    </SettingsSection>
+  );
+}
+
+function PulseSectionAutopilot({
+  enabled,
+  favoriteId,
+  schedule,
+  prompt,
+  favorites,
+  scheduleOptions,
+  onToggle,
+  onScheduleChange,
+  onFavoriteChange,
+  onPromptChange,
+  locale,
+}: Omit<PulseSectionProps, "mode">): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  return (
+    <SettingsSection
+      icon={<Bot className="h-4 w-4 text-primary" />}
+      title={t("post.autopilot.title")}
+      description={t("post.autopilot.description")}
+    >
+      <SettingsRow label={t("post.autopilot.toggle.label")}>
+        <Switch checked={enabled} onCheckedChange={onToggle} />
+      </SettingsRow>
+      <SettingsRow label={t("post.autopilot.schedule.label")}>
+        <Select
+          value={schedule}
+          onValueChange={onScheduleChange}
+          disabled={!enabled}
+        >
+          <SelectTrigger className="w-[180px] h-8 text-sm">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {scheduleOptions.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {getScheduleLabel(opt, "autopilot", locale)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </SettingsRow>
+      <SettingsRow label={t("post.autopilot.favoriteId.label")}>
+        <Select
+          value={favoriteId ?? FAVORITE_DEFAULT_VALUE}
+          onValueChange={(value) =>
+            onFavoriteChange(value === FAVORITE_DEFAULT_VALUE ? null : value)
+          }
+          disabled={!enabled}
+        >
+          <SelectTrigger className="w-[180px] h-8 text-sm">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={FAVORITE_DEFAULT_VALUE}>
+              {t("post.autopilot.favoriteId.defaultOption")}
+            </SelectItem>
+            {favorites.map((fav) => (
+              <SelectItem key={fav.id} value={fav.id}>
+                {fav.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </SettingsRow>
+      <SettingsRow label={t("post.autopilot.prompt.label")}>
+        <Textarea
+          value={prompt ?? ""}
+          onChange={(e) =>
+            onPromptChange(e.target.value.trim() === "" ? null : e.target.value)
+          }
+          placeholder={t("post.autopilot.prompt.placeholder")}
+          disabled={!enabled}
+          className="text-sm min-h-[80px] resize-none"
+        />
+      </SettingsRow>
+    </SettingsSection>
+  );
+}
+
+/** Sentinel value for the "Auto" search provider option (not a real provider ID) */
+const SEARCH_AUTO_VALUE = "auto-detect";
+
+interface ChatSettingsWidgetProps {
+  field: (typeof definition.POST)["fields"];
+}
+
+export function ChatSettingsWidget({
+  field,
+}: ChatSettingsWidgetProps): JSX.Element {
+  const children = field.children;
+  const locale = useWidgetLocale();
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: tSearch } = searchScopedTranslation.scopedT(locale);
+
+  const { settings, isLoading, updateSettings } = useChatSettings(user, logger);
+  const { favorites } = useChatFavorites(logger, {
+    activeFavoriteId: settings?.activeFavoriteId ?? null,
+  });
+
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleUpdate = useCallback(
+    async (
+      updates: Partial<ChatSettingsUpdateRequestOutput>,
+    ): Promise<void> => {
+      setIsSaving(true);
+      try {
+        await updateSettings(updates);
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [updateSettings],
   );
 
-  // ── Full-panel takeover: chat model ──────────────────────────────────────
-  if (activeSelector === "chat") {
-    const chatSelection = getChatModelSelection(settings);
+  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
+
+  if (isLoading || !settings) {
     return (
-      <Div className="flex flex-col gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          onClick={() => setActiveSelector(null)}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <ModelSelector
-          modelSelection={chatSelection ?? undefined}
-          onChange={async (sel) => {
-            if (
-              sel !== null &&
-              sel.selectionType === ModelSelectionType.MANUAL
-            ) {
-              await updateSettings({
-                selectedModel: sel.manualModelId as ChatModelId,
-              });
-            }
-          }}
-          onSelect={() => setActiveSelector(null)}
-          locale={locale}
-          user={user}
-          chatOnly
-        />
+      <Div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </Div>
     );
   }
-
-  // ── Full-panel takeover: media model selectors ───────────────────────────
-  if (activeSelector !== null) {
-    const config = SELECTOR_CONFIGS.find(
-      (c) => c.selectorKey === activeSelector,
-    );
-    if (config !== undefined) {
-      const currentSelection = getModelSelectionFromSettings(
-        settings,
-        config.key,
-      );
-      return (
-        <Div className="flex flex-col gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => setActiveSelector(null)}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <ModelSelector
-            allowedRoles={config.allowedRoles}
-            requiredInputs={config.requiredInputs}
-            modelSelection={currentSelection ?? undefined}
-            onChange={async (sel) => {
-              await updateSettings({ [config.key]: sel });
-            }}
-            onSelect={async (confirmed) => {
-              const defaultSel = selectorDefaults[config.key];
-              const isDefault =
-                confirmed !== null &&
-                confirmed.selectionType === ModelSelectionType.MANUAL &&
-                defaultSel?.selectionType === ModelSelectionType.MANUAL &&
-                defaultSel.manualModelId === confirmed.manualModelId;
-              await updateSettings({
-                [config.key]: isDefault ? null : confirmed,
-              });
-              setActiveSelector(null);
-            }}
-            locale={locale}
-            user={user}
-          />
-        </Div>
-      );
-    }
-  }
-
-  // ── Default view: trigger cards ──────────────────────────────────────────
-  const chatSelection = getChatModelSelection(settings);
-
-  const renderSelector = (
-    config: Omit<SelectorConfig, "defaultModelSelection">,
-  ): JSX.Element => {
-    const currentSelection = getModelSelectionFromSettings(
-      settings,
-      config.key,
-    );
-    return (
-      <Div key={config.key} className="flex flex-col gap-1">
-        <Span className="text-xs opacity-40">
-          {tId(`get.models.slots.${config.slotKey}`)}
-        </Span>
-        <ModelSelectorTrigger
-          modelSelection={currentSelection}
-          allowedRoles={config.allowedRoles}
-          requiredInputs={config.requiredInputs}
-          defaultModelSelection={selectorDefaults[config.key]}
-          placeholder={t(config.placeholderKey)}
-          onClick={() => setActiveSelector(config.selectorKey)}
-          locale={locale}
-          user={user}
-        />
-      </Div>
-    );
-  };
 
   return (
-    <Div className="flex flex-col gap-3">
-      {/* Brain - Chat */}
-      <ModelGroup
-        icon={<Brain className="h-4 w-4" />}
-        label={tId("get.models.brain")}
-      >
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs opacity-40">
-            {tId("get.models.slots.chat")}
-          </Span>
-          <ModelSelectorTrigger
-            modelSelection={chatSelection}
-            placeholder={t("patch.chatModel.placeholder")}
-            onClick={() => setActiveSelector("chat")}
-            locale={locale}
-            user={user}
-          />
-        </Div>
-      </ModelGroup>
-
-      {/* Eyes - Vision */}
-      <ModelGroup
-        icon={<Eye className="h-4 w-4" />}
-        label={tId("get.models.eyes")}
-      >
-        {SELECTOR_CONFIGS.filter((c) => c.group === "eyes").map(renderSelector)}
-      </ModelGroup>
-
-      {/* Ears & Voice */}
-      <ModelGroup
-        icon={<Mic className="h-4 w-4" />}
-        label={tId("get.models.ears")}
-      >
-        {SELECTOR_CONFIGS.filter((c) => c.group === "ears").map(renderSelector)}
-      </ModelGroup>
-
-      {/* Media - Generation */}
-      <ModelGroup
-        icon={<Film className="h-4 w-4" />}
-        label={tId("get.models.media")}
-      >
-        {SELECTOR_CONFIGS.filter((c) => c.group === "media").map(
-          renderSelector,
+    <Div className="flex flex-col gap-4 p-4">
+      {/* Header */}
+      <Div className="flex items-center gap-3 pb-1">
+        <NavigateButtonWidget field={children.backButton} />
+        <Settings className="h-5 w-5 text-primary" />
+        <Span className="text-lg font-bold">{t("post.container.title")}</Span>
+        {isSaving && (
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground ml-auto" />
         )}
-      </ModelGroup>
+      </Div>
+
+      {/* Search Provider */}
+      <SettingsSection
+        icon={<Globe className="h-4 w-4 text-primary" />}
+        title={t("post.searchProvider.label")}
+        description={t("post.searchProvider.description")}
+      >
+        <SettingsRow label={t("post.searchProvider.label")}>
+          <Select
+            value={settings.searchProvider ?? SEARCH_AUTO_VALUE}
+            onValueChange={(value) =>
+              void handleUpdate({
+                searchProvider:
+                  value === SEARCH_AUTO_VALUE
+                    ? null
+                    : (value as NonNullable<
+                        ChatSettingsUpdateRequestOutput["searchProvider"]
+                      >),
+              })
+            }
+          >
+            <SelectTrigger className="w-[140px] h-8 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={SEARCH_AUTO_VALUE}>
+                {t("post.searchProvider.auto")}
+              </SelectItem>
+              {SearchProviderOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {tSearch(opt.label)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </SettingsRow>
+      </SettingsSection>
+
+      {/* Admin-only: Coding Agent */}
+      {isAdmin && (
+        <SettingsSection
+          icon={<Monitor className="h-4 w-4 text-primary" />}
+          title={t("post.codingAgent.label")}
+          description={t("post.codingAgent.description")}
+        >
+          <SettingsRow label={t("post.codingAgent.label")}>
+            <Select
+              value={settings.codingAgent ?? "claude-code"}
+              onValueChange={(value) =>
+                void handleUpdate({
+                  codingAgent: value as NonNullable<
+                    ChatSettingsUpdateRequestOutput["codingAgent"]
+                  >,
+                })
+              }
+            >
+              <SelectTrigger className="w-[160px] h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="claude-code">
+                  {t("post.codingAgent.options.claudeCode")}
+                </SelectItem>
+                <SelectItem value="open-code">
+                  {t("post.codingAgent.options.openCode")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </SettingsRow>
+        </SettingsSection>
+      )}
+
+      {/* Dreaming — customers only */}
+      {!user.isPublic && (
+        <PulseSectionDreaming
+          enabled={settings.dreamerEnabled ?? false}
+          favoriteId={settings.dreamerFavoriteId ?? null}
+          schedule={settings.dreamerSchedule ?? DREAM_DEFAULT_SCHEDULE}
+          prompt={settings.dreamerPrompt ?? null}
+          favorites={favorites}
+          scheduleOptions={DREAM_SCHEDULE_OPTIONS}
+          defaultSchedule={DREAM_DEFAULT_SCHEDULE}
+          onToggle={(val) => void handleUpdate({ dreamerEnabled: val })}
+          onScheduleChange={(val) =>
+            void handleUpdate({ dreamerSchedule: val })
+          }
+          onFavoriteChange={(val) =>
+            void handleUpdate({ dreamerFavoriteId: val })
+          }
+          onPromptChange={(val) => void handleUpdate({ dreamerPrompt: val })}
+          locale={locale}
+        />
+      )}
+
+      {/* Autopilot — customers only */}
+      {!user.isPublic && (
+        <PulseSectionAutopilot
+          enabled={settings.autopilotEnabled ?? false}
+          favoriteId={settings.autopilotFavoriteId ?? null}
+          schedule={settings.autopilotSchedule ?? AUTOPILOT_DEFAULT_SCHEDULE}
+          prompt={settings.autopilotPrompt ?? null}
+          favorites={favorites}
+          scheduleOptions={AUTOPILOT_SCHEDULE_OPTIONS}
+          defaultSchedule={AUTOPILOT_DEFAULT_SCHEDULE}
+          onToggle={(val) => void handleUpdate({ autopilotEnabled: val })}
+          onScheduleChange={(val) =>
+            void handleUpdate({ autopilotSchedule: val })
+          }
+          onFavoriteChange={(val) =>
+            void handleUpdate({ autopilotFavoriteId: val })
+          }
+          onPromptChange={(val) => void handleUpdate({ autopilotPrompt: val })}
+          locale={locale}
+        />
+      )}
     </Div>
   );
 }

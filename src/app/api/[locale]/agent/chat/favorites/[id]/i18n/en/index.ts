@@ -190,9 +190,8 @@ export const translations = {
     },
     skillId: {
       label: "Skill",
-    },
-    variantId: {
-      label: "Variant",
+      description:
+        'Skill ID. Use "skillSlug" for default variant, "skillSlug__variantId" for a specific variant.',
     },
     customVariantName: {
       label: "Variant Name",
@@ -250,10 +249,6 @@ export const translations = {
       description:
         "Override video generator for this favorite. null = skill's videoGenModelSelection wins (media gen: skill takes priority).",
       placeholder: "Inherit from skill",
-    },
-    defaultChatMode: {
-      label: "Default Chat Mode",
-      description: "Default mode when opening this chat",
     },
     mode: {
       label: "Selection Mode",

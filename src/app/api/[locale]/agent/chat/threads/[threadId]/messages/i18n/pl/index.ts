@@ -25,6 +25,20 @@ export const translations: typeof enTranslations = {
     hideAnalysis: "Ukryj analizę",
   },
   errorCode: "Kod błędu",
+  errorFeedback: {
+    autoReported: "Błąd zgłoszony automatycznie",
+    helpFix: "Pomóż nam to naprawić",
+    hideDetails: "Ukryj",
+    feedbackHelps: "Twoja informacja zwrotna pomaga nam naprawić to szybciej.",
+    reportCta: "Wyślij feedback",
+    threadShared: "ID wątku zostanie dołączone",
+    incognitoNote: "Incognito - brak danych wątku",
+    incognitoThread: "Wątek incognito (dane nie są przechowywane)",
+    autoContext: "[Automatycznie wygenerowany raport błędu]",
+    errorLabel: "Błąd",
+    userContextLabel: "Twój kontekst (opcjonalnie)",
+    separator: "·",
+  },
   compacting: {
     title: "Historia skompresowana",
     loading: "Kompresowanie historii...",
@@ -505,6 +519,10 @@ export const translations: typeof enTranslations = {
     },
     batchToolConfirmation: {
       title: "Potwierdź wywołania narzędzi wsadowych",
+    },
+    queue: {
+      badge: "W kolejce",
+      cancelTooltip: "Usuń z kolejki i przywróć do pola tekstowego",
     },
   },
   flatView: {

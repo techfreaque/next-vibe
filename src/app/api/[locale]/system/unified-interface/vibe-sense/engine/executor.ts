@@ -48,7 +48,6 @@ const VIBE_SENSE_STREAM_CONTEXT: ToolExecutionContext = {
   threadId: undefined,
   aiMessageId: undefined,
   skillId: undefined,
-  modelId: undefined,
   headless: undefined,
   subAgentDepth: 0,
   currentToolMessageId: undefined,
@@ -62,10 +61,6 @@ const VIBE_SENSE_STREAM_CONTEXT: ToolExecutionContext = {
   callerCallbackMode: undefined,
   onEscalatedTaskCancel: undefined,
   escalateToTask: undefined,
-  imageGenModelSelection: undefined,
-  musicGenModelSelection: undefined,
-  videoGenModelSelection: undefined,
-  variantId: undefined,
   isRevival: undefined,
 
   providerOverride: undefined,

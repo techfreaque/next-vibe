@@ -474,7 +474,7 @@ export const translations: typeof enTranslations = {
         },
         description: {
           label: "Beschreibung",
-          placeholder: "Kurze Beschreibung der Skill",
+          placeholder: "Kurze Beschreibung des Skills",
         },
         systemPrompt: {
           label: "System-Prompt",

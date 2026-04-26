@@ -196,9 +196,8 @@ export const translations: typeof enTranslations = {
     },
     skillId: {
       label: "Charakter",
-    },
-    variantId: {
-      label: "Variante",
+      description:
+        'Skill-ID. „skillSlug" für die Standardvariante, „skillSlug__variantId" für eine bestimmte Variante.',
     },
     customVariantName: {
       label: "Variantenname",
@@ -248,10 +247,6 @@ export const translations: typeof enTranslations = {
       label: "Video-Generierungsmodell",
       description: "Modell zur Videoerstellung",
       placeholder: "Vom Charakter erben",
-    },
-    defaultChatMode: {
-      label: "Standard-Chat-Modus",
-      description: "Standardmodus beim Öffnen dieses Chats",
     },
     mode: {
       label: "Auswahlmodus",

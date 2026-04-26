@@ -26,9 +26,9 @@ export const translations: typeof enTranslations = {
   whatAreSkills: {
     title: "Was sind Skills auf {{appName}}?",
     p1: "Ein Skill ist ein vollständiges KI-Setup - System-Prompt, Companion-Persona, Modellauswahl pro Modalität, Stimme, Bildgenerierungseinstellungen - einmal konfiguriert und überall wiederverwendbar. Denk daran wie an ein Rezept: Du findest einmal die richtigen Zutaten, dann kann es jeder nutzen.",
-    p2: "Die Plattform hat {{modelCount}} Modelle: Mainstream, Open Source, unzensiert. Jeder Skill konfiguriert, welches Modell für Gespräche, welches für Vision, welches für Bildgenerierung und welche Stimme verwendet wird. Die meisten Nutzer müssen diese Einstellungen nie anfassen - sie nutzen einfach den Skill. Du als Ersteller machst das einmal.",
-    p3: "Skills sind kostenlos zu erstellen. Kein bezahltes Abo nötig. Kein Code. Wenn du beschreiben kannst, was eine KI tun soll, kannst du einen Skill bauen.",
-    buildTitle: "Drei Wege, einen Skill zu bauen",
+    p2: "Die Plattform hat {{modelCount}} Modelle: Mainstream, Open Source, unzensiert. Jedes Skill konfiguriert, welches Modell für Gespräche, welches für Vision, welches für Bildgenerierung und welche Stimme verwendet wird. Die meisten Nutzer müssen diese Einstellungen nie anfassen - sie nutzen einfach das Skill. Du als Ersteller machst das einmal.",
+    p3: "Skills sind kostenlos zu erstellen. Kein bezahltes Abo nötig. Kein Code. Wenn du beschreiben kannst, was eine KI tun soll, kannst du ein Skill bauen.",
+    buildTitle: "Drei Wege, ein Skill zu bauen",
     build1Title: "Manuell auf der Skill-Seite",
     build1Body:
       "Volle Kontrolle. Jede Einstellung direkt konfigurieren. Gut, wenn du genau weißt, was du willst.",
@@ -43,7 +43,7 @@ export const translations: typeof enTranslations = {
     title: "Der Share-Link-Mechanismus - wie du tatsächlich verdienst",
     p1: "Wenn du bei einem Skill auf Share & Earn klickst, bekommst du eine URL, die zwei Dinge gleichzeitig tut:",
     bullet1:
-      "Zeigt Besuchern den Skill - was er kann, wie er konfiguriert ist, was für eine KI er ist",
+      "Zeigt Besuchern das Skill - was es kann, wie es konfiguriert ist, was für eine KI es ist",
     bullet2:
       "Positioniert dich in der Empfehlungskette - jeder, der sich über diesen Link anmeldet, wird dir zugeordnet",
     p2: "Das bedeutet in der Praxis: Wenn sich jemand über deinen Skill-Link anmeldet, wirst du gleichzeitig ihr direkter Empfehler UND ihr Skill-Ersteller. Du verdienst 10 % jeder Zahlung, die sie je machen (direkte Empfehlungsprovision) plus 5 % zusätzlich (Skill-Bonus) - 15 % total von diesem einen Nutzer, für immer.",
@@ -55,7 +55,7 @@ export const translations: typeof enTranslations = {
     p1: "Die erfolgreichsten Skills lösen ein spezifisches, wiederkehrendes Problem, das schwer zu erklären ist, ohne es zu zeigen. Hier sind Muster, die funktionieren:",
     example1Title: "Der Spezialist-Companion",
     example1Body:
-      "Ein Medizinstudent baut einen Skill, der wie ein erfahrener klinischer Kollege spricht - Fälle, Differenzialdiagnosen, Reasoning unter Druck. Geteilt in Medizin-Foren. Jede Anmeldung aus dieser Community zahlt monatlich.",
+      "Ein Medizinstudent baut ein Skill, das wie ein erfahrener klinischer Kollege spricht - Fälle, Differenzialdiagnosen, Reasoning unter Druck. Geteilt in Medizin-Foren. Jede Anmeldung aus dieser Community zahlt monatlich.",
     example2Title: "Das echte Produkt des Wissensverkäufers",
     example2Body:
       "Coaches, Berater, Kursersteller - sie haben PDFs und Zoom-Calls verkauft. Ein gut gebauter Skill mit ihrem echten Fachwissen verdient wiederkehrend ohne den Overhead. Das ist besser als ein Kurs.",
@@ -84,8 +84,8 @@ export const translations: typeof enTranslations = {
     row4Profile: "Entwickler / Power User",
     row4Spend: "200 $+/Monat",
     row4Earn: "30,00 $+/Monat",
-    p2: "Der Skill ist der Haken. Der Link ist die Einnahme. Du verdienst, ob jemand deinen Skill täglich nutzt oder nach der Anmeldung wechselt - die Empfehlungszuordnung bleibt bei dir.",
-    p3: "Teile einen Skill an fünf Stellen. Ein Prozentsatz klickt durch. Ein Prozentsatz meldet sich an. Diese Anmeldungen zahlen dir 15 % jeden Monat. Nächsten Monat einen weiteren Skill teilen. Deine Einnahmen wachsen ohne proportional mehr Arbeit.",
+    p2: "Das Skill ist der Haken. Der Link ist die Einnahme. Du verdienst, ob jemand dein Skill täglich nutzt oder nach der Anmeldung wechselt - die Empfehlungszuordnung bleibt bei dir.",
+    p3: "Teile ein Skill an fünf Stellen. Ein Prozentsatz klickt durch. Ein Prozentsatz meldet sich an. Diese Anmeldungen zahlen dir 15 % jeden Monat. Nächsten Monat ein weiteres Skill teilen. Deine Einnahmen wachsen ohne proportional mehr Arbeit.",
   },
   chain: {
     title: "Du verdienst auch, wenn deine Nutzer andere empfehlen",
@@ -100,16 +100,16 @@ export const translations: typeof enTranslations = {
     title: "5 Minuten bis zu deinem ersten Share-Link",
     step1Title: "Skill erstellen oder finden",
     step1Body:
-      "Baue einen von Grund auf auf der Skill-Seite, frag Thea oder Hermes um Hilfe beim Entwurf, oder finde einen eingebauten Skill, der es wert ist, geteilt zu werden.",
+      "Baue eines von Grund auf auf der Skill-Seite, frag Thea oder Hermes um Hilfe beim Entwurf, oder finde ein eingebautes Skill, das es wert ist, geteilt zu werden.",
     step2Title: "Skill öffnen",
     step2Body:
-      "Klick auf den Skill, um die Detailseite zu sehen. Hier findest du den Share & Earn Button.",
+      "Klick auf das Skill, um die Detailseite zu sehen. Hier findest du den Share & Earn Button.",
     step3Title: "Share-Link generieren",
     step3Body:
       "Klick auf Share & Earn. Falls du einen Empfehlungscode hast, wähle ihn aus. Falls nicht, erstelle einen in drei Sekunden. Dein Link trägt automatisch sowohl deinen Empfehlungscode als auch die Skill-ID - beide Provisionen werden automatisch getrackt.",
     step4Title: "Dort teilen, wo es zählt",
     step4Body:
-      "Poste ihn in Communities, wo Leute den Skill tatsächlich nutzen würden - Discord-Server, Subreddits, Forum-Threads, Blog-Posts, Slack-Channels. Spezifisch schlägt breit.",
+      "Poste ihn in Communities, wo Leute das Skill tatsächlich nutzen würden - Discord-Server, Subreddits, Forum-Threads, Blog-Posts, Slack-Channels. Spezifisch schlägt breit.",
     step5Title: "Dashboard beobachten",
     step5Body:
       "Dein Empfehlungs-Dashboard zeigt Besucher, Anmeldungen und Einnahmen in Echtzeit. Jede neue Anmeldung über deinen Link ist 15 % wiederkehrendes Einkommen.",

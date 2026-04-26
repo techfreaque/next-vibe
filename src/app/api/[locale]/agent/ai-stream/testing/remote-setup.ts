@@ -18,12 +18,8 @@
 
 import "server-only";
 
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
-import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
-import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
@@ -414,112 +410,6 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
   const { DefaultFolderId } =
     await import("@/app/api/[locale]/agent/chat/config");
 
-  // Resolve the user's preferred media gen models (same cascade as stream-setup).
-  // Without this, the handler falls back to schema defaults (WAN_2_7_T2V, lyria-3, z-image-turbo)
-  // which may have much higher credit costs than what the stream originally computed.
-  // This mirrors what hermes would do if it stored and replayed the user's model selection.
-  const { ModalityResolver } =
-    await import("@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver");
-  const { chatSettings } =
-    await import("@/app/api/[locale]/agent/chat/settings/db");
-  const [userSettingsRow] = await db
-    .select({
-      imageGenModelSelection: chatSettings.imageGenModelSelection,
-      musicGenModelSelection: chatSettings.musicGenModelSelection,
-      videoGenModelSelection: chatSettings.videoGenModelSelection,
-    })
-    .from(chatSettings)
-    .where(eq(chatSettings.userId, userId))
-    .limit(1);
-  // Also load the favorite's media gen selections (the stream was launched with wakeUpFavoriteId).
-  // The favorite may override userSettings (e.g. quality-tester favorite has LTX_2_PRO_T2V).
-  interface FavMediaRow {
-    skillId: string;
-    variantId: string | null;
-    imageGenModelSelection: ImageGenModelSelection | null;
-    musicGenModelSelection: MusicGenModelSelection | null;
-    videoGenModelSelection: VideoGenModelSelection | null;
-  }
-  let favoriteRow: FavMediaRow | null = null;
-  if (remoteTask.wakeUpFavoriteId) {
-    const { chatFavorites } =
-      await import("@/app/api/[locale]/agent/chat/favorites/db");
-    const [fav] = await db
-      .select({
-        skillId: chatFavorites.skillId,
-        variantId: chatFavorites.variantId,
-        imageGenModelSelection: chatFavorites.imageGenModelSelection,
-        musicGenModelSelection: chatFavorites.musicGenModelSelection,
-        videoGenModelSelection: chatFavorites.videoGenModelSelection,
-      })
-      .from(chatFavorites)
-      .where(
-        or(
-          eq(chatFavorites.id, remoteTask.wakeUpFavoriteId),
-          eq(chatFavorites.slug, remoteTask.wakeUpFavoriteId),
-        ),
-      )
-      .limit(1);
-    if (fav) {
-      favoriteRow = fav;
-    }
-  }
-
-  // Resolve skill config from the favorite's skillId (same as stream-setup does).
-  // This is critical for skill-level media model defaults (e.g. quality-tester.videoGenModelId).
-  const uuidPattern =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  const { DEFAULT_SKILLS } =
-    await import("@/app/api/[locale]/agent/chat/skills/config");
-  const effectiveSkillId = remoteTask.wakeUpSkillId ?? favoriteRow?.skillId;
-  const defaultSkill =
-    effectiveSkillId && !uuidPattern.test(effectiveSkillId)
-      ? (DEFAULT_SKILLS.find((c) => c.id === effectiveSkillId) ?? null)
-      : null;
-  const activeVariantId = favoriteRow?.variantId ?? null;
-  const skillConfig = defaultSkill
-    ? ((activeVariantId
-        ? (defaultSkill.variants.find((v) => v.id === activeVariantId) ??
-          defaultSkill.variants.find((v) => v.isDefault) ??
-          defaultSkill.variants[0])
-        : (defaultSkill.variants.find((v) => v.isDefault) ??
-          defaultSkill.variants[0])) ?? null)
-    : null;
-
-  const userBridgeCtx = {
-    skill: skillConfig,
-    favorite: favoriteRow
-      ? {
-          ...favoriteRow,
-          // other BridgeFavorite fields not relevant for media gen:
-          voiceModelSelection: null,
-          sttModelSelection: null,
-          imageVisionModelSelection: null,
-          videoVisionModelSelection: null,
-          audioVisionModelSelection: null,
-          defaultChatMode: null,
-        }
-      : null,
-    userSettings: userSettingsRow
-      ? {
-          ...userSettingsRow,
-          // other fields required by BridgeSettings but not queried - irrelevant for media gen:
-          voiceModelSelection: null,
-          sttModelSelection: null,
-          imageVisionModelSelection: null,
-          videoVisionModelSelection: null,
-          audioVisionModelSelection: null,
-          defaultChatMode: null,
-        }
-      : null,
-  };
-  const handlerImageGenModelSelection =
-    ModalityResolver.resolveImageGenSelection(userBridgeCtx);
-  const handlerMusicGenModelSelection =
-    ModalityResolver.resolveMusicGenSelection(userBridgeCtx);
-  const handlerVideoGenModelSelection =
-    ModalityResolver.resolveVideoGenSelection(userBridgeCtx);
-
   /**
    * Execute one remote task handler in-process and return its output.
    * Returns null if the route is missing, handler not found, or throws.
@@ -583,7 +473,6 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
         leafMessageId: task.wakeUpLeafMessageId ?? undefined,
         favoriteId: task.wakeUpFavoriteId ?? undefined,
         skillId: task.wakeUpSkillId ?? undefined,
-        modelId: (task.wakeUpModelId ?? undefined) as ChatModelId | undefined,
         headless: undefined,
         subAgentDepth: task.wakeUpSubAgentDepth ?? 0,
         waitingForRemoteResult: undefined,
@@ -591,10 +480,6 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
         callerCallbackMode: undefined,
         onEscalatedTaskCancel: undefined,
         escalateToTask: undefined,
-        imageGenModelSelection: handlerImageGenModelSelection,
-        musicGenModelSelection: handlerMusicGenModelSelection,
-        videoGenModelSelection: handlerVideoGenModelSelection,
-        variantId: undefined,
         isRevival: undefined,
         providerOverride: undefined,
       },
@@ -621,7 +506,7 @@ export async function triggerLocalPulse(threadId: string): Promise<void> {
       success: handlerResult
         ? (handlerResult as { success?: boolean }).success
         : null,
-      videoGenModelSelectionType: handlerVideoGenModelSelection.selectionType,
+      hasFavoriteId: !!task.wakeUpFavoriteId,
       taskOutputWaiting:
         taskOutput &&
         typeof taskOutput === "object" &&

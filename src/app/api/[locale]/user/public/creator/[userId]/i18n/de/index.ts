@@ -8,13 +8,13 @@ export const translations = {
   get: {
     title: "Creator-Profil abrufen",
     description:
-      "Oeffentliches Creator-Profil mit Bio, Social-Links und Skill-Anzahl",
+      "Oeffentliches Creator-Profil mit Bio, Social-Links und Skills",
     form: {
       title: "Creator-Profil",
       description: "Oeffentliches Profil eines Skill-Creators",
-      userId: {
-        label: "Benutzer-ID",
-        description: "Die Benutzer-ID des Creators",
+      creatorId: {
+        label: "Creator-ID",
+        description: "ID oder Slug des Creators",
       },
     },
     response: {
@@ -29,11 +29,20 @@ export const translations = {
       instagramUrl: "Instagram",
       tiktokUrl: "TikTok",
       githubUrl: "GitHub",
+      facebookUrl: "Facebook",
       discordUrl: "Discord",
+      tribeUrl: "Tribe",
+      rumbleUrl: "Rumble",
+      odyseeUrl: "Odysee",
+      nostrUrl: "Nostr",
+      gabUrl: "Gab",
       creatorAccentColor: "Akzentfarbe",
       creatorHeaderImageUrl: "Header-Bild",
-      skillCount: "Skills",
       referralCode: "Empfehlungscode",
+      appName: "App-Name",
+      leadMagnetHeadline: "Lead-Magnet-Titel",
+      leadMagnetButtonText: "Lead-Magnet-Button",
+      skills: "Skills",
     },
     errors: {
       validation: {
@@ -64,6 +73,34 @@ export const translations = {
     success: {
       title: "Creator-Profil",
       description: "Creator-Profil abgerufen",
+    },
+  },
+  widget: {
+    notFound: {
+      title: "Creator nicht gefunden",
+      description: "Dieses Profil existiert nicht oder wurde entfernt.",
+      back: "Zurück zur Startseite",
+    },
+    skills: {
+      title: "Skills",
+    },
+    referral: {
+      label: "Empfehlungscode",
+    },
+    nav: {
+      backArrow: "\u2190",
+      copyright: "\u00a9",
+    },
+    lead: {
+      headline: "Bleib auf dem Laufenden",
+      namePlaceholder: "Dein Vorname",
+      emailPlaceholder: "Deine E-Mail",
+      send: "Anmelden",
+      sending: "...",
+      doneHeading: "Fertig.",
+      doneSub: "Du stehst auf der Liste.",
+      finePrint: "Kein Spam. Jederzeit abmeldbar.",
+      error: "Etwas ist schiefgelaufen. Versuch es noch einmal.",
     },
   },
 };

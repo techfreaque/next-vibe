@@ -7,14 +7,12 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { upsertMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/update-messages";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -52,11 +50,10 @@ export interface MessageOperationDeps {
   settings: {
     selectedModel: ChatModelId;
     selectedSkill: string;
-    availableTools: ToolConfigItem[] | null;
-    pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
-    voiceModelSelection: VoiceModelSelection | null | undefined;
   };
+  /** Active favorite config — sent to server for model/tool/context resolution */
+  favoriteConfig: FavoriteConfig | null;
   /** Called immediately after the optimistic user message is added - switches the visible branch */
   setLeafMessageId?: (messageId: string) => void;
   locale: CountryLanguage;
@@ -75,8 +72,8 @@ export async function createAndSendUserMessage(
     startStream,
     currentRootFolderId,
     currentSubFolderId,
-    user,
     settings,
+    favoriteConfig,
     setLeafMessageId,
   } = deps;
 
@@ -209,8 +206,9 @@ export async function createAndSendUserMessage(
 
       // Add an optimistic assistant placeholder so the group header + loading
       // indicator appear immediately, before the server emits MESSAGE_CREATED.
-      // Tagged with isOptimistic so event-handlers can remove it when the real
-      // server message arrives (or on error).
+      // If the server detects the thread is already streaming, the WS event
+      // for the user message will carry isQueued: true metadata, and the
+      // message-created handler will clean up this optimistic placeholder.
       const optimisticAssistantId = crypto.randomUUID();
       const optimisticAssistantMessage: ChatMessage = {
         id: optimisticAssistantId,
@@ -246,39 +244,27 @@ export async function createAndSendUserMessage(
       });
     }
 
-    // Voice mode settings - resolve TTS voice from selection or fall back to default
-    const resolvedVoiceModel = settings.voiceModelSelection
-      ? getBestTtsModel(settings.voiceModelSelection, user)
-      : null;
+    // Voice mode - resolve voice from favoriteConfig cascade, fall back to default
+    const voiceSel = favoriteConfig?.voiceModelSelection;
+    const resolvedVoice =
+      voiceSel?.selectionType === ModelSelectionType.MANUAL &&
+      "manualModelId" in voiceSel &&
+      voiceSel.manualModelId
+        ? voiceSel.manualModelId
+        : DEFAULT_TTS_VOICE_ID;
     const effectiveVoiceMode = {
       enabled: settings.ttsAutoplay,
-      voice: resolvedVoiceModel?.id ?? DEFAULT_TTS_VOICE_ID,
+      voice: resolvedVoice,
     };
 
     // Get user's timezone from browser
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    // availableTools = permission layer (null = all tools allowed)
-    // pinnedTools = context window layer (tools loaded into AI SDK context window)
-    // Both stored in settings in the same format as ai-stream expects
-    const availableToolsPayload =
-      settings.availableTools?.map((t) => ({
-        toolId: t.toolId,
-        requiresConfirmation: t.requiresConfirmation ?? false,
-      })) ?? null;
-    const pinnedToolsPayload = (
-      settings.pinnedTools ??
-      getDefaultToolIdsForUser(user).map((id) => ({
-        toolId: id,
-        requiresConfirmation: false,
-      }))
-    ).map((t) => ({
-      toolId: t.toolId,
-      requiresConfirmation: t.requiresConfirmation ?? false,
-    }));
-
     // Start AI stream (all model types go through ai-stream, including image/audio)
     // POST is fire-and-forget - WS events handled by useMessagesSubscription
+    // If the thread is already streaming, the server auto-queues the message.
+    // favoriteConfig carries the full cascade config (models, tools, context).
+    // Server uses it directly — no re-query needed.
     const streamStarted = await startStream({
       operation,
       rootFolderId: currentRootFolderId,
@@ -290,8 +276,7 @@ export async function createAndSendUserMessage(
       role: ChatMessageRole.USER,
       model: settings.selectedModel,
       skill: settings.selectedSkill ?? null,
-      availableTools: availableToolsPayload,
-      pinnedTools: pinnedToolsPayload,
+      favoriteConfig,
       toolConfirmations: params.toolConfirmations ?? null,
       messageHistory: messageHistory ?? [],
       attachments: attachments && attachments.length > 0 ? attachments : null,

@@ -120,7 +120,7 @@ export class SkillPublishRepository {
       emitSkills("skill-updated", {
         wsEvent: {
           type: "updated",
-          id: skill.slug ?? skill.id,
+          skillId: skill.slug ?? skill.id,
           ownershipType: newOwnershipType,
         },
       });

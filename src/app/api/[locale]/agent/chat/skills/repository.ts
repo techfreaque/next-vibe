@@ -44,7 +44,13 @@ import { referralCodes } from "@/app/api/[locale]/referral/db";
 import { users } from "@/app/api/[locale]/user/db";
 import { getBestChatModel } from "../../ai-stream/models";
 import { chatFavorites } from "../favorites/db";
-import { ensureUniqueSlug, generateSlug, isUuid } from "../slugify";
+import {
+  ensureUniqueSlug,
+  formatSkillId,
+  generateSlug,
+  isUuid,
+  parseSkillId,
+} from "../slugify";
 import type {
   SkillDeleteResponseOutput,
   SkillGetResponseOutput,
@@ -223,7 +229,12 @@ export class SkillsRepository {
     try {
       const userId = user.id;
       const query = data?.query?.trim().toLowerCase();
-      const requestedCharId = data?.skillId?.trim();
+      const rawCharId = data?.skillId?.trim();
+      // Support merged "skillSlug__variantId" format in the filter param
+      const { skillId: requestedCharId, variantId: requestedVariantId } =
+        rawCharId
+          ? parseSkillId(rawCharId)
+          : { skillId: undefined, variantId: null };
       const source = data?.sourceFilter;
 
       // For authenticated users, return default + user's own + public from others
@@ -303,7 +314,6 @@ export class SkillsRepository {
               customSkillsCards.push(
                 SkillsRepository.mapSkillToListItem(
                   externalId,
-                  char.slug ? char.id : null,
                   {
                     icon: char.icon,
                     name: char.name,
@@ -366,14 +376,19 @@ export class SkillsRepository {
               searchField((s) => s.tagline, 0.5),
               searchField((s) => s.description ?? "", 0.3),
               searchField((s) => s.category, 0.2),
-              searchField((s) => s.id, 0.1),
+              searchField((s) => parseSkillId(s.skillId).skillId, 0.1),
             ],
           });
         }
 
-        // Apply skill ID filter if requested
+        // Apply skill ID filter if requested (supports merged "skillSlug__variantId")
         if (requestedCharId) {
-          allSkills = allSkills.filter((char) => char.id === requestedCharId);
+          allSkills = allSkills.filter(
+            (char) =>
+              parseSkillId(char.skillId).skillId === requestedCharId &&
+              (!requestedVariantId ||
+                parseSkillId(char.skillId).variantId === requestedVariantId),
+          );
         }
 
         // Group skills by category into sections
@@ -471,7 +486,6 @@ export class SkillsRepository {
             communitySkillsCards.push(
               SkillsRepository.mapSkillToListItem(
                 externalId,
-                char.slug ? char.id : null,
                 {
                   icon: char.icon,
                   name: char.name,
@@ -502,14 +516,16 @@ export class SkillsRepository {
             searchField((s) => s.tagline, 0.5),
             searchField((s) => s.description ?? "", 0.3),
             searchField((s) => s.category, 0.2),
-            searchField((s) => s.id, 0.1),
+            searchField((s) => parseSkillId(s.skillId).skillId, 0.1),
           ],
         });
       }
 
       // Apply skill ID filter if requested
       if (requestedCharId) {
-        allSkills = allSkills.filter((char) => char.id === requestedCharId);
+        allSkills = allSkills.filter(
+          (char) => parseSkillId(char.skillId).skillId === requestedCharId,
+        );
       }
 
       // Group skills by category into sections
@@ -678,7 +694,6 @@ export class SkillsRepository {
             defaultVariant?.musicGenModelSelection ?? null,
           videoGenModelSelection:
             defaultVariant?.videoGenModelSelection ?? null,
-          defaultChatMode: defaultVariant?.defaultChatMode ?? null,
           systemPrompt: defaultSkill.systemPrompt,
           skillOwnership: SkillOwnershipType.SYSTEM,
           compactTrigger: null,
@@ -696,6 +711,7 @@ export class SkillsRepository {
             : null,
           variants: defaultSkill.variants.map((v) => ({
             id: v.id,
+            displayName: t(v.variantName),
             modelSelection: v.modelSelection,
             isDefault: v.isDefault,
             voiceModelSelection: v.voiceModelSelection,
@@ -703,7 +719,6 @@ export class SkillsRepository {
             imageVisionModelSelection: v.imageVisionModelSelection,
             videoVisionModelSelection: v.videoVisionModelSelection,
             audioVisionModelSelection: v.audioVisionModelSelection,
-            defaultChatMode: v.defaultChatMode,
             imageGenModelSelection: v.imageGenModelSelection,
             musicGenModelSelection: v.musicGenModelSelection,
             videoGenModelSelection: v.videoGenModelSelection,
@@ -732,7 +747,6 @@ export class SkillsRepository {
           imageGenModelSelection: null,
           musicGenModelSelection: null,
           videoGenModelSelection: null,
-          defaultChatMode: null,
           systemPrompt: null,
           skillOwnership: SkillOwnershipType.SYSTEM,
           compactTrigger: null,
@@ -747,7 +761,6 @@ export class SkillsRepository {
             imageVisionModelSelection: v.imageVisionModelSelection,
             videoVisionModelSelection: v.videoVisionModelSelection,
             audioVisionModelSelection: v.audioVisionModelSelection,
-            defaultChatMode: v.defaultChatMode,
             imageGenModelSelection: v.imageGenModelSelection,
             musicGenModelSelection: v.musicGenModelSelection,
             videoGenModelSelection: v.videoGenModelSelection,
@@ -877,7 +890,6 @@ export class SkillsRepository {
               manualModelId: customSkill.videoGenModelId,
             }
           : null,
-        defaultChatMode: customSkill.defaultChatMode ?? null,
         systemPrompt: customSkill.systemPrompt,
         skillOwnership: customSkill.ownershipType,
         compactTrigger: customSkill.compactTrigger ?? null,
@@ -1009,7 +1021,6 @@ export class SkillsRepository {
             "manualModelId" in data.videoGenModelSelection
               ? (data.videoGenModelSelection.manualModelId ?? null)
               : null,
-          defaultChatMode: data.defaultChatMode ?? null,
           modelSelection: effectiveModelSelection,
           variants: effectiveVariants,
           ownershipType: data.isPublic
@@ -1018,6 +1029,30 @@ export class SkillsRepository {
           compactTrigger: data.compactTrigger ?? null,
         })
         .returning();
+
+      // Fire-and-forget: sync embedding for vector search
+      if (skill) {
+        void (async (): Promise<void> => {
+          const { syncVirtualNodeToEmbedding } =
+            await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+          const embeddingContent = [
+            `# ${skill.name}`,
+            skill.tagline ? `> ${skill.tagline}` : "",
+            skill.description ?? "",
+            "",
+            skill.systemPrompt ?? "",
+          ]
+            .filter(Boolean)
+            .join("\n");
+          await syncVirtualNodeToEmbedding(
+            userId,
+            `/skills/${skill.id}.md`,
+            embeddingContent,
+          );
+        })().catch(() => {
+          // Best-effort embedding sync
+        });
+      }
 
       // Emit WS event so all open tabs see the new skill immediately
       const emitSkills = createEndpointEmitter(
@@ -1028,7 +1063,6 @@ export class SkillsRepository {
       if (skill) {
         const listItem = SkillsRepository.mapSkillToListItem(
           skill.slug ?? skill.id,
-          skill.slug ? skill.id : null,
           {
             icon: skill.icon,
             name: skill.name,
@@ -1090,6 +1124,17 @@ export class SkillsRepository {
         });
       }
 
+      // Validate: if variants provided, exactly one must be isDefault
+      if (data.variants && data.variants.length > 0) {
+        const defaultCount = data.variants.filter((v) => v.isDefault).length;
+        if (defaultCount !== 1) {
+          return fail({
+            message: t("id.patch.errors.validation.title"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+      }
+
       // Check if this is a default skill
       const isDefaultSkill = DEFAULT_SKILLS.some((c) => c.id === skillId);
 
@@ -1141,7 +1186,6 @@ export class SkillsRepository {
               data.videoGenModelSelection.manualModelId
                 ? data.videoGenModelSelection.manualModelId
                 : null,
-            defaultChatMode: data.defaultChatMode ?? null,
             modelSelection: data.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
             variants:
               data.variants && data.variants.length > 0
@@ -1170,7 +1214,6 @@ export class SkillsRepository {
         if (derivedSkill) {
           const derivedListItem = SkillsRepository.mapSkillToListItem(
             derivedSkill.slug ?? derivedSkill.id,
-            derivedSkill.slug ? derivedSkill.id : null,
             {
               icon: derivedSkill.icon,
               name: derivedSkill.name,
@@ -1300,6 +1343,28 @@ export class SkillsRepository {
         });
       }
 
+      // Fire-and-forget: sync embedding for vector search
+      void (async (): Promise<void> => {
+        const { syncVirtualNodeToEmbedding } =
+          await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+        const embeddingContent = [
+          `# ${updated.name}`,
+          updated.tagline ? `> ${updated.tagline}` : "",
+          updated.description ?? "",
+          "",
+          updated.systemPrompt ?? "",
+        ]
+          .filter(Boolean)
+          .join("\n");
+        await syncVirtualNodeToEmbedding(
+          userId,
+          `/skills/${updated.id}.md`,
+          embeddingContent,
+        );
+      })().catch(() => {
+        // Best-effort embedding sync
+      });
+
       // Emit WS events so all open tabs see the updated skill immediately
       const emitSkills = createEndpointEmitter(
         skillsDefinitions.GET,
@@ -1309,7 +1374,7 @@ export class SkillsRepository {
       emitSkills("skill-updated", {
         wsEvent: {
           type: "updated",
-          id: existingSkill.slug ?? existingSkill.id,
+          skillId: existingSkill.slug ?? existingSkill.id,
           name: updated.name,
           icon: updated.icon,
           tagline: updated.tagline,
@@ -1358,7 +1423,6 @@ export class SkillsRepository {
               manualModelId: updated.videoGenModelId,
             }
           : null,
-        defaultChatMode: updated.defaultChatMode ?? null,
       });
 
       // Return the full updated skill to match GET response structure
@@ -1458,7 +1522,16 @@ export class SkillsRepository {
         user,
       );
       emitSkills("skill-deleted", {
-        wsEvent: { type: "deleted", id: deleted.slug ?? deleted.id },
+        wsEvent: { type: "deleted", skillId: deleted.slug ?? deleted.id },
+      });
+
+      // Fire-and-forget: remove embedding from cortex_nodes
+      void (async (): Promise<void> => {
+        const { removeVirtualNode } =
+          await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+        await removeVirtualNode(userId, `/skills/${deleted.id}.md`);
+      })().catch(() => {
+        // Best-effort embedding removal
       });
 
       return success({
@@ -1486,7 +1559,6 @@ export class SkillsRepository {
    */
   private static mapSkillToListItem(
     id: string,
-    internalId: string | null,
     char: {
       icon: IconKey | null;
       name: string | null;
@@ -1528,8 +1600,7 @@ export class SkillsRepository {
     // Flattened structure - no nested content object
     // name/tagline/description are pre-resolved strings (from t() for defaults, raw strings for custom chars)
     return {
-      id,
-      internalId,
+      skillId: formatSkillId(id, variantId),
       category: char.category,
       icon: char.icon ?? "sparkles",
       modelId,
@@ -1539,7 +1610,6 @@ export class SkillsRepository {
       ownershipType: char.ownershipType,
       voteCount: char.voteCount,
       trustLevel: char.trustLevel,
-      variantId: variantId ?? null,
       variantName: variantName ?? null,
       isVariant: isVariant ?? false,
       isDefault: isDefault ?? false,
@@ -1570,7 +1640,6 @@ export class SkillsRepository {
     return char.variants.map((variant) =>
       SkillsRepository.mapSkillToListItem(
         id,
-        null,
         {
           ...char,
           modelSelection: variant.modelSelection,

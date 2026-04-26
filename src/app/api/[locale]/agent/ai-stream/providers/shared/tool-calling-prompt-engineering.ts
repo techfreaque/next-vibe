@@ -8,15 +8,14 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import {
-  MEMORY_DELETE_ALIAS,
-  MEMORY_UPDATE_ALIAS,
-} from "../../../chat/memories/[id]/constants";
-import { MEMORY_ADD_ALIAS } from "../../../chat/memories/create/constants";
-import MEMORY_ADD_DEFINITION from "../../../chat/memories/create/definition";
+  CORTEX_DELETE_ALIAS,
+  CORTEX_EDIT_ALIAS,
+  CORTEX_WRITE_ALIAS,
+} from "../../../cortex/constants";
 import { FETCH_URL_ALIAS } from "../../../fetch-url-content/constants";
 import FETCH_URL_DEFINITION from "../../../fetch-url-content/definition";
-import { BRAVE_SEARCH_ALIAS } from "../../../search/brave/constants";
-import SEARCH_DEFINITION from "../../../search/brave/definition";
+import { WEB_SEARCH_ALIAS } from "../../../search/web-search/constants";
+import SEARCH_DEFINITION from "../../../search/web-search/definition";
 
 /**
  * OpenAI API Types
@@ -77,8 +76,11 @@ export function generateToolSystemPrompt(tools: OpenAITool[]): string {
 
   // Use actual examples from endpoint definitions
   const searchExample = SEARCH_DEFINITION.GET.examples.requests.default;
-  const memoryExample = MEMORY_ADD_DEFINITION.POST.examples.requests.add;
   const fetchExample = FETCH_URL_DEFINITION.GET.examples.requests.default;
+  const cortexWriteExample = {
+    path: "/memories/note.md",
+    content: "User prefers dark mode.",
+  };
 
   return `You have access to the following tools (use EXACT names: ${toolNames}):
 
@@ -104,14 +106,14 @@ MULTI-STEP WORKFLOW:
 
 STOP LOOP - callbackMode endLoop:
 When a tool call needs no follow-up response (e.g. saving a memory), add "callbackMode": "endLoop" to the arguments. The system stops after that tool completes.
-- Use for: ${MEMORY_ADD_ALIAS}, ${MEMORY_UPDATE_ALIAS}, ${MEMORY_DELETE_ALIAS}
-- Example: {"name": "${MEMORY_ADD_ALIAS}", "arguments": {"content": "...", "callbackMode": "endLoop"}}
+- Use for: ${CORTEX_WRITE_ALIAS}, ${CORTEX_EDIT_ALIAS}, ${CORTEX_DELETE_ALIAS}
+- Example: {"name": "${CORTEX_WRITE_ALIAS}", "arguments": {"path": "/memories/note.md", "content": "...", "callbackMode": "endLoop"}}
 
 EXAMPLES:
-- Search: <tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
-- Multiple: <tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}, {"name": "${FETCH_URL_ALIAS}", "arguments": ${JSON.stringify(fetchExample)}}]</tool_calls>
-- With text: Let me search for that.\n<tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
-- With endLoop: I'll remember that.\n<tool_calls>[{"name": "${MEMORY_ADD_ALIAS}", "arguments": ${JSON.stringify({ ...memoryExample, callbackMode: "endLoop" })}}]</tool_calls>`;
+- Search: <tool_calls>[{"name": "${WEB_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
+- Multiple: <tool_calls>[{"name": "${WEB_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}, {"name": "${FETCH_URL_ALIAS}", "arguments": ${JSON.stringify(fetchExample)}}]</tool_calls>
+- With text: Let me search for that.\n<tool_calls>[{"name": "${WEB_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
+- With endLoop: I'll remember that.\n<tool_calls>[{"name": "${CORTEX_WRITE_ALIAS}", "arguments": ${JSON.stringify({ ...cortexWriteExample, callbackMode: "endLoop" })}}]</tool_calls>`;
 }
 
 /**

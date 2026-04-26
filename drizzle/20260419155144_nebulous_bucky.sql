@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS "cortex_nodes_embedding_idx";

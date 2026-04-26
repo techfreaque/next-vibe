@@ -36,7 +36,7 @@ import {
 } from "@/config/constants";
 import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
-import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import loginEndpoints, {
   type LoginPostResponseOutput,
@@ -504,56 +504,58 @@ export class RemoteConnectionConnectRepository {
       isDefault: true,
     });
 
-    // ── Step 6: Write default remote tools to user's availableTools setting ───────
+    // ── Step 6: Add default remote tools to user's favorites ─────────────────
+    // Tool config (availableTools/pinnedTools) lives in favorites, not settings.
+    // Merge remote tools into every existing favorite's availableTools.
     try {
-      const { ChatSettingsRepository } =
-        await import("@/app/api/[locale]/agent/chat/settings/repository");
-      const { scopedTranslation: settingsScopedT } =
-        await import("@/app/api/[locale]/agent/chat/settings/i18n");
-      const { t: settingsT } = settingsScopedT.scopedT(defaultLocale);
+      const { chatFavorites } =
+        await import("@/app/api/[locale]/agent/chat/favorites/db");
 
-      const existingResult = await ChatSettingsRepository.getSettings(
-        user,
-        logger,
-        settingsT,
-      );
-      // When availableTools is null the user hasn't customised the list yet —
-      // fall back to the role-based defaults so we merge on top of them instead
-      // of replacing them with only the 4 remote tools.
-      const rawAllowed = existingResult.success
-        ? existingResult.data.availableTools
-        : null;
-      const existingAllowed =
-        rawAllowed ??
-        getDefaultToolIdsForUser(user).map((id) => ({
-          toolId: id,
-          requiresConfirmation: false,
-        }));
       const remoteTools = DEFAULT_REMOTE_TOOL_IDS.map((id) => ({
         toolId: `${instanceId}__${id}`,
         requiresConfirmation: false,
       }));
-      const existingIds = new Set(existingAllowed.map((tool) => tool.toolId));
-      const newTools = remoteTools.filter(
-        (tool) => !existingIds.has(tool.toolId),
-      );
-      if (newTools.length > 0) {
-        await ChatSettingsRepository.upsertSettings(
-          { availableTools: [...existingAllowed, ...newTools] },
-          user,
-          logger,
-          settingsT,
+
+      const userFavorites = await db
+        .select({
+          id: chatFavorites.id,
+          availableTools: chatFavorites.availableTools,
+        })
+        .from(chatFavorites)
+        .where(eq(chatFavorites.userId, user.id));
+
+      let updatedCount = 0;
+      for (const fav of userFavorites) {
+        const existing =
+          fav.availableTools ??
+          getDefaultToolIdsForUser(user).map((id) => ({
+            toolId: id,
+            requiresConfirmation: false,
+          }));
+        const existingIds = new Set(existing.map((tc) => tc.toolId));
+        const newTools = remoteTools.filter(
+          (tc) => !existingIds.has(tc.toolId),
         );
+        if (newTools.length > 0) {
+          await db
+            .update(chatFavorites)
+            .set({
+              availableTools: [...existing, ...newTools],
+              updatedAt: new Date(),
+            })
+            .where(eq(chatFavorites.id, fav.id));
+          updatedCount++;
+        }
+      }
+      if (updatedCount > 0) {
         logger.info(
-          `[CONNECT] Added ${newTools.length.toString()} remote tools to availableTools`,
-          {
-            instanceId,
-          },
+          `[CONNECT] Added remote tools to ${updatedCount.toString()} favorite(s)`,
+          { instanceId },
         );
       }
     } catch (toolWriteError) {
       // Non-fatal - connection is established, tools can be added manually
-      logger.warn("[CONNECT] Failed to write remote tools to availableTools", {
+      logger.warn("[CONNECT] Failed to write remote tools to favorites", {
         error: String(toolWriteError),
       });
     }

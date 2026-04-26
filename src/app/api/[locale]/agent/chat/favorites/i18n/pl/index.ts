@@ -107,6 +107,7 @@ export const translations: typeof enTranslations = {
       companion: "Towarzysze",
       skills: "Umiejętności",
       model: "Bezpośrednie modele",
+      background: "Agenci w tle",
     },
     container: {
       title: "Twoje ulubione",
@@ -123,9 +124,6 @@ export const translations: typeof enTranslations = {
         },
         skillId: {
           content: "Postać: {{value}}",
-        },
-        variantId: {
-          content: "Wariant: {{value}}",
         },
         customVariantName: {
           content: "Nazwa niestandardowa: {{value}}",

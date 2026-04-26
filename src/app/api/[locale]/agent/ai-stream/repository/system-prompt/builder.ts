@@ -46,6 +46,7 @@ export async function buildSystemPrompt(params: {
   excludeMemories?: boolean;
   memoryLimit?: number | null;
   mediaCapabilities?: MediaCapabilitiesParams;
+  lastUserMessage?: string;
   threadId: string | null;
   voiceTranscription?: {
     wasTranscribed: boolean;
@@ -66,6 +67,7 @@ export async function buildSystemPrompt(params: {
     excludeMemories,
     memoryLimit,
     mediaCapabilities,
+    lastUserMessage,
     voiceTranscription,
   } = params;
 
@@ -95,6 +97,7 @@ export async function buildSystemPrompt(params: {
     subAgentDepth,
     callMode: callMode ?? false,
     extraInstructions: extraInstructions ?? "",
+    lastUserMessage,
     memoryLimit: memoryLimit ?? null,
     mediaCapabilities,
   };

@@ -1057,10 +1057,17 @@ export function collectServerDefaults<F>(
   fields: F,
   userRoles?: readonly (typeof UserPermissionRoleValue)[],
   platform?: Platform,
-): Record<string, (ctx: ServerDefaultContext) => WidgetData | undefined> {
+): Record<
+  string,
+  (
+    ctx: ServerDefaultContext,
+  ) => WidgetData | undefined | Promise<WidgetData | undefined>
+> {
   const result: Record<
     string,
-    (ctx: ServerDefaultContext) => WidgetData | undefined
+    (
+      ctx: ServerDefaultContext,
+    ) => WidgetData | undefined | Promise<WidgetData | undefined>
   > = {};
 
   if (!fields || typeof fields !== "object") {
@@ -1073,7 +1080,9 @@ export function collectServerDefaults<F>(
     children?: Record<string, FieldLike>;
     visibleFor?: readonly (typeof UserPermissionRoleValue)[];
     hiddenForPlatforms?: readonly Platform[];
-    serverDefault?: (ctx: ServerDefaultContext) => WidgetData | undefined;
+    serverDefault?: (
+      ctx: ServerDefaultContext,
+    ) => WidgetData | undefined | Promise<WidgetData | undefined>;
   }
 
   const typed = fields as F & FieldLike;

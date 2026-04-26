@@ -95,6 +95,18 @@ export const translations = {
       descriptionPrefilled:
         "Your friend gets rewarded when you create your account.",
     },
+    supportedSkillId: {
+      label: "Support a Creator",
+      description:
+        "Your signup supports the creator of this skill with a +5% bonus on your subscriptions.",
+      selectorTitle: "Support a Creator",
+      selectorDescription:
+        "You added skills by independent creators to your favorites. Pick one to support — they get +5% from your subscriptions. You can change this anytime.",
+      selectorNone: "None (skip)",
+    },
+    localFavorites: {
+      label: "Local Favorites",
+    },
   },
 
   footer: {

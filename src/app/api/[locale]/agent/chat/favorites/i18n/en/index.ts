@@ -105,6 +105,7 @@ export const translations = {
       companion: "Companions",
       skills: "Skills",
       model: "Direct Models",
+      background: "Background Agents",
     },
     container: {
       title: "Your Favorites",
@@ -121,9 +122,6 @@ export const translations = {
         },
         skillId: {
           content: "Skill: {{value}}",
-        },
-        variantId: {
-          content: "Variant: {{value}}",
         },
         customVariantName: {
           content: "Variant Name: {{value}}",

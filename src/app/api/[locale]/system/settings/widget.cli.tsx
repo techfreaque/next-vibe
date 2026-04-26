@@ -304,12 +304,8 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
           threadId: undefined,
           aiMessageId: undefined,
           skillId: undefined,
-          modelId: undefined,
           headless: undefined,
           subAgentDepth: 0,
-          imageGenModelSelection: undefined,
-          musicGenModelSelection: undefined,
-          videoGenModelSelection: undefined,
           isRevival: undefined,
 
           providerOverride: undefined,
@@ -324,7 +320,6 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
           callerCallbackMode: undefined,
           onEscalatedTaskCancel: undefined,
           escalateToTask: undefined,
-          variantId: undefined,
         },
       });
       setSaveMsg("Saved \u2713");
@@ -752,12 +747,8 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
           threadId: undefined,
           aiMessageId: undefined,
           skillId: undefined,
-          modelId: undefined,
           headless: undefined,
           subAgentDepth: 0,
-          imageGenModelSelection: undefined,
-          musicGenModelSelection: undefined,
-          videoGenModelSelection: undefined,
           isRevival: undefined,
 
           providerOverride: undefined,
@@ -772,7 +763,6 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
           callerCallbackMode: undefined,
           onEscalatedTaskCancel: undefined,
           escalateToTask: undefined,
-          variantId: undefined,
         },
       });
       setSaveMsg("Saved ✓");
@@ -1103,12 +1093,8 @@ export function SystemSettingsPatchWidget(): JSX.Element {
             threadId: undefined,
             aiMessageId: undefined,
             skillId: undefined,
-            modelId: undefined,
             headless: undefined,
             subAgentDepth: 0,
-            imageGenModelSelection: undefined,
-            musicGenModelSelection: undefined,
-            videoGenModelSelection: undefined,
             isRevival: undefined,
 
             providerOverride: undefined,
@@ -1123,7 +1109,6 @@ export function SystemSettingsPatchWidget(): JSX.Element {
             callerCallbackMode: undefined,
             onEscalatedTaskCancel: undefined,
             escalateToTask: undefined,
-            variantId: undefined,
           },
         });
         if (result.success) {

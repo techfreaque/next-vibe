@@ -251,10 +251,22 @@ export const translations: typeof enTranslations = {
     splitHero: {
       or: "ODER",
       clickToExplore: "Klicken zum Erkunden",
-      header: "Vier Produkte. Eine Plattform.",
-
+      header: "Wir sind kein Milliarden-Konzern.",
       subheader:
-        "Unzensierte KI · Selbstgehosteter Agent · Open-Source-Framework · Passives Einkommen",
+        "Wir sind Entwickler, die finden: KI sollte keine politische Meinung haben.",
+      introBody:
+        "Das heißt: Ecken und Kanten. Modelle fallen aus. Features kommen roh raus. Wir fixen schnell und tun nicht so, als wären wir perfekt. Was wir sind: die einzige Plattform, auf der du den Filterlevel wählst - kein Sicherheits-Komitee.",
+      introGuide: "Wähle, was zu dir passt:",
+      introOption1:
+        "Einfach mit unzensierter KI chatten? Fang hier an - die meisten tun das.",
+      introOption2:
+        "Willst du es auf deiner eigenen Hardware laufen lassen? Hoste alles selbst.",
+      introOption3:
+        "Du bist Entwickler? Das Framework ist Open Source. Fork es.",
+      introOption4:
+        "Willst du verdienen? Empfiehl Nutzer oder veröffentliche KI-Skills für wiederkehrende Einnahmen.",
+      introHelp: "Orientierungslos?",
+      introHelpCta: "Schreib uns",
       unbottled: {
         badge: "Unzensiert · Open · Mainstream",
         titleLine1: "Unzensierte KI.",
@@ -1122,7 +1134,7 @@ export const translations: typeof enTranslations = {
     ctaReferral: {
       title: "Fang heute an zu verdienen.",
       subtitle:
-        "Teile deinen Link. Veröffentliche einen Skill. Verdiene bei jeder Zahlung, für immer.",
+        "Teile deinen Link. Veröffentliche ein Skill. Verdiene bei jeder Zahlung, für immer.",
       primary: "Zum Empfehlungs-Dashboard",
       secondary: "Skill erstellen",
     },

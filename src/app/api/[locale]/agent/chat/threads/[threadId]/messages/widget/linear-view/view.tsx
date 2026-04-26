@@ -81,6 +81,8 @@ export interface LinearMessageViewProps {
   onLoadNewerHistory: ((anchorId: string) => void) | null;
   /** Whether newer history is currently loading */
   isLoadingNewerHistory: boolean;
+  /** Cancel a queued message - removes it and restores content to input */
+  onCancelQueued: ((messageId: string, content: string) => void) | null;
   /** Vote callback - null when voting is not available */
   onVoteMessage:
     | ((messageId: string, vote: 1 | -1 | 0) => Promise<void>)
@@ -166,6 +168,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   sendMessage,
   onLoadNewerHistory,
   isLoadingNewerHistory,
+  onCancelQueued,
   onVoteMessage,
   ttsAutoplay,
   voiceId,
@@ -329,6 +332,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                                 }
                               : undefined
                           }
+                          onCancelQueued={onCancelQueued ?? undefined}
                           showAuthor={rootFolderId === "public"}
                           rootFolderId={rootFolderId}
                           currentUserId={currentUserId ?? undefined}

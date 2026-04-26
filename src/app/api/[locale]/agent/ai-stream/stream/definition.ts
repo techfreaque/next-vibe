@@ -5,11 +5,11 @@
 
 import { z } from "zod";
 
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import {
   ChatModelId,
   ChatModelIdOptions,
 } from "@/app/api/[locale]/agent/ai-stream/models";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import {
   TtsModelId,
   TtsModelIdOptions,
@@ -31,14 +31,55 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
+import { lazy } from "react";
 import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../../chat/config";
 import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
 import { type ChatMessage, selectChatMessageSchema } from "../../chat/db";
 import { ChatMessageRole, ChatMessageRoleOptions } from "../../chat/enum";
-import { lazy } from "react";
 import { AI_STREAM_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+
+const toolConfigItemSchema = z.object({
+  toolId: z.string(),
+  requiresConfirmation: z.boolean(),
+});
+
+/**
+ * Zod schema for FavoriteConfig — proper field-driven validation.
+ * skillId accepts merged "skillSlug__variantId" format or plain "skillSlug".
+ */
+const favoriteConfigSchema = z.object({
+  id: z.string(),
+  /** Merged format: "skillSlug" or "skillSlug__variantId" */
+  skillId: z.string(),
+  modelSelection: chatModelSelectionSchema.nullable(),
+  voiceModelSelection: voiceModelSelectionSchema.nullable(),
+  sttModelSelection: sttModelSelectionSchema.nullable(),
+  imageVisionModelSelection: imageVisionModelSelectionSchema.nullable(),
+  videoVisionModelSelection: videoVisionModelSelectionSchema.nullable(),
+  audioVisionModelSelection: audioVisionModelSelectionSchema.nullable(),
+  imageGenModelSelection: imageGenModelSelectionSchema.nullable(),
+  musicGenModelSelection: musicGenModelSelectionSchema.nullable(),
+  videoGenModelSelection: videoGenModelSelectionSchema.nullable(),
+  availableTools: z.array(toolConfigItemSchema).nullable(),
+  pinnedTools: z.array(toolConfigItemSchema).nullable(),
+  deniedTools: z.array(toolConfigItemSchema).nullable(),
+  compactTrigger: z.number().nullable(),
+  memoryLimit: z.number().nullable(),
+  promptAppend: z.string().nullable(),
+});
 
 const AiStreamWidget = lazy(() =>
   import("./widget/widget").then((m) => ({ default: m.AiStreamWidget })),
@@ -219,75 +260,18 @@ const { POST } = createEndpoint({
         schema: z.string(),
       }),
 
-      // optional allowed tools - null/undefined = all tools permitted
-      // allowed tools = permission gate (what the model is allowed to call)
-      availableTools: requestDataArrayOptionalField(
-        scopedTranslation,
-        {
-          type: WidgetType.CONTAINER,
-          title: "post.availableTools.label",
-          description: "post.availableTools.description",
-        },
-        objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-          usage: { request: "data" },
-          children: {
-            toolId: requestField(scopedTranslation, {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "post.availableTools.toolId.label",
-              description: "post.availableTools.toolId.description",
-              columns: 6,
-              schema: z.string(),
-            }),
-            requiresConfirmation: requestField(scopedTranslation, {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "post.pinnedTools.requiresConfirmation.label",
-              description: "post.pinnedTools.requiresConfirmation.description",
-              columns: 6,
-              schema: z.boolean().default(false),
-            }),
-          },
-        }),
-      ),
-      // optional pinned tools - null/undefined = use default set
-      // Pinned tools are the ones the model sees and is able to execute
-      // They are loaded into the AI context window
-      pinnedTools: requestDataArrayOptionalField(
-        scopedTranslation,
-        {
-          type: WidgetType.CONTAINER,
-          title: "post.pinnedTools.label",
-          description: "post.pinnedTools.description",
-        },
-        objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-          usage: { request: "data" },
-          children: {
-            toolId: requestField(scopedTranslation, {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "post.pinnedTools.toolId.label",
-              description: "post.pinnedTools.toolId.description",
-              columns: 6,
-              schema: z.string(),
-            }),
-            requiresConfirmation: requestField(scopedTranslation, {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "post.pinnedTools.requiresConfirmation.label",
-              description: "post.pinnedTools.requiresConfirmation.description",
-              columns: 6,
-              schema: z.boolean().default(false),
-            }),
-          },
-        }),
-      ),
+      // Active favorite's full config — model selections, tools, context settings.
+      // null = no favorite active (use skill/system defaults).
+      // Logged-in users send their active favorite's config.
+      // Public users send their client-side favorite's config.
+      favoriteConfig: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "post.favoriteConfig.label",
+        description: "post.favoriteConfig.description",
+        columns: 12,
+        schema: favoriteConfigSchema.nullable(),
+      }),
       toolConfirmations: requestDataArrayOptionalField(
         scopedTranslation,
         {
@@ -588,8 +572,7 @@ const { POST } = createEndpoint({
         role: ChatMessageRole.USER,
         model: ChatModelId.GPT_5_MINI,
         skill: "default",
-        availableTools: null,
-        pinnedTools: null,
+        favoriteConfig: null,
         toolConfirmations: null,
         messageHistory: [],
         attachments: [],
@@ -609,8 +592,7 @@ const { POST } = createEndpoint({
         role: ChatMessageRole.USER,
         model: ChatModelId.GPT_5,
         skill: "professional",
-        availableTools: null,
-        pinnedTools: null,
+        favoriteConfig: null,
         toolConfirmations: null,
         messageHistory: [],
         attachments: [],
@@ -630,8 +612,7 @@ const { POST } = createEndpoint({
         role: ChatMessageRole.USER,
         model: ChatModelId.CLAUDE_SONNET_4_5,
         skill: "default",
-        availableTools: null,
-        pinnedTools: null,
+        favoriteConfig: null,
         toolConfirmations: null,
         messageHistory: [],
         attachments: [],

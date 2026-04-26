@@ -4,4 +4,10 @@ import { translations as kagiTranslations } from "../../kagi/i18n/en";
 export const translations = {
   brave: braveTranslations,
   kagi: kagiTranslations,
+  enums: {
+    provider: {
+      BRAVE: "Brave Search",
+      KAGI: "Kagi FastGPT",
+    },
+  },
 };

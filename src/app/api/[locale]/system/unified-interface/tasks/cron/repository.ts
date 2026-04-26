@@ -331,6 +331,29 @@ export class CronTasksRepository {
         id: newTask.id,
         routeId: newTask.routeId,
       });
+
+      if (newTask.userId) {
+        void import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual")
+          .then(({ syncVirtualNodeToEmbedding }) => {
+            const embeddingContent = [
+              `# ${newTask.displayName ?? newTask.id}`,
+              newTask.schedule ? `Schedule: ${newTask.schedule}` : "",
+              "",
+              newTask.description ?? "",
+            ]
+              .filter(Boolean)
+              .join("\n");
+            return syncVirtualNodeToEmbedding(
+              newTask.userId!,
+              `/tasks/${newTask.id}.md`,
+              embeddingContent,
+            );
+          })
+          .catch(() => {
+            // Best-effort embedding sync
+          });
+      }
+
       return success(newTask);
     } catch (error) {
       const parsedError = parseError(error);
@@ -427,6 +450,28 @@ export class CronTasksRepository {
           errorType: ErrorResponseTypes.FORBIDDEN,
           messageParams: { taskId: id },
         });
+      }
+
+      if (task.userId) {
+        void import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual")
+          .then(({ syncVirtualNodeToEmbedding }) => {
+            const embeddingContent = [
+              `# ${task.displayName ?? task.id}`,
+              task.schedule ? `Schedule: ${task.schedule}` : "",
+              "",
+              task.description ?? "",
+            ]
+              .filter(Boolean)
+              .join("\n");
+            return syncVirtualNodeToEmbedding(
+              task.userId!,
+              `/tasks/${task.id}.md`,
+              embeddingContent,
+            );
+          })
+          .catch(() => {
+            // Best-effort embedding sync
+          });
       }
 
       const serialized = CronTasksRepository.serializeTask(task, logger);

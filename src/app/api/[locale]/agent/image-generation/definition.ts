@@ -23,7 +23,6 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
-  getBestImageGenModel,
   ImageGenModelId,
   ImageGenModelIdOptions,
 } from "@/app/api/[locale]/agent/image-generation/models";
@@ -99,17 +98,6 @@ const { POST } = createEndpoint({
           .enum(ImageGenModelId)
           .default(ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW),
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
-        serverDefault: (ctx) => {
-          const sel = ctx.streamContext.imageGenModelSelection;
-          if (!sel || !ctx.user) {
-            return undefined;
-          }
-          return getBestImageGenModel(
-            sel,
-            ctx.user,
-            ctx.streamContext.providerOverride,
-          )?.id;
-        },
       }),
       size: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

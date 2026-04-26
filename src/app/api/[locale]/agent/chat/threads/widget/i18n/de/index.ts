@@ -62,6 +62,7 @@ export const translations: typeof enTranslations = {
       },
     },
     credits: {
+      label: "Credits",
       credit: "{{count}} Credit",
       credits: "{{count}} Credits",
     },
@@ -108,7 +109,7 @@ export const translations: typeof enTranslations = {
       browseSkills: {
         title: "Weitere Skills entdecken",
         description:
-          "Entdecke 40+ Skills - von Programmierern und Forschern bis zu Autoren und Beratern. Füge einen Skill als Favorit hinzu und er erscheint direkt hier.",
+          "Entdecke 40+ Skills - von Programmierern und Forschern bis zu Autoren und Beratern. Füge ein Skill als Favorit hinzu und es erscheint direkt hier.",
         tip: "Skills geben deiner KI einen klaren Fokus und das passende Modell für die Aufgabe.",
       },
       meetCompanion: {

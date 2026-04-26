@@ -59,7 +59,7 @@ export function getAwsSnsProvider(): SmsProvider {
 
     async sendSms(
       params: SendSmsParams,
-      // oxlint-disable-next-line no-unused-vars
+      // eslint-disable-next-line no-unused-vars
       _logger: EndpointLogger,
       locale: CountryLanguage,
     ): Promise<ResponseType<SmsResult>> {

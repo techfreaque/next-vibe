@@ -119,12 +119,12 @@ export class ToolResultHandler {
     /** Stream context - used to detect waitingForRemoteResult for escalated tools */
     streamContext: ToolExecutionContext;
     threadId: string;
-    model: ChatModelId;
-    skill: string;
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
     user: JwtPayloadType;
+    model: ChatModelId;
+    skill: string;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
     emittedToolResultIds?: Set<string>;
@@ -137,8 +137,6 @@ export class ToolResultHandler {
       pendingToolMessage,
       streamContext,
       threadId,
-      model,
-      skill,
       sequenceId,
       isIncognito,
       userId,
@@ -148,6 +146,8 @@ export class ToolResultHandler {
       emittedToolResultIds,
       t,
     } = params;
+
+    const { model, skill } = params;
 
     if (!pendingToolMessage) {
       logger.error(
@@ -288,6 +288,7 @@ export class ToolResultHandler {
       ...toolCallData.toolCall,
       result: effectiveIsError ? undefined : validatedOutput,
       error: toolError,
+      isPartial: false,
       status: effectiveIsError
         ? "failed"
         : isBackground

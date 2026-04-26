@@ -25,7 +25,16 @@ import {
 } from "@/app/api/[locale]/agent/chat/config";
 import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
+import {
+  chatFavorites,
+  FAVORITE_CONFIG_COLUMNS,
+  type FavoriteConfig,
+} from "@/app/api/[locale]/agent/chat/favorites/db";
+import {
+  buildFavoriteConfig,
+  resolveFavoriteConfig,
+} from "@/app/api/[locale]/agent/chat/favorites/repository";
+import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
@@ -171,13 +180,9 @@ export class AiStreamRunRepository {
               pendingTimeoutMs: undefined,
               leafMessageId: undefined,
               skillId: undefined,
-              modelId: undefined,
               favoriteId: undefined,
               headless: undefined,
               subAgentDepth: streamContext.subAgentDepth ?? 0,
-              imageGenModelSelection: undefined,
-              musicGenModelSelection: undefined,
-              videoGenModelSelection: undefined,
               waitingForRemoteResult: undefined,
               pendingEscalatedTaskId: undefined,
               cancelPendingStreamTimer: undefined,
@@ -185,7 +190,6 @@ export class AiStreamRunRepository {
               escalateToTask: undefined,
               callerCallbackMode: undefined,
               onEscalatedTaskCancel: undefined,
-              variantId: undefined,
               isRevival: false,
               providerOverride: undefined,
             },
@@ -221,47 +225,27 @@ export class AiStreamRunRepository {
         }),
       );
 
-      // ── Step 2: Resolve tool config from favorite if needed ────────────
-      // When favoriteId is set and pinnedTools/availableTools are NOT provided in the request,
-      // load the favorite's tool config as defaults.
+      // ── Step 2: Resolve tool config from favorite ────────────────────────
+      // Resolve parent's favorite on demand from favoriteId (picks up latest DB state).
+      const parentFavConfig = await resolveFavoriteConfig(
+        streamContext.favoriteId,
+        user.isPublic ? undefined : user.id,
+      );
       let resolvedPinnedTools = pinnedTools;
       let resolvedAvailableTools = availableTools;
-
-      if (favoriteId && (!pinnedTools || !availableTools)) {
-        const userId = user.isPublic ? undefined : user.id;
-        if (userId) {
-          const [favorite] = await db
-            .select({
-              availableTools: chatFavorites.availableTools,
-              pinnedTools: chatFavorites.pinnedTools,
-            })
-            .from(chatFavorites)
-            .where(
-              and(
-                or(
-                  eq(chatFavorites.id, favoriteId),
-                  eq(chatFavorites.slug, favoriteId),
-                ),
-                eq(chatFavorites.userId, userId),
-              ),
-            )
-            .limit(1);
-
-          if (favorite) {
-            if (!pinnedTools && favorite.pinnedTools) {
-              resolvedPinnedTools = favorite.pinnedTools.map((entry) => ({
-                toolId: entry.toolId,
-                requiresConfirmation: entry.requiresConfirmation ?? false,
-              }));
-            }
-            if (!availableTools && favorite.availableTools) {
-              resolvedAvailableTools = favorite.availableTools.map((entry) => ({
-                toolId: entry.toolId,
-                requiresConfirmation: entry.requiresConfirmation ?? false,
-              }));
-            }
-          }
-        }
+      if (!pinnedTools && parentFavConfig?.pinnedTools) {
+        resolvedPinnedTools = parentFavConfig.pinnedTools.map((entry) => ({
+          toolId: entry.toolId,
+          requiresConfirmation: entry.requiresConfirmation ?? false,
+        }));
+      }
+      if (!availableTools && parentFavConfig?.availableTools) {
+        resolvedAvailableTools = parentFavConfig.availableTools.map(
+          (entry) => ({
+            toolId: entry.toolId,
+            requiresConfirmation: entry.requiresConfirmation ?? false,
+          }),
+        );
       }
 
       // ── Step 2b: Resolve tool config from skill definition if needed ─────
@@ -304,9 +288,10 @@ export class AiStreamRunRepository {
       // ── Sub-agent favorite override ──────────────────────────────────────
       // When called from within an active stream (via execute-tool), check if
       // the invoking favorite has a subAgentFavoriteId set. If so, the sub-agent
-      // inherits that favorite's model + tool config instead of being isolated.
+      // inherits that favorite's full config instead of the parent's.
       // null = task isolation (default); set = power-user override.
       let effectiveFavoriteId = favoriteId;
+      let subAgentOverrideConfig: FavoriteConfig | null = null;
       if (streamContext.favoriteId) {
         const userId = user.isPublic ? undefined : user.id;
         if (userId) {
@@ -326,6 +311,20 @@ export class AiStreamRunRepository {
 
           if (invokingFavorite?.subAgentFavoriteId) {
             effectiveFavoriteId = invokingFavorite.subAgentFavoriteId;
+            // Load the override favorite's full config
+            const [overrideFav] = await db
+              .select(FAVORITE_CONFIG_COLUMNS)
+              .from(chatFavorites)
+              .where(
+                and(
+                  eq(chatFavorites.id, invokingFavorite.subAgentFavoriteId),
+                  eq(chatFavorites.userId, userId),
+                ),
+              )
+              .limit(1);
+            if (overrideFav) {
+              subAgentOverrideConfig = overrideFav;
+            }
           }
         }
       }
@@ -354,13 +353,25 @@ export class AiStreamRunRepository {
       // Increment sub-agent depth: parent's depth + 1
       const parentDepth = streamContext.subAgentDepth ?? 0;
 
+      // Build FavoriteConfig for sub-agent headless stream.
+      // If subAgentFavoriteId override fired, use that favorite's full config.
+      // Otherwise inherit ALL model selections + context from parent's resolved config.
+      // Only tool config may differ (sub-agent resolves its own tools above).
+      const parentConfig = subAgentOverrideConfig ?? parentFavConfig;
+      const headlessFavoriteConfig: FavoriteConfig = buildFavoriteConfig({
+        ...(parentConfig ?? {}),
+        id: effectiveFavoriteId ?? parentConfig?.id ?? "ai-run",
+        skillId: skill ?? parentConfig?.skillId ?? NO_SKILL_ID,
+        availableTools: resolvedAvailableTools ?? null,
+        pinnedTools: resolvedPinnedTools ?? defaultTools,
+      });
+
       const streamResult = await runHeadlessAiStream({
         favoriteId: effectiveFavoriteId,
         model,
         skill,
         prompt,
-        pinnedTools: resolvedPinnedTools ?? defaultTools, // default: base tools; null = all tools
-        availableTools: resolvedAvailableTools ?? null, // null = all tools permitted
+        favoriteConfig: headlessFavoriteConfig,
         headlessInstructions: effectiveInstructions,
         maxTurns,
         threadId: appendThreadId,

@@ -33,8 +33,9 @@ export const translations: typeof enTranslations = {
   skillAngle: {
     title: "Opublikuj skill - dodaj 5% na górę",
     p1: "Każdy skill, który publikujesz, ma link do udostępnienia. Gdy ktoś rejestruje się przez link do Twojego skilla, zarabiasz dodatkowe 5% od wszystkich płatności - na dodatek do 10% prowizji bezpośredniej. To 15% od jednego użytkownika, wiecznie.",
-    p2: "Wbuduj link do skilla w README na GitHubie. Opublikuj go na dewelopero wym Discordzie. Każda osoba, która się przez to zarejestruje, przynosi Ci obie prowizje jednocześnie. Nie musisz wybierać - link do skilla niesie obie.",
-    p3: "Skille są darmowe do stworzenia. Nie potrzeba płatnej subskrypcji. Jeśli masz użyteczne ustawienie AI - code reviewer znający Twój stack lub pisarz dokumentacji dostrojony do Twojego stylu - udostępnij go. Link zajmie się resztą.",
+    p2: "To, czego większość nie zauważa: zarabiasz 5% jako autor skilla nawet gdy ktoś inny udostępnia Twój link. Użytkownik znajduje Twój skill w katalogu, wysyła link znajomemu - znajomy się rejestruje, a Ty dostajesz 5% jego płatności. Automatycznie. Platforma śledzi autorstwo skilla, nie to kto udostępnił link. Twój skill pracuje za Ciebie, nawet gdy aktywnie go nie promujesz.",
+    p3: "Wbuduj link do skilla w README na GitHubie. Opublikuj go na deweloperskim Discordzie. Każda osoba, która się przez to zarejestruje, przynosi Ci obie prowizje jednocześnie. Nie musisz wybierać - link do skilla niesie obie.",
+    p4: "Skille są darmowe do stworzenia. Nie potrzeba płatnej subskrypcji. Jeśli masz użyteczne ustawienie AI - code reviewer znający Twój stack lub pisarz dokumentacji dostrojony do Twojego stylu - udostępnij go. Link zajmie się resztą.",
   },
   math: {
     title: "Matematyka (prawdziwe liczby)",

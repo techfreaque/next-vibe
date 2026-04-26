@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import { count, eq } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -13,33 +13,110 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
+import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
+import { SkillOwnershipType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";
+import { formatSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
+import { modelProviders } from "@/app/api/[locale]/agent/models/models";
+import { leadMagnetConfigs } from "@/app/api/[locale]/lead-magnet/db";
 import { referralCodes } from "@/app/api/[locale]/referral/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users } from "@/app/api/[locale]/user/db";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type {
-  CreatorGetRequestOutput,
-  CreatorGetResponseOutput,
-} from "./definition";
+import type { CreatorGetResponseOutput } from "./definition";
 import type { CreatorT } from "./i18n";
+
+/** Resolve creatorId param — accepts UUID or creatorSlug */
+async function resolveCreatorId(param: string): Promise<string | null> {
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (uuidPattern.test(param)) {
+    return param;
+  }
+  const result = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(
+      or(
+        eq(users.creatorSlug, param),
+        eq(sql`lower(replace(${users.publicName}, ' ', '-'))`, param),
+      ),
+    )
+    .limit(1);
+  return result[0]?.id ?? null;
+}
 
 export class CreatorProfileRepository {
   static async getCreatorProfile(
-    data: CreatorGetRequestOutput,
+    urlPathParams: { creatorId: string },
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: CreatorT,
+    viewer: JwtPayloadType,
   ): Promise<ResponseType<CreatorGetResponseOutput>> {
     try {
-      const { userId } = data;
+      const resolvedId = await resolveCreatorId(urlPathParams.creatorId);
+
+      if (!resolvedId) {
+        return fail({
+          message: t("get.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: { creatorId: urlPathParams.creatorId },
+        });
+      }
+
+      const userId = resolvedId;
       logger.debug("Getting creator profile", { userId });
 
-      const results = await db.select().from(users).where(eq(users.id, userId));
+      const [userResults, skillRows, referralResult, configRows] =
+        await Promise.all([
+          db.select().from(users).where(eq(users.id, userId)),
+          db
+            .select({
+              id: customSkills.id,
+              name: customSkills.name,
+              tagline: customSkills.tagline,
+              description: customSkills.description,
+              icon: customSkills.icon,
+              category: customSkills.category,
+              modelSelection: customSkills.modelSelection,
+              ownershipType: customSkills.ownershipType,
+              voteCount: customSkills.voteCount,
+              trustLevel: customSkills.trustLevel,
+            })
+            .from(customSkills)
+            .where(
+              and(
+                eq(customSkills.userId, userId),
+                eq(
+                  customSkills.ownershipType,
+                  SkillOwnershipType.PUBLIC as typeof SkillOwnershipType.PUBLIC,
+                ),
+              ),
+            ),
+          db
+            .select({ code: referralCodes.code })
+            .from(referralCodes)
+            .where(eq(referralCodes.ownerUserId, userId))
+            .limit(1),
+          db
+            .select({
+              headline: leadMagnetConfigs.headline,
+              buttonText: leadMagnetConfigs.buttonText,
+              isActive: leadMagnetConfigs.isActive,
+            })
+            .from(leadMagnetConfigs)
+            .where(eq(leadMagnetConfigs.userId, userId))
+            .limit(1),
+        ]);
 
-      if (results.length === 0) {
+      if (userResults.length === 0) {
         return fail({
           message: t("get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
@@ -47,29 +124,62 @@ export class CreatorProfileRepository {
         });
       }
 
-      const user = results[0];
+      const user = userResults[0];
+      const { t: configT } = configScopedTranslation.scopedT(locale);
+      const appName = configT("appName");
 
-      // Count public skills owned by this user
-      const skillCountResult = await db
-        .select({ count: count() })
-        .from(customSkills)
-        .where(eq(customSkills.userId, userId));
+      // Enrich skills with model display info
+      const skills = skillRows.map((row) => {
+        const selection = row.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
+        const bestModel = getBestChatModel(selection, viewer);
+        const modelId = bestModel?.id ?? null;
+        const modelRow = bestModel
+          ? {
+              modelIcon: bestModel.icon,
+              modelInfo: getModelDisplayName(bestModel, false),
+              modelProvider:
+                modelProviders[bestModel.provider]?.name ?? bestModel.provider,
+            }
+          : {
+              modelIcon: "sparkles" as const,
+              modelInfo: "Unknown Model",
+              modelProvider: "Unknown",
+            };
 
-      const skillCount = skillCountResult[0]?.count ?? 0;
-
-      // Get referral code if any
-      const referralResult = await db
-        .select({ code: referralCodes.code })
-        .from(referralCodes)
-        .where(eq(referralCodes.ownerUserId, userId))
-        .limit(1);
+        return {
+          id: row.id,
+          internalId: null,
+          skillId: formatSkillId(row.id, null),
+          category: row.category,
+          icon: row.icon ?? "sparkles",
+          modelId,
+          name: row.name,
+          description: row.description,
+          tagline: row.tagline,
+          ownershipType: row.ownershipType,
+          voteCount: row.voteCount,
+          trustLevel: row.trustLevel,
+          variantId: null,
+          variantName: null,
+          isVariant: false,
+          isDefault: false,
+          ...modelRow,
+        };
+      });
 
       const referralCode = referralResult[0]?.code ?? null;
+      const cfg = configRows[0];
+      const leadMagnetHeadline = cfg?.isActive ? (cfg.headline ?? null) : null;
+      const leadMagnetButtonText = cfg?.isActive
+        ? (cfg.buttonText ?? null)
+        : null;
 
-      logger.debug("Creator profile retrieved", { userId, skillCount });
+      logger.debug("Creator profile retrieved", {
+        userId,
+        skillCount: skills.length,
+      });
 
       return success({
-        userId,
         publicName: user.publicName,
         avatarUrl: user.avatarUrl ?? null,
         bio: user.bio ?? null,
@@ -79,11 +189,20 @@ export class CreatorProfileRepository {
         instagramUrl: user.instagramUrl ?? null,
         tiktokUrl: user.tiktokUrl ?? null,
         githubUrl: user.githubUrl ?? null,
+        facebookUrl: user.facebookUrl ?? null,
         discordUrl: user.discordUrl ?? null,
+        tribeUrl: user.tribeUrl ?? null,
+        rumbleUrl: user.rumbleUrl ?? null,
+        odyseeUrl: user.odyseeUrl ?? null,
+        nostrUrl: user.nostrUrl ?? null,
+        gabUrl: user.gabUrl ?? null,
         creatorAccentColor: user.creatorAccentColor ?? null,
         creatorHeaderImageUrl: user.creatorHeaderImageUrl ?? null,
-        skillCount,
         referralCode,
+        appName,
+        leadMagnetHeadline,
+        leadMagnetButtonText,
+        skills,
       });
     } catch (error) {
       logger.error("Error getting creator profile", parseError(error));

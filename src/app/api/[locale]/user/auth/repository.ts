@@ -1020,9 +1020,24 @@ export class AuthRepository {
       }
 
       // Check if session is expired
-      if (session.expiresAt < new Date()) {
+      const now = new Date();
+      if (session.expiresAt < now) {
         logger.debug(`Session expired`);
         return false;
+      }
+
+      // Auto-extend session when within 25% of remaining lifetime.
+      // This keeps remote connection sessions alive as long as they're actively used.
+      const totalLifetime =
+        session.expiresAt.getTime() - session.createdAt.getTime();
+      const remaining = session.expiresAt.getTime() - now.getTime();
+      if (remaining < totalLifetime * 0.25 && totalLifetime > 0) {
+        const newExpiry = new Date(now.getTime() + totalLifetime);
+        void SessionRepository.extendSession(token, newExpiry, sessionT);
+        logger.debug("Session auto-extended", {
+          userId,
+          newExpiry: newExpiry.toISOString(),
+        });
       }
 
       return true;

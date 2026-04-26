@@ -71,60 +71,38 @@ export const translations = {
     ttsAutoplay: {
       label: "TTS Autoplay",
     },
-    ttsVoice: {
-      label: "TTS Voice",
-    },
-    voiceModelSelection: {
-      label: "Voice Model",
-      placeholder: "System default",
-    },
-    sttModel: {
-      label: "Speech-to-Text Model",
-      placeholder: "System default",
-    },
-    imageVisionModel: {
-      label: "Image Vision Model",
-      placeholder: "System default",
-    },
-    videoVisionModel: {
-      label: "Video Vision Model",
-      placeholder: "System default",
-    },
-    audioVisionModel: {
-      label: "Audio Vision Model",
-      placeholder: "System default",
-    },
-    imageGenModel: {
-      label: "Image Generation Model",
-      placeholder: "System default",
-    },
-    musicGenModel: {
-      label: "Music Generation Model",
-      placeholder: "System default",
-    },
-    videoGenModel: {
-      label: "Video Generation Model",
-      placeholder: "System default",
-    },
-    defaultChatMode: {
-      label: "Default Chat Mode",
-    },
     viewMode: {
       label: "View Mode",
     },
-    availableTools: {
-      label: "Allowed Tools",
-    },
-    pinnedTools: {
-      label: "Pinned Tools",
-    },
-    compactTrigger: {
-      label: "Compact Trigger (tokens)",
-    },
-    memoryLimit: {
-      label: "Memory Limit (tokens)",
+    contextMemory: {
+      title: "Context Memory Budget",
       description:
-        "Maximum total tokens of memory content injected per turn. Leave empty to use the system default (1000 tokens).",
+        "How far back the AI remembers your conversation before it starts summarising.",
+      costNote: "Lower = cheaper",
+      costExplain:
+        "(to a point) – you trade a little memory for lower per-message cost.",
+      tooltipTitle: "How much conversation history the AI keeps",
+      tooltipBody:
+        "When the conversation grows past this limit, older messages are automatically summarised. The AI stays coherent but uses fewer tokens – reducing cost.",
+      tooltipModelCap: "Current model supports up to {cap} tokens.",
+      default: "default",
+      tokens: "tokens",
+      modelMax: "model max",
+      resetToDefault: "Reset to default ({value})",
+      cheaper: "cheaper",
+      moreMemory: "more memory",
+      barCheap: "Lower cost · shorter memory",
+      barBalanced: "Balanced cost & memory",
+      barRich: "Richer memory · higher cost",
+      barMax: "Maximum memory · highest cost",
+      tools: "Tools",
+      toolsInherited: "inherited",
+    },
+    searchProvider: {
+      label: "Search Provider",
+      description:
+        "Your preferred web search engine. Auto picks the cheapest available provider.",
+      auto: "Auto",
     },
     codingAgent: {
       label: "Coding Agent",
@@ -134,6 +112,68 @@ export const translations = {
         claudeCode: "Claude Code (default)",
         openCode: "OpenCode",
       },
+    },
+    dreaming: {
+      title: "Dreaming",
+      description:
+        "AI sorts your brain while you sleep — consolidates memories, cleans up documents, surfaces what matters.",
+      toggle: {
+        label: "Enable Dreaming",
+      },
+      schedule: {
+        label: "Schedule",
+        options: {
+          nightlyAt2: "2:00 AM nightly",
+          weekdaysAt2: "2:00 AM weekdays",
+          weekdaysAt8: "8:00 AM weekdays",
+          every6h: "Every 6 hours",
+          every12h: "Every 12 hours",
+        },
+      },
+      favoriteId: {
+        label: "Favorite slot",
+        defaultOption: "Default (Thea)",
+      },
+      prompt: {
+        label: "Session prompt",
+        placeholder:
+          "What should Thea focus on this session? Leave blank for the default.",
+        defaultPrompt:
+          "Run your dreaming session. Reorganize and consolidate the cortex — memories, documents, threads. Leave everything cleaner and more organized.",
+      },
+      lastRun: "Last run:",
+      neverRun: "Never run",
+    },
+    autopilot: {
+      title: "Autopilot",
+      description:
+        "AI works your queue while you're away — picks up next steps, advances projects, handles what's waiting.",
+      toggle: {
+        label: "Enable Autopilot",
+      },
+      schedule: {
+        label: "Schedule",
+        options: {
+          nightlyAt2: "2:00 AM nightly",
+          weekdaysAt2: "2:00 AM weekdays",
+          weekdaysAt8: "8:00 AM weekdays",
+          every6h: "Every 6 hours",
+          every12h: "Every 12 hours",
+        },
+      },
+      favoriteId: {
+        label: "Favorite slot",
+        defaultOption: "Default (Thea)",
+      },
+      prompt: {
+        label: "Session prompt",
+        placeholder:
+          "What should Hermes focus on this session? Leave blank for the default.",
+        defaultPrompt:
+          "Run your autopilot session. Pick up where active projects left off — advance next steps, handle queued work, keep things moving.",
+      },
+      lastRun: "Last run:",
+      neverRun: "Never run",
     },
     errors: {
       validation: {

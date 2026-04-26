@@ -159,13 +159,85 @@ export function SplitHero({
 
   return (
     <Div className="relative flex flex-col">
-      {/* Orientation strip */}
-      <Div className="w-full bg-[#080010] px-6 py-12 md:py-20 text-center">
-        <Div className="text-2xl md:text-4xl font-black text-white tracking-tighter mb-3">
-          {t("home.splitHero.header")}
-        </Div>
-        <Div className="text-xs md:text-sm text-white/40 tracking-widest uppercase">
-          {t("home.splitHero.subheader")}
+      {/* Intro section - underdog narrative */}
+      <Div className="w-full bg-[#080010] px-6 py-14 md:py-20">
+        <Div className="max-w-3xl mx-auto">
+          <MotionDiv
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-center mb-6"
+          >
+            <H1 className="text-2xl md:text-4xl font-black text-white tracking-tighter mb-3 leading-tight">
+              {t("home.splitHero.header")}
+            </H1>
+            <P className="text-sm md:text-base text-white/50 font-medium">
+              {t("home.splitHero.subheader")}
+            </P>
+          </MotionDiv>
+
+          <MotionDiv
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-sm md:text-base text-white/40 leading-relaxed text-center mb-8"
+          >
+            {t("home.splitHero.introBody")}
+          </MotionDiv>
+
+          <MotionDiv
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="space-y-2 mb-8"
+          >
+            <Div className="text-xs font-bold text-white/60 uppercase tracking-widest mb-3 text-center">
+              {t("home.splitHero.introGuide")}
+            </Div>
+            <Div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <Div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-violet-500/5 border border-violet-500/10">
+                <MessageSquare className="w-4 h-4 text-violet-400 mt-0.5 flex-shrink-0" />
+                <Span className="text-sm text-white/50">
+                  {t("home.splitHero.introOption1")}
+                </Span>
+              </Div>
+              <Div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
+                <Server className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                <Span className="text-sm text-white/50">
+                  {t("home.splitHero.introOption2")}
+                </Span>
+              </Div>
+              <Div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-cyan-500/5 border border-cyan-500/10">
+                <Code className="w-4 h-4 text-cyan-400 mt-0.5 flex-shrink-0" />
+                <Span className="text-sm text-white/50">
+                  {t("home.splitHero.introOption3")}
+                </Span>
+              </Div>
+              <Div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-rose-500/5 border border-rose-500/10">
+                <TrendingUp className="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0" />
+                <Span className="text-sm text-white/50">
+                  {t("home.splitHero.introOption4")}
+                </Span>
+              </Div>
+            </Div>
+          </MotionDiv>
+
+          <MotionDiv
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-center"
+          >
+            <Span className="text-sm text-white/30">
+              {t("home.splitHero.introHelp")}{" "}
+            </Span>
+            <Link
+              href={`/${locale}/help`}
+              className="text-sm text-white/50 underline underline-offset-2 hover:text-white/70 transition-colors"
+            >
+              {t("home.splitHero.introHelpCta")}
+            </Link>
+          </MotionDiv>
         </Div>
       </Div>
       {/* Mobile: flex-col with dividers interleaved */}

@@ -52,8 +52,6 @@ let globalSeq = 0;
 /** Set to true during shutdown to suppress expected proxy errors */
 let shuttingDown = false;
 
-
-
 /**
  * Broadcast an event to LOCAL subscribers of a channel (this process only).
  * Called directly by the emitter (same process - no HTTP POST needed).
@@ -127,6 +125,7 @@ export function broadcastLocal(
         emitterIsPublic: user.isPublic,
         channel,
         event,
+        env: process.env.NODE_ENV,
       });
       continue;
     }
@@ -146,7 +145,6 @@ export function broadcastLocal(
 export function broadcastLocalBatch(
   events: WsBatchEvent[],
   user: JwtPayloadType,
-  logger: EndpointLogger,
 ): void {
   if (events.length === 0) {
     return;
@@ -399,7 +397,7 @@ export function startWebSocketServer(
               events: WsBatchEvent[];
               user: JwtPayloadType;
             };
-            broadcastLocalBatch(batchBody.events, batchBody.user, logger);
+            broadcastLocalBatch(batchBody.events, batchBody.user);
           } else {
             const singleBody = body as {
               channel: string;

@@ -17,13 +17,13 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { generateFavoriteSlug, generateSlug } from "../slugify";
 import { parseError } from "../../../shared/utils";
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { ChatModelSelection } from "../../ai-stream/models";
 import { getModelDisplayName } from "../../models/all-models";
 import { modelProviders } from "../../models/models";
-import type { ChatModelSelection } from "../../ai-stream/models";
 import type { VoiceModelSelection } from "../../text-to-speech/models";
+import { generateFavoriteSlug, generateSlug, parseSkillId } from "../slugify";
 
 import type { TtsModelId } from "../../text-to-speech/models";
 import { STORAGE_KEYS } from "../constants";
@@ -31,16 +31,17 @@ import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
 import { ModelSelectionType } from "../skills/enum";
 import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
-import { getBestChatModelForFavorite } from "./[id]/definition";
 import type {
   FavoriteGetResponseOutput,
   FavoriteUpdateRequestOutput,
   FavoriteUpdateResponseOutput,
 } from "./[id]/definition";
+import { getBestChatModelForFavorite } from "./[id]/definition";
 import type {
   FavoriteCreateRequestOutput,
   FavoriteCreateResponseOutput,
 } from "./create/definition";
+import type { FavoriteConfig } from "./db";
 import type { FavoriteCard, FavoritesListResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 import type { FavoritesReorderRequestOutput } from "./reorder/definition";
@@ -51,8 +52,8 @@ import type { FavoritesReorderRequestOutput } from "./reorder/definition";
  */
 interface StoredLocalFavorite {
   id: string;
+  /** Merged format: "skillSlug" or "skillSlug__variantId" */
   skillId: string;
-  variantId: string | null;
   customVariantName?: string | null;
   customIcon: IconKey | null;
   voiceModelSelection: VoiceModelSelection | null;
@@ -65,6 +66,33 @@ interface StoredLocalFavorite {
  * Mirrors ChatFavoritesRepository but uses localStorage
  */
 export class ChatFavoritesRepositoryClient {
+  /**
+   * Build a FavoriteConfig from a StoredLocalFavorite (public users / localStorage).
+   * Only id, skillId, modelSelection, voiceModelSelection are populated;
+   * everything else is null (cascade to system defaults).
+   */
+  static buildLocalFavoriteConfig(stored: StoredLocalFavorite): FavoriteConfig {
+    return {
+      id: stored.id,
+      skillId: stored.skillId,
+      modelSelection: stored.modelSelection ?? null,
+      voiceModelSelection: stored.voiceModelSelection ?? null,
+      sttModelSelection: null,
+      imageVisionModelSelection: null,
+      videoVisionModelSelection: null,
+      audioVisionModelSelection: null,
+      imageGenModelSelection: null,
+      musicGenModelSelection: null,
+      videoGenModelSelection: null,
+      availableTools: null,
+      pinnedTools: null,
+      deniedTools: null,
+      compactTrigger: null,
+      memoryLimit: null,
+      promptAppend: null,
+    };
+  }
+
   /**
    * Get all favorites (mirrors server getFavorites)
    */
@@ -81,23 +109,94 @@ export class ChatFavoritesRepositoryClient {
       // Load stored minimal configs
       const storedConfigs = this.loadAllLocalFavorites();
 
+      // Batch-fetch UUID skills (custom/community) from the public API
+      const uuidRe =
+        /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
+      const uuidSkillIds = [
+        ...new Set(
+          storedConfigs.map((c) => c.skillId).filter((id) => uuidRe.test(id)),
+        ),
+      ];
+
+      interface FetchedSkill {
+        icon: IconKey | null;
+        name: string | null;
+        tagline: string | null;
+        description: string | null;
+        variants: Array<{
+          id: string;
+          modelSelection: ChatModelSelection | null;
+          voiceModelSelection: VoiceModelSelection | null;
+          isDefault: boolean;
+        }>;
+      }
+
+      const fetchedSkillMap = new Map<string, FetchedSkill>();
+      if (uuidSkillIds.length > 0) {
+        const results = await Promise.allSettled(
+          uuidSkillIds.map(async (skillId) => {
+            const res = await fetch(
+              `/api/${locale}/agent/chat/skills/${skillId}`,
+            );
+            if (!res.ok) {
+              return;
+            }
+            const json = (await res.json()) as {
+              data?: FetchedSkill & { id?: string };
+            };
+            if (json.data) {
+              fetchedSkillMap.set(skillId, json.data);
+            }
+          }),
+        );
+        // Log failures for debugging but don't crash
+        for (const result of results) {
+          if (result.status === "rejected") {
+            logger.warn("Failed to fetch UUID skill", {
+              reason: String(result.reason),
+            });
+          }
+        }
+      }
+
       // For PUBLIC users (localStorage), get character data from DEFAULT_SKILLS
       const { t: tChar } = charactersScopedTranslation.scopedT(locale);
       const cards = storedConfigs.map((config): FavoriteCard => {
-        const character = DEFAULT_SKILLS.find((c) => c.id === config.skillId);
-        const variant = config.variantId
-          ? (character?.variants.find((v) => v.id === config.variantId) ??
-            character?.variants.find((v) => v.isDefault) ??
-            character?.variants[0])
-          : (character?.variants.find((v) => v.isDefault) ??
-            character?.variants[0]);
+        // UUID skills: use fetched data; built-in skills: use DEFAULT_SKILLS
+        const isUuid = uuidRe.test(config.skillId);
+        const fetchedSkill = isUuid
+          ? fetchedSkillMap.get(config.skillId)
+          : undefined;
+        const character = isUuid
+          ? undefined
+          : DEFAULT_SKILLS.find((c) => c.id === config.skillId);
+
+        const variants = fetchedSkill?.variants ?? character?.variants ?? [];
+        const { variantId: configVariantId } = parseSkillId(config.skillId);
+        const variant = configVariantId
+          ? (variants.find((v) => v.id === configVariantId) ??
+            variants.find((v) => v.isDefault) ??
+            variants[0])
+          : (variants.find((v) => v.isDefault) ?? variants[0]);
+
+        const icon = fetchedSkill?.icon ?? character?.icon ?? null;
+        const name =
+          fetchedSkill?.name ??
+          (character?.name ? tChar(character.name) : null);
+        const tagline =
+          fetchedSkill?.tagline ??
+          (character?.tagline ? tChar(character.tagline) : null);
+        const description =
+          fetchedSkill?.description ??
+          (character?.description ? tChar(character.description) : null);
+
         return this.computeFavoriteDisplayFields(
           config,
           variant?.modelSelection,
-          character?.icon ?? null,
-          character?.name ? tChar(character.name) : null,
-          character?.tagline ? tChar(character.tagline) : null,
-          character?.description ? tChar(character.description) : null,
+          icon,
+          name,
+          tagline,
+          description,
           activeFavoriteId,
           variant?.voiceModelSelection ?? null,
           locale,
@@ -138,13 +237,14 @@ export class ChatFavoritesRepositoryClient {
       const currentConfigs = this.loadAllLocalFavorites();
 
       // Generate a slug-based ID for localStorage favorites
-      const skillId = data.skillId ?? "default";
-      const defaultSkill = DEFAULT_SKILLS.find((c) => c.id === skillId);
-      const skillSlug = defaultSkill?.id ?? generateSlug(skillId);
+      const { skillId: plainSkillId, variantId: parsedVariantId } =
+        parseSkillId(data.skillId);
+      const defaultSkill = DEFAULT_SKILLS.find((c) => c.id === plainSkillId);
+      const skillSlug = defaultSkill?.id ?? generateSlug(plainSkillId);
       const baseSlug = generateFavoriteSlug({
         customVariantName: data.customVariantName,
         skillSlug,
-        variantId: data.variantId,
+        variantId: parsedVariantId,
       });
       const existingSlugs = currentConfigs.map((c) => c.id);
       // Ensure uniqueness: append -2, -3, etc. if needed
@@ -159,8 +259,7 @@ export class ChatFavoritesRepositoryClient {
 
       const newConfig: StoredLocalFavorite = {
         id,
-        skillId,
-        variantId: data.variantId ?? null,
+        skillId: data.skillId, // store as-is (merged format)
         voiceModelSelection: data.voiceModelSelection ?? null,
         modelSelection: data.modelSelection ?? null,
         customIcon: null,
@@ -369,7 +468,6 @@ export class ChatFavoritesRepositoryClient {
     return {
       id: stored.id,
       skillId: stored.skillId,
-      variantId: stored.variantId ?? null,
       customVariantName: stored.customVariantName ?? null,
       modelId: bestModel?.id ?? null,
       voiceId: resolvedVoiceId,
@@ -414,7 +512,6 @@ export class ChatFavoritesRepositoryClient {
       // Flattened structure - no character found
       return {
         skillId: stored.skillId,
-        variantId: stored.variantId ?? null,
         customVariantName: stored.customVariantName ?? null,
         icon: "user" as const,
         name: t("fallbacks.unknownSkill"),
@@ -432,16 +529,16 @@ export class ChatFavoritesRepositoryClient {
       };
     }
 
-    // Resolve modelSelection from the specific variant (variantId always set for default skills)
-    const variant = stored.variantId
-      ? character.variants.find((v) => v.id === stored.variantId)
+    // Resolve modelSelection from the specific variant
+    const { variantId: storedVariantId } = parseSkillId(stored.skillId);
+    const variant = storedVariantId
+      ? character.variants.find((v) => v.id === storedVariantId)
       : undefined;
     const effectiveCharacterModelSelection = variant?.modelSelection ?? null;
 
     // Flattened structure - translate default character keys using characters scope
     return {
       skillId: stored.skillId,
-      variantId: stored.variantId ?? null,
       customVariantName: stored.customVariantName ?? null,
       icon: stored.customIcon ?? character.icon,
       name: character.name ? tChar(character.name) : t("fallbacks.unknown"),
@@ -490,6 +587,94 @@ export class ChatFavoritesRepositoryClient {
       STORAGE_KEYS.FAVORITE_CHARACTERS,
       JSON.stringify(configs),
     );
+  }
+
+  /**
+   * Store the last UUID skillId (+ display name) a public user favorited.
+   * Used on the signup page to pre-select the creator to support.
+   * "Last wins" — each new UUID-skill add overwrites.
+   */
+  static setLastAttributedSkillId(skillId: string, name?: string | null): void {
+    if (typeof window === "undefined") {
+      return;
+    }
+    localStorage.setItem(
+      STORAGE_KEYS.LAST_ATTRIBUTED_SKILL,
+      JSON.stringify({ skillId, name: name ?? null }),
+    );
+  }
+
+  /**
+   * Get the last UUID skillId stored by setLastAttributedSkillId.
+   */
+  static getLastAttributedSkillId(): string | null {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    const raw = localStorage.getItem(STORAGE_KEYS.LAST_ATTRIBUTED_SKILL);
+    if (!raw) {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(raw) as { skillId?: string };
+      return parsed.skillId ?? null;
+    } catch {
+      return raw; // legacy: plain string
+    }
+  }
+
+  /**
+   * Return UUID skills from local favorites with names from the attribution store.
+   * Used on signup page to build the creator-support selector.
+   */
+  static getLocalUuidSkillsForAttribution(): Array<{
+    skillId: string;
+    name: string | null;
+  }> {
+    const uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
+
+    // Build name map from the attribution store
+    const nameMap = new Map<string, string | null>();
+    if (typeof window !== "undefined") {
+      const raw = localStorage.getItem(STORAGE_KEYS.LAST_ATTRIBUTED_SKILL);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw) as {
+            skillId?: string;
+            name?: string | null;
+          };
+          if (parsed.skillId) {
+            nameMap.set(parsed.skillId, parsed.name ?? null);
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
+
+    return this.loadAllLocalFavorites()
+      .filter((f) => uuidRe.test(f.skillId))
+      .map((f) => f.skillId)
+      .filter((id, idx, arr) => arr.indexOf(id) === idx) // dedupe
+      .map((skillId) => ({ skillId, name: nameMap.get(skillId) ?? null }));
+  }
+
+  /**
+   * Return local favorites in a shape suitable for the signup migration payload.
+   * Only the fields the server needs to recreate them are included.
+   */
+  static getLocalFavoritesForMigration(): Array<{
+    skillId: string;
+    customVariantName: string | null | undefined;
+    modelSelection: StoredLocalFavorite["modelSelection"];
+    voiceModelSelection: StoredLocalFavorite["voiceModelSelection"];
+  }> {
+    return this.loadAllLocalFavorites().map((f) => ({
+      skillId: f.skillId,
+      customVariantName: f.customVariantName,
+      modelSelection: f.modelSelection,
+      voiceModelSelection: f.voiceModelSelection,
+    }));
   }
 
   /**

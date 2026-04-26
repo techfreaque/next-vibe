@@ -8,7 +8,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -27,9 +27,9 @@ export interface AnswerAsAIDeps {
   settings: {
     selectedModel: ChatModelId;
     selectedSkill: string;
-    availableTools: ToolConfigItem[] | null;
-    pinnedTools: ToolConfigItem[] | null;
   };
+  /** Active favorite config for model/tool resolution */
+  favoriteConfig: FavoriteConfig | null;
 }
 
 export async function answerAsAI(
@@ -45,6 +45,7 @@ export async function answerAsAI(
     currentSubFolderId,
     activeThreadId,
     settings,
+    favoriteConfig,
   } = deps;
 
   logger.debug("Answer as AI operation", { messageId, content });
@@ -107,16 +108,7 @@ export async function answerAsAI(
       role: ChatMessageRole.ASSISTANT,
       model: settings.selectedModel,
       skill: settings.selectedSkill ?? null,
-      availableTools:
-        settings.availableTools?.map((t) => ({
-          toolId: t.toolId,
-          requiresConfirmation: t.requiresConfirmation ?? false,
-        })) ?? null,
-      pinnedTools:
-        settings.pinnedTools?.map((t) => ({
-          toolId: t.toolId,
-          requiresConfirmation: t.requiresConfirmation ?? false,
-        })) ?? null,
+      favoriteConfig,
       messageHistory: messageHistory ?? [],
       attachments: attachments && attachments.length > 0 ? attachments : null,
       toolConfirmations: null,

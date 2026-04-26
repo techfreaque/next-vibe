@@ -293,6 +293,75 @@ export class RemoteCapabilitiesGeneratorRepository {
 
   // ─── Private helpers ──────────────────────────────────────────────────────
 
+  /**
+   * Import a single definition file and safely access its default export,
+   * retrying once on Bun TDZ race errors (both import and .default access).
+   */
+  private static async importDefinitionFile(
+    defFile: string,
+    logger: EndpointLogger,
+  ): Promise<Record<string, CreateApiEndpointAny> | null> {
+    const tryImport = async (): Promise<{
+      default?: Record<string, CreateApiEndpointAny>;
+    } | null> => {
+      try {
+        return (await import(defFile)) as {
+          default?: Record<string, CreateApiEndpointAny>;
+        };
+      } catch (error) {
+        const msg = parseError(error).message;
+        if (msg.includes("before initialization")) {
+          await new Promise((resolve) => {
+            setTimeout(resolve, 10);
+          });
+          try {
+            return (await import(defFile)) as {
+              default?: Record<string, CreateApiEndpointAny>;
+            };
+          } catch (retryError) {
+            logger.warn(
+              `Could not load definition: ${defFile} - ${parseError(retryError).message}`,
+            );
+            return null;
+          }
+        }
+        logger.warn(`Could not load definition: ${defFile} - ${msg}`);
+        return null;
+      }
+    };
+
+    const mod = await tryImport();
+    if (!mod) {
+      return null;
+    }
+
+    // Access .default with retry — Bun plugin race can throw TDZ here too
+    let defaultExport: Record<string, CreateApiEndpointAny> | undefined;
+    try {
+      defaultExport = mod.default;
+    } catch (error) {
+      const msg = parseError(error).message;
+      if (msg.includes("before initialization")) {
+        await new Promise((resolve) => {
+          setTimeout(resolve, 10);
+        });
+        try {
+          defaultExport = mod.default;
+        } catch (retryError) {
+          logger.warn(
+            `Could not access default export: ${defFile} - ${parseError(retryError).message}`,
+          );
+          return null;
+        }
+      } else {
+        logger.warn(`Could not access default export: ${defFile} - ${msg}`);
+        return null;
+      }
+    }
+
+    return defaultExport ?? null;
+  }
+
   private static async loadDefinitions(
     defFiles: string[],
     logger: EndpointLogger,
@@ -300,24 +369,19 @@ export class RemoteCapabilitiesGeneratorRepository {
     const results: Array<{ definition: CreateApiEndpointAny }> = [];
 
     for (const defFile of defFiles) {
-      try {
-        const mod = (await import(defFile)) as {
-          default?: Record<string, CreateApiEndpointAny>;
-        };
-        const defaultExport = mod.default;
-        if (!defaultExport || typeof defaultExport !== "object") {
-          continue;
-        }
-        for (const method of RemoteCapabilitiesGeneratorRepository.HTTP_METHODS) {
-          const definition = defaultExport[method];
-          if (definition) {
-            results.push({ definition });
-          }
-        }
-      } catch (error) {
-        logger.warn(
-          `Could not load definition: ${defFile} - ${parseError(error).message}`,
+      const defaultExport =
+        await RemoteCapabilitiesGeneratorRepository.importDefinitionFile(
+          defFile,
+          logger,
         );
+      if (!defaultExport || typeof defaultExport !== "object") {
+        continue;
+      }
+      for (const method of RemoteCapabilitiesGeneratorRepository.HTTP_METHODS) {
+        const definition = defaultExport[method];
+        if (definition) {
+          results.push({ definition });
+        }
       }
     }
 

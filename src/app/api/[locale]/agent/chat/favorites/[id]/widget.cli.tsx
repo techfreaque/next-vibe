@@ -63,10 +63,7 @@ function renderGetCli(value: FavoriteGetResponseOutput): string {
   if (value.tagline) {
     lines.push(chalk.white(`  ${value.tagline}`));
   }
-  lines.push(
-    chalk.dim(`  Skill: ${value.skillId}`) +
-      (value.variantId ? chalk.dim(` (variant: ${value.variantId})`) : ""),
-  );
+  lines.push(chalk.dim(`  Skill: ${value.skillId}`));
   lines.push(chalk.dim(`  Model: ${modelSummary(value.modelSelection)}`));
   if (value.promptAppend) {
     const preview =
@@ -81,9 +78,7 @@ function renderGetCli(value: FavoriteGetResponseOutput): string {
 function renderGetMcp(value: FavoriteGetResponseOutput): string {
   const lines: string[] = [];
   lines.push(`${value.name} - ${value.tagline ?? ""}`);
-  lines.push(
-    `Skill: ${value.skillId}${value.variantId ? ` (variant: ${value.variantId})` : ""}`,
-  );
+  lines.push(`Skill: ${value.skillId}`);
   lines.push(`Model: ${modelSummary(value.modelSelection)}`);
   if (value.promptAppend) {
     lines.push(`Prompt append: ${value.promptAppend}`);
