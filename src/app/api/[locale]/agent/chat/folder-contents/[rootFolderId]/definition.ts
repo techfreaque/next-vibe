@@ -351,6 +351,18 @@ const { GET } = createEndpoint({
                 .enum(["idle", "streaming", "aborting", "waiting"])
                 .nullable(),
             }),
+            // Share link fields (only populated for SHARED folder threads)
+            activeShareCount: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content:
+                "get.response.items.item.activeShareCount.content" as const,
+              schema: z.number().nullable(),
+            }),
+            lastSharedAt: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.items.item.lastSharedAt.content" as const,
+              schema: dateSchema.nullable(),
+            }),
             // Thread role arrays (nullable for folder items)
             rolesEdit: responseArrayOptionalField(scopedTranslation, {
               type: WidgetType.CONTAINER,

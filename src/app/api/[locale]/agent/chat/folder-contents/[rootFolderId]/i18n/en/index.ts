@@ -53,6 +53,8 @@ export const translations = {
           canEdit: { content: "Can Edit" },
           canPost: { content: "Can Post" },
           streamingState: { content: "Streaming State" },
+          activeShareCount: { content: "Active Share Links" },
+          lastSharedAt: { content: "Last Shared" },
           createdAt: { content: "Created At" },
           updatedAt: { content: "Updated At" },
         },

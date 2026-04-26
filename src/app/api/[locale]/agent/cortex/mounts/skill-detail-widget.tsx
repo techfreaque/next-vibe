@@ -1,17 +1,20 @@
 /**
  * Skill Detail Widget — domain enrichment for /skills/ paths
  *
- * Renders a compact skill card below the Cortex operation summary
- * showing the skill's identity in a domain-aware format.
+ * Renders the actual skill view widget using EndpointsPage,
+ * so the full skill detail appears below the Cortex file content.
  */
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { Span } from "next-vibe-ui/ui/span";
+import { useMemo } from "react";
+
+import skillDefinitions from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import {
+  useWidgetLocale,
+  useWidgetUser,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 interface SkillDetailWidgetProps {
   path: string;
@@ -19,27 +22,49 @@ interface SkillDetailWidgetProps {
   mountLabel: string;
 }
 
+/**
+ * Extract the skill id from a cortex path like:
+ *   /skills/my-skill-slug
+ *   /skills/abc123-uuid.md
+ * Returns null if the path doesn't contain a valid skill segment.
+ */
+function extractSkillId(path: string): string | null {
+  const segments = path.split("/").filter(Boolean);
+  // segments[0] = "skills", segments[1] = skillId or slug
+  if (segments.length < 2) {
+    return null;
+  }
+  return segments[1].replace(/\.md$/, "") || null;
+}
+
 export function SkillDetailWidget({
   path,
-  label,
-  mountLabel,
-}: SkillDetailWidgetProps): React.JSX.Element {
+}: SkillDetailWidgetProps): React.JSX.Element | null {
+  const locale = useWidgetLocale();
+  const user = useWidgetUser();
+
+  const id = useMemo(() => extractSkillId(path), [path]);
+
+  if (!id) {
+    return null;
+  }
+
   return (
-    <Card className="border-amber-500/20 bg-amber-500/5">
-      <CardContent className="p-3">
-        <Div className="flex items-center gap-2">
-          <Zap className="h-4 w-4 text-amber-500" />
-          <Span className="text-sm font-medium text-amber-700 dark:text-amber-300">
-            {mountLabel}
-          </Span>
-          <Span className="font-mono text-xs text-muted-foreground">
-            {label}
-          </Span>
-          <Badge variant="outline" className="ml-auto text-xs">
-            {path}
-          </Badge>
-        </Div>
-      </CardContent>
-    </Card>
+    <EndpointsPage
+      endpoint={skillDefinitions}
+      locale={locale}
+      user={user}
+      endpointOptions={{
+        read: {
+          urlPathParams: { id },
+        },
+        update: {
+          urlPathParams: { id },
+        },
+        delete: {
+          urlPathParams: { id },
+        },
+      }}
+    />
   );
 }

@@ -101,6 +101,9 @@ export class FolderContentsRepositoryClient {
           canPost: null,
           streamingState: null,
           rolesEdit: null,
+          // Share link fields - null for folders
+          activeShareCount: null,
+          lastSharedAt: null,
         }));
 
       // Map threads to FolderContentsItem
@@ -141,6 +144,9 @@ export class FolderContentsRepositoryClient {
           canCreateThread: null,
           rolesManage: null,
           rolesCreateThread: null,
+          // Share link fields - not applicable for client-side incognito
+          activeShareCount: null,
+          lastSharedAt: null,
         }),
       );
 

@@ -8,6 +8,7 @@ import { Form } from "next-vibe-ui/ui/form/form";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { Camera } from "next-vibe-ui/ui/icons/Camera";
 import { Check } from "next-vibe-ui/ui/icons/Check";
+import { Save } from "next-vibe-ui/ui/icons/Save";
 import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
@@ -63,7 +64,6 @@ import { MarkdownTextareaFieldWidget } from "@/app/api/[locale]/system/unified-i
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
 import { UrlFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/url-field/widget";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 import { envClient } from "@/config/env-client";
 import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 
@@ -397,14 +397,27 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
         </Link>
       )}
       {editing ? (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="bg-black/50 text-white/75 backdrop-blur-sm text-xs h-[30px] hover:bg-black/70 hover:text-white/90"
-          onClick={handleCancelEdit}
-        >
-          {t("widget.cancelEdit")}
-        </Button>
+        <>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="bg-black/50 text-white/75 backdrop-blur-sm text-xs h-[30px] hover:bg-black/70 hover:text-white/90"
+            onClick={handleCancelEdit}
+          >
+            {t("widget.cancelEdit")}
+          </Button>
+          <Button
+            type="submit"
+            size="sm"
+            className="text-xs h-[30px] gap-1.5"
+            disabled={form.formState.isSubmitting}
+          >
+            <Save className="h-3 w-3" />
+            {form.formState.isSubmitting
+              ? t("widget.saving")
+              : t("widget.save")}
+          </Button>
+        </>
       ) : (
         <Button
           variant="ghost"
@@ -546,15 +559,6 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
           </Div>
         ))}
       </Div>
-
-      <SubmitButtonWidget<typeof meDefinition.POST>
-        field={{
-          text: "widget.save",
-          loadingText: "widget.saving",
-          icon: "check",
-          variant: "primary",
-        }}
-      />
     </Div>
   ) : (
     <>

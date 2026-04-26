@@ -82,6 +82,12 @@ export const translations: typeof enTranslations = {
         description: 'Möchten Sie "{{title}}" wirklich löschen?',
       },
     },
+    sharedThread: {
+      noLinks: "Noch nicht geteilt — tippen zum Teilen",
+      linkCount: "{{count}} aktive(r) Link(s)",
+      shareAction: "Teilen",
+      moveToShared: "In Geteilt verschieben",
+    },
     common: {
       cancel: "Abbrechen",
       delete: "Löschen",

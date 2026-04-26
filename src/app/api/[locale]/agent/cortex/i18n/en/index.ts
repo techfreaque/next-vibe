@@ -186,6 +186,8 @@ export const translations = {
     task: "Task",
     upload: "Upload",
     search: "Search",
+    favorite: "Favorite",
+    gen: "Generated",
   },
   button: {
     label: "Cortex",

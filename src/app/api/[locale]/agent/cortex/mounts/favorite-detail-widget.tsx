@@ -1,42 +1,42 @@
 /**
- * Task Detail Widget — domain enrichment for /tasks/ paths
+ * Favorite Detail Widget — domain enrichment for /favorites/ paths
  *
- * Renders the actual cron task view using EndpointsPage.
+ * Renders the actual favorite view using EndpointsPage.
  */
 
 "use client";
 
 import { useMemo } from "react";
 
-import cronTaskDefinitions from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
+import favoriteDefinitions from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetLocale,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-interface TaskDetailWidgetProps {
+interface FavoriteDetailWidgetProps {
   path: string;
   label: string;
   mountLabel: string;
 }
 
-function extractTaskId(path: string): string | null {
+function extractFavoriteId(path: string): string | null {
   const segments = path.split("/").filter(Boolean);
-  // /tasks/<taskId>.md
+  // /favorites/<slug-or-id>.md
   if (segments.length < 2) {
     return null;
   }
   return segments[1].replace(/\.md$/, "") || null;
 }
 
-export function TaskDetailWidget({
+export function FavoriteDetailWidget({
   path,
-}: TaskDetailWidgetProps): React.JSX.Element | null {
+}: FavoriteDetailWidgetProps): React.JSX.Element | null {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
 
-  const id = useMemo(() => extractTaskId(path), [path]);
+  const id = useMemo(() => extractFavoriteId(path), [path]);
 
   if (!id) {
     return null;
@@ -44,14 +44,14 @@ export function TaskDetailWidget({
 
   return (
     <EndpointsPage
-      endpoint={cronTaskDefinitions}
+      endpoint={favoriteDefinitions}
       locale={locale}
       user={user}
       endpointOptions={{
         read: {
           urlPathParams: { id },
         },
-        create: {
+        update: {
           urlPathParams: { id },
         },
         delete: {

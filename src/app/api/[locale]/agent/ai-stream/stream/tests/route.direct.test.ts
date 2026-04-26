@@ -31,6 +31,7 @@ async function setupDirectConnection(
   const {
     connectToHermes,
     disconnectFromHermes,
+    ensureProdUserCredits,
     resolveProdUserId,
     triggerPull,
   } = await import("../../testing/remote-setup");
@@ -45,6 +46,13 @@ async function setupDirectConnection(
   await triggerPull();
 
   _prodUserId = await resolveProdUserId();
+
+  // Direct-mode tests POST tool calls to hermes (3001) which checks credits in its own DB.
+  // Both the hermes admin AND the local test user identity may be used (shared JWT secret
+  // means local JWTs are valid on hermes). Ensure both have enough credits (~125cr for video).
+  await ensureProdUserCredits(_prodUserId, 500);
+  await ensureProdUserCredits(testUser.id, 500);
+
   // isDirectlyAccessible=true is the default after connectToHermes (same machine)
 }
 

@@ -20,7 +20,7 @@ import {
  * The default chat model used across skills, fallbacks, and test fixtures.
  * Change this one constant to switch the platform default everywhere.
  */
-export const DEFAULT_CHAT_MODEL_ID = ChatModelId.KIMI_K2;
+export const DEFAULT_CHAT_MODEL_ID = ChatModelId.KIMI_K2_6;
 
 /**
  * Default chat model selection - MANUAL preferred model with 2-level sort fallback.

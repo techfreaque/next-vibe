@@ -138,6 +138,28 @@ export const MOUNT_WIDGET_REGISTRY: Record<string, MountWidgetConfig> = {
     color: "indigo",
     cliEmoji: "🔍",
   },
+  "/favorites": {
+    extractLabel: defaultExtractLabel("/favorites"),
+    loadWidget: () =>
+      import("./favorite-detail-widget").then((m) => ({
+        default: m.FavoriteDetailWidget,
+      })),
+    translationKey: "mounts.favorite" as const,
+    icon: "Star",
+    color: "yellow",
+    cliEmoji: "⭐",
+  },
+  "/gens": {
+    extractLabel: defaultExtractLabel("/gens"),
+    loadWidget: () =>
+      import("./gen-detail-widget").then((m) => ({
+        default: m.GenDetailWidget,
+      })),
+    translationKey: "mounts.gen" as const,
+    icon: "Wand2",
+    color: "pink",
+    cliEmoji: "✨",
+  },
 };
 
 /**

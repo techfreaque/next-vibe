@@ -59,6 +59,7 @@ export enum ChatModelId {
   CLAUDE_OPUS_4_7 = "claude-opus-4.7",
   GLM_4_5V = "glm-4.5v",
   KIMI_K2 = "kimi-k2",
+  KIMI_K2_5 = "kimi_k2_5",
   KIMI_K2_THINKING = "kimi-k2-thinking",
   DEEPSEEK_V32 = "deepseek-v3.2",
   DEEPSEEK_V31 = "deepseek-v3.1",
@@ -1606,6 +1607,48 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+  [ChatModelId.KIMI_K2_5]: {
+    name: "Kimi K2.5",
+    by: "moonshotAI",
+    description: "chat.models.descriptions.kimiK2_5",
+    parameterCount: 1000,
+    contextWindow: 262144,
+    icon: "moon",
+    inputs: ["text", "image"], // updated: 2026-04-03 from openrouter-api
+    outputs: ["text"], // updated: 2026-04-03 from openrouter-api
+    providers: [
+      {
+        id: ChatModelId.KIMI_K2_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "moonshotai/kimi-k2.5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.38, // updated: 2026-04-03 from openrouter-api
+        outputTokenCost: 1.72, // updated: 2026-04-03 from openrouter-api
+        cacheReadTokenCost: 0.19, // updated: 2026-04-03 from openrouter-api
+      },
+      {
+        id: ChatModelId.KIMI_K2_5,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kimi_k2_5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.494, // updated: 2026-04-07 from unbottled.ai
+        outputTokenCost: 2.236, // updated: 2026-04-07 from unbottled.ai
+        cacheReadTokenCost: 0.247, // updated: 2026-04-07 from unbottled.ai
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.FAST,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CREATIVE,
+      ModelUtility.VISION,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },

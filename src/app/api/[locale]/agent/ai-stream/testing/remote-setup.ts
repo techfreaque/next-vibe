@@ -109,6 +109,61 @@ export async function resolveProdUserId(): Promise<string> {
   return rows.rows[0]!.id;
 }
 
+/**
+ * Ensure the prod (hermes) admin user has at least `minCredits` permanent credits.
+ * Used by direct-mode tests that send tool calls to hermes (3001) directly — hermes
+ * checks credits in its own DB, so we must top up there, not in the local DB.
+ *
+ * Credits live in credit_packs (not just credit_wallets.balance), so we insert a
+ * permanent pack and update the wallet balance to match.
+ */
+export async function ensureProdUserCredits(
+  prodUserId: string,
+  minCredits: number,
+): Promise<void> {
+  const pdb = getProdDb();
+
+  // Read current packable balance (sum of remaining pack amounts)
+  const packRows = await pdb.execute<{ total: string }>(
+    sql`SELECT COALESCE(SUM(cp.remaining), 0) AS total
+        FROM credit_packs cp
+        JOIN credit_wallets cw ON cw.id = cp.wallet_id
+        WHERE cw.user_id = ${prodUserId}
+          AND (cp.expires_at IS NULL OR cp.expires_at > NOW())`,
+  );
+  const current = parseFloat(packRows.rows[0]?.total ?? "0");
+  if (current >= minCredits) { return; }
+
+  const toAdd = minCredits - current;
+
+  // Ensure the user exists in the prod DB; if not, skip (FK constraint would fail)
+  const userRows = await pdb.execute<{ id: string }>(
+    sql`SELECT id FROM users WHERE id = ${prodUserId} LIMIT 1`,
+  );
+  if (!userRows.rows[0]) { return; }
+
+  // Ensure the wallet exists; get its id
+  await pdb.execute(
+    sql`INSERT INTO credit_wallets (id, user_id, balance, free_credits_remaining, created_at, updated_at)
+        VALUES (gen_random_uuid(), ${prodUserId}, 0, 0, NOW(), NOW())
+        ON CONFLICT ON CONSTRAINT uq_wallet_user DO NOTHING`,
+  );
+  const walletRows = await pdb.execute<{ id: string }>(
+    sql`SELECT id FROM credit_wallets WHERE user_id = ${prodUserId} LIMIT 1`,
+  );
+  const walletId = walletRows.rows[0]?.id;
+  if (!walletId) { return; }
+
+  // Insert a permanent pack and bump the wallet balance
+  await pdb.execute(
+    sql`INSERT INTO credit_packs (id, wallet_id, original_amount, remaining, type, expires_at, source, metadata, created_at, updated_at)
+        VALUES (gen_random_uuid(), ${walletId}, ${toAdd}, ${toAdd}, 'permanent', NULL, 'test_top_up', '{}', NOW(), NOW())`,
+  );
+  await pdb.execute(
+    sql`UPDATE credit_wallets SET balance = balance + ${toAdd}, updated_at = NOW() WHERE id = ${walletId}`,
+  );
+}
+
 // ── Connection setup ──────────────────────────────────────────────────────────
 
 /**

@@ -51,6 +51,7 @@ import { MessageSquarePlus } from "next-vibe-ui/ui/icons/MessageSquarePlus";
 import { MoreVertical } from "next-vibe-ui/ui/icons/MoreVertical";
 import { Pin } from "next-vibe-ui/ui/icons/Pin";
 import { PinOff } from "next-vibe-ui/ui/icons/PinOff";
+import { Share2 } from "next-vibe-ui/ui/icons/Share2";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Input } from "next-vibe-ui/ui/input";
@@ -91,6 +92,7 @@ import {
   scopedTranslation as chatScopedTranslation,
   type ChatT,
 } from "../../i18n";
+import { ThreadShareDialog } from "../../threads/[threadId]/share-links/widget";
 
 import type { ChatFolder } from "../../db";
 import createFolderDefinition from "../../folders/[rootFolderId]/create/definition";
@@ -499,6 +501,60 @@ function ThreadRow({
                       : t("widget.actions.archive")}
                   </DropdownMenuItem>
                 )}
+                {item.canEdit &&
+                  item.rootFolderId === DefaultFolderId.PRIVATE && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setDropdownOpen(false);
+                          void (async (): Promise<void> => {
+                            // Remove from private folder cache
+                            apiClient.updateEndpointData(
+                              definitions.GET,
+                              logger,
+                              (old) => {
+                                if (!old?.success) {
+                                  return old;
+                                }
+                                return success({
+                                  ...old.data,
+                                  items: old.data.items.filter(
+                                    (i) => i.id !== item.id,
+                                  ),
+                                });
+                              },
+                              {
+                                urlPathParams: {
+                                  rootFolderId: item.rootFolderId,
+                                },
+                                requestData: {
+                                  subFolderId: item.folderId ?? null,
+                                },
+                              },
+                            );
+                            const threadDef =
+                              await import("../../threads/[threadId]/definition");
+                            await apiClient.mutate(
+                              threadDef.default.PATCH,
+                              logger,
+                              user,
+                              {
+                                rootFolderId: DefaultFolderId.SHARED,
+                                folderId: null,
+                              },
+                              { threadId: item.id },
+                              locale,
+                            );
+                          })();
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <Share2 className="h-4 w-4 mr-2" />
+                        {tFolders("widget.sharedThread.moveToShared")}
+                      </DropdownMenuItem>
+                    </>
+                  )}
                 {item.canEdit && allFolders.length > 0 && (
                   <>
                     <DropdownMenuSeparator />
@@ -574,6 +630,436 @@ function ThreadRow({
           <Div className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full" />
         )}
       </Div>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {tFolders("widget.threadList.deleteDialog.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {tFolders("widget.threadList.deleteDialog.description", {
+                title: item.title ?? "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {tFolders("widget.common.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {tFolders("widget.common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// timeAgo helper
+// ---------------------------------------------------------------------------
+
+/* eslint-disable i18next/no-literal-string */
+function timeAgo(date: Date | string): string {
+  const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+  if (seconds < 60) {
+    return `${seconds}s`;
+  }
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) {
+    return `${minutes}m`;
+  }
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    return `${hours}h`;
+  }
+  const days = Math.floor(hours / 24);
+  return `${days}d`;
+}
+/* eslint-enable i18next/no-literal-string */
+
+// ---------------------------------------------------------------------------
+// ThreadRowShared — 2-line variant for the SHARED root folder
+// ---------------------------------------------------------------------------
+
+function ThreadRowShared({
+  item,
+}: {
+  item: FolderContentsItem;
+}): React.JSX.Element {
+  const { locale, logger, user } = useWidgetContext();
+  const { t: tFolders } = foldersScopedTranslation.scopedT(locale);
+  const { t } = threadsScopedTranslation.scopedT(locale);
+  const isTouch = useTouchDevice();
+  const [isHovered, setIsHovered] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isTouched, setIsTouched] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(item.title ?? "");
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
+  const setNavigation = useChatNavigationStore((s) => s.setNavigation);
+  const isActive = activeThreadId === item.id;
+  const isThreadStreaming = item.streamingState !== "idle";
+  const activeShareCount = item.activeShareCount ?? 0;
+  const lastSharedAt = item.lastSharedAt ?? null;
+
+  const handleThreadClick = (e: DivMouseEvent): void => {
+    if (isEditing) {
+      return;
+    }
+    if (e.target.closest?.("button") || e.target.closest?.("input")) {
+      return;
+    }
+    setNavigation({
+      activeThreadId: item.id,
+      currentRootFolderId: item.rootFolderId as DefaultFolderId,
+      currentSubFolderId: item.folderId ?? null,
+    });
+    const url = item.folderId
+      ? `/${locale}/threads/${item.rootFolderId}/${item.folderId}/${item.id}`
+      : `/${locale}/threads/${item.rootFolderId}/${item.id}`;
+    window.history.pushState(null, "", url);
+  };
+
+  const mutateThread = async (updates: {
+    title?: string;
+    pinned?: boolean;
+    archived?: boolean;
+    folderId?: string | null;
+  }): Promise<void> => {
+    const isFolderMove =
+      "folderId" in updates && updates.folderId !== item.folderId;
+    if (isFolderMove) {
+      apiClient.updateEndpointData(
+        definitions.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            items: old.data.items.filter((i) => i.id !== item.id),
+          });
+        },
+        {
+          urlPathParams: { rootFolderId: item.rootFolderId },
+          requestData: { subFolderId: item.folderId ?? null },
+        },
+      );
+    } else {
+      apiClient.updateEndpointData(
+        definitions.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            items: old.data.items.map((i) =>
+              i.id === item.id ? { ...i, ...updates } : i,
+            ),
+          });
+        },
+        {
+          urlPathParams: { rootFolderId: item.rootFolderId },
+          requestData: { subFolderId: item.folderId ?? null },
+        },
+      );
+    }
+    const threadDef = await import("../../threads/[threadId]/definition");
+    await apiClient.mutate(
+      threadDef.default.PATCH,
+      logger,
+      user,
+      { ...updates, rootFolderId: item.rootFolderId },
+      { threadId: item.id },
+      locale,
+    );
+  };
+
+  const handleSaveEdit = (): void => {
+    if (editTitle.trim() && editTitle.trim() !== item.title) {
+      void mutateThread({ title: editTitle.trim() });
+    }
+    setIsEditing(false);
+  };
+
+  const handleConfirmDelete = (): void => {
+    void (async (): Promise<void> => {
+      apiClient.updateEndpointData(
+        definitions.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            items: old.data.items.filter((i) => i.id !== item.id),
+          });
+        },
+        {
+          urlPathParams: { rootFolderId: item.rootFolderId },
+          requestData: { subFolderId: item.folderId ?? null },
+        },
+      );
+      if (isActive) {
+        setNavigation({
+          activeThreadId: NEW_MESSAGE_ID,
+          currentRootFolderId: item.rootFolderId as DefaultFolderId,
+          currentSubFolderId: null,
+        });
+        window.history.pushState(
+          null,
+          "",
+          `/${locale}/threads/${item.rootFolderId}/${NEW_MESSAGE_ID}`,
+        );
+      }
+      const threadDef = await import("../../threads/[threadId]/definition");
+      await apiClient.mutate(
+        threadDef.default.DELETE,
+        logger,
+        user,
+        { rootFolderId: item.rootFolderId },
+        { threadId: item.id },
+        locale,
+      );
+    })();
+    setDeleteDialogOpen(false);
+  };
+
+  const hasMenuItems =
+    item.canEdit ?? item.canManagePermissions ?? item.canDelete;
+
+  /* eslint-disable i18next/no-literal-string */
+  const shareStatusLine =
+    activeShareCount > 0 ? (
+      <Div
+        className="flex items-center gap-1.5 text-xs text-teal-500 dark:text-teal-400 cursor-pointer hover:text-teal-400 dark:hover:text-teal-300 transition-colors"
+        onClick={(e) => {
+          e.stopPropagation();
+          setShareDialogOpen(true);
+        }}
+      >
+        <Share2 className="h-3 w-3 shrink-0" />
+        <Span>
+          {tFolders("widget.sharedThread.linkCount", {
+            count: activeShareCount,
+          })}
+          {lastSharedAt ? ` · ${timeAgo(lastSharedAt)}` : ""}
+        </Span>
+      </Div>
+    ) : (
+      <Div
+        className="flex items-center gap-1.5 text-xs text-muted-foreground/60 cursor-pointer hover:text-teal-400 dark:hover:text-teal-300 transition-colors"
+        onClick={(e) => {
+          e.stopPropagation();
+          setShareDialogOpen(true);
+        }}
+      >
+        <Share2 className="h-3 w-3 shrink-0" />
+        <Span>{tFolders("widget.sharedThread.noLinks")}</Span>
+      </Div>
+    );
+  /* eslint-enable i18next/no-literal-string */
+
+  return (
+    <>
+      <Div
+        className={cn(
+          "relative flex flex-col gap-0.5 px-2 py-1.5 rounded-md cursor-pointer",
+          chatTransitions.colors,
+          isActive
+            ? cn(chatColors.sidebar.active, "shadow-sm")
+            : chatColors.sidebar.hover,
+        )}
+        onClick={handleThreadClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => {
+          if (!dropdownOpen) {
+            setIsHovered(false);
+          }
+        }}
+        onTouchStart={() => setIsTouched(true)}
+        onTouchEnd={() => setTimeout(() => setIsTouched(false), 3000)}
+      >
+        {/* Line 1: title + actions */}
+        <Div className="flex items-center gap-2 min-w-0">
+          {isEditing ? (
+            <Div className="flex-1 min-w-0">
+              <Input<"text">
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                onBlur={handleSaveEdit}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSaveEdit();
+                  } else if (e.key === "Escape") {
+                    setEditTitle(item.title ?? "");
+                    setIsEditing(false);
+                  }
+                }}
+                className="w-full px-2 py-1 text-sm bg-background border border-border rounded"
+              />
+            </Div>
+          ) : (
+            <Div className="text-sm font-medium truncate flex-1 min-w-0">
+              {item.title}
+            </Div>
+          )}
+
+          {!isEditing && (isHovered || isTouched || isActive || isTouch) && (
+            <Div className="flex items-center gap-1 shrink-0">
+              {/* Always-visible share button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 w-6 text-teal-500 hover:text-teal-400 hover:bg-teal-500/10"
+                title={tFolders("widget.sharedThread.shareAction")}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShareDialogOpen(true);
+                }}
+              >
+                <Share2 className="h-3.5 w-3.5" />
+              </Button>
+
+              {hasMenuItems && (
+                <DropdownMenu
+                  open={dropdownOpen}
+                  onOpenChange={(open) => {
+                    setDropdownOpen(open);
+                    if (!open) {
+                      setIsHovered(false);
+                      setIsTouched(false);
+                    }
+                  }}
+                >
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-5 w-6"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDropdownOpen(true);
+                      }}
+                    >
+                      <MoreVertical className="h-3.5 w-3.5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    onCloseAutoFocus={(e) => e?.preventDefault()}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {item.canEdit && (
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setDropdownOpen(false);
+                          void mutateThread({ pinned: !item.pinned });
+                        }}
+                        className="cursor-pointer"
+                      >
+                        {item.pinned ? (
+                          <PinOff className="h-4 w-4 mr-2" />
+                        ) : (
+                          <Pin className="h-4 w-4 mr-2" />
+                        )}
+                        {item.pinned
+                          ? tFolders("widget.folderList.unpin")
+                          : tFolders("widget.folderList.pin")}
+                      </DropdownMenuItem>
+                    )}
+                    {item.canEdit && (
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setDropdownOpen(false);
+                          setIsEditing(true);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        {tFolders("widget.actions.rename")}
+                      </DropdownMenuItem>
+                    )}
+                    {item.canEdit && (
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setDropdownOpen(false);
+                          void mutateThread({ archived: !item.archived });
+                        }}
+                        className="cursor-pointer"
+                      >
+                        {item.archived ? (
+                          <ArchiveRestore className="h-4 w-4 mr-2" />
+                        ) : (
+                          <Archive className="h-4 w-4 mr-2" />
+                        )}
+                        {item.archived
+                          ? t("widget.actions.unarchive")
+                          : t("widget.actions.archive")}
+                      </DropdownMenuItem>
+                    )}
+                    {item.canDelete && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onSelect={() => {
+                            setDropdownOpen(false);
+                            setDeleteDialogOpen(true);
+                          }}
+                          className="text-destructive cursor-pointer"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          {tFolders("widget.common.delete")}
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </Div>
+          )}
+
+          {isThreadStreaming && (
+            <Div className="flex items-center gap-0.5 shrink-0">
+              <Div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0ms]" />
+              <Div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:150ms]" />
+              <Div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:300ms]" />
+            </Div>
+          )}
+
+          {item.pinned && (
+            <Div className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full" />
+          )}
+        </Div>
+
+        {/* Line 2: share status — always visible */}
+        {!isEditing && shareStatusLine}
+      </Div>
+
+      {/* Share dialog */}
+      {shareDialogOpen && (
+        <ThreadShareDialog
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+          threadId={item.id}
+          threadTitle={item.title ?? ""}
+          locale={locale}
+          user={user}
+        />
+      )}
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
@@ -1268,6 +1754,9 @@ function ItemSection({
                 allFolders={allFolders}
               />
             );
+          }
+          if (activeRootFolderId === DefaultFolderId.SHARED) {
+            return <ThreadRowShared key={item.id} item={item} />;
           }
           return (
             <ThreadRow key={item.id} item={item} allFolders={allFolders} />

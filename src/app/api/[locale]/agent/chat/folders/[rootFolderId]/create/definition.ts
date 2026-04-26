@@ -243,6 +243,8 @@ const { POST } = createEndpoint({
             canPost: null,
             streamingState: null,
             rolesEdit: null,
+            activeShareCount: null,
+            lastSharedAt: null,
           },
           logger,
         );

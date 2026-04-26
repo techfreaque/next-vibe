@@ -43,6 +43,10 @@ export function CortexListWidget({ field }: CliWidgetProps): JSX.Element {
         threads: "thrd ",
         skills: "skl ",
         tasks: "task ",
+        uploads: "file ",
+        searches: "srch ",
+        favorites: "fav ",
+        gens: "gen ",
       };
       const lines = [`${v.responsePath} (${v.total} items)`];
       for (const e of v.entries) {
@@ -66,6 +70,10 @@ export function CortexListWidget({ field }: CliWidgetProps): JSX.Element {
       threads: chalk.cyan,
       skills: chalk.yellow,
       tasks: chalk.green,
+      uploads: chalk.white,
+      searches: chalk.gray,
+      favorites: chalk.yellowBright,
+      gens: chalk.magentaBright,
     };
 
     const maxName = Math.max(...v.entries.map((e) => e.name.length), 4);

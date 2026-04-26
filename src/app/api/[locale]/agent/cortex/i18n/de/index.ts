@@ -188,6 +188,8 @@ export const translations = {
     task: "Aufgabe",
     upload: "Datei-Upload",
     search: "Websuche",
+    favorite: "Favorit",
+    gen: "Generiert",
   },
   button: {
     label: "Kortex",

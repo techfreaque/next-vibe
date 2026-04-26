@@ -596,6 +596,8 @@ export class PulseHealthRepository {
 
           const { user: cronUser, locale: userLocale } = taskUserContext;
           const { t: tTask } = scopedTranslation.scopedT(userLocale);
+          // Resolve displayName: may be a translation key (e.g. "dbHealthCheck.name") or plain string
+          const resolvedTaskName = tTask(dbTask.displayName);
           const startedAt = new Date();
 
           // Emit task-updated (RUNNING) to WS subscribers
@@ -666,6 +668,9 @@ export class PulseHealthRepository {
               let finalStatus: typeof CronTaskStatusValue =
                 CronTaskStatus.FAILED;
               let finalMessage: string | null = null;
+              let finalMessageParams:
+                | Record<string, string | number | boolean>
+                | undefined;
               let finalDurationMs = 0;
               let didLogHistory = false;
               let finalOutput: Record<string, WidgetData> | null = null;
@@ -814,16 +819,27 @@ export class PulseHealthRepository {
 
                 finalStatus = attemptStatus;
                 finalMessage = typedResult.message ?? null;
+                finalMessageParams = typedResult.messageParams;
+
+                const logMessage = finalMessage
+                  ? finalMessageParams
+                    ? finalMessage.replace(
+                        /\{\{(\w+)\}\}/g,
+                        (match, key: string) =>
+                          String(finalMessageParams?.[key] ?? match),
+                      )
+                    : finalMessage
+                  : null;
 
                 if (attempt < maxRetries) {
                   logger.warn(
-                    `Pulse: task "${dbTask.displayName}" failed (attempt ${attempt + 1}/${maxRetries + 1}), will retry`,
-                    { message: finalMessage },
+                    `Pulse: task "${resolvedTaskName}" failed (attempt ${attempt + 1}/${maxRetries + 1}), will retry`,
+                    { message: logMessage },
                   );
                 } else {
                   logger.error(
-                    `Pulse: task "${dbTask.displayName}" failed after ${maxRetries + 1} attempt(s)`,
-                    { message: finalMessage },
+                    `Pulse: task "${resolvedTaskName}" failed after ${maxRetries + 1} attempt(s)`,
+                    { message: logMessage },
                   );
                 }
               }

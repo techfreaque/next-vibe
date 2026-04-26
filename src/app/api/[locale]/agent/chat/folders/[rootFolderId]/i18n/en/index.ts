@@ -80,6 +80,12 @@ export const translations = {
         description: 'Are you sure you want to delete "{{title}}"?',
       },
     },
+    sharedThread: {
+      noLinks: "Not shared yet — tap to share",
+      linkCount: "{{count}} active link(s)",
+      shareAction: "Share",
+      moveToShared: "Move to Shared",
+    },
     common: {
       cancel: "Cancel",
       delete: "Delete",

@@ -1,17 +1,21 @@
 /**
  * Thread Detail Widget — domain enrichment for /threads/ paths
  *
- * Renders a compact thread card below the Cortex operation summary
- * showing the thread's identity in a domain-aware format.
+ * Renders the actual messages widget for the thread using EndpointsPage,
+ * so the full thread view (read-only) appears below the Cortex file content.
  */
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
-import { Span } from "next-vibe-ui/ui/span";
+import { useMemo } from "react";
+
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import messagesDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import {
+  useWidgetLocale,
+  useWidgetUser,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 interface ThreadDetailWidgetProps {
   path: string;
@@ -19,27 +23,65 @@ interface ThreadDetailWidgetProps {
   mountLabel: string;
 }
 
+interface ThreadPathInfo {
+  threadId: string;
+  rootFolderId: DefaultFolderId;
+}
+
+/**
+ * Extract thread info from a cortex path like:
+ *   /threads/private/abc123-uuid.md
+ *   /threads/private/folder-id/abc123-uuid.md
+ * segments: ["threads", rootFolder, ...rest, threadId.md]
+ */
+function extractThreadInfo(path: string): ThreadPathInfo | null {
+  const segments = path.split("/").filter(Boolean);
+  // Need at least: threads / rootFolder / threadId.md
+  if (segments.length < 3) {
+    return null;
+  }
+  const rootFolderSegment = segments[1];
+  const last = segments[segments.length - 1];
+  const threadId = last.replace(/\.md$/, "");
+  if (!threadId) {
+    return null;
+  }
+  // Validate rootFolder is a known DefaultFolderId
+  const rootFolderId = Object.values(DefaultFolderId).includes(
+    rootFolderSegment as DefaultFolderId,
+  )
+    ? (rootFolderSegment as DefaultFolderId)
+    : DefaultFolderId.PRIVATE;
+
+  return { threadId, rootFolderId };
+}
+
 export function ThreadDetailWidget({
   path,
-  label,
-  mountLabel,
-}: ThreadDetailWidgetProps): React.JSX.Element {
+}: ThreadDetailWidgetProps): React.JSX.Element | null {
+  const locale = useWidgetLocale();
+  const user = useWidgetUser();
+
+  const info = useMemo(() => extractThreadInfo(path), [path]);
+
+  if (!info) {
+    return null;
+  }
+
   return (
-    <Card className="border-cyan-500/20 bg-cyan-500/5">
-      <CardContent className="p-3">
-        <Div className="flex items-center gap-2">
-          <MessageSquare className="h-4 w-4 text-cyan-500" />
-          <Span className="text-sm font-medium text-cyan-700 dark:text-cyan-300">
-            {mountLabel}
-          </Span>
-          <Span className="font-mono text-xs text-muted-foreground">
-            {label}
-          </Span>
-          <Badge variant="outline" className="ml-auto text-xs">
-            {path}
-          </Badge>
-        </Div>
-      </CardContent>
-    </Card>
+    <EndpointsPage
+      endpoint={messagesDefinitions}
+      locale={locale}
+      user={user}
+      endpointOptions={{
+        read: {
+          urlPathParams: { threadId: info.threadId },
+          initialState: { rootFolderId: info.rootFolderId },
+        },
+        create: {
+          urlPathParams: { threadId: info.threadId },
+        },
+      }}
+    />
   );
 }

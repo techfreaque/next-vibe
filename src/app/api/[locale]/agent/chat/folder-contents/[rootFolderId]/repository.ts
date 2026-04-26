@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull, max } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -14,6 +14,7 @@ import {
   type ChatFolder,
   chatFolders,
   chatThreads,
+  threadShareLinks,
 } from "@/app/api/[locale]/agent/chat/db";
 import {
   canCreateThreadInFolder,
@@ -180,6 +181,9 @@ export class FolderContentsRepository {
           canPost: null,
           streamingState: null,
           rolesEdit: null,
+          // Share link fields - null for folders
+          activeShareCount: null,
+          lastSharedAt: null,
         });
       }
 
@@ -220,6 +224,35 @@ export class FolderContentsRepository {
         .from(chatThreads)
         .where(and(...threadConditions))
         .orderBy(desc(chatThreads.pinned), desc(chatThreads.updatedAt));
+
+      // Batch-fetch active share link counts for SHARED folder threads
+      const shareCountMap = new Map<
+        string,
+        { activeShareCount: number; lastSharedAt: Date | null }
+      >();
+      if (rootFolderId === DefaultFolderId.SHARED && dbThreads.length > 0) {
+        const threadIds = dbThreads.map((thread) => thread.id);
+        const shareCounts = await db
+          .select({
+            threadId: threadShareLinks.threadId,
+            activeShareCount: count(threadShareLinks.id),
+            lastSharedAt: max(threadShareLinks.createdAt),
+          })
+          .from(threadShareLinks)
+          .where(
+            and(
+              inArray(threadShareLinks.threadId, threadIds),
+              eq(threadShareLinks.active, true),
+            ),
+          )
+          .groupBy(threadShareLinks.threadId);
+        for (const row of shareCounts) {
+          shareCountMap.set(row.threadId, {
+            activeShareCount: row.activeShareCount,
+            lastSharedAt: row.lastSharedAt ?? null,
+          });
+        }
+      }
 
       // Build folder map for thread permission checks
       const threadFolderMap: Record<string, ChatFolder> = {};
@@ -340,6 +373,10 @@ export class FolderContentsRepository {
           canCreateThread: null,
           rolesManage: null,
           rolesCreateThread: null,
+          // Share link fields - only populated for SHARED folder
+          activeShareCount:
+            shareCountMap.get(thread.id)?.activeShareCount ?? null,
+          lastSharedAt: shareCountMap.get(thread.id)?.lastSharedAt ?? null,
         });
       }
 

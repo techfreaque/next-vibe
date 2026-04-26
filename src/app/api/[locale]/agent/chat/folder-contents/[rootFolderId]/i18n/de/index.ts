@@ -51,6 +51,8 @@ export const translations = {
           canEdit: { content: "Kann bearbeiten" },
           canPost: { content: "Kann posten" },
           streamingState: { content: "Streaming-Status" },
+          activeShareCount: { content: "Aktive Freigabelinks" },
+          lastSharedAt: { content: "Zuletzt geteilt" },
           createdAt: { content: "Erstellt am" },
           updatedAt: { content: "Aktualisiert am" },
         },
