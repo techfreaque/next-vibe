@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-execute-tool----ede085f2-3886-4da3-aa51-f75e2ff4f392.md\n\n# [T1 thread-create+tool-call] Use execute-tool...\nFolder: cron\n\ntool: \nassistant: STEP_OK\ntool: \ntool: \nassistant: WAKEUP_FAILED: Result shows status=failed with no imageUrl\nuser: [T6d-phase1 wakeUp-idem-setup] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'idempotency-test'}, callbackMode='wakeUp'. In this phase you should receive a taskId (no imageUrl). End with STEP_OK if you see taskId.\nassistant: \ntool: \nassistant: STEP_OK\ntool: \ntool: \nassistant: WAKEUP_OK\nuser: [T6e-phase1 wakeUp-deadstream-setup] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'dead-stream-test'}, callbackMode='wakeUp'. You should receive a taskId (no imageUrl yet). End with STEP_OK if taskId is present, FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived (you will see the generate_image tool result containing an imageUrl), confirm the imageUrl is present and non-empty, then end with\nassistant: \ntool: \nassistant: \nassistant: STEP_OK\ntool: \ntool: \nassistant: WAKEUP_OK",
+    "encoding_format": "float"
+  }
+}

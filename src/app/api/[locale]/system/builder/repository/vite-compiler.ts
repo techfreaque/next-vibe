@@ -20,6 +20,7 @@ import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
 import {
   isRunnableDevEnvironment,
   type BuildOptions,
+  type EnvironmentModuleGraph,
   type InlineConfig,
   type Plugin,
   type PluginOption,
@@ -159,6 +160,30 @@ function serverOnlyTracePlugin(
       ].join("\n");
     },
   };
+}
+
+// Walk the importer graph recursively and invalidate every module that
+// transitively depends on the changed file. Only invalidating the leaf module
+// leaves importers with stale cached references — they never know to re-fetch.
+function invalidateWithImporters(
+  graph: EnvironmentModuleGraph,
+  startId: string,
+  visited: Set<string>,
+): void {
+  if (visited.has(startId)) {
+    return;
+  }
+  visited.add(startId);
+  const mod = graph.getModuleById(startId);
+  if (!mod) {
+    return;
+  }
+  graph.invalidateModule(mod);
+  for (const importer of mod.importers) {
+    if (importer.id) {
+      invalidateWithImporters(graph, importer.id, visited);
+    }
+  }
 }
 
 export class ViteCompiler {
@@ -1441,46 +1466,49 @@ export class ViteCompiler {
               if (srcModules.length === 0) {
                 return;
               }
-              // Invalidate ALL evaluated SSR modules on every src/ change.
-              // Walking only importers misses stale bindings in circular deps:
-              // when A→B→A exists, Vite may only track one direction, so the
-              // other side keeps a stale __vite_ssr_import_N__ binding that hits
-              // TDZ on the next SSR request. Clearing everything is safe in dev
-              // - modules re-evaluate on demand, so this just forces a clean
-              // re-evaluation of the full SSR module graph after each HMR.
+              // Skip SSR invalidation for CSS-only changes. Tailwind rescans
+              // can trigger globals.css HMR without any actual source change —
+              // CSS doesn't affect SSR module bindings, so clearing the SSR
+              // cache just causes unnecessary full re-evaluation + page reloads.
+              const nonCssModules = srcModules.filter(
+                (m) => m.id && !m.id.endsWith(".css"),
+              );
+              if (nonCssModules.length === 0) {
+                return;
+              }
+
+              // SSR: clear the runner evaluated-module cache so stale
+              // __vite_ssr_import_N__ bindings from circular deps are reset,
+              // then invalidate the SSR graph for each changed module + importers.
               const ssrEnv = viteServer.environments?.["ssr"];
               if (ssrEnv && isRunnableDevEnvironment(ssrEnv)) {
-                // Use the runner's built-in clear() which clears all three
-                // internal maps (idToModuleMap, fileToModulesMap,
-                // urlToIdModuleMap) atomically - same as what Vite does on a
-                // full program reload. This forces a clean re-evaluation chain
-                // on the next SSR request with no stale module references.
                 ssrEnv.runner.evaluatedModules.clear();
               }
-              // Also invalidate the SSR environment module graph so Vite
-              // re-transforms modules on the next SSR request.
               if (ssrEnv) {
-                for (const mod of srcModules) {
-                  if (!mod.id) {
-                    continue;
-                  }
-                  const ssrGraphMod = ssrEnv.moduleGraph.getModuleById(mod.id);
-                  if (ssrGraphMod) {
-                    ssrEnv.moduleGraph.invalidateModule(ssrGraphMod);
+                const visited = new Set<string>();
+                for (const mod of nonCssModules) {
+                  if (mod.id) {
+                    invalidateWithImporters(
+                      ssrEnv.moduleGraph,
+                      mod.id,
+                      visited,
+                    );
                   }
                 }
               }
-              // Also invalidate the client environment module graph for the changed
-              // modules so Vite re-transforms them and serves updated JS to the browser.
+
+              // Client: walk importers and invalidate so the browser receives
+              // an HMR update for every module that transitively used the changed file.
               const clientEnv = viteServer.environments?.["client"];
               if (clientEnv) {
-                for (const mod of srcModules) {
-                  if (!mod.id) {
-                    continue;
-                  }
-                  const clientMod = clientEnv.moduleGraph.getModuleById(mod.id);
-                  if (clientMod) {
-                    clientEnv.moduleGraph.invalidateModule(clientMod);
+                const visited = new Set<string>();
+                for (const mod of nonCssModules) {
+                  if (mod.id) {
+                    invalidateWithImporters(
+                      clientEnv.moduleGraph,
+                      mod.id,
+                      visited,
+                    );
                   }
                 }
               }
@@ -1554,35 +1582,40 @@ export class ViteCompiler {
           strictPort: true,
           host: "127.0.0.1",
           watch: {
-            // Ignore .tmp dir - contains bracket paths ([locale]) that crash inotify on Linux.
+            // Ignore .tmp dir - build artifacts, not user source.
             // Ignore routeTree.gen.ts - regenerated by TanStack Start plugin, not user source.
             // Ignore app-tanstack/routes - auto-generated, touching them shouldn't trigger CSS HMR.
             // Ignore generated/ dirs - written by task runner generators, contain no Tailwind classes.
             // Without this, every generator run triggers a globals.css HMR cycle via Tailwind's
             // @source scanner re-evaluating all watched files.
-            ignored: [
-              "**/.tmp/**",
-              "**/.next/**",
-              "**/.next-prod/**",
-              "**/.next-rebuild/**",
-              "**/node_modules/**",
-              "**/routeTree.gen.ts",
-              "**/app-tanstack/routes/**",
-              "**/system/generated/**",
-              "**/messenger/registry/generated.ts",
-              "**/app-native/**",
-              "**/test-files/**",
-              "**/testing/fixtures/**",
-              "**/*.test.ts",
-              "**/*.test.tsx",
-              "**/*.spec.ts",
-              "**/*.spec.tsx",
-            ],
-            // usePolling is required for paths with square brackets (e.g. [locale]).
-            // Chokidar treats brackets as glob patterns and won't watch those paths via inotify.
-            // Polling is slower but correctly tracks all file changes.
-            usePolling: true,
-            interval: 300,
+            // Use a function for ignored so it works with disableGlobbing:true.
+            // Glob strings in ignored are treated as literals when disableGlobbing
+            // is set, so they would never match. A function always works.
+            ignored: (filePath: string) => {
+              return (
+                filePath.includes("/.tmp/") ||
+                filePath.includes("/.next/") ||
+                filePath.includes("/.next-prod/") ||
+                filePath.includes("/.next-rebuild/") ||
+                filePath.includes("/node_modules/") ||
+                filePath.endsWith("/routeTree.gen.ts") ||
+                filePath.includes("/app-tanstack/routes/") ||
+                filePath.includes("/system/generated/") ||
+                filePath.endsWith("/messenger/registry/generated.ts") ||
+                filePath.includes("/app-native/") ||
+                filePath.includes("/test-files/") ||
+                filePath.includes("/testing/fixtures/") ||
+                filePath.endsWith(".test.ts") ||
+                filePath.endsWith(".test.tsx") ||
+                filePath.endsWith(".spec.ts") ||
+                filePath.endsWith(".spec.tsx")
+              );
+            },
+            // disableGlobbing tells chokidar to treat [locale] as a literal path,
+            // not a glob pattern. This allows native inotify (Linux) / FSEvents (macOS)
+            // instead of polling — faster detection, less CPU, no false mtime positives.
+            // ignored must be a function (not glob strings) for this to work correctly.
+            disableGlobbing: true,
           },
           // When running behind a proxy (e.g. Bun WS proxy on publicPort), tell Vite's
           // injected HMR client to connect to the proxy port instead of the internal port.

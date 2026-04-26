@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-execute-tool----142ed435-99f2-4310-a10f-008fae7c3222.md\n\n# [T1 thread-create+tool-call] Use execute-tool...\nFolder: cron\n\nuser: [T1 thread-create+tool-call] Use execute-tool with toolName='tool-help' and instanceId='hermes' to list available tools. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if everything worked, or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK\nuser: [T1b tool-help-detail] Call execute-tool with toolName='tool-help' and instanceId='hermes' with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK\nuser: [T2 image-gen] Call execute-tool with toolName='generate_image', instanceId='hermes', prompt='red circle'. Check that the result contains a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK",
+    "encoding_format": "float"
+  }
+}

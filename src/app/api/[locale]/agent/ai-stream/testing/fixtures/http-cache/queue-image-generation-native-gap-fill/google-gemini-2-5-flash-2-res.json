@@ -1,0 +1,65 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "9f26c918fcaaa8cb-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sun, 26 Apr 2026 15:57:52 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1777219071-V6yEBLvc5d9vFb9FU0bt"
+  },
+  "body": {
+    "id": "gen-1777219071-V6yEBLvc5d9vFb9FU0bt",
+    "object": "chat.completion",
+    "created": 1777219071,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This audio file features a joyful and laid-back synth funk track. The music combines a groovy acoustic guitar line with a bouncy bassline, creating a fun and danceable vibe. The overall atmosphere of the song is upbeat and lighthearted, making it perfect for a chill evening or a leisurely stroll.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 794,
+      "completion_tokens": 60,
+      "total_tokens": 854,
+      "cost": 0.0009132,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0009132,
+        "upstream_inference_prompt_cost": 0.0007632,
+        "upstream_inference_completions_cost": 0.00015
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

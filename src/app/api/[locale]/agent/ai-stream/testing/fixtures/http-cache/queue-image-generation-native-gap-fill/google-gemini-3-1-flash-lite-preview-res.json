@@ -1,0 +1,73 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "9f26c919ae54d2a6-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sun, 26 Apr 2026 15:57:55 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1777219071-0nB1rwqQJr9mIYarWhWe"
+  },
+  "body": {
+    "id": "gen-1777219071-0nB1rwqQJr9mIYarWhWe",
+    "object": "chat.completion",
+    "created": 1777219071,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video presents a high-definition, close-up shot focused on a pair of hands assembling and manipulating a Rubik’s Cube. \n\n**Visual Content and Scene:**\n*   **Central Subject:** A person with medium-toned skin is holding a standard 3x3 Rubik’s Cube. The cube is currently in a partially solved, scrambled state, featuring scattered red, white, yellow, and blue stickers across its faces.\n*   **The Background:** The background is densely packed with a vast, out-of-focus collection of dozens of other Rubik’s Cubes, creating a chaotic, colorful mosaic of plastic grids. This vast sea of cubes suggests a workshop, a collector's hobby space, or a specialized store.\n*   **Lighting and Style:** The lighting is soft and cinematic, with a shallow depth of field that keeps the cube in the hands in sharp, crisp focus while blurring the surrounding cubes into bokeh circles of color. The style is professional and polished, commonly seen in instructional videos or high-quality advertisements regarding puzzle-solving.\n\n**Actions:**\n*   The hands are actively rotating the layers of the cube. The fingers move with dexterity and speed, snapping different sections of the cube into new alignments. The movement is fluid and purposeful, characteristic of someone experienced with the mechanics of the puzzle.\n\n**Notable Elements:**\n*   **Text/Logo:** There is a small, distinct white logo—a stylized \"X\" or cross symbol—printed on one of the white-faced squares on the top layer of the cube.\n*   **Color Palette:** The scene is incredibly vivid, dominated by the primary colors typically found on a Rubik's Cube (bright red, royal blue, sunny yellow, white, and greenery), which contrast against the dark, neutral skin tones of the hands.\n\nThe overall atmosphere of the clip is focused, tactile, and rhythmic.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "EjQKMgEMOdbHkPnasbqX1elXYiYmPnkWWRwvBJUMAPTPlNViBjynktPxhxpq/ap+mNL6L1DU",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 107,
+      "completion_tokens": 393,
+      "total_tokens": 500,
+      "cost": 0.00061625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00061625,
+        "upstream_inference_prompt_cost": 0.00002675,
+        "upstream_inference_completions_cost": 0.0005895
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

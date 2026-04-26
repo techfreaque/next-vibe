@@ -1,0 +1,38 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "9f26ca62484cd3ac-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Sun, 26 Apr 2026 15:58:46 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1777219123-I4bY7rlRZaZ1UCJLG4FO"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1777219123-I4bY7rlRZaZ1UCJLG4FO\",\"object\":\"chat.completion.chunk\",\"created\":1777219123,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"IN\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1777219123-I4bY7rlRZaZ1UCJLG4FO\",\"object\":\"chat.completion.chunk\",\"created\":1777219123,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"CO\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1777219123-I4bY7rlRZaZ1UCJLG4FO\",\"object\":\"chat.completion.chunk\",\"created\":1777219123,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"GN\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1777219123-I4bY7rlRZaZ1UCJLG4FO\",\"object\":\"chat.completion.chunk\",\"created\":1777219123,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"ITO\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1777219123-I4bY7rlRZaZ1UCJLG4FO\",\"object\":\"chat.completion.chunk\",\"created\":1777219123,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"_TEST\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1777219123-I4bY7rlRZaZ1UCJLG4FO\",\"object\":\"chat.completion.chunk\",\"created\":1777219123,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1777219123-I4bY7rlRZaZ1UCJLG4FO\",\"object\":\"chat.completion.chunk\",\"created\":1777219123,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":6047,\"completion_tokens\":5,\"total_tokens\":6052,\"cost\":0.0036407,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.0036407,\"upstream_inference_prompt_cost\":0.0036282,\"upstream_inference_completions_cost\":0.0000125},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

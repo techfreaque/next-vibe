@@ -23,7 +23,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  UserPermissionRole,
+  UserRole,
+} from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
@@ -123,6 +126,19 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS (for AI/CLI filtering) ===
+      /**
+       * Admin-only: fetch skills for a specific user instead of the authenticated user.
+       * Allows viewing another user's custom skills from the admin panel.
+       */
+      targetUserId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "get.fields.targetUserId.label" as const,
+        description: "get.fields.targetUserId.description" as const,
+        schema: z.string().uuid().optional(),
+        visibleFor: [UserPermissionRole.ADMIN],
+        hidden: true,
+      }),
       query: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,

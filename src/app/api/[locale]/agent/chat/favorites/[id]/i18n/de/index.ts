@@ -22,8 +22,8 @@ export const translations: typeof enTranslations = {
     deleteButton: {
       label: "Favoriten löschen",
     },
-    customizeSkillButton: {
-      label: "Charakter-Persönlichkeit anpassen",
+    viewSkillButton: {
+      label: "Skill ansehen",
     },
     signupPrompt: {
       title: "Charakter-Persönlichkeit anpassen",
@@ -163,8 +163,8 @@ export const translations: typeof enTranslations = {
     deleteButton: {
       label: "Favorit löschen",
     },
-    customizeSkillButton: {
-      label: "Charakter-Persönlichkeit anpassen",
+    viewSkillButton: {
+      label: "Skill ansehen",
     },
     useThisSkillButton: {
       label: "Diesen Charakter verwenden",

@@ -384,16 +384,23 @@ export class ChatFavoritesRepository {
         const characterName = variantLabel
           ? `${baseName} - ${variantLabel}`
           : baseName;
-        // Use slug as external ID (fall back to UUID for backcompat)
-        const externalId = row.slug || row.id;
         // Resolve skillId to canonical slug (never expose UUIDs in system prompt)
         const canonicalSkillId = skillSlugMap.get(row.skillId) ?? row.skillId;
+        // Use slug as external ID; if slug is a UUID (legacy: same as skillId), prefer canonicalSkillId
+        const UUID_RE_ITEM =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const rawSlug = row.slug || row.id;
+        const externalId =
+          rawSlug && !UUID_RE_ITEM.test(rawSlug) ? rawSlug : canonicalSkillId;
+        // Extract model from model_selection jsonb
+        const sel = row.modelSelection as { manualModelId?: string } | null;
+        const resolvedModelId = sel?.manualModelId ?? null;
         return {
           id: externalId,
           name: row.customVariantName ?? characterName,
           skillId: canonicalSkillId,
           characterName,
-          modelId: null as string | null, // model resolved client-side; not stored server-side
+          modelId: resolvedModelId,
           modelInfo: "",
           isActive:
             row.slug === activeFavoriteId || row.id === activeFavoriteId,
@@ -507,16 +514,23 @@ export class ChatFavoritesRepository {
       const characterName = variantLabel
         ? `${baseName} - ${variantLabel}`
         : baseName;
-      // Use slug as external ID (fall back to UUID for backcompat)
-      const externalId = row.slug || row.id;
       // Resolve skillId to canonical slug (never expose UUIDs)
       const canonicalSkillId = skillSlugMap.get(row.skillId) ?? row.skillId;
+      // Use slug as external ID; if slug is a UUID (legacy: same as skillId), prefer canonicalSkillId
+      const UUID_RE_ITEM =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const rawSlug = row.slug || row.id;
+      const externalId =
+        rawSlug && !UUID_RE_ITEM.test(rawSlug) ? rawSlug : canonicalSkillId;
+      // Extract model from model_selection jsonb
+      const sel = row.modelSelection as { manualModelId?: string } | null;
+      const resolvedModelId = sel?.manualModelId ?? null;
       return {
         id: externalId,
         name: row.customVariantName ?? characterName,
         skillId: canonicalSkillId,
         characterName,
-        modelId: null,
+        modelId: resolvedModelId,
         modelInfo: "",
         isActive: row.slug === activeFavoriteId || row.id === activeFavoriteId,
         position: row.position,

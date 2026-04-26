@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Tool: [result:execute-tool] {\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/39a3258f-8065-404e-98ea-a6f35b1e244b/e79a406a-9326-40e3-88ed-92f035e2ba15.png\",\"creditCost\":2.7}\n\nAssistant: STEP_OK\n\nSystem: [Context: ID:2ba14e0d | Posted:Apr 26, 15:33]\n\nUser: [T5c execute-tool-direct] Call the execute-tool endpoint with toolName='tool-help' and input={} and instanceId='hermes'. Check that the inner result contains a tools array with at least one entry. End your reply with STEP_OK if a tools list was returned, or FAILED: <reason> if the result was missing or malformed.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English — the user's language.\n\n/ (cortex)\n├── memories/ (42 · 4 archived)\n│   ├── 121.md\n│   │   SINGLE FOCUSED SESSION: Cloud Code Mode Bug Fix - Mar 9, 2026 00:49 UTC · **TASK CREATED FOR HERMES:** · - ID: fix-cloud-code-mode · - Status: Manual schedule, queued for Hermes execution · - Mode: PAIR MODE (interactive: true) - Max and Thea work through this together · - Character: Hermes Delegate (bd07b02d-074b-44a7-a19b-0e67c7a245fd) · - Model: Claude Sonnet 4.5 · - Route: \n│   ├── 51.md\n│   │   Multi-Instance Set\n\nSystem: [Context: ID:05b10f03 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 15:33]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{},\"instanceId\":\"hermes\",\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"status\":\"status.pending\"}",
+    "encoding_format": "float"
+  }
+}

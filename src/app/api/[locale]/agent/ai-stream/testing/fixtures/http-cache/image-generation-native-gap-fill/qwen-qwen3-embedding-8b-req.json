@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: I can process the audio description provided: \"This audio file features a joyful hip hop music with a catchy melody, lively rhythm, and a strong beat. The main instruments include an acoustic bass guitar, drums, and string pads, which together create a relaxed and groovy atmosphere. The music is ideal as background music for an urban scene or an energetic commercial, making it suitable for a wide range of content creators.\"\n\nThis describes upbeat hip hop music with bass guitar, drums, and string pads creating a relaxed, groovy atmosphere perfect for urban scenes or commercials.\n\nSTEP_OK\n\nUser: [T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.\n\nAssistant: I can process the video description provided: \n\nThe video shows a close-up shot of someone speedcubing a Rubik's Cube. The scene features skilled hands rapidly manipulating a 3x3 cube with practiced precision. The background is a colorful blur of dozens of other Rubik's Cubes, creating a vibrant mosaic effect. The lighting is bright and highlights the glossy plastic of the cube. There's a visible logo on one face of the cube being solved. The overall tone conveys hobbyist dedication and mechanical coordination.\n\nThe description captures the essence of a speedcubing demonstration with professional photography using shallow depth of field to keep focus on the active cube while the blurred background provides dynamic visual context.\n\nSTEP_OK\n\nUser: [T11 native-image] Generate an image of a blue triangle. Output the image directly (no tool call needed). End your reply with STEP_OK if the image was generated, or FAILED: <reason> if generation failed.\n\nUser: [T11b gap-fill-pass2] In the previous turn you generated an image. Describe what was generated. End your reply with STEP_OK if you can describe it, or FAILED: <reason> if you have no information about the image.",
+    "encoding_format": "float"
+  }
+}

@@ -30,6 +30,7 @@ export const translations = {
       uploads: "Uploads",
       searches: "Searches",
       gens: "Generated Media",
+      favorites: "Favorites",
       inbox: "Inbox",
       projects: "Projects",
       knowledge: "Knowledge",

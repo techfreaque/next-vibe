@@ -63,6 +63,7 @@ export const translations = {
       d: "D: Two-Row",
     },
     addVariant: "Add Variant",
+    addVariantHint: "Different model, personality, or style",
     yourskill: "Your skill",
     signupPrompt: {
       title: "Customize this skill",

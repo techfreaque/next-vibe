@@ -1,0 +1,28 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 400,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "9f2661d2afccd3bc-FRA",
+    "connection": "keep-alive",
+    "content-type": "application/json",
+    "date": "Sun, 26 Apr 2026 14:47:20 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff"
+  },
+  "body": {
+    "error": {
+      "message": "Cannot fetch from private/localhost URLs: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/43d1d260-f427-4e83-8119-81ed00a1e83f/3ea28dee-dbc0-485e-b581-b9d50c8b1836.png",
+      "code": 400,
+      "metadata": {
+        "provider_name": "Google"
+      }
+    },
+    "user_id": "user_2xa4RltcnuVIYLYSeWPhnk4qIjt"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "9f2661ae2859ac6b-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sun, 26 Apr 2026 14:47:19 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1777214835-m28jD3rBJ0hhDddC8ZWF"
+  },
+  "body": {
+    "id": "gen-1777214835-m28jD3rBJ0hhDddC8ZWF",
+    "object": "chat.completion",
+    "created": 1777214835,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video, captured in a close-up, high-definition style, features a pair of hands holding a standard 3x3 Rubik's cube. The scene is set against a backdrop filled with dozens of other Rubik’s cubes, creating a chaotic, colorful, and dense environment.\n\n**Visual Content & Scene:**\n*   **Central Focus:** A person's hands are expertly manipulating a Rubik's cube. The cube itself is partially solved, with a mix of blue, orange, white, and red faces visible. Notable on one of the white squares is a small, black \"X\" or crosshair symbol located in the center.\n*   **Background:** The entire surface behind the hands is covered in a cluttered pile of various Rubik’s cubes. Some are standard, some appear to be different variants or colors, and all are out of focus, creating a soft, blurry depth-of-field effect that keeps the viewer's attention on the cube being held.\n*   **Lighting & Style:** The lighting is professional and moody, with high contrast that emphasizes the textures of the plastic cubes and the skin tones of the hands. The overall aesthetic is polished and cinematic, reminiscent of high-end promotional or social media content.\n\n**Actions:**\n*   Throughout the clip, the hands demonstrate quick, skillful movements, rotating the layers of the cube. The motion is fluid and purposeful, conveying mastery and speed.\n\n**Notable Elements:**\n*   **The Symbol:** The black \"X\" on the white center piece of the cube is a distinct visual identifier that stands out against the primary colors.\n*   **Composition:** The framing is tight, focusing strictly on the cube and the hands, which isolates the action and removes any distracting environmental context, keeping the focus entirely on the puzzle-solving experience.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "EjQKMgEMOdbHSZ8tjJDDbkBZdAdkz0TwYaA4fiZNiCXNT/hKKXP2wzbuuKhi7+2f5fdbbumX",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 107,
+      "completion_tokens": 377,
+      "total_tokens": 484,
+      "cost": 0.00059225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00059225,
+        "upstream_inference_prompt_cost": 0.00002675,
+        "upstream_inference_completions_cost": 0.0005655
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

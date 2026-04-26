@@ -1,0 +1,73 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "9f26ca03bb90d2a6-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sun, 26 Apr 2026 15:58:37 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1777219109-Z9IJJ0PZsdVzM0mt5JKM"
+  },
+  "body": {
+    "id": "gen-1777219109-Z9IJJ0PZsdVzM0mt5JKM",
+    "object": "chat.completion",
+    "created": 1777219109,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video depicts a close-up, high-definition scene of a person’s hands interacting with a standard 3x3 Rubik’s Cube. \n\n**Visual Content and Setting:** \nThe primary subject is a colorful Rubik’s Cube being held by a person with a medium-to-dark skin tone. The cube is in the center of the frame and appears to be in an unsolved, scrambled state. The background is completely filled with a dense, out-of-focus collection of dozens of other Rubik’s Cubes, creating a chaotic, cluttered atmosphere of puzzle toys.\n\n**Actions:** \nThe person’s hands perform rhythmic, skillful rotations of the cube’s layers. The fingers move quickly and precisely, twisting the top, middle, and side faces of the cube to rearrange the colored stickers. The motion is fluid and steady, suggesting the person is experienced in solving or manipulating the puzzle.\n\n**Style and Lighting:** \nThe video has a polished, professional aesthetic. The lighting is bright and crisp, highlighting the textures of the plastic cubes and the motion of the hands. The depth of field is shallow, keeping the primary cube in sharp focus while the background cubes are softly blurred, which helps emphasize the action. \n\n**Text/Notable Elements:** \n*   **Logo:** One of the corner pieces of the primary cube features a small, white square logo with a black \"TR\" emblem.\n*   **Color Palette:** The scene is vibrant, dominated by the primary colors of Rubik’s Cubes: red, blue, green, yellow, white, and orange.\n*   **Composition:** The framing remains steady on the hands and the cube, maintaining a consistent focus throughout the progression of the layers being turned.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "AY89a192Pun4dahtEX4ivD4SQdouQQoBcDul+Oria35h2OpBdrPsj2YVovYjD9JCjCQ=",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 106,
+      "completion_tokens": 364,
+      "total_tokens": 470,
+      "cost": 0.0005725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0005725,
+        "upstream_inference_prompt_cost": 0.0000265,
+        "upstream_inference_completions_cost": 0.000546
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

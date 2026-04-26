@@ -419,7 +419,7 @@ function QueueRow({
                 getStatusColorClass(task.lastExecutionStatus),
               )}
             >
-              {tTasks(task.lastExecutionStatus as Parameters<typeof tTasks>[0])}
+              {tTasks(task.lastExecutionStatus)}
             </Span>
           )}
           {task.averageExecutionTime !== null && (

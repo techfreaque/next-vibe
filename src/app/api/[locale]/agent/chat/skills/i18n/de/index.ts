@@ -1233,6 +1233,10 @@ export const translations: typeof enTranslations = {
         description:
           "Filtere nach Herkunft: eingebaut, Community oder eigene Charaktere.",
       },
+      targetUserId: {
+        label: "Ziel-Benutzer-ID",
+        description: "Nur Admins: Skills eines bestimmten Benutzers anzeigen.",
+      },
     },
     container: {
       title: "Charaktere-Liste",

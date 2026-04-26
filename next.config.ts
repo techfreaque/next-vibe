@@ -8,13 +8,21 @@ const nextConfig: NextConfig = {
     // Cap page-data collection workers. Next.js default is min(cpuCount, freemem/1GB)
     // which hits 23 workers locally - each worker loads the full module graph causing
     // 14+ GB peak. 4 workers keeps peak under control with acceptable build time.
-    cpus: 1,
+    cpus:
+      process.env.NODE_ENV === "production" &&
+      process.env.NEXT_PUBLIC_LOCAL_MODE === "true"
+        ? 1
+        : undefined,
     webpackBuildWorker: true,
     webpackMemoryOptimizations: true,
     // Soft memory hint for Turbopack's Rust engine (NapiTurboEngineOptions.memoryLimit).
     // Does NOT cap peak RSS - Turbopack still peaks at ~12 GB while building the module graph.
     // May reduce memory after compilation phase. Unit: bytes.
-    turbopackMemoryLimit: 8 * 1024 * 1024 * 1024, // 8 GB
+    turbopackMemoryLimit:
+      process.env.NODE_ENV === "production" &&
+      process.env.NEXT_PUBLIC_LOCAL_MODE === "true"
+        ? 8 * 1024 * 1024 * 1024
+        : undefined, // 8 GB
     // parallelServerBuildTraces: true,
     // parallelServerCompiles: true,
     turbopackFileSystemCacheForDev: true,

@@ -1228,6 +1228,10 @@ export const translations = {
         description:
           "Filter skills by source: built-in, community, or your own custom skills.",
       },
+      targetUserId: {
+        label: "Target User ID",
+        description: "Admin only: view skills for a specific user.",
+      },
     },
     container: {
       title: "Skills List",

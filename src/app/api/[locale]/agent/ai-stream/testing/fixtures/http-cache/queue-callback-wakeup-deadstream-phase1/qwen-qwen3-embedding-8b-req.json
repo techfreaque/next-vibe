@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: STEP_OK\n\nAssistant: WAKEUP_OK\n\nUser: [T6e-phase1 wakeUp-deadstream-setup] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'dead-stream-test'}, callbackMode='wakeUp'. You should receive a taskId (no imageUrl yet). End with STEP_OK if taskId is present, FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived (you will see the generate_image tool result containing an imageUrl), confirm the imageUrl is present and non-empty, then end with WAKEUP_OK. If revived but imageUrl is missing or empty, end with WAKEUP_FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

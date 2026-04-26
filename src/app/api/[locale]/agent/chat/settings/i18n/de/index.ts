@@ -207,6 +207,7 @@ export const translations: typeof enTranslations = {
       },
       lastRun: "Letzter Lauf:",
       neverRun: "Noch nie ausgeführt",
+      runNow: "Jetzt ausführen",
     },
     errors: {
       validation: {

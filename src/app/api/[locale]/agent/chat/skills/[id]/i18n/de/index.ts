@@ -66,6 +66,7 @@ export const translations: typeof enTranslations = {
       d: "D: Two-Row",
     },
     addVariant: "Variante hinzufügen",
+    addVariantHint: "Anderes Modell, Persönlichkeit oder Stil",
     yourskill: "Dein Charakter",
     signupPrompt: {
       title: "Diesen Charakter anpassen",

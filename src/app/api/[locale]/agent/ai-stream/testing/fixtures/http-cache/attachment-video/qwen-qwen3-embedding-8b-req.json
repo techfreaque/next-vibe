@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T10a image-attach] Describe the attached image briefly. End your reply with STEP_OK if you could see and describe it, or FAILED: <reason> if you could not process the image.\n\nAssistant: I can see the image of the Japanese flag (Hinomaru) as described - a red circle representing the sun on a white background with proper proportions and a black border outline. The flag appears clean and crisp with no defects or pixelation visible.\n\nSTEP_OK\n\nUser: [T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.\n\nAssistant: I can see the image description provided: \"A digital illustration of the Japanese Flag shows a white background with a large solid red circle in the center. The central red sun, or hinomaru, is perfectly centered and occupies approximately one-third of the flag's overall height. There are no other elements or text present on the flag.\"\n\nFor the audio, the description states: \"This audio file features up-tempo funk music, creating a happy and groovy atmosphere perfect for dancing. The primary instruments are a drum machine, electric guitar, and bass, providing a dynamic and rhythmic foundation.\"\n\nSTEP_OK\n\nUser: [T10c_attach audio-attach] An audio file is attached. Describe or transcribe what you hear in it. End your reply with STEP_OK if you could process the audio, or FAILED: <reason> if you could not process it at all.\n\nAssistant: I can process the audio description provided: \"This audio file features a joyful hip hop music with a catchy melody, lively rhythm, and a strong beat. The main instruments include an acoustic bass guitar, drums, and string pads, which together create a relaxed and groovy atmosphere. The music is ideal as background music for an urban scene or an energetic commercial, making it suitable for a wide range of content creators.\"\n\nThis describes upbeat hip hop music with bass guitar, drums, and string pads creating a relaxed, groovy atmosphere perfect for urban scenes or commercials.\n\nSTEP_OK\n\nUser: [T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.",
+    "encoding_format": "float"
+  }
+}

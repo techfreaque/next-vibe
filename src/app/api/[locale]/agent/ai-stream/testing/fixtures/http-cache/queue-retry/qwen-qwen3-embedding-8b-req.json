@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: STEP_OK\n\nUser: [T1b tool-help-detail] Call execute-tool with toolName='tool-help' and instanceId='hermes' with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\n\nAssistant: STEP_OK\n\nUser: [T3a retry-branch] Say exactly: RETRY_RESPONSE STEP_OK",
+    "encoding_format": "float"
+  }
+}

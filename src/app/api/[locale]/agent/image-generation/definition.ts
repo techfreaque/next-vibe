@@ -95,7 +95,7 @@ const { POST } = createEndpoint({
         columns: 6,
         options: ImageGenModelIdOptions,
         schema: z.enum(ImageGenModelId).optional(),
-        hiddenForPlatforms: [Platform.AI, Platform.MCP],
+        hiddenForPlatforms: [Platform.AI],
       }),
       size: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

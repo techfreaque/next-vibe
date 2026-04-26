@@ -132,6 +132,8 @@ export const translations = {
     referrals: "Referrals",
     earnings: "Earnings",
     connections: "Connections",
+    favorites: "Favorites",
+    skills: "Skills",
   },
   modelUsage: {
     title: "Model Usage",

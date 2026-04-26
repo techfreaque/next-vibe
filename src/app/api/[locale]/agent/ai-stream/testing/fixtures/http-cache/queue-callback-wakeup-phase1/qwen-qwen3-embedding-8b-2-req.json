@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Tool: [result:execute-tool] {\"hint\":\"397 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\\\"<name>\\\" for detail on one tool. To call any tool: execute-tool toolName=\\\"<name>\\\". Page 1/16 - pass page=2 to continue.\",\"tools\":[{\"name\":\"ai-run\",\"title\":\"Run AI Agent\",\"alias\n\nAssistant: STEP_OK\n\nSystem: [Context: ID:2ef6e84c | Posted:Apr 26, 15:33]\n\nUser: [T6a wakeUp-phase1] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'wakeup-test'}, callbackMode='wakeUp'. The image will be generated asynchronously. IMPORTANT: In this first phase you should receive a taskId with no imageUrl yet - end your reply with STEP_OK if you see taskId and no imageUrl, or FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived (you will see the generate_image tool result containing an imageUrl), confirm the imageUrl is present and non-empty, then end with WAKEUP_OK. If revived but imageUrl is missing or empty, end with WAKEUP_FAILED: <reason>.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English — the user's language.\n\n/ (cortex)\n├── memories/ (42 · 4 archived)\n│   ├── 121.md\n│   │   SINGLE FOCUSED SESSION: Cloud Code Mode Bug Fix - Mar 9, 2026 00:49 UTC · **TASK CREATED FOR HERMES:** · - ID: fix-cloud-code-mode · - Status: Manual schedule, queued for Hermes execution · - Mode: PAIR MODE (interactive: true) - Max and Thea work through this together · - Character: Hermes Delegate (bd07b02d-074b-44a7-a19b-0e67c7a245fd) · - Model: Claude Sonnet 4.5 · - Route: \n│   ├── 51.md\n│   │   Multi-Instance Set\n\nSystem: [Context: ID:2e179b10 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 15:33]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_image\",\"input\":{},\"instanceId\":\"hermes\",\"callbackMode\":\"wakeUp\"}\n\nTool: [result:execute-tool] {\"taskId\":\"remote-hermes-1777217594854-8al3y2\",\"status\":\"status.pending\",\"hint\":\"Result/return will be injected when complete and wakes up the thread. Call wait-for-task only if you need the result before continuing.\"}",
+    "encoding_format": "float"
+  }
+}

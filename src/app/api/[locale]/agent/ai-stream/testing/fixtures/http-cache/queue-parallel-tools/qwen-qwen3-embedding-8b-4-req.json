@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-execute-tool----7ad35efe-a5ac-419f-948c-d83edfc14cc7.md\n\n# [T1 thread-create+tool-call] Use execute-tool...\nFolder: cron\n\ntool: \nassistant: WAKEUP_OK\nuser: [T6e-phase1 wakeUp-deadstream-setup] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'dead-stream-test'}, callbackMode='wakeUp'. You should receive a taskId (no imageUrl yet). End with STEP_OK if taskId is present, FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived (you will see the generate_image tool result containing an imageUrl), confirm the imageUrl is present and non-empty, then end with\nassistant: \ntool: \nassistant: STEP_OK\ntool: \ntool: \nassistant: WAKEUP_OK\nuser: [T7a approve-phase1] In a single response, call BOTH at the same time: (1) execute-tool with toolName='tool-help' and instanceId='hermes' to list available tools, and (2) execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'approve-test'}. The generate_image tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.\nassistant: \ntool: \nassistant: \ntool: \nassistant: The async remote task has completed. All tool results from the previous step are now available in the context above.\nuser: [T8 parallel-tools] In a single response, call BOTH at the same time: (1) execute-tool with toolName='tool-help', instanceId='hermes', callbackMode='wait' to list available tools, and (2) execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'green square'}, callbackMode='wait'. IMPORTANT: You MUST use callbackMode='wait' for both tools - do NOT use wakeUp or detach. Check that tool-help returned a non-empty tools array and generate_image returned an imageUrl (not a t\nassistant: \ntool: \ntool: \nassistant: STEP_OK",
+    "encoding_format": "float"
+  }
+}

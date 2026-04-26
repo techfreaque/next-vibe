@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: The async remote task has completed. All tool results from the previous step are now available in the context above.\n\nUser: [T8 parallel-tools] In a single response, call BOTH at the same time: (1) execute-tool with toolName='tool-help', instanceId='hermes', callbackMode='wait' to list available tools, and (2) execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'green square'}, callbackMode='wait'. IMPORTANT: You MUST use callbackMode='wait' for both tools - do NOT use wakeUp or detach. Check that tool-help returned a non-empty tools array and generate_image returned an imageUrl (not a taskId). End your reply with STEP_OK if both tools returned correct results, or FAILED: <reason> if either tool failed or only one ran.\n\nUser:",
+    "encoding_format": "float"
+  }
+}

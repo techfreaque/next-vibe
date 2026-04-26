@@ -372,6 +372,7 @@ function createToolFromEndpoint(
             context.logger,
             execT,
             perCallStreamContext ?? context.streamContext,
+            Platform.AI,
           );
 
           // Propagate waitingForRemoteResult back to the shared streamContext.
@@ -595,6 +596,7 @@ function createRemoteTool(params: {
           logger,
           t,
           streamContext,
+          Platform.AI,
         );
 
         if (!result.success) {
@@ -604,8 +606,18 @@ function createRemoteTool(params: {
           throw new Error(errorMsg);
         }
 
-        // Signal the stream layer to pause when callbackMode=wait.
-        if (callbackMode === CM.WAIT && streamContext) {
+        // Signal the stream layer to pause when callbackMode=wait AND the result
+        // is actually pending (task-queue path). For direct HTTP the result is
+        // already inline — do NOT set waitingForRemoteResult or the tool-result
+        // handler will skip storing the result (treating it as still queued).
+        const resultData = result.data as Record<string, WidgetData> | null;
+        const isActuallyPending =
+          callbackMode === CM.WAIT &&
+          resultData !== null &&
+          typeof resultData === "object" &&
+          !Array.isArray(resultData) &&
+          resultData["status"] === "status.pending";
+        if (isActuallyPending && streamContext) {
           streamContext.waitingForRemoteResult = true;
         }
 

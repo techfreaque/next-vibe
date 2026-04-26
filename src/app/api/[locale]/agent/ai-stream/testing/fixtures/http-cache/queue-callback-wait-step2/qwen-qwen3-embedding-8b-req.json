@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-execute-tool----e1f6b4c0-e414-4d99-ba7a-70e20f30d56f.md\n\n# [T1 thread-create+tool-call] Use execute-tool...\nFolder: cron\n\nuser: [T2 image-gen] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'red circle'}. Check that the result contains a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK\nuser: [T3a retry-branch] Say exactly: RETRY_RESPONSE STEP_OK\nassistant: RETRY_RESPONSE STEP_OK\nuser: [T3b fork-branch] Say exactly: BRANCH_RESPONSE STEP_OK\nassistant: BRANCH_RESPONSE STEP_OK\nuser: [T4a music-gen] Call execute-tool with toolName='generate_music', instanceId='hermes', input={'prompt':'upbeat piano melody'}. Check that the result has a non-empty audioUrl, a positive creditCost, and durationSeconds between 8 and 120. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK\nuser: [T4b video-gen] Call execute-tool with toolName='generate_video', instanceId='hermes', input={'prompt':'spinning cube'}. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK\nuser: [T5 detach-dispatch] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'wait-for-task-test'}, callbackMode='detach'. Check that the result has a taskId string and status field, and does NOT have an imageUrl. End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK taskId=remote-hermes-1777217289149-htkjzo",
+    "encoding_format": "float"
+  }
+}

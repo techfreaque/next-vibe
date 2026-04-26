@@ -127,7 +127,8 @@ ${treeStr}
 
 **Tools:** \`${CORTEX_WRITE_ALIAS}\` · \`${CORTEX_READ_ALIAS}\` · \`${CORTEX_SEARCH_ALIAS}\` · \`${CORTEX_LIST_ALIAS}\` (+ edit/move/delete/mkdir/tree — \`tool-help query="cortex"\`)
 **Rules:** One idea per file. <200 words. Names: \`specific-kebab-case.md\`. Write proactively. Consolidate duplicates. Archive (\`archived: true\` frontmatter) over deleting. Pin critical files (\`pinned: true\`) — always shown, never trimmed.
-**Paths:** ${memoriesPath}/ = knowledge · ${documentsPath}/ = working files · /threads/ = conversations`;
+**Writable:** ${memoriesPath}/ (knowledge) · ${documentsPath}/ (working files) · /skills/ (custom skills)
+**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ — use \`${CORTEX_READ_ALIAS}\` or \`${CORTEX_LIST_ALIAS}\` only`;
   },
 };
 

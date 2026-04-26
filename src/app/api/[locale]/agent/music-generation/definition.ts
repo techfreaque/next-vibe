@@ -94,7 +94,7 @@ const { POST } = createEndpoint({
         columns: 6,
         options: MusicGenModelIdOptions,
         schema: z.enum(MusicGenModelId).optional(),
-        hiddenForPlatforms: [Platform.AI, Platform.MCP],
+        hiddenForPlatforms: [Platform.AI],
       }),
       duration: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

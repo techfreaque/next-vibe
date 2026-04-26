@@ -49,6 +49,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { createPortal } from "react-dom";
 
 import {
@@ -1336,7 +1337,8 @@ export function SkillViewContainer({
 }: GetWidgetProps): React.JSX.Element {
   const children = field.children;
   const [systemPromptOpen, setSystemPromptOpen] = useState(false);
-  const [isLandingPage, setIsLandingPage] = useState(false);
+  const pathname = usePathname();
+  const isLandingPage = pathname?.includes("/skill/") ?? false;
   const [promptModalOpen, setPromptModalOpen] = useState(false);
   const [promptCopied, setPromptCopied] = useState(false);
   const navigation = useWidgetNavigation();
@@ -1495,10 +1497,6 @@ export function SkillViewContainer({
 
   const creator = skillData?.creatorProfile ?? null;
   const accent = creator?.creatorAccentColor ?? "#8b5cf6";
-
-  useEffect(() => {
-    setIsLandingPage(window.location.pathname.includes("/skill/"));
-  }, []);
 
   // ── LANDING PAGE MODE ──────────────────────────────────────────────────────
   // Creator-first layout: the creator is the hero, the skill is a featured
@@ -1832,7 +1830,6 @@ export function SkillViewContainer({
                   user={user}
                   locale={locale}
                   favorites={favorites}
-                  navigation={navigation}
                   t={t}
                   viewDefaults={viewDefaults}
                   isOwner={isOwner}
@@ -2198,13 +2195,45 @@ export function SkillViewContainer({
         <Div className="px-4 pb-4 flex flex-col gap-4">
           {!isLoading && variantsToRender.length > 0 && (
             <Div className="flex flex-col gap-2">
-              {variantsToRender.length > 1 && (
-                <Div className="flex items-center justify-between">
+              {/* Owner / non-owner header row */}
+              <Div className="flex items-center justify-between">
+                {variantsToRender.length > 1 && (
                   <Div className="text-sm font-semibold opacity-60">
                     {t("get.variants.title")}
                   </Div>
-                </Div>
-              )}
+                )}
+                <Div className="flex-1" />
+                {isOwner && skillId ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 h-7 text-xs text-muted-foreground hover:text-foreground"
+                    onClick={async () => {
+                      const patchDef = await import("./definition");
+                      navigation.push(patchDef.default.PATCH, {
+                        urlPathParams: { id: skillId },
+                        popNavigationOnSuccess: 1,
+                        prefillFromGet: true,
+                        getEndpoint: patchDef.default.GET,
+                      });
+                    }}
+                  >
+                    <Pencil className="h-3 w-3" />
+                    {t("get.edit")}
+                  </Button>
+                ) : skillId ? (
+                  <EditSkillButton
+                    skillId={skillId}
+                    navigation={navigation}
+                    t={t}
+                    isOwner={false}
+                    variant="ghost"
+                    size="sm"
+                  />
+                ) : null}
+              </Div>
+
               {variantsToRender.map((v) => (
                 <VariantCard
                   key={v.id}
@@ -2216,7 +2245,6 @@ export function SkillViewContainer({
                   user={user}
                   locale={locale}
                   favorites={favorites}
-                  navigation={navigation}
                   t={t}
                   viewDefaults={viewDefaults}
                   isOwner={isOwner}
@@ -2224,13 +2252,11 @@ export function SkillViewContainer({
                   defaultExpanded={false}
                 />
               ))}
-              {/* Owner: Add Variant button */}
+
+              {/* Owner: Add Variant — styled like a variant card */}
               {isOwner && skillId && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="gap-1.5 w-full border-dashed h-9"
+                <Div
+                  className="rounded-lg border border-dashed border-muted-foreground/30 overflow-hidden transition-colors hover:border-primary/40 hover:bg-muted/20 cursor-pointer"
                   onClick={async () => {
                     const patchDef = await import("./definition");
                     navigation.push(patchDef.default.PATCH, {
@@ -2241,9 +2267,18 @@ export function SkillViewContainer({
                     });
                   }}
                 >
-                  <Plus className="h-3.5 w-3.5" />
-                  {t("get.addVariant")}
-                </Button>
+                  <Div className="flex items-center gap-2 px-3 py-2.5">
+                    <Plus className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                    <Div className="flex-1 min-w-0">
+                      <Span className="text-sm text-muted-foreground">
+                        {t("get.addVariant")}
+                      </Span>
+                      <Span className="text-xs text-muted-foreground/60 ml-2">
+                        {t("get.addVariantHint")}
+                      </Span>
+                    </Div>
+                  </Div>
+                </Div>
               )}
             </Div>
           )}
@@ -2280,7 +2315,6 @@ function VariantCard({
   user,
   locale,
   favorites,
-  navigation,
   t,
   viewDefaults,
   isOwner,
@@ -2295,7 +2329,6 @@ function VariantCard({
   user: ReturnType<typeof useWidgetContext>["user"];
   locale: CountryLanguage;
   favorites: FavoriteCard[];
-  navigation: ReturnType<typeof useWidgetNavigation>;
   t: ReturnType<typeof useWidgetTranslation>;
   viewDefaults: ReturnType<typeof useViewDefaults>;
   isOwner: boolean;
@@ -2623,19 +2656,11 @@ function VariantCard({
 
           {/* ── OWNER ACTIONS ── */}
           {isOwner && (
-            <Div className="flex items-center gap-2 flex-wrap pt-1 border-t">
-              <EditSkillButton
-                skillId={skillId}
-                navigation={navigation}
-                t={t}
-                isOwner={true}
-                variant="outline"
-                size="sm"
-              />
+            <Div className="flex items-center gap-2 pt-1 border-t">
               <Button
                 variant="ghost"
                 size="sm"
-                className="gap-1 text-destructive hover:bg-destructive/10"
+                className="gap-1 text-destructive hover:bg-destructive/10 ml-auto"
                 onClick={handleDelete}
               >
                 <Trash2 className="h-3.5 w-3.5" />
@@ -3261,8 +3286,6 @@ interface SkillCardProps {
   logger: ReturnType<typeof useWidgetContext>["logger"];
   user: ReturnType<typeof useWidgetContext>["user"];
   t: ReturnType<typeof useWidgetTranslation>;
-  isOwner: boolean;
-  handleDelete: (e?: ButtonMouseEvent) => void;
 }
 
 /**
@@ -3286,8 +3309,6 @@ export function SkillCard({
   logger,
   user,
   t,
-  isOwner,
-  handleDelete,
 }: SkillCardProps): React.JSX.Element {
   const IconComponent =
     ownershipIcon[skillOwnership] ?? ownershipIcon[SkillOwnershipType.SYSTEM];
@@ -3382,40 +3403,6 @@ export function SkillCard({
             logger={logger}
             navigation={navigation}
           />
-          {isOwner ? (
-            <>
-              <Div className="flex-1" />
-              <EditSkillButton
-                skillId={skillId}
-                navigation={navigation}
-                t={t}
-                isOwner={true}
-                variant="outline"
-                size="sm"
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1 text-destructive hover:bg-destructive/10"
-                onClick={handleDelete}
-              >
-                <Trash2 className="h-4 w-4" />
-                {t("get.delete")}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Div className="flex-1" />
-              <EditSkillButton
-                skillId={skillId}
-                navigation={navigation}
-                t={t}
-                isOwner={false}
-                variant="outline"
-                size="sm"
-              />
-            </>
-          )}
         </Div>
       )}
     </Div>

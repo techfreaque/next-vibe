@@ -95,6 +95,7 @@ import { scopedTranslation } from "./i18n";
 import {
   AUTOPILOT_DEFAULT_SCHEDULE,
   DREAM_DEFAULT_SCHEDULE,
+  MAMA_DEFAULT_SCHEDULE,
 } from "./pulse/constants";
 
 const MIN_VALUE = 1_000;
@@ -986,6 +987,95 @@ function PulseSectionAutopilot({
   );
 }
 
+/** Stable global task ID for the mama heartbeat (admin-only, userId=null) */
+const MAMA_TASK_ID = "thea-mama";
+
+interface MamaSectionProps {
+  enabled: boolean;
+  schedule: string;
+  prompt: string | null;
+  onToggle: (enabled: boolean) => void;
+  onScheduleChange: (schedule: string) => void;
+  onPromptChange: (prompt: string | null) => void;
+  locale: CountryLanguage;
+}
+
+function PulseSectionMama({
+  enabled,
+  schedule,
+  prompt,
+  onToggle,
+  onScheduleChange,
+  onPromptChange,
+  locale,
+}: MamaSectionProps): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const [isRunning, setIsRunning] = useState(false);
+
+  const handleRunNow = useCallback(async (): Promise<void> => {
+    setIsRunning(true);
+    try {
+      await apiClient.mutate(
+        cronBulkEndpoints.POST,
+        logger,
+        user,
+        { ids: [MAMA_TASK_ID], action: "run" },
+        undefined,
+        locale,
+      );
+    } finally {
+      setIsRunning(false);
+    }
+  }, [logger, user, locale]);
+
+  return (
+    <SettingsSection
+      icon={<Brain className="h-4 w-4 text-primary" />}
+      title={t("post.mama.title")}
+      description={t("post.mama.description")}
+    >
+      <SettingsRow label={t("post.mama.toggle.label")}>
+        <Switch checked={enabled} onCheckedChange={onToggle} />
+      </SettingsRow>
+      <SettingsRow label={t("post.mama.schedule.label")}>
+        <ScheduleAutocomplete
+          value={schedule}
+          onChange={onScheduleChange}
+          disabled={!enabled}
+          locale={locale}
+        />
+      </SettingsRow>
+      <SettingsRow label={t("post.mama.prompt.label")}>
+        <Textarea
+          value={prompt ?? t("post.mama.prompt.defaultPrompt")}
+          onChange={(e) =>
+            onPromptChange(e.target.value.trim() === "" ? null : e.target.value)
+          }
+          placeholder={t("post.mama.prompt.placeholder")}
+          disabled={!enabled}
+          className="text-sm min-h-[80px] resize-none"
+        />
+      </SettingsRow>
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={!enabled || isRunning}
+        onClick={() => void handleRunNow()}
+        className="self-start"
+      >
+        {isRunning ? (
+          <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+        ) : (
+          <Play className="h-3.5 w-3.5 mr-1.5" />
+        )}
+        {t("post.mama.runNow")}
+      </Button>
+    </SettingsSection>
+  );
+}
+
 /** Sentinel value for the "Auto" search provider option (not a real provider ID) */
 const SEARCH_AUTO_VALUE = "auto-detect";
 
@@ -1225,6 +1315,19 @@ export function ChatSettingsWidget({
             void handleUpdate({ autopilotFavoriteId: val })
           }
           onPromptChange={(val) => void handleUpdate({ autopilotPrompt: val })}
+          locale={locale}
+        />
+      )}
+
+      {/* AI Heartbeat (Mama) — admin only */}
+      {isAdmin && (
+        <PulseSectionMama
+          enabled={settings.mamaEnabled ?? false}
+          schedule={settings.mamaSchedule ?? MAMA_DEFAULT_SCHEDULE}
+          prompt={settings.mamaPrompt ?? null}
+          onToggle={(val) => void handleUpdate({ mamaEnabled: val })}
+          onScheduleChange={(val) => void handleUpdate({ mamaSchedule: val })}
+          onPromptChange={(val) => void handleUpdate({ mamaPrompt: val })}
           locale={locale}
         />
       )}

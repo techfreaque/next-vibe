@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:72d3681a | Posted:Apr 26, 20:09]\n\nUser: [TEST] Create a new skill AND a favorite for it. Both steps are required.\n\nSkill parameters:\nname: Test Chef Bot\ntagline: Cooks up anything you crave\ndescription: A friendly sous-chef for everyday cooking questions\ncategory: enums.category.assistant\nicon: chef\nsystemPrompt: You are Chef Bot, a friendly cooking assistant. Answer cooking questions concisely and confidently.\nmodelSelection: filter-based, smart to brilliant intelligence, mainstream content only\nisPublic: false\n\nSteps: 1) Call skill-create with the above params. 2) Call favorite-create with the returned skill ID.\nWhen BOTH are done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on failure.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English — the user's language.\n\n/ (cortex)\n├── memories/ (58 · 4 archived)\n│   ├── 121.md\n│   │   SINGLE FOCUSED SESSION: Cloud Code Mode Bug Fix - Mar 9, 2026 00:49 UTC · **TASK CREATED FOR HERMES:** · - ID: fix-cloud-code-mode · - Status: Manual schedule, queued for Hermes execution · - Mode: PAIR MODE (interactive: true) - Max and Thea work through this together · - C\n│   ├── 51.md\n│   │   Multi-Instance Setup & Task Routing (Feb 2026): THREE instances: (1) Prod Thea - VPS, handles live users, 6h heartbeat; (2)\n\nSystem: [Context: ID:729901ff | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 20:09]\n\nAssistant: I'll create the test skill and then add it as a favorite. Let me start by creating the skill with the specified parameters. [tool:execute-tool] {\"toolName\":\"skill-create\",\"input\":{\"name\":\"Test Chef Bot\",\"tagline\":\"Cooks up anything you crave\",\"description\":\"A friendly sous-chef for everyday cooking questions\",\"category\":\"enums.category.assist\n\nAssistant: Let me check the correct format for modelSelection by looking at the skill-create tool parameters: [tool:tool-help] {\"toolName\":\"skill-create\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"skill-create\",\"title\":\"Create Skill\",\"description\":\"Create a new custom skill\",\"category\":\"Skills\",\"subCategory\":\"Management\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"parameters\":{\"$schema\":\"http://json-schema.org/draft",
+    "encoding_format": "float"
+  }
+}

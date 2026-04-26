@@ -1,0 +1,73 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "9f26c894ff3ad2a6-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sun, 26 Apr 2026 15:57:38 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1777219050-AChHsieREhpGdQZ1r6Xz"
+  },
+  "body": {
+    "id": "gen-1777219050-AChHsieREhpGdQZ1r6Xz",
+    "object": "chat.completion",
+    "created": 1777219050,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video captures a close-up, high-definition view of a person’s hands skillfully manipulating a standard 3x3 Rubik’s Cube. \n\n**Visual Content and Setting:** \nThe scene is set against a background densely packed with dozens of scattered, solved, and partially solved Rubik’s Cubes, creating a chaotic yet colorful mosaic of grid patterns. In the foreground, the primary focus is a specific Rubik's Cube held by a person with a tanned complexion. The cube has a white plastic core and is printed with a distinctive logo on the center white tile—a stylized, circular emblem containing the letters \"TR.\"\n\n**Actions:** \nThe primary action is the rapid, rhythmic twisting and turning of the Rubik’s Cube layers. The person’s fingers move with fluid precision, rotating the faces of the cube to scramble and then realign the colored squares. The lighting is deliberate and dramatic, emphasizing the texture of the plastic and the mechanics of the cube's pivots as the layers click into place.\n\n**Style and Aesthetic:** \nThe video utilizes a shallow depth of field, keeping the main cube in sharp focus while the surrounding pile of cubes in the background is softly blurred into an array of vibrant primary colors (red, blue, yellow, green, orange, and white). The lighting is studio-quality, creating subtle highlights and shadows that give the cubes a tactile, professional appearance.\n\n**Key Elements:** \n*   **Logo:** A clear, black-and-white \"TR\" logo is visible on the white center face.\n*   **Motion:** The video emphasizes the physical interaction between human hands and the mechanical puzzle.\n*   **Atmosphere:** The sheer mass of cubes in the background suggests a theme of expertise, collection, or speed-cubing enthusiasts.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "AY89a18Bf01jeqGekf9uiGL9KcsuyPHggaDCxYS8POmtF7ZywkGVrzLEp6t7uIBlwMA=",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 106,
+      "completion_tokens": 375,
+      "total_tokens": 481,
+      "cost": 0.000589,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000589,
+        "upstream_inference_prompt_cost": 0.0000265,
+        "upstream_inference_completions_cost": 0.0005625
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

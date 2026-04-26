@@ -136,6 +136,8 @@ export const translations: typeof enTranslations = {
     referrals: "Polecenia",
     earnings: "Zarobki",
     connections: "Połączenia",
+    favorites: "Ulubione",
+    skills: "Umiejętności",
   },
   modelUsage: {
     title: "Użycie modeli",

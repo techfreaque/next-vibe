@@ -32,6 +32,27 @@ export const translations: typeof enTranslations = {
       description: "Filtruj użytkowników według roli",
       placeholder: "Wybierz rolę...",
     },
+    subscription: {
+      label: "Subskrypcja",
+      description: "Filtruj według statusu subskrypcji",
+      placeholder: "Dowolny status subskrypcji",
+    },
+    creditActivity: {
+      label: "Aktywność kredytowa",
+      description: "Filtruj według zakupu lub wydatków kredytowych",
+      placeholder: "Dowolna aktywność kredytowa",
+    },
+    threads: {
+      label: "Wątki",
+      description: "Filtruj według tego, czy użytkownik ma wątki czatu",
+      placeholder: "Dowolny status",
+    },
+    referralActivity: {
+      label: "Aktywność referencyjna",
+      description:
+        "Filtruj według linku, kliknięć, rejestracji lub płacących subskrybentów",
+      placeholder: "Dowolna aktywność referencyjna",
+    },
     // Sorting section
     sortingOptions: {
       title: "Sortowanie",
@@ -336,6 +357,30 @@ export const translations: typeof enTranslations = {
       partnerEmployee: "Pracownik Partnera",
       admin: "Administrator",
       superAdmin: "Super Administrator",
+    },
+    subscriptionPresenceFilter: {
+      any: "Dowolny",
+      hasActive: "Ma aktywną subskrypcję",
+      hadAny: "Miał subskrypcję (kiedykolwiek)",
+      never: "Nigdy nie subskrybował",
+    },
+    creditActivityFilter: {
+      any: "Dowolna",
+      boughtPack: "Kupił pakiet kredytów",
+      spentCredits: "Wydał kredyty",
+      neverSpent: "Nigdy nie wydał kredytów",
+    },
+    threadsFilter: {
+      any: "Dowolny",
+      hasThreads: "Ma wątki",
+      noThreads: "Brak wątków",
+    },
+    referralActivityFilter: {
+      any: "Dowolna",
+      hasCode: "Ma link referencyjny",
+      hasClicks: "Ma kliknięcia referecyjne",
+      hasSignups: "Ma rejestracje referencyjne",
+      hasSubscribers: "Ma płacących poleconych",
     },
   },
 };

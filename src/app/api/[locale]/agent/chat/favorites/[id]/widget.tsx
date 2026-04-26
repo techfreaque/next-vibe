@@ -124,9 +124,7 @@ import { useChatSettings } from "../../settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../settings/repository-client";
 import { CompactTriggerEdit } from "../../settings/widget";
 import { useSkill } from "../../skills/[id]/hooks";
-import { DEFAULT_SKILLS } from "../../skills/config";
 import { ModelSelectionType } from "../../skills/enum";
-import { scopedTranslation as skillsScopedTranslation } from "../../skills/i18n";
 import definitionPatch from "./definition";
 
 /**
@@ -383,26 +381,15 @@ export function FavoriteEditContainer({
     [form],
   );
 
-  const handleCustomizeSkill = async (): Promise<void> => {
+  const handleViewSkill = async (): Promise<void> => {
     if (!skillId || isNoSkill) {
       return;
     }
 
-    // Check if user is logged in
-    if (isPublic) {
-      // Show signup prompt for public users
-      setShowSignupPrompt(true);
-    } else {
-      // Navigate to character edit for authenticated users
-      const characterDefinitions = await import("../../skills/[id]/definition");
-
-      navigation.push(characterDefinitions.default.PATCH, {
-        urlPathParams: { id: skillId },
-        getEndpoint: characterDefinitions.default.GET,
-        popNavigationOnSuccess: 1,
-        prefillFromGet: true,
-      });
-    }
+    const characterDefinitions = await import("../../skills/[id]/definition");
+    navigation.push(characterDefinitions.default.GET, {
+      urlPathParams: { id: baseSkillId },
+    });
   };
 
   const handleSignup = (): void => {
@@ -922,7 +909,14 @@ export function FavoriteEditContainer({
                   <Div className="flex items-start gap-4 p-6 rounded-xl border bg-card transition-colors">
                     {/* Editable Icon Field in icon position */}
                     <Div className="flex-shrink-0">
-                      <IconFieldWidget fieldName="icon" field={children.icon} />
+                      <IconFieldWidget
+                        fieldName="icon"
+                        field={{
+                          ...children.icon,
+                          label: undefined,
+                          description: undefined,
+                        }}
+                      />
                     </Div>
 
                     {/* Skill Content */}
@@ -958,16 +952,16 @@ export function FavoriteEditContainer({
 
                   {/* Action Buttons */}
                   <Div className="flex flex-col gap-2">
-                    {/* Customize Skill Button */}
+                    {/* View Skill Button */}
                     <Button
                       type="button"
                       variant="outline"
                       size="default"
-                      onClick={handleCustomizeSkill}
+                      onClick={handleViewSkill}
                       className="gap-2"
                     >
                       <Settings className="h-4 w-4" />
-                      {t("patch.customizeSkillButton.label")}
+                      {t("patch.viewSkillButton.label")}
                     </Button>
                   </Div>
                 </Div>
@@ -988,24 +982,7 @@ export function FavoriteEditContainer({
                         { shouldDirty: true },
                       )
                     }
-                    placeholder={
-                      variantId
-                        ? (() => {
-                            const skill = DEFAULT_SKILLS.find(
-                              (s) => s.id === skillId,
-                            );
-                            const variant = skill?.variants?.find(
-                              (v) => v.id === variantId,
-                            );
-                            if (variant?.variantName) {
-                              return skillsScopedTranslation
-                                .scopedT(locale)
-                                .t(variant.variantName);
-                            }
-                            return "";
-                          })()
-                        : ""
-                    }
+                    placeholder={characterVariant?.displayName ?? ""}
                     className="h-8 text-sm"
                   />
                 </Div>

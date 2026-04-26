@@ -1235,6 +1235,10 @@ export const translations: typeof enTranslations = {
         description:
           "Filtruj po źródle: wbudowane, społeczność lub twoje własne postacie.",
       },
+      targetUserId: {
+        label: "ID użytkownika docelowego",
+        description: "Tylko administratorzy: wyświetl umiejętności konkretnego użytkownika.",
+      },
     },
     container: {
       title: "Lista postaci",

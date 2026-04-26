@@ -20,8 +20,8 @@ export const translations = {
     deleteButton: {
       label: "Delete Favorite",
     },
-    customizeSkillButton: {
-      label: "Customize Skill's Personality",
+    viewSkillButton: {
+      label: "View Skill",
     },
     signupPrompt: {
       title: "Customize the character's personality",
@@ -157,8 +157,8 @@ export const translations = {
     deleteButton: {
       label: "Delete Favorite",
     },
-    customizeSkillButton: {
-      label: "Customize Skill's Personality",
+    viewSkillButton: {
+      label: "View Skill",
     },
     useThisSkillButton: {
       label: "Use This Skill",

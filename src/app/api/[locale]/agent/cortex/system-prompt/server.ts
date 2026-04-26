@@ -8,7 +8,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CronTaskItem } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
 import { languageConfig } from "@/i18n";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { stripFrontmatter, truncateContent } from "../_shared/text-utils";
 import type {
@@ -115,7 +114,7 @@ export async function loadCortexData(
       loadFavedSkills(userId),
       loadCreatedSkills(userId),
       loadTasksForCortex(userId, logger),
-      loadFavoritesForCortex(userId, locale, logger),
+      loadFavoritesForCortex(userId, logger),
     ]);
 
     const uploadCount = counts.uploads;
@@ -440,13 +439,7 @@ async function loadMemoryContext(
       continue;
     }
     const rawContent = file.content ?? "";
-    // Skip files that are pure placeholder templates (only headings + HTML comments, no real content)
-    const strippedContent = rawContent
-      .replace(/<!--[\s\S]*?-->/g, "")
-      .replace(/^#{1,6}\s+.+$/gm, "")
-      .replace(/^---[\s\S]*?---/m, "")
-      .trim();
-    if (strippedContent.length < 20 && rawContent.length > 0) {
+    if (!rawContent.trim()) {
       continue;
     }
     const mem: MemoryFile = {
@@ -482,13 +475,7 @@ async function loadMemoryContext(
       if (segments.length !== 3) {
         continue;
       }
-      // Skip templates that are pure placeholder shells — no real content yet
-      const strippedContent = tpl.content
-        .replace(/<!--[\s\S]*?-->/g, "")
-        .replace(/^#{1,6}\s+.+$/gm, "")
-        .replace(/^---[\s\S]*?---/m, "")
-        .trim();
-      if (strippedContent.length < 20) {
+      if (!tpl.content.trim()) {
         continue;
       }
       active.push({
@@ -767,20 +754,100 @@ async function loadTasksForCortex(
 
 async function loadFavoritesForCortex(
   userId: string,
-  locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<{ items: FavoriteSummaryItem[]; activeId: string | null }> {
   try {
-    const { ChatFavoritesRepository } =
-      await import("@/app/api/[locale]/agent/chat/favorites/repository");
-    const items = await ChatFavoritesRepository.loadFavoritesItems({
-      userId,
-      locale,
-      logger,
+    // Dynamic imports only — skip DEFAULT_SKILLS/skills/config/skills/i18n (pull in UI widget chain → TDZ)
+    // Default skill IDs are friendly slugs (e.g. "thea", "vibe-coder") — non-UUID, treated as canonical.
+    const [
+      { chatFavorites },
+      { chatSettings },
+      { db: favDb },
+      { asc: favAsc, eq: favEq, inArray: favInArray },
+    ] = await Promise.all([
+      import("@/app/api/[locale]/agent/chat/favorites/db"),
+      import("@/app/api/[locale]/agent/chat/settings/db"),
+      import("@/app/api/[locale]/system/db"),
+      import("drizzle-orm"),
+    ]);
+
+    const [settingsRow] = await favDb
+      .select({ activeFavoriteId: chatSettings.activeFavoriteId })
+      .from(chatSettings)
+      .where(favEq(chatSettings.userId, userId))
+      .limit(1);
+    const activeFavoriteId = settingsRow?.activeFavoriteId ?? null;
+
+    const rows = await favDb
+      .select()
+      .from(chatFavorites)
+      .where(favEq(chatFavorites.userId, userId))
+      .orderBy(favAsc(chatFavorites.position));
+
+    if (rows.length === 0) {
+      return { items: [], activeId: null };
+    }
+
+    const UUID_RE =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    // Only look up custom skills (UUID-based IDs); default skills are already canonical slugs
+    const skillNameMap = new Map<string, string>();
+    const skillSlugMap = new Map<string, string>();
+    const customSkillUuids = [
+      ...new Set(rows.map((r) => r.skillId).filter((id) => UUID_RE.test(id))),
+    ];
+
+    if (customSkillUuids.length > 0) {
+      const { customSkills: customSkillsTable } =
+        await import("@/app/api/[locale]/agent/chat/skills/db");
+      const customSkillsList = await favDb
+        .select({
+          id: customSkillsTable.id,
+          slug: customSkillsTable.slug,
+          name: customSkillsTable.name,
+        })
+        .from(customSkillsTable)
+        .where(favInArray(customSkillsTable.id, customSkillUuids));
+      for (const s of customSkillsList) {
+        skillNameMap.set(s.id, s.name);
+        if (s.slug) {
+          skillSlugMap.set(s.id, s.slug);
+        }
+      }
+    }
+
+    const items: FavoriteSummaryItem[] = rows.map((row) => {
+      // For default skills: skillId IS the canonical slug (e.g. "thea")
+      // For custom skills: resolve UUID → slug via skillSlugMap
+      const canonicalSkillId = skillSlugMap.get(row.skillId) ?? row.skillId;
+      const rawSlug = row.slug || row.id;
+      const externalId =
+        rawSlug && !UUID_RE.test(rawSlug) ? rawSlug : canonicalSkillId;
+      // Use the favorite's own slug as display name (e.g. "thea-brilliant" > "thea" for system prompt)
+      const displayName = row.customVariantName ?? externalId;
+      const sel = row.modelSelection as { manualModelId?: string } | null;
+      const resolvedModelId = sel?.manualModelId ?? null;
+      return {
+        id: externalId,
+        name: displayName,
+        skillId: canonicalSkillId,
+        characterName: displayName,
+        modelId: resolvedModelId,
+        modelInfo: "",
+        isActive: row.slug === activeFavoriteId || row.id === activeFavoriteId,
+        position: row.position,
+        useCount: row.useCount,
+        lastUsedAt: row.lastUsedAt,
+      };
     });
+
     const activeItem = items.find((f) => f.isActive);
     return { items, activeId: activeItem?.id ?? null };
-  } catch {
+  } catch (err) {
+    logger.warn("loadFavoritesForCortex failed", {
+      error: err instanceof Error ? err.message : String(err),
+    });
     return { items: [], activeId: null };
   }
 }

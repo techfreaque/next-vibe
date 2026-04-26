@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: STEP_OK\n\nUser: [T10a image-attach] Describe the attached image briefly. End your reply with STEP_OK if you could see and describe it, or FAILED: <reason> if you could not process the image.\n\nAssistant: The image shows a photograph. STEP_OK\n\nAssistant: - Successfully executed tool-help and confirmed 397 available tools with non-empty tools array and proper name/description fields.  \n- Verified generate_image schema included name, description, and parameters.  \n- Generated video with prompt \"spinning cube\" returned creditCost=124.8, durationSeconds=4, videoUrl=\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/f26e17fa-9eca-4fc9-b993-9b1b5457f14e/0db6d87f-7629-4970-835a-9c1268583fbb.mp4\".  \n- Detached generate_image call returned taskId=\"remote-hermes-1777217289149-htkjzo\" with no imageUrl.  \n- wait-for-task retrieved result containing imageUrl for the above task.  \n- endLoop callbackMode stopped after one tool-help invocation.  \n- wakeUp callbackMode tests:  \n  – First wakeUp generated image with imageUrl present → WAKEUP_OK. \n\nUser: [T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.\n\nAssistant: Image description: The image shows a minimalist design resembling the Japanese flag - a large red circle centered on a textured white background.\n\nAudio description: The audio features a joyful hip-hop beat with smooth bassline, rhythmic drumming, and playful marimba melodies.\n\nSTEP_OK\n\nUser: [T10c_attach audio-attach] An audio file is attached. Describe or transcribe what you hear in it. End your reply with STEP_OK if you could process the audio, or FAILED: <reason> if you could not process it at all.",
+    "encoding_format": "float"
+  }
+}

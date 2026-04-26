@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/uploads/audio/t1-thread-create-tool-call-use-the-tool-help-43d1d260-f427-4e83-8119-81ed00a1e83f/test-music.mp3.md\n\n---\nfilename: \"test-music.mp3\"\nembedded: true\nmimeType: \"audio/mpeg\"\nsize: \"1.1 MB\"\nthreadId: \"43d1d260-f427-4e83-8119-81ed00a1e83f\"\nthreadTitle: \"[T1 thread-create+tool-call] Use the tool-help...\"\nuploadedAt: \"2026-04-26T14:45:47.279Z\"\n---\n\n# test-music.mp3\n\n**Stored:** base64-embedded (no public URL)\n\n| Field | Value |\n| --- | --- |\n| Type | `audio/mpeg` |\n| Size | 1.1 MB |\n| Thread | [T1 thread-create+tool-call] Use the tool-help... |\n| Uploaded | 2026-04-26 |\n\n## Message Context\n\n[T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.",
+    "encoding_format": "float"
+  }
+}

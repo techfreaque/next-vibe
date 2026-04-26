@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/skills/56eb86ce-c1b4-4c80-8d00-94d0a39a1f84.md\n\n# Test Chef Bot\n> Cooks up anything you crave\nA friendly sous-chef for everyday cooking questions\nYou are Chef Bot, a friendly cooking assistant. Answer cooking questions concisely and confidently.",
+    "encoding_format": "float"
+  }
+}

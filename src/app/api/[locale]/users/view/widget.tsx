@@ -63,7 +63,14 @@ interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
 
-type TabId = "overview" | "credits" | "referrals" | "earnings" | "connections";
+type TabId =
+  | "overview"
+  | "credits"
+  | "referrals"
+  | "earnings"
+  | "connections"
+  | "favorites"
+  | "skills";
 
 /**
  * Format currency cents to dollars
@@ -278,6 +285,34 @@ export function UserViewContainer({
     [userId],
   );
 
+  const favoritesEndpointOptions = useMemo(
+    () =>
+      userId
+        ? {
+            read: {
+              initialState: {
+                userId,
+              },
+            },
+          }
+        : undefined,
+    [userId],
+  );
+
+  const skillsEndpointOptions = useMemo(
+    () =>
+      userId
+        ? {
+            read: {
+              initialState: {
+                targetUserId: userId,
+              },
+            },
+          }
+        : undefined,
+    [userId],
+  );
+
   if (!data) {
     return (
       <Div className="flex flex-col items-center justify-center py-12 text-center">
@@ -306,6 +341,8 @@ export function UserViewContainer({
     { id: "referrals", label: t("tabs.referrals") },
     { id: "earnings", label: t("tabs.earnings") },
     { id: "connections", label: t("tabs.connections") },
+    { id: "favorites", label: t("tabs.favorites") },
+    { id: "skills", label: t("tabs.skills") },
   ];
 
   return (
@@ -610,6 +647,22 @@ export function UserViewContainer({
           connectedUsers={connectedUsers}
           t={t}
           navigate={navigate}
+        />
+      )}
+
+      {activeTab === "favorites" && userId && favoritesEndpointOptions && (
+        <FavoritesTab
+          locale={locale}
+          user={user}
+          endpointOptions={favoritesEndpointOptions}
+        />
+      )}
+
+      {activeTab === "skills" && userId && skillsEndpointOptions && (
+        <SkillsTab
+          locale={locale}
+          user={user}
+          endpointOptions={skillsEndpointOptions}
         />
       )}
     </Div>
@@ -1302,6 +1355,102 @@ function ReferralCodesTab({
     <Div className="border rounded-lg overflow-hidden">
       <EndpointsPage
         endpoint={referralCodesDef}
+        locale={locale}
+        user={user}
+        endpointOptions={endpointOptions}
+      />
+    </Div>
+  );
+}
+
+/**
+ * Favorites tab - embeds the agent/chat/favorites EndpointsPage (readonly via admin userId param)
+ */
+function FavoritesTab({
+  locale,
+  user,
+  endpointOptions,
+}: {
+  locale: ReturnType<typeof useWidgetLocale>;
+  user: ReturnType<typeof useWidgetContext>["user"];
+  endpointOptions: {
+    read: {
+      initialState: {
+        userId: string;
+      };
+    };
+  };
+}): React.JSX.Element {
+  const [favoritesDef, setFavoritesDef] = useState<{
+    GET: CreateApiEndpointAny;
+  } | null>(null);
+
+  if (!favoritesDef) {
+    void import("@/app/api/[locale]/agent/chat/favorites/definition").then(
+      (mod) => {
+        setFavoritesDef(mod.default);
+        return undefined;
+      },
+    );
+    return (
+      <Div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </Div>
+    );
+  }
+
+  return (
+    <Div className="border rounded-lg overflow-hidden">
+      <EndpointsPage
+        endpoint={favoritesDef}
+        locale={locale}
+        user={user}
+        endpointOptions={endpointOptions}
+      />
+    </Div>
+  );
+}
+
+/**
+ * Skills tab - embeds the agent/chat/skills EndpointsPage (readonly via admin targetUserId param)
+ */
+function SkillsTab({
+  locale,
+  user,
+  endpointOptions,
+}: {
+  locale: ReturnType<typeof useWidgetLocale>;
+  user: ReturnType<typeof useWidgetContext>["user"];
+  endpointOptions: {
+    read: {
+      initialState: {
+        targetUserId: string;
+      };
+    };
+  };
+}): React.JSX.Element {
+  const [skillsDef, setSkillsDef] = useState<{
+    GET: CreateApiEndpointAny;
+  } | null>(null);
+
+  if (!skillsDef) {
+    void import("@/app/api/[locale]/agent/chat/skills/definition").then(
+      (mod) => {
+        setSkillsDef(mod.default);
+        return undefined;
+      },
+    );
+    return (
+      <Div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </Div>
+    );
+  }
+
+  return (
+    <Div className="border rounded-lg overflow-hidden">
+      <EndpointsPage
+        endpoint={skillsDef}
         locale={locale}
         user={user}
         endpointOptions={endpointOptions}

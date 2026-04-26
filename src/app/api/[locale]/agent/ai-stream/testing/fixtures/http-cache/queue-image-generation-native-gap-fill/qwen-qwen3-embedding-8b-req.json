@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: I can hear the audio file you've attached. It's an electronic music piece with a retro arcade feel, featuring high-pitched synthesizer melodies and energetic electronic drum beats with cymbal crashes. The music has an upbeat, playful atmosphere that evokes classic 80s/90s video game soundtracks.\n\nSTEP_OK\n\nUser: [T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.\n\nAssistant: The video shows a pair of hands rapidly solving a Rubik's cube in a cinematic close-up shot. The scene features dramatic lighting with a shallow depth of field that keeps the cube and hands in sharp focus while blurring a background filled with dozens of other Rubik's cubes. The colors are highly saturated and vivid against the darker setting. The rapid, mechanical movements demonstrate speed and precision, creating an engaging visual rhythm. There's a small black logo visible on the white center square of the cube facing the camera.\n\nSTEP_OK\n\nUser: [T11 native-image] Generate an image of a blue triangle. Output the image directly (no tool call needed). End your reply with STEP_OK if the image was generated, or FAILED: <reason> if generation failed.\n\nUser: [T11b gap-fill-pass2] In the previous turn you generated an image. Describe what was generated. End your reply with STEP_OK if you can describe it, or FAILED: <reason> if you have no information about the image.",
+    "encoding_format": "float"
+  }
+}

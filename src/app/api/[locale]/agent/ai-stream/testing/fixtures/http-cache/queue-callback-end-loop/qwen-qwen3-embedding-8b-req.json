@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: STEP_OK taskId=remote-hermes-1777217289149-htkjzo\n\nUser: [T5b wait-for-task] Call execute-tool with toolName='wait-for-task', instanceId='hermes', input={'taskId':'remote-hermes-1777217427105-ozh5zj'}. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.\n\nAssistant: STEP_OK\n\nUser: [T5a endLoop] Call execute-tool with toolName='tool-help', instanceId='hermes', callbackMode='endLoop'. After receiving the result, try to call execute-tool with toolName='tool-help' and instanceId='hermes' again. Check that only ONE tool-help call was executed (the loop should have stopped) and the result had a non-empty tools array. End your reply with STEP_OK if exactly one call ran and the result was correct, or FAILED: <reason> if the loop continued or the result was wrong.",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "9f26c36defa79bfe-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sun, 26 Apr 2026 15:54:00 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1777218838-izKTJp7I2bqFdMeT805w"
+  },
+  "body": {
+    "id": "gen-1777218838-izKTJp7I2bqFdMeT805w",
+    "object": "chat.completion",
+    "created": 1777218838,
+    "model": "google/gemini-3.1-flash-image-preview-20260226",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "Following is a comprehensive descriptive analysis of the image:\n\n### Overview and Composition\nThis image presents a simple, minimalistic, and graphic depiction against a solid background. It has a square aspect ratio (1:1). At the visual center of the entire composition is a large, perfectly formed, solid-colored circle. The circle occupies a significant portion of the image’s surface area, dominating the space.\n\n### Color Information\nThe visual elements are restricted to two primary colors:\n-   **Background:** The background is a stark, solid, and uniform white (RGB approximately 255, 255, 255).\n-   **Circle:** The centered circle is a vibrant, saturated, and uniform bright red (RGB approximately 255, 0, 0). There are no gradients, shadows, or variations in tone within this circle; it is a single, flat shade.\n\n### Texture and Surface\nThe overall aesthetic is very clean and graphic. The entire image has a smooth, matte finish, suggesting a high-quality print or digital render. The edges of the central red circle are perfectly crisp, clean, and defined.\n\n### Specific Objects\nThere is only one primary object identified within the scene:\n-   **Central Red Circle:** This is the focal point, positioned exactly at the geometric center of the canvas. It has consistent edges and uniform saturation.\n\n### Context\nWhen viewed in its full form with all elements, this image accurately and precisely represents:\n-   **The Flag of Japan (Nisshōki):** A significant cultural, national, and historical symbol consisting of a white background with a central crimson disc (the \"Hinomaru\" or \"Sun Mark\"). The crimson disc in this image aligns perfectly with the standard depiction of the Hinomaru within its white field.\n\nIn summary, the image is a minimalist graphic of a central, solid red circle against a clean white square background, which forms the definitive visual identity of the Japanese flag.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "EjQKMgEMOdbHot7KC7NDBOzbMyVzpP6bhhiqEeguGePTkI5z0Ys1mIF34hY8DyzKnnZTH0Sp",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 296,
+      "completion_tokens": 411,
+      "total_tokens": 707,
+      "cost": 0.001381,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001381,
+        "upstream_inference_prompt_cost": 0.000148,
+        "upstream_inference_completions_cost": 0.001233
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

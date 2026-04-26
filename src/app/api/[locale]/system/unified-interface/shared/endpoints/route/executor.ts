@@ -62,7 +62,7 @@ export class RouteExecutionExecutor {
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
-    platform: CliCompatiblePlatform | Platform.AI;
+    platform: Platform;
     /** Stream context - rootFolderId, threadId, aiMessageId, etc. */
     streamContext: ToolExecutionContext;
     /** Pre-loaded route handler - avoids a second dynamic import when caller already loaded it */

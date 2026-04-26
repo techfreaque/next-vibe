@@ -27,6 +27,7 @@ import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -37,6 +38,7 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
 import { CronTaskStatus, type CronTaskStatusValue } from "../../enum";
+import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import type endpoints from "./definition";
 import type { CronHistoryResponseOutput } from "./definition";
 
@@ -217,6 +219,8 @@ function ExecutionCard({
   onToggle: (section: "error" | "result") => void;
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
 }): React.JSX.Element {
+  const locale = useWidgetLocale();
+  const { t: tTasks } = tasksScopedTranslation.scopedT(locale);
   const hasError = Boolean(execution.error);
   const hasResult =
     execution.result && Object.keys(execution.result).length > 0;
@@ -232,7 +236,7 @@ function ExecutionCard({
             getStatusColorClass(execution.status),
           )}
         >
-          {t(execution.status as Parameters<typeof t>[0])}
+          {tTasks(execution.status)}
         </Span>
 
         {/* Task name + meta */}

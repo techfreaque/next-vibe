@@ -96,7 +96,10 @@ export class RouteExecuteRepository {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}${BEARER_LEAD_ID_SEPARATOR}${leadId}`,
         },
-        body: JSON.stringify({ toolName, input: input ?? {} }),
+        body: JSON.stringify({
+          toolName,
+          input: input ?? {},
+        }),
         signal: AbortSignal.timeout(90_000),
       });
       if (!resp.ok) {
@@ -129,6 +132,7 @@ export class RouteExecuteRepository {
     logger: EndpointLogger,
     t: AiT,
     streamContext: ToolExecutionContext,
+    platform: Platform,
   ): Promise<ResponseType<RouteExecuteResponseInput>> {
     try {
       // Bail out immediately if the stream was cancelled before tool execution started.
@@ -250,12 +254,89 @@ export class RouteExecuteRepository {
         // remote instance" and enter a self-referential lookup returning unfiltered results.
         // eslint-disable-next-line no-unused-vars
         const { instanceId: _stripInstanceId, ...remoteInput } = input ?? {};
-        const strippedInput =
+        let strippedInput: Record<string, WidgetData> | null =
           Object.keys(remoteInput).length > 0 ? remoteInput : null;
+
+        // Pre-resolve media gen model locally before sending to remote.
+        // The remote instance has no skill/fav context, so fieldDefaults.model
+        // would return undefined. We resolve it here using our local context
+        // and inject it into the input, so the remote just receives an explicit model.
+        const preferredName = getPreferredName(toolName);
+        const MEDIA_GEN_TOOLS = [
+          "generate_image",
+          "generate_music",
+          "generate_video",
+        ] as const;
+        type MediaGenTool = (typeof MEDIA_GEN_TOOLS)[number];
+        const isMediaGenTool = (MEDIA_GEN_TOOLS as readonly string[]).includes(
+          preferredName,
+        );
+        if (
+          isMediaGenTool &&
+          !(strippedInput as Record<string, WidgetData> | null)?.["model"]
+        ) {
+          const mediaToolName = preferredName as MediaGenTool;
+          let resolvedModel: string | undefined;
+          if (mediaToolName === "generate_image") {
+            const { getBestImageGenModel } =
+              await import("@/app/api/[locale]/agent/image-generation/models");
+            const sel =
+              execSkill?.imageGenModelSelection ??
+              execFav?.imageGenModelSelection;
+            resolvedModel = sel
+              ? getBestImageGenModel(sel, user, streamContext.providerOverride)
+                  ?.id
+              : undefined;
+          } else if (mediaToolName === "generate_music") {
+            const { getBestMusicGenModel } =
+              await import("@/app/api/[locale]/agent/music-generation/models");
+            const sel =
+              execSkill?.musicGenModelSelection ??
+              execFav?.musicGenModelSelection;
+            resolvedModel = sel
+              ? getBestMusicGenModel(sel, user, streamContext.providerOverride)
+                  ?.id
+              : undefined;
+          } else if (mediaToolName === "generate_video") {
+            const { videoGenModelSelectionSchema, filterVideoGenModels } =
+              await import("@/app/api/[locale]/agent/video-generation/models");
+            const { ModelSelectionType } =
+              await import("@/app/api/[locale]/agent/models/models");
+            const sel =
+              execSkill?.videoGenModelSelection ??
+              execFav?.videoGenModelSelection;
+            if (sel) {
+              // For MANUAL selection, use manualModelId directly (skip provider availability
+              // check — provider availability is local, but execution is on the remote).
+              const parsed = videoGenModelSelectionSchema.safeParse(sel);
+              if (
+                parsed.success &&
+                parsed.data.selectionType === ModelSelectionType.MANUAL &&
+                "manualModelId" in parsed.data
+              ) {
+                resolvedModel = parsed.data.manualModelId;
+              } else {
+                // FILTERS selection: run normal filtering (may return empty if no providers)
+                resolvedModel = filterVideoGenModels(sel, user, streamContext.providerOverride)[0]?.id;
+              }
+            }
+          }
+          if (resolvedModel) {
+            strippedInput = { ...(strippedInput ?? {}), model: resolvedModel };
+            logger.debug(
+              "[RouteExecute] Pre-resolved media gen model for remote",
+              {
+                toolName: preferredName,
+                model: resolvedModel,
+              },
+            );
+          }
+        }
+
         // Normalize incoming toolName to preferred name (alias > canonical).
         // Capabilities are stored using the preferred name so both alias and
         // full-path forms resolve to the same snapshot entry.
-        toolName = getPreferredName(toolName);
+        toolName = preferredName;
 
         // Deduplication: if a remote task for this toolMessageId already exists
         // (created by the first stream before the user confirmed), skip creation.
@@ -515,8 +596,7 @@ export class RouteExecuteRepository {
 
         const taskId = `remote-${instanceId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-        // eslint-disable-next-line no-console
-        console.log("[RouteExecute] Creating DB task", {
+        logger.debug("[RouteExecute] Creating DB task", {
           toolName,
           taskId,
           callbackMode,
@@ -1249,7 +1329,6 @@ export class RouteExecuteRepository {
 
       logger.debug("[RouteExecute] Executing route", { toolName });
 
-      // Set callerCallbackMode so the tool knows what mode was requested.
       if (streamContext) {
         streamContext.callerCallbackMode = callbackMode ?? undefined;
       }
@@ -1260,7 +1339,7 @@ export class RouteExecuteRepository {
         user,
         locale,
         logger,
-        platform: Platform.MCP,
+        platform,
         streamContext: streamContext ?? {
           rootFolderId: DefaultFolderId.BACKGROUND,
           threadId: undefined,

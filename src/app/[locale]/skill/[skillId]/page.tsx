@@ -28,6 +28,7 @@ import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models"
 import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
 import { Div } from "next-vibe-ui/ui/div";
 import { scopedTranslation } from "./i18n";
+import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
 import {
   SkillLandingPage,
   type LeadMagnetConfigData,
@@ -64,6 +65,9 @@ export interface SkillLandingPageData {
   appName: string;
   resolvedModels: ResolvedSkillModels;
   leadMagnetConfig: LeadMagnetConfigData | null;
+  skillData:
+    | import("@/app/api/[locale]/agent/chat/skills/[id]/definition").SkillGetResponseOutput
+    | null;
 }
 
 // Reference token counts for "~X credits/msg" estimate (short message)
@@ -283,6 +287,7 @@ export async function tanstackLoader({
     appName,
     resolvedModels,
     leadMagnetConfig,
+    skillData: initialSkillData,
   };
 }
 

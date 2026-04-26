@@ -1,0 +1,32 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "9f2676e4ca01972f-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Sun, 26 Apr 2026 15:01:44 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1777215703-waEmzwSklXR0eopLAbIb"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1777215703-waEmzwSklXR0eopLAbIb\",\"object\":\"chat.completion.chunk\",\"created\":1777215703,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Groq\",\"system_fingerprint\":\"fp_bbcbd62eb2\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"BR\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1777215703-waEmzwSklXR0eopLAbIb\",\"object\":\"chat.completion.chunk\",\"created\":1777215703,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Groq\",\"system_fingerprint\":\"fp_bbcbd62eb2\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"ANCH\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1777215703-waEmzwSklXR0eopLAbIb\",\"object\":\"chat.completion.chunk\",\"created\":1777215703,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Groq\",\"system_fingerprint\":\"fp_bbcbd62eb2\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"_RESPONSE\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1777215703-waEmzwSklXR0eopLAbIb\",\"object\":\"chat.completion.chunk\",\"created\":1777215703,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Groq\",\"system_fingerprint\":\"fp_bbcbd62eb2\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\" STEP\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1777215703-waEmzwSklXR0eopLAbIb\",\"object\":\"chat.completion.chunk\",\"created\":1777215703,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Groq\",\"system_fingerprint\":\"fp_bbcbd62eb2\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1777215703-waEmzwSklXR0eopLAbIb\",\"object\":\"chat.completion.chunk\",\"created\":1777215703,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Groq\",\"system_fingerprint\":\"fp_bbcbd62eb2\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1777215703-waEmzwSklXR0eopLAbIb\",\"object\":\"chat.completion.chunk\",\"created\":1777215703,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Groq\",\"system_fingerprint\":\"fp_bbcbd62eb2\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":15869,\"completion_tokens\":6,\"total_tokens\":15875,\"cost\":0.012431,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":6912,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.012431,\"upstream_inference_prompt_cost\":0.012413,\"upstream_inference_completions_cost\":0.000018},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

@@ -103,22 +103,33 @@ export function useChatSettings(
         },
       );
 
-      // Set form values before submitting
-      if (updates.selectedModel !== undefined) {
-        endpoint.create?.setValue("selectedModel", updates.selectedModel);
-      }
-      if (updates.selectedSkill !== undefined) {
-        endpoint.create?.setValue("selectedSkill", updates.selectedSkill);
-      }
-      if (updates.activeFavoriteId !== undefined) {
-        endpoint.create?.setValue("activeFavoriteId", updates.activeFavoriteId);
-      }
-      if (updates.ttsAutoplay !== undefined) {
-        endpoint.create?.setValue("ttsAutoplay", updates.ttsAutoplay);
-      }
-      if (updates.viewMode !== undefined) {
-        endpoint.create?.setValue("viewMode", updates.viewMode);
-      }
+      // Set all provided fields in form before submitting
+      const setIf = <K extends keyof ChatSettingsUpdateRequestOutput>(
+        key: K,
+        value: ChatSettingsUpdateRequestOutput[K] | undefined,
+      ): void => {
+        if (value !== undefined) {
+          endpoint.create?.setValue(key, value);
+        }
+      };
+      setIf("selectedModel", updates.selectedModel);
+      setIf("selectedSkill", updates.selectedSkill);
+      setIf("activeFavoriteId", updates.activeFavoriteId);
+      setIf("ttsAutoplay", updates.ttsAutoplay);
+      setIf("viewMode", updates.viewMode);
+      setIf("searchProvider", updates.searchProvider);
+      setIf("codingAgent", updates.codingAgent);
+      setIf("dreamerEnabled", updates.dreamerEnabled);
+      setIf("dreamerFavoriteId", updates.dreamerFavoriteId);
+      setIf("dreamerSchedule", updates.dreamerSchedule);
+      setIf("dreamerPrompt", updates.dreamerPrompt);
+      setIf("autopilotEnabled", updates.autopilotEnabled);
+      setIf("autopilotFavoriteId", updates.autopilotFavoriteId);
+      setIf("autopilotSchedule", updates.autopilotSchedule);
+      setIf("autopilotPrompt", updates.autopilotPrompt);
+      setIf("mamaEnabled", updates.mamaEnabled);
+      setIf("mamaSchedule", updates.mamaSchedule);
+      setIf("mamaPrompt", updates.mamaPrompt);
       // Submit through endpoint (endpoint handles API vs localStorage based on config)
       await endpoint.create?.onSubmit();
     },

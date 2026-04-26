@@ -6,16 +6,16 @@
     "access-control-allow-origin": "*",
     "access-control-expose-headers": "X-Generation-Id,cf-ray",
     "cache-control": "no-cache",
-    "cf-ray": "9f25e070ed9a4dbe-FRA",
+    "cf-ray": "9f27e92b8b8cd9d6-FRA",
     "connection": "keep-alive",
     "content-type": "text/event-stream",
-    "date": "Sun, 26 Apr 2026 13:19:03 GMT",
+    "date": "Sun, 26 Apr 2026 19:14:32 GMT",
     "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
     "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
     "x-content-type-options": "nosniff",
-    "x-generation-id": "gen-1777209541-Jc3Ihldc0co78gZcltYV"
+    "x-generation-id": "gen-1777230870-4pZbx2C9FnWpyyr4nJ4G"
   },
   "events": [
     ": OPENROUTER PROCESSING",
@@ -24,17 +24,12 @@
     ": OPENROUTER PROCESSING",
     ": OPENROUTER PROCESSING",
     ": OPENROUTER PROCESSING",
-    ": OPENROUTER PROCESSING",
-    ": OPENROUTER PROCESSING",
-    ": OPENROUTER PROCESSING",
-    ": OPENROUTER PROCESSING",
-    "data: {\"id\":\"gen-1777209541-Jc3Ihldc0co78gZcltYV\",\"object\":\"chat.completion.chunk\",\"created\":1777209541,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\" \",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
-    "data: {\"id\":\"gen-1777209541-Jc3Ihldc0co78gZcltYV\",\"object\":\"chat.completion.chunk\",\"created\":1777209541,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\" \",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
-    ": OPENROUTER PROCESSING",
-    "data: {\"id\":\"gen-1777209541-Jc3Ihldc0co78gZcltYV\",\"object\":\"chat.completion.chunk\",\"created\":1777209541,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"functions.execute-tool:7\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
-    "data: {\"id\":\"gen-1777209541-Jc3Ihldc0co78gZcltYV\",\"object\":\"chat.completion.chunk\",\"created\":1777209541,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"toolName\\\": \\\"tool-help\\\", \\\"input\\\": {}}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
-    "data: {\"id\":\"gen-1777209541-Jc3Ihldc0co78gZcltYV\",\"object\":\"chat.completion.chunk\",\"created\":1777209541,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
-    "data: {\"id\":\"gen-1777209541-Jc3Ihldc0co78gZcltYV\",\"object\":\"chat.completion.chunk\",\"created\":1777209541,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":14737,\"completion_tokens\":80,\"total_tokens\":14817,\"cost\":0.0090422,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":6144,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.0090422,\"upstream_inference_prompt_cost\":0.0088422,\"upstream_inference_completions_cost\":0.0002},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: {\"id\":\"gen-1777230870-4pZbx2C9FnWpyyr4nJ4G\",\"object\":\"chat.completion.chunk\",\"created\":1777230870,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\" \",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1777230870-4pZbx2C9FnWpyyr4nJ4G\",\"object\":\"chat.completion.chunk\",\"created\":1777230870,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\" \",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1777230870-4pZbx2C9FnWpyyr4nJ4G\",\"object\":\"chat.completion.chunk\",\"created\":1777230870,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"functions.execute-tool:7\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1777230870-4pZbx2C9FnWpyyr4nJ4G\",\"object\":\"chat.completion.chunk\",\"created\":1777230870,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"input\\\": {}, \\\"toolName\\\": \\\"tool-help\\\"}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1777230870-4pZbx2C9FnWpyyr4nJ4G\",\"object\":\"chat.completion.chunk\",\"created\":1777230870,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1777230870-4pZbx2C9FnWpyyr4nJ4G\",\"object\":\"chat.completion.chunk\",\"created\":1777230870,\"model\":\"moonshotai/kimi-k2-0905\",\"provider\":\"Novita\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":18782,\"completion_tokens\":49,\"total_tokens\":18831,\"cost\":0.0113917,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.0113917,\"upstream_inference_prompt_cost\":0.0112692,\"upstream_inference_completions_cost\":0.0001225},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}",
     "data: [DONE]"
   ]
 }

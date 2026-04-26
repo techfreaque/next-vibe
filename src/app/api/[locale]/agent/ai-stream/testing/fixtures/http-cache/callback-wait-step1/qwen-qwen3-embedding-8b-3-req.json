@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-the-tool-help----6ad79706-c4f3-4cc3-a19b-ebc7ce743434.md\n\n# [T1 thread-create+tool-call] Use the tool-help...\nFolder: cron\n\nuser: [T2 image-gen] Call the generate_image tool with prompt='red circle'. Check that the result contains a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK\n\n**Verification:**\n- `imageUrl`: \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/ea36c307-def6-46c6-87ed-19f59c712051/cdaa0b5d-26d0-40c6-9d12-8d4ee706bfdd.png\" (non-empty) ✓\n- `creditCost`: 2.6 (positive) ✓\nuser: [T3a retry-branch] Say exactly: RETRY_RESPONSE STEP_OK\nassistant: RETRY_RESPONSE STEP_OK\nuser: [T3b fork-branch] Say exactly: BRANCH_RESPONSE STEP_OK\nassistant: BRANCH_RESPONSE STEP_OK\nuser: [T4a music-gen] Call the generate_music tool with prompt='upbeat piano melody'. Check that the result has a non-empty audioUrl, a positive creditCost, and durationSeconds between 8 and 120. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK\n\n**Verification:**\n- `audioUrl`: non-empty URL present ✓\n- `creditCost`: 10.4 (positive) ✓\n- `durationSeconds`: 8 (within 8-120 range) ✓\nuser: [T4b video-gen] Call the generate_video tool with prompt='spinning cube'. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK\n\n**Verification:**\n- `videoUrl`: non-empty URL present ✓\n- `creditCost`: 124.8 (positive) ✓\n- `durationSeconds`: 4 (positive) ✓\nuser: [T5 detach-dispatch] Call the generate_image tool with prompt='wait-for-task-test' and callbackMode='detach'. Check that the result has a taskId string and status field, and does NOT have an imageUrl. End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK taskId=local-bg-1777209383133-1lbj8v",
+    "encoding_format": "float"
+  }
+}

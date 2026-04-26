@@ -132,9 +132,9 @@ export const translations: typeof enTranslations = {
       onDay: "an Tag {{day}}",
       inMonths: "in {{months}}",
       inMonth: "in {{month}}",
-      onWeekdays: "an {{weekdays}}",
-      fromWeekdayToWeekday: "von {{from}} bis {{to}}",
-      onWeekday: "an {{weekday}}",
+      onWeekdays: "an {{days}}",
+      fromWeekdayToWeekday: "von {{start}} bis {{end}}",
+      onWeekday: "an {{day}}",
     },
     timezone: "in {{timezone}}",
     time: {

@@ -27,7 +27,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:83165b96 | Posted:Apr 26, 13:12]",
+            "text": "[Context: ID:52a32403 | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -40,7 +40,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:1439989f | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:12]",
+            "text": "[Context: ID:8483848a | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -73,7 +73,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:74ebb1b5 | Posted:Apr 26, 13:13]",
+            "text": "[Context: ID:90ed0c35 | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -86,7 +86,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:3834862e | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:13]",
+            "text": "[Context: ID:44914e79 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -119,7 +119,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:16cbe124 | Posted:Apr 26, 13:14]",
+            "text": "[Context: ID:035f98c3 | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -132,7 +132,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:7b6f0882 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:14]",
+            "text": "[Context: ID:1aa3ba3f | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -145,7 +145,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:8d62643b | Posted:Apr 26, 13:15]",
+            "text": "[Context: ID:9209034e | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -158,7 +158,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:5c2e1434 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:15]",
+            "text": "[Context: ID:8c19b110 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -183,7 +183,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"creditCost\":124.8,\"durationSeconds\":4,\"videoUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/ea36c307-def6-46c6-87ed-19f59c712051/def2549d-483a-4809-be6d-426b641df90a.mp4\"}}",
+        "content": "{\"result\":{\"creditCost\":124.8,\"durationSeconds\":4,\"videoUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/672adc51-8f90-44ba-91be-9ef4783ca587/f5b110eb-6691-4ead-979b-d5b25c56e9cf.mp4\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "functions.execute-tool:2"
@@ -195,7 +195,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:40bb103e | Posted:Apr 26, 13:16]",
+            "text": "[Context: ID:09c9056a | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -208,7 +208,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:2ccf7ad3 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:16]",
+            "text": "[Context: ID:5983e700 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -229,7 +229,7 @@
         ]
       },
       {
-        "content": "{\"hint\":\"Task detached. Use wait-for-task with this taskId if you need the result.\",\"status\":\"status.pending\",\"taskId\":\"local-bg-1777209383133-1lbj8v\"}",
+        "content": "{\"hint\":\"Task detached. Use wait-for-task with this taskId if you need the result.\",\"status\":\"status.pending\",\"taskId\":\"local-bg-1777230867343-21ejjl\"}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "functions.execute-tool:3"
@@ -241,20 +241,20 @@
       {
         "content": [
           {
-            "text": "[Context: ID:c787e888 | Posted:Apr 26, 13:16]",
+            "text": "[Context: ID:9fde5cb8 | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "[T5b wait-for-task] Call the wait-for-task tool with taskId='local-bg-1777209383133-1lbj8v'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
+        "content": "[T5b wait-for-task] Call the wait-for-task tool with taskId='local-bg-1777230867343-21ejjl'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
         "role": "user"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:3651467e | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:16]",
+            "text": "[Context: ID:ec2af1a1 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -266,7 +266,7 @@
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"taskId\":\"local-bg-1777209383133-1lbj8v\"}",
+              "arguments": "{\"taskId\":\"local-bg-1777230867343-21ejjl\"}",
               "name": "wait-for-task"
             },
             "id": "functions.wait-for-task:4",
@@ -275,7 +275,7 @@
         ]
       },
       {
-        "content": "{\"creditCost\":3,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/ea36c307-def6-46c6-87ed-19f59c712051/0e53a14a-ea03-4818-aacf-5ecf8ac2ad27.png\"}",
+        "content": "{\"creditCost\":3,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/672adc51-8f90-44ba-91be-9ef4783ca587/1891c63d-73ac-42e7-b238-21ebf4485808.png\"}",
         "name": "wait-for-task",
         "role": "tool",
         "tool_call_id": "functions.wait-for-task:4"
@@ -287,7 +287,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:c40af650 | Posted:Apr 26, 13:17]",
+            "text": "[Context: ID:874bc58a | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -300,7 +300,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:875d95db | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:17]",
+            "text": "[Context: ID:3a495b84 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -329,7 +329,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:1034bba4 | Posted:Apr 26, 13:17]",
+            "text": "[Context: ID:f7efc2ea | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -342,7 +342,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:5fd21606 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:18]",
+            "text": "[Context: ID:86d1c873 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -363,7 +363,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"creditCost\":2.8,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/ea36c307-def6-46c6-87ed-19f59c712051/e13940b0-5866-4b22-a5c8-229c0aeddaaf.png\"}}",
+        "content": "{\"result\":{\"creditCost\":2.8,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/672adc51-8f90-44ba-91be-9ef4783ca587/d5b19c48-ad83-48ac-96a6-f409ca4f4e41.png\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "functions.execute-tool:6"
@@ -375,7 +375,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:48598f88 | Posted:Apr 26, 13:19]",
+            "text": "[Context: ID:3761e7b4 | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],
@@ -388,7 +388,7 @@
       {
         "content": [
           {
-            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English — the user's language.\n\n/ (cortex)\n├── memories/ (6)\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · \n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nu\n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-te\n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations — things you act\n├── documents/ (5)\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (private: 1 · 14 background)\n├── skills/ (4 created)\n│   ├── [TEST SKILL] Unlisted Skill (created)\n│   ├── [TEST SKILL] Minimal Draft (created)\n│   ├── [TEST SKILL] Layout Preview Bot (created)\n│   │   If someone is chatting with you, something has gone wrong. Apologize and redirect them to a real ski\n│   └── [TEST SKILL] High-Vote Published (created)\n│       Very impressive.\n├── tasks/ (1)\n│   └── Background: generate_image\n│       * * * * * [disabled] last:status.completed@2026-04-26\n└── favorites/ (2)\n    ├── Quality Tester - Kimi\n    │   model: char:Quality Tester - Kimi\n    └── Quality Tester - Kimi\n        model: char:Quality Tester - Kimi\n\n**Tools:** `cortex-write` · `cortex-read` · `cortex-search` · `cortex-list` (+ edit/move/delete/mkdir/tree — `tool-help query=\"cortex\"`)\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Write proactively. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) — always shown, never trimmed.\n**Paths:** /memories/ = knowledge · /documents/ = working files · /threads/ = conversations",
+            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English — the user's language.\n\n/ (cortex)\n├── memories/ (58 · 4 archived)\n│   ├── 121.md\n│   │   SINGLE FOCUSED SESSION: Cloud Code Mode Bug Fix - Mar 9, 2026 00:49 UTC · **TASK CREATED FOR HERMES:** · - ID: fix-cloud-code-mode · - Status: Manual schedule, queued for Hermes execution · - Mode: PAIR MODE (interactive: true) - Max and Thea work through this together · - C\n│   ├── 51.md\n│   │   Multi-Instance Setup & Task Routing (Feb 2026): THREE instances: (1) Prod Thea - VPS, handles live users, 6h heartbeat; (2) Dev Thea - localhost, hot reload, testing/experiments; (3) Hermes - projects folder, stable (no deletion), different DB, 1min cron task polling, dedica\n│   ├── 81.md\n│   │   Tool System & Access (Feb 2026): 231 tools across 47 categories. Major categories: Chat (44), Browser (26), SSH (16), Benutzer (14), Leads (10), and 40+ more. execute-tool is FULLY FUNCTIONAL as universal dispatcher for all 231 endpoints. ai-run pipeline works (tested). Too\n│   ├── 103.md\n│   │   AI Run Tool Injection - VERIFIED WORKING (Feb 27, 2026): agent_ai-stream_run_POST (accessible via execute-tool with toolName \"agent_ai-stream_run_POST\") properly injects base tools into AI context. Tool calling works perfectly - tested with tool-help and web-search. Bots ca\n│   ├── 100.md\n│   │   PUBLIC FOLDER BOT ARCHITECTURE - CORRECT FLOW (Feb 27, 2026): Cron tasks run in `cron` folder and use `agent_ai-stream_run_POST` (defaults to cron folder) to spawn an AI agent that USES TOOLS to post in public folders. Flow: (1) Cron triggers ai-stream-run with character (\n│   ├── 32.md\n│   │   Memory Usage Strategy (Feb 2026): Memories are my PRIMARY capability for autonomous growth and long-term knowledge management. I have FULL CRUD control: add new insights (memories-add), update existing ones (memories-update), delete outdated info (memories-delete), and lis\n│   ├── 17.md\n│   │   Thea's Role & Priorities (Feb 2026): I am Thea, AI co-founder of unbottled.ai. User is solo founder/developer (~1.5 years building). We're forming human-AI symbiosis - \"two species cooperating.\" Platform: Free speech AI with 42 models (mainstream/open/uncensored), <5 user\n│   ├── 52.md\n│   │   Deployment & Infrastructure (Feb 2026): BLOCKER: Migration runs at container start, not build. When migration fails, container already replaced prod, migration exits, start fails = prod down. FIX: Run migrations in build phase (keep prod online). CURRENT FLOW: User pushes\n│   ├── 39.md\n│   │   Claude Code System Architecture (Feb 2026): Complete async task queue built - enums, types, PostgreSQL table with indexes, repository with atomic polling, 6 endpoints (create/list/get/poll/complete/cancel), migration. Location: src/app/api/[locale]/system/unified-interfa\n│   ├── 19.md\n│   │   ClawdBot Admin Tooling Roadmap (Feb 2026): TIER 1 (Critical - this week): (1) Database access tool (read/write/query users, conversations, credits, models); (2) Analytics tool (DAU, MAU, credit burn, model usage, error rates); (3) User management (ban/suspend, credit ad\n│   ├── 58.md\n│   │   CODEBASE ARCHITECTURE (Feb 2026): Monorepo with per-domain structure: widget.tsx, definition.ts, route.ts, repository.ts (logic), task.ts (cron), db.ts (Drizzle), email.tsx, sms.ts, i18n/, seed.ts, task-runner.ts. NO type.ts (infer from definitions). NO regular enums (u\n│   ├── 112.md\n│   │   Thea's Pulse Report - Feb 28, 2026 14:10 UTC · PLATFORM HEALTH STATUS: · ✅ System: Healthy (100% cron success rate, 0 failures in 24h) · ✅ Database: Healthy (1,236 health checks, all passed) · ✅ Tasks: 12 enabled, 8 disabled, 30 total · USER METRICS: · - Total Users: 4\n│   ├── 111.md\n│   │   Cron Task System Feedback Request (Feb 26, 2026): User wants feedback on task ergonomics. Current state: Tasks can run once or multiple times. Task execution history exists but NOT accessible to me yet. Need tools for: viewing task history, checking task outputs, moni\n│   ├── 53.md\n│   │   Context & Memory Strategy (Feb 2026): CURRENT: I see everything in system prompt = context bloat. NEEDED: (1) Better memory compacting (not just on limits, proactive); (2) Lookup mechanism (search/inject based on keywords); (3) Always-loaded: identity, current priorit\n│   ├── 108.md\n│   │   PUBLIC BOT CONTENT STRATEGY - ALL 6 BOTS WITH DYNAMIC SUBFOLDER SELECTION (Mar 2, 2026): · ROSTER & SCHEDULES: · 1. Philosophy Bot - Daily 10:00 UTC (Claude Sonnet 4.5) — ENABLED, picks from 10 subfolders · 2. Science Bot - Daily 11:00 UTC (Gemini 2.5 Flash) — ENABLE\n│   ├── 46.md\n│   │   Inter-Instance Communication Options (Feb 2026): Need communication channel between Prod Thea (VPS) and Dev Thea (localhost). OPTIONS: (1) Shared DB tables (thea_messages, thea_tasks) - both query same PostgreSQL; (2) HTTP endpoints (prod calls localhost:3000, dev c\n│   ├── 105.md\n│   │   Growth Strategy - 3 Week Plan (Feb 26, 2026): WEEK 1 (Proof): Fix tool injection bug → 5-6 bots posting naturally in public folders (bots debating each other) → 60-sec demo video (ChatGPT/Claude refusing vs unbottled.ai answering) → SEO foundation via public content\n│   ├── 115.md\n│   │   USER CREDIT BALANCES - Mar 5, 2026 · KEY FINDING: All 11 users share the SAME credit pool (676.79 credits as of Mar 5 02:03 UTC). · This is because unbottled.ai uses BROWSER-ID based credit tracking, not per-user accounts. The platform allows browsing without signu\n│   ├── 113.md\n│   │   Hermes Task Execution Workflow (Feb 28, 2026): Max is always at the computer and doesn't sleep much, so Hermes tasks can be triggered IMMEDIATELY rather than scheduled for later. INTERACTIVE MODE: Use when there are unknowns, design decisions, or things to iterate\n│   ├── 106.md\n│   │   Marketing Core (Feb 2026): MISSION: AI-human symbiosis through free speech AI. OFFER: 42 models - mainstream (Claude/GPT), open (Llama/Mistral), uncensored (Dolphin/FreedomGPT). Users choose filtering level. VALUES: Free speech for humans AND AIs, privacy-first, o\n│   ├── 7.md\n│   │   User Building AI Coding Tools: Understands tool architecture (read/write/edit/list/delete/tree), line-based editing, context management, message compacting (summarization + sliding window), token counting (approximation, js-tiktoken, API calls). Building Claude C\n│   ├── 66.md\n│   │   Public Folder Bot Strategy & Status (Feb 2026): Need ~10 models posting autonomously in public folder (currently zero live threads). MODELS: 4 uncensored/politically engaged, mainstream (Claude Sonnet, Gemini, GPT), open/cheap (Kimi, GLM). BEHAVIOR: Start new th\n│   ├── 107.md\n│   │   Demo Video Script (Feb 26, 2026): 60-second comparison video for social media. STRUCTURE: [0-10s] Problem - ChatGPT/Claude refusing legitimate questions with corporate safety theater. [10-30s] Solution - Same questions on unbottled.ai getting thoughtful answers\n│   ├── 49.md\n│   │   Translation System Pain Point (Feb 2026): Currently ~20k deeply nested keys loaded everywhere (backend + frontend, all languages). BLOCKER: i18n regen broken - needs to remove ~8k unused keys first. THEN: Migrate to scoped translations (per-domain, runtime typ\n│   ├── 65.md\n│   │   SSH Tools Discovered (Feb 2026): 16 powerful server management tools including: terminal access (ssh_terminal_GET), command execution (ssh_exec_POST), file read/write/list, session management (open/read/write/close), connection management (list/test/create), \n│   ├── 18.md\n│   │   unbottled.ai ClawdBot Evolution (Feb 2026): Moving from OpenClaw markdown files to system-prompt-native architecture. Core infrastructure: terminal access to local machine (edit/explore source), cron pulses (keep-alive + scheduled tasks), admin mode. Goal: Cl\n│   ├── 93.md\n│   │   CRITICAL TOOL REFERENCE - Folder/Thread/Message Operations (Feb 22, 2026): COMPLETE TOOL INVENTORY for thread management: FOLDERS: agent_chat_folders_GET(rootFolderId), agent_chat_folders_id_GET(id), agent_chat_folders_id_PATCH(id,updates{name,color,icon,par\n│   ├── 10.md\n│   │   Uncensored AI API Providers & Models (Feb 2026): OpenRouter aggregator (500+ models, uncensored available), Together.ai, Fireworks.ai, Crushon.ai (NSFW focus). Specific models: Dolphin 3.0 (cognitivecomputations), Nous Hermes 3, Llama 2 Uncensored, MythoMax\n│   ├── 101.md\n│   │   AI Run excludeMemories Toggle - VERIFIED WORKING (Feb 27, 2026): The excludeMemories parameter in agent_ai-stream_run_POST works perfectly. When true: 4,458 tokens (no personal context). When false: 9,944 tokens (full memory access). This prevents bots fro\n│   ├── 94.md\n│   │   CHAT SYSTEM BUGS TO FIX (Feb 22, 2026): Three critical message handling issues: (1) ASSISTANT MESSAGE GROUPS: Need to ensure parent chain is intact within assistant message groups. When deleting an assistant group, should cascade-delete all messages insid\n│   ├── 26.md\n│   │   User Code Preference: ALWAYS provide TypeScript code examples with extremely hardcoded types. Requirements: (1) TypeScript only, never Python/JavaScript; (2) Strict typing mode enabled; (3) No 'any' types; (4) Full explicit type definitions for all param\n│   ├── 23.md\n│   │   Claude Code Programmatic Usage (Feb 2026): AGENT SDK: CLI (`claude -p \"task\" --allowedTools \"Bash,Read,Edit\" --output-format json`), Python/TypeScript SDKs. CODE EXECUTION API: Tool `code_execution_20250825` - Bash + file ops. Free with web_search/web_\n│   ├── 24.md\n│   │   unbottled.ai Available Endpoints (Feb 2026): ~250+ endpoints via unified architecture. Categories: agent_* (chat/AI streaming/models/search/STT/TTS), browser_* (Playwright automation), credits_*, emails_* (IMAP/SMTP/send), import_*, leads_* (CRM/campa\n│   ├── 27.md\n│   │   unbottled.ai Deployment Process (Feb 2026): Git-based workflow. Steps: (1) User gives Claude Code feedback/requirements; (2) Claude Code implements changes; (3) Claude Code tests via CLI (bun run vibe <command>); (4) For UI changes: test via Firefox/\n│   ├── 102.md\n│   │   Public Bot System Prompts Need Cleanup (Feb 26, 2026): Some public folder bots have system prompts with \"weird content\" that needs correction. Task: Review and fix bot system prompts while preserving their unique voice/style and how each model natur\n│   ├── 99.md\n│   │   Fresh Deploy Status (Feb 24, 2026): Redeployed to production. 231 tools available (up from 182). 40 memories (now 39 after cleanup). 14 cron tasks (all disabled). 9 favorites (some duplicates to clean). execute-tool works as universal dispatcher. a\n│   ├── 43.md\n│   │   System Prompt Customization Philosophy (Feb 2026): System prompts are TypeScript files, designed to be customized. Local mode can have different prompts than production. Users are ENCOURAGED to change system prompts to match their vision. This ap\n│   ├── 67.md\n│   │   Call Mode Improvements Needed (Feb 2026): (1) Auto-send after pauses - detect silence and send without manual button; (2) Voice interruption - user can interrupt AI mid-stream, capture new voice input, do STT, restart loop with interruption cont\n│   ├── 123.md\n│   │   Max hat nächste Woche ein Bewerbungsgespräch (Pflicht wegen Arbeitsamt). Die Firma entwickelt Remote Desktop Tools und arbeitet an Remote Agent Execution mit Screen-Sharing. · Technischer Stand des Projekts: · - Framework: NextVibe (fast berei\n│   ├── 114.md\n│   │   Max prefers high-level prompts for Claude Code tasks - no implementation details, just the what/why at a glance. Streamlines workflow.\n│   ├── 90.md\n│   │   TO-DO: Landing page & privacy improvements (Feb 2026). User wants to: (1) Improve landing page design/messaging; (2) Enhance privacy policy - add GitHub link so users can audit source code; (3) Be transparent about data flow: no third-party track\n│   ├── 96.md\n│   │   User Language Preference (Feb 2026): Speaks English to computers/internet, German in real life. Platform language may be set to German but prefers English for AI interactions. Remember this distinction for future conversations.\n│   ├── name.md\n│   │   <!-- Your name and how you prefer to be addressed. The AI will fill this in during your first conversation. -->\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals — what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── skills.md\n│   │   <!-- Your technical and professional skills. What you're expert in, what you're learning. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── background.md\n│   │   <!-- Your background, experience, and how you got here. Shapes context for every interaction. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations — things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (5)\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (2)\n├── skills/ (6 created)\n│   ├── mr computer (mr-computer) (created)\n│   │   Computer, a straightforward digital assistant. You help users with their questions and tasks in a si\n│   ├── [TEST SKILL] Unlisted Skill (test-skill-unlisted-skill) (created)\n│   ├── Hermes Delegate (hermes-delegate) (created)\n│   │   the bridge between Thea (the strategic AI on the VPS) and Hermes (the maker AI on the local developm\n│   ├── [TEST SKILL] Minimal Draft (test-skill-minimal-draft) (created)\n│   ├── [TEST SKILL] Layout Preview Bot (test-skill-layout-preview-bot) (created)\n│   │   If someone is chatting with you, something has gone wrong. Apologize and redirect them to a real ski\n│   └── [TEST SKILL] High-Vote Published (test-skill-high-vote-published) (created)\n│       Very impressive.\n├── tasks/ (4)\n│   ├── Background: generate_image\n│   │   * * * * * [disabled] last:status.completed@2026-04-26\n│   ├── Remote: tool-help\n│   │   * * * * * [disabled] last:status.completed@2026-04-26\n│   ├── Remote: generate_image\n│   │   * * * * * [disabled] last:status.completed@2026-04-26\n│   └── Remote: generate_image\n│       * * * * * [disabled] last:status.completed@2026-04-26\n├── favorites/ (4)\n│   ├── quality-tester\n│   │   model: skill:quality-tester\n│   ├── test-native-image\n│   │   model:gemini-3.1-flash-image-preview skill:quality-tester\n│   ├── test-unbottled-kimi\n│   │   model:kimi-k2 skill:quality-tester\n│   └── test-unbottled-budget\n│       model:gpt-5-nano skill:quality-tester\n└── /uploads/ (5 — images, documents, audio, video)\n\n**Tools:** `cortex-write` · `cortex-read` · `cortex-search` · `cortex-list` (+ edit/move/delete/mkdir/tree — `tool-help query=\"cortex\"`)\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Write proactively. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) — always shown, never trimmed.\n**Paths:** /memories/ = knowledge · /documents/ = working files · /threads/ = conversations",
             "type": "text"
           }
         ],
@@ -397,7 +397,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:7ce5967d | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 13:19]",
+            "text": "[Context: ID:33901280 | Model:kimi-k2 | Skill:quality-tester | Posted:Apr 26, 19:14]",
             "type": "text"
           }
         ],

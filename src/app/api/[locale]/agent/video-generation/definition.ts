@@ -85,7 +85,7 @@ const { POST } = createEndpoint({
         description: "post.model.description",
         columns: 12,
         options: [],
-        hiddenForPlatforms: [Platform.AI, Platform.MCP],
+        hiddenForPlatforms: [Platform.AI],
         schema: z.enum(VideoGenModelId).optional(),
       }),
       duration: requestField(scopedTranslation, {

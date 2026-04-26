@@ -131,9 +131,9 @@ export const translations = {
       onDay: "on day {{day}}",
       inMonths: "in {{months}}",
       inMonth: "in {{month}}",
-      onWeekdays: "on {{weekdays}}",
-      fromWeekdayToWeekday: "from {{from}} to {{to}}",
-      onWeekday: "on {{weekday}}",
+      onWeekdays: "on {{days}}",
+      fromWeekdayToWeekday: "from {{start}} to {{end}}",
+      onWeekday: "on {{day}}",
     },
     timezone: "in {{timezone}}",
     time: {

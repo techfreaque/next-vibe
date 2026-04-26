@@ -14,6 +14,7 @@ import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { FolderOpen } from "next-vibe-ui/ui/icons/FolderOpen";
 import { Home } from "next-vibe-ui/ui/icons/Home";
 import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
+import { Star } from "next-vibe-ui/ui/icons/Star";
 import { SquareCheck } from "next-vibe-ui/ui/icons/SquareCheck";
 import { Upload } from "next-vibe-ui/ui/icons/Upload";
 import { Wand2 } from "next-vibe-ui/ui/icons/Wand2";
@@ -89,6 +90,12 @@ const MOUNT_ICONS: Record<
     bg: "bg-pink-500/10",
     textColor: "text-pink-300",
   },
+  favorites: {
+    icon: Star,
+    color: "text-yellow-400",
+    bg: "bg-yellow-500/10",
+    textColor: "text-yellow-300",
+  },
 };
 
 function getMountStyle(entryPath: string): {
@@ -120,6 +127,7 @@ const FOLDER_NAME_KEYS: Record<
   | "get.folderNames.uploads"
   | "get.folderNames.searches"
   | "get.folderNames.gens"
+  | "get.folderNames.favorites"
   | "get.folderNames.inbox"
   | "get.folderNames.projects"
   | "get.folderNames.knowledge"
@@ -137,6 +145,7 @@ const FOLDER_NAME_KEYS: Record<
   uploads: "get.folderNames.uploads",
   searches: "get.folderNames.searches",
   gens: "get.folderNames.gens",
+  favorites: "get.folderNames.favorites",
   inbox: "get.folderNames.inbox",
   projects: "get.folderNames.projects",
   knowledge: "get.folderNames.knowledge",

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/uploads/audio/t1-thread-create-tool-call-use-execute-tool-f26e17fa-9eca-4fc9-b993-9b1b5457f14e/test-music.mp3.md\n\n---\nfilename: \"test-music.mp3\"\nembedded: true\nmimeType: \"audio/mpeg\"\nsize: \"1.1 MB\"\nthreadId: \"f26e17fa-9eca-4fc9-b993-9b1b5457f14e\"\nthreadTitle: \"[T1 thread-create+tool-call] Use execute-tool...\"\nuploadedAt: \"2026-04-26T15:56:48.747Z\"\n---\n\n# test-music.mp3\n\n**Stored:** base64-embedded (no public URL)\n\n| Field | Value |\n| --- | --- |\n| Type | `audio/mpeg` |\n| Size | 1.1 MB |\n| Thread | [T1 thread-create+tool-call] Use execute-tool... |\n| Uploaded | 2026-04-26 |\n\n## Message Context\n\n[T10c_attach audio-attach] An audio file is attached. Describe or transcribe what you hear in it. End your reply with STEP_OK if you could process the audio, or FAILED: <reason> if you could not process it at all.",
+    "encoding_format": "float"
+  }
+}

@@ -203,6 +203,7 @@ export const translations = {
       },
       lastRun: "Last run:",
       neverRun: "Never run",
+      runNow: "Run now",
     },
     errors: {
       validation: {

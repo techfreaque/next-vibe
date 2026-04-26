@@ -132,9 +132,9 @@ export const translations: typeof enTranslations = {
       onDay: "w dniu {{day}}",
       inMonths: "w {{months}}",
       inMonth: "w {{month}}",
-      onWeekdays: "w {{weekdays}}",
-      fromWeekdayToWeekday: "od {{from}} do {{to}}",
-      onWeekday: "w {{weekday}}",
+      onWeekdays: "w {{days}}",
+      fromWeekdayToWeekday: "od {{start}} do {{end}}",
+      onWeekday: "w {{day}}",
     },
     timezone: "w {{timezone}}",
     time: {

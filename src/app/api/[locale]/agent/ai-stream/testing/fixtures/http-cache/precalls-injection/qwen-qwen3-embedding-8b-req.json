@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "Assistant: STEP_OK\n\nUser: [T9 preCalls] An image was already generated for you before this message. Look at the generate_image tool result in your context and report the imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.\n\nUser: [T9 preCalls] An image was already generated for you before this message. Look at the generate_image tool result in your context and report the imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.",
+    "input": "User: [T9 preCalls] An image was already generated for you before this message. Look at the generate_image tool result in your context and report the imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.\n\nUser: [T9 preCalls] An image was already generated for you before this message. Look at the generate_image tool result in your context and report the imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.",
     "encoding_format": "float"
   }
 }

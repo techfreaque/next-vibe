@@ -30,6 +30,27 @@ export const translations = {
       description: "Filter users by role",
       placeholder: "Select role...",
     },
+    subscription: {
+      label: "Subscription",
+      description: "Filter by subscription status",
+      placeholder: "Any subscription status",
+    },
+    creditActivity: {
+      label: "Credit Activity",
+      description: "Filter by credit purchase or spending activity",
+      placeholder: "Any credit activity",
+    },
+    threads: {
+      label: "Threads",
+      description: "Filter by whether the user has any chat threads",
+      placeholder: "Any thread status",
+    },
+    referralActivity: {
+      label: "Referral Activity",
+      description:
+        "Filter by referral link, clicks, signups, or paying subscribers",
+      placeholder: "Any referral activity",
+    },
     // Sorting section
     sortingOptions: {
       title: "Sorting",
@@ -333,6 +354,30 @@ export const translations = {
       partnerEmployee: "Partner Employee",
       admin: "Admin",
       superAdmin: "Super Admin",
+    },
+    subscriptionPresenceFilter: {
+      any: "Any",
+      hasActive: "Has active subscription",
+      hadAny: "Had a subscription (ever)",
+      never: "Never subscribed",
+    },
+    creditActivityFilter: {
+      any: "Any",
+      boughtPack: "Bought credit pack",
+      spentCredits: "Spent credits",
+      neverSpent: "Never spent credits",
+    },
+    threadsFilter: {
+      any: "Any",
+      hasThreads: "Has threads",
+      noThreads: "No threads",
+    },
+    referralActivityFilter: {
+      any: "Any",
+      hasCode: "Has referral link",
+      hasClicks: "Has referral clicks",
+      hasSignups: "Has referral signups",
+      hasSubscribers: "Has paying referrals",
     },
   },
 };

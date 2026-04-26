@@ -170,3 +170,83 @@ export const PaymentMethodFilterDB = [
   PaymentMethodFilter.CRYPTO,
   PaymentMethodFilter.NO_PAYMENT_METHOD,
 ] as const;
+
+/**
+ * Subscription Presence Filter — does the user have / had a subscription?
+ */
+export const {
+  enum: SubscriptionPresenceFilter,
+  options: SubscriptionPresenceFilterOptions,
+  Value: SubscriptionPresenceFilterValue,
+} = createEnumOptions(scopedTranslation, {
+  ANY: "list.enums.subscriptionPresenceFilter.any",
+  HAS_ACTIVE: "list.enums.subscriptionPresenceFilter.hasActive",
+  HAD_ANY: "list.enums.subscriptionPresenceFilter.hadAny",
+  NEVER: "list.enums.subscriptionPresenceFilter.never",
+});
+export const SubscriptionPresenceFilterDB = [
+  SubscriptionPresenceFilter.ANY,
+  SubscriptionPresenceFilter.HAS_ACTIVE,
+  SubscriptionPresenceFilter.HAD_ANY,
+  SubscriptionPresenceFilter.NEVER,
+] as const;
+
+/**
+ * Credit Activity Filter — purchased packs / spent credits
+ */
+export const {
+  enum: CreditActivityFilter,
+  options: CreditActivityFilterOptions,
+  Value: CreditActivityFilterValue,
+} = createEnumOptions(scopedTranslation, {
+  ANY: "list.enums.creditActivityFilter.any",
+  BOUGHT_PACK: "list.enums.creditActivityFilter.boughtPack",
+  SPENT_CREDITS: "list.enums.creditActivityFilter.spentCredits",
+  NEVER_SPENT: "list.enums.creditActivityFilter.neverSpent",
+});
+export const CreditActivityFilterDB = [
+  CreditActivityFilter.ANY,
+  CreditActivityFilter.BOUGHT_PACK,
+  CreditActivityFilter.SPENT_CREDITS,
+  CreditActivityFilter.NEVER_SPENT,
+] as const;
+
+/**
+ * Threads Filter — has any threads
+ */
+export const {
+  enum: ThreadsFilter,
+  options: ThreadsFilterOptions,
+  Value: ThreadsFilterValue,
+} = createEnumOptions(scopedTranslation, {
+  ANY: "list.enums.threadsFilter.any",
+  HAS_THREADS: "list.enums.threadsFilter.hasThreads",
+  NO_THREADS: "list.enums.threadsFilter.noThreads",
+});
+export const ThreadsFilterDB = [
+  ThreadsFilter.ANY,
+  ThreadsFilter.HAS_THREADS,
+  ThreadsFilter.NO_THREADS,
+] as const;
+
+/**
+ * Referral Activity Filter — referral link, clicks, signups, paying subscribers
+ */
+export const {
+  enum: ReferralActivityFilter,
+  options: ReferralActivityFilterOptions,
+  Value: ReferralActivityFilterValue,
+} = createEnumOptions(scopedTranslation, {
+  ANY: "list.enums.referralActivityFilter.any",
+  HAS_CODE: "list.enums.referralActivityFilter.hasCode",
+  HAS_CLICKS: "list.enums.referralActivityFilter.hasClicks",
+  HAS_SIGNUPS: "list.enums.referralActivityFilter.hasSignups",
+  HAS_SUBSCRIBERS: "list.enums.referralActivityFilter.hasSubscribers",
+});
+export const ReferralActivityFilterDB = [
+  ReferralActivityFilter.ANY,
+  ReferralActivityFilter.HAS_CODE,
+  ReferralActivityFilter.HAS_CLICKS,
+  ReferralActivityFilter.HAS_SIGNUPS,
+  ReferralActivityFilter.HAS_SUBSCRIBERS,
+] as const;

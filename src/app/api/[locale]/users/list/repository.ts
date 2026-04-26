@@ -5,7 +5,18 @@
 
 import "server-only";
 
-import { and, count, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  exists,
+  ilike,
+  notExists,
+  or,
+  sql,
+  type SQL,
+} from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -17,11 +28,32 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { referralCodes, userReferrals } from "@/app/api/[locale]/referral/db";
+import {
+  creditPacks,
+  creditTransactions,
+  creditWallets,
+} from "@/app/api/[locale]/credits/db";
+import {
+  CreditActivityFilter,
+  ReferralActivityFilter,
+  SortOrder,
+  SubscriptionPresenceFilter,
+  ThreadsFilter,
+  UserSortField,
+  UserStatusFilter,
+} from "@/app/api/[locale]/users/enum";
+import {
+  referralCodes,
+  leadReferrals,
+  userReferrals,
+} from "@/app/api/[locale]/referral/db";
+import { subscriptions } from "@/app/api/[locale]/subscription/db";
+import type { SubscriptionStatusDB } from "@/app/api/[locale]/subscription/enum";
+import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
+import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { users } from "@/app/api/[locale]/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { SortOrder, UserSortField, UserStatusFilter } from "../enum";
 import type { UserListRequestOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -56,6 +88,213 @@ export class UserListRepository {
     // Role filtering disabled for now due to enum type complexity
     // TODO: Implement proper role filtering with correct type mapping
     return null;
+  }
+
+  /**
+   * Subscription presence filter — uses EXISTS on subscriptions table
+   */
+  private static convertSubscriptionFilter(
+    filter: string | undefined,
+  ): SQL | null {
+    if (!filter || filter === SubscriptionPresenceFilter.ANY) {
+      return null;
+    }
+
+    const activeStatuses = [
+      SubscriptionStatus.ACTIVE,
+      SubscriptionStatus.TRIALING,
+    ] as (typeof SubscriptionStatusDB)[number][];
+
+    switch (filter) {
+      case SubscriptionPresenceFilter.HAS_ACTIVE:
+        return exists(
+          db
+            .select({ one: sql`1` })
+            .from(subscriptions)
+            .where(
+              and(
+                eq(subscriptions.userId, users.id),
+                sql`${subscriptions.status} = ANY(ARRAY[${sql.join(
+                  activeStatuses.map((s) => sql`${s}`),
+                  sql`, `,
+                )}])`,
+              ),
+            ),
+        );
+      case SubscriptionPresenceFilter.HAD_ANY:
+        return exists(
+          db
+            .select({ one: sql`1` })
+            .from(subscriptions)
+            .where(eq(subscriptions.userId, users.id)),
+        );
+      case SubscriptionPresenceFilter.NEVER:
+        return notExists(
+          db
+            .select({ one: sql`1` })
+            .from(subscriptions)
+            .where(eq(subscriptions.userId, users.id)),
+        );
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Credit activity filter — purchased packs or spent credits
+   */
+  private static convertCreditActivityFilter(
+    filter: string | undefined,
+  ): SQL | null {
+    if (!filter || filter === CreditActivityFilter.ANY) {
+      return null;
+    }
+
+    switch (filter) {
+      case CreditActivityFilter.BOUGHT_PACK:
+        // Has at least one credit pack of type PERMANENT (purchased, not subscription/bonus)
+        return exists(
+          db
+            .select({ one: sql`1` })
+            .from(creditWallets)
+            .innerJoin(creditPacks, eq(creditPacks.walletId, creditWallets.id))
+            .where(
+              and(
+                eq(creditWallets.userId, users.id),
+                sql`${creditPacks.source} LIKE '%purchase%'`,
+              ),
+            ),
+        );
+      case CreditActivityFilter.SPENT_CREDITS:
+        // Has at least one USAGE transaction
+        return exists(
+          db
+            .select({ one: sql`1` })
+            .from(creditWallets)
+            .innerJoin(
+              creditTransactions,
+              eq(creditTransactions.walletId, creditWallets.id),
+            )
+            .where(
+              and(
+                eq(creditWallets.userId, users.id),
+                sql`${creditTransactions.amount} < 0`,
+              ),
+            ),
+        );
+      case CreditActivityFilter.NEVER_SPENT:
+        return notExists(
+          db
+            .select({ one: sql`1` })
+            .from(creditWallets)
+            .innerJoin(
+              creditTransactions,
+              eq(creditTransactions.walletId, creditWallets.id),
+            )
+            .where(
+              and(
+                eq(creditWallets.userId, users.id),
+                sql`${creditTransactions.amount} < 0`,
+              ),
+            ),
+        );
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Threads filter — has/no chat threads
+   */
+  private static convertThreadsFilter(filter: string | undefined): SQL | null {
+    if (!filter || filter === ThreadsFilter.ANY) {
+      return null;
+    }
+
+    switch (filter) {
+      case ThreadsFilter.HAS_THREADS:
+        return exists(
+          db
+            .select({ one: sql`1` })
+            .from(chatThreads)
+            .where(eq(chatThreads.userId, users.id)),
+        );
+      case ThreadsFilter.NO_THREADS:
+        return notExists(
+          db
+            .select({ one: sql`1` })
+            .from(chatThreads)
+            .where(eq(chatThreads.userId, users.id)),
+        );
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Referral activity filter — code, clicks, signups, paying subscribers
+   */
+  private static convertReferralActivityFilter(
+    filter: string | undefined,
+  ): SQL | null {
+    if (!filter || filter === ReferralActivityFilter.ANY) {
+      return null;
+    }
+
+    switch (filter) {
+      case ReferralActivityFilter.HAS_CODE:
+        // Has at least one referral code
+        return exists(
+          db
+            .select({ one: sql`1` })
+            .from(referralCodes)
+            .where(eq(referralCodes.ownerUserId, users.id)),
+        );
+      case ReferralActivityFilter.HAS_CLICKS:
+        // Has a referral code that has been clicked (leadReferrals exist for their code)
+        return exists(
+          db
+            .select({ one: sql`1` })
+            .from(referralCodes)
+            .innerJoin(
+              leadReferrals,
+              eq(leadReferrals.referralCodeId, referralCodes.id),
+            )
+            .where(eq(referralCodes.ownerUserId, users.id)),
+        );
+      case ReferralActivityFilter.HAS_SIGNUPS:
+        // Has at least one user who signed up via their referral
+        return exists(
+          db
+            .select({ one: sql`1` })
+            .from(userReferrals)
+            .where(eq(userReferrals.referrerUserId, users.id)),
+        );
+      case ReferralActivityFilter.HAS_SUBSCRIBERS:
+        // Has at least one referred user who has an active subscription
+        return exists(
+          db
+            .select({ one: sql`1` })
+            .from(userReferrals)
+            .innerJoin(
+              subscriptions,
+              eq(subscriptions.userId, userReferrals.referredUserId),
+            )
+            .where(
+              and(
+                eq(userReferrals.referrerUserId, users.id),
+                sql`${subscriptions.status} IN (${sql.join(
+                  [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING].map(
+                    (s) => sql`${s}`,
+                  ),
+                  sql`, `,
+                )})`,
+              ),
+            ),
+        );
+      default:
+        return null;
+    }
   }
 
   /**
@@ -127,6 +366,10 @@ export class UserListRepository {
           search?: string;
           status?: string[];
           role?: string[];
+          subscription?: string;
+          creditActivity?: string;
+          threads?: string;
+          referralActivity?: string;
         };
         sortingOptions?: {
           sortBy?: string;
@@ -157,6 +400,40 @@ export class UserListRepository {
       const roleCondition = UserListRepository.convertRoleFilter();
       if (roleCondition) {
         conditions.push(roleCondition);
+      }
+
+      // Subscription presence filter
+      const subscriptionCondition =
+        UserListRepository.convertSubscriptionFilter(
+          requestData.searchFilters?.subscription,
+        );
+      if (subscriptionCondition) {
+        conditions.push(subscriptionCondition);
+      }
+
+      // Credit activity filter
+      const creditCondition = UserListRepository.convertCreditActivityFilter(
+        requestData.searchFilters?.creditActivity,
+      );
+      if (creditCondition) {
+        conditions.push(creditCondition);
+      }
+
+      // Threads filter
+      const threadsCondition = UserListRepository.convertThreadsFilter(
+        requestData.searchFilters?.threads,
+      );
+      if (threadsCondition) {
+        conditions.push(threadsCondition);
+      }
+
+      // Referral activity filter
+      const referralCondition =
+        UserListRepository.convertReferralActivityFilter(
+          requestData.searchFilters?.referralActivity,
+        );
+      if (referralCondition) {
+        conditions.push(referralCondition);
       }
 
       // Search filter

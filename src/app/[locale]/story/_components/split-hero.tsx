@@ -344,8 +344,8 @@ export function SplitHero({
       <Div className="relative hidden md:grid md:grid-cols-2">
         {/* Center badge */}
         <Div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex z-30">
-          <Div className="w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center shrink-0">
-            <Span className="text-xs font-bold text-muted-foreground">
+          <Div className="min-w-10 h-10 px-2 rounded-full bg-background border border-border flex items-center justify-center shrink-0">
+            <Span className="text-xs font-bold text-muted-foreground whitespace-nowrap">
               {orLabel}
             </Span>
           </Div>
@@ -355,9 +355,9 @@ export function SplitHero({
         {/* Vertical line bottom half */}
         <Div className="absolute bottom-0 left-1/2 h-[calc(50%-20px)] w-px bg-white/20 -translate-x-1/2 z-20" />
         {/* Horizontal line left half */}
-        <Div className="absolute top-1/2 left-0 w-[calc(50%-20px)] h-px bg-white/20 -translate-y-1/2 z-20" />
+        <Div className="absolute top-1/2 left-0 w-[calc(50%-28px)] h-px bg-white/20 -translate-y-1/2 z-20" />
         {/* Horizontal line right half */}
-        <Div className="absolute top-1/2 right-0 w-[calc(50%-20px)] h-px bg-white/20 -translate-y-1/2 z-20" />
+        <Div className="absolute top-1/2 right-0 w-[calc(50%-28px)] h-px bg-white/20 -translate-y-1/2 z-20" />
 
         {/* unbottled.ai - top-left */}
         <Panel

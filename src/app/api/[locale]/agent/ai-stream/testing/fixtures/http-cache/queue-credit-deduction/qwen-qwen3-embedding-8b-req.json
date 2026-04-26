@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T11b gap-fill-pass2] In the previous turn you generated an image. Describe what was generated. End your reply with STEP_OK if you can describe it, or FAILED: <reason> if you have no information about the image.\n\nAssistant: I cannot directly analyze the image because the current model (Kimi K2) does not support vision/file analysis. However, based on the previous turn's context, I know that an image was successfully generated. Since I can access information about what was generated through the system context and memory, but cannot directly view the image file itself, I can confirm the image generation was successful.\n\nSTEP_OK\n\nUser: [T12 invalid-parent] Say exactly: INVALID_PARENT_TEST STEP_OK\n\nAssistant: INVALID_PARENT_TEST STEP_OK\n\nUser: [C1 credit-deduction] Reply with exactly one word: OK",
+    "encoding_format": "float"
+  }
+}

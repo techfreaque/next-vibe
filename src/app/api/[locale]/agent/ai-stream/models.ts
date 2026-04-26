@@ -2897,8 +2897,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 8, // released: 2026-04-21 from openrouter
         outputTokenCost: 15, // released: 2026-04-21 from openrouter
-      },
-    ],
+      },    ],
     utilities: [
       ModelUtility.IMAGE_GEN,
       ModelUtility.CREATIVE,

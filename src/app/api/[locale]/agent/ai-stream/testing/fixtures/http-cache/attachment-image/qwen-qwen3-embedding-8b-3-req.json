@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-the-tool-help----dbbc56ea-3e6d-46bb-aafb-52d6de07e00a.md\n\n# [T1 thread-create+tool-call] Use the tool-help...\nFolder: cron\n\ntool: \nassistant: WAKEUP_OK\nuser: [T7a approve-phase1] In a single response, call BOTH at the same time: (1) the tool-help tool to list available tools, and (2) the generate_image tool with prompt='approve-test'. The generate_image tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.\nassistant: \ntool: \ntool: \nassistant: STEP_OK\n\n**Verification:**\n- tool-help: Returned 397 tools across 16 pages ✓\n- generate_image (approve mode): Executed after confirmation, returned imageUrl ✓\nuser: [T8 parallel-tools] In a single response, call BOTH at the same time: (1) the tool-help tool to list available tools, and (2) the generate_image tool with prompt='green square'. IMPORTANT: You MUST use callbackMode='wait' for both tools - do NOT use wakeUp or detach. Check that tool-help returned a non-empty tools array and generate_image returned an imageUrl (not a taskId). End your reply with STEP_OK if both tools returned correct results, or FAILED: <reason> if either tool failed or only one \nassistant: \ntool: \nassistant: \ntool: \nassistant: STEP_OK\nuser: [T9 preCalls] An image was already generated for you before this message. Look at the generate_image tool result in your context and report the imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.\nassistant: \ntool: \nassistant: I can see the imageUrl in the tool result: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800\n\nSTEP_OK\nassistant: I can see the image URL from the previous result: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800\n\nThis appears to be a mountain landscape image from Unsplash. The task seems to have been completed successfully - an image was generated or retrieved and the URL was provided.\n\n**Task Status:** COMPLETED\n\n**Result:** Image URL generated - https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800\nuser: [T10a image-attach] Describe the attached image briefly. End your reply with STEP_OK if you could see and describe it, or FAILED: <reason> if you could not process the image.\nassistant: I can see the image of the Japanese flag (Hinomaru) as described - a red circle representing the sun on a white background with proper proportions and a black border outline. The flag appears clean and crisp with no defects or pixelation visible.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-execute-tool----e9cda5ce-7983-48e3-8876-ebcc38e911aa.md\n\n# [T1 thread-create+tool-call] Use execute-tool...\nFolder: cron\n\nuser: [T1 thread-create+tool-call] Use execute-tool with toolName='tool-help' and instanceId='hermes' to list available tools. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if everything worked, or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: Result contains a non-empty tools array with 25 tools on the first page. Each tool has both a name and description field. The tools array is properly structured with entries like:\n\n- agent_ai-stream_ws-provider_models_GET (description: \"Returns all available AI models...\")\n- agent_text-to-speech_POST (description: \"Convert text to natural-sounding speech...\")\n- ai-run (description: \"Delegate a task to a specialist AI agent...\")\n\nAll tools have the required name and description fields.\n\nSTEP_OK\nuser: [T1b tool-help-detail] Call execute-tool with toolName='tool-help', instanceId='hermes', input={'toolName':'generate_image'}. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\nassistant: \ntool: \nassistant: Result contains all three required elements:\n- name: \"generate_image\" \n- description: \"Generate an image from a text prompt using AI\"\n- parameters schema: Full JSON schema with properties for aspectRatio, model, prompt, quality, and size fields\n\nSTEP_OK\nuser: [T2 image-gen] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'red circle'}. Check that the result contains a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\nassistant: \ntool: \nassistant: STEP_OK",
+    "encoding_format": "float"
+  }
+}

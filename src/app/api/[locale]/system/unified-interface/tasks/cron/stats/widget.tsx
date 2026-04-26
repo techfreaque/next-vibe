@@ -24,12 +24,14 @@ import React, { useCallback, useMemo } from "react";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
+import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import type statsEndpoints from "./definition";
 import type { CronStatsGetResponseOutput } from "./definition";
 
@@ -60,7 +62,12 @@ function formatDate(s: string | null | undefined): string {
   return s ? s.slice(0, 10) : "—";
 }
 
-import { CronTaskPriority, CronTaskStatus } from "../../enum";
+import {
+  CronTaskPriority,
+  CronTaskStatus,
+  type CronTaskPriorityValue,
+  type CronTaskStatusValue,
+} from "../../enum";
 
 // ─── Priority color map ────────────────────────────────────────────────────────
 // Keyed on enum values (i18n key strings), not plain short strings
@@ -220,11 +227,11 @@ function MiniBar({
 
 function StatusBadge({
   status,
-  t,
 }: {
-  status: string;
-  t: ReturnType<typeof useWidgetTranslation<typeof statsEndpoints.GET>>;
+  status: typeof CronTaskStatusValue;
 }): React.JSX.Element {
+  const locale = useWidgetLocale();
+  const { t } = tasksScopedTranslation.scopedT(locale);
   const cls =
     status === CronTaskStatus.COMPLETED
       ? "bg-success/10 text-success"
@@ -246,7 +253,7 @@ function StatusBadge({
         cls,
       )}
     >
-      {t(status as Parameters<typeof t>[0])}
+      {t(status)}
     </Span>
   );
 }
@@ -255,11 +262,11 @@ function StatusBadge({
 
 function PriorityBadge({
   priority,
-  t,
 }: {
-  priority: string;
-  t: ReturnType<typeof useWidgetTranslation<typeof statsEndpoints.GET>>;
+  priority: typeof CronTaskPriorityValue;
 }): React.JSX.Element {
+  const locale = useWidgetLocale();
+  const { t } = tasksScopedTranslation.scopedT(locale);
   const cls =
     priority === CronTaskPriority.CRITICAL
       ? "bg-destructive/10 text-destructive"
@@ -278,7 +285,7 @@ function PriorityBadge({
         cls,
       )}
     >
-      {t(priority as Parameters<typeof t>[0])}
+      {t(priority)}
     </Span>
   );
 }
@@ -493,10 +500,8 @@ function ProblemTasksTable({
 
 function RecentActivityFeed({
   items,
-  t,
 }: {
   items: NonNullable<StatsData["recentActivity"]>;
-  t: ReturnType<typeof useWidgetTranslation<typeof statsEndpoints.GET>>;
 }): React.JSX.Element {
   return (
     <Div className="flex flex-col divide-y">
@@ -509,7 +514,7 @@ function RecentActivityFeed({
                 {item.taskName}
               </Span>
               <Span className="text-xs text-muted-foreground">{item.type}</Span>
-              <StatusBadge status={item.status} t={t} />
+              <StatusBadge status={item.status as typeof CronTaskStatusValue} />
             </Div>
             <Div className="flex items-center gap-3">
               <Span className="text-xs text-muted-foreground">
@@ -889,7 +894,9 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
           title={t("widget.tasksByStatus")}
           entries={tasksByStatusEntries}
           total={tasksByStatusTotal}
-          getBadge={(key) => <StatusBadge status={key} t={t} />}
+          getBadge={(key) => (
+            <StatusBadge status={key as typeof CronTaskStatusValue} />
+          )}
           getColor={getStatusColor}
         />
       )}
@@ -900,7 +907,9 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
           title={t("widget.tasksByPriority")}
           entries={tasksByPriorityEntries}
           total={tasksByPriorityTotal}
-          getBadge={(key) => <PriorityBadge priority={key} t={t} />}
+          getBadge={(key) => (
+            <PriorityBadge priority={key as typeof CronTaskPriorityValue} />
+          )}
           getColor={getPriorityColor}
         />
       )}
@@ -937,7 +946,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
           <Span className="text-sm font-semibold mb-3 block">
             {t("widget.recentActivity")}
           </Span>
-          <RecentActivityFeed items={recentActivity} t={t} />
+          <RecentActivityFeed items={recentActivity} />
         </Div>
       )}
 

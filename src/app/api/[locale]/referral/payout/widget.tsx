@@ -47,14 +47,14 @@ function fmtPct(v: number): string {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-warning/10 text-warning",
-  APPROVED: "bg-info/10 text-info",
-  REJECTED: "bg-destructive/10 text-destructive",
-  PROCESSING:
+  "enums.payoutStatus.pending": "bg-warning/10 text-warning",
+  "enums.payoutStatus.approved": "bg-info/10 text-info",
+  "enums.payoutStatus.rejected": "bg-destructive/10 text-destructive",
+  "enums.payoutStatus.processing":
     "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
-  COMPLETED:
+  "enums.payoutStatus.completed":
     "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-  FAILED: "bg-destructive/10 text-destructive",
+  "enums.payoutStatus.failed": "bg-destructive/10 text-destructive",
 };
 
 export function ReferralPayoutContainer(): React.JSX.Element {
@@ -267,7 +267,7 @@ export function ReferralPayoutContainer(): React.JSX.Element {
                         {`$${(item.amountCents / 100).toFixed(2)}`}
                       </Span>
                       <Span className="text-xs text-muted-foreground">
-                        {item.currency}
+                        {t(item.currency)}
                       </Span>
                       {item.walletAddress ? (
                         <Span className="text-xs text-muted-foreground truncate max-w-[120px]">
@@ -291,7 +291,7 @@ export function ReferralPayoutContainer(): React.JSX.Element {
                       "bg-muted text-muted-foreground"
                     }
                   >
-                    {item.status}
+                    {t(item.status)}
                   </Badge>
                 </Div>
               ))}

@@ -172,7 +172,7 @@ function StatusBadge({
   status,
   tTasks,
 }: {
-  status: string | null;
+  status: typeof CronTaskStatusValue | null;
   tTasks: ReturnType<typeof tasksScopedTranslation.scopedT>["t"];
 }): React.JSX.Element {
   return (
@@ -182,7 +182,7 @@ function StatusBadge({
         getStatusColorClass(status),
       )}
     >
-      {status ? tTasks(status as Parameters<typeof tTasks>[0]) : "—"}
+      {status ? tTasks(status) : "—"}
     </Span>
   );
 }

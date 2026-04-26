@@ -4,6 +4,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import skillDefs from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
+import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -55,6 +56,8 @@ export interface SkillLandingPageProps {
   appName: string;
   resolvedModels: ResolvedSkillModels;
   leadMagnetConfig: LeadMagnetConfigData | null;
+  /** Full skill GET response pre-fetched server-side — seeds React Query cache */
+  skillData: SkillGetResponseOutput | null;
 }
 
 // ─── page (minimal shell — widget handles nav, hero, CTA, footer) ───────────
@@ -63,6 +66,7 @@ export function SkillLandingPage({
   locale,
   skillId,
   user,
+  skillData,
 }: SkillLandingPageProps): JSX.Element {
   return (
     <Div
@@ -78,6 +82,7 @@ export function SkillLandingPage({
           read: {
             urlPathParams: { id: skillId },
             queryOptions: { staleTime: 60_000 },
+            ...(skillData ? { initialData: skillData } : {}),
           },
           update: { urlPathParams: { id: skillId } },
           delete: { urlPathParams: { id: skillId } },

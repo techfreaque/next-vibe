@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: STEP_OK\n\nUser: [T3b fork-branch] Say exactly: BRANCH_RESPONSE STEP_OK\n\nAssistant: BRANCH_RESPONSE STEP_OK\n\nUser: [T4b video-gen] Call execute-tool with toolName='generate_video', instanceId='hermes', input={'prompt':'spinning cube'}. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nUser:",
+    "encoding_format": "float"
+  }
+}

@@ -76,7 +76,7 @@ export function AdminPayoutsContainer(): React.JSX.Element {
                   STATUS_COLORS[item.status] ?? "bg-muted text-muted-foreground"
                 }
               >
-                {t(item.status as Parameters<typeof t>[0])}
+                {t(item.status)}
               </Badge>
             </Div>
             <Div className="text-sm text-muted-foreground">
@@ -85,7 +85,7 @@ export function AdminPayoutsContainer(): React.JSX.Element {
               </Span>{" "}
               {t("admin.payouts.widget.credits")}
               {"  "}
-              {t(item.currency as Parameters<typeof t>[0])}
+              {t(item.currency)}
             </Div>
             {item.walletAddress ? (
               <Div className="text-xs text-muted-foreground truncate max-w-xs">

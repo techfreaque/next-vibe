@@ -32,6 +32,27 @@ export const translations: typeof enTranslations = {
       description: "Benutzer nach Rolle filtern",
       placeholder: "Rolle auswählen...",
     },
+    subscription: {
+      label: "Abonnement",
+      description: "Nach Abonnementstatus filtern",
+      placeholder: "Beliebiger Abonnementstatus",
+    },
+    creditActivity: {
+      label: "Kreditaktivität",
+      description: "Nach Kauf oder Verbrauch von Guthaben filtern",
+      placeholder: "Beliebige Kreditaktivität",
+    },
+    threads: {
+      label: "Unterhaltungen",
+      description: "Filtern, ob der Benutzer Chat-Unterhaltungen hat",
+      placeholder: "Beliebiger Status",
+    },
+    referralActivity: {
+      label: "Empfehlungsaktivität",
+      description:
+        "Nach Empfehlungslink, Klicks, Anmeldungen oder zahlenden Abonnenten filtern",
+      placeholder: "Beliebige Empfehlungsaktivität",
+    },
     // Sorting section
     sortingOptions: {
       title: "Sortierung",
@@ -337,6 +358,30 @@ export const translations: typeof enTranslations = {
       partnerEmployee: "Partner Mitarbeiter",
       admin: "Administrator",
       superAdmin: "Super Administrator",
+    },
+    subscriptionPresenceFilter: {
+      any: "Beliebig",
+      hasActive: "Hat aktives Abonnement",
+      hadAny: "Hatte jemals ein Abonnement",
+      never: "Nie abonniert",
+    },
+    creditActivityFilter: {
+      any: "Beliebig",
+      boughtPack: "Guthaben-Paket gekauft",
+      spentCredits: "Guthaben verbraucht",
+      neverSpent: "Nie Guthaben verbraucht",
+    },
+    threadsFilter: {
+      any: "Beliebig",
+      hasThreads: "Hat Unterhaltungen",
+      noThreads: "Keine Unterhaltungen",
+    },
+    referralActivityFilter: {
+      any: "Beliebig",
+      hasCode: "Hat Empfehlungslink",
+      hasClicks: "Hat Empfehlungsklicks",
+      hasSignups: "Hat Empfehlungsanmeldungen",
+      hasSubscribers: "Hat zahlende Geworbene",
     },
   },
 };

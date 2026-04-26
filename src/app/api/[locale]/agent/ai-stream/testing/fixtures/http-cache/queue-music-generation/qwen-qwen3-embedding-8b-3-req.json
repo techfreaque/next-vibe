@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: STEP_OK\n\nUser: [T3a retry-branch] Say exactly: RETRY_RESPONSE STEP_OK\n\nAssistant: RETRY_RESPONSE STEP_OK\n\nUser: [T4a music-gen] Call execute-tool with toolName='generate_music', instanceId='hermes', prompt='upbeat piano melody'. Check that the result has a non-empty audioUrl, a positive creditCost, and durationSeconds between 8 and 120. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nUser:",
+    "encoding_format": "float"
+  }
+}
