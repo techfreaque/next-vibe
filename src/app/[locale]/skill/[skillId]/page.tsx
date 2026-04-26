@@ -65,9 +65,7 @@ export interface SkillLandingPageData {
   appName: string;
   resolvedModels: ResolvedSkillModels;
   leadMagnetConfig: LeadMagnetConfigData | null;
-  skillData:
-    | import("@/app/api/[locale]/agent/chat/skills/[id]/definition").SkillGetResponseOutput
-    | null;
+  skillData: SkillGetResponseOutput | null;
 }
 
 // Reference token counts for "~X credits/msg" estimate (short message)

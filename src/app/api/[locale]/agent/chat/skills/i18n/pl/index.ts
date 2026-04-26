@@ -1237,7 +1237,8 @@ export const translations: typeof enTranslations = {
       },
       targetUserId: {
         label: "ID użytkownika docelowego",
-        description: "Tylko administratorzy: wyświetl umiejętności konkretnego użytkownika.",
+        description:
+          "Tylko administratorzy: wyświetl umiejętności konkretnego użytkownika.",
       },
     },
     container: {

@@ -301,7 +301,9 @@ export class RouteExecuteRepository {
             const { videoGenModelSelectionSchema, filterVideoGenModels } =
               await import("@/app/api/[locale]/agent/video-generation/models");
             const { ModelSelectionType } =
-              await import("@/app/api/[locale]/agent/models/models");
+              await import(
+                "@/app/api/[locale]/agent/chat/skills/enum"
+              );
             const sel =
               execSkill?.videoGenModelSelection ??
               execFav?.videoGenModelSelection;
@@ -317,7 +319,11 @@ export class RouteExecuteRepository {
                 resolvedModel = parsed.data.manualModelId;
               } else {
                 // FILTERS selection: run normal filtering (may return empty if no providers)
-                resolvedModel = filterVideoGenModels(sel, user, streamContext.providerOverride)[0]?.id;
+                resolvedModel = filterVideoGenModels(
+                  sel,
+                  user,
+                  streamContext.providerOverride,
+                )[0]?.id;
               }
             }
           }

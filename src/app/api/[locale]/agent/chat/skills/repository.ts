@@ -256,8 +256,7 @@ export class SkillsRepository {
     try {
       const isAdmin =
         !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-      const userId =
-        data.targetUserId && isAdmin ? data.targetUserId : user.id;
+      const userId = data.targetUserId && isAdmin ? data.targetUserId : user.id;
       const query = data?.query?.trim().toLowerCase();
       const rawCharId = data?.skillId?.trim();
       // Support merged "skillSlug__variantId" format in the filter param
