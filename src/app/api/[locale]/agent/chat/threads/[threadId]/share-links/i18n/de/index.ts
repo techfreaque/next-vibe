@@ -369,10 +369,24 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     shareDialog: {
-      title: "Thread teilen",
+      title: "Teilen",
+      copyLink: "Link kopieren",
+    },
+    visibility: {
+      publicTitle: "Jeder mit dem Link kann lesen",
+      publicDescription: "Thread ist im Ordner 'Geteilt' — Link ist aktiv.",
+      privateTitle: "Privat",
+      privateDescription: "Nur du hast Zugriff auf diesen Thread.",
+      makePublic: "Öffentlich machen",
+      makePrivate: "Privat machen",
+      toggling: "Speichern...",
+    },
+    emailShare: {
+      placeholder: "Per E-Mail einladen",
+      send: "Senden",
     },
     common: {
-      close: "Schließen",
+      close: "Fertig",
     },
   },
 };

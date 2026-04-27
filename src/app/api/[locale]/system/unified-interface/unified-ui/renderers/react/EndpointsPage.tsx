@@ -673,7 +673,15 @@ function EndpointsPageInternal<
                 endpoint={activeEndpoint}
                 locale={locale}
                 isSubmitting={false}
-                data={responseData}
+                data={
+                  responseData ??
+                  (finalEndpointOptions.create?.autoPrefillData as
+                    | WidgetData
+                    | undefined) ??
+                  (finalEndpointOptions.update?.autoPrefillData as
+                    | WidgetData
+                    | undefined)
+                }
                 className={className}
                 response={response}
                 endpointMutations={endpointMutations}

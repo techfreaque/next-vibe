@@ -357,10 +357,24 @@ export const translations = {
   },
   widget: {
     shareDialog: {
-      title: "Share Thread",
+      title: "Share",
+      copyLink: "Copy link",
+    },
+    visibility: {
+      publicTitle: "Anyone with the link can view",
+      publicDescription: "Thread is in the Shared folder — link is live.",
+      privateTitle: "Private",
+      privateDescription: "Only you can access this thread.",
+      makePublic: "Make public",
+      makePrivate: "Make private",
+      toggling: "Saving...",
+    },
+    emailShare: {
+      placeholder: "Invite by email",
+      send: "Send",
     },
     common: {
-      close: "Close",
+      close: "Done",
     },
   },
 };

@@ -268,6 +268,14 @@ export class AiStreamRepository {
             metadata: { isQueued: true },
             createdAt: new Date(),
             updatedAt: new Date(),
+            authorId: userId ?? null,
+            authorName: null,
+            errorType: null,
+            errorCode: null,
+            errorMessage: null,
+            upvotes: 0,
+            downvotes: 0,
+            searchVector: null,
           },
         ],
       });
@@ -324,6 +332,9 @@ export class AiStreamRepository {
           const errorType = setupResult.errorType
             ? `${setupResult.errorType.errorCode}`
             : "SETUP_ERROR";
+          // Chain error as child of user message (if present), else child of last AI message.
+          const setupErrorParentId =
+            data.userMessageId || data.parentMessageId || null;
           // Persist error message to DB only for non-incognito threads (incognito has no DB row)
           if (!isIncognito) {
             await MessagesRepository.createErrorMessage({
@@ -331,7 +342,7 @@ export class AiStreamRepository {
               threadId,
               content: errorContent,
               errorType,
-              parentId: data.parentMessageId || null,
+              parentId: setupErrorParentId,
               user,
               sequenceId: null,
               logger,
@@ -352,14 +363,22 @@ export class AiStreamRepository {
                 threadId,
                 role: ChatMessageRole.ERROR,
                 content: errorContent,
-                parentId: data.parentMessageId || null,
+                parentId: setupErrorParentId,
                 sequenceId: null,
                 model: null,
                 skill: null,
                 metadata: {},
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                isAI: true,
+                isAI: false,
+                authorId: "id" in user ? (user.id ?? null) : null,
+                authorName: null,
+                errorType: errorType ?? null,
+                errorCode: null,
+                errorMessage: null,
+                upvotes: 0,
+                downvotes: 0,
+                searchVector: null,
               },
             ],
           });
@@ -1324,10 +1343,18 @@ export class AiStreamRepository {
                 sequenceId: null,
                 model: null,
                 skill: null,
-                metadata: null,
-                isAI: true,
+                metadata: {},
+                isAI: false,
                 createdAt: new Date(),
                 updatedAt: new Date(),
+                authorId: userId ?? null,
+                authorName: null,
+                errorType: "STREAM_ERROR",
+                errorCode: null,
+                errorMessage: null,
+                upvotes: 0,
+                downvotes: 0,
+                searchVector: null,
               },
             ],
             streamingState: "idle",

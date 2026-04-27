@@ -119,14 +119,40 @@
       {
         "content": [
           {
-            "text": "[Context: ID:dcfee64a | Posted:Apr 26, 22:43]",
+            "text": "[Context: ID:303d5c3b | Posted:Apr 26, 22:43]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "[T3b fork-branch] Say exactly: BRANCH_RESPONSE STEP_OK",
+        "content": "[T3a retry-branch] Say exactly: RETRY_RESPONSE STEP_OK",
+        "role": "user"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:76bf9aba | Model:kimi-k2.6 | Skill:quality-tester | Posted:Apr 26, 22:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "RETRY_RESPONSE STEP_OK",
+        "role": "assistant"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:0a0fb084 | Posted:Apr 26, 22:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "[T4a music-gen] Call execute-tool with toolName='generate_music', instanceId='hermes', input={'prompt':'upbeat piano melody'}. Check that the result has a non-empty audioUrl, a positive creditCost, and durationSeconds between 8 and 120. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.",
         "role": "user"
       },
       {
@@ -145,7 +171,7 @@
         },
         "content": [
           {
-            "text": "[Context: ID:d295676e | Model:kimi-k2.6 | Skill:quality-tester | Posted:Apr 26, 22:43]",
+            "text": "[Context: ID:c5705ba5 | Model:kimi-k2.6 | Skill:quality-tester | Posted:Apr 26, 22:43]",
             "type": "text"
           }
         ],

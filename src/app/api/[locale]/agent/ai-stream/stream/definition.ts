@@ -346,6 +346,14 @@ const { POST } = createEndpoint({
                     : JSON.stringify(v),
                 )
                 .optional(),
+              // DB-populated fields absent in incognito client-side messages
+              authorId: z.string().nullish(),
+              authorName: z.string().nullish(),
+              errorType: z.string().nullish(),
+              errorCode: z.string().nullish(),
+              upvotes: z.number().nullish(),
+              downvotes: z.number().nullish(),
+              searchVector: z.string().nullish(),
             }),
           )
           .optional()

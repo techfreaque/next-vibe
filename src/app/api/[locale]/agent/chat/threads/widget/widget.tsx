@@ -472,9 +472,8 @@ function ThreadRow({
                   </DropdownMenuItem>
                 )}
 
-                {/* Manage Sharing - only for threads in SHARED folder */}
-                {/* eslint-disable-next-line i18next/no-literal-string */}
-                {thread.rootFolderId === "shared" && thread.canEdit && (
+                {/* Manage Sharing - available for all threads (dialog handles move to Shared) */}
+                {thread.canEdit && (
                   <DropdownMenuItem
                     onSelect={handleManageSharing}
                     className="cursor-pointer"
@@ -602,7 +601,9 @@ function ThreadRow({
         onOpenChange={setShareDialogOpen}
         threadId={thread.id}
         threadTitle={thread.title}
+        currentRootFolderId={thread.rootFolderId}
         locale={locale}
+        logger={logger}
       />
     </Div>
   );

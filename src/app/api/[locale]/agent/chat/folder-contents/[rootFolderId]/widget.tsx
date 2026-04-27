@@ -920,20 +920,6 @@ function ThreadRowShared({
 
           {!isEditing && (isHovered || isTouched || isActive || isTouch) && (
             <Div className="flex items-center gap-1 shrink-0">
-              {/* Always-visible share button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-5 w-6 text-teal-500 hover:text-teal-400 hover:bg-teal-500/10"
-                title={tFolders("widget.sharedThread.shareAction")}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShareDialogOpen(true);
-                }}
-              >
-                <Share2 className="h-3.5 w-3.5" />
-              </Button>
-
               {hasMenuItems && (
                 <DropdownMenu
                   open={dropdownOpen}
@@ -1011,6 +997,18 @@ function ThreadRowShared({
                           : t("widget.actions.archive")}
                       </DropdownMenuItem>
                     )}
+                    {item.canEdit && (
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setDropdownOpen(false);
+                          setShareDialogOpen(true);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <Share2 className="h-4 w-4 mr-2" />
+                        {tFolders("widget.sharedThread.shareAction")}
+                      </DropdownMenuItem>
+                    )}
                     {item.canDelete && (
                       <>
                         <DropdownMenuSeparator />
@@ -1056,8 +1054,10 @@ function ThreadRowShared({
           onOpenChange={setShareDialogOpen}
           threadId={item.id}
           threadTitle={item.title ?? ""}
+          currentRootFolderId={item.rootFolderId}
           locale={locale}
           user={user}
+          logger={logger}
         />
       )}
 
